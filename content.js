@@ -20,4 +20,32 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-document.body.style.background = 'lightyellow';
+function insertBreakAtPoint(e) {
+    var range;
+    var textNode;
+    var offset;
+
+    if (document.caretPositionFromPoint) {
+        range = document.caretPositionFromPoint(e.clientX, e.clientY);
+        textNode = range.offsetNode;
+        offset = range.offset;
+    } else if (document.caretRangeFromPoint) {
+        range = document.caretRangeFromPoint(e.clientX, e.clientY);
+        textNode = range.startContainer;
+        offset = range.startOffset;
+    }
+
+    // only split TEXT_NODEs
+    if (textNode.nodeType == 3) {
+        var replacement = textNode.splitText(offset);
+        var br = document.createElement('br');
+        textNode.parentNode.insertBefore(br, replacement);
+    }
+}
+
+function onMouseDown(e) {
+    insertBreakAtPoint(e);
+}
+
+
+window.addEventListener('mousedown', onMouseDown, false);
