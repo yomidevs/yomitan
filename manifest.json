@@ -1,0 +1,16 @@
+{
+    "manifest_version": 2,
+    "name":             "Yomichan",
+    "description":      "Yomichan Extension",
+    "version":          "0.0.1",
+
+    "browser_action": {
+        "default_icon": "icon.png"
+    },
+
+    "content_scripts": [{
+        "matches": [ "http://*/*", "https://*/*" ],
+        "js":      [ "content.js" ],
+        "run_at":  "document_end"
+    }]
+}
