@@ -20,32 +20,27 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-function insertBreakAtPoint(e) {
-    var range;
-    var textNode;
-    var offset;
+function getText(e, length) {
+    let range = document.caretRangeFromPoint(e.clientX, e.clientY);
 
-    if (document.caretPositionFromPoint) {
-        range = document.caretPositionFromPoint(e.clientX, e.clientY);
-        textNode = range.offsetNode;
-        offset = range.offset;
-    } else if (document.caretRangeFromPoint) {
-        range = document.caretRangeFromPoint(e.clientX, e.clientY);
-        textNode = range.startContainer;
-        offset = range.startOffset;
+    let node = range.startContainer;
+    if (node.nodeType !== 3 /* TEXT_NODE */) {
+        return '';
     }
 
-    // only split TEXT_NODEs
-    if (textNode.nodeType == 3) {
-        var replacement = textNode.splitText(offset);
-        var br = document.createElement('br');
-        textNode.parentNode.insertBefore(br, replacement);
+    let scan = Math.min(- range.startOffset, length);
+    console.log(scan);
+    range.setEnd(node, range.startOffset + scan);
+
+    return range.toString();
+}
+
+function onMouseMove(e) {
+    const text = getText(e);
+    if (text !== '') {
+        console.log(text);
     }
 }
 
-function onMouseDown(e) {
-    insertBreakAtPoint(e);
-}
 
-
-window.addEventListener('mousedown', onMouseDown, false);
+window.addEventListener('mousemove', onMouseMove, false);
