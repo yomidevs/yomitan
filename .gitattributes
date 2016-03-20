@@ -1,2 +1,2 @@
 util/data/* filter=lfs diff=lfs merge=lfs -text
-extension/jp/data/rules.json filter=lfs diff=lfs merge=lfs -text
+ext/jp/data/rules.json filter=lfs diff=lfs merge=lfs -text
