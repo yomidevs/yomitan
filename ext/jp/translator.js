@@ -17,21 +17,32 @@
  */
 
 class Translator {
-    constructor(paths) {
-        this.paths = paths
-        this.rules = {}
+    constructor() {
+        this.rules       = {};
+        this.edict       = {};
+        this.enamdict    = {};
+        this.kanjidic    = {};
         this.initialized = false;
     }
 
-    initialize(callback) {
+    initialize(paths, callback) {
         if (this.initialized) {
             return;
         }
 
-        $.when(
-            $.getJSON(chrome.extension.getURL(this.paths['rules']))
-        ).done(rules => {
-            this.rules = rules;
+        const loaders = [];
+        for (const key of ['rules', 'edict', 'enamdict', 'kanjidic']) {
+            loaders.push(
+                $.getJSON(chrome.extension.getURL(paths[key]))
+            );
+        }
+
+        $.when.apply($, loaders).done((rules, edict, enamdict, kanjidic) => {
+            this.rules    = rules;
+            this.edict    = edict;
+            this.enamdict = enamdict;
+            this.kanjidic = kanjidic;
+
             this.initialized = true;
 
             if (callback) {
@@ -41,8 +52,13 @@ class Translator {
     }
 }
 
-let trans = new Translator({
-    rules: 'jp/data/rules.json'
-});
+const trans = new Translator();
 
-trans.initialize();
+trans.initialize({
+    rules:    'jp/data/rules.json',
+    edict:    'jp/data/edict.json',
+    enamdict: 'jp/data/enamdict.json',
+    kanjidic: 'jp/data/kanjidic.json',
+}, function() {
+    alert('Loaded');
+});
