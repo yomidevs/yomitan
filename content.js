@@ -35,6 +35,7 @@ function getRangeAtCursor(e, lookAhead) {
     return range;
 }
 
+
 function onMouseDown(e) {
     const range = getRangeAtCursor(e, 20);
     if (range === null) {
@@ -51,4 +52,4 @@ function onMouseDown(e) {
 }
 
 
-window.addEventListener('mousedown', onMouseDown, false);
+window.addEventListener('mousemove', onMouseMove, false);
