@@ -137,7 +137,7 @@ def parse_krad_file(path):
 
 
 def parse_edict(path):
-    results = []
+    results = {}
 
     for line in load_definitions(path):
         segments = line.split('/')
@@ -154,11 +154,11 @@ def parse_edict(path):
         tags = []
         for group in re.findall('\(([^\)\]]+)\)', glossary):
             tags.extend(group.split(','))
+        tags = list(set(tags).intersection(PARSED_TAGS))
 
-        tags = set(tags).intersection(PARSED_TAGS)
-        tags = ' '.join(sorted(tags))
-
-        results.append((term, reading, glossary, tags))
+        defs = results.get(term, [])
+        defs.append((reading, glossary, tags))
+        results[term] = defs
 
     return results
 
