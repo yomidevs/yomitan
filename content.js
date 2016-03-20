@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 function getRangeAtCursor(e, lookAhead) {
     const range = document.caretRangeFromPoint(e.clientX, e.clientY);
     if (range === null) {
@@ -52,4 +51,4 @@ function onMouseDown(e) {
 }
 
 
-window.addEventListener('mousemove', onMouseMove, false);
+window.addEventListener('mousedown', onMouseDown, false);
