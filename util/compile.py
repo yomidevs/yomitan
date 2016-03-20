@@ -111,7 +111,7 @@ def load_definitions(path):
 
 
 def parse_kanji_dic(path):
-    results = []
+    results = {}
 
     for line in load_definitions(path):
         segments = line.split()
@@ -119,26 +119,25 @@ def parse_kanji_dic(path):
         kunyomi = ', '.join(filter(lambda x: filter(is_hiragana, x), segments[1:]))
         onyomi = ', '.join(filter(lambda x: filter(is_katakana, x), segments[1:]))
         glossary = '; '.join(re.findall('\{([^\}]+)\}', line))
-        results.append((character, kunyomi, onyomi, glossary))
+        results[character] = (kunyomi, onyomi, glossary)
 
     return results
 
 
 def parse_krad_file(path):
-    results = []
+    results = {}
 
     for line in load_definitions(path):
         segments = line.split(' ')
         character = segments[0]
         radicals = ' '.join(segments[2:])
-        results.append((character, radicals))
+        results[character] = radicals;
 
     return results
 
 
 def parse_edict(path):
-    results = {}
-
+    defs = []
     for line in load_definitions(path):
         segments = line.split('/')
 
@@ -147,26 +146,46 @@ def parse_edict(path):
         match = re.search('\[([^\]]+)\]', expression[1])
         reading = None if match is None else match.group(1)
 
-        glossary = filter(lambda x: len(x) > 0, segments[1:])
-        glossary = '; '.join(glossary)
-        glossary = re.sub('\(\d+\)\s*', str(), glossary)
+        glossary = '; '.join(filter(lambda x: len(x) > 0, segments[1:]))
+        glossary = re.sub('\(\d+\)\s*', '', glossary)
 
         tags = []
         for group in re.findall('\(([^\)\]]+)\)', glossary):
             tags.extend(group.split(','))
-        tags = list(set(tags).intersection(PARSED_TAGS))
 
-        defs = results.get(term, [])
-        defs.append((reading, glossary, tags))
-        results[term] = defs
+        tags = set(tags).intersection(PARSED_TAGS)
+        tags = ' '.join(tags)
 
-    return results
+        defs.append((term, reading, glossary, tags))
+
+    term_indices = {}
+    reading_indices = {}
+
+    for i, d in enumerate(defs):
+        term, reading = d[:2]
+
+        if term is not None:
+            term_list = term_indices.get(term, [])
+            term_list.append(i)
+            term_indices[term] = term_list
+
+        if reading is not None:
+            reading_list = reading_indices.get(reading, [])
+            reading_list.append(i)
+            reading_indices[reading] = reading_list
+
+    return {
+        'defs': defs,
+        't_idx': term_indices,
+        'r_idx': reading_indices
+    };
 
 
 def build_dict(output_dir, input_file, parser):
     if input_file is not None:
         base = os.path.splitext(os.path.basename(input_file))[0]
         with open(os.path.join(output_dir, base) + '.json', 'w') as fp:
+            # json.dump(parser(input_file), fp, sort_keys=True, indent=4, separators=(',', ': '))
             json.dump(parser(input_file), fp)
 
 
