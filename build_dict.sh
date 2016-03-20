@@ -3,7 +3,7 @@
 KANJIDIC=util/data/kanjidic
 EDICT=util/data/edict
 ENAMDICT=util/data/enamdict
-DICT=ext/jp/data/dict.json
+KRADFILE=util/data/kradfile
+DICT_DIR=ext/jp/data
 
-[ -f $DICT ] && rm $DICT
-util/compile.py --kanjidic $KANJIDIC --edict $EDICT $DICT --enamdict $ENAMDICT
+util/compile.py --kanjidic $KANJIDIC --kradfile $KRADFILE --edict $EDICT --enamdict $ENAMDICT $DICT_DIR

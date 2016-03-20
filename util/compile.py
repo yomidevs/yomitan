@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
-# Copyright (C) 2013  Alex Yatskov
+# Copyright (C) 2016  Alex Yatskov <alex@foosoft.net>
+# Author: Alex Yatskov <alex@foosoft.net>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,11 +18,10 @@
 
 
 import codecs
+import json
 import optparse
-import os
+import os.path
 import re
-import sqlite3
-import sys
 
 
 PARSED_TAGS = {
@@ -97,44 +96,38 @@ PARSED_TAGS = {
 }
 
 
-def isHiragana(c):
+def is_hiragana(c):
     return 0x3040 <= ord(c) < 0x30a0
 
 
-def isKatakana(c):
+def is_katakana(c):
     return 0x30a0 <= ord(c) < 0x3100
 
 
-def loadDefinitions(path):
-    print 'Parsing "{0}"...'.format(path)
+def load_definitions(path):
+    print('Parsing "{0}"...'.format(path))
     with codecs.open(path, encoding='euc-jp') as fp:
         return filter(lambda x: x and x[0] != '#', fp.read().splitlines())
 
 
-def parseKanjiDic(path):
-    results = list()
+def parse_kanji_dic(path):
+    results = []
 
-    for line in loadDefinitions(path):
+    for line in load_definitions(path):
         segments = line.split()
         character = segments[0]
-        kunyomi = ', '.join(filter(lambda x: filter(isHiragana, x), segments[1:]))
-        onyomi = ', '.join(filter(lambda x: filter(isKatakana, x), segments[1:]))
+        kunyomi = ', '.join(filter(lambda x: filter(is_hiragana, x), segments[1:]))
+        onyomi = ', '.join(filter(lambda x: filter(is_katakana, x), segments[1:]))
         glossary = '; '.join(re.findall('\{([^\}]+)\}', line))
         results.append((character, kunyomi, onyomi, glossary))
 
     return results
 
 
-def writeKanjiDic(cursor, values):
-    cursor.execute('DROP TABLE IF EXISTS Kanji')
-    cursor.execute('CREATE TABLE Kanji(character TEXT, kunyomi TEXT, onyomi TEXT, glossary TEXT)')
-    cursor.executemany('INSERT INTO Kanji VALUES(?, ?, ?, ?)', values)
+def parse_krad_file(path):
+    results = []
 
-
-def parseKradFile(path):
-    results = list()
-
-    for line in loadDefinitions(path):
+    for line in load_definitions(path):
         segments = line.split(' ')
         character = segments[0]
         radicals = ' '.join(segments[2:])
@@ -143,16 +136,10 @@ def parseKradFile(path):
     return results
 
 
-def writeKradFile(cursor, values):
-    cursor.execute('DROP TABLE IF EXISTS Radicals')
-    cursor.execute('CREATE TABLE Radicals(character TEXT, radicals TEXT)')
-    cursor.executemany('INSERT INTO Radicals VALUES(?, ?)', values)
+def parse_edict(path):
+    results = []
 
-
-def parseEdict(path):
-    results = list()
-
-    for line in loadDefinitions(path):
+    for line in load_definitions(path):
         segments = line.split('/')
 
         expression = segments[0].split(' ')
@@ -164,7 +151,7 @@ def parseEdict(path):
         glossary = '; '.join(glossary)
         glossary = re.sub('\(\d+\)\s*', str(), glossary)
 
-        tags = list()
+        tags = []
         for group in re.findall('\(([^\)\]]+)\)', glossary):
             tags.extend(group.split(','))
 
@@ -176,27 +163,18 @@ def parseEdict(path):
     return results
 
 
-def writeEdict(cursor, values):
-    cursor.execute('DROP TABLE IF EXISTS Terms')
-    cursor.execute('CREATE TABLE Terms(expression TEXT, reading TEXT, glossary TEXT, tags TEXT)')
-    cursor.executemany('INSERT INTO Terms VALUES(?, ?, ?, ?)', values)
+def build_dict(output_dir, input_file, parser):
+    if input_file is not None:
+        base = os.path.splitext(os.path.basename(input_file))[0]
+        with open(os.path.join(output_dir, base) + '.json', 'w') as fp:
+            json.dump(parser(input_file), fp)
 
 
-def build(path, kanjidic, kradfile, edict, enamdict):
-    with sqlite3.connect(path) as db:
-        if kanjidic is not None:
-            writeKanjiDic(db, parseKanjiDic(kanjidic))
-
-        if kradfile is not None:
-            writeKradFile(db, parseKradFile(kradfile))
-
-        terms = []
-        if edict is not None:
-            terms += parseEdict(edict)
-        if enamdict is not None:
-            terms += parseEdict(enamdict)
-        if len(terms) > 0:
-            writeEdict(db, terms)
+def build(dict_dir, kanjidic, kradfile, edict, enamdict):
+    build_dict(dict_dir, kanjidic, parse_kanji_dic)
+    build_dict(dict_dir, kradfile, parse_krad_file)
+    build_dict(dict_dir, edict, parse_edict)
+    build_dict(dict_dir, enamdict, parse_edict)
 
 
 def main():
