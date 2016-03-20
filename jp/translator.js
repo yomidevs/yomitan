@@ -16,13 +16,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-class Dictionary {
-    constructor(rules) {
-        this.rules = rules;
+class Translator {
+    constructor(paths) {
+        this.paths = paths
+        this.rules = {}
+        this.initialized = false;
     }
 
-    deinflect(term, validator) {
+    initialize(callback) {
+        if (this.initialized) {
+            return;
+        }
 
+        $.when(
+            $.getJSON(chrome.extension.getURL(this.paths['rules']))
+        ).done(rules => {
+            this.rules = rules;
+            this.initialized = true;
+
+            if (callback) {
+                callback();
+            }
+        });
     }
 }
+
+let trans = new Translator({
+    rules: 'jp/data/rules.json'
+});
+
+trans.initialize();
