@@ -19,6 +19,7 @@
 class Translator {
     constructor() {
         this.dictionary  = new Dictionary();
+        this.deinflector = new Deinflector();
         this.initialized = false;
     }
 
@@ -35,6 +36,8 @@ class Translator {
         }
 
         $.when.apply($, loaders).done((rules, edict, enamdict, kanjidic) => {
+            this.deinflector.setRules(rules);
+
             this.dictionary.addTermDict(edict[0]);
             this.dictionary.addTermDict(enamdict[0]);
             this.dictionary.addKanjiDict(kanjidic[0]);
@@ -56,6 +59,6 @@ trans.initialize({
     enamdict: 'jp/data/enamdict.json',
     kanjidic: 'jp/data/kanjidic.json',
 }, function() {
-    // alert('Loaded');
+    alert('Loaded');
     // alert(trans.dictionary.findTerm('猫'));
 });
