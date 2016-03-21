@@ -94,7 +94,6 @@ class Translator {
 
         // for (const entry of this.dictionary.findTerm(root)) {
         //     const key = 
-
         // }
 
         // root = root or source
@@ -156,7 +155,12 @@ class Translator {
     }
 
     validator(term) {
-        // return [d['tags'] for d in self.dictionary.findTerm(term)]
+        const tags = [];
+        for (const d of self.dictionary.findTerm(term)) {
+            tags.push(d.tags);
+        }
+
+        return tags;
     }
 }
 
