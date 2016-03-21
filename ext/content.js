@@ -19,7 +19,7 @@
 function getRangeAtCursor(e, lookAhead) {
     const range = document.caretRangeFromPoint(e.clientX, e.clientY);
     if (range === null) {
-        return null
+        return null;
     }
 
     const node = range.startContainer;

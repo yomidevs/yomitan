@@ -57,7 +57,7 @@ trans.initialize({
     rules:    'jp/data/rules.json',
     edict:    'jp/data/edict.json',
     enamdict: 'jp/data/enamdict.json',
-    kanjidic: 'jp/data/kanjidic.json',
+    kanjidic: 'jp/data/kanjidic.json'
 }, function() {
     alert('Loaded');
     // alert(trans.dictionary.findTerm('猫'));

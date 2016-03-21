@@ -23,7 +23,6 @@ class Deinflection {
         this.term     = term;
         this.tags     = tags;
         this.rule     = rule;
-        this.success  = false;
     }
 
     validate(validator) {
@@ -63,17 +62,15 @@ class Deinflection {
                     }
                 }
 
-                // FIX
-                // if (!allowed || !this.term.endswith(kanaIn)) {
-                //     continue;
-                // }
+                if (!allowed || !this.term.endsWith(kanaIn)) {
+                    continue;
+                }
 
-                // FIX
-                // const term = self.term[:-kanaIn.length] + kanaOut;
-                // const child = new Deinflection(term, tagsOut, rule);
-                // if (child.deinflect(validator, rules)) {
-                //     this.children.append(child);
-                // }
+                const term = self.term.slice(0, -kanaIn.length) + kanaOut;
+                const child = new Deinflection(term, tagsOut, rule);
+                if (child.deinflect(validator, rules)) {
+                    this.children.append(child);
+                }
             }
         }
 
@@ -82,8 +79,7 @@ class Deinflection {
 
     searchTags(tag, tags) {
         for (const t of tags) {
-            // FIX
-            if (re.search(tag, t)) {
+            if (tag === t) {
                 return true;
             }
         }
@@ -123,7 +119,7 @@ class Deinflector {
     }
 
     deinflect(term, validator) {
-        const node = new Deinflection(term)
+        const node = new Deinflection(term);
         if (node.deinflect(validator, this.rules)) {
             return node.gather();
         }
