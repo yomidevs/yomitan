@@ -49,6 +49,85 @@ class Translator {
             }
         });
     }
+
+    findTerm(text) {
+        const groups = {}
+        for (let i = text.length; i >= 0; --i) {
+            const term = text.slice(0, i);
+
+            const deinflections = this.deinflector.deinflect(term, this.validator);
+            if (deinflections === null) {
+                this.processTerm(groups, term);
+            } else {
+                for (const deinflection of deinflections) {
+                    //fix
+                    //this.processTerm(groups, **deinflection);
+                }
+            }
+
+            const results = 
+        }
+
+
+        // text = util.sanitize(text, wildcards=wildcards)
+
+        // groups = dict()
+        // for i in xrange(len(text), 0, -1):
+        //     term = text[:i]
+        //     deinflections = self.deinflector.deinflect(term, self.validator)
+        //     if deinflections is None:
+        //         self.processTerm(groups, term, wildcards=wildcards)
+        //     else:
+        //         for deinflection in deinflections:
+        //             self.processTerm(groups, **deinflection)
+
+        // results = map(self.formatResult, groups.items())
+        // results = filter(operator.truth, results)
+        // results = sorted(results, key=lambda d: (len(d['source']), 'P' in d['tags'], -len(d['rules'])), reverse=True)
+
+        // length = 0
+        // for result in results:
+        //     length = max(length, len(result['source']))
+
+        // return results, length
+    }
+
+    findKanji(text) {
+        // text = util.sanitize(text, kana=False)
+        // results = list()
+
+        // processed = dict()
+        // for c in text:
+        //     if c not in processed:
+        //         match = self.dictionary.findCharacter(c)
+        //         if match is not None:
+        //             results.append(match)
+        //         processed[c] = match
+
+        // return results
+    }
+
+    processTerm(groups, source, rules=[], root='') {
+        // root = root or source
+
+        // for entry in self.dictionary.findTerm(root, wildcards):
+        //     key = entry['expression'], entry['reading'], entry['glossary']
+        //     if key not in groups:
+        //         groups[key] = entry['tags'], source, rules
+    }
+
+    formatResult(group) {
+        // root = root or source
+
+        // for entry in self.dictionary.findTerm(root, wildcards):
+        //     key = entry['expression'], entry['reading'], entry['glossary']
+        //     if key not in groups:
+        //         groups[key] = entry['tags'], source, rules
+    }
+
+    validator(term) {
+        // return [d['tags'] for d in self.dictionary.findTerm(term)]
+    }
 }
 
 const trans = new Translator();
@@ -59,6 +138,6 @@ trans.initialize({
     enamdict: 'jp/data/enamdict.json',
     kanjidic: 'jp/data/kanjidic.json'
 }, function() {
-    alert('Loaded');
+    // alert('Loaded');
     // alert(trans.dictionary.findTerm('猫'));
 });
