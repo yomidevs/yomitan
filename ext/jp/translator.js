@@ -51,63 +51,52 @@ class Translator {
     }
 
     findTerm(text) {
-        const groups = {}
+        const groups = {};
         for (let i = text.length; i >= 0; --i) {
             const term = text.slice(0, i);
 
-            const deinflections = this.deinflector.deinflect(term, this.validator);
-            if (deinflections === null) {
+            const dfs = this.deinflector.deinflect(term, this.validator);
+            if (dfs === null) {
                 this.processTerm(groups, term);
             } else {
-                for (const deinflection of deinflections) {
-                    //fix
-                    //this.processTerm(groups, **deinflection);
+                for (const df of dfs) {
+                    this.processTerm(groups, df.source, df.rules, df.root);
                 }
             }
 
-            const results = 
+            const results = formatResults(groups).sort(resultSorter);
+
+            let length = 0;
+            for (const result of results) {
+                length = Math.max(length, result.source.length);
+            }
+
+            return {results: results, length: length};
         }
-
-
-        // text = util.sanitize(text, wildcards=wildcards)
-
-        // groups = dict()
-        // for i in xrange(len(text), 0, -1):
-        //     term = text[:i]
-        //     deinflections = self.deinflector.deinflect(term, self.validator)
-        //     if deinflections is None:
-        //         self.processTerm(groups, term, wildcards=wildcards)
-        //     else:
-        //         for deinflection in deinflections:
-        //             self.processTerm(groups, **deinflection)
-
-        // results = map(self.formatResult, groups.items())
-        // results = filter(operator.truth, results)
-        // results = sorted(results, key=lambda d: (len(d['source']), 'P' in d['tags'], -len(d['rules'])), reverse=True)
-
-        // length = 0
-        // for result in results:
-        //     length = max(length, len(result['source']))
-
-        // return results, length
     }
 
     findKanji(text) {
-        // text = util.sanitize(text, kana=False)
-        // results = list()
+        let results = [];
 
-        // processed = dict()
-        // for c in text:
-        //     if c not in processed:
-        //         match = self.dictionary.findCharacter(c)
-        //         if match is not None:
-        //             results.append(match)
-        //         processed[c] = match
+        const processed = {};
+        for (const c of text) {
+            if (!processed.has(c)) {
+                results = results.concat(this.dictionary.findKanji(c));
+                processed[c] = true;
+            }
+        }
 
-        // return results
+        return results;
     }
 
     processTerm(groups, source, rules=[], root='') {
+        root = root || source;
+
+        // for (const entry of this.dictionary.findTerm(root)) {
+        //     const key = 
+
+        // }
+
         // root = root or source
 
         // for entry in self.dictionary.findTerm(root, wildcards):
@@ -117,12 +106,53 @@ class Translator {
     }
 
     formatResult(group) {
-        // root = root or source
+        const results = [];
+        for (const [key, value] of groups) {
+            [expression, reading, glossary] = key;
+            [tags, source, rules]           = group;
 
-        // for entry in self.dictionary.findTerm(root, wildcards):
-        //     key = entry['expression'], entry['reading'], entry['glossary']
-        //     if key not in groups:
-        //         groups[key] = entry['tags'], source, rules
+            results.push({
+                expression: expression,
+                reading:    reading,
+                glossary:   glossary,
+                rules:      rules,
+                source:     source,
+                tags:       tags
+            });
+        }
+
+        return results;
+    }
+
+    resultSorter(v1, v2) {
+        const sl1 = v1.source.length;
+        const sl2 = v2.source.length;
+
+        if (sl1 > sl2) {
+            return -1;
+        } else if (sl1 > sl2) {
+            return 1;
+        }
+
+        const p1 = v1.tags.indexOf('P') >= 0;
+        const p2 = v2.tags.indexOf('P') >= 0;
+
+        if (p1 && !p2) {
+            return -1;
+        } else if (!p1 && p2) {
+            return 1;
+        }
+
+        const rl1 = v1.rules.length;
+        const rl2 = v2.rules.length;
+
+        if (rl1 < rl2) {
+            return -1;
+        } else if (rl2 > rl1) {
+            return 1;
+        }
+
+        return 0;
     }
 
     validator(term) {
