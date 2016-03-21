@@ -52,4 +52,4 @@ function onMouseDown(e) {
 
 
 
-window.addEventListener('mousedown', onMouseDown, false);
+// window.addEventListener('mousedown', onMouseDown, false);

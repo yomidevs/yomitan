@@ -18,11 +18,55 @@
 
 
 class Dictionary {
-    constructor(rules) {
-        this.rules = rules;
+    constructor() {
+        this.termDicts  = [];
+        this.kanjiDicts = [];
     }
 
-    deinflect(term, validator) {
+    addTermDict(termDict) {
+        this.termDicts.push(termDict);
+    }
 
+    addKanjiDict(kanjiDict) {
+        this.kanjiDicts.push(kanjiDict);
+    }
+
+
+    findTerm(term) {
+        let results = [];
+        for (let dict of this.termDicts) {
+            results = results.concat(this.findTermInDict(term, dict));
+        }
+
+        return results;
+    }
+
+    findKanji(kanji) {
+        const results = [];
+        for (let dict of this.kanjiDicts) {
+            const result = this.findKanjiInDict(kanji, dict);
+            if (result !== null) {
+                results.push(result);
+            }
+        }
+
+        return results;
+    }
+
+    findTermInDict(term, dict) {
+        return (dict.indices[term] || []).map(index => {
+            const [e, r, g, t] = dict.defs[index];
+            return {expression: e, reading: r, glossary: g, tags: t};
+        });
+    }
+
+    findKanjiInDict(kanji, dict) {
+        const def = dict.defs[kanji];
+        if (def === null) {
+            return null;
+        }
+
+        const [c, k, o, g] = def;
+        return {character: c, kunyomi: k, onyomi: o, glossary: g};
     }
 }

@@ -158,27 +158,15 @@ def parse_edict(path):
 
         defs.append((term, reading, glossary, tags))
 
-    term_indices = {}
-    reading_indices = {}
-
+    indices = {}
     for i, d in enumerate(defs):
-        term, reading = d[:2]
+        for key in d[:2]:
+            if key is not None:
+                values = indices.get(key, [])
+                values.append(i)
+                indices[key] = values
 
-        if term is not None:
-            term_list = term_indices.get(term, [])
-            term_list.append(i)
-            term_indices[term] = term_list
-
-        if reading is not None:
-            reading_list = reading_indices.get(reading, [])
-            reading_list.append(i)
-            reading_indices[reading] = reading_list
-
-    return {
-        'defs': defs,
-        't_idx': term_indices,
-        'r_idx': reading_indices
-    };
+    return {'defs': defs, 'indices': indices}
 
 
 def build_dict(output_dir, input_file, parser):
