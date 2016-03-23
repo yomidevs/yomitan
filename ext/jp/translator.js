@@ -55,7 +55,15 @@ class Translator {
         for (let i = text.length; i >= 0; --i) {
             const term = text.slice(0, i);
 
-            const dfs = this.deinflector.deinflect(term, this.validator);
+            const dfs = this.deinflector.deinflect(term, t => {
+                const tags = [];
+                for (const d of this.dictionary.findTerm(t)) {
+                    tags.push(d.tags);
+                }
+
+                return tags;
+            });
+
             if (dfs === null) {
                 this.processTerm(groups, term);
             } else {
@@ -132,15 +140,6 @@ class Translator {
 
         return 0;
     }
-
-    validator(term) {
-        const tags = [];
-        for (const d of self.dictionary.findTerm(term)) {
-            tags.push(d.tags);
-        }
-
-        return tags;
-    }
 }
 
 const trans = new Translator();
@@ -151,6 +150,5 @@ trans.initialize({
     enamdict: 'jp/data/enamdict.json',
     kanjidic: 'jp/data/kanjidic.json'
 }, function() {
-    // alert('Loaded');
-    // alert(trans.dictionary.findTerm('猫'));
+    console.log(trans.findTerm('食べました'));
 });
