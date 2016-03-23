@@ -48,26 +48,21 @@ class Deinflection {
         }
 
         for (const [rule, variants] of rules) {
-            for (const variant of variants) {
-                const tagsIn  = variant.tagsIn;
-                const tagsOut = variant.tagsOut;
-                const kanaIn  = variant.kanaIn;
-                const kanaOut = variant.kanaOut;
-
+            for (const v of variants) {
                 let allowed = this.tags.length === 0;
                 for (const tag in this.tags) {
-                    if (this.searchTags(tag, tagsIn)) {
+                    if (this.searchTags(tag, v.tagsIn)) {
                         allowed = true;
                         break;
                     }
                 }
 
-                if (!allowed || !this.term.endsWith(kanaIn)) {
+                if (!allowed || !this.term.endsWith(v.kanaIn)) {
                     continue;
                 }
 
-                const term = self.term.slice(0, -kanaIn.length) + kanaOut;
-                const child = new Deinflection(term, tagsOut, rule);
+                const term = self.term.slice(0, -v.kanaIn.length) + v.kanaOut;
+                const child = new Deinflection(term, v.tagsOut, rule);
                 if (child.deinflect(validator, rules)) {
                     this.children.append(child);
                 }
