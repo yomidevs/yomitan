@@ -56,7 +56,7 @@ class Dictionary {
     findTermInDict(term, dict) {
         return (dict.indices[term] || []).map(index => {
             const [e, r, g, t] = dict.defs[index];
-            return {expression: e, reading: r, glossary: g, tags: t};
+            return {id: index, expression: e, reading: r, glossary: g, tags: t};
         });
     }
 
@@ -67,6 +67,6 @@ class Dictionary {
         }
 
         const [c, k, o, g] = def;
-        return {character: c, kunyomi: k, onyomi: o, glossary: g};
+        return {id: kanji.charCodeAt(0), character: c, kunyomi: k, onyomi: o, glossary: g};
     }
 }

@@ -64,7 +64,7 @@ class Translator {
                 }
             }
 
-            const results = formatResults(groups).sort(resultSorter);
+            const results = groups.sort(resultSorter);
 
             let length = 0;
             for (const result of results) {
@@ -90,37 +90,16 @@ class Translator {
     }
 
     processTerm(groups, source, rules=[], root='') {
-        root = root || source;
-
-        // for (const entry of this.dictionary.findTerm(root)) {
-        //     const key = 
-        // }
-
-        // root = root or source
-
-        // for entry in self.dictionary.findTerm(root, wildcards):
-        //     key = entry['expression'], entry['reading'], entry['glossary']
-        //     if key not in groups:
-        //         groups[key] = entry['tags'], source, rules
-    }
-
-    formatResult(group) {
-        const results = [];
-        for (const [key, value] of groups) {
-            [expression, reading, glossary] = key;
-            [tags, source, rules]           = group;
-
-            results.push({
-                expression: expression,
-                reading:    reading,
-                glossary:   glossary,
-                rules:      rules,
+        for (const entry of this.dictionary.findTerm(root || source)) {
+            groups[entry.id] = {
+                expression: entry.expression,
+                reading:    entry.reading,
+                glossary:   entry.glossary,
+                tags:       entry.tags,
                 source:     source,
-                tags:       tags
-            });
+                rules:      rules
+            };
         }
-
-        return results;
     }
 
     resultSorter(v1, v2) {
