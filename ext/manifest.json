@@ -9,7 +9,7 @@
 
     "content_scripts": [{
         "matches": ["http://*/*", "https://*/*"],
-        "js":      ["content.js"],
+        "js":      ["content.js", "util.js"],
         "run_at":  "document_end"
     }]
 }

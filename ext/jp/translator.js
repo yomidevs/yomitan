@@ -16,17 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 class Translator {
-    constructor() {
+    constructor(paths, callback) {
         this.dictionary  = new Dictionary();
         this.deinflector = new Deinflector();
-        this.initialized = false;
-    }
-
-    initialize(paths, callback) {
-        if (this.initialized) {
-            return;
-        }
 
         const loaders = [];
         for (const key of ['rules', 'edict', 'enamdict', 'kanjidic']) {
@@ -118,7 +112,6 @@ class Translator {
     resultSorter(v1, v2) {
         const sl1 = v1.source.length;
         const sl2 = v2.source.length;
-
         if (sl1 > sl2) {
             return 1;
         } else if (sl1 > sl2) {
@@ -127,7 +120,6 @@ class Translator {
 
         const p1 = v1.tags.indexOf('P') >= 0;
         const p2 = v2.tags.indexOf('P') >= 0;
-
         if (p1 && !p2) {
             return 1;
         } else if (!p1 && p2) {
@@ -136,7 +128,6 @@ class Translator {
 
         const rl1 = v1.rules.length;
         const rl2 = v2.rules.length;
-
         if (rl1 < rl2) {
             return 1;
         } else if (rl2 > rl1) {
@@ -146,14 +137,3 @@ class Translator {
         return 0;
     }
 }
-
-const trans = new Translator();
-
-trans.initialize({
-    rules:    'jp/data/rules.json',
-    edict:    'jp/data/edict.json',
-    enamdict: 'jp/data/enamdict.json',
-    kanjidic: 'jp/data/kanjidic.json'
-}, function() {
-    console.log(trans.findTerm('食べました'));
-});

@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 function getRangeAtCursor(e, lookAhead) {
     const range = document.caretRangeFromPoint(e.clientX, e.clientY);
     if (range === null) {
@@ -36,6 +37,8 @@ function getRangeAtCursor(e, lookAhead) {
 
 
 function onMouseDown(e) {
+    e.preventDefault();
+
     const range = getRangeAtCursor(e, 20);
     if (range === null) {
         return;
@@ -45,11 +48,9 @@ function onMouseDown(e) {
     selection.removeAllRanges();
     selection.addRange(range);
 
-    e.preventDefault();
-
-    console.log(range.toString());
+    findTerm(range.toString(), response => {
+        console.log(response);
+    });
 }
 
-
-
-// window.addEventListener('mousedown', onMouseDown, false);
+window.addEventListener('mousedown', onMouseDown, false);
