@@ -37,7 +37,7 @@ function getRangeAtCursor(e, lookAhead) {
 
 
 function onMouseDown(e) {
-    e.preventDefault();
+    // e.preventDefault();
 
     const range = getRangeAtCursor(e, 20);
     if (range === null) {

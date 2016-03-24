@@ -18,5 +18,5 @@
 
 
 function findTerm(text, callback) {
-    chrome.runtime.sendMessage({action: 'define', text: text}, callback);
+    window.chrome.runtime.sendMessage({action: 'define', text: text}, callback);
 }

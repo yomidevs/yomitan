@@ -33,7 +33,7 @@ const trans = new Translator(res, onInit);
 function onMessage(request, sender, callback) {
     switch (request.action.toLowerCase()) {
         case 'define':
-            callback(trans.findTerm(request.term));
+            callback(trans.findTerm(request.text));
             break;
     }
 }
