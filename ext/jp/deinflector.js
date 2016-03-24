@@ -47,7 +47,8 @@ class Deinflection {
             this.children.push(child);
         }
 
-        for (const [rule, variants] of rules) {
+        for (const rule in rules) {
+            const variants = rules[rule];
             for (const v of variants) {
                 let allowed = this.tags.length === 0;
                 for (const tag in this.tags) {
@@ -61,10 +62,10 @@ class Deinflection {
                     continue;
                 }
 
-                const term = self.term.slice(0, -v.kanaIn.length) + v.kanaOut;
+                const term = this.term.slice(0, -v.kanaIn.length) + v.kanaOut;
                 const child = new Deinflection(term, v.tagsOut, rule);
                 if (child.deinflect(validator, rules)) {
-                    this.children.append(child);
+                    this.children.push(child);
                 }
             }
         }
@@ -89,9 +90,9 @@ class Deinflection {
 
         const paths = [];
         for (const child of this.children) {
-            for (const path in child.gather()) {
+            for (const path of child.gather()) {
                 if (this.rule.length > 0) {
-                    path.rules.append(this.rule);
+                    path.rules.push(this.rule);
                 }
 
                 path.source = this.term;

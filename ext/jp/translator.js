@@ -36,7 +36,7 @@ class Translator {
         }
 
         $.when.apply($, loaders).done((rules, edict, enamdict, kanjidic) => {
-            this.deinflector.setRules(rules);
+            this.deinflector.setRules(rules[0]);
 
             this.dictionary.addTermDict(edict[0]);
             this.dictionary.addTermDict(enamdict[0]);
@@ -71,16 +71,21 @@ class Translator {
                     this.processTerm(groups, df.source, df.rules, df.root);
                 }
             }
-
-            const results = groups.sort(resultSorter);
-
-            let length = 0;
-            for (const result of results) {
-                length = Math.max(length, result.source.length);
-            }
-
-            return {results: results, length: length};
         }
+
+        let results = [];
+        for (const key in groups) {
+            results.push(groups[key]);
+        }
+
+        results = results.sort(this.resultSorter);
+
+        let length = 0;
+        for (const result of results) {
+            length = Math.max(length, result.source.length);
+        }
+
+        return {results: results, length: length};
     }
 
     findKanji(text) {
@@ -115,27 +120,27 @@ class Translator {
         const sl2 = v2.source.length;
 
         if (sl1 > sl2) {
-            return -1;
-        } else if (sl1 > sl2) {
             return 1;
+        } else if (sl1 > sl2) {
+            return -1;
         }
 
         const p1 = v1.tags.indexOf('P') >= 0;
         const p2 = v2.tags.indexOf('P') >= 0;
 
         if (p1 && !p2) {
-            return -1;
-        } else if (!p1 && p2) {
             return 1;
+        } else if (!p1 && p2) {
+            return -1;
         }
 
         const rl1 = v1.rules.length;
         const rl2 = v2.rules.length;
 
         if (rl1 < rl2) {
-            return -1;
-        } else if (rl2 > rl1) {
             return 1;
+        } else if (rl2 > rl1) {
+            return -1;
         }
 
         return 0;
