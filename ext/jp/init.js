@@ -18,6 +18,7 @@
 
 
 function onInit() {
+    const test = trans.findTerm('食べられない');
     chrome.runtime.onMessage.addListener(onMessage);
 }
 
@@ -28,12 +29,12 @@ const res =  {
     kanjidic: 'jp/data/kanjidic.json'
 };
 
-const trans = new Translator(res, onInit);
+window.trans = new Translator(res, onInit);
 
 function onMessage(request, sender, callback) {
     switch (request.action.toLowerCase()) {
         case 'define':
-            callback(trans.findTerm(request.text));
+            callback(window.trans.findTerm(request.text));
             break;
     }
 }
