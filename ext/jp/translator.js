@@ -46,7 +46,7 @@ class Translator {
 
     findTerm(text) {
         const groups = {};
-        for (let i = text.length; i >= 0; --i) {
+        for (let i = text.length; i > 0; --i) {
             const term = text.slice(0, i);
 
             const dfs = this.deinflector.deinflect(term, t => {
