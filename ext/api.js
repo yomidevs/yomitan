@@ -17,6 +17,10 @@
  */
 
 
+function sendMessage(action, data, callback) {
+    window.chrome.runtime.sendMessage({action: action, data: data}, callback);
+}
+
 function findTerm(text, callback) {
-    window.chrome.runtime.sendMessage({action: 'define', text: text}, callback);
+    sendMessage('findTerm', {term: text}, callback);
 }

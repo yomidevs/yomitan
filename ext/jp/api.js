@@ -17,11 +17,22 @@
  */
 
 
+function onFindTerm({term}) {
+    return window.trans.findTerm(term);
+}
+
 function onMessage(request, sender, callback) {
-    switch (request.action.toLowerCase()) {
-        case 'define':
-            callback(window.trans.findTerm(request.text));
-            break;
+    const {action, data} = request;
+
+    const handler = {
+        findTerm: onFindTerm
+    }[action];
+
+    if (handler !== null) {
+        const result = handler(data);
+        if (callback !== null) {
+            callback(result);
+        }
     }
 }
 
@@ -33,7 +44,8 @@ function onMessage(request, sender, callback) {
         kanjidic: 'jp/data/kanjidic.json'
     };
 
-    window.trans = new Translator(res, function() {
-        chrome.runtime.onMessage.addListener(onMessage);
-    });
+    window.trans = new Translator(
+        res,
+        () => chrome.runtime.onMessage.addListener(onMessage)
+    );
 })();
