@@ -31,7 +31,7 @@ class Deinflection {
                 return true;
             }
 
-            for (const tag in this.tags) {
+            for (const tag of this.tags) {
                 if (this.searchTags(tag, tags)) {
                     return true;
                 }
@@ -51,7 +51,7 @@ class Deinflection {
             const variants = rules[rule];
             for (const v of variants) {
                 let allowed = this.tags.length === 0;
-                for (const tag in this.tags) {
+                for (const tag of this.tags) {
                     if (this.searchTags(tag, v.tagsIn)) {
                         allowed = true;
                         break;

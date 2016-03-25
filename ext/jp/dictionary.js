@@ -61,7 +61,7 @@ class Dictionary {
                 expression: e,
                 reading:    r,
                 glossary:   g,
-                tags:       t
+                tags:       t.split(' ')
             };
         });
     }
