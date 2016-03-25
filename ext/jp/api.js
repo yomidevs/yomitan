@@ -17,20 +17,6 @@
  */
 
 
-function onInit() {
-    const test = trans.findTerm('食べられない');
-    chrome.runtime.onMessage.addListener(onMessage);
-}
-
-const res =  {
-    rules:    'jp/data/rules.json',
-    edict:    'jp/data/edict.json',
-    enamdict: 'jp/data/enamdict.json',
-    kanjidic: 'jp/data/kanjidic.json'
-};
-
-window.trans = new Translator(res, onInit);
-
 function onMessage(request, sender, callback) {
     switch (request.action.toLowerCase()) {
         case 'define':
@@ -39,3 +25,15 @@ function onMessage(request, sender, callback) {
     }
 }
 
+(() => {
+    const res =  {
+        rules:    'jp/data/rules.json',
+        edict:    'jp/data/edict.json',
+        enamdict: 'jp/data/enamdict.json',
+        kanjidic: 'jp/data/kanjidic.json'
+    };
+
+    window.trans = new Translator(res, function() {
+        chrome.runtime.onMessage.addListener(onMessage);
+    });
+})();

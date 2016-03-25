@@ -8,8 +8,7 @@
     "background":     {"page": "background.html"},
 
     "content_scripts": [{
-        "matches": ["http://*/*", "https://*/*"],
-        "js":      ["content.js", "util.js"],
-        "run_at":  "document_end"
+        "matches": ["*://*/*"],
+        "js":      ["content.js", "api.js"]
     }]
 }
