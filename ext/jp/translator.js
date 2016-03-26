@@ -18,9 +18,17 @@
 
 
 class Translator {
-    constructor(paths, callback) {
+    constructor() {
         this.dictionary  = new Dictionary();
         this.deinflector = new Deinflector();
+        this.initialized = false;
+    }
+
+    loadData(paths, callback) {
+        if (this.initialized) {
+            callback();
+            return;
+        }
 
         const loaders = [];
         for (const key of ['rules', 'edict', 'enamdict', 'kanjidic']) {
