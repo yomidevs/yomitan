@@ -117,25 +117,25 @@ class Translator {
         const sl1 = v1.source.length;
         const sl2 = v2.source.length;
         if (sl1 > sl2) {
-            return 1;
-        } else if (sl1 > sl2) {
             return -1;
+        } else if (sl1 < sl2) {
+            return 1;
         }
 
         const p1 = v1.tags.indexOf('P') >= 0;
         const p2 = v2.tags.indexOf('P') >= 0;
         if (p1 && !p2) {
-            return 1;
-        } else if (!p1 && p2) {
             return -1;
+        } else if (!p1 && p2) {
+            return 1;
         }
 
         const rl1 = v1.rules.length;
         const rl2 = v2.rules.length;
         if (rl1 < rl2) {
-            return 1;
-        } else if (rl2 > rl1) {
             return -1;
+        } else if (rl2 > rl1) {
+            return 1;
         }
 
         return 0;

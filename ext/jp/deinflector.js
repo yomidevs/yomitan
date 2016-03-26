@@ -75,7 +75,8 @@ class Deinflection {
 
     searchTags(tag, tags) {
         for (const t of tags) {
-            if (tag === t) {
+            const re = new RegExp(tag);
+            if (re.test(t)) {
                 return true;
             }
         }
