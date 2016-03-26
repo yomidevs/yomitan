@@ -21,10 +21,10 @@ class Yomichan {
     constructor() {
         this.translator = new Translator();
         this.res = {
-            rules:    'jp/data/rules.json',
-            edict:    'jp/data/edict.json',
-            enamdict: 'jp/data/enamdict.json',
-            kanjidic: 'jp/data/kanjidic.json'
+            rules:    'bg/data/rules.json',
+            edict:    'bg/data/edict.json',
+            enamdict: 'bg/data/enamdict.json',
+            kanjidic: 'bg/data/kanjidic.json'
         };
 
         this.updateState('disabled');
