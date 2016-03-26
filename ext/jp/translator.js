@@ -98,6 +98,10 @@ class Translator {
 
     processTerm(groups, source, rules=[], root='') {
         for (const entry of this.dictionary.findTerm(root || source)) {
+            if (entry.id in groups) {
+                continue;
+            }
+
             groups[entry.id] = {
                 expression: entry.expression,
                 reading:    entry.reading,

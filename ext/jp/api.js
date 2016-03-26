@@ -36,6 +36,13 @@ function onMessage(request, sender, callback) {
     }
 }
 
+function onInit() {
+    chrome.runtime.onMessage.addListener(onMessage);
+
+    const res1 = window.trans.findTerm('食べられない');
+    const res2 = window.trans.findTerm('作られている');
+}
+
 (() => {
     const res =  {
         rules:    'jp/data/rules.json',
@@ -44,8 +51,5 @@ function onMessage(request, sender, callback) {
         kanjidic: 'jp/data/kanjidic.json'
     };
 
-    window.trans = new Translator(
-        res,
-        () => chrome.runtime.onMessage.addListener(onMessage)
-    );
+    window.trans = new Translator(res, onInit);
 })();
