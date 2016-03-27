@@ -30,30 +30,51 @@ function getRangeAtCursor(e, lookAhead) {
 
     const offset = range.startOffset;
     const length = Math.min(node.length - offset, lookAhead);
+    if (length === 0) {
+        return null;
+    }
 
     range.setEnd(node, offset + length);
     return range;
 }
 
+function getRangePaddedRect(range) {
+    const node        = range.startContainer;
+    const startOffset = range.startOffset;
+    const endOffset   = range.endOffset;
 
-function onMouseDown(e) {
-    // e.preventDefault();
+    range.setStart(node, Math.max(0, startOffset - 1));
+    range.setEnd(node, Math.min(node.length, endOffset + 1));
+    const rect = range.getBoundingClientRect();
+    range.setStart(node, startOffset);
+    range.setEnd(node, endOffset);
 
-    const range = getRangeAtCursor(e, 20);
-    if (range === null) {
-        return;
-    }
-
-    const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-
-    findTerm(range.toString(), response => {
-        console.log(response);
-    });
+    return rect;
 }
 
+function getPopupPositionForRange(popup, range, offset) {
+    const rangeRect = range.getBoundingClientRect();
+    const popupRect = popup.get(0).getBoundingClientRect();
 
-(() => {
-    window.addEventListener('mousedown', onMouseDown, false);
-})();
+    let posX = rangeRect.left;
+    if (posX + popupRect.width >= window.innerWidth) {
+        posX = window.innerWidth - popupRect.width;
+    }
+
+    let posY = rangeRect.bottom + offset;
+    if (posY + popupRect.height >= window.innerHeight) {
+        posY = rangeRect.top - popupRect.height - offset;
+    }
+
+    return {x: posX, y: posY};
+}
+
+function whenEnabled(callback) {
+    return (...args) => {
+        getState((state) => {
+            if (state === 'enabled') {
+                callback(...args);
+            }
+        });
+    };
+}
