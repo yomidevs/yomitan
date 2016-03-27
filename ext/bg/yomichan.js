@@ -33,14 +33,12 @@ class Yomichan {
         chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
     }
 
-    onFindTerm({term}) {
-        return this.translator.findTerm(term);
-    }
-
     onMessage(request, sender, callback) {
         const {action, data} = request;
         const handler = {
-            findTerm: this.onFindTerm
+            findKanji: ({text}) => this.translator.onFindKanji(text),
+            findTerm:  ({text}) => this.translator.findTerm(text),
+            getState:  () => this.state
         }[action];
 
         if (handler !== null) {

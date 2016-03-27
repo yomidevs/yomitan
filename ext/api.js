@@ -22,5 +22,13 @@ function sendMessage(action, data, callback) {
 }
 
 function findTerm(text, callback) {
-    sendMessage('findTerm', {term: text}, callback);
+    sendMessage('findTerm', {text: text}, callback);
+}
+
+function findKanji(text, callback) {
+    sendMessage('findKanji', {text: text}, callback);
+}
+
+function getState(callback) {
+    sendMessage('getState', null, callback);
 }
