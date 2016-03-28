@@ -21,36 +21,55 @@ class Client {
     constructor() {
         this.popup       = $('<div class="yomichan-popup"/>');
         this.popupOffset = 10;
+        this.lastMosePos = null;
         this.enabled     = false;
 
-        $('body').append(this.popup).click(() => this.hidePopup());
+        $('body').append(this.popup);
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
-        window.addEventListener('mousemove', this.onMouseMove.bind(this));
-        window.addEventListener('keydown', this.onKeyDown.bind(this));
+        window.addEventListener('mousedown', this.onMouseAction.bind(this));
+        window.addEventListener('mousemove', this.onMouseAction.bind(this));
+        window.addEventListener('keydown', this.onKeyAction.bind(this));
 
         getState((state) => this.setEnabled(state === 'enabled'));
     }
 
-    onKeyDown(e) {
-        if (e.keyCode === 16 || e.charCode === 16) {
-            this.hidePopup();
-        }
-    }
-
-    onMouseMove(e) {
-        if (!this.enabled || (!e.shiftKey && e.which !== 2)) {
+    onKeyAction(e) {
+        if (!this.enabled) {
             return;
         }
 
-        const range = getRangeAtCursor(e, 10);
+        if (this.lastMousePos !== null && (e.keyCode === 16 || e.charCode === 16)) {
+            this.searchAtPoint(this.lastMousePos);
+        }
+    }
+
+    onMouseAction(e) {
+        this.lastMousePos = {x: e.clientX, y: e.clientY};
+
+        if (!this.enabled) {
+            return;
+        }
+
+        if (e.shiftKey || e.which === 2) {
+            this.searchAtPoint(this.lastMousePos);
+        }
+    }
+
+    onMessage(request, sender, callback) {
+        this.setEnabled(request === 'enabled');
+        callback();
+    }
+
+    searchAtPoint(point) {
+        const range = getRangeAtPoint(point, 10);
         if (range === null) {
             this.hidePopup();
             return;
         }
 
         const rect = getRangePaddedRect(range);
-        if (e.clientX < rect.left || e.clientX > rect.right) {
+        if (point.x < rect.left || point.x > rect.right) {
             this.hidePopup();
             return;
         }
@@ -68,11 +87,6 @@ class Client {
         });
     }
 
-    onMessage(request, sender, callback) {
-        this.setEnabled(request === 'enabled');
-        callback();
-    }
-
     showPopup(range) {
         const selection = window.getSelection();
         selection.removeAllRanges();
@@ -83,6 +97,10 @@ class Client {
     }
 
     hidePopup() {
+        if (this.popup.css('visibility') === 'hidden') {
+            return;
+        }
+
         const selection = window.getSelection();
         selection.removeAllRanges();
 

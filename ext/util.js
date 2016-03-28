@@ -17,8 +17,8 @@
  */
 
 
-function getRangeAtCursor(e, lookAhead) {
-    const range = document.caretRangeFromPoint(e.clientX, e.clientY);
+function getRangeAtPoint(point, lookAhead) {
+    const range = document.caretRangeFromPoint(point.x, point.y);
     if (range === null) {
         return null;
     }
