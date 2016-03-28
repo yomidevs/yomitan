@@ -19,7 +19,6 @@
 
 class Yomichan {
     constructor() {
-        this.translator = new Translator();
         this.res = {
             rules:    'bg/data/rules.json',
             edict:    'bg/data/edict.json',
@@ -27,6 +26,7 @@ class Yomichan {
             kanjidic: 'bg/data/kanjidic.json'
         };
 
+        this.translator = new Translator();
         this.updateState('disabled');
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
@@ -36,9 +36,10 @@ class Yomichan {
     onMessage(request, sender, callback) {
         const {action, data} = request;
         const handler = {
-            findKanji: ({text}) => this.translator.onFindKanji(text),
-            findTerm:  ({text}) => this.translator.findTerm(text),
-            getState:  () => this.state
+            findKanji:      ({text}) => this.translator.onFindKanji(text),
+            findTerm:       ({text}) => this.translator.findTerm(text),
+            getState:       () => this.state,
+            renderTemplate: ({data, template}) => Handlebars.templates[template](data)
         }[action];
 
         if (handler !== null) {

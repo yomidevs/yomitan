@@ -53,8 +53,10 @@ class Client {
                 this.hidePopup();
             } else {
                 range.setEnd(range.endContainer, range.startOffset + length);
-                this.popup.html(renderDefs(results.slice(0, 5)));
-                this.showPopup(range);
+                renderTemplate({defs: results.slice(0, 5)}, 'defs.html', (html) => {
+                    this.popup.html(html);
+                    this.showPopup(range);
+                });
             }
         });
     }
