@@ -23,16 +23,23 @@ class Client {
         this.popupOffset = 10;
         this.enabled     = false;
 
-        $('body').append(this.popup);
+        $('body').append(this.popup).click(() => this.hidePopup());
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
         window.addEventListener('mousemove', this.onMouseMove.bind(this));
+        window.addEventListener('keydown', this.onKeyDown.bind(this));
 
         getState((state) => this.setEnabled(state === 'enabled'));
     }
 
+    onKeyDown(e) {
+        if (e.keyCode === 16 || e.charCode === 16) {
+            this.hidePopup();
+        }
+    }
+
     onMouseMove(e) {
-        if (!this.enabled || !e.shiftKey) {
+        if (!this.enabled || (!e.shiftKey && e.which !== 2)) {
             return;
         }
 
@@ -53,7 +60,7 @@ class Client {
                 this.hidePopup();
             } else {
                 range.setEnd(range.endContainer, range.startOffset + length);
-                renderTemplate({defs: results.slice(0, 5)}, 'defs.html', (html) => {
+                renderTemplate({defs: results}, 'defs.html', (html) => {
                     this.popup.html(html);
                     this.showPopup(range);
                 });
