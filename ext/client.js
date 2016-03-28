@@ -48,7 +48,15 @@ class Client {
             return;
         }
 
-        this.showPopup(range);
+        findTerm(range.toString(), ({results, length}) => {
+            if (length === 0) {
+                this.hidePopup();
+            } else {
+                range.setEnd(range.endContainer, range.startOffset + length);
+                this.popup.html(renderDefs(results.slice(0, 5)));
+                this.showPopup(range);
+            }
+        });
     }
 
     onMessage(request, sender, callback) {

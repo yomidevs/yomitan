@@ -68,3 +68,23 @@ function getPopupPositionForRange(popup, range, offset) {
 
     return {x: posX, y: posY};
 }
+
+function renderDefs(terms) {
+    const outputs = [];
+    for (let term of terms) {
+        outputs.push(renderDef(term));
+    }
+
+    return outputs.join('');
+}
+
+function renderDef(term) {
+    return `
+<div class="yomichan-def">
+    <span class="yomichan-def-expression">${term.expression}</span>
+    <span class="yomichan-def-rules">${term.rules.join('&nbsp;&lt;&nbsp;')}</span>
+    <span class="yomichan-def-reading">${term.reading}</span>
+    <span class="yomichan-def-glossary">${term.glossary}</span>
+</div>
+`;
+}
