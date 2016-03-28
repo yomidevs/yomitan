@@ -20,9 +20,24 @@
     background-color: #fff;
     border:           1px solid #999;
     box-shadow:       0 0 10px rgba(0, 0, 0, .5);
+    max-width:        50em;
     padding:          10px;
     pointer-events:   none;
     position:         fixed;
     width:            auto;
     z-index:          64;
+}
+
+.yomichan-def-expression {
+    float:       left;
+    font-weight: bold;
+}
+
+.yomichan-def-reading {
+    float:       right;
+    font-weight: bold;
+}
+
+.yomichan-def-glossary {
+    clear: both;
 }

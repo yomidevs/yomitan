@@ -32,7 +32,7 @@ class Client {
     }
 
     onMouseMove(e) {
-        if (!this.enabled) {
+        if (!this.enabled || !e.shiftKey) {
             return;
         }
 

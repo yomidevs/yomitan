@@ -1,7 +1,9 @@
 {{#each defs}}
 <div class="yomichan-def">
-    <span class="yomichan-def-expression">{{expression}}</span>
-    <span class="yomichan-def-reading">{{reading}}</span>
-    <span class="yomichan-def-glossary">{{glossary}}</span>
+    <div class="yomichan-def-expression">{{expression}}</div>
+    {{#if reading}}
+    <div class="yomichan-def-reading">{{reading}}</div>
+    {{/if}}
+    <div class="yomichan-def-glossary">{{glossary}}</div>
 </div>
 {{/each}}
