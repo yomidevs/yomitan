@@ -68,13 +68,3 @@ function getPopupPositionForRange(popup, range, offset) {
 
     return {x: posX, y: posY};
 }
-
-function whenEnabled(callback) {
-    return (...args) => {
-        getState((state) => {
-            if (state === 'enabled') {
-                callback(...args);
-            }
-        });
-    };
-}

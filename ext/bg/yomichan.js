@@ -53,7 +53,6 @@ class Yomichan {
         switch (this.state) {
             case 'disabled':
                 this.updateState('loading');
-                this.translator.loadData(this.res, () => this.updateState('enabled'));
                 break;
             case 'enabled':
                 this.updateState('disabled');
@@ -62,9 +61,26 @@ class Yomichan {
     }
 
     updateState(state) {
-        const text = {'disabled': '', 'enabled': 'on', 'loading': '...'}[state];
-        chrome.browserAction.setBadgeText({text: text});
         this.state = state;
+
+        switch (state) {
+            case 'disabled':
+                chrome.browserAction.setBadgeText({text: ''});
+                break;
+            case 'enabled':
+                chrome.browserAction.setBadgeText({text: 'on'});
+                break;
+            case 'loading':
+                chrome.browserAction.setBadgeText({text: '...'});
+                this.translator.loadData(this.res, () => this.updateState('enabled'));
+                break;
+        }
+
+        chrome.tabs.query({}, (tabs) => {
+            for (const tab of tabs) {
+                chrome.tabs.sendMessage(tab.id, this.state, () => null);
+            }
+        });
     }
 }
 

@@ -19,15 +19,23 @@
 
 class Client {
     constructor() {
-        $('body').append('<div class="yomichan-popup"/>');
-
-        this.popup       = $('.yomichan-popup');
+        this.popup       = $('<div class="yomichan-popup"/>');
         this.popupOffset = 10;
+        this.enabled     = false;
 
-        window.addEventListener('mousemove', whenEnabled(this.onMouseMove.bind(this)));
+        $('body').append(this.popup);
+
+        chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
+        window.addEventListener('mousemove', this.onMouseMove.bind(this));
+
+        getState((state) => this.setEnabled(state === 'enabled'));
     }
 
     onMouseMove(e) {
+        if (!this.enabled) {
+            return;
+        }
+
         const range = getRangeAtCursor(e, 10);
         if (range === null) {
             this.hidePopup();
@@ -41,6 +49,11 @@ class Client {
         }
 
         this.showPopup(range);
+    }
+
+    onMessage(request, sender, callback) {
+        this.setEnabled(request === 'enabled');
+        callback();
     }
 
     showPopup(range) {
@@ -57,6 +70,12 @@ class Client {
         selection.removeAllRanges();
 
         this.popup.css({visibility: 'hidden'});
+    }
+
+    setEnabled(enabled) {
+        if (!(this.enabled = enabled)) {
+            this.hidePopup();
+        }
     }
 }
 
