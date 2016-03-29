@@ -26,7 +26,9 @@
     font-size:        1em;
     max-height:       25em;
     max-width:        35em;
-    overflow-y:       scroll;
+    min-height:       10em;
+    min-width:        15em;
+    overflow-y:       auto;
     padding:          10px;
     position:         fixed;
     visibility:       hidden;

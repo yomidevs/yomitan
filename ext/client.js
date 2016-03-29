@@ -31,6 +31,7 @@ class Client {
         window.addEventListener('mousemove', this.onMouseMove.bind(this));
         window.addEventListener('keydown', this.onKeyDown.bind(this));
         this.popup.mousedown((e) => e.stopPropagation());
+        this.popup.scroll((e) => e.stopPropagation());
 
         getState((state) => this.setEnabled(state === 'enabled'));
     }
