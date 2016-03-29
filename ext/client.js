@@ -27,32 +27,32 @@ class Client {
         $('body').append(this.popup);
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
-        window.addEventListener('mousedown', this.onMouseAction.bind(this));
-        window.addEventListener('mousemove', this.onMouseAction.bind(this));
-        window.addEventListener('keydown', this.onKeyAction.bind(this));
+        window.addEventListener('mousedown', this.onMouseDown.bind(this));
+        window.addEventListener('mousemove', this.onMouseMove.bind(this));
+        window.addEventListener('keydown', this.onKeyDown.bind(this));
 
         getState((state) => this.setEnabled(state === 'enabled'));
     }
 
-    onKeyAction(e) {
-        if (!this.enabled) {
-            return;
-        }
-
-        if (this.lastMousePos !== null && (e.keyCode === 16 || e.charCode === 16)) {
+    onKeyDown(e) {
+        if (this.enabled && this.lastMousePos !== null && (e.keyCode === 16 || e.charCode === 16)) {
             this.searchAtPoint(this.lastMousePos);
         }
     }
 
-    onMouseAction(e) {
+    onMouseMove(e) {
         this.lastMousePos = {x: e.clientX, y: e.clientY};
-
-        if (!this.enabled) {
-            return;
-        }
-
-        if (e.shiftKey || e.which === 2) {
+        if (this.enabled && (e.shiftKey || e.which === 2)) {
             this.searchAtPoint(this.lastMousePos);
+        }
+    }
+
+    onMouseDown(e) {
+        this.lastMousePos = {x: e.clientX, y: e.clientY};
+        if (this.enabled && (e.shiftKey || e.which === 2)) {
+            this.searchAtPoint(this.lastMousePos);
+        } else {
+            this.hidePopup();
         }
     }
 
