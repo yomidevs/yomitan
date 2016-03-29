@@ -31,6 +31,8 @@ class Yomichan {
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
         chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
+
+        Handlebars.partials = Handlebars.templates;
     }
 
     onMessage(request, sender, callback) {
