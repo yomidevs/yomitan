@@ -10,7 +10,7 @@
 
     "content_scripts": [{
         "matches": ["*://*/*"],
-        "js":      ["lib/jquery-2.2.2.min.js", "api.js", "util.js", "client.js"],
+        "js":      ["api.js", "util.js", "client.js"],
         "css":     ["client.css"]
     }]
 }

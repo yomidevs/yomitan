@@ -19,12 +19,15 @@
 
 class Client {
     constructor() {
-        this.popup       = $('<div class="yomichan-popup"/>');
         this.popupOffset = 10;
         this.lastMosePos = null;
         this.enabled     = false;
 
-        $('body').append(this.popup);
+        this.popup = document.createElement('div');
+        this.popup.classList.add('yomichan-popup');
+        this.popup.addEventListener('mousedown', (e) => e.stopPropagation());
+        this.popup.addEventListener('scroll', (e) => e.stopPropagation());
+        document.body.appendChild(this.popup);
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
         window.addEventListener('mousedown', this.onMouseDown.bind(this));
@@ -32,8 +35,6 @@ class Client {
         window.addEventListener('keydown', this.onKeyDown.bind(this));
         window.addEventListener('scroll', (e) => this.hidePopup());
         window.addEventListener('resize', (e) => this.hidePopup());
-        this.popup.mousedown((e) => e.stopPropagation());
-        this.popup.scroll((e) => e.stopPropagation());
 
         getState((state) => this.setEnabled(state === 'enabled'));
     }
@@ -84,7 +85,7 @@ class Client {
             } else {
                 range.setEnd(range.endContainer, range.startOffset + length);
                 renderTemplate({defs: results}, 'defs.html', (html) => {
-                    this.popup.html(html);
+                    this.popup.innerHTML = html;
                     this.showPopup(range);
                 });
             }
@@ -97,18 +98,18 @@ class Client {
         selection.addRange(range);
 
         const pos = getPopupPositionForRange(this.popup, range, this.popupOffset);
-        this.popup.css({left: pos.x, top: pos.y, visibility: 'visible'});
+
+        this.popup.style.left       = pos.x + 'px';
+        this.popup.style.top        = pos.y + 'px';
+        this.popup.style.visibility = 'visible';
     }
 
     hidePopup() {
-        if (this.popup.css('visibility') === 'hidden') {
-            return;
+        if (this.popup.style.visibility !== 'hidden') {
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            this.popup.style.visibility = 'hidden';
         }
-
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-
-        this.popup.css({visibility: 'hidden'});
     }
 
     setEnabled(enabled) {

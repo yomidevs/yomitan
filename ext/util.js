@@ -54,7 +54,7 @@ function getRangePaddedRect(range) {
 
 function getPopupPositionForRange(popup, range, offset) {
     const rangeRect = range.getBoundingClientRect();
-    const popupRect = popup.get(0).getBoundingClientRect();
+    const popupRect = popup.getBoundingClientRect();
 
     let posX = rangeRect.left;
     if (posX + popupRect.width >= window.innerWidth) {
