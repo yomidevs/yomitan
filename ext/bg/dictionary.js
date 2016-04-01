@@ -19,43 +19,33 @@
 
 class Dictionary {
     constructor() {
-        this.termDicts  = [];
-        this.kanjiDicts = [];
+        this.terms       = [];
+        this.termIndices = {};
+
+        this.kanji        = [];
+        this.kanjiIndices = {};
     }
 
-    addTermDict(termDict) {
-        this.termDicts.push(termDict);
+    addTermDict(terms) {
+        let index = this.terms.length;
+        for (const [e, r, g, t] in terms) {
+            this.storeIndex(this.termIndices, e, index);
+            this.storeIndex(this.termIndices, r, index++);
+            this.terms.push([e, r, g, t]);
+        }
     }
 
-    addKanjiDict(kanjiDict) {
-        this.kanjiDicts.push(kanjiDict);
+    addKanjiDict(kanji) {
+        let index = this.kanji.length;
+        for (const [c, k, o, g] in kanji) {
+            this.storeIndex(this.kanjiIndices, c, index++);
+            this.kanji.push([c, k, o, g]);
+        }
     }
-
 
     findTerm(term) {
-        let results = [];
-        for (let dict of this.termDicts) {
-            results = results.concat(this.findTermInDict(term, dict));
-        }
-
-        return results;
-    }
-
-    findKanji(kanji) {
-        const results = [];
-        for (let dict of this.kanjiDicts) {
-            const result = this.findKanjiInDict(kanji, dict);
-            if (result !== null) {
-                results.push(result);
-            }
-        }
-
-        return results;
-    }
-
-    findTermInDict(term, dict) {
-        return (dict.indices[term] || []).map(index => {
-            const [e, r, g, t] = dict.defs[index];
+        return (this.termIndices[term] || []).map(index => {
+            const [e, r, g, t] = this.terms[index];
             return {
                 id:         index,
                 expression: e,
@@ -66,19 +56,24 @@ class Dictionary {
         });
     }
 
-    findKanjiInDict(kanji, dict) {
-        const def = dict.defs[kanji];
-        if (def === null) {
-            return null;
-        }
+    findKanji(kanji) {
+        return (this.kanjiIndices[kanji] || []).map(index => {
+            const [c, k, o, g] = def;
+            return {
+                id:        kanji.charCodeAt(0),
+                character: c,
+                kunyomi:   k,
+                onyomi:    o,
+                glossary:  g
+            };
+        });
+    }
 
-        const [c, k, o, g] = def;
-        return {
-            id:        kanji.charCodeAt(0),
-            character: c,
-            kunyomi:   k,
-            onyomi:    o,
-            glossary:  g
-        };
+    storeIndex(indices, term, index) {
+        if (term.length > 0) {
+            const indices = this.termIndices[term] || [];
+            indices.push(term);
+            this.termIndices[term] = indices;
+        }
     }
 }

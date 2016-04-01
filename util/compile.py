@@ -18,7 +18,6 @@
 
 
 import codecs
-import json
 import optparse
 import os.path
 import re
@@ -111,7 +110,7 @@ def load_definitions(path):
 
 
 def parse_kanji_dic(path):
-    results = {}
+    results = []
 
     for line in load_definitions(path):
         segments = line.split()
@@ -119,32 +118,20 @@ def parse_kanji_dic(path):
         kunyomi = ', '.join(filter(lambda x: filter(is_hiragana, x), segments[1:]))
         onyomi = ', '.join(filter(lambda x: filter(is_katakana, x), segments[1:]))
         glossary = '; '.join(re.findall('\{([^\}]+)\}', line))
-        results[character] = (kunyomi, onyomi, glossary)
-
-    return results
-
-
-def parse_krad_file(path):
-    results = {}
-
-    for line in load_definitions(path):
-        segments = line.split(' ')
-        character = segments[0]
-        radicals = ' '.join(segments[2:])
-        results[character] = radicals;
+        results.append((character, kunyomi, onyomi, glossary))
 
     return results
 
 
 def parse_edict(path):
-    defs = []
+    results = []
     for line in load_definitions(path):
         segments = line.split('/')
 
         expression = segments[0].split(' ')
         term = expression[0]
         match = re.search('\[([^\]]+)\]', expression[1])
-        reading = None if match is None else match.group(1)
+        reading = '' if match is None else match.group(1)
 
         glossary = '; '.join(filter(lambda x: len(x) > 0, segments[1:]))
         glossary = re.sub('\(\d+\)\s*', '', glossary)
@@ -156,30 +143,21 @@ def parse_edict(path):
         tags = set(tags).intersection(PARSED_TAGS)
         tags = ' '.join(tags)
 
-        defs.append((term, reading, glossary, tags))
+        results.append((term, reading, glossary, tags))
 
-    indices = {}
-    for i, d in enumerate(defs):
-        for key in d[:2]:
-            if key is not None:
-                values = indices.get(key, [])
-                values.append(i)
-                indices[key] = values
-
-    return {'defs': defs, 'indices': indices}
+    return results[1:]
 
 
 def build_dict(output_dir, input_file, parser):
     if input_file is not None:
         base = os.path.splitext(os.path.basename(input_file))[0]
-        with open(os.path.join(output_dir, base) + '.json', 'w') as fp:
-            # json.dump(parser(input_file), fp, sort_keys=True, indent=4, separators=(',', ': '))
-            json.dump(parser(input_file), fp)
+        with codecs.open(os.path.join(output_dir, base) + '.csv', 'wb', encoding='utf-8') as fp:
+            for d in parser(input_file):
+                fp.write('\t'.join(d) + '\n')
 
 
-def build(dict_dir, kanjidic, kradfile, edict, enamdict):
+def build(dict_dir, kanjidic, edict, enamdict):
     build_dict(dict_dir, kanjidic, parse_kanji_dic)
-    build_dict(dict_dir, kradfile, parse_krad_file)
     build_dict(dict_dir, edict, parse_edict)
     build_dict(dict_dir, enamdict, parse_edict)
 
@@ -187,7 +165,6 @@ def build(dict_dir, kanjidic, kradfile, edict, enamdict):
 def main():
     parser = optparse.OptionParser()
     parser.add_option('--kanjidic', dest='kanjidic')
-    parser.add_option('--kradfile', dest='kradfile')
     parser.add_option('--edict', dest='edict')
     parser.add_option('--enamdict', dest='enamdict')
 
@@ -196,13 +173,7 @@ def main():
     if len(args) == 0:
         parser.print_help()
     else:
-        build(
-            args[0],
-            options.kanjidic,
-            options.kradfile,
-            options.edict,
-            options.enamdict
-        )
+        build(args[0], options.kanjidic, options.edict, options.enamdict)
 
 
 if __name__ == '__main__':
