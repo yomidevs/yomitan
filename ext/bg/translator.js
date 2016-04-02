@@ -19,9 +19,9 @@
 
 class Translator {
     constructor() {
-        this.dictionary  = new Dictionary();
-        this.deinflector = new Deinflector();
-        this.initialized = false;
+        this.dictionary   = new Dictionary();
+        this.deinflector  = new Deinflector();
+        this.pendingLoads = [];
     }
 
     loadData(paths, callback) {
@@ -30,26 +30,29 @@ class Translator {
             return;
         }
 
-        const loaders = [];
         for (const key of ['rules', 'edict', 'enamdict', 'kanjidic']) {
-            loaders.push(
-                $.getJSON(chrome.extension.getURL(paths[key]))
-            );
+            this.pendingLoads.push(key);
+            Translator.loadData(paths[key], (response) => {
+                switch (key) {
+                    case 'rules':
+                        this.deinflector.setRules(JSON.parse(response));
+                        break;
+                    case 'kanjidic':
+                        this.dictionary.addKanjiData(Translator.parseCsv(response));
+                        break;
+                    case 'edict':
+                    case 'enamdict':
+                        this.dictionary.addTermsData(Translator.parseCsv(response));
+                        break;
+                }
+
+                const index = this.pendingLoads.indexOf(key);
+                this.pendingLoads = this.pendingLoads.splice(index, 1);
+                if (this.pendingLoads.length === 0) {
+                    callback();
+                }
+            });
         }
-
-        $.when.apply($, loaders).done((rules, edict, enamdict, kanjidic) => {
-            this.deinflector.setRules(rules[0]);
-
-            this.dictionary.addTermDict(edict[0]);
-            this.dictionary.addTermDict(enamdict[0]);
-            this.dictionary.addKanjiDict(kanjidic[0]);
-
-            this.initialized = true;
-
-            if (callback) {
-                callback();
-            }
-        });
     }
 
     findTerm(text) {
@@ -80,7 +83,33 @@ class Translator {
             results.push(groups[key]);
         }
 
-        results = results.sort(this.resultSorter);
+        results = results.sort((v1, v2) => {
+            const sl1 = v1.source.length;
+            const sl2 = v2.source.length;
+            if (sl1 > sl2) {
+                return -1;
+            } else if (sl1 < sl2) {
+                return 1;
+            }
+
+            const p1 = v1.tags.indexOf('P') >= 0;
+            const p2 = v2.tags.indexOf('P') >= 0;
+            if (p1 && !p2) {
+                return -1;
+            } else if (!p1 && p2) {
+                return 1;
+            }
+
+            const rl1 = v1.rules.length;
+            const rl2 = v2.rules.length;
+            if (rl1 < rl2) {
+                return -1;
+            } else if (rl2 > rl1) {
+                return 1;
+            }
+
+            return 0;
+        });
 
         let length = 0;
         for (const result of results) {
@@ -121,31 +150,19 @@ class Translator {
         }
     }
 
-    resultSorter(v1, v2) {
-        const sl1 = v1.source.length;
-        const sl2 = v2.source.length;
-        if (sl1 > sl2) {
-            return -1;
-        } else if (sl1 < sl2) {
-            return 1;
+    static loadData(url, callback) {
+        const xhr = new XMLHttpRequest();
+        xhr.addEventListener('load', () => callback(xhr.responseText));
+        xhr.open('GET', chrome.extension.getURL(url), true);
+        xhr.send();
+    }
+
+    static parseCsv(data) {
+        const result = [];
+        for (const row in data.split('\n')) {
+            result.push(row.split('\t'));
         }
 
-        const p1 = v1.tags.indexOf('P') >= 0;
-        const p2 = v2.tags.indexOf('P') >= 0;
-        if (p1 && !p2) {
-            return -1;
-        } else if (!p1 && p2) {
-            return 1;
-        }
-
-        const rl1 = v1.rules.length;
-        const rl2 = v2.rules.length;
-        if (rl1 < rl2) {
-            return -1;
-        } else if (rl2 > rl1) {
-            return 1;
-        }
-
-        return 0;
+        return result;
     }
 }

@@ -26,7 +26,7 @@ class Dictionary {
         this.kanjiIndices = {};
     }
 
-    addTermDict(terms) {
+    addTermData(terms) {
         let index = this.terms.length;
         for (const [e, r, g, t] in terms) {
             this.storeIndex(this.termIndices, e, index);
@@ -35,7 +35,7 @@ class Dictionary {
         }
     }
 
-    addKanjiDict(kanji) {
+    addKanjiData(kanji) {
         let index = this.kanji.length;
         for (const [c, k, o, g] in kanji) {
             this.storeIndex(this.kanjiIndices, c, index++);
@@ -46,26 +46,14 @@ class Dictionary {
     findTerm(term) {
         return (this.termIndices[term] || []).map(index => {
             const [e, r, g, t] = this.terms[index];
-            return {
-                id:         index,
-                expression: e,
-                reading:    r,
-                glossary:   g,
-                tags:       t.split(' ')
-            };
+            return {id: index, expression: e, reading: r, glossary: g, tags: t.split(' ')};
         });
     }
 
     findKanji(kanji) {
         return (this.kanjiIndices[kanji] || []).map(index => {
             const [c, k, o, g] = def;
-            return {
-                id:        kanji.charCodeAt(0),
-                character: c,
-                kunyomi:   k,
-                onyomi:    o,
-                glossary:  g
-            };
+            return {id: index, character: c, kunyomi: k, onyomi: o, glossary: g};
         });
     }
 
