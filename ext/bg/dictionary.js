@@ -28,7 +28,7 @@ class Dictionary {
 
     addTermData(terms) {
         let index = this.terms.length;
-        for (const [e, r, g, t] in terms) {
+        for (const [e, r, g, t] of terms) {
             this.storeIndex(this.termIndices, e, index);
             this.storeIndex(this.termIndices, r, index++);
             this.terms.push([e, r, g, t]);
@@ -37,7 +37,7 @@ class Dictionary {
 
     addKanjiData(kanji) {
         let index = this.kanji.length;
-        for (const [c, k, o, g] in kanji) {
+        for (const [c, k, o, g] of kanji) {
             this.storeIndex(this.kanjiIndices, c, index++);
             this.kanji.push([c, k, o, g]);
         }

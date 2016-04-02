@@ -42,7 +42,7 @@ class Translator {
                         break;
                     case 'edict':
                     case 'enamdict':
-                        this.dictionary.addTermsData(Translator.parseCsv(response));
+                        this.dictionary.addTermData(Translator.parseCsv(response));
                         break;
                 }
 
@@ -159,7 +159,7 @@ class Translator {
 
     static parseCsv(data) {
         const result = [];
-        for (const row in data.split('\n')) {
+        for (const row of data.split('\n')) {
             result.push(row.split('\t'));
         }
 

@@ -21,9 +21,9 @@ class Yomichan {
     constructor() {
         this.res = {
             rules:    'bg/data/rules.json',
-            edict:    'bg/data/edict.json',
-            enamdict: 'bg/data/enamdict.json',
-            kanjidic: 'bg/data/kanjidic.json'
+            edict:    'bg/data/edict.csv',
+            enamdict: 'bg/data/enamdict.csv',
+            kanjidic: 'bg/data/kanjidic.csv'
         };
 
         this.translator = new Translator();
