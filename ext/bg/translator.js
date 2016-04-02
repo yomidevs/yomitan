@@ -19,9 +19,9 @@
 
 class Translator {
     constructor() {
-        this.dictionary   = new Dictionary();
-        this.deinflector  = new Deinflector();
-        this.pendingLoads = [];
+        this.dictionary  = new Dictionary();
+        this.deinflector = new Deinflector();
+        this.initialized = false;
     }
 
     loadData(paths, callback) {
@@ -30,8 +30,9 @@ class Translator {
             return;
         }
 
+        const pendingLoads = [];
         for (const key of ['rules', 'edict', 'enamdict', 'kanjidic']) {
-            this.pendingLoads.push(key);
+            pendingLoads.push(key);
             Translator.loadData(paths[key], (response) => {
                 switch (key) {
                     case 'rules':
@@ -46,9 +47,9 @@ class Translator {
                         break;
                 }
 
-                const index = this.pendingLoads.indexOf(key);
-                this.pendingLoads = this.pendingLoads.splice(index, 1);
-                if (this.pendingLoads.length === 0) {
+                pendingLoads.splice(pendingLoads.indexOf(key), 1);
+                if (pendingLoads.length === 0) {
+                    this.initialized = true;
                     callback();
                 }
             });
@@ -160,7 +161,9 @@ class Translator {
     static parseCsv(data) {
         const result = [];
         for (const row of data.split('\n')) {
-            result.push(row.split('\t'));
+            if (row.length > 0) {
+                result.push(row.split('\t'));
+            }
         }
 
         return result;

@@ -27,9 +27,7 @@ class Client {
         this.popup.classList.add('yomichan-popup');
         this.popup.addEventListener('mousedown', (e) => e.stopPropagation());
         this.popup.addEventListener('scroll', (e) => e.stopPropagation());
-
-        const base = document.body.appendChild('div');
-        base.createShadowRoot().appendChild(this.popup);
+        document.body.appendChild(this.popup);
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
         window.addEventListener('mousedown', this.onMouseDown.bind(this));

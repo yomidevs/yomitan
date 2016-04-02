@@ -60,7 +60,7 @@ class Dictionary {
     storeIndex(indices, term, index) {
         if (term.length > 0) {
             const indices = this.termIndices[term] || [];
-            indices.push(term);
+            indices.push(index);
             this.termIndices[term] = indices;
         }
     }
