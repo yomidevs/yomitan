@@ -19,20 +19,13 @@
 
 class Yomichan {
     constructor() {
-        this.res = {
-            rules:    'bg/data/rules.json',
-            edict:    'bg/data/edict.csv',
-            enamdict: 'bg/data/enamdict.csv',
-            kanjidic: 'bg/data/kanjidic.csv'
-        };
+        Handlebars.partials = Handlebars.templates;
 
         this.translator = new Translator();
         this.updateState('disabled');
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
         chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
-
-        Handlebars.partials = Handlebars.templates;
     }
 
     onMessage(request, sender, callback) {
@@ -75,7 +68,7 @@ class Yomichan {
                 break;
             case 'loading':
                 chrome.browserAction.setBadgeText({text: '...'});
-                this.translator.loadData(this.res, () => this.updateState('enabled'));
+                this.translator.loadData(() => this.updateState('enabled'));
                 break;
         }
 

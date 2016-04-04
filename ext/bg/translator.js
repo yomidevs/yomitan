@@ -19,13 +19,20 @@
 
 class Translator {
     constructor() {
+        this.loaded = false;
+        this.paths  = {
+            rules:    'bg/data/rules.json',
+            edict:    'bg/data/edict.csv',
+            enamdict: 'bg/data/enamdict.csv',
+            kanjidic: 'bg/data/kanjidic.csv'
+        };
+
         this.dictionary  = new Dictionary();
         this.deinflector = new Deinflector();
-        this.initialized = false;
     }
 
-    loadData(paths, callback) {
-        if (this.initialized) {
+    loadData(callback) {
+        if (this.loaded) {
             callback();
             return;
         }
@@ -33,7 +40,7 @@ class Translator {
         const pendingLoads = [];
         for (const key of ['rules', 'edict', 'enamdict', 'kanjidic']) {
             pendingLoads.push(key);
-            Translator.loadData(paths[key], (response) => {
+            Translator.loadData(this.paths[key], (response) => {
                 switch (key) {
                     case 'rules':
                         this.deinflector.setRules(JSON.parse(response));
@@ -49,7 +56,7 @@ class Translator {
 
                 pendingLoads.splice(pendingLoads.indexOf(key), 1);
                 if (pendingLoads.length === 0) {
-                    this.initialized = true;
+                    this.loaded = true;
                     callback();
                 }
             });
