@@ -17,26 +17,21 @@
  */
 
 
-$('#saveOptions').click(() => {
-    saveOptions(sanitizeOptions(formToOptions()))
-});
-
-$('#resetOptions').click(() => {
-    if (confirm('Reset options to defaults?')) {
-        optionsToForm(sanitizeOptions({}));
-    }
-});
-
 function optionsToForm(opts) {
     $('#scanLength').val(opts.scanLength);
 }
 
 function formToOptions() {
-    return {
+    return sanitizeOptions({
         scanLength: $('#scanLength').val()
-    };
+    });
 }
 
-$(document).ready(() => {
-    loadOptions((opts) => optionsToForm(sanitizeOptions(opts)));
+$(document).ready(() => loadOptions((opts) => optionsToForm(opts)));
+
+$('#saveOptions').click(() => saveOptions(formToOptions()));
+$('#resetOptions').click(() => {
+    if (confirm('Reset options to defaults?')) {
+        optionsToForm(sanitizeOptions({}));
+    }
 });
