@@ -27,27 +27,7 @@
             <script src="lib/jquery-2.2.2.min.js"></script>
             <script src="lib/bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
             <script src="options.js"></script>
-
-            <script>
-                $('#saveOptions').click(() => saveOptions(sanitizeOptions(formToOptions())));
-                $('#resetOptions').click(() => {
-                    if (confirm('Reset options to defaults?')) {
-                        optionsToForm(sanitizeOptions({}));
-                    }
-                });
-
-                function optionsToForm(opts) {
-                    $('#scanLength').val(opts.scanLength);
-                }
-
-                function formToOptions() {
-                    return {
-                        scanLength: $('#scanLength').val()
-                    };
-                }
-
-                loadOptions((opts) => optionsToForm(sanitizeOptions(opts)));
-            </script>
+            <script src="options-form.js"></script>
         </div>
     </body>
 </html>
