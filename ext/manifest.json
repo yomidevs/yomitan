@@ -11,7 +11,7 @@
 
     "content_scripts": [{
         "matches": ["*://*/*"],
-        "js":      ["api.js", "util.js", "client.js"],
-        "css":     ["client.css"]
+        "js":      ["js/api.js", "js/util.js", "js/client.js"],
+        "css":     ["css/client.css"]
     }]
 }
