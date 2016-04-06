@@ -22,6 +22,7 @@ class Client {
         this.popupOffset = 10;
         this.lastMosePos = null;
         this.enabled     = false;
+        this.options     = null;
 
         this.popup = document.createElement('div');
         this.popup.classList.add('yomichan-popup');
@@ -61,8 +62,16 @@ class Client {
         }
     }
 
-    onMessage(request, sender, callback) {
-        this.setEnabled(request === 'enabled');
+    onMessage({name, value}, sender, callback) {
+        switch (name) {
+            case 'state':
+                this.setEnabled(value === 'enabled');
+                break;
+            case 'options':
+                this.setOptions(value);
+                break;
+        }
+
         callback();
     }
 
@@ -116,6 +125,10 @@ class Client {
         if (!(this.enabled = enabled)) {
             this.hidePopup();
         }
+    }
+
+    setOptions(opts) {
+        this.options = opts;
     }
 }
 

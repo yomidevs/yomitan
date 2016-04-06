@@ -23,9 +23,12 @@ class Yomichan {
 
         this.translator = new Translator();
         this.updateState('disabled');
+        this.updateOptions({});
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
         chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
+
+        loadOptions((opts) => this.updateOptions(opts));
     }
 
     onMessage(request, sender, callback) {
@@ -37,11 +40,9 @@ class Yomichan {
             renderTemplate: ({data, template}) => Handlebars.templates[template](data)
         }[action];
 
-        if (handler !== null) {
-            const result = handler.call(this, data);
-            if (callback !== null) {
-                callback(result);
-            }
+        const result = handler.call(this, data);
+        if (callback !== null) {
+            callback(result);
         }
     }
 
@@ -57,6 +58,10 @@ class Yomichan {
     }
 
     updateState(state) {
+        if (this.state === state) {
+            return;
+        }
+
         this.state = state;
 
         switch (state) {
@@ -72,9 +77,18 @@ class Yomichan {
                 break;
         }
 
+        Yomichan.notifyChange('state', this.state);
+    }
+
+    updateOptions(options) {
+        this.options = sanitizeOptions(options);
+        Yomichan.notifyChange('options', this.options);
+    }
+
+    static notifyChange(name, value) {
         chrome.tabs.query({}, (tabs) => {
             for (const tab of tabs) {
-                chrome.tabs.sendMessage(tab.id, this.state, () => null);
+                chrome.tabs.sendMessage(tab.id, {name: name, value: value}, () => null);
             }
         });
     }

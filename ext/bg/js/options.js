@@ -23,6 +23,9 @@ function sanitizeOptions(options) {
     };
 
     for (const key in defaults) {
+        if (!options.hasOwnProperty(key)) {
+            options[key] = defaults[key];
+        }
         options[key] = options[key] || defaults[key];
     }
 
