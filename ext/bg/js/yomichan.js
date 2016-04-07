@@ -23,24 +23,26 @@ class Yomichan {
 
         this.translator = new Translator();
         this.updateState('disabled');
-        this.updateOptions({});
 
-        chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
-        chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
+        loadOptions((opts) => {
+            this.updateOptions(opts);
 
-        loadOptions((opts) => this.updateOptions(opts));
+            chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
+            chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
+        });
     }
 
     onMessage(request, sender, callback) {
         const {action, data} = request;
-        const handler = {
-            findKanji:      ({text}) => this.translator.onFindKanji(text),
-            findTerm:       ({text}) => this.translator.findTerm(text),
-            getState:       () => this.state,
-            renderTemplate: ({data, template}) => Handlebars.templates[template](data)
-        }[action];
+        const handlers = {
+            findKanji:  ({text}) => this.translator.onFindKanji(text),
+            findTerm:   ({text}) => this.translator.findTerm(text),
+            getState:   () => this.state,
+            getOptions: () => this.options,
+            renderText: ({data, template}) => Handlebars.templates[template](data)
+        };
 
-        const result = handler.call(this, data);
+        const result = handlers[action].call(this, data);
         if (callback !== null) {
             callback(result);
         }

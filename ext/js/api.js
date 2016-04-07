@@ -29,8 +29,12 @@ function findKanji(text, callback) {
     sendMessage('findKanji', {text: text}, callback);
 }
 
-function renderTemplate(data, template, callback) {
-    sendMessage('renderTemplate', {data: data, template: template}, callback);
+function renderText(data, template, callback) {
+    sendMessage('renderText', {data: data, template: template}, callback);
+}
+
+function getOptions(callback) {
+    sendMessage('getOptions', null, callback);
 }
 
 function getState(callback) {

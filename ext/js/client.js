@@ -37,7 +37,12 @@ class Client {
         window.addEventListener('scroll', (e) => this.hidePopup());
         window.addEventListener('resize', (e) => this.hidePopup());
 
-        getState((state) => this.setEnabled(state === 'enabled'));
+        getOptions((opts) => {
+            this.setOptions(opts);
+            getState((state) => {
+                this.setEnabled(state === 'enabled');
+            });
+        });
     }
 
     onKeyDown(e) {
@@ -93,7 +98,7 @@ class Client {
                 this.hidePopup();
             } else {
                 range.setEnd(range.endContainer, range.startOffset + length);
-                renderTemplate({defs: results}, 'defs.html', (html) => {
+                renderText({defs: results}, 'defs.html', (html) => {
                     this.popup.innerHTML = html;
                     this.showPopup(range);
                 });
