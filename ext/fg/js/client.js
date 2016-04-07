@@ -81,7 +81,7 @@ class Client {
     }
 
     searchAtPoint(point) {
-        const range = getRangeAtPoint(point, 10);
+        const range = getRangeAtPoint(point, this.options.scanLength);
         if (range === null) {
             this.hidePopup();
             return;

@@ -17,7 +17,7 @@
  */
 
 
-function getRangeAtPoint(point, lookAhead) {
+function getRangeAtPoint(point, scanLength) {
     const range = document.caretRangeFromPoint(point.x, point.y);
     if (range === null) {
         return null;
@@ -29,7 +29,7 @@ function getRangeAtPoint(point, lookAhead) {
     }
 
     const offset = range.startOffset;
-    const length = Math.min(node.length - offset, lookAhead);
+    const length = Math.min(node.length - offset, scanLength);
     if (length === 0) {
         return null;
     }
