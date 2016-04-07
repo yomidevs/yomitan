@@ -29,6 +29,10 @@ class Yomichan {
 
             chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
             chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
+
+            if (this.options.loadOnStartup) {
+                this.updateState('loading');
+            }
         });
     }
 
