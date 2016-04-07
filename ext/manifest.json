@@ -7,11 +7,11 @@
     "browser_action": {"default_icon": "icon.png"},
     "background":     {"page": "bg/background.html"},
     "options_page":   "bg/options.html",
-    "permissions":    [ "storage" ],
+    "permissions":    ["storage"],
 
     "content_scripts": [{
         "matches": ["*://*/*"],
-        "js":      ["js/api.js", "js/util.js", "js/client.js"],
-        "css":     ["css/client.css"]
+        "js":      ["fg/js/api.js", "fg/js/util.js", "fg/js/client.js"],
+        "css":     ["fg/css/client.css"]
     }]
 }
