@@ -83,7 +83,7 @@ class Yomichan {
     }
 
     updateOptions(options) {
-        this.options = sanitizeOptions(options);
+        this.options = options;
         Yomichan.notifyChange('options', this.options);
     }
 

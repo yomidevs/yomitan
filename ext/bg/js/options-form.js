@@ -19,18 +19,20 @@
 
 function optionsToForm(opts) {
     $('#scanLength').val(opts.scanLength);
+    $('#loadOnStartup').prop('checked', opts.loadOnStartup);
 }
 
 function formToOptions() {
     return sanitizeOptions({
-        scanLength: $('#scanLength').val()
+        scanLength: $('#scanLength').val(),
+        loadOnStartup: $('#loadOnStartup').prop('checked')
     });
 }
 
 $('#saveOptions').click(() => {
-    const opt = formToOptions();
+    const opts = formToOptions();
     const yomichan = chrome.extension.getBackgroundPage().yomichan;
-    saveOptions(() => yomichan.updateOptions(opts));
+    saveOptions(opts, () => yomichan.updateOptions(opts));
 });
 
 $('#resetOptions').click(() => {
