@@ -4,10 +4,22 @@
     "description":      "Yomichan Extension",
     "version":          "0.0.1",
 
-    "browser_action": {"default_icon": "icon.png"},
-    "background":     {"page": "bg/background.html"},
-    "options_page":   "bg/options.html",
-    "permissions":    ["storage"],
+    "icons": {
+        "16":  "img/icon16.png",
+        "48":  "img/icon48.png",
+        "128": "img/icon128.png"
+    },
+
+    "browser_action": {
+        "default_icon": {
+            "19": "img/icon19.png",
+            "38": "img/icon38.png"
+        }
+    },
+
+    "background":   {"page": "bg/background.html"},
+    "options_page": "bg/options.html",
+    "permissions":  ["storage"],
 
     "content_scripts": [{
         "matches": ["*://*/*"],
