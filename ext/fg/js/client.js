@@ -19,8 +19,9 @@
 
 class Client {
     constructor() {
-        this.popupOffset = 10;
         this.lastMosePos = null;
+        this.popupText   = '';
+        this.popupOffset = 10;
         this.enabled     = false;
         this.options     = null;
 
@@ -93,7 +94,12 @@ class Client {
             return;
         }
 
-        findTerm(range.toString(), ({results, length}) => {
+        const text = range.toString();
+        if (text === this.popupText) {
+            return;
+        }
+
+        findTerm(text, ({results, length}) => {
             if (length === 0) {
                 this.hidePopup();
             } else {
@@ -113,17 +119,22 @@ class Client {
 
         const pos = getPopupPositionForRange(this.popup, range, this.popupOffset);
 
+        this.popupText              = range.toString();
         this.popup.style.left       = pos.x + 'px';
         this.popup.style.top        = pos.y + 'px';
         this.popup.style.visibility = 'visible';
     }
 
     hidePopup() {
-        if (this.popup.style.visibility !== 'hidden') {
-            const selection = window.getSelection();
-            selection.removeAllRanges();
-            this.popup.style.visibility = 'hidden';
+        if (this.popup.style.visibility === 'hidden') {
+            return;
         }
+
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+
+        this.popupText              = '';
+        this.popup.style.visibility = 'hidden';
     }
 
     setEnabled(enabled) {
