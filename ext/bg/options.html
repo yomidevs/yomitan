@@ -5,6 +5,11 @@
         <title>Here go options</title>
         <link rel="stylesheet" type="text/css" href="lib/bootstrap-3.3.6-dist/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="lib/bootstrap-3.3.6-dist/css/bootstrap-theme.min.css">
+        <style type="text/css">
+            .notifyAlerts {
+                display: none;
+            }
+        </style>
     </head>
     <body>
         <div class="container">
@@ -32,6 +37,20 @@
                             <label><input type="checkbox" id="highlightText" checked> Highlight text</label>
                         </div>
                     </div>
+                </div>
+
+                <div class="alert alert-success notifyAlerts" id="notifySave">
+                    Preferences saved
+                    <button type="button" class="close" data-hide="notifySave">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="alert alert-warning notifyAlerts" id="notifyReset">
+                    Preferences reset to defaults
+                    <button type="button" class="close" data-hide="notifyReset">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
 
                 <div class="text-right">

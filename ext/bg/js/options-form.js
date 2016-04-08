@@ -33,14 +33,21 @@ function formToOptions() {
 
 $('#saveOptions').click(() => {
     const opts = formToOptions();
-    const yomichan = chrome.extension.getBackgroundPage().yomichan;
-    saveOptions(opts, () => yomichan.updateOptions(opts));
+    saveOptions(opts, () => {
+        $('.notifyAlerts').hide();
+        $('#notifySave').slideDown();
+        chrome.extension.getBackgroundPage().yomichan.updateOptions(opts);
+    });
 });
 
 $('#resetOptions').click(() => {
-    if (confirm('Reset options to default values?')) {
-        optionsToForm(sanitizeOptions({}));
-    }
+    optionsToForm(sanitizeOptions({}));
+    $('.notifyAlerts').hide();
+    $('#notifyReset').slideDown();
+});
+
+$('[data-hide]').on('click', function() {
+    $('#' + $(this).attr('data-hide')).hide();
 });
 
 $(document).ready(() => loadOptions((opts) => optionsToForm(opts)));
