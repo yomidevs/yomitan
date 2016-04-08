@@ -113,9 +113,11 @@ class Client {
     }
 
     showPopup(range) {
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
+        if (this.options.highlightText) {
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
 
         const pos = getPopupPositionForRange(this.popup, range, this.popupOffset);
 
@@ -130,8 +132,10 @@ class Client {
             return;
         }
 
-        const selection = window.getSelection();
-        selection.removeAllRanges();
+        if (this.options.highlightText) {
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+        }
 
         this.popupText              = '';
         this.popup.style.visibility = 'hidden';

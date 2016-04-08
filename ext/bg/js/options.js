@@ -20,7 +20,8 @@
 function sanitizeOptions(options) {
     const defaults = {
         scanLength:    20,
-        loadOnStartup: false
+        loadOnStartup: false,
+        highlightText: true
     };
 
     for (const key in defaults) {

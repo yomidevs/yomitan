@@ -20,12 +20,14 @@
 function optionsToForm(opts) {
     $('#scanLength').val(opts.scanLength);
     $('#loadOnStartup').prop('checked', opts.loadOnStartup);
+    $('#highlightText').prop('checked', opts.highlightText);
 }
 
 function formToOptions() {
     return sanitizeOptions({
-        scanLength: $('#scanLength').val(),
-        loadOnStartup: $('#loadOnStartup').prop('checked')
+        scanLength:    $('#scanLength').val(),
+        loadOnStartup: $('#loadOnStartup').prop('checked'),
+        highlightText: $('#highlightText').prop('checked')
     });
 }
 
