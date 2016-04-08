@@ -28,7 +28,6 @@ function sanitizeOptions(options) {
         if (!options.hasOwnProperty(key)) {
             options[key] = defaults[key];
         }
-        options[key] = options[key] || defaults[key];
     }
 
     return options;
