@@ -88,6 +88,11 @@ class Client {
             return;
         }
 
+        if (this.popup.contains(range.startContainer)) {
+            this.hidePopup();
+            return;
+        }
+
         const rect = getRangePaddedRect(range);
         if (point.x < rect.left || point.x > rect.right) {
             this.hidePopup();
