@@ -144,15 +144,14 @@ def load_definitions(path):
 
 
 def parse_kanji_dic(path):
-    results = []
-
+    results = {}
     for line in load_definitions(path):
         segments = line.split()
         character = segments[0]
-        kunyomi = ', '.join(filter(lambda x: filter(is_hiragana, x), segments[1:]))
-        onyomi = ', '.join(filter(lambda x: filter(is_katakana, x), segments[1:]))
+        kunyomi = ' '.join(filter(lambda x: list(filter(is_hiragana, x)), segments[1:]))
+        onyomi = ' '.join(filter(lambda x: list(filter(is_katakana, x)), segments[1:]))
         glossary = '; '.join(re.findall('\{([^\}]+)\}', line))
-        results.append((character, kunyomi, onyomi, glossary))
+        results[character] = (kunyomi or None, onyomi or None, glossary)
 
     return results
 
