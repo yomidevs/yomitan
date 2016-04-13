@@ -33,16 +33,33 @@ class Dictionary {
 
     findTerm(term) {
         const results = [];
-        return (this.termIndices[term] || []).map(index => {
-            const [e, r, g, t] = this.terms[index];
-            return {id: index, expression: e, reading: r, glossary: g, tags: t.split(' ')};
-        });
+
+        for (const name in this.termDicts) {
+            const dict    = this.termDicts[name];
+            const indices = dict.indices[term] || [];
+
+            results.push(
+                indices.map(index => {
+                    const [e, r, t, ...g] = dict.defs[index];
+                    return {id: index, expression: e, reading: r, glossary: g.join('; '), tags: t.split(' ')};
+                })
+            );
+        }
+
+        return results;
     }
 
     findKanji(kanji) {
-        return (this.kanjiIndices[kanji] || []).map(index => {
-            const [c, k, o, g] = def;
-            return {id: index, character: c, kunyomi: k, onyomi: o, glossary: g};
-        });
+        const results = [];
+
+        for (const name in this.termDicts) {
+            const def = this.termDicts[name][kanji];
+            if (def) {
+                const [c, k, o, g] = def;
+                results.push({id: index, character: c, kunyomi: k, onyomi: o, glossary: g});
+            }
+        }
+
+        return results;
     }
 }

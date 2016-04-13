@@ -22,9 +22,9 @@ class Translator {
         this.loaded = false;
         this.paths  = {
             rules:    'bg/data/rules.json',
-            edict:    'bg/data/edict.csv',
-            enamdict: 'bg/data/enamdict.csv',
-            kanjidic: 'bg/data/kanjidic.csv'
+            edict:    'bg/data/edict.json',
+            enamdict: 'bg/data/enamdict.json',
+            kanjidic: 'bg/data/kanjidic.json'
         };
 
         this.dictionary  = new Dictionary();
@@ -46,7 +46,7 @@ class Translator {
                         this.deinflector.setRules(JSON.parse(response));
                         break;
                     case 'kanjidic':
-                        this.dictionary.addKanjiDict('kanjidic', JSON.parse(response));
+                        this.dictionary.addKanjiDict(key, JSON.parse(response));
                         break;
                     case 'edict':
                     case 'enamdict':
