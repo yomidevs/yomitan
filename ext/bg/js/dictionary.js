@@ -19,31 +19,20 @@
 
 class Dictionary {
     constructor() {
-        this.terms       = [];
-        this.termIndices = {};
-
-        this.kanji        = [];
-        this.kanjiIndices = {};
+        this.termDicts  = {};
+        this.kanjiDicts = {};
     }
 
-    addTermData(terms) {
-        let index = this.terms.length;
-        for (const [e, r, g, t] of terms) {
-            this.storeIndex(this.termIndices, e, index);
-            this.storeIndex(this.termIndices, r, index++);
-            this.terms.push([e, r, g, t]);
-        }
+    addTermDict(name, dict) {
+        this.termDicts[name] = dict;
     }
 
-    addKanjiData(kanji) {
-        let index = this.kanji.length;
-        for (const [c, k, o, g] of kanji) {
-            this.storeIndex(this.kanjiIndices, c, index++);
-            this.kanji.push([c, k, o, g]);
-        }
+    addKanjiDict(name, dict) {
+        this.kanjiDicts[name] = dict;
     }
 
     findTerm(term) {
+        const results = [];
         return (this.termIndices[term] || []).map(index => {
             const [e, r, g, t] = this.terms[index];
             return {id: index, expression: e, reading: r, glossary: g, tags: t.split(' ')};
@@ -55,13 +44,5 @@ class Dictionary {
             const [c, k, o, g] = def;
             return {id: index, character: c, kunyomi: k, onyomi: o, glossary: g};
         });
-    }
-
-    storeIndex(indices, term, index) {
-        if (term.length > 0) {
-            const indices = this.termIndices[term] || [];
-            indices.push(index);
-            this.termIndices[term] = indices;
-        }
     }
 }

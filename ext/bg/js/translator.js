@@ -46,11 +46,11 @@ class Translator {
                         this.deinflector.setRules(JSON.parse(response));
                         break;
                     case 'kanjidic':
-                        this.dictionary.addKanjiData(Translator.parseCsv(response));
+                        this.dictionary.addKanjiDict('kanjidic', JSON.parse(response));
                         break;
                     case 'edict':
                     case 'enamdict':
-                        this.dictionary.addTermData(Translator.parseCsv(response));
+                        this.dictionary.addTermDict(key, JSON.parse(response));
                         break;
                 }
 
@@ -163,16 +163,5 @@ class Translator {
         xhr.addEventListener('load', () => callback(xhr.responseText));
         xhr.open('GET', chrome.extension.getURL(url), true);
         xhr.send();
-    }
-
-    static parseCsv(data) {
-        const result = [];
-        for (const row of data.split('\n')) {
-            if (row.length > 0) {
-                result.push(row.split('\t'));
-            }
-        }
-
-        return result;
     }
 }
