@@ -34,12 +34,17 @@
     z-index:          256;
 }
 
+.yomichan-popup ol {
+    padding-left: 1.2em;
+}
+
 .yomichan-def-expression {
-    font-family: serif;
-    font-size:   18pt;
+    font-family:   serif;
+    font-size:     18pt;
 }
 
 .yomichan-def-glossary {
-    clear:     both;
-    font-size: 12pt;
+    clear:       both;
+    font-size:   12pt;
+    padding-top: 0.8em;
 }
