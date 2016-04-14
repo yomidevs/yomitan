@@ -41,7 +41,7 @@ class Dictionary {
             results = results.concat(
                 indices.map(index => {
                     const [e, r, t, ...g] = dict.defs[index];
-                    return {id: index, expression: e, reading: r, glossary: g.join('; '), tags: t.split(' ')};
+                    return {id: index, expression: e, reading: r, glossary: g, tags: t.split(' ')};
                 })
             );
         }
