@@ -32,13 +32,13 @@ class Dictionary {
     }
 
     findTerm(term) {
-        const results = [];
+        let results = [];
 
         for (const name in this.termDicts) {
             const dict    = this.termDicts[name];
             const indices = dict.indices[term] || [];
 
-            results.push(
+            results = results.concat(
                 indices.map(index => {
                     const [e, r, t, ...g] = dict.defs[index];
                     return {id: index, expression: e, reading: r, glossary: g.join('; '), tags: t.split(' ')};
