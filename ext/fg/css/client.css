@@ -35,17 +35,11 @@
 }
 
 .yomichan-def-expression {
-    float:       left;
     font-family: serif;
-    font-size:   16pt;
-}
-
-.yomichan-def-reading {
-    float:       right;
-    font-family: serif;
-    font-size:   16pt;
+    font-size:   18pt;
 }
 
 .yomichan-def-glossary {
-    clear: both;
+    clear:     both;
+    font-size: 12pt;
 }

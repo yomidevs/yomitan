@@ -1,5 +1,9 @@
+{{#if reading}}
+<div class="yomichan-def-expression"><ruby>{{expression}}<rt>{{reading}}</rt></ruby></div>
+{{else}}
 <div class="yomichan-def-expression">{{expression}}</div>
-{{#if reading}}<div class="yomichan-def-reading">{{reading}}</div>{{/if}}
+{{/if}}
+
 <div class="yomichan-def-glossary">
     <ol>
         {{#each glossary}}
