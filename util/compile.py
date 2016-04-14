@@ -89,6 +89,7 @@ PARSED_TAGS = {
     'obsc':    'obscure term',
     'ok':      'out-dated or obsolete kana usage',
     'on-mim':  'onomatopoeic or mimetic word',
+    'P':       'popular term',
     'p':       'place-name',
     'physics': 'physics terminology',
     'pn':      'pronoun',
@@ -177,15 +178,18 @@ def parse_edict(path):
         reading = None if reading_match is None else reading_match.group(1)
 
         defs = []
-        tags = []
+        tags = set()
 
         for index, dfn in enumerate(filter(None, segments[1:])):
-            dfn_match = re.search(r'^((?:\((?:[\w\-\,\:]*)*\)\s+)*)(.*)$', dfn)
-            gloss = dfn_match.group(2)
+            dfn_match = re.search(r'^((?:\((?:[\w\-\,\:]*)*\)\s*)*)(.*)$', dfn)
 
-            if index == 0:
-                tags_raw = set(filter(None, re.split(r'[\s\(\),]', dfn_match.group(1))))
-                tags = tags_raw.intersection(set(PARSED_TAGS.keys()))
+            gloss = dfn_match.group(2).strip()
+            if len(gloss) == 0:
+                continue
+
+            tags_raw = set(filter(None, re.split(r'[\s\(\),]', dfn_match.group(1))))
+            tags_raw = tags_raw.intersection(set(PARSED_TAGS.keys()))
+            tags = tags.union(tags_raw)
 
             if index == 0 or len(dfn_match.group(1)) > 0:
                 defs.append([gloss])
