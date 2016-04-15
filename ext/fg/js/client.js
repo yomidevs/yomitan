@@ -27,6 +27,8 @@ class Client {
 
         this.popup = document.createElement('iframe');
         this.popup.classList.add('yomichan-popup');
+        this.popup.addEventListener('mousedown', (e) => e.stopPropagation());
+        this.popup.addEventListener('scroll', (e) => e.stopPropagation());
         document.body.appendChild(this.popup);
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
