@@ -17,9 +17,10 @@
         }
     },
 
-    "background":   {"page": "bg/background.html"},
-    "options_page": "bg/options.html",
-    "permissions":  ["storage"],
+    "background":               {"page": "bg/background.html"},
+    "options_page":             "bg/options.html",
+    "permissions":              ["storage"],
+    "web_accessible_resources": ["fg/css/popup.css"],
 
     "content_scripts": [{
         "matches": ["*://*/*"],

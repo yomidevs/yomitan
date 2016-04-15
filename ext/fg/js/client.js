@@ -25,10 +25,8 @@ class Client {
         this.enabled     = false;
         this.options     = null;
 
-        this.popup = document.createElement('div');
+        this.popup = document.createElement('iframe');
         this.popup.classList.add('yomichan-popup');
-        this.popup.addEventListener('mousedown', (e) => e.stopPropagation());
-        this.popup.addEventListener('scroll', (e) => e.stopPropagation());
         document.body.appendChild(this.popup);
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
@@ -109,8 +107,8 @@ class Client {
                 this.hidePopup();
             } else {
                 range.setEnd(range.endContainer, range.startOffset + length);
-                renderText({defs: results}, 'defs.html', (html) => {
-                    this.popup.innerHTML = html;
+                renderText({defs: results, root: chrome.extension.getURL('fg')}, 'defs.html', (html) => {
+                    this.popup.setAttribute('srcdoc', html);
                     this.showPopup(range);
                 });
             }

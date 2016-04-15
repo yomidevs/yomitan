@@ -1,6 +1,16 @@
-{{#each defs}}
-<div class="yomichan-def">
-    {{> term.html}}
-    {{#unless @last}}<br>{{/unless}}
-</div>
-{{/each}}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <link rel="stylesheet" href="{{root}}/css/popup.css">
+    </head>
+    <body>
+        {{#each defs}}
+        <div class="definition">
+            {{> term.html}}
+            {{#unless @last}}<br>{{/unless}}
+        </div>
+        {{/each}}
+    </body>
+</html>
