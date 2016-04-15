@@ -20,7 +20,7 @@
 class Client {
     constructor() {
         this.lastMosePos = null;
-        this.popupText   = '';
+        this.popupQuery  = '';
         this.popupOffset = 10;
         this.enabled     = false;
         this.options     = null;
@@ -38,9 +38,7 @@ class Client {
 
         getOptions((opts) => {
             this.setOptions(opts);
-            getState((state) => {
-                this.setEnabled(state === 'enabled');
-            });
+            getState((state) => this.setEnabled(state === 'enabled'));
         });
     }
 
@@ -97,26 +95,25 @@ class Client {
             return;
         }
 
-        const text = range.toString();
-        if (text === this.popupText) {
+        const popupQuery = range.toString();
+        if (popupQuery === this.popupQuery) {
             return;
         }
 
-        findTerm(text, ({results, length}) => {
+        findTerm(popupQuery, ({results, length}) => {
             if (length === 0) {
                 this.hidePopup();
             } else {
-                range.setEnd(range.endContainer, range.startOffset + length);
-                renderText({defs: results, root: chrome.extension.getURL('fg')}, 'defs.html', (html) => {
-                    this.popup.setAttribute('srcdoc', html);
-                    this.showPopup(range);
-                });
+                const params = {defs: results, root: chrome.extension.getURL('fg')};
+                renderText(params, 'defs.html', (html) => this.showPopup(range, html, popupQuery, length));
             }
         });
     }
 
-    showPopup(range) {
+    showPopup(range, html, popupQuery, length) {
         if (this.options.highlightText) {
+            range.setEnd(range.endContainer, range.startOffset + length);
+
             const selection = window.getSelection();
             selection.removeAllRanges();
             selection.addRange(range);
@@ -124,10 +121,14 @@ class Client {
 
         const pos = getPopupPositionForRange(this.popup, range, this.popupOffset);
 
-        this.popupText              = range.toString();
+        if (this.popup.getAttribute('srcdoc') !== html) {
+            this.popup.setAttribute('srcdoc', html);
+        }
+
         this.popup.style.left       = pos.x + 'px';
         this.popup.style.top        = pos.y + 'px';
         this.popup.style.visibility = 'visible';
+        this.popupQuery             = popupQuery;
     }
 
     hidePopup() {
@@ -140,8 +141,8 @@ class Client {
             selection.removeAllRanges();
         }
 
-        this.popupText              = '';
         this.popup.style.visibility = 'hidden';
+        this.popupQuery             = '';
     }
 
     setEnabled(enabled) {
