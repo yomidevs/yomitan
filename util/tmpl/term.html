@@ -8,8 +8,12 @@
 <div class="rules">
     {{#each rules}}
     {{.}}
-    {{#unless @last}} &laquo; {{/unless}}
+    {{#unless @last}}
+    &raquo;
+    {{/unless}}
     {{/each}}
+    &raquo;
+    {{source}}
 </div>
 {{/if}}
 
