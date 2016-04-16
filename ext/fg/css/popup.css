@@ -34,6 +34,10 @@ body {
     display: inline-block;
 }
 
+.tags {
+    color: #777;
+}
+
 .glossary {
     font-size:   12pt;
 }

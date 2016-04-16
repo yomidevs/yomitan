@@ -7,13 +7,18 @@
 {{#if rules}}
 <div class="rules">
     {{#each rules}}
-    {{.}}
-    {{#unless @last}}
-    &raquo;
-    {{/unless}}
+    {{.}} {{#unless @last}}&laquo;{{/unless}}
     {{/each}}
-    &raquo;
+    &laquo;
     {{source}}
+</div>
+{{/if}}
+
+{{#if tags}}
+<div class="tags">
+    {{#each tags}}
+    {{.}}{{#unless @last}},{{/unless}}
+    {{/each}}
 </div>
 {{/if}}
 
