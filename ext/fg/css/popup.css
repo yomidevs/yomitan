@@ -17,15 +17,31 @@
  */
 
 body {
-    font-family: sans-serif;
-    font-size:   12pt;
+    background-color: #fff;
+    color:            #000;
+    font-family:      sans-serif;
+    font-size:        12pt;
 }
 
 .expression {
     font-family: serif;
     font-size:   18pt;
+    display:     inline-block;
+}
+
+.rules {
+    color:   #777;
+    display: inline-block;
 }
 
 .glossary {
     font-size:   12pt;
+}
+
+li {
+    color: #777;
+}
+
+li span {
+    color: #000;
 }
