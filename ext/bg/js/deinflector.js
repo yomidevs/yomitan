@@ -32,7 +32,7 @@ class Deinflection {
             }
 
             for (const tag of this.tags) {
-                if (this.searchTags(tag, tags)) {
+                if (tags.indexOf(tag) !== -1) {
                     return true;
                 }
             }
@@ -43,7 +43,7 @@ class Deinflection {
 
     deinflect(validator, rules) {
         if (this.validate(validator)) {
-            const child = new Deinflection(this.term);
+            const child = new Deinflection(this.term, this.tags);
             this.children.push(child);
         }
 
@@ -52,7 +52,7 @@ class Deinflection {
             for (const v of variants) {
                 let allowed = this.tags.length === 0;
                 for (const tag of this.tags) {
-                    if (this.searchTags(tag, v.tagsIn)) {
+                    if (v.tagsIn.indexOf(tag) !== -1) {
                         allowed = true;
                         break;
                     }
@@ -73,20 +73,9 @@ class Deinflection {
         return this.children.length > 0;
     }
 
-    searchTags(tag, tags) {
-        for (const t of tags) {
-            const re = new RegExp(tag);
-            if (re.test(t)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     gather() {
         if (this.children.length === 0) {
-            return [{root: this.term, rules: []}];
+            return [{root: this.term, tags: this.tags, rules: []}];
         }
 
         const paths = [];

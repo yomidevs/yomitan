@@ -77,11 +77,9 @@ class Translator {
                 return tags;
             });
 
-            if (dfs === null) {
-                this.processTerm(groups, term);
-            } else {
+            if (dfs !== null) {
                 for (const df of dfs) {
-                    this.processTerm(groups, df.source, df.rules, df.root);
+                    this.processTerm(groups, df.source, df.tags, df.rules, df.root);
                 }
             }
         }
@@ -141,20 +139,30 @@ class Translator {
         return results;
     }
 
-    processTerm(groups, source, rules=[], root='') {
-        for (const entry of this.dictionary.findTerm(root || source)) {
+    processTerm(groups, source, tags, rules=[], root='') {
+        for (const entry of this.dictionary.findTerm(root)) {
             if (entry.id in groups) {
                 continue;
             }
 
-            groups[entry.id] = {
-                expression: entry.expression,
-                reading:    entry.reading,
-                glossary:   entry.glossary,
-                tags:       entry.tags,
-                source:     source,
-                rules:      rules
-            };
+            let matched = tags.length == 0;
+            for (const tag of tags) {
+                if (entry.tags.indexOf(tag) !== -1) {
+                    matched = true;
+                    break;
+                }
+            }
+
+            if (matched) {
+                groups[entry.id] = {
+                    expression: entry.expression,
+                    reading:    entry.reading,
+                    glossary:   entry.glossary,
+                    tags:       entry.tags,
+                    source:     source,
+                    rules:      rules
+                };
+            }
         }
     }
 
