@@ -34,19 +34,17 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
     + container.escapeExpression(((helper = (helper = helpers.expression || (depth0 != null ? depth0.expression : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"expression","hash":{},"data":data}) : helper)))
     + "</div>\n";
 },"5":function(container,depth0,helpers,partials,data) {
-    var stack1, helper, alias1=depth0 != null ? depth0 : {};
+    var stack1;
 
   return "<div class=\"rules\">\n"
-    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.rules : depth0),{"name":"each","hash":{},"fn":container.program(6, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "    &laquo;\n    "
-    + container.escapeExpression(((helper = (helper = helpers.source || (depth0 != null ? depth0.source : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"source","hash":{},"data":data}) : helper)))
-    + "\n</div>\n";
+    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.rules : depth0),{"name":"each","hash":{},"fn":container.program(6, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "</div>\n";
 },"6":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "    "
+  return "    <span class=\"rule\">"
     + container.escapeExpression(container.lambda(depth0, depth0))
-    + " "
+    + "</span> "
     + ((stack1 = helpers.unless.call(depth0 != null ? depth0 : {},(data && data.last),{"name":"unless","hash":{},"fn":container.program(7, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "\n";
 },"7":function(container,depth0,helpers,partials,data) {
@@ -58,15 +56,10 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
     + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.tags : depth0),{"name":"each","hash":{},"fn":container.program(10, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "</div>\n";
 },"10":function(container,depth0,helpers,partials,data) {
-    var stack1;
-
-  return "    "
+    return "    <span class=\"tag\">"
     + container.escapeExpression(container.lambda(depth0, depth0))
-    + ((stack1 = helpers.unless.call(depth0 != null ? depth0 : {},(data && data.last),{"name":"unless","hash":{},"fn":container.program(11, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "\n";
-},"11":function(container,depth0,helpers,partials,data) {
-    return ",";
-},"13":function(container,depth0,helpers,partials,data) {
+    + "</span>\n";
+},"12":function(container,depth0,helpers,partials,data) {
     return "        <li><span>"
     + container.escapeExpression(container.lambda(depth0, depth0))
     + "</span></li>\n";
@@ -79,7 +72,7 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
     + "\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.tags : depth0),{"name":"if","hash":{},"fn":container.program(9, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "\n<div class=\"glossary\">\n    <ol>\n"
-    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.glossary : depth0),{"name":"each","hash":{},"fn":container.program(13, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.glossary : depth0),{"name":"each","hash":{},"fn":container.program(12, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "    </ol>\n</div>\n";
 },"useData":true});
 })();

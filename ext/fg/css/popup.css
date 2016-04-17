@@ -18,14 +18,16 @@
 
 body {
     background-color: #fff;
-    color:            #000;
-    font-family:      sans-serif;
-    font-size:        12pt;
+    color:            #333;
+    font-family:      helvetica neue,helvetica,arial,sans-serif;
+    font-size:        14px;
+    line-height:      1.42857143;
+    overflow-y:       auto;
 }
 
 .expression {
     font-family: serif;
-    font-size:   18pt;
+    font-size:   24px;
     display:     inline-block;
 }
 
@@ -34,12 +36,22 @@ body {
     display: inline-block;
 }
 
-.tags {
-    color: #777;
+.tag {
+    background-color: #777;
+    border-radius:    0.25em;
+    color:            #fff;
+    display:          inline;
+    font-size:        75%;
+    font-weight:      700;
+    line-height:      1;
+    padding:          0.2em 0.6em 0.3em;
+    text-align:       center;
+    vertical-align:   baseline;
+    white-space:      nowrap;
 }
 
-.glossary {
-    font-size:   12pt;
+ol {
+    padding-left: 1.2em;
 }
 
 li {
