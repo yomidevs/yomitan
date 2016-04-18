@@ -19,11 +19,12 @@
 
 class Client {
     constructor() {
-        this.lastMosePos = null;
-        this.popupQuery  = '';
-        this.popupOffset = 10;
-        this.enabled     = false;
-        this.options     = null;
+        this.popupMousePos = null;
+        this.popupQuery    = '';
+        this.popupOffset   = 10;
+        this.enabled       = false;
+        this.options       = {};
+        this.activeDict    = '';
 
         this.popup = document.createElement('iframe');
         this.popup.classList.add('yomichan-popup');
@@ -40,29 +41,29 @@ class Client {
         window.addEventListener('resize', (e) => this.hidePopup());
 
         getOptions((opts) => {
-            this.setDict('edict');
+            this.setActiveDict('edict');
             this.setOptions(opts);
             getState((state) => this.setEnabled(state === 'enabled'));
         });
     }
 
     onKeyDown(e) {
-        if (this.enabled && this.lastMousePos !== null && (e.keyCode === 16 || e.charCode === 16)) {
-            this.searchAtPoint(this.lastMousePos);
+        if (this.enabled && this.popupMousePos !== null && (e.keyCode === 16 || e.charCode === 16)) {
+            this.searchAtPoint(this.popupMousePos);
         }
     }
 
     onMouseMove(e) {
-        this.lastMousePos = {x: e.clientX, y: e.clientY};
+        this.popupMousePos = {x: e.clientX, y: e.clientY};
         if (this.enabled && (e.shiftKey || e.which === 2)) {
-            this.searchAtPoint(this.lastMousePos);
+            this.searchAtPoint(this.popupMousePos);
         }
     }
 
     onMouseDown(e) {
-        this.lastMousePos = {x: e.clientX, y: e.clientY};
+        this.popupMousePos = {x: e.clientX, y: e.clientY};
         if (this.enabled && (e.shiftKey || e.which === 2)) {
-            this.searchAtPoint(this.lastMousePos);
+            this.searchAtPoint(this.popupMousePos);
         } else {
             this.hidePopup();
         }
@@ -84,8 +85,8 @@ class Client {
     onFrameMessage(e) {
         const {action, data} = e.data;
         switch (action) {
-            case 'selectDict':
-                this.setDict(data);
+            case 'setActiveDict':
+                this.setActiveDict(data);
                 break;
         }
     }
@@ -113,11 +114,11 @@ class Client {
             return;
         }
 
-        findTerm(popupQuery, ({results, length}) => {
+        findTerm(popupQuery, this.activeDict, ({results, length}) => {
             if (length === 0) {
                 this.hidePopup();
             } else {
-                const params = {defs: results, root: chrome.extension.getURL('fg')};
+                const params = {defs: results, root: chrome.extension.getURL('fg'), activeDict: this.activeDict};
                 renderText(params, 'defs.html', (html) => this.showPopup(range, html, popupQuery, length));
             }
         });
@@ -168,9 +169,8 @@ class Client {
         this.options = opts;
     }
 
-    setDict(dict) {
-        this.dict = dict;
-        alert(dict);
+    setActiveDict(activeDict) {
+        this.activeDict = activeDict;
     }
 }
 

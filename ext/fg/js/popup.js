@@ -17,26 +17,6 @@
  */
 
 
-function sendMessage(action, data, callback) {
-    chrome.runtime.sendMessage({action: action, data: data}, callback);
-}
-
-function findTerm(text, dict, callback) {
-    sendMessage('findTerm', {text: text, dict: dict}, callback);
-}
-
-function findKanji(text, callback) {
-    sendMessage('findKanji', {text: text}, callback);
-}
-
-function renderText(data, template, callback) {
-    sendMessage('renderText', {data: data, template: template}, callback);
-}
-
-function getOptions(callback) {
-    sendMessage('getOptions', null, callback);
-}
-
-function getState(callback) {
-    sendMessage('getState', null, callback);
+function setActiveDict(dict) {
+    parent.postMessage({action: 'setActiveDict', data: dict}, '*');
 }
