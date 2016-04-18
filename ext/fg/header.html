@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <link rel="stylesheet" href="{{root}}/css/popup.css">
+    </head>
+    <body>
+        <div class="dictionary">
+            <a href="javascript:setActiveDict('edict');">単</a><a href="javascript:setActiveDict('enamdict')">名</a><a href="javascript:setActiveDict('kanjidic');">漢</a>
+        </div>
+
+        {{#each defs}}
+        <div class="definition">
+            {{> term.html}}
+        </div>
+        {{/each}}
+
+    <script src="{{root}}/js/popup.js"></script>
+    </body>
+</html>

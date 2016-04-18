@@ -119,7 +119,7 @@ class Client {
                 this.hidePopup();
             } else {
                 const params = {defs: results, root: chrome.extension.getURL('fg'), activeDict: this.activeDict};
-                renderText(params, 'defs.html', (html) => this.showPopup(range, html, popupQuery, length));
+                renderText(params, 'term-list.html', (html) => this.showPopup(range, html, popupQuery, length));
             }
         });
     }
