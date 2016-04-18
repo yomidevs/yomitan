@@ -31,7 +31,8 @@ class Client {
         this.popup.addEventListener('scroll', (e) => e.stopPropagation());
         document.body.appendChild(this.popup);
 
-        chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
+        chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
+        window.addEventListener('message', this.onFrameMessage.bind(this));
         window.addEventListener('mousedown', this.onMouseDown.bind(this));
         window.addEventListener('mousemove', this.onMouseMove.bind(this));
         window.addEventListener('keydown', this.onKeyDown.bind(this));
@@ -39,6 +40,7 @@ class Client {
         window.addEventListener('resize', (e) => this.hidePopup());
 
         getOptions((opts) => {
+            this.setDict('edict');
             this.setOptions(opts);
             getState((state) => this.setEnabled(state === 'enabled'));
         });
@@ -66,7 +68,7 @@ class Client {
         }
     }
 
-    onMessage({name, value}, sender, callback) {
+    onBgMessage({name, value}, sender, callback) {
         switch (name) {
             case 'state':
                 this.setEnabled(value === 'enabled');
@@ -77,6 +79,15 @@ class Client {
         }
 
         callback();
+    }
+
+    onFrameMessage(e) {
+        const {action, data} = e.data;
+        switch (action) {
+            case 'selectDict':
+                this.setDict(data);
+                break;
+        }
     }
 
     searchAtPoint(point) {
@@ -155,6 +166,11 @@ class Client {
 
     setOptions(opts) {
         this.options = opts;
+    }
+
+    setDict(dict) {
+        this.dict = dict;
+        alert(dict);
     }
 }
 
