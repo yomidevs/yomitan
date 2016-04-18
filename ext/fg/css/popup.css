@@ -50,26 +50,6 @@ body {
     white-space:      nowrap;
 }
 
-.dictionary {
-    position:         fixed;
-    right:            0px;
-    bottom:           0px;
-}
-
-.dictionary a {
-    background-color: #333;
-    color:            #eee;
-    display:          inline-block;
-    font-size:        16px;
-    opacity:          0.75;
-    padding:          0.3em;
-    text-decoration:  none;
-}
-
-.dictionary a:hover {
-    opacity: 1.0;
-}
-
 ol {
     padding-left: 1.2em;
 }
