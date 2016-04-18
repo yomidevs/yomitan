@@ -14,10 +14,23 @@ templates['header.html'] = template({"compiler":[7,">= 4.0.0"],"main":function(c
     + container.escapeExpression(((helper = (helper = helpers.root || (depth0 != null ? depth0.root : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"root","hash":{},"data":data}) : helper)))
     + "/css/popup.css\">\n    </head>\n    <body>\n        <div class=\"dictionary\">\n            <a href=\"javascript:setActiveDict('edict');\">単</a><a href=\"javascript:setActiveDict('enamdict')\">名</a><a href=\"javascript:setActiveDict('kanjidic');\">漢</a>\n        </div>\n";
 },"useData":true});
+templates['kanji.html'] = template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
+
+  return "<div class=\"kanji\">"
+    + alias4(((helper = (helper = helpers.character || (depth0 != null ? depth0.character : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"character","hash":{},"data":data}) : helper)))
+    + "</div>\n\n<div class=\"reading\">\n    "
+    + alias4(((helper = (helper = helpers.kunyomi || (depth0 != null ? depth0.kunyomi : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"kunyomi","hash":{},"data":data}) : helper)))
+    + "\n</div>\n\n<div class=\"reading\">\n    "
+    + alias4(((helper = (helper = helpers.onyomi || (depth0 != null ? depth0.onyomi : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"onyomi","hash":{},"data":data}) : helper)))
+    + "\n</div>\n\n<div class=\"glossary\">\n    "
+    + alias4(((helper = (helper = helpers.glossary || (depth0 != null ? depth0.glossary : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"glossary","hash":{},"data":data}) : helper)))
+    + "\n</div>\n";
+},"useData":true});
 templates['term.html'] = template({"1":function(container,depth0,helpers,partials,data) {
     var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
-  return "<div class=\"expression\"><ruby>"
+  return "<div class=\"term\"><ruby>"
     + alias4(((helper = (helper = helpers.expression || (depth0 != null ? depth0.expression : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"expression","hash":{},"data":data}) : helper)))
     + "<rt>"
     + alias4(((helper = (helper = helpers.reading || (depth0 != null ? depth0.reading : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"reading","hash":{},"data":data}) : helper)))
@@ -25,7 +38,7 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
 },"3":function(container,depth0,helpers,partials,data) {
     var helper;
 
-  return "<div class=\"expression\">"
+  return "<div class=\"term\">"
     + container.escapeExpression(((helper = (helper = helpers.expression || (depth0 != null ? depth0.expression : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"expression","hash":{},"data":data}) : helper)))
     + "</div>\n";
 },"5":function(container,depth0,helpers,partials,data) {

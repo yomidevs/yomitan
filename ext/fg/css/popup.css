@@ -25,7 +25,7 @@ body {
     overflow-y:       auto;
 }
 
-.expression {
+.term {
     font-family: serif;
     font-size:   24px;
     display:     inline-block;
