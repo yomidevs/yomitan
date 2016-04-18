@@ -24,7 +24,7 @@ class Yomichan {
             let result = '';
             for (const c of options.fn(this)) {
                 if (Translator.isKanji(c)) {
-                    result += `<a href="#">${c}</a>`;
+                    result += Handlebars.templates['kanji-link.html']({kanji: c});
                 } else {
                     result += c;
                 }
