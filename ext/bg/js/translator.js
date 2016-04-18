@@ -166,6 +166,21 @@ class Translator {
         }
     }
 
+    static isHiragana(c) {
+        const code = c.charCodeAt(0);
+        return code >= 0x3040 && code < 0x30a0;
+    }
+
+    static isKatakana(c) {
+        const code = c.charCodeAt(0);
+        return code >= 0x30a0 && code < 0x3100;
+    }
+
+    static isKanji(c) {
+        const code = c.charCodeAt(0);
+        return code >= 0x4e00 && code < 0x9fb0 || code >= 0x3400 && code < 0x4dc0;
+    }
+
     static loadData(url, callback) {
         const xhr = new XMLHttpRequest();
         xhr.addEventListener('load', () => callback(xhr.responseText));

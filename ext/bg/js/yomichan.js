@@ -20,6 +20,18 @@
 class Yomichan {
     constructor() {
         Handlebars.partials = Handlebars.templates;
+        Handlebars.registerHelper('kanjiLinks', function(options) {
+            let result = '';
+            for (const c of options.fn(this)) {
+                if (Translator.isKanji(c)) {
+                    result += `<a href="#">${c}</a>`;
+                } else {
+                    result += c;
+                }
+            }
+
+            return result;
+        });
 
         this.translator = new Translator();
         this.updateState('disabled');

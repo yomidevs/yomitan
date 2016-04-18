@@ -31,6 +31,12 @@ body {
     display:     inline-block;
 }
 
+.term a {
+    border-bottom:   1px #777 dashed;
+    color:           #333;
+    text-decoration: none;
+}
+
 .rules {
     color:   #777;
     display: inline-block;
