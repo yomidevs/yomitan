@@ -11,7 +11,7 @@ templates['defs.html'] = template({"1":function(container,depth0,helpers,partial
 
   return "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"UTF-8\">\n        <title></title>\n        <link rel=\"stylesheet\" href=\""
     + container.escapeExpression(((helper = (helper = helpers.root || (depth0 != null ? depth0.root : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"root","hash":{},"data":data}) : helper)))
-    + "/css/popup.css\">\n    </head>\n    <body>\n"
+    + "/css/popup.css\">\n    </head>\n    <body>\n        <div class=\"dictionary\">\n            <a href=\"javascript:selectDict('edict');\">単</a><a href=\"javascript:selectDict('enamdict')\">名</a><a href=\"javascript:selectDict('kanjidic');\">漢</a>\n        </div>\n\n"
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.defs : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "    </body>\n</html>\n";
 },"usePartial":true,"useData":true});
