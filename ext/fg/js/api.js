@@ -21,8 +21,8 @@ function sendMessage(action, data, callback) {
     chrome.runtime.sendMessage({action: action, data: data}, callback);
 }
 
-function findTerm(text, dict, callback) {
-    sendMessage('findTerm', {text: text, dict: dict}, callback);
+function findTerm(text, callback) {
+    sendMessage('findTerm', {text: text}, callback);
 }
 
 function findKanji(text, callback) {

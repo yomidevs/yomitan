@@ -12,7 +12,7 @@ templates['header.html'] = template({"compiler":[7,">= 4.0.0"],"main":function(c
 
   return "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"UTF-8\">\n        <title></title>\n        <link rel=\"stylesheet\" href=\""
     + container.escapeExpression(((helper = (helper = helpers.root || (depth0 != null ? depth0.root : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"root","hash":{},"data":data}) : helper)))
-    + "/css/popup.css\">\n    </head>\n    <body>\n        <div class=\"dictionary\">\n            <a href=\"javascript:setActiveDict('edict');\">単</a><a href=\"javascript:setActiveDict('enamdict')\">名</a><a href=\"javascript:setActiveDict('kanjidic');\">漢</a>\n        </div>\n";
+    + "/css/popup.css\">\n    </head>\n    <body>\n        <div class=\"dictionary\">\n            <a href=\"javascript:selectDict('edict');\">単</a><a href=\"javascript:selectDict('enamdict')\">名</a><a href=\"javascript:selectDict('kanjidic');\">漢</a>\n        </div>\n";
 },"useData":true});
 templates['kanji.html'] = template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;

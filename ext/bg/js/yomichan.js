@@ -39,8 +39,8 @@ class Yomichan {
     onMessage(request, sender, callback) {
         const {action, data} = request;
         const handlers = {
-            findKanji:  ({text, dict}) => this.translator.onFindKanji(text, dict),
-            findTerm:   ({text, dict}) => this.translator.findTerm(text, dict),
+            findKanji:  ({text}) => this.translator.onFindKanji(text),
+            findTerm:   ({text}) => this.translator.findTerm(text),
             getState:   () => this.state,
             getOptions: () => this.options,
             renderText: ({data, template}) => Handlebars.templates[template](data)

@@ -63,14 +63,14 @@ class Translator {
         }
     }
 
-    findTerm(text, dict) {
+    findTerm(text) {
         const groups = {};
         for (let i = text.length; i > 0; --i) {
             const term = text.slice(0, i);
 
             const dfs = this.deinflector.deinflect(term, t => {
                 const tags = [];
-                for (const d of this.dictionary.findTerm(t, dict)) {
+                for (const d of this.dictionary.findTerm(t)) {
                     tags.push(d.tags);
                 }
 
@@ -79,7 +79,7 @@ class Translator {
 
             if (dfs !== null) {
                 for (const df of dfs) {
-                    this.processTerm(dict, groups, df.source, df.tags, df.rules, df.root);
+                    this.processTerm(groups, df.source, df.tags, df.rules, df.root);
                 }
             }
         }
@@ -125,13 +125,13 @@ class Translator {
         return {results: results, length: length};
     }
 
-    findKanji(text, dict) {
+    findKanji(text) {
         let results = [];
 
         const processed = {};
         for (const c of text) {
             if (!processed.has(c)) {
-                results = results.concat(this.dictionary.findKanji(c, dict));
+                results = results.concat(this.dictionary.findKanji(c));
                 processed[c] = true;
             }
         }
@@ -139,8 +139,8 @@ class Translator {
         return results;
     }
 
-    processTerm(dict, groups, source, tags, rules=[], root='') {
-        for (const entry of this.dictionary.findTerm(root, dict)) {
+    processTerm(groups, source, tags, rules=[], root='') {
+        for (const entry of this.dictionary.findTerm(root)) {
             if (entry.id in groups) {
                 continue;
             }

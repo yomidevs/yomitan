@@ -31,24 +31,35 @@ class Dictionary {
         this.kanjiDicts[name] = dict;
     }
 
-    findTerm(term, dict) {
-        const db      = this.termDicts[dict];
-        const indices = db.indices[term] || [];
+    findTerm(term) {
+        let results = [];
 
-        return indices.map(index => {
-            const [e, r, t, ...g] = db.defs[index];
-            return {id: index, expression: e, reading: r, glossary: g, tags: t.split(' ')};
-        });
-    }
+        for (const name in this.termDicts) {
+            const dict    = this.termDicts[name];
+            const indices = dict.indices[term] || [];
 
-    findKanji(kanji, dict) {
-        const def = this.termDicts[dict][kanji];
-
-        if (def) {
-            const [c, k, o, g] = def;
-            return {id: index, character: c, kunyomi: k, onyomi: o, glossary: g};
+            results = results.concat(
+                indices.map(index => {
+                    const [e, r, t, ...g] = dict.defs[index];
+                    return {id: index, expression: e, reading: r, glossary: g, tags: t.split(' ')};
+                })
+            );
         }
 
-        return null;
+        return results;
+    }
+
+    findKanji(kanji) {
+        const results = [];
+
+        for (const name in this.termDicts) {
+            const def = this.termDicts[name][kanji];
+            if (def) {
+                const [c, k, o, g] = def;
+                results.push({id: index, character: c, kunyomi: k, onyomi: o, glossary: g});
+            }
+        }
+
+        return results;
     }
 }
