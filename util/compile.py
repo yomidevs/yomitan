@@ -193,14 +193,14 @@ def parse_edict(path):
         for index, dfn in enumerate(filter(None, segments[1:])):
             dfn_match = re.search(r'^((?:\((?:[\w\-\,\:]*)*\)\s*)*)(.*)$', dfn)
 
-            gloss = dfn_match.group(2).strip()
-            if len(gloss) == 0:
-                continue
-
             tags_raw = set(filter(None, re.split(r'[\s\(\),]', dfn_match.group(1))))
             tags_raw = fixup_godan_verbs(tags_raw)
             tags_raw = tags_raw.intersection(set(PARSED_TAGS.keys()))
             tags = tags.union(tags_raw)
+
+            gloss = dfn_match.group(2).strip()
+            if len(gloss) == 0:
+                continue
 
             if index == 0 or len(dfn_match.group(1)) > 0:
                 defs.append([gloss])

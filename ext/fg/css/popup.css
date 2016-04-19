@@ -43,7 +43,6 @@ body {
 }
 
 .tag {
-    background-color: #777;
     border-radius:    0.25em;
     color:            #fff;
     cursor:           default;
@@ -55,6 +54,22 @@ body {
     text-align:       center;
     vertical-align:   baseline;
     white-space:      nowrap;
+}
+
+.tag-default {
+    background-color: #8a8a91;
+}
+
+.tag-name {
+    background-color: #5cb85c;
+}
+
+.tag-expression {
+    background-color: #f0ad4e;
+}
+
+.tag-popular {
+    background-color: #0275d8;
 }
 
 ol {
