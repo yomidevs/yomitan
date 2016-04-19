@@ -166,7 +166,8 @@ class Translator {
                     tagItems.push({
                         class: tagItem.class || 'default',
                         order: tagItem.order || Number.MAX_SAFE_INTEGER,
-                        name: tag
+                        desc:  tagItem.desc,
+                        name:  tag
                     });
                 }
                 if (tag === 'P') {
