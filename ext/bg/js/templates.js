@@ -77,8 +77,12 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
     + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.tags : depth0),{"name":"each","hash":{},"fn":container.program(11, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "</div>\n";
 },"11":function(container,depth0,helpers,partials,data) {
-    return "    <span class=\"tag\">"
-    + container.escapeExpression(container.lambda(depth0, depth0))
+    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
+
+  return "    <span class=\"tag\" title=\""
+    + alias4(((helper = (helper = helpers.desc || (depth0 != null ? depth0.desc : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"desc","hash":{},"data":data}) : helper)))
+    + "\">"
+    + alias4(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"key","hash":{},"data":data}) : helper)))
     + "</span>\n";
 },"13":function(container,depth0,helpers,partials,data) {
     return "        <li><span>"

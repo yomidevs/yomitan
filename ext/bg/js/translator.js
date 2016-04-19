@@ -19,14 +19,16 @@
 
 class Translator {
     constructor() {
-        this.loaded = false;
-        this.paths  = {
+        this.paths = {
             rules:    'bg/data/rules.json',
+            tags:     'bg/data/tags.json',
             edict:    'bg/data/edict.json',
             enamdict: 'bg/data/enamdict.json',
             kanjidic: 'bg/data/kanjidic.json'
         };
 
+        this.loaded      = false;
+        this.tags        = null;
         this.dictionary  = new Dictionary();
         this.deinflector = new Deinflector();
     }
@@ -38,12 +40,15 @@ class Translator {
         }
 
         const pendingLoads = [];
-        for (const key of ['rules', 'edict', 'enamdict', 'kanjidic']) {
+        for (const key of ['rules', 'tags', 'edict', 'enamdict', 'kanjidic']) {
             pendingLoads.push(key);
             Translator.loadData(this.paths[key], (response) => {
                 switch (key) {
                     case 'rules':
                         this.deinflector.setRules(JSON.parse(response));
+                        break;
+                    case 'tags':
+                        this.tags = JSON.parse(response);
                         break;
                     case 'kanjidic':
                         this.dictionary.addKanjiDict(key, JSON.parse(response));
@@ -98,8 +103,8 @@ class Translator {
                 return 1;
             }
 
-            const p1 = v1.tags.indexOf('P') >= 0;
-            const p2 = v2.tags.indexOf('P') >= 0;
+            const p1 = v1.tags.hasOwnProperty('P');
+            const p2 = v2.tags.hasOwnProperty('P');
             if (p1 && !p2) {
                 return -1;
             } else if (!p1 && p2) {
@@ -153,12 +158,20 @@ class Translator {
                 }
             }
 
+            let tagInfo = {};
+            for (const tag of entry.tags) {
+                const info = this.tags[tag];
+                if (info) {
+                    tagInfo[tag] = info;
+                }
+            }
+
             if (matched) {
                 groups[entry.id] = {
                     expression: entry.expression,
                     reading:    entry.reading,
                     glossary:   entry.glossary,
-                    tags:       entry.tags,
+                    tags:       tagInfo,
                     source:     source,
                     rules:      rules
                 };

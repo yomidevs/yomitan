@@ -46,6 +46,7 @@ body {
     background-color: #777;
     border-radius:    0.25em;
     color:            #fff;
+    cursor:           default;
     display:          inline;
     font-size:        75%;
     font-weight:      700;
