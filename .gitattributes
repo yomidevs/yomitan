@@ -1,2 +1,2 @@
-util/data/* filter=lfs diff=lfs merge=lfs -text
-ext/bg/data/* filter=lfs diff=lfs merge=lfs -text
+util/data/*dic* filter=lfs diff=lfs merge=lfs -text
+ext/bg/data/*dic* filter=lfs diff=lfs merge=lfs -text
