@@ -103,8 +103,8 @@ class Translator {
                 return 1;
             }
 
-            const p1 = v1.tags.hasOwnProperty('P');
-            const p2 = v2.tags.hasOwnProperty('P');
+            const p1 = v1.popular;
+            const p2 = v2.popular;
             if (p1 && !p2) {
                 return -1;
             } else if (!p1 && p2) {
@@ -158,22 +158,52 @@ class Translator {
                 }
             }
 
-            let tagInfo = {};
+            let popular  = false;
+            let tagItems = [];
             for (const tag of entry.tags) {
-                const info = this.tags[tag];
-                if (info) {
-                    tagInfo[tag] = info;
+                const tagItem = this.tags[tag];
+                if (tagItem) {
+                    tagItems.push({
+                        class: tagItem.class || 'default',
+                        order: tagItem.order || Number.MAX_SAFE_INTEGER,
+                        name: tag
+                    });
+                }
+                if (tag === 'P') {
+                    popular = true;
                 }
             }
+
+            tagItems = tagItems.sort((v1, v2) => {
+                const order1 = v1.order;
+                const order2 = v2.order;
+                if (order1 < order2) {
+                    return -1;
+                } else if (order1 > order2) {
+                    return 1;
+                }
+
+                const name1 = v1.name;
+                const name2 = v2.name;
+                if (name1 < name2) {
+                    return -1;
+                } else if (name1 > name2) {
+                    return 1;
+                }
+
+                return 0;
+            });
+
 
             if (matched) {
                 groups[entry.id] = {
                     expression: entry.expression,
                     reading:    entry.reading,
                     glossary:   entry.glossary,
-                    tags:       tagInfo,
+                    tags:       tagItems,
                     source:     source,
-                    rules:      rules
+                    rules:      rules,
+                    popular:    popular
                 };
             }
         }
