@@ -41,8 +41,29 @@ class Dictionary {
             results = results.concat(
                 indices.map(index => {
                     const [e, r, t, ...g] = dict.defs[index];
-                    const tags = Dictionary.fixupTags(t.split(' '));
-                    return {id: index, expression: e, reading: r, glossary: g, tags: tags};
+                    const addons          = [];
+                    const tags            = t.split(' ');
+
+                    //
+                    // TODO: Handle addons through data.
+                    //
+
+                    for (const tag of tags) {
+                        if (tag.startsWith('v5') && tag !== 'v5') {
+                            addons.push('v5');
+                        } else if (tag.startsWith('vs-')) {
+                            addons.push('vs');
+                        }
+                    }
+
+                    return {
+                        id:         index,
+                        expression: e,
+                        reading:    r,
+                        glossary:   g,
+                        tags:       tags.concat(addons),
+                        addons:     addons
+                    };
                 })
             );
         }
@@ -59,21 +80,6 @@ class Dictionary {
                 const [c, k, o, g] = def;
                 results.push({id: index, character: c, kunyomi: k, onyomi: o, glossary: g});
             }
-        }
-
-        return results;
-    }
-
-    static fixupTags(tags) {
-        const results = [];
-        for (const tag of tags) {
-            if (tag.startsWith('v5') && tag !== 'v5') {
-                results.push('v5');
-            } else if (tag.startsWith('vs-')) {
-                results.push('vs');
-            }
-
-            results.push(tag);
         }
 
         return results;

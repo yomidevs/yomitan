@@ -52,6 +52,10 @@ class Deinflection {
             for (const v of variants) {
                 let allowed = this.tags.length === 0;
                 for (const tag of this.tags) {
+                    //
+                    // TODO: Handle addons through tags.json or rules.json
+                    //
+
                     if (v.tagsIn.indexOf(tag) !== -1) {
                         allowed = true;
                         break;

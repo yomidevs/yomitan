@@ -162,7 +162,7 @@ class Translator {
             let tagItems = [];
             for (const tag of entry.tags) {
                 const tagItem = this.tags[tag];
-                if (tagItem) {
+                if (tagItem && entry.addons.indexOf(tag) === -1) {
                     tagItems.push({
                         class: tagItem.class || 'default',
                         order: tagItem.order || Number.MAX_SAFE_INTEGER,
@@ -170,6 +170,11 @@ class Translator {
                         name:  tag
                     });
                 }
+
+                //
+                // TODO: Handle tagging as popular through data.
+                //
+
                 if (tag === 'P') {
                     popular = true;
                 }
@@ -194,7 +199,6 @@ class Translator {
 
                 return 0;
             });
-
 
             if (matched) {
                 groups[entry.id] = {
