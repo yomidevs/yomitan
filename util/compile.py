@@ -112,21 +112,21 @@ PARSED_TAGS = {
     'v4h':     'Yodan verb with "hu/fu" ending (archaic)',
     'v4r':     'Yodan verb with "ru" ending (archaic)',
     'v5':      'Godan verb (not completely classified)',
-    # 'v5aru':   'Godan verb - -aru special class',
-    # 'v5b':     'Godan verb with "bu" ending',
-    # 'v5g':     'Godan verb with "gu" ending',
-    # 'v5k':     'Godan verb with "ku" ending',
-    # 'v5k-s':   'Godan verb - iku/yuku special class',
-    # 'v5m':     'Godan verb with "mu" ending',
-    # 'v5n':     'Godan verb with "nu" ending',
-    # 'v5r':     'Godan verb with "ru" ending',
-    # 'v5r-i':   'Godan verb with "ru" ending (irregular verb)',
-    # 'v5s':     'Godan verb with "su" ending',
-    # 'v5t':     'Godan verb with "tsu" ending',
-    # 'v5u':     'Godan verb with "u" ending',
-    # 'v5u-s':   'Godan verb with "u" ending (special class)',
-    # 'v5uru':   'Godan verb - uru old class verb (old form of Eru)',
-    # 'v5z':     'Godan verb with "zu" ending',
+    'v5aru':   'Godan verb - -aru special class',
+    'v5b':     'Godan verb with "bu" ending',
+    'v5g':     'Godan verb with "gu" ending',
+    'v5k':     'Godan verb with "ku" ending',
+    'v5k-s':   'Godan verb - iku/yuku special class',
+    'v5m':     'Godan verb with "mu" ending',
+    'v5n':     'Godan verb with "nu" ending',
+    'v5r':     'Godan verb with "ru" ending',
+    'v5r-i':   'Godan verb with "ru" ending (irregular verb)',
+    'v5s':     'Godan verb with "su" ending',
+    'v5t':     'Godan verb with "tsu" ending',
+    'v5u':     'Godan verb with "u" ending',
+    'v5u-s':   'Godan verb with "u" ending (special class)',
+    'v5uru':   'Godan verb - uru old class verb (old form of Eru)',
+    'v5z':     'Godan verb with "zu" ending',
     'vi':      'intransitive verb',
     'vk':      'kuru verb - special class',
     'vn':      'irregular nu verb',
@@ -167,16 +167,6 @@ def parse_kanji_dic(path):
     return results
 
 
-def fixup_godan_verbs(tags):
-    results = []
-    for tag in tags:
-        if tag.startswith('v5'):
-            tag = 'v5'
-        results.append(tag)
-
-    return set(results)
-
-
 def parse_edict(path):
     results = []
     for line in load_definitions(path):
@@ -194,7 +184,6 @@ def parse_edict(path):
             dfn_match = re.search(r'^((?:\((?:[\w\-\,\:]*)*\)\s*)*)(.*)$', dfn)
 
             tags_raw = set(filter(None, re.split(r'[\s\(\),]', dfn_match.group(1))))
-            tags_raw = fixup_godan_verbs(tags_raw)
             tags_raw = tags_raw.intersection(set(PARSED_TAGS.keys()))
             tags = tags.union(tags_raw)
 
