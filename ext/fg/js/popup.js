@@ -20,6 +20,30 @@
 class Popup {
     constructor() {
         this.offset = 10;
+    }
+
+    show(content, pos) {
+        inject();
+
+        this.popup.style.left = pos.x + 'px';
+        this.popup.style.top  = pos.y + 'px';
+        this.popup.style.visibility = 'visible';
+    }
+
+    hide() {
+        remove();
+    }
+
+    update(content) {
+        if (this.popup !== null) {
+            this.popup.setAttribute('srcdoc', content);
+        }
+    }
+
+    inject() {
+        if (this.popup !== null) {
+            return;
+        }
 
         this.popup = document.createElement('iframe');
         this.popup.id = 'yomichan-popup';
@@ -29,17 +53,10 @@ class Popup {
         document.body.appendChild(this.popup);
     }
 
-    show(cont, pos) {
-        this.popup.style.left = pos.x + 'px';
-        this.popup.style.top  = pos.y + 'px';
-        this.popup.style.visibility = 'visible';
-    }
-
-    hide() {
-        this.popup.style.visibility = 'hidden';
-    }
-
-    update(cont) {
-        this.popup.setAttribute('srcdoc', cont);
+    remove() {
+        if (this.popup !== null) {
+            this.popup.parentNode.removeChild(this.popup);
+            this.popup = null;
+        }
     }
 }
