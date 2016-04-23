@@ -19,22 +19,46 @@
 
 class Popup {
     constructor() {
+        this.popup  = null;
         this.offset = 10;
     }
 
-    show(content, pos) {
-        inject();
+    showAt(pos, content) {
+        this.inject();
 
         this.popup.style.left = pos.x + 'px';
         this.popup.style.top  = pos.y + 'px';
-        this.popup.style.visibility = 'visible';
+
+        this.setContent(content);
+    }
+
+    showBy(element, content) {
+        this.inject();
+
+        const elementRect = element.getBoundingClientRect();
+        const popupRect   = this.popup.getBoundingClientRect();
+
+        let posX = elementRect.left;
+        if (posX + popupRect.width >= window.innerWidth) {
+            posX = window.innerWidth - popupRect.width;
+        }
+
+        let posY = elementRect.bottom + this.offset;
+        if (posY + popupRect.height >= window.innerHeight) {
+            posY = elementRect.top - popupRect.height - this.offset;
+        }
+
+        this.popup.style.left = pos.x + 'px';
+        this.popup.style.top  = pos.y + 'px';
+
+        this.setContent(content);
     }
 
     hide() {
-        remove();
+        this.remove();
     }
 
-    update(content) {
+    setContent(content) {
         if (this.popup !== null) {
             this.popup.setAttribute('srcdoc', content);
         }
