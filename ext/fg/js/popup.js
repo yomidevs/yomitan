@@ -26,8 +26,9 @@ class Popup {
     showAt(pos, content) {
         this.inject();
 
-        this.popup.style.left = pos.x + 'px';
-        this.popup.style.top  = pos.y + 'px';
+        this.popup.style.left       = pos.x + 'px';
+        this.popup.style.top        = pos.y + 'px';
+        this.popup.style.visibility = 'visible';
 
         this.setContent(content);
     }
@@ -48,14 +49,17 @@ class Popup {
             posY = elementRect.top - popupRect.height - this.offset;
         }
 
-        this.popup.style.left = pos.x + 'px';
-        this.popup.style.top  = pos.y + 'px';
+        this.popup.style.left       = pos.x + 'px';
+        this.popup.style.top        = pos.y + 'px';
+        this.popup.style.visibility = 'visible';
 
         this.setContent(content);
     }
 
     hide() {
-        this.remove();
+        if (this.popup !== null) {
+            this.popup.style.visibility = 'hidden';
+        }
     }
 
     setContent(content) {
@@ -75,12 +79,5 @@ class Popup {
         this.popup.addEventListener('scroll', (e) => e.stopPropagation());
 
         document.body.appendChild(this.popup);
-    }
-
-    remove() {
-        if (this.popup !== null) {
-            this.popup.parentNode.removeChild(this.popup);
-            this.popup = null;
-        }
     }
 }
