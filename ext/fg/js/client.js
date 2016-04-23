@@ -19,17 +19,11 @@
 
 class Client {
     constructor() {
-        this.popupMousePos = null;
-        this.popupQuery    = '';
-        this.popupOffset   = 10;
-        this.enabled       = false;
-        this.options       = {};
-
-        this.popup = document.createElement('iframe');
-        this.popup.classList.add('yomichan-popup');
-        this.popup.addEventListener('mousedown', (e) => e.stopPropagation());
-        this.popup.addEventListener('scroll', (e) => e.stopPropagation());
-        document.body.appendChild(this.popup);
+        this.popup        = new Popup();
+        this.lastMousePos = null;
+        this.lastRange    = null;
+        this.enabled      = false;
+        this.options      = {};
 
         chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
         window.addEventListener('message', this.onFrameMessage.bind(this));
@@ -46,24 +40,24 @@ class Client {
     }
 
     onKeyDown(e) {
-        if (this.enabled && this.popupMousePos !== null && (e.keyCode === 16 || e.charCode === 16)) {
-            this.searchAtPoint(this.popupMousePos);
+        if (this.enabled && this.lastMousePos !== null && (e.keyCode === 16 || e.charCode === 16)) {
+            this.searchAt(this.lastMousePos);
         }
     }
 
     onMouseMove(e) {
-        this.popupMousePos = {x: e.clientX, y: e.clientY};
+        this.lastMousePos = {x: e.clientX, y: e.clientY};
         if (this.enabled && (e.shiftKey || e.which === 2)) {
-            this.searchAtPoint(this.popupMousePos);
+            this.searchAt(this.lastMousePos);
         }
     }
 
     onMouseDown(e) {
-        this.popupMousePos = {x: e.clientX, y: e.clientY};
+        this.lastMousePos = {x: e.clientX, y: e.clientY};
         if (this.enabled && (e.shiftKey || e.which === 2)) {
-            this.searchAtPoint(this.popupMousePos);
+            this.searchAt(this.lastMousePos);
         } else {
-            this.hidePopup();
+            this.popup.hide();
         }
     }
 
@@ -86,35 +80,32 @@ class Client {
         // }
     }
 
-    searchAtPoint(point) {
-        const range = getRangeAtPoint(point, this.options.scanLength);
-        if (range === null) {
-            this.hidePopup();
+    searchAt(point) {
+        const range = Range.fromPoint(point);
+        if (range === null || !range.containsPoint(point)) {
+            this.popup.hide();
             return;
         }
 
-        if (this.popup.contains(range.startContainer)) {
-            this.hidePopup();
-            return;
-        }
-
-        const rect = getRangePaddedRect(range);
-        if (point.x < rect.left || point.x > rect.right) {
-            this.hidePopup();
-            return;
-        }
-
-        const popupQuery = range.toString();
-        if (popupQuery === this.popupQuery) {
+        const text = range.text();
+        if (this.lastRange !== null && this.lastRange.text() == text) {
             return;
         }
 
         findTerm(popupQuery, ({results, length}) => {
             if (length === 0) {
-                this.hidePopup();
+                this.popup.hide();
             } else {
-                const params = {defs: results, root: chrome.extension.getURL('fg')};
-                renderText(params, 'term-list.html', (html) => this.showPopup(range, html, popupQuery, length));
+                const params = {
+                    defs: results,
+                    root: chrome.extension.getURL('fg')
+                };
+
+                renderText(
+                    params,
+                    'term-list.html',
+                    (html) => this.showPopup(range, html, popupQuery, length)
+                );
             }
         });
     }

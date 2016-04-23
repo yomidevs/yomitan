@@ -39,6 +39,11 @@ class Range {
         return length;
     }
 
+    containsPoint(point) {
+        const rect = this.paddedRect();
+        return point.x >= rect.left && point.x <= rect.right;
+    }
+
     paddedRect() {
         const node        = this.range.startContainer;
         const startOffset = this.range.startOffset;
@@ -53,7 +58,7 @@ class Range {
         return rect;
     }
 
-    static fromPoint(point) {
+    static fromPos(point) {
         const range = document.caretRangeFromPoint(point.x, point.y);
         return range === null ? null : new Range(range);
     }
