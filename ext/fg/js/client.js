@@ -87,14 +87,13 @@ class Client {
             return;
         }
 
-        const text = range.text();
-        if (this.lastRange !== null && this.lastRange.text() == text) {
+        if (this.lastRange !== null && this.lastRange.equalTo(range)) {
             return;
         }
 
-        findTerm(popupQuery, ({results, length}) => {
+        findTerm(range.text(), ({results, length}) => {
             if (length === 0) {
-                this.popup.hide();
+                this.hidePopup();
             } else {
                 const params = {
                     defs: results,
@@ -104,13 +103,13 @@ class Client {
                 renderText(
                     params,
                     'term-list.html',
-                    (html) => this.showPopup(range, html, popupQuery, length)
+                    (content) => this.showPopup(range, length, content)
                 );
             }
         });
     }
 
-    showPopup(range, html, popupQuery, length) {
+    showPopup(range, length, content) {
         if (this.options.highlightText) {
             range.setEnd(range.endContainer, range.startOffset + length);
 
@@ -119,30 +118,17 @@ class Client {
             selection.addRange(range);
         }
 
-        const pos = getPopupPositionForRange(this.popup, range, this.popupOffset);
-
-        if (this.popup.getAttribute('srcdoc') !== html) {
-            this.popup.setAttribute('srcdoc', html);
-        }
-
-        this.popup.style.left       = pos.x + 'px';
-        this.popup.style.top        = pos.y + 'px';
-        this.popup.style.visibility = 'visible';
-        this.popupQuery             = popupQuery;
+        this.popup.showNextTo(range, content);
     }
 
     hidePopup() {
-        if (this.popup.style.visibility === 'hidden') {
-            return;
+        this.popup.hide();
+
+        if (this.options.highlightText && this.lastRange !== null) {
+            this.lastRange.deselect();
         }
 
-        if (this.options.highlightText) {
-            const selection = window.getSelection();
-            selection.removeAllRanges();
-        }
-
-        this.popup.style.visibility = 'hidden';
-        this.popupQuery             = '';
+        this.lastRange = null;
     }
 
     setEnabled(enabled) {

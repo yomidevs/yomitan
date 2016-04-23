@@ -45,17 +45,38 @@ class Range {
     }
 
     paddedRect() {
-        const node        = this.range.startContainer;
-        const startOffset = this.range.startOffset;
-        const endOffset   = this.range.endOffset;
+        const range       = this.range.cloneRange();
+        const startOffset = range.startOffset;
+        const endOffset   = range.endOffset;
+        const node        = range.startContainer;
 
-        this.range.setStart(node, Math.max(0, startOffset - 1));
-        this.range.setEnd(node, Math.min(node.length, endOffset + 1));
-        const rect = range.getBoundingClientRect();
-        this.range.setStart(node, startOffset);
-        this.range.setEnd(node, endOffset);
+        range.setStart(node, Math.max(0, startOffset - 1));
+        range.setEnd(node, Math.min(node.length, endOffset + 1));
 
-        return rect;
+        return range.getBoundingClientRect();
+    }
+
+    select(length) {
+        const range = this.range.cloneRange();
+        range.setEnd(range.startContainer, range.startOffset + length);
+
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+
+    deselect() {
+        const selection = window.getSelection();
+        selection.removeRange(this.range);
+    }
+
+    equalTo(range) {
+        const equal =
+            range.compareBoundaryPoints(Range.END_TO_END, this.range) === 0 &&
+            range.compareBoundaryPoints(Range.START_TO_START, this.range) === 0;
+
+        return equal;
+
     }
 
     static fromPos(point) {

@@ -33,7 +33,7 @@ class Popup {
         this.setContent(content);
     }
 
-    showBy(element, content) {
+    showNextTo(element, content) {
         this.inject();
 
         const elementRect = element.getBoundingClientRect();
