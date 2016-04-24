@@ -19,23 +19,23 @@
 
 class Range {
     constructor(range) {
-        this.range = range;
+        this.rng = range;
     }
 
     text() {
-        return this.range.toString();
+        return this.rng.toString();
     }
 
     setLength(length) {
-        const node   = this.range.startContainer;
-        const offset = this.range.startOffset;
+        const node   = this.rng.startContainer;
+        const offset = this.rng.startOffset;
 
         length = Math.min(node.length - offset, length);
         if (length === 0) {
             return null;
         }
 
-        this.range.setEnd(node, offset + length);
+        this.rng.setEnd(node, offset + length);
         return length;
     }
 
@@ -45,7 +45,7 @@ class Range {
     }
 
     getBoundingClientRect() {
-        const range       = this.range.cloneRange();
+        const range       = this.rng.cloneRange();
         const startOffset = range.startOffset;
         const endOffset   = range.endOffset;
         const node        = range.startContainer;
@@ -57,7 +57,7 @@ class Range {
     }
 
     select(length) {
-        const range = this.range.cloneRange();
+        const range = this.rng.cloneRange();
         range.setEnd(range.startContainer, range.startOffset + length);
 
         const selection = window.getSelection();
@@ -72,8 +72,8 @@ class Range {
 
     equals(range) {
         const equal =
-            range.range.compareBoundaryPoints(Range.END_TO_END, this.range) === 0 &&
-            range.range.compareBoundaryPoints(Range.START_TO_START, this.range) === 0;
+            range.rng.compareBoundaryPoints(Range.END_TO_END, this.rng) === 0 &&
+            range.rng.compareBoundaryPoints(Range.START_TO_START, this.rng) === 0;
 
         return equal;
 
