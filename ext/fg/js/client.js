@@ -83,7 +83,7 @@ class Client {
     searchAt(point) {
         const range = Range.fromPoint(point);
         if (range === null || !range.containsPoint(point)) {
-            this.popup.hide();
+            this.hidePopup();
             return;
         }
 
