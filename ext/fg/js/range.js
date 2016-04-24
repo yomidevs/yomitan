@@ -79,7 +79,7 @@ class Range {
 
     }
 
-    static fromPos(point) {
+    static fromPoint(point) {
         const range = document.caretRangeFromPoint(point.x, point.y);
         return range === null ? null : new Range(range);
     }

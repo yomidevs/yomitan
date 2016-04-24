@@ -24,7 +24,7 @@
 
     "content_scripts": [{
         "matches": ["*://*/*"],
-        "js":      ["fg/js/api.js", "fg/js/util.js", "fg/js/client.js"],
+        "js":      ["fg/js/range.js", "fg/js/popup.js", "fg/js/api.js", "fg/js/client.js"],
         "css":     ["fg/css/client.css"]
     }]
 }
