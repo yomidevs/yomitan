@@ -22,6 +22,8 @@ class Client {
         this.popup        = new Popup();
         this.lastMousePos = null;
         this.lastRange    = null;
+        this.activateKey  = 16;
+        this.activateBtn  = 2;
         this.enabled      = false;
         this.options      = {};
 
@@ -40,21 +42,21 @@ class Client {
     }
 
     onKeyDown(e) {
-        if (this.enabled && this.lastMousePos !== null && (e.keyCode === 16 || e.charCode === 16)) {
+        if (this.enabled && this.lastMousePos !== null && (e.keyCode === this.activateKey || e.charCode === this.activateKey)) {
             this.searchAt(this.lastMousePos);
         }
     }
 
     onMouseMove(e) {
         this.lastMousePos = {x: e.clientX, y: e.clientY};
-        if (this.enabled && (e.shiftKey || e.which === 2)) {
+        if (this.enabled && (e.shiftKey || e.which === this.activateBtn)) {
             this.searchAt(this.lastMousePos);
         }
     }
 
     onMouseDown(e) {
         this.lastMousePos = {x: e.clientX, y: e.clientY};
-        if (this.enabled && (e.shiftKey || e.which === 2)) {
+        if (this.enabled && (e.shiftKey || e.which === this.activateBtn)) {
             this.searchAt(this.lastMousePos);
         } else {
             this.hidePopup();
