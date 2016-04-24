@@ -62,6 +62,7 @@ class Range {
 
     select() {
         const selection = window.getSelection();
+        selection.removeAllRanges();
         selection.addRange(this.rng);
     }
 

@@ -118,10 +118,6 @@ class Client {
         this.popup.showNextTo(range.getRect(), content);
 
         if (this.options.highlightText) {
-            if (this.lastRange !== null) {
-                this.lastRange.deselect();
-            }
-
             range.select();
         }
 
