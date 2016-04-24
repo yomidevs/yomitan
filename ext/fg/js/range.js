@@ -73,7 +73,6 @@ class Range {
 
     compareOrigin(range) {
         return range.rng.compareBoundaryPoints(Range.END_TO_END, this.rng);
-
     }
 
     static fromPoint(point) {
