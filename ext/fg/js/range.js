@@ -35,16 +35,16 @@ class Range {
             return null;
         }
 
-        range.setEnd(node, offset + length);
+        this.range.setEnd(node, offset + length);
         return length;
     }
 
     containsPoint(point) {
-        const rect = this.paddedRect();
+        const rect = this.getBoundingClientRect();
         return point.x >= rect.left && point.x <= rect.right;
     }
 
-    paddedRect() {
+    getBoundingClientRect() {
         const range       = this.range.cloneRange();
         const startOffset = range.startOffset;
         const endOffset   = range.endOffset;
@@ -72,8 +72,8 @@ class Range {
 
     equals(range) {
         const equal =
-            range.compareBoundaryPoints(Range.END_TO_END, this.range) === 0 &&
-            range.compareBoundaryPoints(Range.START_TO_START, this.range) === 0;
+            range.range.compareBoundaryPoints(Range.END_TO_END, this.range) === 0 &&
+            range.range.compareBoundaryPoints(Range.START_TO_START, this.range) === 0;
 
         return equal;
 

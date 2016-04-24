@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-iframe.yomichan-popup {
+iframe#yomichan-popup {
     all:        initial;
     border:     1px solid #999;
     box-shadow: 0 0 10px rgba(0, 0, 0, .5);

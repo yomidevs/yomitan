@@ -87,6 +87,8 @@ class Client {
             return;
         }
 
+        range.setLength(this.options.scanLength);
+
         if (this.lastRange !== null && this.lastRange.equals(range)) {
             return;
         }
@@ -113,7 +115,7 @@ class Client {
         this.popup.showNextTo(range, content);
 
         if (this.options.highlightText) {
-            this.range.select(length);
+            range.select(length);
         }
 
         this.lastRange = range;

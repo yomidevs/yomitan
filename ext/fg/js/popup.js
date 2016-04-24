@@ -49,8 +49,8 @@ class Popup {
             posY = elementRect.top - popupRect.height - this.offset;
         }
 
-        this.popup.style.left       = pos.x + 'px';
-        this.popup.style.top        = pos.y + 'px';
+        this.popup.style.left       = posX + 'px';
+        this.popup.style.top        = posY + 'px';
         this.popup.style.visibility = 'visible';
 
         this.setContent(content);
