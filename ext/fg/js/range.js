@@ -67,10 +67,10 @@ class Range {
 
     deselect() {
         const selection = window.getSelection();
-        selection.removeRange(this.range);
+        selection.removeAllRanges();
     }
 
-    equalTo(range) {
+    equals(range) {
         const equal =
             range.compareBoundaryPoints(Range.END_TO_END, this.range) === 0 &&
             range.compareBoundaryPoints(Range.START_TO_START, this.range) === 0;

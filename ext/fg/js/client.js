@@ -57,7 +57,7 @@ class Client {
         if (this.enabled && (e.shiftKey || e.which === 2)) {
             this.searchAt(this.lastMousePos);
         } else {
-            this.popup.hide();
+            this.hidePopup();
         }
     }
 
@@ -87,7 +87,7 @@ class Client {
             return;
         }
 
-        if (this.lastRange !== null && this.lastRange.equalTo(range)) {
+        if (this.lastRange !== null && this.lastRange.equals(range)) {
             return;
         }
 
@@ -110,15 +110,13 @@ class Client {
     }
 
     showPopup(range, length, content) {
-        if (this.options.highlightText) {
-            range.setEnd(range.endContainer, range.startOffset + length);
+        this.popup.showNextTo(range, content);
 
-            const selection = window.getSelection();
-            selection.removeAllRanges();
-            selection.addRange(range);
+        if (this.options.highlightText) {
+            this.range.select(length);
         }
 
-        this.popup.showNextTo(range, content);
+        this.lastRange = range;
     }
 
     hidePopup() {
