@@ -33,11 +33,10 @@ class Popup {
         this.setContent(content);
     }
 
-    showNextTo(element, content) {
+    showNextTo(elementRect, content) {
         this.inject();
 
-        const elementRect = element.getBoundingClientRect();
-        const popupRect   = this.popup.getBoundingClientRect();
+        const popupRect = this.popup.getBoundingClientRect();
 
         let posX = elementRect.left;
         if (posX + popupRect.width >= window.innerWidth) {
@@ -49,11 +48,7 @@ class Popup {
             posY = elementRect.top - popupRect.height - this.offset;
         }
 
-        this.popup.style.left       = posX + 'px';
-        this.popup.style.top        = posY + 'px';
-        this.popup.style.visibility = 'visible';
-
-        this.setContent(content);
+        this.showAt({x: posX, y: posY}, content);
     }
 
     hide() {

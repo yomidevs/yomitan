@@ -40,11 +40,15 @@ class Range {
     }
 
     containsPoint(point) {
-        const rect = this.getBoundingClientRect();
+        const rect = this.getPaddedRect();
         return point.x >= rect.left && point.x <= rect.right;
     }
 
-    getBoundingClientRect() {
+    getRect() {
+        return this.rng.getBoundingClientRect();
+    }
+
+    getPaddedRect() {
         const range       = this.rng.cloneRange();
         const startOffset = range.startOffset;
         const endOffset   = range.endOffset;
@@ -56,13 +60,9 @@ class Range {
         return range.getBoundingClientRect();
     }
 
-    select(length) {
-        const range = this.rng.cloneRange();
-        range.setEnd(range.startContainer, range.startOffset + length);
-
+    select() {
         const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
+        selection.addRange(this.rng);
     }
 
     deselect() {
@@ -70,12 +70,8 @@ class Range {
         selection.removeAllRanges();
     }
 
-    equals(range) {
-        const equal =
-            range.rng.compareBoundaryPoints(Range.END_TO_END, this.rng) === 0 &&
-            range.rng.compareBoundaryPoints(Range.START_TO_START, this.rng) === 0;
-
-        return equal;
+    compareOrigin(range) {
+        return range.rng.compareBoundaryPoints(Range.END_TO_END, this.rng);
 
     }
 

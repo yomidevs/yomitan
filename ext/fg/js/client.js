@@ -87,16 +87,17 @@ class Client {
             return;
         }
 
-        range.setLength(this.options.scanLength);
-
-        if (this.lastRange !== null && this.lastRange.equals(range)) {
+        if (this.lastRange !== null && this.lastRange.compareOrigin(range) === 0) {
             return;
         }
 
+        range.setLength(this.options.scanLength);
         findTerm(range.text(), ({results, length}) => {
             if (length === 0) {
                 this.hidePopup();
             } else {
+                range.setLength(length);
+
                 const params = {
                     defs: results,
                     root: chrome.extension.getURL('fg')
@@ -105,17 +106,21 @@ class Client {
                 renderText(
                     params,
                     'term-list.html',
-                    (content) => this.showPopup(range, length, content)
+                    (content) => this.showPopup(range, content)
                 );
             }
         });
     }
 
-    showPopup(range, length, content) {
-        this.popup.showNextTo(range, content);
+    showPopup(range, content) {
+        this.popup.showNextTo(range.getRect(), content);
 
         if (this.options.highlightText) {
-            range.select(length);
+            if (this.lastRange !== null) {
+                this.lastRange.deselect();
+            }
+
+            range.select();
         }
 
         this.lastRange = range;
