@@ -30,7 +30,7 @@ templates['kanji.html'] = template({"compiler":[7,">= 4.0.0"],"main":function(co
 templates['kanji-link.html'] = template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var helper;
 
-  return "<a href=\"#\">"
+  return "<a href=\"#\" class=\"kanji-link\">"
     + container.escapeExpression(((helper = (helper = helpers.kanji || (depth0 != null ? depth0.kanji : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"kanji","hash":{},"data":data}) : helper)))
     + "</a>\n";
 },"useData":true});

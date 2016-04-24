@@ -20,7 +20,7 @@
     "background":               {"page": "bg/background.html"},
     "options_page":             "bg/options.html",
     "permissions":              ["storage"],
-    "web_accessible_resources": ["fg/css/frame.css", "fg/css/frame.js"],
+    "web_accessible_resources": ["fg/css/frame.css", "fg/js/frame.js"],
 
     "content_scripts": [{
         "matches": ["*://*/*"],

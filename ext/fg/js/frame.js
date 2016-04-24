@@ -17,3 +17,17 @@
  */
 
 
+function onKanjiQuery(kanji) {
+    alert(kanji);
+}
+
+function registerKanjiLinks() {
+    for (const link of [].slice.call(document.getElementsByClassName('kanji-link'))) {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            onKanjiQuery(e.target.innerHTML);
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', registerKanjiLinks, false);
