@@ -17,10 +17,15 @@
         }
     },
 
-    "background":               {"page": "bg/background.html"},
-    "options_page":             "bg/options.html",
-    "permissions":              ["storage"],
-    "web_accessible_resources": ["fg/css/frame.css", "fg/js/frame.js"],
+    "background":   {"page": "bg/background.html"},
+    "options_page": "bg/options.html",
+    "permissions":  ["storage"],
+
+    "web_accessible_resources": [
+        "fg/css/frame.css",
+        "fg/js/frame.js",
+        "fg/ttf/kanji-stroke-orders.ttf"
+    ],
 
     "content_scripts": [{
         "matches": ["*://*/*"],

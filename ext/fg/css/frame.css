@@ -46,8 +46,9 @@ body {
 .kanji {
     background-color: #eee;
     display:          inline-block;
-    font-size:        82px;
-    line-height:      82px;
+    font-family:      "KanjiStrokeOrders";
+    font-size:        140px;
+    line-height:      140px;
     vertical-align:   top;
 }
 

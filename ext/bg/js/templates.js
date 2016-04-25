@@ -8,10 +8,12 @@ templates['footer.html'] = template({"compiler":[7,">= 4.0.0"],"main":function(c
     + "/js/frame.js\"></script>\n    </body>\n</html>\n";
 },"useData":true});
 templates['header.html'] = template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    var helper;
+    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
-  return "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"UTF-8\">\n        <title></title>\n        <link rel=\"stylesheet\" href=\""
-    + container.escapeExpression(((helper = (helper = helpers.root || (depth0 != null ? depth0.root : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"root","hash":{},"data":data}) : helper)))
+  return "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"UTF-8\">\n        <title></title>\n        <style>\n            @font-face {\n                font-family: \"KanjiStrokeOrders\";\n                src:         url(\""
+    + alias4(((helper = (helper = helpers.root || (depth0 != null ? depth0.root : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"root","hash":{},"data":data}) : helper)))
+    + "/ttf/kanji-stroke-orders.ttf\");\n            }\n        </style>\n        <link rel=\"stylesheet\" href=\""
+    + alias4(((helper = (helper = helpers.root || (depth0 != null ? depth0.root : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"root","hash":{},"data":data}) : helper)))
     + "/css/frame.css\">\n    </head>\n    <body>\n";
 },"useData":true});
 templates['kanji.html'] = template({"1":function(container,depth0,helpers,partials,data) {
