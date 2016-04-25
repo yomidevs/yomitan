@@ -43,18 +43,6 @@ body {
     display: inline-block;
 }
 
-.kanji-glyph {
-    font-family:      "KanjiStrokeOrders";
-    font-size:        140px;
-    line-height:      140px;
-    vertical-align:   top;
-}
-
-.kanji-info {
-    float: left;
-    display: inline-block;
-}
-
 .tag {
     border-radius:    0.25em;
     color:            #fff;
@@ -85,6 +73,17 @@ body {
     background-color: #0275d8;
 }
 
+.kanji-glyph {
+    font-family:      "KanjiStrokeOrders";
+    font-size:        140px;
+    line-height:      140px;
+    vertical-align:   top;
+}
+
+.kanji-info {
+    display: inline-block;
+}
+
 ol {
     padding-left: 1.2em;
 }
@@ -97,6 +96,23 @@ li span {
     color: #000;
 }
 
+dl {
+    padding: 0.5em;
+}
+
 dt {
+    float: left;
+    clear: left;
+    width: 100px;
+    text-align: right;
     font-weight: bold;
+}
+
+dt:after {
+    content: ":";
+}
+
+dd {
+    margin: 0 0 0 110px;
+    padding: 0 0 0.5em 0;
 }

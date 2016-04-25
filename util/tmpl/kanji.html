@@ -1,31 +1,33 @@
 <div class="definition">
     <div class="kanji-info kanji-glyph">{{character}}</div>
 
-    {{#if glossary}}
     <dl class="kanji-info">
+        {{#if glossary}}
         <dt>Meanings</dt>
-        {{#each glossary}}
-        <dd>{{.}}</dd>
-        {{/each}}
-    </dl>
-    {{/if}}
+        <dd>
+            {{#each glossary}}
+            {{.}}{{#unless @last}}, {{/unless}}
+            {{/each}}
+        </dd>
+        {{/if}}
 
-    {{#if kunyomi}}
-    <dl class="kanji-info">
-        <dt>Kun</dt>
-        {{#each kunyomi}}
-        <dd>{{.}}</dd>
-        {{/each}}
-    </dl>
-    {{/if}}
+        {{#if kunyomi}}
+        <dt>Kunyomi</dt>
+        <dd>
+            {{#each kunyomi}}
+            {{.}}{{#unless @last}}, {{/unless}}
+            {{/each}}
+        </dd>
+        {{/if}}
 
-    {{#if onyomi}}
-    <dl class="kanji-info">
-        <dt>On</dt>
-        {{#each onyomi}}
-        <dd>{{.}}</dd>
-        {{/each}}
+        {{#if onyomi}}
+        <dt>Onyomi</dt>
+        <dd>
+            {{#each onyomi}}
+            {{.}}{{#unless @last}}, {{/unless}}
+            {{/each}}
+        </dd>
+        {{/if}}
     </dl>
-    {{/if}}
 </div>
 </div>
