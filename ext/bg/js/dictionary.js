@@ -74,11 +74,16 @@ class Dictionary {
     findKanji(kanji) {
         const results = [];
 
-        for (const name in this.termDicts) {
-            const def = this.termDicts[name][kanji];
+        for (const name in this.kanjiDicts) {
+            const def = this.kanjiDicts[name][kanji];
             if (def) {
-                const [c, k, o, g] = def;
-                results.push({id: index, character: c, kunyomi: k, onyomi: o, glossary: g});
+                const [k, o, g] = def;
+                results.push({
+                    character: kanji,
+                    kunyomi:   k.split(' '),
+                    onyomi:    o.split(' '),
+                    glossary:  g
+                });
             }
         }
 

@@ -26,6 +26,7 @@ class Client {
         this.activateBtn  = 2;
         this.enabled      = false;
         this.options      = {};
+        this.fgRoot       = chrome.extension.getURL('fg');
 
         chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
         window.addEventListener('message', this.onFrameMessage.bind(this));
@@ -101,18 +102,22 @@ class Client {
                 this.hidePopup();
             } else {
                 range.setLength(length);
-
-                const params = {
-                    defs: results,
-                    root: chrome.extension.getURL('fg')
-                };
-
                 renderText(
-                    params,
+                    {defs: results, root: this.fgRoot},
                     'term-list.html',
                     (content) => this.showPopup(range, content)
                 );
             }
+        });
+    }
+
+    displayKanji(kanji) {
+        findKanji(kanji, (results) => {
+            renderText(
+                {defs: results, root: this.fgRoot},
+                'kanji-list.html',
+                (content) => this.popup.setContent(content)
+            );
         });
     }
 
@@ -134,10 +139,6 @@ class Client {
         }
 
         this.lastRange = null;
-    }
-
-    displayKanji(kanji) {
-        this.popup.setContent(kanji);
     }
 
     setEnabled(enabled) {

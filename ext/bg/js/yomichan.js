@@ -50,7 +50,7 @@ class Yomichan {
 
     onMessage(request, sender, callback) {
         const {action, data} = request, handlers = {
-            findKanji:  ({text}) => this.translator.onFindKanji(text),
+            findKanji:  ({text}) => this.translator.findKanji(text),
             findTerm:   ({text}) => this.translator.findTerm(text),
             getState:   () => this.state,
             getOptions: () => this.options,

@@ -131,11 +131,11 @@ class Translator {
     }
 
     findKanji(text) {
-        let results = [];
-
+        let results     = [];
         const processed = {};
+
         for (const c of text) {
-            if (!processed.has(c)) {
+            if (!processed[c]) {
                 results = results.concat(this.dictionary.findKanji(c));
                 processed[c] = true;
             }
