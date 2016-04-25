@@ -97,3 +97,7 @@ li {
 li span {
     color: #000;
 }
+
+dt {
+    font-weight: bold;
+}

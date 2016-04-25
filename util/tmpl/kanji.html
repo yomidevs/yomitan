@@ -4,16 +4,16 @@
     <div class="readings">
         <dl>
             {{#if kunyomi}}
-            <dt>Kunyomi</dt>
+            <dt>Kunyomi:</dt>
             {{#each kunyomi}}
-            <dd>{{.}}</dd>
+            <dd>{{.}}{{#unless @last}}, {{/unless}}</dd>
             {{/each}}
             {{/if}}
 
             {{#if onyomi}}
-            <dt>Onyomi</dt>
+            <dt>Onyomi:</dt>
             {{#each onyomi}}
-            <dd>{{.}}</dd>
+            <dd>{{.}}{{#unless @last}}, {{/unless}}</dd>
             {{/each}}
             {{/if}}
         </dl>
