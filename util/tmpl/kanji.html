@@ -2,23 +2,21 @@
     <div class="kanji">{{character}}</div>
 
     <div class="readings">
-        {{#if kunyomi}}
         <dl>
+            {{#if kunyomi}}
             <dt>Kunyomi</dt>
             {{#each kunyomi}}
             <dd>{{.}}</dd>
             {{/each}}
-        </dl>
-        {{/if}}
+            {{/if}}
 
-        {{#if onyomi}}
-        <dl>
+            {{#if onyomi}}
             <dt>Onyomi</dt>
             {{#each onyomi}}
             <dd>{{.}}</dd>
             {{/each}}
+            {{/if}}
         </dl>
-        {{/if}}
     </div>
 
     <div class="glossary">

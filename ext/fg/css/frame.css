@@ -44,7 +44,16 @@ body {
 }
 
 .kanji {
-    font-size: 82px;
+    background-color: #eee;
+    display:          inline-block;
+    font-size:        82px;
+    line-height:      82px;
+    vertical-align:   top;
+}
+
+.readings {
+    display:        inline-block;
+    vertical-align: top;
 }
 
 .tag {
