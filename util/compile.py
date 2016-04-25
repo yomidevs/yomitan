@@ -161,7 +161,7 @@ def parse_kanji_dic(path):
         character = segments[0]
         kunyomi = ' '.join(filter(lambda x: list(filter(is_hiragana, x)), segments[1:]))
         onyomi = ' '.join(filter(lambda x: list(filter(is_katakana, x)), segments[1:]))
-        glossary = '; '.join(re.findall('\{([^\}]+)\}', line))
+        glossary = re.findall('\{([^\}]+)\}', line)
         results[character] = (kunyomi or None, onyomi or None, glossary)
 
     return results
