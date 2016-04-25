@@ -82,7 +82,9 @@ class Client {
             displayKanji: this.displayKanji
         };
 
-        handlers[action].call(this, data);
+        if (handlers.hasOwnProperty(action)) {
+            handlers[action].call(this, data);
+        }
     }
 
     searchAt(point) {

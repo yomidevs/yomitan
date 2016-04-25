@@ -43,18 +43,16 @@ body {
     display: inline-block;
 }
 
-.kanji {
-    background-color: #eee;
-    display:          inline-block;
+.kanji-glyph {
     font-family:      "KanjiStrokeOrders";
     font-size:        140px;
     line-height:      140px;
     vertical-align:   top;
 }
 
-.readings {
-    display:        inline-block;
-    vertical-align: top;
+.kanji-info {
+    float: left;
+    display: inline-block;
 }
 
 .tag {

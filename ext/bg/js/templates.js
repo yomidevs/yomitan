@@ -19,38 +19,37 @@ templates['header.html'] = template({"compiler":[7,">= 4.0.0"],"main":function(c
 templates['kanji.html'] = template({"1":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "            <dt>Kunyomi:</dt>\n"
-    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.kunyomi : depth0),{"name":"each","hash":{},"fn":container.program(2, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+  return "    <dl class=\"kanji-info\">\n        <dt>Meanings</dt>\n"
+    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.glossary : depth0),{"name":"each","hash":{},"fn":container.program(2, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "    </dl>\n";
 },"2":function(container,depth0,helpers,partials,data) {
-    var stack1;
-
-  return "            <dd>"
+    return "        <dd>"
     + container.escapeExpression(container.lambda(depth0, depth0))
-    + ((stack1 = helpers.unless.call(depth0 != null ? depth0 : {},(data && data.last),{"name":"unless","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "</dd>\n";
-},"3":function(container,depth0,helpers,partials,data) {
-    return ", ";
-},"5":function(container,depth0,helpers,partials,data) {
+},"4":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "            <dt>Onyomi:</dt>\n"
-    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.onyomi : depth0),{"name":"each","hash":{},"fn":container.program(2, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
-},"7":function(container,depth0,helpers,partials,data) {
-    return "            <li><span>"
-    + container.escapeExpression(container.lambda(depth0, depth0))
-    + "</span></li>\n";
+  return "    <dl class=\"kanji-info\">\n        <dt>Kun</dt>\n"
+    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.kunyomi : depth0),{"name":"each","hash":{},"fn":container.program(2, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "    </dl>\n";
+},"6":function(container,depth0,helpers,partials,data) {
+    var stack1;
+
+  return "    <dl class=\"kanji-info\">\n        <dt>On</dt>\n"
+    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.onyomi : depth0),{"name":"each","hash":{},"fn":container.program(2, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "    </dl>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : {};
 
-  return "<div class=\"definition\">\n    <div class=\"kanji\">"
+  return "<div class=\"definition\">\n    <div class=\"kanji-info kanji-glyph\">"
     + container.escapeExpression(((helper = (helper = helpers.character || (depth0 != null ? depth0.character : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"character","hash":{},"data":data}) : helper)))
-    + "</div>\n\n    <div class=\"readings\">\n        <dl>\n"
-    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.kunyomi : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "</div>\n\n"
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.glossary : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "\n"
-    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.onyomi : depth0),{"name":"if","hash":{},"fn":container.program(5, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "        </dl>\n    </div>\n\n    <div class=\"glossary\">\n        <ol>\n"
-    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.glossary : depth0),{"name":"each","hash":{},"fn":container.program(7, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "        </ol>\n    </div>\n</div>\n";
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.kunyomi : depth0),{"name":"if","hash":{},"fn":container.program(4, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.onyomi : depth0),{"name":"if","hash":{},"fn":container.program(6, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "</div>\n</div>\n";
 },"useData":true});
 templates['kanji-link.html'] = template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var helper;
