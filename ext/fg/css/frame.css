@@ -43,6 +43,10 @@ body {
     display: inline-block;
 }
 
+.kanji {
+    font-size: 82px;
+}
+
 .tag {
     border-radius:    0.25em;
     color:            #fff;

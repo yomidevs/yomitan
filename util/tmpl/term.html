@@ -1,29 +1,31 @@
-{{#if reading}}
-<div class="term"><ruby>{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}<rt>{{reading}}</rt></ruby></div>
-{{else}}
-<div class="term">{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}</div>
-{{/if}}
+<div class="definition">
+    {{#if reading}}
+    <div class="term"><ruby>{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}<rt>{{reading}}</rt></ruby></div>
+    {{else}}
+    <div class="term">{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}</div>
+    {{/if}}
 
-{{#if rules}}
-<div class="rules">
-    {{#each rules}}
-    <span class="rule">{{.}}</span> {{#unless @last}}&laquo;{{/unless}}
-    {{/each}}
-</div>
-{{/if}}
-
-{{#if tags}}
-<div class="tags">
-    {{#each tags}}
-    <span class="tag tag-{{class}}" title="{{desc}}">{{name}}</span>
-    {{/each}}
-</div>
-{{/if}}
-
-<div class="glossary">
-    <ol>
-        {{#each glossary}}
-        <li><span>{{.}}</span></li>
+    {{#if rules}}
+    <div class="rules">
+        {{#each rules}}
+        <span class="rule">{{.}}</span> {{#unless @last}}&laquo;{{/unless}}
         {{/each}}
-    </ol>
+    </div>
+    {{/if}}
+
+    {{#if tags}}
+    <div class="tags">
+        {{#each tags}}
+        <span class="tag tag-{{class}}" title="{{desc}}">{{name}}</span>
+        {{/each}}
+    </div>
+    {{/if}}
+
+    <div class="glossary">
+        <ol>
+            {{#each glossary}}
+            <li><span>{{.}}</span></li>
+            {{/each}}
+        </ol>
+    </div>
 </div>

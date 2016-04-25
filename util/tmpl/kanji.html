@@ -1,13 +1,31 @@
-<div class="kanji">{{character}}</div>
+<div class="definition">
+    <div class="kanji">{{character}}</div>
 
-<div class="reading">
-    {{kunyomi}}
-</div>
+    <div class="readings">
+        {{#if kunyomi}}
+        <dl>
+            <dt>Kunyomi</dt>
+            {{#each kunyomi}}
+            <dd>{{.}}</dd>
+            {{/each}}
+        </dl>
+        {{/if}}
 
-<div class="reading">
-    {{onyomi}}
-</div>
+        {{#if onyomi}}
+        <dl>
+            <dt>Onyomi</dt>
+            {{#each onyomi}}
+            <dd>{{.}}</dd>
+            {{/each}}
+        </dl>
+        {{/if}}
+    </div>
 
-<div class="glossary">
-    {{glossary}}
+    <div class="glossary">
+        <ol>
+            {{#each glossary}}
+            <li><span>{{.}}</span></li>
+            {{/each}}
+        </ol>
+    </div>
 </div>
