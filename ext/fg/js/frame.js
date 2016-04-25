@@ -17,15 +17,11 @@
  */
 
 
-function onKanjiQuery(kanji) {
-    alert(kanji);
-}
-
 function registerKanjiLinks() {
     for (const link of [].slice.call(document.getElementsByClassName('kanji-link'))) {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            onKanjiQuery(e.target.innerHTML);
+            window.parent.postMessage({action: 'displayKanji', data: e.target.innerHTML}, '*');
         });
     }
 }

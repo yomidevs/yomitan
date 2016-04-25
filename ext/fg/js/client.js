@@ -77,9 +77,11 @@ class Client {
     }
 
     onFrameMessage(e) {
-        // const {action, data} = e.data;
-        // switch (action) {
-        // }
+        const {action, data} = e.data, handlers = {
+            displayKanji: this.displayKanji
+        };
+
+        handlers[action].call(this, data);
     }
 
     searchAt(point) {
@@ -132,6 +134,10 @@ class Client {
         }
 
         this.lastRange = null;
+    }
+
+    displayKanji(kanji) {
+        this.popup.setContent(kanji);
     }
 
     setEnabled(enabled) {
