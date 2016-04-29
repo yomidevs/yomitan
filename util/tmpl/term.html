@@ -1,12 +1,12 @@
-<div class="definition">
+<div class="term-definition">
     {{#if reading}}
-    <div class="term"><ruby>{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}<rt>{{reading}}</rt></ruby></div>
+    <div class="term-expression"><ruby>{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}<rt>{{reading}}</rt></ruby></div>
     {{else}}
-    <div class="term">{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}</div>
+    <div class="term-expression">{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}</div>
     {{/if}}
 
     {{#if rules}}
-    <div class="rules">
+    <div class="term-rules">
         {{#each rules}}
         <span class="rule">{{.}}</span> {{#unless @last}}&laquo;{{/unless}}
         {{/each}}
@@ -14,14 +14,14 @@
     {{/if}}
 
     {{#if tags}}
-    <div class="tags">
+    <div class="term-tags">
         {{#each tags}}
         <span class="tag tag-{{class}}" title="{{desc}}">{{name}}</span>
         {{/each}}
     </div>
     {{/if}}
 
-    <div class="glossary">
+    <div class="term-glossary">
         <ol>
             {{#each glossary}}
             <li><span>{{.}}</span></li>

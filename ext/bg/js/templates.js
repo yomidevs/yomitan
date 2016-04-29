@@ -76,7 +76,7 @@ templates['kanji-list.html'] = template({"1":function(container,depth0,helpers,p
 },"usePartial":true,"useData":true});
 templates['term.html'] = template({"1":function(container,depth0,helpers,partials,data) {
     var stack1, helper, options, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", buffer = 
-  "    <div class=\"term\"><ruby>";
+  "    <div class=\"term-expression\"><ruby>";
   stack1 = ((helper = (helper = helpers.kanjiLinks || (depth0 != null ? depth0.kanjiLinks : depth0)) != null ? helper : alias2),(options={"name":"kanjiLinks","hash":{},"fn":container.program(2, data, 0),"inverse":container.noop,"data":data}),(typeof helper === alias3 ? helper.call(alias1,options) : helper));
   if (!helpers.kanjiLinks) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
   if (stack1 != null) { buffer += stack1; }
@@ -89,7 +89,7 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
   return container.escapeExpression(((helper = (helper = helpers.expression || (depth0 != null ? depth0.expression : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"expression","hash":{},"data":data}) : helper)));
 },"4":function(container,depth0,helpers,partials,data) {
     var stack1, helper, options, buffer = 
-  "    <div class=\"term\">";
+  "    <div class=\"term-expression\">";
   stack1 = ((helper = (helper = helpers.kanjiLinks || (depth0 != null ? depth0.kanjiLinks : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"kanjiLinks","hash":{},"fn":container.program(2, data, 0),"inverse":container.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},options) : helper));
   if (!helpers.kanjiLinks) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
   if (stack1 != null) { buffer += stack1; }
@@ -97,7 +97,7 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
 },"6":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "    <div class=\"rules\">\n"
+  return "    <div class=\"term-rules\">\n"
     + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.rules : depth0),{"name":"each","hash":{},"fn":container.program(7, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "    </div>\n";
 },"7":function(container,depth0,helpers,partials,data) {
@@ -113,7 +113,7 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
 },"10":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "    <div class=\"tags\">\n"
+  return "    <div class=\"term-tags\">\n"
     + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.tags : depth0),{"name":"each","hash":{},"fn":container.program(11, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "    </div>\n";
 },"11":function(container,depth0,helpers,partials,data) {
@@ -133,13 +133,13 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=depth0 != null ? depth0 : {};
 
-  return "<div class=\"definition\">\n"
+  return "<div class=\"term-definition\">\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.reading : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(4, data, 0),"data":data})) != null ? stack1 : "")
     + "\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.rules : depth0),{"name":"if","hash":{},"fn":container.program(6, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.tags : depth0),{"name":"if","hash":{},"fn":container.program(10, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "\n    <div class=\"glossary\">\n        <ol>\n"
+    + "\n    <div class=\"term-glossary\">\n        <ol>\n"
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.glossary : depth0),{"name":"each","hash":{},"fn":container.program(13, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "        </ol>\n    </div>\n</div>\n";
 },"useData":true});
