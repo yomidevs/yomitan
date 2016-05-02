@@ -19,9 +19,10 @@
 
 function sanitizeOptions(options) {
     const defaults = {
-        scanLength:    20,
-        loadOnStartup: false,
-        highlightText: true
+        loadOnStartup:     false,
+        selectMatchedText: true,
+        enableAnkiConnect: false,
+        scanLength:        20
     };
 
     for (const key in defaults) {

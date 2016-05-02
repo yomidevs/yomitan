@@ -126,7 +126,7 @@ class Client {
     showPopup(range, content) {
         this.popup.showNextTo(range.getRect(), content);
 
-        if (this.options.highlightText) {
+        if (this.options.selectMatchedText) {
             range.select();
         }
 
@@ -136,7 +136,7 @@ class Client {
     hidePopup() {
         this.popup.hide();
 
-        if (this.options.highlightText && this.lastRange !== null) {
+        if (this.options.selectMatchedText && this.lastRange !== null) {
             this.lastRange.deselect();
         }
 

@@ -18,16 +18,18 @@
 
 
 function optionsToForm(opts) {
-    $('#scanLength').val(opts.scanLength);
+    $('#enableAnkiConnect').prop('checked', opts.ankiConnect);
+    $('#selectMatchedText').prop('checked', opts.selectMatchedText);
     $('#loadOnStartup').prop('checked', opts.loadOnStartup);
-    $('#highlightText').prop('checked', opts.highlightText);
+    $('#scanLength').val(opts.scanLength);
 }
 
 function formToOptions() {
     return sanitizeOptions({
-        scanLength:    $('#scanLength').val(),
-        loadOnStartup: $('#loadOnStartup').prop('checked'),
-        highlightText: $('#highlightText').prop('checked')
+        loadOnStartup:     $('#loadOnStartup').prop('checked'),
+        selectMatchedText: $('#selectMatchedText').prop('checked'),
+        ankiConnect:       $('#enableAnkiConnect').prop('checked'),
+        scanLength:        $('#scanLength').val()
     });
 }
 
