@@ -101,15 +101,23 @@ class Yomichan {
 
     findTerm(text, callback) {
         const results = this.translator.findTerm(text);
-        this.callAnkiApi('canAddNotes', results, (resultsFull) => {
-            callback(resultsFull || results);
+        this.callAnkiApi('canAddNotes', results.results, (definitions) => {
+            if (definitions !== null) {
+                results.results = definitions;
+            }
+
+            callback(results);
         });
     }
 
     findKanji(text, callback) {
         const results = this.translator.findKanji(text);
-        this.callAnkiApi('cannAddNotes', results, (resultsFull) => {
-            callback(resultsFull || results);
+        this.callAnkiApi('cannAddNotes', results.results, (definitions) => {
+            if (definitions !== null) {
+                results.results = definitions;
+            }
+
+            callback(results);
         });
     }
 
@@ -120,7 +128,7 @@ class Yomichan {
             xhr.open('POST', 'http://127.0.0.1:8888');
             xhr.withCredentials = true;
             xhr.setRequestHeader('Content-Type', 'text/json');
-            xhr.send(JSON.stringify(data));
+            xhr.send(JSON.stringify({action: action, data: data}));
         } else {
             callback(null);
         }
