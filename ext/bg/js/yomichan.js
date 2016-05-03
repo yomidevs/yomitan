@@ -124,7 +124,7 @@ class Yomichan {
     callAnkiApi(action, data, callback) {
         if (this.options.enableAnkiConnect) {
             const xhr = new XMLHttpRequest();
-            xhr.addEventListener('load', () => callback(JSON.parse(xhr.responseText)));
+            xhr.addEventListener('loadend', () => callback(xhr.responseText ? JSON.parse(xhr.responseText) : null));
             xhr.open('POST', 'http://127.0.0.1:8888');
             xhr.withCredentials = true;
             xhr.setRequestHeader('Content-Type', 'text/json');
