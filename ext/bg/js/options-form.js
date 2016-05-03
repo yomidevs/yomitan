@@ -18,7 +18,7 @@
 
 
 function optionsToForm(opts) {
-    $('#enableAnkiConnect').prop('checked', opts.ankiConnect);
+    $('#enableAnkiConnect').prop('checked', opts.enableAnkiConnect);
     $('#selectMatchedText').prop('checked', opts.selectMatchedText);
     $('#loadOnStartup').prop('checked', opts.loadOnStartup);
     $('#scanLength').val(opts.scanLength);
@@ -28,7 +28,7 @@ function formToOptions() {
     return sanitizeOptions({
         loadOnStartup:     $('#loadOnStartup').prop('checked'),
         selectMatchedText: $('#selectMatchedText').prop('checked'),
-        ankiConnect:       $('#enableAnkiConnect').prop('checked'),
+        enableAnkiConnect: $('#enableAnkiConnect').prop('checked'),
         scanLength:        $('#scanLength').val()
     });
 }

@@ -50,17 +50,14 @@ class Yomichan {
 
     onMessage(request, sender, callback) {
         const {action, data} = request, handlers = {
-            findKanji:  ({text}) => this.translator.findKanji(text),
-            findTerm:   ({text}) => this.translator.findTerm(text),
-            getState:   () => this.state,
-            getOptions: () => this.options,
-            renderText: ({data, template}) => Handlebars.templates[template](data)
+            findKanji:  ({text}) => this.findKanji(text, callback),
+            findTerm:   ({text}) => this.findTerm(text, callback),
+            getOptions: () => callback(this.options),
+            getState:   () => callback(this.state),
+            renderText: ({data, template}) => callback(Handlebars.templates[template](data))
         };
 
-        const result = handlers[action].call(this, data);
-        if (callback !== null) {
-            callback(result);
-        }
+        handlers[action].call(this, data);
     }
 
     onBrowserAction(tab) {
@@ -100,6 +97,33 @@ class Yomichan {
     updateOptions(options) {
         this.options = options;
         Yomichan.notifyChange('options', this.options);
+    }
+
+    findTerm(text, callback) {
+        const results = this.translator.findTerm(text);
+        this.callAnkiApi('canAddNotes', results, (resultsFull) => {
+            callback(resultsFull || results);
+        });
+    }
+
+    findKanji(text, callback) {
+        const results = this.translator.findKanji(text);
+        this.callAnkiApi('cannAddNotes', results, (resultsFull) => {
+            callback(resultsFull || results);
+        });
+    }
+
+    callAnkiApi(action, data, callback) {
+        if (this.options.enableAnkiConnect) {
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('load', () => callback(JSON.parse(xhr.responseText)));
+            xhr.open('POST', 'http://127.0.0.1:8888');
+            xhr.withCredentials = true;
+            xhr.setRequestHeader('Content-Type', 'text/json');
+            xhr.send(JSON.stringify(data));
+        } else {
+            callback(null);
+        }
     }
 
     static notifyChange(name, value) {
