@@ -58,6 +58,7 @@ class Yomichan {
         };
 
         handlers[action].call(this, data);
+        return true;
     }
 
     onBrowserAction(tab) {
