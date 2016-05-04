@@ -58,6 +58,16 @@ body {
     background-color: #0275d8;
 }
 
+.action-icons {
+    float: right;
+}
+
+.action-icons:after {
+    clear:   both;
+    content: '';
+    display: block;
+}
+
 /* term styles */
 
 .term-expression {
@@ -93,7 +103,7 @@ body {
 
 .kanji-glyph {
     float:          left;
-    font-family:    "KanjiStrokeOrders";
+    font-family:    'KanjiStrokeOrders';
     font-size:      140px;
     line-height:    140px;
     padding:        0.01em;
