@@ -116,7 +116,7 @@ class Client {
     displayKanji(kanji) {
         findKanji(kanji, (results) => {
             renderText(
-                {defs: results, root: this.fgRoot},
+                {defs: results, root: this.fgRoot, options: this.options},
                 'kanji-list.html',
                 (content) => this.popup.setContent(content)
             );

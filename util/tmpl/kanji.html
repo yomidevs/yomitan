@@ -1,13 +1,17 @@
 <div class="kanji-definition">
-    <div class="action-icons">
-        {{#with addable}}
-            {{#if kanji}}
-            <a href="#" title="Add Kanji"><img src="{{../root}}/add_kanji.png"></a>
-            {{else}}
-            <img src="{{../root}}/add_kanji.png" class="inactive">
-            {{/if}}
-        {{/with}}
-    </div>
+    {{#with options}}
+        {{#if enableAnkiConnect}}
+        <div class="action-icons">
+            {{#with ../addable}}
+                {{#if kanji}}
+                <a href="#" title="Add Kanji"><img src="{{../../root}}/add_kanji.png"></a>
+                {{else}}
+                <img src="{{../../root}}/add_kanji.png" class="inactive">
+                {{/if}}
+            {{/with}}
+        </div>
+        {{/if}}
+    {{/with}}
 
     <div class="kanji-glyph">{{character}}</div>
 

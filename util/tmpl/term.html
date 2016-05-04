@@ -1,19 +1,23 @@
 <div class="term-definition">
-    <div class="action-icons">
-        {{#with addable}}
-            {{#if vocabExp}}
-            <a href="#" title="Add as expression"><img src="{{../root}}/img/add_expression.png"></a>
-            {{else}}
-            <img src="{{../root}}/img/add_expression.png" class="inactive">
-            {{/if}}
+    {{#with options}}
+        {{#if enableAnkiConnect}}
+        <div class="action-icons">
+            {{#with ../addable}}
+                {{#if vocabExp}}
+                <a href="#" title="Add as expression"><img src="{{../../root}}/img/add_expression.png"></a>
+                {{else}}
+                <img src="{{../../root}}/img/add_expression.png" class="inactive">
+                {{/if}}
 
-            {{#if vocabReading}}
-            <a href="#" title="Add as reading"><img src="{{../root}}/img/add_reading.png"></a>
-            {{else}}
-            <img src="{{../root}}/img/add_reading.png" class="inactive">
-            {{/if}}
-        {{/with}}
-    </div>
+                {{#if vocabReading}}
+                <a href="#" title="Add as reading"><img src="{{../../root}}/img/add_reading.png"></a>
+                {{else}}
+                <img src="{{../../root}}/img/add_reading.png" class="inactive">
+                {{/if}}
+            {{/with}}
+        </div>
+        {{/if}}
+    {{/with}}
 
     {{#if reading}}
     <div class="term-expression"><ruby>{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}<rt>{{reading}}</rt></ruby></div>
