@@ -105,7 +105,7 @@ class Client {
             } else {
                 range.setLength(length);
                 renderText(
-                    {defs: results, root: this.fgRoot},
+                    {defs: results, root: this.fgRoot, options: this.options},
                     'term-list.html',
                     (content) => this.showPopup(range, content)
                 );

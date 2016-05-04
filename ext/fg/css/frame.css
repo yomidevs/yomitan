@@ -68,6 +68,11 @@ body {
     display: block;
 }
 
+.action-icons .inactive {
+    -webkit-filter: grayscale(100%);
+    opacity:        0.25;
+}
+
 /* term styles */
 
 .term-expression {

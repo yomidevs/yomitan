@@ -25,9 +25,9 @@
         "fg/css/frame.css",
         "fg/js/frame.js",
         "fg/ttf/kanji-stroke-orders.ttf",
-        "fg/img/icon_add_expression.png",
-        "fg/img/icon_add_reading.png",
-        "fg/img/icon_copy_definition.png"
+        "fg/img/add_expression.png",
+        "fg/img/add_reading.png",
+        "fg/img/add_kanji.png"
     ],
 
     "content_scripts": [{

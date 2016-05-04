@@ -1,10 +1,18 @@
 <div class="term-definition">
     <div class="action-icons">
         {{#with addable}}
-        {{#if vocabExp}}<a href="#" title="Add as expression"><img src="{{../root}}/img/icon_add_expression.png"></a>{{/if}}
-        {{#if vocabReading}}<a href="#" title="Add as reading"><img src="{{../root}}/img/icon_add_reading.png"></a>{{/if}}
+            {{#if vocabExp}}
+            <a href="#" title="Add as expression"><img src="{{../root}}/img/add_expression.png"></a>
+            {{else}}
+            <img src="{{../root}}/img/add_expression.png" class="inactive">
+            {{/if}}
+
+            {{#if vocabReading}}
+            <a href="#" title="Add as reading"><img src="{{../root}}/img/add_reading.png"></a>
+            {{else}}
+            <img src="{{../root}}/img/add_reading.png" class="inactive">
+            {{/if}}
         {{/with}}
-        <a href="#" title="Copy definition"><img src="{{root}}/img/icon_copy_definition.png"></a>
     </div>
 
     {{#if reading}}
