@@ -1,5 +1,13 @@
 <div class="kanji-definition">
+    <div class="action-icons">
+        {{#with addable}}
+        {{#if kanji}}<a href="#" title="Add Kanji"><img src="{{../root}}/img/icon_add_expression.png"></a>{{/if}}
+        {{/with}}
+        <a href="#" title="Copy definition"><img src="{{root}}/img/icon_copy_definition.png"></a>
+    </div>
+
     <div class="kanji-glyph">{{character}}</div>
+
     <div class="kanji-info">
         <dl>
             {{#if glossary}}
