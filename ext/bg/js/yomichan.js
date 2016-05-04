@@ -34,6 +34,8 @@ class Yomichan {
         });
 
         this.translator = new Translator();
+        this.xhr        = null;
+
         this.updateState('disabled');
 
         loadOptions((opts) => {
@@ -123,16 +125,26 @@ class Yomichan {
     }
 
     callAnkiApi(action, data, callback) {
-        if (this.options.enableAnkiConnect) {
-            const xhr = new XMLHttpRequest();
-            xhr.addEventListener('loadend', () => callback(xhr.responseText ? JSON.parse(xhr.responseText) : null));
-            xhr.open('POST', 'http://127.0.0.1:8888');
-            xhr.withCredentials = true;
-            xhr.setRequestHeader('Content-Type', 'text/json');
-            xhr.send(JSON.stringify({action: action, data: data}));
-        } else {
+        if (!this.options.enableAnkiConnect) {
             callback(null);
+            return;
         }
+
+        if (this.xhr !== null) {
+            this.xhr.abort();
+        }
+
+        this.xhr = new XMLHttpRequest();
+        this.xhr.addEventListener('loadend', () => {
+            const resp = this.xhr.responseText;
+            callback(resp ? JSON.parse(resp) : null);
+            this.xhr = null;
+        });
+
+        this.xhr.open('POST', 'http://127.0.0.1:8888');
+        this.xhr.withCredentials = true;
+        this.xhr.setRequestHeader('Content-Type', 'text/json');
+        this.xhr.send(JSON.stringify({action: action, data: data}));
     }
 
     static notifyChange(name, value) {
