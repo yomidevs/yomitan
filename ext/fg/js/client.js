@@ -27,6 +27,7 @@ class Client {
         this.enabled      = false;
         this.options      = {};
         this.results      = null;
+        this.xhr          = null;
         this.fgRoot       = chrome.extension.getURL('fg');
 
         chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
@@ -79,8 +80,12 @@ class Client {
     }
 
     onFrameMessage(e) {
+        const callback = (data) => {
+            e.source.postMessage(data, e.origin);
+        };
+
         const {action, data} = e.data, handlers = {
-            addNote:      this.addNote,
+            addNote:      ({mode, index}) => this.addNote(mode, index, callback),
             displayKanji: this.displayKanji
         };
 
@@ -118,8 +123,9 @@ class Client {
         });
     }
 
-    addNote({mode, index}) {
-        console.log(mode, index);
+    addNote(mode, index, callback) {
+        callback({action: 'disableAction', data: {mode: mode, index: index}});
+        // this.callAnkiApi('addNote', {mode: mode, definition: this.results[index]});
     }
 
     displayKanji(kanji) {
@@ -164,6 +170,29 @@ class Client {
 
     setOptions(opts) {
         this.options = opts;
+    }
+
+    callAnkiApi(action, data, callback) {
+        if (!this.options.enableAnkiConnect) {
+            callback(null);
+            return;
+        }
+
+        if (this.xhr !== null) {
+            this.xhr.abort();
+        }
+
+        this.xhr = new XMLHttpRequest();
+        this.xhr.addEventListener('loadend', () => {
+            const resp = this.xhr.responseText;
+            callback(resp ? JSON.parse(resp) : null);
+            this.xhr = null;
+        });
+
+        this.xhr.open('POST', 'http://127.0.0.1:8888');
+        this.xhr.withCredentials = true;
+        this.xhr.setRequestHeader('Content-Type', 'text/json');
+        this.xhr.send(JSON.stringify({action: action, data: data}));
     }
 }
 

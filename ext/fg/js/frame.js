@@ -36,9 +36,21 @@ function registerActionLinks() {
     }
 }
 
-function domContentLoaded() {
+function onDomContentLoaded() {
     registerKanjiLinks();
     registerActionLinks();
 }
 
-document.addEventListener('DOMContentLoaded', domContentLoaded, false);
+function onMessage(e) {
+    const {action, data} = e.data, handlers = {
+        'disableAction': ({mode, index}) => {
+            const matches = document.querySelectorAll(`.action-link[data-index="${index}"][data-mode="${mode}"]`);
+            matches[0].classList.add('disabled');
+        }
+    };
+
+    handlers[action](data);
+}
+
+document.addEventListener('DOMContentLoaded', onDomContentLoaded, false);
+window.addEventListener('message', onMessage);
