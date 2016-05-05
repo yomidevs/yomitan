@@ -58,17 +58,22 @@ body {
     background-color: #0275d8;
 }
 
-.action-icons {
+.action-bar {
     float: right;
 }
 
-.action-icons:after {
+.action-bar:after {
     clear:   both;
     content: '';
     display: block;
 }
 
-.action-icons .inactive {
+.action-bar .disabled {
+    pointer-events: none;
+    cursor:         default;
+}
+
+.action-bar .disabled img {
     -webkit-filter: grayscale(100%);
     opacity:        0.25;
 }
