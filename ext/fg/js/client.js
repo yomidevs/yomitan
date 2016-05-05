@@ -80,6 +80,7 @@ class Client {
 
     onFrameMessage(e) {
         const {action, data} = e.data, handlers = {
+            addNote:      this.addNote,
             displayKanji: this.displayKanji
         };
 
@@ -115,6 +116,10 @@ class Client {
                 );
             }
         });
+    }
+
+    addNote({mode, index}) {
+        console.log(mode, index);
     }
 
     displayKanji(kanji) {

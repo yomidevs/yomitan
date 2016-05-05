@@ -26,4 +26,19 @@ function registerKanjiLinks() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', registerKanjiLinks, false);
+function registerActionLinks() {
+    for (const link of [].slice.call(document.getElementsByClassName('action-link'))) {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const ds = e.currentTarget.dataset;
+            window.parent.postMessage({action: 'addNote', data: {index: ds.index, mode: ds.mode}}, '*');
+        });
+    }
+}
+
+function domContentLoaded() {
+    registerKanjiLinks();
+    registerActionLinks();
+}
+
+document.addEventListener('DOMContentLoaded', domContentLoaded, false);
