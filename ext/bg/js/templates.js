@@ -23,19 +23,19 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
 },"2":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
-  return "        <div class=\"action-icons\">\n"
+  return "    <div class=\"action-icons\">\n"
     + ((stack1 = helpers["with"].call(depth0 != null ? depth0 : {},(depths[1] != null ? depths[1].addable : depths[1]),{"name":"with","hash":{},"fn":container.program(3, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "        </div>\n";
+    + "    </div>\n";
 },"3":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
   return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.kanji : depth0),{"name":"if","hash":{},"fn":container.program(4, data, 0, blockParams, depths),"inverse":container.program(6, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "");
 },"4":function(container,depth0,helpers,partials,data,blockParams,depths) {
-    return "                <a href=\"#\" title=\"Add Kanji\"><img src=\""
+    return "        <a href=\"#\" title=\"Add Kanji\"><img src=\""
     + container.escapeExpression(container.lambda((depths[2] != null ? depths[2].root : depths[2]), depth0))
     + "/add_kanji.png\"></a>\n";
 },"6":function(container,depth0,helpers,partials,data,blockParams,depths) {
-    return "                <img src=\""
+    return "        <img src=\""
     + container.escapeExpression(container.lambda((depths[2] != null ? depths[2].root : depths[2]), depth0))
     + "/add_kanji.png\" class=\"inactive\">\n";
 },"8":function(container,depth0,helpers,partials,data) {
@@ -105,9 +105,9 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
 },"2":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
-  return "        <div class=\"action-icons\">\n"
+  return "    <div class=\"action-icons\">\n"
     + ((stack1 = helpers["with"].call(depth0 != null ? depth0 : {},(depths[1] != null ? depths[1].addable : depths[1]),{"name":"with","hash":{},"fn":container.program(3, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "        </div>\n";
+    + "    </div>\n";
 },"3":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, alias1=depth0 != null ? depth0 : {};
 
@@ -115,19 +115,19 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
     + "\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.vocabReading : depth0),{"name":"if","hash":{},"fn":container.program(8, data, 0, blockParams, depths),"inverse":container.program(10, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "");
 },"4":function(container,depth0,helpers,partials,data,blockParams,depths) {
-    return "                <a href=\"#\" title=\"Add as expression\"><img src=\""
+    return "        <a href=\"#\" title=\"Add as expression\"><img src=\""
     + container.escapeExpression(container.lambda((depths[2] != null ? depths[2].root : depths[2]), depth0))
     + "/img/add_expression.png\"></a>\n";
 },"6":function(container,depth0,helpers,partials,data,blockParams,depths) {
-    return "                <img src=\""
+    return "        <img src=\""
     + container.escapeExpression(container.lambda((depths[2] != null ? depths[2].root : depths[2]), depth0))
     + "/img/add_expression.png\" class=\"inactive\">\n";
 },"8":function(container,depth0,helpers,partials,data,blockParams,depths) {
-    return "                <a href=\"#\" title=\"Add as reading\"><img src=\""
+    return "        <a href=\"#\" title=\"Add as reading\"><img src=\""
     + container.escapeExpression(container.lambda((depths[2] != null ? depths[2].root : depths[2]), depth0))
     + "/img/add_reading.png\"></a>\n";
 },"10":function(container,depth0,helpers,partials,data,blockParams,depths) {
-    return "                <img src=\""
+    return "        <img src=\""
     + container.escapeExpression(container.lambda((depths[2] != null ? depths[2].root : depths[2]), depth0))
     + "/img/add_reading.png\" class=\"inactive\">\n";
 },"12":function(container,depth0,helpers,partials,data) {
@@ -187,9 +187,11 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
     + container.escapeExpression(container.lambda(depth0, depth0))
     + "</span></li>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
-    var stack1, alias1=depth0 != null ? depth0 : {};
+    var stack1, helper, alias1=depth0 != null ? depth0 : {};
 
-  return "<div class=\"term-definition\">\n"
+  return "<div class=\"term-definition\">\n    "
+    + container.escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\n\n"
     + ((stack1 = helpers["with"].call(alias1,(depth0 != null ? depth0.options : depth0),{"name":"with","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.reading : depth0),{"name":"if","hash":{},"fn":container.program(12, data, 0, blockParams, depths),"inverse":container.program(15, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
