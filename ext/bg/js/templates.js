@@ -27,12 +27,14 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
     + ((stack1 = helpers["with"].call(depth0 != null ? depth0 : {},(depths[1] != null ? depths[1].addable : depths[1]),{"name":"with","hash":{},"fn":container.program(3, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "    </div>\n";
 },"3":function(container,depth0,helpers,partials,data,blockParams,depths) {
-    var stack1;
+    var stack1, helper, alias1=depth0 != null ? depth0 : {}, alias2=container.escapeExpression;
 
-  return "        <a href=\"#\" title=\"Add Kanji\" class=\""
-    + ((stack1 = helpers.unless.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.kanji : depth0),{"name":"unless","hash":{},"fn":container.program(4, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+  return "        <a href=\"#\" title=\"Add Kanji\" class=\"action-link "
+    + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.kanji : depth0),{"name":"unless","hash":{},"fn":container.program(4, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\" data-mode=\"kanji\" data-index=\""
+    + alias2(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\""
-    + container.escapeExpression(container.lambda((depths[2] != null ? depths[2].root : depths[2]), depth0))
+    + alias2(container.lambda((depths[2] != null ? depths[2].root : depths[2]), depth0))
     + "/add_kanji.png\"></a>\n";
 },"4":function(container,depth0,helpers,partials,data) {
     return "disabled";
@@ -107,16 +109,20 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
     + ((stack1 = helpers["with"].call(depth0 != null ? depth0 : {},(depths[1] != null ? depths[1].addable : depths[1]),{"name":"with","hash":{},"fn":container.program(3, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "    </div>\n";
 },"3":function(container,depth0,helpers,partials,data,blockParams,depths) {
-    var stack1, alias1=depth0 != null ? depth0 : {}, alias2=container.lambda, alias3=container.escapeExpression;
+    var stack1, helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression, alias5=container.lambda;
 
-  return "        <a href=\"#\" title=\"Add as expression\" class=\""
+  return "        <a href=\"#\" title=\"Add as expression\" class=\"action-link "
     + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.vocabExp : depth0),{"name":"unless","hash":{},"fn":container.program(4, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\" data-mode=\"vocabExp\" data-index=\""
+    + alias4(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\""
-    + alias3(alias2((depths[2] != null ? depths[2].root : depths[2]), depth0))
-    + "/img/add_expression.png\"></a>\n        <a href=\"#\" title=\"Add as reading\" class=\""
+    + alias4(alias5((depths[2] != null ? depths[2].root : depths[2]), depth0))
+    + "/img/add_expression.png\"></a>\n        <a href=\"#\" title=\"Add as reading\" class=\"action-link "
     + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.vocabExp : depth0),{"name":"unless","hash":{},"fn":container.program(4, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\" data-mode=\"vocabReading\" data-index=\""
+    + alias4(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\""
-    + alias3(alias2((depths[2] != null ? depths[2].root : depths[2]), depth0))
+    + alias4(alias5((depths[2] != null ? depths[2].root : depths[2]), depth0))
     + "/img/add_reading.png\"></a>\n";
 },"4":function(container,depth0,helpers,partials,data) {
     return "disabled";
@@ -177,11 +183,9 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
     + container.escapeExpression(container.lambda(depth0, depth0))
     + "</span></li>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
-    var stack1, helper, alias1=depth0 != null ? depth0 : {};
+    var stack1, alias1=depth0 != null ? depth0 : {};
 
-  return "<div class=\"term-definition\">\n    "
-    + container.escapeExpression(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"id","hash":{},"data":data}) : helper)))
-    + "\n\n"
+  return "<div class=\"term-definition\">\n"
     + ((stack1 = helpers["with"].call(alias1,(depth0 != null ? depth0.options : depth0),{"name":"with","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.reading : depth0),{"name":"if","hash":{},"fn":container.program(6, data, 0, blockParams, depths),"inverse":container.program(9, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")

@@ -26,6 +26,7 @@ class Client {
         this.activateBtn  = 2;
         this.enabled      = false;
         this.options      = {};
+        this.results      = null;
         this.fgRoot       = chrome.extension.getURL('fg');
 
         chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
@@ -107,7 +108,10 @@ class Client {
                 renderText(
                     {defs: results, root: this.fgRoot, options: this.options},
                     'term-list.html',
-                    (content) => this.showPopup(range, content)
+                    (content) => {
+                        this.results = results;
+                        this.showPopup(range, content, results);
+                    }
                 );
             }
         });
@@ -118,7 +122,10 @@ class Client {
             renderText(
                 {defs: results, root: this.fgRoot, options: this.options},
                 'kanji-list.html',
-                (content) => this.popup.setContent(content)
+                (content) => {
+                    this.results = results;
+                    this.popup.setContent(content, results);
+                }
             );
         });
     }
@@ -141,6 +148,7 @@ class Client {
         }
 
         this.lastRange = null;
+        this.results   = null;
     }
 
     setEnabled(enabled) {

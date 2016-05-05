@@ -3,7 +3,7 @@
     {{#if enableAnkiConnect}}
     <div class="action-bar">
         {{#with ../addable}}
-        <a href="#" title="Add Kanji" class="{{#unless kanji}}disabled{{/unless}}"><img src="{{../../root}}/add_kanji.png"></a>
+        <a href="#" title="Add Kanji" class="action-link {{#unless kanji}}disabled{{/unless}}" data-mode="kanji" data-index="{{@index}}"><img src="{{../../root}}/add_kanji.png"></a>
         {{/with}}
     </div>
     {{/if}}
