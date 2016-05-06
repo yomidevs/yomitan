@@ -21,12 +21,14 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
 
   return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.enableAnkiConnect : depth0),{"name":"if","hash":{},"fn":container.program(2, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "");
 },"2":function(container,depth0,helpers,partials,data,blockParams,depths) {
-    var helper, alias1=container.escapeExpression;
+    var helper, alias1=container.lambda, alias2=container.escapeExpression;
 
-  return "    <a href=\"#\" title=\"Add Kanji\" class=\"action-link disabled\" data-mode=\"kanji\" data-index=\""
-    + alias1(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"index","hash":{},"data":data}) : helper)))
+  return "    <a href=\"#\" title=\"Add Kanji\" class=\"action-link disabled\" data-sequence=\""
+    + alias2(alias1((depths[1] != null ? depths[1].sequence : depths[1]), depth0))
+    + "\" data-mode=\"kanji\" data-index=\""
+    + alias2(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\""
-    + alias1(container.lambda((depths[1] != null ? depths[1].root : depths[1]), depth0))
+    + alias2(alias1((depths[1] != null ? depths[1].root : depths[1]), depth0))
     + "/add_kanji.png\"></a>\n";
 },"4":function(container,depth0,helpers,partials,data) {
     var stack1;
@@ -80,7 +82,7 @@ templates['kanji-link.html'] = template({"compiler":[7,">= 4.0.0"],"main":functi
 templates['kanji-list.html'] = template({"1":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
-  return ((stack1 = container.invokePartial(partials["kanji.html"],depth0,{"name":"kanji.html","hash":{"options":(depths[1] != null ? depths[1].options : depths[1]),"root":(depths[1] != null ? depths[1].root : depths[1])},"data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
+  return ((stack1 = container.invokePartial(partials["kanji.html"],depth0,{"name":"kanji.html","hash":{"sequence":(depths[1] != null ? depths[1].sequence : depths[1]),"options":(depths[1] != null ? depths[1].options : depths[1]),"root":(depths[1] != null ? depths[1].root : depths[1])},"data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
@@ -93,16 +95,20 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
 
   return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.enableAnkiConnect : depth0),{"name":"if","hash":{},"fn":container.program(2, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "");
 },"2":function(container,depth0,helpers,partials,data,blockParams,depths) {
-    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression, alias5=container.lambda;
+    var helper, alias1=container.lambda, alias2=container.escapeExpression, alias3=depth0 != null ? depth0 : {}, alias4=helpers.helperMissing, alias5="function";
 
-  return "    <div class=\"action-bar\">\n        <a href=\"#\" title=\"Add as expression\" class=\"action-link disabled\" data-mode=\"vocabExp\" data-index=\""
-    + alias4(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"index","hash":{},"data":data}) : helper)))
+  return "    <div class=\"action-bar\">\n        <a href=\"#\" title=\"Add as expression\" class=\"action-link disabled\" data-sequence=\""
+    + alias2(alias1((depths[1] != null ? depths[1].sequence : depths[1]), depth0))
+    + "\" data-mode=\"vocabExp\" data-index=\""
+    + alias2(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias4),(typeof helper === alias5 ? helper.call(alias3,{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\""
-    + alias4(alias5((depths[1] != null ? depths[1].root : depths[1]), depth0))
-    + "/img/add_expression.png\"></a>\n        <a href=\"#\" title=\"Add as reading\" class=\"action-link disabled\" data-mode=\"vocabReading\" data-index=\""
-    + alias4(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"index","hash":{},"data":data}) : helper)))
+    + alias2(alias1((depths[1] != null ? depths[1].root : depths[1]), depth0))
+    + "/img/add_expression.png\"></a>\n        <a href=\"#\" title=\"Add as reading\" class=\"action-link disabled\" data-sequence=\""
+    + alias2(alias1((depths[1] != null ? depths[1].sequence : depths[1]), depth0))
+    + "\" data-mode=\"vocabReading\" data-index=\""
+    + alias2(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias4),(typeof helper === alias5 ? helper.call(alias3,{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\""
-    + alias4(alias5((depths[1] != null ? depths[1].root : depths[1]), depth0))
+    + alias2(alias1((depths[1] != null ? depths[1].root : depths[1]), depth0))
     + "/img/add_reading.png\"></a>\n    </div>\n";
 },"4":function(container,depth0,helpers,partials,data) {
     var stack1, helper, options, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", buffer = 
@@ -178,7 +184,7 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
 templates['term-list.html'] = template({"1":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
-  return ((stack1 = container.invokePartial(partials["term.html"],depth0,{"name":"term.html","hash":{"options":(depths[1] != null ? depths[1].options : depths[1]),"root":(depths[1] != null ? depths[1].root : depths[1])},"data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
+  return ((stack1 = container.invokePartial(partials["term.html"],depth0,{"name":"term.html","hash":{"sequence":(depths[1] != null ? depths[1].sequence : depths[1]),"options":(depths[1] != null ? depths[1].options : depths[1]),"root":(depths[1] != null ? depths[1].root : depths[1])},"data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 

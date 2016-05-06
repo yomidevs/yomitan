@@ -43,9 +43,9 @@ function onDomContentLoaded() {
 
 function onMessage(e) {
     const {action, params} = e.data, handlers = {
-        setActionState: ({index, state}) => {
+        setActionState: ({index, state, sequence}) => {
             for (const mode in state) {
-                const matches = document.querySelectorAll(`.action-link[data-index="${index}"][data-mode="${mode}"]`);
+                const matches = document.querySelectorAll(`.action-link[data-sequence="${sequence}"][data-index="${index}"][data-mode="${mode}"]`);
                 if (matches.length === 0) {
                     return;
                 }
