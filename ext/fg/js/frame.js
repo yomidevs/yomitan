@@ -21,7 +21,7 @@ function registerKanjiLinks() {
     for (const link of [].slice.call(document.getElementsByClassName('kanji-link'))) {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            window.parent.postMessage({action: 'displayKanji', data: e.target.innerHTML}, '*');
+            window.parent.postMessage({action: 'displayKanji', params: e.target.innerHTML}, '*');
         });
     }
 }
@@ -31,7 +31,7 @@ function registerActionLinks() {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const ds = e.currentTarget.dataset;
-            window.parent.postMessage({action: 'addNote', data: {index: ds.index, mode: ds.mode}}, '*');
+            window.parent.postMessage({action: 'addNote', params: {index: ds.index, mode: ds.mode}}, '*');
         });
     }
 }
@@ -42,14 +42,16 @@ function onDomContentLoaded() {
 }
 
 function onMessage(e) {
-    const {action, data} = e.data, handlers = {
-        'disableAction': ({mode, index}) => {
+    const {action, params} = e.data, handlers = {
+        disableAction: ({mode, index}) => {
             const matches = document.querySelectorAll(`.action-link[data-index="${index}"][data-mode="${mode}"]`);
             matches[0].classList.add('disabled');
         }
     };
 
-    handlers[action](data);
+    if (handlers.hasOwnProperty(action)) {
+        handlers[action](params);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', onDomContentLoaded, false);

@@ -36,45 +36,45 @@ class Yomichan {
         this.translator = new Translator();
         this.xhr        = null;
 
-        this.updateState('disabled');
+        this.setState('disabled');
 
         loadOptions((opts) => {
-            this.updateOptions(opts);
+            this.setOptions(opts);
 
             chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
             chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
 
             if (this.options.loadOnStartup) {
-                this.updateState('loading');
+                this.setState('loading');
             }
         });
     }
 
     onMessage(request, sender, callback) {
-        const {action, data} = request, handlers = {
-            findKanji:  ({text}) => this.findKanji(text, callback),
-            findTerm:   ({text}) => this.findTerm(text, callback),
+        const {action, params} = request, handlers = {
+            findKanji:  ({text}) => this.actionFindKanji(text, callback),
+            findTerm:   ({text}) => this.actionFindTerm(text, callback),
             getOptions: () => callback(this.options),
             getState:   () => callback(this.state),
             renderText: ({data, template}) => callback(Handlebars.templates[template](data))
         };
 
-        handlers[action].call(this, data);
+        handlers[action].call(this, params);
         return true;
     }
 
     onBrowserAction(tab) {
         switch (this.state) {
             case 'disabled':
-                this.updateState('loading');
+                this.setState('loading');
                 break;
             case 'enabled':
-                this.updateState('disabled');
+                this.setState('disabled');
                 break;
         }
     }
 
-    updateState(state) {
+    setState(state) {
         if (this.state === state) {
             return;
         }
@@ -90,19 +90,19 @@ class Yomichan {
                 break;
             case 'loading':
                 chrome.browserAction.setBadgeText({text: '...'});
-                this.translator.loadData(() => this.updateState('enabled'));
+                this.translator.loadData(() => this.setState('enabled'));
                 break;
         }
 
         Yomichan.notifyChange('state', this.state);
     }
 
-    updateOptions(options) {
+    setOptions(options) {
         this.options = options;
         Yomichan.notifyChange('options', this.options);
     }
 
-    findTerm(text, callback) {
+    actionFindTerm(text, callback) {
         const results = this.translator.findTerm(text);
         this.callAnkiApi('canAddNotes', results.results, (definitions) => {
             if (definitions !== null) {
@@ -113,7 +113,7 @@ class Yomichan {
         });
     }
 
-    findKanji(text, callback) {
+    actionFindKanji(text, callback) {
         const results = this.translator.findKanji(text);
         this.callAnkiApi('cannAddNotes', results.results, (definitions) => {
             if (definitions !== null) {
@@ -124,7 +124,7 @@ class Yomichan {
         });
     }
 
-    callAnkiApi(action, data, callback) {
+    callAnkiApi(action, params, callback) {
         if (!this.options.enableAnkiConnect) {
             callback(null);
             return;
@@ -144,7 +144,7 @@ class Yomichan {
         this.xhr.open('POST', 'http://127.0.0.1:8888');
         this.xhr.withCredentials = true;
         this.xhr.setRequestHeader('Content-Type', 'text/json');
-        this.xhr.send(JSON.stringify({action: action, data: data}));
+        this.xhr.send(JSON.stringify({action: action, params: params}));
     }
 
     static notifyChange(name, value) {

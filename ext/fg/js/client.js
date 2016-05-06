@@ -80,17 +80,13 @@ class Client {
     }
 
     onFrameMessage(e) {
-        const callback = (data) => {
-            e.source.postMessage(data, e.origin);
-        };
-
-        const {action, data} = e.data, handlers = {
-            addNote:      ({mode, index}) => this.addNote(mode, index, callback),
-            displayKanji: this.displayKanji
+        const {action, params} = e.data, handlers = {
+            addNote:      ({mode, index}) => this.actionAddNote(mode, index, (data) => e.source.postMessage(data, e.origin)),
+            displayKanji: this.actionDisplayKanji
         };
 
         if (handlers.hasOwnProperty(action)) {
-            handlers[action].call(this, data);
+            handlers[action].call(this, params);
         }
     }
 
@@ -123,12 +119,17 @@ class Client {
         });
     }
 
-    addNote(mode, index, callback) {
-        callback({action: 'disableAction', data: {mode: mode, index: index}});
-        // this.callAnkiApi('addNote', {mode: mode, definition: this.results[index]});
+    actionAddNote(mode, index, callback) {
+        callback({
+            action: 'disableAction',
+            params: {
+                mode: mode,
+                index: index
+            }
+        });
     }
 
-    displayKanji(kanji) {
+    actionDisplayKanji(kanji) {
         findKanji(kanji, (results) => {
             renderText(
                 {defs: results, root: this.fgRoot, options: this.options},
@@ -172,7 +173,7 @@ class Client {
         this.options = opts;
     }
 
-    callAnkiApi(action, data, callback) {
+    callAnkiApi(action, params, callback) {
         if (!this.options.enableAnkiConnect) {
             callback(null);
             return;
@@ -192,7 +193,7 @@ class Client {
         this.xhr.open('POST', 'http://127.0.0.1:8888');
         this.xhr.withCredentials = true;
         this.xhr.setRequestHeader('Content-Type', 'text/json');
-        this.xhr.send(JSON.stringify({action: action, data: data}));
+        this.xhr.send(JSON.stringify({action: action, params: params}));
     }
 }
 
