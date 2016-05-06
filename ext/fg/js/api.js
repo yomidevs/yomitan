@@ -17,6 +17,10 @@
  */
 
 
+//
+// Background APIs
+//
+
 function sendMessage(action, params, callback) {
     chrome.runtime.sendMessage({action: action, params: params}, callback);
 }
@@ -39,4 +43,8 @@ function getOptions(callback) {
 
 function getState(callback) {
     sendMessage('getState', null, callback);
+}
+
+function canAddNotes(definitions, callback) {
+    sendMessage('canAddNotes', {definitions: definitions}, callback);
 }

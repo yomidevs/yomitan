@@ -43,9 +43,21 @@ function onDomContentLoaded() {
 
 function onMessage(e) {
     const {action, params} = e.data, handlers = {
-        disableAction: ({mode, index}) => {
-            const matches = document.querySelectorAll(`.action-link[data-index="${index}"][data-mode="${mode}"]`);
-            matches[0].classList.add('disabled');
+        setActionStates: (states) => {
+            for (let i = 0, count = states.length; i < count; ++i) {
+                const state = states[i];
+                for (const mode in state) {
+                    const matches = document.querySelectorAll(`.action-link[data-index="${i}"][data-mode="${mode}"]`);
+                    if (matches.length > 0) {
+                        const classes = matches[0].classList;
+                        if (state[mode]) {
+                            classes.remove('disabled');
+                        } else {
+                            classes.add('disabled');
+                        }
+                    }
+                }
+            }
         }
     };
 

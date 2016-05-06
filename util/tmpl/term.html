@@ -2,10 +2,8 @@
     {{#with options}}
     {{#if enableAnkiConnect}}
     <div class="action-bar">
-        {{#with ../addable}}
-        <a href="#" title="Add as expression" class="action-link {{#unless vocabExp}}disabled{{/unless}}" data-mode="vocabExp" data-index="{{@index}}"><img src="{{../../root}}/img/add_expression.png"></a>
-        <a href="#" title="Add as reading" class="action-link {{#unless vocabExp}}disabled{{/unless}}" data-mode="vocabReading" data-index="{{@index}}"><img src="{{../../root}}/img/add_reading.png"></a>
-        {{/with}}
+        <a href="#" title="Add as expression" class="action-link disabled" data-mode="vocabExp" data-index="{{@index}}"><img src="{{../root}}/img/add_expression.png"></a>
+        <a href="#" title="Add as reading" class="action-link disabled" data-mode="vocabReading" data-index="{{@index}}"><img src="{{../root}}/img/add_reading.png"></a>
     </div>
     {{/if}}
     {{/with}}

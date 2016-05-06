@@ -68,6 +68,12 @@ class Popup {
         doc.close();
     }
 
+    sendMessage(action, params, callback) {
+        if (this.popup !== null) {
+            this.popup.contentWindow.postMessage({action: action, params: params}, '*');
+        }
+    }
+
     inject() {
         if (this.popup !== null) {
             return;

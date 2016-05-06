@@ -1,11 +1,7 @@
 <div class="kanji-definition">
     {{#with options}}
     {{#if enableAnkiConnect}}
-    <div class="action-bar">
-        {{#with ../addable}}
-        <a href="#" title="Add Kanji" class="action-link {{#unless kanji}}disabled{{/unless}}" data-mode="kanji" data-index="{{@index}}"><img src="{{../../root}}/add_kanji.png"></a>
-        {{/with}}
-    </div>
+    <a href="#" title="Add Kanji" class="action-link disabled" data-mode="kanji" data-index="{{@index}}"><img src="{{../root}}/add_kanji.png"></a>
     {{/if}}
     {{/with}}
 

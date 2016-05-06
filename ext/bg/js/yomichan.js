@@ -34,8 +34,6 @@ class Yomichan {
         });
 
         this.translator = new Translator();
-        this.xhr        = null;
-
         this.setState('disabled');
 
         loadOptions((opts) => {
@@ -52,11 +50,12 @@ class Yomichan {
 
     onMessage(request, sender, callback) {
         const {action, params} = request, handlers = {
-            findKanji:  ({text}) => this.actionFindKanji(text, callback),
-            findTerm:   ({text}) => this.actionFindTerm(text, callback),
-            getOptions: () => callback(this.options),
-            getState:   () => callback(this.state),
-            renderText: ({data, template}) => callback(Handlebars.templates[template](data))
+            canAddNotes: ({definitions}) => this.ankiInvoke('canAddNotes', definitions, callback),
+            findKanji:   ({text}) => callback(this.translator.findKanji(text)),
+            findTerm:    ({text}) => callback(this.translator.findTerm(text)),
+            getOptions:  () => callback(this.options),
+            getState:    () => callback(this.state),
+            renderText:  ({data, template}) => callback(Handlebars.templates[template](data))
         };
 
         handlers[action].call(this, params);
@@ -102,49 +101,21 @@ class Yomichan {
         Yomichan.notifyChange('options', this.options);
     }
 
-    actionFindTerm(text, callback) {
-        const results = this.translator.findTerm(text);
-        this.callAnkiApi('canAddNotes', results.results, (definitions) => {
-            if (definitions !== null) {
-                results.results = definitions;
-            }
+    ankiInvoke(action, params, callback) {
+        if (this.options.enableAnkiConnect) {
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('loadend', () => {
+                const resp = xhr.responseText;
+                callback(resp ? JSON.parse(resp) : null);
+            });
 
-            callback(results);
-        });
-    }
-
-    actionFindKanji(text, callback) {
-        const results = this.translator.findKanji(text);
-        this.callAnkiApi('cannAddNotes', results.results, (definitions) => {
-            if (definitions !== null) {
-                results.results = definitions;
-            }
-
-            callback(results);
-        });
-    }
-
-    callAnkiApi(action, params, callback) {
-        if (!this.options.enableAnkiConnect) {
+            xhr.open('POST', 'http://127.0.0.1:8888');
+            xhr.withCredentials = true;
+            xhr.setRequestHeader('Content-Type', 'text/json');
+            xhr.send(JSON.stringify({action: action, params: params}));
+        } else {
             callback(null);
-            return;
         }
-
-        if (this.xhr !== null) {
-            this.xhr.abort();
-        }
-
-        this.xhr = new XMLHttpRequest();
-        this.xhr.addEventListener('loadend', () => {
-            const resp = this.xhr.responseText;
-            callback(resp ? JSON.parse(resp) : null);
-            this.xhr = null;
-        });
-
-        this.xhr.open('POST', 'http://127.0.0.1:8888');
-        this.xhr.withCredentials = true;
-        this.xhr.setRequestHeader('Content-Type', 'text/json');
-        this.xhr.send(JSON.stringify({action: action, params: params}));
     }
 
     static notifyChange(name, value) {

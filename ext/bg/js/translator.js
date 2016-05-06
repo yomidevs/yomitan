@@ -89,12 +89,12 @@ class Translator {
             }
         }
 
-        let results = [];
+        let definitions = [];
         for (const key in groups) {
-            results.push(groups[key]);
+            definitions.push(groups[key]);
         }
 
-        results = results.sort((v1, v2) => {
+        definitions = definitions.sort((v1, v2) => {
             const sl1 = v1.source.length;
             const sl2 = v2.source.length;
             if (sl1 > sl2) {
@@ -123,25 +123,25 @@ class Translator {
         });
 
         let length = 0;
-        for (const result of results) {
+        for (const result of definitions) {
             length = Math.max(length, result.source.length);
         }
 
-        return {results: results, length: length};
+        return {definitions: definitions, length: length};
     }
 
     findKanji(text) {
-        let results     = [];
+        let definitions     = [];
         const processed = {};
 
         for (const c of text) {
             if (!processed[c]) {
-                results = results.concat(this.dictionary.findKanji(c));
+                definitions = definitions.concat(this.dictionary.findKanji(c));
                 processed[c] = true;
             }
         }
 
-        return results;
+        return definitions;
     }
 
     processTerm(groups, source, tags, rules=[], root='') {
