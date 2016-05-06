@@ -50,9 +50,9 @@ class Yomichan {
 
     onMessage(request, sender, callback) {
         const {action, params} = request, handlers = {
-            canAddNotes: ({definitions}) => this.ankiInvoke('canAddNotes', definitions, callback),
-            findKanji:   ({text}) => callback(this.translator.findKanji(text)),
-            findTerm:    ({text}) => callback(this.translator.findTerm(text)),
+            canAddNotes: (definitions) => this.ankiInvoke('canAddNotes', definitions, callback),
+            findKanji:   (text) => callback(this.translator.findKanji(text)),
+            findTerm:    (text) => callback(this.translator.findTerm(text)),
             getOptions:  () => callback(this.options),
             getState:    () => callback(this.state),
             renderText:  ({data, template}) => callback(Handlebars.templates[template](data))

@@ -37,9 +37,9 @@ class Client {
         window.addEventListener('scroll', (e) => this.hidePopup());
         window.addEventListener('resize', (e) => this.hidePopup());
 
-        getOptions((opts) => {
+        bgGetOptions((opts) => {
             this.setOptions(opts);
-            getState((state) => this.setEnabled(state === 'enabled'));
+            bgGetState((state) => this.setEnabled(state === 'enabled'));
         });
     }
 
@@ -101,19 +101,21 @@ class Client {
         }
 
         range.setLength(this.options.scanLength);
-        findTerm(range.text(), ({definitions, length}) => {
+        bgFindTerm(range.text(), ({definitions, length}) => {
             if (length === 0) {
                 this.hidePopup();
             } else {
                 range.setLength(length);
-                renderText(
+                bgRenderText(
                     {defs: definitions, root: this.fgRoot, options: this.options},
                     'term-list.html',
                     (content) => {
                         this.definitions = definitions;
                         this.showPopup(range, content);
-                        canAddNotes(definitions, (states) => {
-                            states.forEach((state, index) => this.popup.sendMessage('setActionState', {index: index, state: state}));
+                        bgCanAddNotes(definitions, (states) => {
+                            if (states !== null) {
+                                states.forEach((state, index) => this.popup.sendMessage('setActionState', {index: index, state: state}));
+                            }
                         });
                     }
                 );
@@ -129,8 +131,8 @@ class Client {
     }
 
     actionDisplayKanji(kanji) {
-        findKanji(kanji, (definitions) => {
-            renderText(
+        bgFindKanji(kanji, (definitions) => {
+            bgRenderText(
                 {defs: definitions, root: this.fgRoot, options: this.options},
                 'kanji-list.html',
                 (content) => {

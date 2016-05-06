@@ -21,30 +21,30 @@
 // Background APIs
 //
 
-function sendMessage(action, params, callback) {
+function bgSendMessage(action, params, callback) {
     chrome.runtime.sendMessage({action: action, params: params}, callback);
 }
 
-function findTerm(text, callback) {
-    sendMessage('findTerm', {text: text}, callback);
+function bgFindTerm(text, callback) {
+    bgSendMessage('findTerm', text, callback);
 }
 
-function findKanji(text, callback) {
-    sendMessage('findKanji', {text: text}, callback);
+function bgFindKanji(text, callback) {
+    bgSendMessage('findKanji', text, callback);
 }
 
-function renderText(data, template, callback) {
-    sendMessage('renderText', {data: data, template: template}, callback);
+function bgRenderText(data, template, callback) {
+    bgSendMessage('renderText', {data: data, template: template}, callback);
 }
 
-function getOptions(callback) {
-    sendMessage('getOptions', null, callback);
+function bgGetOptions(callback) {
+    bgSendMessage('getOptions', null, callback);
 }
 
-function getState(callback) {
-    sendMessage('getState', null, callback);
+function bgGetState(callback) {
+    bgSendMessage('getState', null, callback);
 }
 
-function canAddNotes(definitions, callback) {
-    sendMessage('canAddNotes', {definitions: definitions}, callback);
+function bgCanAddNotes(definitions, callback) {
+    bgSendMessage('canAddNotes', definitions, callback);
 }
