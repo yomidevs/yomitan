@@ -38,7 +38,7 @@ $('#saveOptions').click(() => {
     saveOptions(opts, () => {
         $('.notifyAlerts').hide();
         $('#notifySave').slideDown();
-        chrome.extension.getBackgroundPage().yomichan.updateOptions(opts);
+        chrome.extension.getBackgroundPage().yomichan.setOptions(opts);
     });
 });
 
