@@ -106,7 +106,7 @@ class Client {
             if (length === 0) {
                 this.hidePopup();
             } else {
-                const sequence = this.sequence++;
+                const sequence = ++this.sequence;
                 range.setLength(length);
                 bgRenderText(
                     {defs: definitions, root: this.fgRoot, options: this.options, sequence: sequence},
@@ -141,7 +141,7 @@ class Client {
 
     actionDisplayKanji(kanji) {
         bgFindKanji(kanji, (definitions) => {
-            const sequence = this.sequence++;
+            const sequence = ++this.sequence;
             bgRenderText(
                 {defs: definitions, root: this.fgRoot, options: this.options, sequence: sequence},
                 'kanji-list.html',
