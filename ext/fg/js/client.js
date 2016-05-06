@@ -112,7 +112,9 @@ class Client {
                     (content) => {
                         this.definitions = definitions;
                         this.showPopup(range, content);
-                        canAddNotes(definitions, (states) => this.popup.sendMessage('setActionStates', states));
+                        canAddNotes(definitions, (states) => {
+                            states.forEach((state, index) => this.popup.sendMessage('setActionState', {index: index, state: state}));
+                        });
                     }
                 );
             }
@@ -120,7 +122,10 @@ class Client {
     }
 
     actionAddNote(mode, index, callback) {
+        const state = {};
+        state[mode] = false;
 
+        this.popup.sendMessage('setActionState', {index: index, state: state});
     }
 
     actionDisplayKanji(kanji) {
