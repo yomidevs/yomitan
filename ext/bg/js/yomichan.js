@@ -34,6 +34,7 @@ class Yomichan {
         });
 
         this.translator = new Translator();
+        this.asyncPools = {};
         this.setState('disabled');
 
         loadOptions((opts) => {
@@ -50,7 +51,7 @@ class Yomichan {
 
     onMessage(request, sender, callback) {
         const {action, params} = request, handlers = {
-            canAddNotes: (definitions) => this.ankiInvoke('canAddNotes', definitions, callback),
+            canAddNotes: (definitions) => this.ankiInvoke('canAddNotes', definitions, 'notes', callback),
             findKanji:   (text) => callback(this.translator.findKanji(text)),
             findTerm:    (text) => callback(this.translator.findTerm(text)),
             getOptions:  () => callback(this.options),
@@ -101,10 +102,17 @@ class Yomichan {
         Yomichan.notifyChange('options', this.options);
     }
 
-    ankiInvoke(action, params, callback) {
-        if (this.options.enableAnkiConnect) {
+    ankiInvoke(action, params, pool, callback) {
+        if (pool !== null && this.asyncPools.hasOwnProperty(pool)) {
+            this.asyncPools[pool].abort();
+            callback(null);
+        } else if (this.options.enableAnkiConnect) {
             const xhr = new XMLHttpRequest();
             xhr.addEventListener('loadend', () => {
+                if (pool !== null) {
+                    delete this.asyncPools[pool];
+                }
+
                 const resp = xhr.responseText;
                 callback(resp ? JSON.parse(resp) : null);
             });
