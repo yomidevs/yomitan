@@ -115,7 +115,7 @@ class Client {
                         this.definitions = definitions;
                         this.showPopup(range, content);
 
-                        bgCanAddNotes(definitions, (states) => {
+                        bgCanAddNotes(definitions, ['vocabExp', 'vocabReading'], (states) => {
                             if (states !== null) {
                                 states.forEach((state, index) => this.popup.sendMessage(
                                     'setActionState',
@@ -149,7 +149,7 @@ class Client {
                     this.definitions = definitions;
                     this.popup.setContent(content, definitions);
 
-                    bgCanAddNotes(definitions, (states) => {
+                    bgCanAddNotes(definitions, ['kanji'], (states) => {
                         if (states !== null) {
                             states.forEach((state, index) => this.popup.sendMessage(
                                 'setActionState',

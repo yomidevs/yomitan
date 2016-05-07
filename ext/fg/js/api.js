@@ -45,6 +45,6 @@ function bgGetState(callback) {
     bgSendMessage('getState', null, callback);
 }
 
-function bgCanAddNotes(definitions, callback) {
-    bgSendMessage('canAddNotes', definitions, callback);
+function bgCanAddNotes(definitions, modes, callback) {
+    bgSendMessage('canAddNotes', {definitions, modes}, callback);
 }
