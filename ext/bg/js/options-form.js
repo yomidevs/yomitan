@@ -33,23 +33,16 @@ function formToOptions() {
     });
 }
 
-$('#saveOptions').click(() => {
+function onOptionsChanged() {
     const opts = formToOptions();
     saveOptions(opts, () => {
-        $('.notifyAlerts').hide();
-        $('#notifySave').slideDown();
         chrome.extension.getBackgroundPage().yomichan.setOptions(opts);
     });
-});
+}
 
-$('#resetOptions').click(() => {
-    optionsToForm(sanitizeOptions({}));
-    $('.notifyAlerts').hide();
-    $('#notifyReset').slideDown();
+$(document).ready(() => {
+    loadOptions((opts) => {
+        optionsToForm(opts);
+        $('input').on('input paste change', onOptionsChanged);
+    });
 });
-
-$('[data-hide]').on('click', function() {
-    $('#' + $(this).attr('data-hide')).hide();
-});
-
-$(document).ready(() => loadOptions((opts) => optionsToForm(opts)));
