@@ -103,10 +103,11 @@ class Yomichan {
     }
 
     ankiInvoke(action, params, pool, callback) {
-        if (pool !== null && this.asyncPools.hasOwnProperty(pool)) {
-            this.asyncPools[pool].abort();
-            callback(null);
-        } else if (this.options.enableAnkiConnect) {
+        if (this.options.enableAnkiConnect) {
+            if (pool !== null && this.asyncPools.hasOwnProperty(pool)) {
+                this.asyncPools[pool].abort();
+            }
+
             const xhr = new XMLHttpRequest();
             xhr.addEventListener('loadend', () => {
                 if (pool !== null) {
