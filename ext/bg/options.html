@@ -9,39 +9,57 @@
     <body>
         <div class="container">
             <div class="page-header">
-                <h1>Options</h1>
+                <h1>Yomichan <small>for Chrome</small></h1>
             </div>
 
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <label for="scanLength" class="control-label col-sm-2">Scan length</label>
-                    <div class="col-sm-10"><input type="number" value="20" min="1" id="scanLength" class="form-control"></div>
-                </div>
+            <h2>Options</h2>
+            <div>
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="scanLength" class="control-label col-sm-2">Scan length</label>
+                        <div class="col-sm-10"><input type="number" value="20" min="1" id="scanLength" class="form-control"></div>
+                    </div>
 
-                <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-10">
-                        <div class="checkbox">
-                            <label><input type="checkbox" id="loadOnStartup"> Load on startup</label>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <div class="checkbox">
+                                <label><input type="checkbox" id="loadOnStartup"> Load on startup</label>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-10">
-                        <div class="checkbox">
-                            <label><input type="checkbox" id="selectMatchedText" checked> Select matched text</label>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <div class="checkbox">
+                                <label><input type="checkbox" id="selectMatchedText" checked> Select matched text</label>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-10">
-                        <div class="checkbox">
-                            <label><input type="checkbox" id="enableAnkiConnect" checked> Enable AnkiConnect</label>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <div class="checkbox">
+                                <label><input type="checkbox" id="enableAnkiConnect" checked> Enable AnkiConnect</label>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
+
+            <h2>License</h2>
+            <div>
+                <p>Copyright (C) 2016  Alex Yatskov &lt;alex@foosoft.net&gt;<br>Author: Alex Yatskov &lt;alex@foosoft.net&gt;</p> 
+                <p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</p>
+                <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.</p>
+                <p>You should have received a copy of the GNU General Public License along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</p>
+            </div>
+
+            <h2>Third-party Software</h2>
+            <div>
+                <p>This software uses the <a href = "http://www.famfamfam.com/lab/icons/silk/">Silk web icon set</a> created by Mark James.</p>
+                <p>Portions of this application's code and data are based on the <a href="http://www.polarcloud.com/rikaichan/">Rikaichan</a> extension developed by Jonathan Zarate.</p>
+                <p>This package uses the <a href="http://www.csse.monash.edu.au/~jwb/edict.html">EDICT</a> and <a href="http://www.csse.monash.edu.au/~jwb/kanjidic.html">KANJIDIC</a> dictionary files. These files are the property of the <a href="http://www.edrdg.org/"> Electronic Dictionary Research and Development Group</a>, and are used in conformance with the Group's <a href="http://www.edrdg.org/edrdg/licence.html">licence</a>.</p>
+            </div>
 
             <script src="../lib/jquery-2.2.2.min.js"></script>
             <script src="../lib/bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
