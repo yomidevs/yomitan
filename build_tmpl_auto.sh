@@ -1,5 +1,5 @@
 #!/bin/bash
-DIRECTORY_TO_OBSERVE="util/tmpl"
+DIRECTORY_TO_OBSERVE="tmpl"
 BUILD_SCRIPT="build_tmpl.sh"
 
 function block_for_change {
