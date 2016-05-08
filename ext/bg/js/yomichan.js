@@ -43,7 +43,7 @@ class Yomichan {
             chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
             chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
 
-            if (this.options.loadOnStartup) {
+            if (this.options.activateOnStartup) {
                 this.setState('loading');
             }
         });
@@ -52,6 +52,7 @@ class Yomichan {
     onMessage(request, sender, callback) {
         const {action, params} = request, handlers = {
             canAddNotes: ({definitions, modes}) => this.ankiInvoke('canAddNotes', {definitions: definitions, modes: modes}, 'notes', callback),
+            addNote:     ({definition, mode}) => this.ankiInvoke('addNote', {definition: definition, mode: mode}, null, callback),
             findKanji:   (text) => callback(this.translator.findKanji(text)),
             findTerm:    (text) => callback(this.translator.findTerm(text)),
             getOptions:  () => callback(this.options),
@@ -90,7 +91,10 @@ class Yomichan {
                 break;
             case 'loading':
                 chrome.browserAction.setBadgeText({text: '...'});
-                this.translator.loadData(() => this.setState('enabled'));
+                this.translator.loadData(
+                    {loadEnamDict: this.options.loadEnamDict},
+                    () => this.setState('enabled')
+                );
                 break;
         }
 

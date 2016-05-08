@@ -18,18 +18,20 @@
 
 
 function optionsToForm(opts) {
+    $('#activateOnStartup').prop('checked', opts.activateOnStartup);
     $('#enableAnkiConnect').prop('checked', opts.enableAnkiConnect);
-    $('#selectMatchedText').prop('checked', opts.selectMatchedText);
-    $('#loadOnStartup').prop('checked', opts.loadOnStartup);
+    $('#loadEnamDict').prop('checked', opts.loadEnamDict);
     $('#scanLength').val(opts.scanLength);
+    $('#selectMatchedText').prop('checked', opts.selectMatchedText);
 }
 
 function formToOptions() {
     return sanitizeOptions({
-        loadOnStartup:     $('#loadOnStartup').prop('checked'),
-        selectMatchedText: $('#selectMatchedText').prop('checked'),
+        activateOnStartup: $('#activateOnStartup').prop('checked'),
         enableAnkiConnect: $('#enableAnkiConnect').prop('checked'),
-        scanLength:        $('#scanLength').val()
+        loadEnamDict:      $('#loadEnamDict').prop('checked'),
+        scanLength:        $('#scanLength').val(),
+        selectMatchedText: $('#selectMatchedText').prop('checked')
     });
 }
 

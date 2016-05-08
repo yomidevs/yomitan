@@ -33,14 +33,19 @@ class Translator {
         this.deinflector = new Deinflector();
     }
 
-    loadData(callback) {
+    loadData({loadEnamDict=true}, callback) {
         if (this.loaded) {
             callback();
             return;
         }
 
+        let files = ['rules', 'tags', 'edict', 'kanjidic'];
+        if (loadEnamDict) {
+            files = files.concat('enamdict');
+        }
+
         const pendingLoads = [];
-        for (const key of ['rules', 'tags', 'edict', 'enamdict', 'kanjidic']) {
+        for (const key of files) {
             pendingLoads.push(key);
             Translator.loadData(this.paths[key], (response) => {
                 switch (key) {
@@ -82,10 +87,12 @@ class Translator {
                 return tags;
             });
 
-            if (dfs !== null) {
-                for (const df of dfs) {
-                    this.processTerm(groups, df.source, df.tags, df.rules, df.root);
-                }
+            if (dfs === null) {
+                continue;
+            }
+
+            for (const df of dfs) {
+                this.processTerm(groups, df.source, df.tags, df.rules, df.root);
             }
         }
 
@@ -131,7 +138,7 @@ class Translator {
     }
 
     findKanji(text) {
-        let definitions     = [];
+        let definitions = [];
         const processed = {};
 
         for (const c of text) {
