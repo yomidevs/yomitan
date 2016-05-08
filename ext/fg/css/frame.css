@@ -126,6 +126,7 @@ body {
 }
 
 .kanji-info dt {
+    color:       #31708f;
     font-weight: bold;
 }
 
