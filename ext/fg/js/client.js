@@ -81,7 +81,7 @@ class Client {
 
     onFrameMessage(e) {
         const {action, params} = e.data, handlers = {
-            addNote:      ({mode, index}) => this.actionAddNote(mode, index, (data) => e.source.postMessage(data, e.origin)),
+            addNote:      ({mode, index}) => this.actionAddNote(index, mode, (data) => e.source.postMessage(data, e.origin)),
             displayKanji: this.actionDisplayKanji
         };
 
@@ -117,10 +117,7 @@ class Client {
 
                         bgCanAddNotes(definitions, ['vocabExp', 'vocabReading'], (states) => {
                             if (states !== null) {
-                                states.forEach((state, index) => this.popup.sendMessage(
-                                    'setActionState',
-                                    {index: index, state: state, sequence: sequence}
-                                ));
+                                states.forEach((state, index) => this.popup.sendMessage('setActionState', {index: index, state: state, sequence: sequence}));
                             }
                         });
                     }
@@ -129,14 +126,18 @@ class Client {
         });
     }
 
-    actionAddNote(mode, index, callback) {
+    actionAddNote(index, mode, callback) {
         const state = {};
         state[mode] = false;
 
-        this.popup.sendMessage(
-            'setActionState',
-            {index: index, state: state, sequence: this.sequence}
-        );
+        bgAddNote(this.definitions[index], mode, (success) => {
+            if (success) {
+                this.popup.sendMessage('setActionState', {index: index, state: state, sequence: this.sequence});
+            } else {
+                alert('Note could not be added');
+            }
+        });
+
     }
 
     actionDisplayKanji(kanji) {
@@ -151,10 +152,7 @@ class Client {
 
                     bgCanAddNotes(definitions, ['kanji'], (states) => {
                         if (states !== null) {
-                            states.forEach((state, index) => this.popup.sendMessage(
-                                'setActionState',
-                                {index: index, state: state, sequence: sequence}
-                            ));
+                            states.forEach((state, index) => this.popup.sendMessage('setActionState', {index: index, state: state, sequence: sequence}));
                         }
                     });
                 }
