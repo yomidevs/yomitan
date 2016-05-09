@@ -122,7 +122,7 @@ class Translator {
             const rl2 = v2.rules.length;
             if (rl1 < rl2) {
                 return -1;
-            } else if (rl2 > rl1) {
+            } else if (rl1 > rl2) {
                 return 1;
             }
 
