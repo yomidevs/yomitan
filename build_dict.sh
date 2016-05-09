@@ -1,8 +1,8 @@
 #!/bin/sh
 
-KANJIDIC=util/data/kanjidic
-EDICT=util/data/edict
-ENAMDICT=util/data/enamdict
+KANJIDIC=common/data/kanjidic
+EDICT=common/data/edict
+ENAMDICT=common/data/enamdict
 DICT_DIR=ext/bg/data
 
-util/compile.py --kanjidic $KANJIDIC --edict $EDICT --enamdict $ENAMDICT $DICT_DIR
+common/compile.py --kanjidic $KANJIDIC --edict $EDICT --enamdict $ENAMDICT $DICT_DIR
