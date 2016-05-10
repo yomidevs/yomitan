@@ -50,13 +50,13 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
 },"8":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "            <dt>Kunyomi</dt>\n            <dd class=\"kanji-reading\">\n"
+  return "            <dt>Kun'yomi</dt>\n            <dd class=\"kanji-reading\">\n"
     + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.kunyomi : depth0),{"name":"each","hash":{},"fn":container.program(5, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "            </dd>\n";
 },"10":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "            <dt>Onyomi</dt>\n            <dd class=\"kanji-reading\">\n"
+  return "            <dt>On'yomi</dt>\n            <dd class=\"kanji-reading\">\n"
     + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.onyomi : depth0),{"name":"each","hash":{},"fn":container.program(5, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "            </dd>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {

@@ -130,8 +130,8 @@ body {
 }
 
 .kanji-info dt {
-    color:       #31708f;
-    font-weight: bold;
+    background-color: #eee;
+    font-weight:      bold;
 }
 
 .kanji-info dd {
