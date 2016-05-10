@@ -21,7 +21,7 @@
 body {
     background-color: #fff;
     color:            #333;
-    font-family:      helvetica neue,helvetica,arial,sans-serif;
+    font-family:      helvetica neue, helvetica, arial, sans-serif;
     font-size:        14px;
     line-height:      1.42857143;
     overflow-y:       auto;
@@ -82,7 +82,7 @@ body {
 
 .term-expression {
     display:     inline-block;
-    font-family: serif;
+    font-family: vl-gothic-regular;
     font-size:   24px;
 }
 
@@ -113,11 +113,15 @@ body {
 
 .kanji-glyph {
     float:          left;
-    font-family:    'KanjiStrokeOrders';
+    font-family:    kanji-stroke-orders;
     font-size:      140px;
     line-height:    140px;
     padding:        0.01em;
     vertical-align: top;
+}
+
+.kanji-reading {
+    font-family: vl-gothic-regular;
 }
 
 .kanji-info {

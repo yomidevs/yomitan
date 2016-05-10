@@ -22,7 +22,7 @@
 
             {{#if kunyomi}}
             <dt>Kunyomi</dt>
-            <dd>
+            <dd class="kanji-reading">
                 {{#each kunyomi}}
                 {{.}}{{#unless @last}}, {{/unless}}
                 {{/each}}
@@ -31,7 +31,7 @@
 
             {{#if onyomi}}
             <dt>Onyomi</dt>
-            <dd>
+            <dd class="kanji-reading">
                 {{#each onyomi}}
                 {{.}}{{#unless @last}}, {{/unless}}
                 {{/each}}

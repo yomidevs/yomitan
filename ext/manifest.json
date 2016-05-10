@@ -23,11 +23,12 @@
 
     "web_accessible_resources": [
         "fg/css/frame.css",
+        "fg/img/add_expression.png",
+        "fg/img/add_kanji.png",
+        "fg/img/add_reading.png",
         "fg/js/frame.js",
         "fg/ttf/kanji-stroke-orders.ttf",
-        "fg/img/add_expression.png",
-        "fg/img/add_reading.png",
-        "fg/img/add_kanji.png"
+        "fg/ttf/vl-gothic-regular.ttf"
     ],
 
     "content_scripts": [{
