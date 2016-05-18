@@ -1,26 +1,22 @@
 {
     "manifest_version": 2,
-    "name":             "Yomichan",
-    "description":      "Yomichan Extension",
-    "version":          "0.0.1",
+    "name": "Yomichan",
+    "version": "0.1",
 
-    "icons": {
-        "16":  "img/icon16.png",
-        "48":  "img/icon48.png",
-        "128": "img/icon128.png"
-    },
+    "description": "Japanese dictionary with Anki integration",
+    "icons": {"16": "img/icon16.png", "48": "img/icon48.png", "128": "img/icon128.png"},
+    "browser_action": {"default_icon": {"19": "img/icon19.png", "38": "img/icon38.png"}},
 
-    "browser_action": {
-        "default_icon": {
-            "19": "img/icon19.png",
-            "38": "img/icon38.png"
-        }
-    },
-
-    "background":   {"page": "bg/background.html"},
+    "author": "Alex Yatskov",
+    "background": {"page": "bg/background.html"},
+    "content_scripts": [{
+        "matches": ["*://*/*"],
+        "js": ["fg/js/range.js", "fg/js/popup.js", "fg/js/api.js", "fg/js/client.js"],
+        "css": ["fg/css/client.css"]
+    }],
+    "minimum_chrome_version": "45.0.0.0",
     "options_page": "bg/options.html",
-    "permissions":  ["storage"],
-
+    "permissions": ["storage"],
     "web_accessible_resources": [
         "fg/css/frame.css",
         "fg/img/add_expression.png",
@@ -29,11 +25,5 @@
         "fg/js/frame.js",
         "fg/ttf/kanji-stroke-orders.ttf",
         "fg/ttf/vl-gothic-regular.ttf"
-    ],
-
-    "content_scripts": [{
-        "matches": ["*://*/*"],
-        "js":      ["fg/js/range.js", "fg/js/popup.js", "fg/js/api.js", "fg/js/client.js"],
-        "css":     ["fg/css/client.css"]
-    }]
+    ]
 }
