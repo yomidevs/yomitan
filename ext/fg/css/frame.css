@@ -112,7 +112,7 @@ body {
 /* kanji styles */
 
 .kanji-glyph {
-    float:          left;
+    float:          right;
     font-family:    kanji-stroke-orders;
     font-size:      140px;
     line-height:    140px;
@@ -137,4 +137,3 @@ body {
 .kanji-info dd {
     margin-left: 1.2em;
 }
-

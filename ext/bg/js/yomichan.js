@@ -122,7 +122,7 @@ class Yomichan {
                 callback(resp ? JSON.parse(resp) : null);
             });
 
-            xhr.open('POST', 'http://127.0.0.1:8888');
+            xhr.open('POST', 'http://127.0.0.1:8765');
             xhr.withCredentials = true;
             xhr.setRequestHeader('Content-Type', 'text/json');
             xhr.send(JSON.stringify({action: action, params: params}));
