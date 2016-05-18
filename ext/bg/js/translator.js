@@ -151,10 +151,9 @@ class Translator {
         return definitions;
     }
 
-    processTerm(groups, source, tags, rules=[], root) {
+    processTerm(groups, source, tags, rules=[], root='') {
         for (const entry of this.dictionary.findTerm(root)) {
-            const groupId = `${source}_${entry.id}`;
-            if (groupId in groups) {
+            if (entry.id in groups) {
                 continue;
             }
 
@@ -209,7 +208,7 @@ class Translator {
             });
 
             if (matched) {
-                groups[groupId] = {
+                groups[entry.id] = {
                     expression: entry.expression,
                     reading:    entry.reading,
                     glossary:   entry.glossary,
