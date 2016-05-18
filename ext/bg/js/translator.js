@@ -126,7 +126,7 @@ class Translator {
                 return 1;
             }
 
-            return 0;
+            return v2.expression.localeCompare(v1.expression);
         });
 
         let length = 0;
