@@ -53,8 +53,8 @@ function onOptionsChanged() {
 
 $(document).ready(() => {
     loadOptions((opts) => {
-        updateVisibility();
         optionsToForm(opts);
+        updateVisibility();
         $('input').on('input paste change', onOptionsChanged);
     });
 });
