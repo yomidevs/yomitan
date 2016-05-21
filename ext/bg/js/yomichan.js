@@ -84,10 +84,10 @@ class Yomichan {
 
         switch (state) {
             case 'disabled':
-                chrome.browserAction.setBadgeText({text: ''});
+                chrome.browserAction.setBadgeText({text: 'off'});
                 break;
             case 'enabled':
-                chrome.browserAction.setBadgeText({text: 'on'});
+                chrome.browserAction.setBadgeText({text: ''});
                 break;
             case 'loading':
                 chrome.browserAction.setBadgeText({text: '...'});
