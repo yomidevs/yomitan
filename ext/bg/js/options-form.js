@@ -35,7 +35,16 @@ function formToOptions() {
     });
 }
 
+function updateVisibility() {
+    if ($('#enableAnkiConnect').prop('checked')) {
+        $('.options-anki').show();
+    } else {
+        $('.options-anki').hide();
+    }
+}
+
 function onOptionsChanged() {
+    updateVisibility();
     const opts = formToOptions();
     saveOptions(opts, () => {
         chrome.extension.getBackgroundPage().yomichan.setOptions(opts);
@@ -44,6 +53,7 @@ function onOptionsChanged() {
 
 $(document).ready(() => {
     loadOptions((opts) => {
+        updateVisibility();
         optionsToForm(opts);
         $('input').on('input paste change', onOptionsChanged);
     });
