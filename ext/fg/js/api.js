@@ -22,27 +22,27 @@
 //
 
 function bgSendMessage(action, params, callback) {
-    chrome.runtime.sendMessage({action: action, params: params}, callback);
+    chrome.runtime.sendMessage({action, params}, callback);
 }
 
 function bgFindTerm(text, callback) {
-    bgSendMessage('findTerm', text, callback);
+    bgSendMessage('findTerm', {text}, callback);
 }
 
 function bgFindKanji(text, callback) {
-    bgSendMessage('findKanji', text, callback);
+    bgSendMessage('findKanji', {text}, callback);
 }
 
 function bgRenderText(data, template, callback) {
-    bgSendMessage('renderText', {data: data, template: template}, callback);
+    bgSendMessage('renderText', {data, template}, callback);
 }
 
 function bgGetOptions(callback) {
-    bgSendMessage('getOptions', null, callback);
+    bgSendMessage('getOptions', {}, callback);
 }
 
 function bgGetState(callback) {
-    bgSendMessage('getState', null, callback);
+    bgSendMessage('getState', {}, callback);
 }
 
 function bgCanAddNotes(definitions, modes, callback) {
@@ -50,5 +50,5 @@ function bgCanAddNotes(definitions, modes, callback) {
 }
 
 function bgAddNote(definition, mode, callback) {
-    bgSendMessage('addNote', {definition: definition, mode: mode}, callback);
+    bgSendMessage('addNote', {definition, mode}, callback);
 }

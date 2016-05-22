@@ -80,13 +80,9 @@ class Client {
     }
 
     onFrameMessage(e) {
-        const {action, params} = e.data, handlers = {
-            addNote:      ({mode, index}) => this.actionAddNote(index, mode, (data) => e.source.postMessage(data, e.origin)),
-            displayKanji: this.actionDisplayKanji
-        };
-
-        if (handlers.hasOwnProperty(action)) {
-            handlers[action].call(this, params);
+        const {action, params} = e.data, method = this['api_' + action];
+        if (typeof(method) === 'function') {
+            method.call(this, params);
         }
     }
 
@@ -126,40 +122,6 @@ class Client {
         });
     }
 
-    actionAddNote(index, mode, callback) {
-        const state = {};
-        state[mode] = false;
-
-        bgAddNote(this.definitions[index], mode, (success) => {
-            if (success) {
-                this.popup.sendMessage('setActionState', {index: index, state: state, sequence: this.sequence});
-            } else {
-                alert('Note could not be added');
-            }
-        });
-
-    }
-
-    actionDisplayKanji(kanji) {
-        bgFindKanji(kanji, (definitions) => {
-            const sequence = ++this.sequence;
-            bgRenderText(
-                {defs: definitions, root: this.fgRoot, options: this.options, sequence: sequence},
-                'kanji-list.html',
-                (content) => {
-                    this.definitions = definitions;
-                    this.popup.setContent(content, definitions);
-
-                    bgCanAddNotes(definitions, ['kanji'], (states) => {
-                        if (states !== null) {
-                            states.forEach((state, index) => this.popup.sendMessage('setActionState', {index: index, state: state, sequence: sequence}));
-                        }
-                    });
-                }
-            );
-        });
-    }
-
     showPopup(range, content) {
         this.popup.showNextTo(range.getRect(), content);
 
@@ -189,6 +151,39 @@ class Client {
 
     setOptions(opts) {
         this.options = opts;
+    }
+
+    api_addNote({index, mode}) {
+        const state = {};
+        state[mode] = false;
+
+        bgAddNote(this.definitions[index], mode, (success) => {
+            if (success) {
+                this.popup.sendMessage('setActionState', {index: index, state: state, sequence: this.sequence});
+            } else {
+                alert('Note could not be added');
+            }
+        });
+    }
+
+    api_displayKanji(kanji) {
+        bgFindKanji(kanji, (definitions) => {
+            const sequence = ++this.sequence;
+            bgRenderText(
+                {defs: definitions, root: this.fgRoot, options: this.options, sequence: sequence},
+                'kanji-list.html',
+                (content) => {
+                    this.definitions = definitions;
+                    this.popup.setContent(content, definitions);
+
+                    bgCanAddNotes(definitions, ['kanji'], (states) => {
+                        if (states !== null) {
+                            states.forEach((state, index) => this.popup.sendMessage('setActionState', {index: index, state: state, sequence: sequence}));
+                        }
+                    });
+                }
+            );
+        });
     }
 }
 

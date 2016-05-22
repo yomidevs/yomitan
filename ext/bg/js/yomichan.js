@@ -50,11 +50,11 @@ class Yomichan {
     }
 
     onMessage(request, sender, callback) {
-        const {action, params} = request;
-        const method           = this['api_' + action];
+        const {action, params} = request, method = this['api_' + action];
 
         if (typeof(method) === 'function') {
-            method.call(this, callback, params);
+            params.callback = callback;
+            method.call(this, params);
         }
 
         return true;
@@ -132,39 +132,39 @@ class Yomichan {
         });
     }
 
-    api_addNote(callback, {definition, mode}) {
+    api_addNote({definition, mode, callback}) {
         this.ankiInvoke('addNote', {definition: definition, mode: mode}, null, callback);
     }
 
-    api_canAddNotes(callback, {definitions, modes}) {
+    api_canAddNotes({definitions, modes, callback}) {
         this.ankiInvoke('canAddNotes', {definitions: definitions, modes: modes}, 'notes', callback);
     }
 
-    api_findKanji(callback, text) {
+    api_findKanji({text, callback}) {
         callback(this.translator.findKanji(text));
     }
 
-    api_findTerm(callback, text) {
+    api_findTerm({text, callback}) {
         callback(this.translator.findTerm(text));
     }
 
-    api_getDeckNames(callback) {
+    api_getDeckNames({callback}) {
         this.ankiInvoke('deckNames', {}, null, callback);
     }
 
-    api_getModelNames(callback) {
+    api_getModelNames({callback}) {
         this.ankiInvoke('modelNames', {}, null, callback);
     }
 
-    api_getOptions(callback) {
+    api_getOptions({callback}) {
         callback(this.options);
     }
 
-    api_getState(callback) {
+    api_getState({callback}) {
         callback(this.state);
     }
 
-    api_renderText(callback, {template, data}) {
+    api_renderText({template, data, callback}) {
         callback(Handlebars.templates[template](data));
     }
 }

@@ -49,19 +49,19 @@ function updateAnkiFormData() {
 
     const ankiDeck = $('#ankiDeck');
     ankiDeck.find('option').remove();
-    yomichan.api_getDeckNames((names) => {
+    yomichan.api_getDeckNames({callback: (names) => {
         if (names !== null) {
             names.forEach((name) => ankiDeck.append($('<option/>', {value: name, text: name})));
         }
-    });
+    }});
 
     const ankiModel = $('#ankiModel');
     ankiModel.find('option').remove();
-    yomichan.api_getModelNames((names) => {
+    yomichan.api_getModelNames({callback: (names) => {
         if (names !== null) {
             names.forEach((name) => ankiModel.append($('<option/>', {value: name, text: name})));
         }
-    });
+    }});
 }
 
 function onOptionsChanged() {
