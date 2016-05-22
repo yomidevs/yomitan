@@ -17,6 +17,10 @@
  */
 
 
+function yomichan() {
+    return chrome.extension.getBackgroundPage().yomichan;
+}
+
 function optionsToForm(opts) {
     $('#activateOnStartup').prop('checked', opts.activateOnStartup);
     $('#enableAnkiConnect').prop('checked', opts.enableAnkiConnect);
@@ -35,21 +39,21 @@ function formToOptions() {
     });
 }
 
-function updateAnkiFormDataVis(opts) {
+function updateAnkiFormVis(opts) {
     if (opts.enableAnkiConnect) {
-        updateAnkiFormData();
+        populateAnkiDeckAndModel();
         $('.options-anki').fadeIn();
     } else {
         $('.options-anki').fadeOut();
     }
 }
 
-function updateAnkiFormData() {
-    const yomichan = chrome.extension.getBackgroundPage().yomichan;
+function populateAnkiDeckAndModel() {
+    const yomi = yomichan();
 
     const ankiDeck = $('.ankiDeck');
     ankiDeck.find('option').remove();
-    yomichan.api_getDeckNames({callback: (names) => {
+    yomi.api_getDeckNames({callback: (names) => {
         if (names !== null) {
             names.forEach((name) => ankiDeck.append($('<option/>', {value: name, text: name})));
         }
@@ -57,25 +61,52 @@ function updateAnkiFormData() {
 
     const ankiModel = $('.ankiModel');
     ankiModel.find('option').remove();
-    yomichan.api_getModelNames({callback: (names) => {
+    yomi.api_getModelNames({callback: (names) => {
         if (names !== null) {
             names.forEach((name) => ankiModel.append($('<option/>', {value: name, text: name})));
+            $('.ankiModel').trigger('change');
         }
     }});
+
 }
 
 function onOptionsChanged() {
     const opts = formToOptions();
     saveOptions(opts, () => {
-        chrome.extension.getBackgroundPage().yomichan.setOptions(opts);
-        updateAnkiFormDataVis(opts);
+        yomichan().setOptions(opts);
+        updateAnkiFormVis(opts);
     });
+}
+
+function onModelChanged() {
+    const modelName = $(this).val();
+    if (modelName === null) {
+        return;
+    }
+
+    yomichan().api_getModelFieldNames({modelName, callback: (names) => {
+        const table = $(this).closest('.tab-pane').find('.ankiFields');
+        table.find('tbody').remove();
+
+        const body = $('<tbody>');
+        names.forEach((name) => {
+            const row = $('<tr>');
+            row.append($('<td>').text(name));
+            row.append($('<input>', {class: 'ankiFieldValue form-control'}).data('field', name));
+            body.append(row);
+        });
+
+        table.append(body);
+    }});
 }
 
 $(document).ready(() => {
     loadOptions((opts) => {
         optionsToForm(opts);
-        updateAnkiFormDataVis(opts);
+
         $('input').on('input paste change', onOptionsChanged);
+        $('.ankiModel').change(onModelChanged);
+
+        updateAnkiFormVis(opts);
     });
 });
