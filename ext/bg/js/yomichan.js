@@ -50,28 +50,14 @@ class Yomichan {
     }
 
     onMessage(request, sender, callback) {
-        const {action, params} = request, handlers = {
-            addNote:       ({definition, mode}) => this.ankiInvoke('addNote', {definition: definition, mode: mode}, null, callback),
-            canAddNotes:   ({definitions, modes}) => this.ankiInvoke('canAddNotes', {definitions: definitions, modes: modes}, 'notes', callback),
-            findKanji:     (text) => callback(this.translator.findKanji(text)),
-            findTerm:      (text) => callback(this.translator.findTerm(text)),
-            getDeckNames:  () => this.getDeckNames(callback),
-            getModelNames: () => this.getModelNames(callback),
-            getOptions:    () => callback(this.options),
-            getState:      () => callback(this.state),
-            renderText:    ({data, template}) => callback(Handlebars.templates[template](data))
-        };
+        const {action, params} = request;
+        const method           = this['api_' + action];
 
-        handlers[action].call(this, params);
+        if (typeof(method) === 'function') {
+            method.call(this, callback, params);
+        }
+
         return true;
-    }
-
-    getDeckNames(callback) {
-        this.ankiInvoke('deckNames', {}, null, callback);
-    }
-
-    getModelNames(callback) {
-        this.ankiInvoke('modelNames', {}, null, callback);
     }
 
     onBrowserAction(tab) {
@@ -101,19 +87,16 @@ class Yomichan {
                 break;
             case 'loading':
                 chrome.browserAction.setBadgeText({text: '...'});
-                this.translator.loadData(
-                    {loadEnamDict: this.options.loadEnamDict},
-                    () => this.setState('enabled')
-                );
+                this.translator.loadData({loadEnamDict: this.options.loadEnamDict}, () => this.setState('enabled'));
                 break;
         }
 
-        Yomichan.notifyChange('state', this.state);
+        Yomichan.notifyTabs('state', this.state);
     }
 
     setOptions(options) {
         this.options = options;
-        Yomichan.notifyChange('options', this.options);
+        Yomichan.notifyTabs('options', this.options);
     }
 
     ankiInvoke(action, params, pool, callback) {
@@ -141,12 +124,48 @@ class Yomichan {
         }
     }
 
-    static notifyChange(name, value) {
+    static notifyTabs(name, value) {
         chrome.tabs.query({}, (tabs) => {
             for (const tab of tabs) {
                 chrome.tabs.sendMessage(tab.id, {name: name, value: value}, () => null);
             }
         });
+    }
+
+    api_addNote(callback, {definition, mode}) {
+        this.ankiInvoke('addNote', {definition: definition, mode: mode}, null, callback);
+    }
+
+    api_canAddNotes(callback, {definitions, modes}) {
+        this.ankiInvoke('canAddNotes', {definitions: definitions, modes: modes}, 'notes', callback);
+    }
+
+    api_findKanji(callback, text) {
+        callback(this.translator.findKanji(text));
+    }
+
+    api_findTerm(callback, text) {
+        callback(this.translator.findTerm(text));
+    }
+
+    api_getDeckNames(callback) {
+        this.ankiInvoke('deckNames', {}, null, callback);
+    }
+
+    api_getModelNames(callback) {
+        this.ankiInvoke('modelNames', {}, null, callback);
+    }
+
+    api_getOptions(callback) {
+        callback(this.options);
+    }
+
+    api_getState(callback) {
+        callback(this.state);
+    }
+
+    api_renderText(callback, {template, data}) {
+        callback(Handlebars.templates[template](data));
     }
 }
 

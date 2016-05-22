@@ -35,46 +35,47 @@ function formToOptions() {
     });
 }
 
-function updateVisibility() {
-    if ($('#enableAnkiConnect').prop('checked')) {
+function updateAnkiFormDataVis(opts) {
+    if (opts.enableAnkiConnect) {
+        updateAnkiFormData();
         $('.options-anki').show();
     } else {
         $('.options-anki').hide();
     }
 }
 
-function updateAnkiPage() {
+function updateAnkiFormData() {
     const yomichan = chrome.extension.getBackgroundPage().yomichan;
 
-    $('#ankiDeck').find('option').remove();
-    $('#ankiModel').find('option').remove();
-
-    yomichan.getDeckNames((names) => {
-        names.forEach((name) => {
-            $('#ankiDeck').append($('<option/>', {value: name, text: name}));
-        });
+    const ankiDeck = $('#ankiDeck');
+    ankiDeck.find('option').remove();
+    yomichan.api_getDeckNames((names) => {
+        if (names !== null) {
+            names.forEach((name) => ankiDeck.append($('<option/>', {value: name, text: name})));
+        }
     });
 
-    yomichan.getModelNames((names) => {
-        names.forEach((name) => {
-            $('#ankiModel').append($('<option/>', {value: name, text: name}));
-        });
+    const ankiModel = $('#ankiModel');
+    ankiModel.find('option').remove();
+    yomichan.api_getModelNames((names) => {
+        if (names !== null) {
+            names.forEach((name) => ankiModel.append($('<option/>', {value: name, text: name})));
+        }
     });
 }
 
 function onOptionsChanged() {
-    updateVisibility();
     const opts = formToOptions();
     saveOptions(opts, () => {
         chrome.extension.getBackgroundPage().yomichan.setOptions(opts);
+        updateAnkiFormDataVis(opts);
     });
 }
 
 $(document).ready(() => {
     loadOptions((opts) => {
         optionsToForm(opts);
-        updateVisibility();
-        updateAnkiPage();
+        updateAnkiFormDataVis(opts);
         $('input').on('input paste change', onOptionsChanged);
     });
 });
