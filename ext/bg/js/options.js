@@ -20,10 +20,14 @@
 function sanitizeOptions(options) {
     const defaults = {
         activateOnStartup: false,
-        enableAnkiConnect: false,
         loadEnamDict:      false,
         scanLength:        20,
-        selectMatchedText: true
+        selectMatchedText: true,
+        enableAnkiConnect: false,
+        ankiDeck:          '',
+        ankiModel:         '',
+        ankiVocabFields:   {},
+        ankiKanjiFields:   {}
     };
 
     for (const key in defaults) {
