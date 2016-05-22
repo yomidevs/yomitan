@@ -36,7 +36,7 @@
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10">
                             <div class="checkbox">
-                                <label><input type="checkbox" id="activateOnStartup"> Activate on startup</label>
+                                <label class="control-label"><input type="checkbox" id="activateOnStartup"> Activate on startup</label>
                             </div>
                         </div>
                     </div>
@@ -44,7 +44,7 @@
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10">
                             <div class="checkbox">
-                                <label><input type="checkbox" id="loadEnamdict"> Load <a href="http://www.edrdg.org/enamdict/enamdict_doc.html">ENAMDICT</a> (requires restart)</label>
+                                <label class="control-label"><input type="checkbox" id="loadEnamdict"> Load <a href="http://www.edrdg.org/enamdict/enamdict_doc.html">ENAMDICT</a> (requires restart)</label>
                             </div>
                         </div>
                     </div>
@@ -52,7 +52,7 @@
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10">
                             <div class="checkbox">
-                                <label><input type="checkbox" id="selectMatchedText" checked> Select matched text</label>
+                                <label class="control-label"><input type="checkbox" id="selectMatchedText" checked> Select matched text</label>
                             </div>
                         </div>
                     </div>
@@ -60,7 +60,7 @@
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10">
                             <div class="checkbox">
-                                <label><input type="checkbox" id="enableAnkiConnect"> Enable <a href="https://foosoft.net/projects/yomichan">AnkiConnect</a></label>
+                                <label class="control-label"><input type="checkbox" id="enableAnkiConnect"> Enable <a href="https://foosoft.net/projects/yomichan">AnkiConnect</a></label>
                             </div>
                         </div>
                     </div>
@@ -92,6 +92,17 @@
                                     <select class="form-control ankiModel" id="ankiVocabModel"></select>
                                 </div>
                             </div>
+
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Field</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ankiVocabFields">
+                                </tbody>
+                            </table>
                         </div>
                         <div id="kanji" class="tab-pane fade">
                             <div class="form-group">
@@ -107,6 +118,17 @@
                                     <select class="form-control ankiModel" id="ankiKanjiModel"></select>
                                 </div>
                             </div>
+
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Field</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ankiKanjiFields">
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </form>
