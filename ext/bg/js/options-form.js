@@ -22,20 +22,20 @@ function yomichan() {
 }
 
 function optionsToForm(opts) {
-    $('#activateOnStartup').prop('checked', opts.activateOnStartup);
-    $('#enableAnkiConnect').prop('checked', opts.enableAnkiConnect);
-    $('#loadEnamDict').prop('checked', opts.loadEnamDict);
-    $('#scanLength').val(opts.scanLength);
-    $('#selectMatchedText').prop('checked', opts.selectMatchedText);
+    $('#activate-on-startup').prop('checked', opts.activateOnStartup);
+    $('#enable-anki-connect').prop('checked', opts.enableAnkiConnect);
+    $('#load-enamdict').prop('checked', opts.loadEnamDict);
+    $('#scan-length').val(opts.scanLength);
+    $('#select-matched-text').prop('checked', opts.selectMatchedText);
 }
 
 function formToOptions() {
     return sanitizeOptions({
-        activateOnStartup: $('#activateOnStartup').prop('checked'),
-        enableAnkiConnect: $('#enableAnkiConnect').prop('checked'),
-        loadEnamDict:      $('#loadEnamDict').prop('checked'),
-        scanLength:        $('#scanLength').val(),
-        selectMatchedText: $('#selectMatchedText').prop('checked')
+        activateOnStartup: $('#activate-on-startup').prop('checked'),
+        enableAnkiConnect: $('#enable-anki-connect').prop('checked'),
+        loadEnamDict:      $('#load-enamdict').prop('checked'),
+        scanLength:        $('#scan-length').val(),
+        selectMatchedText: $('#select-matched-text').prop('checked')
     });
 }
 
@@ -51,7 +51,7 @@ function updateAnkiFormVis(opts) {
 function populateAnkiDeckAndModel() {
     const yomi = yomichan();
 
-    const ankiDeck = $('.ankiDeck');
+    const ankiDeck = $('.anki-deck');
     ankiDeck.find('option').remove();
     yomi.api_getDeckNames({callback: (names) => {
         if (names !== null) {
@@ -59,12 +59,12 @@ function populateAnkiDeckAndModel() {
         }
     }});
 
-    const ankiModel = $('.ankiModel');
+    const ankiModel = $('.anki-model');
     ankiModel.find('option').remove();
     yomi.api_getModelNames({callback: (names) => {
         if (names !== null) {
             names.forEach((name) => ankiModel.append($('<option/>', {value: name, text: name})));
-            $('.ankiModel').trigger('change');
+            $('.anki-model').trigger('change');
         }
     }});
 
@@ -85,14 +85,14 @@ function onModelChanged() {
     }
 
     yomichan().api_getModelFieldNames({modelName, callback: (names) => {
-        const table = $(this).closest('.tab-pane').find('.ankiFields');
+        const table = $(this).closest('.tab-pane').find('.anki-fields');
         table.find('tbody').remove();
 
         const body = $('<tbody>');
         names.forEach((name) => {
             const row = $('<tr>');
             row.append($('<td>').text(name));
-            row.append($('<input>', {class: 'ankiFieldValue form-control'}).data('field', name));
+            row.append($('<input>', {class: 'anki-field-value form-control'}).data('field', name));
             body.append(row);
         });
 
@@ -105,7 +105,7 @@ $(document).ready(() => {
         optionsToForm(opts);
 
         $('input').on('input paste change', onOptionsChanged);
-        $('.ankiModel').change(onModelChanged);
+        $('.anki-model').change(onModelChanged);
 
         updateAnkiFormVis(opts);
     });
