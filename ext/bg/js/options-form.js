@@ -38,16 +38,16 @@ function formToOptions() {
 function updateAnkiFormDataVis(opts) {
     if (opts.enableAnkiConnect) {
         updateAnkiFormData();
-        $('.options-anki').show();
+        $('.options-anki').fadeIn();
     } else {
-        $('.options-anki').hide();
+        $('.options-anki').fadeOut();
     }
 }
 
 function updateAnkiFormData() {
     const yomichan = chrome.extension.getBackgroundPage().yomichan;
 
-    const ankiDeck = $('#ankiDeck');
+    const ankiDeck = $('.ankiDeck');
     ankiDeck.find('option').remove();
     yomichan.api_getDeckNames({callback: (names) => {
         if (names !== null) {
@@ -55,7 +55,7 @@ function updateAnkiFormData() {
         }
     }});
 
-    const ankiModel = $('#ankiModel');
+    const ankiModel = $('.ankiModel');
     ankiModel.find('option').remove();
     yomichan.api_getModelNames({callback: (names) => {
         if (names !== null) {
