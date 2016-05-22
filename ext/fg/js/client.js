@@ -104,6 +104,7 @@ class Client {
             } else {
                 const sequence = ++this.sequence;
                 range.setLength(length);
+
                 bgRenderText(
                     {defs: definitions, root: this.fgRoot, options: this.options, sequence: sequence},
                     'term-list.html',

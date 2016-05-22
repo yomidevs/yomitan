@@ -42,26 +42,25 @@ function onDomContentLoaded() {
 }
 
 function onMessage(e) {
-    const {action, params} = e.data, handlers = {
-        setActionState: ({index, state, sequence}) => {
-            for (const mode in state) {
-                const matches = document.querySelectorAll(`.action-link[data-sequence="${sequence}"][data-index="${index}"][data-mode="${mode}"]`);
-                if (matches.length === 0) {
-                    return;
-                }
+    const {action, params} = e.data, method = window['api_' + action];
+    if (typeof(method) === 'function') {
+        method(params);
+    }
+}
 
-                const classes = matches[0].classList;
-                if (state[mode]) {
-                    classes.remove('disabled');
-                } else {
-                    classes.add('disabled');
-                }
-            }
+function api_setActionState({index, state, sequence}) {
+    for (const mode in state) {
+        const matches = document.querySelectorAll(`.action-link[data-sequence="${sequence}"][data-index="${index}"][data-mode="${mode}"]`);
+        if (matches.length === 0) {
+            return;
         }
-    };
 
-    if (handlers.hasOwnProperty(action)) {
-        handlers[action](params);
+        const classes = matches[0].classList;
+        if (state[mode]) {
+            classes.remove('disabled');
+        } else {
+            classes.add('disabled');
+        }
     }
 }
 

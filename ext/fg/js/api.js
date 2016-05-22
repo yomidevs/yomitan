@@ -17,10 +17,6 @@
  */
 
 
-//
-// Background APIs
-//
-
 function bgSendMessage(action, params, callback) {
     chrome.runtime.sendMessage({action, params}, callback);
 }

@@ -156,6 +156,10 @@ class Yomichan {
         this.ankiInvoke('modelNames', {}, null, callback);
     }
 
+    api_getModelFieldNames({callback}) {
+        this.ankiInvoke('modelFieldNames', {}, null, callback);
+    }
+
     api_getOptions({callback}) {
         callback(this.options);
     }
