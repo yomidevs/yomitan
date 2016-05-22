@@ -43,6 +43,25 @@ function updateVisibility() {
     }
 }
 
+function updateAnkiPage() {
+    const yomichan = chrome.extension.getBackgroundPage().yomichan;
+
+    $('#ankiDeck').find('option').remove();
+    $('#ankiModel').find('option').remove();
+
+    yomichan.getDeckNames((names) => {
+        names.forEach((name) => {
+            $('#ankiDeck').append($('<option/>', {value: name, text: name}));
+        });
+    });
+
+    yomichan.getModelNames((names) => {
+        names.forEach((name) => {
+            $('#ankiModel').append($('<option/>', {value: name, text: name}));
+        });
+    });
+}
+
 function onOptionsChanged() {
     updateVisibility();
     const opts = formToOptions();
@@ -55,6 +74,7 @@ $(document).ready(() => {
     loadOptions((opts) => {
         optionsToForm(opts);
         updateVisibility();
+        updateAnkiPage();
         $('input').on('input paste change', onOptionsChanged);
     });
 });

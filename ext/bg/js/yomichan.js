@@ -51,17 +51,27 @@ class Yomichan {
 
     onMessage(request, sender, callback) {
         const {action, params} = request, handlers = {
-            canAddNotes: ({definitions, modes}) => this.ankiInvoke('canAddNotes', {definitions: definitions, modes: modes}, 'notes', callback),
-            addNote:     ({definition, mode}) => this.ankiInvoke('addNote', {definition: definition, mode: mode}, null, callback),
-            findKanji:   (text) => callback(this.translator.findKanji(text)),
-            findTerm:    (text) => callback(this.translator.findTerm(text)),
-            getOptions:  () => callback(this.options),
-            getState:    () => callback(this.state),
-            renderText:  ({data, template}) => callback(Handlebars.templates[template](data))
+            addNote:       ({definition, mode}) => this.ankiInvoke('addNote', {definition: definition, mode: mode}, null, callback),
+            canAddNotes:   ({definitions, modes}) => this.ankiInvoke('canAddNotes', {definitions: definitions, modes: modes}, 'notes', callback),
+            findKanji:     (text) => callback(this.translator.findKanji(text)),
+            findTerm:      (text) => callback(this.translator.findTerm(text)),
+            getDeckNames:  () => this.getDeckNames(callback),
+            getModelNames: () => this.getModelNames(callback),
+            getOptions:    () => callback(this.options),
+            getState:      () => callback(this.state),
+            renderText:    ({data, template}) => callback(Handlebars.templates[template](data))
         };
 
         handlers[action].call(this, params);
         return true;
+    }
+
+    getDeckNames(callback) {
+        this.ankiInvoke('deckNames', {}, null, callback);
+    }
+
+    getModelNames(callback) {
+        this.ankiInvoke('modelNames', {}, null, callback);
     }
 
     onBrowserAction(tab) {
