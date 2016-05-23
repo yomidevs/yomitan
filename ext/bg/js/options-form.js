@@ -22,20 +22,28 @@ function yomichan() {
 }
 
 function optionsToForm(opts) {
-    $('#activate-on-startup').prop('checked', opts.activateOnStartup);
-    $('#enable-anki-connect').prop('checked', opts.enableAnkiConnect);
-    $('#load-enamdict').prop('checked', opts.loadEnamDict);
     $('#scan-length').val(opts.scanLength);
+    $('#activate-on-startup').prop('checked', opts.activateOnStartup);
+    $('#load-enamdict').prop('checked', opts.loadEnamDict);
     $('#select-matched-text').prop('checked', opts.selectMatchedText);
+    $('#enable-anki-connect').prop('checked', opts.enableAnkiConnect);
+    $('#anki-vocab-deck').val(opts.ankiVocabDeck);
+    $('#anki-vocab-model').val(opts.ankiVocabModel);
+    $('#anki-kanji-deck').val(opts.ankiKanjiDeck);
+    $('#anki-kanji-model').val(opts.ankiKanjiModel);
 }
 
 function formToOptions() {
     return sanitizeOptions({
-        activateOnStartup: $('#activate-on-startup').prop('checked'),
-        enableAnkiConnect: $('#enable-anki-connect').prop('checked'),
-        loadEnamDict:      $('#load-enamdict').prop('checked'),
         scanLength:        $('#scan-length').val(),
-        selectMatchedText: $('#select-matched-text').prop('checked')
+        activateOnStartup: $('#activate-on-startup').prop('checked'),
+        loadEnamDict:      $('#load-enamdict').prop('checked'),
+        selectMatchedText: $('#select-matched-text').prop('checked'),
+        enableAnkiConnect: $('#enable-anki-connect').prop('checked'),
+        ankiVocabDeck:     $('#anki-vocab-deck').val(),
+        ankiVocabModel:    $('#anki-vocab-model').val(),
+        ankiKanjiDeck:     $('#anki-kanji-deck').val(),
+        ankiKanjiModel:    $('#anki-kanji-model').val()
     });
 }
 
@@ -104,7 +112,7 @@ $(document).ready(() => {
     loadOptions((opts) => {
         optionsToForm(opts);
 
-        $('input').on('input paste change', onOptionsChanged);
+        $('input, select').on('input paste change', onOptionsChanged);
         $('.anki-model').change(onModelChanged);
 
         updateAnkiFormVis(opts);

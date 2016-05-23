@@ -19,14 +19,16 @@
 
 function sanitizeOptions(options) {
     const defaults = {
-        activateOnStartup: false,
-        loadEnamDict:      false,
         scanLength:        20,
+        activateOnStartup: false,
         selectMatchedText: true,
+        loadEnamDict:      false,
         enableAnkiConnect: false,
-        ankiDeck:          '',
-        ankiModel:         '',
+        ankiVocabDeck:     '',
+        ankiVocabModel:    '',
         ankiVocabFields:   {},
+        ankiKanjiDeck:     '',
+        ankiKanjiModel:    '',
         ankiKanjiFields:   {}
     };
 
