@@ -27,10 +27,13 @@ function optionsToForm(opts) {
     $('#load-enamdict').prop('checked', opts.loadEnamDict);
     $('#select-matched-text').prop('checked', opts.selectMatchedText);
     $('#enable-anki-connect').prop('checked', opts.enableAnkiConnect);
-    $('#anki-vocab-deck').val(opts.ankiVocabDeck);
-    $('#anki-vocab-model').val(opts.ankiVocabModel);
-    $('#anki-kanji-deck').val(opts.ankiKanjiDeck);
-    $('#anki-kanji-model').val(opts.ankiKanjiModel);
+
+    if (opts.enableAnkiConnect) {
+        $('#anki-vocab-deck').val(opts.ankiVocabDeck);
+        $('#anki-vocab-model').val(opts.ankiVocabModel);
+        $('#anki-kanji-deck').val(opts.ankiKanjiDeck);
+        $('#anki-kanji-model').val(opts.ankiKanjiModel);
+    }
 }
 
 function formToOptions(section, callback) {
@@ -78,6 +81,28 @@ function populateAnkiDeckAndModel() {
     }});
 }
 
+function populateAnkiFields(control) {
+    const modelName = control.val();
+    if (modelName === null) {
+        return;
+    }
+
+    yomichan().api_getModelFieldNames({modelName, callback: (names) => {
+        const table = control.closest('.tab-pane').find('.anki-fields');
+        table.find('tbody').remove();
+
+        const body = $('<tbody>');
+        names.forEach((name) => {
+            const row = $('<tr>');
+            row.append($('<td>').text(name));
+            row.append($('<input>', {class: 'anki-field-value form-control'}).data('field', name));
+            body.append(row);
+        });
+
+        table.append(body);
+    }});
+}
+
 function onOptionsGeneralChanged(e) {
     if (!e.originalEvent) {
         return;
@@ -101,37 +126,15 @@ function onOptionsAnkiChanged(e) {
     }
 }
 
-function onModelChanged() {
-    const modelName = $(this).val();
-    if (modelName === null) {
-        return;
-    }
-
-    yomichan().api_getModelFieldNames({modelName, callback: (names) => {
-        const table = $(this).closest('.tab-pane').find('.anki-fields');
-        table.find('tbody').remove();
-
-        const body = $('<tbody>');
-        names.forEach((name) => {
-            const row = $('<tr>');
-            row.append($('<td>').text(name));
-            row.append($('<input>', {class: 'anki-field-value form-control'}).data('field', name));
-            body.append(row);
-        });
-
-        table.append(body);
-    }});
-}
-
 $(document).ready(() => {
     loadOptions((opts) => {
         optionsToForm(opts);
 
         $('.options-general input').change(onOptionsGeneralChanged);
         $('.options-anki input, .options-anki select').change(onOptionsAnkiChanged);
-        $('.anki-model').change(onModelChanged);
-        $('#enable-anki-connect').change(() => {
-            if ($('#enable-anki-connect').prop('checked')) {
+        $('.anki-model').change((e) => populateAnkiFields($(e.currentTarget)));
+        $('#enable-anki-connect').change((e) => {
+            if ($(e.currentTarget).prop('checked')) {
                 $('.options-anki').fadeIn();
             } else {
                 $('.options-anki').fadeOut();
