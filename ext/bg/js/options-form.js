@@ -60,25 +60,24 @@ function populateAnkiDeckAndModel(opts) {
         yomi.api_getModelNames({callback: (names) => {
             if (names !== null) {
                 names.forEach((name) => ankiModel.append($('<option/>', {value: name, text: name})));
-
-                $('#anki-vocab-deck').val(opts.ankiVocabDeck);
-                $('#anki-vocab-model').val(opts.ankiVocabModel);
-                $('#anki-kanji-deck').val(opts.ankiKanjiDeck);
-                $('#anki-kanji-model').val(opts.ankiKanjiModel);
-                ankiModel.trigger('change');
             }
+
+            $('#anki-vocab-deck').val(opts.ankiVocabDeck);
+            populateAnkiFields($('#anki-vocab-model').val(opts.ankiVocabModel), opts);
+            $('#anki-kanji-deck').val(opts.ankiKanjiDeck);
+            populateAnkiFields($('#anki-kanji-model').val(opts.ankiKanjiModel), opts);
         }});
     }});
 }
 
-function populateAnkiFields(control) {
-    const modelName = control.val();
+function populateAnkiFields(element, opts) {
+    const modelName = element.val();
     if (modelName === null) {
         return;
     }
 
     yomichan().api_getModelFieldNames({modelName, callback: (names) => {
-        const table = control.closest('.tab-pane').find('.anki-fields');
+        const table = element.closest('.tab-pane').find('.anki-fields');
         table.find('tbody').remove();
 
         const body = $('<tbody>');
@@ -126,7 +125,9 @@ $(document).ready(() => {
 
         $('.options-general input').change(onOptionsGeneralChanged);
         $('.options-anki input, .options-anki select').change(onOptionsAnkiChanged);
-        $('.anki-model').change((e) => populateAnkiFields($(e.currentTarget)));
+        $('.anki-model').change((e) => {
+            loadOptions((opts) => populateAnkiFields($(e.currentTarget), opts));
+        });
         $('#enable-anki-connect').change((e) => {
             if ($(e.currentTarget).prop('checked')) {
                 $('.options-anki').fadeIn();
