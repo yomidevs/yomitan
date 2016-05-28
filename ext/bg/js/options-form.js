@@ -33,27 +33,28 @@ function optionsToForm(opts) {
     $('#anki-kanji-model').val(opts.ankiKanjiModel);
 }
 
-function formToOptions() {
-    return sanitizeOptions({
-        scanLength:        $('#scan-length').val(),
-        activateOnStartup: $('#activate-on-startup').prop('checked'),
-        loadEnamDict:      $('#load-enamdict').prop('checked'),
-        selectMatchedText: $('#select-matched-text').prop('checked'),
-        enableAnkiConnect: $('#enable-anki-connect').prop('checked'),
-        ankiVocabDeck:     $('#anki-vocab-deck').val(),
-        ankiVocabModel:    $('#anki-vocab-model').val(),
-        ankiKanjiDeck:     $('#anki-kanji-deck').val(),
-        ankiKanjiModel:    $('#anki-kanji-model').val()
-    });
-}
+function formToOptions(section, callback) {
+    loadOptions((optsOld) => {
+        const optsNew = $.extend({}, optsOld);
 
-function updateAnkiFormVis(opts) {
-    if (opts.enableAnkiConnect) {
-        populateAnkiDeckAndModel();
-        $('.options-anki').fadeIn();
-    } else {
-        $('.options-anki').fadeOut();
-    }
+        switch (section) {
+            case 'general':
+                optsNew.scanLength        = $('#scan-length').val();
+                optsNew.activateOnStartup = $('#activate-on-startup').prop('checked');
+                optsNew.loadEnamDict      = $('#load-enamdict').prop('checked');
+                optsNew.selectMatchedText = $('#select-matched-text').prop('checked');
+                optsNew.enableAnkiConnect = $('#enable-anki-connect').prop('checked');
+                break;
+            case 'anki':
+                optsNew.ankiVocabDeck  = $('#anki-vocab-deck').val();
+                optsNew.ankiVocabModel = $('#anki-vocab-model').val();
+                optsNew.ankiKanjiDeck  = $('#anki-kanji-deck').val();
+                optsNew.ankiKanjiModel = $('#anki-kanji-model').val();
+                break;
+        }
+
+        callback(sanitizeOptions(optsNew), sanitizeOptions(optsOld));
+    });
 }
 
 function populateAnkiDeckAndModel() {
@@ -72,18 +73,32 @@ function populateAnkiDeckAndModel() {
     yomi.api_getModelNames({callback: (names) => {
         if (names !== null) {
             names.forEach((name) => ankiModel.append($('<option/>', {value: name, text: name})));
-            $('.anki-model').trigger('change');
+            ankiModel.trigger('change');
         }
     }});
-
 }
 
-function onOptionsChanged() {
-    const opts = formToOptions();
-    saveOptions(opts, () => {
-        yomichan().setOptions(opts);
-        updateAnkiFormVis(opts);
+function onOptionsGeneralChanged(e) {
+    if (!e.originalEvent) {
+        return;
+    }
+
+    formToOptions('general', (optsNew, optsOld) => {
+        saveOptions(optsNew, () => {
+            yomichan().setOptions(optsNew);
+            if (!optsOld.enableAnkiConnect && optsNew.enableAnkiConnect) {
+                populateAnkiDeckAndModel();
+            }
+        });
     });
+}
+
+function onOptionsAnkiChanged(e) {
+    if (e.originalEvent) {
+        formToOptions('anki', (opts) => {
+            saveOptions(opts, () => yomichan().setOptions(opts));
+        });
+    }
 }
 
 function onModelChanged() {
@@ -112,9 +127,20 @@ $(document).ready(() => {
     loadOptions((opts) => {
         optionsToForm(opts);
 
-        $('input, select').on('input paste change', onOptionsChanged);
+        $('.options-general input').change(onOptionsGeneralChanged);
+        $('.options-anki input, .options-anki select').change(onOptionsAnkiChanged);
         $('.anki-model').change(onModelChanged);
+        $('#enable-anki-connect').change(() => {
+            if ($('#enable-anki-connect').prop('checked')) {
+                $('.options-anki').fadeIn();
+            } else {
+                $('.options-anki').fadeOut();
+            }
+        });
 
-        updateAnkiFormVis(opts);
+        if (opts.enableAnkiConnect) {
+            populateAnkiDeckAndModel();
+            $('.options-anki').show();
+        }
     });
 });
