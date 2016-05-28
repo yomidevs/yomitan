@@ -55,18 +55,19 @@ function populateAnkiDeckAndModel(opts) {
             names.forEach((name) => ankiDeck.append($('<option/>', {value: name, text: name})));
         }
 
-        const ankiModel = $('.anki-model');
-        ankiModel.find('option').remove();
-        yomi.api_getModelNames({callback: (names) => {
-            if (names !== null) {
-                names.forEach((name) => ankiModel.append($('<option/>', {value: name, text: name})));
-            }
+        $('#anki-vocab-deck').val(opts.ankiVocabDeck);
+        $('#anki-kanji-deck').val(opts.ankiKanjiDeck);
+    }});
 
-            $('#anki-vocab-deck').val(opts.ankiVocabDeck);
-            populateAnkiFields($('#anki-vocab-model').val(opts.ankiVocabModel), opts);
-            $('#anki-kanji-deck').val(opts.ankiKanjiDeck);
-            populateAnkiFields($('#anki-kanji-model').val(opts.ankiKanjiModel), opts);
-        }});
+    const ankiModel = $('.anki-model');
+    ankiModel.find('option').remove();
+    yomi.api_getModelNames({callback: (names) => {
+        if (names !== null) {
+            names.forEach((name) => ankiModel.append($('<option/>', {value: name, text: name})));
+        }
+
+        populateAnkiFields($('#anki-vocab-model').val(opts.ankiVocabModel), opts);
+        populateAnkiFields($('#anki-kanji-model').val(opts.ankiKanjiModel), opts);
     }});
 }
 
