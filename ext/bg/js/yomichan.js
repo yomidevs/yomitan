@@ -99,12 +99,26 @@ class Yomichan {
         this.notifyTabs('options', this.options);
     }
 
+    getApiVersion() {
+        return 1;
+    }
+
     notifyTabs(name, value) {
         chrome.tabs.query({}, (tabs) => {
             for (const tab of tabs) {
                 chrome.tabs.sendMessage(tab.id, {name, value}, () => null);
             }
         });
+    }
+
+    ankiInvokeSafe(action, params, pool, callback) {
+        this.api_getVersion({callback: (version) => {
+            if (version === this.getApiVersion()) {
+                this.ankiInvoke(action, params, pool, callback);
+            } else {
+                callback(null);
+            }
+        }});
     }
 
     ankiInvoke(action, params, pool, callback) {
@@ -181,7 +195,7 @@ class Yomichan {
 
     api_addDefinition({definition, mode, callback}) {
         const note = this.formatNote(definition, mode);
-        this.ankiInvoke('addNote', {note}, null, callback);
+        this.ankiInvokeSafe('addNote', {note}, null, callback);
     }
 
     api_canAddDefinitions({definitions, modes, callback}) {
@@ -192,7 +206,7 @@ class Yomichan {
             }
         }
 
-        this.ankiInvoke('canAddNotes', {notes}, 'notes', (results) => {
+        this.ankiInvokeSafe('canAddNotes', {notes}, 'notes', (results) => {
             const states = [];
 
             if (results !== null) {
@@ -219,15 +233,19 @@ class Yomichan {
     }
 
     api_getDeckNames({callback}) {
-        this.ankiInvoke('deckNames', {}, null, callback);
+        this.ankiInvokeSafe('deckNames', {}, null, callback);
     }
 
     api_getModelNames({callback}) {
-        this.ankiInvoke('modelNames', {}, null, callback);
+        this.ankiInvokeSafe('modelNames', {}, null, callback);
     }
 
     api_getModelFieldNames({modelName, callback}) {
-        this.ankiInvoke('modelFieldNames', {modelName}, null, callback);
+        this.ankiInvokeSafe('modelFieldNames', {modelName}, null, callback);
+    }
+
+    api_getVersion({callback}) {
+        this.ankiInvoke('version', {}, null, callback);
     }
 
     api_getOptions({callback}) {

@@ -86,6 +86,17 @@ function populateAnkiDeckAndModel(opts) {
     }});
 }
 
+function updateAnkiStatus() {
+    $('.error-dlg').hide();
+    yomichan().api_getVersion({callback: (version) => {
+        if (version === null) {
+            $('.error-dlg-connection').show();
+        } else if (version !== yomichan().getApiVersion()) {
+            $('.error-dlg-version').show();
+        }
+    }});
+}
+
 function populateAnkiFields(element, opts) {
     const modelName = element.val();
     if (modelName === null) {
@@ -119,6 +130,7 @@ function onOptionsGeneralChanged(e) {
         saveOptions(optsNew, () => {
             yomichan().setOptions(optsNew);
             if (!optsOld.enableAnkiConnect && optsNew.enableAnkiConnect) {
+                updateAnkiStatus();
                 populateAnkiDeckAndModel(optsNew);
                 $('.options-anki').fadeIn();
             } else if (optsOld.enableAnkiConnect && !optsNew.enableAnkiConnect) {
@@ -159,6 +171,7 @@ $(document).ready(() => {
         $('.anki-model').change(onAnkiModelChanged);
 
         if (opts.enableAnkiConnect) {
+            updateAnkiStatus();
             populateAnkiDeckAndModel(opts);
             $('.options-anki').show();
         }

@@ -16,6 +16,10 @@
                 border-right:  1px #ddd solid;
                 padding:       10px;
             }
+
+            .error-dlg {
+                display: none;
+            }
         </style>
     </head>
     <body>
@@ -60,7 +64,7 @@
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10">
                             <div class="checkbox">
-                                <label class="control-label"><input type="checkbox" id="enable-anki-connect"> Enable <a href="https://foosoft.net/projects/yomichan">AnkiConnect</a></label>
+                                <label class="control-label"><input type="checkbox" id="enable-anki-connect"> Enable <a href="https://foosoft.net/projects/anki-connect">AnkiConnect</a></label>
                             </div>
                         </div>
                     </div>
@@ -70,6 +74,9 @@
 
             <div class="options-anki">
                 <h2>Anki</h2>
+
+                <div class="alert alert-danger error-dlg error-dlg-connection"><strong>Unable to connect</strong>: is the <a href="https://foosoft.net/projects/anki-connect">AnkiConnect</a> extension for <a href="http://ankisrs.net/">Anki</a> installed and running?</div>
+                <div class="alert alert-warning error-dlg error-dlg-version"><strong>Unsupported version</strong>: the installed version of the <a href="https://foosoft.net/projects/anki-connect">AnkiConnect</a> extension for <a href="http://ankisrs.net/">Anki</a> is not compatible with this release.</div>
 
                 <form class="form-horizontal">
                     <ul class="nav nav-tabs">
