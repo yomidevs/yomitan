@@ -100,9 +100,9 @@ function populateAnkiFields(element, opts) {
         const body = $('<tbody>');
         names.forEach((name) => {
             const row = $('<tr>');
-            row.append($('<td>').text(name));
+            row.append($('<td>', {class: 'col-sm-2'}).text(name));
             const value = opts[optKey][name] || '';
-            row.append($('<input>', {class: 'anki-field-value form-control', value}).data('field', name).change(onOptionsAnkiChanged));
+            row.append($('<td>', {class: 'col-sm-10'}).append($('<input>', {class: 'anki-field-value form-control', value}).data('field', name).change(onOptionsAnkiChanged)));
             body.append(row);
         });
 
