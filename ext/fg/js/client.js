@@ -106,13 +106,13 @@ class Client {
                 range.setLength(length);
 
                 bgRenderText(
-                    {defs: definitions, root: this.fgRoot, options: this.options, sequence},
+                    {definitions, root: this.fgRoot, options: this.options, sequence},
                     'term-list.html',
                     (content) => {
                         this.definitions = definitions;
                         this.showPopup(range, content);
 
-                        bgCanAddNotes(definitions, ['vocabExp', 'vocabReading'], (states) => {
+                        bgCanAddDefinitions(definitions, ['vocab_kanji', 'vocab_kana'], (states) => {
                             if (states !== null) {
                                 states.forEach((state, index) => this.popup.sendMessage('setActionState', {index, state, sequence}));
                             }
@@ -158,7 +158,7 @@ class Client {
         const state = {};
         state[mode] = false;
 
-        bgAddNote(this.definitions[index], mode, (success) => {
+        bgAddDefinition(this.definitions[index], mode, (success) => {
             if (success) {
                 this.popup.sendMessage('setActionState', {index, state, sequence: this.sequence});
             } else {
@@ -171,13 +171,13 @@ class Client {
         bgFindKanji(kanji, (definitions) => {
             const sequence = ++this.sequence;
             bgRenderText(
-                {defs: definitions, root: this.fgRoot, options: this.options, sequence},
+                {definitions, root: this.fgRoot, options: this.options, sequence},
                 'kanji-list.html',
                 (content) => {
                     this.definitions = definitions;
                     this.popup.setContent(content, definitions);
 
-                    bgCanAddNotes(definitions, ['kanji'], (states) => {
+                    bgCanAddDefinitions(definitions, ['kanji'], (states) => {
                         if (states !== null) {
                             states.forEach((state, index) => this.popup.sendMessage('setActionState', {index, state, sequence}));
                         }

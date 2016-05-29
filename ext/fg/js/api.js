@@ -41,10 +41,10 @@ function bgGetState(callback) {
     bgSendMessage('getState', {}, callback);
 }
 
-function bgCanAddNotes(definitions, modes, callback) {
-    bgSendMessage('canAddNotes', {definitions, modes}, callback);
+function bgCanAddDefinitions(definitions, modes, callback) {
+    bgSendMessage('canAddDefinitions', {definitions, modes}, callback);
 }
 
-function bgAddNote(definition, mode, callback) {
-    bgSendMessage('addNote', {definition, mode}, callback);
+function bgAddDefinition(definition, mode, callback) {
+    bgSendMessage('addDefinition', {definition, mode}, callback);
 }

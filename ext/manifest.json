@@ -19,9 +19,9 @@
     "permissions": ["storage"],
     "web_accessible_resources": [
         "fg/css/frame.css",
-        "fg/img/add_expression.png",
         "fg/img/add_kanji.png",
-        "fg/img/add_reading.png",
+        "fg/img/add_vocab_kana.png",
+        "fg/img/add_vocab_kanji.png",
         "fg/js/frame.js",
         "fg/ttf/kanji-stroke-orders.ttf",
         "fg/ttf/vl-gothic-regular.ttf"

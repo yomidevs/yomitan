@@ -99,6 +99,14 @@ class Yomichan {
         this.notifyTabs('options', this.options);
     }
 
+    notifyTabs(name, value) {
+        chrome.tabs.query({}, (tabs) => {
+            for (const tab of tabs) {
+                chrome.tabs.sendMessage(tab.id, {name, value}, () => null);
+            }
+        });
+    }
+
     ankiInvoke(action, params, pool, callback) {
         if (this.options.enableAnkiConnect) {
             if (pool !== null && this.asyncPools.hasOwnProperty(pool)) {
@@ -165,26 +173,18 @@ class Yomichan {
         }
 
         for (const name in fields) {
-            note.fields[name] = this.formatField(fields[name], definition, mode === 'vocabReading');
+            note.fields[name] = this.formatField(fields[name], definition, mode === 'vocab_kana');
         }
 
         return note;
     }
 
-    notifyTabs(name, value) {
-        chrome.tabs.query({}, (tabs) => {
-            for (const tab of tabs) {
-                chrome.tabs.sendMessage(tab.id, {name, value}, () => null);
-            }
-        });
-    }
-
-    api_addNote({definition, mode, callback}) {
+    api_addDefinition({definition, mode, callback}) {
         const note = this.formatNote(definition, mode);
         this.ankiInvoke('addNote', {note}, null, callback);
     }
 
-    api_canAddNotes({definitions, modes, callback}) {
+    api_canAddDefinitions({definitions, modes, callback}) {
         let notes = [];
         for (const definition of definitions) {
             for (const mode of modes) {
@@ -194,13 +194,16 @@ class Yomichan {
 
         this.ankiInvoke('canAddNotes', {notes}, 'notes', (results) => {
             const states = [];
-            for (let resultBase = 0; resultBase < results.length; resultBase += modes.length) {
-                const state = {};
-                for (let modeOffset = 0; modeOffset < modes.length; ++modeOffset) {
-                    state[modes[modeOffset]] = results[resultBase + modeOffset];
-                }
 
-                states.push(state);
+            if (results !== null) {
+                for (let resultBase = 0; resultBase < results.length; resultBase += modes.length) {
+                    const state = {};
+                    for (let modeOffset = 0; modeOffset < modes.length; ++modeOffset) {
+                        state[modes[modeOffset]] = results[resultBase + modeOffset];
+                    }
+
+                    states.push(state);
+                }
             }
 
             callback(states);

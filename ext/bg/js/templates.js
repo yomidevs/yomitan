@@ -89,7 +89,7 @@ templates['kanji-list.html'] = template({"1":function(container,depth0,helpers,p
     var stack1;
 
   return ((stack1 = container.invokePartial(partials["header.html"],depth0,{"name":"header.html","data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
-    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.defs : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.definitions : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ((stack1 = container.invokePartial(partials["footer.html"],depth0,{"name":"footer.html","data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
 },"usePartial":true,"useData":true,"useDepths":true});
 templates['term.html'] = template({"1":function(container,depth0,helpers,partials,data,blockParams,depths) {
@@ -101,17 +101,17 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
 
   return "    <div class=\"action-bar\">\n        <a href=\"#\" title=\"Add term as expression\" class=\"action-link disabled\" data-sequence=\""
     + alias2(alias1((depths[1] != null ? depths[1].sequence : depths[1]), depth0))
-    + "\" data-mode=\"vocabExp\" data-index=\""
+    + "\" data-mode=\"vocab_kanji\" data-index=\""
     + alias2(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias4),(typeof helper === alias5 ? helper.call(alias3,{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\""
     + alias2(alias1((depths[1] != null ? depths[1].root : depths[1]), depth0))
-    + "/img/add_expression.png\"></a>\n        <a href=\"#\" title=\"Add term as reading\" class=\"action-link disabled\" data-sequence=\""
+    + "/img/add_vocab_kanji.png\"></a>\n        <a href=\"#\" title=\"Add term as reading\" class=\"action-link disabled\" data-sequence=\""
     + alias2(alias1((depths[1] != null ? depths[1].sequence : depths[1]), depth0))
-    + "\" data-mode=\"vocabReading\" data-index=\""
+    + "\" data-mode=\"vocab_kana\" data-index=\""
     + alias2(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias4),(typeof helper === alias5 ? helper.call(alias3,{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\""
     + alias2(alias1((depths[1] != null ? depths[1].root : depths[1]), depth0))
-    + "/img/add_reading.png\"></a>\n    </div>\n";
+    + "/img/add_vocab_kana.png\"></a>\n    </div>\n";
 },"4":function(container,depth0,helpers,partials,data) {
     var stack1, helper, options, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", buffer = 
   "    <div class=\"term-expression\"><ruby>";
@@ -191,7 +191,7 @@ templates['term-list.html'] = template({"1":function(container,depth0,helpers,pa
     var stack1;
 
   return ((stack1 = container.invokePartial(partials["header.html"],depth0,{"name":"header.html","data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
-    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.defs : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.definitions : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ((stack1 = container.invokePartial(partials["footer.html"],depth0,{"name":"footer.html","data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
 },"usePartial":true,"useData":true,"useDepths":true});
 })();
