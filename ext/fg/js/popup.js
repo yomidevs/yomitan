@@ -70,7 +70,7 @@ class Popup {
 
     sendMessage(action, params, callback) {
         if (this.popup !== null) {
-            this.popup.contentWindow.postMessage({action: action, params: params}, '*');
+            this.popup.contentWindow.postMessage({action, params}, '*');
         }
     }
 

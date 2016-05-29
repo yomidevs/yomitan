@@ -174,7 +174,7 @@ class Yomichan {
     notifyTabs(name, value) {
         chrome.tabs.query({}, (tabs) => {
             for (const tab of tabs) {
-                chrome.tabs.sendMessage(tab.id, {name: name, value: value}, () => null);
+                chrome.tabs.sendMessage(tab.id, {name, value}, () => null);
             }
         });
     }
