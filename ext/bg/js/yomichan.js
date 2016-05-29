@@ -146,7 +146,7 @@ class Yomichan {
         }
     }
 
-    formatField(field, definition, kana) {
+    formatField(field, definition, mode) {
         const supported = ['character', 'expression', 'glossary', 'kunyomi', 'onyomi', 'reading'];
 
         for (const key in definition) {
@@ -155,18 +155,27 @@ class Yomichan {
             }
 
             let value = definition[key];
-            if (kana) {
+            if (value !== null && typeof(value) !== 'string') {
+                value = value.join(', ');
+            }
+
+            if (mode === 'vocab_kana') {
                 if (key === 'expression') {
                     value = definition.reading;
                 } else if (key === 'reading') {
-                    value = '';
+                    value = null;
                 }
             }
-            if (key === 'glossary') {
-                value = definition.glossary.join('; ');
+
+            if (mode !== 'kanji' && key === 'glossary') {
+                value = '<ol>';
+                for (const gloss of definition.glossary) {
+                    value += `<li>${gloss}</li>`;
+                }
+                value += '</ol>';
             }
 
-            field = field.replace(`{${key}}`, value);
+            field = field.replace(`{${key}}`, value || '');
         }
 
         return field;
@@ -187,7 +196,7 @@ class Yomichan {
         }
 
         for (const name in fields) {
-            note.fields[name] = this.formatField(fields[name], definition, mode === 'vocab_kana');
+            note.fields[name] = this.formatField(fields[name], definition, mode);
         }
 
         return note;
