@@ -21,6 +21,19 @@ function yomichan() {
     return chrome.extension.getBackgroundPage().yomichan;
 }
 
+function fieldsToDict(selection) {
+    const result = {};
+    selection.each((index, element) => {
+        result[$(element).data('field')] = $(element).val();
+    });
+
+    return result;
+}
+
+function modelIdToFieldOptKey(id) {
+    return {'anki-vocab-model': 'ankiVocabFields', 'anki-kanji-model': 'ankiKanjiFields'}[id];
+}
+
 function formToOptions(section, callback) {
     loadOptions((optsOld) => {
         const optsNew = $.extend({}, optsOld);
@@ -34,10 +47,12 @@ function formToOptions(section, callback) {
                 optsNew.enableAnkiConnect = $('#enable-anki-connect').prop('checked');
                 break;
             case 'anki':
-                optsNew.ankiVocabDeck  = $('#anki-vocab-deck').val();
-                optsNew.ankiVocabModel = $('#anki-vocab-model').val();
-                optsNew.ankiKanjiDeck  = $('#anki-kanji-deck').val();
-                optsNew.ankiKanjiModel = $('#anki-kanji-model').val();
+                optsNew.ankiVocabDeck   = $('#anki-vocab-deck').val();
+                optsNew.ankiVocabModel  = $('#anki-vocab-model').val();
+                optsNew.ankiVocabFields = fieldsToDict($('#vocab .anki-field-value'));
+                optsNew.ankiKanjiDeck   = $('#anki-kanji-deck').val();
+                optsNew.ankiKanjiModel  = $('#anki-kanji-model').val();
+                optsNew.ankiKanjiFields = fieldsToDict($('#kanji .anki-field-value'));
                 break;
         }
 
@@ -77,6 +92,7 @@ function populateAnkiFields(element, opts) {
         return;
     }
 
+    const optKey = modelIdToFieldOptKey(element.attr('id'));
     yomichan().api_getModelFieldNames({modelName, callback: (names) => {
         const table = element.closest('.tab-pane').find('.anki-fields');
         table.find('tbody').remove();
@@ -85,7 +101,8 @@ function populateAnkiFields(element, opts) {
         names.forEach((name) => {
             const row = $('<tr>');
             row.append($('<td>').text(name));
-            row.append($('<input>', {class: 'anki-field-value form-control'}).data('field', name));
+            const value = opts[optKey][name] || '';
+            row.append($('<input>', {class: 'anki-field-value form-control', value}).data('field', name).change(onOptionsAnkiChanged));
             body.append(row);
         });
 
@@ -103,6 +120,9 @@ function onOptionsGeneralChanged(e) {
             yomichan().setOptions(optsNew);
             if (!optsOld.enableAnkiConnect && optsNew.enableAnkiConnect) {
                 populateAnkiDeckAndModel(optsNew);
+                $('.options-anki').fadeIn();
+            } else if (optsOld.enableAnkiConnect && !optsNew.enableAnkiConnect) {
+                $('.options-anki').fadeOut();
             }
         });
     });
@@ -111,6 +131,16 @@ function onOptionsGeneralChanged(e) {
 function onOptionsAnkiChanged(e) {
     if (e.originalEvent) {
         formToOptions('anki', (opts) => {
+            saveOptions(opts, () => yomichan().setOptions(opts));
+        });
+    }
+}
+
+function onAnkiModelChanged(e) {
+    if (e.originalEvent) {
+        formToOptions('anki', (opts) => {
+            opts[modelIdToFieldOptKey($(this).id)] = {};
+            populateAnkiFields($(this), opts);
             saveOptions(opts, () => yomichan().setOptions(opts));
         });
     }
@@ -125,17 +155,8 @@ $(document).ready(() => {
         $('#enable-anki-connect').prop('checked', opts.enableAnkiConnect);
 
         $('.options-general input').change(onOptionsGeneralChanged);
-        $('.options-anki input, .options-anki select').change(onOptionsAnkiChanged);
-        $('.anki-model').change((e) => {
-            loadOptions((opts) => populateAnkiFields($(e.currentTarget), opts));
-        });
-        $('#enable-anki-connect').change((e) => {
-            if ($(e.currentTarget).prop('checked')) {
-                $('.options-anki').fadeIn();
-            } else {
-                $('.options-anki').fadeOut();
-            }
-        });
+        $('.anki-deck').change(onOptionsAnkiChanged);
+        $('.anki-model').change(onAnkiModelChanged);
 
         if (opts.enableAnkiConnect) {
             populateAnkiDeckAndModel(opts);
