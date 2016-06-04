@@ -37,16 +37,22 @@ class Yomichan {
         this.asyncPools = {};
         this.setState('disabled');
 
+        chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
+        chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
+        chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
+
         loadOptions((opts) => {
             this.setOptions(opts);
-
-            chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
-            chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
-
             if (this.options.activateOnStartup) {
                 this.setState('loading');
             }
         });
+    }
+
+    onInstalled(details) {
+        if (details.reason === 'install') {
+            chrome.runtime.openOptionsPage();
+        }
     }
 
     onMessage(request, sender, callback) {
