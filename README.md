@@ -37,6 +37,12 @@ preferences.
 [![Kanji information](img/kanji-thumb.png)](img/kanji.png)
 [![Options page](img/options-thumb.png)](img/options.png)
 
+## Build Requirements ##
+
+* Python 3
+* [Handlebars](https://www.npmjs.com/package/handlebars)
+* 7-zip
+
 ## License ##
 
 GPL
