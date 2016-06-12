@@ -40,7 +40,7 @@ function formToOptions(section, callback) {
 
         switch (section) {
             case 'general':
-                optsNew.scanLength        = $('#scan-length').val();
+                optsNew.scanLength        = parseInt($('#scan-length').val());
                 optsNew.activateOnStartup = $('#activate-on-startup').prop('checked');
                 optsNew.loadEnamDict      = $('#load-enamdict').prop('checked');
                 optsNew.selectMatchedText = $('#select-matched-text').prop('checked');

@@ -38,6 +38,8 @@ function sanitizeOptions(options) {
         }
     }
 
+    options.scanLength = parseInt(options.scanLength);
+
     return options;
 }
 

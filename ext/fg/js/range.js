@@ -27,16 +27,29 @@ class Range {
     }
 
     setLength(length) {
-        const node   = this.rng.startContainer;
-        const offset = this.rng.startOffset;
+        const end = this.findEnd(this.rng.startContainer, this.rng.startOffset, length);
+        this.rng.setEnd(end.node, end.offset);
+    }
 
-        length = Math.min(node.length - offset, length);
-        if (length === 0) {
-            return null;
+    findEnd(node, offset, length) {
+        if (node.nodeType === 3) {
+            const remainder = node.data.length - offset;
+            if (remainder >= length) {
+                return {node, offset: offset + length};
+            }
+
+            length -= remainder;
         }
 
-        this.rng.setEnd(node, offset + length);
-        return length;
+        if (node.childNodes.length > 0) {
+            return this.findEnd(node.childNodes[0], 0, length);
+        }
+
+        if (node.nextSibling !== null) {
+            return this.findEnd(node.nextSibling, 0, length);
+        }
+
+        return {node, offset: node.data.length};
     }
 
     containsPoint(point) {
