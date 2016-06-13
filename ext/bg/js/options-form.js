@@ -47,6 +47,8 @@ function formToOptions(section, callback) {
                 optsNew.enableAnkiConnect = $('#enable-anki-connect').prop('checked');
                 break;
             case 'anki':
+                optsNew.ankiCardTags    = $('#anki-card-tags').val().split(/[,; ]+/);
+                optsNew.ankiHtmlCards   = $('#anki-html-cards').prop('checked');
                 optsNew.ankiVocabDeck   = $('#anki-vocab-deck').val();
                 optsNew.ankiVocabModel  = $('#anki-vocab-model').val();
                 optsNew.ankiVocabFields = fieldsToDict($('#vocab .anki-field-value'));
@@ -91,8 +93,12 @@ function updateAnkiStatus() {
     yomichan().api_getVersion({callback: (version) => {
         if (version === null) {
             $('.error-dlg-connection').show();
+            $('.options-anki-controls').hide();
         } else if (version !== yomichan().getApiVersion()) {
             $('.error-dlg-version').show();
+            $('.options-anki-controls').hide();
+        } else {
+            $('.options-anki-controls').show();
         }
     }});
 }
@@ -166,7 +172,11 @@ $(document).ready(() => {
         $('#select-matched-text').prop('checked', opts.selectMatchedText);
         $('#enable-anki-connect').prop('checked', opts.enableAnkiConnect);
 
+        $('#anki-card-tags').val(opts.ankiCardTags.join(' '));
+        $('#anki-html-cards').prop('checked', opts.ankiHtmlCards);
+
         $('.options-general input').change(onOptionsGeneralChanged);
+        $('.options-anki input').change(onOptionsAnkiChanged);
         $('.anki-deck').change(onOptionsAnkiChanged);
         $('.anki-model').change(onAnkiModelChanged);
 
