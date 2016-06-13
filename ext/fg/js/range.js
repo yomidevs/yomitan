@@ -27,29 +27,8 @@ class Range {
     }
 
     setLength(length) {
-        const end = this.findEnd(this.rng.startContainer, this.rng.startOffset, length);
+        const end = Range.seekEnd(this.rng.startContainer, this.rng.startOffset + length);
         this.rng.setEnd(end.node, end.offset);
-    }
-
-    findEnd(node, offset, length) {
-        if (node.nodeType === 3) {
-            const remainder = node.data.length - offset;
-            if (remainder >= length) {
-                return {node, offset: offset + length};
-            }
-
-            length -= remainder;
-        }
-
-        if (node.childNodes.length > 0) {
-            return this.findEnd(node.childNodes[0], 0, length);
-        }
-
-        if (node.nextSibling !== null) {
-            return this.findEnd(node.nextSibling, 0, length);
-        }
-
-        return {node, offset: node.data.length};
     }
 
     containsPoint(point) {
@@ -86,6 +65,45 @@ class Range {
 
     compareOrigin(range) {
         return range.rng.compareBoundaryPoints(Range.END_TO_END, this.rng);
+    }
+
+    static seekEnd(node, length) {
+        const state = {node, offset: 0, length};
+
+        if (!Range.seekEndRecurse(node, state)) {
+            return {node: state.node, offset: state.offset};
+        }
+
+        for (let sibling = node.nextSibling; sibling !== null; sibling = sibling.nextSibling) {
+            if (!Range.seekEndRecurse(sibling, state)) {
+                return {node: state.node, offset: state.offset};
+            }
+        }
+
+        for (let sibling = node.parentElement.nextSibling; sibling !== null; sibling = sibling.nextSibling) {
+            if (!Range.seekEndRecurse(sibling, state)) {
+                return {node: state.node, offset: state.offset};
+            }
+        }
+
+        return {node: state.node, offset: state.offset};
+    }
+
+    static seekEndRecurse(node, state) {
+        if (node.nodeType === 3) {
+            const consumed = Math.min(node.length, state.length);
+            state.node = node;
+            state.offset = consumed;
+            state.length -= consumed;
+        } else {
+            for (let i = 0; i < node.childNodes.length; ++i) {
+                if (!Range.seekEndRecurse(node.childNodes[i], state)) {
+                    break;
+                }
+            }
+        }
+
+        return state.length > 0;
     }
 
     static fromPoint(point) {
