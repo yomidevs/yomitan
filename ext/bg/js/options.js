@@ -25,7 +25,6 @@ function sanitizeOptions(options) {
         loadEnamDict:      false,
         enableAnkiConnect: false,
         ankiCardTags:      ['yomichan'],
-        ankiHtmlCards:     true,
         ankiVocabDeck:     '',
         ankiVocabModel:    '',
         ankiVocabFields:   {},
