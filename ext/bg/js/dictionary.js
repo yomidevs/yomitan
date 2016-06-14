@@ -34,7 +34,7 @@ class Dictionary {
     findTerm(term) {
         let results = [];
 
-        for (const name in this.termDicts) {
+        for (let name in this.termDicts) {
             const dict    = this.termDicts[name];
             const indices = dict.indices[term] || [];
 
@@ -48,7 +48,7 @@ class Dictionary {
                     // TODO: Handle addons through data.
                     //
 
-                    for (const tag of tags) {
+                    for (let tag of tags) {
                         if (tag.startsWith('v5') && tag !== 'v5') {
                             addons.push('v5');
                         } else if (tag.startsWith('vs-')) {
@@ -74,7 +74,7 @@ class Dictionary {
     findKanji(kanji) {
         const results = [];
 
-        for (const name in this.kanjiDicts) {
+        for (let name in this.kanjiDicts) {
             const def = this.kanjiDicts[name][kanji];
             if (def) {
                 const [k, o, g] = def;

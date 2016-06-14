@@ -26,12 +26,12 @@ class Deinflection {
     }
 
     validate(validator) {
-        for (const tags of validator(this.term)) {
+        for (let tags of validator(this.term)) {
             if (this.tags.length === 0) {
                 return true;
             }
 
-            for (const tag of this.tags) {
+            for (let tag of this.tags) {
                 if (tags.indexOf(tag) !== -1) {
                     return true;
                 }
@@ -47,11 +47,11 @@ class Deinflection {
             this.children.push(child);
         }
 
-        for (const rule in rules) {
+        for (let rule in rules) {
             const variants = rules[rule];
-            for (const v of variants) {
+            for (let v of variants) {
                 let allowed = this.tags.length === 0;
-                for (const tag of this.tags) {
+                for (let tag of this.tags) {
                     //
                     // TODO: Handle addons through tags.json or rules.json
                     //
@@ -83,8 +83,8 @@ class Deinflection {
         }
 
         const paths = [];
-        for (const child of this.children) {
-            for (const path of child.gather()) {
+        for (let child of this.children) {
+            for (let path of child.gather()) {
                 if (this.rule.length > 0) {
                     path.rules.push(this.rule);
                 }

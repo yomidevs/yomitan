@@ -33,7 +33,7 @@ function sanitizeOptions(options) {
         ankiKanjiFields:   {}
     };
 
-    for (const key in defaults) {
+    for (let key in defaults) {
         if (!options.hasOwnProperty(key)) {
             options[key] = defaults[key];
         }

@@ -22,7 +22,7 @@ class Yomichan {
         Handlebars.partials = Handlebars.templates;
         Handlebars.registerHelper('kanjiLinks', function(options) {
             let result = '';
-            for (const c of options.fn(this)) {
+            for (let c of options.fn(this)) {
                 if (Translator.isKanji(c)) {
                     result += Handlebars.templates['kanji-link.html']({kanji: c}).trim();
                 } else {
@@ -111,7 +111,7 @@ class Yomichan {
 
     notifyTabs(name, value) {
         chrome.tabs.query({}, (tabs) => {
-            for (const tab of tabs) {
+            for (let tab of tabs) {
                 chrome.tabs.sendMessage(tab.id, {name, value}, () => null);
             }
         });
@@ -155,7 +155,7 @@ class Yomichan {
     formatField(field, definition, mode) {
         const supported = ['character', 'expression', 'glossary', 'kunyomi', 'onyomi', 'reading'];
 
-        for (const key in definition) {
+        for (let key in definition) {
             if (supported.indexOf(key) === -1) {
                 continue;
             }
@@ -175,7 +175,7 @@ class Yomichan {
 
             if (mode !== 'kanji' && key === 'glossary') {
                 value = '<ol>';
-                for (const gloss of definition.glossary) {
+                for (let gloss of definition.glossary) {
                     value += `<li>${gloss}</li>`;
                 }
                 value += '</ol>';
@@ -201,7 +201,7 @@ class Yomichan {
             note.modelName = this.options.ankiVocabModel;
         }
 
-        for (const name in fields) {
+        for (let name in fields) {
             note.fields[name] = this.formatField(fields[name], definition, mode);
         }
 
@@ -215,8 +215,8 @@ class Yomichan {
 
     api_canAddDefinitions({definitions, modes, callback}) {
         let notes = [];
-        for (const definition of definitions) {
-            for (const mode of modes) {
+        for (let definition of definitions) {
+            for (let mode of modes) {
                 notes.push(this.formatNote(definition, mode));
             }
         }

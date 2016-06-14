@@ -18,7 +18,7 @@
 
 
 function registerKanjiLinks() {
-    for (const link of [].slice.call(document.getElementsByClassName('kanji-link'))) {
+    for (let link of [].slice.call(document.getElementsByClassName('kanji-link'))) {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             window.parent.postMessage({action: 'displayKanji', params: e.target.innerHTML}, '*');
@@ -27,7 +27,7 @@ function registerKanjiLinks() {
 }
 
 function registerAddNoteLinks() {
-    for (const link of [].slice.call(document.getElementsByClassName('action-add-note'))) {
+    for (let link of [].slice.call(document.getElementsByClassName('action-add-note'))) {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const ds = e.currentTarget.dataset;
@@ -37,7 +37,7 @@ function registerAddNoteLinks() {
 }
 
 function registerPronounceLinks() {
-    for (const link of [].slice.call(document.getElementsByClassName('action-pronounce'))) {
+    for (let link of [].slice.call(document.getElementsByClassName('action-pronounce'))) {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const ds = e.currentTarget.dataset;
@@ -60,7 +60,7 @@ function onMessage(e) {
 }
 
 function api_setActionState({index, state, sequence}) {
-    for (const mode in state) {
+    for (let mode in state) {
         const matches = document.querySelectorAll(`.action-bar[data-sequence="${sequence}"] .action-add-note[data-index="${index}"][data-mode="${mode}"]`);
         if (matches.length === 0) {
             return;

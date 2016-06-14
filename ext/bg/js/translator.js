@@ -45,7 +45,7 @@ class Translator {
         }
 
         const pendingLoads = [];
-        for (const key of files) {
+        for (let key of files) {
             pendingLoads.push(key);
             Translator.loadData(this.paths[key], (response) => {
                 switch (key) {
@@ -80,7 +80,7 @@ class Translator {
 
             const dfs = this.deinflector.deinflect(term, t => {
                 const tags = [];
-                for (const d of this.dictionary.findTerm(t)) {
+                for (let d of this.dictionary.findTerm(t)) {
                     tags.push(d.tags);
                 }
 
@@ -91,13 +91,13 @@ class Translator {
                 continue;
             }
 
-            for (const df of dfs) {
+            for (let df of dfs) {
                 this.processTerm(groups, df.source, df.tags, df.rules, df.root);
             }
         }
 
         let definitions = [];
-        for (const key in groups) {
+        for (let key in groups) {
             definitions.push(groups[key]);
         }
 
@@ -130,7 +130,7 @@ class Translator {
         });
 
         let length = 0;
-        for (const result of definitions) {
+        for (let result of definitions) {
             length = Math.max(length, result.source.length);
         }
 
@@ -141,7 +141,7 @@ class Translator {
         let definitions = [];
         const processed = {};
 
-        for (const c of text) {
+        for (let c of text) {
             if (!processed[c]) {
                 definitions = definitions.concat(this.dictionary.findKanji(c));
                 processed[c] = true;
@@ -152,13 +152,13 @@ class Translator {
     }
 
     processTerm(groups, source, tags, rules=[], root='') {
-        for (const entry of this.dictionary.findTerm(root)) {
+        for (let entry of this.dictionary.findTerm(root)) {
             if (entry.id in groups) {
                 continue;
             }
 
             let matched = tags.length == 0;
-            for (const tag of tags) {
+            for (let tag of tags) {
                 if (entry.tags.indexOf(tag) !== -1) {
                     matched = true;
                     break;
@@ -167,7 +167,7 @@ class Translator {
 
             let popular  = false;
             let tagItems = [];
-            for (const tag of entry.tags) {
+            for (let tag of entry.tags) {
                 const tagItem = this.tags[tag];
                 if (tagItem && entry.addons.indexOf(tag) === -1) {
                     tagItems.push({
