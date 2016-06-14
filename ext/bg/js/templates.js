@@ -93,25 +93,33 @@ templates['kanji-list.html'] = template({"1":function(container,depth0,helpers,p
     + ((stack1 = container.invokePartial(partials["footer.html"],depth0,{"name":"footer.html","data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
 },"usePartial":true,"useData":true,"useDepths":true});
 templates['term.html'] = template({"1":function(container,depth0,helpers,partials,data,blockParams,depths) {
-    var stack1;
+    var stack1, helper, alias1=container.lambda, alias2=container.escapeExpression, alias3=depth0 != null ? depth0 : {};
 
-  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.enableAnkiConnect : depth0),{"name":"if","hash":{},"fn":container.program(2, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+  return "    <div class=\"action-bar\">\n        <a href=\"#\" title=\"Pronounce\" class=\"action-pronounce\" data-sequence=\""
+    + alias2(alias1((depths[1] != null ? depths[1].sequence : depths[1]), depth0))
+    + "\" data-index=\""
+    + alias2(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(alias3,{"name":"index","hash":{},"data":data}) : helper)))
+    + "\"><img src=\""
+    + alias2(alias1((depths[1] != null ? depths[1].root : depths[1]), depth0))
+    + "/img/pronounce.png\"></a>\n"
+    + ((stack1 = helpers["if"].call(alias3,(depth0 != null ? depth0.enableAnkiConnect : depth0),{"name":"if","hash":{},"fn":container.program(2, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "    </div>\n";
 },"2":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var helper, alias1=container.lambda, alias2=container.escapeExpression, alias3=depth0 != null ? depth0 : {}, alias4=helpers.helperMissing, alias5="function";
 
-  return "    <div class=\"action-bar\">\n        <a href=\"#\" title=\"Add term as expression\" class=\"action-link disabled\" data-sequence=\""
+  return "        <a href=\"#\" title=\"Add term as expression\" class=\"action-learn disabled\" data-sequence=\""
     + alias2(alias1((depths[1] != null ? depths[1].sequence : depths[1]), depth0))
     + "\" data-mode=\"vocab_kanji\" data-index=\""
     + alias2(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias4),(typeof helper === alias5 ? helper.call(alias3,{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\""
     + alias2(alias1((depths[1] != null ? depths[1].root : depths[1]), depth0))
-    + "/img/add_vocab_kanji.png\"></a>\n        <a href=\"#\" title=\"Add term as reading\" class=\"action-link disabled\" data-sequence=\""
+    + "/img/add_vocab_kanji.png\"></a>\n        <a href=\"#\" title=\"Add term as reading\" class=\"action-learn disabled\" data-sequence=\""
     + alias2(alias1((depths[1] != null ? depths[1].sequence : depths[1]), depth0))
     + "\" data-mode=\"vocab_kana\" data-index=\""
     + alias2(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias4),(typeof helper === alias5 ? helper.call(alias3,{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\""
     + alias2(alias1((depths[1] != null ? depths[1].root : depths[1]), depth0))
-    + "/img/add_vocab_kana.png\"></a>\n    </div>\n";
+    + "/img/add_vocab_kana.png\"></a>\n";
 },"4":function(container,depth0,helpers,partials,data) {
     var stack1, helper, options, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", buffer = 
   "    <div class=\"term-expression\"><ruby>";

@@ -167,6 +167,13 @@ class Client {
         });
     }
 
+    api_pronounce(index) {
+        const dfn = this.definitions[index];
+        const url = `http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kana=${dfn.reading}&kanji=${dfn.expression}`;
+        const audio = new Audio(url);
+        audio.play();
+    }
+
     api_displayKanji(kanji) {
         bgFindKanji(kanji, (definitions) => {
             const sequence = ++this.sequence;

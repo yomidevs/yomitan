@@ -26,8 +26,8 @@ function registerKanjiLinks() {
     }
 }
 
-function registerActionLinks() {
-    for (const link of [].slice.call(document.getElementsByClassName('action-link'))) {
+function registerLearnLinks() {
+    for (const link of [].slice.call(document.getElementsByClassName('action-learn'))) {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const ds = e.currentTarget.dataset;
@@ -36,9 +36,20 @@ function registerActionLinks() {
     }
 }
 
+function registerPronounceLinks() {
+    for (const link of [].slice.call(document.getElementsByClassName('action-pronounce'))) {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const ds = e.currentTarget.dataset;
+            window.parent.postMessage({action: 'pronounce', params: ds.index}, '*');
+        });
+    }
+}
+
 function onDomContentLoaded() {
     registerKanjiLinks();
-    registerActionLinks();
+    registerLearnLinks();
+    registerPronounceLinks();
 }
 
 function onMessage(e) {
@@ -50,7 +61,7 @@ function onMessage(e) {
 
 function api_setActionState({index, state, sequence}) {
     for (const mode in state) {
-        const matches = document.querySelectorAll(`.action-link[data-sequence="${sequence}"][data-index="${index}"][data-mode="${mode}"]`);
+        const matches = document.querySelectorAll(`.action-learn[data-sequence="${sequence}"][data-index="${index}"][data-mode="${mode}"]`);
         if (matches.length === 0) {
             return;
         }
