@@ -26,8 +26,8 @@ function registerKanjiLinks() {
     }
 }
 
-function registerLearnLinks() {
-    for (const link of [].slice.call(document.getElementsByClassName('action-learn'))) {
+function registerAddNoteLinks() {
+    for (const link of [].slice.call(document.getElementsByClassName('action-add-note'))) {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const ds = e.currentTarget.dataset;
@@ -48,7 +48,7 @@ function registerPronounceLinks() {
 
 function onDomContentLoaded() {
     registerKanjiLinks();
-    registerLearnLinks();
+    registerAddNoteLinks();
     registerPronounceLinks();
 }
 
@@ -61,7 +61,7 @@ function onMessage(e) {
 
 function api_setActionState({index, state, sequence}) {
     for (const mode in state) {
-        const matches = document.querySelectorAll(`.action-learn[data-sequence="${sequence}"][data-index="${index}"][data-mode="${mode}"]`);
+        const matches = document.querySelectorAll(`.action-bar[data-sequence="${sequence}"] .action-add-note[data-index="${index}"][data-mode="${mode}"]`);
         if (matches.length === 0) {
             return;
         }

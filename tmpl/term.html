@@ -1,10 +1,10 @@
 <div class="term-definition">
     {{#with options}}
-    <div class="action-bar">
-        <a href="#" title="Pronounce" class="action-pronounce" data-sequence="{{../sequence}}" data-index="{{@index}}"><img src="{{../root}}/img/pronounce.png"></a>
+    <div class="action-bar" data-sequence="{{../sequence}}">
+        <a href="#" title="Pronounce" class="action-pronounce" data-index="{{@index}}"><img src="{{../root}}/img/pronounce.png"></a>
         {{#if enableAnkiConnect}}
-        <a href="#" title="Add term as expression" class="action-learn disabled" data-sequence="{{../sequence}}" data-mode="vocab_kanji" data-index="{{@index}}"><img src="{{../root}}/img/add_vocab_kanji.png"></a>
-        <a href="#" title="Add term as reading" class="action-learn disabled" data-sequence="{{../sequence}}" data-mode="vocab_kana" data-index="{{@index}}"><img src="{{../root}}/img/add_vocab_kana.png"></a>
+        <a href="#" title="Add term as expression" class="action-add-note disabled" data-mode="vocab_kanji" data-index="{{@index}}"><img src="{{../root}}/img/add_vocab_kanji.png"></a>
+        <a href="#" title="Add term as reading" class="action-add-note disabled" data-mode="vocab_kana" data-index="{{@index}}"><img src="{{../root}}/img/add_vocab_kana.png"></a>
         {{/if}}
     </div>
     {{/with}}
