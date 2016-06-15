@@ -188,7 +188,7 @@ class Yomichan {
     }
 
     formatNote(definition, mode) {
-        const note = {fields: {}, tags: []};
+        const note = {fields: {}, tags: this.options.ankiCardTags};
 
         let fields = [];
         if (mode === 'kanji') {
