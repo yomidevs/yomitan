@@ -20,7 +20,7 @@
 class Client {
     constructor() {
         this.popup        = new Popup();
-        this.audio        = null;
+        this.audio        = {};
         this.lastMousePos = null;
         this.lastRange    = null;
         this.activateKey  = 16;
@@ -172,12 +172,15 @@ class Client {
         const dfn = this.definitions[index];
         const url = `http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kana=${dfn.reading}&kanji=${dfn.expression}`;
 
-        if (this.audio !== null) {
-            this.audio.pause();
+        for (let key in this.audio) {
+            this.audio[key].pause();
         }
 
-        this.audio = new Audio(url);
-        this.audio.play();
+        const audio = this.audio[url] || new Audio(url);
+        audio.currentTime = 0;
+        audio.play();
+
+        this.audio[url] = audio;
     }
 
     api_displayKanji(kanji) {
