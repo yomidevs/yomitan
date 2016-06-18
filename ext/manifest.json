@@ -15,7 +15,9 @@
         "css": ["fg/css/client.css"]
     }],
     "minimum_chrome_version": "45.0.0.0",
-    "options_page": "bg/options.html",
+    "options_ui": {
+        "page": "bg/options.html"
+    },
     "permissions": ["storage"],
     "web_accessible_resources": [
         "fg/css/frame.css",
