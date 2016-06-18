@@ -237,6 +237,7 @@ class Translator {
 
     static loadData(url, callback) {
         const xhr = new XMLHttpRequest();
+        xhr.overrideMimeType("application/json");
         xhr.addEventListener('load', () => callback(xhr.responseText));
         xhr.open('GET', chrome.extension.getURL(url), true);
         xhr.send();
