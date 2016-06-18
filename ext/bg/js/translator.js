@@ -46,8 +46,17 @@ class Translator {
 
         const pendingLoads = [];
         for (let key of files) {
+            /*
+                Spidermonkey does not implement lexical bindings for for-of loop
+                (see https://bugzilla.mozilla.org/show_bug.cgi?id=449811)
+                so we need to manually make a new declaration for key.
+                Otherwise key will always remain the same in the callback to loadData
+                and the dictionary data will not be set correctly
+            */
+            let key_ = key;
             pendingLoads.push(key);
             Translator.loadData(this.paths[key], (response) => {
+                let key = key_
                 switch (key) {
                     case 'rules':
                         this.deinflector.setRules(JSON.parse(response));
