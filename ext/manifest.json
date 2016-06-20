@@ -15,8 +15,10 @@
         "css": ["fg/css/client.css"]
     }],
     "minimum_chrome_version": "45.0.0.0",
-    "options_page": "bg/options.html",
-    "permissions": ["storage"],
+    "options_ui": {
+        "page": "bg/options.html"
+    },
+    "permissions": ["*://127.0.0.1/*", "storage"],
     "web_accessible_resources": [
         "fg/css/frame.css",
         "fg/img/add_kanji.png",
@@ -26,5 +28,10 @@
         "fg/js/frame.js",
         "fg/ttf/kanji-stroke-orders.ttf",
         "fg/ttf/vl-gothic-regular.ttf"
-    ]
+    ],
+    "applications": {
+      "gecko": {
+        "id": "yomichan-gecko@example.com"
+      }
+    }
 }

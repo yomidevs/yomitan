@@ -62,10 +62,8 @@ class Popup {
             return;
         }
 
-        const doc = this.popup.contentDocument;
-        doc.open();
-        doc.write(content);
-        doc.close();
+        const doc = this.popup;
+        doc.srcdoc=content;
     }
 
     sendMessage(action, params, callback) {
