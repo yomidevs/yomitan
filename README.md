@@ -10,6 +10,12 @@ was starting to learn Japanese back in 2011.
 
 <iframe width="800" height="500" src="https://www.youtube.com/embed/90_A1VpTnMk" frameborder="0" allowfullscreen></iframe>
 
+## Dependencies ##
+
+* [7-Zip](http://www.7-zip.org/)
+* [Handlebars](http://handlebarsjs.com/)
+* [Python 3](https://www.python.org/downloads/releases/3.0)
+
 ## Installation ##
 
 The most straightforward way to install this extension is to download it from its listing in the [Chrome Web
