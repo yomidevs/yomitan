@@ -28,10 +28,5 @@
         "fg/js/frame.js",
         "fg/ttf/kanji-stroke-orders.ttf",
         "fg/ttf/vl-gothic-regular.ttf"
-    ],
-    "applications": {
-      "gecko": {
-        "id": "yomichan-gecko@example.com"
-      }
-    }
+    ]
 }
