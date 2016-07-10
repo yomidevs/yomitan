@@ -12,9 +12,10 @@ was starting to learn Japanese back in 2011.
 
 ## Build Requirements ##
 
-* [7-Zip](http://www.7-zip.org/)
-* [Handlebars](http://handlebarsjs.com/)
-* [Python 3](https://www.python.org/downloads/releases/3.0)
+*   [7-Zip](http://www.7-zip.org/)
+*   [Handlebars](http://handlebarsjs.com/)
+*   [Node.js](https://nodejs.org/)
+*   [Python 3](https://www.python.org/downloads/releases/3.0)
 
 ## Installation ##
 
