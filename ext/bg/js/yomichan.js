@@ -153,35 +153,51 @@ class Yomichan {
     }
 
     formatField(field, definition, mode) {
-        const supported = ['character', 'expression', 'glossary', 'kunyomi', 'onyomi', 'reading'];
+        const tags = [
+            'character',
+            'expression',
+            'glossary',
+            'glossary-list',
+            'kunyomi',
+            'onyomi',
+            'reading',
+            'tags',
+        ];
 
-        for (let key in definition) {
-            if (supported.indexOf(key) === -1) {
-                continue;
+        for (let tag of tags) {
+            let value = definition[tag] || null;
+            switch (tag) {
+                case 'expression':
+                    if (mode === 'vocab_kana' && definition.reading) {
+                        value = definition.reading;
+                    }
+                    break;
+                case 'reading':
+                    if (mode === 'vocab_kana') {
+                        value = null;
+                    }
+                    break;
+                case 'glossary-list':
+                    if (definition.glossary) {
+                        value = '<ol>';
+                        for (let gloss of definition.glossary) {
+                            value += `<li>${gloss}</li>`;
+                        }
+                        value += '</ol>';
+                    }
+                    break;
+                case 'tags':
+                    if (definition.tags) {
+                        value = definition.tags.map((t) => t.name);
+                    }
+                    break;
             }
 
-            let value = definition[key];
             if (value !== null && typeof(value) !== 'string') {
                 value = value.join(', ');
             }
 
-            if (mode === 'vocab_kana') {
-                if (key === 'expression') {
-                    value = definition.reading;
-                } else if (key === 'reading') {
-                    value = null;
-                }
-            }
-
-            if (mode !== 'kanji' && key === 'glossary') {
-                value = '<ol>';
-                for (let gloss of definition.glossary) {
-                    value += `<li>${gloss}</li>`;
-                }
-                value += '</ol>';
-            }
-
-            field = field.replace(`{${key}}`, value || '');
+            field = field.replace(`{${tag}}`, value || '');
         }
 
         return field;
