@@ -144,8 +144,6 @@ class Yomichan {
             });
 
             xhr.open('POST', 'http://127.0.0.1:8765');
-            xhr.withCredentials = true;
-            xhr.setRequestHeader('Content-Type', 'text/json');
             xhr.send(JSON.stringify({action, params}));
         } else {
             callback(null);
