@@ -40,11 +40,12 @@ function formToOptions(section, callback) {
 
         switch (section) {
             case 'general':
-                optsNew.scanLength        = parseInt($('#scan-length').val());
-                optsNew.activateOnStartup = $('#activate-on-startup').prop('checked');
-                optsNew.loadEnamDict      = $('#load-enamdict').prop('checked');
-                optsNew.selectMatchedText = $('#select-matched-text').prop('checked');
-                optsNew.enableAnkiConnect = $('#enable-anki-connect').prop('checked');
+                optsNew.scanLength          = parseInt($('#scan-length').val());
+                optsNew.activateOnStartup   = $('#activate-on-startup').prop('checked');
+                optsNew.loadEnamDict        = $('#load-enamdict').prop('checked');
+                optsNew.selectMatchedText   = $('#select-matched-text').prop('checked');
+                optsNew.enableAudioPlayback = $('#enable-audio-playback').prop('checked');
+                optsNew.enableAnkiConnect   = $('#enable-anki-connect').prop('checked');
                 break;
             case 'anki':
                 optsNew.ankiCardTags    = $('#anki-card-tags').val().split(/[,; ]+/);
@@ -169,6 +170,7 @@ $(document).ready(() => {
         $('#activate-on-startup').prop('checked', opts.activateOnStartup);
         $('#load-enamdict').prop('checked', opts.loadEnamDict);
         $('#select-matched-text').prop('checked', opts.selectMatchedText);
+        $('#enable-audio-playback').prop('checked', opts.enableAudioPlayback);
         $('#enable-anki-connect').prop('checked', opts.enableAnkiConnect);
 
         $('#anki-card-tags').val(opts.ankiCardTags.join(' '));
