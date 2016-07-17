@@ -152,6 +152,7 @@ class Yomichan {
 
     formatField(field, definition, mode) {
         const tags = [
+            'audio',
             'character',
             'expression',
             'glossary',
@@ -165,6 +166,9 @@ class Yomichan {
         for (let tag of tags) {
             let value = definition[tag] || null;
             switch (tag) {
+                case 'audio':
+                    value = '';
+                    break;
                 case 'expression':
                     if (mode === 'vocab_kana' && definition.reading) {
                         value = definition.reading;
@@ -213,6 +217,22 @@ class Yomichan {
             fields         = this.options.ankiVocabFields;
             note.deckName  = this.options.ankiVocabDeck;
             note.modelName = this.options.ankiVocabModel;
+
+            const audio = {
+                kanji:  definition.expression,
+                kana:   definition.reading,
+                fields: []
+            };
+
+            for (let name in fields) {
+                if (fields[name].indexOf('{audio}') !== -1) {
+                    audio.fields.push(name);
+                }
+            }
+
+            if (audio.fields.length > 0) {
+                note.audio = audio;
+            }
         }
 
         for (let name in fields) {
