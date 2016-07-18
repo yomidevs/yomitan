@@ -21,17 +21,19 @@ templates['header.html'] = template({"compiler":[7,">= 4.0.0"],"main":function(c
 templates['kanji.html'] = template({"1":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
-  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.enableAnkiConnect : depth0),{"name":"if","hash":{},"fn":container.program(2, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+  return "    <div class=\"action-bar\" data-sequence=\""
+    + container.escapeExpression(container.lambda((depths[1] != null ? depths[1].sequence : depths[1]), depth0))
+    + "\">\n"
+    + ((stack1 = helpers["if"].call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.enableAnkiConnect : depth0),{"name":"if","hash":{},"fn":container.program(2, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "    </div>\n";
 },"2":function(container,depth0,helpers,partials,data,blockParams,depths) {
-    var helper, alias1=container.lambda, alias2=container.escapeExpression;
+    var helper, alias1=container.escapeExpression;
 
-  return "    <div class=\"action-bar\">\n        <a href=\"#\" title=\"Add Kanji\" class=\"action-link disabled\" data-sequence=\""
-    + alias2(alias1((depths[1] != null ? depths[1].sequence : depths[1]), depth0))
-    + "\" data-mode=\"kanji\" data-index=\""
-    + alias2(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"index","hash":{},"data":data}) : helper)))
+  return "        <a href=\"#\" title=\"Add Kanji\" class=\"action-add-note disabled\" data-mode=\"kanji\" data-index=\""
+    + alias1(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\""
-    + alias2(alias1((depths[1] != null ? depths[1].root : depths[1]), depth0))
-    + "/img/add_kanji.png\"></a>\n    </div>\n";
+    + alias1(container.lambda((depths[1] != null ? depths[1].root : depths[1]), depth0))
+    + "/img/add_kanji.png\"></a>\n";
 },"4":function(container,depth0,helpers,partials,data) {
     var stack1;
 
@@ -72,7 +74,7 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.kunyomi : depth0),{"name":"if","hash":{},"fn":container.program(8, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.onyomi : depth0),{"name":"if","hash":{},"fn":container.program(10, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "        </dl>\n    </div>\n</div>\n</div>\n";
+    + "        </dl>\n    </div>\n</div>\n";
 },"useData":true,"useDepths":true});
 templates['kanji-link.html'] = template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var helper;
@@ -112,11 +114,11 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
 },"4":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression, alias5=container.lambda;
 
-  return "        <a href=\"#\" title=\"Add term as expression\" class=\"action-add-note disabled\" data-mode=\"vocab_kanji\" data-index=\""
+  return "        <a href=\"#\" title=\"Add vocabulary as expression\" class=\"action-add-note disabled\" data-mode=\"vocab_kanji\" data-index=\""
     + alias4(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\""
     + alias4(alias5((depths[1] != null ? depths[1].root : depths[1]), depth0))
-    + "/img/add_vocab_kanji.png\"></a>\n        <a href=\"#\" title=\"Add term as reading\" class=\"action-add-note disabled\" data-mode=\"vocab_kana\" data-index=\""
+    + "/img/add_vocab_kanji.png\"></a>\n        <a href=\"#\" title=\"Add vocabulary as reading\" class=\"action-add-note disabled\" data-mode=\"vocab_kana\" data-index=\""
     + alias4(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\""
     + alias4(alias5((depths[1] != null ? depths[1].root : depths[1]), depth0))

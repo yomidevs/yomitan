@@ -1,10 +1,10 @@
 <div class="kanji-definition">
     {{#with options}}
-    {{#if enableAnkiConnect}}
-    <div class="action-bar">
-        <a href="#" title="Add Kanji" class="action-link disabled" data-sequence="{{../sequence}}" data-mode="kanji" data-index="{{@index}}"><img src="{{../root}}/img/add_kanji.png"></a>
+    <div class="action-bar" data-sequence="{{../sequence}}">
+        {{#if enableAnkiConnect}}
+        <a href="#" title="Add Kanji" class="action-add-note disabled" data-mode="kanji" data-index="{{@index}}"><img src="{{../root}}/img/add_kanji.png"></a>
+        {{/if}}
     </div>
-    {{/if}}
     {{/with}}
 
     <div class="kanji-glyph">{{character}}</div>
@@ -39,5 +39,4 @@
             {{/if}}
         </dl>
     </div>
-</div>
 </div>
