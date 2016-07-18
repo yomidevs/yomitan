@@ -168,9 +168,13 @@ class Client {
         });
     }
 
-    api_pronounce(index) {
-        const dfn = this.definitions[index];
-        const url = `http://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kana=${dfn.reading}&kanji=${dfn.expression}`;
+    api_playAudio(index) {
+        const definition = this.definitions[index];
+
+        let url = `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=${definition.expression}`;
+        if (definition.reading) {
+            url += `&kana=${definition.reading}`;
+        }
 
         for (let key in this.audio) {
             this.audio[key].pause();

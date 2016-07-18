@@ -36,12 +36,12 @@ function registerAddNoteLinks() {
     }
 }
 
-function registerPronounceLinks() {
-    for (let link of [].slice.call(document.getElementsByClassName('action-pronounce'))) {
+function registerAudioLinks() {
+    for (let link of [].slice.call(document.getElementsByClassName('action-play-audio'))) {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const ds = e.currentTarget.dataset;
-            window.parent.postMessage({action: 'pronounce', params: ds.index}, '*');
+            window.parent.postMessage({action: 'playAudio', params: ds.index}, '*');
         });
     }
 }
@@ -49,7 +49,7 @@ function registerPronounceLinks() {
 function onDomContentLoaded() {
     registerKanjiLinks();
     registerAddNoteLinks();
-    registerPronounceLinks();
+    registerAudioLinks();
 }
 
 function onMessage(e) {

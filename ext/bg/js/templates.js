@@ -104,11 +104,11 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
 },"2":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var helper, alias1=container.escapeExpression;
 
-  return "        <a href=\"#\" title=\"Pronounce\" class=\"action-pronounce\" data-index=\""
+  return "        <a href=\"#\" title=\"Play audio\" class=\"action-play-audio\" data-index=\""
     + alias1(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\""
     + alias1(container.lambda((depths[1] != null ? depths[1].root : depths[1]), depth0))
-    + "/img/pronounce.png\"></a>\n";
+    + "/img/play_audio.png\"></a>\n";
 },"4":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression, alias5=container.lambda;
 
