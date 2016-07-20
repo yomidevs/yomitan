@@ -171,9 +171,9 @@ class Client {
     api_playAudio(index) {
         const definition = this.definitions[index];
 
-        let url = `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=${definition.expression}`;
+        let url = `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=${encodeURIComponent(definition.expression)}`;
         if (definition.reading) {
-            url += `&kana=${definition.reading}`;
+            url += `&kana=${encodeURIComponent(definition.reading)}`;
         }
 
         for (let key in this.audio) {
