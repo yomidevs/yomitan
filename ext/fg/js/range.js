@@ -64,7 +64,7 @@ class Range {
     }
 
     compareOrigin(range) {
-        return range.rng.compareBoundaryPoints(Range.END_TO_END, this.rng);
+        return range.rng.compareBoundaryPoints(Range.START_TO_START, this.rng);
     }
 
     static seekEnd(node, length) {
