@@ -59,7 +59,10 @@ class Popup {
 
     setContent(content) {
         if (this.popup !== null) {
-            this.popup.srcdoc = content;
+            const doc = this.popup.contentDocument;
+            doc.open();
+            doc.write(content);
+            doc.close();
         }
     }
 
