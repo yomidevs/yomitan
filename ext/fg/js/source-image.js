@@ -17,7 +17,7 @@
  */
 
 
-class ImageSource {
+class TextSourceImage {
     constructor(image) {
         this.img = image;
         this.length = -1;

@@ -17,7 +17,7 @@
  */
 
 
-class RangeSource {
+class TextSourceRange {
     constructor(range) {
         this.rng = range;
     }
@@ -27,7 +27,7 @@ class RangeSource {
     }
 
     setLength(length) {
-        const end = RangeSource.seekEnd(this.rng.startContainer, this.rng.startOffset + length);
+        const end = TextSourceRange.seekEnd(this.rng.startContainer, this.rng.startOffset + length);
         this.rng.setEnd(end.node, end.offset);
     }
 
@@ -70,18 +70,18 @@ class RangeSource {
     static seekEnd(node, length) {
         const state = {node, offset: 0, length};
 
-        if (!RangeSource.seekEndRecurse(node, state)) {
+        if (!TextSourceRange.seekEndRecurse(node, state)) {
             return {node: state.node, offset: state.offset};
         }
 
         for (let sibling = node.nextSibling; sibling !== null; sibling = sibling.nextSibling) {
-            if (!RangeSource.seekEndRecurse(sibling, state)) {
+            if (!TextSourceRange.seekEndRecurse(sibling, state)) {
                 return {node: state.node, offset: state.offset};
             }
         }
 
         for (let sibling = node.parentElement.nextSibling; sibling !== null; sibling = sibling.nextSibling) {
-            if (!RangeSource.seekEndRecurse(sibling, state)) {
+            if (!TextSourceRange.seekEndRecurse(sibling, state)) {
                 return {node: state.node, offset: state.offset};
             }
         }
@@ -97,7 +97,7 @@ class RangeSource {
             state.length -= consumed;
         } else {
             for (let i = 0; i < node.childNodes.length; ++i) {
-                if (!RangeSource.seekEndRecurse(node.childNodes[i], state)) {
+                if (!TextSourceRange.seekEndRecurse(node.childNodes[i], state)) {
                     break;
                 }
             }
