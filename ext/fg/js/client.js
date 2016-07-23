@@ -22,7 +22,7 @@ class Client {
         this.popup        = new Popup();
         this.audio        = {};
         this.lastMousePos = null;
-        this.lastRange    = null;
+        this.lastTextSource    = null;
         this.activateKey  = 16;
         this.activateBtn  = 2;
         this.enabled      = false;
@@ -87,31 +87,35 @@ class Client {
         }
     }
 
+    textSourceFromPoint(point) {
+        return Range.fromPoint(point);
+    }
+
     searchAt(point) {
-        const range = Range.fromPoint(point);
-        if (range === null || !range.containsPoint(point)) {
+        const textSource = this.textSourceFromPoint(point);
+        if (textSource === null || !textSource.containsPoint(point)) {
             this.hidePopup();
             return;
         }
 
-        if (this.lastRange !== null && this.lastRange.compareOrigin(range) === 0) {
+        if (this.lastTextSource !== null && this.lastTextSource.compareOrigin(textSource) === 0) {
             return;
         }
 
-        range.setLength(this.options.scanLength);
-        bgFindTerm(range.text(), ({definitions, length}) => {
+        textSource.setLength(this.options.scanLength);
+        bgFindTerm(textSource.text(), ({definitions, length}) => {
             if (length === 0) {
                 this.hidePopup();
             } else {
                 const sequence = ++this.sequence;
-                range.setLength(length);
+                textSource.setLength(length);
 
                 bgRenderText(
                     {definitions, root: this.fgRoot, options: this.options, sequence},
                     'term-list.html',
                     (content) => {
                         this.definitions = definitions;
-                        this.showPopup(range, content);
+                        this.showPopup(textSource, content);
 
                         bgCanAddDefinitions(definitions, ['vocab_kanji', 'vocab_kana'], (states) => {
                             if (states !== null) {
@@ -124,24 +128,24 @@ class Client {
         });
     }
 
-    showPopup(range, content) {
-        this.popup.showNextTo(range.getRect(), content);
+    showPopup(textSource, content) {
+        this.popup.showNextTo(textSource.getRect(), content);
 
         if (this.options.selectMatchedText) {
-            range.select();
+            textSource.select();
         }
 
-        this.lastRange = range;
+        this.lastTextSource = textSource;
     }
 
     hidePopup() {
         this.popup.hide();
 
-        if (this.options.selectMatchedText && this.lastRange !== null) {
-            this.lastRange.deselect();
+        if (this.options.selectMatchedText && this.lastTextSource !== null) {
+            this.lastTextSource.deselect();
         }
 
-        this.lastRange   = null;
+        this.lastTextSource   = null;
         this.definitions = null;
     }
 

@@ -11,7 +11,13 @@
     "background": {"page": "bg/background.html"},
     "content_scripts": [{
         "matches": ["*://*/*"],
-        "js": ["fg/js/range.js", "fg/js/popup.js", "fg/js/api.js", "fg/js/client.js"],
+        "js": [
+            "fg/js/source-range.js",
+            "fg/js/source-image.js",
+            "fg/js/popup.js",
+            "fg/js/api.js",
+            "fg/js/client.js"
+        ],
         "css": ["fg/css/client.css"]
     }],
     "minimum_chrome_version": "45.0.0.0",
