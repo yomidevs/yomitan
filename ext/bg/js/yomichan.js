@@ -308,14 +308,6 @@ class Yomichan {
         this.ankiInvoke('version', {}, null, callback);
     }
 
-    api_getOptions({callback}) {
-        callback(this.options);
-    }
-
-    api_getState({callback}) {
-        callback(this.state);
-    }
-
     api_renderText({template, data, callback}) {
         callback(Handlebars.templates[template](data));
     }
