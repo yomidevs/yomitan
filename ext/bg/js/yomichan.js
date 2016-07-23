@@ -40,6 +40,8 @@ class Yomichan {
         chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
         chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
+        chrome.tabs.onCreated.addListener(this.onTabReady.bind(this));
+        chrome.tabs.onUpdated.addListener(this.onTabReady.bind(this));
 
         loadOptions((opts) => {
             this.setOptions(opts);
@@ -64,6 +66,11 @@ class Yomichan {
         }
 
         return true;
+    }
+
+    onTabReady(tab) {
+        this.tabInvoke(tab, 'setOptions', this.options);
+        this.tabInvoke(tab, 'setEnabled', this.state === 'enabled');
     }
 
     onBrowserAction(tab) {
@@ -97,24 +104,28 @@ class Yomichan {
                 break;
         }
 
-        this.notifyTabs('state', this.state);
+        this.tabInvokeAll('setEnabled', this.state === 'enabled');
     }
 
     setOptions(options) {
         this.options = options;
-        this.notifyTabs('options', this.options);
+        this.tabInvokeAll('setOptions', this.options);
     }
 
     getApiVersion() {
         return 1;
     }
 
-    notifyTabs(name, value) {
+    tabInvokeAll(action, params) {
         chrome.tabs.query({}, (tabs) => {
             for (let tab of tabs) {
-                chrome.tabs.sendMessage(tab.id, {name, value}, () => null);
+                this.tabInvoke(tab.id, action, params);
             }
         });
+    }
+
+    tabInvoke(tabId, action, params) {
+        chrome.tabs.sendMessage(tabId, {action, params}, () => null);
     }
 
     ankiInvokeSafe(action, params, pool, callback) {

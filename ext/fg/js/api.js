@@ -33,14 +33,6 @@ function bgRenderText(data, template, callback) {
     bgSendMessage('renderText', {data, template}, callback);
 }
 
-function bgGetOptions(callback) {
-    bgSendMessage('getOptions', {}, callback);
-}
-
-function bgGetState(callback) {
-    bgSendMessage('getState', {}, callback);
-}
-
 function bgCanAddDefinitions(definitions, modes, callback) {
     bgSendMessage('canAddDefinitions', {definitions, modes}, callback);
 }

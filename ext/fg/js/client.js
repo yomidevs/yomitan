@@ -38,11 +38,6 @@ class Client {
         window.addEventListener('keydown', this.onKeyDown.bind(this));
         window.addEventListener('scroll', (e) => this.hidePopup());
         window.addEventListener('resize', (e) => this.hidePopup());
-
-        bgGetOptions((opts) => {
-            this.setOptions(opts);
-            bgGetState((state) => this.setEnabled(state === 'enabled'));
-        });
     }
 
     onKeyDown(e) {
@@ -67,14 +62,10 @@ class Client {
         }
     }
 
-    onBgMessage({name, value}, sender, callback) {
-        switch (name) {
-            case 'state':
-                this.setEnabled(value === 'enabled');
-                break;
-            case 'options':
-                this.setOptions(value);
-                break;
+    onBgMessage({action, params}, sender, callback) {
+        const method = this['api_' + action];
+        if (typeof(method) === 'function') {
+            method.call(this, params);
         }
 
         callback();
@@ -159,14 +150,14 @@ class Client {
         this.definitions = null;
     }
 
-    setEnabled(enabled) {
+    api_setOptions(opts) {
+        this.options = opts;
+    }
+
+    api_setEnabled(enabled) {
         if (!(this.enabled = enabled)) {
             this.hidePopup();
         }
-    }
-
-    setOptions(opts) {
-        this.options = opts;
     }
 
     api_addNote({index, mode}) {
