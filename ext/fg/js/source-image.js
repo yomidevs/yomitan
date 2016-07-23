@@ -17,40 +17,43 @@
  */
 
 
-class Image {
+class ImageSource {
     constructor(image) {
-
+        this.img = image;
+        this.length = -1;
     }
 
     text() {
+        const text = this.textRaw();
+        return this.length < 0 ? text : text.substring(0, this.length);
+    }
 
+    textRaw() {
+        return this.img.getAttribute('alt') || '';
     }
 
     setLength(length) {
-
+        this.length = length;
     }
 
     containsPoint(point) {
-
+        const rect = this.getRect();
+        return point.x >= rect.left && point.x <= rect.right;
     }
 
     getRect() {
-
-    }
-
-    getPaddedRect() {
-
+        return this.img.getBoundingClientRect();
     }
 
     select() {
-
+        // NOP
     }
 
     deselect() {
-
+        // NOP
     }
 
-    compareOrigin(range) {
-
+    equals(other) {
+        return other.img && other.textRaw() == this.textRaw();
     }
 }

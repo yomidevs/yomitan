@@ -108,7 +108,7 @@ class Client {
             return;
         }
 
-        if (this.lastTextSource !== null && this.lastTextSource.compareOrigin(textSource) === 0) {
+        if (this.lastTextSource !== null && this.lastTextSource.equals(textSource)) {
             return;
         }
 

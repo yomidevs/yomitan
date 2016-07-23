@@ -63,8 +63,8 @@ class RangeSource {
         selection.removeAllRanges();
     }
 
-    compareOrigin(range) {
-        return range.rng.compareBoundaryPoints(Range.START_TO_START, this.rng);
+    equals(other) {
+        return other.rng && other.rng.compareBoundaryPoints(Range.START_TO_START, this.rng) == 0;
     }
 
     static seekEnd(node, length) {
