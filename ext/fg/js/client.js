@@ -19,17 +19,17 @@
 
 class Client {
     constructor() {
-        this.popup        = new Popup();
-        this.audio        = {};
-        this.lastMousePos = null;
-        this.lastTextSource    = null;
-        this.activateKey  = 16;
-        this.activateBtn  = 2;
-        this.enabled      = false;
-        this.options      = {};
-        this.definitions  = null;
-        this.sequence     = 0;
-        this.fgRoot       = chrome.extension.getURL('fg');
+        this.popup          = new Popup();
+        this.audio          = {};
+        this.lastMousePos   = null;
+        this.lastTextSource = null;
+        this.activateKey    = 16;
+        this.activateBtn    = 2;
+        this.enabled        = false;
+        this.options        = {};
+        this.definitions    = null;
+        this.sequence       = 0;
+        this.fgRoot         = chrome.extension.getURL('fg');
 
         chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
         window.addEventListener('message', this.onFrameMessage.bind(this));
@@ -88,7 +88,17 @@ class Client {
     }
 
     textSourceFromPoint(point) {
-        return Range.fromPoint(point);
+        const element = document.elementFromPoint(point.x, point.y);
+        if (element !== null && element.nodeName === 'IMG') {
+            return new ImageSource(element);
+        }
+
+        const range = document.caretRangeFromPoint(point.x, point.y);
+        if (range !== null) {
+            return new RangeSource(range);
+        }
+
+        return null;
     }
 
     searchAt(point) {

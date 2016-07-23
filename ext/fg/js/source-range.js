@@ -17,7 +17,7 @@
  */
 
 
-class Range {
+class RangeSource {
     constructor(range) {
         this.rng = range;
     }
@@ -27,7 +27,7 @@ class Range {
     }
 
     setLength(length) {
-        const end = Range.seekEnd(this.rng.startContainer, this.rng.startOffset + length);
+        const end = RangeSource.seekEnd(this.rng.startContainer, this.rng.startOffset + length);
         this.rng.setEnd(end.node, end.offset);
     }
 
@@ -70,18 +70,18 @@ class Range {
     static seekEnd(node, length) {
         const state = {node, offset: 0, length};
 
-        if (!Range.seekEndRecurse(node, state)) {
+        if (!RangeSource.seekEndRecurse(node, state)) {
             return {node: state.node, offset: state.offset};
         }
 
         for (let sibling = node.nextSibling; sibling !== null; sibling = sibling.nextSibling) {
-            if (!Range.seekEndRecurse(sibling, state)) {
+            if (!RangeSource.seekEndRecurse(sibling, state)) {
                 return {node: state.node, offset: state.offset};
             }
         }
 
         for (let sibling = node.parentElement.nextSibling; sibling !== null; sibling = sibling.nextSibling) {
-            if (!Range.seekEndRecurse(sibling, state)) {
+            if (!RangeSource.seekEndRecurse(sibling, state)) {
                 return {node: state.node, offset: state.offset};
             }
         }
@@ -97,17 +97,12 @@ class Range {
             state.length -= consumed;
         } else {
             for (let i = 0; i < node.childNodes.length; ++i) {
-                if (!Range.seekEndRecurse(node.childNodes[i], state)) {
+                if (!RangeSource.seekEndRecurse(node.childNodes[i], state)) {
                     break;
                 }
             }
         }
 
         return state.length > 0;
-    }
-
-    static fromPoint(point) {
-        const range = document.caretRangeFromPoint(point.x, point.y);
-        return range === null ? null : new Range(range);
     }
 }
