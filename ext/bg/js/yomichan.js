@@ -40,7 +40,7 @@ class Yomichan {
         chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
         chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
-        chrome.tabs.onCreated.addListener(this.onTabReady.bind(this));
+        chrome.tabs.onCreated.addListener((tab) => this.onTabReady(tab.id));
         chrome.tabs.onUpdated.addListener(this.onTabReady.bind(this));
 
         loadOptions((opts) => {
@@ -68,12 +68,12 @@ class Yomichan {
         return true;
     }
 
-    onTabReady(tab) {
-        this.tabInvoke(tab, 'setOptions', this.options);
-        this.tabInvoke(tab, 'setEnabled', this.state === 'enabled');
+    onTabReady(tabId) {
+        this.tabInvoke(tabId, 'setOptions', this.options);
+        this.tabInvoke(tabId, 'setEnabled', this.state === 'enabled');
     }
 
-    onBrowserAction(tab) {
+    onBrowserAction() {
         switch (this.state) {
             case 'disabled':
                 this.setState('loading');
