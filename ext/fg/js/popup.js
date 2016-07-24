@@ -58,12 +58,14 @@ class Popup {
     }
 
     setContent(content) {
-        if (this.popup !== null) {
-            const doc = this.popup.contentDocument;
-            doc.open();
-            doc.write(content);
-            doc.close();
+        if (this.popup === null) {
+            return;
         }
+
+        const doc = this.popup.contentDocument;
+        doc.open();
+        doc.write(content);
+        doc.close();
     }
 
     sendMessage(action, params, callback) {

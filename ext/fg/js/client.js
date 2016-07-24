@@ -80,8 +80,15 @@ class Client {
 
     textSourceFromPoint(point) {
         const element = document.elementFromPoint(point.x, point.y);
-        if (element !== null && element.nodeName === 'IMG') {
-            return new TextSourceImage(element);
+        if (element !== null) {
+            switch (element.nodeName) {
+                case 'IMG':
+                    return new TextSourceImage(element);
+                case 'INPUT':
+                case 'BUTTON':
+                case 'TEXTAREA':
+                    return new TextSourceInput(element);
+            }
         }
 
         const range = document.caretRangeFromPoint(point.x, point.y);
