@@ -78,29 +78,8 @@ class Client {
         }
     }
 
-    textSourceFromPoint(point) {
-        const element = document.elementFromPoint(point.x, point.y);
-        if (element !== null) {
-            switch (element.nodeName) {
-                case 'IMG':
-                    return new TextSourceImage(element);
-                case 'INPUT':
-                case 'BUTTON':
-                case 'TEXTAREA':
-                    return new TextSourceInput(element);
-            }
-        }
-
-        const range = document.caretRangeFromPoint(point.x, point.y);
-        if (range !== null) {
-            return new TextSourceRange(range);
-        }
-
-        return null;
-    }
-
     searchAt(point) {
-        const textSource = this.textSourceFromPoint(point);
+        const textSource = Client.textSourceFromPoint(point);
         if (textSource === null || !textSource.containsPoint(point)) {
             this.hidePopup();
             return;
@@ -217,6 +196,77 @@ class Client {
                 }
             );
         });
+    }
+
+    static textSourceFromPoint(point) {
+        const element = document.elementFromPoint(point.x, point.y);
+        if (element !== null) {
+            switch (element.nodeName) {
+                case 'IMG':
+                    return new TextSourceImage(element);
+                case 'INPUT':
+                case 'BUTTON':
+                case 'TEXTAREA':
+                    return new TextSourceInput(element);
+            }
+        }
+
+        const range = document.caretRangeFromPoint(point.x, point.y);
+        if (range !== null) {
+            return new TextSourceRange(range);
+        }
+
+        return null;
+    }
+
+    static extractSentence(content, position) {
+        const quotesFwd   = {'「': '」', '『': '』', "'": "'", '"': '"'};
+        const quotesBwd   = {'」': '「', '』': '『', "'": "'", '"': '"'};
+        const terminators = '…。．.？?！!';
+
+        let quoteStack = [];
+
+        let startPos = 0;
+        for (let i = position; i >= startPos; --i) {
+            const c = content[i];
+
+            if (quoteStack.length === 0 && (terminators.indexOf(c) !== -1 || c in quotesFwd)) {
+                startPos = i + 1;
+                break;
+            }
+
+            if (quoteStack.length > 0 && c === quoteStack[0]) {
+                quoteStack.pop();
+            } else if (c in quotesBwd) {
+                quoteStack = [quotesBwd[c]].concat(quoteStack);
+            }
+        }
+
+        quoteStack = [];
+
+        let endPos = content.length;
+        for (let i = position; i < endPos; ++i) {
+            const c = content[i];
+
+            if (quoteStack.length === 0) {
+                if (terminators.indexOf(c) !== -1) {
+                    endPos = i + 1;
+                    break;
+                }
+                else if (c in quotesBwd) {
+                    endPos = i;
+                    break;
+                }
+            }
+
+            if (quoteStack.length > 0 && c === quoteStack[0]) {
+                quoteStack.pop();
+            } else if (c in quotesFwd) {
+                quoteStack = [quotesFwd[c]].concat(quoteStack);
+            }
+        }
+
+        return content.substring(startPos, endPos).trim();
     }
 }
 
