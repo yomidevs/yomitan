@@ -32,8 +32,14 @@ class TextSourceInput {
         return this.input.nodeName === 'BUTTON' ? this.input.innerHTML : this.input.value;
     }
 
-    setLength(length) {
+    setStartOffset(length) {
+        // NOP
+        return 0;
+    }
+
+    setEndOffset(length) {
         this.length = length;
+        return length;
     }
 
     containsPoint(point) {

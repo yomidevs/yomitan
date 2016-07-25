@@ -32,8 +32,14 @@ class TextSourceImage {
         return this.img.getAttribute('alt') || '';
     }
 
-    setLength(length) {
+    setStartOffset(length) {
+        // NOP
+        return 0;
+    }
+
+    setEndOffset(length) {
         this.length = length;
+        return length;
     }
 
     containsPoint(point) {

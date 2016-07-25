@@ -26,9 +26,16 @@ class TextSourceRange {
         return this.rng.toString();
     }
 
-    setLength(length) {
-        const end = TextSourceRange.seekEnd(this.rng.startContainer, this.rng.startOffset + length);
+    setEndOffset(length) {
+        const end = TextSourceRange.seekForward(this.rng.startContainer, this.rng.startOffset + length);
         this.rng.setEnd(end.node, end.offset);
+        return length - end.length;
+    }
+
+    setStartOffset(length) {
+        const start = TextSourceRange.seekBackward(this.rng.startContainer, length + (this.rng.startContainer.length - this.rng.startOffset));
+        this.rng.setStart(start.node, start.offset);
+        return length - start.length;
     }
 
     containsPoint(point) {
@@ -67,29 +74,24 @@ class TextSourceRange {
         return other.rng && other.rng.compareBoundaryPoints(Range.START_TO_START, this.rng) == 0;
     }
 
-    static seekEnd(node, length) {
+    static seekForward(node, length) {
         const state = {node, offset: 0, length};
-
-        if (!TextSourceRange.seekEndRecurse(node, state)) {
-            return {node: state.node, offset: state.offset};
+        if (!TextSourceRange.seekForwardHelper(node, state)) {
+            return state;
         }
 
-        for (let sibling = node.nextSibling; sibling !== null; sibling = sibling.nextSibling) {
-            if (!TextSourceRange.seekEndRecurse(sibling, state)) {
-                return {node: state.node, offset: state.offset};
+        for (let current = node; current !== null; current = current.parentElement) {
+            for (let sibling = current.nextSibling; sibling !== null; sibling = sibling.nextSibling) {
+                if (!TextSourceRange.seekForwardHelper(sibling, state)) {
+                    return state;
+                }
             }
         }
 
-        for (let sibling = node.parentElement.nextSibling; sibling !== null; sibling = sibling.nextSibling) {
-            if (!TextSourceRange.seekEndRecurse(sibling, state)) {
-                return {node: state.node, offset: state.offset};
-            }
-        }
-
-        return {node: state.node, offset: state.offset};
+        return state;
     }
 
-    static seekEndRecurse(node, state) {
+    static seekForwardHelper(node, state) {
         if (node.nodeType === 3) {
             const consumed = Math.min(node.length, state.length);
             state.node = node;
@@ -97,7 +99,41 @@ class TextSourceRange {
             state.length -= consumed;
         } else {
             for (let i = 0; i < node.childNodes.length; ++i) {
-                if (!TextSourceRange.seekEndRecurse(node.childNodes[i], state)) {
+                if (!TextSourceRange.seekForwardHelper(node.childNodes[i], state)) {
+                    break;
+                }
+            }
+        }
+
+        return state.length > 0;
+    }
+
+    static seekBackward(node, length) {
+        const state = {node, offset: node.length, length};
+        if (!TextSourceRange.seekBackwardHelper(node, state)) {
+            return state;
+        }
+
+        for (let current = node; current !== null; current = current.parentElement) {
+            for (let sibling = current.previousSibling; sibling !== null; sibling = sibling.previousSibling) {
+                if (!TextSourceRange.seekBackwardHelper(sibling, state)) {
+                    return state;
+                }
+            }
+        }
+
+        return state;
+    }
+
+    static seekBackwardHelper(node, state) {
+        if (node.nodeType === 3) {
+            const consumed = Math.min(node.length, state.length);
+            state.node = node;
+            state.offset = node.length - consumed;
+            state.length -= consumed;
+        } else {
+            for (let i = node.childNodes.length - 1; i >= 0; --i) {
+                if (!TextSourceRange.seekBackwardHelper(node.childNodes[i], state)) {
                     break;
                 }
             }

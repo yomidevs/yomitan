@@ -110,13 +110,13 @@ class Client {
             return;
         }
 
-        textSource.setLength(this.options.scanLength);
+        textSource.setEndOffset(this.options.scanLength);
         bgFindTerm(textSource.text(), ({definitions, length}) => {
             if (length === 0) {
                 this.hidePopup();
             } else {
                 const sequence = ++this.sequence;
-                textSource.setLength(length);
+                textSource.setEndOffset(length);
 
                 bgRenderText(
                     {definitions, root: this.fgRoot, options: this.options, sequence},
