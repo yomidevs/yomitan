@@ -25,7 +25,6 @@ class Client {
         this.lastTextSource = null;
         this.activateKey = 16;
         this.activateBtn = 2;
-        this.sentenceExtent = 200;
         this.enabled = false;
         this.options = {};
         this.definitions = null;
@@ -97,7 +96,7 @@ class Client {
             } else {
                 textSource.setEndOffset(length);
 
-                const sentence = Client.extractSentence(textSource, this.sentenceExtent);
+                const sentence = Client.extractSentence(textSource, this.opts.sentenceExtent);
                 definitions.forEach((definition) => {
                     definition.url = window.location.href;
                     definition.sentence = sentence;

@@ -49,6 +49,7 @@ function formToOptions(section, callback) {
                 break;
             case 'anki':
                 optsNew.ankiCardTags    = $('#anki-card-tags').val().split(/[,; ]+/);
+                optsNew.sentenceExtent  = parseInt($('#sentence-extent').val());
                 optsNew.ankiVocabDeck   = $('#anki-vocab-deck').val();
                 optsNew.ankiVocabModel  = $('#anki-vocab-model').val();
                 optsNew.ankiVocabFields = fieldsToDict($('#vocab .anki-field-value'));
@@ -174,6 +175,7 @@ $(document).ready(() => {
         $('#enable-anki-connect').prop('checked', opts.enableAnkiConnect);
 
         $('#anki-card-tags').val(opts.ankiCardTags.join(' '));
+        $('#sentence-extent').val(opts.sentenceExtent);
 
         $('.options-general input').change(onOptionsGeneralChanged);
         $('.options-anki input').change(onOptionsAnkiChanged);

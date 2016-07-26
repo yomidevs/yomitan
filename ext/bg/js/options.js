@@ -26,6 +26,7 @@ function sanitizeOptions(options) {
         enableAudioPlayback: true,
         enableAnkiConnect:   false,
         ankiCardTags:        ['yomichan'],
+        sentenceExtent:      200,
         ankiVocabDeck:       '',
         ankiVocabModel:      '',
         ankiVocabFields:     {},
