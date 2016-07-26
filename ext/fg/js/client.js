@@ -96,7 +96,7 @@ class Client {
             } else {
                 textSource.setEndOffset(length);
 
-                const sentence = Client.extractSentence(textSource, this.opts.sentenceExtent);
+                const sentence = Client.extractSentence(textSource, this.options.sentenceExtent);
                 definitions.forEach((definition) => {
                     definition.url = window.location.href;
                     definition.sentence = sentence;
