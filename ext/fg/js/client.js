@@ -19,17 +19,18 @@
 
 class Client {
     constructor() {
-        this.popup          = new Popup();
-        this.audio          = {};
-        this.lastMousePos   = null;
+        this.popup = new Popup();
+        this.audio = {};
+        this.lastMousePos = null;
         this.lastTextSource = null;
-        this.activateKey    = 16;
-        this.activateBtn    = 2;
-        this.enabled        = false;
-        this.options        = {};
-        this.definitions    = null;
-        this.sequence       = 0;
-        this.fgRoot         = chrome.extension.getURL('fg');
+        this.activateKey = 16;
+        this.activateBtn = 2;
+        this.sentenceExtent = 200;
+        this.enabled = false;
+        this.options = {};
+        this.definitions = null;
+        this.sequence = 0;
+        this.fgRoot = chrome.extension.getURL('fg');
 
         chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
         window.addEventListener('message', this.onFrameMessage.bind(this));
@@ -94,9 +95,15 @@ class Client {
             if (length === 0) {
                 this.hidePopup();
             } else {
-                const sequence = ++this.sequence;
                 textSource.setEndOffset(length);
 
+                const sentence = Client.extractSentence(textSource, this.sentenceExtent);
+                definitions.forEach((definition) => {
+                    definition.url = window.location.href;
+                    definition.sentence = sentence;
+                });
+
+                const sequence = ++this.sequence;
                 bgRenderText(
                     {definitions, root: this.fgRoot, options: this.options, sequence},
                     'term-list.html',
@@ -180,6 +187,10 @@ class Client {
 
     api_displayKanji(kanji) {
         bgFindKanji(kanji, (definitions) => {
+            definitions.forEach((definition) => {
+                definition.url = window.location.href;
+            });
+
             const sequence = ++this.sequence;
             bgRenderText(
                 {definitions, root: this.fgRoot, options: this.options, sequence},
@@ -219,10 +230,15 @@ class Client {
         return null;
     }
 
-    static extractSentence(content, position) {
-        const quotesFwd   = {'「': '」', '『': '』', "'": "'", '"': '"'};
-        const quotesBwd   = {'」': '「', '』': '『', "'": "'", '"': '"'};
+    static extractSentence(source, extent) {
+        const quotesFwd = {'「': '」', '『': '』', "'": "'", '"': '"'};
+        const quotesBwd = {'」': '「', '』': '『', "'": "'", '"': '"'};
         const terminators = '…。．.？?！!';
+
+        const sourceLocal = source.clone();
+        const position = sourceLocal.setStartOffset(extent);
+        sourceLocal.setEndOffset(position + extent);
+        const content = sourceLocal.text();
 
         let quoteStack = [];
 

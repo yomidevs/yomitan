@@ -171,7 +171,9 @@ class Yomichan {
             'kunyomi',
             'onyomi',
             'reading',
+            'sentence',
             'tags',
+            'url',
         ];
 
         for (let tag of tags) {

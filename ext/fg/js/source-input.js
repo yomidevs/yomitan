@@ -18,9 +18,13 @@
 
 
 class TextSourceInput {
-    constructor(input) {
+    constructor(input, length=-1) {
         this.input = input;
-        this.length = -1;
+        this.length = length;
+    }
+
+    clone() {
+        return new TextSourceInput(this.input, this.length);
     }
 
     text() {

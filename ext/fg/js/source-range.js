@@ -22,20 +22,26 @@ class TextSourceRange {
         this.rng = range;
     }
 
+    clone() {
+        return new TextSourceRange(this.rng.cloneRange());
+    }
+
     text() {
         return this.rng.toString();
     }
 
     setEndOffset(length) {
-        const end = TextSourceRange.seekForward(this.rng.startContainer, this.rng.startOffset + length);
-        this.rng.setEnd(end.node, end.offset);
-        return length - end.length;
+        const lengthAdj = length + this.rng.startOffset;
+        const state = TextSourceRange.seekForward(this.rng.startContainer, lengthAdj);
+        this.rng.setEnd(state.node, state.offset);
+        return length - state.length;
     }
 
     setStartOffset(length) {
-        const start = TextSourceRange.seekBackward(this.rng.startContainer, length + (this.rng.startContainer.length - this.rng.startOffset));
-        this.rng.setStart(start.node, start.offset);
-        return length - start.length;
+        const lengthAdj = length + (this.rng.startContainer.length - this.rng.startOffset);
+        const state = TextSourceRange.seekBackward(this.rng.startContainer, lengthAdj);
+        this.rng.setStart(state.node, state.offset);
+        return length - state.length;
     }
 
     containsPoint(point) {
@@ -48,10 +54,10 @@ class TextSourceRange {
     }
 
     getPaddedRect() {
-        const range       = this.rng.cloneRange();
+        const range = this.rng.cloneRange();
         const startOffset = range.startOffset;
-        const endOffset   = range.endOffset;
-        const node        = range.startContainer;
+        const endOffset = range.endOffset;
+        const node = range.startContainer;
 
         range.setStart(node, Math.max(0, startOffset - 1));
         range.setEnd(node, Math.min(node.length, endOffset + 1));
