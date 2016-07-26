@@ -17,10 +17,14 @@
  */
 
 
-class TextSourceImage {
-    constructor(image) {
-        this.img = image;
-        this.length = -1;
+class TextSourceElement {
+    constructor(element, length=-1) {
+        this.element = element;
+        this.length = length;
+    }
+
+    clone() {
+        return new TextSourceElement(this.element, this.length);
     }
 
     text() {
@@ -29,7 +33,14 @@ class TextSourceImage {
     }
 
     textRaw() {
-        return this.img.getAttribute('alt') || '';
+        switch (this.element.nodeName) {
+            case 'BUTTON':
+                return this.element.innerHTML;
+            case 'IMG':
+                return this.element.getAttribute('alt');
+            default:
+                return this.element.value;
+        }
     }
 
     setStartOffset(length) {
@@ -48,7 +59,7 @@ class TextSourceImage {
     }
 
     getRect() {
-        return this.img.getBoundingClientRect();
+        return this.element.getBoundingClientRect();
     }
 
     select() {
@@ -60,6 +71,6 @@ class TextSourceImage {
     }
 
     equals(other) {
-        return other.img && other.textRaw() == this.textRaw();
+        return other.element && other.textRaw() == this.textRaw();
     }
 }

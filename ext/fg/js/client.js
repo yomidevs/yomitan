@@ -211,13 +211,9 @@ class Client {
     static textSourceFromPoint(point) {
         const element = document.elementFromPoint(point.x, point.y);
         if (element !== null) {
-            switch (element.nodeName) {
-                case 'IMG':
-                    return new TextSourceImage(element);
-                case 'INPUT':
-                case 'BUTTON':
-                case 'TEXTAREA':
-                    return new TextSourceInput(element);
+            const names = ['IMG', 'INPUT', 'BUTTON', 'TEXTAREA'];
+            if (names.indexOf(element.nodeName) !== -1) {
+                return new TextSourceElement(element);
             }
         }
 

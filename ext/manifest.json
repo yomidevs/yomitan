@@ -13,8 +13,7 @@
         "matches": ["*://*/*", "file://*/*"],
         "js": [
             "fg/js/source-range.js",
-            "fg/js/source-image.js",
-            "fg/js/source-input.js",
+            "fg/js/source-element.js",
             "fg/js/popup.js",
             "fg/js/api.js",
             "fg/js/client.js"
