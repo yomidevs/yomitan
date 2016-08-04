@@ -35,12 +35,16 @@ class Dictionary {
         let results = [];
 
         for (let name in this.termDicts) {
-            const dict    = this.termDicts[name];
-            const indices = dict.indices[term] || [];
+            const dict = this.termDicts[name];
+            const indexStr = dict.i[term] || null;
+            if (indexStr === null) {
+                continue;
+            }
 
+            const indices = indexStr.split(' ').map(Number);
             results = results.concat(
                 indices.map(index => {
-                    const [e, r, t, ...g] = dict.defs[index];
+                    const [e, r, t, ...g] = dict.d[index];
                     const addons          = [];
                     const tags            = t.split(' ');
 
