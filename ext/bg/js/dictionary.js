@@ -79,9 +79,9 @@ class Dictionary {
         const results = [];
 
         for (let name in this.kanjiDicts) {
-            const def = this.kanjiDicts[name][kanji];
+            const def = this.kanjiDicts[name].c[kanji];
             if (def) {
-                const [k, o, g] = def;
+                const [k, o, ...g] = def;
                 results.push({
                     character: kanji,
                     kunyomi:   k.split(' '),
