@@ -168,15 +168,25 @@ class Translator {
             let popular  = false;
             let tagItems = [];
             for (let tag of entry.tags) {
-                const tagItem = this.tags[tag];
-                if (tagItem && entry.addons.indexOf(tag) === -1) {
-                    tagItems.push({
-                        class: tagItem.class || 'default',
-                        order: tagItem.order || Number.MAX_SAFE_INTEGER,
-                        desc:  tagItem.desc,
-                        name:  tag
-                    });
+                if (entry.addons.indexOf(tag) !== -1) {
+                    continue;
                 }
+
+                const tagItem = {
+                    class: 'default',
+                    order: Number.MAX_SAFE_INTEGER,
+                    desc:  entry.entities[tag] || '',
+                    name:  tag
+                };
+
+                const tagMeta = this.tags[tag];
+                if (tagMeta) {
+                    for (const key in tagMeta) {
+                        tagItem[key] = tagMeta[key] || tagItem[key];
+                    }
+                }
+
+                tagItems.push(tagItem);
 
                 //
                 // TODO: Handle tagging as popular through data.

@@ -19,7 +19,7 @@
 
 class Dictionary {
     constructor() {
-        this.termDicts  = {};
+        this.termDicts = {};
         this.kanjiDicts = {};
     }
 
@@ -36,22 +36,21 @@ class Dictionary {
 
         for (let name in this.termDicts) {
             const dict = this.termDicts[name];
-            const indexStr = dict.i[term] || null;
-            if (indexStr === null) {
+            if (!(term in dict.i)) {
                 continue;
             }
 
-            const indices = indexStr.split(' ').map(Number);
+            const indices = dict.i[term].split(' ').map(Number);
             results = results.concat(
                 indices.map(index => {
                     const [e, r, t, ...g] = dict.d[index];
-                    const addons          = [];
-                    const tags            = t.split(' ');
+                    const tags = t.split(' ');
 
                     //
                     // TODO: Handle addons through data.
                     //
 
+                    const addons = [];
                     for (let tag of tags) {
                         if (tag.startsWith('v5') && tag !== 'v5') {
                             addons.push('v5');
@@ -66,6 +65,7 @@ class Dictionary {
                         reading:    r,
                         glossary:   g,
                         tags:       tags.concat(addons),
+                        entities:   dict.e,
                         addons:     addons
                     };
                 })
