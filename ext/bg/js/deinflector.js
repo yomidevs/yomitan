@@ -56,18 +56,18 @@ class Deinflection {
                     // TODO: Handle addons through tags.json or rules.json
                     //
 
-                    if (v.tagsIn.indexOf(tag) !== -1) {
+                    if (v.ti.indexOf(tag) !== -1) {
                         allowed = true;
                         break;
                     }
                 }
 
-                if (!allowed || !this.term.endsWith(v.kanaIn)) {
+                if (!allowed || !this.term.endsWith(v.ki)) {
                     continue;
                 }
 
-                const term = this.term.slice(0, -v.kanaIn.length) + v.kanaOut;
-                const child = new Deinflection(term, v.tagsOut, rule);
+                const term = this.term.slice(0, -v.ki.length) + v.ko;
+                const child = new Deinflection(term, v.to, rule);
                 if (child.deinflect(validator, rules)) {
                     this.children.push(child);
                 }
