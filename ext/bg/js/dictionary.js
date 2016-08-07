@@ -44,29 +44,13 @@ class Dictionary {
             results = results.concat(
                 indices.map(index => {
                     const [e, r, t, ...g] = dict.d[index];
-                    const tags = t.split(' ');
-
-                    //
-                    // TODO: Handle addons through data.
-                    //
-
-                    const addons = [];
-                    for (let tag of tags) {
-                        if (tag.startsWith('v5') && tag !== 'v5') {
-                            addons.push('v5');
-                        } else if (tag.startsWith('vs-')) {
-                            addons.push('vs');
-                        }
-                    }
-
                     return {
-                        id:         index,
                         expression: e,
                         reading:    r,
+                        tags:       t.split(' '),
                         glossary:   g,
-                        tags:       tags.concat(addons),
                         entities:   dict.e,
-                        addons:     addons
+                        id:         index
                     };
                 })
             );

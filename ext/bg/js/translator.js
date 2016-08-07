@@ -168,10 +168,6 @@ class Translator {
             let popular  = false;
             let tagItems = [];
             for (let tag of entry.tags) {
-                if (entry.addons.indexOf(tag) !== -1) {
-                    continue;
-                }
-
                 const tagItem = {
                     class: 'default',
                     order: Number.MAX_SAFE_INTEGER,
