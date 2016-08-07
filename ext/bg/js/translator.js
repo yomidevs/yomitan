@@ -27,9 +27,9 @@ class Translator {
             kanjidic: 'bg/data/kanjidic.json'
         };
 
-        this.loaded      = false;
-        this.tags        = null;
-        this.dictionary  = new Dictionary();
+        this.loaded = false;
+        this.tagMeta = null;
+        this.dictionary = new Dictionary();
         this.deinflector = new Deinflector();
     }
 
@@ -53,7 +53,7 @@ class Translator {
                         this.deinflector.setRules(JSON.parse(response));
                         break;
                     case 'tags':
-                        this.tags = JSON.parse(response);
+                        this.tagMeta = JSON.parse(response);
                         break;
                     case 'kanjidic':
                         this.dictionary.addKanjiDict(key, JSON.parse(response));
@@ -165,7 +165,7 @@ class Translator {
                 }
             }
 
-            let popular  = false;
+            let popular = false;
             let tagItems = [];
             for (let tag of entry.tags) {
                 const tagItem = {
@@ -175,10 +175,10 @@ class Translator {
                     name:  tag
                 };
 
-                const tagMeta = this.tags[tag];
+                const tagMeta = this.tagMeta[tag];
                 if (tagMeta) {
-                    for (const key in tagMeta) {
-                        tagItem[key] = tagMeta[key] || tagItem[key];
+                    for (const tagProp in tagMeta) {
+                        tagItem[tagProp] = tagMeta[tagProp] || tagItem[tagProp];
                     }
                 }
 

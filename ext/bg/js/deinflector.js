@@ -20,9 +20,9 @@
 class Deinflection {
     constructor(term, tags=[], rule='') {
         this.children = [];
-        this.term     = term;
-        this.tags     = tags;
-        this.rule     = rule;
+        this.term = term;
+        this.tags = tags;
+        this.rule = rule;
     }
 
     validate(validator) {
