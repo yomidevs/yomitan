@@ -58,6 +58,14 @@ body {
     background-color: #0275d8;
 }
 
+.tag-frequent {
+    background-color: #5bc0de;
+}
+
+.tag-archaism {
+    background-color: #d9534f;
+}
+
 .action-bar {
     float: right;
 }
