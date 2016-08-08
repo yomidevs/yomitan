@@ -151,113 +151,102 @@ class Translator {
         return this.processKanji(definitions);
     }
 
-    processTerm(groups, source, tags, rules=[], root='') {
-        for (let entry of this.dictionary.findTerm(root)) {
+    processTerm(groups, dfSource, dfTags, dfRules=[], dfRoot='') {
+        for (let entry of this.dictionary.findTerm(dfRoot)) {
             if (entry.id in groups) {
                 continue;
             }
 
-            let matched = tags.length == 0;
-            for (let tag of tags) {
-                if (entry.tags.indexOf(tag) !== -1) {
+            let matched = dfTags.length === 0;
+            for (let t of dfTags) {
+                if (entry.tags.indexOf(t) !== -1) {
                     matched = true;
                     break;
                 }
             }
 
+            if (!matched) {
+                continue;
+            }
+
             let popular = false;
-            let tagItems = [];
-            for (let tag of entry.tags) {
-                const tagItem = {
-                    class: 'default',
-                    order: Number.MAX_SAFE_INTEGER,
-                    desc:  entry.entities[tag] || '',
-                    name:  tag
-                };
 
-                const tagMeta = this.tagMeta[tag];
-                if (tagMeta) {
-                    for (const tagProp in tagMeta) {
-                        tagItem[tagProp] = tagMeta[tagProp] || tagItem[tagProp];
-                    }
-                }
-
-                tagItems.push(tagItem);
+            let tags = [];
+            for (let t of entry.tags) {
+                const tag = {class: 'default', order: Number.MAX_SAFE_INTEGER, desc: entry.entities[t] || '', name: t};
+                this.applyTagMeta(tag);
+                tags.push(tag);
 
                 //
                 // TODO: Handle tagging as popular through data.
                 //
 
-                if (tag === 'P') {
+                if (t === 'P') {
                     popular = true;
                 }
             }
 
-            tagItems = tagItems.sort((v1, v2) => {
-                const order1 = v1.order;
-                const order2 = v2.order;
-                if (order1 < order2) {
-                    return -1;
-                } else if (order1 > order2) {
-                    return 1;
-                }
-
-                const name1 = v1.name;
-                const name2 = v2.name;
-                if (name1 < name2) {
-                    return -1;
-                } else if (name1 > name2) {
-                    return 1;
-                }
-
-                return 0;
-            });
-
-            if (matched) {
-                groups[entry.id] = {
-                    expression: entry.expression,
-                    reading:    entry.reading,
-                    glossary:   entry.glossary,
-                    tags:       tagItems,
-                    source:     source,
-                    rules:      rules,
-                    popular:    popular
-                };
-            }
+            groups[entry.id] = {
+                expression: entry.expression,
+                reading:    entry.reading,
+                glossary:   entry.glossary,
+                tags:       Translator.sortTags(tags),
+                source:     dfSource,
+                rules:      dfRules,
+                popular:    popular
+            };
         }
     }
 
     processKanji(entries) {
-        const results = [];
+        const processed = [];
+
         for (let entry of entries) {
-            const tagItems = [];
-            for (let tag of entry.tags) {
-                const tagItem = {
-                    class: 'default',
-                    order: Number.MAX_SAFE_INTEGER,
-                    name:  tag
-                };
-
-                const tagMeta = this.tagMeta[tag];
-                if (tagMeta) {
-                    for (const tagProp in tagMeta) {
-                        tagItem[tagProp] = tagMeta[tagProp] || tagItem[tagProp];
-                    }
-                }
-
-                tagItems.push(tagItem);
+            const tags = [];
+            for (let t of entry.tags) {
+                const tag = {class: 'default', order: Number.MAX_SAFE_INTEGER, desc: '', name: t};
+                this.applyTagMeta(tag);
+                tags.push(tag);
             }
 
-            results.push({
+            processed.push({
                 character: entry.character,
                 kunyomi:   entry.kunyomi,
                 onyomi:    entry.onyomi,
-                tags:      tagItems,
+                tags:      Translator.sortTags(tags),
                 glossary:  entry.glossary
             });
         }
 
-        return results;
+        return processed;
+    }
+
+    applyTagMeta(tag) {
+        for (const prop in this.tagMeta[tag.name] || {}) {
+            tag[prop] = this.tagMeta[tag.name][prop] || tag[prop];
+        }
+    }
+
+    static sortTags(tags) {
+        return tags.sort((v1, v2) => {
+            const order1 = v1.order;
+            const order2 = v2.order;
+            if (order1 < order2) {
+                return -1;
+            } else if (order1 > order2) {
+                return 1;
+            }
+
+            const name1 = v1.name;
+            const name2 = v2.name;
+            if (name1 < name2) {
+                return -1;
+            } else if (name1 > name2) {
+                return 1;
+            }
+
+            return 0;
+        });
     }
 
     static isKanji(c) {
