@@ -19,14 +19,6 @@
 
 class Translator {
     constructor() {
-        this.paths = {
-            rules:    'bg/data/rules.json',
-            tags:     'bg/data/tags.json',
-            edict:    'bg/data/edict.json',
-            enamdict: 'bg/data/enamdict.json',
-            kanjidic: 'bg/data/kanjidic.json'
-        };
-
         this.loaded = false;
         this.tagMeta = null;
         this.dictionary = new Dictionary();
@@ -39,38 +31,31 @@ class Translator {
             return;
         }
 
-        let files = ['rules', 'tags', 'edict', 'kanjidic'];
-        if (loadEnamDict) {
-            files = files.concat('enamdict');
-        }
-
-        const pendingLoads = [];
-        for (let key of files) {
-            pendingLoads.push(key);
-            Translator.loadData(this.paths[key], (response) => {
-                switch (key) {
-                    case 'rules':
-                        this.deinflector.setRules(JSON.parse(response));
-                        break;
-                    case 'tags':
-                        this.tagMeta = JSON.parse(response);
-                        break;
-                    case 'kanjidic':
-                        this.dictionary.addKanjiDict(key, JSON.parse(response));
-                        break;
-                    case 'edict':
-                    case 'enamdict':
-                        this.dictionary.addTermDict(key, JSON.parse(response));
-                        break;
+        Translator.loadData('bg/data/rules.json')
+            .then((response) => {
+                this.deinflector.setRules(JSON.parse(response));
+                return Translator.loadData('bg/data/tags.json');
+            })
+            .then((response) => {
+                this.tagMeta = JSON.parse(response);
+                return Translator.loadData('bg/data/edict.json');
+            })
+            .then((response) => {
+                this.dictionary.addTermDict('edict', JSON.parse(response));
+                return Translator.loadData('bg/data/kanjidic.json');
+            })
+            .then((response) => {
+                this.dictionary.addKanjiDict('kanjidic', JSON.parse(response));
+                return loadEnamDict ? Translator.loadData('bg/data/enamdict.json') : Promise.resolve(null);
+            })
+            .then((response) => {
+                if (response !== null) {
+                    this.dictionary.addTermDict('enamdict', JSON.parse(response));
                 }
 
-                pendingLoads.splice(pendingLoads.indexOf(key), 1);
-                if (pendingLoads.length === 0) {
-                    this.loaded = true;
-                    callback();
-                }
+                this.loaded = true;
+                callback();
             });
-        }
     }
 
     findTerm(text) {
@@ -254,10 +239,12 @@ class Translator {
         return code >= 0x4e00 && code < 0x9fb0 || code >= 0x3400 && code < 0x4dc0;
     }
 
-    static loadData(url, callback) {
-        const xhr = new XMLHttpRequest();
-        xhr.addEventListener('load', () => callback(xhr.responseText));
-        xhr.open('GET', chrome.extension.getURL(url), true);
-        xhr.send();
+    static loadData(url) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('load', () => resolve(xhr.responseText));
+            xhr.open('GET', chrome.extension.getURL(url), true);
+            xhr.send();
+        });
     }
 }
