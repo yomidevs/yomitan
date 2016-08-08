@@ -17,21 +17,17 @@
     <div class="term-expression">{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}</div>
     {{/if}}
 
-    {{#if rules}}
     <div class="term-rules">
         {{#each rules}}
         <span class="rule">{{.}}</span> {{#unless @last}}&laquo;{{/unless}}
         {{/each}}
     </div>
-    {{/if}}
 
-    {{#if tags}}
     <div class="term-tags">
         {{#each tags}}
         <span class="tag tag-{{class}}" title="{{desc}}">{{name}}</span>
         {{/each}}
     </div>
-    {{/if}}
 
     <div class="term-glossary">
         <ol>

@@ -148,7 +148,7 @@ class Translator {
             }
         }
 
-        return definitions;
+        return this.processKanji(definitions);
     }
 
     processTerm(groups, source, tags, rules=[], root='') {
@@ -225,6 +225,39 @@ class Translator {
                 };
             }
         }
+    }
+
+    processKanji(entries) {
+        const results = [];
+        for (let entry of entries) {
+            const tagItems = [];
+            for (let tag of entry.tags) {
+                const tagItem = {
+                    class: 'default',
+                    order: Number.MAX_SAFE_INTEGER,
+                    name:  tag
+                };
+
+                const tagMeta = this.tagMeta[tag];
+                if (tagMeta) {
+                    for (const tagProp in tagMeta) {
+                        tagItem[tagProp] = tagMeta[tagProp] || tagItem[tagProp];
+                    }
+                }
+
+                tagItems.push(tagItem);
+            }
+
+            results.push({
+                character: entry.character,
+                kunyomi:   entry.kunyomi,
+                onyomi:    entry.onyomi,
+                tags:      tagItems,
+                glossary:  entry.glossary
+            });
+        }
+
+        return results;
     }
 
     static isKanji(c) {

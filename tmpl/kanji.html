@@ -9,34 +9,38 @@
 
     <div class="kanji-glyph">{{character}}</div>
 
-    <div class="kanji-info">
-        <dl>
-            {{#if glossary}}
-            <dt>Meanings</dt>
-            <dd>
-                {{#each glossary}}
-                {{.}}{{#unless @last}}, {{/unless}}
-                {{/each}}
-            </dd>
-            {{/if}}
+    <div class="kanji-reading">
+        <table>
+            <tr>
+                <th>Kunyomi:</th>
+                <td>
+                    {{#each kunyomi}}
+                    {{.}}{{#unless @last}}, {{/unless}}
+                    {{/each}}
+                </td>
+            </tr>
+            <tr>
+                <th>Onyomi:</th>
+                <td>
+                    {{#each onyomi}}
+                    {{.}}{{#unless @last}}, {{/unless}}
+                    {{/each}}
+                </td>
+            </tr>
+        </table>
+    </div>
 
-            {{#if kunyomi}}
-            <dt>Kun'yomi</dt>
-            <dd class="kanji-reading">
-                {{#each kunyomi}}
-                {{.}}{{#unless @last}}, {{/unless}}
-                {{/each}}
-            </dd>
-            {{/if}}
+    <div class="kanji-tags">
+        {{#each tags}}
+        <span class="tag tag-{{class}}" title="{{desc}}">{{name}}</span>
+        {{/each}}
+    </div>
 
-            {{#if onyomi}}
-            <dt>On'yomi</dt>
-            <dd class="kanji-reading">
-                {{#each onyomi}}
-                {{.}}{{#unless @last}}, {{/unless}}
-                {{/each}}
-            </dd>
-            {{/if}}
-        </dl>
+    <div class="kanji-glossary">
+        <ol>
+            {{#each glossary}}
+            <li><span>{{.}}</span></li>
+            {{/each}}
+        </ol>
     </div>
 </div>

@@ -106,7 +106,7 @@ body {
 }
 
 .term-glossary ol {
-    padding-left: 1.2em;
+    padding-left: 1.4em;
 }
 
 .term-glossary li {
@@ -120,28 +120,36 @@ body {
 /* kanji styles */
 
 .kanji-glyph {
-    float:          right;
     font-family:    kanji-stroke-orders;
-    font-size:      140px;
-    line-height:    140px;
+    font-size:      120px;
+    line-height:    120px;
     padding:        0.01em;
     vertical-align: top;
 }
 
-.kanji-reading {
+.kanji-reading table {
+    padding: 0.3em, 0.3em;
+}
+
+.kanji-reading th {
+    color:          #777;
+    font-weight:    bold;
+    text-align:     right;
+    vertical-align: top;
+}
+
+.kanji-reading td {
     font-family: vl-gothic-regular;
 }
 
-.kanji-info {
-    display:  block;
-    overflow: hidden;
+.kanji-glossary ol {
+    padding-left: 1.4em;
 }
 
-.kanji-info dt {
-    color:       #777;
-    font-weight: bold;
+.kanji-glossary li {
+    color: #777;
 }
 
-.kanji-info dd {
-    margin-left: 1.2em;
+.kanji-glossary li span {
+    color: #000;
 }
