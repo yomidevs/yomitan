@@ -207,8 +207,9 @@ class Translator {
     }
 
     applyTagMeta(tag) {
-        for (const prop in this.tagMeta[tag.name] || {}) {
-            tag[prop] = this.tagMeta[tag.name][prop] || tag[prop];
+        const symbol = tag.name.split(':')[0];
+        for (const prop in this.tagMeta[symbol] || {}) {
+            tag[prop] = this.tagMeta[symbol][prop];
         }
     }
 
