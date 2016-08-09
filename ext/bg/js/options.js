@@ -19,29 +19,27 @@
 
 function sanitizeOptions(options) {
     const defaults = {
-        scanLength:          20,
-        activateOnStartup:   false,
-        selectMatchedText:   true,
-        loadEnamDict:        false,
+        scanLength: 20,
+        activateOnStartup: false,
+        selectMatchedText: true,
+        loadEnamDict: false,
         enableAudioPlayback: true,
-        enableAnkiConnect:   false,
-        ankiCardTags:        ['yomichan'],
-        sentenceExtent:      200,
-        ankiVocabDeck:       '',
-        ankiVocabModel:      '',
-        ankiVocabFields:     {},
-        ankiKanjiDeck:       '',
-        ankiKanjiModel:      '',
-        ankiKanjiFields:     {}
+        enableAnkiConnect: false,
+        ankiCardTags: ['yomichan'],
+        sentenceExtent: 200,
+        ankiVocabDeck: '',
+        ankiVocabModel: '',
+        ankiVocabFields: {},
+        ankiKanjiDeck: '',
+        ankiKanjiModel: '',
+        ankiKanjiFields: {}
     };
 
-    for (let key in defaults) {
-        if (!options.hasOwnProperty(key)) {
+    for (const key in defaults) {
+        if (!(key in options)) {
             options[key] = defaults[key];
         }
     }
-
-    options.scanLength = parseInt(options.scanLength);
 
     return options;
 }

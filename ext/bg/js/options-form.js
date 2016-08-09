@@ -40,21 +40,21 @@ function formToOptions(section, callback) {
 
         switch (section) {
             case 'general':
-                optsNew.scanLength          = parseInt($('#scan-length').val());
-                optsNew.activateOnStartup   = $('#activate-on-startup').prop('checked');
-                optsNew.loadEnamDict        = $('#load-enamdict').prop('checked');
-                optsNew.selectMatchedText   = $('#select-matched-text').prop('checked');
+                optsNew.scanLength = parseInt($('#scan-length').val(), 10);
+                optsNew.activateOnStartup = $('#activate-on-startup').prop('checked');
+                optsNew.loadEnamDict = $('#load-enamdict').prop('checked');
+                optsNew.selectMatchedText = $('#select-matched-text').prop('checked');
                 optsNew.enableAudioPlayback = $('#enable-audio-playback').prop('checked');
-                optsNew.enableAnkiConnect   = $('#enable-anki-connect').prop('checked');
+                optsNew.enableAnkiConnect = $('#enable-anki-connect').prop('checked');
                 break;
             case 'anki':
-                optsNew.ankiCardTags    = $('#anki-card-tags').val().split(/[,; ]+/);
-                optsNew.sentenceExtent  = parseInt($('#sentence-extent').val());
-                optsNew.ankiVocabDeck   = $('#anki-vocab-deck').val();
-                optsNew.ankiVocabModel  = $('#anki-vocab-model').val();
+                optsNew.ankiCardTags = $('#anki-card-tags').val().split(/[,; ]+/);
+                optsNew.sentenceExtent = parseInt($('#sentence-extent').val(), 10);
+                optsNew.ankiVocabDeck = $('#anki-vocab-deck').val();
+                optsNew.ankiVocabModel = $('#anki-vocab-model').val();
                 optsNew.ankiVocabFields = fieldsToDict($('#vocab .anki-field-value'));
-                optsNew.ankiKanjiDeck   = $('#anki-kanji-deck').val();
-                optsNew.ankiKanjiModel  = $('#anki-kanji-model').val();
+                optsNew.ankiKanjiDeck = $('#anki-kanji-deck').val();
+                optsNew.ankiKanjiModel = $('#anki-kanji-model').val();
                 optsNew.ankiKanjiFields = fieldsToDict($('#kanji .anki-field-value'));
                 break;
         }
@@ -91,6 +91,7 @@ function populateAnkiDeckAndModel(opts) {
 
 function updateAnkiStatus() {
     $('.error-dlg').hide();
+
     yomichan().api_getVersion({callback: (version) => {
         if (version === null) {
             $('.error-dlg-connection').show();
