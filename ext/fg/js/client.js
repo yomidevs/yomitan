@@ -90,10 +90,16 @@ class Client {
         }
 
         textSource.setEndOffset(this.options.scanLength);
-        bgFindTerm(textSource.text(), ({definitions, length}) => {
-            if (length === 0) {
-                this.hidePopup();
-            } else {
+
+        let defs = [];
+        let seq = -1;
+
+        bgFindTerm(textSource.text())
+            .then(({definitions, length}) => {
+                if (length === 0) {
+                    return Promise.reject();
+                }
+
                 textSource.setEndOffset(length);
 
                 const sentence = Client.extractSentence(textSource, this.options.sentenceExtent);
@@ -102,23 +108,22 @@ class Client {
                     definition.sentence = sentence;
                 });
 
-                const sequence = ++this.sequence;
-                bgRenderText(
-                    {definitions, root: this.fgRoot, options: this.options, sequence},
-                    'term-list.html',
-                    (content) => {
-                        this.definitions = definitions;
-                        this.showPopup(textSource, content);
+                defs = definitions;
+                seq = ++this.sequence;
 
-                        bgCanAddDefinitions(definitions, ['vocab_kanji', 'vocab_kana'], (states) => {
-                            if (states !== null) {
-                                states.forEach((state, index) => this.popup.sendMessage('setActionState', {index, state, sequence}));
-                            }
-                        });
-                    }
-                );
-            }
-        });
+                return bgRenderText({definitions, root: this.fgRoot, options: this.options, sequence: seq}, 'term-list.html');
+            })
+            .then((content) => {
+                this.definitions = defs;
+                this.showPopup(textSource, content);
+
+                return bgCanAddDefinitions(defs, ['vocab_kanji', 'vocab_kana']);
+            })
+            .then((states) => {
+                if (states !== null) {
+                    states.forEach((state, index) => this.popup.sendMessage('setActionState', {index, state, sequence: seq}));
+                }
+            }, () => this.hidePopup());
     }
 
     showPopup(textSource, content) {
@@ -138,7 +143,7 @@ class Client {
             this.lastTextSource.deselect();
         }
 
-        this.lastTextSource   = null;
+        this.lastTextSource = null;
         this.definitions = null;
     }
 
@@ -156,7 +161,7 @@ class Client {
         const state = {};
         state[mode] = false;
 
-        bgAddDefinition(this.definitions[index], mode, (success) => {
+        bgAddDefinition(this.definitions[index], mode).then((success) => {
             if (success) {
                 this.popup.sendMessage('setActionState', {index, state, sequence: this.sequence});
             } else {
@@ -173,7 +178,7 @@ class Client {
             url += `&kana=${encodeURIComponent(definition.reading)}`;
         }
 
-        for (let key in this.audio) {
+        for (const key in this.audio) {
             this.audio[key].pause();
         }
 
@@ -185,27 +190,29 @@ class Client {
     }
 
     api_displayKanji(kanji) {
-        bgFindKanji(kanji, (definitions) => {
-            definitions.forEach((definition) => {
-                definition.url = window.location.href;
-            });
+        let defs = [];
+        let seq = -1;
 
-            const sequence = ++this.sequence;
-            bgRenderText(
-                {definitions, root: this.fgRoot, options: this.options, sequence},
-                'kanji-list.html',
-                (content) => {
-                    this.definitions = definitions;
-                    this.popup.setContent(content, definitions);
+        bgFindKanji(kanji)
+            .then((definitions) => {
+                definitions.forEach((definition) => definition.url = window.location.href);
 
-                    bgCanAddDefinitions(definitions, ['kanji'], (states) => {
-                        if (states !== null) {
-                            states.forEach((state, index) => this.popup.sendMessage('setActionState', {index, state, sequence}));
-                        }
-                    });
+                defs = definitions;
+                seq = ++this.sequence;
+
+                return bgRenderText({definitions, root: this.fgRoot, options: this.options, sequence: seq}, 'kanji-list.html');
+            })
+            .then((content) => {
+                this.definitions = defs;
+                this.popup.setContent(content, defs);
+
+                return bgCanAddDefinitions(defs, ['kanji']);
+            })
+            .then((states) => {
+                if (states !== null) {
+                    states.forEach((state, index) => this.popup.sendMessage('setActionState', {index, state, sequence: seq}));
                 }
-            );
-        });
+            });
     }
 
     static textSourceFromPoint(point) {

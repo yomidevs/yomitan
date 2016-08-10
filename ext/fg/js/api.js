@@ -17,26 +17,26 @@
  */
 
 
-function bgSendMessage(action, params, callback) {
-    chrome.runtime.sendMessage({action, params}, callback);
+function bgSendMessage(action, params) {
+    return new Promise((resolve, reject) => chrome.runtime.sendMessage({action, params}, resolve));
 }
 
-function bgFindTerm(text, callback) {
-    bgSendMessage('findTerm', {text}, callback);
+function bgFindTerm(text) {
+    return bgSendMessage('findTerm', {text});
 }
 
-function bgFindKanji(text, callback) {
-    bgSendMessage('findKanji', {text}, callback);
+function bgFindKanji(text) {
+    return bgSendMessage('findKanji', {text});
 }
 
-function bgRenderText(data, template, callback) {
-    bgSendMessage('renderText', {data, template}, callback);
+function bgRenderText(data, template) {
+    return bgSendMessage('renderText', {data, template});
 }
 
-function bgCanAddDefinitions(definitions, modes, callback) {
-    bgSendMessage('canAddDefinitions', {definitions, modes}, callback);
+function bgCanAddDefinitions(definitions, modes) {
+    return bgSendMessage('canAddDefinitions', {definitions, modes});
 }
 
-function bgAddDefinition(definition, mode, callback) {
-    bgSendMessage('addDefinition', {definition, mode}, callback);
+function bgAddDefinition(definition, mode) {
+    return bgSendMessage('addDefinition', {definition, mode});
 }

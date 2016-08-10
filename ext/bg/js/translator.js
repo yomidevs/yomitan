@@ -65,7 +65,7 @@ class Translator {
 
             const dfs = this.deinflector.deinflect(term, t => {
                 const tags = [];
-                for (let d of this.dictionary.findTerm(t)) {
+                for (const d of this.dictionary.findTerm(t)) {
                     tags.push(d.tags);
                 }
 
@@ -76,13 +76,13 @@ class Translator {
                 continue;
             }
 
-            for (let df of dfs) {
+            for (const df of dfs) {
                 this.processTerm(groups, df.source, df.tags, df.rules, df.root);
             }
         }
 
         let definitions = [];
-        for (let key in groups) {
+        for (const key in groups) {
             definitions.push(groups[key]);
         }
 
@@ -115,7 +115,7 @@ class Translator {
         });
 
         let length = 0;
-        for (let result of definitions) {
+        for (const result of definitions) {
             length = Math.max(length, result.source.length);
         }
 
@@ -126,7 +126,7 @@ class Translator {
         let definitions = [];
         const processed = {};
 
-        for (let c of text) {
+        for (const c of text) {
             if (!processed[c]) {
                 definitions = definitions.concat(this.dictionary.findKanji(c));
                 processed[c] = true;
@@ -137,13 +137,13 @@ class Translator {
     }
 
     processTerm(groups, dfSource, dfTags, dfRules=[], dfRoot='') {
-        for (let entry of this.dictionary.findTerm(dfRoot)) {
+        for (const entry of this.dictionary.findTerm(dfRoot)) {
             if (entry.id in groups) {
                 continue;
             }
 
             let matched = dfTags.length === 0;
-            for (let t of dfTags) {
+            for (const t of dfTags) {
                 if (entry.tags.indexOf(t) !== -1) {
                     matched = true;
                     break;
@@ -157,7 +157,7 @@ class Translator {
             let popular = false;
 
             let tags = [];
-            for (let t of entry.tags) {
+            for (const t of entry.tags) {
                 const tag = {class: 'default', order: Number.MAX_SAFE_INTEGER, desc: entry.entities[t] || '', name: t};
                 this.applyTagMeta(tag);
                 tags.push(tag);
@@ -186,9 +186,9 @@ class Translator {
     processKanji(entries) {
         const processed = [];
 
-        for (let entry of entries) {
+        for (const entry of entries) {
             const tags = [];
-            for (let t of entry.tags) {
+            for (const t of entry.tags) {
                 const tag = {class: 'default', order: Number.MAX_SAFE_INTEGER, desc: '', name: t};
                 this.applyTagMeta(tag);
                 tags.push(tag);

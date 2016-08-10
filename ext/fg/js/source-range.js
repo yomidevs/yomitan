@@ -77,7 +77,7 @@ class TextSourceRange {
     }
 
     equals(other) {
-        return other.rng && other.rng.compareBoundaryPoints(Range.START_TO_START, this.rng) == 0;
+        return other.rng && other.rng.compareBoundaryPoints(Range.START_TO_START, this.rng) === 0;
     }
 
     static seekForward(node, length) {
