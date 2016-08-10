@@ -112,15 +112,15 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
 },"4":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression, alias5=container.lambda;
 
-  return "        <a href=\"#\" title=\"Add vocabulary as expression\" class=\"action-add-note disabled\" data-mode=\"vocab_kanji\" data-index=\""
+  return "        <a href=\"#\" title=\"Add term as expression\" class=\"action-add-note disabled\" data-mode=\"term_kanji\" data-index=\""
     + alias4(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\""
     + alias4(alias5((depths[1] != null ? depths[1].root : depths[1]), depth0))
-    + "/img/add_vocab_kanji.png\"></a>\n        <a href=\"#\" title=\"Add vocabulary as reading\" class=\"action-add-note disabled\" data-mode=\"vocab_kana\" data-index=\""
+    + "/img/add_term_kanji.png\"></a>\n        <a href=\"#\" title=\"Add term as reading\" class=\"action-add-note disabled\" data-mode=\"term_kana\" data-index=\""
     + alias4(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\""
     + alias4(alias5((depths[1] != null ? depths[1].root : depths[1]), depth0))
-    + "/img/add_vocab_kana.png\"></a>\n";
+    + "/img/add_term_kana.png\"></a>\n";
 },"6":function(container,depth0,helpers,partials,data) {
     var stack1, helper, options, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", buffer = 
   "    <div class=\"term-expression\"><ruby>";

@@ -31,7 +31,7 @@ function fieldsToDict(selection) {
 }
 
 function modelIdToFieldOptKey(id) {
-    return {'anki-vocab-model': 'ankiVocabFields', 'anki-kanji-model': 'ankiKanjiFields'}[id];
+    return {'anki-term-model': 'ankiTermFields', 'anki-kanji-model': 'ankiKanjiFields'}[id];
 }
 
 function formToOptions(section, callback) {
@@ -50,9 +50,9 @@ function formToOptions(section, callback) {
             case 'anki':
                 optsNew.ankiCardTags = $('#anki-card-tags').val().split(/[,; ]+/);
                 optsNew.sentenceExtent = parseInt($('#sentence-extent').val(), 10);
-                optsNew.ankiVocabDeck = $('#anki-vocab-deck').val();
-                optsNew.ankiVocabModel = $('#anki-vocab-model').val();
-                optsNew.ankiVocabFields = fieldsToDict($('#vocab .anki-field-value'));
+                optsNew.ankiTermDeck = $('#anki-term-deck').val();
+                optsNew.ankiTermModel = $('#anki-term-model').val();
+                optsNew.ankiTermFields = fieldsToDict($('#term .anki-field-value'));
                 optsNew.ankiKanjiDeck = $('#anki-kanji-deck').val();
                 optsNew.ankiKanjiModel = $('#anki-kanji-model').val();
                 optsNew.ankiKanjiFields = fieldsToDict($('#kanji .anki-field-value'));
@@ -73,7 +73,7 @@ function populateAnkiDeckAndModel(opts) {
             names.forEach((name) => ankiDeck.append($('<option/>', {value: name, text: name})));
         }
 
-        $('#anki-vocab-deck').val(opts.ankiVocabDeck);
+        $('#anki-term-deck').val(opts.ankiTermDeck);
         $('#anki-kanji-deck').val(opts.ankiKanjiDeck);
     }});
 
@@ -84,7 +84,7 @@ function populateAnkiDeckAndModel(opts) {
             names.forEach((name) => ankiModel.append($('<option/>', {value: name, text: name})));
         }
 
-        populateAnkiFields($('#anki-vocab-model').val(opts.ankiVocabModel), opts);
+        populateAnkiFields($('#anki-term-model').val(opts.ankiTermModel), opts);
         populateAnkiFields($('#anki-kanji-model').val(opts.ankiKanjiModel), opts);
     }});
 }

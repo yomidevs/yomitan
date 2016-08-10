@@ -117,7 +117,7 @@ class Client {
                 this.definitions = defs;
                 this.showPopup(textSource, content);
 
-                return bgCanAddDefinitions(defs, ['vocab_kanji', 'vocab_kana']);
+                return bgCanAddDefinitions(defs, ['term_kanji', 'term_kana']);
             })
             .then((states) => {
                 if (states !== null) {

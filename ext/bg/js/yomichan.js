@@ -183,12 +183,12 @@ class Yomichan {
                     value = '';
                     break;
                 case 'expression':
-                    if (mode === 'vocab_kana' && definition.reading) {
+                    if (mode === 'term_kana' && definition.reading) {
                         value = definition.reading;
                     }
                     break;
                 case 'reading':
-                    if (mode === 'vocab_kana') {
+                    if (mode === 'term_kana') {
                         value = null;
                     }
                     break;
@@ -227,9 +227,9 @@ class Yomichan {
             note.deckName  = this.options.ankiKanjiDeck;
             note.modelName = this.options.ankiKanjiModel;
         } else {
-            fields         = this.options.ankiVocabFields;
-            note.deckName  = this.options.ankiVocabDeck;
-            note.modelName = this.options.ankiVocabModel;
+            fields         = this.options.ankiTermFields;
+            note.deckName  = this.options.ankiTermDeck;
+            note.modelName = this.options.ankiTermModel;
 
             const audio = {
                 kanji:  definition.expression,
