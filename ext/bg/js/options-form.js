@@ -118,10 +118,17 @@ function populateAnkiFields(element, opts) {
 
         const body = $('<tbody>');
         names.forEach((name) => {
+            const groupBtn = $('<div>', {class: 'input-group-btn'});
+            groupBtn.append($('<button>', {type: 'button', class: 'btn btn-default dropdown-toggle'}).append($('<span>', {class: 'caret'})));
+
+            const group = $('<div>', {class: 'input-group'});
+            group.append($('<input>', {class: 'anki-field-value form-control', value: opts[optKey][name] || ''}).data('field', name).change(onOptionsAnkiChanged));
+            group.append(groupBtn);
+
             const row = $('<tr>');
             row.append($('<td>', {class: 'col-sm-2'}).text(name));
-            const value = opts[optKey][name] || '';
-            row.append($('<td>', {class: 'col-sm-10'}).append($('<input>', {class: 'anki-field-value form-control', value}).data('field', name).change(onOptionsAnkiChanged)));
+            row.append($('<td>', {class: 'col-sm-10'}).append(group));
+
             body.append(row);
         });
 
