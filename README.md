@@ -40,7 +40,7 @@ Store](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmn
 
 ## Screenshots ##
 
-[![Term definitions](https://foosoft.net/projects/yomichan-chrome/img/term-thumb.png)](https://foosoft.net/projects/yomichan-chrome/img/term.png)
+[![Vocabulary definitions](https://foosoft.net/projects/yomichan-chrome/img/vocab-thumb.png)](https://foosoft.net/projects/yomichan-chrome/img/vocab.png)
 [![Kanji information](https://foosoft.net/projects/yomichan-chrome/img/kanji-thumb.png)](https://foosoft.net/projects/yomichan-chrome/img/kanji.png)
 [![Options page](https://foosoft.net/projects/yomichan-chrome/img/options-thumb.png)](https://foosoft.net/projects/yomichan-chrome/img/options.png)
 
