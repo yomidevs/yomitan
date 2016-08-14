@@ -6,7 +6,7 @@
         <link rel="stylesheet" type="text/css" href="../lib/bootstrap-3.3.6-dist/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="../lib/bootstrap-3.3.6-dist/css/bootstrap-theme.min.css">
         <style>
-            .options-anki {
+            .options-anki, .options-advanced {
                 display: none;
             }
 
@@ -28,7 +28,7 @@
                 <h3>General Options</h3>
 
                 <form class="form-horizontal">
-                    <div class="form-group">
+                    <div class="form-group options-advanced">
                         <label for="scan-length" class="control-label col-sm-2">Scan length</label>
                         <div class="col-sm-10"><input type="number" min="1" id="scan-length" class="form-control"></div>
                     </div>
@@ -72,6 +72,15 @@
                             </div>
                         </div>
                     </div>
+
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <div class="checkbox">
+                                <label class="control-label"><input type="checkbox" id="show-advanced-options"> Show advanced options</label>
+                            </div>
+                        </div>
+                    </div>
                 </form>
 
             </div>
@@ -92,7 +101,7 @@
                         <div class="col-sm-10"><input type="text" id="anki-card-tags" class="form-control"></div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group options-advanced">
                         <label for="sentence-extent" class="control-label col-sm-2">Sentence extent</label>
                         <div class="col-sm-10"><input type="number" min="1" id="sentence-extent" class="form-control"></div>
                     </div>
@@ -162,7 +171,7 @@
             </div>
 
             <div style="text-align: right;">
-                <small><a href="https://foosoft.net/projects/yomichan-chrome">Homepage</a> &bull; <a href="legal.html">Legal</a></small>
+                <small><a href="https://foosoft.net/projects/yomichan-chrome">Homepage</a> &bull; <a href="guide.html">Guide</a> &bull; <a href="legal.html">Legal</a></small>
             </div>
         </div>
 

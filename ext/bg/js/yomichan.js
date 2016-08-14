@@ -22,7 +22,7 @@ class Yomichan {
         Handlebars.partials = Handlebars.templates;
         Handlebars.registerHelper('kanjiLinks', function(options) {
             let result = '';
-            for (let c of options.fn(this)) {
+            for (const c of options.fn(this)) {
                 if (Translator.isKanji(c)) {
                     result += Handlebars.templates['kanji-link.html']({kanji: c}).trim();
                 } else {
@@ -53,7 +53,7 @@ class Yomichan {
 
     onInstalled(details) {
         if (details.reason === 'install') {
-            chrome.runtime.openOptionsPage();
+            chrome.tabs.create({url: chrome.extension.getURL('bg/guide.html')});
         }
     }
 
@@ -118,7 +118,7 @@ class Yomichan {
 
     tabInvokeAll(action, params) {
         chrome.tabs.query({}, (tabs) => {
-            for (let tab of tabs) {
+            for (const tab of tabs) {
                 this.tabInvoke(tab.id, action, params);
             }
         });
@@ -176,7 +176,7 @@ class Yomichan {
             'url',
         ];
 
-        for (let tag of tags) {
+        for (const tag of tags) {
             let value = definition[tag] || null;
             switch (tag) {
                 case 'audio':
@@ -195,7 +195,7 @@ class Yomichan {
                 case 'glossary-list':
                     if (definition.glossary) {
                         value = '<ol>';
-                        for (let gloss of definition.glossary) {
+                        for (const gloss of definition.glossary) {
                             value += `<li>${gloss}</li>`;
                         }
                         value += '</ol>';
@@ -223,12 +223,12 @@ class Yomichan {
 
         let fields = [];
         if (mode === 'kanji') {
-            fields         = this.options.ankiKanjiFields;
-            note.deckName  = this.options.ankiKanjiDeck;
+            fields = this.options.ankiKanjiFields;
+            note.deckName = this.options.ankiKanjiDeck;
             note.modelName = this.options.ankiKanjiModel;
         } else {
-            fields         = this.options.ankiTermFields;
-            note.deckName  = this.options.ankiTermDeck;
+            fields = this.options.ankiTermFields;
+            note.deckName = this.options.ankiTermDeck;
             note.modelName = this.options.ankiTermModel;
 
             const audio = {
@@ -237,7 +237,7 @@ class Yomichan {
                 fields: []
             };
 
-            for (let name in fields) {
+            for (const name in fields) {
                 if (fields[name].indexOf('{audio}') !== -1) {
                     audio.fields.push(name);
                 }
@@ -261,9 +261,9 @@ class Yomichan {
     }
 
     api_canAddDefinitions({definitions, modes, callback}) {
-        let notes = [];
-        for (let definition of definitions) {
-            for (let mode of modes) {
+        const notes = [];
+        for (const definition of definitions) {
+            for (const mode of modes) {
                 notes.push(this.formatNote(definition, mode));
             }
         }

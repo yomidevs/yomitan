@@ -22,6 +22,7 @@ function sanitizeOptions(options) {
         scanLength: 20,
         activateOnStartup: false,
         selectMatchedText: true,
+        showAdvancedOptions: false,
         loadEnamDict: false,
         enableAudioPlayback: true,
         enableAnkiConnect: false,

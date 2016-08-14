@@ -54,6 +54,7 @@ function formToOptions(section, callback) {
                 optsNew.activateOnStartup = $('#activate-on-startup').prop('checked');
                 optsNew.loadEnamDict = $('#load-enamdict').prop('checked');
                 optsNew.selectMatchedText = $('#select-matched-text').prop('checked');
+                optsNew.showAdvancedOptions = $('#show-advanced-options').prop('checked');
                 optsNew.enableAudioPlayback = $('#enable-audio-playback').prop('checked');
                 optsNew.enableAnkiConnect = $('#enable-anki-connect').prop('checked');
                 break;
@@ -174,9 +175,15 @@ function onOptionsGeneralChanged(e) {
             if (!optsOld.enableAnkiConnect && optsNew.enableAnkiConnect) {
                 updateAnkiStatus();
                 populateAnkiDeckAndModel(optsNew);
-                $('.options-anki').fadeIn();
+                $('.options-anki').show();
             } else if (optsOld.enableAnkiConnect && !optsNew.enableAnkiConnect) {
-                $('.options-anki').fadeOut();
+                $('.options-anki').hide();
+            }
+
+            if (optsNew.showAdvancedOptions) {
+                $('.options-advanced').show();
+            } else {
+                $('.options-advanced').hide();
             }
         });
     });
@@ -208,6 +215,7 @@ $(document).ready(() => {
         $('#activate-on-startup').prop('checked', opts.activateOnStartup);
         $('#load-enamdict').prop('checked', opts.loadEnamDict);
         $('#select-matched-text').prop('checked', opts.selectMatchedText);
+        $('#show-advanced-options').prop('checked', opts.showAdvancedOptions);
         $('#enable-audio-playback').prop('checked', opts.enableAudioPlayback);
         $('#enable-anki-connect').prop('checked', opts.enableAnkiConnect);
 
@@ -218,6 +226,10 @@ $(document).ready(() => {
         $('.options-anki input').change(onOptionsAnkiChanged);
         $('.anki-deck').change(onOptionsAnkiChanged);
         $('.anki-model').change(onAnkiModelChanged);
+
+        if (opts.showAdvancedOptions) {
+            $('.options-advanced').show();
+        }
 
         if (opts.enableAnkiConnect) {
             updateAnkiStatus();
