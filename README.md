@@ -70,7 +70,7 @@ Yomichan can be used as a standalone extension, or in conjunction with [Anki](ht
         *   `{{tags}}`: Grammar and usage tags providing additional information about the term.
         *   `{{url}}`: Address of the web page in which the current vocabulary term appeared in.
     *   **Kanji Markers**
-        *   `{{character}}` Unicode glyph representing the current Kanji.
+        *   `{{character}}`: Unicode glyph representing the current Kanji.
         *   `{{glossary-list}}`: List of definitions with items expressed as a numbered list.
         *   `{{glossary}}`: List of definitions with items delimited using semicolons.
         *   `{{kunyomi}}`: Kunyomi (Japanese reading) for the current Kanji expressed in Katakana.
