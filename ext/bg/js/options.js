@@ -28,9 +28,9 @@ function sanitizeOptions(options) {
         enableAnkiConnect:   false,
         ankiCardTags:        ['yomichan'],
         sentenceExtent:      200,
-        ankiTermDeck:        options.ankiVocabDeck || '',
-        ankiTermModel:       options.ankiVocabModel || '',
-        ankiTermFields:      options.ankiVocabFields || {},
+        ankiTermDeck:        '',
+        ankiTermModel:       '',
+        ankiTermFields:      {},
         ankiKanjiDeck:       '',
         ankiKanjiModel:      '',
         ankiKanjiFields:     {}

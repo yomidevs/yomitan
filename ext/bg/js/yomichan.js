@@ -248,7 +248,7 @@ class Yomichan {
             }
         }
 
-        for (let name in fields) {
+        for (const name in fields) {
             note.fields[name] = this.formatField(fields[name], definition, mode);
         }
 
