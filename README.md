@@ -61,21 +61,21 @@ Yomichan can be used as a standalone extension, or in conjunction with [Anki](ht
 7.  Select the Anki deck and model to use when creating new cards (see the [Anki Manual](http://ankisrs.net/docs/manual.html) for more details).
 8.  Populate the model fields with markup representing contextual properties for the current vocabulary term or Kanji:
     *   **Term Markers**
-        *   `{{audio}}`: Audio sample of a native speaker's pronunciation in MP3 format (if available).
-        *   `{{expression}}`: Term written in Kanji (will be written in Kana if Kanji is not available).
-        *   `{{glossary-list}}`: List of definitions with items expressed as a numbered list.
-        *   `{{glossary}}`: List of definitions with items delimited using semicolons.
-        *   `{{reading}}`: Kana reading for the term (empty for terms where the expression is the reading).
-        *   `{{sentence}}`: Sentence, quote, or phrase in which the term appears in the source content.
-        *   `{{tags}}`: Grammar and usage tags providing additional information about the term.
-        *   `{{url}}`: Address of the web page in which the current vocabulary term appeared in.
+        *   `{audio}`: Audio sample of a native speaker's pronunciation in MP3 format (if available).
+        *   `{expression}`: Term written in Kanji (will be written in Kana if Kanji is not available).
+        *   `{glossary-list}`: List of definitions with items expressed as a numbered list.
+        *   `{glossary}`: List of definitions with items delimited using semicolons.
+        *   `{reading}`: Kana reading for the term (empty for terms where the expression is the reading).
+        *   `{sentence}`: Sentence, quote, or phrase in which the term appears in the source content.
+        *   `{tags}`: Grammar and usage tags providing additional information about the term.
+        *   `{url}`: Address of the web page in which the current vocabulary term appeared in.
     *   **Kanji Markers**
-        *   `{{character}}`: Unicode glyph representing the current Kanji.
-        *   `{{glossary-list}}`: List of definitions with items expressed as a numbered list.
-        *   `{{glossary}}`: List of definitions with items delimited using semicolons.
-        *   `{{kunyomi}}`: Kunyomi (Japanese reading) for the current Kanji expressed in Katakana.
-        *   `{{onyomi}}`: Onyomi (Chinese reading) for the current Kanji expressed in Hiragana.
-        *   `{{url}}`: Address of the web page in which the current vocabulary term appeared in.
+        *   `{character}`: Unicode glyph representing the current Kanji.
+        *   `{glossary-list}`: List of definitions with items expressed as a numbered list.
+        *   `{glossary}`: List of definitions with items delimited using semicolons.
+        *   `{kunyomi}`: Kunyomi (Japanese reading) for the current Kanji expressed in Katakana.
+        *   `{onyomi}`: Onyomi (Chinese reading) for the current Kanji expressed in Hiragana.
+        *   `{url}`: Address of the web page in which the current vocabulary term appeared in.
 9.  Click on the ![](https://foosoft.net/projects/yomichan-chrome/img/add-expression.png) icon to add the current expression using Kanji (e.g. 食べる).
 10. Click on the ![](https://foosoft.net/projects/yomichan-chrome/img/add-reading.png) icon to add the current expression using the reading alone (e.g. たべる).
 
