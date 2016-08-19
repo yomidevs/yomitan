@@ -162,7 +162,7 @@ class Yomichan {
     }
 
     formatField(field, definition, mode) {
-        const tags = [
+        const markers = [
             'audio',
             'character',
             'expression',
@@ -176,9 +176,9 @@ class Yomichan {
             'url',
         ];
 
-        for (const tag of tags) {
-            let value = definition[tag] || null;
-            switch (tag) {
+        for (const marker of markers) {
+            let value = definition[marker] || null;
+            switch (marker) {
                 case 'audio':
                     value = '';
                     break;
@@ -212,7 +212,7 @@ class Yomichan {
                 value = value.join(', ');
             }
 
-            field = field.replace(`{${tag}}`, value || '');
+            field = field.replace(`{${marker}}`, value || '');
         }
 
         return field;
