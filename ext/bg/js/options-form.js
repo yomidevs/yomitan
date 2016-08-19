@@ -37,7 +37,7 @@ function modelIdToFieldOptKey(id) {
     }[id];
 }
 
-function modelIdToTags(id) {
+function modelIdToMarkers(id) {
     return {
         'anki-term-model': ['audio', 'expression', 'glossary', 'glossary-list', 'reading', 'sentence', 'tags', 'url'],
         'anki-kanji-model': ['character', 'glossary', 'glossary-list', 'kunyomi', 'onyomi', 'url'],
@@ -124,7 +124,7 @@ function populateAnkiFields(element, opts) {
 
     const modelId = element.attr('id');
     const optKey = modelIdToFieldOptKey(modelId);
-    const tags = modelIdToTags(modelId);
+    const markers = modelIdToMarkers(modelId);
 
     yomichan().api_getModelFieldNames({modelName, callback: (names) => {
         const table = element.closest('.tab-pane').find('.anki-fields');
@@ -135,19 +135,19 @@ function populateAnkiFields(element, opts) {
             const button = $('<button>', {type: 'button', class: 'btn btn-default dropdown-toggle'});
             button.attr('data-toggle', 'dropdown').dropdown();
 
-            const tagItems = $('<ul>', {class: 'dropdown-menu dropdown-menu-right'});
-            for (const tag of tags) {
-                const link = $('<a>', {href: '#'}).text(`{${tag}}`);
+            const markerItems = $('<ul>', {class: 'dropdown-menu dropdown-menu-right'});
+            for (const marker of markers) {
+                const link = $('<a>', {href: '#'}).text(`{${marker}}`);
                 link.click((e) => {
                     e.preventDefault();
                     link.closest('.input-group').find('.anki-field-value').val(link.text()).trigger('change');
                 });
-                tagItems.append($('<li>').append(link));
+                markerItems.append($('<li>').append(link));
             }
 
             const groupBtn = $('<div>', {class: 'input-group-btn'});
             groupBtn.append(button.append($('<span>', {class: 'caret'})));
-            groupBtn.append(tagItems);
+            groupBtn.append(markerItems);
 
             const group = $('<div>', {class: 'input-group'});
             group.append($('<input>', {type: 'text', class: 'anki-field-value form-control', value: opts[optKey][name] || ''}).data('field', name).change(onOptionsAnkiChanged));
