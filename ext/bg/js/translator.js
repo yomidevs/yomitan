@@ -62,7 +62,6 @@ class Translator {
         const groups = {};
         for (let i = text.length; i > 0; --i) {
             const term = text.slice(0, i);
-
             const dfs = this.deinflector.deinflect(term, t => {
                 const tags = [];
                 for (const d of this.dictionary.findTerm(t)) {
@@ -136,15 +135,15 @@ class Translator {
         return this.processKanji(definitions);
     }
 
-    processTerm(groups, dfSource, dfTags, dfRules=[], dfRoot='') {
-        for (const entry of this.dictionary.findTerm(dfRoot)) {
+    processTerm(groups, source, tags, rules, root) {
+        for (const entry of this.dictionary.findTerm(root)) {
             if (entry.id in groups) {
                 continue;
             }
 
-            let matched = dfTags.length === 0;
-            for (const t of dfTags) {
-                if (entry.tags.indexOf(t) !== -1) {
+            let matched = tags.length === 0;
+            for (const tag of tags) {
+                if (entry.tags.indexOf(tag) !== -1) {
                     matched = true;
                     break;
                 }
@@ -154,71 +153,64 @@ class Translator {
                 continue;
             }
 
-            const tags = [];
-            for (const name of entry.tags) {
-                const tag = {
-                    name,
+            const tagItems = [];
+            for (const tag of entry.tags) {
+                const tagItem = {
+                    name: tag,
                     class: 'default',
                     order: Number.MAX_SAFE_INTEGER,
                     score: 0,
-                    desc: entry.entities[name] || '',
+                    desc: entry.entities[tag] || '',
                 };
 
-                this.applyTagMeta(tag);
-                tags.push(tag);
+                this.applyTagMeta(tagItem);
+                tagItems.push(tagItem);
             }
 
             let score = 0;
-            for (const tag of tags) {
-                score += tag.score;
+            for (const tagItem of tagItems) {
+                score += tagItem.score;
             }
 
             groups[entry.id] = {
                 score,
+                source,
+                rules,
                 expression: entry.expression,
                 reading: entry.reading,
                 glossary: entry.glossary,
-                tags: Translator.sortTags(tags),
-                source: dfSource,
-                rules: dfRules,
+                tags: Translator.sortTags(tagItems)
             };
         }
     }
 
     processKanji(entries) {
-        const processed = [];
+        const results = [];
 
         for (const entry of entries) {
-            const tags = [];
-            for (const name of entry.tags) {
-                const tag = {
-                    name,
+            const tagItems = [];
+            for (const tag of entry.tags) {
+                const tagItem = {
+                    name: tag,
                     class: 'default',
                     order: Number.MAX_SAFE_INTEGER,
-                    score: 0,
                     desc: '',
                 };
 
-                this.applyTagMeta(tag);
-                tags.push(tag);
+                this.applyTagMeta(tagItem);
+                tagItems.push(tagItem);
             }
 
-            let score = 0;
-            for (const tag of tags) {
-                score += tag.score;
-            }
-
-            processed.push({
-                score,
+            results.push({
                 character: entry.character,
                 kunyomi: entry.kunyomi,
                 onyomi: entry.onyomi,
-                tags: Translator.sortTags(tags),
-                glossary: entry.glossary
+                glossary: entry.glossary,
+                tags: Translator.sortTags(tagItems)
             });
         }
 
-        return processed;
+        return results;
     }
 
     applyTagMeta(tag) {
