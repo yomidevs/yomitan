@@ -95,11 +95,11 @@ class Translator {
                 return 1;
             }
 
-            const p1 = v1.popular;
-            const p2 = v2.popular;
-            if (p1 && !p2) {
+            const s1 = v1.score;
+            const s2 = v2.score;
+            if (s1 > s2) {
                 return -1;
-            } else if (!p1 && p2) {
+            } else if (s1 < s2) {
                 return 1;
             }
 
@@ -154,31 +154,33 @@ class Translator {
                 continue;
             }
 
-            let popular = false;
+            const tags = [];
+            for (const name of entry.tags) {
+                const tag = {
+                    name,
+                    class: 'default',
+                    order: Number.MAX_SAFE_INTEGER,
+                    score: 0,
+                    desc: entry.entities[name] || '',
+                };
 
-            let tags = [];
-            for (const t of entry.tags) {
-                const tag = {class: 'default', order: Number.MAX_SAFE_INTEGER, desc: entry.entities[t] || '', name: t};
                 this.applyTagMeta(tag);
                 tags.push(tag);
+            }
 
-                //
-                // TODO: Handle tagging as popular through data.
-                //
-
-                if (t === 'P') {
-                    popular = true;
-                }
+            let score = 0;
+            for (const tag of tags) {
+                score += tag.score;
             }
 
             groups[entry.id] = {
+                score,
                 expression: entry.expression,
-                reading:    entry.reading,
-                glossary:   entry.glossary,
-                tags:       Translator.sortTags(tags),
-                source:     dfSource,
-                rules:      dfRules,
-                popular:    popular
+                reading: entry.reading,
+                glossary: entry.glossary,
+                tags: Translator.sortTags(tags),
+                source: dfSource,
+                rules: dfRules,
             };
         }
     }
@@ -188,18 +190,31 @@ class Translator {
 
         for (const entry of entries) {
             const tags = [];
-            for (const t of entry.tags) {
-                const tag = {class: 'default', order: Number.MAX_SAFE_INTEGER, desc: '', name: t};
+            for (const name of entry.tags) {
+                const tag = {
+                    name,
+                    class: 'default',
+                    order: Number.MAX_SAFE_INTEGER,
+                    score: 0,
+                    desc: '',
+                };
+
                 this.applyTagMeta(tag);
                 tags.push(tag);
             }
 
+            let score = 0;
+            for (const tag of tags) {
+                score += tag.score;
+            }
+
             processed.push({
+                score,
                 character: entry.character,
-                kunyomi:   entry.kunyomi,
-                onyomi:    entry.onyomi,
-                tags:      Translator.sortTags(tags),
-                glossary:  entry.glossary
+                kunyomi: entry.kunyomi,
+                onyomi: entry.onyomi,
+                tags: Translator.sortTags(tags),
+                glossary: entry.glossary
             });
         }
 

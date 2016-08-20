@@ -26,12 +26,12 @@ class Deinflection {
     }
 
     validate(validator) {
-        for (let tags of validator(this.term)) {
+        for (const tags of validator(this.term)) {
             if (this.tags.length === 0) {
                 return true;
             }
 
-            for (let tag of this.tags) {
+            for (const tag of this.tags) {
                 if (tags.indexOf(tag) !== -1) {
                     return true;
                 }
@@ -47,11 +47,11 @@ class Deinflection {
             this.children.push(child);
         }
 
-        for (let rule in rules) {
+        for (const rule in rules) {
             const variants = rules[rule];
-            for (let v of variants) {
+            for (const v of variants) {
                 let allowed = this.tags.length === 0;
-                for (let tag of this.tags) {
+                for (const tag of this.tags) {
                     if (v.ti.indexOf(tag) !== -1) {
                         allowed = true;
                         break;
@@ -79,8 +79,8 @@ class Deinflection {
         }
 
         const paths = [];
-        for (let child of this.children) {
-            for (let path of child.gather()) {
+        for (const child of this.children) {
+            for (const path of child.gather()) {
                 if (this.rule.length > 0) {
                     path.rules.push(this.rule);
                 }
