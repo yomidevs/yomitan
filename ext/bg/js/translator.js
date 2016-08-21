@@ -31,31 +31,28 @@ class Translator {
             return;
         }
 
-        Translator.loadData('bg/data/rules.json')
-            .then((response) => {
-                this.deinflector.setRules(JSON.parse(response));
-                return Translator.loadData('bg/data/tags.json');
-            })
-            .then((response) => {
-                this.tagMeta = JSON.parse(response);
-                return Translator.loadData('bg/data/edict.json');
-            })
-            .then((response) => {
-                this.dictionary.addTermDict('edict', JSON.parse(response));
-                return Translator.loadData('bg/data/kanjidic.json');
-            })
-            .then((response) => {
-                this.dictionary.addKanjiDict('kanjidic', JSON.parse(response));
-                return loadEnamDict ? Translator.loadData('bg/data/enamdict.json') : Promise.resolve(null);
-            })
-            .then((response) => {
-                if (response !== null) {
-                    this.dictionary.addTermDict('enamdict', JSON.parse(response));
-                }
-
-                this.loaded = true;
-                callback();
-            });
+        Translator.loadData('bg/data/rules.json').then((response) => {
+            this.deinflector.setRules(JSON.parse(response));
+            return Translator.loadData('bg/data/tags.json');
+        }).then((response) => {
+            this.tagMeta = JSON.parse(response);
+            return this.dictionary.loadDb();
+        }).then(() => {
+            this.loaded = true;
+            callback();
+        }).catch(() => {
+            return Translator.loadData('bg/data/edict.json');
+        }).then((response) => {
+            this.dictionary.importTermDict('edict', JSON.parse(response));
+            return Translator.loadData('bg/data/enamdict.json');
+        }).then((response) => {
+            this.dictionary.importTermDict('enamdict', JSON.parse(response));
+            return Translator.loadData('bg/data/kanjidic.json');
+        }).then((response) => {
+            this.dictionary.importKanjiDict('kanjidic', JSON.parse(response));
+            this.loaded = true;
+            callback();
+        });
     }
 
     findTerm(text) {

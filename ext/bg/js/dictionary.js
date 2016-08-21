@@ -21,20 +21,32 @@ class Dictionary {
     constructor() {
         this.termDicts = {};
         this.kanjiDicts = {};
+        this.db = new Dexie('dict');
+        this.dbVer = 1;
     }
 
-    addTermDict(name, dict) {
+    loadDb() {
+        return this.db.open().then((db) => {
+            if (db.verno !== this.dbVer) {
+                Promise.reject('db version mismatch');
+            }
+
+            return db.verno;
+        });
+    }
+
+    importTermDict(name, dict) {
         this.termDicts[name] = dict;
     }
 
-    addKanjiDict(name, dict) {
+    importKanjiDict(name, dict) {
         this.kanjiDicts[name] = dict;
     }
 
     findTerm(term) {
         let results = [];
 
-        for (let name in this.termDicts) {
+        for (const name in this.termDicts) {
             const dict = this.termDicts[name];
             if (!(term in dict.i)) {
                 continue;
@@ -62,7 +74,7 @@ class Dictionary {
     findKanji(kanji) {
         const results = [];
 
-        for (let name in this.kanjiDicts) {
+        for (const name in this.kanjiDicts) {
             const def = this.kanjiDicts[name].c[kanji];
             if (def) {
                 const [k, o, t, ...g] = def;
