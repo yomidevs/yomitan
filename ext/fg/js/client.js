@@ -158,9 +158,7 @@ class Client {
     }
 
     api_addNote({index, mode}) {
-        const state = {};
-        state[mode] = false;
-
+        const state = {[mode]: false};
         bgAddDefinition(this.definitions[index], mode).then((success) => {
             if (success) {
                 this.popup.sendMessage('setActionState', {index, state, sequence: this.sequence});

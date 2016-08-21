@@ -71,6 +71,6 @@ class TextSourceElement {
     }
 
     equals(other) {
-        return other.element && other.textRaw() == this.textRaw();
+        return other.element && other.textRaw() === this.textRaw();
     }
 }

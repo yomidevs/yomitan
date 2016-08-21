@@ -19,15 +19,15 @@
 
 class Popup {
     constructor() {
-        this.popup  = null;
+        this.popup = null;
         this.offset = 10;
     }
 
     showAt(pos, content) {
         this.inject();
 
-        this.popup.style.left       = pos.x + 'px';
-        this.popup.style.top        = pos.y + 'px';
+        this.popup.style.left = pos.x + 'px';
+        this.popup.style.top = pos.y + 'px';
         this.popup.style.visibility = 'visible';
 
         this.setContent(content);

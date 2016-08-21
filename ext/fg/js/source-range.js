@@ -81,7 +81,7 @@ class TextSourceRange {
     }
 
     static seekForward(node, length) {
-        const state = {node, offset: 0, length};
+        const state = {node, length, offset: 0};
         if (!TextSourceRange.seekForwardHelper(node, state)) {
             return state;
         }
@@ -115,7 +115,7 @@ class TextSourceRange {
     }
 
     static seekBackward(node, length) {
-        const state = {node, offset: node.length, length};
+        const state = {node, length, offset: node.length};
         if (!TextSourceRange.seekBackwardHelper(node, state)) {
             return state;
         }
