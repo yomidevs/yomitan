@@ -35,6 +35,7 @@ class Yomichan {
 
         this.translator = new Translator();
         this.asyncPools = {};
+        this.ankiConnectVer = 0;
         this.setState('disabled');
 
         chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
@@ -129,13 +130,18 @@ class Yomichan {
     }
 
     ankiInvokeSafe(action, params, pool, callback) {
-        this.api_getVersion({callback: (version) => {
-            if (version === this.getApiVersion()) {
-                this.ankiInvoke(action, params, pool, callback);
-            } else {
-                callback(null);
-            }
-        }});
+        if (this.ankiConnectVer === this.getApiVersion()) {
+            this.ankiInvoke(action, params, pool, callback);
+        } else {
+            this.api_getVersion({callback: (version) => {
+                if (version === this.getApiVersion()) {
+                    this.ankiConnectVer = version;
+                    this.ankiInvoke(action, params, pool, callback);
+                } else {
+                    callback(null);
+                }
+            }});
+        }
     }
 
     ankiInvoke(action, params, pool, callback) {
