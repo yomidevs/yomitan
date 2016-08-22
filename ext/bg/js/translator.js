@@ -41,16 +41,20 @@ class Translator {
             this.loaded = true;
             callback();
         }).catch(() => {
-            this.dictionary.initDb();
-            return Translator.loadData('bg/data/edict.json');
-        }).then((response) => {
-            this.dictionary.importTermDict(JSON.parse(response));
-            return Translator.loadData('bg/data/enamdict.json');
-        }).then((response) => {
-            this.dictionary.importTermDict(JSON.parse(response));
-            return Translator.loadData('bg/data/kanjidic.json');
-        }).then((response) => {
-            this.dictionary.importKanjiDict(JSON.parse(response));
+            return this.dictionary.resetDb().then(() => {
+                return Translator.loadData('bg/data/edict.json');
+            }).then((response) => {
+                return this.dictionary.importTermDict(JSON.parse(response));
+            }).then(() => {
+                return Translator.loadData('bg/data/enamdict.json');
+            }).then((response) => {
+                return this.dictionary.importTermDict(JSON.parse(response));
+            }).then(() => {
+                return Translator.loadData('bg/data/kanjidic.json');
+            }).then((response) => {
+                return this.dictionary.importKanjiDict(JSON.parse(response));
+            });
+        }).then(() => {
             this.loaded = true;
             callback();
         });

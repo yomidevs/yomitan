@@ -19,43 +19,48 @@
 
 class Dictionary {
     constructor() {
-        this.db = new Dexie('dict');
-        this.dbVer = 1;
+        this.db = null;
         this.entities = null;
     }
 
     loadDb() {
-        return this.db.open().then((db) => {
-            if (db.verno !== this.dbVer) {
-                Promise.reject('db version mismatch');
-            }
+        this.db = null;
+        this.entities = null;
 
-            return db.verno;
+        return new Dexie('dict').open().then((db) => {
+            this.db = db;
         });
     }
 
-    initDb() {
-        this.entities = {};
-        return this.db.version(this.dbVer).stores({
-            terms: 'expression, reading',
-            entities: 'name',
-            kanji: 'character',
+    resetDb() {
+        this.db = null;
+        this.entities = null;
+
+        return new Dexie('dict').delete().then(() => {
+            return Promise.resolve(new Dexie('dict'));
+        }).then((db) => {
+            this.db = db;
+            return this.db.version(1).stores({
+                terms: '++id, e, r',
+                entities: 'n',
+                kanji: 'c'
+            });
         });
     }
 
     importTermDict(dict) {
-        this.entities = {};
-        return this.db.terms.bulkAdd(dict.d, 'expression, reading, tags, glossary').then(() => {
-            for (const [key, value] of dict.e) {
-                this.entities[key] = value;
+        return this.db.terms.bulkAdd(dict.d).then(() => {
+            this.entities = {};
+            for (const name in dict.e) {
+                this.entities[name] = dict.e[name];
             }
 
-            return this.db.entities.bulkAdd(dict.e, 'name, value');
+            return this.db.entities.bulkAdd(dict.e);
         });
     }
 
     importKanjiDict(dict) {
-        return this.db.kanji.bulkAdd(dict.d, 'character, onyomi, kunyomi, tags, glossary');
+        return this.db.kanji.bulkAdd(dict.d);
     }
 
     fetchEntities() {
@@ -63,9 +68,11 @@ class Dictionary {
             return Promise.resolve(this.entities);
         }
 
-        this.entities = {};
-        return this.db.entities.each((row) => {
-            this.entities[row.name] = row.value;
+        return this.db.entities.toArray((rows) => {
+            this.entities = {};
+            for (const row of rows) {
+                this.entities[row.name] = row.value;
+            }
         }).then(() => {
             return Promise.resolve(this.entities);
         });
@@ -73,14 +80,14 @@ class Dictionary {
 
     findterm(term) {
         const results = [];
-        return this.db.terms.where('expression').equals(term).or('reading').equals(term).each((row) => {
+        return this.db.terms.where('e').equals(term).or('r').equals(term).each((row) => {
             results.push({
-                expression: row.expression,
-                reading: row.reading,
-                tags: row.tags.split(' '),
-                glossary: row.glossary,
+                expression: row.e,
+                reading: row.r,
+                tags: row.t.split(' '),
+                glossary: row.g,
                 entities: this.entities,
-                id: results.length
+                id: results.id
             });
         }).then(() => {
             Promise.resolve(results);
@@ -89,13 +96,13 @@ class Dictionary {
 
     findKanji(kanji) {
         const results = [];
-        return this.db.kanji.where('character').equals(kanji).each((row) => {
+        return this.db.kanji.where('c').equals(kanji).each((row) => {
             results.push({
-                character: row.character,
-                onyomi: row.onyomi.split(' '),
-                kunyomi: row.kunyomi.split(' '),
-                tags: row.tags.split(' '),
-                glossary: row.glossary
+                character: row.c,
+                onyomi: row.o.split(' '),
+                kunyomi: row.k.split(' '),
+                tags: row.t.split(' '),
+                glossary: row.m
             });
         });
     }
