@@ -19,10 +19,9 @@
 
 class Dictionary {
     constructor() {
-        this.termDicts = {};
-        this.kanjiDicts = {};
         this.db = new Dexie('dict');
         this.dbVer = 1;
+        this.entities = null;
     }
 
     loadDb() {
@@ -35,59 +34,69 @@ class Dictionary {
         });
     }
 
-    importTermDict(name, dict) {
-        this.termDicts[name] = dict;
+    initDb() {
+        this.entities = {};
+        return this.db.version(this.dbVer).stores({
+            terms: 'expression, reading',
+            entities: 'name',
+            kanji: 'character',
+        });
     }
 
-    importKanjiDict(name, dict) {
-        this.kanjiDicts[name] = dict;
-    }
-
-    findTerm(term) {
-        let results = [];
-
-        for (const name in this.termDicts) {
-            const dict = this.termDicts[name];
-            if (!(term in dict.i)) {
-                continue;
+    importTermDict(dict) {
+        this.entities = {};
+        return this.db.terms.bulkAdd(dict.d, 'expression, reading, tags, glossary').then(() => {
+            for (const [key, value] of dict.e) {
+                this.entities[key] = value;
             }
 
-            const indices = dict.i[term].split(' ').map(Number);
-            results = results.concat(
-                indices.map(index => {
-                    const [e, r, t, ...g] = dict.d[index];
-                    return {
-                        expression: e,
-                        reading:    r,
-                        tags:       t.split(' '),
-                        glossary:   g,
-                        entities:   dict.e,
-                        id:         index
-                    };
-                })
-            );
+            return this.db.entities.bulkAdd(dict.e, 'name, value');
+        });
+    }
+
+    importKanjiDict(dict) {
+        return this.db.kanji.bulkAdd(dict.d, 'character, onyomi, kunyomi, tags, glossary');
+    }
+
+    fetchEntities() {
+        if (this.entities !== null) {
+            return Promise.resolve(this.entities);
         }
 
-        return results;
+        this.entities = {};
+        return this.db.entities.each((row) => {
+            this.entities[row.name] = row.value;
+        }).then(() => {
+            return Promise.resolve(this.entities);
+        });
+    }
+
+    findterm(term) {
+        const results = [];
+        return this.db.terms.where('expression').equals(term).or('reading').equals(term).each((row) => {
+            results.push({
+                expression: row.expression,
+                reading: row.reading,
+                tags: row.tags.split(' '),
+                glossary: row.glossary,
+                entities: this.entities,
+                id: results.length
+            });
+        }).then(() => {
+            Promise.resolve(results);
+        });
     }
 
     findKanji(kanji) {
         const results = [];
-
-        for (const name in this.kanjiDicts) {
-            const def = this.kanjiDicts[name].c[kanji];
-            if (def) {
-                const [k, o, t, ...g] = def;
-                results.push({
-                    character: kanji,
-                    kunyomi:   k.split(' '),
-                    onyomi:    o.split(' '),
-                    tags:      t.split(' '),
-                    glossary:  g
-                });
-            }
-        }
-
-        return results;
+        return this.db.kanji.where('character').equals(kanji).each((row) => {
+            results.push({
+                character: row.character,
+                onyomi: row.onyomi.split(' '),
+                kunyomi: row.kunyomi.split(' '),
+                tags: row.tags.split(' '),
+                glossary: row.glossary
+            });
+        });
     }
 }
