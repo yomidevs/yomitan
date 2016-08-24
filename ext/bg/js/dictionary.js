@@ -38,8 +38,8 @@ class Dictionary {
         this.db = new Dexie('dict');
         this.db.version(1).stores({
             terms: '++id,expression,reading',
-            entities: '++id,name',
-            kanji: '++id,character'
+            entities: '++,name',
+            kanji: '++,character'
         });
 
         return this.db;
@@ -125,24 +125,24 @@ class Dictionary {
 
                 for (let i = 0; i < index.refs; ++i) {
                     const refUrl = `${indexDir}/ref_${i}.json`;
-                    loaders.push(
-                        Dictionary.loadJson(refUrl).then((refs) => {
+                    loaders.push(() => {
+                        return Dictionary.loadJson(refUrl).then((refs) => {
                             const rows = [];
-                            for (const [e, r, t, ...g] of refs) {
-                                rows.push({
-                                    'expression': e,
-                                    'reading': r,
-                                    'tags': t,
-                                    'glossary': g
-                                });
+                            for (const [expression, reading, tags, ...glossary] of refs) {
+                                rows.push({expression, reading, tags, glossary});
                             }
 
                             return this.db.terms.bulkAdd(rows);
-                        })
-                    );
+                        });
+                    });
                 }
 
-                return Promise.all(loaders);
+                let chain = Promise.resolve();
+                for (const loader of loaders) {
+                    chain = chain.then(loader);
+                }
+
+                return chain;
             });
         });
     }

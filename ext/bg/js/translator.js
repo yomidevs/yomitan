@@ -31,11 +31,11 @@ class Translator {
             return;
         }
 
-        Translator.loadData('bg/data/rules.json').then((response) => {
-            this.deinflector.setRules(JSON.parse(response));
-            return Translator.loadData('bg/data/tags.json');
-        }).then((response) => {
-            this.tagMeta = JSON.parse(response);
+        Translator.loadJson('bg/data/rules.json').then((rules) => {
+            this.deinflector.setRules(rules);
+            return Translator.loadJson('bg/data/tags.json');
+        }).then((tagMeta) => {
+            this.tagMeta = tagMeta;
             return this.dictionary.existsDb();
         }).then((exists) => {
             if (exists) {
@@ -48,12 +48,12 @@ class Translator {
                 ]);
             }
         }).then(() => {
-            this.loaded = true;
-            callback();
-
             this.dictionary.findTerm('猫').then((result) => {
                 console.log(result);
             });
+
+            this.loaded = true;
+            callback();
         });
     }
 
@@ -246,10 +246,10 @@ class Translator {
         return code >= 0x4e00 && code < 0x9fb0 || code >= 0x3400 && code < 0x4dc0;
     }
 
-    static loadData(url) {
+    static loadJson(url) {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
-            xhr.addEventListener('load', () => resolve(xhr.responseText));
+            xhr.addEventListener('load', () => resolve(JSON.parse(xhr.responseText)));
             xhr.open('GET', chrome.extension.getURL(url), true);
             xhr.send();
         });
