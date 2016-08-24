@@ -36,6 +36,8 @@ Store](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmn
 helpful and appreciate the time that was spent developing it, I would kindly ask that you leave a positive review. Your
 support and feedback encourages continued development of this tool.
 
+[![Chrome web store](https://foosoft.net/projects/yomichan-chrome/img/store.png)](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami)
+
 ## Usage ##
 
 Yomichan can be used as a standalone extension, or in conjunction with [Anki](http://ankisrs.net) via
@@ -52,7 +54,7 @@ Yomichan can be used as a standalone extension, or in conjunction with [Anki](ht
 
 ### Anki Integration ###
 
-1.  Open the *Install Add-on* dialog by the selecting *Tools* &gt; *Add-ons* &gt; *Browse &amp; Install* in Anki.
+1.  Open the *Install Add-on* dialog by selecting *Tools* &gt; *Add-ons* &gt; *Browse &amp; Install* in Anki.
 2.  Input *2055492159* into the text box labeled *Code* and press the *OK* button to proceed.
 3.  Restart Anki when prompted to do so in order to complete the installation of AnkiConnect.
 4.  In Chrome, open the Yomichan options page by right-clicking the ![](https://foosoft.net/projects/yomichan-chrome/img/logo.png) icon and selecting *Options*.
