@@ -43,6 +43,7 @@ class Translator {
             } else {
                 this.dictionary.initDb();
                 return Promise.all([
+                    this.dictionary.importKanjiDict('bg/data/kanjidic/index.json'),
                     this.dictionary.importTermDict('bg/data/edict/index.json'),
                     this.dictionary.importTermDict('bg/data/enamdict/index.json')
                 ]);

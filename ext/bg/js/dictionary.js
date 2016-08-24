@@ -108,12 +108,12 @@ class Dictionary {
                 }
             }).then(() => {
                 const loaders = [];
-                for (let i = 0; i <= index.refs; ++i) {
-                    const refUrl = `${indexDir}/ref_${i}.json`;
+                for (let i = 1; i <= index.banks; ++i) {
+                    const bankUrl = `${indexDir}/bank_${i}.json`;
                     loaders.push(() => {
-                        return loadJson(refUrl).then((refs) => {
+                        return loadJson(bankUrl).then((defs) => {
                             const rows = [];
-                            for (const [expression, reading, tags, ...glossary] of refs) {
+                            for (const [expression, reading, tags, ...glossary] of defs) {
                                 rows.push({expression, reading, tags, glossary});
                             }
 
@@ -137,13 +137,13 @@ class Dictionary {
 
         return loadJson(indexUrl).then((index) => {
             const loaders = [];
-            for (let i = 0; i <= index.refs; ++i) {
-                const refUrl = `${indexDir}/ref_${i}.json`;
+            for (let i = 1; i <= index.banks; ++i) {
+                const bankUrl = `${indexDir}/bank_${i}.json`;
                 loaders.push(() => {
-                    return loadJson(refUrl).then((refs) => {
+                    return loadJson(bankUrl).then((defs) => {
                         const rows = [];
-                        for (const [character, onyomi, kunyomi, tags, ...glossary] of refs) {
-                            rows.push({character, onyomi, kunyomi, tags, glossary});
+                        for (const [character, onyomi, kunyomi, tags, ...meanings] of defs) {
+                            rows.push({character, onyomi, kunyomi, tags, meanings});
                         }
 
                         return this.db.kanji.bulkAdd(rows);
