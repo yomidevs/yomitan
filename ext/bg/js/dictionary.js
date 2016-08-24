@@ -27,13 +27,6 @@ class Dictionary {
         return Dexie.exists('dict');
     }
 
-    loadDb() {
-        this.db = null;
-        this.entities = null;
-
-        return this.initDb().open();
-    }
-
     initDb() {
         this.db = new Dexie('dict');
         this.db.version(1).stores({
@@ -45,23 +38,11 @@ class Dictionary {
         return this.db;
     }
 
-    importKanjiDict(dict) {
-        return this.db.kanji.bulkAdd(dict.d);
-    }
+    loadDb() {
+        this.db = null;
+        this.entities = null;
 
-    fetchEntities() {
-        if (this.entities !== null) {
-            return Promise.resolve(this.entities);
-        }
-
-        return this.db.entities.toArray((rows) => {
-            this.entities = {};
-            for (const row of rows) {
-                this.entities[row.name] = row.value;
-            }
-        }).then(() => {
-            return Promise.resolve(this.entities);
-        });
+        return this.initDb().open();
     }
 
     findTerm(term) {
@@ -93,18 +74,24 @@ class Dictionary {
         });
     }
 
-    // importTermDict(dict) {
-    //     return this.db.terms.bulkAdd(dict.d).then(() => {
-    //         this.entities = {};
-    //         for (const name in dict.e) {
-    //             this.entities[name] = dict.e[name];
-    //         }
+    getEntities() {
+        if (this.entities !== null) {
+            return Promise.resolve(this.entities);
+        }
 
-    //         return this.db.entities.bulkAdd(dict.e);
-    //     });
-    // }
+        return this.db.entities.toArray((rows) => {
+            this.entities = {};
+            for (const row of rows) {
+                this.entities[row.name] = row.value;
+            }
+        }).then(() => {
+            return Promise.resolve(this.entities);
+        });
+    }
 
     importTermDict(indexUrl) {
+        const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
+
         return Dictionary.loadJson(indexUrl).then((index) => {
             const entities = [];
             for (const [name, value] of index.ents) {
@@ -121,9 +108,7 @@ class Dictionary {
                 }
             }).then(() => {
                 const loaders = [];
-                const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
-
-                for (let i = 0; i < index.refs; ++i) {
+                for (let i = 0; i <= index.refs; ++i) {
                     const refUrl = `${indexDir}/ref_${i}.json`;
                     loaders.push(() => {
                         return Dictionary.loadJson(refUrl).then((refs) => {
@@ -144,6 +129,34 @@ class Dictionary {
 
                 return chain;
             });
+        });
+    }
+
+    importKanjiDict(indexUrl) {
+        const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
+
+        return Dictionary.loadJson(indexUrl).then((index) => {
+            const loaders = [];
+            for (let i = 0; i <= index.refs; ++i) {
+                const refUrl = `${indexDir}/ref_${i}.json`;
+                loaders.push(() => {
+                    return Dictionary.loadJson(refUrl).then((refs) => {
+                        const rows = [];
+                        for (const [character, onyomi, kunyomi, tags, ...glossary] of refs) {
+                            rows.push({character, onyomi, kunyomi, tags, glossary});
+                        }
+
+                        return this.db.kanji.bulkAdd(rows);
+                    });
+                });
+            }
+
+            let chain = Promise.resolve();
+            for (const loader of loaders) {
+                chain = chain.then(loader);
+            }
+
+            return chain;
         });
     }
 
