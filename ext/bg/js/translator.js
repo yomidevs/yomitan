@@ -36,27 +36,24 @@ class Translator {
             return Translator.loadData('bg/data/tags.json');
         }).then((response) => {
             this.tagMeta = JSON.parse(response);
-            return this.dictionary.loadDb();
+            return this.dictionary.existsDb();
+        }).then((exists) => {
+            if (exists) {
+                return this.dictionary.loadDb();
+            } else {
+                this.dictionary.initDb();
+                return Promise.all([
+                    this.dictionary.importTermDict('bg/data/edict/index.json'),
+                    this.dictionary.importTermDict('bg/data/enamdict/index.json')
+                ]);
+            }
         }).then(() => {
             this.loaded = true;
             callback();
-        }).catch(() => {
-            return this.dictionary.resetDb().then(() => {
-                return Translator.loadData('bg/data/edict.json');
-            }).then((response) => {
-                return this.dictionary.importTermDict(JSON.parse(response));
-            }).then(() => {
-                return Translator.loadData('bg/data/enamdict.json');
-            }).then((response) => {
-                return this.dictionary.importTermDict(JSON.parse(response));
-            }).then(() => {
-                return Translator.loadData('bg/data/kanjidic.json');
-            }).then((response) => {
-                return this.dictionary.importKanjiDict(JSON.parse(response));
+
+            this.dictionary.findTerm('猫').then((result) => {
+                console.log(result);
             });
-        }).then(() => {
-            this.loaded = true;
-            callback();
         });
     }
 

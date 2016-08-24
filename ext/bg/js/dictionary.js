@@ -23,40 +23,26 @@ class Dictionary {
         this.entities = null;
     }
 
+    existsDb() {
+        return Dexie.exists('dict');
+    }
+
     loadDb() {
         this.db = null;
         this.entities = null;
 
-        return new Dexie('dict').open().then((db) => {
-            this.db = db;
-        });
+        return this.initDb().open();
     }
 
-    resetDb() {
-        this.db = null;
-        this.entities = null;
-
-        return new Dexie('dict').delete().then(() => {
-            return Promise.resolve(new Dexie('dict'));
-        }).then((db) => {
-            this.db = db;
-            return this.db.version(1).stores({
-                terms: '++id, e, r',
-                entities: 'n',
-                kanji: 'c'
-            });
+    initDb() {
+        this.db = new Dexie('dict');
+        this.db.version(1).stores({
+            terms: '++id,expression,reading',
+            entities: '++id,name',
+            kanji: '++id,character'
         });
-    }
 
-    importTermDict(dict) {
-        return this.db.terms.bulkAdd(dict.d).then(() => {
-            this.entities = {};
-            for (const name in dict.e) {
-                this.entities[name] = dict.e[name];
-            }
-
-            return this.db.entities.bulkAdd(dict.e);
-        });
+        return this.db;
     }
 
     importKanjiDict(dict) {
@@ -78,19 +64,19 @@ class Dictionary {
         });
     }
 
-    findterm(term) {
+    findTerm(term) {
         const results = [];
-        return this.db.terms.where('e').equals(term).or('r').equals(term).each((row) => {
+        return this.db.terms.where('expression').equals(term).or('reading').equals(term).each((row) => {
             results.push({
-                expression: row.e,
-                reading: row.r,
-                tags: row.t.split(' '),
-                glossary: row.g,
+                expression: row.expression,
+                reading: row.reading,
+                tags: row.tags.split(' '),
+                glossary: row.glossary,
                 entities: this.entities,
-                id: results.id
+                id: row.id
             });
         }).then(() => {
-            Promise.resolve(results);
+            return Promise.resolve(results);
         });
     }
 
@@ -104,6 +90,69 @@ class Dictionary {
                 tags: row.t.split(' '),
                 glossary: row.m
             });
+        });
+    }
+
+    // importTermDict(dict) {
+    //     return this.db.terms.bulkAdd(dict.d).then(() => {
+    //         this.entities = {};
+    //         for (const name in dict.e) {
+    //             this.entities[name] = dict.e[name];
+    //         }
+
+    //         return this.db.entities.bulkAdd(dict.e);
+    //     });
+    // }
+
+    importTermDict(indexUrl) {
+        return Dictionary.loadJson(indexUrl).then((index) => {
+            const entities = [];
+            for (const [name, value] of index.ents) {
+                entities.push({name, value});
+            }
+
+            return this.db.entities.bulkAdd(entities).then(() => {
+                if (this.entities === null) {
+                    this.entities = {};
+                }
+
+                for (const entity of entities) {
+                    this.entities[entity.name] = entity.value;
+                }
+            }).then(() => {
+                const loaders = [];
+                const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
+
+                for (let i = 0; i < index.refs; ++i) {
+                    const refUrl = `${indexDir}/ref_${i}.json`;
+                    loaders.push(
+                        Dictionary.loadJson(refUrl).then((refs) => {
+                            const rows = [];
+                            for (const [e, r, t, ...g] of refs) {
+                                rows.push({
+                                    'expression': e,
+                                    'reading': r,
+                                    'tags': t,
+                                    'glossary': g
+                                });
+                            }
+
+                            return this.db.terms.bulkAdd(rows);
+                        })
+                    );
+                }
+
+                return Promise.all(loaders);
+            });
+        });
+    }
+
+    static loadJson(url) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('load', () => resolve(JSON.parse(xhr.responseText)));
+            xhr.open('GET', chrome.extension.getURL(url), true);
+            xhr.send();
         });
     }
 }
