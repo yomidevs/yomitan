@@ -92,7 +92,7 @@ class Dictionary {
     importTermDict(indexUrl) {
         const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
 
-        return Dictionary.loadJson(indexUrl).then((index) => {
+        return loadJson(indexUrl).then((index) => {
             const entities = [];
             for (const [name, value] of index.ents) {
                 entities.push({name, value});
@@ -111,7 +111,7 @@ class Dictionary {
                 for (let i = 0; i <= index.refs; ++i) {
                     const refUrl = `${indexDir}/ref_${i}.json`;
                     loaders.push(() => {
-                        return Dictionary.loadJson(refUrl).then((refs) => {
+                        return loadJson(refUrl).then((refs) => {
                             const rows = [];
                             for (const [expression, reading, tags, ...glossary] of refs) {
                                 rows.push({expression, reading, tags, glossary});
@@ -135,12 +135,12 @@ class Dictionary {
     importKanjiDict(indexUrl) {
         const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
 
-        return Dictionary.loadJson(indexUrl).then((index) => {
+        return loadJson(indexUrl).then((index) => {
             const loaders = [];
             for (let i = 0; i <= index.refs; ++i) {
                 const refUrl = `${indexDir}/ref_${i}.json`;
                 loaders.push(() => {
-                    return Dictionary.loadJson(refUrl).then((refs) => {
+                    return loadJson(refUrl).then((refs) => {
                         const rows = [];
                         for (const [character, onyomi, kunyomi, tags, ...glossary] of refs) {
                             rows.push({character, onyomi, kunyomi, tags, glossary});
@@ -157,15 +157,6 @@ class Dictionary {
             }
 
             return chain;
-        });
-    }
-
-    static loadJson(url) {
-        return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.addEventListener('load', () => resolve(JSON.parse(xhr.responseText)));
-            xhr.open('GET', chrome.extension.getURL(url), true);
-            xhr.send();
         });
     }
 }

@@ -31,9 +31,9 @@ class Translator {
             return;
         }
 
-        Translator.loadJson('bg/data/rules.json').then((rules) => {
+        loadJson('bg/data/rules.json').then((rules) => {
             this.deinflector.setRules(rules);
-            return Translator.loadJson('bg/data/tags.json');
+            return loadJson('bg/data/tags.json');
         }).then((tagMeta) => {
             this.tagMeta = tagMeta;
             return this.dictionary.existsDb();
@@ -238,20 +238,6 @@ class Translator {
             }
 
             return 0;
-        });
-    }
-
-    static isKanji(c) {
-        const code = c.charCodeAt(0);
-        return code >= 0x4e00 && code < 0x9fb0 || code >= 0x3400 && code < 0x4dc0;
-    }
-
-    static loadJson(url) {
-        return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.addEventListener('load', () => resolve(JSON.parse(xhr.responseText)));
-            xhr.open('GET', chrome.extension.getURL(url), true);
-            xhr.send();
         });
     }
 }

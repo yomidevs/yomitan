@@ -23,7 +23,7 @@ class Yomichan {
         Handlebars.registerHelper('kanjiLinks', function(options) {
             let result = '';
             for (const c of options.fn(this)) {
-                if (Translator.isKanji(c)) {
+                if (isKanji(c)) {
                     result += Handlebars.templates['kanji-link.html']({kanji: c}).trim();
                 } else {
                     result += c;
