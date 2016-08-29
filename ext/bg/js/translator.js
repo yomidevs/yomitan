@@ -38,16 +38,16 @@ class Translator {
             this.tagMeta = tagMeta;
             return this.dictionary.existsDb();
         }).then((exists) => {
+            this.dictionary.initDb();
             if (exists) {
-                return this.dictionary.loadDb();
-            } else {
-                this.dictionary.initDb();
-                return Promise.all([
-                    this.dictionary.importKanjiDict('bg/data/kanjidic/index.json'),
-                    this.dictionary.importTermDict('bg/data/edict/index.json'),
-                    this.dictionary.importTermDict('bg/data/enamdict/index.json')
-                ]);
+                return Promise.resolve();
             }
+
+            return Promise.all([
+                this.dictionary.importKanjiDict('bg/data/kanjidic/index.json'),
+                this.dictionary.importTermDict('bg/data/edict/index.json'),
+                this.dictionary.importTermDict('bg/data/enamdict/index.json')
+            ]);
         }).then(() => {
             this.dictionary.findTerm('猫').then((result) => {
                 console.log(result);

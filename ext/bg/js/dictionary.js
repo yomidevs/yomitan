@@ -28,21 +28,14 @@ class Dictionary {
     }
 
     initDb() {
+        this.entities = null;
+
         this.db = new Dexie('dict');
         this.db.version(1).stores({
             terms: '++id,expression,reading',
             entities: '++,name',
             kanji: '++,character'
         });
-
-        return this.db;
-    }
-
-    loadDb() {
-        this.db = null;
-        this.entities = null;
-
-        return this.initDb().open();
     }
 
     findTerm(term) {
