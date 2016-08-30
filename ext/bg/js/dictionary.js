@@ -19,8 +19,8 @@
 
 class Dictionary {
     constructor() {
-        this.db = null;
         this.entities = null;
+        this.db = new Dexie('dict');
     }
 
     existsDb() {
@@ -29,8 +29,6 @@ class Dictionary {
 
     initDb() {
         this.entities = null;
-
-        this.db = new Dexie('dict');
         this.db.version(1).stores({
             terms: '++id,expression,reading',
             entities: '++,name',
@@ -46,11 +44,16 @@ class Dictionary {
                 reading: row.reading,
                 tags: row.tags.split(' '),
                 glossary: row.glossary,
-                entities: this.entities,
                 id: row.id
             });
         }).then(() => {
-            return Promise.resolve(results);
+            return this.getEntities();
+        }).then((entities) => {
+            for (const result of results) {
+                result.entities = entities;
+            }
+
+            return results;
         });
     }
 
@@ -67,9 +70,9 @@ class Dictionary {
         });
     }
 
-    getEntities() {
+    getEntities(tags) {
         if (this.entities !== null) {
-            return Promise.resolve(this.entities);
+            return this.entities;
         }
 
         return this.db.entities.toArray((rows) => {
@@ -77,8 +80,8 @@ class Dictionary {
             for (const row of rows) {
                 this.entities[row.name] = row.value;
             }
-        }).then(() => {
-            return Promise.resolve(this.entities);
+
+            return this.entities;
         });
     }
 
