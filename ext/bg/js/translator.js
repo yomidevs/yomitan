@@ -31,13 +31,13 @@ class Translator {
             return;
         }
 
-        loadJson('bg/data/rules.json').then((rules) => {
+        loadJson('bg/data/rules.json').then(rules => {
             this.deinflector.setRules(rules);
             return loadJson('bg/data/tags.json');
-        }).then((tagMeta) => {
+        }).then(tagMeta => {
             this.tagMeta = tagMeta;
             return this.dictionary.existsDb();
-        }).then((exists) => {
+        }).then(exists => {
             this.dictionary.initDb();
             if (exists) {
                 return Promise.resolve();
@@ -49,10 +49,6 @@ class Translator {
                 this.dictionary.importTermDict('bg/data/enamdict/index.json')
             ]);
         }).then(() => {
-            this.dictionary.findTerm('猫').then((result) => {
-                console.log(result);
-            });
-
             this.loaded = true;
             callback();
         });
