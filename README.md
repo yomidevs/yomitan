@@ -1,4 +1,3 @@
-# Yomichan for Chrome #
 
 Yomichan for Chrome turns your browser into a tool for building Japanese language literacy by helping you to decipher
 texts which would be otherwise too difficult tackle. This extension was inspired in part by
@@ -8,7 +7,7 @@ apart in its goal of being a all-encompassing learning tool as opposed to a mere
 natural evolution of the [Yomichan](https://foosoft.net/projects/yomichan) plugin that I developed for Anki when I began learning Japanese
 in early 2011.
 
-<iframe width="800" height="500" src="https://www.youtube.com/embed/90_A1VpTnMk" frameborder="0" allowfullscreen></iframe>
+<iframe width="800" height="500" src="https://www.youtube.com/embed/90_A1VpTnMk" allowfullscreen></iframe>
 
 ## Requirements ##
 
