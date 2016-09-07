@@ -1,3 +1,4 @@
+# Yomichan for Chrome #
 
 Yomichan for Chrome turns your browser into a tool for building Japanese language literacy by helping you to decipher
 texts which would be otherwise too difficult tackle. This extension was inspired in part by
