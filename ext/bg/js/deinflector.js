@@ -116,7 +116,7 @@ class Deinflector {
     deinflect(term, validator) {
         const node = new Deinflection(term);
         return node.deinflect(validator, this.rules).then(success => {
-            return success ? node.gather() : null;
+            return success ? node.gather() : [];
         });
     }
 }

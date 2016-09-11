@@ -63,7 +63,7 @@ class Translator {
                 this.deinflector.deinflect(text.slice(0, i), term => {
                     return this.dictionary.findTerm(term).then(definitions => definitions.map(def => def.tags));
                 }).then(inflects => {
-                    for (const inflect of inflects || []) {
+                    for (const inflect of inflects) {
                         this.processTerm(groups, df.source, df.tags, df.rules, df.root);
                     }
                 })
