@@ -73,7 +73,7 @@ class Translator {
             );
         }
 
-        return Promise.all(deinflectPromises).then(Promise.resolve(groups));
+        return Promise.all(deinflectPromises).then(() => groups);
     }
 
     findTerm(text) {
