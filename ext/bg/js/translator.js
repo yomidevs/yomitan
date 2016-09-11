@@ -55,17 +55,23 @@ class Translator {
     }
 
     findTermGroups(text) {
-        const groups = {};
-
+        const deinflectGroups = {};
         const deinflectPromises = [];
+
         for (let i = text.length; i > 0; --i) {
             deinflectPromises.push(
                 this.deinflector.deinflect(text.slice(0, i), term => {
                     return this.dictionary.findTerm(term).then(definitions => definitions.map(definition => definition.tags));
-                }).then(inflects => {
+                }).then(deinflects => {
                     const processPromises = [];
-                    for (const inflect of inflects) {
-                        processPromises.push(this.processTerm(groups, inflect.source, inflect.tags, inflect.rules, inflect.root));
+                    for (const deinflect of deinflects) {
+                        processPromises.push(this.processTerm(
+                            deinflectGroups,
+                            deinflect.source,
+                            deinflect.tags,
+                            deinflect.rules,
+                            deinflect.root
+                        ));
                     }
 
                     return Promise.all(processPromises);
@@ -73,14 +79,14 @@ class Translator {
             );
         }
 
-        return Promise.all(deinflectPromises).then(() => groups);
+        return Promise.all(deinflectPromises).then(() => deinflectGroups);
     }
 
     findTerm(text) {
-        return this.findTermGroups(text).then(groups => {
+        return this.findTermGroups(text).then(deinflectGroups => {
             let definitions = [];
-            for (const key in groups) {
-                definitions.push(groups[key]);
+            for (const key in deinflectGroups) {
+                definitions.push(deinflectGroups[key]);
             }
 
             definitions = definitions.sort((v1, v2) => {
@@ -121,17 +127,20 @@ class Translator {
     }
 
     findKanji(text) {
-        let definitions = [];
         const processed = {};
+        const promises = [];
 
         for (const c of text) {
             if (!processed[c]) {
-                definitions = definitions.concat(this.dictionary.findKanji(c));
+                promises.push(this.dictionary.findKanji(c).then((definitions) => definitions));
                 processed[c] = true;
             }
         }
 
-        return this.processKanji(definitions);
+        return Promise.all(promises).then((sets) => {
+            const definitions = sets.reduce((a, b) => a.concat(b));
+            return this.processKanji(definitions);
+        });
     }
 
     processTerm(groups, source, tags, rules, root) {
@@ -143,7 +152,7 @@ class Translator {
 
                 let matched = tags.length === 0;
                 for (const tag of tags) {
-                    if (definition.tags.indexOf(tag) !== -1) {
+                    if (definition.tags.includes(tag)) {
                         matched = true;
                         break;
                     }

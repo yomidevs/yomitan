@@ -59,15 +59,15 @@ class Dictionary {
 
     findKanji(kanji) {
         const results = [];
-        return this.db.kanji.where('c').equals(kanji).each(row => {
+        return this.db.kanji.where('character').equals(kanji).each(row => {
             results.push({
-                character: row.c,
-                onyomi: row.o.split(' '),
-                kunyomi: row.k.split(' '),
-                tags: row.t.split(' '),
-                glossary: row.m
+                character: row.character,
+                onyomi: row.onyomi.split(' '),
+                kunyomi: row.kunyomi.split(' '),
+                tags: row.tags.split(' '),
+                glossary: row.meanings
             });
-        });
+        }).then(() => results);
     }
 
     getEntities(tags) {

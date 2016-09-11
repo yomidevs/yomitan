@@ -26,14 +26,14 @@ class Deinflection {
     }
 
     validate(validator) {
-        return validator(this.term).then(tagSets => {
-            for (const tags of tagSets) {
+        return validator(this.term).then(sets => {
+            for (const tags of sets) {
                 if (this.tags.length === 0) {
                     return true;
                 }
 
                 for (const tag of this.tags) {
-                    if (tags.indexOf(tag) !== -1) {
+                    if (tags.includes(tag)) {
                         return true;
                     }
                 }
@@ -55,7 +55,7 @@ class Deinflection {
             for (const variant of rules[rule]) {
                 let allowed = this.tags.length === 0;
                 for (const tag of this.tags) {
-                    if (variant.ti.indexOf(tag) !== -1) {
+                    if (variant.ti.includes(tag)) {
                         allowed = true;
                         break;
                     }
@@ -115,8 +115,6 @@ class Deinflector {
 
     deinflect(term, validator) {
         const node = new Deinflection(term);
-        return node.deinflect(validator, this.rules).then(success => {
-            return success ? node.gather() : [];
-        });
+        return node.deinflect(validator, this.rules).then(success => success ? node.gather() : []);
     }
 }

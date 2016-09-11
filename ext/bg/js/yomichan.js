@@ -41,10 +41,10 @@ class Yomichan {
         chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
         chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
-        chrome.tabs.onCreated.addListener((tab) => this.onTabReady(tab.id));
+        chrome.tabs.onCreated.addListener(tab => this.onTabReady(tab.id));
         chrome.tabs.onUpdated.addListener(this.onTabReady.bind(this));
 
-        loadOptions((opts) => {
+        loadOptions(opts => {
             this.setOptions(opts);
             if (this.options.activateOnStartup) {
                 this.setState('loading');
@@ -118,7 +118,7 @@ class Yomichan {
     }
 
     tabInvokeAll(action, params) {
-        chrome.tabs.query({}, (tabs) => {
+        chrome.tabs.query({}, tabs => {
             for (const tab of tabs) {
                 this.tabInvoke(tab.id, action, params);
             }
@@ -133,7 +133,7 @@ class Yomichan {
         if (this.ankiConnectVer === this.getApiVersion()) {
             this.ankiInvoke(action, params, pool, callback);
         } else {
-            this.api_getVersion({callback: (version) => {
+            this.api_getVersion({callback: version => {
                 if (version === this.getApiVersion()) {
                     this.ankiConnectVer = version;
                     this.ankiInvoke(action, params, pool, callback);
@@ -209,7 +209,7 @@ class Yomichan {
                     break;
                 case 'tags':
                     if (definition.tags) {
-                        value = definition.tags.map((t) => t.name);
+                        value = definition.tags.map(t => t.name);
                     }
                     break;
             }
@@ -244,7 +244,7 @@ class Yomichan {
             };
 
             for (const name in fields) {
-                if (fields[name].indexOf('{audio}') !== -1) {
+                if (fields[name].includes('{audio}')) {
                     audio.fields.push(name);
                 }
             }
@@ -274,7 +274,7 @@ class Yomichan {
             }
         }
 
-        this.ankiInvokeSafe('canAddNotes', {notes}, 'notes', (results) => {
+        this.ankiInvokeSafe('canAddNotes', {notes}, 'notes', results => {
             const states = [];
 
             if (results !== null) {
@@ -293,11 +293,11 @@ class Yomichan {
     }
 
     api_findKanji({text, callback}) {
-        callback(this.translator.findKanji(text));
+        this.translator.findKanji(text).then(result => callback(result));
     }
 
     api_findTerm({text, callback}) {
-        this.translator.findTerm(text).then((result) => callback(result));
+        this.translator.findTerm(text).then(result => callback(result));
     }
 
     api_getDeckNames({callback}) {
