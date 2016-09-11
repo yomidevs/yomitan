@@ -133,10 +133,7 @@ class Translator {
             }
         }
 
-        return Promise.all(promises).then((sets) => {
-            const definitions = sets.reduce((a, b) => a.concat(b));
-            return this.processKanji(definitions);
-        });
+        return Promise.all(promises).then(sets => this.processKanji(sets.reduce((a, b) => a.concat(b))));
     }
 
     processTerm(groups, source, tags, rules, root) {
