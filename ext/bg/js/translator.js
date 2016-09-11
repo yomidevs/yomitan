@@ -59,12 +59,12 @@ class Translator {
         for (let i = text.length; i > 0; --i) {
             const term = text.slice(0, i);
             const dfs = this.deinflector.deinflect(term, t => {
-                const tags = [];
+                const tagSets = [];
                 for (const d of this.dictionary.findTerm(t)) {
-                    tags.push(d.tags);
+                    tagSets.push(d.tags);
                 }
 
-                return tags;
+                return tagSets;
             });
 
             if (dfs === null) {
@@ -114,7 +114,7 @@ class Translator {
             length = Math.max(length, result.source.length);
         }
 
-        return {definitions: definitions, length: length};
+        return {definitions, length};
     }
 
     findKanji(text) {
