@@ -54,67 +54,67 @@ class Translator {
         });
     }
 
-    findTerm(text) {
+    findTermGroups(text) {
         const groups = {};
+        const promises = [];
+
         for (let i = text.length; i > 0; --i) {
-            const term = text.slice(0, i);
-            const dfs = this.deinflector.deinflect(term, t => {
-                const tagSets = [];
-                for (const d of this.dictionary.findTerm(t)) {
-                    tagSets.push(d.tags);
+            promises.append(
+                this.deinflector.deinflect(text.slice(0, i), term => {
+                    return this.dictionary.findTerm(term).then(definitions => definitions.map(def => def.tags));
+                }).then(inflects => {
+                    for (const inflect of inflects || []) {
+                        this.processTerm(groups, df.source, df.tags, df.rules, df.root);
+                    }
+                })
+            );
+        }
+
+        return Promise.all(promises).then(Promise.resolve(groups));
+    }
+
+    findTerm(text) {
+        return this.findTermGroups(text).then(groups => {
+            let definitions = [];
+            for (const key in groups) {
+                definitions.push(groups[key]);
+            }
+
+            definitions = definitions.sort((v1, v2) => {
+                const sl1 = v1.source.length;
+                const sl2 = v2.source.length;
+                if (sl1 > sl2) {
+                    return -1;
+                } else if (sl1 < sl2) {
+                    return 1;
                 }
 
-                return tagSets;
+                const s1 = v1.score;
+                const s2 = v2.score;
+                if (s1 > s2) {
+                    return -1;
+                } else if (s1 < s2) {
+                    return 1;
+                }
+
+                const rl1 = v1.rules.length;
+                const rl2 = v2.rules.length;
+                if (rl1 < rl2) {
+                    return -1;
+                } else if (rl1 > rl2) {
+                    return 1;
+                }
+
+                return v2.expression.localeCompare(v1.expression);
             });
 
-            if (dfs === null) {
-                continue;
+            let length = 0;
+            for (const result of definitions) {
+                length = Math.max(length, result.source.length);
             }
 
-            for (const df of dfs) {
-                this.processTerm(groups, df.source, df.tags, df.rules, df.root);
-            }
-        }
-
-        let definitions = [];
-        for (const key in groups) {
-            definitions.push(groups[key]);
-        }
-
-        definitions = definitions.sort((v1, v2) => {
-            const sl1 = v1.source.length;
-            const sl2 = v2.source.length;
-            if (sl1 > sl2) {
-                return -1;
-            } else if (sl1 < sl2) {
-                return 1;
-            }
-
-            const s1 = v1.score;
-            const s2 = v2.score;
-            if (s1 > s2) {
-                return -1;
-            } else if (s1 < s2) {
-                return 1;
-            }
-
-            const rl1 = v1.rules.length;
-            const rl2 = v2.rules.length;
-            if (rl1 < rl2) {
-                return -1;
-            } else if (rl1 > rl2) {
-                return 1;
-            }
-
-            return v2.expression.localeCompare(v1.expression);
+            return {definitions, length};
         });
-
-        let length = 0;
-        for (const result of definitions) {
-            length = Math.max(length, result.source.length);
-        }
-
-        return {definitions, length};
     }
 
     findKanji(text) {
@@ -132,52 +132,54 @@ class Translator {
     }
 
     processTerm(groups, source, tags, rules, root) {
-        for (const entry of this.dictionary.findTerm(root)) {
-            if (entry.id in groups) {
-                continue;
-            }
-
-            let matched = tags.length === 0;
-            for (const tag of tags) {
-                if (entry.tags.indexOf(tag) !== -1) {
-                    matched = true;
-                    break;
+        return this.dictionary.findTerm(root).then(definitions => {
+            for (const definition of definitions) {
+                if (definition.id in groups) {
+                    continue;
                 }
-            }
 
-            if (!matched) {
-                continue;
-            }
+                let matched = tags.length === 0;
+                for (const tag of tags) {
+                    if (definition.tags.indexOf(tag) !== -1) {
+                        matched = true;
+                        break;
+                    }
+                }
 
-            const tagItems = [];
-            for (const tag of entry.tags) {
-                const tagItem = {
-                    name: tag,
-                    class: 'default',
-                    order: Number.MAX_SAFE_INTEGER,
-                    score: 0,
-                    desc: entry.entities[tag] || '',
+                if (!matched) {
+                    continue;
+                }
+
+                const tagItems = [];
+                for (const tag of definition.tags) {
+                    const tagItem = {
+                        name: tag,
+                        class: 'default',
+                        order: Number.MAX_SAFE_INTEGER,
+                        score: 0,
+                        desc: definition.entities[tag] || '',
+                    };
+
+                    this.applyTagMeta(tagItem);
+                    tagItems.push(tagItem);
+                }
+
+                let score = 0;
+                for (const tagItem of tagItems) {
+                    score += tagItem.score;
+                }
+
+                groups[definition.id] = {
+                    score,
+                    source,
+                    rules,
+                    expression: definition.expression,
+                    reading: definition.reading,
+                    glossary: definition.glossary,
+                    tags: Translator.sortTags(tagItems)
                 };
-
-                this.applyTagMeta(tagItem);
-                tagItems.push(tagItem);
             }
-
-            let score = 0;
-            for (const tagItem of tagItems) {
-                score += tagItem.score;
-            }
-
-            groups[entry.id] = {
-                score,
-                source,
-                rules,
-                expression: entry.expression,
-                reading: entry.reading,
-                glossary: entry.glossary,
-                tags: Translator.sortTags(tagItems)
-            };
-        }
+        });
     }
 
     processKanji(entries) {
