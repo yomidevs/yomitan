@@ -59,12 +59,18 @@ class Translator {
         const promises = [];
 
         for (let i = text.length; i > 0; --i) {
-            promises.append(
+            promises.push(
                 this.deinflector.deinflect(text.slice(0, i), term => {
                     return this.dictionary.findTerm(term).then(definitions => definitions.map(def => def.tags));
                 }).then(inflects => {
                     for (const inflect of inflects) {
-                        this.processTerm(groups, df.source, df.tags, df.rules, df.root);
+                        this.processTerm(
+                            groups,
+                            inflect.source,
+                            inflect.tags,
+                            inflect.rules,
+                            inflect.root
+                        );
                     }
                 })
             );

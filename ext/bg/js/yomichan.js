@@ -297,7 +297,7 @@ class Yomichan {
     }
 
     api_findTerm({text, callback}) {
-        callback(this.translator.findTerm(text));
+        this.translator.findTerm(text).then((result) => callback(result));
     }
 
     api_getDeckNames({callback}) {
