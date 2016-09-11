@@ -56,27 +56,24 @@ class Translator {
 
     findTermGroups(text) {
         const groups = {};
-        const promises = [];
 
+        const deinflectPromises = [];
         for (let i = text.length; i > 0; --i) {
-            promises.push(
+            deinflectPromises.push(
                 this.deinflector.deinflect(text.slice(0, i), term => {
-                    return this.dictionary.findTerm(term).then(definitions => definitions.map(def => def.tags));
+                    return this.dictionary.findTerm(term).then(definitions => definitions.map(definition => definition.tags));
                 }).then(inflects => {
+                    const processPromises = [];
                     for (const inflect of inflects) {
-                        this.processTerm(
-                            groups,
-                            inflect.source,
-                            inflect.tags,
-                            inflect.rules,
-                            inflect.root
-                        );
+                        processPromises.push(this.processTerm(groups, inflect.source, inflect.tags, inflect.rules, inflect.root));
                     }
+
+                    return Promise.all(processPromises);
                 })
             );
         }
 
-        return Promise.all(promises).then(Promise.resolve(groups));
+        return Promise.all(deinflectPromises).then(Promise.resolve(groups));
     }
 
     findTerm(text) {
