@@ -101,7 +101,7 @@ class Yomichan {
                 break;
             case 'loading':
                 chrome.browserAction.setBadgeText({text: '...'});
-                this.translator.loadData({loadEnamDict: this.options.loadEnamDict}, () => this.setState('enabled'));
+                this.translator.loadData().then(() => this.setState('enabled'));
                 break;
         }
 

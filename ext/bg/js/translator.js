@@ -25,13 +25,12 @@ class Translator {
         this.deinflector = new Deinflector();
     }
 
-    loadData({loadEnamDict=true}, callback) {
+    loadData() {
         if (this.loaded) {
-            callback();
-            return;
+            return Promise.resolve();
         }
 
-        loadJson('bg/data/rules.json').then(rules => {
+        return loadJson('bg/data/rules.json').then(rules => {
             this.deinflector.setRules(rules);
             return loadJson('bg/data/tags.json');
         }).then(tagMeta => {
@@ -39,18 +38,15 @@ class Translator {
             return this.dictionary.existsDb();
         }).then(exists => {
             this.dictionary.initDb();
-            if (exists) {
-                return Promise.resolve();
+            if (!exists) {
+                return Promise.all([
+                    this.dictionary.importKanjiDict('bg/data/kanjidic/index.json'),
+                    this.dictionary.importTermDict('bg/data/edict/index.json'),
+                    this.dictionary.importTermDict('bg/data/enamdict/index.json')
+                ]);
             }
-
-            return Promise.all([
-                this.dictionary.importKanjiDict('bg/data/kanjidic/index.json'),
-                this.dictionary.importTermDict('bg/data/edict/index.json'),
-                this.dictionary.importTermDict('bg/data/enamdict/index.json')
-            ]);
         }).then(() => {
             this.loaded = true;
-            callback();
         });
     }
 
@@ -194,12 +190,10 @@ class Translator {
         });
     }
 
-    processKanji(entries) {
-        const results = [];
-
-        for (const entry of entries) {
+    processKanji(definitions) {
+        for (const definition of definitions) {
             const tagItems = [];
-            for (const tag of entry.tags) {
+            for (const tag of definition.tags) {
                 const tagItem = {
                     name: tag,
                     class: 'default',
@@ -211,16 +205,10 @@ class Translator {
                 tagItems.push(tagItem);
             }
 
-            results.push({
-                character: entry.character,
-                kunyomi: entry.kunyomi,
-                onyomi: entry.onyomi,
-                glossary: entry.glossary,
-                tags: Translator.sortTags(tagItems)
-            });
+            definition.tags = Translator.sortTags(tagItems);
         }
 
-        return results;
+        return definitions;
     }
 
     applyTagMeta(tag) {
