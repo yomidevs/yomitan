@@ -38,7 +38,7 @@ class Dictionary {
 
     findTerm(term) {
         const results = [];
-        return this.db.terms.where('expression').equals(term).or('reading').equals(term).each((row) => {
+        return this.db.terms.where('expression').equals(term).or('reading').equals(term).each(row => {
             results.push({
                 expression: row.expression,
                 reading: row.reading,
@@ -48,7 +48,7 @@ class Dictionary {
             });
         }).then(() => {
             return this.getEntities();
-        }).then((entities) => {
+        }).then(entities => {
             for (const result of results) {
                 result.entities = entities;
             }
@@ -59,7 +59,7 @@ class Dictionary {
 
     findKanji(kanji) {
         const results = [];
-        return this.db.kanji.where('c').equals(kanji).each((row) => {
+        return this.db.kanji.where('c').equals(kanji).each(row => {
             results.push({
                 character: row.c,
                 onyomi: row.o.split(' '),
@@ -75,7 +75,7 @@ class Dictionary {
             return this.entities;
         }
 
-        return this.db.entities.toArray((rows) => {
+        return this.db.entities.toArray(rows => {
             this.entities = {};
             for (const row of rows) {
                 this.entities[row.name] = row.value;
@@ -88,7 +88,7 @@ class Dictionary {
     importTermDict(indexUrl) {
         const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
 
-        return loadJson(indexUrl).then((index) => {
+        return loadJson(indexUrl).then(index => {
             const entities = [];
             for (const [name, value] of index.ents) {
                 entities.push({name, value});
@@ -107,9 +107,9 @@ class Dictionary {
                 for (let i = 1; i <= index.banks; ++i) {
                     const bankUrl = `${indexDir}/bank_${i}.json`;
                     loaders.push(() => {
-                        return loadJson(bankUrl).then((defs) => {
+                        return loadJson(bankUrl).then(definitions => {
                             const rows = [];
-                            for (const [expression, reading, tags, ...glossary] of defs) {
+                            for (const [expression, reading, tags, ...glossary] of definitions) {
                                 rows.push({expression, reading, tags, glossary});
                             }
 
@@ -131,14 +131,14 @@ class Dictionary {
     importKanjiDict(indexUrl) {
         const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
 
-        return loadJson(indexUrl).then((index) => {
+        return loadJson(indexUrl).then(index => {
             const loaders = [];
             for (let i = 1; i <= index.banks; ++i) {
                 const bankUrl = `${indexDir}/bank_${i}.json`;
                 loaders.push(() => {
-                    return loadJson(bankUrl).then((defs) => {
+                    return loadJson(bankUrl).then(definitions => {
                         const rows = [];
-                        for (const [character, onyomi, kunyomi, tags, ...meanings] of defs) {
+                        for (const [character, onyomi, kunyomi, tags, ...meanings] of definitions) {
                             rows.push({character, onyomi, kunyomi, tags, meanings});
                         }
 
