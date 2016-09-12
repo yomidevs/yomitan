@@ -19,7 +19,7 @@
 
 function registerKanjiLinks() {
     for (const link of Array.from(document.getElementsByClassName('kanji-link'))) {
-        link.addEventListener('click', (e) => {
+        link.addEventListener('click', e => {
             e.preventDefault();
             window.parent.postMessage({action: 'displayKanji', params: e.target.innerHTML}, '*');
         });
@@ -28,7 +28,7 @@ function registerKanjiLinks() {
 
 function registerAddNoteLinks() {
     for (const link of Array.from(document.getElementsByClassName('action-add-note'))) {
-        link.addEventListener('click', (e) => {
+        link.addEventListener('click', e => {
             e.preventDefault();
             const ds = e.currentTarget.dataset;
             window.parent.postMessage({action: 'addNote', params: {index: ds.index, mode: ds.mode}}, '*');
@@ -38,7 +38,7 @@ function registerAddNoteLinks() {
 
 function registerAudioLinks() {
     for (const link of Array.from(document.getElementsByClassName('action-play-audio'))) {
-        link.addEventListener('click', (e) => {
+        link.addEventListener('click', e => {
             e.preventDefault();
             const ds = e.currentTarget.dataset;
             window.parent.postMessage({action: 'playAudio', params: ds.index}, '*');

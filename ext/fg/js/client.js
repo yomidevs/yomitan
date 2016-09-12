@@ -82,7 +82,7 @@ class Client {
             return;
         }
 
-        const textSource = Client.textSourceFromPoint(point);
+        const textSource = textSourceFromPoint(point);
         if (textSource === null || !textSource.containsPoint(point)) {
             this.hidePopup();
             return;
@@ -95,25 +95,25 @@ class Client {
         textSource.setEndOffset(this.options.scanLength);
 
         this.pendingLookup = true;
-        bgFindTerm(textSource.text()).then(({definitions, length}) => {
+        findTerm(textSource.text()).then(({definitions, length}) => {
             if (length === 0) {
                 this.pendingLookup = false;
                 this.hidePopup();
             } else {
                 textSource.setEndOffset(length);
 
-                const sentence = Client.extractSentence(textSource, this.options.sentenceExtent);
+                const sentence = extractSentence(textSource, this.options.sentenceExtent);
                 definitions.forEach(definition => {
                     definition.url = window.location.href;
                     definition.sentence = sentence;
                 });
 
                 const sequence = ++this.sequence;
-                return bgRenderText({definitions, sequence, root: this.fgRoot, options: this.options}, 'term-list.html').then(content => {
+                return renderText({definitions, sequence, root: this.fgRoot, options: this.options}, 'term-list.html').then(content => {
                     this.definitions = definitions;
                     this.pendingLookup = false;
                     this.showPopup(textSource, content);
-                    return bgCanAddDefinitions(definitions, ['term_kanji', 'term_kana']);
+                    return canAddDefinitions(definitions, ['term_kanji', 'term_kana']);
                 }).then(states => {
                     if (states !== null) {
                         states.forEach((state, index) => this.popup.sendMessage('setActionState', {index, state, sequence }));
@@ -156,7 +156,7 @@ class Client {
 
     api_addNote({index, mode}) {
         const state = {[mode]: false};
-        bgAddDefinition(this.definitions[index], mode).then(success => {
+        addDefinition(this.definitions[index], mode).then(success => {
             if (success) {
                 this.popup.sendMessage('setActionState', {index, state, sequence: this.sequence});
             } else {
@@ -185,92 +185,20 @@ class Client {
     }
 
     api_displayKanji(kanji) {
-        bgFindKanji(kanji).then(definitions => {
+        findKanji(kanji).then(definitions => {
             definitions.forEach(definition => definition.url = window.location.href);
 
             const sequence = ++this.sequence;
-            return bgRenderText({definitions, sequence, root: this.fgRoot, options: this.options}, 'kanji-list.html').then(content => {
+            return renderText({definitions, sequence, root: this.fgRoot, options: this.options}, 'kanji-list.html').then(content => {
                 this.definitions = definitions;
                 this.popup.setContent(content, definitions);
-                return bgCanAddDefinitions(definitions, ['kanji']);
+                return canAddDefinitions(definitions, ['kanji']);
             }).then(states => {
                 if (states !== null) {
                     states.forEach((state, index) => this.popup.sendMessage('setActionState', {index, state, sequence}));
                 }
             });
         });
-    }
-
-    static textSourceFromPoint(point) {
-        const element = document.elementFromPoint(point.x, point.y);
-        if (element !== null) {
-            const names = ['IMG', 'INPUT', 'BUTTON', 'TEXTAREA'];
-            if (names.includes(element.nodeName)) {
-                return new TextSourceElement(element);
-            }
-        }
-
-        const range = document.caretRangeFromPoint(point.x, point.y);
-        if (range !== null) {
-            return new TextSourceRange(range);
-        }
-
-        return null;
-    }
-
-    static extractSentence(source, extent) {
-        const quotesFwd = {'「': '」', '『': '』', "'": "'", '"': '"'};
-        const quotesBwd = {'」': '「', '』': '『', "'": "'", '"': '"'};
-        const terminators = '…。．.？?！!';
-
-        const sourceLocal = source.clone();
-        const position = sourceLocal.setStartOffset(extent);
-        sourceLocal.setEndOffset(position + extent);
-        const content = sourceLocal.text();
-
-        let quoteStack = [];
-
-        let startPos = 0;
-        for (let i = position; i >= startPos; --i) {
-            const c = content[i];
-
-            if (quoteStack.length === 0 && (terminators.includes(c) || c in quotesFwd)) {
-                startPos = i + 1;
-                break;
-            }
-
-            if (quoteStack.length > 0 && c === quoteStack[0]) {
-                quoteStack.pop();
-            } else if (c in quotesBwd) {
-                quoteStack = [quotesBwd[c]].concat(quoteStack);
-            }
-        }
-
-        quoteStack = [];
-
-        let endPos = content.length;
-        for (let i = position; i < endPos; ++i) {
-            const c = content[i];
-
-            if (quoteStack.length === 0) {
-                if (terminators.includes(c)) {
-                    endPos = i + 1;
-                    break;
-                }
-                else if (c in quotesBwd) {
-                    endPos = i;
-                    break;
-                }
-            }
-
-            if (quoteStack.length > 0 && c === quoteStack[0]) {
-                quoteStack.pop();
-            } else if (c in quotesFwd) {
-                quoteStack = [quotesFwd[c]].concat(quoteStack);
-            }
-        }
-
-        return content.substring(startPos, endPos).trim();
     }
 }
 
