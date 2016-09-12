@@ -97,6 +97,7 @@ class Client {
         this.pendingLookup = true;
         bgFindTerm(textSource.text()).then(({definitions, length}) => {
             if (length === 0) {
+                this.pendingLookup = false;
                 this.hidePopup();
             } else {
                 textSource.setEndOffset(length);
@@ -108,8 +109,9 @@ class Client {
                 });
 
                 const sequence = ++this.sequence;
-                return bgRenderText({definitions, sequence, root: this.fgRoot, options: this.options}, 'term-list.html').then((content) => {
+                return bgRenderText({definitions, sequence, root: this.fgRoot, options: this.options}, 'term-list.html').then(content => {
                     this.definitions = definitions;
+                    this.pendingLookup = false;
                     this.showPopup(textSource, content);
                     return bgCanAddDefinitions(definitions, ['term_kanji', 'term_kana']);
                 }).then(states => {
@@ -118,7 +120,7 @@ class Client {
                     }
                 });
             }
-        }).then(() => this.pendingLookup = false);
+        });
     }
 
     showPopup(textSource, content) {
