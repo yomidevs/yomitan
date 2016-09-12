@@ -19,24 +19,34 @@
 
 class Dictionary {
     constructor() {
+        this.db = null;
         this.entities = null;
+    }
+
+    initDb() {
         this.db = new Dexie('dict');
+        this.db.version(1).stores({
+            terms: '++id,expression,reading',
+            entities: '++,name',
+            kanji: '++,character'
+        });
+
+        this.entities = null;
+    }
+
+    deleteDb() {
+        return this.db === null ? Promise.resolve() : this.db.delete();
     }
 
     existsDb() {
         return Dexie.exists('dict');
     }
 
-    initDb() {
-        this.entities = null;
-        this.db.version(1).stores({
-            terms: '++id,expression,reading',
-            entities: '++,name',
-            kanji: '++,character'
-        });
-    }
-
     findTerm(term) {
+        if (this.db === null) {
+            return Promise.reject('database not initialized');
+        }
+
         const results = [];
         return this.db.terms.where('expression').equals(term).or('reading').equals(term).each(row => {
             results.push({
@@ -58,6 +68,10 @@ class Dictionary {
     }
 
     findKanji(kanji) {
+        if (this.db === null) {
+            return Promise.reject('database not initialized');
+        }
+
         const results = [];
         return this.db.kanji.where('character').equals(kanji).each(row => {
             results.push({
@@ -71,8 +85,12 @@ class Dictionary {
     }
 
     getEntities(tags) {
+        if (this.db === null) {
+            return Promise.reject('database not initialized');
+        }
+
         if (this.entities !== null) {
-            return this.entities;
+            return Promise.resolve(this.entities);
         }
 
         return this.db.entities.toArray(rows => {
@@ -86,8 +104,11 @@ class Dictionary {
     }
 
     importTermDict(indexUrl) {
-        const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
+        if (this.db === null) {
+            return Promise.reject('database not initialized');
+        }
 
+        const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
         return loadJson(indexUrl).then(index => {
             const entities = [];
             for (const [name, value] of index.ents) {
@@ -129,8 +150,11 @@ class Dictionary {
     }
 
     importKanjiDict(indexUrl) {
-        const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
+        if (this.db === null) {
+            return Promise.reject('database not initialized');
+        }
 
+        const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
         return loadJson(indexUrl).then(index => {
             const loaders = [];
             for (let i = 1; i <= index.banks; ++i) {
