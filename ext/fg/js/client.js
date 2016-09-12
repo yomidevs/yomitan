@@ -23,6 +23,7 @@ class Client {
         this.audio = {};
         this.lastMousePos = null;
         this.lastTextSource = null;
+        this.pendingLookup = false;
         this.activateKey = 16;
         this.activateBtn = 2;
         this.enabled = false;
@@ -36,8 +37,8 @@ class Client {
         window.addEventListener('mousedown', this.onMouseDown.bind(this));
         window.addEventListener('mousemove', this.onMouseMove.bind(this));
         window.addEventListener('keydown', this.onKeyDown.bind(this));
-        window.addEventListener('scroll', (e) => this.hidePopup());
-        window.addEventListener('resize', (e) => this.hidePopup());
+        window.addEventListener('scroll', e => this.hidePopup());
+        window.addEventListener('resize', e => this.hidePopup());
     }
 
     onKeyDown(e) {
@@ -89,11 +90,16 @@ class Client {
             return;
         }
 
+        if (this.pendingLookup) {
+            return;
+        }
+
         textSource.setEndOffset(this.options.scanLength);
 
         let defs = [];
         let seq = -1;
 
+        this.pendingLookup = true;
         bgFindTerm(textSource.text())
             .then(({definitions, length}) => {
                 if (length === 0) {
@@ -103,7 +109,7 @@ class Client {
                 textSource.setEndOffset(length);
 
                 const sentence = Client.extractSentence(textSource, this.options.sentenceExtent);
-                definitions.forEach((definition) => {
+                definitions.forEach(definition => {
                     definition.url = window.location.href;
                     definition.sentence = sentence;
                 });
@@ -113,17 +119,21 @@ class Client {
 
                 return bgRenderText({definitions, root: this.fgRoot, options: this.options, sequence: seq}, 'term-list.html');
             })
-            .then((content) => {
+            .then(content => {
                 this.definitions = defs;
                 this.showPopup(textSource, content);
 
                 return bgCanAddDefinitions(defs, ['term_kanji', 'term_kana']);
             })
-            .then((states) => {
+            .then(states => {
+                this.pendingLookup = false;
                 if (states !== null) {
                     states.forEach((state, index) => this.popup.sendMessage('setActionState', {index, state, sequence: seq}));
                 }
-            }, () => this.hidePopup());
+            }, () => {
+                this.pendingLookup = false;
+                this.hidePopup();
+            });
     }
 
     showPopup(textSource, content) {
@@ -159,7 +169,7 @@ class Client {
 
     api_addNote({index, mode}) {
         const state = {[mode]: false};
-        bgAddDefinition(this.definitions[index], mode).then((success) => {
+        bgAddDefinition(this.definitions[index], mode).then(success => {
             if (success) {
                 this.popup.sendMessage('setActionState', {index, state, sequence: this.sequence});
             } else {
@@ -192,21 +202,21 @@ class Client {
         let seq = -1;
 
         bgFindKanji(kanji)
-            .then((definitions) => {
-                definitions.forEach((definition) => definition.url = window.location.href);
+            .then(definitions => {
+                definitions.forEach(definition => definition.url = window.location.href);
 
                 defs = definitions;
                 seq = ++this.sequence;
 
                 return bgRenderText({definitions, root: this.fgRoot, options: this.options, sequence: seq}, 'kanji-list.html');
             })
-            .then((content) => {
+            .then(content => {
                 this.definitions = defs;
                 this.popup.setContent(content, defs);
 
                 return bgCanAddDefinitions(defs, ['kanji']);
             })
-            .then((states) => {
+            .then(states => {
                 if (states !== null) {
                     states.forEach((state, index) => this.popup.sendMessage('setActionState', {index, state, sequence: seq}));
                 }
@@ -217,7 +227,7 @@ class Client {
         const element = document.elementFromPoint(point.x, point.y);
         if (element !== null) {
             const names = ['IMG', 'INPUT', 'BUTTON', 'TEXTAREA'];
-            if (names.indexOf(element.nodeName) !== -1) {
+            if (names.includes(element.nodeName)) {
                 return new TextSourceElement(element);
             }
         }
@@ -246,7 +256,7 @@ class Client {
         for (let i = position; i >= startPos; --i) {
             const c = content[i];
 
-            if (quoteStack.length === 0 && (terminators.indexOf(c) !== -1 || c in quotesFwd)) {
+            if (quoteStack.length === 0 && (terminators.includes(c) || c in quotesFwd)) {
                 startPos = i + 1;
                 break;
             }
@@ -265,7 +275,7 @@ class Client {
             const c = content[i];
 
             if (quoteStack.length === 0) {
-                if (terminators.indexOf(c) !== -1) {
+                if (terminators.includes(c)) {
                     endPos = i + 1;
                     break;
                 }
