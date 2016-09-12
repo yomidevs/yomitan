@@ -183,25 +183,19 @@ class Client {
     }
 
     api_displayKanji(kanji) {
-        let defs = [];
-        let seq = -1;
-
         bgFindKanji(kanji).then(definitions => {
             definitions.forEach(definition => definition.url = window.location.href);
 
-            defs = definitions;
-            seq = ++this.sequence;
-
-            return bgRenderText({definitions, root: this.fgRoot, options: this.options, sequence: seq}, 'kanji-list.html');
-        }).then(content => {
-            this.definitions = defs;
-            this.popup.setContent(content, defs);
-
-            return bgCanAddDefinitions(defs, ['kanji']);
-        }).then(states => {
-            if (states !== null) {
-                states.forEach((state, index) => this.popup.sendMessage('setActionState', {index, state, sequence: seq}));
-            }
+            const sequence = ++this.sequence;
+            return bgRenderText({definitions, sequence, root: this.fgRoot, options: this.options}, 'kanji-list.html').then(content => {
+                this.definitions = definitions;
+                this.popup.setContent(content, definitions);
+                return bgCanAddDefinitions(definitions, ['kanji']);
+            }).then(states => {
+                if (states !== null) {
+                    states.forEach((state, index) => this.popup.sendMessage('setActionState', {index, state, sequence}));
+                }
+            });
         });
     }
 
