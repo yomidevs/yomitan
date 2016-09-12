@@ -24,8 +24,6 @@ class Client {
         this.lastMousePos = null;
         this.lastTextSource = null;
         this.pendingLookup = false;
-        this.activateKey = 16;
-        this.activateBtn = 2;
         this.enabled = false;
         this.options = {};
         this.definitions = null;
@@ -42,21 +40,21 @@ class Client {
     }
 
     onKeyDown(e) {
-        if (this.enabled && this.lastMousePos !== null && (e.keyCode === this.activateKey || e.charCode === this.activateKey)) {
+        if (this.enabled && this.lastMousePos !== null && (e.keyCode === 16 || e.charCode === 16)) {
             this.searchAt(this.lastMousePos);
         }
     }
 
     onMouseMove(e) {
         this.lastMousePos = {x: e.clientX, y: e.clientY};
-        if (this.enabled && (e.shiftKey || e.which === this.activateBtn)) {
+        if (this.enabled && (e.shiftKey || e.which === 2)) {
             this.searchAt(this.lastMousePos);
         }
     }
 
     onMouseDown(e) {
         this.lastMousePos = {x: e.clientX, y: e.clientY};
-        if (this.enabled && (e.shiftKey || e.which === this.activateBtn)) {
+        if (this.enabled && (e.shiftKey || e.which === 2)) {
             this.searchAt(this.lastMousePos);
         } else {
             this.hidePopup();
@@ -80,6 +78,10 @@ class Client {
     }
 
     searchAt(point) {
+        if (this.pendingLookup) {
+            return;
+        }
+
         const textSource = Client.textSourceFromPoint(point);
         if (textSource === null || !textSource.containsPoint(point)) {
             this.hidePopup();
@@ -90,22 +92,13 @@ class Client {
             return;
         }
 
-        if (this.pendingLookup) {
-            return;
-        }
-
         textSource.setEndOffset(this.options.scanLength);
 
-        let defs = [];
-        let seq = -1;
-
         this.pendingLookup = true;
-        bgFindTerm(textSource.text())
-            .then(({definitions, length}) => {
-                if (length === 0) {
-                    return Promise.reject();
-                }
-
+        bgFindTerm(textSource.text()).then(({definitions, length}) => {
+            if (length === 0) {
+                this.hidePopup();
+            } else {
                 textSource.setEndOffset(length);
 
                 const sentence = Client.extractSentence(textSource, this.options.sentenceExtent);
@@ -114,26 +107,18 @@ class Client {
                     definition.sentence = sentence;
                 });
 
-                defs = definitions;
-                seq = ++this.sequence;
-
-                return bgRenderText({definitions, root: this.fgRoot, options: this.options, sequence: seq}, 'term-list.html');
-            })
-            .then(content => {
-                this.definitions = defs;
-                this.showPopup(textSource, content);
-
-                return bgCanAddDefinitions(defs, ['term_kanji', 'term_kana']);
-            })
-            .then(states => {
-                this.pendingLookup = false;
-                if (states !== null) {
-                    states.forEach((state, index) => this.popup.sendMessage('setActionState', {index, state, sequence: seq}));
-                }
-            }, () => {
-                this.pendingLookup = false;
-                this.hidePopup();
-            });
+                const sequence = ++this.sequence;
+                return bgRenderText({definitions, sequence, root: this.fgRoot, options: this.options}, 'term-list.html').then((content) => {
+                    this.definitions = definitions;
+                    this.showPopup(textSource, content);
+                    return bgCanAddDefinitions(definitions, ['term_kanji', 'term_kana']);
+                }).then(states => {
+                    if (states !== null) {
+                        states.forEach((state, index) => this.popup.sendMessage('setActionState', {index, state, sequence }));
+                    }
+                });
+            }
+        }).then(() => this.pendingLookup = false);
     }
 
     showPopup(textSource, content) {
@@ -201,26 +186,23 @@ class Client {
         let defs = [];
         let seq = -1;
 
-        bgFindKanji(kanji)
-            .then(definitions => {
-                definitions.forEach(definition => definition.url = window.location.href);
+        bgFindKanji(kanji).then(definitions => {
+            definitions.forEach(definition => definition.url = window.location.href);
 
-                defs = definitions;
-                seq = ++this.sequence;
+            defs = definitions;
+            seq = ++this.sequence;
 
-                return bgRenderText({definitions, root: this.fgRoot, options: this.options, sequence: seq}, 'kanji-list.html');
-            })
-            .then(content => {
-                this.definitions = defs;
-                this.popup.setContent(content, defs);
+            return bgRenderText({definitions, root: this.fgRoot, options: this.options, sequence: seq}, 'kanji-list.html');
+        }).then(content => {
+            this.definitions = defs;
+            this.popup.setContent(content, defs);
 
-                return bgCanAddDefinitions(defs, ['kanji']);
-            })
-            .then(states => {
-                if (states !== null) {
-                    states.forEach((state, index) => this.popup.sendMessage('setActionState', {index, state, sequence: seq}));
-                }
-            });
+            return bgCanAddDefinitions(defs, ['kanji']);
+        }).then(states => {
+            if (states !== null) {
+                states.forEach((state, index) => this.popup.sendMessage('setActionState', {index, state, sequence: seq}));
+            }
+        });
     }
 
     static textSourceFromPoint(point) {
