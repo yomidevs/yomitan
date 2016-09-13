@@ -35,15 +35,14 @@ class Translator {
             return loadJson('bg/data/tags.json');
         }).then(tagMeta => {
             this.tagMeta = tagMeta;
-            return this.dictionary.existsDb();
+            return this.dictionary.prepareDb();
         }).then(exists => {
-            this.dictionary.initDb();
             if (!exists) {
                 return Promise.all([
                     this.dictionary.importKanjiDict('bg/data/kanjidic/index.json'),
                     this.dictionary.importTermDict('bg/data/edict/index.json'),
                     this.dictionary.importTermDict('bg/data/enamdict/index.json')
-                ]);
+                ]).then(() => this.dictionary.sealDb());
             }
         }).then(() => {
             this.loaded = true;

@@ -20,26 +20,53 @@
 class Dictionary {
     constructor() {
         this.db = null;
+        this.dbVer = 1;
         this.entities = null;
     }
 
     initDb() {
+        if (this.db !== null) {
+            return Promise.reject('database already initialized');
+        }
+
         this.db = new Dexie('dict');
         this.db.version(1).stores({
             terms: '++id,expression,reading',
             entities: '++,name',
-            kanji: '++,character'
+            kanji: '++,character',
+            meta: 'name,value',
         });
-
-        this.entities = null;
     }
 
-    deleteDb() {
-        return this.db === null ? Promise.resolve() : this.db.delete();
+    prepareDb() {
+        this.initDb();
+
+        return this.db.meta.get('version').then(row => {
+            return row ? row.value : 0;
+        }).catch(() => {
+            return 0;
+        }).then(version => {
+            if (this.dbVer === version) {
+                return true;
+            }
+
+            const db = this.db;
+            this.db.close();
+            this.db = null;
+
+            return db.delete().then(() => {
+                this.initDb();
+                return false;
+            });
+        });
     }
 
-    existsDb() {
-        return Dexie.exists('dict');
+    sealDb() {
+        if (this.db === null) {
+            return Promise.reject('database not initialized');
+        }
+
+        return this.db.meta.put({name: 'version', value: this.dbVer});
     }
 
     findTerm(term) {
