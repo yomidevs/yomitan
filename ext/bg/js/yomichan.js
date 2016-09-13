@@ -33,7 +33,7 @@ class Yomichan {
         chrome.tabs.onCreated.addListener(tab => this.onTabReady(tab.id));
         chrome.tabs.onUpdated.addListener(this.onTabReady.bind(this));
 
-        loadOptions(opts => {
+        loadOptions().then(opts => {
             this.setOptions(opts);
             if (this.options.activateOnStartup) {
                 this.setState('loading');

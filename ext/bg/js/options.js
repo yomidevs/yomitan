@@ -45,10 +45,10 @@ function sanitizeOptions(options) {
     return options;
 }
 
-function loadOptions(callback) {
-    chrome.storage.sync.get(null, (items) => callback(sanitizeOptions(items)));
+function loadOptions() {
+    return new Promise((resolve, reject) => chrome.storage.sync.get(null, resolve));
 }
 
-function saveOptions(opts, callback) {
-    chrome.storage.sync.set(sanitizeOptions(opts), callback);
+function saveOptions(opts) {
+    return new Promise((resolve, reject) => chrome.storage.sync.set(sanitizeOptions(opts), resolve));
 }

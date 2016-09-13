@@ -60,8 +60,8 @@ function modelIdToMarkers(id) {
     }[id];
 }
 
-function formToOptions(section, callback) {
-    loadOptions((optsOld) => {
+function formToOptions(section) {
+    return loadOptions().then(optsOld => {
         const optsNew = $.extend({}, optsOld);
 
         switch (section) {
@@ -86,7 +86,10 @@ function formToOptions(section, callback) {
                 break;
         }
 
-        callback(sanitizeOptions(optsNew), sanitizeOptions(optsOld));
+        return {
+            optsNew: sanitizeOptions(optsNew),
+            optsOld: sanitizeOptions(optsOld)
+        };
     });
 }
 
@@ -185,8 +188,8 @@ function onOptionsGeneralChanged(e) {
         return;
     }
 
-    formToOptions('general', (optsNew, optsOld) => {
-        saveOptions(optsNew, () => {
+    formToOptions('general').then(({optsNew, optsOld}) => {
+        saveOptions(optsNew).then(() => {
             yomichan().setOptions(optsNew);
             if (!optsOld.enableAnkiConnect && optsNew.enableAnkiConnect) {
                 updateAnkiStatus();
@@ -210,23 +213,23 @@ function onOptionsAnkiChanged(e) {
         return;
     }
 
-    formToOptions('anki', (opts) => {
-        saveOptions(opts, () => yomichan().setOptions(opts));
+    formToOptions('anki').then(({optsNew, optsOld}) => {
+        saveOptions(optsNew).then(() => yomichan().setOptions(optsNew));
     });
 }
 
 function onAnkiModelChanged(e) {
     if (e.originalEvent) {
-        formToOptions('anki', (opts) => {
-            opts[modelIdToFieldOptKey($(this).id)] = {};
-            populateAnkiFields($(this), opts);
-            saveOptions(opts, () => yomichan().setOptions(opts));
+        formToOptions('anki').then(({optsNew, optsOld}) => {
+            optsNew[modelIdToFieldOptKey($(this).id)] = {};
+            populateAnkiFields($(this), optsNew);
+            saveOptions(optsNew).then(() => yomichan().setOptions(optsNew));
         });
     }
 }
 
 $(document).ready(() => {
-    loadOptions((opts) => {
+    loadOptions().then(opts => {
         $('#scan-length').val(opts.scanLength);
         $('#activate-on-startup').prop('checked', opts.activateOnStartup);
         $('#load-enamdict').prop('checked', opts.loadEnamDict);
