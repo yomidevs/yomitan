@@ -17,6 +17,19 @@
  */
 
 
+function kanjiLinks(options) {
+    let result = '';
+    for (const c of options.fn(this)) {
+        if (isKanji(c)) {
+            result += Handlebars.templates['kanji-link.html']({kanji: c}).trim();
+        } else {
+            result += c;
+        }
+    }
+
+    return result;
+}
+
 function loadJson(url) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
