@@ -47,6 +47,10 @@ class Yomichan {
         }
     }
 
+    onImport({state, progress}) {
+        console.log(`${state}: ${progress}`);
+    }
+
     onMessage(request, sender, callback) {
         const {action, params} = request, method = this['api_' + action];
 
@@ -90,7 +94,7 @@ class Yomichan {
                 break;
             case 'loading':
                 chrome.browserAction.setBadgeText({text: '...'});
-                this.translator.loadData().then(() => this.setState('enabled'));
+                this.translator.loadData(this.onImport.bind(this)).then(() => this.setState('enabled'));
                 break;
         }
 

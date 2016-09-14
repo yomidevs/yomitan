@@ -45,14 +45,21 @@ class Translator {
                 callback({state: 'begin', progress: 0});
             }
 
-            let banksLoaded = 0;
-            let banksTotal = 0;
+            const banks = {};
+            const bankCallback = (indexUrl, loaded, total) => {
+                banks[indexUrl] = {loaded: loaded, total: total};
+                if (Object.keys(banks).length !== 3) {
+                    return;
+                }
 
-            const bankCallback = (loaded, total) => {
-                banksLoaded += loaded;
-                banksTotal += total;
+                let banksLoaded = 0;
+                let banksTotal = 0;
+                for (const url in banks) {
+                    banksLoaded += banks[url].loaded;
+                    banksTotal += banks[url].total;
+                }
 
-                if (callback) {
+                if (callback && banksTotal > 0) {
                     callback({state: 'update', progress: Math.ceil(100 * banksLoaded / banksTotal)});
                 }
             };
