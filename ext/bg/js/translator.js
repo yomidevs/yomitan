@@ -25,7 +25,7 @@ class Translator {
         this.deinflector = new Deinflector();
     }
 
-    loadData() {
+    loadData(callback) {
         if (this.loaded) {
             return Promise.resolve();
         }
@@ -37,13 +37,37 @@ class Translator {
             this.tagMeta = tagMeta;
             return this.dictionary.prepareDb();
         }).then(exists => {
-            if (!exists) {
-                return Promise.all([
-                    this.dictionary.importKanjiDict('bg/data/kanjidic/index.json'),
-                    this.dictionary.importTermDict('bg/data/edict/index.json'),
-                    this.dictionary.importTermDict('bg/data/enamdict/index.json')
-                ]).then(() => this.dictionary.sealDb());
+            if (exists) {
+                return;
             }
+
+            if (callback) {
+                callback({state: 'begin', progress: 0});
+            }
+
+            let banksLoaded = 0;
+            let banksTotal = 0;
+
+            const bankCallback = (loaded, total) => {
+                banksLoaded += loaded;
+                banksTotal += total;
+
+                if (callback) {
+                    callback({state: 'update', progress: Math.ceil(100 * banksLoaded / banksTotal)});
+                }
+            };
+
+            return Promise.all([
+                this.dictionary.importTermDict('bg/data/edict/index.json', bankCallback),
+                this.dictionary.importTermDict('bg/data/enamdict/index.json', bankCallback),
+                this.dictionary.importKanjiDict('bg/data/kanjidic/index.json', bankCallback),
+            ]).then(() => {
+                return this.dictionary.sealDb();
+            }).then(() => {
+                if (callback) {
+                    callback({state: 'end', progress: 100});
+                }
+            });
         }).then(() => {
             this.loaded = true;
         });

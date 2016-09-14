@@ -130,7 +130,7 @@ class Dictionary {
         });
     }
 
-    importTermDict(indexUrl) {
+    importTermDict(indexUrl, callback) {
         if (this.db === null) {
             return Promise.reject('database not initialized');
         }
@@ -161,7 +161,11 @@ class Dictionary {
                                 rows.push({expression, reading, tags, glossary});
                             }
 
-                            return this.db.terms.bulkAdd(rows);
+                            return this.db.terms.bulkAdd(rows).then(() => {
+                                if (callback) {
+                                    callback(i, index.banks);
+                                }
+                            });
                         });
                     });
                 }
@@ -176,7 +180,7 @@ class Dictionary {
         });
     }
 
-    importKanjiDict(indexUrl) {
+    importKanjiDict(indexUrl, callback) {
         if (this.db === null) {
             return Promise.reject('database not initialized');
         }
@@ -193,7 +197,11 @@ class Dictionary {
                             rows.push({character, onyomi, kunyomi, tags, meanings});
                         }
 
-                        return this.db.kanji.bulkAdd(rows);
+                        return this.db.kanji.bulkAdd(rows).then(() => {
+                            if (callback) {
+                                callback(i, index.banks);
+                            }
+                        });
                     });
                 });
             }
