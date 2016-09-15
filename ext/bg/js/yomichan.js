@@ -23,6 +23,7 @@ class Yomichan {
         Handlebars.registerHelper('kanjiLinks', kanjiLinks);
 
         this.translator = new Translator();
+        this.importTabId = null;
         this.asyncPools = {};
         this.ankiConnectVer = 0;
         this.setState('disabled');
@@ -48,7 +49,17 @@ class Yomichan {
     }
 
     onImport({state, progress}) {
-        console.log(`${state}: ${progress}`);
+        if (state === 'begin') {
+            chrome.tabs.create({url: chrome.extension.getURL('bg/import.html')}, tab => this.importTabId = tab.id);
+        }
+
+        if (this.importTabId !== null) {
+            chrome.tabs.sendMessage(this.importTabId, {state, progress}, () => null);
+        }
+
+        if (state === 'end') {
+            this.importTabId = null;
+        }
     }
 
     onMessage(request, sender, callback) {
