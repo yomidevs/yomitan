@@ -46,21 +46,18 @@ class Translator {
             }
 
             const banks = {};
-            const bankCallback = (indexUrl, loaded, total) => {
-                banks[indexUrl] = {loaded: loaded, total: total};
-                if (Object.keys(banks).length !== 3) {
-                    return;
-                }
+            const bankCallback = (loaded, total, indexUrl) => {
+                banks[indexUrl] = {loaded, total};
 
-                let banksLoaded = 0;
-                let banksTotal = 0;
+                let percent = 0.0;
                 for (const url in banks) {
-                    banksLoaded += banks[url].loaded;
-                    banksTotal += banks[url].total;
+                    percent += banks[url].loaded / banks[url].total;
                 }
 
-                if (callback && banksTotal > 0) {
-                    callback({state: 'update', progress: Math.ceil(100 * banksLoaded / banksTotal)});
+                percent /= 3;
+
+                if (callback) {
+                    callback({state: 'update', progress: Math.ceil(100 * percent)});
                 }
             };
 

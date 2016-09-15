@@ -163,7 +163,7 @@ class Dictionary {
 
                             return this.db.terms.bulkAdd(rows).then(() => {
                                 if (callback) {
-                                    callback(indexUrl, i, index.banks);
+                                    callback(i, index.banks, indexUrl);
                                 }
                             });
                         });
@@ -199,7 +199,7 @@ class Dictionary {
 
                         return this.db.kanji.bulkAdd(rows).then(() => {
                             if (callback) {
-                                callback(indexUrl, i, index.banks);
+                                callback(i, index.banks, indexUrl);
                             }
                         });
                     });
