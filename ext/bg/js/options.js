@@ -19,20 +19,20 @@
 
 function sanitizeOptions(options) {
     const defaults = {
-        scanLength:          20,
-        activateOnStartup:   false,
-        selectMatchedText:   true,
+        scanLength: 20,
+        activateOnStartup: false,
+        selectMatchedText: true,
         showAdvancedOptions: false,
         enableAudioPlayback: true,
-        enableAnkiConnect:   false,
-        ankiCardTags:        ['yomichan'],
-        sentenceExtent:      200,
-        ankiTermDeck:        '',
-        ankiTermModel:       '',
-        ankiTermFields:      {},
-        ankiKanjiDeck:       '',
-        ankiKanjiModel:      '',
-        ankiKanjiFields:     {}
+        enableAnkiConnect: false,
+        ankiCardTags: ['yomichan'],
+        sentenceExtent: 200,
+        ankiTermDeck: '',
+        ankiTermModel: '',
+        ankiTermFields: {},
+        ankiKanjiDeck: '',
+        ankiKanjiModel: '',
+        ankiKanjiFields: {}
     };
 
     for (const key in defaults) {

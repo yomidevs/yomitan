@@ -32,7 +32,7 @@ function fieldsToDict(selection) {
 
 function modelIdToFieldOptKey(id) {
     return {
-        'anki-term-model':  'ankiTermFields',
+        'anki-term-model': 'ankiTermFields',
         'anki-kanji-model': 'ankiKanjiFields'
     }[id];
 }
