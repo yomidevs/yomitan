@@ -23,7 +23,6 @@ function sanitizeOptions(options) {
         activateOnStartup:   false,
         selectMatchedText:   true,
         showAdvancedOptions: false,
-        loadEnamDict:        false,
         enableAudioPlayback: true,
         enableAnkiConnect:   false,
         ankiCardTags:        ['yomichan'],

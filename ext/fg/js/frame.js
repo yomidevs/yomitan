@@ -46,19 +46,6 @@ function registerAudioLinks() {
     }
 }
 
-function onDomContentLoaded() {
-    registerKanjiLinks();
-    registerAddNoteLinks();
-    registerAudioLinks();
-}
-
-function onMessage(e) {
-    const {action, params} = e.data, method = window['api_' + action];
-    if (typeof(method) === 'function') {
-        method(params);
-    }
-}
-
 function api_setActionState({index, state, sequence}) {
     for (const mode in state) {
         const matches = document.querySelectorAll(`.action-bar[data-sequence="${sequence}"] .action-add-note[data-index="${index}"][data-mode="${mode}"]`);
@@ -75,5 +62,15 @@ function api_setActionState({index, state, sequence}) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', onDomContentLoaded, false);
-window.addEventListener('message', onMessage);
+document.addEventListener('DOMContentLoaded', () => {
+    registerKanjiLinks();
+    registerAddNoteLinks();
+    registerAudioLinks();
+});
+
+window.addEventListener('message', () => {
+    const {action, params} = e.data, method = window['api_' + action];
+    if (typeof(method) === 'function') {
+        method(params);
+    }
+});

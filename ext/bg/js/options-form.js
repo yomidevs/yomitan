@@ -68,7 +68,6 @@ function formToOptions(section) {
             case 'general':
                 optsNew.scanLength = parseInt($('#scan-length').val(), 10);
                 optsNew.activateOnStartup = $('#activate-on-startup').prop('checked');
-                optsNew.loadEnamDict = $('#load-enamdict').prop('checked');
                 optsNew.selectMatchedText = $('#select-matched-text').prop('checked');
                 optsNew.showAdvancedOptions = $('#show-advanced-options').prop('checked');
                 optsNew.enableAudioPlayback = $('#enable-audio-playback').prop('checked');
@@ -98,9 +97,9 @@ function populateAnkiDeckAndModel(opts) {
 
     const ankiDeck = $('.anki-deck');
     ankiDeck.find('option').remove();
-    yomi.api_getDeckNames({callback: (names) => {
+    yomi.api_getDeckNames({callback: names => {
         if (names !== null) {
-            names.forEach((name) => ankiDeck.append($('<option/>', {value: name, text: name})));
+            names.forEach(name => ankiDeck.append($('<option/>', {value: name, text: name})));
         }
 
         $('#anki-term-deck').val(opts.ankiTermDeck);
@@ -109,9 +108,9 @@ function populateAnkiDeckAndModel(opts) {
 
     const ankiModel = $('.anki-model');
     ankiModel.find('option').remove();
-    yomi.api_getModelNames({callback: (names) => {
+    yomi.api_getModelNames({callback: names => {
         if (names !== null) {
-            names.forEach((name) => ankiModel.append($('<option/>', {value: name, text: name})));
+            names.forEach(name => ankiModel.append($('<option/>', {value: name, text: name})));
         }
 
         populateAnkiFields($('#anki-term-model').val(opts.ankiTermModel), opts);
@@ -122,7 +121,7 @@ function populateAnkiDeckAndModel(opts) {
 function updateAnkiStatus() {
     $('.error-dlg').hide();
 
-    yomichan().api_getVersion({callback: (version) => {
+    yomichan().api_getVersion({callback: version => {
         if (version === null) {
             $('.error-dlg-connection').show();
             $('.options-anki-controls').hide();
@@ -145,19 +144,19 @@ function populateAnkiFields(element, opts) {
     const optKey = modelIdToFieldOptKey(modelId);
     const markers = modelIdToMarkers(modelId);
 
-    yomichan().api_getModelFieldNames({modelName, callback: (names) => {
+    yomichan().api_getModelFieldNames({modelName, callback: names => {
         const table = element.closest('.tab-pane').find('.anki-fields');
         table.find('tbody').remove();
 
         const tbody = $('<tbody>');
-        names.forEach((name) => {
+        names.forEach(name => {
             const button = $('<button>', {type: 'button', class: 'btn btn-default dropdown-toggle'});
             button.attr('data-toggle', 'dropdown').dropdown();
 
             const markerItems = $('<ul>', {class: 'dropdown-menu dropdown-menu-right'});
             for (const marker of markers) {
                 const link = $('<a>', {href: '#'}).text(`{${marker}}`);
-                link.click((e) => {
+                link.click(e => {
                     e.preventDefault();
                     link.closest('.input-group').find('.anki-field-value').val(link.text()).trigger('change');
                 });
@@ -232,7 +231,6 @@ $(document).ready(() => {
     loadOptions().then(opts => {
         $('#scan-length').val(opts.scanLength);
         $('#activate-on-startup').prop('checked', opts.activateOnStartup);
-        $('#load-enamdict').prop('checked', opts.loadEnamDict);
         $('#select-matched-text').prop('checked', opts.selectMatchedText);
         $('#show-advanced-options').prop('checked', opts.showAdvancedOptions);
         $('#enable-audio-playback').prop('checked', opts.enableAudioPlayback);
