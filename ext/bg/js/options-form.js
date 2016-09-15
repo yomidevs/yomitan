@@ -229,12 +229,12 @@ function onAnkiModelChanged(e) {
 
 $(document).ready(() => {
     loadOptions().then(opts => {
-        $('#scan-length').val(opts.scanLength);
         $('#activate-on-startup').prop('checked', opts.activateOnStartup);
         $('#select-matched-text').prop('checked', opts.selectMatchedText);
-        $('#show-advanced-options').prop('checked', opts.showAdvancedOptions);
         $('#enable-audio-playback').prop('checked', opts.enableAudioPlayback);
         $('#enable-anki-connect').prop('checked', opts.enableAnkiConnect);
+        $('#show-advanced-options').prop('checked', opts.showAdvancedOptions);
+        $('#scan-length').val(opts.scanLength);
 
         $('#anki-card-tags').val(opts.ankiCardTags.join(' '));
         $('#sentence-extent').val(opts.sentenceExtent);

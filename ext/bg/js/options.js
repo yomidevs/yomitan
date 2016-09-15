@@ -19,14 +19,16 @@
 
 function sanitizeOptions(options) {
     const defaults = {
-        scanLength: 20,
         activateOnStartup: false,
         selectMatchedText: true,
-        showAdvancedOptions: false,
         enableAudioPlayback: true,
         enableAnkiConnect: false,
+        showAdvancedOptions: false,
+        scanLength: 20,
+
         ankiCardTags: ['yomichan'],
         sentenceExtent: 200,
+
         ankiTermDeck: '',
         ankiTermModel: '',
         ankiTermFields: {},
