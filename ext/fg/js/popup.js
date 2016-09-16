@@ -68,7 +68,7 @@ class Popup {
         doc.close();
     }
 
-    sendMessage(action, params, callback) {
+    invokeApi(action, params) {
         if (this.popup !== null) {
             this.popup.contentWindow.postMessage({action, params}, '*');
         }

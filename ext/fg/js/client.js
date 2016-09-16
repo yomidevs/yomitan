@@ -116,7 +116,7 @@ class Client {
                     return canAddDefinitions(definitions, ['term_kanji', 'term_kana']);
                 }).then(states => {
                     if (states !== null) {
-                        states.forEach((state, index) => this.popup.sendMessage('setActionState', {index, state, sequence }));
+                        states.forEach((state, index) => this.popup.invokeApi('setActionState', {index, state, sequence}));
                     }
                 });
             }
@@ -158,7 +158,7 @@ class Client {
         const state = {[mode]: false};
         addDefinition(this.definitions[index], mode).then(success => {
             if (success) {
-                this.popup.sendMessage('setActionState', {index, state, sequence: this.sequence});
+                this.popup.invokeApi('setActionState', {index, state, sequence: this.sequence});
             } else {
                 alert('Note could not be added');
             }
@@ -195,7 +195,7 @@ class Client {
                 return canAddDefinitions(definitions, ['kanji']);
             }).then(states => {
                 if (states !== null) {
-                    states.forEach((state, index) => this.popup.sendMessage('setActionState', {index, state, sequence}));
+                    states.forEach((state, index) => this.popup.invokeApi('setActionState', {index, state, sequence}));
                 }
             });
         });

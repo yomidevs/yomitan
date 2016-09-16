@@ -17,11 +17,15 @@
  */
 
 
+function invokeApi(action, params, target) {
+    target.postMessage({action, params}, '*');
+}
+
 function registerKanjiLinks() {
     for (const link of Array.from(document.getElementsByClassName('kanji-link'))) {
         link.addEventListener('click', e => {
             e.preventDefault();
-            window.parent.postMessage({action: 'displayKanji', params: e.target.innerHTML}, '*');
+            invokeApi('displayKanji', e.target.innerHTML, window.parent);
         });
     }
 }
@@ -31,7 +35,7 @@ function registerAddNoteLinks() {
         link.addEventListener('click', e => {
             e.preventDefault();
             const ds = e.currentTarget.dataset;
-            window.parent.postMessage({action: 'addNote', params: {index: ds.index, mode: ds.mode}}, '*');
+            invokeApi('addNote', {index: ds.index, mode: ds.mode}, window.parent);
         });
     }
 }
@@ -41,7 +45,7 @@ function registerAudioLinks() {
         link.addEventListener('click', e => {
             e.preventDefault();
             const ds = e.currentTarget.dataset;
-            window.parent.postMessage({action: 'playAudio', params: ds.index}, '*');
+            invokeApi('playAudio', ds.index, window.parent);
         });
     }
 }

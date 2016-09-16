@@ -17,28 +17,28 @@
  */
 
 
-function sendMessage(action, params) {
+function invokeApiBg(action, params) {
     return new Promise((resolve, reject) => chrome.runtime.sendMessage({action, params}, resolve));
 }
 
 function findTerm(text) {
-    return sendMessage('findTerm', {text});
+    return invokeApiBg('findTerm', {text});
 }
 
 function findKanji(text) {
-    return sendMessage('findKanji', {text});
+    return invokeApiBg('findKanji', {text});
 }
 
 function renderText(data, template) {
-    return sendMessage('renderText', {data, template});
+    return invokeApiBg('renderText', {data, template});
 }
 
 function canAddDefinitions(definitions, modes) {
-    return sendMessage('canAddDefinitions', {definitions, modes});
+    return invokeApiBg('canAddDefinitions', {definitions, modes});
 }
 
 function addDefinition(definition, mode) {
-    return sendMessage('addDefinition', {definition, mode});
+    return invokeApiBg('addDefinition', {definition, mode});
 }
 
 function textSourceFromPoint(point) {

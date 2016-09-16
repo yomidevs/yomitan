@@ -54,10 +54,10 @@ class Translator {
                     percent += banks[url].loaded / banks[url].total;
                 }
 
-                percent /= 3;
+                percent /= 3.0;
 
                 if (callback) {
-                    callback({state: 'update', progress: Math.ceil(100 * percent)});
+                    callback({state: 'update', progress: Math.ceil(100.0 * percent)});
                 }
             };
 
@@ -69,7 +69,7 @@ class Translator {
                 return this.dictionary.sealDb();
             }).then(() => {
                 if (callback) {
-                    callback({state: 'end', progress: 100});
+                    callback({state: 'end', progress: 100.0});
                 }
             });
         }).then(() => {
