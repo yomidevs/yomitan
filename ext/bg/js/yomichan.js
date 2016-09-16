@@ -54,7 +54,7 @@ class Yomichan {
         }
 
         if (this.importTabId !== null) {
-            chrome.tabs.sendMessage(this.importTabId, {state, progress}, () => null);
+            this.tabInvoke(this.importTabId, 'setProgress', {state, progress});
         }
 
         if (state === 'end') {

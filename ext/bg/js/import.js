@@ -17,7 +17,16 @@
  */
 
 
-chrome.runtime.onMessage.addListener(({state, progress}, sender, callback) => {
-    $('.progress-bar').css('width', progress + '%');
+function api_setProgress({state, progress}) {
+    const str = `${progress}%`;
+    $('.progress-bar').css('width', str).text(str);
+}
+
+chrome.runtime.onMessage.addListener(({action, params}, sender, callback) => {
+    const method = this['api_' + action];
+    if (typeof(method) === 'function') {
+        method.call(this, params);
+    }
+
     callback();
 });

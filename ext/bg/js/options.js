@@ -47,9 +47,15 @@ function sanitizeOptions(options) {
 }
 
 function loadOptions() {
-    return new Promise((resolve, reject) => chrome.storage.sync.get(null, resolve));
+    return new Promise((resolve, reject) => {
+        chrome.storage.sync.get(null, opts => {
+            resolve(sanitizeOptions(opts));
+        });
+    });
 }
 
 function saveOptions(opts) {
-    return new Promise((resolve, reject) => chrome.storage.sync.set(sanitizeOptions(opts), resolve));
+    return new Promise((resolve, reject) => {
+        chrome.storage.sync.set(sanitizeOptions(opts), resolve);
+    });
 }
