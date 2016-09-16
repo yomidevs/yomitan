@@ -17,7 +17,7 @@
  */
 
 
-class Client {
+class Driver {
     constructor() {
         this.popup = new Popup();
         this.audio = {};
@@ -202,4 +202,4 @@ class Client {
     }
 }
 
-window.yomiClient = new Client();
+window.driver = new Driver();
