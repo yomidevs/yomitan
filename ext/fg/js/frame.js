@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
     registerAudioLinks();
 });
 
-window.addEventListener('message', () => {
+window.addEventListener('message', e => {
     const {action, params} = e.data, method = window['api_' + action];
     if (typeof(method) === 'function') {
         method(params);
