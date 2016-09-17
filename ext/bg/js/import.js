@@ -17,9 +17,13 @@
  */
 
 
-function api_setProgress({state, progress}) {
-    const str = `${progress}%`;
-    $('.progress-bar').css('width', str).text(str);
+function api_setProgress(progress) {
+    $('.progress-bar').css('width', `${progress}%`);
+
+    if (progress === 100.0) {
+        $('.progress').hide();
+        $('.alert').show();
+    }
 }
 
 chrome.runtime.onMessage.addListener(({action, params}, sender, callback) => {

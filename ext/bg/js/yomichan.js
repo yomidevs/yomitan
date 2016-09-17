@@ -28,7 +28,6 @@ class Yomichan {
         this.ankiConnectVer = 0;
         this.setState('disabled');
 
-        chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
         chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
         chrome.tabs.onCreated.addListener(tab => this.onTabReady(tab.id));
@@ -42,19 +41,13 @@ class Yomichan {
         });
     }
 
-    onInstalled(details) {
-        if (details.reason === 'install') {
-            chrome.tabs.create({url: chrome.extension.getURL('bg/guide.html')});
-        }
-    }
-
     onImport({state, progress}) {
         if (state === 'begin') {
             chrome.tabs.create({url: chrome.extension.getURL('bg/import.html')}, tab => this.importTabId = tab.id);
         }
 
         if (this.importTabId !== null) {
-            this.tabInvoke(this.importTabId, 'setProgress', {state, progress});
+            this.tabInvoke(this.importTabId, 'setProgress', progress);
         }
 
         if (state === 'end') {

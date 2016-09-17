@@ -66,6 +66,10 @@ class Deinflection {
                 }
 
                 const term = this.term.slice(0, -variant.ki.length) + variant.ko;
+                if (term.length === 0) {
+                    continue;
+                }
+
                 const child = new Deinflection(term, variant.to, rule);
                 promises.push(
                     child.deinflect(validator, rules).then(valid => {
