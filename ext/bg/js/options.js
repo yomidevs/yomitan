@@ -19,7 +19,7 @@
 
 function sanitizeOptions(options) {
     const defaults = {
-        activateOnStartup: false,
+        activateOnStartup: true,
         selectMatchedText: true,
         enableAudioPlayback: true,
         enableAnkiConnect: false,
