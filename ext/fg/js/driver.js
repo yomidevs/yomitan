@@ -41,21 +41,23 @@ class Driver {
 
     onKeyDown(e) {
         if (this.enabled && this.lastMousePos !== null && (e.keyCode === 16 || e.charCode === 16)) {
-            this.searchAt(this.lastMousePos);
+            this.searchAt(this.lastMousePos, e.ctrlKey ? 'kanji' : 'terms');
+        } else {
+            this.hidePopup();
         }
     }
 
     onMouseMove(e) {
         this.lastMousePos = {x: e.clientX, y: e.clientY};
         if (this.enabled && (e.shiftKey || e.which === 2)) {
-            this.searchAt(this.lastMousePos);
+            this.searchAt(this.lastMousePos, e.ctrlKey ? 'kanji' : 'terms');
         }
     }
 
     onMouseDown(e) {
         this.lastMousePos = {x: e.clientX, y: e.clientY};
         if (this.enabled && (e.shiftKey || e.which === 2)) {
-            this.searchAt(this.lastMousePos);
+            this.searchAt(this.lastMousePos, e.ctrlKey ? 'kanji' : 'terms');
         } else {
             this.hidePopup();
         }
@@ -77,26 +79,12 @@ class Driver {
         }
     }
 
-    searchAt(point) {
-        if (this.pendingLookup) {
-            return;
-        }
-
-        const textSource = textSourceFromPoint(point);
-        if (textSource === null || !textSource.containsPoint(point)) {
-            this.hidePopup();
-            return;
-        }
-
-        if (this.lastTextSource !== null && this.lastTextSource.equals(textSource)) {
-            return;
-        }
-
+    searchTerms(textSource) {
         textSource.setEndOffset(this.options.scanLength);
 
         this.pendingLookup = true;
         findTerm(textSource.text()).then(({definitions, length}) => {
-            if (length === 0) {
+            if (definitions.length === 0) {
                 this.pendingLookup = false;
                 this.hidePopup();
             } else {
@@ -121,6 +109,57 @@ class Driver {
                 });
             }
         });
+    }
+
+    searchKanji(textSource) {
+        textSource.setEndOffset(1);
+
+        this.pendingLookup = true;
+        findKanji(textSource.text()).then(definitions => {
+            if (definitions.length === 0) {
+                this.pendingLookup = false;
+                this.hidePopup();
+            } else {
+                definitions.forEach(definition => definition.url = window.location.href);
+
+                const sequence = ++this.sequence;
+                return renderText({definitions, sequence, root: this.fgRoot, options: this.options}, 'kanji-list.html').then(content => {
+                    this.definitions = definitions;
+                    this.pendingLookup = false;
+                    this.showPopup(textSource, content);
+                    return canAddDefinitions(definitions, ['kanji']);
+                }).then(states => {
+                    if (states !== null) {
+                        states.forEach((state, index) => this.popup.invokeApi('setActionState', {index, state, sequence}));
+                    }
+                });
+            }
+        });
+    }
+
+    searchAt(point, mode) {
+        if (this.pendingLookup) {
+            return;
+        }
+
+        const textSource = textSourceFromPoint(point);
+        if (textSource === null || !textSource.containsPoint(point)) {
+            this.hidePopup();
+            return;
+        }
+
+        if (this.lastTextSource !== null && this.lastTextSource.equals(textSource)) {
+            return;
+        }
+
+        switch (mode) {
+            case 'terms':
+                this.searchTerms(textSource);
+                break;
+            case 'kanji':
+                this.searchKanji(textSource);
+                break;
+        }
     }
 
     showPopup(textSource, content) {
