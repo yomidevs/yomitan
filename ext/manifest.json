@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Yomichan",
-    "version": "0.97",
+    "version": "0.98",
 
     "description": "Japanese dictionary with Anki integration",
     "icons": {"16": "img/icon16.png", "48": "img/icon48.png", "128": "img/icon128.png"},
@@ -15,8 +15,8 @@
             "fg/js/source-range.js",
             "fg/js/source-element.js",
             "fg/js/popup.js",
-            "fg/js/api.js",
-            "fg/js/client.js"
+            "fg/js/util.js",
+            "fg/js/driver.js"
         ],
         "css": ["fg/css/client.css"]
     }],

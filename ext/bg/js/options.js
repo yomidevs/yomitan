@@ -19,21 +19,22 @@
 
 function sanitizeOptions(options) {
     const defaults = {
-        scanLength:          20,
-        activateOnStartup:   false,
-        selectMatchedText:   true,
-        showAdvancedOptions: false,
-        loadEnamDict:        false,
+        activateOnStartup: true,
+        selectMatchedText: true,
         enableAudioPlayback: true,
-        enableAnkiConnect:   false,
-        ankiCardTags:        ['yomichan'],
-        sentenceExtent:      200,
-        ankiTermDeck:        '',
-        ankiTermModel:       '',
-        ankiTermFields:      {},
-        ankiKanjiDeck:       '',
-        ankiKanjiModel:      '',
-        ankiKanjiFields:     {}
+        enableAnkiConnect: false,
+        showAdvancedOptions: false,
+        scanLength: 20,
+
+        ankiCardTags: ['yomichan'],
+        sentenceExtent: 200,
+
+        ankiTermDeck: '',
+        ankiTermModel: '',
+        ankiTermFields: {},
+        ankiKanjiDeck: '',
+        ankiKanjiModel: '',
+        ankiKanjiFields: {}
     };
 
     for (const key in defaults) {
@@ -45,10 +46,16 @@ function sanitizeOptions(options) {
     return options;
 }
 
-function loadOptions(callback) {
-    chrome.storage.sync.get(null, (items) => callback(sanitizeOptions(items)));
+function loadOptions() {
+    return new Promise((resolve, reject) => {
+        chrome.storage.sync.get(null, opts => {
+            resolve(sanitizeOptions(opts));
+        });
+    });
 }
 
-function saveOptions(opts, callback) {
-    chrome.storage.sync.set(sanitizeOptions(opts), callback);
+function saveOptions(opts) {
+    return new Promise((resolve, reject) => {
+        chrome.storage.sync.set(sanitizeOptions(opts), resolve);
+    });
 }

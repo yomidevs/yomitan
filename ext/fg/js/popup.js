@@ -68,7 +68,7 @@ class Popup {
         doc.close();
     }
 
-    sendMessage(action, params, callback) {
+    invokeApi(action, params) {
         if (this.popup !== null) {
             this.popup.contentWindow.postMessage({action, params}, '*');
         }
@@ -81,8 +81,8 @@ class Popup {
 
         this.popup = document.createElement('iframe');
         this.popup.id = 'yomichan-popup';
-        this.popup.addEventListener('mousedown', (e) => e.stopPropagation());
-        this.popup.addEventListener('scroll', (e) => e.stopPropagation());
+        this.popup.addEventListener('mousedown', e => e.stopPropagation());
+        this.popup.addEventListener('scroll', e => e.stopPropagation());
 
         document.body.appendChild(this.popup);
     }

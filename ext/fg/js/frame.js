@@ -17,45 +17,36 @@
  */
 
 
+function invokeApi(action, params, target) {
+    target.postMessage({action, params}, '*');
+}
+
 function registerKanjiLinks() {
     for (const link of Array.from(document.getElementsByClassName('kanji-link'))) {
-        link.addEventListener('click', (e) => {
+        link.addEventListener('click', e => {
             e.preventDefault();
-            window.parent.postMessage({action: 'displayKanji', params: e.target.innerHTML}, '*');
+            invokeApi('displayKanji', e.target.innerHTML, window.parent);
         });
     }
 }
 
 function registerAddNoteLinks() {
     for (const link of Array.from(document.getElementsByClassName('action-add-note'))) {
-        link.addEventListener('click', (e) => {
+        link.addEventListener('click', e => {
             e.preventDefault();
             const ds = e.currentTarget.dataset;
-            window.parent.postMessage({action: 'addNote', params: {index: ds.index, mode: ds.mode}}, '*');
+            invokeApi('addNote', {index: ds.index, mode: ds.mode}, window.parent);
         });
     }
 }
 
 function registerAudioLinks() {
     for (const link of Array.from(document.getElementsByClassName('action-play-audio'))) {
-        link.addEventListener('click', (e) => {
+        link.addEventListener('click', e => {
             e.preventDefault();
             const ds = e.currentTarget.dataset;
-            window.parent.postMessage({action: 'playAudio', params: ds.index}, '*');
+            invokeApi('playAudio', ds.index, window.parent);
         });
-    }
-}
-
-function onDomContentLoaded() {
-    registerKanjiLinks();
-    registerAddNoteLinks();
-    registerAudioLinks();
-}
-
-function onMessage(e) {
-    const {action, params} = e.data, method = window['api_' + action];
-    if (typeof(method) === 'function') {
-        method(params);
     }
 }
 
@@ -75,5 +66,15 @@ function api_setActionState({index, state, sequence}) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', onDomContentLoaded, false);
-window.addEventListener('message', onMessage);
+document.addEventListener('DOMContentLoaded', () => {
+    registerKanjiLinks();
+    registerAddNoteLinks();
+    registerAudioLinks();
+});
+
+window.addEventListener('message', e => {
+    const {action, params} = e.data, method = window['api_' + action];
+    if (typeof(method) === 'function') {
+        method(params);
+    }
+});

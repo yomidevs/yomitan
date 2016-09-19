@@ -17,26 +17,20 @@
  */
 
 
-function bgSendMessage(action, params) {
-    return new Promise((resolve, reject) => chrome.runtime.sendMessage({action, params}, resolve));
+function api_setProgress(progress) {
+    $('.progress-bar').css('width', `${progress}%`);
+
+    if (progress === 100.0) {
+        $('.progress').hide();
+        $('.alert').show();
+    }
 }
 
-function bgFindTerm(text) {
-    return bgSendMessage('findTerm', {text});
-}
+chrome.runtime.onMessage.addListener(({action, params}, sender, callback) => {
+    const method = this['api_' + action];
+    if (typeof(method) === 'function') {
+        method.call(this, params);
+    }
 
-function bgFindKanji(text) {
-    return bgSendMessage('findKanji', {text});
-}
-
-function bgRenderText(data, template) {
-    return bgSendMessage('renderText', {data, template});
-}
-
-function bgCanAddDefinitions(definitions, modes) {
-    return bgSendMessage('canAddDefinitions', {definitions, modes});
-}
-
-function bgAddDefinition(definition, mode) {
-    return bgSendMessage('addDefinition', {definition, mode});
-}
+    callback();
+});

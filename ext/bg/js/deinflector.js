@@ -26,32 +26,36 @@ class Deinflection {
     }
 
     validate(validator) {
-        for (const tags of validator(this.term)) {
-            if (this.tags.length === 0) {
-                return true;
-            }
-
-            for (const tag of this.tags) {
-                if (tags.indexOf(tag) !== -1) {
+        return validator(this.term).then(sets => {
+            for (const tags of sets) {
+                if (this.tags.length === 0) {
                     return true;
                 }
-            }
-        }
 
-        return false;
+                for (const tag of this.tags) {
+                    if (tags.includes(tag)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        });
     }
 
     deinflect(validator, rules) {
-        if (this.validate(validator)) {
-            const child = new Deinflection(this.term, this.tags);
-            this.children.push(child);
-        }
+        const promises = [
+            this.validate(validator).then(valid => {
+                const child = new Deinflection(this.term, this.tags);
+                this.children.push(child);
+            })
+        ];
 
         for (const rule in rules) {
             for (const variant of rules[rule]) {
                 let allowed = this.tags.length === 0;
                 for (const tag of this.tags) {
-                    if (variant.ti.indexOf(tag) !== -1) {
+                    if (variant.ti.includes(tag)) {
                         allowed = true;
                         break;
                     }
@@ -62,14 +66,24 @@ class Deinflection {
                 }
 
                 const term = this.term.slice(0, -variant.ki.length) + variant.ko;
-                const child = new Deinflection(term, variant.to, rule);
-                if (child.deinflect(validator, rules)) {
-                    this.children.push(child);
+                if (term.length === 0) {
+                    continue;
                 }
+
+                const child = new Deinflection(term, variant.to, rule);
+                promises.push(
+                    child.deinflect(validator, rules).then(valid => {
+                        if (valid) {
+                            this.children.push(child);
+                        }
+                    }
+                ));
             }
         }
 
-        return this.children.length > 0;
+        return Promise.all(promises).then(() => {
+            return this.children.length > 0;
+        });
     }
 
     gather() {
@@ -105,10 +119,6 @@ class Deinflector {
 
     deinflect(term, validator) {
         const node = new Deinflection(term);
-        if (node.deinflect(validator, this.rules)) {
-            return node.gather();
-        }
-
-        return null;
+        return node.deinflect(validator, this.rules).then(success => success ? node.gather() : []);
     }
 }

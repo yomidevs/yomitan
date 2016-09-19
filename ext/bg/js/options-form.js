@@ -32,7 +32,7 @@ function fieldsToDict(selection) {
 
 function modelIdToFieldOptKey(id) {
     return {
-        'anki-term-model':  'ankiTermFields',
+        'anki-term-model': 'ankiTermFields',
         'anki-kanji-model': 'ankiKanjiFields'
     }[id];
 }
@@ -60,15 +60,14 @@ function modelIdToMarkers(id) {
     }[id];
 }
 
-function formToOptions(section, callback) {
-    loadOptions((optsOld) => {
+function formToOptions(section) {
+    return loadOptions().then(optsOld => {
         const optsNew = $.extend({}, optsOld);
 
         switch (section) {
             case 'general':
                 optsNew.scanLength = parseInt($('#scan-length').val(), 10);
                 optsNew.activateOnStartup = $('#activate-on-startup').prop('checked');
-                optsNew.loadEnamDict = $('#load-enamdict').prop('checked');
                 optsNew.selectMatchedText = $('#select-matched-text').prop('checked');
                 optsNew.showAdvancedOptions = $('#show-advanced-options').prop('checked');
                 optsNew.enableAudioPlayback = $('#enable-audio-playback').prop('checked');
@@ -86,7 +85,10 @@ function formToOptions(section, callback) {
                 break;
         }
 
-        callback(sanitizeOptions(optsNew), sanitizeOptions(optsOld));
+        return {
+            optsNew: sanitizeOptions(optsNew),
+            optsOld: sanitizeOptions(optsOld)
+        };
     });
 }
 
@@ -95,9 +97,9 @@ function populateAnkiDeckAndModel(opts) {
 
     const ankiDeck = $('.anki-deck');
     ankiDeck.find('option').remove();
-    yomi.api_getDeckNames({callback: (names) => {
+    yomi.api_getDeckNames({callback: names => {
         if (names !== null) {
-            names.forEach((name) => ankiDeck.append($('<option/>', {value: name, text: name})));
+            names.forEach(name => ankiDeck.append($('<option/>', {value: name, text: name})));
         }
 
         $('#anki-term-deck').val(opts.ankiTermDeck);
@@ -106,9 +108,9 @@ function populateAnkiDeckAndModel(opts) {
 
     const ankiModel = $('.anki-model');
     ankiModel.find('option').remove();
-    yomi.api_getModelNames({callback: (names) => {
+    yomi.api_getModelNames({callback: names => {
         if (names !== null) {
-            names.forEach((name) => ankiModel.append($('<option/>', {value: name, text: name})));
+            names.forEach(name => ankiModel.append($('<option/>', {value: name, text: name})));
         }
 
         populateAnkiFields($('#anki-term-model').val(opts.ankiTermModel), opts);
@@ -119,7 +121,7 @@ function populateAnkiDeckAndModel(opts) {
 function updateAnkiStatus() {
     $('.error-dlg').hide();
 
-    yomichan().api_getVersion({callback: (version) => {
+    yomichan().api_getVersion({callback: version => {
         if (version === null) {
             $('.error-dlg-connection').show();
             $('.options-anki-controls').hide();
@@ -142,19 +144,19 @@ function populateAnkiFields(element, opts) {
     const optKey = modelIdToFieldOptKey(modelId);
     const markers = modelIdToMarkers(modelId);
 
-    yomichan().api_getModelFieldNames({modelName, callback: (names) => {
+    yomichan().api_getModelFieldNames({modelName, callback: names => {
         const table = element.closest('.tab-pane').find('.anki-fields');
         table.find('tbody').remove();
 
         const tbody = $('<tbody>');
-        names.forEach((name) => {
+        names.forEach(name => {
             const button = $('<button>', {type: 'button', class: 'btn btn-default dropdown-toggle'});
             button.attr('data-toggle', 'dropdown').dropdown();
 
             const markerItems = $('<ul>', {class: 'dropdown-menu dropdown-menu-right'});
             for (const marker of markers) {
                 const link = $('<a>', {href: '#'}).text(`{${marker}}`);
-                link.click((e) => {
+                link.click(e => {
                     e.preventDefault();
                     link.closest('.input-group').find('.anki-field-value').val(link.text()).trigger('change');
                 });
@@ -185,8 +187,8 @@ function onOptionsGeneralChanged(e) {
         return;
     }
 
-    formToOptions('general', (optsNew, optsOld) => {
-        saveOptions(optsNew, () => {
+    formToOptions('general').then(({optsNew, optsOld}) => {
+        saveOptions(optsNew).then(() => {
             yomichan().setOptions(optsNew);
             if (!optsOld.enableAnkiConnect && optsNew.enableAnkiConnect) {
                 updateAnkiStatus();
@@ -210,30 +212,29 @@ function onOptionsAnkiChanged(e) {
         return;
     }
 
-    formToOptions('anki', (opts) => {
-        saveOptions(opts, () => yomichan().setOptions(opts));
+    formToOptions('anki').then(({optsNew, optsOld}) => {
+        saveOptions(optsNew).then(() => yomichan().setOptions(optsNew));
     });
 }
 
 function onAnkiModelChanged(e) {
     if (e.originalEvent) {
-        formToOptions('anki', (opts) => {
-            opts[modelIdToFieldOptKey($(this).id)] = {};
-            populateAnkiFields($(this), opts);
-            saveOptions(opts, () => yomichan().setOptions(opts));
+        formToOptions('anki').then(({optsNew, optsOld}) => {
+            optsNew[modelIdToFieldOptKey($(this).id)] = {};
+            populateAnkiFields($(this), optsNew);
+            saveOptions(optsNew).then(() => yomichan().setOptions(optsNew));
         });
     }
 }
 
 $(document).ready(() => {
-    loadOptions((opts) => {
-        $('#scan-length').val(opts.scanLength);
+    loadOptions().then(opts => {
         $('#activate-on-startup').prop('checked', opts.activateOnStartup);
-        $('#load-enamdict').prop('checked', opts.loadEnamDict);
         $('#select-matched-text').prop('checked', opts.selectMatchedText);
-        $('#show-advanced-options').prop('checked', opts.showAdvancedOptions);
         $('#enable-audio-playback').prop('checked', opts.enableAudioPlayback);
         $('#enable-anki-connect').prop('checked', opts.enableAnkiConnect);
+        $('#show-advanced-options').prop('checked', opts.showAdvancedOptions);
+        $('#scan-length').val(opts.scanLength);
 
         $('#anki-card-tags').val(opts.ankiCardTags.join(' '));
         $('#sentence-extent').val(opts.sentenceExtent);
