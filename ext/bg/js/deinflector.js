@@ -55,22 +55,22 @@ class Deinflection {
             for (const variant of rules[rule]) {
                 let allowed = this.tags.length === 0;
                 for (const tag of this.tags) {
-                    if (variant.ti.includes(tag)) {
+                    if (variant.tagsIn.includes(tag)) {
                         allowed = true;
                         break;
                     }
                 }
 
-                if (!allowed || !this.term.endsWith(variant.ki)) {
+                if (!allowed || !this.term.endsWith(variant.kanaIn)) {
                     continue;
                 }
 
-                const term = this.term.slice(0, -variant.ki.length) + variant.ko;
+                const term = this.term.slice(0, -variant.kanaIn.length) + variant.kanaOut;
                 if (term.length === 0) {
                     continue;
                 }
 
-                const child = new Deinflection(term, variant.to, rule);
+                const child = new Deinflection(term, variant.tagsOut, rule);
                 promises.push(
                     child.deinflect(validator, rules).then(valid => {
                         if (valid) {
