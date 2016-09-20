@@ -44,3 +44,63 @@ function isKanji(c) {
     return code >= 0x4e00 && code < 0x9fb0 || code >= 0x3400 && code < 0x4dc0;
 }
 
+function sortTags(tags) {
+    return tags.sort((v1, v2) => {
+        const order1 = v1.order;
+        const order2 = v2.order;
+        if (order1 < order2) {
+            return -1;
+        } else if (order1 > order2) {
+            return 1;
+        }
+
+        const name1 = v1.name;
+        const name2 = v2.name;
+        if (name1 < name2) {
+            return -1;
+        } else if (name1 > name2) {
+            return 1;
+        }
+
+        return 0;
+    });
+}
+
+function sortTermDefs(definitions) {
+    return definitions.sort((v1, v2) => {
+        const sl1 = v1.source.length;
+        const sl2 = v2.source.length;
+        if (sl1 > sl2) {
+            return -1;
+        } else if (sl1 < sl2) {
+            return 1;
+        }
+
+        const s1 = v1.score;
+        const s2 = v2.score;
+        if (s1 > s2) {
+            return -1;
+        } else if (s1 < s2) {
+            return 1;
+        }
+
+        const rl1 = v1.rules.length;
+        const rl2 = v2.rules.length;
+        if (rl1 < rl2) {
+            return -1;
+        } else if (rl1 > rl2) {
+            return 1;
+        }
+
+        return v2.expression.localeCompare(v1.expression);
+    });
+}
+
+function applyTagMeta(tag, meta) {
+    const symbol = tag.name.split(':')[0];
+    for (const prop in meta[symbol] || {}) {
+        tag[prop] = meta[symbol][prop];
+    }
+
+    return tag;
+}
