@@ -47,11 +47,11 @@ Yomichan can be used as a standalone extension, or in conjunction with [Anki](ht
 
 1.  Left-click on the ![](https://foosoft.net/projects/yomichan-chrome/img/logo.png) icon to enable or disable Yomichan for the current browser instance.
 2.  Right-click on the ![](https://foosoft.net/projects/yomichan-chrome/img/logo.png) icon and select *Options* to display the Yomichan options page.
-3.  Hold down <kbd>Shift</kbd> or the middle mouse button as you move your cursor over text to see definitions (or
-    <kbd>Shift</kbd> + <kbd>Ctrl</kbd> for Kanji).
-4.  Resize the definition window by dragging the bottom-left corner inwards or outwards.
-5.  Click on the Kanji links in the definition window to view additional information about those characters.
-6.  Click on the ![](https://foosoft.net/projects/yomichan-chrome/img/play-audio.png) icon to hear the term pronounced by a native speaker.
+3.  Hold down <kbd>Shift</kbd> (or the middle mouse button) as you hover over text to see term definitions.
+4.  Hold down <kbd>Ctrl</kbd> + <kbd>Shift</kbd> (or the middle mouse button) as you hover over text to see Kanji definitions.
+5.  Resize the definition window by dragging the bottom-left corner inwards or outwards.
+6.  Click on the Kanji links in the definition window to view additional information about those characters.
+7.  Click on the ![](https://foosoft.net/projects/yomichan-chrome/img/play-audio.png) icon to hear the term pronounced by a native speaker.
 
 ### Anki Integration ###
 
