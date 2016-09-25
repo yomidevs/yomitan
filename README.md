@@ -84,6 +84,11 @@ Yomichan can be used as a standalone extension, or in conjunction with [Anki](ht
 
 ## Frequently Asked Questions ##
 
+*   **Is it possible to use Yomichan with files saved locally on my computer?**
+
+    It in order to be able use Yomichan with local files, you must first tick the *Allow access to file URLs* checkbox
+    for Yomichan on the chrome extensions page.
+
 *   **When are you going to port Yomichan to $MYBROWSER?**
 
     I am considering creating a Firefox port once I am satisfied with the feature set of the Chrome extension. I may
