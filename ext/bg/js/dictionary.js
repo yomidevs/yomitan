@@ -20,7 +20,7 @@
 class Dictionary {
     constructor() {
         this.db = null;
-        this.dbVer = 1;
+        this.dbVer = 2;
         this.entities = null;
     }
 
