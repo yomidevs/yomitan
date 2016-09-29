@@ -23,6 +23,7 @@ class Yomichan {
         Handlebars.registerHelper('kanjiLinks', kanjiLinks);
 
         this.translator = new Translator();
+        this.options = null;
         this.importTabId = null;
         this.asyncPools = {};
         this.ankiConnectVer = 0;
@@ -30,8 +31,6 @@ class Yomichan {
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
         chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
-        chrome.tabs.onCreated.addListener(tab => this.onTabReady(tab.id));
-        chrome.tabs.onUpdated.addListener(this.onTabReady.bind(this));
 
         loadOptions().then(opts => {
             this.setOptions(opts);
@@ -64,11 +63,6 @@ class Yomichan {
         }
 
         return true;
-    }
-
-    onTabReady(tabId) {
-        this.tabInvoke(tabId, 'setOptions', this.options);
-        this.tabInvoke(tabId, 'setEnabled', this.state === 'enabled');
     }
 
     onBrowserAction() {
@@ -256,6 +250,14 @@ class Yomichan {
         }
 
         return note;
+    }
+
+    api_getEnabled({callback}) {
+        callback(this.state === 'enabled');
+    }
+
+    api_getOptions({callback}) {
+        loadOptions().then(opts => callback(opts));
     }
 
     api_addDefinition({definition, mode, callback}) {

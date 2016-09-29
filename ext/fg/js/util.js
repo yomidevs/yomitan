@@ -21,6 +21,14 @@ function invokeApiBg(action, params) {
     return new Promise((resolve, reject) => chrome.runtime.sendMessage({action, params}, resolve));
 }
 
+function getEnabled() {
+    return invokeApiBg('getEnabled', {});
+}
+
+function getOptions() {
+    return invokeApiBg('getOptions', {});
+}
+
 function findTerm(text) {
     return invokeApiBg('findTerm', {text});
 }

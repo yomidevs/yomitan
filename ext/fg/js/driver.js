@@ -25,7 +25,7 @@ class Driver {
         this.lastTextSource = null;
         this.pendingLookup = false;
         this.enabled = false;
-        this.options = {};
+        this.options = null;
         this.definitions = null;
         this.sequence = 0;
         this.fgRoot = chrome.extension.getURL('fg');
@@ -37,6 +37,13 @@ class Driver {
         window.addEventListener('keydown', this.onKeyDown.bind(this));
         window.addEventListener('scroll', e => this.hidePopup());
         window.addEventListener('resize', e => this.hidePopup());
+
+        getOptions().then(opts => {
+            this.options = opts;
+            return getEnabled();
+        }).then(enabled => {
+            this.enabled = enabled;
+        });
     }
 
     onKeyDown(e) {
