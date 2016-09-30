@@ -51,6 +51,10 @@ class Popup {
         this.showAt({x: posX, y: posY}, content);
     }
 
+    visible() {
+        return this.popup !== null && this.popup.style.visibility !== 'hidden';
+    }
+
     hide() {
         if (this.popup !== null) {
             this.popup.style.visibility = 'hidden';
