@@ -65,7 +65,7 @@ class Driver {
 
         if (this.enabled && this.lastMousePos !== null && e.keyCode === 16 /* shift */) {
             this.searchAt(this.lastMousePos, true);
-        } else {
+        } else if (e.keyCode === 27) {
             this.hidePopup();
         }
     }
