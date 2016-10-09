@@ -29,7 +29,7 @@ class Driver {
         this.options = null;
         this.definitions = null;
         this.sequence = 0;
-        this.extRoot = chrome.extension.getURL('.');
+        this.fgRoot = chrome.extension.getURL('fg');
 
         chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
         window.addEventListener('message', this.onFrameMessage.bind(this));
@@ -139,7 +139,7 @@ class Driver {
                 });
 
                 const sequence = ++this.sequence;
-                return renderText({definitions, sequence, root: this.extRoot, options: this.options}, 'term-list.html').then(content => {
+                return renderText({definitions, sequence, root: this.fgRoot, options: this.options}, 'term-list.html').then(content => {
                     this.definitions = definitions;
                     this.pendingLookup = false;
                     this.showPopup(textSource, content);
@@ -167,7 +167,7 @@ class Driver {
                 definitions.forEach(definition => definition.url = window.location.href);
 
                 const sequence = ++this.sequence;
-                return renderText({definitions, sequence, root: this.extRoot, options: this.options}, 'kanji-list.html').then(content => {
+                return renderText({definitions, sequence, root: this.fgRoot, options: this.options}, 'kanji-list.html').then(content => {
                     this.definitions = definitions;
                     this.pendingLookup = false;
                     this.showPopup(textSource, content);
@@ -278,7 +278,7 @@ class Driver {
             definitions.forEach(definition => definition.url = window.location.href);
 
             const sequence = ++this.sequence;
-            return renderText({definitions, sequence, root: this.extRoot, options: this.options}, 'kanji-list.html').then(content => {
+            return renderText({definitions, sequence, root: this.fgRoot, options: this.options}, 'kanji-list.html').then(content => {
                 this.definitions = definitions;
                 this.popup.setContent(content, definitions);
                 return canAddDefinitions(definitions, ['kanji']);
