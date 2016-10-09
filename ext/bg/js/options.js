@@ -20,12 +20,13 @@
 function sanitizeOptions(options) {
     const defaults = {
         activateOnStartup: true,
-        selectMatchedText: true,
         enableAudioPlayback: true,
         enableAnkiConnect: false,
         showAdvancedOptions: false,
+        selectMatchedText: true,
+        holdShiftToScan: true,
+        scanDelay: 15,
         scanLength: 20,
-
         ankiCardTags: ['yomichan'],
         sentenceExtent: 200,
 

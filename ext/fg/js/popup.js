@@ -19,16 +19,16 @@
 
 class Popup {
     constructor() {
-        this.popup = null;
+        this.container = null;
         this.offset = 10;
     }
 
     showAt(pos, content) {
         this.inject();
 
-        this.popup.style.left = pos.x + 'px';
-        this.popup.style.top = pos.y + 'px';
-        this.popup.style.visibility = 'visible';
+        this.container.style.left = pos.x + 'px';
+        this.container.style.top = pos.y + 'px';
+        this.container.style.visibility = 'visible';
 
         this.setContent(content);
     }
@@ -36,58 +36,58 @@ class Popup {
     showNextTo(elementRect, content) {
         this.inject();
 
-        const popupRect = this.popup.getBoundingClientRect();
+        const containerRect = this.container.getBoundingClientRect();
 
         let posX = elementRect.left;
-        if (posX + popupRect.width >= window.innerWidth) {
-            posX = window.innerWidth - popupRect.width;
+        if (posX + containerRect.width >= window.innerWidth) {
+            posX = window.innerWidth - containerRect.width;
         }
 
         let posY = elementRect.bottom + this.offset;
-        if (posY + popupRect.height >= window.innerHeight) {
-            posY = elementRect.top - popupRect.height - this.offset;
+        if (posY + containerRect.height >= window.innerHeight) {
+            posY = elementRect.top - containerRect.height - this.offset;
         }
 
         this.showAt({x: posX, y: posY}, content);
     }
 
     visible() {
-        return this.popup !== null && this.popup.style.visibility !== 'hidden';
+        return this.container !== null && this.container.style.visibility !== 'hidden';
     }
 
     hide() {
-        if (this.popup !== null) {
-            this.popup.style.visibility = 'hidden';
+        if (this.container !== null) {
+            this.container.style.visibility = 'hidden';
         }
     }
 
     setContent(content) {
-        if (this.popup === null) {
+        if (this.container === null) {
             return;
         }
 
-        const doc = this.popup.contentDocument;
+        const doc = this.container.contentDocument;
         doc.open();
         doc.write(content);
         doc.close();
     }
 
     invokeApi(action, params) {
-        if (this.popup !== null) {
-            this.popup.contentWindow.postMessage({action, params}, '*');
+        if (this.container !== null) {
+            this.container.contentWindow.postMessage({action, params}, '*');
         }
     }
 
     inject() {
-        if (this.popup !== null) {
+        if (this.container !== null) {
             return;
         }
 
-        this.popup = document.createElement('iframe');
-        this.popup.id = 'yomichan-popup';
-        this.popup.addEventListener('mousedown', e => e.stopPropagation());
-        this.popup.addEventListener('scroll', e => e.stopPropagation());
+        this.container = document.createElement('iframe');
+        this.container.id = 'yomichan-popup';
+        this.container.addEventListener('mousedown', e => e.stopPropagation());
+        this.container.addEventListener('scroll', e => e.stopPropagation());
 
-        document.body.appendChild(this.popup);
+        document.body.appendChild(this.container);
     }
 }

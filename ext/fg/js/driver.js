@@ -20,6 +20,7 @@
 class Driver {
     constructor() {
         this.popup = new Popup();
+        this.popupTimer = null;
         this.audio = {};
         this.lastMousePos = null;
         this.lastTextSource = null;
@@ -32,6 +33,7 @@ class Driver {
 
         chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
         window.addEventListener('message', this.onFrameMessage.bind(this));
+        window.addEventListener('mouseover', this.onMouseOver.bind(this));
         window.addEventListener('mousedown', this.onMouseDown.bind(this));
         window.addEventListener('mousemove', this.onMouseMove.bind(this));
         window.addEventListener('keydown', this.onKeyDown.bind(this));
@@ -46,25 +48,58 @@ class Driver {
         });
     }
 
+    popupTimerSet(callback) {
+        this.popupTimerClear();
+        this.popupTimer = window.setTimeout(callback, this.options.scanDelay);
+    }
+
+    popupTimerClear() {
+        if (this.popupTimer !== null) {
+            window.clearTimeout(this.popupTimer);
+            this.popupTimer = null;
+        }
+    }
+
     onKeyDown(e) {
-        if (this.enabled && this.lastMousePos !== null && (e.keyCode === 16 || e.charCode === 16)) {
-            this.searchAt(this.lastMousePos, e.ctrlKey ? 'kanji' : 'terms');
+        this.popupTimerClear();
+
+        if (this.enabled && this.lastMousePos !== null && e.keyCode === 16 /* shift */) {
+            this.searchAt(this.lastMousePos, true);
         } else {
             this.hidePopup();
         }
     }
 
+    onMouseOver(e) {
+        if (e.target === this.popup.container && this.popuptimer !== null) {
+            this.popupTimerClear();
+        }
+    }
+
     onMouseMove(e) {
+        this.popupTimerClear();
+
         this.lastMousePos = {x: e.clientX, y: e.clientY};
-        if (this.enabled && (e.shiftKey || e.which === 2)) {
-            this.searchAt(this.lastMousePos, e.ctrlKey ? 'kanji' : 'terms');
+        if (!this.enabled) {
+            return;
+        }
+
+        if (this.options.holdShiftToScan && !e.shiftKey) {
+            return;
+        }
+
+        const searcher = () => this.searchAt(this.lastMousePos, false);
+        if (!this.popup.visible() || e.shiftKey || e.which === 2 /* mmb */) {
+            searcher();
+        } else {
+            this.popupTimerSet(searcher);
         }
     }
 
     onMouseDown(e) {
         this.lastMousePos = {x: e.clientX, y: e.clientY};
-        if (this.enabled && (e.shiftKey || e.which === 2)) {
-            this.searchAt(this.lastMousePos, e.ctrlKey ? 'kanji' : 'terms');
+        if (this.enabled && (e.shiftKey || !this.options.holdShiftToScan || e.which === 2 /* mmb */)) {
+            this.searchAt(this.lastMousePos, true);
         } else {
             this.hidePopup();
         }
@@ -90,10 +125,10 @@ class Driver {
         textSource.setEndOffset(this.options.scanLength);
 
         this.pendingLookup = true;
-        findTerm(textSource.text()).then(({definitions, length}) => {
+        return findTerm(textSource.text()).then(({definitions, length}) => {
             if (definitions.length === 0) {
                 this.pendingLookup = false;
-                this.hidePopup();
+                return false;
             } else {
                 textSource.setEndOffset(length);
 
@@ -113,6 +148,8 @@ class Driver {
                     if (states !== null) {
                         states.forEach((state, index) => this.popup.invokeApi('setActionState', {index, state, sequence}));
                     }
+
+                    return true;
                 });
             }
         });
@@ -122,10 +159,10 @@ class Driver {
         textSource.setEndOffset(1);
 
         this.pendingLookup = true;
-        findKanji(textSource.text()).then(definitions => {
+        return findKanji(textSource.text()).then(definitions => {
             if (definitions.length === 0) {
                 this.pendingLookup = false;
-                this.hidePopup();
+                return false;
             } else {
                 definitions.forEach(definition => definition.url = window.location.href);
 
@@ -139,34 +176,40 @@ class Driver {
                     if (states !== null) {
                         states.forEach((state, index) => this.popup.invokeApi('setActionState', {index, state, sequence}));
                     }
+
+                    return true;
                 });
             }
         });
     }
 
-    searchAt(point, mode) {
+    searchAt(point, hideNotFound) {
         if (this.pendingLookup) {
             return;
         }
 
         const textSource = textSourceFromPoint(point);
         if (textSource === null || !textSource.containsPoint(point)) {
-            this.hidePopup();
+            if (hideNotFound) {
+                this.hidePopup();
+            }
+
             return;
         }
 
         if (this.lastTextSource !== null && this.lastTextSource.equals(textSource)) {
-            return;
+            return true;
         }
 
-        switch (mode) {
-            case 'terms':
-                this.searchTerms(textSource);
-                break;
-            case 'kanji':
-                this.searchKanji(textSource);
-                break;
-        }
+        this.searchTerms(textSource).then(found => {
+            if (!found) {
+                this.searchKanji(textSource).then(found => {
+                    if (!found && hideNotFound) {
+                        this.hidePopup();
+                    }
+                });
+            }
+        });
     }
 
     showPopup(textSource, content) {

@@ -24,7 +24,7 @@
     </head>
     <body>
         <div class="container">
-            <div class="options-general">
+            <div class="options-basic">
                 <h3>General Options</h3>
 
                 <form class="form-horizontal">
@@ -32,14 +32,6 @@
                         <div class="col-sm-offset-2 col-sm-10">
                             <div class="checkbox">
                                 <label class="control-label"><input type="checkbox" id="activate-on-startup"> Activate on startup</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <div class="checkbox">
-                                <label class="control-label"><input type="checkbox" id="select-matched-text"> Select matched text</label>
                             </div>
                         </div>
                     </div>
@@ -67,23 +59,51 @@
                             </div>
                         </div>
                     </div>
+                </form>
+            </div>
+
+            <div class="options-basic">
+                <h3>Scanning Options</h3>
+
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <div class="checkbox">
+                                <label class="control-label"><input type="checkbox" id="hold-shift-to-scan"> Hold <kbd>Shift</kbd> to scan</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <div class="checkbox">
+                                <label class="control-label"><input type="checkbox" id="select-matched-text"> Select matched text</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group options-advanced">
+                        <label for="scan-delay" class="control-label col-sm-2">Scan delay</label>
+                        <div class="col-sm-10"><input type="number" min="1" id="scan-delay" class="form-control"></div>
+                    </div>
 
                     <div class="form-group options-advanced">
                         <label for="scan-length" class="control-label col-sm-2">Scan length</label>
                         <div class="col-sm-10"><input type="number" min="1" id="scan-length" class="form-control"></div>
                     </div>
                 </form>
-
             </div>
 
             <div class="options-anki">
                 <h3>Anki Options</h3>
 
                 <div class="alert alert-danger error-dlg error-dlg-connection">
-                    <strong>Unable to connect</strong>: is the <a href="https://foosoft.net/projects/anki-connect">AnkiConnect</a> extension for <a href="http://ankisrs.net/">Anki</a> installed and running? This software is required for Anki-related features.
+                    <strong>Unable to Connect</strong><br>
+                    Is the <a href="https://foosoft.net/projects/anki-connect">AnkiConnect</a> extension for <a href="http://ankisrs.net/">Anki</a> installed and running? This software is required for Anki-related features.
                 </div>
                 <div class="alert alert-warning error-dlg error-dlg-version">
-                    <strong>Unsupported version</strong>: the installed version of the <a href="https://foosoft.net/projects/anki-connect">AnkiConnect</a> extension for <a href="http://ankisrs.net/">Anki</a> is not compatible with this release; please update it.
+                    <strong>Unsupported Version</strong><br>
+                    The installed version of the <a href="https://foosoft.net/projects/anki-connect">AnkiConnect</a> extension for <a href="http://ankisrs.net/">Anki</a> is not compatible with this release; please update it.
                 </div>
 
                 <form class="form-horizontal options-anki-controls">
@@ -158,7 +178,6 @@
                         </div>
                     </div>
                 </form>
-
             </div>
 
             <div style="text-align: right;">
