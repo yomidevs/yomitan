@@ -33,6 +33,11 @@
         "fg/img/play_audio.png",
         "fg/js/frame.js",
         "fg/ttf/kanji-stroke-orders.ttf",
-        "fg/ttf/vl-gothic-regular.ttf"
+        "fg/ttf/vl-gothic-regular.ttf",
+        "lib/bootstrap-3.3.6-dist/css/bootstrap-theme.min.css",
+        "lib/bootstrap-3.3.6-dist/css/bootstrap.min.css",
+        "lib/bootstrap-3.3.6-dist/fonts/glyphicons-halflings-regular.ttf",
+        "lib/bootstrap-3.3.6-dist/fonts/glyphicons-halflings-regular.woff",
+        "lib/bootstrap-3.3.6-dist/fonts/glyphicons-halflings-regular.woff2"
     ]
 }
