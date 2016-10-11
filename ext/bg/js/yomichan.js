@@ -23,9 +23,9 @@ class Yomichan {
         Handlebars.registerHelper('kanjiLinks', kanjiLinks);
 
         this.translator = new Translator();
+        this.anki = new AnkiConnect();
         this.options = null;
         this.importTabId = null;
-        this.anki = new AnkiConnect(this.getApiVersion());
         this.setState('disabled');
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
@@ -248,7 +248,6 @@ class Yomichan {
 
         this.anki.canAddNotes(notes).then(results => {
             const states = [];
-
             if (results !== null) {
                 for (let resultBase = 0; resultBase < results.length; resultBase += modes.length) {
                     const state = {};
@@ -269,7 +268,7 @@ class Yomichan {
     }
 
     api_getModelNames({callback}) {
-        this.anki.getModelFieldNames().then(callback);
+        this.anki.getModelNames().then(callback);
     }
 
     api_getModelFieldNames({modelName, callback}) {

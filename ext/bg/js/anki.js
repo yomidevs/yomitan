@@ -17,10 +17,10 @@
  */
 
 class AnkiConnect {
-    constructor(apiVersion) {
+    constructor() {
         this.asyncPools = {};
-        this.apiVersion = apiVersion;
-        this.ankiConnectVer = 0;
+        this.pluginVersion = null;
+        this.apiVersion = 1;
     }
 
     addNote(note) {
@@ -48,12 +48,13 @@ class AnkiConnect {
     }
 
     ankiInvokeSafe(action, params, pool) {
-        if (this.ankiConnectVer === this.apiVersion) {
+        if (this.pluginVersion === this.apiVersion) {
             return this.ankiInvoke(action, params, pool);
         }
 
         return this.getVersion().then(version => {
             if (version === this.apiVersion) {
+                this.pluginVersion = version;
                 return this.ankiInvoke(action, params, pool);
             }
 
