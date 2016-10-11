@@ -25,8 +25,7 @@ class Yomichan {
         this.translator = new Translator();
         this.options = null;
         this.importTabId = null;
-        this.asyncPools = {};
-        this.ankiConnectVer = 0;
+        this.anki = new AnkiConnect(this.getApiVersion());
         this.setState('disabled');
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
@@ -118,44 +117,6 @@ class Yomichan {
 
     tabInvoke(tabId, action, params) {
         chrome.tabs.sendMessage(tabId, {action, params}, () => null);
-    }
-
-    ankiInvokeSafe(action, params, pool, callback) {
-        if (this.ankiConnectVer === this.getApiVersion()) {
-            this.ankiInvoke(action, params, pool, callback);
-        } else {
-            this.api_getVersion({callback: version => {
-                if (version === this.getApiVersion()) {
-                    this.ankiConnectVer = version;
-                    this.ankiInvoke(action, params, pool, callback);
-                } else {
-                    callback(null);
-                }
-            }});
-        }
-    }
-
-    ankiInvoke(action, params, pool, callback) {
-        if (this.options.enableAnkiConnect) {
-            if (pool !== null && this.asyncPools.hasOwnProperty(pool)) {
-                this.asyncPools[pool].abort();
-            }
-
-            const xhr = new XMLHttpRequest();
-            xhr.addEventListener('loadend', () => {
-                if (pool !== null) {
-                    delete this.asyncPools[pool];
-                }
-
-                const resp = xhr.responseText;
-                callback(resp ? JSON.parse(resp) : null);
-            });
-
-            xhr.open('POST', 'http://127.0.0.1:8765');
-            xhr.send(JSON.stringify({action, params}));
-        } else {
-            callback(null);
-        }
     }
 
     formatField(field, definition, mode) {
@@ -260,9 +221,21 @@ class Yomichan {
         loadOptions().then(opts => callback(opts));
     }
 
+    api_findKanji({text, callback}) {
+        this.translator.findKanji(text).then(result => callback(result));
+    }
+
+    api_findTerm({text, callback}) {
+        this.translator.findTerm(text).then(result => callback(result));
+    }
+
+    api_renderText({template, data, callback}) {
+        callback(Handlebars.templates[template](data));
+    }
+
     api_addDefinition({definition, mode, callback}) {
         const note = this.formatNote(definition, mode);
-        this.ankiInvokeSafe('addNote', {note}, null, callback);
+        this.anki.addNote(note).then(callback);
     }
 
     api_canAddDefinitions({definitions, modes, callback}) {
@@ -273,7 +246,7 @@ class Yomichan {
             }
         }
 
-        this.ankiInvokeSafe('canAddNotes', {notes}, 'notes', results => {
+        this.anki.canAddNotes(notes).then(results => {
             const states = [];
 
             if (results !== null) {
@@ -291,32 +264,20 @@ class Yomichan {
         });
     }
 
-    api_findKanji({text, callback}) {
-        this.translator.findKanji(text).then(result => callback(result));
-    }
-
-    api_findTerm({text, callback}) {
-        this.translator.findTerm(text).then(result => callback(result));
-    }
-
     api_getDeckNames({callback}) {
-        this.ankiInvokeSafe('deckNames', {}, null, callback);
+        this.anki.getDeckNames().then(callback);
     }
 
     api_getModelNames({callback}) {
-        this.ankiInvokeSafe('modelNames', {}, null, callback);
+        this.anki.getModelFieldNames().then(callback);
     }
 
     api_getModelFieldNames({modelName, callback}) {
-        this.ankiInvokeSafe('modelFieldNames', {modelName}, null, callback);
+        this.anki.getModelFieldNames(modelName).then(callback);
     }
 
     api_getVersion({callback}) {
-        this.ankiInvoke('version', {}, null, callback);
-    }
-
-    api_renderText({template, data, callback}) {
-        callback(Handlebars.templates[template](data));
+        this.anki.getVersion().then(callback);
     }
 }
 
