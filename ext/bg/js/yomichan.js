@@ -103,10 +103,6 @@ class Yomichan {
         this.tabInvokeAll('setOptions', this.options);
     }
 
-    getApiVersion() {
-        return 1;
-    }
-
     tabInvokeAll(action, params) {
         chrome.tabs.query({}, tabs => {
             for (const tab of tabs) {
@@ -124,6 +120,7 @@ class Yomichan {
             'audio',
             'character',
             'expression',
+            'expression-furigana',
             'glossary',
             'glossary-list',
             'kunyomi',
@@ -143,6 +140,13 @@ class Yomichan {
                 case 'expression':
                     if (mode === 'term_kana' && definition.reading) {
                         value = definition.reading;
+                    }
+                    break;
+                case 'expression-furigana':
+                    if (mode === 'term_kana' && definition.reading) {
+                        value = definition.reading;
+                    } else {
+                        value = `<ruby>${definition.expression}<rt>${definition.reading}</rt></ruby>`;
                     }
                     break;
                 case 'reading':
@@ -273,10 +277,6 @@ class Yomichan {
 
     api_getModelFieldNames({modelName, callback}) {
         this.anki.getModelFieldNames(modelName).then(callback);
-    }
-
-    api_getVersion({callback}) {
-        this.anki.getVersion().then(callback);
     }
 }
 

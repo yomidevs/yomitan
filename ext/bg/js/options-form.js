@@ -39,8 +39,25 @@ function modelIdToFieldOptKey(id) {
 
 function modelIdToMarkers(id) {
     return {
-        'anki-term-model': ['audio', 'expression', 'glossary', 'glossary-list', 'reading', 'sentence', 'tags', 'url'],
-        'anki-kanji-model': ['character', 'glossary', 'glossary-list', 'kunyomi', 'onyomi', 'url'],
+        'anki-term-model': [
+            'audio',
+            'expression',
+            'expression-furigana',
+            'glossary',
+            'glossary-list',
+            'reading',
+            'sentence',
+            'tags',
+            'url'
+        ],
+        'anki-kanji-model': [
+            'character',
+            'glossary',
+            'glossary-list',
+            'kunyomi',
+            'onyomi',
+            'url'
+        ],
     }[id];
 }
 
@@ -111,19 +128,21 @@ function populateAnkiDeckAndModel(opts) {
 }
 
 function updateAnkiStatus() {
-    $('.error-dlg').hide();
+    // $('.error-dlg').hide();
 
-    yomichan().api_getVersion({callback: version => {
-        if (version === null) {
-            $('.error-dlg-connection').show();
-            $('.options-anki-controls').hide();
-        } else if (version !== yomichan().getApiVersion()) {
-            $('.error-dlg-version').show();
-            $('.options-anki-controls').hide();
-        } else {
-            $('.options-anki-controls').show();
-        }
-    }});
+    // yomichan().api_getVersion({callback: version => {
+    //     if (version === null) {
+    //         $('.error-dlg-connection').show();
+    //         $('.options-anki-controls').hide();
+    //     } else if (version !== yomichan().getApiVersion()) {
+    //         $('.error-dlg-version').show();
+    //         $('.options-anki-controls').hide();
+    //     } else {
+    //         $('.options-anki-controls').show();
+    //     }
+    // }});
+
+    $('.options-anki-controls').show();
 }
 
 function populateAnkiFields(element, opts) {

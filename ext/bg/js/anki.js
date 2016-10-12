@@ -43,6 +43,18 @@ class AnkiConnect {
         return this.ankiInvokeSafe('modelFieldNames', {modelName}, null);
     }
 
+    getStatus() {
+        return this.getVersion().then(version => {
+            if (version === null) {
+                return 'disconnected';
+            } else if (version === this.apiVersion) {
+                return 'ready';
+            } else {
+                return 'mismatch';
+            }
+        });
+    }
+
     getVersion() {
         return this.ankiInvoke('version', {}, null);
     }
