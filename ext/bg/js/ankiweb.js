@@ -21,7 +21,7 @@ class AnkiWeb {
         this.username = username;
         this.password = password;
         this.noteInfo = null;
-        this.logged = false;
+        this.logged = true;
     }
 
     addNote(note) {

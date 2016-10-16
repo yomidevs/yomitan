@@ -23,7 +23,7 @@ class Yomichan {
         Handlebars.registerHelper('kanjiLinks', kanjiLinks);
 
         this.translator = new Translator();
-        this.anki = null;
+        this.anki = new AnkiNull();
         this.options = null;
         this.importTabId = null;
         this.setState('disabled');
@@ -109,7 +109,7 @@ class Yomichan {
                 this.anki = new AnkiConnect();
                 break;
             default:
-                this.anki = null;
+                this.anki = new AnkiNull();
                 break;
         }
 
@@ -251,66 +251,45 @@ class Yomichan {
     }
 
     api_addDefinition({definition, mode, callback}) {
-        if (this.anki === null) {
-            callback(null);
-        } else {
-            const note = this.formatNote(definition, mode);
-            this.anki.addNote(note).then(callback);
-        }
+        const note = this.formatNote(definition, mode);
+        this.anki.addNote(note).then(callback);
     }
 
     api_canAddDefinitions({definitions, modes, callback}) {
-        if (this.anki === null) {
-            callback(null);
+        const notes = [];
+        for (const definition of definitions) {
+            for (const mode of modes) {
+                notes.push(this.formatNote(definition, mode));
+            }
         }
-        else {
-            const notes = [];
-            for (const definition of definitions) {
-                for (const mode of modes) {
-                    notes.push(this.formatNote(definition, mode));
+
+        this.anki.canAddNotes(notes).then(results => {
+            const states = [];
+            if (results !== null) {
+                for (let resultBase = 0; resultBase < results.length; resultBase += modes.length) {
+                    const state = {};
+                    for (let modeOffset = 0; modeOffset < modes.length; ++modeOffset) {
+                        state[modes[modeOffset]] = results[resultBase + modeOffset];
+                    }
+
+                    states.push(state);
                 }
             }
 
-            this.anki.canAddNotes(notes).then(results => {
-                const states = [];
-                if (results !== null) {
-                    for (let resultBase = 0; resultBase < results.length; resultBase += modes.length) {
-                        const state = {};
-                        for (let modeOffset = 0; modeOffset < modes.length; ++modeOffset) {
-                            state[modes[modeOffset]] = results[resultBase + modeOffset];
-                        }
-
-                        states.push(state);
-                    }
-                }
-
-                callback(states);
-            });
-        }
+            callback(states);
+        });
     }
 
     api_getDeckNames({callback}) {
-        if (this.anki === null) {
-            callback(null);
-        } else {
-            this.anki.getDeckNames().then(callback);
-        }
+        this.anki.getDeckNames().then(callback);
     }
 
     api_getModelNames({callback}) {
-        if (this.anki === null) {
-            callback(null);
-        } else {
-            this.anki.getModelNames().then(callback);
-        }
+        this.anki.getModelNames().then(callback);
     }
 
     api_getModelFieldNames({modelName, callback}) {
-        if (this.anki === null) {
-            callback(null);
-        } else {
-            this.anki.getModelFieldNames(modelName).then(callback);
-        }
+        this.anki.getModelFieldNames(modelName).then(callback);
     }
 }
 

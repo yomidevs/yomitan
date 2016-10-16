@@ -19,58 +19,40 @@
 class AnkiConnect {
     constructor() {
         this.asyncPools = {};
-        this.pluginVersion = null;
-        this.apiVersion = 1;
+        this.localVersion = 1;
+        this.remoteVersion = null;
     }
 
     addNote(note) {
-        return this.ankiInvokeSafe('addNote', {note}, null);
+        return this.checkVersion().then(() => this.ankiInvoke('addNote', {note}, null));
     }
 
     canAddNotes(notes) {
-        return this.ankiInvokeSafe('canAddNotes', {notes}, 'notes');
+        return this.checkVersion().then(() => this.ankiInvoke('canAddNotes', {notes}, 'notes'));
     }
 
     getDeckNames() {
-        return this.ankiInvokeSafe('deckNames', {}, null);
+        return this.checkVersion().then(() => this.ankiInvoke('deckNames', {}, null));
     }
 
     getModelNames() {
-        return this.ankiInvokeSafe('modelNames', {}, null);
+        return this.checkVersion().then(() => this.ankiInvoke('modelNames', {}, null));
     }
 
     getModelFieldNames(modelName) {
-        return this.ankiInvokeSafe('modelFieldNames', {modelName}, null);
+        return this.checkVersion().then(() => this.ankiInvoke('modelFieldNames', {modelName}, null));
     }
 
-    getStatus() {
-        return this.getVersion().then(version => {
-            if (version === null) {
-                return 'disconnected';
-            } else if (version === this.apiVersion) {
-                return 'ready';
-            } else {
-                return 'mismatch';
-            }
-        });
-    }
-
-    getVersion() {
-        return this.ankiInvoke('version', {}, null);
-    }
-
-    ankiInvokeSafe(action, params, pool) {
-        if (this.pluginVersion === this.apiVersion) {
-            return this.ankiInvoke(action, params, pool);
+    checkVersion() {
+        if (this.localVersion === this.remoteVersion) {
+            return Promise.resolve(true);
         }
 
-        return this.getVersion().then(version => {
-            if (version === this.apiVersion) {
-                this.pluginVersion = version;
-                return this.ankiInvoke(action, params, pool);
+        return this.ankiInvoke('version', {}, null).then(version => {
+            this.remoteVersion = version;
+            if (this.remoteVersion !== this.localVersion) {
+                return Promise.reject('browser extension and anki plugin version mismatch');
             }
-
-            return null;
         });
     }
 
