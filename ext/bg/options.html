@@ -17,7 +17,7 @@
                 padding: 10px;
             }
 
-            .error-dlg {
+            .status-dlg {
                 display: none;
             }
         </style>
@@ -89,6 +89,16 @@
             <div class="options-anki">
                 <h3>Anki Options</h3>
 
+                <div class="alert alert-danger status-dlg" id="error-dlg">
+                    <strong>Error</strong>
+                    <span>Unable to connect</span>
+                </div>
+
+                <div class="alert alert-success status-dlg" id="success-dlg">
+                    <strong>Success</strong>
+                    <span>Connection established</span>
+                </div>
+
                 <div class="form-group">
                     <label class="control-label" for="anki-method">Connection method</label>
                     <select class="form-control" id="anki-method">
@@ -96,11 +106,6 @@
                         <option value="ankiweb">AnkiWeb</option>
                         <option value="ankiconnect">AnkiConnect</option>
                     </select>
-                </div>
-
-                <div class="alert alert-danger error-dlg error-dlg-connection">
-                    <strong>Unable to Connect</strong><br>
-                    Is the <a href="https://foosoft.net/projects/anki-connect">AnkiConnect</a> extension for <a href="http://ankisrs.net/">Anki</a> installed and running? This software is required for Anki-related features.
                 </div>
 
                 <form class="form-horizontal options-anki-general">
@@ -124,64 +129,66 @@
                         <div class="col-sm-10"><input type="number" min="1" id="sentence-extent" class="form-control"></div>
                     </div>
 
-                    <ul class="nav nav-tabs col-sm-offset-2 col-sm-10">
-                        <li class="active"><a href="#term" data-toggle="tab">Terms</a></li>
-                        <li><a href="#kanji" data-toggle="tab">Kanji</a></li>
-                    </ul>
+                    <div class="options-anki-format">
+                        <ul class="nav nav-tabs col-sm-offset-2 col-sm-10">
+                            <li class="active"><a href="#term" data-toggle="tab">Terms</a></li>
+                            <li><a href="#kanji" data-toggle="tab">Kanji</a></li>
+                        </ul>
 
-                    <div class="tab-content col-sm-offset-2 col-sm-10">
-                        <div id="term" class="tab-pane fade in active">
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label" for="anki-term-deck">Deck</label>
-                                <div class="col-sm-10">
-                                    <select class="form-control anki-deck" id="anki-term-deck"></select>
+                        <div class="tab-content col-sm-offset-2 col-sm-10">
+                            <div id="term" class="tab-pane fade in active">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" for="anki-term-deck">Deck</label>
+                                    <div class="col-sm-10">
+                                        <select class="form-control anki-deck" id="anki-term-deck"></select>
+                                    </div>
                                 </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" for="anki-term-model">Model</label>
+                                    <div class="col-sm-10">
+                                        <select class="form-control anki-model" id="anki-term-model"></select>
+                                    </div>
+                                </div>
+
+                                <table class="table table-bordered anki-fields">
+                                    <thead>
+                                        <tr>
+                                            <th>Field</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
                             </div>
 
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label" for="anki-term-model">Model</label>
-                                <div class="col-sm-10">
-                                    <select class="form-control anki-model" id="anki-term-model"></select>
+                            <div id="kanji" class="tab-pane fade">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" for="anki-kanji-deck">Deck</label>
+                                    <div class="col-sm-10">
+                                        <select class="form-control anki-deck" id="anki-kanji-deck"></select>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <table class="table table-bordered anki-fields">
-                                <thead>
-                                    <tr>
-                                        <th>Field</th>
-                                        <th>Value</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div id="kanji" class="tab-pane fade">
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label" for="anki-kanji-deck">Deck</label>
-                                <div class="col-sm-10">
-                                    <select class="form-control anki-deck" id="anki-kanji-deck"></select>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" for="anki-kanji-model">Model</label>
+                                    <div class="col-sm-10">
+                                        <select class="form-control anki-model" id="anki-kanji-model"></select>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label" for="anki-kanji-model">Model</label>
-                                <div class="col-sm-10">
-                                    <select class="form-control anki-model" id="anki-kanji-model"></select>
-                                </div>
+                                <table class="table table-bordered anki-fields">
+                                    <thead>
+                                        <tr>
+                                            <th>Field</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
                             </div>
-
-                            <table class="table table-bordered anki-fields">
-                                <thead>
-                                    <tr>
-                                        <th>Field</th>
-                                        <th>Value</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
                         </div>
                     </div>
                 </form>

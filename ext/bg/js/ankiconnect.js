@@ -51,7 +51,7 @@ class AnkiConnect {
         return this.ankiInvoke('version', {}, null).then(version => {
             this.remoteVersion = version;
             if (this.remoteVersion !== this.localVersion) {
-                return Promise.reject('browser extension and anki plugin version mismatch');
+                return Promise.reject('extension and plugin version mismatch');
             }
         });
     }
@@ -68,8 +68,11 @@ class AnkiConnect {
                     delete this.asyncPools[pool];
                 }
 
-                const resp = xhr.responseText;
-                resolve(resp ? JSON.parse(resp) : null);
+                if (xhr.responseText) {
+                    resolve(JSON.parse(resp));
+                } else {
+                    reject('unable to connect to plugin');
+                }
             });
 
             xhr.open('POST', 'http://127.0.0.1:8765');

@@ -130,6 +130,9 @@ function updateVisibility(opts) {
 }
 
 function populateAnkiDeckAndModel(opts) {
+    $('.options-anki-format').hide();
+    $('.status-dlg').hide();
+
     const ankiDeck = $('.anki-deck');
     ankiDeck.find('option').remove();
 
@@ -147,6 +150,14 @@ function populateAnkiDeckAndModel(opts) {
         populateAnkiFields($('#anki-term-model').val(opts.ankiTermModel), opts);
     }).then(() => {
         populateAnkiFields($('#anki-kanji-model').val(opts.ankiKanjiModel), opts);
+    }).then(() => {
+        $('.options-anki-format').show();
+        if (opts.ankiMethod !== 'none') {
+            $('#success-dlg').show();
+        }
+    }).catch(error => {
+        $('#error-dlg').show();
+        $('#error-dlg span').text(error);
     });
 }
 
@@ -213,7 +224,12 @@ function onOptionsAnkiChanged(e) {
     if (e.originalEvent || e.isTrigger) {
         getAnkiOptions().then(({optsNew, optsOld}) => {
             updateVisibility(optsNew);
-            saveOptions(optsNew).then(() => yomichan().setOptions(optsNew));
+            saveOptions(optsNew).then(() => {
+                yomichan().setOptions(optsNew);
+                if (optsNew.ankiMethod !== optsOld.ankiMethod) {
+                    populateAnkiDeckAndModel(optsNew);
+                }
+            });
         });
     }
 }
@@ -245,8 +261,8 @@ $(document).ready(() => {
         $('#sentence-extent').val(opts.sentenceExtent);
 
         $('.options-basic').change(onOptionsBasicChanged);
-        $('.options-anki').not('.anki-model').change(onOptionsAnkiChanged);
         $('.anki-model').change(onAnkiModelChanged);
+        $('.options-anki').not('.anki-model').change(onOptionsAnkiChanged);
 
         populateAnkiDeckAndModel(opts);
         updateVisibility(opts);
