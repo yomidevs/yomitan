@@ -75,12 +75,9 @@ class AnkiWeb {
 
     static scrape() {
         return new Promise((resolve, reject) => {
-            $.get('https://ankiweb.net/edit/', (data, status) => {
-                if (status !== 'success') {
-                    reject('failed to execute scrape request');
-                    return;
-                }
-
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('error', () => reject('failed to execute scrape request'));
+            xhr.addEventListener('load', () => {
                 const modelsJson = JSON.parse(/editor\.models = (.*}]);/.exec(data)[1]);
                 if (!modelsJson) {
                     reject('failed to scrape model data');
@@ -105,34 +102,42 @@ class AnkiWeb {
 
                 resolve({deckNames, models});
             });
+
+            xhr.open('GET', 'https://ankiweb.net/edit/');
+            xhr.send();
         });
     }
 
     static login(username, password) {
         return new Promise((resolve, reject) => {
-            $.post('https://ankiweb.net/account/login', {username, password, submitted: 1}, (data, status) => {
-                if (status === 'success') {
-                    if (data.includes('class="mitem"')) {
-                        resolve();
-                    } else {
-                        reject('failed to authenticate');
-                    }
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('error', () => reject('failed to execute login request'));
+            xhr.addEventListener('success', () => {
+                if (xhr.responseText.includes('class="mitem"')) {
+                    resolve();
                 } else {
-                    reject('failed to execute login request');
+                    reject('failed to authenticate');
                 }
             });
+
+            const form = new FormData();
+            form.append('username', username);
+            form.append('password', password);
+            form.append('submitted', 1);
+
+            xhr.open('POST', 'https://ankiweb.net/account/login');
+            xhr.send(form);
         });
     }
 
     static logout() {
         return new Promise((resolve, reject) => {
-            $.get('https://ankiweb.net/account/logout', (data, status) => {
-                if (status === 'success') {
-                    resolve();
-                } else {
-                    reject('failed to execute logout request');
-                }
-            });
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('error', () => reject('failed to execute logout request'));
+            xhr.addEventListener('load', () => resolve());
+
+            xhr.open('GET', 'https://ankiweb.net/account/logout');
+            xhr.send();
         });
     }
 }

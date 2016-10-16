@@ -34,7 +34,7 @@ function loadJson(url) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.addEventListener('load', () => resolve(JSON.parse(xhr.responseText)));
-        xhr.open('GET', chrome.extension.getURL(url), true);
+        xhr.open('GET', chrome.extension.getURL(url));
         xhr.send();
     });
 }
