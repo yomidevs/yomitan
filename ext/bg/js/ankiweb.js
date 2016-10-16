@@ -78,13 +78,13 @@ class AnkiWeb {
             const xhr = new XMLHttpRequest();
             xhr.addEventListener('error', () => reject('failed to execute scrape request'));
             xhr.addEventListener('load', () => {
-                const modelsJson = JSON.parse(/editor\.models = (.*}]);/.exec(data)[1]);
+                const modelsJson = JSON.parse(/editor\.models = (.*}]);/.exec(xhr.responseText)[1]);
                 if (!modelsJson) {
                     reject('failed to scrape model data');
                     return;
                 }
 
-                const decksJson = JSON.parse(/editor\.decks = (.*}});/.exec(data)[1]);
+                const decksJson = JSON.parse(/editor\.decks = (.*}});/.exec(xhr.responseText)[1]);
                 if (!decksJson) {
                     reject('failed to scrape deck data');
                     return;
@@ -112,7 +112,7 @@ class AnkiWeb {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.addEventListener('error', () => reject('failed to execute login request'));
-            xhr.addEventListener('success', () => {
+            xhr.addEventListener('load', () => {
                 if (xhr.responseText.includes('class="mitem"')) {
                     resolve();
                 } else {
