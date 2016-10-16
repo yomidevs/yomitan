@@ -21,7 +21,6 @@ function sanitizeOptions(options) {
     const defaults = {
         activateOnStartup: true,
         enableAudioPlayback: true,
-        enableAnkiConnect: false,
         showAdvancedOptions: false,
         selectMatchedText: true,
         holdShiftToScan: true,

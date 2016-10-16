@@ -73,10 +73,6 @@ class AnkiWeb {
         });
     }
 
-    getStatus() {
-        return 'ready';
-    }
-
     static scrape() {
         return new Promise((resolve, reject) => {
             $.get('https://ankiweb.net/edit/', (data, status) => {

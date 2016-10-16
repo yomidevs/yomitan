@@ -68,7 +68,6 @@ function getBasicOptions() {
         optsNew.activateOnStartup = $('#activate-on-startup').prop('checked');
         optsNew.showAdvancedOptions = $('#show-advanced-options').prop('checked');
         optsNew.enableAudioPlayback = $('#enable-audio-playback').prop('checked');
-        optsNew.enableAnkiConnect = $('#enable-anki-connect').prop('checked');
         optsNew.holdShiftToScan = $('#hold-shift-to-scan').prop('checked');
         optsNew.selectMatchedText = $('#select-matched-text').prop('checked');
         optsNew.scanDelay = parseInt($('#scan-delay').val(), 10);
@@ -243,7 +242,6 @@ $(document).ready(() => {
     loadOptions().then(opts => {
         $('#activate-on-startup').prop('checked', opts.activateOnStartup);
         $('#enable-audio-playback').prop('checked', opts.enableAudioPlayback);
-        $('#enable-anki-connect').prop('checked', opts.enableAnkiConnect);
         $('#show-advanced-options').prop('checked', opts.showAdvancedOptions);
         $('#hold-shift-to-scan').prop('checked', opts.holdShiftToScan);
         $('#select-matched-text').prop('checked', opts.selectMatchedText);
@@ -256,20 +254,17 @@ $(document).ready(() => {
         $('#anki-card-tags').val(opts.ankiCardTags.join(' '));
         $('#sentence-extent').val(opts.sentenceExtent);
 
-        $('#anki-method').change(onOptionsAnkiChanged);
-        $('.options-basic input').change(onOptionsBasicChanged);
-        $('.options-anki input').change(onOptionsAnkiChanged);
-        $('.anki-deck').change(onOptionsAnkiChanged);
+        $('.options-basic').change(onOptionsBasicChanged);
+        $('.options-anki').not('.anki-model').change(onOptionsAnkiChanged);
         $('.anki-model').change(onAnkiModelChanged);
 
         if (opts.showAdvancedOptions) {
             $('.options-advanced').show();
         }
 
-        if (opts.enableAnkiConnect) {
-            updateAnkiStatus();
-            populateAnkiDeckAndModel(opts);
-            $('.options-anki').show();
-        }
+        updateAnkiStatus();
+        populateAnkiDeckAndModel(opts);
+
+        $('.options-anki').show();
     });
 });
