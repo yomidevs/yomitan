@@ -85,6 +85,9 @@ function getAnkiOptions() {
     return loadOptions().then(optsOld => {
         const optsNew = $.extend({}, optsOld);
 
+        optsNew.ankiMethod = $('#anki-method').val();
+        optsNew.ankiUsername = $('#anki-username').val();
+        optsNew.ankiPassword = $('#anki-password').val();
         optsNew.ankiCardTags = $('#anki-card-tags').val().split(/[,; ]+/);
         optsNew.sentenceExtent = parseInt($('#sentence-extent').val(), 10);
         optsNew.ankiTermDeck = $('#anki-term-deck').val();
@@ -219,13 +222,11 @@ function onOptionsBasicChanged(e) {
 }
 
 function onOptionsAnkiChanged(e) {
-    if (!e.originalEvent && !e.isTrigger) {
-        return;
+    if (e.originalEvent || e.isTrigger) {
+        getAnkiOptions().then(({optsNew, optsOld}) => {
+            saveOptions(optsNew).then(() => yomichan().setOptions(optsNew));
+        });
     }
-
-    getAnkiOptions().then(({optsNew, optsOld}) => {
-        saveOptions(optsNew).then(() => yomichan().setOptions(optsNew));
-    });
 }
 
 function onAnkiModelChanged(e) {
@@ -248,9 +249,14 @@ $(document).ready(() => {
         $('#select-matched-text').prop('checked', opts.selectMatchedText);
         $('#scan-delay').val(opts.scanDelay);
         $('#scan-length').val(opts.scanLength);
+
+        $('#anki-method').val(opts.ankiMethod);
+        $('#anki-username').val(opts.ankiUsername);
+        $('#anki-password').val(opts.ankiPassword);
         $('#anki-card-tags').val(opts.ankiCardTags.join(' '));
         $('#sentence-extent').val(opts.sentenceExtent);
 
+        $('#anki-method').change(onOptionsAnkiChanged);
         $('.options-basic input').change(onOptionsBasicChanged);
         $('.options-anki input').change(onOptionsAnkiChanged);
         $('.anki-deck').change(onOptionsAnkiChanged);

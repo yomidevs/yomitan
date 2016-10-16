@@ -97,6 +97,15 @@
             <div class="options-anki">
                 <h3>Anki Options</h3>
 
+                <div class="form-group">
+                    <label class="control-label" for="anki-method">Integration method</label>
+                    <select class="form-control" id="anki-method">
+                        <option value="none">None</option>
+                        <option value="ankiweb">AnkiWeb</option>
+                        <option value="ankiconnect">AnkiConnect</option>
+                    </select>
+                </div>
+
                 <div class="alert alert-danger error-dlg error-dlg-connection">
                     <strong>Unable to Connect</strong><br>
                     Is the <a href="https://foosoft.net/projects/anki-connect">AnkiConnect</a> extension for <a href="http://ankisrs.net/">Anki</a> installed and running? This software is required for Anki-related features.
@@ -107,6 +116,16 @@
                 </div>
 
                 <form class="form-horizontal options-anki-controls">
+                    <div class="form-group">
+                        <label for="anki-username" class="control-label col-sm-2">Username</label>
+                        <div class="col-sm-10"><input type="text" id="anki-username" class="form-control"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="anki-password" class="control-label col-sm-2">Password</label>
+                        <div class="col-sm-10"><input type="password" id="anki-password" class="form-control"></div>
+                    </div>
+
                     <div class="form-group">
                         <label for="anki-card-tags" class="control-label col-sm-2">Card tags</label>
                         <div class="col-sm-10"><input type="text" id="anki-card-tags" class="form-control"></div>

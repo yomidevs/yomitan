@@ -115,7 +115,7 @@ class AnkiWeb {
     static login(username, password) {
         return new Promise((resolve, reject) => {
             $.post('https://ankiweb.net/account/login', {username, password, submitted: 1}, (data, status) => {
-                if (status !== 'success') {
+                if (status === 'success') {
                     if (data.includes('class="mitem"')) {
                         resolve();
                     } else {

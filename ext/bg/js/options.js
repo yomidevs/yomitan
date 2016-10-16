@@ -27,6 +27,10 @@ function sanitizeOptions(options) {
         holdShiftToScan: true,
         scanDelay: 15,
         scanLength: 20,
+
+        ankiMethod: 'none',
+        ankiUsername: '',
+        ankiPassword: '',
         ankiCardTags: ['yomichan'],
         sentenceExtent: 200,
 
