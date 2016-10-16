@@ -17,33 +17,126 @@
  */
 
 class AnkiWeb {
-    constructor() {
+    constructor(username, password) {
+        this.username = username;
+        this.password = password;
+        this.noteInfo = null;
+        this.logged = false;
     }
 
     addNote(note) {
+        return Promise.resolve(true);
     }
 
     canAddNotes(notes) {
+        return Promise.resolve([]);
     }
 
     getDeckNames() {
+        return this.retrieve().then(info => info.deckNames);
     }
 
     getModelNames() {
+        return this.retrieve().then(info => info.models.map(m => m.name));
     }
 
     getModelFieldNames(modelName) {
+        return this.retrieve().then(info => {
+            const model = info.models.find(m => m.name === modelName);
+            return model ? model.fields : [];
+        });
+    }
+
+    retrieve() {
+        if (this.noteInfo !== null) {
+            return Promise.resolve(this.noteInfo);
+        }
+
+        return this.authenticate().then(() => {
+            return AnkiWeb.scrape();
+        }).then(({deckNames, models}) => {
+            this.noteInfo = {deckNames, models};
+            return this.noteInfo;
+        });
+    }
+
+    authenticate() {
+        if (this.logged) {
+            return Promise.resolve(true);
+        }
+
+        return AnkiWeb.logout().then(() => {
+            return AnkiWeb.login(this.username, this.password);
+        }).then(() => {
+            this.logged = true;
+            return true;
+        });
     }
 
     getStatus() {
-        return this.getVersion().then(version => {
-            if (version === null) {
-                return 'disconnected';
-            } else if (version === this.apiVersion) {
-                return 'ready';
-            } else {
-                return 'mismatch';
-            }
+        return 'ready';
+    }
+
+    static scrape() {
+        return new Promise((resolve, reject) => {
+            $.get('https://ankiweb.net/edit/', (data, status) => {
+                if (status !== 'success') {
+                    reject('scrape failed');
+                    return;
+                }
+
+                const modelsJson = JSON.parse(/editor\.models = (.*}]);/.exec(data)[1]);
+                if (!modelsJson) {
+                    reject('failed to scrape model data');
+                    return;
+                }
+
+                const decksJson = JSON.parse(/editor\.decks = (.*}});/.exec(data)[1]);
+                if (!decksJson) {
+                    reject('failed to scrape deck data');
+                    return;
+                }
+
+                const deckNames = Object.keys(decksJson).map(d => decksJson[d].name);
+                const models = [];
+                for (const modelJson of modelsJson) {
+                    models.push({
+                        name: modelJson.name,
+                        id: modelJson.id,
+                        fields: modelJson.flds.map(f => f.name)
+                    });
+                }
+
+                resolve({deckNames, models});
+            });
+        });
+    }
+
+    static login(username, password) {
+        return new Promise((resolve, reject) => {
+            $.post('https://ankiweb.net/account/login', {username, password, submitted: 1}, (data, status) => {
+                if (status !== 'success') {
+                    if (data.includes('class="mitem"')) {
+                        resolve();
+                    } else {
+                        reject('authentication failed');
+                    }
+                } else {
+                    reject('login failed');
+                }
+            });
+        });
+    }
+
+    static logout() {
+        return new Promise((resolve, reject) => {
+            $.get('https://ankiweb.net/account/logout', (data, status) => {
+                if (status === 'success') {
+                    resolve();
+                } else {
+                    reject('logout failed');
+                }
+            });
         });
     }
 }
