@@ -81,7 +81,7 @@ class AnkiWeb {
         return new Promise((resolve, reject) => {
             $.get('https://ankiweb.net/edit/', (data, status) => {
                 if (status !== 'success') {
-                    reject('scrape failed');
+                    reject('failed to execute scrape request');
                     return;
                 }
 
@@ -119,10 +119,10 @@ class AnkiWeb {
                     if (data.includes('class="mitem"')) {
                         resolve();
                     } else {
-                        reject('authentication failed');
+                        reject('failed to authenticate');
                     }
                 } else {
-                    reject('login failed');
+                    reject('failed to execute login request');
                 }
             });
         });
@@ -134,7 +134,7 @@ class AnkiWeb {
                 if (status === 'success') {
                     resolve();
                 } else {
-                    reject('logout failed');
+                    reject('failed to execute logout request');
                 }
             });
         });
