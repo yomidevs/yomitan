@@ -21,6 +21,10 @@ function yomichan() {
     return chrome.extension.getBackgroundPage().yomichan;
 }
 
+function anki() {
+    return yomichan().anki;
+}
+
 function fieldsToDict(selection) {
     const result = {};
     selection.each((index, element) => {
@@ -103,32 +107,6 @@ function getAnkiOptions() {
     });
 }
 
-function populateAnkiDeckAndModel(opts) {
-    const anki = yomichan().anki;
-
-    const populateDecks = () => {
-        const ankiDeck = $('.anki-deck');
-        ankiDeck.find('option').remove();
-        return anki.getDeckNames().then(names => {
-            names.forEach(name => ankiDeck.append($('<option/>', {value: name, text: name})));
-            $('#anki-term-deck').val(opts.ankiTermDeck);
-            $('#anki-kanji-deck').val(opts.ankiKanjiDeck);
-        });
-    };
-
-    const populateModels = () => {
-        const ankiModel = $('.anki-model');
-        ankiModel.find('option').remove();
-        return anki.getModelNames().then(names => {
-            names.forEach(name => ankiModel.append($('<option/>', {value: name, text: name})));
-            populateAnkiFields($('#anki-term-model').val(opts.ankiTermModel), opts);
-            populateAnkiFields($('#anki-kanji-model').val(opts.ankiKanjiModel), opts);
-        });
-    };
-
-    return populateDecks().then(populateModels);
-}
-
 function updateVisibility(opts) {
     switch (opts.ankiMethod) {
         case 'ankiweb':
@@ -151,17 +129,38 @@ function updateVisibility(opts) {
     }
 }
 
+function populateAnkiDeckAndModel(opts) {
+    const ankiDeck = $('.anki-deck');
+    ankiDeck.find('option').remove();
+
+    const ankiModel = $('.anki-model');
+    ankiModel.find('option').remove();
+
+    return anki().getDeckNames().then(names => {
+        names.forEach(name => ankiDeck.append($('<option/>', {value: name, text: name})));
+        $('#anki-term-deck').val(opts.ankiTermDeck);
+        $('#anki-kanji-deck').val(opts.ankiKanjiDeck);
+    }).then(() => {
+        return anki().getModelNames();
+    }).then(names => {
+        names.forEach(name => ankiModel.append($('<option/>', {value: name, text: name})));
+        populateAnkiFields($('#anki-term-model').val(opts.ankiTermModel), opts);
+    }).then(() => {
+        populateAnkiFields($('#anki-kanji-model').val(opts.ankiKanjiModel), opts);
+    });
+}
+
 function populateAnkiFields(element, opts) {
     const modelName = element.val();
     if (modelName === null) {
-        return;
+        return Promise.resolve();
     }
 
     const modelId = element.attr('id');
     const optKey = modelIdToFieldOptKey(modelId);
     const markers = modelIdToMarkers(modelId);
 
-    yomichan().api_getModelFieldNames({modelName, callback: names => {
+    return anki().getModelFieldNames(modelName).then(names => {
         const table = element.closest('.tab-pane').find('.anki-fields');
         table.find('tbody').remove();
 
@@ -196,7 +195,7 @@ function populateAnkiFields(element, opts) {
         });
 
         table.append(tbody);
-    }});
+    });
 }
 
 function onOptionsBasicChanged(e) {
