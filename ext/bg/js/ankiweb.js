@@ -61,6 +61,10 @@ class AnkiWeb {
     }
 
     authenticate() {
+        if (this.username.length === 0 || this.password.length === 0) {
+            return Promise.reject('missing login credentials');
+        }
+
         if (this.logged) {
             return Promise.resolve(true);
         }

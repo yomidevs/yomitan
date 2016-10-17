@@ -110,15 +110,15 @@ function getAnkiOptions() {
 function updateVisibility(opts) {
     switch (opts.ankiMethod) {
         case 'ankiweb':
-            $('.options-anki-general').show();
-            $('.options-anki-login').show();
+            $('#options-anki-general').show();
+            $('#options-anki-login').show();
             break;
         case 'ankiconnect':
-            $('.options-anki-general').show();
-            $('.options-anki-login').hide();
+            $('#options-anki-general').show();
+            $('#options-anki-login').hide();
             break;
         default:
-            $('.options-anki-general').hide();
+            $('#options-anki-general').hide();
             break;
     }
 
@@ -130,8 +130,13 @@ function updateVisibility(opts) {
 }
 
 function populateAnkiDeckAndModel(opts) {
-    $('.options-anki-format').hide();
     $('.status-dlg').hide();
+
+    const ankiSpinner = $('#ankiSpinner');
+    ankiSpinner.show();
+
+    const ankiFormat = $('#options-anki-format');
+    ankiFormat.hide();
 
     const ankiDeck = $('.anki-deck');
     ankiDeck.find('option').remove();
@@ -147,17 +152,18 @@ function populateAnkiDeckAndModel(opts) {
         return anki().getModelNames();
     }).then(names => {
         names.forEach(name => ankiModel.append($('<option/>', {value: name, text: name})));
-        populateAnkiFields($('#anki-term-model').val(opts.ankiTermModel), opts);
+        return populateAnkiFields($('#anki-term-model').val(opts.ankiTermModel), opts);
     }).then(() => {
-        populateAnkiFields($('#anki-kanji-model').val(opts.ankiKanjiModel), opts);
+        return populateAnkiFields($('#anki-kanji-model').val(opts.ankiKanjiModel), opts);
     }).then(() => {
-        $('.options-anki-format').show();
+        ankiFormat.show();
         if (opts.ankiMethod !== 'none') {
             $('#success-dlg').show();
         }
     }).catch(error => {
-        $('#error-dlg').show();
-        $('#error-dlg span').text(error);
+        $('#error-dlg').show().find('span').text(error);
+    }).then(() => {
+        ankiSpinner.hide();
     });
 }
 
@@ -260,9 +266,9 @@ $(document).ready(() => {
         $('#anki-card-tags').val(opts.ankiCardTags.join(' '));
         $('#sentence-extent').val(opts.sentenceExtent);
 
-        $('.options-basic').change(onOptionsBasicChanged);
+        $('#options-general, #options-scanning').change(onOptionsBasicChanged);
+        $('#options-anki').not('.anki-model').change(onOptionsAnkiChanged);
         $('.anki-model').change(onAnkiModelChanged);
-        $('.options-anki').not('.anki-model').change(onOptionsAnkiChanged);
 
         populateAnkiDeckAndModel(opts);
         updateVisibility(opts);

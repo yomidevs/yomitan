@@ -6,7 +6,7 @@
         <link rel="stylesheet" type="text/css" href="../lib/bootstrap-3.3.6-dist/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="../lib/bootstrap-3.3.6-dist/css/bootstrap-theme.min.css">
         <style>
-            .options-anki-general, .options-anki-login, .options-advanced {
+            #anki-spinner, #options-anki-general, #options-anki-login, #options-advanced {
                 display: none;
             }
 
@@ -24,7 +24,7 @@
     </head>
     <body>
         <div class="container">
-            <div class="options-basic">
+            <div id="options-general">
                 <h3>General Options</h3>
 
                 <form class="form-horizontal">
@@ -54,7 +54,7 @@
                 </form>
             </div>
 
-            <div class="options-basic">
+            <div id="options-scanning">
                 <h3>Scanning Options</h3>
 
                 <form class="form-horizontal">
@@ -86,8 +86,19 @@
                 </form>
             </div>
 
-            <div class="options-anki">
+            <div id="options-anki">
+                <img src="img/spinner.gif" class="pull-right" id="anki-spinner" alt>
+
                 <h3>Anki Options</h3>
+
+                <div class="form-group">
+                    <label class="control-label" for="anki-method">Connection method</label>
+                    <select class="form-control" id="anki-method">
+                        <option value="none">None</option>
+                        <option value="ankiweb">AnkiWeb</option>
+                        <option value="ankiconnect">AnkiConnect</option>
+                    </select>
+                </div>
 
                 <div class="alert alert-danger status-dlg" id="error-dlg">
                     <strong>Error</strong>
@@ -99,24 +110,17 @@
                     <span>Connection established</span>
                 </div>
 
-                <div class="form-group">
-                    <label class="control-label" for="anki-method">Connection method</label>
-                    <select class="form-control" id="anki-method">
-                        <option value="none">None</option>
-                        <option value="ankiweb">AnkiWeb</option>
-                        <option value="ankiconnect">AnkiConnect</option>
-                    </select>
-                </div>
+                <form class="form-horizontal" id="options-anki-general">
+                    <div id="options-anki-login">
+                        <div class="form-group">
+                            <label for="anki-username" class="control-label col-sm-2">Username</label>
+                            <div class="col-sm-10"><input type="text" id="anki-username" class="form-control"></div>
+                        </div>
 
-                <form class="form-horizontal options-anki-general">
-                    <div class="form-group options-anki-login">
-                        <label for="anki-username" class="control-label col-sm-2">Username</label>
-                        <div class="col-sm-10"><input type="text" id="anki-username" class="form-control"></div>
-                    </div>
-
-                    <div class="form-group options-anki-login">
-                        <label for="anki-password" class="control-label col-sm-2">Password</label>
-                        <div class="col-sm-10"><input type="password" id="anki-password" class="form-control"></div>
+                        <div class="form-group">
+                            <label for="anki-password" class="control-label col-sm-2">Password</label>
+                            <div class="col-sm-10"><input type="password" id="anki-password" class="form-control"></div>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -129,7 +133,7 @@
                         <div class="col-sm-10"><input type="number" min="1" id="sentence-extent" class="form-control"></div>
                     </div>
 
-                    <div class="options-anki-format">
+                    <div id="options-anki-format">
                         <ul class="nav nav-tabs col-sm-offset-2 col-sm-10">
                             <li class="active"><a href="#term" data-toggle="tab">Terms</a></li>
                             <li><a href="#kanji" data-toggle="tab">Kanji</a></li>
