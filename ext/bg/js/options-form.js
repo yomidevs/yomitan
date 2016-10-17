@@ -215,7 +215,12 @@ function onOptionsChanged(e) {
             yomichan().setOptions(optsNew);
             updateVisibility(optsNew);
 
-            if (optsNew.ankiMethod !== optsOld.ankiMethod) {
+            const invalidated =
+                optsNew.ankiMethod !== optsOld.ankiMethod ||
+                optsNew.ankiUsername !== optsOld.ankiUsername ||
+                optsNew.ankiPassword !== optsOld.ankiPassword;
+
+            if (invalidated) {
                 populateAnkiDeckAndModel(optsNew);
             }
         });
