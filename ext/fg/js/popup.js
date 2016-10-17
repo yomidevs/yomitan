@@ -66,6 +66,8 @@ class Popup {
             return;
         }
 
+        this.container.contentWindow.scrollTo(0, 0);
+
         const doc = this.container.contentDocument;
         doc.open();
         doc.write(content);

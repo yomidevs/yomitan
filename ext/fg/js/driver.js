@@ -100,9 +100,11 @@ class Driver {
     }
 
     onMouseDown(e) {
+        this.lastMousePos = {x: e.clientX, y: e.clientY};
+        this.popupTimerClear();
+
         if (this.popup.visible()) {
-            const selection = window.getSelection();
-            selection.removeAllRanges();
+            this.hidePopup();
         }
     }
 
