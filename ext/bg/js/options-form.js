@@ -120,9 +120,7 @@ function updateVisibility(opts) {
 }
 
 function populateAnkiDeckAndModel(opts) {
-    $('.status-dlg').hide();
-
-    const ankiSpinner = $('#ankiSpinner');
+    const ankiSpinner = $('#anki-spinner');
     ankiSpinner.show();
 
     const ankiFormat = $('#anki-format');
@@ -146,12 +144,10 @@ function populateAnkiDeckAndModel(opts) {
     }).then(() => {
         return populateAnkiFields($('#anki-kanji-model').val(opts.ankiKanjiModel), opts);
     }).then(() => {
+        $('#anki-error').hide();
         ankiFormat.show();
-        if (opts.ankiMethod !== 'none') {
-            $('#success-dlg').show();
-        }
     }).catch(error => {
-        $('#error-dlg').show().find('span').text(error);
+        $('#anki-error').show().find('span').text(error);
     }).then(() => {
         ankiSpinner.hide();
     });
@@ -218,6 +214,7 @@ function onOptionsChanged(e) {
         saveOptions(optsNew).then(() => {
             yomichan().setOptions(optsNew);
             updateVisibility(optsNew);
+
             if (optsNew.ankiMethod !== optsOld.ankiMethod) {
                 populateAnkiDeckAndModel(optsNew);
             }
@@ -233,16 +230,15 @@ function onAnkiModelChanged(e) {
     getFormValues().then(({optsNew, optsOld}) => {
         optsNew[modelIdToFieldOptKey($(this).id)] = {};
 
-        const ankiSpinner = $('#ankiSpinner');
+        const ankiSpinner = $('#anki-spinner');
         ankiSpinner.show();
 
         populateAnkiFields($(this), optsNew).then(() => {
             saveOptions(optsNew).then(() => yomichan().setOptions(optsNew));
         }).catch(error => {
-            $('#success-dlg').hide();
-            $('#error-dlg').show().find('span').text(error);
+            $('#anki-error').show().find('span').text(error);
         }).then(() => {
-            $('#success-dlg').show();
+            $('#anki-error').hide();
             ankiSpinner.hide();
         });
     });

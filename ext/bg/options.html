@@ -6,7 +6,7 @@
         <link rel="stylesheet" type="text/css" href="../lib/bootstrap-3.3.6-dist/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="../lib/bootstrap-3.3.6-dist/css/bootstrap-theme.min.css">
         <style>
-            #anki-spinner, #anki-general, #options-advanced {
+            #anki-spinner, #anki-general, #anki-error, #options-advanced {
                 display: none;
             }
 
@@ -15,10 +15,6 @@
                 border-left: 1px #ddd solid;
                 border-right: 1px #ddd solid;
                 padding: 10px;
-            }
-
-            .status-dlg {
-                display: none;
             }
         </style>
     </head>
@@ -91,6 +87,11 @@
 
                 <h3>Anki Options</h3>
 
+                <div class="alert alert-danger" id="anki-error">
+                    <strong>Error</strong>
+                    <span></span>
+                </div>
+
                 <div class="form-group">
                     <label class="control-label" for="anki-method">Connection method</label>
                     <select class="form-control" id="anki-method">
@@ -98,16 +99,6 @@
                         <option value="ankiweb">AnkiWeb</option>
                         <option value="ankiconnect">AnkiConnect</option>
                     </select>
-                </div>
-
-                <div class="alert alert-danger status-dlg" id="error-dlg">
-                    <strong>Error</strong>
-                    <span>Unable to connect</span>
-                </div>
-
-                <div class="alert alert-success status-dlg" id="success-dlg">
-                    <strong>Success</strong>
-                    <span>Connection established</span>
                 </div>
 
                 <form class="form-horizontal" id="anki-general">
