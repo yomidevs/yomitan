@@ -69,7 +69,7 @@ class AnkiConnect {
                 }
 
                 if (xhr.responseText) {
-                    resolve(JSON.parse(resp));
+                    resolve(JSON.parse(xhr.responseText));
                 } else {
                     reject('unable to connect to plugin');
                 }
