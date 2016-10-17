@@ -65,28 +65,18 @@ function modelIdToMarkers(id) {
     }[id];
 }
 
-function getBasicOptions() {
+function getFormValues() {
     return loadOptions().then(optsOld => {
         const optsNew = $.extend({}, optsOld);
 
         optsNew.activateOnStartup = $('#activate-on-startup').prop('checked');
-        optsNew.showAdvancedOptions = $('#show-advanced-options').prop('checked');
         optsNew.enableAudioPlayback = $('#enable-audio-playback').prop('checked');
+        optsNew.showAdvancedOptions = $('#show-advanced-options').prop('checked');
+
         optsNew.holdShiftToScan = $('#hold-shift-to-scan').prop('checked');
         optsNew.selectMatchedText = $('#select-matched-text').prop('checked');
         optsNew.scanDelay = parseInt($('#scan-delay').val(), 10);
         optsNew.scanLength = parseInt($('#scan-length').val(), 10);
-
-        return {
-            optsNew: sanitizeOptions(optsNew),
-            optsOld: sanitizeOptions(optsOld)
-        };
-    });
-}
-
-function getAnkiOptions() {
-    return loadOptions().then(optsOld => {
-        const optsNew = $.extend({}, optsOld);
 
         optsNew.ankiMethod = $('#anki-method').val();
         optsNew.ankiUsername = $('#anki-username').val();
@@ -110,15 +100,15 @@ function getAnkiOptions() {
 function updateVisibility(opts) {
     switch (opts.ankiMethod) {
         case 'ankiweb':
-            $('#options-anki-general').show();
-            $('#options-anki-login').show();
+            $('#anki-general').show();
+            $('.anki-login').show();
             break;
         case 'ankiconnect':
-            $('#options-anki-general').show();
-            $('#options-anki-login').hide();
+            $('#anki-general').show();
+            $('.anki-login').hide();
             break;
         default:
-            $('#options-anki-general').hide();
+            $('#anki-general').hide();
             break;
     }
 
@@ -135,7 +125,7 @@ function populateAnkiDeckAndModel(opts) {
     const ankiSpinner = $('#ankiSpinner');
     ankiSpinner.show();
 
-    const ankiFormat = $('#options-anki-format');
+    const ankiFormat = $('#anki-format');
     ankiFormat.hide();
 
     const ankiDeck = $('.anki-deck');
@@ -168,6 +158,9 @@ function populateAnkiDeckAndModel(opts) {
 }
 
 function populateAnkiFields(element, opts) {
+    const table = element.closest('.tab-pane').find('.anki-fields');
+    table.find('tbody').remove();
+
     const modelName = element.val();
     if (modelName === null) {
         return Promise.resolve();
@@ -178,9 +171,6 @@ function populateAnkiFields(element, opts) {
     const markers = modelIdToMarkers(modelId);
 
     return anki().getModelFieldNames(modelName).then(names => {
-        const table = element.closest('.tab-pane').find('.anki-fields');
-        table.find('tbody').remove();
-
         const tbody = $('<tbody>');
         names.forEach(name => {
             const button = $('<button>', {type: 'button', class: 'btn btn-default dropdown-toggle'});
@@ -201,7 +191,11 @@ function populateAnkiFields(element, opts) {
             groupBtn.append(markerItems);
 
             const group = $('<div>', {class: 'input-group'});
-            group.append($('<input>', {type: 'text', class: 'anki-field-value form-control', value: opts[optKey][name] || ''}).data('field', name).change(onOptionsAnkiChanged));
+            group.append($('<input>', {
+                type: 'text',
+                class: 'anki-field-value form-control',
+                value: opts[optKey][name] || ''
+            }).data('field', name).change(onOptionsChanged));
             group.append(groupBtn);
 
             const row = $('<tr>');
@@ -215,39 +209,43 @@ function populateAnkiFields(element, opts) {
     });
 }
 
-function onOptionsBasicChanged(e) {
-    if (e.originalEvent || e.isTrigger) {
-        getBasicOptions().then(({optsNew, optsOld}) => {
-            saveOptions(optsNew).then(() => {
-                yomichan().setOptions(optsNew);
-                updateVisibility(optsNew);
-            });
-        });
+function onOptionsChanged(e) {
+    if (!e.originalEvent && !e.isTrigger) {
+        return;
     }
-}
 
-function onOptionsAnkiChanged(e) {
-    if (e.originalEvent || e.isTrigger) {
-        getAnkiOptions().then(({optsNew, optsOld}) => {
+    getFormValues().then(({optsNew, optsOld}) => {
+        saveOptions(optsNew).then(() => {
+            yomichan().setOptions(optsNew);
             updateVisibility(optsNew);
-            saveOptions(optsNew).then(() => {
-                yomichan().setOptions(optsNew);
-                if (optsNew.ankiMethod !== optsOld.ankiMethod) {
-                    populateAnkiDeckAndModel(optsNew);
-                }
-            });
+            if (optsNew.ankiMethod !== optsOld.ankiMethod) {
+                populateAnkiDeckAndModel(optsNew);
+            }
         });
-    }
+    });
 }
 
 function onAnkiModelChanged(e) {
-    if (e.originalEvent) {
-        getAnkiOptions().then(({optsNew, optsOld}) => {
-            optsNew[modelIdToFieldOptKey($(this).id)] = {};
-            populateAnkiFields($(this), optsNew);
-            saveOptions(optsNew).then(() => yomichan().setOptions(optsNew));
-        });
+    if (!e.originalEvent) {
+        return;
     }
+
+    getFormValues().then(({optsNew, optsOld}) => {
+        optsNew[modelIdToFieldOptKey($(this).id)] = {};
+
+        const ankiSpinner = $('#ankiSpinner');
+        ankiSpinner.show();
+
+        populateAnkiFields($(this), optsNew).then(() => {
+            saveOptions(optsNew).then(() => yomichan().setOptions(optsNew));
+        }).catch(error => {
+            $('#success-dlg').hide();
+            $('#error-dlg').show().find('span').text(error);
+        }).then(() => {
+            $('#success-dlg').show();
+            ankiSpinner.hide();
+        });
+    });
 }
 
 $(document).ready(() => {
@@ -266,8 +264,7 @@ $(document).ready(() => {
         $('#anki-card-tags').val(opts.ankiCardTags.join(' '));
         $('#sentence-extent').val(opts.sentenceExtent);
 
-        $('#options-general, #options-scanning').change(onOptionsBasicChanged);
-        $('#options-anki').not('.anki-model').change(onOptionsAnkiChanged);
+        $('input, select').not('.anki-model').change(onOptionsChanged);
         $('.anki-model').change(onAnkiModelChanged);
 
         populateAnkiDeckAndModel(opts);
