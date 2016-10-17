@@ -88,16 +88,15 @@
                 <h3>Anki Options</h3>
 
                 <div class="alert alert-danger" id="anki-error">
-                    <strong>Error</strong>
-                    <span></span>
+                    <strong>Error:</strong> <span></span>
                 </div>
 
                 <div class="form-group">
                     <label class="control-label" for="anki-method">Connection method</label>
                     <select class="form-control" id="anki-method">
-                        <option value="none">None</option>
-                        <option value="ankiweb">AnkiWeb</option>
-                        <option value="ankiconnect">AnkiConnect</option>
+                        <option value="disabled">Disabled (no auto flashcard creation)</option>
+                        <option value="ankiweb">AnkiWeb (requires an account on AnkiWeb)</option>
+                        <option value="ankiconnect">AnkiConnect (requires the AnkiConnect plugin)</option>
                     </select>
                 </div>
 

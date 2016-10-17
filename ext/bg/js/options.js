@@ -27,7 +27,7 @@ function sanitizeOptions(options) {
         scanDelay: 15,
         scanLength: 20,
 
-        ankiMethod: 'none',
+        ankiMethod: 'disabled',
         ankiUsername: '',
         ankiPassword: '',
         ankiCardTags: ['yomichan'],
