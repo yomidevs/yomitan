@@ -21,7 +21,6 @@ class AnkiWeb {
         this.username = username;
         this.password = password;
         this.noteInfo = null;
-        this.logged = true;
     }
 
     addNote(note) {
@@ -52,96 +51,75 @@ class AnkiWeb {
             return Promise.resolve(this.noteInfo);
         }
 
-        return this.authenticate().then(() => {
-            return AnkiWeb.scrape();
-        }).then(({deckNames, models}) => {
+        return AnkiWeb.scrape(this.username, this.password).then(({deckNames, models}) => {
             this.noteInfo = {deckNames, models};
             return this.noteInfo;
         });
     }
 
-    authenticate() {
-        if (this.username.length === 0 || this.password.length === 0) {
-            return Promise.reject('missing login credentials');
-        }
+    static scrape(username, password) {
+        return AnkiWeb.loadAccountPage('https://ankiweb.net/edit/', 'GET', null, username, password).then(response => {
+            const modelsMatch = /editor\.models = (.*}]);/.exec(response);
+            if (modelsMatch === null) {
+                return Promise.reject('failed to scrape model data');
+            }
 
-        if (this.logged) {
-            return Promise.resolve(true);
-        }
+            const decksMatch = /editor\.decks = (.*}});/.exec(response);
+            if (decksMatch === null) {
+                return Promise.reject('failed to scrape deck data');
+            }
 
-        return AnkiWeb.logout().then(() => {
-            return AnkiWeb.login(this.username, this.password);
-        }).then(() => {
-            this.logged = true;
-            return true;
-        });
-    }
+            const modelsJson = JSON.parse(modelsMatch[1]);
+            const decksJson = JSON.parse(decksMatch[1]);
 
-    static scrape() {
-        return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.addEventListener('error', () => reject('failed to execute scrape request'));
-            xhr.addEventListener('load', () => {
-                const modelsJson = JSON.parse(/editor\.models = (.*}]);/.exec(xhr.responseText)[1]);
-                if (!modelsJson) {
-                    reject('failed to scrape model data');
-                    return;
-                }
+            const deckNames = Object.keys(decksJson).map(d => decksJson[d].name);
+            const models = [];
+            for (const modelJson of modelsJson) {
+                models.push({
+                    name: modelJson.name,
+                    id: modelJson.id,
+                    fields: modelJson.flds.map(f => f.name)
+                });
+            }
 
-                const decksJson = JSON.parse(/editor\.decks = (.*}});/.exec(xhr.responseText)[1]);
-                if (!decksJson) {
-                    reject('failed to scrape deck data');
-                    return;
-                }
-
-                const deckNames = Object.keys(decksJson).map(d => decksJson[d].name);
-                const models = [];
-                for (const modelJson of modelsJson) {
-                    models.push({
-                        name: modelJson.name,
-                        id: modelJson.id,
-                        fields: modelJson.flds.map(f => f.name)
-                    });
-                }
-
-                resolve({deckNames, models});
-            });
-
-            xhr.open('GET', 'https://ankiweb.net/edit/');
-            xhr.send();
+            return {deckNames, models};
         });
     }
 
     static login(username, password) {
-        return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.addEventListener('error', () => reject('failed to execute login request'));
-            xhr.addEventListener('load', () => {
-                if (xhr.responseText.includes('class="mitem"')) {
-                    resolve();
-                } else {
-                    reject('failed to authenticate');
-                }
-            });
+        if (username.length === 0 || password.length === 0) {
+            return Promise.reject('unspecified login credentials');
+        }
 
-            const form = new FormData();
-            form.append('username', username);
-            form.append('password', password);
-            form.append('submitted', 1);
+        const form = new FormData();
+        form.append('username', username);
+        form.append('password', password);
+        form.append('submitted', 1);
 
-            xhr.open('POST', 'https://ankiweb.net/account/login');
-            xhr.send(form);
+        return AnkiWeb.loadPage('https://ankiweb.net/account/login', 'POST', form).then(response => {
+            if (!response.includes('class="mitem"')) {
+                return Promise.reject('failed to authenticate');
+            }
         });
     }
 
-    static logout() {
+    static loadAccountPage(url, method, form, username, password) {
+        return AnkiWeb.loadPage(url, method, form).then(response => {
+            if (response.includes('name="password"')) {
+                return AnkiWeb.login(username, password).then(() => AnkiWeb.loadPage(url, method, form));
+            } else {
+                return response;
+            }
+        });
+    }
+
+    static loadPage(url, method, form) {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
-            xhr.addEventListener('error', () => reject('failed to execute logout request'));
-            xhr.addEventListener('load', () => resolve());
-
-            xhr.open('GET', 'https://ankiweb.net/account/logout');
-            xhr.send();
+            xhr.addEventListener('error', () => reject('failed to execute request'));
+            xhr.addEventListener('load', () => resolve(xhr.responseText));
+            xhr.open(method, url);
+            xhr.send(form);
         });
     }
 }
