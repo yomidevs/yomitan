@@ -102,10 +102,7 @@ class Driver {
     onMouseDown(e) {
         this.lastMousePos = {x: e.clientX, y: e.clientY};
         this.popupTimerClear();
-
-        if (this.popup.visible()) {
-            this.hidePopup();
-        }
+        this.hidePopup();
     }
 
     onBgMessage({action, params}, sender, callback) {
