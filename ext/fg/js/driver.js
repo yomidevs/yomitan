@@ -64,7 +64,7 @@ class Driver {
 
         if (this.enabled && this.lastMousePos !== null && e.keyCode === 16 /* shift */) {
             this.searchAt(this.lastMousePos, true);
-        } else if (e.keyCode === 27) {
+        } else if (e.keyCode === 27 /* esc */) {
             this.hidePopup();
         }
     }
@@ -76,10 +76,14 @@ class Driver {
     }
 
     onMouseMove(e) {
+        this.lastMousePos = {x: e.clientX, y: e.clientY};
         this.popupTimerClear();
 
-        this.lastMousePos = {x: e.clientX, y: e.clientY};
         if (!this.enabled) {
+            return;
+        }
+
+        if (e.which === 1 /* lmb */) {
             return;
         }
 
@@ -96,11 +100,9 @@ class Driver {
     }
 
     onMouseDown(e) {
-        this.lastMousePos = {x: e.clientX, y: e.clientY};
-        if (this.enabled && (e.shiftKey || !this.options.holdShiftToScan || e.which === 2 /* mmb */)) {
-            this.searchAt(this.lastMousePos, true);
-        } else {
-            this.hidePopup();
+        if (this.popup.visible()) {
+            const selection = window.getSelection();
+            selection.removeAllRanges();
         }
     }
 
