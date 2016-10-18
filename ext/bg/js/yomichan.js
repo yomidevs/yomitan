@@ -235,15 +235,15 @@ class Yomichan {
     }
 
     api_getOptions({callback}) {
-        loadOptions().then(opts => callback(opts));
+        loadOptions().then(opts => callback(opts)).catch(() => callback(null));
     }
 
     api_findKanji({text, callback}) {
-        this.translator.findKanji(text).then(result => callback(result));
+        this.translator.findKanji(text).then(result => callback(result)).catch(() => callback(null));
     }
 
     api_findTerm({text, callback}) {
-        this.translator.findTerm(text).then(result => callback(result));
+        this.translator.findTerm(text).then(result => callback(result)).catch(() => callback(null));
     }
 
     api_renderText({template, data, callback}) {
@@ -252,7 +252,7 @@ class Yomichan {
 
     api_addDefinition({definition, mode, callback}) {
         const note = this.formatNote(definition, mode);
-        this.anki.addNote(note).then(callback);
+        this.anki.addNote(note).then(callback).catch(() => callback(null));
     }
 
     api_canAddDefinitions({definitions, modes, callback}) {
@@ -277,19 +277,21 @@ class Yomichan {
             }
 
             callback(states);
+        }).catch(() => {
+            callback(null);
         });
     }
 
     api_getDeckNames({callback}) {
-        this.anki.getDeckNames().then(callback);
+        this.anki.getDeckNames().then(callback).catch(() => callback(null));
     }
 
     api_getModelNames({callback}) {
-        this.anki.getModelNames().then(callback);
+        this.anki.getModelNames().then(callback).catch(() => callback(null));
     }
 
     api_getModelFieldNames({modelName, callback}) {
-        this.anki.getModelFieldNames(modelName).then(callback);
+        this.anki.getModelFieldNames(modelName).then(callback).catch(() => callback(null));
     }
 }
 
