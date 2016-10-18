@@ -28,7 +28,7 @@ class AnkiWeb {
     }
 
     canAddNotes(notes) {
-        return Promise.resolve([]);
+        return Promise.resolve(new Array(notes.length).fill(true));
     }
 
     getDeckNames() {
