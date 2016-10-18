@@ -24,7 +24,26 @@ class AnkiWeb {
     }
 
     addNote(note) {
-        return Promise.resolve(true);
+        return this.retrieve().then(info => {
+            const model = info.models.find(m => m.name === note.modelName);
+            if (!model) {
+                return Promise.reject('invalid model');
+            }
+
+            const fields = [];
+            for (const field of model.fields) {
+                fields.push(note.fields[field]);
+            }
+
+            const form = new FormData();
+            form.append('data', [fields, note.tags.join(' ')]);
+            form.append('mid', model.id);
+            form.append('deck', note.deckname);
+
+            return AnkiWeb.loadAccountPage('https://ankiweb.net/edit/save', 'POST', form, this.username, this.password);
+        }).then(response => {
+            return true;
+        });
     }
 
     canAddNotes(notes) {
