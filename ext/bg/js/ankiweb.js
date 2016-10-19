@@ -75,6 +75,10 @@ class AnkiWeb {
         });
     }
 
+    logout() {
+        return AnkiWeb.loadPage('https://ankiweb.net/account/logout', null);
+    }
+
     static scrape(username, password) {
         return AnkiWeb.loadAccountPage('https://ankiweb.net/edit/', null, username, password).then(response => {
             const modelsMatch = /editor\.models = (.*}]);/.exec(response);

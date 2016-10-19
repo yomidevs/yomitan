@@ -198,12 +198,15 @@ function onOptionsChanged(e) {
             yomichan().setOptions(optsNew);
             updateVisibility(optsNew);
 
-            const invalidated =
-                optsNew.ankiMethod !== optsOld.ankiMethod ||
+            const loginChanged =
                 optsNew.ankiUsername !== optsOld.ankiUsername ||
                 optsNew.ankiPassword !== optsOld.ankiPassword;
 
-            if (invalidated) {
+            if (loginChanged && optsNew.ankiMethod === 'ankiweb') {
+                anki().logout().then(() => populateAnkiDeckAndModel(optsNew)).catch(error => {
+                    $('#anki-error').show().find('span').text(error);
+                });
+            } else if (loginChanged || optsNew.ankiMethod !== optsOld.ankiMethod) {
                 populateAnkiDeckAndModel(optsNew);
             }
         });
