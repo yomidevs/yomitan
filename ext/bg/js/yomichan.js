@@ -207,8 +207,8 @@ class Yomichan {
             note.modelName = this.options.ankiTermModel;
 
             const audio = {
-                kanji:  definition.expression,
-                kana:   definition.reading,
+                kanji: definition.expression,
+                kana: definition.reading,
                 fields: []
             };
 

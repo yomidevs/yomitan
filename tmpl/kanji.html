@@ -1,11 +1,9 @@
 <div class="kanji-definition">
-    {{#with options}}
-    <div class="action-bar" data-sequence="{{../sequence}}">
-        {{#if enableAnkiConnect}}
-        <a href="#" title="Add Kanji" class="action-add-note disabled" data-mode="kanji" data-index="{{@index}}"><img src="{{../root}}/img/add_kanji.png"></a>
+    <div class="action-bar" data-sequence="{{sequence}}">
+        {{#if addable}}
+        <a href="#" title="Add Kanji" class="action-add-note disabled" data-mode="kanji" data-index="{{@index}}"><img src="{{root}}/img/add_kanji.png"></a>
         {{/if}}
     </div>
-    {{/with}}
 
     <div class="kanji-glyph">{{character}}</div>
 

@@ -139,14 +139,25 @@ class Driver {
                 });
 
                 const sequence = ++this.sequence;
-                return renderText({definitions, sequence, root: this.fgRoot, options: this.options}, 'term-list.html').then(content => {
+                const context = {
+                    definitions,
+                    sequence,
+                    addable: this.options.ankiMethod !== 'disabled',
+                    root: this.fgRoot,
+                    options: this.options
+                };
+
+                return renderText(context, 'term-list.html').then(content => {
                     this.definitions = definitions;
                     this.pendingLookup = false;
                     this.showPopup(textSource, content);
                     return canAddDefinitions(definitions, ['term_kanji', 'term_kana']);
                 }).then(states => {
                     if (states !== null) {
-                        states.forEach((state, index) => this.popup.invokeApi('setActionState', {index, state, sequence}));
+                        states.forEach((state, index) => this.popup.invokeApi(
+                            'setActionState',
+                            {index, state, sequence}
+                        ));
                     }
 
                     return true;
@@ -167,14 +178,25 @@ class Driver {
                 definitions.forEach(definition => definition.url = window.location.href);
 
                 const sequence = ++this.sequence;
-                return renderText({definitions, sequence, root: this.fgRoot, options: this.options}, 'kanji-list.html').then(content => {
+                const context = {
+                    definitions,
+                    sequence,
+                    addable: this.options.ankiMethod !== 'disabled',
+                    root: this.fgRoot,
+                    options: this.options
+                };
+
+                return renderText(context, 'kanji-list.html').then(content => {
                     this.definitions = definitions;
                     this.pendingLookup = false;
                     this.showPopup(textSource, content);
                     return canAddDefinitions(definitions, ['kanji']);
                 }).then(states => {
                     if (states !== null) {
-                        states.forEach((state, index) => this.popup.invokeApi('setActionState', {index, state, sequence}));
+                        states.forEach((state, index) => this.popup.invokeApi(
+                            'setActionState',
+                            {index, state, sequence}
+                        ));
                     }
 
                     return true;
@@ -278,7 +300,15 @@ class Driver {
             definitions.forEach(definition => definition.url = window.location.href);
 
             const sequence = ++this.sequence;
-            return renderText({definitions, sequence, root: this.fgRoot, options: this.options}, 'kanji-list.html').then(content => {
+            const context = {
+                definitions,
+                sequence,
+                addable: this.options.ankiMethod !== 'disabled',
+                root: this.fgRoot,
+                options: this.options
+            };
+
+            return renderText(context, 'kanji-list.html').then(content => {
                 this.definitions = definitions;
                 this.popup.setContent(content, definitions);
                 return canAddDefinitions(definitions, ['kanji']);
