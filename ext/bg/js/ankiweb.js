@@ -35,15 +35,14 @@ class AnkiWeb {
                 fields.push(note.fields[field]);
             }
 
-            const form = new FormData();
-            form.append('data', [fields, note.tags.join(' ')]);
-            form.append('mid', model.id);
-            form.append('deck', note.deckname);
+            const data = {
+                data: JSON.stringify([fields, note.tags.join(' ')]),
+                mid: model.id,
+                deck: note.deckName
+            };
 
-            return AnkiWeb.loadAccountPage('https://ankiweb.net/edit/save', 'POST', form, this.username, this.password);
-        }).then(response => {
-            return true;
-        });
+            return AnkiWeb.loadAccountPage('https://ankiweb.net/edit/save', data, this.username, this.password);
+        }).then(response => response !== '0');
     }
 
     canAddNotes(notes) {
@@ -77,7 +76,7 @@ class AnkiWeb {
     }
 
     static scrape(username, password) {
-        return AnkiWeb.loadAccountPage('https://ankiweb.net/edit/', 'GET', null, username, password).then(response => {
+        return AnkiWeb.loadAccountPage('https://ankiweb.net/edit/', null, username, password).then(response => {
             const modelsMatch = /editor\.models = (.*}]);/.exec(response);
             if (modelsMatch === null) {
                 return Promise.reject('failed to scrape model data');
@@ -110,35 +109,40 @@ class AnkiWeb {
             return Promise.reject('unspecified login credentials');
         }
 
-        const form = new FormData();
-        form.append('username', username);
-        form.append('password', password);
-        form.append('submitted', 1);
-
-        return AnkiWeb.loadPage('https://ankiweb.net/account/login', 'POST', form).then(response => {
+        const data = {username, password, submitted: 1};
+        return AnkiWeb.loadPage('https://ankiweb.net/account/login', data).then(response => {
             if (!response.includes('class="mitem"')) {
                 return Promise.reject('failed to authenticate');
             }
         });
     }
 
-    static loadAccountPage(url, method, form, username, password) {
-        return AnkiWeb.loadPage(url, method, form).then(response => {
+    static loadAccountPage(url, data, username, password) {
+        return AnkiWeb.loadPage(url, data).then(response => {
             if (response.includes('name="password"')) {
-                return AnkiWeb.login(username, password).then(() => AnkiWeb.loadPage(url, method, form));
+                return AnkiWeb.login(username, password).then(() => AnkiWeb.loadPage(url, data));
             } else {
                 return response;
             }
         });
     }
 
-    static loadPage(url, method, form) {
+    static loadPage(url, data) {
         return new Promise((resolve, reject) => {
+            if (data) {
+                const params = [];
+                for (const key in data) {
+                    params.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`);
+                }
+
+                url += '?' + params.join('&');
+            }
+
             const xhr = new XMLHttpRequest();
             xhr.addEventListener('error', () => reject('failed to execute request'));
             xhr.addEventListener('load', () => resolve(xhr.responseText));
-            xhr.open(method, url);
-            xhr.send(form);
+            xhr.open('GET', url);
+            xhr.send();
         });
     }
 }
