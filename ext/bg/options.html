@@ -19,67 +19,43 @@
         </style>
     </head>
     <body>
-        <div class="container">
+        <div class="container-fluid">
             <div>
                 <h3>General Options</h3>
 
-                <form class="form-horizontal">
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <div class="checkbox">
-                                <label class="control-label"><input type="checkbox" id="activate-on-startup"> Activate on startup</label>
-                            </div>
-                        </div>
-                    </div>
+                <div class="checkbox">
+                    <label><input type="checkbox" id="activate-on-startup"> Activate on startup</label>
+                </div>
 
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <div class="checkbox">
-                                <label class="control-label"><input type="checkbox" id="enable-audio-playback"> Enable audio playback</label>
-                            </div>
-                        </div>
-                    </div>
+                <div class="checkbox">
+                    <label><input type="checkbox" id="enable-audio-playback"> Enable audio playback</label>
+                </div>
 
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <div class="checkbox">
-                                <label class="control-label"><input type="checkbox" id="show-advanced-options"> Show advanced options</label>
-                            </div>
-                        </div>
-                    </div>
-                </form>
+                <div class="checkbox">
+                    <label><input type="checkbox" id="show-advanced-options"> Show advanced options</label>
+                </div>
             </div>
 
             <div>
                 <h3>Scanning Options</h3>
 
-                <form class="form-horizontal">
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <div class="checkbox">
-                                <label class="control-label"><input type="checkbox" id="hold-shift-to-scan"> Hold <kbd>Shift</kbd> to scan</label>
-                            </div>
-                        </div>
-                    </div>
+                <div class="checkbox">
+                    <label><input type="checkbox" id="hold-shift-to-scan"> Hold <kbd>Shift</kbd> to scan</label>
+                </div>
 
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <div class="checkbox">
-                                <label class="control-label"><input type="checkbox" id="select-matched-text"> Select matched text</label>
-                            </div>
-                        </div>
-                    </div>
+                <div class="checkbox">
+                    <label><input type="checkbox" id="select-matched-text"> Select matched text</label>
+                </div>
 
-                    <div class="form-group options-advanced">
-                        <label for="scan-delay" class="control-label col-sm-2">Scan delay</label>
-                        <div class="col-sm-10"><input type="number" min="1" id="scan-delay" class="form-control"></div>
-                    </div>
+                <div class="form-group options-advanced">
+                    <label for="scan-delay">Scan delay</label>
+                    <input type="number" min="1" id="scan-delay" class="form-control">
+                </div>
 
-                    <div class="form-group options-advanced">
-                        <label for="scan-length" class="control-label col-sm-2">Scan length</label>
-                        <div class="col-sm-10"><input type="number" min="1" id="scan-length" class="form-control"></div>
-                    </div>
-                </form>
+                <div class="form-group options-advanced">
+                    <label for="scan-length">Scan length</label>
+                    <input type="number" min="1" id="scan-length" class="form-control">
+                </div>
             </div>
 
             <div>
@@ -88,11 +64,12 @@
                 <h3>Anki Options</h3>
 
                 <div class="alert alert-danger" id="anki-error">
-                    <strong>Error:</strong> <span></span>
+                    <strong>Error:</strong>
+                    <span></span>
                 </div>
 
                 <div class="form-group">
-                    <label class="control-label" for="anki-method">Connection method</label>
+                    <label for="anki-method">Connection method</label>
                     <select class="form-control" id="anki-method">
                         <option value="disabled">Disabled (no auto flashcard creation)</option>
                         <option value="ankiweb">AnkiWeb (requires an account on AnkiWeb)</option>
@@ -100,90 +77,76 @@
                     </select>
                 </div>
 
-                <form class="form-horizontal" id="anki-general">
-                    <div class="form-group anki-login">
-                        <label for="anki-username" class="control-label col-sm-2">Username</label>
-                        <div class="col-sm-10"><input type="text" id="anki-username" class="form-control anki-credential"></div>
-                    </div>
+                <div id="anki-general">
+                    <div class="row">
+                        <div class="form-group anki-login col-xs-6">
+                            <label for="anki-username">Username</label>
+                            <input type="text" id="anki-username" class="form-control anki-credential">
+                        </div>
 
-                    <div class="form-group anki-login">
-                        <label for="anki-password" class="control-label col-sm-2">Password</label>
-                        <div class="col-sm-10"><input type="password" id="anki-password" class="form-control anki-credential"></div>
+                        <div class="form-group anki-login col-xs-6">
+                            <label for="anki-password">Password</label>
+                            <input type="password" id="anki-password" class="form-control anki-credential">
+                        </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="anki-card-tags" class="control-label col-sm-2">Card tags</label>
-                        <div class="col-sm-10"><input type="text" id="anki-card-tags" class="form-control"></div>
+                        <label for="anki-card-tags">Card tags</label>
+                        <input type="text" id="anki-card-tags" class="form-control">
                     </div>
 
                     <div class="form-group options-advanced">
-                        <label for="sentence-extent" class="control-label col-sm-2">Sentence extent</label>
-                        <div class="col-sm-10"><input type="number" min="1" id="sentence-extent" class="form-control"></div>
+                        <label for="sentence-extent">Sentence extent</label>
+                        <input type="number" min="1" id="sentence-extent" class="form-control">
                     </div>
 
                     <div id="anki-format">
-                        <ul class="nav nav-tabs col-sm-offset-2 col-sm-10">
+                        <ul class="nav nav-tabs">
                             <li class="active"><a href="#term" data-toggle="tab">Terms</a></li>
                             <li><a href="#kanji" data-toggle="tab">Kanji</a></li>
                         </ul>
 
-                        <div class="tab-content col-sm-offset-2 col-sm-10">
+                        <div class="tab-content">
                             <div id="term" class="tab-pane fade in active">
-                                <div class="form-group">
-                                    <label class="col-sm-2 control-label" for="anki-term-deck">Deck</label>
-                                    <div class="col-sm-10">
+                                <div class="row">
+                                    <div class="form-group col-xs-6">
+                                        <label for="anki-term-deck">Deck</label>
                                         <select class="form-control anki-deck" id="anki-term-deck"></select>
                                     </div>
-                                </div>
 
-                                <div class="form-group">
-                                    <label class="col-sm-2 control-label" for="anki-term-model">Model</label>
-                                    <div class="col-sm-10">
+                                    <div class="form-group col-xs-6">
+                                        <label for="anki-term-model">Model</label>
                                         <select class="form-control anki-model" id="anki-term-model"></select>
                                     </div>
                                 </div>
 
                                 <table class="table table-bordered anki-fields">
-                                    <thead>
-                                        <tr>
-                                            <th>Field</th>
-                                            <th>Value</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
+                                    <thead><tr><th>Field</th><th>Value</th></tr></thead>
+                                    <tbody></tbody>
                                 </table>
                             </div>
 
                             <div id="kanji" class="tab-pane fade">
-                                <div class="form-group">
-                                    <label class="col-sm-2 control-label" for="anki-kanji-deck">Deck</label>
-                                    <div class="col-sm-10">
+                                <div class="row">
+                                    <div class="form-group col-xs-6">
+                                        <label for="anki-kanji-deck">Deck</label>
                                         <select class="form-control anki-deck" id="anki-kanji-deck"></select>
                                     </div>
-                                </div>
 
-                                <div class="form-group">
-                                    <label class="col-sm-2 control-label" for="anki-kanji-model">Model</label>
-                                    <div class="col-sm-10">
+                                    <div class="form-group col-xs-6">
+                                        <label for="anki-kanji-model">Model</label>
                                         <select class="form-control anki-model" id="anki-kanji-model"></select>
                                     </div>
                                 </div>
 
                                 <table class="table table-bordered anki-fields">
-                                    <thead>
-                                        <tr>
-                                            <th>Field</th>
-                                            <th>Value</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
+                                    <thead><tr><th>Field</th><th>Value</th></tr></thead>
+                                    <tbody></tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
-                </form>
+                </div>
             </div>
 
             <div class="pull-right">
