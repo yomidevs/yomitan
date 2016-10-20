@@ -72,9 +72,15 @@
                     <label for="anki-method">Connection method</label>
                     <select class="form-control" id="anki-method">
                         <option value="disabled">Disabled (no auto flashcard creation)</option>
-                        <option value="ankiweb">AnkiWeb (requires an account on AnkiWeb)</option>
                         <option value="ankiconnect">AnkiConnect (requires the AnkiConnect plugin)</option>
+                        <option value="ankiweb">AnkiWeb (requires an account on AnkiWeb)</option>
                     </select>
+                    <p class="help-block">
+                        Yomichan features automatic flashcard creation for <a href="http://ankisrs.net/">Anki</a>, a free application
+                        designed to help you retain knowledge. While the <a href="https://foosoft.net/projects/anki-connect/">AnkiConnect</a> plugin
+                        offers the best experience, it is also possible to create flash cards through <a href="https://ankiweb.net/">AnkiWeb</a>,
+                        provided you already have an account.
+                    </p>
                 </div>
 
                 <div id="anki-general">
@@ -91,7 +97,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="anki-card-tags">Card tags</label>
+                        <label for="anki-card-tags">Card tags (comma or space separated)</label>
                         <input type="text" id="anki-card-tags" class="form-control">
                     </div>
 

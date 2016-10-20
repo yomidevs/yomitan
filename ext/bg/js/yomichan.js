@@ -169,7 +169,7 @@ class Yomichan {
                     break;
                 case 'glossary-list':
                     if (definition.glossary) {
-                        value = '<ol>';
+                        value = '<ol style="text-align: left;">';
                         for (const gloss of definition.glossary) {
                             value += `<li>${gloss}</li>`;
                         }
