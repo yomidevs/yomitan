@@ -19,7 +19,7 @@
 
 function invokeApiBg(action, params) {
     return new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({action, params}, (result, error) => {
+        chrome.runtime.sendMessage({action, params}, ({result, error}) => {
             if (error) {
                 reject(error);
             } else {

@@ -163,6 +163,8 @@ class Driver {
                     return true;
                 });
             }
+        }).catch(error => {
+            alert('Error: ' + error);
         });
     }
 
@@ -202,6 +204,8 @@ class Driver {
                     return true;
                 });
             }
+        }).catch(error => {
+            alert('Error: ' + error);
         });
     }
 
@@ -231,6 +235,8 @@ class Driver {
                     }
                 });
             }
+        }).catch(error => {
+            alert('Error: ' + error);
         });
     }
 
@@ -273,6 +279,8 @@ class Driver {
             } else {
                 alert('Note could not be added');
             }
+        }).catch(error => {
+            alert('Error: ' + error);
         });
     }
 
@@ -317,6 +325,8 @@ class Driver {
                     states.forEach((state, index) => this.popup.invokeApi('setActionState', {index, state, sequence}));
                 }
             });
+        }).catch(error => {
+            alert('Error: ' + error);
         });
     }
 }

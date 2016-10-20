@@ -231,43 +231,43 @@ class Yomichan {
     }
 
     api_getEnabled({callback}) {
-        callback(this.state === 'enabled', null);
+        callback({result: this.state === 'enabled'});
     }
 
     api_getOptions({callback}) {
         loadOptions().then(result => {
-            callback(result, null);
+            callback({result});
         }).catch(error => {
-            callback(null, error);
+            callback({error});
         });
     }
 
     api_findKanji({text, callback}) {
         this.translator.findKanji(text).then(result => {
-            callback(result, null);
+            callback({result});
         }).catch(error => {
-            callback(null, error);
+            callback({error});
         });
     }
 
     api_findTerm({text, callback}) {
         this.translator.findTerm(text).then(result => {
-            callback(result, null);
+            callback({result});
         }).catch(error => {
-            callback(null, error);
+            callback({error});
         });
     }
 
     api_renderText({template, data, callback}) {
-        callback(Handlebars.templates[template](data), null);
+        callback({result: Handlebars.templates[template](data)});
     }
 
     api_addDefinition({definition, mode, callback}) {
         const note = this.formatNote(definition, mode);
         this.anki.addNote(note).then(result => {
-            callback(result, null);
+            callback({result});
         }).catch(error => {
-            callback(null, error);
+            callback({error});
         });
     }
 
@@ -279,22 +279,20 @@ class Yomichan {
             }
         }
 
-        this.anki.canAddNotes(notes).then(results => {
+        this.anki.canAddNotes(notes).then(raw => {
             const states = [];
-            if (results !== null) {
-                for (let resultBase = 0; resultBase < results.length; resultBase += modes.length) {
-                    const state = {};
-                    for (let modeOffset = 0; modeOffset < modes.length; ++modeOffset) {
-                        state[modes[modeOffset]] = results[resultBase + modeOffset];
-                    }
-
-                    states.push(state);
+            for (let resultBase = 0; resultBase < raw.length; resultBase += modes.length) {
+                const state = {};
+                for (let modeOffset = 0; modeOffset < modes.length; ++modeOffset) {
+                    state[modes[modeOffset]] = raw[resultBase + modeOffset];
                 }
+
+                states.push(state);
             }
 
-            callback(states, null);
+            callback({result: states});
         }).catch(error => {
-            callback(null, error);
+            callback({error});
         });
     }
 }

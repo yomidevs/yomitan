@@ -27,7 +27,7 @@ class AnkiWeb {
         return this.retrieve().then(info => {
             const model = info.models.find(m => m.name === note.modelName);
             if (!model) {
-                return Promise.reject('invalid model');
+                return Promise.reject('cannot add note model provided');
             }
 
             const fields = [];
@@ -110,7 +110,7 @@ class AnkiWeb {
 
     static login(username, password) {
         if (username.length === 0 || password.length === 0) {
-            return Promise.reject('unspecified login credentials');
+            return Promise.reject('login credentials not specified');
         }
 
         const data = {username, password, submitted: 1};
@@ -143,7 +143,7 @@ class AnkiWeb {
             }
 
             const xhr = new XMLHttpRequest();
-            xhr.addEventListener('error', () => reject('failed to execute request'));
+            xhr.addEventListener('error', () => reject('failed to execute network request'));
             xhr.addEventListener('load', () => resolve(xhr.responseText));
             xhr.open('GET', url);
             xhr.send();
