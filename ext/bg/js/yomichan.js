@@ -231,28 +231,44 @@ class Yomichan {
     }
 
     api_getEnabled({callback}) {
-        callback(this.state === 'enabled');
+        callback(this.state === 'enabled', null);
     }
 
     api_getOptions({callback}) {
-        loadOptions().then(opts => callback(opts)).catch(() => callback(null));
+        loadOptions().then(result => {
+            callback(result, null);
+        }).catch(error => {
+            callback(null, error);
+        });
     }
 
     api_findKanji({text, callback}) {
-        this.translator.findKanji(text).then(result => callback(result)).catch(() => callback(null));
+        this.translator.findKanji(text).then(result => {
+            callback(result, null);
+        }).catch(error => {
+            callback(null, error);
+        });
     }
 
     api_findTerm({text, callback}) {
-        this.translator.findTerm(text).then(result => callback(result)).catch(() => callback(null));
+        this.translator.findTerm(text).then(result => {
+            callback(result, null);
+        }).catch(error => {
+            callback(null, error);
+        });
     }
 
     api_renderText({template, data, callback}) {
-        callback(Handlebars.templates[template](data));
+        callback(Handlebars.templates[template](data), null);
     }
 
     api_addDefinition({definition, mode, callback}) {
         const note = this.formatNote(definition, mode);
-        this.anki.addNote(note).then(callback).catch(() => callback(null));
+        this.anki.addNote(note).then(result => {
+            callback(result, null);
+        }).catch(error => {
+            callback(null, error);
+        });
     }
 
     api_canAddDefinitions({definitions, modes, callback}) {
@@ -276,22 +292,10 @@ class Yomichan {
                 }
             }
 
-            callback(states);
-        }).catch(() => {
-            callback(null);
+            callback(states, null);
+        }).catch(error => {
+            callback(null, error);
         });
-    }
-
-    api_getDeckNames({callback}) {
-        this.anki.getDeckNames().then(callback).catch(() => callback(null));
-    }
-
-    api_getModelNames({callback}) {
-        this.anki.getModelNames().then(callback).catch(() => callback(null));
-    }
-
-    api_getModelFieldNames({modelName, callback}) {
-        this.anki.getModelFieldNames(modelName).then(callback).catch(() => callback(null));
     }
 }
 
