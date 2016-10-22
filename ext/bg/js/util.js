@@ -112,3 +112,7 @@ function applyTagMeta(tag, meta) {
 
     return tag;
 }
+
+function splitField(field) {
+    return field.length === 0 ? [] : field.split(' ');
+}

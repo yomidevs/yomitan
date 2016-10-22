@@ -79,7 +79,7 @@ class Dictionary {
             results.push({
                 expression: row.expression,
                 reading: row.reading,
-                tags: row.tags.split(' '),
+                tags: splitField(row.tags),
                 glossary: row.glossary,
                 id: row.id
             });
@@ -103,9 +103,9 @@ class Dictionary {
         return this.db.kanji.where('character').equals(kanji).each(row => {
             results.push({
                 character: row.character,
-                onyomi: row.onyomi.split(' '),
-                kunyomi: row.kunyomi.split(' '),
-                tags: row.tags.split(' '),
+                onyomi: splitField(row.onyomi),
+                kunyomi: splitField(row.kunyomi),
+                tags: splitField(row.tags),
                 glossary: row.meanings
             });
         }).then(() => results);
