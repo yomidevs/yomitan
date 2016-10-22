@@ -21,6 +21,7 @@ function sanitizeOptions(options) {
     const defaults = {
         activateOnStartup: true,
         enableAudioPlayback: true,
+        enableSoftKatakanaSearch: true,
         showAdvancedOptions: false,
         selectMatchedText: true,
         holdShiftToScan: true,
