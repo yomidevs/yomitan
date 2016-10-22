@@ -105,11 +105,24 @@ class Translator {
         return Promise.all(deinflectPromises).then(() => deinflectGroups);
     }
 
-    findTerm(text) {
-        return this.findTermGroups(text).then(deinflectGroups => {
+    findTerm(text, enableSoftKatakanaSearch) {
+        return this.findTermGroups(text).then(groups => {
+            const textHiragana = wanakana._katakanaToHiragana(text);
+            if (text !== textHiragana && enableSoftKatakanaSearch) {
+                return this.findTermGroups(textHiragana).then(groupsHiragana => {
+                    for (const key in groupsHiragana) {
+                        groups[key] = groups[key] || groupsHiragana[key];
+                    }
+
+                    return groups;
+                });
+            } else {
+                return groups;
+            }
+        }).then(groups => {
             const definitions = [];
-            for (const key in deinflectGroups) {
-                definitions.push(deinflectGroups[key]);
+            for (const key in groups) {
+                definitions.push(groups[key]);
             }
 
             let length = 0;

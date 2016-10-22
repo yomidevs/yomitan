@@ -243,7 +243,7 @@ class Yomichan {
     }
 
     api_findTerm({text, callback}) {
-        promiseCallback(this.translator.findTerm(text), callback);
+        promiseCallback(this.translator.findTerm(text, this.options.enableSoftKatakanaSearch), callback);
     }
 
     api_renderText({template, data, callback}) {
