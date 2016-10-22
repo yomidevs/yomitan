@@ -30,6 +30,19 @@ function kanjiLinks(options) {
     return result;
 }
 
+function isKanji(c) {
+    const code = c.charCodeAt(0);
+    return code >= 0x4e00 && code < 0x9fb0 || code >= 0x3400 && code < 0x4dc0;
+}
+
+function promiseCallback(promise, callback) {
+    return promise.then(result => {
+       callback({result});
+    }).catch(error => {
+        callback({error});
+    });
+}
+
 function loadJson(url) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
@@ -37,11 +50,6 @@ function loadJson(url) {
         xhr.open('GET', chrome.extension.getURL(url));
         xhr.send();
     });
-}
-
-function isKanji(c) {
-    const code = c.charCodeAt(0);
-    return code >= 0x4e00 && code < 0x9fb0 || code >= 0x3400 && code < 0x4dc0;
 }
 
 function sortTags(tags) {

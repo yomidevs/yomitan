@@ -235,27 +235,15 @@ class Yomichan {
     }
 
     api_getOptions({callback}) {
-        loadOptions().then(result => {
-            callback({result});
-        }).catch(error => {
-            callback({error});
-        });
+        promiseCallback(loadOptions(), callback);
     }
 
     api_findKanji({text, callback}) {
-        this.translator.findKanji(text).then(result => {
-            callback({result});
-        }).catch(error => {
-            callback({error});
-        });
+        promiseCallback(this.translator.findKanji(text), callback);
     }
 
     api_findTerm({text, callback}) {
-        this.translator.findTerm(text).then(result => {
-            callback({result});
-        }).catch(error => {
-            callback({error});
-        });
+        promiseCallback(this.translator.findTerm(text), callback);
     }
 
     api_renderText({template, data, callback}) {
@@ -264,11 +252,7 @@ class Yomichan {
 
     api_addDefinition({definition, mode, callback}) {
         const note = this.formatNote(definition, mode);
-        this.anki.addNote(note).then(result => {
-            callback({result});
-        }).catch(error => {
-            callback({error});
-        });
+        promiseCallback(this.anki.addNote(note), callback);
     }
 
     api_canAddDefinitions({definitions, modes, callback}) {
@@ -279,7 +263,7 @@ class Yomichan {
             }
         }
 
-        this.anki.canAddNotes(notes).then(raw => {
+        const promise = this.anki.canAddNotes(notes).then(raw => {
             const states = [];
             for (let resultBase = 0; resultBase < raw.length; resultBase += modes.length) {
                 const state = {};
@@ -290,10 +274,10 @@ class Yomichan {
                 states.push(state);
             }
 
-            callback({result: states});
-        }).catch(error => {
-            callback({error});
+            return states;
         });
+
+        promiseCallback(promise, callback);
     }
 }
 
