@@ -5,8 +5,7 @@ texts which would be otherwise too difficult tackle. This extension was inspired
 [Rikaichan](https://addons.mozilla.org/en-US/firefox/addon/rikaichan/) and
 [Rikaikun](https://chrome.google.com/webstore/detail/rikaikun/jipdnfibhldikgcjhfnomkfpcebammhp?hl=en), but it stands
 apart in its goal of being a all-encompassing learning tool as opposed to a mere browser-based dictionary. It is the
-natural evolution of the [Yomichan](https://foosoft.net/projects/yomichan) plugin that I developed for Anki when I began learning Japanese
-in early 2011.
+evolution of the [Yomichan](https://foosoft.net/projects/yomichan) plugin that I developed for Anki when I began studying Japanese.
 
 ## Requirements ##
 
@@ -31,7 +30,7 @@ support and feedback encourages continued development of this tool.
 
 [![Chrome web store](https://foosoft.net/projects/yomichan-chrome/img/store.png)](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami)
 
-### Basic Functionality ###
+## Basic Functionality ##
 
 1.  Left-click on the ![](https://foosoft.net/projects/yomichan-chrome/img/logo.png) icon to enable or disable Yomichan for the current browser instance.
 2.  Right-click on the ![](https://foosoft.net/projects/yomichan-chrome/img/logo.png) icon and select *Options* to display the Yomichan options page.
@@ -40,13 +39,13 @@ support and feedback encourages continued development of this tool.
 5.  Click on the Kanji links in the definition window to view additional information about those characters.
 6.  Click on the ![](https://foosoft.net/projects/yomichan-chrome/img/play-audio.png) icon to hear the term pronounced by a native speaker.
 
-### Anki Integration ###
+## Anki Integration ##
 
 Yomichan features automatic flashcard creation for [Anki](http://ankisrs.net/), a free application designed to help you
 retain knowledge. While the [AnkiConnect](https://foosoft.net/projects/anki-connect/) plugin offers the best experience,
 it is also possible to create flashcards through [AnkiWeb](https://ankiweb.net/), provided you already have an account.
 
-#### Using AnkiConnect ####
+### Using AnkiConnect ###
 
 Installing the AnkiConnect plugin for Anki is the preferred way of enabling automatic flashcard creation in Yomichan.
 
@@ -56,7 +55,7 @@ Installing the AnkiConnect plugin for Anki is the preferred way of enabling auto
 
 When using AnkiConnect, Anki must be kept running in the background for automatic flashcard creation to function.
 
-#### Using AnkiWeb ####
+### Using AnkiWeb ###
 
 Yomichan is able to create flashcards directly on AnkiWeb, assuming you have [registered an
 account](https://ankiweb.net/account/register). While this method can be convenient as it does not require Anki to be
@@ -69,7 +68,7 @@ Your AnkiWeb login information must specified on the options page to make use of
 that AnkiWeb will temporarily block your IP address if there are too many login attempts; if this happens, just try
 again after waiting for about an hour.
 
-#### Flashcard Configuration ####
+### Flashcard Configuration ###
 
 Before flashcards can be automatically created through Yomichan, Anki must be configured as follows:
 
@@ -77,23 +76,32 @@ Before flashcards can be automatically created through Yomichan, Anki must be co
 2.  Activate the *Terms* or the *Kanji* tab, depending on the type of card template you wish to configure.
 3.  Select the Anki deck and model to use when creating new flashcards (see the [Anki Manual](http://ankisrs.net/docs/manual.html) for more details).
 4.  Populate the model fields with markup representing contextual properties for the current vocabulary term or Kanji:
-    *   **Term Markers**
-        *   `{audio}`: Audio sample of a native speaker's pronunciation in MP3 format (if available).
-        *   `{expression}`: Term written in Kanji (will be written in Kana if Kanji is not available).
-        *   `{expression-furigana}`: Term written in Kanji with Furigana displayed above it (e.g. <ruby>日本語<rt>にほんご</rt></ruby>).
-        *   `{glossary-list}`: List of definitions with items expressed as a numbered list.
-        *   `{glossary}`: List of definitions with items delimited using semicolons.
-        *   `{reading}`: Kana reading for the term (empty for terms where the expression is the reading).
-        *   `{sentence}`: Sentence, quote, or phrase in which the term appears in the source content.
-        *   `{tags}`: Grammar and usage tags providing additional information about the term.
-        *   `{url}`: Address of the web page in which the current vocabulary term appeared in.
-    *   **Kanji Markers**
-        *   `{character}`: Unicode glyph representing the current Kanji.
-        *   `{glossary-list}`: List of definitions with items expressed as a numbered list.
-        *   `{glossary}`: List of definitions with items delimited using semicolons.
-        *   `{kunyomi}`: Kunyomi (Japanese reading) for the current Kanji expressed in Katakana.
-        *   `{onyomi}`: Onyomi (Chinese reading) for the current Kanji expressed in Hiragana.
-        *   `{url}`: Address of the web page in which the current vocabulary term appeared in.
+
+    #### Markers for term tags ####
+
+    Marker | Description
+    -------|------------
+    `{audio}` | Audio sample of a native speaker's pronunciation in MP3 format (if available).
+    `{expression}` | Term written in Kanji (will be written in Kana if Kanji is not available).
+    `{expression-furigana}` | Term written in Kanji with Furigana displayed above it (e.g. <ruby>日本語<rt>にほんご</rt></ruby>).
+    `{glossary-list}` | List of definitions with items expressed as a numbered list.
+    `{glossary}` | List of definitions with items delimited using semicolons.
+    `{reading}` | Kana reading for the term (empty for terms where the expression is the reading).
+    `{sentence}` | Sentence, quote, or phrase in which the term appears in the source content.
+    `{tags}` | Grammar and usage tags providing additional information about the term.
+    `{url}` | Address of the web page in which the current vocabulary term appeared in.
+
+    #### Markers for Kanji tags ####
+
+    Marker | Description
+    -------|------------
+    `{character}` | Unicode glyph representing the current Kanji.
+    `{glossary-list}` | List of definitions with items expressed as a numbered list.
+    `{glossary}` | List of definitions with items delimited using semicolons.
+    `{kunyomi}` | Kunyomi (Japanese reading) for the current Kanji expressed in Katakana.
+    `{onyomi}` | Onyomi (Chinese reading) for the current Kanji expressed in Hiragana.
+    `{url}` | Address of the web page in which the current vocabulary term appeared in.
+
 5.  Click on the ![](https://foosoft.net/projects/yomichan-chrome/img/add-expression.png) icon to add the current expression using Kanji (e.g. 食べる). If the icon
     appears grayed out, this means that a new flashcard cannot be created with the current configuration (please verify
     your Anki deck and model settings).
