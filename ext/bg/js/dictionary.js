@@ -20,7 +20,7 @@
 class Dictionary {
     constructor() {
         this.db = null;
-        this.dbVer = 2;
+        this.dbVer = 3;
         this.entities = null;
     }
 
@@ -135,49 +135,31 @@ class Dictionary {
             return Promise.reject('database not initialized');
         }
 
-        const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
-        return loadJson(indexUrl).then(index => {
-            const entities = [];
-            for (const [name, value] of index.ents) {
-                entities.push({name, value});
+        const entitiesLoaded = entities => {
+            this.entities = entities || {};
+
+            const rows = [];
+            for (const name in entities || {}) {
+                rows.push({name, value: entities[name]});
             }
 
-            return this.db.entities.bulkAdd(entities).then(() => {
-                if (this.entities === null) {
-                    this.entities = {};
-                }
+            return this.db.entities.bulkAdd(rows);
+        };
 
-                for (const entity of entities) {
-                    this.entities[entity.name] = entity.value;
-                }
-            }).then(() => {
-                const loaders = [];
-                for (let i = 1; i <= index.banks; ++i) {
-                    const bankUrl = `${indexDir}/bank_${i}.json`;
-                    loaders.push(() => {
-                        return loadJson(bankUrl).then(definitions => {
-                            const rows = [];
-                            for (const [expression, reading, tags, ...glossary] of definitions) {
-                                rows.push({expression, reading, tags, glossary});
-                            }
+        const entriesLoaded = (entries, total, current) => {
+            const rows = [];
+            for (const [expression, reading, tags, ...glossary] of entries) {
+                rows.push({expression, reading, tags, glossary});
+            }
 
-                            return this.db.terms.bulkAdd(rows).then(() => {
-                                if (callback) {
-                                    callback(i, index.banks, indexUrl);
-                                }
-                            });
-                        });
-                    });
+            return this.db.terms.bulkAdd(rows).then(() => {
+                if (callback) {
+                    callback(current, total, indexUrl);
                 }
-
-                let chain = Promise.resolve();
-                for (const loader of loaders) {
-                    chain = chain.then(loader);
-                }
-
-                return chain;
             });
-        });
+        };
+
+        return importJsonDb(indexUrl, entitiesLoaded, entriesLoaded);
     }
 
     importKanjiDict(indexUrl, callback) {
@@ -185,33 +167,19 @@ class Dictionary {
             return Promise.reject('database not initialized');
         }
 
-        const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
-        return loadJson(indexUrl).then(index => {
-            const loaders = [];
-            for (let i = 1; i <= index.banks; ++i) {
-                const bankUrl = `${indexDir}/bank_${i}.json`;
-                loaders.push(() => {
-                    return loadJson(bankUrl).then(definitions => {
-                        const rows = [];
-                        for (const [character, onyomi, kunyomi, tags, ...meanings] of definitions) {
-                            rows.push({character, onyomi, kunyomi, tags, meanings});
-                        }
-
-                        return this.db.kanji.bulkAdd(rows).then(() => {
-                            if (callback) {
-                                callback(i, index.banks, indexUrl);
-                            }
-                        });
-                    });
-                });
+        const entriesLoaded = (entries, total, current)  => {
+            const rows = [];
+            for (const [character, onyomi, kunyomi, tags, ...meanings] of entries) {
+                rows.push({character, onyomi, kunyomi, tags, meanings});
             }
 
-            let chain = Promise.resolve();
-            for (const loader of loaders) {
-                chain = chain.then(loader);
-            }
+            return this.db.kanji.bulkAdd(rows).then(() => {
+                if (callback) {
+                    callback(current, total, indexUrl);
+                }
+            });
+        };
 
-            return chain;
-        });
+        return importJsonDb(indexUrl, null, entriesLoaded);
     }
 }
