@@ -66,6 +66,49 @@
                 <h3>Dictionaries</h3>
 
                 <div class="dictionaries">
+                    <div class="dictionary well well-sm">
+                        <div class="row">
+                            <div class="col-xs-8">
+                                <h4><span class="text-muted glyphicon glyphicon-book"></span> Dictionary <small>v.1</small></h4>
+                            </div>
+                            <div class="col-xs-4 text-right">
+                                <button type="button" class="dict-delete btn btn-danger">Delete</button>
+                            </div>
+                        </div>
+
+                        <div class="checkbox">
+                            <label><input type="checkbox" class="dict-enable-terms"> Enable term search</label>
+                        </div>
+                        <div class="checkbox">
+                            <label><input type="checkbox" class="dict-enable-kanji"> Enable Kanji search</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-danger" id="dict-error">
+                    <strong>Error:</strong>
+                    <span>Something went wrong!</span>
+                </div>
+
+                <div class="progress" id="dict-import-progress">
+                    <div id="dict-import-progress-value" class="progress-bar progress-bar-striped" style="width: 45%"></div>
+                </div>
+
+                <div class="input-group" id="dict-import">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" id="dict-import-jmdict">JMdict</a></li>
+                            <li><a href="#" id="dict-import-jmnedict">JMnedict</a></li>
+                            <li><a href="#" id="dict-import-kanjidic2">KANJIDIC2</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#" id="dict-import-local">Local dictionary</a></li>
+                        </ul>
+                    </div>
+                    <input type="text" id="dict-import-url" class="form-control" placeholder="Dictionary import URL">
+                    <div class="input-group-btn">
+                        <button type="button" id="dict-import-start" class="btn btn-primary">Import</button>
+                    </div>
                 </div>
             </div>
 
