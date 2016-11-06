@@ -117,11 +117,11 @@ function splitField(field) {
     return field.length === 0 ? [] : field.split(' ');
 }
 
-function importJsonDb(indexUrl, entitiesLoaded, entriesLoaded) {
+function importJsonDb(indexUrl, indexLoaded, entriesLoaded) {
     const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
     return loadJson(indexUrl).then(index => {
-        if (entitiesLoaded !== null) {
-            return entitiesLoaded(index.entities, index.banks).then(() => index);
+        if (indexLoaded !== null) {
+            return indexLoaded(index.title, index.entities, index.banks).then(() => index);
         }
 
         return index;
@@ -129,7 +129,7 @@ function importJsonDb(indexUrl, entitiesLoaded, entriesLoaded) {
         const loaders = [];
         for (let i = 1; i <= index.banks; ++i) {
             const bankUrl = `${indexDir}/bank_${i}.json`;
-            loaders.push(() => loadJson(bankUrl).then(entries => entriesLoaded(entries, index.banks, i)));
+            loaders.push(() => loadJson(bankUrl).then(entries => entriesLoaded(index.title, entries, index.banks, i)));
         }
 
         let chain = Promise.resolve();

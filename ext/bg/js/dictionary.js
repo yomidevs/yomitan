@@ -20,7 +20,7 @@
 class Dictionary {
     constructor() {
         this.db = null;
-        this.dbVer = 3;
+        this.dbVer = 4;
         this.entities = null;
     }
 
@@ -31,10 +31,10 @@ class Dictionary {
 
         this.db = new Dexie('dict');
         this.db.version(1).stores({
-            terms: '++id,expression,reading',
-            entities: '++,name',
-            kanji: '++,character',
-            meta: 'name,value',
+            terms: '++id, dictionary, expression, reading',
+            kanji: '++, dictionary, character',
+            entities: '++, dictionary, name',
+            meta: 'name, value',
         });
     }
 
@@ -135,21 +135,31 @@ class Dictionary {
             return Promise.reject('database not initialized');
         }
 
-        const entitiesLoaded = entities => {
+        const indexLoaded = (dictionary, entities) => {
             this.entities = entities || {};
 
             const rows = [];
             for (const name in entities || {}) {
-                rows.push({name, value: entities[name]});
+                rows.push({
+                    dictionary,
+                    name,
+                    value: entities[name]
+                });
             }
 
             return this.db.entities.bulkAdd(rows);
         };
 
-        const entriesLoaded = (entries, total, current) => {
+        const entriesLoaded = (dictionary, entries, total, current) => {
             const rows = [];
             for (const [expression, reading, tags, ...glossary] of entries) {
-                rows.push({expression, reading, tags, glossary});
+                rows.push({
+                    dictionary,
+                    expression,
+                    reading,
+                    tags,
+                    glossary
+                });
             }
 
             return this.db.terms.bulkAdd(rows).then(() => {
@@ -159,7 +169,7 @@ class Dictionary {
             });
         };
 
-        return importJsonDb(indexUrl, entitiesLoaded, entriesLoaded);
+        return importJsonDb(indexUrl, indexLoaded, entriesLoaded);
     }
 
     importKanjiDict(indexUrl, callback) {
@@ -167,10 +177,17 @@ class Dictionary {
             return Promise.reject('database not initialized');
         }
 
-        const entriesLoaded = (entries, total, current)  => {
+        const entriesLoaded = (dictionary, entries, total, current)  => {
             const rows = [];
             for (const [character, onyomi, kunyomi, tags, ...meanings] of entries) {
-                rows.push({character, onyomi, kunyomi, tags, meanings});
+                rows.push({
+                    dictionary,
+                    character,
+                    onyomi,
+                    kunyomi,
+                    tags,
+                    meanings
+                });
             }
 
             return this.db.kanji.bulkAdd(rows).then(() => {
