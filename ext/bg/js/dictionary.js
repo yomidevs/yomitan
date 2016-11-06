@@ -20,7 +20,7 @@
 class Dictionary {
     constructor() {
         this.db = null;
-        this.dbVer = 5;
+        this.dbVer = 4;
         this.entities = null;
     }
 
@@ -131,6 +131,14 @@ class Dictionary {
         });
     }
 
+    getDictionaries() {
+        if (this.db === null) {
+            return Promise.reject('database not initialized');
+        }
+
+        return this.db.dictionaries.toArray();
+    }
+
     importTermDict(indexUrl, callback) {
         if (this.db === null) {
             return Promise.reject('database not initialized');
@@ -204,6 +212,6 @@ class Dictionary {
             });
         };
 
-        return importJsonDb(indexUrl, null, entriesLoaded);
+        return importJsonDb(indexUrl, indexLoaded, entriesLoaded);
     }
 }

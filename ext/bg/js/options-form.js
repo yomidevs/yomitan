@@ -154,6 +154,16 @@ function populateAnkiDeckAndModel(opts) {
     });
 }
 
+function populateDictionaries() {
+    const dictionaries = $('.dictionaries');
+    yomichan().translator.dictionary.getDictionaries().then(rows => {
+        for (const row of rows) {
+            const dictionary = $('<p>').text(row.dictionary);
+            dictionaries.append(dictionary);
+        }
+    });
+}
+
 function populateAnkiFields(element, opts) {
     const table = element.closest('.tab-pane').find('.anki-fields');
     table.find('tbody').remove();
@@ -274,6 +284,7 @@ $(document).ready(() => {
         $('input, select').not('.anki-model').change(onOptionsChanged);
         $('.anki-model').change(onAnkiModelChanged);
 
+        populateDictionaries();
         populateAnkiDeckAndModel(opts);
         updateVisibility(opts);
     });
