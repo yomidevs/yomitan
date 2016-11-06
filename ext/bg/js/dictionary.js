@@ -20,7 +20,7 @@
 class Dictionary {
     constructor() {
         this.db = null;
-        this.dbVer = 4;
+        this.dbVer = 5;
         this.entities = null;
     }
 
@@ -34,8 +34,7 @@ class Dictionary {
             terms: '++id, dictionary, expression, reading',
             kanji: '++, dictionary, character',
             entities: '++, dictionary',
-            termDicts: '++, dictionary',
-            kanjiDicts: '++, dictionary, version',
+            dictionaries: '++, dictionary, version',
             meta: 'name, value',
         });
     }
@@ -138,7 +137,7 @@ class Dictionary {
         }
 
         const indexLoaded = (dictionary, version, entities) => {
-            return this.db.termDicts.add({dictionary, version}).then(() => {
+            return this.db.dictionaries.add({dictionary, version}).then(() => {
                 this.entities = entities || {};
 
                 const rows = [];
@@ -182,7 +181,7 @@ class Dictionary {
         }
 
         const indexLoaded = (dictionary, version) => {
-            return this.db.kanjiDicts.add({dictionary, version});
+            return this.db.dictionaries.add({dictionary, version});
         };
 
         const entriesLoaded = (dictionary, version, entries, total, current)  => {
