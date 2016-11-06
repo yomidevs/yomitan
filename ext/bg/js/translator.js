@@ -46,7 +46,7 @@ class Translator {
             }
 
             const banks = {};
-            const bankCallback = (loaded, total, indexUrl) => {
+            const bankCallback = (total, loaded, indexUrl) => {
                 banks[indexUrl] = {loaded, total};
 
                 let percent = 0.0;
@@ -62,9 +62,9 @@ class Translator {
             };
 
             return Promise.all([
-                this.dictionary.importTermDict('bg/data/edict/index.json', bankCallback),
-                this.dictionary.importTermDict('bg/data/enamdict/index.json', bankCallback),
-                this.dictionary.importKanjiDict('bg/data/kanjidic/index.json', bankCallback),
+                this.dictionary.importDb('bg/data/edict/index.json', bankCallback),
+                this.dictionary.importDb('bg/data/enamdict/index.json', bankCallback),
+                this.dictionary.importDb('bg/data/kanjidic/index.json', bankCallback),
             ]).then(() => {
                 return this.dictionary.sealDb();
             }).then(() => {

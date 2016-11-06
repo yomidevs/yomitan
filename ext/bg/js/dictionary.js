@@ -20,7 +20,7 @@
 class Dictionary {
     constructor() {
         this.db = null;
-        this.dbVer = 4;
+        this.dbVer = 5;
         this.entities = null;
     }
 
@@ -131,7 +131,7 @@ class Dictionary {
         });
     }
 
-    getDictionaries() {
+    getNames() {
         if (this.db === null) {
             return Promise.reject('database not initialized');
         }
@@ -139,7 +139,7 @@ class Dictionary {
         return this.db.dictionaries.toArray();
     }
 
-    importTermDict(indexUrl, callback) {
+    importDb(indexUrl, callback) {
         if (this.db === null) {
             return Promise.reject('database not initialized');
         }
@@ -161,7 +161,7 @@ class Dictionary {
             });
         };
 
-        const entriesLoaded = (dictionary, version, entries, total, current) => {
+        const termsLoaded = (dictionary, version, entries, total, current) => {
             const rows = [];
             for (const [expression, reading, tags, ...glossary] of entries) {
                 rows.push({
@@ -175,24 +175,12 @@ class Dictionary {
 
             return this.db.terms.bulkAdd(rows).then(() => {
                 if (callback) {
-                    callback(current, total, indexUrl);
+                    callback(total, current, indexUrl);
                 }
             });
         };
 
-        return importJsonDb(indexUrl, indexLoaded, entriesLoaded);
-    }
-
-    importKanjiDict(indexUrl, callback) {
-        if (this.db === null) {
-            return Promise.reject('database not initialized');
-        }
-
-        const indexLoaded = (dictionary, version) => {
-            return this.db.dictionaries.add({dictionary, version});
-        };
-
-        const entriesLoaded = (dictionary, version, entries, total, current)  => {
+        const kanjiLoaded = (dictionary, version, entries, total, current)  => {
             const rows = [];
             for (const [character, onyomi, kunyomi, tags, ...meanings] of entries) {
                 rows.push({
@@ -207,11 +195,11 @@ class Dictionary {
 
             return this.db.kanji.bulkAdd(rows).then(() => {
                 if (callback) {
-                    callback(current, total, indexUrl);
+                    callback(total, current, indexUrl);
                 }
             });
         };
 
-        return importJsonDb(indexUrl, indexLoaded, entriesLoaded);
+        return importJsonDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded);
     }
 }

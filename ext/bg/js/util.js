@@ -43,15 +43,6 @@ function promiseCallback(promise, callback) {
     });
 }
 
-function loadJson(url) {
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.addEventListener('load', () => resolve(JSON.parse(xhr.responseText)));
-        xhr.open('GET', chrome.extension.getURL(url));
-        xhr.send();
-    });
-}
-
 function sortTags(tags) {
     return tags.sort((v1, v2) => {
         const order1 = v1.order;
@@ -117,19 +108,48 @@ function splitField(field) {
     return field.length === 0 ? [] : field.split(' ');
 }
 
-function importJsonDb(indexUrl, indexLoaded, entriesLoaded) {
+function loadJson(url) {
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.addEventListener('load', () => resolve(JSON.parse(xhr.responseText)));
+        xhr.open('GET', chrome.extension.getURL(url));
+        xhr.send();
+    });
+}
+
+function importJsonDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
     const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
     return loadJson(indexUrl).then(index => {
         if (indexLoaded !== null) {
-            return indexLoaded(index.title, index.version, index.entities, index.banks).then(() => index);
+            return indexLoaded(index.title, index.version).then(() => index);
         }
 
         return index;
     }).then(index => {
         const loaders = [];
-        for (let i = 1; i <= index.banks; ++i) {
-            const bankUrl = `${indexDir}/bank_${i}.json`;
-            loaders.push(() => loadJson(bankUrl).then(entries => entriesLoaded(index.title, index.version, entries, index.banks, i)));
+        const banksTotal = index.termBanks + index.kanjiBanks;
+        let banksLoaded = 0;
+
+        for (let i = 1; i <= index.termBanks; ++i) {
+            const bankUrl = `${indexDir}/term_bank_${i}.json`;
+            loaders.push(() => loadJson(bankUrl).then(entries => termsLoaded(
+                index.title,
+                index.version,
+                entries,
+                banksTotal,
+                banksLoaded++
+            )));
+        }
+
+        for (let i = 1; i <= index.kanjiBanks; ++i) {
+            const bankUrl = `${indexDir}/kanji_bank_${i}.json`;
+            loaders.push(() => loadJson(bankUrl).then(entries => kanjiLoaded(
+                index.title,
+                index.version,
+                entries,
+                banksTotal,
+                banksLoaded++
+            )));
         }
 
         let chain = Promise.resolve();

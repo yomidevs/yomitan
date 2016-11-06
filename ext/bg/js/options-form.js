@@ -158,7 +158,7 @@ function populateDictionaries() {
     // const dictGroups = $('.dictionaries');
     // dictGroups.empty();
 
-    // yomichan().translator.dictionary.getDictionaries().then(rows => {
+    // yomichan().translator.dictionary.getNames().then(rows => {
     //     for (const row of rows) {
     //         const dictPanel = $('<div>', {class: 'dictionary panel panel-default'});
     //         const dictRow = $('<div>', {class: 'panel-body row'}).appendTo(dictPanel);
