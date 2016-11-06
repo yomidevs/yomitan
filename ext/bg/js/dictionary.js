@@ -33,7 +33,9 @@ class Dictionary {
         this.db.version(1).stores({
             terms: '++id, dictionary, expression, reading',
             kanji: '++, dictionary, character',
-            entities: '++, dictionary, name',
+            entities: '++, dictionary',
+            termDicts: '++, dictionary',
+            kanjiDicts: '++, dictionary, version',
             meta: 'name, value',
         });
     }
@@ -135,22 +137,24 @@ class Dictionary {
             return Promise.reject('database not initialized');
         }
 
-        const indexLoaded = (dictionary, entities) => {
-            this.entities = entities || {};
+        const indexLoaded = (dictionary, version, entities) => {
+            return this.db.termDicts.add({dictionary, version}).then(() => {
+                this.entities = entities || {};
 
-            const rows = [];
-            for (const name in entities || {}) {
-                rows.push({
-                    dictionary,
-                    name,
-                    value: entities[name]
-                });
-            }
+                const rows = [];
+                for (const name in entities || {}) {
+                    rows.push({
+                        dictionary,
+                        name,
+                        value: entities[name]
+                    });
+                }
 
-            return this.db.entities.bulkAdd(rows);
+                return this.db.entities.bulkAdd(rows);
+            });
         };
 
-        const entriesLoaded = (dictionary, entries, total, current) => {
+        const entriesLoaded = (dictionary, version, entries, total, current) => {
             const rows = [];
             for (const [expression, reading, tags, ...glossary] of entries) {
                 rows.push({
@@ -177,7 +181,11 @@ class Dictionary {
             return Promise.reject('database not initialized');
         }
 
-        const entriesLoaded = (dictionary, entries, total, current)  => {
+        const indexLoaded = (dictionary, version) => {
+            return this.db.kanjiDicts.add({dictionary, version});
+        };
+
+        const entriesLoaded = (dictionary, version, entries, total, current)  => {
             const rows = [];
             for (const [character, onyomi, kunyomi, tags, ...meanings] of entries) {
                 rows.push({

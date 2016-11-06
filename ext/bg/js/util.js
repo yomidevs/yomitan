@@ -121,7 +121,7 @@ function importJsonDb(indexUrl, indexLoaded, entriesLoaded) {
     const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
     return loadJson(indexUrl).then(index => {
         if (indexLoaded !== null) {
-            return indexLoaded(index.title, index.entities, index.banks).then(() => index);
+            return indexLoaded(index.title, index.version, index.entities, index.banks).then(() => index);
         }
 
         return index;
@@ -129,7 +129,7 @@ function importJsonDb(indexUrl, indexLoaded, entriesLoaded) {
         const loaders = [];
         for (let i = 1; i <= index.banks; ++i) {
             const bankUrl = `${indexDir}/bank_${i}.json`;
-            loaders.push(() => loadJson(bankUrl).then(entries => entriesLoaded(index.title, entries, index.banks, i)));
+            loaders.push(() => loadJson(bankUrl).then(entries => entriesLoaded(index.title, index.version, entries, index.banks, i)));
         }
 
         let chain = Promise.resolve();
