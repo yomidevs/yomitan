@@ -155,13 +155,25 @@ function populateAnkiDeckAndModel(opts) {
 }
 
 function populateDictionaries() {
-    const dictionaries = $('.dictionaries');
-    yomichan().translator.dictionary.getDictionaries().then(rows => {
-        for (const row of rows) {
-            const dictionary = $('<p>').text(row.dictionary);
-            dictionaries.append(dictionary);
-        }
-    });
+    // const dictGroups = $('.dictionaries');
+    // dictGroups.empty();
+
+    // yomichan().translator.dictionary.getDictionaries().then(rows => {
+    //     for (const row of rows) {
+    //         const dictPanel = $('<div>', {class: 'dictionary panel panel-default'});
+    //         const dictRow = $('<div>', {class: 'panel-body row'}).appendTo(dictPanel);
+
+    //         const title = $('<div>', {class: 'col-xs-8'});
+    //         $('<h4>').append().html(`<span class="text-muted glyphicon glyphicon-book"></span> ${row.dictionary} <small>v.${row.version}</small>`).appendTo(title);
+    //         title.appendTo(dictRow);
+
+    //         const controls = $('<div>', {class: 'col-xs-4 text-right'});
+    //         $('<button>', {class: 'btn btn-danger dictionary-delete'}).text('Delete').appendTo(controls);
+    //         controls.appendTo(dictRow);
+
+    //         dictGroups.append(dictPanel);
+    //     }
+    // });
 }
 
 function populateAnkiFields(element, opts) {
