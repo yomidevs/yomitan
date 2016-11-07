@@ -131,12 +131,28 @@ class Dictionary {
         });
     }
 
-    getInfo() {
+    getDictionaries() {
         if (this.db === null) {
             return Promise.reject('database not initialized');
         }
 
         return this.db.dictionaries.toArray();
+    }
+
+    deleteDictionary(title) {
+        if (this.db === null) {
+            return Promise.reject('database not initialized');
+        }
+
+        const tasks = [
+            this.db.terms.where('dictionary').equals(title).delete(),
+            this.db.kanji.where('dictionary').equals(title).delete(),
+            this.db.entities.where('dictionary').equals(title).delete()
+        ];
+
+        return Promise.all(tasks).then(() => {
+            return this.db.dictionaries.where('title').equals(title).delete();
+        });
     }
 
     importDb(indexUrl, callback) {

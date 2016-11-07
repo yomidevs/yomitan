@@ -166,7 +166,7 @@ function populateDictionaries(opts) {
     const container = $('.dicts');
     container.empty();
 
-    yomichan().translator.dictionary.getInfo().then(rows => {
+    yomichan().translator.dictionary.getDictionaries().then(rows => {
         rows.forEach(row => {
             const dictOpts = opts.dictionaries[row.title] || {enableTerms: true, enableKanji: false};
             const html = Handlebars.templates['dictionary.html']({
@@ -179,6 +179,13 @@ function populateDictionaries(opts) {
             });
 
             container.append($(html));
+        });
+
+        const dictDelete = $('.dict-delete');
+        dictDelete.click(() => {
+            const dict = dictDelete.closest('.dict');
+            const title = dict.data('title');
+            yomichan().translator.dictionary.deleteDictionary(title).then(() => dict.slideUp());
         });
 
         container.find('.dict input').change(onOptionsChanged);
@@ -301,8 +308,9 @@ $(document).ready(() => {
             control.trigger('input');
         });
 
-        $('#dict-import-url').on('input', () => {
-            const disable = $('#dict-import-url').val().trim().length === 0;
+        const dictImportUrl = $('#dict-import-url');
+        dictImportUrl.on('input', () => {
+            const disable = dictImportUrl.val().trim().length === 0;
             $('#dict-import-start').prop('disabled', disable);
         });
 
