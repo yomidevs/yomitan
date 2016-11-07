@@ -1,9 +1,9 @@
 (function() {
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
 templates['dictionary.html'] = template({"1":function(container,depth0,helpers,partials,data) {
-    return "    <div class=\"checkbox\">\n        <label><input type=\"checkbox\" class=\"dict-enable-terms\"> Enable term search</label>\n    </div>\n";
+    return "disabled";
 },"3":function(container,depth0,helpers,partials,data) {
-    return "    <div class=\"checkbox\">\n        <label><input type=\"checkbox\" class=\"dict-enable-kanji\"> Enable Kanji search</label>\n    </div>\n";
+    return "checked";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
@@ -13,10 +13,19 @@ templates['dictionary.html'] = template({"1":function(container,depth0,helpers,p
     + alias4(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"name","hash":{},"data":data}) : helper)))
     + " <small>v."
     + alias4(((helper = (helper = helpers.version || (depth0 != null ? depth0.version : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"version","hash":{},"data":data}) : helper)))
-    + "</small></h4>\n        </div>\n        <div class=\"col-xs-4 text-right\">\n            <button type=\"button\" class=\"dict-delete btn btn-danger\">Delete</button>\n        </div>\n    </div>\n\n"
-    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.hasTerms : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.hasKanji : depth0),{"name":"if","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "</div>\n";
+    + "</small></h4>\n        </div>\n        <div class=\"col-xs-4 text-right\">\n            <button type=\"button\" class=\"dict-delete btn btn-danger\">Delete</button>\n        </div>\n    </div>\n\n    <div class=\"checkbox "
+    + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.hasTerms : depth0),{"name":"unless","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\">\n        <label><input type=\"checkbox\" class=\"dict-enable-terms\" "
+    + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.hasTerms : depth0),{"name":"unless","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.enableTerms : depth0),{"name":"if","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "> Enable term search</label>\n    </div>\n    <div class=\"checkbox "
+    + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.hasKanji : depth0),{"name":"unless","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\">\n        <label><input type=\"checkbox\" class=\"dict-enable-kanji\" "
+    + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.hasKanji : depth0),{"name":"unless","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + " "
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.enableKanji : depth0),{"name":"if","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "> Enable Kanji search</label>\n    </div>\n</div>\n";
 },"useData":true});
 templates['footer.html'] = template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var helper;

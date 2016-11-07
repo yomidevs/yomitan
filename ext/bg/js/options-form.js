@@ -154,17 +154,20 @@ function populateAnkiDeckAndModel(opts) {
     });
 }
 
-function populateDictionaries() {
+function populateDictionaries(opts) {
     const container = $('.dictionaries');
     container.empty();
 
     yomichan().translator.dictionary.getInfo().then(rows => {
         rows.forEach(row => {
+            const dictOpts = opts.dictionaries[row.dictionary] || {enableTerms: true, enableKanji: false};
             const html = Handlebars.templates['dictionary.html']({
                 name: row.dictionary,
                 version: row.version,
                 hasTerms: row.hasTerms,
-                hasKanji: row.hasKanji
+                hasKanji: row.hasKanji,
+                enableTerms: dictOpts.enableTerms,
+                enableKanji: dictOpts.enableKanji
             });
 
             container.append($(html));
@@ -276,7 +279,7 @@ $(document).ready(() => {
         $('input, select').not('.anki-model').change(onOptionsChanged);
         $('.anki-model').change(onAnkiModelChanged);
 
-        populateDictionaries();
+        populateDictionaries(opts);
         populateAnkiDeckAndModel(opts);
         updateVisibility(opts);
     });
