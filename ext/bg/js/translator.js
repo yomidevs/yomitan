@@ -21,7 +21,7 @@ class Translator {
     constructor() {
         this.loaded = false;
         this.tagMeta = null;
-        this.dictionary = new Dictionary();
+        this.database = new Database();
         this.deinflector = new Deinflector();
     }
 
@@ -35,7 +35,7 @@ class Translator {
             return loadJson('bg/data/tags.json');
         }).then(tagMeta => {
             this.tagMeta = tagMeta;
-            return this.dictionary.prepareDb();
+            return this.database.prepare();
         }).then(exists => {
             if (exists) {
                 return;
@@ -62,11 +62,11 @@ class Translator {
             };
 
             return Promise.all([
-                this.dictionary.importDictionary('bg/data/edict/index.json', bankCallback),
-                this.dictionary.importDictionary('bg/data/enamdict/index.json', bankCallback),
-                this.dictionary.importDictionary('bg/data/kanjidic/index.json', bankCallback),
+                this.database.importDictionary('bg/data/edict/index.json', bankCallback),
+                this.database.importDictionary('bg/data/enamdict/index.json', bankCallback),
+                this.database.importDictionary('bg/data/kanjidic/index.json', bankCallback),
             ]).then(() => {
-                return this.dictionary.sealDb();
+                return this.database.seal();
             }).then(() => {
                 if (callback) {
                     callback({state: 'end', progress: 100.0});
@@ -84,7 +84,7 @@ class Translator {
         for (let i = text.length; i > 0; --i) {
             deinflectPromises.push(
                 this.deinflector.deinflect(text.slice(0, i), term => {
-                    return this.dictionary.findTerm(term).then(definitions => definitions.map(definition => definition.tags));
+                    return this.database.findTerm(term).then(definitions => definitions.map(definition => definition.tags));
                 }).then(deinflects => {
                     const processPromises = [];
                     for (const deinflect of deinflects) {
@@ -143,7 +143,7 @@ class Translator {
 
         for (const c of text) {
             if (!processed[c]) {
-                promises.push(this.dictionary.findKanji(c).then((definitions) => definitions));
+                promises.push(this.database.findKanji(c).then((definitions) => definitions));
                 processed[c] = true;
             }
         }
@@ -152,7 +152,7 @@ class Translator {
     }
 
     processTerm(groups, source, tags, rules, root) {
-        return this.dictionary.findTerm(root).then(definitions => {
+        return this.database.findTerm(root).then(definitions => {
             for (const definition of definitions) {
                 if (definition.id in groups) {
                     continue;

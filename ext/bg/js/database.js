@@ -17,14 +17,14 @@
  */
 
 
-class Dictionary {
+class Database {
     constructor() {
         this.db = null;
         this.dbVer = 6;
         this.entities = null;
     }
 
-    initDb() {
+    init() {
         if (this.db !== null) {
             return Promise.reject('database already initialized');
         }
@@ -39,8 +39,8 @@ class Dictionary {
         });
     }
 
-    prepareDb() {
-        this.initDb();
+    prepare() {
+        this.init();
 
         return this.db.meta.get('version').then(row => {
             return row ? row.value : 0;
@@ -56,13 +56,13 @@ class Dictionary {
             this.db = null;
 
             return db.delete().then(() => {
-                this.initDb();
+                this.init();
                 return false;
             });
         });
     }
 
-    sealDb() {
+    seal() {
         if (this.db === null) {
             return Promise.reject('database not initialized');
         }

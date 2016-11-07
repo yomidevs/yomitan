@@ -166,7 +166,7 @@ function populateDictionaries(opts) {
     const container = $('.dicts');
     container.empty();
 
-    yomichan().translator.dictionary.getDictionaries().then(rows => {
+    yomichan().translator.database.getDictionaries().then(rows => {
         rows.forEach(row => {
             const dictOpts = opts.dictionaries[row.title] || {enableTerms: true, enableKanji: false};
             const html = Handlebars.templates['dictionary.html']({
@@ -184,7 +184,7 @@ function populateDictionaries(opts) {
         $('.dict-delete').click(e => {
             const dict = $(e.target).closest('.dict');
             const title = dict.data('title');
-            yomichan().translator.dictionary.deleteDictionary(title);
+            yomichan().translator.database.deleteDictionary(title);
             dict.slideUp();
         });
 
