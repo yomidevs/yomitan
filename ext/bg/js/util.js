@@ -112,6 +112,7 @@ function loadJson(url) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.addEventListener('load', () => resolve(JSON.parse(xhr.responseText)));
+        xhr.addEventListener('error', () => reject('failed to execute network request'));
         xhr.open('GET', chrome.extension.getURL(url));
         xhr.send();
     });

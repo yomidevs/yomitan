@@ -166,6 +166,9 @@ function populateDictionaries(opts) {
     const container = $('.dicts');
     container.empty();
 
+    const dictError = $('#dict-error');
+    dictError.hide();
+
     yomichan().translator.database.getDictionaries().then(rows => {
         rows.forEach(row => {
             const dictOpts = opts.dictionaries[row.title] || {enableTerms: true, enableKanji: false};
@@ -182,13 +185,47 @@ function populateDictionaries(opts) {
         });
 
         $('.dict-delete').click(e => {
-            const dict = $(e.target).closest('.dict');
+            const button = $(e.target);
+            const dict = button.closest('.dict');
             const title = dict.data('title');
-            yomichan().translator.database.deleteDictionary(title);
-            dict.slideUp();
+
+            button.prop('disabled', true);
+            yomichan().translator.database.deleteDictionary(title).then(() => {
+                dict.slideUp();
+            }).catch(error => {
+                dictError.show().find('span').text(error);
+            }).then(() => {
+                button.prop('disabled', false);
+            });
         });
 
         container.find('.dict input').change(onOptionsChanged);
+    }).catch(error => {
+        dictError.show().find('span').text(error);
+    });
+}
+
+function onImportDictionary() {
+    const dictInputs = $('#dict-import').find('input');
+    dictInputs.prop('disabled', true);
+
+    const dictError = $('#dict-error');
+    dictError.hide();
+
+    const progressbar = $('#dict-import-progress');
+    const progressValue = progressbar.find('div');
+    progressbar.show();
+
+    const callback = (total, current) => {
+        $('.progress-bar').css('width', `${current / total * 100.0}%`);
+    };
+
+    const dictUrl = $('#dict-import-url').val();
+    yomichan().translator.database.importDictionary(dictUrl, callback).catch(error => {
+        dictError.show().find('span').text(error);
+    }).then(() => {
+        dictInputs.prop('disabled', false);
+        progressbar.hide();
     });
 }
 
@@ -303,7 +340,7 @@ $(document).ready(() => {
             if (url.includes('/')) {
                 control.val(url);
             } else {
-                control.val(chrome.extension.getURL(`bg/data/${url}`));
+                control.val(chrome.extension.getURL(`bg/data/${url}/index.json`));
             }
             control.trigger('input');
         });
@@ -313,6 +350,8 @@ $(document).ready(() => {
             const disable = dictImportUrl.val().trim().length === 0;
             $('#dict-import-start').prop('disabled', disable);
         });
+
+        $('#dict-import-start').click(onImportDictionary);
 
         populateDictionaries(opts);
         populateAnkiDeckAndModel(opts);
