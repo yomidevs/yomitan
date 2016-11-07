@@ -6,7 +6,7 @@
         <link rel="stylesheet" type="text/css" href="../lib/bootstrap-3.3.6-dist/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="../lib/bootstrap-3.3.6-dist/css/bootstrap-theme.min.css">
         <style>
-            #anki-spinner, #anki-general, #anki-error, #options-advanced {
+            #anki-spinner, #anki-general, #anki-error, #dict-error, #dict-import-progress, #options-advanced {
                 display: none;
             }
 
@@ -65,7 +65,7 @@
             <div>
                 <h3>Dictionaries</h3>
 
-                <div class="dictionaries"></div>
+                <div class="dicts"></div>
 
                 <div class="alert alert-danger" id="dict-error">
                     <strong>Error:</strong>
@@ -80,16 +80,16 @@
                     <div class="input-group-btn">
                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
                         <ul class="dropdown-menu">
-                            <li><a href="#" id="dict-import-jmdict">JMdict</a></li>
-                            <li><a href="#" id="dict-import-jmnedict">JMnedict</a></li>
-                            <li><a href="#" id="dict-import-kanjidic2">KANJIDIC2</a></li>
+                            <li><a href="#" data-url="edict">JMdict</a></li>
+                            <li><a href="#" data-url="enamdict">JMnedict</a></li>
+                            <li><a href="#" data-url="kanjidic">KANJIDIC2</a></li>
                             <li role="separator" class="divider"></li>
-                            <li><a href="#" id="dict-import-local">Local dictionary</a></li>
+                            <li><a href="#" data-url="http://localhost:9876">Local dictionary</a></li>
                         </ul>
                     </div>
                     <input type="text" id="dict-import-url" class="form-control" placeholder="Dictionary import URL">
-                    <div class="input-group-btn">
-                        <button type="button" id="dict-import-start" class="btn btn-primary">Import</button>
+                    <div class="input-group-btn disabled">
+                        <button type="button" id="dict-import-start" class="btn btn-primary" disabled>Import</button>
                     </div>
                 </div>
             </div>

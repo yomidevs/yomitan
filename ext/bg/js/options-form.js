@@ -91,7 +91,7 @@ function getFormValues() {
         optsNew.ankiKanjiModel = $('#anki-kanji-model').val();
         optsNew.ankiKanjiFields = fieldsToDict($('#kanji .anki-field-value'));
 
-        $('.dictionary').each((index, element) => {
+        $('.dict').each((index, element) => {
             const dictionary = $(element);
             const name = dictionary.data('name');
             const enableTerms = dictionary.find('.dict-enable-terms').prop('checked');
@@ -163,7 +163,7 @@ function populateAnkiDeckAndModel(opts) {
 }
 
 function populateDictionaries(opts) {
-    const container = $('.dictionaries');
+    const container = $('.dicts');
     container.empty();
 
     yomichan().translator.dictionary.getInfo().then(rows => {
@@ -181,7 +181,7 @@ function populateDictionaries(opts) {
             container.append($(html));
         });
 
-        container.find('.dictionary input').change(onOptionsChanged);
+        container.find('.dict input').change(onOptionsChanged);
     });
 }
 
@@ -288,6 +288,23 @@ $(document).ready(() => {
 
         $('input, select').not('.anki-model').change(onOptionsChanged);
         $('.anki-model').change(onAnkiModelChanged);
+
+        $('#dict-import a').click(e => {
+            e.preventDefault();
+            const control = $('#dict-import-url');
+            const url = $(e.target).data('url');
+            if (url.includes('/')) {
+                control.val(url);
+            } else {
+                control.val(chrome.extension.getURL(`bg/data/${url}`));
+            }
+            control.trigger('change');
+        });
+
+        $('#dict-import-url').on('change keyup paste', () => {
+            const disable = $('#dict-import-url').val().trim().length === 0;
+            $('#dict-import-start').prop('disabled', disable);
+        });
 
         populateDictionaries(opts);
         populateAnkiDeckAndModel(opts);
