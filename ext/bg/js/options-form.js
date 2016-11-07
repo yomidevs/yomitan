@@ -298,10 +298,10 @@ $(document).ready(() => {
             } else {
                 control.val(chrome.extension.getURL(`bg/data/${url}`));
             }
-            control.trigger('change');
+            control.trigger('input');
         });
 
-        $('#dict-import-url').on('change keyup paste', () => {
+        $('#dict-import-url').on('input', () => {
             const disable = $('#dict-import-url').val().trim().length === 0;
             $('#dict-import-start').prop('disabled', disable);
         });
