@@ -91,6 +91,14 @@ function getFormValues() {
         optsNew.ankiKanjiModel = $('#anki-kanji-model').val();
         optsNew.ankiKanjiFields = fieldsToDict($('#kanji .anki-field-value'));
 
+        $('.dictionary').each((index, element) => {
+            const dictionary = $(element);
+            const name = dictionary.data('name');
+            const enableTerms = dictionary.find('.dict-enable-terms').prop('checked');
+            const enableKanji = dictionary.find('.dict-enable-kanji').prop('checked');
+            optsNew.dictionaries[name] = {enableTerms, enableKanji};
+        });
+
         return {
             optsNew: sanitizeOptions(optsNew),
             optsOld: sanitizeOptions(optsOld)
@@ -172,12 +180,14 @@ function populateDictionaries(opts) {
 
             container.append($(html));
         });
+
+        container.find('.dictionary input').change(onOptionsChanged);
     });
 }
 
 function populateAnkiFields(element, opts) {
     const tab = element.closest('.tab-pane');
-    const container = tab.find('.anki-fields tbody');
+    const container = tab.find('tbody');
     container.empty();
 
     const modelName = element.val();
