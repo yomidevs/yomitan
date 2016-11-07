@@ -131,7 +131,7 @@ class Dictionary {
         });
     }
 
-    getNames() {
+    getInfo() {
         if (this.db === null) {
             return Promise.reject('database not initialized');
         }
@@ -144,8 +144,8 @@ class Dictionary {
             return Promise.reject('database not initialized');
         }
 
-        const indexLoaded = (dictionary, version, entities) => {
-            return this.db.dictionaries.add({dictionary, version}).then(() => {
+        const indexLoaded = (dictionary, version, entities, hasTerms, hasKanji) => {
+            return this.db.dictionaries.add({dictionary, version, hasTerms, hasKanji}).then(() => {
                 this.entities = entities || {};
 
                 const rows = [];
@@ -161,7 +161,7 @@ class Dictionary {
             });
         };
 
-        const termsLoaded = (dictionary, version, entries, total, current) => {
+        const termsLoaded = (dictionary, entries, total, current) => {
             const rows = [];
             for (const [expression, reading, tags, ...glossary] of entries) {
                 rows.push({
@@ -180,7 +180,7 @@ class Dictionary {
             });
         };
 
-        const kanjiLoaded = (dictionary, version, entries, total, current)  => {
+        const kanjiLoaded = (dictionary, entries, total, current)  => {
             const rows = [];
             for (const [character, onyomi, kunyomi, tags, ...meanings] of entries) {
                 rows.push({

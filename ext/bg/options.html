@@ -124,18 +124,18 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="anki-method">Connection method</label>
-                    <select class="form-control" id="anki-method">
-                        <option value="disabled">Disabled (no auto flashcard creation)</option>
-                        <option value="ankiconnect">AnkiConnect (requires the AnkiConnect plugin)</option>
-                        <option value="ankiweb">AnkiWeb (requires an account on AnkiWeb)</option>
-                    </select>
                     <p class="help-block">
                         Yomichan features automatic flashcard creation for <a href="http://ankisrs.net/">Anki</a>, a free application
                         designed to help you retain knowledge. While the <a href="https://foosoft.net/projects/anki-connect/">AnkiConnect</a> plugin
                         offers the best experience, it is also possible to create flashcards through <a href="https://ankiweb.net/">AnkiWeb</a>,
                         provided you already have an account.
                     </p>
+                    <label for="anki-method">Connection method</label>
+                    <select class="form-control" id="anki-method">
+                        <option value="disabled">Disabled (no auto flashcard creation)</option>
+                        <option value="ankiconnect">AnkiConnect (requires the AnkiConnect plugin)</option>
+                        <option value="ankiweb">AnkiWeb (requires an account on AnkiWeb)</option>
+                    </select>
                 </div>
 
                 <div id="anki-general">
@@ -217,6 +217,8 @@
 
         <script src="../lib/jquery-2.2.2.min.js"></script>
         <script src="../lib/bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
+        <script src="../lib/handlebars.min.js"></script>
+        <script src="js/templates.js"></script>
         <script src="js/options.js"></script>
         <script src="js/options-form.js"></script>
     </body>

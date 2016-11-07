@@ -121,7 +121,13 @@ function importJsonDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
     const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
     return loadJson(indexUrl).then(index => {
         if (indexLoaded !== null) {
-            return indexLoaded(index.title, index.version).then(() => index);
+            return indexLoaded(
+                index.title,
+                index.version,
+                index.entities,
+                index.termBanks > 0,
+                index.kanjiBanks > 0
+            ).then(() => index);
         }
 
         return index;
@@ -134,7 +140,6 @@ function importJsonDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
             const bankUrl = `${indexDir}/term_bank_${i}.json`;
             loaders.push(() => loadJson(bankUrl).then(entries => termsLoaded(
                 index.title,
-                index.version,
                 entries,
                 banksTotal,
                 banksLoaded++
@@ -145,7 +150,6 @@ function importJsonDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
             const bankUrl = `${indexDir}/kanji_bank_${i}.json`;
             loaders.push(() => loadJson(bankUrl).then(entries => kanjiLoaded(
                 index.title,
-                index.version,
                 entries,
                 banksTotal,
                 banksLoaded++

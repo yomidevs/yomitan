@@ -155,25 +155,21 @@ function populateAnkiDeckAndModel(opts) {
 }
 
 function populateDictionaries() {
-    // const dictGroups = $('.dictionaries');
-    // dictGroups.empty();
+    const dictGroups = $('.dictionaries');
+    dictGroups.empty();
 
-    // yomichan().translator.dictionary.getNames().then(rows => {
-    //     for (const row of rows) {
-    //         const dictPanel = $('<div>', {class: 'dictionary panel panel-default'});
-    //         const dictRow = $('<div>', {class: 'panel-body row'}).appendTo(dictPanel);
+    yomichan().translator.dictionary.getInfo().then(rows => {
+        for (const row of rows) {
+            const html = Handlebars.templates['dictionary.html']({
+                name: row.dictionary,
+                version: row.version,
+                hasTerms: row.hasTerms,
+                hasKanji: row.hasKanji
+            });
 
-    //         const title = $('<div>', {class: 'col-xs-8'});
-    //         $('<h4>').append().html(`<span class="text-muted glyphicon glyphicon-book"></span> ${row.dictionary} <small>v.${row.version}</small>`).appendTo(title);
-    //         title.appendTo(dictRow);
-
-    //         const controls = $('<div>', {class: 'col-xs-4 text-right'});
-    //         $('<button>', {class: 'btn btn-danger dictionary-delete'}).text('Delete').appendTo(controls);
-    //         controls.appendTo(dictRow);
-
-    //         dictGroups.append(dictPanel);
-    //     }
-    // });
+            dictGroups.append($(html));
+        }
+    });
 }
 
 function populateAnkiFields(element, opts) {
@@ -276,6 +272,8 @@ function onAnkiModelChanged(e) {
 }
 
 $(document).ready(() => {
+    Handlebars.partials = Handlebars.templates;
+
     loadOptions().then(opts => {
         $('#activate-on-startup').prop('checked', opts.activateOnStartup);
         $('#enable-audio-playback').prop('checked', opts.enableAudioPlayback);

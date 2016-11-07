@@ -1,0 +1,21 @@
+<div class="dictionary well well-sm" data-name="{{name}}">
+    <div class="row">
+        <div class="col-xs-8">
+            <h4><span class="text-muted glyphicon glyphicon-book"></span> {{name}} <small>v.{{version}}</small></h4>
+        </div>
+        <div class="col-xs-4 text-right">
+            <button type="button" class="dict-delete btn btn-danger">Delete</button>
+        </div>
+    </div>
+
+    {{#if hasTerms}}
+    <div class="checkbox">
+        <label><input type="checkbox" class="dict-enable-terms"> Enable term search</label>
+    </div>
+    {{/if}}
+    {{#if hasKanji}}
+    <div class="checkbox">
+        <label><input type="checkbox" class="dict-enable-kanji"> Enable Kanji search</label>
+    </div>
+    {{/if}}
+</div>
