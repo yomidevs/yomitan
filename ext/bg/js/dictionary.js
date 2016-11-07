@@ -34,7 +34,7 @@ class Dictionary {
             terms: '++id, dictionary, expression, reading',
             kanji: '++, dictionary, character',
             entities: '++, dictionary',
-            dictionaries: '++, dictionary, version',
+            dictionaries: '++, title, version',
             meta: 'name, value',
         });
     }
@@ -144,16 +144,16 @@ class Dictionary {
             return Promise.reject('database not initialized');
         }
 
-        const indexLoaded = (dictionary, version, entities, hasTerms, hasKanji) => {
-            return this.db.dictionaries.add({dictionary, version, hasTerms, hasKanji}).then(() => {
+        const indexLoaded = (title, version, entities, hasTerms, hasKanji) => {
+            return this.db.dictionaries.add({title, version, hasTerms, hasKanji}).then(() => {
                 this.entities = entities || {};
 
                 const rows = [];
                 for (const name in entities || {}) {
                     rows.push({
-                        dictionary,
                         name,
-                        value: entities[name]
+                        value: entities[name],
+                        dictionary: title
                     });
                 }
 
@@ -161,15 +161,15 @@ class Dictionary {
             });
         };
 
-        const termsLoaded = (dictionary, entries, total, current) => {
+        const termsLoaded = (title, entries, total, current) => {
             const rows = [];
             for (const [expression, reading, tags, ...glossary] of entries) {
                 rows.push({
-                    dictionary,
                     expression,
                     reading,
                     tags,
-                    glossary
+                    glossary,
+                    dictionary: title
                 });
             }
 
@@ -180,16 +180,16 @@ class Dictionary {
             });
         };
 
-        const kanjiLoaded = (dictionary, entries, total, current)  => {
+        const kanjiLoaded = (title, entries, total, current)  => {
             const rows = [];
             for (const [character, onyomi, kunyomi, tags, ...meanings] of entries) {
                 rows.push({
-                    dictionary,
                     character,
                     onyomi,
                     kunyomi,
                     tags,
-                    meanings
+                    meanings,
+                    dictionary: title
                 });
             }
 

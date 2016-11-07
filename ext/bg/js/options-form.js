@@ -93,10 +93,10 @@ function getFormValues() {
 
         $('.dict').each((index, element) => {
             const dictionary = $(element);
-            const name = dictionary.data('name');
+            const title = dictionary.data('title');
             const enableTerms = dictionary.find('.dict-enable-terms').prop('checked');
             const enableKanji = dictionary.find('.dict-enable-kanji').prop('checked');
-            optsNew.dictionaries[name] = {enableTerms, enableKanji};
+            optsNew.dictionaries[title] = {enableTerms, enableKanji};
         });
 
         return {
@@ -168,9 +168,9 @@ function populateDictionaries(opts) {
 
     yomichan().translator.dictionary.getInfo().then(rows => {
         rows.forEach(row => {
-            const dictOpts = opts.dictionaries[row.dictionary] || {enableTerms: true, enableKanji: false};
+            const dictOpts = opts.dictionaries[row.title] || {enableTerms: true, enableKanji: false};
             const html = Handlebars.templates['dictionary.html']({
-                name: row.dictionary,
+                title: row.title,
                 version: row.version,
                 hasTerms: row.hasTerms,
                 hasKanji: row.hasKanji,
