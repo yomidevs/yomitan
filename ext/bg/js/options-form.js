@@ -155,11 +155,11 @@ function populateAnkiDeckAndModel(opts) {
 }
 
 function populateDictionaries() {
-    const dictGroups = $('.dictionaries');
-    dictGroups.empty();
+    const container = $('.dictionaries');
+    container.empty();
 
     yomichan().translator.dictionary.getInfo().then(rows => {
-        for (const row of rows) {
+        rows.forEach(row => {
             const html = Handlebars.templates['dictionary.html']({
                 name: row.dictionary,
                 version: row.version,
@@ -167,14 +167,15 @@ function populateDictionaries() {
                 hasKanji: row.hasKanji
             });
 
-            dictGroups.append($(html));
-        }
+            container.append($(html));
+        });
     });
 }
 
 function populateAnkiFields(element, opts) {
-    const table = element.closest('.tab-pane').find('.anki-fields');
-    table.find('tbody').remove();
+    const tab = element.closest('.tab-pane');
+    const container = tab.find('.anki-fields tbody');
+    container.empty();
 
     const modelName = element.val();
     if (modelName === null) {
@@ -186,41 +187,22 @@ function populateAnkiFields(element, opts) {
     const markers = modelIdToMarkers(modelId);
 
     return anki().getModelFieldNames(modelName).then(names => {
-        const tbody = $('<tbody>');
         names.forEach(name => {
-            const button = $('<button>', {type: 'button', class: 'btn btn-default dropdown-toggle'});
-            button.attr('data-toggle', 'dropdown').dropdown();
-
-            const markerItems = $('<ul>', {class: 'dropdown-menu dropdown-menu-right'});
-            for (const marker of markers) {
-                const link = $('<a>', {href: '#'}).text(`{${marker}}`);
-                link.click(e => {
-                    e.preventDefault();
-                    link.closest('.input-group').find('.anki-field-value').val(link.text()).trigger('change');
-                });
-                markerItems.append($('<li>').append(link));
-            }
-
-            const groupBtn = $('<div>', {class: 'input-group-btn'});
-            groupBtn.append(button.append($('<span>', {class: 'caret'})));
-            groupBtn.append(markerItems);
-
-            const group = $('<div>', {class: 'input-group'});
-            group.append($('<input>', {
-                type: 'text',
-                class: 'anki-field-value form-control',
+            const html = Handlebars.templates['model.html']({
+                name,
+                markers,
                 value: opts[optKey][name] || ''
-            }).data('field', name).change(onOptionsChanged));
-            group.append(groupBtn);
+            });
 
-            const row = $('<tr>');
-            row.append($('<td>', {class: 'col-sm-2'}).text(name));
-            row.append($('<td>', {class: 'col-sm-10'}).append(group));
-
-            tbody.append(row);
+            container.append($(html));
         });
 
-        table.append(tbody);
+        tab.find('.anki-field-value').change(onOptionsChanged);
+        tab.find('.marker-link').click(e => {
+            e.preventDefault();
+            const link = e.target;
+            $(link).closest('.input-group').find('.anki-field-value').val(`{${link.text}}`).trigger('change');
+        });
     });
 }
 
