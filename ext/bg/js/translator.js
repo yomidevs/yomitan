@@ -62,9 +62,9 @@ class Translator {
             };
 
             return Promise.all([
-                this.dictionary.importDb('bg/data/edict/index.json', bankCallback),
-                this.dictionary.importDb('bg/data/enamdict/index.json', bankCallback),
-                this.dictionary.importDb('bg/data/kanjidic/index.json', bankCallback),
+                this.dictionary.importDictionary('bg/data/edict/index.json', bankCallback),
+                this.dictionary.importDictionary('bg/data/enamdict/index.json', bankCallback),
+                this.dictionary.importDictionary('bg/data/kanjidic/index.json', bankCallback),
             ]).then(() => {
                 return this.dictionary.sealDb();
             }).then(() => {

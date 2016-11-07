@@ -153,7 +153,7 @@ class Dictionary {
         });
     }
 
-    importDb(indexUrl, callback) {
+    importDictionary(indexUrl, callback) {
         if (this.db === null) {
             return Promise.reject('database not initialized');
         }
