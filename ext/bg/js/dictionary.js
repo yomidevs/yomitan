@@ -20,7 +20,7 @@
 class Dictionary {
     constructor() {
         this.db = null;
-        this.dbVer = 5;
+        this.dbVer = 6;
         this.entities = null;
     }
 
@@ -144,13 +144,11 @@ class Dictionary {
             return Promise.reject('database not initialized');
         }
 
-        const tasks = [
-            this.db.terms.where('dictionary').equals(title).delete(),
-            this.db.kanji.where('dictionary').equals(title).delete(),
-            this.db.entities.where('dictionary').equals(title).delete()
-        ];
-
-        return Promise.all(tasks).then(() => {
+        return this.db.terms.where('dictionary').equals(title).delete().then(() => {
+            return this.db.kanji.where('dictionary').equals(title).delete();
+        }).then(() => {
+            return this.db.entities.where('dictionary').equals(title).delete();
+        }).then(() => {
             return this.db.dictionaries.where('title').equals(title).delete();
         });
     }

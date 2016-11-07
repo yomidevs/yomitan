@@ -181,11 +181,11 @@ function populateDictionaries(opts) {
             container.append($(html));
         });
 
-        const dictDelete = $('.dict-delete');
-        dictDelete.click(() => {
-            const dict = dictDelete.closest('.dict');
+        $('.dict-delete').click(e => {
+            const dict = $(e.target).closest('.dict');
             const title = dict.data('title');
-            yomichan().translator.dictionary.deleteDictionary(title).then(() => dict.slideUp());
+            yomichan().translator.dictionary.deleteDictionary(title);
+            dict.slideUp();
         });
 
         container.find('.dict input').change(onOptionsChanged);
