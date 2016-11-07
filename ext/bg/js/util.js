@@ -113,9 +113,13 @@ function loadJson(url) {
         const xhr = new XMLHttpRequest();
         xhr.addEventListener('load', () => resolve(JSON.parse(xhr.responseText)));
         xhr.addEventListener('error', () => reject('failed to execute network request'));
-        xhr.open('GET', chrome.extension.getURL(url));
+        xhr.open('GET', url);
         xhr.send();
     });
+}
+
+function loadJsonInt(url) {
+    return loadJson(chrome.extension.getURL(url));
 }
 
 function importJsonDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {

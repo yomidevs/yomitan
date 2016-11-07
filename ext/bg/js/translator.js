@@ -30,9 +30,9 @@ class Translator {
             return Promise.resolve();
         }
 
-        return loadJson('bg/data/rules.json').then(rules => {
+        return loadJsonInt('bg/data/rules.json').then(rules => {
             this.deinflector.setRules(rules);
-            return loadJson('bg/data/tags.json');
+            return loadJsonInt('bg/data/tags.json');
         }).then(tagMeta => {
             this.tagMeta = tagMeta;
             return this.database.prepare();
