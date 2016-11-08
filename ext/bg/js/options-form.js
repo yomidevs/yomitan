@@ -153,6 +153,9 @@ function onDictionaryDelete() {
     const dictDelete = $(this);
     dictDelete.prop('disabled', true);
 
+    const dictError = $('#dict-error');
+    dictError.hide();
+
     const dictGroup = dictDelete.closest('.dict-group');
     database().deleteDictionary(dictGroup.data('title')).then(() => {
         dictGroup.slideUp();
@@ -176,11 +179,13 @@ function onDictionaryImport() {
         progressbar.find('div').css('width', `${current / total * 100.0}%`);
     };
 
-    database().importDictionary($('#dict-url').val(), callback).then(() => {
+    const dictUrl = $('#dict-url');
+    database().importDictionary(dictUrl.val(), callback).then(() => {
         return loadOptions().then(opts => populateDictionaries(opts));
     }).catch(error => {
         dictError.show().find('span').text(error);
     }).then(() => {
+        dictUrl.val('');
         progressbar.hide();
         dictImport.prop('disabled', false);
     });
