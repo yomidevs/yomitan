@@ -21,6 +21,10 @@ function yomichan() {
     return chrome.extension.getBackgroundPage().yomichan;
 }
 
+function database() {
+    return yomichan().translator.database;
+}
+
 function anki() {
     return yomichan().anki;
 }
@@ -43,25 +47,8 @@ function modelIdToFieldOptKey(id) {
 
 function modelIdToMarkers(id) {
     return {
-        'anki-term-model': [
-            'audio',
-            'expression',
-            'expression-furigana',
-            'glossary',
-            'glossary-list',
-            'reading',
-            'sentence',
-            'tags',
-            'url'
-        ],
-        'anki-kanji-model': [
-            'character',
-            'glossary',
-            'glossary-list',
-            'kunyomi',
-            'onyomi',
-            'url'
-        ],
+        'anki-term-model': ['audio', 'expression', 'expression-furigana', 'glossary', 'glossary-list', 'reading', 'sentence', 'tags', 'url'],
+        'anki-kanji-model': ['character', 'glossary', 'glossary-list', 'kunyomi', 'onyomi', 'url'],
     }[id];
 }
 
@@ -91,7 +78,7 @@ function getFormValues() {
         optsNew.ankiKanjiModel = $('#anki-kanji-model').val();
         optsNew.ankiKanjiFields = fieldsToDict($('#kanji .anki-field-value'));
 
-        $('.dict').each((index, element) => {
+        $('.dict-group').each((index, element) => {
             const dictionary = $(element);
             const title = dictionary.data('title');
             const enableTerms = dictionary.find('.dict-enable-terms').prop('checked');
@@ -128,6 +115,96 @@ function updateVisibility(opts) {
     }
 }
 
+function populateDictionaries(opts) {
+    const dictGroups = $('.dict-groups');
+    dictGroups.empty();
+
+    const dictError = $('#dict-error');
+    dictError.hide();
+
+    const dictLaggy = $('#dict-laggy');
+    dictLaggy.show();
+
+    database().getDictionaries().then(rows => {
+        rows.forEach(row => {
+            const dictOpts = opts.dictionaries[row.title] || {enableTerms: true, enableKanji: false};
+            const html = Handlebars.templates['dictionary.html']({
+                title: row.title,
+                version: row.version,
+                hasTerms: row.hasTerms,
+                hasKanji: row.hasKanji,
+                enableTerms: dictOpts.enableTerms,
+                enableKanji: dictOpts.enableKanji
+            });
+
+            dictGroups.append($(html));
+        });
+
+        $('.dict-enable-terms, .dict-enable.kanji').change(onOptionsChanged);
+        $('.dict-delete').click(onDictionaryDelete);
+    }).catch(error => {
+        dictError.show().find('span').text(error);
+    }).then(() => {
+        dictLaggy.hide();
+    });
+}
+
+function onDictionaryDelete() {
+    const dictDelete = $(this);
+    dictDelete.prop('disabled', true);
+
+    const dictGroup = dictDelete.closest('.dict-group');
+    database().deleteDictionary(dictGroup.data('title')).then(() => {
+        dictGroup.slideUp();
+    }).catch(error => {
+        dictError.show().find('span').text(error);
+        dictDelete.prop('disabled', false);
+    });
+}
+
+function onDictionaryImport() {
+    const dictImport = $(this);
+    dictImport.prop('disabled', true);
+
+    const dictError = $('#dict-error');
+    dictError.hide();
+
+    const progressbar = $('#dict-progress');
+    progressbar.show();
+
+    const callback = (total, current) => {
+        progressbar.find('div').css('width', `${current / total * 100.0}%`);
+    };
+
+    database().importDictionary($('#dict-url').val(), callback).then(() => {
+        return loadOptions().then(opts => populateDictionaries(opts));
+    }).catch(error => {
+        dictError.show().find('span').text(error);
+    }).then(() => {
+        progressbar.hide();
+        dictImport.prop('disabled', false);
+    });
+}
+
+function onDictionarySetUrl(e) {
+    e.preventDefault();
+
+    const dictUrl = $('#dict-url');
+    const url = $(this).data('url');
+
+    if (url.includes('/')) {
+        dictUrl.val(url);
+    } else {
+        dictUrl.val(chrome.extension.getURL(`bg/data/${url}/index.json`));
+    }
+
+    dictUrl.trigger('input');
+}
+
+function onDictionaryUpdateUrl() {
+    $('#dict-import').prop('disabled', $(this).val().length === 0);
+}
+
 function populateAnkiDeckAndModel(opts) {
     const ankiSpinner = $('#anki-spinner');
     ankiSpinner.show();
@@ -159,73 +236,6 @@ function populateAnkiDeckAndModel(opts) {
         $('#anki-error').show().find('span').text(error);
     }).then(() => {
         ankiSpinner.hide();
-    });
-}
-
-function populateDictionaries(opts) {
-    const container = $('.dicts');
-    container.empty();
-
-    const dictError = $('#dict-error');
-    dictError.hide();
-
-    yomichan().translator.database.getDictionaries().then(rows => {
-        rows.forEach(row => {
-            const dictOpts = opts.dictionaries[row.title] || {enableTerms: true, enableKanji: false};
-            const html = Handlebars.templates['dictionary.html']({
-                title: row.title,
-                version: row.version,
-                hasTerms: row.hasTerms,
-                hasKanji: row.hasKanji,
-                enableTerms: dictOpts.enableTerms,
-                enableKanji: dictOpts.enableKanji
-            });
-
-            container.append($(html));
-        });
-
-        $('.dict-delete').click(e => {
-            const button = $(e.target);
-            const dict = button.closest('.dict');
-            const title = dict.data('title');
-
-            button.prop('disabled', true);
-            yomichan().translator.database.deleteDictionary(title).then(() => {
-                dict.slideUp();
-            }).catch(error => {
-                dictError.show().find('span').text(error);
-            }).then(() => {
-                button.prop('disabled', false);
-            });
-        });
-
-        container.find('.dict input').change(onOptionsChanged);
-    }).catch(error => {
-        dictError.show().find('span').text(error);
-    });
-}
-
-function onImportDictionary() {
-    const dictInputs = $('#dict-import').find('input');
-    dictInputs.prop('disabled', true);
-
-    const dictError = $('#dict-error');
-    dictError.hide();
-
-    const progressbar = $('#dict-import-progress');
-    const progressValue = progressbar.find('div');
-    progressbar.show();
-
-    const callback = (total, current) => {
-        $('.progress-bar').css('width', `${current / total * 100.0}%`);
-    };
-
-    const dictUrl = $('#dict-import-url').val();
-    yomichan().translator.database.importDictionary(dictUrl, callback).catch(error => {
-        dictError.show().find('span').text(error);
-    }).then(() => {
-        dictInputs.prop('disabled', false);
-        progressbar.hide();
     });
 }
 
@@ -333,25 +343,9 @@ $(document).ready(() => {
         $('input, select').not('.anki-model').change(onOptionsChanged);
         $('.anki-model').change(onAnkiModelChanged);
 
-        $('#dict-import a').click(e => {
-            e.preventDefault();
-            const control = $('#dict-import-url');
-            const url = $(e.target).data('url');
-            if (url.includes('/')) {
-                control.val(url);
-            } else {
-                control.val(chrome.extension.getURL(`bg/data/${url}/index.json`));
-            }
-            control.trigger('input');
-        });
-
-        const dictImportUrl = $('#dict-import-url');
-        dictImportUrl.on('input', () => {
-            const disable = dictImportUrl.val().trim().length === 0;
-            $('#dict-import-start').prop('disabled', disable);
-        });
-
-        $('#dict-import-start').click(onImportDictionary);
+        $('#dict-importer a').click(onDictionarySetUrl);
+        $('#dict-import').click(onDictionaryImport);
+        $('#dict-url').on('input', onDictionaryUpdateUrl);
 
         populateDictionaries(opts);
         populateAnkiDeckAndModel(opts);

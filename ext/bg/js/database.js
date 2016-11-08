@@ -20,7 +20,7 @@
 class Database {
     constructor() {
         this.db = null;
-        this.dbVer = 7;
+        this.dbVer = 6;
         this.entities = null;
     }
 
@@ -37,6 +37,8 @@ class Database {
             dictionaries: '++, title, version',
             meta: 'name, value',
         });
+
+        return Promise.resolve();
     }
 
     prepare() {
