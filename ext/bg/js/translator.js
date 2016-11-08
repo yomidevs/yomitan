@@ -62,9 +62,9 @@ class Translator {
             };
 
             return Promise.all([
-                this.database.importDictionary('bg/data/edict/index.json', bankCallback),
-                this.database.importDictionary('bg/data/enamdict/index.json', bankCallback),
-                this.database.importDictionary('bg/data/kanjidic/index.json', bankCallback),
+                this.database.importDictionary(chrome.extension.getURL('bg/data/edict/index.json'), bankCallback),
+                this.database.importDictionary(chrome.extension.getURL('bg/data/enamdict/index.json'), bankCallback),
+                this.database.importDictionary(chrome.extension.getURL('bg/data/kanjidic/index.json'), bankCallback),
             ]).then(() => {
                 return this.database.seal();
             }).then(() => {

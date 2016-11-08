@@ -20,7 +20,7 @@
 class Database {
     constructor() {
         this.db = null;
-        this.dbVer = 6;
+        this.dbVer = 7;
         this.entities = null;
     }
 
