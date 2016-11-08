@@ -111,10 +111,17 @@ function splitField(field) {
 function loadJson(url) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        xhr.addEventListener('load', () => resolve(JSON.parse(xhr.responseText)));
+        xhr.addEventListener('load', () => resolve(xhr.responseText));
         xhr.addEventListener('error', () => reject('failed to execute network request'));
         xhr.open('GET', url);
         xhr.send();
+    }).then(responseText => {
+        try {
+            return JSON.parse(responseText);
+        }
+        catch (e) {
+            return Promise.reject('invalid JSON response');
+        }
     });
 }
 
@@ -125,6 +132,10 @@ function loadJsonInt(url) {
 function importJsonDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
     const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
     return loadJson(indexUrl).then(index => {
+        if (!index.title || !index.version) {
+            return Promise.reject('unrecognized dictionary format');
+        }
+
         if (indexLoaded !== null) {
             return indexLoaded(
                 index.title,
