@@ -116,7 +116,7 @@ function updateVisibility(opts) {
 }
 
 function populateDictionaries(opts) {
-    const dictGroups = $('.dict-groups');
+    const dictGroups = $('#dict-groups');
     dictGroups.empty();
 
     const dictError = $('#dict-error');
