@@ -161,19 +161,21 @@ class Database {
         }
 
         const indexLoaded = (title, version, entities, hasTerms, hasKanji) => {
-            return this.db.dictionaries.add({title, version, hasTerms, hasKanji}).then(() => {
-                this.entities = entities || {};
-
-                const rows = [];
-                for (const name in entities || {}) {
-                    rows.push({
-                        name,
-                        value: entities[name],
-                        dictionary: title
-                    });
+            return this.db.dictionaries.where('title').equals(title).count().then(count => {
+                if (count > 0) {
+                    return Promise.reject(`dictionary "${title}" is already imported`);
                 }
 
-                return this.db.entities.bulkAdd(rows);
+                return this.db.dictionaries.add({title, version, hasTerms, hasKanji}).then(() => {
+                    this.entities = entities || {};
+
+                    const rows = [];
+                    for (const name in entities || {}) {
+                        rows.push({name, value: entities[name], dictionary: title});
+                    }
+
+                    return this.db.entities.bulkAdd(rows);
+                });
             });
         };
 
