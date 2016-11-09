@@ -150,8 +150,7 @@ function populateDictionaries(opts) {
 }
 
 function onDictionaryDelete() {
-    const dictDelete = $(this);
-    dictDelete.prop('disabled', true);
+    const dictGroup = $(this).closest('.dict-group');
 
     const dictError = $('#dict-error');
     dictError.hide();
@@ -159,14 +158,20 @@ function onDictionaryDelete() {
     const dictSpinner = $('#dict-spinner');
     dictSpinner.show();
 
-    const dictGroup = dictDelete.closest('.dict-group');
+    const dictProgress = dictGroup.find('.dict-delete-progress');
+    dictProgress.show();
+
+    const dictControls = dictGroup.find('.dict-controls');
+    dictControls.hide();
+
     database().deleteDictionary(dictGroup.data('title')).then(() => {
         dictGroup.slideUp();
     }).catch(error => {
         dictError.show().find('span').text(error);
-        dictDelete.prop('disabled', false);
     }).then(() => {
         dictSpinner.hide();
+        dictProgress.hide();
+        dictControls.show();
     });
 }
 
@@ -177,14 +182,14 @@ function onDictionaryImport() {
     const dictError = $('#dict-error');
     dictError.hide();
 
+    const dictProgress = $('#dict-import-progress');
+    dictProgress.show();
+
     const dictSpinner = $('#dict-spinner');
     dictSpinner.show();
 
-    const progressbar = $('#dict-import-progress');
-    progressbar.show();
-
     const callback = (total, current) => {
-        progressbar.find('div').css('width', `${current / total * 100.0}%`);
+        dictProgress.find('div').css('width', `${current / total * 100.0}%`);
     };
 
     const dictUrl = $('#dict-url');
@@ -196,7 +201,7 @@ function onDictionaryImport() {
         dictImport.prop('disabled', false);
         dictUrl.val('');
         dictUrl.trigger('input');
-        progressbar.hide();
+        dictProgress.hide();
         dictSpinner.hide();
     });
 }

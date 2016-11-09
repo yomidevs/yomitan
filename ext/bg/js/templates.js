@@ -13,13 +13,13 @@ templates['dictionary.html'] = template({"1":function(container,depth0,helpers,p
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
     + " <small>v."
     + alias4(((helper = (helper = helpers.version || (depth0 != null ? depth0.version : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"version","hash":{},"data":data}) : helper)))
-    + "</small></h4>\n        </div>\n        <div class=\"col-xs-4 text-right disabled\">\n            <button type=\"button\" class=\"dict-delete btn btn-danger\">Delete</button>\n        </div>\n    </div>\n    <div class=\"progress\" id=\"dict-delete-progress\">\n        <div class=\"progress-bar progress-bar-striped progress-bar-danger\" style=\"width: 0%\"></div>\n    </div>\n    <div class=\"checkbox "
+    + "</small></h4>\n        </div>\n        <div class=\"col-xs-4 text-right disabled\">\n            <button type=\"button\" class=\"dict-controls dict-delete btn btn-danger\">Delete</button>\n        </div>\n    </div>\n    <div class=\"progress dict-delete-progress\">\n        <div class=\"progress-bar progress-bar-striped progress-bar-danger\" style=\"width: 0%\"></div>\n    </div>\n    <div class=\"checkbox dict-controls "
     + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.hasTerms : depth0),{"name":"unless","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "\">\n        <label><input type=\"checkbox\" class=\"dict-enable-terms\" "
     + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.hasTerms : depth0),{"name":"unless","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + " "
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.enableTerms : depth0),{"name":"if","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "> Enable term search</label>\n    </div>\n    <div class=\"checkbox "
+    + "> Enable term search</label>\n    </div>\n    <div class=\"checkbox dict-controls "
     + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.hasKanji : depth0),{"name":"unless","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "\">\n        <label><input type=\"checkbox\" class=\"dict-enable-kanji\" "
     + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.hasKanji : depth0),{"name":"unless","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
