@@ -7,7 +7,9 @@
             <button type="button" class="dict-delete btn btn-danger">Delete</button>
         </div>
     </div>
-
+    <div class="progress" id="dict-delete-progress">
+        <div class="progress-bar progress-bar-striped progress-bar-danger" style="width: 0%"></div>
+    </div>
     <div class="checkbox {{#unless hasTerms}}disabled{{/unless}}">
         <label><input type="checkbox" class="dict-enable-terms" {{#unless hasTerms}}disabled{{/unless}} {{#if enableTerms}}checked{{/if}}> Enable term search</label>
     </div>

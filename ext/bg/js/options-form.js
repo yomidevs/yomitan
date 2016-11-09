@@ -172,7 +172,7 @@ function onDictionaryImport() {
     const dictError = $('#dict-error');
     dictError.hide();
 
-    const progressbar = $('#dict-progress');
+    const progressbar = $('#dict-import-progress');
     progressbar.show();
 
     const callback = (total, current) => {
