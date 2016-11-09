@@ -164,7 +164,11 @@ function onDictionaryDelete() {
     const dictControls = dictGroup.find('.dict-controls');
     dictControls.hide();
 
-    database().deleteDictionary(dictGroup.data('title')).then(() => {
+    const callback = (total, current) => {
+        dictProgress.find('div').css('width', `${current / total * 100.0}%`);
+    };
+
+    database().deleteDictionary(dictGroup.data('title'), callback).then(() => {
         dictGroup.slideUp();
     }).catch(error => {
         dictError.show().find('span').text(error);

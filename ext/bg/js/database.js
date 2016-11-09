@@ -146,7 +146,7 @@ class Database {
             return Promise.reject('database not initialized');
         }
 
-        this.db.dictionaries.where('title').equals(title).first(info => {
+        return this.db.dictionaries.where('title').equals(title).first(info => {
             if (!info) {
                 return;
             }
@@ -167,34 +167,42 @@ class Database {
 
                 let termDeleter = Promise.resolve();
                 if (info.hasTerms) {
-                    termDeleter = () => {
-                        this.db.terms.where('dictionary').equals(title).limit(1000).delete(count => {
-                            if (count > 0) {
-                                return termDeleter();
-                            } else {
-                                deletedCount += count;
-                                if (callback) {
-                                    callback(deletedCount / totalCount);
-                                }
+                    const termDeleterFunc = () => {
+                        return this.db.terms.where('dictionary').equals(title).limit(1000).delete().then(count => {
+                            if (count === 0) {
+                                return Promise.resolve();
                             }
+
+                            deletedCount += count;
+                            if (callback) {
+                                callback(totalCount, deletedCount);
+                            }
+
+                            return termDeleterFunc();
                         });
                     };
+
+                    termDeleter = termDeleterFunc();
                 }
 
                 let kanjiDeleter = Promise.resolve();
                 if (info.hasKanji) {
-                    kanjiDeleter = () => {
-                        this.db.terms.where('dictionary').equals(title).limit(1000).delete(count => {
-                            if (count > 0) {
-                                return kanjiDeleter();
-                            } else {
-                                deletedCount += count;
-                                if (callback) {
-                                    callback(deletedCount / totalCount);
-                                }
+                    const kanjiDeleterFunc = () => {
+                        return this.db.kanji.where('dictionary').equals(title).limit(1000).delete().then(count => {
+                            if (count === 0) {
+                                return Promise.resolve();
                             }
+
+                            deletedCount += count;
+                            if (callback) {
+                                callback(totalCount, deletedCount);
+                            }
+
+                            return kanjiDeleterFunc();
                         });
                     };
+
+                    kanjiDeleter = kanjiDeleterFunc();
                 }
 
                 return Promise.all([termDeleter, kanjiDeleter]);
