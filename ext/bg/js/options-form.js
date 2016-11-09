@@ -122,8 +122,8 @@ function populateDictionaries(opts) {
     const dictError = $('#dict-error');
     dictError.hide();
 
-    const dictLaggy = $('#dict-laggy');
-    dictLaggy.show();
+    const dictSpinner = $('#dict-spinner');
+    dictSpinner.show();
 
     database().getDictionaries().then(rows => {
         rows.forEach(row => {
@@ -145,7 +145,7 @@ function populateDictionaries(opts) {
     }).catch(error => {
         dictError.show().find('span').text(error);
     }).then(() => {
-        dictLaggy.hide();
+        dictSpinner.hide();
     });
 }
 
@@ -156,12 +156,17 @@ function onDictionaryDelete() {
     const dictError = $('#dict-error');
     dictError.hide();
 
+    const dictSpinner = $('#dict-spinner');
+    dictSpinner.show();
+
     const dictGroup = dictDelete.closest('.dict-group');
     database().deleteDictionary(dictGroup.data('title')).then(() => {
         dictGroup.slideUp();
     }).catch(error => {
         dictError.show().find('span').text(error);
         dictDelete.prop('disabled', false);
+    }).then(() => {
+        dictSpinner.hide();
     });
 }
 
@@ -171,6 +176,9 @@ function onDictionaryImport() {
 
     const dictError = $('#dict-error');
     dictError.hide();
+
+    const dictSpinner = $('#dict-spinner');
+    dictSpinner.show();
 
     const progressbar = $('#dict-import-progress');
     progressbar.show();
@@ -185,9 +193,10 @@ function onDictionaryImport() {
     }).catch(error => {
         dictError.show().find('span').text(error);
     }).then(() => {
+        dictImport.prop('disabled', false);
         dictUrl.val('');
         progressbar.hide();
-        dictImport.prop('disabled', false);
+        dictSpinner.hide();
     });
 }
 
