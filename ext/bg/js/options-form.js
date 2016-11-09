@@ -195,6 +195,7 @@ function onDictionaryImport() {
     }).then(() => {
         dictImport.prop('disabled', false);
         dictUrl.val('');
+        dictUrl.trigger('input');
         progressbar.hide();
         dictSpinner.hide();
     });
