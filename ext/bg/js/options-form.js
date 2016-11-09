@@ -182,7 +182,7 @@ function onDictionaryImport() {
     const dictError = $('#dict-error');
     dictError.hide();
 
-    const dictProgress = $('#dict-import-progress');
+    const dictProgress = $('.dict-import-progress');
     dictProgress.show();
 
     const dictSpinner = $('#dict-spinner');
