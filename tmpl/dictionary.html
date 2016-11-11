@@ -1,20 +1,9 @@
 <div class="dict-group well well-sm" data-title="{{title}}">
-    <div class="row">
-        <div class="col-xs-8">
-            <h4><span class="text-muted glyphicon glyphicon-book"></span> {{title}} <small>v.{{version}}</small></h4>
-        </div>
-        <div class="col-xs-4 text-right disabled">
-            <button type="button" class="dict-controls dict-delete btn btn-danger">Delete</button>
-        </div>
-    </div>
-    <div class="dict-delete-progress">Dictionary data is being deleted, please be patient...</div>
-    <div class="progress dict-delete-progress">
-        <div class="progress-bar progress-bar-striped progress-bar-danger" style="width: 0%"></div>
-    </div>
-    <div class="checkbox dict-controls {{#unless hasTerms}}disabled{{/unless}}">
+    <h4><span class="text-muted glyphicon glyphicon-book"></span> {{title}} <small>v.{{version}}</small></h4>
+    <div class="checkbox {{#unless hasTerms}}disabled{{/unless}}">
         <label><input type="checkbox" class="dict-enable-terms" {{#unless hasTerms}}disabled{{/unless}} {{#if enableTerms}}checked{{/if}}> Enable term search</label>
     </div>
-    <div class="checkbox dict-controls {{#unless hasKanji}}disabled{{/unless}}">
+    <div class="checkbox {{#unless hasKanji}}disabled{{/unless}}">
         <label><input type="checkbox" class="dict-enable-kanji" {{#unless hasKanji}}disabled{{/unless}} {{#if enableKanji}}checked{{/if}}> Enable Kanji search</label>
     </div>
 </div>
