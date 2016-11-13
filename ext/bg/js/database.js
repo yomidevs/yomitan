@@ -159,7 +159,7 @@ class Database {
                 let termDeleter = Promise.resolve();
                 if (info.hasTerms) {
                     const termDeleterFunc = () => {
-                        return this.db.terms.where('dictionary').equals(title).limit(1000).delete().then(count => {
+                        return this.db.terms.where('dictionary').equals(title).limit(500).delete().then(count => {
                             if (count === 0) {
                                 return Promise.resolve();
                             }
@@ -179,7 +179,7 @@ class Database {
                 let kanjiDeleter = Promise.resolve();
                 if (info.hasKanji) {
                     const kanjiDeleterFunc = () => {
-                        return this.db.kanji.where('dictionary').equals(title).limit(1000).delete().then(count => {
+                        return this.db.kanji.where('dictionary').equals(title).limit(500).delete().then(count => {
                             if (count === 0) {
                                 return Promise.resolve();
                             }

@@ -115,40 +115,6 @@ function updateVisibility(opts) {
     }
 }
 
-function populateDictionaries(opts) {
-    const dictGroups = $('#dict-groups');
-    dictGroups.empty();
-
-    const dictError = $('#dict-error');
-    dictError.hide();
-
-    const dictSpinner = $('#dict-spinner');
-    dictSpinner.show();
-
-    return database().getDictionaries().then(rows => {
-        rows.forEach(row => {
-            const dictOpts = opts.dictionaries[row.title] || {enableTerms: false, enableKanji: false};
-            const html = Handlebars.templates['dictionary.html']({
-                title: row.title,
-                version: row.version,
-                hasTerms: row.hasTerms,
-                hasKanji: row.hasKanji,
-                enableTerms: dictOpts.enableTerms,
-                enableKanji: dictOpts.enableKanji
-            });
-
-            dictGroups.append($(html));
-        });
-
-        $('.dict-enable-terms, .dict-enable-kanji').change(onOptionsChanged);
-        $('.dict-delete').click(onDictionaryDelete);
-    }).catch(error => {
-        dictError.show().find('span').text(error);
-    }).then(() => {
-        dictSpinner.hide();
-    });
-}
-
 function onDictionaryDelete() {
     const dictGroup = $(this).closest('.dict-group');
 
@@ -199,7 +165,7 @@ function onDictionaryImport() {
     const dictUrl = $('#dict-url');
     loadOptions().then(opts => {
         database().importDictionary(dictUrl.val(), callback).then(summary => {
-            opts.dictionaries[summary.title] = {hasTerms: summary.hasTerms, hasKanji: summary.hasKanji};
+            opts.dictionaries[summary.title] = {enableTerms: summary.hasTerms, enableKanji: summary.hasKanji};
             return saveOptions(opts);
         }).then(() => {
             return populateDictionaries(opts);
@@ -299,6 +265,49 @@ function populateAnkiFields(element, opts) {
             const link = e.target;
             $(link).closest('.input-group').find('.anki-field-value').val(`{${link.text}}`).trigger('change');
         });
+    });
+}
+
+function populateDictionaries(opts) {
+    const dictGroups = $('#dict-groups');
+    dictGroups.empty();
+
+    const dictError = $('#dict-error');
+    dictError.hide();
+
+    const dictWarning = $('#dict-warning');
+    dictWarning.hide();
+
+    const dictSpinner = $('#dict-spinner');
+    dictSpinner.show();
+
+    let dictCount = 0;
+    return database().getDictionaries().then(rows => {
+        rows.forEach(row => {
+            const dictOpts = opts.dictionaries[row.title] || {enableTerms: false, enableKanji: false};
+            const html = Handlebars.templates['dictionary.html']({
+                title: row.title,
+                version: row.version,
+                hasTerms: row.hasTerms,
+                hasKanji: row.hasKanji,
+                enableTerms: dictOpts.enableTerms,
+                enableKanji: dictOpts.enableKanji
+            });
+
+            dictGroups.append($(html));
+            ++dictCount;
+        });
+
+        $('.dict-enable-terms, .dict-enable-kanji').change(onOptionsChanged);
+        $('.dict-delete').click(onDictionaryDelete);
+    }).catch(error => {
+        dictError.show().find('span').text(error);
+    }).then(() => {
+        if (dictCount === 0) {
+            dictWarning.show();
+        }
+
+        dictSpinner.hide();
     });
 }
 
