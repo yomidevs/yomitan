@@ -133,7 +133,7 @@ class Database {
 
         const promises = [];
         for (const dictionary of dictionaries) {
-            if (this.entities.hasOwnProperty(dictionary)) {
+            if (this.entities[dictionary]) {
                 promises.push(Promise.resolve(this.entities[dictionary]));
             } else {
                 const entities = this.entities[dictionary] = {};
@@ -146,14 +146,14 @@ class Database {
         }
 
         return Promise.all(promises).then(results => {
-            const entries = {};
+            const entities = {};
             for (const result of results) {
                 for (const name in result) {
-                    entries[name] = result[name];
+                    entities[name] = result[name];
                 }
             }
 
-            return entries;
+            return entities;
         });
     }
 
@@ -243,7 +243,9 @@ class Database {
             return Promise.reject('database not initialized');
         }
 
+        let summary = null;
         const indexLoaded = (title, version, entities, hasTerms, hasKanji) => {
+            summary = {title, hasTerms, hasKanji, version};
             return this.db.dictionaries.where('title').equals(title).count().then(count => {
                 if (count > 0) {
                     return Promise.reject(`dictionary "${title}" is already imported`);
@@ -301,6 +303,6 @@ class Database {
             });
         };
 
-        return importJsonDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded);
+        return importJsonDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded).then(() => summary);
     }
 }

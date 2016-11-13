@@ -127,7 +127,7 @@ function populateDictionaries(opts) {
 
     return database().getDictionaries().then(rows => {
         rows.forEach(row => {
-            const dictOpts = opts.dictionaries[row.title] || {enableTerms: true, enableKanji: false};
+            const dictOpts = opts.dictionaries[row.title] || {enableTerms: false, enableKanji: false};
             const html = Handlebars.templates['dictionary.html']({
                 title: row.title,
                 version: row.version,
@@ -198,7 +198,10 @@ function onDictionaryImport() {
 
     const dictUrl = $('#dict-url');
     loadOptions().then(opts => {
-        database().importDictionary(dictUrl.val(), callback).then(() => {
+        database().importDictionary(dictUrl.val(), callback).then(summary => {
+            opts.dictionaries[summary.title] = {hasTerms: summary.hasTerms, hasKanji: summary.hasKanji};
+            return saveOptions(opts);
+        }).then(() => {
             return populateDictionaries(opts);
         }).catch(error => {
             dictError.show().find('span').text(error);
