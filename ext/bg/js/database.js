@@ -20,11 +20,10 @@
 class Database {
     constructor() {
         this.db = null;
-        this.dbVer = 6;
         this.entities = {};
     }
 
-    init() {
+    prepare() {
         if (this.db !== null) {
             return Promise.reject('database already initialized');
         }
@@ -35,41 +34,9 @@ class Database {
             kanji: '++, dictionary, character',
             entities: '++, dictionary',
             dictionaries: '++, title, version',
-            meta: 'name, value',
         });
 
-        return Promise.resolve();
-    }
-
-    prepare() {
-        this.init();
-
-        return this.db.meta.get('version').then(row => {
-            return row ? row.value : 0;
-        }).catch(() => {
-            return 0;
-        }).then(version => {
-            if (this.dbVer === version) {
-                return true;
-            }
-
-            const db = this.db;
-            this.db.close();
-            this.db = null;
-
-            return db.delete().then(() => {
-                this.init();
-                return false;
-            });
-        });
-    }
-
-    seal() {
-        if (this.db === null) {
-            return Promise.reject('database not initialized');
-        }
-
-        return this.db.meta.put({name: 'version', value: this.dbVer});
+        return this.db.open();
     }
 
     findTerm(term, dictionaries) {
