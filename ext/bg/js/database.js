@@ -21,7 +21,6 @@ class Database {
     constructor() {
         this.db = null;
         this.dbVer = 6;
-        this.entities = null;
     }
 
     init() {
@@ -72,22 +71,24 @@ class Database {
         return this.db.meta.put({name: 'version', value: this.dbVer});
     }
 
-    findTerm(term) {
+    findTerm(term, dictionaries) {
         if (this.db === null) {
             return Promise.reject('database not initialized');
         }
 
         const results = [];
         return this.db.terms.where('expression').equals(term).or('reading').equals(term).each(row => {
-            results.push({
-                expression: row.expression,
-                reading: row.reading,
-                tags: splitField(row.tags),
-                glossary: row.glossary,
-                id: row.id
-            });
+            if (dictionaries.includes(row.dictionary)) {
+                results.push({
+                    expression: row.expression,
+                    reading: row.reading,
+                    tags: splitField(row.tags),
+                    glossary: row.glossary,
+                    id: row.id
+                });
+            }
         }).then(() => {
-            return this.getEntities();
+            return this.getEntities(dictionaries);
         }).then(entities => {
             for (const result of results) {
                 result.entities = entities;
@@ -97,33 +98,39 @@ class Database {
         });
     }
 
-    findKanji(kanji) {
+    findKanji(kanji, dictionaries) {
         if (this.db === null) {
             return Promise.reject('database not initialized');
         }
 
         const results = [];
         return this.db.kanji.where('character').equals(kanji).each(row => {
-            results.push({
-                character: row.character,
-                onyomi: splitField(row.onyomi),
-                kunyomi: splitField(row.kunyomi),
-                tags: splitField(row.tags),
-                glossary: row.meanings
-            });
-        }).then(() => results);
+            if (dictionaries.includes(row.dictionary)) {
+                results.push({
+                    character: row.character,
+                    onyomi: splitField(row.onyomi),
+                    kunyomi: splitField(row.kunyomi),
+                    tags: splitField(row.tags),
+                    glossary: row.meanings
+                });
+            }
+        }).then(() => {
+            return this.getEntities(dictionaries);
+        }).then(entities => {
+            for (const result of results) {
+                result.entities = entities;
+            }
+
+            return results;
+        });
     }
 
-    getEntities(tags) {
+    getEntities(dictionaries) {
         if (this.db === null) {
             return Promise.reject('database not initialized');
         }
 
-        if (this.entities !== null) {
-            return Promise.resolve(this.entities);
-        }
-
-        return this.db.entities.toArray(rows => {
+        return this.db.entities.where('dictionary').anyOf(dictionaries).toArray(rows => {
             this.entities = {};
             for (const row of rows) {
                 this.entities[row.name] = row.value;

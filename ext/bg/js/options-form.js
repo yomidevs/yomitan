@@ -140,7 +140,7 @@ function populateDictionaries(opts) {
             dictGroups.append($(html));
         });
 
-        $('.dict-enable-terms, .dict-enable.kanji').change(onOptionsChanged);
+        $('.dict-enable-terms, .dict-enable-kanji').change(onOptionsChanged);
     }).catch(error => {
         dictError.show().find('span').text(error);
     }).then(() => {

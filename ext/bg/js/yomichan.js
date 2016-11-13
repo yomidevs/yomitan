@@ -239,11 +239,31 @@ class Yomichan {
     }
 
     api_findKanji({text, callback}) {
-        promiseCallback(this.translator.findKanji(text), callback);
+        const dictionaries = [];
+        for (const title in this.options.dictionaries) {
+            if (this.options.dictionaries[title].enableKanji) {
+                dictionaries.push(title);
+            }
+        }
+
+        promiseCallback(
+            this.translator.findKanji(text, dictionaries),
+            callback
+        );
     }
 
     api_findTerm({text, callback}) {
-        promiseCallback(this.translator.findTerm(text, this.options.enableSoftKatakanaSearch), callback);
+        const dictionaries = [];
+        for (const title in this.options.dictionaries) {
+            if (this.options.dictionaries[title].enableTerms) {
+                dictionaries.push(title);
+            }
+        }
+
+        promiseCallback(
+            this.translator.findTerm(text, this.options.enableSoftKatakanaSearch, dictionaries),
+            callback
+        );
     }
 
     api_renderText({template, data, callback}) {

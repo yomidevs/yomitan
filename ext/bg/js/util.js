@@ -39,6 +39,7 @@ function promiseCallback(promise, callback) {
     return promise.then(result => {
        callback({result});
     }).catch(error => {
+        console.log(error);
         callback({error});
     });
 }
