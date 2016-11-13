@@ -25,54 +25,20 @@ class Translator {
         this.deinflector = new Deinflector();
     }
 
-    loadData(callback) {
+    prepare() {
         if (this.loaded) {
             return Promise.resolve();
         }
 
-        return loadJsonInt('bg/data/rules.json').then(rules => {
+        const promises = [
+            loadJsonInt('bg/data/rules.json'),
+            loadJsonInt('bg/data/tags.json'),
+            this.database.prepare()
+        ];
+
+        return Promise.all(promises).then(([rules, tags]) => {
             this.deinflector.setRules(rules);
-            return loadJsonInt('bg/data/tags.json');
-        }).then(tagMeta => {
-            this.tagMeta = tagMeta;
-            return this.database.prepare();
-        }).then(exists => {
-            if (exists) {
-                return;
-            }
-
-            if (callback) {
-                callback({state: 'begin', progress: 0});
-            }
-
-            const banks = {};
-            const bankCallback = (total, loaded, indexUrl) => {
-                banks[indexUrl] = {loaded, total};
-
-                let percent = 0.0;
-                for (const url in banks) {
-                    percent += banks[url].loaded / banks[url].total;
-                }
-
-                percent /= 3.0;
-
-                if (callback) {
-                    callback({state: 'update', progress: Math.ceil(100.0 * percent)});
-                }
-            };
-
-            return Promise.all([
-                this.database.importDictionary(chrome.extension.getURL('bg/data/edict/index.json'), bankCallback),
-                this.database.importDictionary(chrome.extension.getURL('bg/data/enamdict/index.json'), bankCallback),
-                this.database.importDictionary(chrome.extension.getURL('bg/data/kanjidic/index.json'), bankCallback),
-            ]).then(() => {
-                return this.database.seal();
-            }).then(() => {
-                if (callback) {
-                    callback({state: 'end', progress: 100.0});
-                }
-            });
-        }).then(() => {
+            this.tagMeta = tags;
             this.loaded = true;
         });
     }

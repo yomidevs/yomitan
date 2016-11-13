@@ -25,7 +25,6 @@ class Yomichan {
         this.translator = new Translator();
         this.anki = new AnkiNull();
         this.options = null;
-        this.importTabId = null;
         this.setState('disabled');
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
@@ -37,20 +36,6 @@ class Yomichan {
                 this.setState('loading');
             }
         });
-    }
-
-    onImport({state, progress}) {
-        if (state === 'begin') {
-            chrome.tabs.create({url: chrome.extension.getURL('bg/import.html')}, tab => this.importTabId = tab.id);
-        }
-
-        if (this.importTabId !== null) {
-            this.tabInvoke(this.importTabId, 'setProgress', progress);
-        }
-
-        if (state === 'end') {
-            this.importTabId = null;
-        }
     }
 
     onMessage(request, sender, callback) {
@@ -91,7 +76,7 @@ class Yomichan {
                 break;
             case 'loading':
                 chrome.browserAction.setBadgeText({text: '...'});
-                this.translator.loadData(this.onImport.bind(this)).then(() => this.setState('enabled'));
+                this.translator.prepare().then(this.setState('enabled'));
                 break;
         }
 
