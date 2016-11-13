@@ -141,10 +141,41 @@ function populateDictionaries(opts) {
         });
 
         $('.dict-enable-terms, .dict-enable-kanji').change(onOptionsChanged);
+        $('.dict-delete').click(onDictionaryDelete);
     }).catch(error => {
         dictError.show().find('span').text(error);
     }).then(() => {
         dictSpinner.hide();
+    });
+}
+
+function onDictionaryDelete() {
+    const dictGroup = $(this).closest('.dict-group');
+
+    const dictError = $('#dict-error');
+    dictError.hide();
+
+    const dictSpinner = $('#dict-spinner');
+    dictSpinner.show();
+
+    const dictProgress = dictGroup.find('.dict-delete-progress');
+    dictProgress.show();
+
+    const dictControls = dictGroup.find('.dict-controls');
+    dictControls.hide();
+
+    const callback = (total, current) => {
+        dictProgress.find('div').css('width', `${current / total * 100.0}%`);
+    };
+
+    database().deleteDictionary(dictGroup.data('title'), callback).then(() => {
+        dictGroup.slideUp();
+    }).catch(error => {
+        dictError.show().find('span').text(error);
+    }).then(() => {
+        dictSpinner.hide();
+        dictProgress.hide();
+        dictControls.show();
     });
 }
 
@@ -155,7 +186,7 @@ function onDictionaryImport() {
     const dictError = $('#dict-error');
     dictError.hide();
 
-    const dictProgress = $('.dict-progress');
+    const dictProgress = $('.dict-import-progress');
     dictProgress.show();
 
     const dictSpinner = $('#dict-spinner');
