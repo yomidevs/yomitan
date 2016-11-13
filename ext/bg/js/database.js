@@ -21,6 +21,7 @@ class Database {
     constructor() {
         this.db = null;
         this.dbVer = 6;
+        this.entities = {};
     }
 
     init() {
@@ -130,13 +131,29 @@ class Database {
             return Promise.reject('database not initialized');
         }
 
-        return this.db.entities.where('dictionary').anyOf(dictionaries).toArray(rows => {
-            this.entities = {};
-            for (const row of rows) {
-                this.entities[row.name] = row.value;
+        const promises = [];
+        for (const dictionary of dictionaries) {
+            if (this.entities.hasOwnProperty(dictionary)) {
+                promises.push(Promise.resolve(this.entities[dictionary]));
+            } else {
+                const entities = this.entities[dictionary] = {};
+                promises.push(
+                    this.db.entities.where('dictionary').equals(dictionary).each(row => {
+                        entities[row.name] = row.value;
+                    }).then(() => entities)
+                );
+            }
+        }
+
+        return Promise.all(promises).then(results => {
+            const entries = {};
+            for (const result of results) {
+                for (const name in result) {
+                    entries[name] = result[name];
+                }
             }
 
-            return this.entities;
+            return entries;
         });
     }
 

@@ -125,7 +125,7 @@ function populateDictionaries(opts) {
     const dictSpinner = $('#dict-spinner');
     dictSpinner.show();
 
-    database().getDictionaries().then(rows => {
+    return database().getDictionaries().then(rows => {
         rows.forEach(row => {
             const dictOpts = opts.dictionaries[row.title] || {enableTerms: true, enableKanji: false};
             const html = Handlebars.templates['dictionary.html']({
@@ -197,16 +197,18 @@ function onDictionaryImport() {
     };
 
     const dictUrl = $('#dict-url');
-    database().importDictionary(dictUrl.val(), callback).then(() => {
-        return loadOptions().then(opts => populateDictionaries(opts));
-    }).catch(error => {
-        dictError.show().find('span').text(error);
-    }).then(() => {
-        dictImport.prop('disabled', false);
-        dictUrl.val('');
-        dictUrl.trigger('input');
-        dictProgress.hide();
-        dictSpinner.hide();
+    loadOptions().then(opts => {
+        database().importDictionary(dictUrl.val(), callback).then(() => {
+            return populateDictionaries(opts);
+        }).catch(error => {
+            dictError.show().find('span').text(error);
+        }).then(() => {
+            dictImport.prop('disabled', false);
+            dictUrl.val('');
+            dictUrl.trigger('input');
+            dictProgress.hide();
+            dictSpinner.hide();
+        });
     });
 }
 
