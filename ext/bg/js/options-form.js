@@ -313,6 +313,12 @@ function populateDictionaries(opts) {
 }
 
 function onPurgeDb() {
+    const dictControls = $('#dict-importer, #dict-groups');
+    dictControls.hide();
+
+    const dictProgress = $('.dict-purge-progress');
+    dictProgress.show();
+
     const dictError = $('#dict-error');
     dictError.hide();
 
@@ -323,6 +329,8 @@ function onPurgeDb() {
         dictError.show().find('span').text(error);
     }).then(() => {
         dictSpinner.hide();
+        dictProgress.hide();
+        dictControls.show();
         return loadOptions().then(opts => populateDictionaries(opts));
     });
 }

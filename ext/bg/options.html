@@ -7,7 +7,7 @@
         <link rel="stylesheet" type="text/css" href="../lib/bootstrap-3.3.6-dist/css/bootstrap-theme.min.css">
         <style>
             #anki-spinner, #anki-general, #anki-error,
-            #dict-spinner, #dict-error, #dict-warning, .dict-import-progress, .dict-delete-progress,
+            #dict-spinner, #dict-error, #dict-warning, .dict-purge-progress, .dict-import-progress, .dict-delete-progress,
             #options-advanced {
                 display: none;
             }
@@ -76,6 +76,8 @@
                     easier to disable them or simply <a id="dict-purge">purge the database</a>. Finally, please make sure to
                     wait for import and delete operations to complete before closing this page.
                 </p>
+
+                <div class="dict-purge-progress">Dictionary data is being purged, please be patient...</div>
 
                 <div id="dict-groups"></div>
 
