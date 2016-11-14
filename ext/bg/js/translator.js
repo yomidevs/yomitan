@@ -43,7 +43,7 @@ class Translator {
         });
     }
 
-    findTerm(text, enableSoftKatakanaSearch, dictionaries) {
+    findTerm(text, dictionaries, enableSoftKatakanaSearch) {
         return this.findTermGroups(text, dictionaries).then(groups => {
             const textHiragana = wanakana._katakanaToHiragana(text);
             if (text !== textHiragana && enableSoftKatakanaSearch) {

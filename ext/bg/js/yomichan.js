@@ -246,7 +246,7 @@ class Yomichan {
         }
 
         promiseCallback(
-            this.translator.findTerm(text, this.options.enableSoftKatakanaSearch, dictionaries),
+            this.translator.findTerm(text, dictionaries, this.options.enableSoftKatakanaSearch),
             callback
         );
     }
