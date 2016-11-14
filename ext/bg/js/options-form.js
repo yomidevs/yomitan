@@ -134,20 +134,19 @@ function onDictionaryDelete() {
         dictProgress.find('div').css('width', `${current / total * 100.0}%`);
     };
 
-    database().deleteDictionary(dictGroup.data('title'), callback).then(() => {
-        dictGroup.slideUp();
-    }).catch(error => {
+    database().deleteDictionary(dictGroup.data('title'), callback).catch(error => {
         dictError.show().find('span').text(error);
     }).then(() => {
         dictSpinner.hide();
         dictProgress.hide();
         dictControls.show();
+        return loadOptions().then(opts => populateDictionaries(opts));
     });
 }
 
 function onDictionaryImport() {
-    const dictImport = $(this);
-    dictImport.prop('disabled', true);
+    const dictImporter = $('#dict-importer');
+    dictImporter.hide();
 
     const dictError = $('#dict-error');
     dictError.hide();
@@ -174,7 +173,7 @@ function onDictionaryImport() {
         }).catch(error => {
             dictError.show().find('span').text(error);
         }).then(() => {
-            dictImport.prop('disabled', false);
+            dictImporter.show();
             dictUrl.val('');
             dictUrl.trigger('input');
             dictProgress.hide();
@@ -313,6 +312,21 @@ function populateDictionaries(opts) {
     });
 }
 
+function onPurgeDb() {
+    const dictError = $('#dict-error');
+    dictError.hide();
+
+    const dictSpinner = $('#dict-spinner');
+    dictSpinner.show();
+
+    return database().purge().catch(error => {
+        dictError.show().find('span').text(error);
+    }).then(() => {
+        dictSpinner.hide();
+        return loadOptions().then(opts => populateDictionaries(opts));
+    });
+}
+
 function onOptionsChanged(e) {
     if (!e.originalEvent && !e.isTrigger) {
         return;
@@ -383,6 +397,7 @@ $(document).ready(() => {
         $('input, select').not('.anki-model').change(onOptionsChanged);
         $('.anki-model').change(onAnkiModelChanged);
 
+        $('#dict-purge').click(onPurgeDb);
         $('#dict-importer a').click(onDictionarySetUrl);
         $('#dict-import').click(onDictionaryImport);
         $('#dict-url').on('input', onDictionaryUpdateUrl);

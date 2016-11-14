@@ -73,7 +73,7 @@
                 <p class="help-block">
                     Yomichan can import both bundled and custom (see the <a href="https://foosoft.net/projects/yomichan-import">Yomichan Import</a>
                     page for details) dictionaries. Although it is also possible to delete unneeded dictionaries, this operation is <em>extremely slow</em> and it is often
-                    easier to disable them or simply <a href="javascript:resetDatabase();">reset the database</a>. Finally, please make sure to
+                    easier to disable them or simply <a id="dict-purge">purge the database</a>. Finally, please make sure to
                     wait for import and delete operations to complete before closing this page.
                 </p>
 
@@ -81,7 +81,7 @@
 
                 <div class="alert alert-warning" id="dict-warning">
                     <strong>No dictionaries found:</strong>
-                    <span>please use the dropdown below to install packaged and external dictionaries</span>
+                    <span>please use the drop down below to install packaged and external dictionaries</span>
                 </div>
 
                 <div class="alert alert-danger" id="dict-error">
@@ -106,7 +106,7 @@
                         </ul>
                     </div>
                     <input type="text" id="dict-url" class="form-control" placeholder="Dictionary import URL">
-                    <div class="input-group-btn disabled">
+                    <div class="input-group-btn">
                         <button type="button" id="dict-import" class="btn btn-primary" disabled>Import</button>
                     </div>
                 </div>

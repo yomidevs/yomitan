@@ -39,6 +39,18 @@ class Database {
         return this.db.open();
     }
 
+    purge() {
+        if (this.db === null) {
+            return Promise.reject('database not initialized');
+        }
+
+        this.db.close();
+        return this.db.delete().then(() => {
+            this.db = null;
+            this.prepare();
+        });
+    }
+
     findTerm(term, dictionaries) {
         if (this.db === null) {
             return Promise.reject('database not initialized');
