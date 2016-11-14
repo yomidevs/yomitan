@@ -7,7 +7,7 @@
         <link rel="stylesheet" type="text/css" href="../lib/bootstrap-3.3.6-dist/css/bootstrap-theme.min.css">
         <style>
             #anki-spinner, #anki-general, #anki-error,
-            #dict-spinner, #dict-error, #dict-warning, .dict-purge-progress, .dict-import-progress, .dict-delete-progress,
+            #dict-spinner, #dict-error, #dict-warning, #dict-purge-progress, #dict-import-progress, .dict-delete-progress,
             #options-advanced {
                 display: none;
             }
@@ -77,13 +77,17 @@
                     wait for import and delete operations to complete before closing this page.
                 </p>
 
-                <div class="dict-purge-progress">Dictionary data is being purged, please be patient...</div>
+                <div id="dict-purge-progress">
+                    Dictionary data is being purged, please be patient...
+                </div>
 
                 <div id="dict-groups"></div>
 
                 <div class="alert alert-warning" id="dict-warning">
-                    <strong>No dictionaries found:</strong>
-                    <span>please use the drop down below to install packaged and external dictionaries</span>
+                    <strong>Warning:</strong>
+                    <span>
+                        No dictionaries found, use the importer below to install packaged and external dictionaries
+                    </span>
                 </div>
 
                 <div class="alert alert-danger" id="dict-error">
@@ -91,9 +95,11 @@
                     <span></span>
                 </div>
 
-                <div class="dict-import-progress">Dictionary data is being imported, please be patient...</div>
-                <div class="progress dict-import-progress">
-                    <div class="progress-bar progress-bar-striped" style="width: 0%"></div>
+                <div id="dict-import-progress">
+                    Dictionary data is being imported, please be patient...
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped" style="width: 0%"></div>
+                    </div>
                 </div>
 
                 <div class="input-group" id="dict-importer">

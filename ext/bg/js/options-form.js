@@ -127,14 +127,16 @@ function onDictionaryDelete() {
     const dictProgress = dictGroup.find('.dict-delete-progress');
     dictProgress.show();
 
-    const dictControls = dictGroup.find('.dict-controls');
+    const dictControls = dictGroup.find('.dict-group-controls');
     dictControls.hide();
 
-    const callback = (total, current) => {
-        dictProgress.find('div').css('width', `${current / total * 100.0}%`);
+    const setProgress = percent => {
+        dictProgress.find('.progress-bar').css('width', `${percent}%`);
     };
 
-    database().deleteDictionary(dictGroup.data('title'), callback).catch(error => {
+    setProgress(0.0);
+
+    database().deleteDictionary(dictGroup.data('title'), (total, current) => setProgress(current / total * 100.0)).catch(error => {
         dictError.show().find('span').text(error);
     }).then(() => {
         dictSpinner.hide();
@@ -151,14 +153,14 @@ function onDictionaryImport() {
     const dictError = $('#dict-error');
     dictError.hide();
 
-    const dictProgress = $('.dict-import-progress');
+    const dictProgress = $('#dict-import-progress');
     dictProgress.show();
 
     const dictSpinner = $('#dict-spinner');
     dictSpinner.show();
 
     const setProgress = percent => {
-        dictProgress.find('div').css('width', `${percent}%`);
+        dictProgress.find('.progress-bar').css('width', `${percent}%`);
     };
 
     setProgress(0.0);
@@ -316,7 +318,7 @@ function onPurgeDb() {
     const dictControls = $('#dict-importer, #dict-groups');
     dictControls.hide();
 
-    const dictProgress = $('.dict-purge-progress');
+    const dictProgress = $('#dict-purge-progress');
     dictProgress.show();
 
     const dictError = $('#dict-error');
