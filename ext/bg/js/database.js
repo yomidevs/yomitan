@@ -153,13 +153,14 @@ class Database {
             }
 
             return Promise.all([termCounter, kanjiCounter]).then(([termCount, kanjiCount]) => {
+                const rowLimit = 500;
                 const totalCount = termCount + kanjiCount;
                 let deletedCount = 0;
 
                 let termDeleter = Promise.resolve();
                 if (info.hasTerms) {
                     const termDeleterFunc = () => {
-                        return this.db.terms.where('dictionary').equals(title).limit(500).delete().then(count => {
+                        return this.db.terms.where('dictionary').equals(title).limit(rowLimit).delete().then(count => {
                             if (count === 0) {
                                 return Promise.resolve();
                             }
@@ -179,7 +180,7 @@ class Database {
                 let kanjiDeleter = Promise.resolve();
                 if (info.hasKanji) {
                     const kanjiDeleterFunc = () => {
-                        return this.db.kanji.where('dictionary').equals(title).limit(500).delete().then(count => {
+                        return this.db.kanji.where('dictionary').equals(title).limit(rowLimit).delete().then(count => {
                             if (count === 0) {
                                 return Promise.resolve();
                             }

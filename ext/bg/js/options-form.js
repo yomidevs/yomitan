@@ -158,15 +158,17 @@ function onDictionaryImport() {
     const dictSpinner = $('#dict-spinner');
     dictSpinner.show();
 
-    const callback = (total, current) => {
-        dictProgress.find('div').css('width', `${current / total * 100.0}%`);
+    const setProgress = percent => {
+        dictProgress.find('div').css('width', `${percent}%`);
     };
+
+    setProgress(0.0);
 
     const dictUrl = $('#dict-url');
     loadOptions().then(opts => {
-        database().importDictionary(dictUrl.val(), callback).then(summary => {
+        database().importDictionary(dictUrl.val(), (total, current) => setProgress(current / total * 100.0)).then(summary => {
             opts.dictionaries[summary.title] = {enableTerms: summary.hasTerms, enableKanji: summary.hasKanji};
-            return saveOptions(opts);
+            return saveOptions(opts).then(() => yomichan().setOptions(opts));
         }).then(() => {
             return populateDictionaries(opts);
         }).catch(error => {
