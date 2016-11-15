@@ -50,7 +50,7 @@ function renderText(data, template) {
 }
 
 function canAddDefinitions(definitions, modes) {
-    return invokeApiBg('canAddDefinitions', {definitions, modes});
+    return invokeApiBg('canAddDefinitions', {definitions, modes}).catch(() => null);
 }
 
 function addDefinition(definition, mode) {

@@ -73,27 +73,23 @@
                 <p class="help-block">
                     Yomichan can import both bundled and custom (see the <a href="https://foosoft.net/projects/yomichan-import">Yomichan Import</a>
                     page for details) dictionaries. Although it is also possible to delete unneeded dictionaries, this operation is <em>extremely slow</em> and it is often
-                    easier to disable them or simply <a id="dict-purge">purge the database</a>. Finally, please make sure to
+                    easier to disable them or simply <a id="dict-purge">purge the database</a>. Please make sure to
                     wait for import and delete operations to complete before closing this page.
                 </p>
 
-                <div id="dict-purge-progress">
-                    Dictionary data is being purged, please be patient...
-                </div>
-
-                <div id="dict-groups"></div>
+                <div id="dict-purge-progress" class="text-danger">Dictionary data is being purged, please be patient...</div>
 
                 <div class="alert alert-warning" id="dict-warning">
                     <strong>Warning:</strong>
-                    <span>
-                        No dictionaries found, use the importer below to install packaged and external dictionaries
-                    </span>
+                    <span>No dictionaries found, use the importer below to install packaged and external dictionaries</span>
                 </div>
 
                 <div class="alert alert-danger" id="dict-error">
                     <strong>Error:</strong>
                     <span></span>
                 </div>
+
+                <div id="dict-groups"></div>
 
                 <div id="dict-import-progress">
                     Dictionary data is being imported, please be patient...
