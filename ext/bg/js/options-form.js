@@ -183,7 +183,9 @@ function populateDictionaries(opts) {
     });
 }
 
-function onDictionaryPurge() {
+function onDictionaryPurge(e) {
+    e.preventDefault();
+
     showDictionaryError(null);
     showDictionarySpinner(true);
 
