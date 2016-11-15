@@ -29,6 +29,7 @@ class Yomichan {
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
         chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
+        chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
 
         loadOptions().then(opts => {
             this.setOptions(opts);
@@ -36,6 +37,12 @@ class Yomichan {
                 this.setState('loading');
             }
         });
+    }
+
+    onInstalled(details) {
+        if (details.reason === 'install') {
+            chrome.tabs.create({url: chrome.extension.getURL('bg/guide.html')});
+        }
     }
 
     onMessage(request, sender, callback) {
