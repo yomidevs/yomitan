@@ -137,19 +137,7 @@ class Translator {
                     continue;
                 }
 
-                const tagItems = [];
-                for (const tag of definition.tags) {
-                    const tagItem = {
-                        name: tag,
-                        category: 'default',
-                        order: Number.MAX_SAFE_INTEGER,
-                        notes: ''
-                    };
-
-                    applyTagMeta(tagItem, definition.tagMeta);
-                    tagItems.push(tagItem);
-                }
-
+                const tags = definition.tags.map(tag => buildTag(tag, definition.tagMeta));
                 groups[definition.id] = {
                     source,
                     reasons,
@@ -157,7 +145,7 @@ class Translator {
                     expression: definition.expression,
                     reading: definition.reading,
                     glossary: definition.glossary,
-                    tags: sortTags(tagItems)
+                    tags: sortTags(tags)
                 };
             }
         });
@@ -165,20 +153,8 @@ class Translator {
 
     processKanji(definitions) {
         for (const definition of definitions) {
-            const tagItems = [];
-            for (const tag of definition.tags) {
-                const tagItem = {
-                    name: tag,
-                    category: 'default',
-                    order: Number.MAX_SAFE_INTEGER,
-                    notes: ''
-                };
-
-                applyTagMeta(tagItem, definition.tagMeta);
-                tagItems.push(tagItem);
-            }
-
-            definition.tags = sortTags(tagItems);
+            const tags = definitions.tags.map(tag => buildTag(tag, definition.tagMeta));
+            definition.tags = sortTags(tags);
         }
 
         return definitions;

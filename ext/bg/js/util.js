@@ -96,8 +96,9 @@ function sortTermDefs(definitions) {
     });
 }
 
-function applyTagMeta(tag, meta) {
-    const symbol = tag.name.split(':')[0];
+function buildTag(name, meta) {
+    const tag = {name};
+    const symbol = name.split(':')[0];
     for (const prop in meta[symbol] || {}) {
         tag[prop] = meta[symbol][prop];
     }
@@ -141,7 +142,7 @@ function importJsonDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
             return indexLoaded(
                 index.title,
                 index.version,
-                index.entities,
+                index.tagMeta,
                 index.termBanks > 0,
                 index.kanjiBanks > 0
             ).then(() => index);

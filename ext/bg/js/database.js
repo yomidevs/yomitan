@@ -64,14 +64,15 @@ class Database {
                     reading: row.reading,
                     tags: splitField(row.tags),
                     glossary: row.glossary,
+                    dictionary: row.dictionary,
                     id: row.id
                 });
             }
         }).then(() => {
-            return this.getTagMeta(dictionaries);
-        }).then(tagMeta => {
+            return this.cacheTagMeta(dictionaries);
+        }).then(() => {
             for (const result of results) {
-                result.tagMeta = tagMeta;
+                result.tagMeta = this.tagMetaCache[result.dictionary] || {};
             }
 
             return results;
@@ -95,17 +96,17 @@ class Database {
                 });
             }
         }).then(() => {
-            return this.getTagMeta(dictionaries);
-        }).then(tagMeta => {
+            return this.cacheTagMeta(dictionaries);
+        }).then(() => {
             for (const result of results) {
-                result.tagMeta = tagMeta;
+                result.tagMeta = this.tagMetaCache[result.dictionary] || {};
             }
 
             return results;
         });
     }
 
-    getTagMeta(dictionaries) {
+    cacheTagMeta(dictionaries) {
         if (this.db === null) {
             return Promise.reject('database not initialized');
         }
@@ -119,7 +120,7 @@ class Database {
             const tagMeta = this.tagMetaCache[dictionary] = {};
             promises.push(
                 this.db.tagMeta.where('dictionary').equals(dictionary).each(row => {
-                    tagMeta[row.tag] = {
+                    tagMeta[row.name] = {
                         category: row.category,
                         notes: row.notes,
                         order: row.order
@@ -128,7 +129,7 @@ class Database {
             );
         }
 
-        return Promise.all(promises).then(() => this.tagMetaCache);
+        return Promise.all(promises);
     }
 
     getDictionaries() {
@@ -232,9 +233,9 @@ class Database {
                         const meta = tagMeta[tag];
                         rows.push({
                             name: tag,
-                            category: meta.category,
-                            notes: meta.notes,
-                            order: meta.order,
+                            category: meta.category || 'default',
+                            notes: meta.notes || '',
+                            order: meta.order || Number.MAX_SAFE_INTEGER,
                             dictionary: title
                         });
                     }
