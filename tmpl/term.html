@@ -28,10 +28,16 @@
     </div>
 
     <div class="term-glossary">
+        {{#if glossary.[1]}}
         <ol>
             {{#each glossary}}
             <li><span>{{.}}</span></li>
             {{/each}}
         </ol>
+        {{else}}
+        <p>
+            {{glossary.[0]}}
+        </p>
+        {{/if}}
     </div>
 </div>
