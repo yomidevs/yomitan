@@ -5,20 +5,7 @@
             "kanaOut": "う",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -26,20 +13,7 @@
             "kanaOut": "く",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -47,20 +21,7 @@
             "kanaOut": "ぐ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -68,20 +29,7 @@
             "kanaOut": "す",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -89,20 +37,7 @@
             "kanaOut": "つ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -110,20 +45,7 @@
             "kanaOut": "ぬ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -131,20 +53,7 @@
             "kanaOut": "ぶ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -152,20 +61,7 @@
             "kanaOut": "む",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -174,25 +70,9 @@
             "tagsIn": [],
             "tagsOut": [
                 "v1",
+                "v5",
                 "vk",
-                "vs",
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
@@ -209,20 +89,7 @@
             "kanaIn": "ちゃう",
             "kanaOut": "る",
             "tagsIn": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ],
             "tagsOut": [
                 "v1",
@@ -233,92 +100,27 @@
             "kanaIn": "いじゃう",
             "kanaOut": "ぐ",
             "tagsIn": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
             "kanaIn": "いちゃう",
             "kanaOut": "く",
             "tagsIn": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
             "kanaIn": "きちゃう",
             "kanaOut": "くる",
             "tagsIn": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ],
             "tagsOut": [
                 "vk"
@@ -328,314 +130,90 @@
             "kanaIn": "しちゃう",
             "kanaOut": "す",
             "tagsIn": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
             "kanaIn": "しちゃう",
             "kanaOut": "する",
             "tagsIn": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
             "kanaIn": "っちゃう",
             "kanaOut": "う",
             "tagsIn": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
             "kanaIn": "っちゃう",
             "kanaOut": "く",
             "tagsIn": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
             "kanaIn": "っちゃう",
             "kanaOut": "つ",
             "tagsIn": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
             "kanaIn": "っちゃう",
             "kanaOut": "る",
             "tagsIn": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
             "kanaIn": "んじゃう",
             "kanaOut": "ぬ",
             "tagsIn": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
             "kanaIn": "んじゃう",
             "kanaOut": "ぶ",
             "tagsIn": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
             "kanaIn": "んじゃう",
             "kanaOut": "む",
             "tagsIn": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         }
     ],
@@ -654,20 +232,7 @@
             "kanaOut": "う",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -675,20 +240,7 @@
             "kanaOut": "く",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -704,20 +256,7 @@
             "kanaOut": "ぐ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -725,20 +264,7 @@
             "kanaOut": "す",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -746,10 +272,7 @@
             "kanaOut": "する",
             "tagsIn": [],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
@@ -757,20 +280,7 @@
             "kanaOut": "つ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -778,20 +288,7 @@
             "kanaOut": "ぬ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -799,20 +296,7 @@
             "kanaOut": "ぶ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -820,20 +304,7 @@
             "kanaOut": "む",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -841,239 +312,7 @@
             "kanaOut": "る",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
-            ]
-        }
-    ],
-    "-nu": [
-        {
-            "kanaIn": "ぬ",
-            "kanaOut": "る",
-            "tagsIn": [],
-            "tagsOut": [
-                "v1",
-                "vk"
-            ]
-        },
-        {
-            "kanaIn": "かぬ",
-            "kanaOut": "く",
-            "tagsIn": [],
-            "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
-            ]
-        },
-        {
-            "kanaIn": "がぬ",
-            "kanaOut": "ぐ",
-            "tagsIn": [],
-            "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
-            ]
-        },
-        {
-            "kanaIn": "こぬ",
-            "kanaOut": "くる",
-            "tagsIn": [],
-            "tagsOut": [
-                "vk"
-            ]
-        },
-        {
-            "kanaIn": "さぬ",
-            "kanaOut": "す",
-            "tagsIn": [],
-            "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
-            ]
-        },
-        {
-            "kanaIn": "せぬ",
-            "kanaOut": "する",
-            "tagsIn": [],
-            "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
-            ]
-        },
-        {
-            "kanaIn": "たぬ",
-            "kanaOut": "つ",
-            "tagsIn": [],
-            "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
-            ]
-        },
-        {
-            "kanaIn": "なぬ",
-            "kanaOut": "ぬ",
-            "tagsIn": [],
-            "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
-            ]
-        },
-        {
-            "kanaIn": "ばぬ",
-            "kanaOut": "ぶ",
-            "tagsIn": [],
-            "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
-            ]
-        },
-        {
-            "kanaIn": "まぬ",
-            "kanaOut": "む",
-            "tagsIn": [],
-            "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
-            ]
-        },
-        {
-            "kanaIn": "らぬ",
-            "kanaOut": "る",
-            "tagsIn": [],
-            "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
-            ]
-        },
-        {
-            "kanaIn": "わぬ",
-            "kanaOut": "う",
-            "tagsIn": [],
-            "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         }
     ],
@@ -1100,20 +339,7 @@
             "kanaOut": "う",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1121,20 +347,7 @@
             "kanaOut": "く",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1150,20 +363,7 @@
             "kanaOut": "ぐ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1171,20 +371,7 @@
             "kanaOut": "す",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1192,10 +379,7 @@
             "kanaOut": "する",
             "tagsIn": [],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
@@ -1203,20 +387,7 @@
             "kanaOut": "つ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1224,20 +395,7 @@
             "kanaOut": "ぬ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1245,20 +403,7 @@
             "kanaOut": "ぶ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1266,20 +411,7 @@
             "kanaOut": "む",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1287,20 +419,7 @@
             "kanaOut": "る",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         }
     ],
@@ -1333,20 +452,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1356,20 +462,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1389,20 +482,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1412,20 +492,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1435,10 +502,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
@@ -1448,20 +512,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1471,20 +522,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1494,20 +532,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1517,20 +542,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1540,20 +552,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         }
     ],
@@ -1576,20 +575,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1599,20 +585,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1632,20 +605,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1655,20 +615,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1678,10 +625,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
@@ -1691,20 +635,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1714,20 +645,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1737,20 +655,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1760,20 +665,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1783,20 +675,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         }
     ],
@@ -1815,20 +694,7 @@
             "kanaOut": "く",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1836,20 +702,7 @@
             "kanaOut": "ぐ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1865,20 +718,7 @@
             "kanaOut": "す",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1886,10 +726,7 @@
             "kanaOut": "する",
             "tagsIn": [],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
@@ -1897,20 +734,7 @@
             "kanaOut": "う",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1918,20 +742,7 @@
             "kanaOut": "つ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1939,20 +750,7 @@
             "kanaOut": "る",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1960,20 +758,7 @@
             "kanaOut": "ぬ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -1981,20 +766,7 @@
             "kanaOut": "ぶ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2002,20 +774,7 @@
             "kanaOut": "む",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2042,20 +801,7 @@
             "kanaOut": "く",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2063,20 +809,7 @@
             "kanaOut": "ぐ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2092,20 +825,7 @@
             "kanaOut": "す",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2113,10 +833,7 @@
             "kanaOut": "する",
             "tagsIn": [],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
@@ -2124,20 +841,7 @@
             "kanaOut": "う",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2145,20 +849,7 @@
             "kanaOut": "つ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2166,20 +857,7 @@
             "kanaOut": "る",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2187,20 +865,7 @@
             "kanaOut": "ぬ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2208,20 +873,7 @@
             "kanaOut": "ぶ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2229,20 +881,7 @@
             "kanaOut": "む",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2269,20 +908,7 @@
             "kanaOut": "く",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2290,20 +916,7 @@
             "kanaOut": "ぐ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2327,20 +940,7 @@
             "kanaOut": "す",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2348,10 +948,7 @@
             "kanaOut": "する",
             "tagsIn": [],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
@@ -2359,20 +956,7 @@
             "kanaOut": "う",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2380,20 +964,7 @@
             "kanaOut": "く",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2401,20 +972,7 @@
             "kanaOut": "つ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2422,20 +980,7 @@
             "kanaOut": "る",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2443,20 +988,7 @@
             "kanaOut": "ぬ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2464,20 +996,7 @@
             "kanaOut": "ぶ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2485,20 +1004,7 @@
             "kanaOut": "む",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         }
     ],
@@ -2517,20 +1023,7 @@
             "kanaOut": "く",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2538,20 +1031,7 @@
             "kanaOut": "ぐ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2567,20 +1047,7 @@
             "kanaOut": "す",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2588,10 +1055,7 @@
             "kanaOut": "する",
             "tagsIn": [],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
@@ -2599,20 +1063,7 @@
             "kanaOut": "つ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2620,20 +1071,7 @@
             "kanaOut": "ぬ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2641,20 +1079,7 @@
             "kanaOut": "ぶ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2662,20 +1087,7 @@
             "kanaOut": "む",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2683,20 +1095,7 @@
             "kanaOut": "る",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2704,20 +1103,106 @@
             "kanaOut": "う",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
+            ]
+        }
+    ],
+    "-nu": [
+        {
+            "kanaIn": "ぬ",
+            "kanaOut": "る",
+            "tagsIn": [],
+            "tagsOut": [
+                "v1",
+                "vk"
+            ]
+        },
+        {
+            "kanaIn": "かぬ",
+            "kanaOut": "く",
+            "tagsIn": [],
+            "tagsOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "がぬ",
+            "kanaOut": "ぐ",
+            "tagsIn": [],
+            "tagsOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "こぬ",
+            "kanaOut": "くる",
+            "tagsIn": [],
+            "tagsOut": [
+                "vk"
+            ]
+        },
+        {
+            "kanaIn": "さぬ",
+            "kanaOut": "す",
+            "tagsIn": [],
+            "tagsOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "せぬ",
+            "kanaOut": "する",
+            "tagsIn": [],
+            "tagsOut": [
+                "vs"
+            ]
+        },
+        {
+            "kanaIn": "たぬ",
+            "kanaOut": "つ",
+            "tagsIn": [],
+            "tagsOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "なぬ",
+            "kanaOut": "ぬ",
+            "tagsIn": [],
+            "tagsOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "ばぬ",
+            "kanaOut": "ぶ",
+            "tagsIn": [],
+            "tagsOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "まぬ",
+            "kanaOut": "む",
+            "tagsIn": [],
+            "tagsOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "らぬ",
+            "kanaOut": "る",
+            "tagsIn": [],
+            "tagsOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "わぬ",
+            "kanaOut": "う",
+            "tagsIn": [],
+            "tagsOut": [
+                "v5"
             ]
         }
     ],
@@ -2739,20 +1224,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2762,20 +1234,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2785,10 +1244,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
@@ -2809,20 +1265,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2832,20 +1275,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2855,20 +1285,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2878,20 +1295,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2901,20 +1305,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2924,20 +1315,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2965,20 +1343,7 @@
             "kanaOut": "う",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -2986,20 +1351,7 @@
             "kanaOut": "く",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3007,20 +1359,7 @@
             "kanaOut": "ぐ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3028,20 +1367,7 @@
             "kanaOut": "す",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3049,20 +1375,7 @@
             "kanaOut": "つ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3070,20 +1383,7 @@
             "kanaOut": "ぬ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3091,20 +1391,7 @@
             "kanaOut": "ぶ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3112,20 +1399,7 @@
             "kanaOut": "む",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3141,20 +1415,7 @@
             "kanaOut": "る",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3178,10 +1439,7 @@
             "kanaOut": "する",
             "tagsIn": [],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
@@ -3189,10 +1447,7 @@
             "kanaOut": "する",
             "tagsIn": [],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         }
     ],
@@ -3203,25 +1458,9 @@
             "tagsIn": [],
             "tagsOut": [
                 "v1",
+                "v5",
                 "vk",
-                "vs",
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         }
     ],
@@ -3239,20 +1478,7 @@
             "kanaOut": "う",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3276,20 +1502,7 @@
             "kanaOut": "く",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3305,20 +1518,7 @@
             "kanaOut": "ぐ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3342,20 +1542,7 @@
             "kanaOut": "す",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3395,20 +1582,7 @@
             "kanaOut": "つ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3440,20 +1614,7 @@
             "kanaOut": "ぬ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3485,20 +1646,7 @@
             "kanaOut": "ぶ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3530,20 +1678,7 @@
             "kanaOut": "む",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3567,20 +1702,7 @@
             "kanaOut": "る",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3611,20 +1733,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3634,20 +1743,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3677,20 +1773,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3700,10 +1783,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
@@ -3713,20 +1793,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3736,20 +1803,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3759,20 +1813,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3782,20 +1823,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3805,20 +1833,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3828,20 +1843,7 @@
                 "adj-i"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         }
     ],
@@ -3863,20 +1865,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3886,20 +1875,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3909,10 +1885,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
@@ -3922,20 +1895,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3945,20 +1905,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3968,20 +1915,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -3991,20 +1925,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4014,20 +1935,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         }
     ],
@@ -4039,20 +1947,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         }
     ],
@@ -4071,20 +1966,7 @@
             "kanaOut": "く",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4092,20 +1974,7 @@
             "kanaOut": "ぐ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4121,20 +1990,7 @@
             "kanaOut": "す",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4142,10 +1998,7 @@
             "kanaOut": "する",
             "tagsIn": [],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
@@ -4153,20 +2006,7 @@
             "kanaOut": "う",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4174,20 +2014,7 @@
             "kanaOut": "く",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4195,20 +2022,7 @@
             "kanaOut": "つ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4216,20 +2030,7 @@
             "kanaOut": "る",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4237,20 +2038,7 @@
             "kanaOut": "ぬ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4258,20 +2046,7 @@
             "kanaOut": "ぶ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4279,20 +2054,7 @@
             "kanaOut": "む",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4319,20 +2081,7 @@
             "kanaOut": "う",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4340,20 +2089,7 @@
             "kanaOut": "く",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4369,20 +2105,7 @@
             "kanaOut": "ぐ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4390,20 +2113,7 @@
             "kanaOut": "す",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4411,10 +2121,7 @@
             "kanaOut": "する",
             "tagsIn": [],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
@@ -4422,20 +2129,7 @@
             "kanaOut": "つ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4443,20 +2137,7 @@
             "kanaOut": "ぬ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4464,20 +2145,7 @@
             "kanaOut": "ぶ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4485,20 +2153,7 @@
             "kanaOut": "む",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4506,20 +2161,7 @@
             "kanaOut": "る",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         }
     ],
@@ -4538,20 +2180,7 @@
             "kanaOut": "う",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4559,20 +2188,7 @@
             "kanaOut": "く",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4588,20 +2204,7 @@
             "kanaOut": "ぐ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4609,20 +2212,7 @@
             "kanaOut": "す",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4630,10 +2220,7 @@
             "kanaOut": "する",
             "tagsIn": [],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
@@ -4641,20 +2228,7 @@
             "kanaOut": "つ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4662,20 +2236,7 @@
             "kanaOut": "ぬ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4683,20 +2244,7 @@
             "kanaOut": "ぶ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4704,20 +2252,7 @@
             "kanaOut": "む",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4725,20 +2260,7 @@
             "kanaOut": "る",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4765,20 +2287,7 @@
             "kanaOut": "う",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4786,20 +2295,7 @@
             "kanaOut": "く",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4815,20 +2311,7 @@
             "kanaOut": "ぐ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4836,20 +2319,7 @@
             "kanaOut": "す",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4857,10 +2327,7 @@
             "kanaOut": "する",
             "tagsIn": [],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
@@ -4868,20 +2335,7 @@
             "kanaOut": "つ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4889,20 +2343,7 @@
             "kanaOut": "ぬ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4910,20 +2351,7 @@
             "kanaOut": "ぶ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4931,20 +2359,7 @@
             "kanaOut": "む",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -4952,20 +2367,7 @@
             "kanaOut": "る",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         }
     ],
@@ -4984,20 +2386,7 @@
             "kanaOut": "う",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5005,20 +2394,7 @@
             "kanaOut": "く",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5034,20 +2410,7 @@
             "kanaOut": "ぐ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5055,20 +2418,7 @@
             "kanaOut": "す",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5076,10 +2426,7 @@
             "kanaOut": "する",
             "tagsIn": [],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
@@ -5087,20 +2434,7 @@
             "kanaOut": "つ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5108,20 +2442,7 @@
             "kanaOut": "ぬ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5129,20 +2450,7 @@
             "kanaOut": "ぶ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5150,20 +2458,7 @@
             "kanaOut": "む",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5171,20 +2466,7 @@
             "kanaOut": "る",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5211,20 +2493,7 @@
             "kanaOut": "う",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5232,20 +2501,7 @@
             "kanaOut": "く",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5261,20 +2517,7 @@
             "kanaOut": "ぐ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5282,20 +2525,7 @@
             "kanaOut": "す",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5303,10 +2533,7 @@
             "kanaOut": "する",
             "tagsIn": [],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         },
         {
@@ -5314,20 +2541,7 @@
             "kanaOut": "つ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5335,20 +2549,7 @@
             "kanaOut": "ぬ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5356,20 +2557,7 @@
             "kanaOut": "ぶ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5377,20 +2565,7 @@
             "kanaOut": "む",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5398,20 +2573,7 @@
             "kanaOut": "る",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         }
     ],
@@ -5423,20 +2585,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5446,20 +2595,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5469,20 +2605,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5492,20 +2615,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5515,20 +2625,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5538,20 +2635,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5561,20 +2645,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5584,20 +2655,7 @@
                 "v1"
             ],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5608,21 +2666,8 @@
             ],
             "tagsOut": [
                 "v1",
-                "vk",
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5",
+                "vk"
             ]
         },
         {
@@ -5645,21 +2690,8 @@
             ],
             "tagsOut": [
                 "v1",
-                "vk",
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5",
+                "vk"
             ]
         },
         {
@@ -5679,20 +2711,7 @@
             "kanaOut": "う",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5700,20 +2719,7 @@
             "kanaOut": "く",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5721,20 +2727,7 @@
             "kanaOut": "ぐ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5742,20 +2735,7 @@
             "kanaOut": "す",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5763,20 +2743,7 @@
             "kanaOut": "つ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5784,20 +2751,7 @@
             "kanaOut": "ぬ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5805,20 +2759,7 @@
             "kanaOut": "ぶ",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5826,20 +2767,7 @@
             "kanaOut": "む",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5856,20 +2784,7 @@
             "kanaOut": "る",
             "tagsIn": [],
             "tagsOut": [
-                "v5aru",
-                "v5b",
-                "v5g",
-                "v5k",
-                "v5k-s",
-                "v5m",
-                "v5n",
-                "v5r",
-                "v5r-i",
-                "v5s",
-                "v5t",
-                "v5u",
-                "v5u-s",
-                "v5uru"
+                "v5"
             ]
         },
         {
@@ -5885,10 +2800,7 @@
             "kanaOut": "する",
             "tagsIn": [],
             "tagsOut": [
-                "vs",
-                "vs-c",
-                "vs-s",
-                "vs-i"
+                "vs"
             ]
         }
     ]
