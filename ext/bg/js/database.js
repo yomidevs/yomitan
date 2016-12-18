@@ -252,8 +252,8 @@ class Database {
                     reading,
                     tags,
                     rules,
-                    score,
                     glossary,
+                    score: parseInt(score),
                     dictionary: title
                 });
             }
