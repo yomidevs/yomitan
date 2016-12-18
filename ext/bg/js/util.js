@@ -97,7 +97,7 @@ function sortTermDefs(definitions) {
 }
 
 function applyTagMeta(tag, meta) {
-    const symbol = tag.tag.split(':')[0];
+    const symbol = tag.name.split(':')[0];
     for (const prop in meta[symbol] || {}) {
         tag[prop] = meta[symbol][prop];
     }

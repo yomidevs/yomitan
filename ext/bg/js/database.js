@@ -231,7 +231,7 @@ class Database {
                     for (const tag in tagMeta || {}) {
                         const meta = tagMeta[tag];
                         rows.push({
-                            tag,
+                            name: tag,
                             category: meta.category,
                             notes: meta.notes,
                             order: meta.order,
@@ -252,8 +252,8 @@ class Database {
                     reading,
                     tags,
                     rules,
+                    score,
                     glossary,
-                    score: parseInt(score),
                     dictionary: title
                 });
             }

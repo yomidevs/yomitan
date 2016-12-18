@@ -140,7 +140,7 @@ class Translator {
                 const tagItems = [];
                 for (const tag of definition.tags) {
                     const tagItem = {
-                        tag,
+                        name: tag,
                         category: 'default',
                         order: Number.MAX_SAFE_INTEGER,
                         notes: ''
@@ -168,7 +168,7 @@ class Translator {
             const tagItems = [];
             for (const tag of definition.tags) {
                 const tagItem = {
-                    tag,
+                    name: tag,
                     category: 'default',
                     order: Number.MAX_SAFE_INTEGER,
                     notes: ''
