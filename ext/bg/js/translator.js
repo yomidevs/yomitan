@@ -32,13 +32,11 @@ class Translator {
 
         const promises = [
             loadJsonInt('bg/data/rules.json'),
-            loadJsonInt('bg/data/tags.json'),
             this.database.prepare()
         ];
 
-        return Promise.all(promises).then(([rules, tags]) => {
+        return Promise.all(promises).then(([rules]) => {
             this.deinflector.setRules(rules);
-            this.tagMeta = tags;
             this.loaded = true;
         });
     }

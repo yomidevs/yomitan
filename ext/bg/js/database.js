@@ -20,7 +20,7 @@
 class Database {
     constructor() {
         this.db = null;
-        this.entities = {};
+        this.tagMetaCache = {};
     }
 
     prepare() {
@@ -32,7 +32,7 @@ class Database {
         this.db.version(1).stores({
             terms: '++id, dictionary, expression, reading',
             kanji: '++, dictionary, character',
-            entities: '++, dictionary',
+            tagMeta: '++, dictionary',
             dictionaries: '++, title, version',
         });
 
@@ -68,10 +68,10 @@ class Database {
                 });
             }
         }).then(() => {
-            return this.getEntities(dictionaries);
-        }).then(entities => {
+            return this.getTagMeta(dictionaries);
+        }).then(tagMeta => {
             for (const result of results) {
-                result.entities = entities;
+                result.tagMeta = tagMeta;
             }
 
             return results;
@@ -95,45 +95,40 @@ class Database {
                 });
             }
         }).then(() => {
-            return this.getEntities(dictionaries);
-        }).then(entities => {
+            return this.getTagMeta(dictionaries);
+        }).then(tagMeta => {
             for (const result of results) {
-                result.entities = entities;
+                result.tagMeta = tagMeta;
             }
 
             return results;
         });
     }
 
-    getEntities(dictionaries) {
+    getTagMeta(dictionaries) {
         if (this.db === null) {
             return Promise.reject('database not initialized');
         }
 
         const promises = [];
         for (const dictionary of dictionaries) {
-            if (this.entities[dictionary]) {
-                promises.push(Promise.resolve(this.entities[dictionary]));
-            } else {
-                const entities = this.entities[dictionary] = {};
-                promises.push(
-                    this.db.entities.where('dictionary').equals(dictionary).each(row => {
-                        entities[row.name] = row.value;
-                    }).then(() => entities)
-                );
+            if (this.tagMetaCache[dictionary]) {
+                continue;
             }
+
+            const tagMeta = this.tagMetaCache[dictionary] = {};
+            const promise = this.db.tagMeta.where('dictionary').equals(dictionary).each(row => {
+                tagMeta[row.tag] = {
+                    category: row.category,
+                    notes: row.notes,
+                    order: row.order
+                };
+            });
+
+            promises.push(promise);
         }
 
-        return Promise.all(promises).then(results => {
-            const entities = {};
-            for (const result of results) {
-                for (const name in result) {
-                    entities[name] = result[name];
-                }
-            }
-
-            return entities;
-        });
+        return Promise.all(promises).then(() => this.tagMetaCache);
     }
 
     getDictionaries() {
@@ -212,7 +207,7 @@ class Database {
                 return Promise.all([termDeleter, kanjiDeleter]);
             });
         }).then(() => {
-            return this.db.entities.where('dictionary').equals(title).delete();
+            return this.db.tagMeta.where('dictionary').equals(title).delete();
         }).then(() => {
             return this.db.dictionaries.where('title').equals(title).delete();
         });
@@ -224,7 +219,7 @@ class Database {
         }
 
         let summary = null;
-        const indexLoaded = (title, version, entities, hasTerms, hasKanji) => {
+        const indexLoaded = (title, version, tagMeta, hasTerms, hasKanji) => {
             summary = {title, hasTerms, hasKanji, version};
             return this.db.dictionaries.where('title').equals(title).count().then(count => {
                 if (count > 0) {
@@ -232,25 +227,32 @@ class Database {
                 }
 
                 return this.db.dictionaries.add({title, version, hasTerms, hasKanji}).then(() => {
-                    this.entities = entities || {};
-
                     const rows = [];
-                    for (const name in entities || {}) {
-                        rows.push({name, value: entities[name], dictionary: title});
+                    for (const tag in tagMeta || {}) {
+                        const meta = tagMeta[tag];
+                        rows.push({
+                            tag,
+                            category: meta.category,
+                            notes: meta.notes,
+                            order: meta.order,
+                            dictionary: title
+                        });
                     }
 
-                    return this.db.entities.bulkAdd(rows);
+                    return this.db.tagMeta.bulkAdd(rows);
                 });
             });
         };
 
         const termsLoaded = (title, entries, total, current) => {
             const rows = [];
-            for (const [expression, reading, tags, ...glossary] of entries) {
+            for (const [expression, reading, tags, rules, score, ...glossary] of entries) {
                 rows.push({
                     expression,
                     reading,
                     tags,
+                    rules,
+                    score,
                     glossary,
                     dictionary: title
                 });
