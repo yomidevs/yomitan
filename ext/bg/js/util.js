@@ -84,8 +84,8 @@ function sortTermDefs(definitions) {
             return 1;
         }
 
-        const rl1 = v1.rules.length;
-        const rl2 = v2.rules.length;
+        const rl1 = v1.reasons.length;
+        const rl2 = v2.reasons.length;
         if (rl1 < rl2) {
             return -1;
         } else if (rl1 > rl2) {

@@ -18,22 +18,22 @@
 
 
 class Deinflection {
-    constructor(term, tags=[], rule='') {
+    constructor(term, rules=[], reason='') {
         this.children = [];
         this.term = term;
-        this.tags = tags;
-        this.rule = rule;
+        this.rules = rules;
+        this.reason = reason;
     }
 
     validate(validator) {
         return validator(this.term).then(sets => {
-            for (const tags of sets) {
-                if (this.tags.length === 0) {
+            for (const rules of sets) {
+                if (this.rules.length === 0) {
                     return true;
                 }
 
-                for (const tag of this.tags) {
-                    if (tags.includes(tag)) {
+                for (const rule of this.rules) {
+                    if (rules.includes(rule)) {
                         return true;
                     }
                 }
@@ -43,19 +43,19 @@ class Deinflection {
         });
     }
 
-    deinflect(validator, rules) {
+    deinflect(validator, reasons) {
         const promises = [
             this.validate(validator).then(valid => {
-                const child = new Deinflection(this.term, this.tags);
+                const child = new Deinflection(this.term, this.rules);
                 this.children.push(child);
             })
         ];
 
-        for (const rule in rules) {
-            for (const variant of rules[rule]) {
-                let allowed = this.tags.length === 0;
-                for (const tag of this.tags) {
-                    if (variant.tagsIn.includes(tag)) {
+        for (const reason in reasons) {
+            for (const variant of reasons[reason]) {
+                let allowed = this.rules.length === 0;
+                for (const rule of this.rules) {
+                    if (variant.rulesIn.includes(rule)) {
                         allowed = true;
                         break;
                     }
@@ -70,9 +70,9 @@ class Deinflection {
                     continue;
                 }
 
-                const child = new Deinflection(term, variant.tagsOut, rule);
+                const child = new Deinflection(term, variant.rulesOut, reason);
                 promises.push(
-                    child.deinflect(validator, rules).then(valid => {
+                    child.deinflect(validator, reasons).then(valid => {
                         if (valid) {
                             this.children.push(child);
                         }
@@ -88,14 +88,14 @@ class Deinflection {
 
     gather() {
         if (this.children.length === 0) {
-            return [{root: this.term, tags: this.tags, rules: []}];
+            return [{root: this.term, rules: this.rules, reasons: []}];
         }
 
         const paths = [];
         for (const child of this.children) {
             for (const path of child.gather()) {
-                if (this.rule.length > 0) {
-                    path.rules.push(this.rule);
+                if (this.reason.length > 0) {
+                    path.reasons.push(this.reason);
                 }
 
                 path.source = this.term;
@@ -110,15 +110,15 @@ class Deinflection {
 
 class Deinflector {
     constructor() {
-        this.rules = {};
+        this.reasons = {};
     }
 
-    setRules(rules) {
-        this.rules = rules;
+    setReasons(reasons) {
+        this.reasons = reasons;
     }
 
     deinflect(term, validator) {
         const node = new Deinflection(term);
-        return node.deinflect(validator, this.rules).then(success => success ? node.gather() : []);
+        return node.deinflect(validator, this.reasons).then(success => success ? node.gather() : []);
     }
 }

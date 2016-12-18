@@ -117,15 +117,15 @@ class Database {
             }
 
             const tagMeta = this.tagMetaCache[dictionary] = {};
-            const promise = this.db.tagMeta.where('dictionary').equals(dictionary).each(row => {
-                tagMeta[row.tag] = {
-                    category: row.category,
-                    notes: row.notes,
-                    order: row.order
-                };
-            });
-
-            promises.push(promise);
+            promises.push(
+                this.db.tagMeta.where('dictionary').equals(dictionary).each(row => {
+                    tagMeta[row.tag] = {
+                        category: row.category,
+                        notes: row.notes,
+                        order: row.order
+                    };
+                })
+            );
         }
 
         return Promise.all(promises).then(() => this.tagMetaCache);

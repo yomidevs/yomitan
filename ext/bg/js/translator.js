@@ -20,7 +20,7 @@
 class Translator {
     constructor() {
         this.loaded = false;
-        this.tagMeta = null;
+        this.ruleMeta = null;
         this.database = new Database();
         this.deinflector = new Deinflector();
     }
@@ -31,21 +31,21 @@ class Translator {
         }
 
         const promises = [
-            loadJsonInt('bg/data/rules.json'),
+            loadJsonInt('bg/data/reasons.json'),
             this.database.prepare()
         ];
 
-        return Promise.all(promises).then(([rules]) => {
-            this.deinflector.setRules(rules);
+        return Promise.all(promises).then(([reasons]) => {
+            this.deinflector.setReasons(reasons);
             this.loaded = true;
         });
     }
 
     findTerm(text, dictionaries, enableSoftKatakanaSearch) {
-        return this.findTermGroups(text, dictionaries).then(groups => {
+        return this.findDeinflectGroups(text, dictionaries).then(groups => {
             const textHiragana = wanakana._katakanaToHiragana(text);
             if (text !== textHiragana && enableSoftKatakanaSearch) {
-                return this.findTermGroups(textHiragana, dictionaries).then(groupsHiragana => {
+                return this.findDeinflectGroups(textHiragana, dictionaries).then(groupsHiragana => {
                     for (const key in groupsHiragana) {
                         groups[key] = groups[key] || groupsHiragana[key];
                     }
@@ -87,25 +87,27 @@ class Translator {
         return Promise.all(promises).then(sets => this.processKanji(sets.reduce((a, b) => a.concat(b), [])));
     }
 
-    findTermGroups(text, dictionaries) {
+    findDeinflectGroups(text, dictionaries) {
         const deinflectGroups = {};
         const deinflectPromises = [];
 
         for (let i = text.length; i > 0; --i) {
             deinflectPromises.push(
                 this.deinflector.deinflect(text.slice(0, i), term => {
-                    return this.database.findTerm(term, dictionaries).then(definitions => definitions.map(definition => definition.tags));
+                    return this.database.findTerm(term, dictionaries).then(definitions => definitions.map(definition => definition.rules));
                 }).then(deinflects => {
                     const processPromises = [];
                     for (const deinflect of deinflects) {
-                        processPromises.push(this.processTerm(
-                            deinflectGroups,
-                            deinflect.source,
-                            deinflect.tags,
-                            deinflect.rules,
-                            deinflect.root,
-                            dictionaries
-                        ));
+                        processPromises.push(
+                            this.processDeinflection(
+                                deinflectGroups,
+                                deinflect.source,
+                                deinflect.rules,
+                                deinflect.reasons,
+                                deinflect.root,
+                                dictionaries
+                            )
+                        );
                     }
 
                     return Promise.all(processPromises);
@@ -116,16 +118,16 @@ class Translator {
         return Promise.all(deinflectPromises).then(() => deinflectGroups);
     }
 
-    processTerm(groups, source, tags, rules, root, dictionaries) {
+    processDeinflection(groups, source, rules, reasons, root, dictionaries) {
         return this.database.findTerm(root, dictionaries).then(definitions => {
             for (const definition of definitions) {
                 if (definition.id in groups) {
                     continue;
                 }
 
-                let matched = tags.length === 0;
-                for (const tag of tags) {
-                    if (definition.tags.includes(tag)) {
+                let matched = rules.length === 0;
+                for (const rule of rules) {
+                    if (definition.rules.includes(rule)) {
                         matched = true;
                         break;
                     }
@@ -138,26 +140,20 @@ class Translator {
                 const tagItems = [];
                 for (const tag of definition.tags) {
                     const tagItem = {
-                        name: tag,
-                        class: 'default',
+                        tag,
+                        category: 'default',
                         order: Number.MAX_SAFE_INTEGER,
-                        score: 0,
-                        desc: definition.entities[tag] || '',
+                        notes: ''
                     };
 
-                    applyTagMeta(tagItem, this.tagMeta);
+                    applyTagMeta(tagItem, definition.tagMeta);
                     tagItems.push(tagItem);
                 }
 
-                let score = 0;
-                for (const tagItem of tagItems) {
-                    score += tagItem.score;
-                }
-
                 groups[definition.id] = {
-                    score,
                     source,
-                    rules,
+                    reasons,
+                    score: definition.score,
                     expression: definition.expression,
                     reading: definition.reading,
                     glossary: definition.glossary,
@@ -172,13 +168,13 @@ class Translator {
             const tagItems = [];
             for (const tag of definition.tags) {
                 const tagItem = {
-                    name: tag,
-                    class: 'default',
+                    tag,
+                    category: 'default',
                     order: Number.MAX_SAFE_INTEGER,
-                    desc: '',
+                    notes: ''
                 };
 
-                applyTagMeta(tagItem, this.tagMeta);
+                applyTagMeta(tagItem, definition.tagMeta);
                 tagItems.push(tagItem);
             }
 
