@@ -47,6 +47,7 @@ class Database {
         this.db.close();
         return this.db.delete().then(() => {
             this.db = null;
+            this.tagMetaCache = {};
             this.prepare();
         });
     }
@@ -93,6 +94,7 @@ class Database {
                     onyomi: splitField(row.onyomi),
                     kunyomi: splitField(row.kunyomi),
                     tags: splitField(row.tags),
+                    dictionary: row.dictionary,
                     glossary: row.meanings
                 });
             }
@@ -214,6 +216,8 @@ class Database {
             return this.db.tagMeta.where('dictionary').equals(title).delete();
         }).then(() => {
             return this.db.dictionaries.where('title').equals(title).delete();
+        }).then(() => {
+            delete this.cacheTagMeta[title];
         });
     }
 
@@ -238,7 +242,7 @@ class Database {
                             name: tag,
                             category: meta.category || 'default',
                             notes: meta.notes || '',
-                            order: meta.order || Number.MAX_SAFE_INTEGER,
+                            order: meta.order || 0,
                             dictionary: title
                         });
                     }

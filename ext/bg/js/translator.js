@@ -154,7 +154,7 @@ class Translator {
 
     processKanji(definitions) {
         for (const definition of definitions) {
-            const tags = definitions.tags.map(tag => buildTag(tag, definition.tagMeta));
+            const tags = definition.tags.map(tag => buildTag(tag, definition.tagMeta));
             definition.tags = sortTags(tags);
         }
 
