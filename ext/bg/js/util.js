@@ -103,6 +103,14 @@ function buildTag(name, meta) {
         tag[prop] = meta[symbol][prop];
     }
 
+    return sanitizeTag(tag);
+}
+
+function sanitizeTag(tag) {
+    tag.name = tag.name || 'untitled';
+    tag.category = tag.category || 'default';
+    tag.notes = tag.notes || '';
+    tag.order = tag.order || 0;
     return tag;
 }
 

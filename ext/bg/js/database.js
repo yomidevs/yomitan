@@ -238,13 +238,15 @@ class Database {
                     const rows = [];
                     for (const tag in tagMeta || {}) {
                         const meta = tagMeta[tag];
-                        rows.push({
+                        const row = sanitizeTag({
                             name: tag,
-                            category: meta.category || 'default',
-                            notes: meta.notes || '',
-                            order: meta.order || 0,
+                            category: meta.category,
+                            notes: meta.notes,
+                            order: meta.order,
                             dictionary: title
                         });
+
+                        rows.push(row);
                     }
 
                     return this.db.tagMeta.bulkAdd(rows);
