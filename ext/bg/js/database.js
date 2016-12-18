@@ -94,8 +94,8 @@ class Database {
                     onyomi: splitField(row.onyomi),
                     kunyomi: splitField(row.kunyomi),
                     tags: splitField(row.tags),
-                    dictionary: row.dictionary,
-                    glossary: row.meanings
+                    glossary: row.meanings,
+                    dictionary: row.dictionary
                 });
             }
         }).then(() => {
