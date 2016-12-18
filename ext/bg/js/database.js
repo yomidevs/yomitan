@@ -64,6 +64,7 @@ class Database {
                     reading: row.reading,
                     tags: splitField(row.tags),
                     glossary: row.glossary,
+                    score: row.score,
                     dictionary: row.dictionary,
                     id: row.id
                 });
@@ -117,7 +118,7 @@ class Database {
                 continue;
             }
 
-            const tagMeta = this.tagMetaCache[dictionary] = {};
+            const tagMeta = {};
             promises.push(
                 this.db.tagMeta.where('dictionary').equals(dictionary).each(row => {
                     tagMeta[row.name] = {
@@ -125,6 +126,8 @@ class Database {
                         notes: row.notes,
                         order: row.order
                     };
+                }).then(() => {
+                    this.tagMetaCache[dictionary] = tagMeta;
                 })
             );
         }

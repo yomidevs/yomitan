@@ -42,10 +42,10 @@ class Translator {
     }
 
     findTerm(text, dictionaries, enableSoftKatakanaSearch) {
-        return this.findDeinflectGroups(text, dictionaries).then(groups => {
+        return this.findDeinflectionGroups(text, dictionaries).then(groups => {
             const textHiragana = wanakana._katakanaToHiragana(text);
             if (text !== textHiragana && enableSoftKatakanaSearch) {
-                return this.findDeinflectGroups(textHiragana, dictionaries).then(groupsHiragana => {
+                return this.findDeinflectionGroups(textHiragana, dictionaries).then(groupsHiragana => {
                     for (const key in groupsHiragana) {
                         groups[key] = groups[key] || groupsHiragana[key];
                     }
@@ -87,24 +87,24 @@ class Translator {
         return Promise.all(promises).then(sets => this.processKanji(sets.reduce((a, b) => a.concat(b), [])));
     }
 
-    findDeinflectGroups(text, dictionaries) {
-        const deinflectGroups = {};
-        const deinflectPromises = [];
+    findDeinflectionGroups(text, dictionaries) {
+        const deinflectionGroups = {};
+        const deinflectionPromises = [];
 
         for (let i = text.length; i > 0; --i) {
-            deinflectPromises.push(
+            deinflectionPromises.push(
                 this.deinflector.deinflect(text.slice(0, i), term => {
                     return this.database.findTerm(term, dictionaries).then(definitions => definitions.map(definition => definition.rules));
-                }).then(deinflects => {
+                }).then(deinflections => {
                     const processPromises = [];
-                    for (const deinflect of deinflects) {
+                    for (const deinflection of deinflections) {
                         processPromises.push(
                             this.processDeinflection(
-                                deinflectGroups,
-                                deinflect.source,
-                                deinflect.rules,
-                                deinflect.reasons,
-                                deinflect.root,
+                                deinflectionGroups,
+                                deinflection.source,
+                                deinflection.rules,
+                                deinflection.reasons,
+                                deinflection.root,
                                 dictionaries
                             )
                         );
@@ -115,7 +115,7 @@ class Translator {
             );
         }
 
-        return Promise.all(deinflectPromises).then(() => deinflectGroups);
+        return Promise.all(deinflectionPromises).then(() => deinflectionGroups);
     }
 
     processDeinflection(groups, source, rules, reasons, root, dictionaries) {
@@ -142,6 +142,7 @@ class Translator {
                     source,
                     reasons,
                     score: definition.score,
+                    dictionary: definition.dictionary,
                     expression: definition.expression,
                     reading: definition.reading,
                     glossary: definition.glossary,
