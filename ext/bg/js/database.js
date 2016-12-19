@@ -30,10 +30,10 @@ class Database {
 
         this.db = new Dexie('dict');
         this.db.version(1).stores({
-            terms: '++id, dictionary, expression, reading',
-            kanji: '++, dictionary, character',
-            tagMeta: '++, dictionary',
-            dictionaries: '++, title, version',
+            terms: '++id,dictionary,expression,reading',
+            kanji: '++,dictionary,character',
+            tagMeta: '++,dictionary',
+            dictionaries: '++,title,version',
         });
 
         return this.db.open();
@@ -48,7 +48,7 @@ class Database {
         return this.db.delete().then(() => {
             this.db = null;
             this.tagMetaCache = {};
-            this.prepare();
+            return this.prepare();
         });
     }
 
@@ -64,6 +64,7 @@ class Database {
                     expression: row.expression,
                     reading: row.reading,
                     tags: splitField(row.tags),
+                    rules: splitField(row.rules),
                     glossary: row.glossary,
                     score: row.score,
                     dictionary: row.dictionary,
@@ -123,11 +124,7 @@ class Database {
             const tagMeta = {};
             promises.push(
                 this.db.tagMeta.where('dictionary').equals(dictionary).each(row => {
-                    tagMeta[row.name] = {
-                        category: row.category,
-                        notes: row.notes,
-                        order: row.order
-                    };
+                    tagMeta[row.name] = {category: row.category, notes: row.notes, order: row.order};
                 }).then(() => {
                     this.tagMetaCache[dictionary] = tagMeta;
                 })
