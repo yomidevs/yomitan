@@ -88,68 +88,41 @@ class Translator {
     }
 
     findDeinflectionGroups(text, dictionaries) {
-        const deinflectionGroups = {};
-        const deinflectionPromises = [];
+        const definer = term => this.database.findTerm(term, dictionaries);
+        const groups = {};
+        const promises = [];
 
         for (let i = text.length; i > 0; --i) {
-            deinflectionPromises.push(
-                this.deinflector.deinflect(text.slice(0, i), term => {
-                    return this.database.findTerm(term, dictionaries).then(definitions => definitions.map(definition => definition.rules));
-                }).then(deinflections => {
-                    const processPromises = [];
+            promises.push(
+                this.deinflector.deinflect(text.slice(0, i), definer).then(deinflections => {
                     for (const deinflection of deinflections) {
-                        processPromises.push(
-                            this.processDeinflection(
-                                deinflectionGroups,
-                                deinflection.source,
-                                deinflection.rules,
-                                deinflection.reasons,
-                                deinflection.root,
-                                dictionaries
-                            )
-                        );
+                        this.processDeinflection(groups, deinflection);
                     }
-
-                    return Promise.all(processPromises);
                 })
             );
         }
 
-        return Promise.all(deinflectionPromises).then(() => deinflectionGroups);
+        return Promise.all(promises).then(() => groups);
     }
 
-    processDeinflection(groups, source, rules, reasons, root, dictionaries) {
-        return this.database.findTerm(root, dictionaries).then(definitions => {
-            for (const definition of definitions) {
-                if (definition.id in groups) {
-                    continue;
-                }
-
-                let matched = rules.length === 0;
-                for (const rule of rules) {
-                    if (definition.rules.includes(rule)) {
-                        matched = true;
-                        break;
-                    }
-                }
-
-                if (!matched) {
-                    continue;
-                }
-
-                const tags = definition.tags.map(tag => buildTag(tag, definition.tagMeta));
-                groups[definition.id] = {
-                    source,
-                    reasons,
-                    score: definition.score,
-                    dictionary: definition.dictionary,
-                    expression: definition.expression,
-                    reading: definition.reading,
-                    glossary: definition.glossary,
-                    tags: sortTags(tags)
-                };
+    processDeinflection(groups, {source, rules, reasons, root, definitions}, dictionaries) {
+        for (const definition of definitions) {
+            if (definition.id in groups) {
+                continue;
             }
-        });
+
+            const tags = definition.tags.map(tag => buildTag(tag, definition.tagMeta));
+            groups[definition.id] = {
+                source,
+                reasons,
+                score: definition.score,
+                dictionary: definition.dictionary,
+                expression: definition.expression,
+                reading: definition.reading,
+                glossary: definition.glossary,
+                tags: sortTags(tags)
+            };
+        }
     }
 
     processKanji(definitions) {

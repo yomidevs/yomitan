@@ -23,24 +23,25 @@ class Deinflection {
         this.term = term;
         this.rules = rules;
         this.reason = reason;
+        this.definitions = [];
     }
 
-    deinflect(validator, reasons, entry=false) {
+    deinflect(definer, reasons, entry=false) {
         const validate = () => {
-            if (entry) {
-                return Promise.resolve(true);
-            }
-
-            return validator(this.term).then(sets => {
-                for (const rules of sets) {
+            return definer(this.term).then(definitions => {
+                if (entry) {
+                    this.definitions = definitions;
+                } else {
                     for (const rule of this.rules) {
-                        if (rules.includes(rule)) {
-                            return true;
+                        for (const definition of definitions) {
+                            if (definition.rules.includes(rule)) {
+                                this.definitions.push(definition);
+                            }
                         }
                     }
                 }
 
-                return false;
+                return this.definitions.length > 0;
             });
         };
 
@@ -74,7 +75,7 @@ class Deinflection {
 
                 const child = new Deinflection(term, variant.rulesOut, reason);
                 promises.push(
-                    child.deinflect(validator, reasons).then(valid => {
+                    child.deinflect(definer, reasons).then(valid => {
                         if (valid) {
                             this.children.push(child);
                         }
@@ -90,12 +91,18 @@ class Deinflection {
 
     gather() {
         if (this.children.length === 0) {
-            return [{root: this.term, rules: this.rules, reasons: []}];
+            return [{
+                root: this.term,
+                rules: this.rules,
+                definitions: this.definitions,
+                reasons: []
+            }];
         }
 
         const paths = [];
         for (const child of this.children) {
             for (const path of child.gather()) {
+                path.definitions = path.definitions.concat(this.definitions);
                 if (this.reason.length > 0) {
                     path.reasons.push(this.reason);
                 }
@@ -119,8 +126,8 @@ class Deinflector {
         this.reasons = reasons;
     }
 
-    deinflect(term, validator) {
+    deinflect(term, definer) {
         const node = new Deinflection(term);
-        return node.deinflect(validator, this.reasons, true).then(success => success ? node.gather() : []);
+        return node.deinflect(definer, this.reasons, true).then(success => success ? node.gather() : []);
     }
 }
