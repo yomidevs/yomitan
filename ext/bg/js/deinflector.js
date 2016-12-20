@@ -25,27 +25,27 @@ class Deinflection {
         this.reason = reason;
     }
 
-    validate(validator) {
-        return validator(this.term).then(sets => {
-            for (const rules of sets) {
-                if (this.rules.length === 0) {
-                    return true;
-                }
-
-                for (const rule of this.rules) {
-                    if (rules.includes(rule)) {
-                        return true;
-                    }
-                }
+    deinflect(validator, reasons, entry=false) {
+        const validate = () => {
+            if (entry) {
+                return Promise.resolve(true);
             }
 
-            return false;
-        });
-    }
+            return validator(this.term).then(sets => {
+                for (const rules of sets) {
+                    for (const rule of this.rules) {
+                        if (rules.includes(rule)) {
+                            return true;
+                        }
+                    }
+                }
 
-    deinflect(validator, reasons) {
+                return false;
+            });
+        };
+
         const promises = [
-            this.validate(validator).then(valid => {
+            validate().then(valid => {
                 const child = new Deinflection(this.term, this.rules);
                 this.children.push(child);
             })
@@ -53,11 +53,13 @@ class Deinflection {
 
         for (const reason in reasons) {
             for (const variant of reasons[reason]) {
-                let allowed = this.rules.length === 0;
-                for (const rule of this.rules) {
-                    if (variant.rulesIn.includes(rule)) {
-                        allowed = true;
-                        break;
+                let allowed = entry;
+                if (!allowed) {
+                    for (const rule of this.rules) {
+                        if (variant.rulesIn.includes(rule)) {
+                            allowed = true;
+                            break;
+                        }
                     }
                 }
 
@@ -119,6 +121,6 @@ class Deinflector {
 
     deinflect(term, validator) {
         const node = new Deinflection(term);
-        return node.deinflect(validator, this.reasons).then(success => success ? node.gather() : []);
+        return node.deinflect(validator, this.reasons, true).then(success => success ? node.gather() : []);
     }
 }
