@@ -42,10 +42,11 @@ class Translator {
     }
 
     findTerm(text, dictionaries, enableSoftKatakanaSearch) {
-        return this.findDeinflectionGroups(text, dictionaries).then(groups => {
+        const cache = {};
+        return this.findDeinflectionGroups(text, dictionaries, cache).then(groups => {
             const textHiragana = wanakana._katakanaToHiragana(text);
             if (text !== textHiragana && enableSoftKatakanaSearch) {
-                return this.findDeinflectionGroups(textHiragana, dictionaries).then(groupsHiragana => {
+                return this.findDeinflectionGroups(textHiragana, dictionaries, cache).then(groupsHiragana => {
                     for (const key in groupsHiragana) {
                         groups[key] = groups[key] || groupsHiragana[key];
                     }
@@ -74,9 +75,7 @@ class Translator {
     }
 
     findKanji(text, dictionaries) {
-        const processed = {};
-        const promises = [];
-
+        const processed = {}, promises = [];
         for (const c of text) {
             if (!processed[c]) {
                 promises.push(this.database.findKanji(c, dictionaries));
@@ -87,11 +86,16 @@ class Translator {
         return Promise.all(promises).then(sets => this.processKanji(sets.reduce((a, b) => a.concat(b), [])));
     }
 
-    findDeinflectionGroups(text, dictionaries) {
-        const definer = term => this.database.findTerm(term, dictionaries);
-        const groups = {};
-        const promises = [];
+    findDeinflectionGroups(text, dictionaries, cache) {
+        const definer = term => {
+            if (cache.hasOwnProperty(term)) {
+                return Promise.resolve(cache[term]);
+            }
 
+            return this.database.findTerm(term, dictionaries).then(definitions => cache[term] = definitions);
+        };
+
+        const groups = {}, promises = [];
         for (let i = text.length; i > 0; --i) {
             promises.push(
                 this.deinflector.deinflect(text.slice(0, i), definer).then(deinflections => {
