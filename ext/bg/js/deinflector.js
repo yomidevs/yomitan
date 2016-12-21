@@ -18,18 +18,18 @@
 
 
 class Deinflection {
-    constructor(term, rules=[], reason='') {
-        this.children = [];
+    constructor(term, {rules=[], definitions=[], reason=''} = {}) {
         this.term = term;
         this.rules = rules;
+        this.definitions = definitions;
         this.reason = reason;
-        this.definitions = [];
+        this.children = [];
     }
 
-    deinflect(definer, reasons, entry=false) {
-        const validate = () => {
+    deinflect(definer, reasons) {
+        const define = () => {
             return definer(this.term).then(definitions => {
-                if (entry) {
+                if (this.rules.length === 0) {
                     this.definitions = definitions;
                 } else {
                     for (const rule of this.rules) {
@@ -45,26 +45,20 @@ class Deinflection {
             });
         };
 
-        const promises = [
-            validate().then(valid => {
-                const child = new Deinflection(this.term, this.rules);
-                this.children.push(child);
-            })
-        ];
-
+        const promises = [];
         for (const reason in reasons) {
             for (const variant of reasons[reason]) {
-                let allowed = entry;
-                if (!allowed) {
+                let accept = this.rules.length === 0;
+                if (!accept) {
                     for (const rule of this.rules) {
                         if (variant.rulesIn.includes(rule)) {
-                            allowed = true;
+                            accept = true;
                             break;
                         }
                     }
                 }
 
-                if (!allowed || !this.term.endsWith(variant.kanaIn)) {
+                if (!accept || !this.term.endsWith(variant.kanaIn)) {
                     continue;
                 }
 
@@ -73,46 +67,46 @@ class Deinflection {
                     continue;
                 }
 
-                const child = new Deinflection(term, variant.rulesOut, reason);
+                const child = new Deinflection(term, {reason, rules: variant.rulesOut});
                 promises.push(
-                    child.deinflect(definer, reasons).then(valid => {
-                        if (valid) {
-                            this.children.push(child);
-                        }
-                    }
-                ));
+                    child.deinflect(definer, reasons).then(valid => valid && this.children.push(child))
+                );
             }
         }
 
-        return Promise.all(promises).then(() => {
-            return this.children.length > 0;
+        return Promise.all(promises).then(define).then(valid => {
+            if (valid && this.children.length > 0) {
+                const child = new Deinflection(this.term, {rules: this.rules, definitions: this.definitions});
+                this.children.push(child);
+            }
+
+            return valid || this.children.length > 0;
         });
     }
 
     gather() {
         if (this.children.length === 0) {
             return [{
-                root: this.term,
+                source: this.term,
                 rules: this.rules,
                 definitions: this.definitions,
-                reasons: []
+                reasons: [this.reason]
             }];
         }
 
-        const paths = [];
+        const results = [];
         for (const child of this.children) {
-            for (const path of child.gather()) {
-                path.definitions = path.definitions.concat(this.definitions);
+            for (const result of child.gather()) {
                 if (this.reason.length > 0) {
-                    path.reasons.push(this.reason);
+                    result.reasons.push(this.reason);
                 }
 
-                path.source = this.term;
-                paths.push(path);
+                result.source = this.term;
+                results.push(result);
             }
         }
 
-        return paths;
+        return results;
     }
 }
 
@@ -128,6 +122,6 @@ class Deinflector {
 
     deinflect(term, definer) {
         const node = new Deinflection(term);
-        return node.deinflect(definer, this.reasons, true).then(success => success ? node.gather() : []);
+        return node.deinflect(definer, this.reasons).then(success => success ? node.gather() : []);
     }
 }

@@ -105,7 +105,7 @@ class Translator {
         return Promise.all(promises).then(() => groups);
     }
 
-    processDeinflection(groups, {source, rules, reasons, root, definitions}, dictionaries) {
+    processDeinflection(groups, {source, rules, reasons, definitions}, dictionaries) {
         for (const definition of definitions) {
             if (definition.id in groups) {
                 continue;
