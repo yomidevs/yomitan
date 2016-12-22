@@ -9,11 +9,15 @@ templates['dictionary.html'] = template({"1":function(container,depth0,helpers,p
 
   return "<div class=\"dict-group well well-sm\" data-title=\""
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
-    + "\">\n    <div class=\"row\">\n        <div class=\"col-xs-8\">\n            <h4><span class=\"text-muted glyphicon glyphicon-book\"></span> "
+    + "\">\n    <h4><span class=\"text-muted glyphicon glyphicon-book\"></span> "
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
     + " <small>v."
     + alias4(((helper = (helper = helpers.version || (depth0 != null ? depth0.version : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"version","hash":{},"data":data}) : helper)))
-    + "</small></h4>\n        </div>\n        <div class=\"col-xs-4 text-right disabled\">\n            <button type=\"button\" class=\"dict-group-controls dict-delete btn btn-danger\">Delete</button>\n        </div>\n    </div>\n\n    <div class=\"dict-delete-progress\">\n        Dictionary data is being deleted, please be patient...\n        <div class=\"progress\">\n            <div class=\"progress-bar progress-bar-striped progress-bar-danger\" style=\"width: 0%\"></div>\n        </div>\n    </div>\n\n    <div class=\"checkbox dict-group-controls "
+    + "</small></h4>\n\n    <!-- <div class=\"row\"> -->\n    <!--     <div class=\"col-xs-8\"> -->\n    <!--         <h4><span class=\"text-muted glyphicon glyphicon-book\"></span> "
+    + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
+    + " <small>v."
+    + alias4(((helper = (helper = helpers.version || (depth0 != null ? depth0.version : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"version","hash":{},"data":data}) : helper)))
+    + "</small></h4> -->\n    <!--     </div> -->\n    <!--     <div class=\"col-xs-4 text-right disabled\"> -->\n    <!--         <button type=\"button\" class=\"dict-group-controls dict-delete btn btn-danger\">Delete</button> -->\n    <!--     </div> -->\n    <!-- </div> -->\n\n    <div class=\"dict-delete-progress\">\n        Dictionary data is being deleted, please be patient...\n        <div class=\"progress\">\n            <div class=\"progress-bar progress-bar-striped progress-bar-danger\" style=\"width: 0%\"></div>\n        </div>\n    </div>\n\n    <div class=\"checkbox dict-group-controls "
     + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.hasTerms : depth0),{"name":"unless","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "\">\n        <label><input type=\"checkbox\" class=\"dict-enable-terms\" "
     + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.hasTerms : depth0),{"name":"unless","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
