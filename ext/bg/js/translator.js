@@ -43,34 +43,40 @@ class Translator {
 
     findTerm(text, dictionaries, enableSoftKatakanaSearch) {
         const cache = {};
-        return this.findDeinflectionGroups(text, dictionaries, cache).then(groups => {
+        return this.findTermDeinflections(text, dictionaries, cache).then(deinfHiragana => {
             const textHiragana = wanakana._katakanaToHiragana(text);
             if (text !== textHiragana && enableSoftKatakanaSearch) {
-                return this.findDeinflectionGroups(textHiragana, dictionaries, cache).then(groupsHiragana => {
-                    for (const key in groupsHiragana) {
-                        groups[key] = groups[key] || groupsHiragana[key];
-                    }
-
-                    return groups;
-                });
+                return this.findTermDeinflections(textHiragana, dictionaries, cache).then(deinfHiragana => deinfHiragana.concat(deinfHiragana));
             } else {
-                return groups;
+                return deinfHiragana;
             }
-        }).then(groups => {
-            const definitions = [];
-            for (const key in groups) {
-                definitions.push(groups[key]);
+        }).then(deinflections => {
+            let definitions = [];
+            for (const deinflection of deinflections) {
+                for (const definition of deinflection.definitions) {
+                    definitions.push({
+                        source: deinflection.source,
+                        reasons: deinflection.reasons,
+                        score: definition.score,
+                        id: definition.id,
+                        dictionary: definition.dictionary,
+                        expression: definition.expression,
+                        reading: definition.reading,
+                        glossary: definition.glossary,
+                        tags: sortTags(definition.tags.map(tag => buildTag(tag, definition.tagMeta)))
+                    });
+                }
             }
+
+            definitions = undupeTermDefs(definitions);
+            definitions = sortTermDefs(definitions);
 
             let length = 0;
-            for (const result of definitions) {
-                length = Math.max(length, result.source.length);
+            for (const definition of definitions) {
+                length = Math.max(length, definition.source.length);
             }
 
-            return {
-                length,
-                definitions: sortTermDefs(definitions)
-            };
+            return {length, definitions};
         });
     }
 
@@ -86,7 +92,7 @@ class Translator {
         return Promise.all(promises).then(sets => this.processKanji(sets.reduce((a, b) => a.concat(b), [])));
     }
 
-    findDeinflectionGroups(text, dictionaries, cache) {
+    findTermDeinflections(text, dictionaries, cache) {
         const definer = term => {
             if (cache.hasOwnProperty(term)) {
                 return Promise.resolve(cache[term]);
@@ -95,38 +101,19 @@ class Translator {
             return this.database.findTerm(term, dictionaries).then(definitions => cache[term] = definitions);
         };
 
-        const groups = {}, promises = [];
+        const promises = [];
         for (let i = text.length; i > 0; --i) {
-            promises.push(
-                this.deinflector.deinflect(text.slice(0, i), definer).then(deinflections => {
-                    for (const deinflection of deinflections) {
-                        this.processDeinflection(groups, deinflection);
-                    }
-                })
-            );
+            promises.push(this.deinflector.deinflect(text.slice(0, i), definer));
         }
 
-        return Promise.all(promises).then(() => groups);
-    }
-
-    processDeinflection(groups, {source, rules, reasons, definitions}, dictionaries) {
-        for (const definition of definitions) {
-            if (definition.id in groups) {
-                continue;
+        return Promise.all(promises).then(results => {
+            let deinflections = [];
+            for (const result of results) {
+                deinflections = deinflections.concat(result);
             }
 
-            const tags = definition.tags.map(tag => buildTag(tag, definition.tagMeta));
-            groups[definition.id] = {
-                source,
-                reasons,
-                score: definition.score,
-                dictionary: definition.dictionary,
-                expression: definition.expression,
-                reading: definition.reading,
-                glossary: definition.glossary,
-                tags: sortTags(tags)
-            };
-        }
+            return deinflections;
+        });
     }
 
     processKanji(definitions) {

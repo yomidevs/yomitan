@@ -96,6 +96,23 @@ function sortTermDefs(definitions) {
     });
 }
 
+function undupeTermDefs(definitions) {
+    const definitionGroups = {};
+    for (const definition of definitions) {
+        const definitionExisting = definitionGroups[definition.id];
+        if (!definitionGroups.hasOwnProperty(definition.id) || definition.expression.length > definitionExisting.expression.length) {
+            definitionGroups[definition.id] = definition;
+        }
+    }
+
+    const definitionsUnique = [];
+    for (const key in definitionGroups) {
+        definitionsUnique.push(definitionGroups[key]);
+    }
+
+    return definitionsUnique;
+}
+
 function buildTag(name, meta) {
     const tag = {name};
     const symbol = name.split(':')[0];
