@@ -30,15 +30,21 @@
 
     <div class="kanji-tags">
         {{#each tags}}
-        <span class="tag tag-{{class}}" title="{{desc}}">{{name}}</span>
+        <span class="tag tag-{{category}}" title="{{notes}}">{{name}}</span>
         {{/each}}
     </div>
 
     <div class="kanji-glossary">
+        {{#if glossary.[1]}}
         <ol>
             {{#each glossary}}
             <li><span>{{.}}</span></li>
             {{/each}}
         </ol>
+        {{else}}
+        <p>
+            {{glossary.[0]}}
+        </p>
+        {{/if}}
     </div>
 </div>

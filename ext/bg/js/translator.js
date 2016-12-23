@@ -20,96 +20,33 @@
 class Translator {
     constructor() {
         this.loaded = false;
-        this.tagMeta = null;
-        this.dictionary = new Dictionary();
+        this.ruleMeta = null;
+        this.database = new Database();
         this.deinflector = new Deinflector();
     }
 
-    loadData(callback) {
+    prepare() {
         if (this.loaded) {
             return Promise.resolve();
         }
 
-        return loadJson('bg/data/rules.json').then(rules => {
-            this.deinflector.setRules(rules);
-            return loadJson('bg/data/tags.json');
-        }).then(tagMeta => {
-            this.tagMeta = tagMeta;
-            return this.dictionary.prepareDb();
-        }).then(exists => {
-            if (exists) {
-                return;
-            }
+        const promises = [
+            loadJsonInt('bg/data/deinflect.json'),
+            this.database.prepare()
+        ];
 
-            if (callback) {
-                callback({state: 'begin', progress: 0});
-            }
-
-            const banks = {};
-            const bankCallback = (loaded, total, indexUrl) => {
-                banks[indexUrl] = {loaded, total};
-
-                let percent = 0.0;
-                for (const url in banks) {
-                    percent += banks[url].loaded / banks[url].total;
-                }
-
-                percent /= 3.0;
-
-                if (callback) {
-                    callback({state: 'update', progress: Math.ceil(100.0 * percent)});
-                }
-            };
-
-            return Promise.all([
-                this.dictionary.importTermDict('bg/data/edict/index.json', bankCallback),
-                this.dictionary.importTermDict('bg/data/enamdict/index.json', bankCallback),
-                this.dictionary.importKanjiDict('bg/data/kanjidic/index.json', bankCallback),
-            ]).then(() => {
-                return this.dictionary.sealDb();
-            }).then(() => {
-                if (callback) {
-                    callback({state: 'end', progress: 100.0});
-                }
-            });
-        }).then(() => {
+        return Promise.all(promises).then(([reasons]) => {
+            this.deinflector.setReasons(reasons);
             this.loaded = true;
         });
     }
 
-    findTermGroups(text) {
-        const deinflectGroups = {};
-        const deinflectPromises = [];
-
-        for (let i = text.length; i > 0; --i) {
-            deinflectPromises.push(
-                this.deinflector.deinflect(text.slice(0, i), term => {
-                    return this.dictionary.findTerm(term).then(definitions => definitions.map(definition => definition.tags));
-                }).then(deinflects => {
-                    const processPromises = [];
-                    for (const deinflect of deinflects) {
-                        processPromises.push(this.processTerm(
-                            deinflectGroups,
-                            deinflect.source,
-                            deinflect.tags,
-                            deinflect.rules,
-                            deinflect.root
-                        ));
-                    }
-
-                    return Promise.all(processPromises);
-                })
-            );
-        }
-
-        return Promise.all(deinflectPromises).then(() => deinflectGroups);
-    }
-
-    findTerm(text, enableSoftKatakanaSearch) {
-        return this.findTermGroups(text).then(groups => {
+    findTerm(text, dictionaries, enableSoftKatakanaSearch) {
+        const cache = {};
+        return this.findDeinflectionGroups(text, dictionaries, cache).then(groups => {
             const textHiragana = wanakana._katakanaToHiragana(text);
             if (text !== textHiragana && enableSoftKatakanaSearch) {
-                return this.findTermGroups(textHiragana).then(groupsHiragana => {
+                return this.findDeinflectionGroups(textHiragana, dictionaries, cache).then(groupsHiragana => {
                     for (const key in groupsHiragana) {
                         groups[key] = groups[key] || groupsHiragana[key];
                     }
@@ -137,13 +74,11 @@ class Translator {
         });
     }
 
-    findKanji(text) {
-        const processed = {};
-        const promises = [];
-
+    findKanji(text, dictionaries) {
+        const processed = {}, promises = [];
         for (const c of text) {
             if (!processed[c]) {
-                promises.push(this.dictionary.findKanji(c).then((definitions) => definitions));
+                promises.push(this.database.findKanji(c, dictionaries));
                 processed[c] = true;
             }
         }
@@ -151,73 +86,53 @@ class Translator {
         return Promise.all(promises).then(sets => this.processKanji(sets.reduce((a, b) => a.concat(b), [])));
     }
 
-    processTerm(groups, source, tags, rules, root) {
-        return this.dictionary.findTerm(root).then(definitions => {
-            for (const definition of definitions) {
-                if (definition.id in groups) {
-                    continue;
-                }
-
-                let matched = tags.length === 0;
-                for (const tag of tags) {
-                    if (definition.tags.includes(tag)) {
-                        matched = true;
-                        break;
-                    }
-                }
-
-                if (!matched) {
-                    continue;
-                }
-
-                const tagItems = [];
-                for (const tag of definition.tags) {
-                    const tagItem = {
-                        name: tag,
-                        class: 'default',
-                        order: Number.MAX_SAFE_INTEGER,
-                        score: 0,
-                        desc: definition.entities[tag] || '',
-                    };
-
-                    applyTagMeta(tagItem, this.tagMeta);
-                    tagItems.push(tagItem);
-                }
-
-                let score = 0;
-                for (const tagItem of tagItems) {
-                    score += tagItem.score;
-                }
-
-                groups[definition.id] = {
-                    score,
-                    source,
-                    rules,
-                    expression: definition.expression,
-                    reading: definition.reading,
-                    glossary: definition.glossary,
-                    tags: sortTags(tagItems)
-                };
+    findDeinflectionGroups(text, dictionaries, cache) {
+        const definer = term => {
+            if (cache.hasOwnProperty(term)) {
+                return Promise.resolve(cache[term]);
             }
-        });
+
+            return this.database.findTerm(term, dictionaries).then(definitions => cache[term] = definitions);
+        };
+
+        const groups = {}, promises = [];
+        for (let i = text.length; i > 0; --i) {
+            promises.push(
+                this.deinflector.deinflect(text.slice(0, i), definer).then(deinflections => {
+                    for (const deinflection of deinflections) {
+                        this.processDeinflection(groups, deinflection);
+                    }
+                })
+            );
+        }
+
+        return Promise.all(promises).then(() => groups);
+    }
+
+    processDeinflection(groups, {source, rules, reasons, definitions}, dictionaries) {
+        for (const definition of definitions) {
+            if (definition.id in groups) {
+                continue;
+            }
+
+            const tags = definition.tags.map(tag => buildTag(tag, definition.tagMeta));
+            groups[definition.id] = {
+                source,
+                reasons,
+                score: definition.score,
+                dictionary: definition.dictionary,
+                expression: definition.expression,
+                reading: definition.reading,
+                glossary: definition.glossary,
+                tags: sortTags(tags)
+            };
+        }
     }
 
     processKanji(definitions) {
         for (const definition of definitions) {
-            const tagItems = [];
-            for (const tag of definition.tags) {
-                const tagItem = {
-                    name: tag,
-                    class: 'default',
-                    order: Number.MAX_SAFE_INTEGER,
-                    desc: '',
-                };
-
-                applyTagMeta(tagItem, this.tagMeta);
-                tagItems.push(tagItem);
-            }
-
-            definition.tags = sortTags(tagItems);
+            const tags = definition.tags.map(tag => buildTag(tag, definition.tagMeta));
+            definition.tags = sortTags(tags);
         }
 
         return definitions;

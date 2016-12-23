@@ -28,6 +28,8 @@ function sanitizeOptions(options) {
         scanDelay: 15,
         scanLength: 20,
 
+        dictionaries: {},
+
         ankiMethod: 'disabled',
         ankiUsername: '',
         ankiPassword: '',

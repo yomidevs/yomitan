@@ -39,16 +39,8 @@ function promiseCallback(promise, callback) {
     return promise.then(result => {
        callback({result});
     }).catch(error => {
+        console.log(error);
         callback({error});
-    });
-}
-
-function loadJson(url) {
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.addEventListener('load', () => resolve(JSON.parse(xhr.responseText)));
-        xhr.open('GET', chrome.extension.getURL(url));
-        xhr.send();
     });
 }
 
@@ -92,8 +84,8 @@ function sortTermDefs(definitions) {
             return 1;
         }
 
-        const rl1 = v1.rules.length;
-        const rl2 = v2.rules.length;
+        const rl1 = v1.reasons.length;
+        const rl2 = v2.reasons.length;
         if (rl1 < rl2) {
             return -1;
         } else if (rl1 > rl2) {
@@ -104,15 +96,97 @@ function sortTermDefs(definitions) {
     });
 }
 
-function applyTagMeta(tag, meta) {
-    const symbol = tag.name.split(':')[0];
+function buildTag(name, meta) {
+    const tag = {name};
+    const symbol = name.split(':')[0];
     for (const prop in meta[symbol] || {}) {
         tag[prop] = meta[symbol][prop];
     }
 
+    return sanitizeTag(tag);
+}
+
+function sanitizeTag(tag) {
+    tag.name = tag.name || 'untitled';
+    tag.category = tag.category || 'default';
+    tag.notes = tag.notes || '';
+    tag.order = tag.order || 0;
     return tag;
 }
 
 function splitField(field) {
     return field.length === 0 ? [] : field.split(' ');
+}
+
+function loadJson(url) {
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.addEventListener('load', () => resolve(xhr.responseText));
+        xhr.addEventListener('error', () => reject('failed to execute network request'));
+        xhr.open('GET', url);
+        xhr.send();
+    }).then(responseText => {
+        try {
+            return JSON.parse(responseText);
+        }
+        catch (e) {
+            return Promise.reject('invalid JSON response');
+        }
+    });
+}
+
+function loadJsonInt(url) {
+    return loadJson(chrome.extension.getURL(url));
+}
+
+function importJsonDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
+    const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
+    return loadJson(indexUrl).then(index => {
+        if (!index.title || !index.version) {
+            return Promise.reject('unrecognized dictionary format');
+        }
+
+        if (indexLoaded !== null) {
+            return indexLoaded(
+                index.title,
+                index.version,
+                index.tagMeta,
+                index.termBanks > 0,
+                index.kanjiBanks > 0
+            ).then(() => index);
+        }
+
+        return index;
+    }).then(index => {
+        const loaders = [];
+        const banksTotal = index.termBanks + index.kanjiBanks;
+        let banksLoaded = 0;
+
+        for (let i = 1; i <= index.termBanks; ++i) {
+            const bankUrl = `${indexDir}/term_bank_${i}.json`;
+            loaders.push(() => loadJson(bankUrl).then(entries => termsLoaded(
+                index.title,
+                entries,
+                banksTotal,
+                banksLoaded++
+            )));
+        }
+
+        for (let i = 1; i <= index.kanjiBanks; ++i) {
+            const bankUrl = `${indexDir}/kanji_bank_${i}.json`;
+            loaders.push(() => loadJson(bankUrl).then(entries => kanjiLoaded(
+                index.title,
+                entries,
+                banksTotal,
+                banksLoaded++
+            )));
+        }
+
+        let chain = Promise.resolve();
+        for (const loader of loaders) {
+            chain = chain.then(loader);
+        }
+
+        return chain;
+    });
 }

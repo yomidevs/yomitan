@@ -25,11 +25,11 @@ class Yomichan {
         this.translator = new Translator();
         this.anki = new AnkiNull();
         this.options = null;
-        this.importTabId = null;
         this.setState('disabled');
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
         chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
+        chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
 
         loadOptions().then(opts => {
             this.setOptions(opts);
@@ -39,17 +39,9 @@ class Yomichan {
         });
     }
 
-    onImport({state, progress}) {
-        if (state === 'begin') {
-            chrome.tabs.create({url: chrome.extension.getURL('bg/import.html')}, tab => this.importTabId = tab.id);
-        }
-
-        if (this.importTabId !== null) {
-            this.tabInvoke(this.importTabId, 'setProgress', progress);
-        }
-
-        if (state === 'end') {
-            this.importTabId = null;
+    onInstalled(details) {
+        if (details.reason === 'install') {
+            chrome.tabs.create({url: chrome.extension.getURL('bg/guide.html')});
         }
     }
 
@@ -91,7 +83,7 @@ class Yomichan {
                 break;
             case 'loading':
                 chrome.browserAction.setBadgeText({text: '...'});
-                this.translator.loadData(this.onImport.bind(this)).then(() => this.setState('enabled'));
+                this.translator.prepare().then(this.setState('enabled'));
                 break;
         }
 
@@ -239,11 +231,31 @@ class Yomichan {
     }
 
     api_findKanji({text, callback}) {
-        promiseCallback(this.translator.findKanji(text), callback);
+        const dictionaries = [];
+        for (const title in this.options.dictionaries) {
+            if (this.options.dictionaries[title].enableKanji) {
+                dictionaries.push(title);
+            }
+        }
+
+        promiseCallback(
+            this.translator.findKanji(text, dictionaries),
+            callback
+        );
     }
 
     api_findTerm({text, callback}) {
-        promiseCallback(this.translator.findTerm(text, this.options.enableSoftKatakanaSearch), callback);
+        const dictionaries = [];
+        for (const title in this.options.dictionaries) {
+            if (this.options.dictionaries[title].enableTerms) {
+                dictionaries.push(title);
+            }
+        }
+
+        promiseCallback(
+            this.translator.findTerm(text, dictionaries, this.options.enableSoftKatakanaSearch),
+            callback
+        );
     }
 
     api_renderText({template, data, callback}) {

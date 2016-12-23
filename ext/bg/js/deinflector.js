@@ -18,50 +18,47 @@
 
 
 class Deinflection {
-    constructor(term, tags=[], rule='') {
-        this.children = [];
+    constructor(term, {rules=[], definitions=[], reason=''} = {}) {
         this.term = term;
-        this.tags = tags;
-        this.rule = rule;
+        this.rules = rules;
+        this.definitions = definitions;
+        this.reason = reason;
+        this.children = [];
     }
 
-    validate(validator) {
-        return validator(this.term).then(sets => {
-            for (const tags of sets) {
-                if (this.tags.length === 0) {
-                    return true;
-                }
-
-                for (const tag of this.tags) {
-                    if (tags.includes(tag)) {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        });
-    }
-
-    deinflect(validator, rules) {
-        const promises = [
-            this.validate(validator).then(valid => {
-                const child = new Deinflection(this.term, this.tags);
-                this.children.push(child);
-            })
-        ];
-
-        for (const rule in rules) {
-            for (const variant of rules[rule]) {
-                let allowed = this.tags.length === 0;
-                for (const tag of this.tags) {
-                    if (variant.tagsIn.includes(tag)) {
-                        allowed = true;
-                        break;
+    deinflect(definer, reasons) {
+        const define = () => {
+            return definer(this.term).then(definitions => {
+                if (this.rules.length === 0) {
+                    this.definitions = definitions;
+                } else {
+                    for (const rule of this.rules) {
+                        for (const definition of definitions) {
+                            if (definition.rules.includes(rule)) {
+                                this.definitions.push(definition);
+                            }
+                        }
                     }
                 }
 
-                if (!allowed || !this.term.endsWith(variant.kanaIn)) {
+                return this.definitions.length > 0;
+            });
+        };
+
+        const promises = [];
+        for (const reason in reasons) {
+            for (const variant of reasons[reason]) {
+                let accept = this.rules.length === 0;
+                if (!accept) {
+                    for (const rule of this.rules) {
+                        if (variant.rulesIn.includes(rule)) {
+                            accept = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!accept || !this.term.endsWith(variant.kanaIn)) {
                     continue;
                 }
 
@@ -70,55 +67,61 @@ class Deinflection {
                     continue;
                 }
 
-                const child = new Deinflection(term, variant.tagsOut, rule);
+                const child = new Deinflection(term, {reason, rules: variant.rulesOut});
                 promises.push(
-                    child.deinflect(validator, rules).then(valid => {
-                        if (valid) {
-                            this.children.push(child);
-                        }
-                    }
-                ));
+                    child.deinflect(definer, reasons).then(valid => valid && this.children.push(child))
+                );
             }
         }
 
-        return Promise.all(promises).then(() => {
-            return this.children.length > 0;
+        return Promise.all(promises).then(define).then(valid => {
+            if (valid && this.children.length > 0) {
+                const child = new Deinflection(this.term, {rules: this.rules, definitions: this.definitions});
+                this.children.push(child);
+            }
+
+            return valid || this.children.length > 0;
         });
     }
 
     gather() {
         if (this.children.length === 0) {
-            return [{root: this.term, tags: this.tags, rules: []}];
+            return [{
+                source: this.term,
+                rules: this.rules,
+                definitions: this.definitions,
+                reasons: [this.reason]
+            }];
         }
 
-        const paths = [];
+        const results = [];
         for (const child of this.children) {
-            for (const path of child.gather()) {
-                if (this.rule.length > 0) {
-                    path.rules.push(this.rule);
+            for (const result of child.gather()) {
+                if (this.reason.length > 0) {
+                    result.reasons.push(this.reason);
                 }
 
-                path.source = this.term;
-                paths.push(path);
+                result.source = this.term;
+                results.push(result);
             }
         }
 
-        return paths;
+        return results;
     }
 }
 
 
 class Deinflector {
     constructor() {
-        this.rules = {};
+        this.reasons = {};
     }
 
-    setRules(rules) {
-        this.rules = rules;
+    setReasons(reasons) {
+        this.reasons = reasons;
     }
 
-    deinflect(term, validator) {
+    deinflect(term, definer) {
         const node = new Deinflection(term);
-        return node.deinflect(validator, this.rules).then(success => success ? node.gather() : []);
+        return node.deinflect(definer, this.reasons).then(success => success ? node.gather() : []);
     }
 }

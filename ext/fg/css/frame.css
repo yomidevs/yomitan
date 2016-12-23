@@ -100,7 +100,7 @@ body {
     text-decoration: none;
 }
 
-.term-rules {
+.term-reasons {
     color:   #777;
     display: inline-block;
 }
@@ -115,6 +115,11 @@ body {
 
 .term-glossary li span {
     color: #000;
+}
+
+.term-glossary p {
+    overflow-x:  auto;
+    white-space: pre;
 }
 
 /* kanji styles */
@@ -152,4 +157,9 @@ body {
 
 .kanji-glossary li span {
     color: #000;
+}
+
+.kanji-glossary p {
+    overflow-x:  auto;
+    white-space: pre;
 }
