@@ -224,14 +224,14 @@ class Database {
         }
 
         let summary = null;
-        const indexLoaded = (title, version, tagMeta, hasTerms, hasKanji) => {
-            summary = {title, hasTerms, hasKanji, version};
+        const indexLoaded = (title, version, revision, tagMeta, hasTerms, hasKanji) => {
+            summary = {title, version, revision, hasTerms, hasKanji};
             return this.db.dictionaries.where('title').equals(title).count().then(count => {
                 if (count > 0) {
                     return Promise.reject(`dictionary "${title}" is already imported`);
                 }
 
-                return this.db.dictionaries.add({title, version, hasTerms, hasKanji}).then(() => {
+                return this.db.dictionaries.add({title, version, revision, hasTerms, hasKanji}).then(() => {
                     const rows = [];
                     for (const tag in tagMeta || {}) {
                         const meta = tagMeta[tag];

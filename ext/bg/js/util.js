@@ -159,7 +159,7 @@ function loadJsonInt(url) {
 function importJsonDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
     const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
     return loadJson(indexUrl).then(index => {
-        if (!index.title || !index.version) {
+        if (!index.title || !index.version || !index.revision) {
             return Promise.reject('unrecognized dictionary format');
         }
 
@@ -167,7 +167,8 @@ function importJsonDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
             return indexLoaded(
                 index.title,
                 index.version,
-                index.tagMeta,
+                index.revision,
+                index.tagMeta || {},
                 index.termBanks > 0,
                 index.kanjiBanks > 0
             ).then(() => index);

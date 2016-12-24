@@ -161,6 +161,7 @@ function populateDictionaries(opts) {
             const html = Handlebars.templates['dictionary.html']({
                 title: row.title,
                 version: row.version,
+                revision: row.revision,
                 hasTerms: row.hasTerms,
                 hasKanji: row.hasKanji,
                 enableTerms: dictOpts.enableTerms,
