@@ -1,0 +1,3 @@
+[submodule "ext/bg/lang/data"]
+	path = ext/bg/lang/data
+	url = https://FooSoft@bitbucket.org/FooSoft/yomichan-data.git

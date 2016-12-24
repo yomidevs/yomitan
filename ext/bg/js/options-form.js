@@ -264,7 +264,7 @@ function onDictionarySetUrl(e) {
     if (url.includes('/')) {
         dictUrl.val(url);
     } else {
-        dictUrl.val(chrome.extension.getURL(`bg/data/${url}/index.json`));
+        dictUrl.val(chrome.extension.getURL(`bg/lang/data/${url}/index.json`));
     }
 
     dictUrl.trigger('input');
