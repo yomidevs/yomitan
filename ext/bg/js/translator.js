@@ -43,12 +43,12 @@ class Translator {
 
     findTerm(text, dictionaries, enableSoftKatakanaSearch) {
         const cache = {};
-        return this.findTermDeinflections(text, dictionaries, cache).then(deinfHiragana => {
+        return this.findTermDeinflections(text, dictionaries, cache).then(deinfLiteral => {
             const textHiragana = wanakana._katakanaToHiragana(text);
             if (text !== textHiragana && enableSoftKatakanaSearch) {
-                return this.findTermDeinflections(textHiragana, dictionaries, cache).then(deinfHiragana => deinfHiragana.concat(deinfHiragana));
+                return this.findTermDeinflections(textHiragana, dictionaries, cache).then(deinfHiragana => deinfLiteral.concat(deinfHiragana));
             } else {
-                return deinfHiragana;
+                return deinfLiteral;
             }
         }).then(deinflections => {
             let definitions = [];
