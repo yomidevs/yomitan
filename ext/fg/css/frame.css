@@ -105,6 +105,10 @@ body {
     display: inline-block;
 }
 
+.term-glossary {
+    font-family: vl-gothic-regular;
+}
+
 .term-glossary ol {
     padding-left: 1.4em;
 }
@@ -146,6 +150,10 @@ body {
 }
 
 .kanji-reading td {
+    font-family: vl-gothic-regular;
+}
+
+.kanji-glossary {
     font-family: vl-gothic-regular;
 }
 
