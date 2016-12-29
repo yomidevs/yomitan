@@ -21,6 +21,15 @@ class AnkiWeb {
         this.username = username;
         this.password = password;
         this.noteInfo = null;
+
+        chrome.webRequest.onBeforeSendHeaders.addListener(
+            details => {
+                details.requestHeaders.push({name: 'Origin', value: 'https://ankiweb.net'});
+                return {requestHeaders: details.requestHeaders};
+            },
+            {urls: ['https://ankiweb.net/*']},
+            ['blocking', 'requestHeaders']
+        );
     }
 
     addNote(note) {
@@ -133,20 +142,22 @@ class AnkiWeb {
 
     static loadPage(url, data) {
         return new Promise((resolve, reject) => {
+            let dataEnc = null;
             if (data) {
                 const params = [];
                 for (const key in data) {
                     params.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`);
                 }
 
-                url += '?' + params.join('&');
+                dataEnc = params.join('&');
             }
 
             const xhr = new XMLHttpRequest();
             xhr.addEventListener('error', () => reject('failed to execute network request'));
             xhr.addEventListener('load', () => resolve(xhr.responseText));
-            xhr.open('GET', url);
-            xhr.send();
+            xhr.open('POST', url);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.send(dataEnc);
         });
     }
 }
