@@ -162,13 +162,13 @@ class Yomichan {
                 case 'glossary-list':
                     if (definition.glossary) {
                         if (definition.glossary.length > 1) {
-                            value = '<ol style="white-space: pre; text-align: left;">';
+                            value = '<ol style="white-space: pre; text-align: left; overflow-x: auto;">';
                             for (const gloss of definition.glossary) {
                                 value += `<li>${gloss}</li>`;
                             }
                             value += '</ol>';
                         } else {
-                            value = `<p style="white-space: pre;">${definition.glossary.join('')}</p>`;
+                            value = `<p style="white-space: pre; overflow-x: auto;">${definition.glossary.join('')}</p>`;
                         }
                     }
                     break;
