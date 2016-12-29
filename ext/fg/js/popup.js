@@ -23,11 +23,13 @@ class Popup {
         this.offset = 10;
     }
 
-    showAt(pos, content) {
+    show(rect, content) {
         this.inject();
 
-        this.container.style.left = pos.x + 'px';
-        this.container.style.top = pos.y + 'px';
+        this.container.style.left = rect.x + 'px';
+        this.container.style.top = rect.y + 'px';
+        this.container.style.height = rect.height + 'px';
+        this.container.style.width = rect.width + 'px';
         this.container.style.visibility = 'visible';
 
         this.setContent(content);
@@ -38,17 +40,23 @@ class Popup {
 
         const containerRect = this.container.getBoundingClientRect();
 
-        let posX = elementRect.left;
-        if (posX + containerRect.width >= window.innerWidth) {
-            posX = window.innerWidth - containerRect.width;
+        let x = elementRect.left;
+        let width = containerRect.width;
+        if (x + width >= window.innerWidth) {
+            const widthMax = window.innerWidth - x;
+            width = Math.min(width, widthMax);
+            x = window.innerWidth - width;
         }
 
-        let posY = elementRect.bottom + this.offset;
-        if (posY + containerRect.height >= window.innerHeight) {
-            posY = elementRect.top - containerRect.height - this.offset;
+        let y = elementRect.bottom + this.offset;
+        let height = containerRect.height;
+        if (y + height >= window.innerHeight) {
+            const heightMax = window.innerHeight - y - this.offset;
+            height = Math.min(height, heightMax);
+            y = elementRect.top - height - this.offset;
         }
 
-        this.showAt({x: posX, y: posY}, content);
+        this.show({x, y, width, height}, content);
     }
 
     visible() {
