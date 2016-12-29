@@ -161,11 +161,15 @@ class Yomichan {
                     break;
                 case 'glossary-list':
                     if (definition.glossary) {
-                        value = '<ol style="text-align: left;">';
-                        for (const gloss of definition.glossary) {
-                            value += `<li>${gloss}</li>`;
+                        if (definition.glossary.length > 1) {
+                            value = '<ol style="white-space: pre; text-align: left;">';
+                            for (const gloss of definition.glossary) {
+                                value += `<li>${gloss}</li>`;
+                            }
+                            value += '</ol>';
+                        } else {
+                            value = `<p style="white-space: pre;">${definition.glossary.join('')}</p>`;
                         }
-                        value += '</ol>';
                     }
                     break;
                 case 'tags':

@@ -114,7 +114,9 @@ body {
 }
 
 .term-glossary li span {
-    color: #000;
+    color:       #000;
+    overflow-x:  auto;
+    white-space: pre;
 }
 
 .term-glossary p {
@@ -156,7 +158,9 @@ body {
 }
 
 .kanji-glossary li span {
-    color: #000;
+    color:       #000;
+    overflow-x:  auto;
+    white-space: pre;
 }
 
 .kanji-glossary p {
