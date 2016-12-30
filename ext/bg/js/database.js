@@ -20,7 +20,7 @@
 class Database {
     constructor() {
         this.db = null;
-        this.dbVersion = 1;
+        this.dbVersion = 2;
         this.tagMetaCache = {};
     }
 
