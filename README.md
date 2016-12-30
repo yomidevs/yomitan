@@ -33,11 +33,17 @@ support and feedback encourages continued development of this tool.
 ## Basic Functionality ##
 
 1.  Left-click on the ![](https://foosoft.net/projects/yomichan-chrome/img/logo.png) icon to enable or disable Yomichan for the current browser instance.
-2.  Right-click on the ![](https://foosoft.net/projects/yomichan-chrome/img/logo.png) icon and select *Options* to display the Yomichan options page.
-3.  Hold down <kbd>Shift</kbd> (or the middle mouse button) as you hover over text to see term definitions.
-4.  Resize the definition window by dragging the bottom-left corner inwards or outwards.
-5.  Click on the Kanji links in the definition window to view additional information about those characters.
-6.  Click on the ![](https://foosoft.net/projects/yomichan-chrome/img/play-audio.png) icon to hear the term pronounced by a native speaker.
+2.  Right-click on the ![](https://foosoft.net/projects/yomichan-chrome/img/logo.png) icon and select <em>Options</em> to open the Yomichan options page.
+3.  Import any dictionaries (bundled or custom) you wish to use for Kanji and term searches; none are imported by default.
+4.  Hold down <kbd>Shift</kbd> (or the middle mouse button) as you hover over text to see term definitions.
+5.  Resize the definitions window by dragging the bottom-left corner inwards or outwards to make it smaller or larger.
+6.  Click on Kanji in the definition window to view additional information about that character.
+7.  Click on the ![](https://foosoft.net/projects/yomichan-chrome/img/play-audio.png) icon to hear the term pronounced by a native speaker.
+
+## Custom Dictionaries ##
+
+Yomichan supports importing of custom dictionaries in several formats. For more information about how this feature
+works, please see the [Yomichan Import](https://foosoft.net/projects/yomichan-import) project page.
 
 ## Anki Integration ##
 
