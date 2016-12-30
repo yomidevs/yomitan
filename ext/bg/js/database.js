@@ -20,7 +20,18 @@
 class Database {
     constructor() {
         this.db = null;
+        this.dbVersion = 1;
         this.tagMetaCache = {};
+    }
+
+    sanitize() {
+        const db = new Dexie('dict');
+        return db.open().then(() => {
+            db.close();
+            if (db.verno !== this.dbVersion) {
+                return db.delete();
+            }
+        }).catch(() => {});
     }
 
     prepare() {
@@ -28,15 +39,17 @@ class Database {
             return Promise.reject('database already initialized');
         }
 
-        this.db = new Dexie('dict');
-        this.db.version(1).stores({
-            terms: '++id,dictionary,expression,reading',
-            kanji: '++,dictionary,character',
-            tagMeta: '++,dictionary',
-            dictionaries: '++,title,version',
-        });
+        return this.sanitize().then(() => {
+            this.db = new Dexie('dict');
+            this.db.version(this.dbVersion).stores({
+                terms: '++id,dictionary,expression,reading',
+                kanji: '++,dictionary,character',
+                tagMeta: '++,dictionary',
+                dictionaries: '++,title,version',
+            });
 
-        return this.db.open();
+            return this.db.open();
+        });
     }
 
     purge() {
