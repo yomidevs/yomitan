@@ -137,12 +137,6 @@ Before flashcards can be automatically created through Yomichan, Anki must be co
     also not be accepting pull request containing this functionality, as I will ultimately be the one maintaining your
     code.
 
-*   **When are you going to add support for [EPWING](https://ja.wikipedia.org/wiki/EPWING) J-J dictionaries?**
-
-    This is a long-term goal, and I do not yet have a timeline for this feature. That being said, I believe that I have
-    figured out how to make this work in the restrictive Chrome extension environment, and mostly have to develop a new
-    tool to support extraction of data from this format.
-
 ## Screenshots ##
 
 [![Term definitions](https://foosoft.net/projects/yomichan-chrome/img/term-thumb.png)](https://foosoft.net/projects/yomichan-chrome/img/term.png)
