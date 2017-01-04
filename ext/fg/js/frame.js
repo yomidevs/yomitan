@@ -63,6 +63,8 @@ function api_setActionState({index, state, sequence}) {
         } else {
             classes.add('disabled');
         }
+
+        classes.remove('pending');
     }
 }
 

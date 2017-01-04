@@ -1,11 +1,11 @@
 <div class="term-definition">
     <div class="action-bar" data-sequence="{{sequence}}">
+        {{#if addable}}
+        <a href="#" title="Add term as expression" class="action-add-note pending disabled" data-mode="term_kanji" data-index="{{@index}}"><img src="{{root}}/img/add_term_kanji.png"></a>
+        <a href="#" title="Add term as reading" class="action-add-note pending disabled" data-mode="term_kana" data-index="{{@index}}"><img src="{{root}}/img/add_term_kana.png"></a>
+        {{/if}}
         {{#if options.enableAudioPlayback}}
         <a href="#" title="Play audio" class="action-play-audio" data-index="{{@index}}"><img src="{{root}}/img/play_audio.png"></a>
-        {{/if}}
-        {{#if addable}}
-        <a href="#" title="Add term as expression" class="action-add-note disabled" data-mode="term_kanji" data-index="{{@index}}"><img src="{{root}}/img/add_term_kanji.png"></a>
-        <a href="#" title="Add term as reading" class="action-add-note disabled" data-mode="term_kana" data-index="{{@index}}"><img src="{{root}}/img/add_term_kana.png"></a>
         {{/if}}
     </div>
 

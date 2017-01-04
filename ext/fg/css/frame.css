@@ -86,6 +86,10 @@ body {
     opacity:        0.25;
 }
 
+.action-bar .pending {
+    visibility: hidden;
+}
+
 /* term styles */
 
 .term-expression {
