@@ -279,6 +279,8 @@ class Driver {
             } else {
                 alert('Note could not be added');
             }
+
+            this.popup.invokeApi('addNoteComplete');
         }).catch(error => {
             alert('Error: ' + error);
         });

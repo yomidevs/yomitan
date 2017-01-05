@@ -21,6 +21,11 @@ function invokeApi(action, params, target) {
     target.postMessage({action, params}, '*');
 }
 
+function showSpinner(show) {
+    const spinner = document.querySelector('.spinner');
+    spinner.style.visibility = show ? 'visible' : 'hidden';
+}
+
 function registerKanjiLinks() {
     for (const link of Array.from(document.getElementsByClassName('kanji-link'))) {
         link.addEventListener('click', e => {
@@ -36,6 +41,7 @@ function registerAddNoteLinks() {
             e.preventDefault();
             const ds = e.currentTarget.dataset;
             invokeApi('addNote', {index: ds.index, mode: ds.mode}, window.parent);
+            showSpinner(true);
         });
     }
 }
@@ -48,6 +54,10 @@ function registerAudioLinks() {
             invokeApi('playAudio', ds.index, window.parent);
         });
     }
+}
+
+function api_addNoteComplete() {
+    showSpinner(false);
 }
 
 function api_setActionState({index, state, sequence}) {

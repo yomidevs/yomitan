@@ -90,6 +90,13 @@ body {
     visibility: hidden;
 }
 
+.spinner {
+    bottom:     5px;
+    position:   fixed;
+    right:      5px;
+    visibility: hidden;
+}
+
 /* term styles */
 
 .term-expression {
