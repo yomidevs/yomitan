@@ -22,6 +22,7 @@ function sanitizeOptions(options) {
         activateOnStartup: true,
         enableAudioPlayback: true,
         enableSoftKatakanaSearch: true,
+        groupTermResults: true,
         showAdvancedOptions: false,
         selectMatchedText: true,
         holdShiftToScan: true,

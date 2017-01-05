@@ -30,8 +30,9 @@ function getFormValues() {
 
         optsNew.activateOnStartup = $('#activate-on-startup').prop('checked');
         optsNew.enableAudioPlayback = $('#enable-audio-playback').prop('checked');
-        optsNew.showAdvancedOptions = $('#show-advanced-options').prop('checked');
         optsNew.enableSoftKatakanaSearch = $('#enable-soft-katakana-search').prop('checked');
+        optsNew.groupTermResults = $('#group-term-results').prop('checked');
+        optsNew.showAdvancedOptions = $('#show-advanced-options').prop('checked');
 
         optsNew.holdShiftToScan = $('#hold-shift-to-scan').prop('checked');
         optsNew.selectMatchedText = $('#select-matched-text').prop('checked');
@@ -94,6 +95,7 @@ $(document).ready(() => {
         $('#activate-on-startup').prop('checked', opts.activateOnStartup);
         $('#enable-audio-playback').prop('checked', opts.enableAudioPlayback);
         $('#enable-soft-katakana-search').prop('checked', opts.enableSoftKatakanaSearch);
+        $('#group-term-results').prop('checked', opts.groupTermResults);
         $('#show-advanced-options').prop('checked', opts.showAdvancedOptions);
 
         $('#hold-shift-to-scan').prop('checked', opts.holdShiftToScan);
