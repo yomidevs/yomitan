@@ -1,9 +1,7 @@
-{{> header.html}}
 {{#if definitions}}
     {{#each definitions}}
-    {{> kanji.html addable=../addable root=../root options=../options sequence=../sequence}}
+    {{> kanji.html addable=../addable root=../root}}
     {{/each}}
 {{else}}
     <p>No results found</p>
 {{/if}}
-{{> footer.html}}

@@ -19,29 +19,32 @@
 
 class Popup {
     constructor() {
-        this.container = null;
         this.offset = 10;
+
+        this.container = document.createElement('iframe');
+        this.container.id = 'yomichan-popup';
+        this.container.addEventListener('mousedown', e => e.stopPropagation());
+        this.container.addEventListener('scroll', e => e.stopPropagation());
+        this.container.setAttribute('src', chrome.extension.getURL('fg/frame.html'));
+
+        document.body.appendChild(this.container);
     }
 
-    show(rect, content) {
-        this.inject();
-
+    show(rect) {
         this.container.style.left = rect.x + 'px';
         this.container.style.top = rect.y + 'px';
         this.container.style.height = rect.height + 'px';
         this.container.style.width = rect.width + 'px';
         this.container.style.visibility = 'visible';
-
-        this.setContent(content);
     }
 
-    showNextTo(elementRect, content) {
-        this.inject();
-
-        const containerRect = this.container.getBoundingClientRect();
+    showNextTo(elementRect) {
+        const containerStyle = window.getComputedStyle(this.container);
+        const containerHeight = parseInt(containerStyle.height);
+        const containerWidth = parseInt(containerStyle.width);
 
         let x = elementRect.left;
-        let width = containerRect.width;
+        let width = containerWidth;
         if (x + width >= window.innerWidth) {
             const widthMax = window.innerWidth - x;
             width = Math.min(width, widthMax);
@@ -49,14 +52,14 @@ class Popup {
         }
 
         let y = elementRect.bottom + this.offset;
-        let height = containerRect.height;
+        let height = containerHeight;
         if (y + height >= window.innerHeight) {
             const heightMax = window.innerHeight - y - this.offset;
             height = Math.min(height, heightMax);
             y = elementRect.top - height - this.offset;
         }
 
-        this.show({x, y, width, height}, content);
+        this.show({x, y, width, height});
     }
 
     visible() {
@@ -69,35 +72,9 @@ class Popup {
         }
     }
 
-    setContent(content) {
-        if (this.container === null) {
-            return;
-        }
-
-        this.container.contentWindow.scrollTo(0, 0);
-
-        const doc = this.container.contentDocument;
-        doc.open();
-        doc.write(content);
-        doc.close();
-    }
-
-    invokeApi(action, params) {
+    invoke(action, params) {
         if (this.container !== null) {
             this.container.contentWindow.postMessage({action, params}, '*');
         }
-    }
-
-    inject() {
-        if (this.container !== null) {
-            return;
-        }
-
-        this.container = document.createElement('iframe');
-        this.container.id = 'yomichan-popup';
-        this.container.addEventListener('mousedown', e => e.stopPropagation());
-        this.container.addEventListener('scroll', e => e.stopPropagation());
-
-        document.body.appendChild(this.container);
     }
 }

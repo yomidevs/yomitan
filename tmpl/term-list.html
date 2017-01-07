@@ -1,9 +1,7 @@
-{{> header.html}}
 {{#if definitions}}
     {{#each definitions}}
-    {{> term.html addable=../addable root=../root options=../options sequence=../sequence}}
+    {{> term.html addable=../addable playback=../playback}}
     {{/each}}
 {{else}}
     <p>No results found</p>
 {{/if}}
-{{> footer.html}}

@@ -21,18 +21,13 @@ class Driver {
     constructor() {
         this.popup = new Popup();
         this.popupTimer = null;
-        this.audio = {};
         this.lastMousePos = null;
         this.lastTextSource = null;
         this.pendingLookup = false;
         this.enabled = false;
         this.options = null;
-        this.definitions = null;
-        this.sequence = 0;
-        this.fgRoot = chrome.extension.getURL('fg');
 
         chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
-        window.addEventListener('message', this.onFrameMessage.bind(this));
         window.addEventListener('mouseover', this.onMouseOver.bind(this));
         window.addEventListener('mousedown', this.onMouseDown.bind(this));
         window.addEventListener('mousemove', this.onMouseMove.bind(this));
@@ -114,101 +109,6 @@ class Driver {
         callback();
     }
 
-    onFrameMessage(e) {
-        const {action, params} = e.data, method = this['api_' + action];
-        if (typeof(method) === 'function') {
-            method.call(this, params);
-        }
-    }
-
-    searchTerms(textSource) {
-        textSource.setEndOffset(this.options.scanLength);
-
-        this.pendingLookup = true;
-        return findTerm(textSource.text()).then(({definitions, length}) => {
-            if (definitions.length === 0) {
-                this.pendingLookup = false;
-                return false;
-            } else {
-                textSource.setEndOffset(length);
-
-                const sentence = extractSentence(textSource, this.options.sentenceExtent);
-                definitions.forEach(definition => {
-                    definition.url = window.location.href;
-                    definition.sentence = sentence;
-                });
-
-                const sequence = ++this.sequence;
-                const context = {
-                    definitions,
-                    sequence,
-                    addable: this.options.ankiMethod !== 'disabled',
-                    root: this.fgRoot,
-                    options: this.options
-                };
-
-                return renderText(context, 'term-list.html').then(content => {
-                    this.definitions = definitions;
-                    this.pendingLookup = false;
-                    this.showPopup(textSource, content);
-                    return canAddDefinitions(definitions, ['term_kanji', 'term_kana']);
-                }).then(states => {
-                    if (states !== null) {
-                        states.forEach((state, index) => this.popup.invokeApi(
-                            'setActionState',
-                            {index, state, sequence}
-                        ));
-                    }
-
-                    return true;
-                });
-            }
-        }).catch(error => {
-            alert('Error: ' + error);
-        });
-    }
-
-    searchKanji(textSource) {
-        textSource.setEndOffset(1);
-
-        this.pendingLookup = true;
-        return findKanji(textSource.text()).then(definitions => {
-            if (definitions.length === 0) {
-                this.pendingLookup = false;
-                return false;
-            } else {
-                definitions.forEach(definition => definition.url = window.location.href);
-
-                const sequence = ++this.sequence;
-                const context = {
-                    definitions,
-                    sequence,
-                    addable: this.options.ankiMethod !== 'disabled',
-                    root: this.fgRoot,
-                    options: this.options
-                };
-
-                return renderText(context, 'kanji-list.html').then(content => {
-                    this.definitions = definitions;
-                    this.pendingLookup = false;
-                    this.showPopup(textSource, content);
-                    return canAddDefinitions(definitions, ['kanji']);
-                }).then(states => {
-                    if (states !== null) {
-                        states.forEach((state, index) => this.popup.invokeApi(
-                            'setActionState',
-                            {index, state, sequence}
-                        ));
-                    }
-
-                    return true;
-                });
-            }
-        }).catch(error => {
-            alert('Error: ' + error);
-        });
-    }
-
     searchAt(point, hideNotFound) {
         if (this.pendingLookup) {
             return;
@@ -227,6 +127,7 @@ class Driver {
             return true;
         }
 
+        this.pendingLookup = true;
         this.searchTerms(textSource).then(found => {
             if (!found) {
                 this.searchKanji(textSource).then(found => {
@@ -237,17 +138,53 @@ class Driver {
             }
         }).catch(error => {
             alert('Error: ' + error);
+        }).then(() => {
+            this.pendingLookup = false;
         });
     }
 
-    showPopup(textSource, content) {
-        this.popup.showNextTo(textSource.getRect(), content);
+    searchTerms(textSource) {
+        textSource.setEndOffset(this.options.scanLength);
 
-        if (this.options.selectMatchedText) {
-            textSource.select();
-        }
+        return findTerm(textSource.text()).then(({definitions, length}) => {
+            if (definitions.length === 0) {
+                return false;
+            } else {
+                textSource.setEndOffset(length);
 
-        this.lastTextSource = textSource;
+                const sentence = extractSentence(textSource, this.options.sentenceExtent);
+                definitions.forEach(definition => {
+                    definition.url = window.location.href;
+                    definition.sentence = sentence;
+                });
+
+                this.popup.showNextTo(textSource.getRect());
+                this.popup.invoke('showTermDefs', {definitions, options: this.options});
+
+                return true;
+            }
+        }).catch(error => {
+            alert('Error: ' + error);
+        });
+    }
+
+    searchKanji(textSource) {
+        textSource.setEndOffset(1);
+
+        return findKanji(textSource.text()).then(definitions => {
+            if (definitions.length === 0) {
+                return false;
+            } else {
+                definitions.forEach(definition => definition.url = window.location.href);
+
+                this.popup.showNextTo(textSource.getRect());
+                this.popup.invoke('showKanjiDefs', {definitions, options: this.options});
+
+                return true;
+            }
+        }).catch(error => {
+            alert('Error: ' + error);
+        });
     }
 
     hidePopup() {
@@ -269,67 +206,6 @@ class Driver {
         if (!(this.enabled = enabled)) {
             this.hidePopup();
         }
-    }
-
-    api_addNote({index, mode}) {
-        const state = {[mode]: false};
-        addDefinition(this.definitions[index], mode).then(success => {
-            if (success) {
-                this.popup.invokeApi('setActionState', {index, state, sequence: this.sequence});
-            } else {
-                alert('Note could not be added');
-            }
-
-            this.popup.invokeApi('addNoteComplete');
-        }).catch(error => {
-            alert('Error: ' + error);
-        });
-    }
-
-    api_playAudio(index) {
-        const definition = this.definitions[index];
-
-        let url = `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=${encodeURIComponent(definition.expression)}`;
-        if (definition.reading) {
-            url += `&kana=${encodeURIComponent(definition.reading)}`;
-        }
-
-        for (const key in this.audio) {
-            this.audio[key].pause();
-        }
-
-        const audio = this.audio[url] || new Audio(url);
-        audio.currentTime = 0;
-        audio.play();
-
-        this.audio[url] = audio;
-    }
-
-    api_displayKanji(kanji) {
-        findKanji(kanji).then(definitions => {
-            definitions.forEach(definition => definition.url = window.location.href);
-
-            const sequence = ++this.sequence;
-            const context = {
-                definitions,
-                sequence,
-                addable: this.options.ankiMethod !== 'disabled',
-                root: this.fgRoot,
-                options: this.options
-            };
-
-            return renderText(context, 'kanji-list.html').then(content => {
-                this.definitions = definitions;
-                this.popup.setContent(content, definitions);
-                return canAddDefinitions(definitions, ['kanji']);
-            }).then(states => {
-                if (states !== null) {
-                    states.forEach((state, index) => this.popup.invokeApi('setActionState', {index, state, sequence}));
-                }
-            });
-        }).catch(error => {
-            alert('Error: ' + error);
-        });
     }
 }
 

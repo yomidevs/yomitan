@@ -18,6 +18,15 @@
 
 /* common styles */
 
+@font-face {
+    font-family: kanji-stroke-orders;
+    src:         url('../ttf/kanji-stroke-orders.ttf');
+}
+@font-face {
+    font-family: vl-gothic-regular;
+    src:         url('../ttf/vl-gothic-regular.ttf');
+}
+
 body {
     background-color: #fff;
     color:            #333;
