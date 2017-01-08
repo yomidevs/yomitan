@@ -349,7 +349,6 @@ function populateAnkiDeckAndModel(opts) {
     showAnkiSpinner(true);
 
     const ankiFormat = $('#anki-format').hide();
-
     return Promise.all([anki().getDeckNames(), anki().getModelNames()]).then(([deckNames, modelNames]) => {
         const ankiDeck = $('.anki-deck');
         ankiDeck.find('option').remove();
@@ -441,7 +440,7 @@ function onOptionsChanged(e) {
                 showAnkiError(null);
                 showAnkiSpinner(true);
                 return anki().logout().then(() => populateAnkiDeckAndModel(optsNew));
-            } else if (loginChanged || optsNew.ankiMethod !== optsOld.ankiMethod) {
+            } else if (optsNew.ankiMethod !== optsOld.ankiMethod) {
                 showAnkiError(null);
                 showAnkiSpinner(true);
                 return populateAnkiDeckAndModel(optsNew);
