@@ -88,6 +88,9 @@
 
 class FrameContext {
     constructor() {
+        this.definitions = [];
+        this.audio = {};
+
         $(window).on('message', e => {
             const {action, params} = e.originalEvent.data, method = this['api_' + action];
             if (typeof(method) === 'function') {
@@ -103,8 +106,20 @@ class FrameContext {
             playback: options.enableAudioPlayback
         };
 
-        this.renderText('term-list.html', context).then(content => {
+        this.definitions = definitions;
+        renderText(context, 'term-list.html').then(content => {
             $('.content').html(content);
+
+            $('.kanji-link').click(e => {
+                e.preventDefault();
+                findKanji($(e.target).text()).then(defs => this.api_showKanjiDefs({options, definitions: defs}));
+            });
+
+            $('.action-play-audio').click(e => {
+                e.preventDefault();
+                const index = $(e.currentTarget).data('index');
+                this.playAudio(this.definitions[index]);
+            });
         });
     }
 
@@ -114,25 +129,27 @@ class FrameContext {
             addable: options.ankiMethod !== 'disabled'
         };
 
-        this.renderText('kanji-list.html', context).then(content => {
+        this.definitions = definitions;
+        renderText(context, 'kanji-list.html').then(content => {
             $('.content').html(content);
         });
     }
 
-    renderText(template, data) {
-        return this.invokeBgApi('renderText', {data, template});
-    }
+    playAudio(definition) {
+        let url = `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=${encodeURIComponent(definition.expression)}`;
+        if (definition.reading) {
+            url += `&kana=${encodeURIComponent(definition.reading)}`;
+        }
 
-    invokeBgApi(action, params) {
-        return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage({action, params}, ({result, error}) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(result);
-                }
-            });
-        });
+        for (const key in this.audio) {
+            this.audio[key].pause();
+        }
+
+        const audio = this.audio[url] || new Audio(url);
+        audio.currentTime = 0;
+        audio.play();
+
+        this.audio[url] = audio;
     }
 }
 
