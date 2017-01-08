@@ -160,6 +160,10 @@ class Driver {
 
                 this.popup.showNextTo(textSource.getRect());
                 this.popup.showTermDefs(definitions, this.options);
+                this.lastTextSource = textSource;
+                if (this.options.selectMatchedText) {
+                    textSource.select();
+                }
 
                 return true;
             }
@@ -180,6 +184,10 @@ class Driver {
 
                 this.popup.showNextTo(textSource.getRect());
                 this.popup.showKanjiDefs(definitions, this.options);
+                this.lastTextSource = textSource;
+                if (this.options.selectMatchedText) {
+                    textSource.select();
+                }
 
                 return true;
             }

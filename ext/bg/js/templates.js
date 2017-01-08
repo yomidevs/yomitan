@@ -69,9 +69,9 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
 },"11":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "        <p>\n            "
+  return "        <p>"
     + container.escapeExpression(container.lambda(((stack1 = (depth0 != null ? depth0.glossary : depth0)) != null ? stack1["0"] : stack1), depth0))
-    + "\n        </p>\n";
+    + "</p>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : {};
 
