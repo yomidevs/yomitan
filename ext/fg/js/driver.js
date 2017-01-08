@@ -32,11 +32,11 @@ class Driver {
         window.addEventListener('mousedown', this.onMouseDown.bind(this));
         window.addEventListener('mousemove', this.onMouseMove.bind(this));
         window.addEventListener('keydown', this.onKeyDown.bind(this));
-        window.addEventListener('resize', e => this.hidePopup());
+        window.addEventListener('resize', e => this.searchClear());
 
         getOptions().then(opts => {
             this.options = opts;
-            return getEnabled();
+            return isEnabled();
         }).then(enabled => {
             this.enabled = enabled;
         });
@@ -60,7 +60,7 @@ class Driver {
         if (this.enabled && this.lastMousePos !== null && e.keyCode === 16 /* shift */) {
             this.searchAt(this.lastMousePos, true);
         } else if (e.keyCode === 27 /* esc */) {
-            this.hidePopup();
+            this.searchClear();
         }
     }
 
@@ -87,7 +87,7 @@ class Driver {
         }
 
         const searcher = () => this.searchAt(this.lastMousePos, false);
-        if (!this.popup.visible() || e.shiftKey || e.which === 2 /* mmb */) {
+        if (!this.popup.isVisible() || e.shiftKey || e.which === 2 /* mmb */) {
             searcher();
         } else {
             this.popupTimerSet(searcher);
@@ -97,7 +97,7 @@ class Driver {
     onMouseDown(e) {
         this.lastMousePos = {x: e.clientX, y: e.clientY};
         this.popupTimerClear();
-        this.hidePopup();
+        this.searchClear();
     }
 
     onBgMessage({action, params}, sender, callback) {
@@ -117,14 +117,14 @@ class Driver {
         const textSource = textSourceFromPoint(point);
         if (textSource === null || !textSource.containsPoint(point)) {
             if (hideNotFound) {
-                this.hidePopup();
+                this.searchClear();
             }
 
             return;
         }
 
         if (this.lastTextSource !== null && this.lastTextSource.equals(textSource)) {
-            return true;
+            return;
         }
 
         this.pendingLookup = true;
@@ -132,12 +132,12 @@ class Driver {
             if (!found) {
                 this.searchKanji(textSource).then(found => {
                     if (!found && hideNotFound) {
-                        this.hidePopup();
+                        this.searchClear();
                     }
                 });
             }
         }).catch(error => {
-            alert('Error: ' + error);
+            window.alert('Error: ' + error);
         }).then(() => {
             this.pendingLookup = false;
         });
@@ -159,12 +159,13 @@ class Driver {
                 });
 
                 this.popup.showNextTo(textSource.getRect());
-                this.popup.invoke('showTermDefs', {definitions, options: this.options});
+                this.popup.showTermDefs(definitions, this.options);
 
                 return true;
             }
         }).catch(error => {
-            alert('Error: ' + error);
+            window.alert('Error: ' + error);
+            return false;
         });
     }
 
@@ -178,16 +179,17 @@ class Driver {
                 definitions.forEach(definition => definition.url = window.location.href);
 
                 this.popup.showNextTo(textSource.getRect());
-                this.popup.invoke('showKanjiDefs', {definitions, options: this.options});
+                this.popup.showKanjiDefs(definitions, this.options);
 
                 return true;
             }
         }).catch(error => {
-            alert('Error: ' + error);
+            window.alert('Error: ' + error);
+            return false;
         });
     }
 
-    hidePopup() {
+    searchClear() {
         this.popup.hide();
 
         if (this.options.selectMatchedText && this.lastTextSource !== null) {
@@ -195,7 +197,6 @@ class Driver {
         }
 
         this.lastTextSource = null;
-        this.definitions = null;
     }
 
     api_setOptions(opts) {
@@ -204,7 +205,7 @@ class Driver {
 
     api_setEnabled(enabled) {
         if (!(this.enabled = enabled)) {
-            this.hidePopup();
+            this.searchClear();
         }
     }
 }

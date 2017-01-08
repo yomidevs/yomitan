@@ -30,7 +30,7 @@ class Popup {
         document.body.appendChild(this.container);
     }
 
-    show(rect) {
+    showAt(rect) {
         this.container.style.left = rect.x + 'px';
         this.container.style.top = rect.y + 'px';
         this.container.style.height = rect.height + 'px';
@@ -59,22 +59,26 @@ class Popup {
             y = elementRect.top - height - this.offset;
         }
 
-        this.show({x, y, width, height});
-    }
-
-    visible() {
-        return this.container !== null && this.container.style.visibility !== 'hidden';
+        this.showAt({x, y, width, height});
     }
 
     hide() {
-        if (this.container !== null) {
-            this.container.style.visibility = 'hidden';
-        }
+        this.container.style.visibility = 'hidden';
     }
 
-    invoke(action, params) {
-        if (this.container !== null) {
-            this.container.contentWindow.postMessage({action, params}, '*');
-        }
+    isVisible() {
+        return this.container.style.visibility !== 'hidden';
+    }
+
+    showTermDefs(definitions, options) {
+        this.invokeApi('showTermDefs', {definitions, options});
+    }
+
+    showKanjiDefs(definitions, options) {
+        this.invokeApi('showKanjiDefs', {definitions, options});
+    }
+
+    invokeApi(action, params) {
+        this.container.contentWindow.postMessage({action, params}, '*');
     }
 }

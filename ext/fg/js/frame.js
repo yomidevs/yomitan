@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class FrameContext {
+class Frame {
     constructor() {
         this.definitions = [];
         this.audioCache = {};
@@ -156,4 +156,4 @@ class FrameContext {
     }
 }
 
-window.frameContext = new FrameContext();
+window.frame = new Frame();

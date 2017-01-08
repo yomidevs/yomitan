@@ -17,7 +17,7 @@
  */
 
 
-function invokeApiBg(action, params) {
+function invokeBgApi(action, params) {
     return new Promise((resolve, reject) => {
         chrome.runtime.sendMessage({action, params}, ({result, error}) => {
             if (error) {
@@ -29,32 +29,32 @@ function invokeApiBg(action, params) {
     });
 }
 
-function getEnabled() {
-    return invokeApiBg('getEnabled', {});
+function isEnabled() {
+    return invokeBgApi('getEnabled', {});
 }
 
 function getOptions() {
-    return invokeApiBg('getOptions', {});
+    return invokeBgApi('getOptions', {});
 }
 
 function findTerm(text) {
-    return invokeApiBg('findTerm', {text});
+    return invokeBgApi('findTerm', {text});
 }
 
 function findKanji(text) {
-    return invokeApiBg('findKanji', {text});
+    return invokeBgApi('findKanji', {text});
 }
 
 function renderText(data, template) {
-    return invokeApiBg('renderText', {data, template});
+    return invokeBgApi('renderText', {data, template});
 }
 
 function canAddDefinitions(definitions, modes) {
-    return invokeApiBg('canAddDefinitions', {definitions, modes}).catch(() => null);
+    return invokeBgApi('canAddDefinitions', {definitions, modes}).catch(() => null);
 }
 
 function addDefinition(definition, mode) {
-    return invokeApiBg('addDefinition', {definition, mode});
+    return invokeBgApi('addDefinition', {definition, mode});
 }
 
 function textSourceFromPoint(point) {
