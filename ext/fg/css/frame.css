@@ -100,10 +100,10 @@ body {
 }
 
 .spinner {
-    bottom:     5px;
-    position:   fixed;
-    right:      5px;
-    visibility: hidden;
+    bottom:   5px;
+    display:  none;
+    position: fixed;
+    right:    5px;
 }
 
 /* term styles */

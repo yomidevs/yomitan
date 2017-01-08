@@ -19,7 +19,8 @@
 class FrameContext {
     constructor() {
         this.definitions = [];
-        this.audio = {};
+        this.audioCache = {};
+        this.sequence = 0;
 
         $(window).on('message', e => {
             const {action, params} = e.originalEvent.data, method = this['api_' + action];
@@ -30,6 +31,7 @@ class FrameContext {
     }
 
     api_showTermDefs({definitions, options}) {
+        const sequence = ++this.sequence;
         const context = {
             definitions,
             addable: options.ankiMethod !== 'disabled',
@@ -38,13 +40,15 @@ class FrameContext {
 
         this.definitions = definitions;
         this.showSpinner(false);
+        window.scrollTo(0, 0);
 
         renderText(context, 'term-list.html').then(content => {
             $('.content').html(content);
+            $('.action-add-note').click(this.onAddNote.bind(this));
 
             $('.kanji-link').click(e => {
                 e.preventDefault();
-                findKanji($(e.target).text()).then(defs => this.api_showKanjiDefs({options, definitions: defs}));
+                findKanji($(e.target).text()).then(kdefs => this.api_showKanjiDefs({options, definitions: kdefs}));
             });
 
             $('.action-play-audio').click(e => {
@@ -53,50 +57,12 @@ class FrameContext {
                 this.playAudio(this.definitions[index]);
             });
 
-            $('.action-add-note').click(e => {
-                e.preventDefault();
-                this.showSpinner(true);
-
-                const link = $(e.currentTarget);
-                const index = link.data('index');
-                const mode = link.data('mode');
-
-                addDefinition(this.definitions[index], mode).then(success => {
-                    if (success) {
-                        const button = this.getAddButton(index, mode);
-                        button.addClass('disabled');
-                    } else {
-                        window.alert('Note could not be added');
-                    }
-                }).catch(error => {
-                    window.alert('Error: ' + error);
-                }).then(() => {
-                    this.showSpinner(false);
-                });
-            });
-
-            canAddDefinitions(definitions, ['term_kanji', 'term_kana']).then(states => {
-                if (states === null) {
-                    return;
-                }
-
-                states.forEach((state, index) => {
-                    for (const mode in state) {
-                        const button = this.getAddButton(index, mode);
-                        if (state[mode]) {
-                            button.removeClass('disabled');
-                        } else {
-                            button.addClass('disabled');
-                        }
-
-                        button.removeClass('pending');
-                    }
-                });
-            });
+            this.updateAddNoteButtons(['term_kanji', 'term_kana'], sequence);
         });
     }
 
     api_showKanjiDefs({definitions, options}) {
+        const sequence = ++this.sequence;
         const context = {
             definitions,
             addable: options.ankiMethod !== 'disabled'
@@ -104,19 +70,74 @@ class FrameContext {
 
         this.definitions = definitions;
         this.showSpinner(false);
+        window.scrollTo(0, 0);
 
         renderText(context, 'kanji-list.html').then(content => {
             $('.content').html(content);
+            $('.action-add-note').click(this.onAddNote.bind(this));
+
+            this.updateAddNoteButtons(['kanji'], sequence);
         });
     }
 
-    getAddButton(index, mode) {
+    findAddNoteButton(index, mode) {
         return $(`.action-add-note[data-index="${index}"][data-mode="${mode}"]`);
     }
 
+    onAddNote(e) {
+        e.preventDefault();
+        this.showSpinner(true);
+
+        const link = $(e.currentTarget);
+        const index = link.data('index');
+        const mode = link.data('mode');
+
+        addDefinition(this.definitions[index], mode).then(success => {
+            if (success) {
+                const button = this.findAddNoteButton(index, mode);
+                button.addClass('disabled');
+            } else {
+                window.alert('Note could not be added');
+            }
+        }).catch(error => {
+            window.alert('Error: ' + error);
+        }).then(() => {
+            this.showSpinner(false);
+        });
+    }
+
+    updateAddNoteButtons(modes, sequence) {
+        canAddDefinitions(this.definitions, modes).then(states => {
+            if (states === null) {
+                return;
+            }
+
+            if (sequence !== this.sequence) {
+                return;
+            }
+
+            states.forEach((state, index) => {
+                for (const mode in state) {
+                    const button = this.findAddNoteButton(index, mode);
+                    if (state[mode]) {
+                        button.removeClass('disabled');
+                    } else {
+                        button.addClass('disabled');
+                    }
+
+                    button.removeClass('pending');
+                }
+            });
+        });
+    }
+
     showSpinner(show) {
-        const spinner = document.querySelector('.spinner');
-        spinner.style.visibility = show ? 'visible' : 'hidden';
+        const spinner = $('.spinner');
+        if (show) {
+            spinner.show();
+        } else {
+            spinner.hide();
+        }
     }
 
     playAudio(definition) {
@@ -125,15 +146,13 @@ class FrameContext {
             url += `&kana=${encodeURIComponent(definition.reading)}`;
         }
 
-        for (const key in this.audio) {
-            this.audio[key].pause();
+        for (const key in this.audioCache) {
+            this.audioCache[key].pause();
         }
 
-        const audio = this.audio[url] || new Audio(url);
+        const audio = this.audioCache[url] || new Audio(url);
         audio.currentTime = 0;
         audio.play();
-
-        this.audio[url] = audio;
     }
 }
 
