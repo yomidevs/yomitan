@@ -16,76 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-// function renderText(data, template) {
-//     return invokeApiBg('renderText', {data, template});
-// }
-
-// function canAddDefinitions(definitions, modes) {
-//     return invokeApiBg('canAddDefinitions', {definitions, modes}).catch(() => null);
-// }
-
-// function addDefinition(definition, mode) {
-//     return invokeApiBg('addDefinition', {definition, mode});
-// }
-
-// function invokeApi(action, params, target) {
-//     target.postMessage({action, params}, '*');
-// }
-
-// function showSpinner(show) {
-//     const spinner = document.querySelector('.spinner');
-//     spinner.style.visibility = show ? 'visible' : 'hidden';
-// }
-
-// function registerKanjiLinks() {
-//     for (const link of Array.from(document.getElementsByClassName('kanji-link'))) {
-//         link.addEventListener('click', e => {
-//             e.preventDefault();
-//             invokeApi('displayKanji', e.target.innerHTML, window.parent);
-//         });
-//     }
-// }
-
-// function registerAddNoteLinks() {
-//     for (const link of Array.from(document.getElementsByClassName('action-add-note'))) {
-//         link.addEventListener('click', e => {
-//             e.preventDefault();
-//             const ds = e.currentTarget.dataset;
-//             invokeApi('addNote', {index: ds.index, mode: ds.mode}, window.parent);
-//             showSpinner(true);
-//         });
-//     }
-// }
-
-// function registerAudioLinks() {
-//     for (const link of Array.from(document.getElementsByClassName('action-play-audio'))) {
-//         link.addEventListener('click', e => {
-//             e.preventDefault();
-//             const ds = e.currentTarget.dataset;
-//             invokeApi('playAudio', ds.index, window.parent);
-//         });
-//     }
-// }
-
-// function api_setActionState({index, state, sequence}) {
-//     for (const mode in state) {
-//         const matches = document.querySelectorAll(`.action-bar[data-sequence="${sequence}"] .action-add-note[data-index="${index}"][data-mode="${mode}"]`);
-//         if (matches.length === 0) {
-//             return;
-//         }
-
-//         const classes = matches[0].classList;
-//         if (state[mode]) {
-//             classes.remove('disabled');
-//         } else {
-//             classes.add('disabled');
-//         }
-
-//         classes.remove('pending');
-//     }
-// }
-
 class FrameContext {
     constructor() {
         this.definitions = [];
@@ -107,6 +37,8 @@ class FrameContext {
         };
 
         this.definitions = definitions;
+        this.showSpinner(false);
+
         renderText(context, 'term-list.html').then(content => {
             $('.content').html(content);
 
@@ -120,6 +52,47 @@ class FrameContext {
                 const index = $(e.currentTarget).data('index');
                 this.playAudio(this.definitions[index]);
             });
+
+            $('.action-add-note').click(e => {
+                e.preventDefault();
+                this.showSpinner(true);
+
+                const link = $(e.currentTarget);
+                const index = link.data('index');
+                const mode = link.data('mode');
+
+                addDefinition(this.definitions[index], mode).then(success => {
+                    if (success) {
+                        const button = this.getAddButton(index, mode);
+                        button.addClass('disabled');
+                    } else {
+                        window.alert('Note could not be added');
+                    }
+                }).catch(error => {
+                    window.alert('Error: ' + error);
+                }).then(() => {
+                    this.showSpinner(false);
+                });
+            });
+
+            canAddDefinitions(definitions, ['term_kanji', 'term_kana']).then(states => {
+                if (states === null) {
+                    return;
+                }
+
+                states.forEach((state, index) => {
+                    for (const mode in state) {
+                        const button = this.getAddButton(index, mode);
+                        if (state[mode]) {
+                            button.removeClass('disabled');
+                        } else {
+                            button.addClass('disabled');
+                        }
+
+                        button.removeClass('pending');
+                    }
+                });
+            });
         });
     }
 
@@ -130,9 +103,20 @@ class FrameContext {
         };
 
         this.definitions = definitions;
+        this.showSpinner(false);
+
         renderText(context, 'kanji-list.html').then(content => {
             $('.content').html(content);
         });
+    }
+
+    getAddButton(index, mode) {
+        return $(`.action-add-note[data-index="${index}"][data-mode="${mode}"]`);
+    }
+
+    showSpinner(show) {
+        const spinner = document.querySelector('.spinner');
+        spinner.style.visibility = show ? 'visible' : 'hidden';
     }
 
     playAudio(definition) {
@@ -154,37 +138,3 @@ class FrameContext {
 }
 
 window.frameContext = new FrameContext();
-
-    // api_addNote({index, mode}) {
-    //     const state = {[mode]: false};
-    //     addDefinition(this.definitions[index], mode).then(success => {
-    //         if (success) {
-    //             this.popup.invokeApi('setActionState', {index, state, sequence: this.sequence});
-    //         } else {
-    //             alert('Note could not be added');
-    //         }
-
-    //         this.popup.invokeApi('addNoteComplete');
-    //     }).catch(error => {
-    //         alert('Error: ' + error);
-    //     });
-    // }
-
-    // api_playAudio(index) {
-    //     const definition = this.definitions[index];
-
-    //     let url = `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=${encodeURIComponent(definition.expression)}`;
-    //     if (definition.reading) {
-    //         url += `&kana=${encodeURIComponent(definition.reading)}`;
-    //     }
-
-    //     for (const key in this.audio) {
-    //         this.audio[key].pause();
-    //     }
-
-    //     const audio = this.audio[url] || new Audio(url);
-    //     audio.currentTime = 0;
-    //     audio.play();
-
-    //     this.audio[url] = audio;
-    // }
