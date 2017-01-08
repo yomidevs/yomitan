@@ -44,28 +44,6 @@ function promiseCallback(promise, callback) {
     });
 }
 
-function sortTags(tags) {
-    return tags.sort((v1, v2) => {
-        const order1 = v1.order;
-        const order2 = v2.order;
-        if (order1 < order2) {
-            return -1;
-        } else if (order1 > order2) {
-            return 1;
-        }
-
-        const name1 = v1.name;
-        const name2 = v2.name;
-        if (name1 < name2) {
-            return -1;
-        } else if (name1 > name2) {
-            return 1;
-        }
-
-        return 0;
-    });
-}
-
 function sortTermDefs(definitions) {
     return definitions.sort((v1, v2) => {
         const sl1 = v1.source.length;
@@ -137,6 +115,95 @@ function sanitizeTag(tag) {
 
 function splitField(field) {
     return field.length === 0 ? [] : field.split(' ');
+}
+
+function sortTags(tags) {
+    return tags.sort((v1, v2) => {
+        const order1 = v1.order;
+        const order2 = v2.order;
+        if (order1 < order2) {
+            return -1;
+        } else if (order1 > order2) {
+            return 1;
+        }
+
+        const name1 = v1.name;
+        const name2 = v2.name;
+        if (name1 < name2) {
+            return -1;
+        } else if (name1 > name2) {
+            return 1;
+        }
+
+        return 0;
+    });
+}
+
+function formatField(field, definition, mode) {
+    const markers = [
+        'audio',
+        'character',
+        'dictionary',
+        'expression',
+        'expression-furigana',
+        'glossary',
+        'glossary-list',
+        'kunyomi',
+        'onyomi',
+        'reading',
+        'sentence',
+        'tags',
+        'url',
+    ];
+
+    for (const marker of markers) {
+        let value = definition[marker] || null;
+        switch (marker) {
+            case 'expression':
+                if (mode === 'term_kana' && definition.reading) {
+                    value = definition.reading;
+                }
+                break;
+            case 'expression-furigana':
+                if (mode === 'term_kana' && definition.reading) {
+                    value = definition.reading;
+                } else {
+                    value = `<ruby>${definition.expression}<rt>${definition.reading}</rt></ruby>`;
+                }
+                break;
+            case 'reading':
+                if (mode === 'term_kana') {
+                    value = null;
+                }
+                break;
+            case 'glossary-list':
+                if (definition.glossary) {
+                    if (definition.glossary.length > 1) {
+                        value = '<ol style="white-space: pre; text-align: left; overflow-x: auto;">';
+                        for (const gloss of definition.glossary) {
+                            value += `<li>${gloss}</li>`;
+                        }
+                        value += '</ol>';
+                    } else {
+                        value = `<p style="white-space: pre; overflow-x: auto;">${definition.glossary.join('')}</p>`;
+                    }
+                }
+                break;
+            case 'tags':
+                if (definition.tags) {
+                    value = definition.tags.map(t => t.name);
+                }
+                break;
+        }
+
+        if (value !== null && typeof(value) !== 'string') {
+            value = value.join(', ');
+        }
+
+        field = field.replace(`{${marker}}`, value || '');
+    }
+
+    return field;
 }
 
 function loadJson(url) {

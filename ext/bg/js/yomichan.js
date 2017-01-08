@@ -120,73 +120,6 @@ class Yomichan {
         chrome.tabs.sendMessage(tabId, {action, params}, () => null);
     }
 
-    formatField(field, definition, mode) {
-        const markers = [
-            'audio',
-            'character',
-            'dictionary',
-            'expression',
-            'expression-furigana',
-            'glossary',
-            'glossary-list',
-            'kunyomi',
-            'onyomi',
-            'reading',
-            'sentence',
-            'tags',
-            'url',
-        ];
-
-        for (const marker of markers) {
-            let value = definition[marker] || null;
-            switch (marker) {
-                case 'expression':
-                    if (mode === 'term_kana' && definition.reading) {
-                        value = definition.reading;
-                    }
-                    break;
-                case 'expression-furigana':
-                    if (mode === 'term_kana' && definition.reading) {
-                        value = definition.reading;
-                    } else {
-                        value = `<ruby>${definition.expression}<rt>${definition.reading}</rt></ruby>`;
-                    }
-                    break;
-                case 'reading':
-                    if (mode === 'term_kana') {
-                        value = null;
-                    }
-                    break;
-                case 'glossary-list':
-                    if (definition.glossary) {
-                        if (definition.glossary.length > 1) {
-                            value = '<ol style="white-space: pre; text-align: left; overflow-x: auto;">';
-                            for (const gloss of definition.glossary) {
-                                value += `<li>${gloss}</li>`;
-                            }
-                            value += '</ol>';
-                        } else {
-                            value = `<p style="white-space: pre; overflow-x: auto;">${definition.glossary.join('')}</p>`;
-                        }
-                    }
-                    break;
-                case 'tags':
-                    if (definition.tags) {
-                        value = definition.tags.map(t => t.name);
-                    }
-                    break;
-            }
-
-            if (value !== null && typeof(value) !== 'string') {
-                value = value.join(', ');
-            }
-
-            field = field.replace(`{${marker}}`, value || '');
-        }
-
-        return field;
-    }
-
     formatNote(definition, mode) {
         const note = {fields: {}, tags: this.options.ankiCardTags};
 
@@ -218,7 +151,7 @@ class Yomichan {
         }
 
         for (const name in fields) {
-            note.fields[name] = this.formatField(fields[name], definition, mode);
+            note.fields[name] = formatField(fields[name], definition, mode);
         }
 
         return note;
