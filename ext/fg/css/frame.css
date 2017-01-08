@@ -75,6 +75,10 @@ body {
     background-color: #d9534f;
 }
 
+.tag-dictionary {
+    background-color: #aa66cc;
+}
+
 .action-bar {
     float: right;
 }

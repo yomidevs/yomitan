@@ -54,6 +54,13 @@ class Translator {
             let definitions = [];
             for (const deinflection of deinflections) {
                 for (const definition of deinflection.definitions) {
+                    const tags = definition.tags.map(tag => buildTag(tag, definition.tagMeta));
+                    tags.push(sanitizeTag({
+                        name: definition.dictionary,
+                        category: 'dictionary',
+                        order: 100
+                    }));
+
                     definitions.push({
                         source: deinflection.source,
                         reasons: deinflection.reasons,
@@ -63,7 +70,7 @@ class Translator {
                         expression: definition.expression,
                         reading: definition.reading,
                         glossary: definition.glossary,
-                        tags: sortTags(definition.tags.map(tag => buildTag(tag, definition.tagMeta)))
+                        tags: sortTags(tags)
                     });
                 }
             }
