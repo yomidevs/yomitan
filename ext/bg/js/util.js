@@ -116,7 +116,7 @@ function groupTermDefs(definitions) {
 
         const tagCounts = {};
         for (const tag of groupDefs.map(def => def.tags)) {
-            const count = tagsGlobal[tag.name] || 0;
+            const count = tagCounts[tag.name] || 0;
             tagCounts[tag.name] = count + 1;
         }
 

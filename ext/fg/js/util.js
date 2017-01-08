@@ -41,6 +41,10 @@ function findTerm(text) {
     return invokeBgApi('findTerm', {text});
 }
 
+function findTermGrouped(text) {
+    return invokeBgApi('findTermGrouped', {text});
+}
+
 function findKanji(text) {
     return invokeBgApi('findKanji', {text});
 }

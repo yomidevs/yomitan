@@ -82,6 +82,12 @@ class Translator {
         });
     }
 
+    findTermGrouped(text, dictionaries, enableSoftKatakanaSearch) {
+        return this.findTerm(text, dictionaries, enableSoftKatakanaSearch).then(({length, definitions}) => {
+            return {length, definitions: groupTermDefs(definitions)};
+        });
+    }
+
     findKanji(text, dictionaries) {
         const processed = {}, promises = [];
         for (const c of text) {

@@ -146,7 +146,14 @@ class Driver {
     searchTerms(textSource) {
         textSource.setEndOffset(this.options.scanLength);
 
-        return findTerm(textSource.text()).then(({definitions, length}) => {
+        let findFunc = findTerm;
+        let showFunc = this.popup.showTermDefs.bind(this.popup);
+        if (this.options.groupTermResults) {
+            findFunc = findTermGrouped;
+            showFunc = this.popup.showTermGroupedDefs.bind(this.popup);
+        }
+
+        return findFunc(textSource.text()).then(({definitions, length}) => {
             if (definitions.length === 0) {
                 return false;
             } else {
@@ -159,7 +166,7 @@ class Driver {
                 });
 
                 this.popup.showNextTo(textSource.getRect());
-                this.popup.showTermDefs(definitions, this.options);
+                showFunc(definitions, this.options);
                 this.lastTextSource = textSource;
                 if (this.options.selectMatchedText) {
                     textSource.select();

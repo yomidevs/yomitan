@@ -188,7 +188,29 @@ class Yomichan {
         }
 
         promiseCallback(
-            this.translator.findTerm(text, dictionaries, this.options.enableSoftKatakanaSearch),
+            this.translator.findTerm(
+                text,
+                dictionaries,
+                this.options.enableSoftKatakanaSearch
+            ),
+            callback
+        );
+    }
+
+    api_findTermGrouped({text, callback}) {
+        const dictionaries = [];
+        for (const title in this.options.dictionaries) {
+            if (this.options.dictionaries[title].enableTerms) {
+                dictionaries.push(title);
+            }
+        }
+
+        promiseCallback(
+            this.translator.findTermGrouped(
+                text,
+                dictionaries,
+                this.options.enableSoftKatakanaSearch
+            ),
             callback
         );
     }

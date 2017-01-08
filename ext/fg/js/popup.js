@@ -74,6 +74,10 @@ class Popup {
         this.invokeApi('showTermDefs', {definitions, options});
     }
 
+    showTermGroupedDefs(definitions, options) {
+        this.invokeApi('showTermGroupedDefs', {definitions, options});
+    }
+
     showKanjiDefs(definitions, options) {
         this.invokeApi('showKanjiDefs', {definitions, options});
     }
