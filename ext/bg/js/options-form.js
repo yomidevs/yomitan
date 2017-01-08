@@ -324,6 +324,7 @@ function modelIdToMarkers(id) {
     return {
         'anki-term-model': [
             'audio',
+            'dictionary',
             'expression',
             'expression-furigana',
             'glossary',
@@ -335,6 +336,7 @@ function modelIdToMarkers(id) {
         ],
         'anki-kanji-model': [
             'character',
+            'dictionary',
             'glossary',
             'glossary-list',
             'kunyomi',

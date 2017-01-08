@@ -124,6 +124,7 @@ class Yomichan {
         const markers = [
             'audio',
             'character',
+            'dictionary',
             'expression',
             'expression-furigana',
             'glossary',
@@ -139,9 +140,6 @@ class Yomichan {
         for (const marker of markers) {
             let value = definition[marker] || null;
             switch (marker) {
-                case 'audio':
-                    value = '';
-                    break;
                 case 'expression':
                     if (mode === 'term_kana' && definition.reading) {
                         value = definition.reading;
