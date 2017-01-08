@@ -55,12 +55,7 @@ class Translator {
             for (const deinflection of deinflections) {
                 for (const definition of deinflection.definitions) {
                     const tags = definition.tags.map(tag => buildTag(tag, definition.tagMeta));
-                    tags.push(sanitizeTag({
-                        name: definition.dictionary,
-                        category: 'dictionary',
-                        order: 100
-                    }));
-
+                    tags.push(buildDictTag(definition.dictionary));
                     definitions.push({
                         source: deinflection.source,
                         reasons: deinflection.reasons,
@@ -96,7 +91,16 @@ class Translator {
             }
         }
 
-        return Promise.all(promises).then(sets => this.processKanji(sets.reduce((a, b) => a.concat(b), [])));
+        return Promise.all(promises).then(defSets => {
+            const definitions = defSets.reduce((a, b) => a.concat(b), []);
+            for (const definition of definitions) {
+                const tags = definition.tags.map(tag => buildTag(tag, definition.tagMeta));
+                tags.push(buildDictTag(definition.dictionary));
+                definition.tags = sortTags(tags);
+            }
+
+            return definitions;
+        });
     }
 
     findTermDeinflections(text, dictionaries, cache) {

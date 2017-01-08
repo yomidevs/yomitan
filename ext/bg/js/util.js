@@ -113,6 +113,10 @@ function undupeTermDefs(definitions) {
     return definitionsUnique;
 }
 
+function buildDictTag(name) {
+    return sanitizeTag({name, category: 'dictionary', order: 100});
+}
+
 function buildTag(name, meta) {
     const tag = {name};
     const symbol = name.split(':')[0];
