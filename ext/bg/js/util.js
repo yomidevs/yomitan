@@ -91,6 +91,71 @@ function undupeTermDefs(definitions) {
     return definitionsUnique;
 }
 
+function groupTermDefs(definitions) {
+    const groups = {};
+    let groupCount = 0;
+
+    for (const definition of definitions) {
+        const key = [definition.source, definition.expression].concat(definition.reasons);
+        if (definition.reading) {
+            key.push(definition.reading);
+        }
+
+        const group = groups[key];
+        if (group) {
+            group.push(definition);
+        } else {
+            groups[key] = [definition];
+            ++groupCount;
+        }
+    }
+
+    const results = [];
+    for (const key in groups) {
+        const groupDefs = sortTermDefs(groups[key]);
+
+        const tagCounts = {};
+        for (const tag of groupDefs.map(def => def.tags)) {
+            const count = tagsGlobal[tag.name] || 0;
+            tagCounts[tag.name] = count + 1;
+        }
+
+        const tagsGlobal = [];
+        const tagsGlobalAdded = {};
+        let maxScore = Number.MIN_SAFE_INTEGER;
+
+        for (const definition of groupDefs) {
+            const tagsLocal = [];
+            for (const tag of definition.tags) {
+                if (tagCounts[tag.name] === groupCount) {
+                    if (!tagsGlobalAdded[tag.name]) {
+                        tagsGlobalAdded[tag.name] = true;
+                        tagsGlobal.push(tag);
+                    }
+                } else {
+                    tagsLocal.push(tag);
+                }
+            }
+
+            definition.tags = tagsLocal;
+            maxScore = Math.max(maxScore, definition.score);
+        }
+
+        const firstDef = groupDefs[0];
+        results.push({
+            definitions: groupDefs,
+            expression: firstDef.expression,
+            reading: firstDef.reading,
+            reasons: firstDef.reasons,
+            score: maxScore,
+            source: firstDef.source,
+            tags: sortTags(tagsGlobal),
+        });
+    }
+
+    return sortTermDefs(results);
+}
+
 function buildDictTag(name) {
     return sanitizeTag({name, category: 'dictionary', order: 100});
 }
