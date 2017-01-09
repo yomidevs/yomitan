@@ -146,13 +146,7 @@ class Driver {
     searchTerms(textSource) {
         textSource.setEndOffset(this.options.scanLength);
 
-        let findFunc = findTerm;
-        let showFunc = this.popup.showTermDefs.bind(this.popup);
-        if (this.options.groupTermResults) {
-            findFunc = findTermGrouped;
-            showFunc = this.popup.showTermGroupedDefs.bind(this.popup);
-        }
-
+        const findFunc = this.options.groupTermResults ? findTermGrouped : findTerm;
         return findFunc(textSource.text()).then(({definitions, length}) => {
             if (definitions.length === 0) {
                 return false;
@@ -166,7 +160,7 @@ class Driver {
                 });
 
                 this.popup.showNextTo(textSource.getRect());
-                showFunc(definitions, this.options);
+                this.popup.showTermDefs(definitions, this.options);
                 this.lastTextSource = textSource;
                 if (this.options.selectMatchedText) {
                     textSource.select();

@@ -62,38 +62,6 @@ class Frame {
         });
     }
 
-    api_showTermGroupedDefs({definitions, options}) {
-        const sequence = ++this.sequence;
-        const context = {
-            definitions,
-            grouped: options.groupTermResults,
-            addable: options.ankiMethod !== 'disabled',
-            playback: options.enableAudioPlayback
-        };
-
-        this.definitions = definitions;
-        this.showSpinner(false);
-        window.scrollTo(0, 0);
-
-        renderText(context, 'term-list.html').then(content => {
-            $('.content').html(content);
-            $('.action-add-note').click(this.onAddNote.bind(this));
-
-            $('.kanji-link').click(e => {
-                e.preventDefault();
-                findKanji($(e.target).text()).then(kdefs => this.api_showKanjiDefs({options, definitions: kdefs}));
-            });
-
-            $('.action-play-audio').click(e => {
-                e.preventDefault();
-                const index = $(e.currentTarget).data('index');
-                this.playAudio(this.definitions[index]);
-            });
-
-            this.updateAddNoteButtons(['term_kanji', 'term_kana'], sequence);
-        });
-    }
-
     api_showKanjiDefs({definitions, options}) {
         const sequence = ++this.sequence;
         const context = {
