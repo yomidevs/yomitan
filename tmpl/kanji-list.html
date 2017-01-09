@@ -1,7 +1,58 @@
+{{#*inline kanji}}
+<div class="kanji-definition">
+    <div class="action-bar">
+        {{#if addable}}
+            <a href="#" title="Add Kanji" class="action-add-note pending disabled" data-mode="kanji" data-index="{{@index}}"><img src="img/add_kanji.png"></a>
+        {{/if}}
+    </div>
+
+    <div class="kanji-glyph">{{character}}</div>
+
+    <div class="kanji-reading">
+        <table>
+            <tr>
+                <th>Kunyomi:</th>
+                <td>
+                    {{#each kunyomi}}
+                        {{.}}{{#unless @last}}, {{/unless}}
+                    {{/each}}
+                </td>
+            </tr>
+            <tr>
+                <th>Onyomi:</th>
+                <td>
+                    {{#each onyomi}}
+                        {{.}}{{#unless @last}}, {{/unless}}
+                    {{/each}}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="kanji-tags">
+        {{#each tags}}
+            <span class="tag tag-{{category}}" title="{{notes}}">{{name}}</span>
+        {{/each}}
+    </div>
+
+    <div class="kanji-glossary">
+        {{#if glossary.[1]}}
+            <ol "kanji-glossary-group">
+                {{#each glossary}}
+                    <li><span class="kanji-glossary-item">{{.}}</span></li>
+                {{/each}}
+            </ol>
+        {{else}}
+            <div class="kanji-glossary-group kanji-glossary-item">{{glossary.[0]}}</div>
+        {{/if}}
+    </div>
+</div>
+{{/inline}}
+
 {{#if definitions}}
     {{#each definitions}}
         {{#unless @first}}<hr>{{/unless}}
-        {{> kanji.html addable=../addable root=../root}}
+        {{> kanji addable=../addable root=../root}}
     {{/each}}
 {{else}}
     <p>No results found</p>

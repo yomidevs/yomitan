@@ -34,6 +34,7 @@ class Frame {
         const sequence = ++this.sequence;
         const context = {
             definitions,
+            grouped: options.groupTermResults,
             addable: options.ankiMethod !== 'disabled',
             playback: options.enableAudioPlayback
         };
@@ -65,6 +66,7 @@ class Frame {
         const sequence = ++this.sequence;
         const context = {
             definitions,
+            grouped: options.groupTermResults,
             addable: options.ankiMethod !== 'disabled',
             playback: options.enableAudioPlayback
         };
@@ -73,7 +75,7 @@ class Frame {
         this.showSpinner(false);
         window.scrollTo(0, 0);
 
-        renderText(context, 'term-grouped-list.html').then(content => {
+        renderText(context, 'term-list.html').then(content => {
             $('.content').html(content);
             $('.action-add-note').click(this.onAddNote.bind(this));
 
