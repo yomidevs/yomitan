@@ -110,6 +110,15 @@ body {
     right:    5px;
 }
 
+hr {
+  background-color: #fff;
+  border:           none;
+  border-top:       1px dotted #ccc;
+  margin-top:       0.8em;
+  margin-bottom:    0.8em;
+  height:           1px;
+}
+
 /* term styles */
 
 .term-expression {

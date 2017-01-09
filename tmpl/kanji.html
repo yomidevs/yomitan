@@ -1,7 +1,7 @@
 <div class="kanji-definition">
     <div class="action-bar">
         {{#if addable}}
-        <a href="#" title="Add Kanji" class="action-add-note pending disabled" data-mode="kanji" data-index="{{@index}}"><img src="img/add_kanji.png"></a>
+            <a href="#" title="Add Kanji" class="action-add-note pending disabled" data-mode="kanji" data-index="{{@index}}"><img src="img/add_kanji.png"></a>
         {{/if}}
     </div>
 
@@ -13,7 +13,7 @@
                 <th>Kunyomi:</th>
                 <td>
                     {{#each kunyomi}}
-                    {{.}}{{#unless @last}}, {{/unless}}
+                        {{.}}{{#unless @last}}, {{/unless}}
                     {{/each}}
                 </td>
             </tr>
@@ -21,7 +21,7 @@
                 <th>Onyomi:</th>
                 <td>
                     {{#each onyomi}}
-                    {{.}}{{#unless @last}}, {{/unless}}
+                        {{.}}{{#unless @last}}, {{/unless}}
                     {{/each}}
                 </td>
             </tr>
@@ -30,19 +30,19 @@
 
     <div class="kanji-tags">
         {{#each tags}}
-        <span class="tag tag-{{category}}" title="{{notes}}">{{name}}</span>
+            <span class="tag tag-{{category}}" title="{{notes}}">{{name}}</span>
         {{/each}}
     </div>
 
     <div class="kanji-glossary">
         {{#if glossary.[1]}}
-        <ol "kanji-glossary-group">
-            {{#each glossary}}
-            <li><span class="kanji-glossary-item">{{.}}</span></li>
-            {{/each}}
-        </ol>
+            <ol "kanji-glossary-group">
+                {{#each glossary}}
+                    <li><span class="kanji-glossary-item">{{.}}</span></li>
+                {{/each}}
+            </ol>
         {{else}}
-        <div class="kanji-glossary-group kanji-glossary-item">{{glossary.[0]}}</div>
+            <div class="kanji-glossary-group kanji-glossary-item">{{glossary.[0]}}</div>
         {{/if}}
     </div>
 </div>

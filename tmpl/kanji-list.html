@@ -1,6 +1,7 @@
 {{#if definitions}}
     {{#each definitions}}
-    {{> kanji.html addable=../addable root=../root}}
+        {{#unless @first}}<hr>{{/unless}}
+        {{> kanji.html addable=../addable root=../root}}
     {{/each}}
 {{else}}
     <p>No results found</p>

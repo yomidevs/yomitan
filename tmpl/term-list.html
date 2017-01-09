@@ -1,7 +1,7 @@
 {{#if definitions}}
     {{#each definitions}}
-    {{> term.html addable=../addable playback=../playback}}
-    <br>
+        {{#unless @first}}<hr>{{/unless}}
+        {{> term.html addable=../addable playback=../playback}}
     {{/each}}
 {{else}}
     <p>No results found</p>

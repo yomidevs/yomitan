@@ -34,13 +34,13 @@ templates['dictionary.html'] = template({"1":function(container,depth0,helpers,p
 templates['kanji.html'] = template({"1":function(container,depth0,helpers,partials,data) {
     var helper;
 
-  return "        <a href=\"#\" title=\"Add Kanji\" class=\"action-add-note pending disabled\" data-mode=\"kanji\" data-index=\""
+  return "            <a href=\"#\" title=\"Add Kanji\" class=\"action-add-note pending disabled\" data-mode=\"kanji\" data-index=\""
     + container.escapeExpression(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\"img/add_kanji.png\"></a>\n";
 },"3":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "                    "
+  return "                        "
     + container.escapeExpression(container.lambda(depth0, depth0))
     + ((stack1 = helpers.unless.call(depth0 != null ? depth0 : {},(data && data.last),{"name":"unless","hash":{},"fn":container.program(4, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "\n";
@@ -49,7 +49,7 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
 },"6":function(container,depth0,helpers,partials,data) {
     var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
-  return "        <span class=\"tag tag-"
+  return "            <span class=\"tag tag-"
     + alias4(((helper = (helper = helpers.category || (depth0 != null ? depth0.category : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"category","hash":{},"data":data}) : helper)))
     + "\" title=\""
     + alias4(((helper = (helper = helpers.notes || (depth0 != null ? depth0.notes : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"notes","hash":{},"data":data}) : helper)))
@@ -59,17 +59,17 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
 },"8":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "        <ol \"kanji-glossary-group\">\n"
+  return "            <ol \"kanji-glossary-group\">\n"
     + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.glossary : depth0),{"name":"each","hash":{},"fn":container.program(9, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "        </ol>\n";
+    + "            </ol>\n";
 },"9":function(container,depth0,helpers,partials,data) {
-    return "            <li><span class=\"kanji-glossary-item\">"
+    return "                    <li><span class=\"kanji-glossary-item\">"
     + container.escapeExpression(container.lambda(depth0, depth0))
     + "</span></li>\n";
 },"11":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "        <div class=\"kanji-glossary-group kanji-glossary-item\">"
+  return "            <div class=\"kanji-glossary-group kanji-glossary-item\">"
     + container.escapeExpression(container.lambda(((stack1 = (depth0 != null ? depth0.glossary : depth0)) != null ? stack1["0"] : stack1), depth0))
     + "</div>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
@@ -103,16 +103,21 @@ templates['kanji-list.html'] = template({"1":function(container,depth0,helpers,p
 },"2":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
-  return ((stack1 = container.invokePartial(partials["kanji.html"],depth0,{"name":"kanji.html","hash":{"root":(depths[1] != null ? depths[1].root : depths[1]),"addable":(depths[1] != null ? depths[1].addable : depths[1])},"data":data,"indent":"    ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
-},"4":function(container,depth0,helpers,partials,data) {
+  return "        "
+    + ((stack1 = helpers.unless.call(depth0 != null ? depth0 : {},(data && data.first),{"name":"unless","hash":{},"fn":container.program(3, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = container.invokePartial(partials["kanji.html"],depth0,{"name":"kanji.html","hash":{"root":(depths[1] != null ? depths[1].root : depths[1]),"addable":(depths[1] != null ? depths[1].addable : depths[1])},"data":data,"indent":"        ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
+},"3":function(container,depth0,helpers,partials,data) {
+    return "<hr>";
+},"5":function(container,depth0,helpers,partials,data) {
     return "    <p>No results found</p>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
-  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.definitions : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.program(4, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "");
+  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.definitions : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.program(5, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "");
 },"usePartial":true,"useData":true,"useDepths":true});
 templates['model.html'] = template({"1":function(container,depth0,helpers,partials,data) {
-    return "                    <li><a class=\"marker-link\" href=\"#\">"
+    return "                        <li><a class=\"marker-link\" href=\"#\">"
     + container.escapeExpression(container.lambda(depth0, depth0))
     + "</a></li>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
@@ -169,20 +174,20 @@ templates['term-definition.html'] = template({"1":function(container,depth0,help
 templates['term-grouped.html'] = template({"1":function(container,depth0,helpers,partials,data) {
     var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
-  return "        <a href=\"#\" title=\"Add term as expression\" class=\"action-add-note pending disabled\" data-mode=\"term_kanji\" data-index=\""
+  return "            <a href=\"#\" title=\"Add term as expression\" class=\"action-add-note pending disabled\" data-mode=\"term_kanji\" data-index=\""
     + alias4(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"index","hash":{},"data":data}) : helper)))
-    + "\"><img src=\"img/add_term_kanji.png\"></a>\n        <a href=\"#\" title=\"Add term as reading\" class=\"action-add-note pending disabled\" data-mode=\"term_kana\" data-index=\""
+    + "\"><img src=\"img/add_term_kanji.png\"></a>\n            <a href=\"#\" title=\"Add term as reading\" class=\"action-add-note pending disabled\" data-mode=\"term_kana\" data-index=\""
     + alias4(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\"img/add_term_kana.png\"></a>\n";
 },"3":function(container,depth0,helpers,partials,data) {
     var helper;
 
-  return "        <a href=\"#\" title=\"Play audio\" class=\"action-play-audio\" data-index=\""
+  return "            <a href=\"#\" title=\"Play audio\" class=\"action-play-audio\" data-index=\""
     + container.escapeExpression(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\"img/play_audio.png\"></a>\n";
 },"5":function(container,depth0,helpers,partials,data) {
     var stack1, helper, options, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", buffer = 
-  "    <div class=\"term-expression\"><ruby>";
+  "        <div class=\"term-expression\"><ruby>";
   stack1 = ((helper = (helper = helpers.kanjiLinks || (depth0 != null ? depth0.kanjiLinks : depth0)) != null ? helper : alias2),(options={"name":"kanjiLinks","hash":{},"fn":container.program(6, data, 0),"inverse":container.noop,"data":data}),(typeof helper === alias3 ? helper.call(alias1,options) : helper));
   if (!helpers.kanjiLinks) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
   if (stack1 != null) { buffer += stack1; }
@@ -195,7 +200,7 @@ templates['term-grouped.html'] = template({"1":function(container,depth0,helpers
   return container.escapeExpression(((helper = (helper = helpers.expression || (depth0 != null ? depth0.expression : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"expression","hash":{},"data":data}) : helper)));
 },"8":function(container,depth0,helpers,partials,data) {
     var stack1, helper, options, buffer = 
-  "    <div class=\"term-expression\">";
+  "        <div class=\"term-expression\">";
   stack1 = ((helper = (helper = helpers.kanjiLinks || (depth0 != null ? depth0.kanjiLinks : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"kanjiLinks","hash":{},"fn":container.program(6, data, 0),"inverse":container.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},options) : helper));
   if (!helpers.kanjiLinks) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
   if (stack1 != null) { buffer += stack1; }
@@ -203,13 +208,13 @@ templates['term-grouped.html'] = template({"1":function(container,depth0,helpers
 },"10":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "    <div class=\"term-reasons\">\n"
+  return "        <div class=\"term-reasons\">\n"
     + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.reasons : depth0),{"name":"each","hash":{},"fn":container.program(11, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "    </div>\n";
+    + "        </div>\n";
 },"11":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "        <span class=\"reasons\">"
+  return "                <span class=\"reasons\">"
     + container.escapeExpression(container.lambda(depth0, depth0))
     + "</span> "
     + ((stack1 = helpers.unless.call(depth0 != null ? depth0 : {},(data && data.last),{"name":"unless","hash":{},"fn":container.program(12, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
@@ -219,9 +224,19 @@ templates['term-grouped.html'] = template({"1":function(container,depth0,helpers
 },"14":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "            <li>"
+  return "        <ol>\n"
+    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.definitions : depth0),{"name":"each","hash":{},"fn":container.program(15, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "        </ol>\n";
+},"15":function(container,depth0,helpers,partials,data) {
+    var stack1;
+
+  return "                <li>"
     + ((stack1 = container.invokePartial(partials["term-definition.html"],depth0,{"name":"term-definition.html","data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
     + "</li>\n";
+},"17":function(container,depth0,helpers,partials,data) {
+    var stack1;
+
+  return ((stack1 = container.invokePartial(partials["term-definition.html"],((stack1 = (depth0 != null ? depth0.definitions : depth0)) != null ? stack1["0"] : stack1),{"name":"term-definition.html","data":data,"indent":"            ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=depth0 != null ? depth0 : {};
 
@@ -232,9 +247,9 @@ templates['term-grouped.html'] = template({"1":function(container,depth0,helpers
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.reading : depth0),{"name":"if","hash":{},"fn":container.program(5, data, 0),"inverse":container.program(8, data, 0),"data":data})) != null ? stack1 : "")
     + "\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.reasons : depth0),{"name":"if","hash":{},"fn":container.program(10, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "\n    <div class=\"term-glossary\">\n        <ol>\n"
-    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.definitions : depth0),{"name":"each","hash":{},"fn":container.program(14, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "        </ol>\n    </div>\n</div>\n";
+    + "\n    <div class=\"term-glossary\">\n"
+    + ((stack1 = helpers["if"].call(alias1,((stack1 = (depth0 != null ? depth0.definitions : depth0)) != null ? stack1["1"] : stack1),{"name":"if","hash":{},"fn":container.program(14, data, 0),"inverse":container.program(17, data, 0),"data":data})) != null ? stack1 : "")
+    + "    </div>\n</div>\n";
 },"usePartial":true,"useData":true});
 templates['term-grouped-list.html'] = template({"1":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
@@ -243,32 +258,36 @@ templates['term-grouped-list.html'] = template({"1":function(container,depth0,he
 },"2":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
-  return ((stack1 = container.invokePartial(partials["term-grouped.html"],depth0,{"name":"term-grouped.html","hash":{"playback":(depths[1] != null ? depths[1].playback : depths[1]),"addable":(depths[1] != null ? depths[1].addable : depths[1])},"data":data,"indent":"    ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
-    + "    <br>\n";
-},"4":function(container,depth0,helpers,partials,data) {
+  return "        "
+    + ((stack1 = helpers.unless.call(depth0 != null ? depth0 : {},(data && data.first),{"name":"unless","hash":{},"fn":container.program(3, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = container.invokePartial(partials["term-grouped.html"],depth0,{"name":"term-grouped.html","hash":{"playback":(depths[1] != null ? depths[1].playback : depths[1]),"addable":(depths[1] != null ? depths[1].addable : depths[1])},"data":data,"indent":"        ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
+},"3":function(container,depth0,helpers,partials,data) {
+    return "<hr>";
+},"5":function(container,depth0,helpers,partials,data) {
     return "    <p>No results found</p>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
-  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.definitions : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.program(4, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "");
+  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.definitions : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.program(5, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "");
 },"usePartial":true,"useData":true,"useDepths":true});
 templates['term.html'] = template({"1":function(container,depth0,helpers,partials,data) {
     var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
-  return "        <a href=\"#\" title=\"Add term as expression\" class=\"action-add-note pending disabled\" data-mode=\"term_kanji\" data-index=\""
+  return "            <a href=\"#\" title=\"Add term as expression\" class=\"action-add-note pending disabled\" data-mode=\"term_kanji\" data-index=\""
     + alias4(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"index","hash":{},"data":data}) : helper)))
-    + "\"><img src=\"img/add_term_kanji.png\"></a>\n        <a href=\"#\" title=\"Add term as reading\" class=\"action-add-note pending disabled\" data-mode=\"term_kana\" data-index=\""
+    + "\"><img src=\"img/add_term_kanji.png\"></a>\n            <a href=\"#\" title=\"Add term as reading\" class=\"action-add-note pending disabled\" data-mode=\"term_kana\" data-index=\""
     + alias4(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\"img/add_term_kana.png\"></a>\n";
 },"3":function(container,depth0,helpers,partials,data) {
     var helper;
 
-  return "        <a href=\"#\" title=\"Play audio\" class=\"action-play-audio\" data-index=\""
+  return "            <a href=\"#\" title=\"Play audio\" class=\"action-play-audio\" data-index=\""
     + container.escapeExpression(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"index","hash":{},"data":data}) : helper)))
     + "\"><img src=\"img/play_audio.png\"></a>\n";
 },"5":function(container,depth0,helpers,partials,data) {
     var stack1, helper, options, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", buffer = 
-  "    <div class=\"term-expression\"><ruby>";
+  "        <div class=\"term-expression\"><ruby>";
   stack1 = ((helper = (helper = helpers.kanjiLinks || (depth0 != null ? depth0.kanjiLinks : depth0)) != null ? helper : alias2),(options={"name":"kanjiLinks","hash":{},"fn":container.program(6, data, 0),"inverse":container.noop,"data":data}),(typeof helper === alias3 ? helper.call(alias1,options) : helper));
   if (!helpers.kanjiLinks) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
   if (stack1 != null) { buffer += stack1; }
@@ -281,7 +300,7 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
   return container.escapeExpression(((helper = (helper = helpers.expression || (depth0 != null ? depth0.expression : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"expression","hash":{},"data":data}) : helper)));
 },"8":function(container,depth0,helpers,partials,data) {
     var stack1, helper, options, buffer = 
-  "    <div class=\"term-expression\">";
+  "        <div class=\"term-expression\">";
   stack1 = ((helper = (helper = helpers.kanjiLinks || (depth0 != null ? depth0.kanjiLinks : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"kanjiLinks","hash":{},"fn":container.program(6, data, 0),"inverse":container.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},options) : helper));
   if (!helpers.kanjiLinks) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
   if (stack1 != null) { buffer += stack1; }
@@ -289,13 +308,13 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
 },"10":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "    <div class=\"term-reasons\">\n"
+  return "        <div class=\"term-reasons\">\n"
     + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.reasons : depth0),{"name":"each","hash":{},"fn":container.program(11, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "    </div>\n";
+    + "        </div>\n";
 },"11":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "        <span class=\"reasons\">"
+  return "                <span class=\"reasons\">"
     + container.escapeExpression(container.lambda(depth0, depth0))
     + "</span> "
     + ((stack1 = helpers.unless.call(depth0 != null ? depth0 : {},(data && data.last),{"name":"unless","hash":{},"fn":container.program(12, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
@@ -323,13 +342,17 @@ templates['term-list.html'] = template({"1":function(container,depth0,helpers,pa
 },"2":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
-  return ((stack1 = container.invokePartial(partials["term.html"],depth0,{"name":"term.html","hash":{"playback":(depths[1] != null ? depths[1].playback : depths[1]),"addable":(depths[1] != null ? depths[1].addable : depths[1])},"data":data,"indent":"    ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
-    + "    <br>\n";
-},"4":function(container,depth0,helpers,partials,data) {
+  return "        "
+    + ((stack1 = helpers.unless.call(depth0 != null ? depth0 : {},(data && data.first),{"name":"unless","hash":{},"fn":container.program(3, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = container.invokePartial(partials["term.html"],depth0,{"name":"term.html","hash":{"playback":(depths[1] != null ? depths[1].playback : depths[1]),"addable":(depths[1] != null ? depths[1].addable : depths[1])},"data":data,"indent":"        ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
+},"3":function(container,depth0,helpers,partials,data) {
+    return "<hr>";
+},"5":function(container,depth0,helpers,partials,data) {
     return "    <p>No results found</p>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
-  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.definitions : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.program(4, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "");
+  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.definitions : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.program(5, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "");
 },"usePartial":true,"useData":true,"useDepths":true});
 })();
