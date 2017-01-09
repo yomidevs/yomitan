@@ -129,11 +129,7 @@ body {
     display: inline-block;
 }
 
-.term-glossary {
-    font-family: vl-gothic-regular;
-}
-
-.term-glossary ol {
+.term-glossary ol, .term-glossary ul {
     padding-left: 1.4em;
 }
 
@@ -141,13 +137,14 @@ body {
     color: #777;
 }
 
-.term-glossary li span {
-    color:       #000;
-    overflow-x:  auto;
-    white-space: pre;
+.term-glossary-group {
+    padding-bottom: 0.7em;
+    padding-top:    0.7em;
 }
 
-.term-glossary p {
+.term-glossary-item {
+    color:       #000;
+    font-family: vl-gothic-regular;
     overflow-x:  auto;
     white-space: pre;
 }
@@ -177,10 +174,6 @@ body {
     font-family: vl-gothic-regular;
 }
 
-.kanji-glossary {
-    font-family: vl-gothic-regular;
-}
-
 .kanji-glossary ol {
     padding-left: 1.4em;
 }
@@ -189,13 +182,14 @@ body {
     color: #777;
 }
 
-.kanji-glossary li span {
-    color:       #000;
-    overflow-x:  auto;
-    white-space: pre;
+.kanji-glossary-group {
+    padding-bottom: 0.7em;
+    padding-top:    0.7em;
 }
 
-.kanji-glossary p {
+.kanji-glossary-item {
+    color:       #000;
+    font-family: vl-gothic-regular;
     overflow-x:  auto;
     white-space: pre;
 }

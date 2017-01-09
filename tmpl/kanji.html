@@ -36,13 +36,13 @@
 
     <div class="kanji-glossary">
         {{#if glossary.[1]}}
-        <ol>
+        <ol "kanji-glossary-group">
             {{#each glossary}}
-            <li><span>{{.}}</span></li>
+            <li><span class="kanji-glossary-item">{{.}}</span></li>
             {{/each}}
         </ol>
         {{else}}
-        <p>{{glossary.[0]}}</p>
+        <div class="kanji-glossary-group kanji-glossary-item">{{glossary.[0]}}</div>
         {{/if}}
     </div>
 </div>

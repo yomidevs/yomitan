@@ -1,0 +1,7 @@
+{{#if definitions}}
+    {{#each definitions}}
+    {{> term-grouped.html addable=../addable playback=../playback}}
+    {{/each}}
+{{else}}
+    <p>No results found</p>
+{{/if}}

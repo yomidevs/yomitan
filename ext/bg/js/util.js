@@ -93,8 +93,6 @@ function undupeTermDefs(definitions) {
 
 function groupTermDefs(definitions) {
     const groups = {};
-    let groupCount = 0;
-
     for (const definition of definitions) {
         const key = [definition.source, definition.expression].concat(definition.reasons);
         if (definition.reading) {
@@ -106,50 +104,20 @@ function groupTermDefs(definitions) {
             group.push(definition);
         } else {
             groups[key] = [definition];
-            ++groupCount;
         }
     }
 
     const results = [];
     for (const key in groups) {
-        const groupDefs = sortTermDefs(groups[key]);
-
-        const tagCounts = {};
-        for (const tag of groupDefs.map(def => def.tags)) {
-            const count = tagCounts[tag.name] || 0;
-            tagCounts[tag.name] = count + 1;
-        }
-
-        const tagsGlobal = [];
-        const tagsGlobalAdded = {};
-        let maxScore = Number.MIN_SAFE_INTEGER;
-
-        for (const definition of groupDefs) {
-            const tagsLocal = [];
-            for (const tag of definition.tags) {
-                if (tagCounts[tag.name] === groupCount) {
-                    if (!tagsGlobalAdded[tag.name]) {
-                        tagsGlobalAdded[tag.name] = true;
-                        tagsGlobal.push(tag);
-                    }
-                } else {
-                    tagsLocal.push(tag);
-                }
-            }
-
-            definition.tags = tagsLocal;
-            maxScore = Math.max(maxScore, definition.score);
-        }
-
+        const groupDefs = groups[key];
         const firstDef = groupDefs[0];
         results.push({
             definitions: groupDefs,
             expression: firstDef.expression,
             reading: firstDef.reading,
             reasons: firstDef.reasons,
-            score: maxScore,
+            score: groupDefs.reduce((x, y) => x > y ? x : y, Number.MIN_SAFE_INTEGER),
             source: firstDef.source,
-            tags: sortTags(tagsGlobal),
         });
     }
 
