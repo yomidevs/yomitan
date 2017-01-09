@@ -1,0 +1,16 @@
+{{#if tags}}
+<div class="term-tags">
+    {{#each tags}}
+    <span class="tag tag-{{category}}" title="{{notes}}">{{name}}</span>
+    {{/each}}
+</div>
+{{/if}}
+{{#if glossary.[1]}}
+<ul class="term-glossary-group">
+    {{#each glossary}}
+    <li><span class="term-glossary-item">{{.}}</span></li>
+    {{/each}}
+</ul>
+{{else}}
+<div class="term-glossary-group term-glossary-item">{{glossary.[0]}}</div>
+{{/if}}

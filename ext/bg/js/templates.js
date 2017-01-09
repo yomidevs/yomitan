@@ -128,6 +128,44 @@ templates['model.html'] = template({"1":function(container,depth0,helpers,partia
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.markers : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "                </ul>\n            </div>\n        </div>\n    </td>\n</tr>\n";
 },"useData":true});
+templates['term-definition.html'] = template({"1":function(container,depth0,helpers,partials,data) {
+    var stack1;
+
+  return "<div class=\"term-tags\">\n"
+    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.tags : depth0),{"name":"each","hash":{},"fn":container.program(2, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "</div>\n";
+},"2":function(container,depth0,helpers,partials,data) {
+    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
+
+  return "    <span class=\"tag tag-"
+    + alias4(((helper = (helper = helpers.category || (depth0 != null ? depth0.category : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"category","hash":{},"data":data}) : helper)))
+    + "\" title=\""
+    + alias4(((helper = (helper = helpers.notes || (depth0 != null ? depth0.notes : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"notes","hash":{},"data":data}) : helper)))
+    + "\">"
+    + alias4(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"name","hash":{},"data":data}) : helper)))
+    + "</span>\n";
+},"4":function(container,depth0,helpers,partials,data) {
+    var stack1;
+
+  return "<ul class=\"term-glossary-group\">\n"
+    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.glossary : depth0),{"name":"each","hash":{},"fn":container.program(5, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "</ul>\n";
+},"5":function(container,depth0,helpers,partials,data) {
+    return "    <li><span class=\"term-glossary-item\">"
+    + container.escapeExpression(container.lambda(depth0, depth0))
+    + "</span></li>\n";
+},"7":function(container,depth0,helpers,partials,data) {
+    var stack1;
+
+  return "<div class=\"term-glossary-group term-glossary-item\">"
+    + container.escapeExpression(container.lambda(((stack1 = (depth0 != null ? depth0.glossary : depth0)) != null ? stack1["0"] : stack1), depth0))
+    + "</div>\n";
+},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    var stack1, alias1=depth0 != null ? depth0 : {};
+
+  return ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.tags : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers["if"].call(alias1,((stack1 = (depth0 != null ? depth0.glossary : depth0)) != null ? stack1["1"] : stack1),{"name":"if","hash":{},"fn":container.program(4, data, 0),"inverse":container.program(7, data, 0),"data":data})) != null ? stack1 : "");
+},"useData":true});
 templates['term-grouped.html'] = template({"1":function(container,depth0,helpers,partials,data) {
     var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
@@ -179,44 +217,11 @@ templates['term-grouped.html'] = template({"1":function(container,depth0,helpers
 },"12":function(container,depth0,helpers,partials,data) {
     return "&laquo;";
 },"14":function(container,depth0,helpers,partials,data) {
-    var stack1, alias1=depth0 != null ? depth0 : {};
-
-  return "            <li>\n"
-    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.tags : depth0),{"name":"if","hash":{},"fn":container.program(15, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + ((stack1 = helpers["if"].call(alias1,((stack1 = (depth0 != null ? depth0.glossary : depth0)) != null ? stack1["1"] : stack1),{"name":"if","hash":{},"fn":container.program(18, data, 0),"inverse":container.program(21, data, 0),"data":data})) != null ? stack1 : "")
-    + "            </li>\n";
-},"15":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "                <div class=\"term-tags\">\n"
-    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.tags : depth0),{"name":"each","hash":{},"fn":container.program(16, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "                </div>\n";
-},"16":function(container,depth0,helpers,partials,data) {
-    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
-
-  return "                    <span class=\"tag tag-"
-    + alias4(((helper = (helper = helpers.category || (depth0 != null ? depth0.category : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"category","hash":{},"data":data}) : helper)))
-    + "\" title=\""
-    + alias4(((helper = (helper = helpers.notes || (depth0 != null ? depth0.notes : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"notes","hash":{},"data":data}) : helper)))
-    + "\">"
-    + alias4(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"name","hash":{},"data":data}) : helper)))
-    + "</span>\n";
-},"18":function(container,depth0,helpers,partials,data) {
-    var stack1;
-
-  return "                <ul class=\"term-glossary-group\">\n"
-    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.glossary : depth0),{"name":"each","hash":{},"fn":container.program(19, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "                </ul>\n";
-},"19":function(container,depth0,helpers,partials,data) {
-    return "                    <li><span class=\"term-glossary-item\">"
-    + container.escapeExpression(container.lambda(depth0, depth0))
-    + "</span></li>\n";
-},"21":function(container,depth0,helpers,partials,data) {
-    var stack1;
-
-  return "                <div class=\"term-glossary-group term-glossary-item\">"
-    + container.escapeExpression(container.lambda(((stack1 = (depth0 != null ? depth0.glossary : depth0)) != null ? stack1["0"] : stack1), depth0))
-    + "</div>\n";
+  return "            <li>"
+    + ((stack1 = container.invokePartial(partials["term-definition.html"],depth0,{"name":"term-definition.html","data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
+    + "</li>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=depth0 != null ? depth0 : {};
 
@@ -230,7 +235,7 @@ templates['term-grouped.html'] = template({"1":function(container,depth0,helpers
     + "\n    <div class=\"term-glossary\">\n        <ol>\n"
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.definitions : depth0),{"name":"each","hash":{},"fn":container.program(14, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "        </ol>\n    </div>\n</div>\n";
-},"useData":true});
+},"usePartial":true,"useData":true});
 templates['term-grouped-list.html'] = template({"1":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
@@ -238,7 +243,8 @@ templates['term-grouped-list.html'] = template({"1":function(container,depth0,he
 },"2":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
-  return ((stack1 = container.invokePartial(partials["term-grouped.html"],depth0,{"name":"term-grouped.html","hash":{"playback":(depths[1] != null ? depths[1].playback : depths[1]),"addable":(depths[1] != null ? depths[1].addable : depths[1])},"data":data,"indent":"    ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
+  return ((stack1 = container.invokePartial(partials["term-grouped.html"],depth0,{"name":"term-grouped.html","hash":{"playback":(depths[1] != null ? depths[1].playback : depths[1]),"addable":(depths[1] != null ? depths[1].addable : depths[1])},"data":data,"indent":"    ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
+    + "    <br>\n";
 },"4":function(container,depth0,helpers,partials,data) {
     return "    <p>No results found</p>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
@@ -283,39 +289,19 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
 },"10":function(container,depth0,helpers,partials,data) {
     var stack1;
 
+  return "    <div class=\"term-reasons\">\n"
+    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.reasons : depth0),{"name":"each","hash":{},"fn":container.program(11, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "    </div>\n";
+},"11":function(container,depth0,helpers,partials,data) {
+    var stack1;
+
   return "        <span class=\"reasons\">"
     + container.escapeExpression(container.lambda(depth0, depth0))
     + "</span> "
-    + ((stack1 = helpers.unless.call(depth0 != null ? depth0 : {},(data && data.last),{"name":"unless","hash":{},"fn":container.program(11, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers.unless.call(depth0 != null ? depth0 : {},(data && data.last),{"name":"unless","hash":{},"fn":container.program(12, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "\n";
-},"11":function(container,depth0,helpers,partials,data) {
+},"12":function(container,depth0,helpers,partials,data) {
     return "&laquo;";
-},"13":function(container,depth0,helpers,partials,data) {
-    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
-
-  return "        <span class=\"tag tag-"
-    + alias4(((helper = (helper = helpers.category || (depth0 != null ? depth0.category : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"category","hash":{},"data":data}) : helper)))
-    + "\" title=\""
-    + alias4(((helper = (helper = helpers.notes || (depth0 != null ? depth0.notes : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"notes","hash":{},"data":data}) : helper)))
-    + "\">"
-    + alias4(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"name","hash":{},"data":data}) : helper)))
-    + "</span>\n";
-},"15":function(container,depth0,helpers,partials,data) {
-    var stack1;
-
-  return "        <ol>\n"
-    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.glossary : depth0),{"name":"each","hash":{},"fn":container.program(16, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "        </ol>\n";
-},"16":function(container,depth0,helpers,partials,data) {
-    return "            <li><span class=\"term-glossary-item\">"
-    + container.escapeExpression(container.lambda(depth0, depth0))
-    + "</span></li>\n";
-},"18":function(container,depth0,helpers,partials,data) {
-    var stack1;
-
-  return "        <p>"
-    + container.escapeExpression(container.lambda(((stack1 = (depth0 != null ? depth0.glossary : depth0)) != null ? stack1["0"] : stack1), depth0))
-    + "</p>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=depth0 != null ? depth0 : {};
 
@@ -324,14 +310,12 @@ templates['term.html'] = template({"1":function(container,depth0,helpers,partial
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.playback : depth0),{"name":"if","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "    </div>\n\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.reading : depth0),{"name":"if","hash":{},"fn":container.program(5, data, 0),"inverse":container.program(8, data, 0),"data":data})) != null ? stack1 : "")
-    + "\n    <div class=\"term-reasons\">\n"
-    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.reasons : depth0),{"name":"each","hash":{},"fn":container.program(10, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "    </div>\n\n    <div class=\"term-tags\">\n"
-    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.tags : depth0),{"name":"each","hash":{},"fn":container.program(13, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "    </div>\n\n    <div class=\"term-glossary\">\n"
-    + ((stack1 = helpers["if"].call(alias1,((stack1 = (depth0 != null ? depth0.glossary : depth0)) != null ? stack1["1"] : stack1),{"name":"if","hash":{},"fn":container.program(15, data, 0),"inverse":container.program(18, data, 0),"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.reasons : depth0),{"name":"if","hash":{},"fn":container.program(10, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\n    <div class=\"term-glossary\">\n"
+    + ((stack1 = container.invokePartial(partials["term-definition.html"],depth0,{"name":"term-definition.html","data":data,"indent":"        ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
     + "    </div>\n</div>\n";
-},"useData":true});
+},"usePartial":true,"useData":true});
 templates['term-list.html'] = template({"1":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
@@ -339,7 +323,8 @@ templates['term-list.html'] = template({"1":function(container,depth0,helpers,pa
 },"2":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
-  return ((stack1 = container.invokePartial(partials["term.html"],depth0,{"name":"term.html","hash":{"playback":(depths[1] != null ? depths[1].playback : depths[1]),"addable":(depths[1] != null ? depths[1].addable : depths[1])},"data":data,"indent":"    ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
+  return ((stack1 = container.invokePartial(partials["term.html"],depth0,{"name":"term.html","hash":{"playback":(depths[1] != null ? depths[1].playback : depths[1]),"addable":(depths[1] != null ? depths[1].addable : depths[1])},"data":data,"indent":"    ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
+    + "    <br>\n";
 },"4":function(container,depth0,helpers,partials,data) {
     return "    <p>No results found</p>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {

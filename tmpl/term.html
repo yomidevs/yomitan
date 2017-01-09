@@ -15,27 +15,15 @@
     <div class="term-expression">{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}</div>
     {{/if}}
 
+    {{#if reasons}}
     <div class="term-reasons">
         {{#each reasons}}
         <span class="reasons">{{.}}</span> {{#unless @last}}&laquo;{{/unless}}
         {{/each}}
     </div>
-
-    <div class="term-tags">
-        {{#each tags}}
-        <span class="tag tag-{{category}}" title="{{notes}}">{{name}}</span>
-        {{/each}}
-    </div>
+    {{/if}}
 
     <div class="term-glossary">
-        {{#if glossary.[1]}}
-        <ol>
-            {{#each glossary}}
-            <li><span class="term-glossary-item">{{.}}</span></li>
-            {{/each}}
-        </ol>
-        {{else}}
-        <p>{{glossary.[0]}}</p>
-        {{/if}}
+        {{> term-definition.html}}
     </div>
 </div>
