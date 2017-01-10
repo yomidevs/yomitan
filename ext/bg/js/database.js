@@ -78,7 +78,7 @@ class Database {
                     reading: row.reading,
                     tags: splitField(row.tags),
                     rules: splitField(row.rules),
-                    glossary: row.glossary.map(g => g.trim()),
+                    glossary: row.glossary,
                     score: row.score,
                     dictionary: row.dictionary,
                     id: row.id
@@ -108,7 +108,7 @@ class Database {
                     onyomi: splitField(row.onyomi),
                     kunyomi: splitField(row.kunyomi),
                     tags: splitField(row.tags),
-                    glossary: row.meanings.map(m => m.trim()),
+                    glossary: row.meanings,
                     dictionary: row.dictionary
                 });
             }
