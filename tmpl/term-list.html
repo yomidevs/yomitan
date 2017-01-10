@@ -9,11 +9,11 @@
     {{#if glossary.[1]}}
         <ul class="term-glossary-group">
             {{#each glossary}}
-                <li><span class="term-glossary-item">{{.}}</span></li>
+                <li><span class="term-glossary-item">{{#multiLine}}{{.}}{{/multiLine}}</span></li>
             {{/each}}
         </ul>
     {{else}}
-        <div class="term-glossary-group term-glossary-item">{{glossary.[0]}}</div>
+        <div class="term-glossary-group term-glossary-item">{{#multiLine}}{{glossary.[0]}}{{/multiLine}}</div>
     {{/if}}
 {{/inline}}
 

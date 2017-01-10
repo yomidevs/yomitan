@@ -21,6 +21,7 @@ class Yomichan {
     constructor() {
         Handlebars.partials = Handlebars.templates;
         Handlebars.registerHelper('kanjiLinks', kanjiLinks);
+        Handlebars.registerHelper('multiLine', multiLine);
 
         this.translator = new Translator();
         this.anki = new AnkiNull();

@@ -21,13 +21,17 @@ function kanjiLinks(options) {
     let result = '';
     for (const c of options.fn(this)) {
         if (isKanji(c)) {
-            result += Handlebars.templates['kanji-link.html']({kanji: c}).trim();
+            result += `<a href="#" class="kanji-link">${c}</a>`;
         } else {
             result += c;
         }
     }
 
     return result;
+}
+
+function multiLine(options) {
+    return options.fn(this).split('\n').join('<br>');
 }
 
 function isKanji(c) {

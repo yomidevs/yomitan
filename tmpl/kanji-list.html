@@ -39,11 +39,11 @@
         {{#if glossary.[1]}}
             <ol "kanji-glossary-group">
                 {{#each glossary}}
-                    <li><span class="kanji-glossary-item">{{.}}</span></li>
+                    <li><span class="kanji-glossary-item">{{#multiLine}}{{.}}{{/multiLine}}</span></li>
                 {{/each}}
             </ol>
         {{else}}
-            <div class="kanji-glossary-group kanji-glossary-item">{{glossary.[0]}}</div>
+            <div class="kanji-glossary-group kanji-glossary-item">{{#multiLine}}{{glossary.[0]}}{{/multiLine}}</div>
         {{/if}}
     </div>
 </div>

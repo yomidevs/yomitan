@@ -154,8 +154,6 @@ hr {
 .term-glossary-item {
     color:       #000;
     font-family: vl-gothic-regular;
-    overflow-x:  auto;
-    white-space: pre;
 }
 
 /* kanji styles */
@@ -199,6 +197,4 @@ hr {
 .kanji-glossary-item {
     color:       #000;
     font-family: vl-gothic-regular;
-    overflow-x:  auto;
-    white-space: pre;
 }
