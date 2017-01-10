@@ -119,7 +119,7 @@ templates['kanji-list.html'] = template({"1":function(container,depth0,helpers,p
 
   var decorators = container.decorators;
 
-  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"args":[(depth0 != null ? depth0.kanji : depth0)],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"args":["kanji"],"data":data}) || fn;
   return fn;
   }
 
