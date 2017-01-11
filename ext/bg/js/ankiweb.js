@@ -47,7 +47,8 @@ class AnkiWeb {
             const data = {
                 data: JSON.stringify([fields, note.tags.join(' ')]),
                 mid: model.id,
-                deck: note.deckName
+                deck: note.deckName,
+                csrf_token: info.token
             };
 
             return AnkiWeb.loadAccountPage('https://ankiweb.net/edit/save', data, this.username, this.password);
@@ -78,8 +79,8 @@ class AnkiWeb {
             return Promise.resolve(this.noteInfo);
         }
 
-        return AnkiWeb.scrape(this.username, this.password).then(({deckNames, models}) => {
-            this.noteInfo = {deckNames, models};
+        return AnkiWeb.scrape(this.username, this.password).then(({deckNames, models, token}) => {
+            this.noteInfo = {deckNames, models, token};
             return this.noteInfo;
         });
     }
@@ -100,8 +101,14 @@ class AnkiWeb {
                 return Promise.reject('failed to scrape deck data');
             }
 
+            const tokenMatch = /editor\.csrf_token = \'(.*)\';/.exec(response);
+            if (tokenMatch === null) {
+                return Promise.reject('failed to acquire csrf_token');
+            }
+
             const modelsJson = JSON.parse(modelsMatch[1]);
             const decksJson = JSON.parse(decksMatch[1]);
+            const token = tokenMatch[1];
 
             const deckNames = Object.keys(decksJson).map(d => decksJson[d].name);
             const models = [];
@@ -113,16 +120,16 @@ class AnkiWeb {
                 });
             }
 
-            return {deckNames, models};
+            return {deckNames, models, token};
         });
     }
 
-    static login(username, password) {
+    static login(username, password, token) {
         if (username.length === 0 || password.length === 0) {
             return Promise.reject('login credentials not specified');
         }
 
-        const data = {username, password, submitted: 1};
+        const data = {username, password, csrf_token: token, submitted: 1};
         return AnkiWeb.loadPage('https://ankiweb.net/account/login', data).then(response => {
             if (!response.includes('class="mitem"')) {
                 return Promise.reject('failed to authenticate');
@@ -133,7 +140,12 @@ class AnkiWeb {
     static loadAccountPage(url, data, username, password) {
         return AnkiWeb.loadPage(url, data).then(response => {
             if (response.includes('name="password"')) {
-                return AnkiWeb.login(username, password).then(() => AnkiWeb.loadPage(url, data));
+                const tokenMatch = /name="csrf_token" value="(.*)"/.exec(response);
+                if (tokenMatch === null) {
+                    return Promise.reject('failed to acquire csrf_token');
+                }
+
+                return AnkiWeb.login(username, password, tokenMatch[1]).then(() => AnkiWeb.loadPage(url, data));
             } else {
                 return response;
             }
