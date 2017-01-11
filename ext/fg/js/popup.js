@@ -46,16 +46,14 @@ class Popup {
         let x = elementRect.left;
         let width = containerWidth;
         if (x + width >= window.innerWidth) {
-            const widthMax = window.innerWidth - x;
-            width = Math.min(width, widthMax);
+            width = Math.min(width, x);
             x = window.innerWidth - width;
         }
 
         let y = elementRect.bottom + this.offset;
         let height = containerHeight;
         if (y + height >= window.innerHeight) {
-            const heightMax = window.innerHeight - y - this.offset;
-            height = Math.min(height, heightMax);
+            height = Math.min(height, y);
             y = elementRect.top - height - this.offset;
         }
 
