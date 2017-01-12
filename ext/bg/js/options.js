@@ -17,6 +17,19 @@
  */
 
 
+function versionOptions(options) {
+    const version = options.version || 0;
+    const fixups = [
+        () => {}
+    ];
+
+    if (version < fixups.length) {
+        fixups[version]();
+        ++options.version;
+        versionOptions(options);
+    }
+}
+
 function sanitizeOptions(options) {
     const defaults = {
         activateOnStartup: true,
