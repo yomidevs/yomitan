@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Yomichan",
-    "version": "1.0.2",
+    "version": "1.0.3",
 
     "description": "Japanese dictionary with Anki integration",
     "icons": {"16": "img/icon16.png", "48": "img/icon48.png", "128": "img/icon128.png"},
@@ -25,11 +25,8 @@
         "page": "bg/options.html"
     },
     "permissions": [
-        "webRequest",
-        "webRequestBlocking",
         "file://*/*",
         "http://127.0.0.1/*",
-        "https://ankiweb.net/*",
         "storage"
     ],
     "web_accessible_resources": [

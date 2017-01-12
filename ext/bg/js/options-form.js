@@ -39,8 +39,6 @@ function getFormValues() {
         optsNew.scanLength = parseInt($('#scan-length').val(), 10);
 
         optsNew.ankiMethod = $('#anki-method').val();
-        optsNew.ankiUsername = $('#anki-username').val();
-        optsNew.ankiPassword = $('#anki-password').val();
         optsNew.ankiCardTags = $('#anki-card-tags').val().split(/[,; ]+/);
         optsNew.sentenceExtent = parseInt($('#sentence-extent').val(), 10);
         optsNew.ankiTermDeck = $('#anki-term-deck').val();
@@ -67,13 +65,8 @@ function getFormValues() {
 
 function updateVisibility(opts) {
     switch (opts.ankiMethod) {
-        case 'ankiweb':
-            $('#anki-general').show();
-            $('.anki-login').show();
-            break;
         case 'ankiconnect':
             $('#anki-general').show();
-            $('.anki-login').hide();
             break;
         default:
             $('#anki-general').hide();
@@ -102,8 +95,6 @@ $(document).ready(() => {
         $('#scan-length').val(opts.scanLength);
 
         $('#anki-method').val(opts.ankiMethod);
-        $('#anki-username').val(opts.ankiUsername);
-        $('#anki-password').val(opts.ankiPassword);
         $('#anki-card-tags').val(opts.ankiCardTags.join(' '));
         $('#sentence-extent').val(opts.sentenceExtent);
 
@@ -430,16 +421,7 @@ function onOptionsChanged(e) {
         return saveOptions(optsNew).then(() => {
             yomichan().setOptions(optsNew);
             updateVisibility(optsNew);
-
-            const loginChanged =
-                optsNew.ankiUsername !== optsOld.ankiUsername ||
-                optsNew.ankiPassword !== optsOld.ankiPassword;
-
-            if (loginChanged && optsNew.ankiMethod === 'ankiweb') {
-                showAnkiError(null);
-                showAnkiSpinner(true);
-                return anki().logout().then(() => populateAnkiDeckAndModel(optsNew));
-            } else if (loginChanged || optsNew.ankiMethod !== optsOld.ankiMethod) {
+            if (optsNew.ankiMethod !== optsOld.ankiMethod) {
                 showAnkiError(null);
                 showAnkiSpinner(true);
                 return populateAnkiDeckAndModel(optsNew);

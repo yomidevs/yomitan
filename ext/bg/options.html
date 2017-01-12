@@ -124,9 +124,8 @@
 
                 <p class="help-block">
                     Yomichan features automatic flashcard creation for <a href="http://ankisrs.net/">Anki</a>, a free application
-                    designed to help you retain knowledge. While the <a href="https://foosoft.net/projects/anki-connect/">AnkiConnect</a> plugin
-                    offers the best experience, it is also possible to create flashcards through <a href="https://ankiweb.net/">AnkiWeb</a>,
-                    provided you already have an account.
+                    designed to help you retain knowledge. This functionality requires prior installation of the
+                    <a href="https://foosoft.net/projects/anki-connect/">AnkiConnect</a> plugin.
                 </p>
 
                 <div class="alert alert-danger" id="anki-error">
@@ -139,23 +138,10 @@
                     <select class="form-control" id="anki-method">
                         <option value="disabled">Disabled (no auto flashcard creation)</option>
                         <option value="ankiconnect">AnkiConnect (requires the AnkiConnect plugin)</option>
-                        <option value="ankiweb">AnkiWeb (requires an account on AnkiWeb)</option>
                     </select>
                 </div>
 
                 <div id="anki-general">
-                    <div class="row">
-                        <div class="form-group anki-login col-xs-6">
-                            <label for="anki-username">Username</label>
-                            <input type="text" id="anki-username" class="form-control anki-credential">
-                        </div>
-
-                        <div class="form-group anki-login col-xs-6">
-                            <label for="anki-password">Password</label>
-                            <input type="password" id="anki-password" class="form-control anki-credential">
-                        </div>
-                    </div>
-
                     <div class="form-group">
                         <label for="anki-card-tags">Card tags (comma or space separated)</label>
                         <input type="text" id="anki-card-tags" class="form-control">
