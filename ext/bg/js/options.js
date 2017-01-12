@@ -45,8 +45,6 @@ function sanitizeOptions(options) {
         dictionaries: {},
 
         ankiMethod: 'disabled',
-        ankiUsername: '',
-        ankiPassword: '',
         ankiCardTags: ['yomichan'],
         sentenceExtent: 200,
 
@@ -62,6 +60,10 @@ function sanitizeOptions(options) {
         if (!(key in options)) {
             options[key] = defaults[key];
         }
+    }
+
+    if (options.ankiMethod === 'ankiweb') {
+        options.ankiMethod = 'disabled';
     }
 
     return options;

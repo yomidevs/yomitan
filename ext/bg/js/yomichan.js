@@ -95,9 +95,6 @@ class Yomichan {
         this.options = options;
 
         switch (options.ankiMethod) {
-            case 'ankiweb':
-                this.anki = new AnkiWeb(options.ankiUsername, options.ankiPassword);
-                break;
             case 'ankiconnect':
                 this.anki = new AnkiConnect();
                 break;
