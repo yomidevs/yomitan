@@ -48,31 +48,14 @@ works, please see the [Yomichan Import](https://foosoft.net/projects/yomichan-im
 ## Anki Integration ##
 
 Yomichan features automatic flashcard creation for [Anki](http://ankisrs.net/), a free application designed to help you
-retain knowledge. While the [AnkiConnect](https://foosoft.net/projects/anki-connect/) plugin offers the best experience,
-it is also possible to create flashcards through [AnkiWeb](https://ankiweb.net/), provided you already have an account.
-
-### Using AnkiConnect ###
-
-Installing the AnkiConnect plugin for Anki is the preferred way of enabling automatic flashcard creation in Yomichan.
+retain knowledge. This functionality requires prior installation of the
+[AnkiConnect](https://foosoft.net/projects/anki-connect/) plugin. The installation process can be done in three steps:
 
 1.  Open the *Install Add-on* dialog by selecting *Tools* &gt; *Add-ons* &gt; *Browse &amp; Install* in Anki.
 2.  Input *2055492159* into the text box labeled *Code* and press the *OK* button to proceed.
 3.  Restart Anki when prompted to do so in order to complete the installation of AnkiConnect.
 
 When using AnkiConnect, Anki must be kept running in the background for automatic flashcard creation to function.
-
-### Using AnkiWeb ###
-
-Yomichan is able to create flashcards directly on AnkiWeb, assuming you have [registered an
-account](https://ankiweb.net/account/register). While this method can be convenient as it does not require Anki to be
-running to running in the background, some features are not supported due to technical limitations:
-
-*   Preventing the creation of duplicate flashcards.
-*   Embedding audio in flashcards via the `{audio}` marker.
-
-Your AnkiWeb login information must specified on the options page to make use of automatic flashcard creation.  Note
-that AnkiWeb will temporarily block your IP address if there are too many login attempts; if this happens, just try
-again after waiting for about an hour.
 
 ### Flashcard Configuration ###
 
@@ -116,6 +99,13 @@ Before flashcards can be automatically created through Yomichan, Anki must be co
     (please verify your Anki deck and model settings).
 
 ## Frequently Asked Questions ##
+
+*   **What happened to AnkiWeb integration? Why was it removed?**
+
+    The author of Anki wants to maintain tight control of AnkiWeb by restricting automated web requests, while at the
+    same time not providing an API for adding or removing flash cards. As circumventing these restrictions led to
+    account restrictions placed on users of this extension, I was forced to remove this feature. Note that it is still
+    possible to automatically generate flashcards with the AnkiConnect plugin.
 
 *   **Is it possible to use Yomichan with files saved locally on my computer?**
 
