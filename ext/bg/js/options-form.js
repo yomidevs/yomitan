@@ -39,7 +39,7 @@ function getFormValues() {
         optsNew.scanDelay = parseInt($('#scan-delay').val(), 10);
         optsNew.scanLength = parseInt($('#scan-length').val(), 10);
 
-        optsNew.ankiMethod = $('#anki-method').val();
+        optsNew.ankiEnable = $('#anki-enable').prop('checked');
         optsNew.ankiCardTags = $('#anki-card-tags').val().split(/[,; ]+/);
         optsNew.sentenceExtent = parseInt($('#sentence-extent').val(), 10);
         optsNew.ankiTermDeck = $('#anki-term-deck').val();
@@ -65,13 +65,10 @@ function getFormValues() {
 }
 
 function updateVisibility(opts) {
-    switch (opts.ankiMethod) {
-        case 'ankiconnect':
-            $('#anki-general').show();
-            break;
-        default:
-            $('#anki-general').hide();
-            break;
+    if (opts.ankiEnable) {
+        $('#anki-general').show();
+    } else {
+        $('#anki-general').hide();
     }
 
     if (opts.showAdvancedOptions) {
@@ -96,7 +93,7 @@ $(document).ready(() => {
         $('#scan-delay').val(opts.scanDelay);
         $('#scan-length').val(opts.scanLength);
 
-        $('#anki-method').val(opts.ankiMethod);
+        $('#anki-enable').prop('checked', opts.ankiEnable);
         $('#anki-card-tags').val(opts.ankiCardTags.join(' '));
         $('#sentence-extent').val(opts.sentenceExtent);
 
@@ -424,7 +421,7 @@ function onOptionsChanged(e) {
         return saveOptions(optsNew).then(() => {
             yomichan().setOptions(optsNew);
             updateVisibility(optsNew);
-            if (optsNew.ankiMethod !== optsOld.ankiMethod) {
+            if (optsNew.ankiEnable !== optsOld.ankiEnable) {
                 showAnkiError(null);
                 showAnkiSpinner(true);
                 return populateAnkiDeckAndModel(optsNew);

@@ -94,13 +94,10 @@ class Yomichan {
     setOptions(options) {
         this.options = options;
 
-        switch (options.ankiMethod) {
-            case 'ankiconnect':
-                this.anki = new AnkiConnect();
-                break;
-            default:
-                this.anki = new AnkiNull();
-                break;
+        if (options.ankiEnable) {
+            this.anki = new AnkiConnect();
+        } else {
+            this.anki = new AnkiNull();
         }
 
         this.tabInvokeAll('setOptions', this.options);
