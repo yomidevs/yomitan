@@ -32,9 +32,9 @@ class Yomichan {
         chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
         chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
 
-        loadOptions().then(opts => {
+        optionsLoad().then(opts => {
             this.setOptions(opts);
-            if (this.options.activateOnStartup) {
+            if (this.options.general.autoStart) {
                 this.setState('loading');
             }
         });
@@ -94,7 +94,7 @@ class Yomichan {
     setOptions(options) {
         this.options = options;
 
-        if (options.ankiEnable) {
+        if (options.anki.enable) {
             this.anki = new AnkiConnect();
         } else {
             this.anki = new AnkiNull();
@@ -116,17 +116,17 @@ class Yomichan {
     }
 
     formatNote(definition, mode) {
-        const note = {fields: {}, tags: this.options.ankiCardTags};
+        const note = {fields: {}, tags: this.options.anki.tags};
 
         let fields = [];
         if (mode === 'kanji') {
-            fields = this.options.ankiKanjiFields;
-            note.deckName = this.options.ankiKanjiDeck;
-            note.modelName = this.options.ankiKanjiModel;
+            fields = this.options.anki.kanji.fields;
+            note.deckName = this.options.anki.kanji.deck;
+            note.modelName = this.options.anki.kanji.model;
         } else {
-            fields = this.options.ankiTermFields;
-            note.deckName = this.options.ankiTermDeck;
-            note.modelName = this.options.ankiTermModel;
+            fields = this.options.anki.terms.fields;
+            note.deckName = this.options.anki.terms.deck;
+            note.modelName = this.options.anki.terms.model;
 
             const audio = {
                 kanji: definition.expression,
@@ -157,7 +157,7 @@ class Yomichan {
     }
 
     api_getOptions({callback}) {
-        promiseCallback(loadOptions(), callback);
+        promiseCallback(optionsLoad(), callback);
     }
 
     api_findKanji({text, callback}) {
@@ -186,7 +186,7 @@ class Yomichan {
             this.translator.findTerm(
                 text,
                 dictionaries,
-                this.options.enableSoftKatakanaSearch
+                this.options.general.softKatakana
             ),
             callback
         );
@@ -204,7 +204,7 @@ class Yomichan {
             this.translator.findTermGrouped(
                 text,
                 dictionaries,
-                this.options.enableSoftKatakanaSearch
+                this.options.general.softKatakana
             ),
             callback
         );

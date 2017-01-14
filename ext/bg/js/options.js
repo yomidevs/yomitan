@@ -77,7 +77,7 @@ function optionsVersion(options) {
             copy(options.general, 'autoStart',     options, 'activateOnStartup');
             copy(options.general, 'audioPlayback', options, 'enableAudioPlayback');
             copy(options.general, 'softKatakana',  options, 'enableSoftKatakanaSearch');
-            copy(options.general, 'groupResults',  options, 'goupTermResults');
+            copy(options.general, 'groupResults',  options, 'groupTermResults');
             copy(options.general, 'showAdvanced',  options, 'showAdvancedOptions');
 
             copy(options.scanning, 'requireShift', options, 'holdShiftToScan');
@@ -89,9 +89,9 @@ function optionsVersion(options) {
 
             copy(options.anki,       'tags',        options, 'ankiCardTags');
             copy(options.anki,       'sentenceExt', options, 'sentenceExtent');
-            copy(options.anki.term,  'deck',        options, 'ankiTermDeck');
-            copy(options.anki.term,  'model',       options, 'ankiTermModel');
-            copy(options.anki.term,  'fields',      options, 'ankiTermFields');
+            copy(options.anki.terms, 'deck',        options, 'ankiTermDeck');
+            copy(options.anki.terms, 'model',       options, 'ankiTermModel');
+            copy(options.anki.terms, 'fields',      options, 'ankiTermFields');
             copy(options.anki.kanji, 'deck',        options, 'ankiKanjiDeck');
             copy(options.anki.kanji, 'model',       options, 'ankiKanjiModel');
             copy(options.anki.kanji, 'fields',      options, 'ankiKanjiFields');

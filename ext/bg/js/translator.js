@@ -41,11 +41,11 @@ class Translator {
         });
     }
 
-    findTerm(text, dictionaries, enableSoftKatakanaSearch) {
+    findTerm(text, dictionaries, softKatakana) {
         const cache = {};
         return this.findTermDeinflections(text, dictionaries, cache).then(deinfLiteral => {
             const textHiragana = wanakana._katakanaToHiragana(text);
-            if (text !== textHiragana && enableSoftKatakanaSearch) {
+            if (text !== textHiragana && softKatakana) {
                 return this.findTermDeinflections(textHiragana, dictionaries, cache).then(deinfHiragana => deinfLiteral.concat(deinfHiragana));
             } else {
                 return deinfLiteral;
@@ -82,8 +82,8 @@ class Translator {
         });
     }
 
-    findTermGrouped(text, dictionaries, enableSoftKatakanaSearch) {
-        return this.findTerm(text, dictionaries, enableSoftKatakanaSearch).then(({length, definitions}) => {
+    findTermGrouped(text, dictionaries, softKatakana) {
+        return this.findTerm(text, dictionaries, softKatakana).then(({length, definitions}) => {
             return {length, definitions: groupTermDefs(definitions)};
         });
     }

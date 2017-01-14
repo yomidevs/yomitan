@@ -34,9 +34,9 @@ class Frame {
         const sequence = ++this.sequence;
         const context = {
             definitions,
-            grouped: options.groupTermResults,
+            grouped: options.general.groupResults,
             addable: options.ankiMethod !== 'disabled',
-            playback: options.enableAudioPlayback
+            playback: options.general.audioPlayback
         };
 
         this.definitions = definitions;

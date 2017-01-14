@@ -44,7 +44,7 @@ class Driver {
 
     popupTimerSet(callback) {
         this.popupTimerClear();
-        this.popupTimer = window.setTimeout(callback, this.options.scanDelay);
+        this.popupTimer = window.setTimeout(callback, this.options.scanning.delay);
     }
 
     popupTimerClear() {
@@ -82,7 +82,7 @@ class Driver {
             return;
         }
 
-        if (this.options.holdShiftToScan && !e.shiftKey) {
+        if (this.options.scanning.requireShift && !e.shiftKey) {
             return;
         }
 
@@ -144,16 +144,16 @@ class Driver {
     }
 
     searchTerms(textSource) {
-        textSource.setEndOffset(this.options.scanLength);
+        textSource.setEndOffset(this.options.scanning.length);
 
-        const findFunc = this.options.groupTermResults ? findTermGrouped : findTerm;
+        const findFunc = this.options.general.groupResults ? findTermGrouped : findTerm;
         return findFunc(textSource.text()).then(({definitions, length}) => {
             if (definitions.length === 0) {
                 return false;
             } else {
                 textSource.setEndOffset(length);
 
-                const sentence = extractSentence(textSource, this.options.sentenceExtent);
+                const sentence = extractSentence(textSource, this.options.anki.sentenceExt);
                 definitions.forEach(definition => {
                     definition.url = window.location.href;
                     definition.sentence = sentence;
@@ -162,7 +162,7 @@ class Driver {
                 this.popup.showNextTo(textSource.getRect());
                 this.popup.showTermDefs(definitions, this.options);
                 this.lastTextSource = textSource;
-                if (this.options.selectMatchedText) {
+                if (this.options.scanning.selectText) {
                     textSource.select();
                 }
 
@@ -186,7 +186,7 @@ class Driver {
                 this.popup.showNextTo(textSource.getRect());
                 this.popup.showKanjiDefs(definitions, this.options);
                 this.lastTextSource = textSource;
-                if (this.options.selectMatchedText) {
+                if (this.options.scanning.selectText) {
                     textSource.select();
                 }
 
@@ -201,7 +201,7 @@ class Driver {
     searchClear() {
         this.popup.hide();
 
-        if (this.options.selectMatchedText && this.lastTextSource !== null) {
+        if (this.options.scanning.selectText && this.lastTextSource !== null) {
             this.lastTextSource.deselect();
         }
 

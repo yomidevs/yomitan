@@ -25,29 +25,29 @@ function yomichan() {
 }
 
 function getFormValues() {
-    return loadOptions().then(optsOld => {
+    return optionsLoad().then(optsOld => {
         const optsNew = $.extend({}, optsOld);
 
-        optsNew.activateOnStartup = $('#activate-on-startup').prop('checked');
-        optsNew.enableAudioPlayback = $('#enable-audio-playback').prop('checked');
-        optsNew.enableSoftKatakanaSearch = $('#enable-soft-katakana-search').prop('checked');
-        optsNew.groupTermResults = $('#group-term-results').prop('checked');
-        optsNew.showAdvancedOptions = $('#show-advanced-options').prop('checked');
+        optsNew.general.autoStart = $('#activate-on-startup').prop('checked');
+        optsNew.general.audioPlayback = $('#enable-audio-playback').prop('checked');
+        optsNew.general.softKatakana = $('#enable-soft-katakana-search').prop('checked');
+        optsNew.general.groupResults = $('#group-term-results').prop('checked');
+        optsNew.general.showAdvanced = $('#show-advanced-options').prop('checked');
 
-        optsNew.holdShiftToScan = $('#hold-shift-to-scan').prop('checked');
-        optsNew.selectMatchedText = $('#select-matched-text').prop('checked');
-        optsNew.scanDelay = parseInt($('#scan-delay').val(), 10);
-        optsNew.scanLength = parseInt($('#scan-length').val(), 10);
+        optsNew.scanning.requireShift = $('#hold-shift-to-scan').prop('checked');
+        optsNew.scanning.selectText = $('#select-matched-text').prop('checked');
+        optsNew.scanning.delay = parseInt($('#scan-delay').val(), 10);
+        optsNew.scanning.length = parseInt($('#scan-length').val(), 10);
 
-        optsNew.ankiEnable = $('#anki-enable').prop('checked');
-        optsNew.ankiCardTags = $('#anki-card-tags').val().split(/[,; ]+/);
-        optsNew.sentenceExtent = parseInt($('#sentence-extent').val(), 10);
-        optsNew.ankiTermDeck = $('#anki-term-deck').val();
-        optsNew.ankiTermModel = $('#anki-term-model').val();
-        optsNew.ankiTermFields = fieldsToDict($('#term .anki-field-value'));
-        optsNew.ankiKanjiDeck = $('#anki-kanji-deck').val();
-        optsNew.ankiKanjiModel = $('#anki-kanji-model').val();
-        optsNew.ankiKanjiFields = fieldsToDict($('#kanji .anki-field-value'));
+        optsNew.anki.enable = $('#anki-enable').prop('checked');
+        optsNew.anki.tags = $('#anki-card-tags').val().split(/[,; ]+/);
+        optsNew.anki.sentenceExt = parseInt($('#sentence-extent').val(), 10);
+        optsNew.anki.terms.deck = $('#anki-term-deck').val();
+        optsNew.anki.terms.model = $('#anki-term-model').val();
+        optsNew.anki.terms.fields = fieldsToDict($('#term .anki-field-value'));
+        optsNew.anki.kanji.deck = $('#anki-kanji-deck').val();
+        optsNew.anki.kanji.model = $('#anki-kanji-model').val();
+        optsNew.anki.kanji.fields = fieldsToDict($('#kanji .anki-field-value'));
 
         $('.dict-group').each((index, element) => {
             const dictionary = $(element);
@@ -65,13 +65,13 @@ function getFormValues() {
 }
 
 function updateVisibility(opts) {
-    if (opts.ankiEnable) {
+    if (opts.anki.enable) {
         $('#anki-general').show();
     } else {
         $('#anki-general').hide();
     }
 
-    if (opts.showAdvancedOptions) {
+    if (opts.general.showAdvanced) {
         $('.options-advanced').show();
     } else {
         $('.options-advanced').hide();
@@ -81,21 +81,21 @@ function updateVisibility(opts) {
 $(document).ready(() => {
     Handlebars.partials = Handlebars.templates;
 
-    loadOptions().then(opts => {
-        $('#activate-on-startup').prop('checked', opts.activateOnStartup);
-        $('#enable-audio-playback').prop('checked', opts.enableAudioPlayback);
-        $('#enable-soft-katakana-search').prop('checked', opts.enableSoftKatakanaSearch);
-        $('#group-term-results').prop('checked', opts.groupTermResults);
-        $('#show-advanced-options').prop('checked', opts.showAdvancedOptions);
+    optionsLoad().then(opts => {
+        $('#activate-on-startup').prop('checked', opts.general.autoStart);
+        $('#enable-audio-playback').prop('checked', opts.general.audioPlayback);
+        $('#enable-soft-katakana-search').prop('checked', opts.general.softKatakana);
+        $('#group-term-results').prop('checked', opts.general.groupResults);
+        $('#show-advanced-options').prop('checked', opts.general.showAdvanced);
 
-        $('#hold-shift-to-scan').prop('checked', opts.holdShiftToScan);
-        $('#select-matched-text').prop('checked', opts.selectMatchedText);
-        $('#scan-delay').val(opts.scanDelay);
-        $('#scan-length').val(opts.scanLength);
+        $('#hold-shift-to-scan').prop('checked', opts.scanning.requireShift);
+        $('#select-matched-text').prop('checked', opts.scanning.selectText);
+        $('#scan-delay').val(opts.scanning.delay);
+        $('#scan-length').val(opts.scanning.length);
 
-        $('#anki-enable').prop('checked', opts.ankiEnable);
-        $('#anki-card-tags').val(opts.ankiCardTags.join(' '));
-        $('#sentence-extent').val(opts.sentenceExtent);
+        $('#anki-enable').prop('checked', opts.anki.enable);
+        $('#anki-card-tags').val(opts.anki.tags.join(' '));
+        $('#sentence-extent').val(opts.anki.sentenceExt);
 
         $('input, select').not('.anki-model').change(onOptionsChanged);
         $('.anki-model').change(onAnkiModelChanged);
@@ -189,7 +189,7 @@ function onDictionaryPurge(e) {
         showDictionarySpinner(false);
         dictControls.show();
         dictProgress.hide();
-        return loadOptions().then(opts => populateDictionaries(opts));
+        return optionsLoad().then(opts => populateDictionaries(opts));
     });
 }
 
@@ -212,7 +212,7 @@ function onDictionaryDelete() {
         showDictionarySpinner(false);
         dictProgress.hide();
         dictControls.show();
-        return loadOptions().then(opts => populateDictionaries(opts));
+        return optionsLoad().then(opts => populateDictionaries(opts));
     });
 }
 
@@ -229,10 +229,10 @@ function onDictionaryImport() {
 
     setProgress(0.0);
 
-    loadOptions().then(opts => {
+    optionsLoad().then(opts => {
         database().importDictionary(dictUrl.val(), (total, current) => setProgress(current / total * 100.0)).then(summary => {
             opts.dictionaries[summary.title] = {enableTerms: summary.hasTerms, enableKanji: summary.hasKanji};
-            return saveOptions(opts).then(() => yomichan().setOptions(opts));
+            return optionsSave(opts).then(() => yomichan().setOptions(opts));
         }).then(() => {
             return populateDictionaries(opts);
         }).catch(error => {
@@ -303,8 +303,8 @@ function fieldsToDict(selection) {
 
 function modelIdToFieldOptKey(id) {
     return {
-        'anki-term-model': 'ankiTermFields',
-        'anki-kanji-model': 'ankiKanjiFields'
+        'anki-term-model': 'anki.terms.fields',
+        'anki-kanji-model': 'anki.kanji.fields'
     }[id];
 }
 
@@ -344,16 +344,16 @@ function populateAnkiDeckAndModel(opts) {
         ankiDeck.find('option').remove();
         deckNames.forEach(name => ankiDeck.append($('<option/>', {value: name, text: name})));
 
-        $('#anki-term-deck').val(opts.ankiTermDeck);
-        $('#anki-kanji-deck').val(opts.ankiKanjiDeck);
+        $('#anki-term-deck').val(opts.anki.terms.deck);
+        $('#anki-kanji-deck').val(opts.anki.kanji.deck);
 
         const ankiModel = $('.anki-model');
         ankiModel.find('option').remove();
         modelNames.forEach(name => ankiModel.append($('<option/>', {value: name, text: name})));
 
         return Promise.all([
-            populateAnkiFields($('#anki-term-model').val(opts.ankiTermModel), opts),
-            populateAnkiFields($('#anki-kanji-model').val(opts.ankiKanjiModel), opts)
+            populateAnkiFields($('#anki-term-model').val(opts.anki.terms.model), opts),
+            populateAnkiFields($('#anki-kanji-model').val(opts.anki.kanji.model), opts)
         ]);
     }).then(() => {
         ankiFormat.show();
@@ -403,7 +403,7 @@ function onAnkiModelChanged(e) {
     getFormValues().then(({optsNew, optsOld}) => {
         optsNew[modelIdToFieldOptKey($(this).id)] = {};
         populateAnkiFields($(this), optsNew).then(() => {
-            saveOptions(optsNew).then(() => yomichan().setOptions(optsNew));
+            optionsSave(optsNew).then(() => yomichan().setOptions(optsNew));
         }).catch(error => {
             showAnkiError(error);
         }).then(() => {
@@ -418,10 +418,10 @@ function onOptionsChanged(e) {
     }
 
     getFormValues().then(({optsNew, optsOld}) => {
-        return saveOptions(optsNew).then(() => {
+        return optionsSave(optsNew).then(() => {
             yomichan().setOptions(optsNew);
             updateVisibility(optsNew);
-            if (optsNew.ankiEnable !== optsOld.ankiEnable) {
+            if (optsNew.anki.enable !== optsOld.anki.enable) {
                 showAnkiError(null);
                 showAnkiSpinner(true);
                 return populateAnkiDeckAndModel(optsNew);
