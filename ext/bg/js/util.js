@@ -123,7 +123,7 @@ function groupTermDefs(definitions) {
             reading: firstDef.reading,
             reasons: firstDef.reasons,
             score: groupDefs.reduce((x, y) => x > y ? x : y, Number.MIN_SAFE_INTEGER),
-            source: firstDef.source,
+            source: firstDef.source
         });
     }
 
@@ -192,7 +192,7 @@ function formatField(field, definition, mode) {
         'reading',
         'sentence',
         'tags',
-        'url',
+        'url'
     ];
 
     for (const marker of markers) {

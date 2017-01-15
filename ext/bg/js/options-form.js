@@ -54,9 +54,10 @@ function getFormData() {
         $('.dict-group').each((index, element) => {
             const dictionary = $(element);
             const title = dictionary.data('title');
+            const priority = parseInt(dictionary.find('.dict-priority').val(), 10);
             const enableTerms = dictionary.find('.dict-enable-terms').prop('checked');
             const enableKanji = dictionary.find('.dict-enable-kanji').prop('checked');
-            optionsNew.dictionaries[title] = {enableTerms, enableKanji};
+            optionsNew.dictionaries[title] = {priority, enableTerms, enableKanji};
         });
 
         return {optionsNew, optionsOld};
@@ -147,22 +148,23 @@ function populateDictionaries(options) {
     let dictCount = 0;
     return database().getDictionaries().then(rows => {
         rows.forEach(row => {
-            const dictoptions = options.dictionaries[row.title] || {enableTerms: false, enableKanji: false};
+            const dictOptions = options.dictionaries[row.title] || {enableTerms: false, enableKanji: false, priority: 0};
             const html = Handlebars.templates['dictionary.html']({
                 title: row.title,
                 version: row.version,
                 revision: row.revision,
                 hasTerms: row.hasTerms,
                 hasKanji: row.hasKanji,
-                enableTerms: dictoptions.enableTerms,
-                enableKanji: dictoptions.enableKanji
+                priority: dictOptions.priority,
+                enableTerms: dictOptions.enableTerms,
+                enableKanji: dictOptions.enableKanji
             });
 
             dictGroups.append($(html));
             ++dictCount;
         });
 
-        $('.dict-enable-terms, .dict-enable-kanji').change(onOptionsChanged);
+        $('.dict-enable-terms, .dict-enable-kanji, .dict-priority').change(onOptionsChanged);
         $('.dict-delete').click(onDictionaryDelete);
     }).catch(error => {
         showDictionaryError(error);
