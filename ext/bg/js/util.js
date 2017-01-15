@@ -43,7 +43,9 @@ function promiseCallback(promise, callback) {
     return promise.then(result => {
        callback({result});
     }).catch(error => {
+        /* eslint-disable */
         console.log(error);
+        /* eslint-enable */
         callback({error});
     });
 }
