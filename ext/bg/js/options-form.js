@@ -26,7 +26,7 @@ function yomichan() {
 
 function getFormValues() {
     return optionsLoad().then(optionsOld => {
-        const optionsNew = $.extend({}, optionsOld);
+        const optionsNew = $.extend(true, {}, optionsOld);
 
         optionsNew.general.autoStart = $('#activate-on-startup').prop('checked');
         optionsNew.general.audioPlayback = $('#audio-playback-buttons').prop('checked');
