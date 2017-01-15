@@ -69,7 +69,7 @@ function optionsVersion(options) {
         targetDict[targetKey] = sourceDict[sourceKey] || targetDict[targetKey];
     };
 
-    const version = options.version || 0;
+    options.version = options.version || 0;
     const fixups = [
         () => {
             optionsSetDefaults(options);
@@ -98,8 +98,8 @@ function optionsVersion(options) {
         },
     ];
 
-    if (version < fixups.length) {
-        fixups[version]();
+    if (options.version < fixups.length) {
+        fixups[options.version]();
         ++options.version;
         optionsVersion(options);
     }

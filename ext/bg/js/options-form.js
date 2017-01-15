@@ -57,24 +57,23 @@ function getFormValues() {
             optsNew.dictionaries[title] = {enableTerms, enableKanji};
         });
 
-        return {
-            optsNew: sanitizeOptions(optsNew),
-            optsOld: sanitizeOptions(optsOld)
-        };
+        return {optsNew, optsOld};
     });
 }
 
 function updateVisibility(opts) {
+    const general = $('#anki-general');
     if (opts.anki.enable) {
-        $('#anki-general').show();
+        general.show();
     } else {
-        $('#anki-general').hide();
+        general.hide();
     }
 
+    const advanced = $('.options-advanced');
     if (opts.general.showAdvanced) {
-        $('.options-advanced').show();
+        advanced.show();
     } else {
-        $('.options-advanced').hide();
+        advanced.hide();
     }
 }
 
@@ -93,17 +92,16 @@ $(document).ready(() => {
         $('#scan-delay').val(opts.scanning.delay);
         $('#scan-length').val(opts.scanning.length);
 
-        $('#anki-enable').prop('checked', opts.anki.enable);
-        $('#anki-card-tags').val(opts.anki.tags.join(' '));
-        $('#sentence-extent').val(opts.anki.sentenceExt);
-
-        $('input, select').not('.anki-model').change(onOptionsChanged);
-        $('.anki-model').change(onAnkiModelChanged);
-
         $('#dict-purge').click(onDictionaryPurge);
         $('#dict-importer a').click(onDictionarySetUrl);
         $('#dict-import').click(onDictionaryImport);
         $('#dict-url').on('input', onDictionaryUpdateUrl);
+
+        $('#anki-enable').prop('checked', opts.anki.enable);
+        $('#anki-card-tags').val(opts.anki.tags.join(' '));
+        $('#sentence-extent').val(opts.anki.sentenceExt);
+        $('input, select').not('.anki-model').change(onOptionsChanged);
+        $('.anki-model').change(onAnkiModelChanged);
 
         populateDictionaries(opts);
         populateAnkiDeckAndModel(opts);
@@ -301,10 +299,10 @@ function fieldsToDict(selection) {
     return result;
 }
 
-function modelIdToFieldOptKey(id) {
+function modelIdToCard(id) {
     return {
-        'anki-term-model': 'anki.terms.fields',
-        'anki-kanji-model': 'anki.kanji.fields'
+        'anki-term-model': 'terms',
+        'anki-kanji-model': 'kanji'
     }[id];
 }
 
@@ -374,12 +372,12 @@ function populateAnkiFields(element, opts) {
     }
 
     const modelId = element.attr('id');
-    const optKey = modelIdToFieldOptKey(modelId);
+    const card = modelIdToCard(modelId);
     const markers = modelIdToMarkers(modelId);
 
     return anki().getModelFieldNames(modelName).then(names => {
         names.forEach(name => {
-            const html = Handlebars.templates['model.html']({name, markers, value: opts[optKey][name] || ''});
+            const html = Handlebars.templates['model.html']({name, markers, value: opts.anki[card].fields[name] || ''});
             container.append($(html));
         });
 
@@ -401,7 +399,8 @@ function onAnkiModelChanged(e) {
     showAnkiSpinner(true);
 
     getFormValues().then(({optsNew, optsOld}) => {
-        optsNew[modelIdToFieldOptKey($(this).id)] = {};
+        const card = modelIdToCard($(this).id);
+        optsNew.anki[card].fields = {};
         populateAnkiFields($(this), optsNew).then(() => {
             optionsSave(optsNew).then(() => yomichan().setOptions(optsNew));
         }).catch(error => {
