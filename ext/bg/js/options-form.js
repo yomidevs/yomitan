@@ -24,7 +24,7 @@ function yomichan() {
     return chrome.extension.getBackgroundPage().yomichan;
 }
 
-function getFormValues() {
+function getFormData() {
     return optionsLoad().then(optionsOld => {
         const optionsNew = $.extend(true, {}, optionsOld);
 
@@ -42,12 +42,14 @@ function getFormValues() {
         optionsNew.anki.enable = $('#anki-enable').prop('checked');
         optionsNew.anki.tags = $('#card-tags').val().split(/[,; ]+/);
         optionsNew.anki.sentenceExt = parseInt($('#sentence-detection-extent').val(), 10);
-        optionsNew.anki.terms.deck = $('#anki-terms-deck').val();
-        optionsNew.anki.terms.model = $('#anki-terms-model').val();
-        optionsNew.anki.terms.fields = fieldsToDict($('#terms .anki-field-value'));
-        optionsNew.anki.kanji.deck = $('#anki-kanji-deck').val();
-        optionsNew.anki.kanji.model = $('#anki-kanji-model').val();
-        optionsNew.anki.kanji.fields = fieldsToDict($('#kanji .anki-field-value'));
+        if (optionsOld.anki.enable) {
+            optionsNew.anki.terms.deck = $('#anki-terms-deck').val();
+            optionsNew.anki.terms.model = $('#anki-terms-model').val();
+            optionsNew.anki.terms.fields = ankiFieldsToDict($('#terms .anki-field-value'));
+            optionsNew.anki.kanji.deck = $('#anki-kanji-deck').val();
+            optionsNew.anki.kanji.model = $('#anki-kanji-model').val();
+            optionsNew.anki.kanji.fields = ankiFieldsToDict($('#kanji .anki-field-value'));
+        }
 
         $('.dict-group').each((index, element) => {
             const dictionary = $(element);
@@ -290,7 +292,7 @@ function showAnkiError(error) {
     }
 }
 
-function fieldsToDict(selection) {
+function ankiFieldsToDict(selection) {
     const result = {};
     selection.each((index, element) => {
         result[$(element).data('field')] = $(element).val();
@@ -369,7 +371,7 @@ function onAnkiModelChanged(e) {
     showAnkiSpinner(true);
 
     const element = $(this);
-    getFormValues().then(({optionsNew, optionsOld}) => {
+    getFormData().then(({optionsNew, optionsOld}) => {
         const tab = element.closest('.tab-pane');
         const tabId = tab.attr('id');
 
@@ -389,7 +391,7 @@ function onOptionsChanged(e) {
         return;
     }
 
-    getFormValues().then(({optionsNew, optionsOld}) => {
+    getFormData().then(({optionsNew, optionsOld}) => {
         return optionsSave(optionsNew).then(() => {
             yomichan().setOptions(optionsNew);
             updateVisibility(optionsNew);
