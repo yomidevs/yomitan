@@ -32,8 +32,8 @@ class Yomichan {
         chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
         chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
 
-        optionsLoad().then(opts => {
-            this.setOptions(opts);
+        optionsLoad().then(options => {
+            this.setOptions(options);
             if (this.options.general.autoStart) {
                 this.setState('loading');
             }
