@@ -29,9 +29,9 @@ function getFormValues() {
         const optionsNew = $.extend({}, optionsOld);
 
         optionsNew.general.autoStart = $('#activate-on-startup').prop('checked');
-        optionsNew.general.audioPlayback = $('#enable-audio-playback').prop('checked');
-        optionsNew.general.softKatakana = $('#enable-soft-katakana-search').prop('checked');
-        optionsNew.general.groupResults = $('#group-term-results').prop('checked');
+        optionsNew.general.audioPlayback = $('#audio-playback-buttons').prop('checked');
+        optionsNew.general.softKatakana = $('#soft-katakana-search').prop('checked');
+        optionsNew.general.groupResults = $('#group-terms-results').prop('checked');
         optionsNew.general.showAdvanced = $('#show-advanced-options').prop('checked');
 
         optionsNew.scanning.requireShift = $('#hold-shift-to-scan').prop('checked');
@@ -40,10 +40,10 @@ function getFormValues() {
         optionsNew.scanning.length = parseInt($('#scan-length').val(), 10);
 
         optionsNew.anki.enable = $('#anki-enable').prop('checked');
-        optionsNew.anki.tags = $('#anki-card-tags').val().split(/[,; ]+/);
-        optionsNew.anki.sentenceExt = parseInt($('#sentence-extent').val(), 10);
-        optionsNew.anki.terms.deck = $('#anki-term-deck').val();
-        optionsNew.anki.terms.model = $('#anki-term-model').val();
+        optionsNew.anki.tags = $('#card-tags').val().split(/[,; ]+/);
+        optionsNew.anki.sentenceExt = parseInt($('#sentence-detection-extent').val(), 10);
+        optionsNew.anki.terms.deck = $('#anki-terms-deck').val();
+        optionsNew.anki.terms.model = $('#anki-terms-model').val();
         optionsNew.anki.terms.fields = fieldsToDict($('#terms .anki-field-value'));
         optionsNew.anki.kanji.deck = $('#anki-kanji-deck').val();
         optionsNew.anki.kanji.model = $('#anki-kanji-model').val();
@@ -82,9 +82,9 @@ $(document).ready(() => {
 
     optionsLoad().then(options => {
         $('#activate-on-startup').prop('checked', options.general.autoStart);
-        $('#enable-audio-playback').prop('checked', options.general.audioPlayback);
-        $('#enable-soft-katakana-search').prop('checked', options.general.softKatakana);
-        $('#group-term-results').prop('checked', options.general.groupResults);
+        $('#audio-playback-buttons').prop('checked', options.general.audioPlayback);
+        $('#soft-katakana-search').prop('checked', options.general.softKatakana);
+        $('#group-terms-results').prop('checked', options.general.groupResults);
         $('#show-advanced-options').prop('checked', options.general.showAdvanced);
 
         $('#hold-shift-to-scan').prop('checked', options.scanning.requireShift);
@@ -98,8 +98,8 @@ $(document).ready(() => {
         $('#dict-url').on('input', onDictionaryUpdateUrl);
 
         $('#anki-enable').prop('checked', options.anki.enable);
-        $('#anki-card-tags').val(options.anki.tags.join(' '));
-        $('#sentence-extent').val(options.anki.sentenceExt);
+        $('#card-tags').val(options.anki.tags.join(' '));
+        $('#sentence-detection-extent').val(options.anki.sentenceExt);
         $('input, select').not('.anki-model').change(onOptionsChanged);
         $('.anki-model').change(onAnkiModelChanged);
 
@@ -309,7 +309,7 @@ function populateAnkiDeckAndModel(options) {
         ankiDeck.find('option').remove();
         deckNames.forEach(name => ankiDeck.append($('<option/>', {value: name, text: name})));
 
-        $('#anki-term-deck').val(options.anki.terms.deck);
+        $('#anki-terms-deck').val(options.anki.terms.deck);
         $('#anki-kanji-deck').val(options.anki.kanji.deck);
 
         const ankiModel = $('.anki-model');
@@ -317,7 +317,7 @@ function populateAnkiDeckAndModel(options) {
         modelNames.forEach(name => ankiModel.append($('<option/>', {value: name, text: name})));
 
         return Promise.all([
-            populateAnkiFields($('#anki-term-model').val(options.anki.terms.model), options),
+            populateAnkiFields($('#anki-terms-model').val(options.anki.terms.model), options),
             populateAnkiFields($('#anki-kanji-model').val(options.anki.kanji.model), options)
         ]);
     }).then(() => {
