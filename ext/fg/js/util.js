@@ -37,12 +37,12 @@ function getOptions() {
     return invokeBgApi('getOptions', {});
 }
 
-function findTerm(text) {
-    return invokeBgApi('findTerm', {text});
+function findTerms(text) {
+    return invokeBgApi('findTerms', {text});
 }
 
-function findTermGrouped(text) {
-    return invokeBgApi('findTermGrouped', {text});
+function findTermsGrouped(text) {
+    return invokeBgApi('findTermsGrouped', {text});
 }
 
 function findKanji(text) {

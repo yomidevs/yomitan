@@ -65,7 +65,7 @@ class Database {
         });
     }
 
-    findTerm(term, dictionaries) {
+    findTerms(term, dictionaries) {
         if (this.db === null) {
             return Promise.reject('database not initialized');
         }

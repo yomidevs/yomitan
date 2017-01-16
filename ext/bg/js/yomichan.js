@@ -106,13 +106,9 @@ class Yomichan {
     tabInvokeAll(action, params) {
         chrome.tabs.query({}, tabs => {
             for (const tab of tabs) {
-                this.tabInvoke(tab.id, action, params);
+                chrome.tabs.sendMessage(tab.id, {action, params}, () => null);
             }
         });
-    }
-
-    tabInvoke(tabId, action, params) {
-        chrome.tabs.sendMessage(tabId, {action, params}, () => null);
     }
 
     formatNote(definition, mode) {
@@ -174,7 +170,7 @@ class Yomichan {
         );
     }
 
-    api_findTerm({text, callback}) {
+    api_findTerms({text, callback}) {
         const dictionaries = [];
         for (const title in this.options.dictionaries) {
             if (this.options.dictionaries[title].enableTerms) {
@@ -183,7 +179,7 @@ class Yomichan {
         }
 
         promiseCallback(
-            this.translator.findTerm(
+            this.translator.findTerms(
                 text,
                 dictionaries,
                 this.options.general.softKatakana
@@ -192,7 +188,7 @@ class Yomichan {
         );
     }
 
-    api_findTermGrouped({text, callback}) {
+    api_findTermsGrouped({text, callback}) {
         const dictionaries = [];
         for (const title in this.options.dictionaries) {
             if (this.options.dictionaries[title].enableTerms) {
@@ -201,7 +197,7 @@ class Yomichan {
         }
 
         promiseCallback(
-            this.translator.findTermGrouped(
+            this.translator.findTermsGrouped(
                 text,
                 dictionaries,
                 this.options.general.softKatakana

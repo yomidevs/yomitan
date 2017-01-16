@@ -146,7 +146,7 @@ class Driver {
     searchTerms(textSource) {
         textSource.setEndOffset(this.options.scanning.length);
 
-        const findFunc = this.options.general.groupResults ? findTermGrouped : findTerm;
+        const findFunc = this.options.general.groupResults ? findTermsGrouped : findTerms;
         return findFunc(textSource.text()).then(({definitions, length}) => {
             if (definitions.length === 0) {
                 return false;

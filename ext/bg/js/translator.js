@@ -41,12 +41,12 @@ class Translator {
         });
     }
 
-    findTerm(text, dictionaries, softKatakana) {
+    findTerms(text, dictionaries, softKatakana) {
         const cache = {};
-        return this.findTermDeinflections(text, dictionaries, cache).then(deinfLiteral => {
+        return this.findTermsDeinflected(text, dictionaries, cache).then(deinfLiteral => {
             const textHiragana = wanakana._katakanaToHiragana(text);
             if (text !== textHiragana && softKatakana) {
-                return this.findTermDeinflections(textHiragana, dictionaries, cache).then(deinfHiragana => deinfLiteral.concat(deinfHiragana));
+                return this.findTermsDeinflected(textHiragana, dictionaries, cache).then(deinfHiragana => deinfLiteral.concat(deinfHiragana));
             } else {
                 return deinfLiteral;
             }
@@ -82,8 +82,8 @@ class Translator {
         });
     }
 
-    findTermGrouped(text, dictionaries, softKatakana) {
-        return this.findTerm(text, dictionaries, softKatakana).then(({length, definitions}) => {
+    findTermsGrouped(text, dictionaries, softKatakana) {
+        return this.findTerms(text, dictionaries, softKatakana).then(({length, definitions}) => {
             return {length, definitions: groupTermDefs(definitions)};
         });
     }
@@ -109,13 +109,13 @@ class Translator {
         });
     }
 
-    findTermDeinflections(text, dictionaries, cache) {
+    findTermsDeinflected(text, dictionaries, cache) {
         const definer = term => {
             if (cache.hasOwnProperty(term)) {
                 return Promise.resolve(cache[term]);
             }
 
-            return this.database.findTerm(term, dictionaries).then(definitions => cache[term] = definitions);
+            return this.database.findTerms(term, dictionaries).then(definitions => cache[term] = definitions);
         };
 
         const promises = [];
