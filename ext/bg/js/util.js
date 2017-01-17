@@ -39,6 +39,18 @@ function isKanji(c) {
     return code >= 0x4e00 && code < 0x9fb0 || code >= 0x3400 && code < 0x4dc0;
 }
 
+function enabledDicts(options) {
+    const dictionaries = {};
+    for (const title in options.dictionaries) {
+        const dictionary = options.dictionaries[title];
+        if (dictionary.enabled) {
+            dictionaries[title] = dictionary;
+        }
+    }
+
+    return dictionaries;
+}
+
 function promiseCallback(promise, callback) {
     return promise.then(result => {
        callback({result});

@@ -1,8 +1,6 @@
 (function() {
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
 templates['dictionary.html'] = template({"1":function(container,depth0,helpers,partials,data) {
-    return "disabled";
-},"3":function(container,depth0,helpers,partials,data) {
     return "checked";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
@@ -17,25 +15,15 @@ templates['dictionary.html'] = template({"1":function(container,depth0,helpers,p
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
     + " <small>v."
     + alias4(((helper = (helper = helpers.version || (depth0 != null ? depth0.version : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"version","hash":{},"data":data}) : helper)))
-    + "</small></h4> -->\n    <!--     </div> -->\n    <!--     <div class=\"col-xs-4 text-right disabled\"> -->\n    <!--         <button type=\"button\" class=\"dict-group-controls dict-delete btn btn-danger\">Delete</button> -->\n    <!--     </div> -->\n    <!-- </div> -->\n\n    <div class=\"dict-delete-progress\">\n        Dictionary data is being deleted, please be patient...\n        <div class=\"progress\">\n            <div class=\"progress-bar progress-bar-striped progress-bar-danger\" style=\"width: 0%\"></div>\n        </div>\n    </div>\n\n    <div class=\"form-group dict-group-controls\">\n        <label for=\"dict-"
+    + "</small></h4> -->\n    <!--     </div> -->\n    <!--     <div class=\"col-xs-4 text-right disabled\"> -->\n    <!--         <button type=\"button\" class=\"dict-group-controls dict-delete btn btn-danger\">Delete</button> -->\n    <!--     </div> -->\n    <!-- </div> -->\n\n    <div class=\"dict-delete-progress\">\n        Dictionary data is being deleted, please be patient...\n        <div class=\"progress\">\n            <div class=\"progress-bar progress-bar-striped progress-bar-danger\" style=\"width: 0%\"></div>\n        </div>\n    </div>\n\n    <div class=\"checkbox dict-group-controls\">\n        <label><input type=\"checkbox\" class=\"dict-enabled\" "
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.enabled : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "> Enable search</label>\n    </div>\n    <div class=\"form-group dict-group-controls\">\n        <label for=\"dict-"
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
-    + "\">Priority</label>\n        <input type=\"number\" value=\""
+    + "\">Result priority</label>\n        <input type=\"number\" value=\""
     + alias4(((helper = (helper = helpers.priority || (depth0 != null ? depth0.priority : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"priority","hash":{},"data":data}) : helper)))
     + "\" id=\"dict-"
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
-    + "\" class=\"form-control dict-priority\">\n    </div>\n    <div class=\"checkbox dict-group-controls "
-    + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.hasTerms : depth0),{"name":"unless","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "\">\n        <label><input type=\"checkbox\" class=\"dict-enable-terms\" "
-    + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.hasTerms : depth0),{"name":"unless","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + " "
-    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.enableTerms : depth0),{"name":"if","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "> Enable term search</label>\n    </div>\n    <div class=\"checkbox dict-group-controls "
-    + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.hasKanji : depth0),{"name":"unless","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "\">\n        <label><input type=\"checkbox\" class=\"dict-enable-kanji\" "
-    + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.hasKanji : depth0),{"name":"unless","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + " "
-    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.enableKanji : depth0),{"name":"if","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "> Enable Kanji search</label>\n    </div>\n</div>\n";
+    + "\" class=\"form-control dict-priority\">\n    </div>\n</div>\n";
 },"useData":true});
 templates['kanji-list.html'] = template({"1":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : {};

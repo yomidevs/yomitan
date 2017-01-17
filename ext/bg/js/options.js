@@ -97,7 +97,9 @@ function optionsVersion(options) {
             copy(options.anki.kanji, 'fields', options, 'ankiKanjiFields');
 
             for (const title in options.dictionaries) {
-                options.dictionaries[title].priority = 0;
+                const dictionary = options.dictionaries[title];
+                dictionary.enabled = dictionary.enableTerms || dictionary.enableKanji;
+                dictionary.priority = 0;
             }
         }
     ];

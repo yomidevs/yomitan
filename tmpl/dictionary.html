@@ -17,14 +17,11 @@
         </div>
     </div>
 
+    <div class="checkbox dict-group-controls">
+        <label><input type="checkbox" class="dict-enabled" {{#if enabled}}checked{{/if}}> Enable search</label>
+    </div>
     <div class="form-group dict-group-controls">
-        <label for="dict-{{title}}">Priority</label>
+        <label for="dict-{{title}}">Result priority</label>
         <input type="number" value="{{priority}}" id="dict-{{title}}" class="form-control dict-priority">
-    </div>
-    <div class="checkbox dict-group-controls {{#unless hasTerms}}disabled{{/unless}}">
-        <label><input type="checkbox" class="dict-enable-terms" {{#unless hasTerms}}disabled{{/unless}} {{#if enableTerms}}checked{{/if}}> Enable term search</label>
-    </div>
-    <div class="checkbox dict-group-controls {{#unless hasKanji}}disabled{{/unless}}">
-        <label><input type="checkbox" class="dict-enable-kanji" {{#unless hasKanji}}disabled{{/unless}} {{#if enableKanji}}checked{{/if}}> Enable Kanji search</label>
     </div>
 </div>

@@ -55,9 +55,8 @@ function getFormData() {
             const dictionary = $(element);
             const title = dictionary.data('title');
             const priority = parseInt(dictionary.find('.dict-priority').val(), 10);
-            const enableTerms = dictionary.find('.dict-enable-terms').prop('checked');
-            const enableKanji = dictionary.find('.dict-enable-kanji').prop('checked');
-            optionsNew.dictionaries[title] = {priority, enableTerms, enableKanji};
+            const enabled = dictionary.find('.dict-enabled').prop('checked');
+            optionsNew.dictionaries[title] = {priority, enabled};
         });
 
         return {optionsNew, optionsOld};
@@ -153,18 +152,15 @@ function populateDictionaries(options) {
                 title: row.title,
                 version: row.version,
                 revision: row.revision,
-                hasTerms: row.hasTerms,
-                hasKanji: row.hasKanji,
                 priority: dictOptions.priority,
-                enableTerms: dictOptions.enableTerms,
-                enableKanji: dictOptions.enableKanji
+                enabled: dictOptions.enabled
             });
 
             dictGroups.append($(html));
             ++dictCount;
         });
 
-        $('.dict-enable-terms, .dict-enable-kanji, .dict-priority').change(onOptionsChanged);
+        $('.dict-enabled, .dict-priority').change(onOptionsChanged);
         $('.dict-delete').click(onDictionaryDelete);
     }).catch(error => {
         showDictionaryError(error);
@@ -233,7 +229,7 @@ function onDictionaryImport() {
 
     optionsLoad().then(options => {
         database().importDictionary(dictUrl.val(), (total, current) => setProgress(current / total * 100.0)).then(summary => {
-            options.dictionaries[summary.title] = {enableTerms: summary.hasTerms, enableKanji: summary.hasKanji};
+            options.dictionaries[summary.title] = {enabled: true, priority: 0};
             return optionsSave(options).then(() => yomichan().setOptions(options));
         }).then(() => {
             return populateDictionaries(options);

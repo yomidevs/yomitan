@@ -157,54 +157,22 @@ class Yomichan {
     }
 
     api_findKanji({text, callback}) {
-        const dictionaries = {};
-        for (const title in this.options.dictionaries) {
-            const dictionary = this.options.dictionaries[title];
-            if (dictionary.enableKanji) {
-                dictionaries[title] = dictionary;
-            }
-        }
-
         promiseCallback(
-            this.translator.findKanji(text, dictionaries),
+            this.translator.findKanji(text, enabledDicts(this.options)),
             callback
         );
     }
 
     api_findTerms({text, callback}) {
-        const dictionaries = {};
-        for (const title in this.options.dictionaries) {
-            const dictionary = this.options.dictionaries[title];
-            if (dictionary.enableTerms) {
-                dictionaries[title] = dictionary;
-            }
-        }
-
         promiseCallback(
-            this.translator.findTerms(
-                text,
-                dictionaries,
-                this.options.general.softKatakana
-            ),
+            this.translator.findTerms(text, enabledDicts(this.options), this.options.general.softKatakana),
             callback
         );
     }
 
     api_findTermsGrouped({text, callback}) {
-        const dictionaries = {};
-        for (const title in this.options.dictionaries) {
-            const dictionary = this.options.dictionaries[title];
-            if (dictionary.enableTerms) {
-                dictionaries[title] = dictionary;
-            }
-        }
-
         promiseCallback(
-            this.translator.findTermsGrouped(
-                text,
-                dictionaries,
-                this.options.general.softKatakana
-            ),
+            this.translator.findTermsGrouped(text, enabledDicts(this.options), this.options.general.softKatakana),
             callback
         );
     }
