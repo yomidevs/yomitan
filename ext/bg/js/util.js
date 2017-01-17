@@ -50,7 +50,7 @@ function promiseCallback(promise, callback) {
     });
 }
 
-function sortTermDefs(definitions) {
+function sortTermDefs(definitions, dictionaries=null) {
     return definitions.sort((v1, v2) => {
         const sl1 = v1.source.length;
         const sl2 = v2.source.length;
@@ -58,6 +58,16 @@ function sortTermDefs(definitions) {
             return -1;
         } else if (sl1 < sl2) {
             return 1;
+        }
+
+        if (dictionaries !== null) {
+            const p1 = (dictionaries[v1.dictionary] || {}).priority || 0;
+            const p2 = (dictionaries[v2.dictionary] || {}).priority || 0;
+            if (p1 > p2) {
+                return -1;
+            } else if (p1 < p2) {
+                return 1;
+            }
         }
 
         const s1 = v1.score;
@@ -97,7 +107,7 @@ function undupeTermDefs(definitions) {
     return definitionsUnique;
 }
 
-function groupTermDefs(definitions) {
+function groupTermDefs(definitions, dictionaries) {
     const groups = {};
     for (const definition of definitions) {
         const key = [definition.source, definition.expression].concat(definition.reasons);
@@ -117,12 +127,13 @@ function groupTermDefs(definitions) {
     for (const key in groups) {
         const groupDefs = groups[key];
         const firstDef = groupDefs[0];
+        sortTermDefs(groupDefs, dictionaries);
         results.push({
             definitions: groupDefs,
             expression: firstDef.expression,
             reading: firstDef.reading,
             reasons: firstDef.reasons,
-            score: groupDefs.reduce((x, y) => x > y ? x : y, Number.MIN_SAFE_INTEGER),
+            score: groupDefs.reduce((x, y) => x.score > y.score ? x.score : y.score, Number.MIN_SAFE_INTEGER),
             source: firstDef.source
         });
     }

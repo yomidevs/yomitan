@@ -157,10 +157,11 @@ class Yomichan {
     }
 
     api_findKanji({text, callback}) {
-        const dictionaries = [];
+        const dictionaries = {};
         for (const title in this.options.dictionaries) {
-            if (this.options.dictionaries[title].enableKanji) {
-                dictionaries.push(title);
+            const dictionary = this.options.dictionaries[title];
+            if (dictionary.enableKanji) {
+                dictionaries[title] = dictionary;
             }
         }
 
@@ -171,10 +172,11 @@ class Yomichan {
     }
 
     api_findTerms({text, callback}) {
-        const dictionaries = [];
+        const dictionaries = {};
         for (const title in this.options.dictionaries) {
-            if (this.options.dictionaries[title].enableTerms) {
-                dictionaries.push(title);
+            const dictionary = this.options.dictionaries[title];
+            if (dictionary.enableTerms) {
+                dictionaries[title] = dictionary;
             }
         }
 
@@ -189,10 +191,11 @@ class Yomichan {
     }
 
     api_findTermsGrouped({text, callback}) {
-        const dictionaries = [];
+        const dictionaries = {};
         for (const title in this.options.dictionaries) {
-            if (this.options.dictionaries[title].enableTerms) {
-                dictionaries.push(title);
+            const dictionary = this.options.dictionaries[title];
+            if (dictionary.enableTerms) {
+                dictionaries[title] = dictionary;
             }
         }
 
