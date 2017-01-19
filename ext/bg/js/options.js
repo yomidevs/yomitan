@@ -39,6 +39,7 @@ function optionsSetDefaults(options) {
         anki: {
             enable: false,
             tags: ['yomichan'],
+            htmlCards: true,
             sentenceExt: 200,
             terms: {deck: '', model: '', fields: {}},
             kanji: {deck: '', model: '', fields: {}}

@@ -41,6 +41,7 @@ function getFormData() {
 
         optionsNew.anki.enable = $('#anki-enable').prop('checked');
         optionsNew.anki.tags = $('#card-tags').val().split(/[,; ]+/);
+        optionsNew.anki.htmlCards = $('#generate-html-cards').prop('checked');
         optionsNew.anki.sentenceExt = parseInt($('#sentence-detection-extent').val(), 10);
         if (optionsOld.anki.enable) {
             optionsNew.anki.terms.deck = $('#anki-terms-deck').val();
@@ -101,6 +102,7 @@ $(document).ready(() => {
 
         $('#anki-enable').prop('checked', options.anki.enable);
         $('#card-tags').val(options.anki.tags.join(' '));
+        $('#generate-html-cards').prop('checked', options.anki.htmlCards);
         $('#sentence-detection-extent').val(options.anki.sentenceExt);
         $('input, select').not('.anki-model').change(onOptionsChanged);
         $('.anki-model').change(onAnkiModelChanged);
