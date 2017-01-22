@@ -201,15 +201,14 @@ function sortTags(tags) {
     });
 }
 
-function formatField(field, definition, mode) {
+function formatField(field, definition, mode, html) {
     const markers = [
         'audio',
         'character',
         'dictionary',
         'expression',
-        'expression-furigana',
+        'furigana',
         'glossary',
-        'glossary-list',
         'kunyomi',
         'onyomi',
         'reading',
@@ -219,50 +218,19 @@ function formatField(field, definition, mode) {
     ];
 
     for (const marker of markers) {
-        let value = definition[marker] || null;
-        switch (marker) {
-            case 'expression':
-                if (mode === 'term_kana' && definition.reading) {
-                    value = definition.reading;
-                }
-                break;
-            case 'expression-furigana':
-                if (mode === 'term_kana' && definition.reading) {
-                    value = definition.reading;
-                } else {
-                    value = `<ruby>${definition.expression}<rt>${definition.reading}</rt></ruby>`;
-                }
-                break;
-            case 'reading':
-                if (mode === 'term_kana') {
-                    value = null;
-                }
-                break;
-            case 'glossary-list':
-                if (definition.glossary) {
-                    if (definition.glossary.length > 1) {
-                        value = '<ol style="white-space: pre; text-align: left; overflow-x: auto;">';
-                        for (const gloss of definition.glossary) {
-                            value += `<li>${gloss}</li>`;
-                        }
-                        value += '</ol>';
-                    } else {
-                        value = `<p style="white-space: pre; overflow-x: auto;">${definition.glossary.join('')}</p>`;
-                    }
-                }
-                break;
-            case 'tags':
-                if (definition.tags) {
-                    value = definition.tags.map(t => t.name);
-                }
-                break;
-        }
+        const data = {
+            marker,
+            definition,
+            html,
+            modeTermKanji: mode === 'term_kanji',
+            modeTermKana: mode === 'term_kana',
+            modeKanji: mode === 'kanji'
+        };
 
-        if (value !== null && typeof(value) !== 'string') {
-            value = value.join(', ');
-        }
-
-        field = field.replace(`{${marker}}`, value || '');
+        field = field.replace(
+            `{${marker}}`,
+            Handlebars.templates['fields.html'](data).trim()
+        );
     }
 
     return field;

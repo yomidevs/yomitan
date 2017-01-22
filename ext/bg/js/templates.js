@@ -25,6 +25,55 @@ templates['dictionary.html'] = template({"1":function(container,depth0,helpers,p
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
     + "\" class=\"form-control dict-priority\">\n    </div>\n</div>\n";
 },"useData":true});
+templates['fields.html'] = template({"1":function(container,depth0,helpers,partials,data) {
+    return "";
+},"3":function(container,depth0,helpers,partials,data) {
+    return "character\n";
+},"5":function(container,depth0,helpers,partials,data) {
+    return "dictionary\n";
+},"7":function(container,depth0,helpers,partials,data) {
+    return "expression\n";
+},"9":function(container,depth0,helpers,partials,data) {
+    return "furigana\n";
+},"11":function(container,depth0,helpers,partials,data) {
+    return "glossary\n";
+},"13":function(container,depth0,helpers,partials,data) {
+    return "kunyomi\n";
+},"15":function(container,depth0,helpers,partials,data) {
+    return "onyomi\n";
+},"17":function(container,depth0,helpers,partials,data) {
+    return "reading\n";
+},"19":function(container,depth0,helpers,partials,data) {
+    return "sentence\n";
+},"21":function(container,depth0,helpers,partials,data) {
+    return "tags\n";
+},"23":function(container,depth0,helpers,partials,data) {
+    return "url\n";
+},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
+
+  return "\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    + ((stack1 = container.invokePartial(helpers.lookup.call(depth0 != null ? depth0 : {},depth0,"marker",{"name":"lookup","hash":{},"data":data}),depth0,{"data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
+},"main_d":  function(fn, props, container, depth0, data, blockParams, depths) {
+
+  var decorators = container.decorators;
+
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"args":["audio"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(3, data, 0, blockParams, depths),"inverse":container.noop,"args":["character"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(5, data, 0, blockParams, depths),"inverse":container.noop,"args":["dictionary"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(7, data, 0, blockParams, depths),"inverse":container.noop,"args":["expression"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(9, data, 0, blockParams, depths),"inverse":container.noop,"args":["furigana"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(11, data, 0, blockParams, depths),"inverse":container.noop,"args":["glossary"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(13, data, 0, blockParams, depths),"inverse":container.noop,"args":["kunyomi"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(15, data, 0, blockParams, depths),"inverse":container.noop,"args":["onyomi"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(17, data, 0, blockParams, depths),"inverse":container.noop,"args":["reading"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(19, data, 0, blockParams, depths),"inverse":container.noop,"args":["sentence"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(21, data, 0, blockParams, depths),"inverse":container.noop,"args":["tags"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(23, data, 0, blockParams, depths),"inverse":container.noop,"args":["url"],"data":data}) || fn;
+  return fn;
+  }
+
+,"useDecorators":true,"usePartial":true,"useData":true,"useDepths":true});
 templates['kanji-list.html'] = template({"1":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : {};
 

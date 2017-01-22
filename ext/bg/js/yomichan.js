@@ -142,9 +142,15 @@ class Yomichan {
         }
 
         for (const name in fields) {
-            note.fields[name] = formatField(fields[name], definition, mode);
+            note.fields[name] = formatField(
+                fields[name],
+                definition,
+                mode,
+                this.options.anki.htmlCards
+            );
         }
 
+        console.log(note);
         return note;
     }
 
