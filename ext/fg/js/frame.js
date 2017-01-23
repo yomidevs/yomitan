@@ -43,7 +43,7 @@ class Frame {
         this.showSpinner(false);
         window.scrollTo(0, 0);
 
-        renderText(context, 'term-list.html').then(content => {
+        renderText(context, 'terms.html').then(content => {
             $('.content').html(content);
             $('.action-add-note').click(this.onAddNote.bind(this));
 
@@ -73,7 +73,7 @@ class Frame {
         this.showSpinner(false);
         window.scrollTo(0, 0);
 
-        renderText(context, 'kanji-list.html').then(content => {
+        renderText(context, 'kanji.html').then(content => {
             $('.content').html(content);
             $('.action-add-note').click(this.onAddNote.bind(this));
 

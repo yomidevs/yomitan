@@ -1,15 +1,16 @@
 {{#*inline "audio"}}{{/inline}}
 
 {{#*inline "character"}}
-character
+{{definition.character}}
 {{/inline}}
 
 {{#*inline "dictionary"}}
-dictionary
+{{definition.dictionary}}
 {{/inline}}
 
 {{#*inline "expression"}}
-expression
+{{#if modeTermKana}}{{#if definition.reading}}{{definition.reading}}{{else}}{{definition.expression}}{{/if}}{{/if}}
+{{#if modeTermKanji}}{{definition.expression}}{{/if}}
 {{/inline}}
 
 {{#*inline "furigana"}}
@@ -21,27 +22,27 @@ glossary
 {{/inline}}
 
 {{#*inline "kunyomi"}}
-kunyomi
+{{definition.kunyomi}}
 {{/inline}}
 
 {{#*inline "onyomi"}}
-onyomi
+{{definition.onyomi}}
 {{/inline}}
 
 {{#*inline "reading"}}
-reading
+{{definition.reading}}
 {{/inline}}
 
 {{#*inline "sentence"}}
-sentence
+{{definition.sentence}}
 {{/inline}}
 
 {{#*inline "tags"}}
-tags
+{{#each definition.tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}}
 {{/inline}}
 
 {{#*inline "url"}}
-url
+{{#if html}}<a href="{{definition.url}}">{{definition.url}}</a>{{else}}{{definition.url}}{{/if}}
 {{/inline}}
 
 {{> (lookup . 'marker') }}
