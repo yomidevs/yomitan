@@ -309,14 +309,14 @@ function populateAnkiDeckAndModel(options) {
     return Promise.all([anki().getDeckNames(), anki().getModelNames()]).then(([deckNames, modelNames]) => {
         const ankiDeck = $('.anki-deck');
         ankiDeck.find('option').remove();
-        deckNames.forEach(name => ankiDeck.append($('<option/>', {value: name, text: name})));
+        deckNames.sort().forEach(name => ankiDeck.append($('<option/>', {value: name, text: name})));
 
         $('#anki-terms-deck').val(options.anki.terms.deck);
         $('#anki-kanji-deck').val(options.anki.kanji.deck);
 
         const ankiModel = $('.anki-model');
         ankiModel.find('option').remove();
-        modelNames.forEach(name => ankiModel.append($('<option/>', {value: name, text: name})));
+        modelNames.sort().forEach(name => ankiModel.append($('<option/>', {value: name, text: name})));
 
         return Promise.all([
             populateAnkiFields($('#anki-terms-model').val(options.anki.terms.model), options),
