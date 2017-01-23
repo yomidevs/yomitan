@@ -14,7 +14,7 @@
 {{/inline}}
 
 {{#*inline "furigana"}}
-furigana
+{{#if definition.reading}}<ruby>{{definition.expression}}<rt>{{definition.reading}}</rt></ruby>{{else}}{{definition.reading}}{{/if}}
 {{/inline}}
 
 {{#*inline "glossary"}}
