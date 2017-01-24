@@ -150,7 +150,7 @@ class Yomichan {
             );
         }
 
-        console.log(note);
+        // console.log(note);
         return note;
     }
 

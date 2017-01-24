@@ -1,48 +1,76 @@
+{{#*inline "definition"}}
+    {{#if html}}
+        {{#if definition.tags}}
+            (<div>{{#each definition.tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}}</div>)
+        {{/if}}
+        {{#if definition.glossary.[1]}}
+            <ul>{{#each definition.glossary}}<li>>{{#multiLine}}{{.}}{{/multiLine}}></li>{{/each}}</ul>
+        {{else}}
+            <div>{{#multiLine}}{{definition.glossary.[0]}}{{/multiLine}}</div>
+        {{/if}}
+    {{else}}
+        {{#if definition.tags}}({{#each definition.tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}}) {{/if}}{{#if definition.glossary.[1]}}{{#each definition.glossary}}{{.}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}{{definition.glossary.[0]}}{{/if}}
+    {{/if}}
+{{/inline}}
+
 {{#*inline "audio"}}{{/inline}}
 
 {{#*inline "character"}}
-{{definition.character}}
+    {{definition.character}}
 {{/inline}}
 
 {{#*inline "dictionary"}}
-{{definition.dictionary}}
+    {{definition.dictionary}}
 {{/inline}}
 
 {{#*inline "expression"}}
-{{#if modeTermKana}}{{#if definition.reading}}{{definition.reading}}{{else}}{{definition.expression}}{{/if}}{{/if}}
-{{#if modeTermKanji}}{{definition.expression}}{{/if}}
+    {{#if modeTermKana}}{{#if definition.reading}}{{definition.reading}}{{else}}{{definition.expression}}{{/if}}{{else}}{{definition.expression}}{{/if}}
 {{/inline}}
 
 {{#*inline "furigana"}}
-{{#if definition.reading}}<ruby>{{definition.expression}}<rt>{{definition.reading}}</rt></ruby>{{else}}{{definition.expression}}{{/if}}
+    {{#if definition.reading}}<ruby>{{definition.expression}}<rt>{{definition.reading}}</rt></ruby>{{else}}{{definition.expression}}{{/if}}
 {{/inline}}
 
 {{#*inline "glossary"}}
-glossary
+<div style="text-align: left;">
+{{#if grouped}}
+    {{#if definitions.[1]}}
+    <ol>
+        {{#each definitions}}
+            <li>{{> definition}}</li>
+        {{/each}}
+    </ol>
+    {{else}}
+        {{> definition definitions.[0]}}
+    {{/if}}
+{{else}}
+    {{> definition}}
+{{/if}}
+</div>
 {{/inline}}
 
 {{#*inline "kunyomi"}}
-{{definition.kunyomi}}
+    {{definition.kunyomi}}
 {{/inline}}
 
 {{#*inline "onyomi"}}
-{{definition.onyomi}}
+    {{definition.onyomi}}
 {{/inline}}
 
 {{#*inline "reading"}}
-{{definition.reading}}
+    {{definition.reading}}
 {{/inline}}
 
 {{#*inline "sentence"}}
-{{definition.sentence}}
+    {{definition.sentence}}
 {{/inline}}
 
 {{#*inline "tags"}}
-{{#each definition.tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}}
+    {{#each definition.tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}}
 {{/inline}}
 
 {{#*inline "url"}}
-{{#if html}}<a href="{{definition.url}}">{{definition.url}}</a>{{else}}{{definition.url}}{{/if}}
+    {{#if html}}<a href="{{definition.url}}">{{definition.url}}</a>{{else}}{{definition.url}}{{/if}}
 {{/inline}}
 
-{{> (lookup . 'marker') }}
+{{> (lookup . "marker") }}
