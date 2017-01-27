@@ -1,16 +1,23 @@
-{{#*inline "definition"}}
-    {{#if html}}
-        {{#if definition.tags}}
-            (<div>{{#each definition.tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}}</div>)
-        {{/if}}
-        {{#if definition.glossary.[1]}}
-            <ul>{{#each definition.glossary}}<li>>{{#multiLine}}{{.}}{{/multiLine}}></li>{{/each}}</ul>
-        {{else}}
-            <div>{{#multiLine}}{{definition.glossary.[0]}}{{/multiLine}}</div>
-        {{/if}}
-    {{else}}
-        {{#if definition.tags}}({{#each definition.tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}}) {{/if}}{{#if definition.glossary.[1]}}{{#each definition.glossary}}{{.}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}{{definition.glossary.[0]}}{{/if}}
-    {{/if}}
+{{#*inline "glossary-single"}}
+    {{~#if html~}}
+        {{~#if tags~}}
+            <div>({{#each tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})</div>
+        {{~/if~}}
+        {{~#if glossary.[1]~}}
+            <ul>{{#each glossary}}<li>>{{#multiLine}}{{.}}{{/multiLine}}></li>{{/each}}</ul>
+        {{~else~}}
+            <div>{{#multiLine}}{{glossary.[0]}}{{/multiLine}}</div>
+        {{~/if~}}
+    {{~else~}}
+        {{~#if tags~}}
+            ({{#each tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})
+        {{~/if~}}
+        {{~#if glossary.[1]~}}
+            {{#each glossary}}{{.}}{{#unless @last}}, {{/unless}}{{/each}}
+        {{~else~}}
+            {{glossary.[0]}}
+        {{~/if~}}
+    {{~/if~}}
 {{/inline}}
 
 {{#*inline "audio"}}{{/inline}}
@@ -28,37 +35,38 @@
 {{/inline}}
 
 {{#*inline "furigana"}}
-    {{#if definition.reading}}<ruby>{{definition.expression}}<rt>{{definition.reading}}</rt></ruby>{{else}}{{definition.expression}}{{/if}}
+    {{~#if html~}}
+        {{~#if definition.reading}}<ruby>{{definition.expression}}<rt>{{definition.reading}}</rt></ruby>{{else}}{{definition.expression}}{{/if~}}
+    {{~else~}}
+        {{~#if definition.reading}}{{definition.expression}} [{{definition.reading}}]{{else}}{{definition.expression}}{{/if~}}
+    {{~/if~}}
 {{/inline}}
 
 {{#*inline "glossary"}}
-<div style="text-align: left;">
-{{#if group}}
-    {{#if definitions.[1]}}
-    <ol>
-        {{#each definitions}}
-            <li>{{> definition}}</li>
-        {{/each}}
-    </ol>
-    {{else}}
-        {{> definition definitions.[0]}}
-    {{/if}}
-{{else}}
-    {{> definition}}
-{{/if}}
-</div>
+    {{~#if html}}<div style="text-align: left;">{{/if~}}
+    {{~#if group~}}
+        {{~#if definition.definitions.[1]~}}
+            {{~#if html}}<ol>{{#each definition.definitions}}<li>{{> glossary-single}}</li>{{/each}}</ol>
+            {{~else}}{{#each definition.definitions}}* {{> glossary-single}}{{/each}}{{/if~}}
+        {{~else~}}
+            {{> glossary-single definition.definitions.[0]}}
+        {{~/if~}}
+    {{~else~}}
+        {{> glossary-single definition}}
+    {{~/if~}}
+    {{~#if html}}</div>{{/if~}}
 {{/inline}}
 
 {{#*inline "kunyomi"}}
-    {{definition.kunyomi}}
+    {{#each definition.kunyomi}}{{.}}{{#unless @last}}, {{/unless}}{{/each}}
 {{/inline}}
 
 {{#*inline "onyomi"}}
-    {{definition.onyomi}}
+    {{#each definition.onyomi}}{{.}}{{#unless @last}}, {{/unless}}{{/each}}
 {{/inline}}
 
 {{#*inline "reading"}}
-    {{definition.reading}}
+    {{#unless modeTermKana}}{{definition.reading}}{{/unless}}
 {{/inline}}
 
 {{#*inline "sentence"}}
@@ -73,4 +81,4 @@
     {{#if html}}<a href="{{definition.url}}">{{definition.url}}</a>{{else}}{{definition.url}}{{/if}}
 {{/inline}}
 
-{{> (lookup . "marker") }}
+{{~> (lookup . "marker") ~}}
