@@ -201,7 +201,7 @@ function sortTags(tags) {
     });
 }
 
-function formatField(field, definition, mode, html) {
+function formatField(field, definition, mode, options) {
     const markers = [
         'audio',
         'character',
@@ -221,7 +221,8 @@ function formatField(field, definition, mode, html) {
         const data = {
             marker,
             definition,
-            html,
+            group: options.general.groupResults,
+            html: options.anki.htmlCards,
             modeTermKanji: mode === 'term_kanji',
             modeTermKana: mode === 'term_kana',
             modeKanji: mode === 'kanji'

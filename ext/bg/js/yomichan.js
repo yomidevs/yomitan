@@ -146,11 +146,10 @@ class Yomichan {
                 fields[name],
                 definition,
                 mode,
-                this.options.anki.htmlCards
+                this.options
             );
         }
 
-        // console.log(note);
         return note;
     }
 

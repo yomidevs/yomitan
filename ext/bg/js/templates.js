@@ -145,7 +145,7 @@ templates['fields.html'] = template({"1":function(container,depth0,helpers,parti
     var stack1;
 
   return "<div style=\"text-align: left;\">\n"
-    + ((stack1 = helpers["if"].call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.grouped : depth0),{"name":"if","hash":{},"fn":container.program(36, data, 0),"inverse":container.program(42, data, 0),"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers["if"].call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.group : depth0),{"name":"if","hash":{},"fn":container.program(36, data, 0),"inverse":container.program(42, data, 0),"data":data})) != null ? stack1 : "")
     + "</div>\n";
 },"36":function(container,depth0,helpers,partials,data) {
     var stack1;
