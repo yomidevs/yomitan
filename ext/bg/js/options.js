@@ -22,8 +22,9 @@ function optionsSetDefaults(options) {
         general: {
             autoStart: true,
             audioPlayback: true,
-            softKatakana: true,
             groupResults: true,
+            softKatakana: true,
+            maxResults: 32,
             showAdvanced: false
         },
 

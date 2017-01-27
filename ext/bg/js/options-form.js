@@ -30,9 +30,10 @@ function getFormData() {
 
         optionsNew.general.autoStart = $('#activate-on-startup').prop('checked');
         optionsNew.general.audioPlayback = $('#audio-playback-buttons').prop('checked');
-        optionsNew.general.softKatakana = $('#soft-katakana-search').prop('checked');
         optionsNew.general.groupResults = $('#group-terms-results').prop('checked');
+        optionsNew.general.softKatakana = $('#soft-katakana-search').prop('checked');
         optionsNew.general.showAdvanced = $('#show-advanced-options').prop('checked');
+        optionsNew.general.maxResults = parseInt($('#max-displayed-results').val(), 10);
 
         optionsNew.scanning.requireShift = $('#hold-shift-to-scan').prop('checked');
         optionsNew.scanning.selectText = $('#select-matched-text').prop('checked');
@@ -86,9 +87,10 @@ $(document).ready(() => {
     optionsLoad().then(options => {
         $('#activate-on-startup').prop('checked', options.general.autoStart);
         $('#audio-playback-buttons').prop('checked', options.general.audioPlayback);
-        $('#soft-katakana-search').prop('checked', options.general.softKatakana);
         $('#group-terms-results').prop('checked', options.general.groupResults);
+        $('#soft-katakana-search').prop('checked', options.general.softKatakana);
         $('#show-advanced-options').prop('checked', options.general.showAdvanced);
+        $('#max-displayed-results').val(options.general.maxResults);
 
         $('#hold-shift-to-scan').prop('checked', options.scanning.requireShift);
         $('#select-matched-text').prop('checked', options.scanning.selectText);
