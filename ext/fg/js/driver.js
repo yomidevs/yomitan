@@ -31,7 +31,6 @@ class Driver {
         window.addEventListener('mouseover', this.onMouseOver.bind(this));
         window.addEventListener('mousedown', this.onMouseDown.bind(this));
         window.addEventListener('mousemove', this.onMouseMove.bind(this));
-        window.addEventListener('keydown', this.onKeyDown.bind(this));
         window.addEventListener('resize', e => this.searchClear());
 
         getOptions().then(options => {
@@ -51,16 +50,6 @@ class Driver {
         if (this.popupTimer !== null) {
             window.clearTimeout(this.popupTimer);
             this.popupTimer = null;
-        }
-    }
-
-    onKeyDown(e) {
-        this.popupTimerClear();
-
-        if (this.enabled && this.lastMousePos !== null && e.keyCode === 16 /* shift */) {
-            this.searchAt(this.lastMousePos, true);
-        } else if (e.keyCode === 27 /* esc */) {
-            this.searchClear();
         }
     }
 
