@@ -66,30 +66,30 @@ Before flashcards can be automatically created through Yomichan, Anki must be co
 3.  Select the Anki deck and model to use when creating new flashcards (see the [Anki Manual](http://ankisrs.net/docs/manual.html) for more details).
 4.  Populate the model fields with markup representing contextual properties for the current vocabulary term or Kanji:
 
-    #### Markers for term tags ####
+    #### Markers for Term Cards ####
 
     Marker | Description
     -------|------------
     `{audio}` | Audio sample of a native speaker's pronunciation in MP3 format (if available).
-    `{expression}` | Term written in Kanji (will be written in Kana if Kanji is not available).
-    `{expression-furigana}` | Term written in Kanji with Furigana displayed above it (e.g. <ruby>日本語<rt>にほんご</rt></ruby>).
-    `{glossary-list}` | List of definitions with items expressed as a numbered list.
-    `{glossary}` | List of definitions with items delimited using semicolons.
+    `{dictionary}` | Name of the dictionary from which the card is being created (unavailable in *grouped* mode).
+    `{expression}` | Term expressed as Kanji (will be displayed in Kana if Kanji is not available).
+    `{furigana}` | Term expressed as Kanji with Furigana displayed above it (e.g. <ruby>日本語<rt>にほんご</rt></ruby>).
+    `{glossary}` | List of definitions for the term (output format depends on whether running in *grouped* mode).
     `{reading}` | Kana reading for the term (empty for terms where the expression is the reading).
     `{sentence}` | Sentence, quote, or phrase in which the term appears in the source content.
-    `{tags}` | Grammar and usage tags providing additional information about the term.
-    `{url}` | Address of the web page in which the current vocabulary term appeared in.
+    `{tags}` | Grammar and usage tags providing information about the term (unavailable in *grouped* mode).
+    `{url}` | Address of the web page in which the term appeared in.
 
-    #### Markers for Kanji tags ####
+    #### Markers for Kanji Cards ####
 
     Marker | Description
     -------|------------
     `{character}` | Unicode glyph representing the current Kanji.
-    `{glossary-list}` | List of definitions with items expressed as a numbered list.
-    `{glossary}` | List of definitions with items delimited using semicolons.
-    `{kunyomi}` | Kunyomi (Japanese reading) for the current Kanji expressed in Katakana.
-    `{onyomi}` | Onyomi (Chinese reading) for the current Kanji expressed in Hiragana.
-    `{url}` | Address of the web page in which the current vocabulary term appeared in.
+    `{dictionary}` | Name of the dictionary from which the card is being created.
+    `{glossary}` | List of definitions for the Kanji.
+    `{kunyomi}` | Kunyomi (Japanese reading) for the Kanji expressed as Katakana.
+    `{onyomi}` | Onyomi (Chinese reading) for the Kanji expressed as Hiragana.
+    `{url}` | Address of the web page in which the Kanji appeared in.
 
 5.  Click on the ![](https://foosoft.net/projects/yomichan-chrome/img/add-expression.png) icon to add the current expression using Kanji (e.g. 食べる). If the icon
     appears grayed out, this means that a new flashcard cannot be created with the current configuration (please verify
@@ -103,9 +103,9 @@ Before flashcards can be automatically created through Yomichan, Anki must be co
 *   **What happened to AnkiWeb integration? Why was it removed?**
 
     The author of Anki wants to maintain tight control of AnkiWeb by restricting automated web requests, while at the
-    same time not providing an API for adding or removing flash cards. As circumventing these restrictions led to
-    account restrictions placed on users of this extension, I was forced to remove this feature. Note that it is still
-    possible to automatically generate flashcards with the AnkiConnect plugin.
+    same time not providing an API for adding or removing flash cards. As circumventing these limitations led to account
+    restrictions placed on users of this extension, I was forced to remove this feature. Note that it is still possible
+    to automatically generate flashcards with the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
 
 *   **Is it possible to use Yomichan with files saved locally on my computer?**
 
