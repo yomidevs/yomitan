@@ -34,8 +34,8 @@ class Driver {
         window.addEventListener('keydown', this.onKeyDown.bind(this));
         window.addEventListener('resize', e => this.searchClear());
 
-        getOptions().then(opts => {
-            this.options = opts;
+        getOptions().then(options => {
+            this.options = options;
             return isEnabled();
         }).then(enabled => {
             this.enabled = enabled;
@@ -208,8 +208,8 @@ class Driver {
         this.lastTextSource = null;
     }
 
-    api_setOptions(opts) {
-        this.options = opts;
+    api_setOptions(options) {
+        this.options = options;
     }
 
     api_setEnabled(enabled) {

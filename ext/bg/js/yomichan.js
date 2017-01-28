@@ -26,16 +26,16 @@ class Yomichan {
         this.translator = new Translator();
         this.anki = new AnkiNull();
         this.options = null;
-        this.setState('disabled');
+        this.setEnabled(false);
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
         chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
         chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
 
-        optionsLoad().then(options => {
+        this.translator.prepare().then(optionsLoad).then(options => {
             this.setOptions(options);
             if (this.options.general.autoStart) {
-                this.setState('loading');
+                this.setEnabled(true);
             }
         });
     }
@@ -58,37 +58,13 @@ class Yomichan {
     }
 
     onBrowserAction() {
-        switch (this.state) {
-            case 'disabled':
-                this.setState('loading');
-                break;
-            case 'enabled':
-                this.setState('disabled');
-                break;
-        }
+        this.setEnabled(!this.enabled);
     }
 
-    setState(state) {
-        if (this.state === state) {
-            return;
-        }
-
-        this.state = state;
-
-        switch (state) {
-            case 'disabled':
-                chrome.browserAction.setBadgeText({text: 'off'});
-                break;
-            case 'enabled':
-                chrome.browserAction.setBadgeText({text: ''});
-                break;
-            case 'loading':
-                chrome.browserAction.setBadgeText({text: '...'});
-                this.translator.prepare().then(this.setState('enabled'));
-                break;
-        }
-
-        this.tabInvokeAll('setEnabled', this.state === 'enabled');
+    setEnabled(enabled) {
+        this.enabled = enabled;
+        this.tabInvokeAll('setEnabled', this.enabled);
+        chrome.browserAction.setBadgeText({text: enabled ? '' : 'off'});
     }
 
     setOptions(options) {
@@ -154,7 +130,7 @@ class Yomichan {
     }
 
     api_getEnabled({callback}) {
-        callback({result: this.state === 'enabled'});
+        callback({result: this.enabled});
     }
 
     api_getOptions({callback}) {
