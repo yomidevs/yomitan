@@ -2,7 +2,7 @@
     {{~#if html~}}
         {{~#if tags~}}<i>({{#each tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})</i> {{/if~}}
         {{~#if glossary.[1]~}}
-            <ul>{{#each glossary}}<li>>{{#multiLine}}{{.}}{{/multiLine}}></li>{{/each}}</ul>
+            <ul>{{#each glossary}}<li>{{#multiLine}}{{.}}{{/multiLine}}</li>{{/each}}</ul>
         {{~else~}}
             {{~#multiLine}}{{glossary.[0]}}{{/multiLine~}}
         {{~/if~}}

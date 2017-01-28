@@ -55,11 +55,11 @@ templates['fields.html'] = template({"1":function(container,depth0,helpers,parti
     + "</ul>";
 },"8":function(container,depth0,helpers,partials,data) {
     var stack1, helper, options, buffer = 
-  "<li>>";
+  "<li>";
   stack1 = ((helper = (helper = helpers.multiLine || (depth0 != null ? depth0.multiLine : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"multiLine","hash":{},"fn":container.program(9, data, 0),"inverse":container.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},options) : helper));
   if (!helpers.multiLine) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
   if (stack1 != null) { buffer += stack1; }
-  return buffer + "></li>";
+  return buffer + "</li>";
 },"9":function(container,depth0,helpers,partials,data) {
     return container.escapeExpression(container.lambda(depth0, depth0));
 },"11":function(container,depth0,helpers,partials,data) {
