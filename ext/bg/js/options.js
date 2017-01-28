@@ -68,7 +68,7 @@ function optionsSetDefaults(options) {
 
 function optionsVersion(options) {
     const copy = (targetDict, targetKey, sourceDict, sourceKey) => {
-        targetDict[targetKey] = sourceDict[sourceKey] || targetDict[targetKey];
+        targetDict[targetKey] = sourceDict.hasOwnProperty(sourceKey) ? sourceDict[sourceKey] : targetDict[targetKey];
     };
 
     options.version = options.version || 0;
