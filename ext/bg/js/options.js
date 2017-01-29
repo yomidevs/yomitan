@@ -100,8 +100,8 @@ function optionsVersion(options) {
 
             const fixupFields = fields => {
                 const fixups = {
-                    'expression-furigana': 'furigana',
-                    'glossary-list': 'glossary'
+                    '{expression-furigana}': '{furigana}',
+                    '{glossary-list}': '{glossary}'
                 };
 
                 for (let i = 0; i < fields.length; ++i) {
