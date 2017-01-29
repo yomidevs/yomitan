@@ -32,8 +32,8 @@ class Deinflection {
                 if (this.rules.length === 0) {
                     this.definitions = definitions;
                 } else {
-                    for (const rule of this.rules) {
-                        for (const definition of definitions) {
+                    for (let rule of this.rules) {
+                        for (let definition of definitions) {
                             if (definition.rules.includes(rule)) {
                                 this.definitions.push(definition);
                             }
@@ -46,11 +46,11 @@ class Deinflection {
         };
 
         const promises = [];
-        for (const reason in reasons) {
-            for (const variant of reasons[reason]) {
+        for (let reason in reasons) {
+            for (let variant of reasons[reason]) {
                 let accept = this.rules.length === 0;
                 if (!accept) {
-                    for (const rule of this.rules) {
+                    for (let rule of this.rules) {
                         if (variant.rulesIn.includes(rule)) {
                             accept = true;
                             break;
@@ -95,8 +95,8 @@ class Deinflection {
         }
 
         const results = [];
-        for (const child of this.children) {
-            for (const result of child.gather()) {
+        for (let child of this.children) {
+            for (let result of child.gather()) {
                 if (this.reason.length > 0) {
                     result.reasons.push(this.reason);
                 }

@@ -118,7 +118,7 @@ class Frame {
             }
 
             states.forEach((state, index) => {
-                for (const mode in state) {
+                for (let mode in state) {
                     const button = this.findAddNoteButton(index, mode);
                     if (state[mode]) {
                         button.removeClass('disabled');
@@ -147,7 +147,7 @@ class Frame {
             url += `&kana=${encodeURIComponent(definition.reading)}`;
         }
 
-        for (const key in this.audioCache) {
+        for (let key in this.audioCache) {
             this.audioCache[key].pause();
         }
 

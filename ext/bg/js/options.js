@@ -48,7 +48,7 @@ function optionsSetDefaults(options) {
     };
 
     const combine = (target, source) => {
-        for (const key in source) {
+        for (let key in source) {
             if (!(key in target)) {
                 target[key] = source[key];
             }
@@ -104,8 +104,8 @@ function optionsVersion(options) {
                     '{glossary-list}': '{glossary}'
                 };
 
-                for (const name in fields) {
-                    for (const fixup in fixups) {
+                for (let name in fields) {
+                    for (let fixup in fixups) {
                         fields[name] = fields[name].replace(fixup, fixups[fixup]);
                     }
                 }
@@ -114,7 +114,7 @@ function optionsVersion(options) {
             fixupFields(options.anki.terms.fields);
             fixupFields(options.anki.kanji.fields);
 
-            for (const title in options.dictionaries) {
+            for (let title in options.dictionaries) {
                 const dictionary = options.dictionaries[title];
                 dictionary.enabled = dictionary.enableTerms || dictionary.enableKanji;
                 dictionary.priority = 0;
@@ -127,8 +127,8 @@ function optionsVersion(options) {
                     '{glossary-list}': '{glossary}'
                 };
 
-                for (const name in fields) {
-                    for (const fixup in fixups) {
+                for (let name in fields) {
+                    for (let fixup in fixups) {
                         fields[name] = fields[name].replace(fixup, fixups[fixup]);
                     }
                 }

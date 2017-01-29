@@ -54,8 +54,8 @@ class Translator {
             }
         }).then(deinflections => {
             let definitions = [];
-            for (const deinflection of deinflections) {
-                for (const definition of deinflection.definitions) {
+            for (let deinflection of deinflections) {
+                for (let definition of deinflection.definitions) {
                     const tags = definition.tags.map(tag => buildTag(tag, definition.tagMeta));
                     tags.push(buildDictTag(definition.dictionary));
                     definitions.push({
@@ -76,7 +76,7 @@ class Translator {
             definitions = sortTermDefs(definitions, dictionaries);
 
             let length = 0;
-            for (const definition of definitions) {
+            for (let definition of definitions) {
                 length = Math.max(length, definition.source.length);
             }
 
@@ -95,7 +95,7 @@ class Translator {
         const processed = {};
         const promises = [];
 
-        for (const c of text) {
+        for (let c of text) {
             if (!processed[c]) {
                 promises.push(this.database.findKanji(c, titles));
                 processed[c] = true;
@@ -104,7 +104,7 @@ class Translator {
 
         return Promise.all(promises).then(defSets => {
             const definitions = defSets.reduce((a, b) => a.concat(b), []);
-            for (const definition of definitions) {
+            for (let definition of definitions) {
                 const tags = definition.tags.map(tag => buildTag(tag, definition.tagMeta));
                 tags.push(buildDictTag(definition.dictionary));
                 definition.tags = sortTags(tags);
@@ -130,7 +130,7 @@ class Translator {
 
         return Promise.all(promises).then(results => {
             let deinflections = [];
-            for (const result of results) {
+            for (let result of results) {
                 deinflections = deinflections.concat(result);
             }
 
@@ -139,7 +139,7 @@ class Translator {
     }
 
     processKanji(definitions) {
-        for (const definition of definitions) {
+        for (let definition of definitions) {
             const tags = definition.tags.map(tag => buildTag(tag, definition.tagMeta));
             definition.tags = sortTags(tags);
         }

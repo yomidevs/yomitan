@@ -87,7 +87,7 @@ class Database {
         }).then(() => {
             return this.cacheTagMeta(dictionaries);
         }).then(() => {
-            for (const result of results) {
+            for (let result of results) {
                 result.tagMeta = this.tagMetaCache[result.dictionary] || {};
             }
 
@@ -115,7 +115,7 @@ class Database {
         }).then(() => {
             return this.cacheTagMeta(dictionaries);
         }).then(() => {
-            for (const result of results) {
+            for (let result of results) {
                 result.tagMeta = this.tagMetaCache[result.dictionary] || {};
             }
 
@@ -129,7 +129,7 @@ class Database {
         }
 
         const promises = [];
-        for (const dictionary of dictionaries) {
+        for (let dictionary of dictionaries) {
             if (this.tagMetaCache[dictionary]) {
                 continue;
             }
@@ -246,7 +246,7 @@ class Database {
 
                 return this.db.dictionaries.add({title, version, revision, hasTerms, hasKanji}).then(() => {
                     const rows = [];
-                    for (const tag in tagMeta || {}) {
+                    for (let tag in tagMeta || {}) {
                         const meta = tagMeta[tag];
                         const row = sanitizeTag({
                             name: tag,
@@ -266,7 +266,7 @@ class Database {
 
         const termsLoaded = (title, entries, total, current) => {
             const rows = [];
-            for (const [expression, reading, tags, rules, score, ...glossary] of entries) {
+            for (let [expression, reading, tags, rules, score, ...glossary] of entries) {
                 rows.push({
                     expression,
                     reading,
@@ -287,7 +287,7 @@ class Database {
 
         const kanjiLoaded = (title, entries, total, current)  => {
             const rows = [];
-            for (const [character, onyomi, kunyomi, tags, ...meanings] of entries) {
+            for (let [character, onyomi, kunyomi, tags, ...meanings] of entries) {
                 rows.push({
                     character,
                     onyomi,

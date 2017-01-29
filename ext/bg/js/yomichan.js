@@ -81,7 +81,7 @@ class Yomichan {
 
     tabInvokeAll(action, params) {
         chrome.tabs.query({}, tabs => {
-            for (const tab of tabs) {
+            for (let tab of tabs) {
                 chrome.tabs.sendMessage(tab.id, {action, params}, () => null);
             }
         });
@@ -106,7 +106,7 @@ class Yomichan {
                 fields: []
             };
 
-            for (const name in fields) {
+            for (let name in fields) {
                 if (fields[name].includes('{audio}')) {
                     audio.fields.push(name);
                 }
@@ -117,7 +117,7 @@ class Yomichan {
             }
         }
 
-        for (const name in fields) {
+        for (let name in fields) {
             note.fields[name] = formatField(
                 fields[name],
                 definition,
@@ -175,8 +175,8 @@ class Yomichan {
 
     api_canAddDefinitions({definitions, modes, callback}) {
         const notes = [];
-        for (const definition of definitions) {
-            for (const mode of modes) {
+        for (let definition of definitions) {
+            for (let mode of modes) {
                 notes.push(this.formatNote(definition, mode));
             }
         }
