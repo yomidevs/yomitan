@@ -1,5 +1,3 @@
-console.log('blah');
-
 //
 // Gecko does not currently support chrome.storage.sync, use storage.local instead
 // https://bugzilla.mozilla.org/show_bug.cgi?id=1220494
