@@ -240,6 +240,7 @@ function formatField(field, definition, mode, options) {
 function loadJson(url) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
+        xhr.overrideMimeType('application/json');
         xhr.addEventListener('load', () => resolve(xhr.responseText));
         xhr.addEventListener('error', () => reject('failed to execute network request'));
         xhr.open('GET', url);

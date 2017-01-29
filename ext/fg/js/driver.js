@@ -67,9 +67,9 @@ class Driver {
             return;
         }
 
-        if (e.which === 1 /* lmb */) {
-            return;
-        }
+        // if (e.which === 1 /* lmb */) {
+        //     return;
+        // }
 
         if (this.options.scanning.requireShift && !e.shiftKey) {
             return;
