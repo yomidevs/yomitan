@@ -41,5 +41,10 @@
         "fg/frame.html",
         "fg/ttf/kanji-stroke-orders.ttf",
         "fg/ttf/vl-gothic-regular.ttf"
-    ]
+    ],
+    "applications": {
+        "gecko": {
+            "id": "alex@foosoft.net"
+        }
+    }
 }
