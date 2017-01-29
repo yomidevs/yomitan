@@ -119,6 +119,23 @@ function optionsVersion(options) {
                 dictionary.enabled = dictionary.enableTerms || dictionary.enableKanji;
                 dictionary.priority = 0;
             }
+        },
+        () => {
+            const fixupFields = fields => {
+                const fixups = {
+                    '{expression-furigana}': '{furigana}',
+                    '{glossary-list}': '{glossary}'
+                };
+
+                for (const name in fields) {
+                    for (const fixup in fixups) {
+                        fields[name] = fields[name].replace(fixup, fixups[fixup]);
+                    }
+                }
+            };
+
+            fixupFields(options.anki.terms.fields);
+            fixupFields(options.anki.kanji.fields);
         }
     ];
 
