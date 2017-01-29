@@ -104,9 +104,9 @@ function optionsVersion(options) {
                     '{glossary-list}': '{glossary}'
                 };
 
-                for (let i = 0; i < fields.length; ++i) {
+                for (const name in fields) {
                     for (const fixup in fixups) {
-                        fields[i]  = value.replace(fields[i], fixups[fixup]);
+                        fields[name] = fields[name].replace(fixup, fixups[fixup]);
                     }
                 }
             };
