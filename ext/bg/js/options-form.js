@@ -164,6 +164,8 @@ function populateDictionaries(options) {
             ++dictCount;
         });
 
+        updateVisibility(options);
+
         $('.dict-enabled, .dict-priority').change(onOptionsChanged);
         $('.dict-delete').click(onDictionaryDelete);
     }).catch(error => {

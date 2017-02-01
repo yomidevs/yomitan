@@ -98,22 +98,6 @@ function optionsVersion(options) {
             copy(options.anki.kanji, 'model', options, 'ankiKanjiModel');
             copy(options.anki.kanji, 'fields', options, 'ankiKanjiFields');
 
-            const fixupFields = fields => {
-                const fixups = {
-                    '{expression-furigana}': '{furigana}',
-                    '{glossary-list}': '{glossary}'
-                };
-
-                for (const name in fields) {
-                    for (const fixup in fixups) {
-                        fields[name] = fields[name].replace(fixup, fixups[fixup]);
-                    }
-                }
-            };
-
-            fixupFields(options.anki.terms.fields);
-            fixupFields(options.anki.kanji.fields);
-
             for (const title in options.dictionaries) {
                 const dictionary = options.dictionaries[title];
                 dictionary.enabled = dictionary.enableTerms || dictionary.enableKanji;
