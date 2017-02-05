@@ -39,6 +39,7 @@ function optionsSetDefaults(options) {
 
         anki: {
             enable: false,
+            server: 'http://127.0.0.1:8765',
             tags: ['yomichan'],
             htmlCards: true,
             sentenceExt: 200,
@@ -67,14 +68,14 @@ function optionsSetDefaults(options) {
 
 
 function optionsVersion(options) {
-    const copy = (targetDict, targetKey, sourceDict, sourceKey) => {
-        targetDict[targetKey] = sourceDict.hasOwnProperty(sourceKey) ? sourceDict[sourceKey] : targetDict[targetKey];
-    };
-
+    optionsSetDefaults(options);
     options.version = options.version || 0;
+
     const fixups = [
         () => {
-            optionsSetDefaults(options);
+            const copy = (targetDict, targetKey, sourceDict, sourceKey) => {
+                targetDict[targetKey] = sourceDict.hasOwnProperty(sourceKey) ? sourceDict[sourceKey] : targetDict[targetKey];
+            };
 
             copy(options.general, 'autoStart', options, 'activateOnStartup');
             copy(options.general, 'audioPlayback', options, 'enableAudioPlayback');

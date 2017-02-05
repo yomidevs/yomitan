@@ -44,6 +44,7 @@ function getFormData() {
         optionsNew.anki.tags = $('#card-tags').val().split(/[,; ]+/);
         optionsNew.anki.htmlCards = $('#generate-html-cards').prop('checked');
         optionsNew.anki.sentenceExt = parseInt($('#sentence-detection-extent').val(), 10);
+        optionsNew.anki.server = $('#interface-server').val();
         if (optionsOld.anki.enable) {
             optionsNew.anki.terms.deck = $('#anki-terms-deck').val();
             optionsNew.anki.terms.model = $('#anki-terms-model').val();
@@ -106,6 +107,7 @@ $(document).ready(() => {
         $('#card-tags').val(options.anki.tags.join(' '));
         $('#generate-html-cards').prop('checked', options.anki.htmlCards);
         $('#sentence-detection-extent').val(options.anki.sentenceExt);
+        $('#interface-server').val(options.anki.server);
         $('input, select').not('.anki-model').change(onOptionsChanged);
         $('.anki-model').change(onAnkiModelChanged);
 
@@ -399,7 +401,7 @@ function onOptionsChanged(e) {
         return optionsSave(optionsNew).then(() => {
             yomichan().setOptions(optionsNew);
             updateVisibility(optionsNew);
-            if (optionsNew.anki.enable !== optionsOld.anki.enable) {
+            if (optionsNew.anki.enable !== optionsOld.anki.enable || optionsNew.anki.server !== optionsOld.anki.server) {
                 showAnkiError(null);
                 showAnkiSpinner(true);
                 return populateAnkiDeckAndModel(optionsNew);

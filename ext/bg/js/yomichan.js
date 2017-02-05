@@ -71,7 +71,7 @@ class Yomichan {
         this.options = options;
 
         if (options.anki.enable) {
-            this.anki = new AnkiConnect();
+            this.anki = new AnkiConnect(this.options.anki.server);
         } else {
             this.anki = new AnkiNull();
         }
