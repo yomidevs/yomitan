@@ -44,7 +44,7 @@ class Frame {
         window.scrollTo(0, 0);
 
         renderText(context, 'terms.html').then(content => {
-            $('.content').html(content);
+            $('#content').html(content);
             $('.action-add-note').click(this.onAddNote.bind(this));
 
             $('.kanji-link').click(e => {
@@ -59,6 +59,8 @@ class Frame {
             });
 
             this.updateAddNoteButtons(['term_kanji', 'term_kana'], sequence);
+        }).catch(error => {
+            this.handleError(error);
         });
     }
 
@@ -74,11 +76,18 @@ class Frame {
         window.scrollTo(0, 0);
 
         renderText(context, 'kanji.html').then(content => {
-            $('.content').html(content);
+            $('#content').html(content);
             $('.action-add-note').click(this.onAddNote.bind(this));
 
             this.updateAddNoteButtons(['kanji'], sequence);
+        }).catch(error => {
+            this.handleError(error);
         });
+    }
+
+    api_showOrphaned() {
+        $('#content').hide();
+        $('#orphan').show();
     }
 
     findAddNoteButton(index, mode) {
@@ -98,10 +107,10 @@ class Frame {
                 const button = this.findAddNoteButton(index, mode);
                 button.addClass('disabled');
             } else {
-                window.alert('Note could not be added');
+                showError('note could not be added');
             }
         }).catch(error => {
-            window.alert('Error: ' + error);
+            this.handleError(error);
         }).then(() => {
             this.showSpinner(false);
         });
@@ -129,6 +138,8 @@ class Frame {
                     button.removeClass('pending');
                 }
             });
+        }).catch(error => {
+            this.handleError(error);
         });
     }
 
@@ -154,6 +165,14 @@ class Frame {
         const audio = this.audioCache[url] || new Audio(url);
         audio.currentTime = 0;
         audio.play();
+    }
+
+    handleError(error) {
+        if (window.orphaned) {
+            this.api_showOrphaned();
+        } else {
+            showError(error);
+        }
     }
 }
 

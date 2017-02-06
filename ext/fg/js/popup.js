@@ -76,7 +76,11 @@ class Popup {
         this.invokeApi('showKanjiDefs', {definitions, options});
     }
 
-    invokeApi(action, params) {
+    showOrphaned() {
+        this.invokeApi('showOrphaned');
+    }
+
+    invokeApi(action, params={}) {
         this.container.contentWindow.postMessage({action, params}, '*');
     }
 }

@@ -19,14 +19,23 @@
 
 function invokeBgApi(action, params) {
     return new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({action, params}, ({result, error}) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(result);
-            }
-        });
+        try {
+            chrome.runtime.sendMessage({action, params}, ({result, error}) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            });
+        } catch (e) {
+            window.orphaned = true;
+            reject(e.message);
+        }
     });
+}
+
+function showError(error) {
+    window.alert(`Error: ${error}`);
 }
 
 function isEnabled() {

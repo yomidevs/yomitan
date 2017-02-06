@@ -119,6 +119,10 @@ hr {
   height:           1px;
 }
 
+#orphan {
+    display: none;
+}
+
 /* term styles */
 
 .term-expression {

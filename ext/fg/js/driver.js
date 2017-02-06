@@ -33,11 +33,11 @@ class Driver {
         window.addEventListener('mousemove', this.onMouseMove.bind(this));
         window.addEventListener('resize', e => this.searchClear());
 
-        getOptions().then(options => {
+        Promise.all([getOptions(), isEnabled()]).then(([options, enabled]) => {
             this.options = options;
-            return isEnabled();
-        }).then(enabled => {
             this.enabled = enabled;
+        }).catch(error => {
+            this.handleError(error);
         });
     }
 
@@ -119,14 +119,14 @@ class Driver {
         this.pendingLookup = true;
         this.searchTerms(textSource).then(found => {
             if (!found) {
-                this.searchKanji(textSource).then(found => {
+                return this.searchKanji(textSource).then(found => {
                     if (!found && hideNotFound) {
                         this.searchClear();
                     }
                 });
             }
         }).catch(error => {
-            window.alert('Error: ' + error);
+            this.handleError(error, textSource);
         }).then(() => {
             this.pendingLookup = false;
         });
@@ -157,9 +157,6 @@ class Driver {
 
                 return true;
             }
-        }).catch(error => {
-            window.alert('Error: ' + error);
-            return false;
         });
     }
 
@@ -181,9 +178,6 @@ class Driver {
 
                 return true;
             }
-        }).catch(error => {
-            window.alert('Error: ' + error);
-            return false;
         });
     }
 
@@ -195,6 +189,17 @@ class Driver {
         }
 
         this.lastTextSource = null;
+    }
+
+    handleError(error, textSource) {
+        if (window.orphaned) {
+            if (textSource) {
+                this.popup.showNextTo(textSource.getRect());
+                this.popup.showOrphaned();
+            }
+        } else {
+            showError(error);
+        }
     }
 
     api_setOptions(options) {
