@@ -37,6 +37,7 @@ function getFormData() {
 
         optionsNew.scanning.requireShift = $('#hold-shift-to-scan').prop('checked');
         optionsNew.scanning.selectText = $('#select-matched-text').prop('checked');
+        optionsNew.scanning.imposter = $('#search-form-text-fields').prop('checked');
         optionsNew.scanning.delay = parseInt($('#scan-delay').val(), 10);
         optionsNew.scanning.length = parseInt($('#scan-length').val(), 10);
 
@@ -95,6 +96,7 @@ $(document).ready(() => {
 
         $('#hold-shift-to-scan').prop('checked', options.scanning.requireShift);
         $('#select-matched-text').prop('checked', options.scanning.selectText);
+        $('#search-form-text-fields').prop('checked', options.scanning.imposter);
         $('#scan-delay').val(options.scanning.delay);
         $('#scan-length').val(options.scanning.length);
 

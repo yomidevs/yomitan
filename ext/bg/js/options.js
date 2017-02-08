@@ -31,6 +31,7 @@ function optionsSetDefaults(options) {
         scanning: {
             requireShift: true,
             selectText: true,
+            imposter: true,
             delay: 15,
             length: 10
         },

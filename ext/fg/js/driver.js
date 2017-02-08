@@ -103,7 +103,7 @@ class Driver {
             return;
         }
 
-        const textSource = textSourceFromPoint(point);
+        const textSource = textSourceFromPoint(point, this.options.scanning.imposter);
         if (textSource === null || !textSource.containsPoint(point)) {
             if (hideNotFound) {
                 this.searchClear();

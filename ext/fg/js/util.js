@@ -93,12 +93,12 @@ function destroyImposters() {
     }
 }
 
-function textSourceFromPoint(point) {
+function textSourceFromPoint(point, imposter) {
     const element = document.elementFromPoint(point.x, point.y);
     if (element !== null) {
         if (element.nodeName === 'IMG' || element.nodeName === 'BUTTON') {
             return new TextSourceElement(element);
-        } else if (element.nodeName === 'INPUT' || element.nodeName === 'TEXTAREA') {
+        } else if (imposter && (element.nodeName === 'INPUT' || element.nodeName === 'TEXTAREA')) {
             createImposter(element);
         }
     }
