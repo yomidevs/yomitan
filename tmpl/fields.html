@@ -48,15 +48,24 @@
 
 {{#*inline "glossary"}}
     {{~#if html}}<div style="text-align: left;">{{/if~}}
-    {{~#if group~}}
-        {{~#if definition.definitions.[1]~}}
-            {{~#if html}}<ol>{{#each definition.definitions}}<li>{{> glossary-single html=../html}}</li>{{/each}}</ol>
-            {{~else}}{{#each definition.definitions}} * {{> glossary-single html=../html}}{{/each}}{{/if~}}
+    {{~#if modeKanji~}}
+        {{~#if definition.glossary.[1]~}}
+            {{~#if html}}<ol>{{#each definition.glossary}}<li>{{.}}</li>{{/each}}</ol>
+            {{~else}}{{#each definition.glossary}}{{.}}{{#unless @last}}, {{/unless}}{{/each}}{{/if~}}
         {{~else~}}
-            {{~> glossary-single definition.definitions.[0] html=html~}}
+            {{definition.glossary.[0]}}
         {{~/if~}}
     {{~else~}}
-        {{~> glossary-single definition html=html~}}
+        {{~#if group~}}
+            {{~#if definition.definitions.[1]~}}
+                {{~#if html}}<ol>{{#each definition.definitions}}<li>{{> glossary-single html=../html}}</li>{{/each}}</ol>
+                {{~else}}{{#each definition.definitions}} * {{> glossary-single html=../html}}{{/each}}{{/if~}}
+            {{~else~}}
+                {{~> glossary-single definition.definitions.[0] html=html~}}
+            {{~/if~}}
+        {{~else~}}
+            {{~> glossary-single definition html=html~}}
+        {{~/if~}}
     {{~/if~}}
     {{~#if html}}</div>{{/if~}}
 {{/inline}}
