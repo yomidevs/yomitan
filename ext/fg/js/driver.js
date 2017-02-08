@@ -182,6 +182,7 @@ class Driver {
     }
 
     searchClear() {
+        destroyImposters();
         this.popup.hide();
 
         if (this.options.scanning.selectText && this.lastTextSource !== null) {

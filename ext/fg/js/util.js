@@ -70,12 +70,36 @@ function addDefinition(definition, mode) {
     return invokeBgApi('addDefinition', {definition, mode});
 }
 
+function createImposter(element) {
+    const imposter = document.createElement('div');
+    const elementRect = element.getBoundingClientRect();
+
+    imposter.className = 'yomichan-imposter';
+    imposter.innerText = element.value;
+    imposter.style.cssText = window.getComputedStyle(element).cssText;
+    imposter.style.position = 'absolute';
+    imposter.style.top = elementRect.top + 'px';
+    imposter.style.left = elementRect.left + 'px';
+    imposter.style.zIndex = 2147483646;
+    document.body.appendChild(imposter);
+
+    imposter.scrollTop = element.scrollTop;
+    imposter.scrollLeft = element.scrollLeft;
+}
+
+function destroyImposters() {
+    for (const element of document.getElementsByClassName('yomichan-imposter')) {
+        element.parentNode.removeChild(element);
+    }
+}
+
 function textSourceFromPoint(point) {
     const element = document.elementFromPoint(point.x, point.y);
     if (element !== null) {
-        const names = ['IMG', 'INPUT', 'BUTTON', 'TEXTAREA'];
-        if (names.includes(element.nodeName)) {
+        if (element.nodeName === 'IMG' || element.nodeName === 'BUTTON') {
             return new TextSourceElement(element);
+        } else if (element.nodeName === 'INPUT' || element.nodeName === 'TEXTAREA') {
+            createImposter(element);
         }
     }
 
