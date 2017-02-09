@@ -167,7 +167,11 @@ class Driver {
             if (definitions.length === 0) {
                 return false;
             } else {
-                definitions.forEach(definition => definition.url = window.location.href);
+                const sentence = extractSentence(textSource, this.options.anki.sentenceExt);
+                definitions.forEach(definition => {
+                    definition.url = window.location.href;
+                    definition.sentence = sentence;
+                });
 
                 this.popup.showNextTo(textSource.getRect());
                 this.popup.showKanjiDefs(definitions, this.options);

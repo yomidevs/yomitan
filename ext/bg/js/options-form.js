@@ -351,7 +351,7 @@ function populateAnkiFields(element, options) {
 
     const markers = {
         'terms': ['audio', 'dictionary', 'expression', 'furigana', 'glossary', 'reading', 'sentence', 'tags', 'url'],
-        'kanji': ['character', 'dictionary', 'glossary', 'kunyomi', 'onyomi', 'url']
+        'kanji': ['character', 'dictionary', 'glossary', 'kunyomi', 'onyomi', 'sentence', 'tags', 'url']
     }[tabId] || {};
 
     return anki().getModelFieldNames(modelName).then(names => {

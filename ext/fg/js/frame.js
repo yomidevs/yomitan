@@ -49,7 +49,15 @@ class Frame {
 
             $('.kanji-link').click(e => {
                 e.preventDefault();
-                findKanji($(e.target).text()).then(kdefs => this.api_showKanjiDefs({options, definitions: kdefs}));
+                const character = $(e.target).text();
+                findKanji(character).then(kdefs => {
+                    kdefs.forEach(kdef => {
+                        kdef.url = definitions[0].url;
+                        kdef.sentence = definitions[0].sentence;
+                    });
+
+                    this.api_showKanjiDefs({options, definitions: kdefs});
+                });
             });
 
             $('.action-play-audio').click(e => {
