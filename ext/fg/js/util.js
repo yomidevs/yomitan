@@ -108,6 +108,7 @@ function textSourceFromPoint(point, imposter) {
         return new TextSourceRange(range);
     }
 
+    destroyImposters();
     return null;
 }
 
