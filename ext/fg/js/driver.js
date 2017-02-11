@@ -75,7 +75,7 @@ class Driver {
             return;
         }
 
-        const searcher = () => this.searchAt(this.lastMousePos, false);
+        const searcher = () => this.searchAt(this.lastMousePos);
         if (!this.popup.isVisible() || e.shiftKey || e.which === 2 /* mmb */) {
             searcher();
         } else {
@@ -98,17 +98,13 @@ class Driver {
         callback();
     }
 
-    searchAt(point, hideNotFound) {
+    searchAt(point) {
         if (this.pendingLookup) {
             return;
         }
 
         const textSource = textSourceFromPoint(point, this.options.scanning.imposter);
         if (textSource === null || !textSource.containsPoint(point)) {
-            if (hideNotFound) {
-                this.searchClear();
-            }
-
             return;
         }
 
@@ -119,11 +115,7 @@ class Driver {
         this.pendingLookup = true;
         this.searchTerms(textSource).then(found => {
             if (!found) {
-                return this.searchKanji(textSource).then(found => {
-                    if (!found && hideNotFound) {
-                        this.searchClear();
-                    }
-                });
+                return this.searchKanji(textSource);
             }
         }).catch(error => {
             this.handleError(error, textSource);
