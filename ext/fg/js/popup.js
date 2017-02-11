@@ -68,12 +68,12 @@ class Popup {
         return this.container.style.visibility !== 'hidden';
     }
 
-    showTermDefs(definitions, options) {
-        this.invokeApi('showTermDefs', {definitions, options});
+    showTermDefs(definitions, options, context) {
+        this.invokeApi('showTermDefs', {definitions, options, context});
     }
 
-    showKanjiDefs(definitions, options) {
-        this.invokeApi('showKanjiDefs', {definitions, options});
+    showKanjiDefs(definitions, options, context) {
+        this.invokeApi('showKanjiDefs', {definitions, options, context});
     }
 
     showOrphaned() {

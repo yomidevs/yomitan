@@ -30,34 +30,32 @@ class Frame {
         });
     }
 
-    api_showTermDefs({definitions, options}) {
+    api_showTermDefs({definitions, options, context}) {
         const sequence = ++this.sequence;
-        const context = {
+        const params = {
             definitions,
             grouped: options.general.groupResults,
             addable: options.ankiMethod !== 'disabled',
             playback: options.general.audioPlayback
         };
 
+        definitions.forEach(definition => {
+            definition.sentence = context.sentence;
+            definition.url = context.url;
+        });
+
         this.definitions = definitions;
         this.showSpinner(false);
         window.scrollTo(0, 0);
 
-        renderText(context, 'terms.html').then(content => {
+        renderText(params, 'terms.html').then(content => {
             $('#content').html(content);
             $('.action-add-note').click(this.onAddNote.bind(this));
 
             $('.kanji-link').click(e => {
                 e.preventDefault();
                 const character = $(e.target).text();
-                findKanji(character).then(kdefs => {
-                    kdefs.forEach(kdef => {
-                        kdef.url = definitions[0].url;
-                        kdef.sentence = definitions[0].sentence;
-                    });
-
-                    this.api_showKanjiDefs({options, definitions: kdefs});
-                });
+                findKanji(character).then(definitions => this.api_showKanjiDefs({definitions, options, context}));
             });
 
             $('.action-play-audio').click(e => {
@@ -72,18 +70,23 @@ class Frame {
         });
     }
 
-    api_showKanjiDefs({definitions, options}) {
+    api_showKanjiDefs({definitions, options, context}) {
         const sequence = ++this.sequence;
-        const context = {
+        const params = {
             definitions,
             addable: options.ankiMethod !== 'disabled'
         };
+
+        definitions.forEach(definition => {
+            definition.sentence = context.sentence;
+            definition.url = context.url;
+        });
 
         this.definitions = definitions;
         this.showSpinner(false);
         window.scrollTo(0, 0);
 
-        renderText(context, 'kanji.html').then(content => {
+        renderText(params, 'kanji.html').then(content => {
             $('#content').html(content);
             $('.action-add-note').click(this.onAddNote.bind(this));
 

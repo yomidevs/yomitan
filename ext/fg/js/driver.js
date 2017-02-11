@@ -143,13 +143,11 @@ class Driver {
                 textSource.setEndOffset(length);
 
                 const sentence = extractSentence(textSource, this.options.anki.sentenceExt);
-                definitions.forEach(definition => {
-                    definition.url = window.location.href;
-                    definition.sentence = sentence;
-                });
+                const url = window.location.href;
 
                 this.popup.showNextTo(textSource.getRect());
-                this.popup.showTermDefs(definitions, this.options);
+                this.popup.showTermDefs(definitions, this.options, {sentence, url});
+
                 this.lastTextSource = textSource;
                 if (this.options.scanning.selectText) {
                     textSource.select();
@@ -168,13 +166,11 @@ class Driver {
                 return false;
             } else {
                 const sentence = extractSentence(textSource, this.options.anki.sentenceExt);
-                definitions.forEach(definition => {
-                    definition.url = window.location.href;
-                    definition.sentence = sentence;
-                });
+                const url = window.location.href;
 
                 this.popup.showNextTo(textSource.getRect());
-                this.popup.showKanjiDefs(definitions, this.options);
+                this.popup.showKanjiDefs(definitions, this.options, {sentence, url});
+
                 this.lastTextSource = textSource;
                 if (this.options.scanning.selectText) {
                     textSource.select();
