@@ -170,12 +170,27 @@ class Frame {
         }
 
         for (const key in this.audioCache) {
-            this.audioCache[key].pause();
+            const audio = this.audioCache[key];
+            if (audio !== null) {
+                audio.pause();
+            }
         }
 
-        const audio = this.audioCache[url] || new Audio(url);
-        audio.currentTime = 0;
-        audio.play();
+        let audio = this.audioCache[url];
+        if (audio) {
+            audio.currentTime = 0;
+            audio.play();
+        } else {
+            audio = new Audio(url);
+            audio.onloadeddata = () => {
+                if (audio.duration === 5.694694) {
+                    audio = new Audio('mp3/button.mp3');
+                }
+
+                this.audioCache[url] = audio;
+                audio.play();
+            };
+        }
     }
 
     handleError(error) {
