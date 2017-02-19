@@ -100,20 +100,23 @@ class Yomichan {
             note.deckName = this.options.anki.terms.deck;
             note.modelName = this.options.anki.terms.model;
 
-            const audio = {
-                kanji: definition.expression,
-                kana: definition.reading,
-                fields: []
-            };
+            if (definition.audio) {
+                const audio = {
+                    url: definition.audio.url,
+                    filename: definition.audio.filename,
+                    skipHash: '7e2c2f954ef6051373ba916f000168dc',
+                    fields: []
+                };
 
-            for (const name in fields) {
-                if (fields[name].includes('{audio}')) {
-                    audio.fields.push(name);
+                for (const name in fields) {
+                    if (fields[name].includes('{audio}')) {
+                        audio.fields.push(name);
+                    }
                 }
-            }
 
-            if (audio.fields.length > 0) {
-                note.audio = audio;
+                if (audio.fields.length > 0) {
+                    note.audio = audio;
+                }
             }
         }
 

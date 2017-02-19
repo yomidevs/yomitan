@@ -166,3 +166,43 @@ function extractSentence(source, extent) {
 
     return content.substring(startPos, endPos).trim();
 }
+
+function buildAudioUrl(definition) {
+    let kana = definition.reading;
+    let kanji = definition.expression;
+
+    if (!kana && !kanji) {
+        return null;
+    }
+
+    if (!kana && wanakana.isHiragana(kanji)) {
+        kana = kanji;
+        kanji = null;
+    }
+
+    const params = [];
+    if (kanji) {
+        params.push(`kanji=${encodeURIComponent(kanji)}`);
+    }
+    if (kana) {
+        params.push(`kana=${encodeURIComponent(kana)}`);
+    }
+
+    return `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?${params.join('&')}`;
+}
+
+function buildAudioFilename(definition) {
+    if (!definition.reading && !definition.expression) {
+        return null;
+    }
+
+    let filename = 'yomichan';
+    if (definition.reading) {
+        filename += `_${definition.reading}`;
+    }
+    if (definition.expression) {
+        filename += `_${definition.expression}`;
+    }
+
+    return filename += '.mp3';
+}

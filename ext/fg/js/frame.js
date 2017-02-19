@@ -113,7 +113,16 @@ class Frame {
         const index = link.data('index');
         const mode = link.data('mode');
 
-        addDefinition(this.definitions[index], mode).then(success => {
+        const definition = this.definitions[index];
+        if (mode !== 'kanji') {
+            const url = buildAudioUrl(definition);
+            const filename = buildAudioFilename(definition);
+            if (url && filename) {
+                definition.audio = {url, filename};
+            }
+        }
+
+        addDefinition(definition, mode).then(success => {
             if (success) {
                 const button = this.findAddNoteButton(index, mode);
                 button.addClass('disabled');
@@ -171,28 +180,11 @@ class Frame {
             }
         }
 
-        let kana = definition.reading;
-        let kanji = definition.expression;
-        if (!kana) {
-            if (!kanji) {
-                return;
-            }
-
-            if (wanakana.isHiragana(kanji)) {
-                kana = kanji;
-                kanji = null;
-            }
+        const url = buildAudioUrl(definition);
+        if (!url) {
+            return;
         }
 
-        const params = [];
-        if (kanji) {
-            params.push(`kanji=${encodeURIComponent(kanji)}`);
-        }
-        if (kana) {
-            params.push(`kana=${encodeURIComponent(kana)}`);
-        }
-
-        const url = `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?${params.join('&')}`;
         let audio = this.audioCache[url];
         if (audio) {
             audio.currentTime = 0;
