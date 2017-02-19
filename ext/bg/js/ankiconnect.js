@@ -20,7 +20,7 @@ class AnkiConnect {
     constructor(server) {
         this.server = server;
         this.asyncPools = {};
-        this.localVersion = 1;
+        this.localVersion = 2;
         this.remoteVersion = null;
     }
 
