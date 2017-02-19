@@ -164,11 +164,6 @@ class Frame {
     }
 
     playAudio(definition) {
-        let url = `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=${encodeURIComponent(definition.expression)}`;
-        if (definition.reading) {
-            url += `&kana=${encodeURIComponent(definition.reading)}`;
-        }
-
         for (const key in this.audioCache) {
             const audio = this.audioCache[key];
             if (audio !== null) {
@@ -176,6 +171,28 @@ class Frame {
             }
         }
 
+        let kana = definition.reading;
+        let kanji = definition.expression;
+        if (!kana) {
+            if (!kanji) {
+                return;
+            }
+
+            if (wanakana.isHiragana(kanji)) {
+                kana = kanji;
+                kanji = null;
+            }
+        }
+
+        const params = [];
+        if (kanji) {
+            params.push(`kanji=${encodeURIComponent(kanji)}`);
+        }
+        if (kana) {
+            params.push(`kana=${encodeURIComponent(kana)}`);
+        }
+
+        const url = `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?${params.join('&')}`;
         let audio = this.audioCache[url];
         if (audio) {
             audio.currentTime = 0;
