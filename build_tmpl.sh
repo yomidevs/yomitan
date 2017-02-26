@@ -1,2 +1,2 @@
 #!/bin/sh
-handlebars tmpl/* -f ext/bg/js/templates.js
+handlebars tmpl/*.html -f ext/bg/js/templates.js
