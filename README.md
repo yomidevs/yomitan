@@ -32,13 +32,11 @@ support and feedback encourages continued development of this tool.
 
 ## Basic Functionality ##
 
-1.  Left-click on the ![](https://foosoft.net/projects/yomichan-chrome/img/logo.png) icon to enable or disable Yomichan for the current browser instance.
-2.  Right-click on the ![](https://foosoft.net/projects/yomichan-chrome/img/logo.png) icon and select <em>Options</em> to open the Yomichan options page.
-3.  Import any dictionaries (bundled or custom) you wish to use for Kanji and term searches; none are imported by default.
-4.  Hold down <kbd>Shift</kbd> (or the middle mouse button) as you hover over text to see term definitions.
-5.  Resize the definitions window by dragging the bottom-left corner inwards or outwards to make it smaller or larger.
-6.  Click on Kanji in the definition window to view additional information about that character.
-7.  Click on the ![](https://foosoft.net/projects/yomichan-chrome/img/play-audio.png) icon to hear the term pronounced by a native speaker.
+1.  Click on the ![](https://foosoft.net/projects/yomichan-chrome/img/logo.png) icon in the browser toolbar to open the Yomichan options page.
+2.  Import the dictionaries (bundled or custom) you wish to use for term and Kanji searches.
+3.  Hold down <kbd>Shift</kbd> (or the middle mouse button) as you hover over text to see term definitions.
+4.  Click on the ![](https://foosoft.net/projects/yomichan-chrome/img/play-audio.png) icon to hear the term pronounced by a native speaker (if audio is available).
+5.  Click on Kanji in the definition window to view additional information about that character.
 
 ## Custom Dictionaries ##
 
