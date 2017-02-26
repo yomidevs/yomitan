@@ -171,7 +171,6 @@ function populateDictionaries(options) {
         updateVisibility(options);
 
         $('.dict-enabled, .dict-priority').change(onOptionsChanged);
-        $('.dict-delete').click(onDictionaryDelete);
     }).catch(showDictionaryError).then(() => {
         showDictionarySpinner(false);
         if (dictCount === 0) {
@@ -197,30 +196,9 @@ function onDictionaryPurge(e) {
     }).then(options => {
         options.dictionaries = {};
         return optionsSave(options).then(() => {
-            yomichan().setOptions(options);
             populateDictionaries(options);
+            yomichan().setOptions(options);
         });
-    });
-}
-
-function onDictionaryDelete() {
-    showDictionaryError(null);
-    showDictionarySpinner(true);
-
-    const dictGroup = $(this).closest('.dict-group');
-    const dictProgress = dictGroup.find('.dict-delete-progress').show();
-    const dictControls = dictGroup.find('.dict-group-controls').hide();
-    const setProgress = percent => {
-        dictProgress.find('.progress-bar').css('width', `${percent}%`);
-    };
-
-    setProgress(0.0);
-
-    database().deleteDictionary(dictGroup.data('title'), (total, current) => setProgress(current / total * 100.0)).catch(showDictionaryError).then(() => {
-        showDictionarySpinner(false);
-        dictProgress.hide();
-        dictControls.show();
-        return optionsLoad().then(populateDictionaries);
     });
 }
 
@@ -231,9 +209,7 @@ function onDictionaryImport() {
     const dictUrl = $('#dict-url');
     const dictImporter = $('#dict-importer').hide();
     const dictProgress = $('#dict-import-progress').show();
-    const setProgress = percent => {
-        dictProgress.find('.progress-bar').css('width', `${percent}%`);
-    };
+    const setProgress = percent => dictProgress.find('.progress-bar').css('width', `${percent}%`);
 
     setProgress(0.0);
 
@@ -389,7 +365,12 @@ function onOptionsChanged(e) {
         return optionsSave(optionsNew).then(() => {
             yomichan().setOptions(optionsNew);
             updateVisibility(optionsNew);
-            if (optionsNew.anki.enable !== optionsOld.anki.enable || optionsNew.anki.server !== optionsOld.anki.server) {
+
+            const ankiUpdated =
+                optionsNew.anki.enable !== optionsOld.anki.enable ||
+                optionsNew.anki.server !== optionsOld.anki.server;
+
+            if (ankiUpdated) {
                 showAnkiError(null);
                 showAnkiSpinner(true);
                 return populateAnkiDeckAndModel(optionsNew);

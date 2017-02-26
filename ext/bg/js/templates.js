@@ -11,13 +11,9 @@ templates['dictionary.html'] = template({"1":function(container,depth0,helpers,p
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
     + " <small>rev."
     + alias4(((helper = (helper = helpers.revision || (depth0 != null ? depth0.revision : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"revision","hash":{},"data":data}) : helper)))
-    + "</small></h4>\n\n    <!-- <div class=\"row\"> -->\n    <!--     <div class=\"col-xs-8\"> -->\n    <!--         <h4><span class=\"text-muted glyphicon glyphicon-book\"></span> "
-    + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
-    + " <small>v."
-    + alias4(((helper = (helper = helpers.version || (depth0 != null ? depth0.version : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"version","hash":{},"data":data}) : helper)))
-    + "</small></h4> -->\n    <!--     </div> -->\n    <!--     <div class=\"col-xs-4 text-right disabled\"> -->\n    <!--         <button type=\"button\" class=\"dict-group-controls dict-delete btn btn-danger\">Delete</button> -->\n    <!--     </div> -->\n    <!-- </div> -->\n\n    <div class=\"dict-delete-progress\">\n        Dictionary data is being deleted, please be patient...\n        <div class=\"progress\">\n            <div class=\"progress-bar progress-bar-striped progress-bar-danger\" style=\"width: 0%\"></div>\n        </div>\n    </div>\n\n    <div class=\"checkbox dict-group-controls\">\n        <label><input type=\"checkbox\" class=\"dict-enabled\" "
+    + "</small></h4>\n\n    <div class=\"checkbox\">\n        <label><input type=\"checkbox\" class=\"dict-enabled\" "
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.enabled : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "> Enable search</label>\n    </div>\n    <div class=\"form-group dict-group-controls options-advanced\">\n        <label for=\"dict-"
+    + "> Enable search</label>\n    </div>\n    <div class=\"form-group options-advanced\">\n        <label for=\"dict-"
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
     + "\">Result priority</label>\n        <input type=\"number\" value=\""
     + alias4(((helper = (helper = helpers.priority || (depth0 != null ? depth0.priority : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"priority","hash":{},"data":data}) : helper)))
