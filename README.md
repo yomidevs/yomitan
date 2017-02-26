@@ -1,17 +1,18 @@
-# Yomichan for Chrome #
+# Yomichan #
 
-Yomichan for Chrome turns your browser into a tool for building Japanese language literacy by helping you to decipher
-texts which would be otherwise too difficult tackle. This extension was inspired in part by
+Yomichan turns your browser into a tool for building Japanese language literacy by helping you to decipher texts which
+would be otherwise too difficult tackle. This extension was inspired in part by
 [Rikaichan](https://addons.mozilla.org/en-US/firefox/addon/rikaichan/) and
 [Rikaikun](https://chrome.google.com/webstore/detail/rikaikun/jipdnfibhldikgcjhfnomkfpcebammhp?hl=en), but it stands
 apart in its goal of being a all-encompassing learning tool as opposed to a mere browser-based dictionary. It is the
-evolution of the [Yomichan](https://foosoft.net/projects/yomichan) plugin that I developed for Anki when I began studying Japanese.
+evolution of the [Yomichan](https://foosoft.net/projects/yomichan-anki) plugin that I developed for Anki when I began studying Japanese.
 
 ## Requirements ##
 
 For basic functionality:
 
-*   [Google Chrome](https://www.google.com/chrome/browser/desktop/)
+*   [Google Chrome](https://www.google.com/chrome/browser/desktop/) (versions 45+)
+*   [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/new/) (versions 51+)
 
 For development:
 
@@ -28,20 +29,21 @@ Store](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmn
 helpful and appreciate the time that was spent developing it, I would kindly ask that you leave a positive review. Your
 support and feedback encourages continued development of this tool.
 
-[![Chrome web store](https://foosoft.net/projects/yomichan-chrome/img/store.png)](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami)
+[![Chrome web store](https://foosoft.net/projects/yomichan/img/store.png)](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami)
 
 ## Basic Functionality ##
 
-1.  Click on the ![](https://foosoft.net/projects/yomichan-chrome/img/logo.png) icon in the browser toolbar to open the Yomichan options page.
+1.  Click on the ![](https://foosoft.net/projects/yomichan/img/logo.png) icon in the browser toolbar to open the Yomichan options page.
 2.  Import the dictionaries (bundled or custom) you wish to use for term and Kanji searches.
 3.  Hold down <kbd>Shift</kbd> (or the middle mouse button) as you hover over text to see term definitions.
-4.  Click on the ![](https://foosoft.net/projects/yomichan-chrome/img/play-audio.png) icon to hear the term pronounced by a native speaker (if audio is available).
+4.  Click on the ![](https://foosoft.net/projects/yomichan/img/play-audio.png) icon to hear the term pronounced by a native speaker (if audio is available).
 5.  Click on Kanji in the definition window to view additional information about that character.
 
 ## Custom Dictionaries ##
 
-Yomichan supports importing of custom dictionaries in several formats. For more information about how this feature
-works, please see the [Yomichan Import](https://foosoft.net/projects/yomichan-import) project page.
+Yomichan supports importing of custom dictionaries including the esoteric but popular
+[EPWING](https://ja.wikipedia.org/wiki/EPWING) format. For more information about how to use this feature, please see
+the [Yomichan Import](https://foosoft.net/projects/yomichan-import) project page.
 
 ## Anki Integration ##
 
@@ -59,7 +61,7 @@ When using AnkiConnect, Anki must be kept running in the background for automati
 
 Before flashcards can be automatically created through Yomichan, Anki must be configured as follows:
 
-1.  In Chrome, open the Yomichan options page by right-clicking the ![](https://foosoft.net/projects/yomichan-chrome/img/logo.png) icon and selecting *Options*.
+1.  In Chrome, open the Yomichan options page by right-clicking the ![](https://foosoft.net/projects/yomichan/img/logo.png) icon and selecting *Options*.
 2.  Activate the *Terms* or the *Kanji* tab, depending on the type of card template you wish to configure.
 3.  Select the Anki deck and model to use when creating new flashcards (see the [Anki Manual](http://ankisrs.net/docs/manual.html) for more details).
 4.  Populate the model fields with markup representing contextual properties for the current vocabulary term or Kanji:
@@ -89,10 +91,10 @@ Before flashcards can be automatically created through Yomichan, Anki must be co
     `{onyomi}` | Onyomi (Chinese reading) for the Kanji expressed as Hiragana.
     `{url}` | Address of the web page in which the Kanji appeared in.
 
-5.  Click on the ![](https://foosoft.net/projects/yomichan-chrome/img/add-expression.png) icon to add the current expression using Kanji (e.g. 食べる). If the icon
+5.  Click on the ![](https://foosoft.net/projects/yomichan/img/add-expression.png) icon to add the current expression using Kanji (e.g. 食べる). If the icon
     appears grayed out, this means that a new flashcard cannot be created with the current configuration (please verify
     your Anki deck and model settings).
-6.  Click on the ![](https://foosoft.net/projects/yomichan-chrome/img/add-reading.png) icon to add the current expression using the reading alone (e.g. たべる). If
+6.  Click on the ![](https://foosoft.net/projects/yomichan/img/add-reading.png) icon to add the current expression using the reading alone (e.g. たべる). If
     the icon appears grayed out, this means that a new flashcard cannot be created with the current configuration
     (please verify your Anki deck and model settings).
 
@@ -107,16 +109,9 @@ Before flashcards can be automatically created through Yomichan, Anki must be co
 
 *   **Is it possible to use Yomichan with files saved locally on my computer?**
 
-    It in order to be able use Yomichan with local files, you must first tick the *Allow access to file URLs* checkbox
-    for Yomichan on the chrome extensions page. Due to restrictions placed on browser extensions by Chrome, it will
-    likely never be possible to use Yomichan with PDF files.
-
-*   **When are you going to port Yomichan to $MYBROWSER?**
-
-    I am considering creating a Firefox port once I am satisfied with the feature set of the Chrome extension. I may
-    consider other browsers in the future, as long as porting would be trivial and the browser in question runs natively
-    on Linux. This is not a high priority Firefox already has good extensions for Japanese learning (and I use Chrome
-    exclusively).
+    It in order to be able use Yomichan with local files in Chrome, you must first tick the *Allow access to file URLs*
+    checkbox for Yomichan on the Chrome extensions page. Due to restrictions placed on browser extensions by Chrome, it
+    will likely never be possible to use Yomichan with PDF files.
 
 *   **When are you going to add support for $MYLANGUAGE?**
 
@@ -127,10 +122,10 @@ Before flashcards can be automatically created through Yomichan, Anki must be co
 
 ## Screenshots ##
 
-[![Term definitions](https://foosoft.net/projects/yomichan-chrome/img/term-thumb.png)](https://foosoft.net/projects/yomichan-chrome/img/term.png)
-[![Kanji information](https://foosoft.net/projects/yomichan-chrome/img/kanji-thumb.png)](https://foosoft.net/projects/yomichan-chrome/img/kanji.png)
-[![General options](https://foosoft.net/projects/yomichan-chrome/img/options-general-thumb.png)](https://foosoft.net/projects/yomichan-chrome/img/options-general.png)
-[![Anki options](https://foosoft.net/projects/yomichan-chrome/img/options-anki-thumb.png)](https://foosoft.net/projects/yomichan-chrome/img/options-anki.png)
+[![Term definitions](https://foosoft.net/projects/yomichan/img/term-thumb.png)](https://foosoft.net/projects/yomichan/img/term.png)
+[![Kanji information](https://foosoft.net/projects/yomichan/img/kanji-thumb.png)](https://foosoft.net/projects/yomichan/img/kanji.png)
+[![General options](https://foosoft.net/projects/yomichan/img/options-general-thumb.png)](https://foosoft.net/projects/yomichan/img/options-general.png)
+[![Anki options](https://foosoft.net/projects/yomichan/img/options-anki-thumb.png)](https://foosoft.net/projects/yomichan/img/options-anki.png)
 
 ## License ##
 
