@@ -22,6 +22,7 @@ class Driver {
         this.popup = new Popup();
         this.popupTimer = null;
         this.lastMousePos = null;
+        this.leftMouseDown = false;
         this.lastTextSource = null;
         this.pendingLookup = false;
         this.options = null;
@@ -30,6 +31,7 @@ class Driver {
             this.options = options;
             window.addEventListener('mouseover', this.onMouseOver.bind(this));
             window.addEventListener('mousedown', this.onMouseDown.bind(this));
+            window.addEventListener('mouseup', this.onMouseUp.bind(this));
             window.addEventListener('mousemove', this.onMouseMove.bind(this));
             window.addEventListener('resize', e => this.searchClear());
             chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
@@ -62,9 +64,9 @@ class Driver {
             return;
         }
 
-        // if (e.which === 1 /* lmb */) {
-        //     return;
-        // }
+        if (this.leftMouseDown) {
+            return;
+        }
 
         if (this.options.scanning.requireShift && !e.shiftKey) {
             return;
@@ -82,6 +84,16 @@ class Driver {
         this.lastMousePos = {x: e.clientX, y: e.clientY};
         this.popupTimerClear();
         this.searchClear();
+
+        if (e.which === 1) {
+            this.leftMouseDown = true;
+        }
+    }
+
+    onMouseUp(e) {
+        if (e.which === 1) {
+            this.leftMouseDown = false;
+        }
     }
 
     onBgMessage({action, params}, sender, callback) {
