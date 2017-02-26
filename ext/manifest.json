@@ -44,7 +44,8 @@
     ],
     "applications": {
         "gecko": {
-            "id": "alex@foosoft.net"
+            "id": "alex@foosoft.net",
+            "strict_min_version": "51.0"
         }
     }
 }
