@@ -20,7 +20,7 @@
 function optionsSetDefaults(options) {
     const defaults = {
         general: {
-            autoStart: true,
+            enable: true,
             audioPlayback: true,
             groupResults: true,
             softKatakana: true,

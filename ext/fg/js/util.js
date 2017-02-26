@@ -38,10 +38,6 @@ function showError(error) {
     window.alert(`Error: ${error}`);
 }
 
-function isEnabled() {
-    return invokeBgApi('getEnabled', {});
-}
-
 function getOptions() {
     return invokeBgApi('getOptions', {});
 }

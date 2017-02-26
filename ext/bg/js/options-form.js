@@ -28,7 +28,7 @@ function getFormData() {
     return optionsLoad().then(optionsOld => {
         const optionsNew = $.extend(true, {}, optionsOld);
 
-        optionsNew.general.autoStart = $('#activate-on-startup').prop('checked');
+        optionsNew.general.enable = $('#enable-search').prop('checked');
         optionsNew.general.audioPlayback = $('#audio-playback-buttons').prop('checked');
         optionsNew.general.groupResults = $('#group-terms-results').prop('checked');
         optionsNew.general.softKatakana = $('#soft-katakana-search').prop('checked');
@@ -87,7 +87,7 @@ $(document).ready(() => {
     Handlebars.partials = Handlebars.templates;
 
     optionsLoad().then(options => {
-        $('#activate-on-startup').prop('checked', options.general.autoStart);
+        $('#enable-search').prop('checked', options.general.enable);
         $('#audio-playback-buttons').prop('checked', options.general.audioPlayback);
         $('#group-terms-results').prop('checked', options.general.groupResults);
         $('#soft-katakana-search').prop('checked', options.general.softKatakana);
@@ -172,9 +172,7 @@ function populateDictionaries(options) {
 
         $('.dict-enabled, .dict-priority').change(onOptionsChanged);
         $('.dict-delete').click(onDictionaryDelete);
-    }).catch(error => {
-        showDictionaryError(error);
-    }).then(() => {
+    }).catch(showDictionaryError).then(() => {
         showDictionarySpinner(false);
         if (dictCount === 0) {
             dictWarning.show();
@@ -191,13 +189,17 @@ function onDictionaryPurge(e) {
     const dictControls = $('#dict-importer, #dict-groups').hide();
     const dictProgress = $('#dict-purge-progress').show();
 
-    return database().purge().catch(error => {
-        showDictionaryError(error);
-    }).then(() => {
+    return database().purge().catch(showDictionaryError).then(() => {
         showDictionarySpinner(false);
         dictControls.show();
         dictProgress.hide();
-        return optionsLoad().then(options => populateDictionaries(options));
+        return optionsLoad();
+    }).then(options => {
+        options.dictionaries = {};
+        return optionsSave(options).then(() => {
+            yomichan().setOptions(options);
+            populateDictionaries(options);
+        });
     });
 }
 
@@ -214,13 +216,11 @@ function onDictionaryDelete() {
 
     setProgress(0.0);
 
-    database().deleteDictionary(dictGroup.data('title'), (total, current) => setProgress(current / total * 100.0)).catch(error => {
-        showDictionaryError(error);
-    }).then(() => {
+    database().deleteDictionary(dictGroup.data('title'), (total, current) => setProgress(current / total * 100.0)).catch(showDictionaryError).then(() => {
         showDictionarySpinner(false);
         dictProgress.hide();
         dictControls.show();
-        return optionsLoad().then(options => populateDictionaries(options));
+        return optionsLoad().then(populateDictionaries);
     });
 }
 
@@ -241,11 +241,7 @@ function onDictionaryImport() {
         database().importDictionary(dictUrl.val(), (total, current) => setProgress(current / total * 100.0)).then(summary => {
             options.dictionaries[summary.title] = {enabled: true, priority: 0};
             return optionsSave(options).then(() => yomichan().setOptions(options));
-        }).then(() => {
-            return populateDictionaries(options);
-        }).catch(error => {
-            showDictionaryError(error);
-        }).then(() => {
+        }).then(() => populateDictionaries(options)).catch(showDictionaryError).then(() => {
             showDictionarySpinner(false);
             dictProgress.hide();
             dictImporter.show();
@@ -330,13 +326,7 @@ function populateAnkiDeckAndModel(options) {
             populateAnkiFields($('#anki-terms-model').val(options.anki.terms.model), options),
             populateAnkiFields($('#anki-kanji-model').val(options.anki.kanji.model), options)
         ]);
-    }).then(() => {
-        ankiFormat.show();
-    }).catch(error => {
-        showAnkiError(error);
-    }).then(() => {
-        showAnkiSpinner(false);
-    });
+    }).then(() => ankiFormat.show()).catch(showAnkiError).then(() => showAnkiSpinner(false));
 }
 
 function populateAnkiFields(element, options) {
@@ -386,11 +376,7 @@ function onAnkiModelChanged(e) {
         optionsNew.anki[tabId].fields = {};
         populateAnkiFields(element, optionsNew).then(() => {
             optionsSave(optionsNew).then(() => yomichan().setOptions(optionsNew));
-        }).catch(error => {
-            showAnkiError(error);
-        }).then(() => {
-            showAnkiSpinner(false);
-        });
+        }).catch(showAnkiError).then(() => showAnkiSpinner(false));
     });
 }
 
@@ -409,9 +395,5 @@ function onOptionsChanged(e) {
                 return populateAnkiDeckAndModel(optionsNew);
             }
         });
-    }).catch(error => {
-        showAnkiError(error);
-    }).then(() => {
-        showAnkiSpinner(false);
-    });
+    }).catch(showAnkiError).then(() => showAnkiSpinner(false));
 }

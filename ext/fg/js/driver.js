@@ -24,21 +24,16 @@ class Driver {
         this.lastMousePos = null;
         this.lastTextSource = null;
         this.pendingLookup = false;
-        this.enabled = false;
         this.options = null;
 
-        chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
-        window.addEventListener('mouseover', this.onMouseOver.bind(this));
-        window.addEventListener('mousedown', this.onMouseDown.bind(this));
-        window.addEventListener('mousemove', this.onMouseMove.bind(this));
-        window.addEventListener('resize', e => this.searchClear());
-
-        Promise.all([getOptions(), isEnabled()]).then(([options, enabled]) => {
+        getOptions().then(options => {
             this.options = options;
-            this.enabled = enabled;
-        }).catch(error => {
-            this.handleError(error);
-        });
+            window.addEventListener('mouseover', this.onMouseOver.bind(this));
+            window.addEventListener('mousedown', this.onMouseDown.bind(this));
+            window.addEventListener('mousemove', this.onMouseMove.bind(this));
+            window.addEventListener('resize', e => this.searchClear());
+            chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
+        }).catch(this.handleError.bind(this));
     }
 
     popupTimerSet(callback) {
@@ -63,7 +58,7 @@ class Driver {
         this.lastMousePos = {x: e.clientX, y: e.clientY};
         this.popupTimerClear();
 
-        if (!this.enabled) {
+        if (!this.options.general.enable) {
             return;
         }
 
@@ -197,12 +192,6 @@ class Driver {
 
     api_setOptions(options) {
         this.options = options;
-    }
-
-    api_setEnabled(enabled) {
-        if (!(this.enabled = enabled)) {
-            this.searchClear();
-        }
     }
 }
 
