@@ -51,7 +51,7 @@ function optionsSetDefaults(options) {
 
     const combine = (target, source) => {
         for (const key in source) {
-            if (!(key in target)) {
+            if (!target.hasOwnProperty(key)) {
                 target[key] = source[key];
             }
         }
@@ -69,9 +69,6 @@ function optionsSetDefaults(options) {
 
 
 function optionsVersion(options) {
-    optionsSetDefaults(options);
-    options.version = options.version || 0;
-
     const fixups = [
         () => {
             const copy = (targetDict, targetKey, sourceDict, sourceKey) => {
@@ -125,10 +122,13 @@ function optionsVersion(options) {
         }
     ];
 
-    if (options.version < fixups.length) {
-        fixups[options.version]();
-        ++options.version;
-        optionsVersion(options);
+    optionsSetDefaults(options);
+    if (!options.hasOwnProperty('version')) {
+        options.version = fixups.length;
+    }
+
+    while (options.version < fixups.length) {
+        fixups[options.version++]();
     }
 
     return options;
