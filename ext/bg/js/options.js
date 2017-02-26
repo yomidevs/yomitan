@@ -20,7 +20,7 @@
 function optionsSetDefaults(options) {
     const defaults = {
         general: {
-            autoStart: true,
+            enable: true,
             audioPlayback: true,
             groupResults: true,
             softKatakana: true,
@@ -31,6 +31,7 @@ function optionsSetDefaults(options) {
         scanning: {
             requireShift: true,
             selectText: true,
+            imposter: true,
             delay: 15,
             length: 10
         },
@@ -39,6 +40,7 @@ function optionsSetDefaults(options) {
 
         anki: {
             enable: false,
+            server: 'http://127.0.0.1:8765',
             tags: ['yomichan'],
             htmlCards: true,
             sentenceExt: 200,
@@ -48,8 +50,8 @@ function optionsSetDefaults(options) {
     };
 
     const combine = (target, source) => {
-        for (let key in source) {
-            if (!(key in target)) {
+        for (const key in source) {
+            if (!target.hasOwnProperty(key)) {
                 target[key] = source[key];
             }
         }
@@ -67,14 +69,11 @@ function optionsSetDefaults(options) {
 
 
 function optionsVersion(options) {
-    const copy = (targetDict, targetKey, sourceDict, sourceKey) => {
-        targetDict[targetKey] = sourceDict.hasOwnProperty(sourceKey) ? sourceDict[sourceKey] : targetDict[targetKey];
-    };
-
-    options.version = options.version || 0;
     const fixups = [
         () => {
-            optionsSetDefaults(options);
+            const copy = (targetDict, targetKey, sourceDict, sourceKey) => {
+                targetDict[targetKey] = sourceDict.hasOwnProperty(sourceKey) ? sourceDict[sourceKey] : targetDict[targetKey];
+            };
 
             copy(options.general, 'autoStart', options, 'activateOnStartup');
             copy(options.general, 'audioPlayback', options, 'enableAudioPlayback');
@@ -98,23 +97,7 @@ function optionsVersion(options) {
             copy(options.anki.kanji, 'model', options, 'ankiKanjiModel');
             copy(options.anki.kanji, 'fields', options, 'ankiKanjiFields');
 
-            const fixupFields = fields => {
-                const fixups = {
-                    '{expression-furigana}': '{furigana}',
-                    '{glossary-list}': '{glossary}'
-                };
-
-                for (let name in fields) {
-                    for (let fixup in fixups) {
-                        fields[name] = fields[name].replace(fixup, fixups[fixup]);
-                    }
-                }
-            };
-
-            fixupFields(options.anki.terms.fields);
-            fixupFields(options.anki.kanji.fields);
-
-            for (let title in options.dictionaries) {
+            for (const title in options.dictionaries) {
                 const dictionary = options.dictionaries[title];
                 dictionary.enabled = dictionary.enableTerms || dictionary.enableKanji;
                 dictionary.priority = 0;
@@ -127,8 +110,8 @@ function optionsVersion(options) {
                     '{glossary-list}': '{glossary}'
                 };
 
-                for (let name in fields) {
-                    for (let fixup in fixups) {
+                for (const name in fields) {
+                    for (const fixup in fixups) {
                         fields[name] = fields[name].replace(fixup, fixups[fixup]);
                     }
                 }
@@ -139,10 +122,13 @@ function optionsVersion(options) {
         }
     ];
 
-    if (options.version < fixups.length) {
-        fixups[options.version]();
-        ++options.version;
-        optionsVersion(options);
+    optionsSetDefaults(options);
+    if (!options.hasOwnProperty('version')) {
+        options.version = fixups.length;
+    }
+
+    while (options.version < fixups.length) {
+        fixups[options.version++]();
     }
 
     return options;

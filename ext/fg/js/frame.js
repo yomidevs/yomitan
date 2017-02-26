@@ -30,26 +30,32 @@ class Frame {
         });
     }
 
-    api_showTermDefs({definitions, options}) {
+    api_showTermDefs({definitions, options, context}) {
         const sequence = ++this.sequence;
-        const context = {
+        const params = {
             definitions,
             grouped: options.general.groupResults,
             addable: options.ankiMethod !== 'disabled',
             playback: options.general.audioPlayback
         };
 
+        definitions.forEach(definition => {
+            definition.sentence = context.sentence;
+            definition.url = context.url;
+        });
+
         this.definitions = definitions;
         this.showSpinner(false);
         window.scrollTo(0, 0);
 
-        renderText(context, 'terms.html').then(content => {
-            $('.content').html(content);
+        renderText(params, 'terms.html').then(content => {
+            $('#content').html(content);
             $('.action-add-note').click(this.onAddNote.bind(this));
 
             $('.kanji-link').click(e => {
                 e.preventDefault();
-                findKanji($(e.target).text()).then(kdefs => this.api_showKanjiDefs({options, definitions: kdefs}));
+                const character = $(e.target).text();
+                findKanji(character).then(definitions => this.api_showKanjiDefs({definitions, options, context}));
             });
 
             $('.action-play-audio').click(e => {
@@ -59,26 +65,40 @@ class Frame {
             });
 
             this.updateAddNoteButtons(['term_kanji', 'term_kana'], sequence);
+        }).catch(error => {
+            this.handleError(error);
         });
     }
 
-    api_showKanjiDefs({definitions, options}) {
+    api_showKanjiDefs({definitions, options, context}) {
         const sequence = ++this.sequence;
-        const context = {
+        const params = {
             definitions,
             addable: options.ankiMethod !== 'disabled'
         };
+
+        definitions.forEach(definition => {
+            definition.sentence = context.sentence;
+            definition.url = context.url;
+        });
 
         this.definitions = definitions;
         this.showSpinner(false);
         window.scrollTo(0, 0);
 
-        renderText(context, 'kanji.html').then(content => {
-            $('.content').html(content);
+        renderText(params, 'kanji.html').then(content => {
+            $('#content').html(content);
             $('.action-add-note').click(this.onAddNote.bind(this));
 
             this.updateAddNoteButtons(['kanji'], sequence);
+        }).catch(error => {
+            this.handleError(error);
         });
+    }
+
+    api_showOrphaned() {
+        $('#content').hide();
+        $('#orphan').show();
     }
 
     findAddNoteButton(index, mode) {
@@ -93,15 +113,24 @@ class Frame {
         const index = link.data('index');
         const mode = link.data('mode');
 
-        addDefinition(this.definitions[index], mode).then(success => {
+        const definition = this.definitions[index];
+        if (mode !== 'kanji') {
+            const url = buildAudioUrl(definition);
+            const filename = buildAudioFilename(definition);
+            if (url && filename) {
+                definition.audio = {url, filename};
+            }
+        }
+
+        addDefinition(definition, mode).then(success => {
             if (success) {
                 const button = this.findAddNoteButton(index, mode);
                 button.addClass('disabled');
             } else {
-                window.alert('Note could not be added');
+                showError('note could not be added');
             }
         }).catch(error => {
-            window.alert('Error: ' + error);
+            this.handleError(error);
         }).then(() => {
             this.showSpinner(false);
         });
@@ -118,7 +147,7 @@ class Frame {
             }
 
             states.forEach((state, index) => {
-                for (let mode in state) {
+                for (const mode in state) {
                     const button = this.findAddNoteButton(index, mode);
                     if (state[mode]) {
                         button.removeClass('disabled');
@@ -129,6 +158,8 @@ class Frame {
                     button.removeClass('pending');
                 }
             });
+        }).catch(error => {
+            this.handleError(error);
         });
     }
 
@@ -142,18 +173,41 @@ class Frame {
     }
 
     playAudio(definition) {
-        let url = `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?kanji=${encodeURIComponent(definition.expression)}`;
-        if (definition.reading) {
-            url += `&kana=${encodeURIComponent(definition.reading)}`;
+        for (const key in this.audioCache) {
+            const audio = this.audioCache[key];
+            if (audio !== null) {
+                audio.pause();
+            }
         }
 
-        for (let key in this.audioCache) {
-            this.audioCache[key].pause();
+        const url = buildAudioUrl(definition);
+        if (!url) {
+            return;
         }
 
-        const audio = this.audioCache[url] || new Audio(url);
-        audio.currentTime = 0;
-        audio.play();
+        let audio = this.audioCache[url];
+        if (audio) {
+            audio.currentTime = 0;
+            audio.play();
+        } else {
+            audio = new Audio(url);
+            audio.onloadeddata = () => {
+                if (audio.duration === 5.694694) {
+                    audio = new Audio('mp3/button.mp3');
+                }
+
+                this.audioCache[url] = audio;
+                audio.play();
+            };
+        }
+    }
+
+    handleError(error) {
+        if (window.orphaned) {
+            this.api_showOrphaned();
+        } else {
+            showError(error);
+        }
     }
 }
 

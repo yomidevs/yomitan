@@ -19,18 +19,23 @@
 
 function invokeBgApi(action, params) {
     return new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({action, params}, ({result, error}) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(result);
-            }
-        });
+        try {
+            chrome.runtime.sendMessage({action, params}, ({result, error}) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            });
+        } catch (e) {
+            window.orphaned = true;
+            reject(e.message);
+        }
     });
 }
 
-function isEnabled() {
-    return invokeBgApi('getEnabled', {});
+function showError(error) {
+    window.alert(`Error: ${error}`);
 }
 
 function getOptions() {
@@ -61,12 +66,36 @@ function addDefinition(definition, mode) {
     return invokeBgApi('addDefinition', {definition, mode});
 }
 
-function textSourceFromPoint(point) {
+function createImposter(element) {
+    const imposter = document.createElement('div');
+    const elementRect = element.getBoundingClientRect();
+
+    imposter.className = 'yomichan-imposter';
+    imposter.innerText = element.value;
+    imposter.style.cssText = window.getComputedStyle(element).cssText;
+    imposter.style.position = 'absolute';
+    imposter.style.top = elementRect.top + 'px';
+    imposter.style.left = elementRect.left + 'px';
+    imposter.style.zIndex = 2147483646;
+    document.body.appendChild(imposter);
+
+    imposter.scrollTop = element.scrollTop;
+    imposter.scrollLeft = element.scrollLeft;
+}
+
+function destroyImposters() {
+    for (const element of document.getElementsByClassName('yomichan-imposter')) {
+        element.parentNode.removeChild(element);
+    }
+}
+
+function textSourceFromPoint(point, imposter) {
     const element = document.elementFromPoint(point.x, point.y);
     if (element !== null) {
-        const names = ['IMG', 'INPUT', 'BUTTON', 'TEXTAREA'];
-        if (names.includes(element.nodeName)) {
+        if (element.nodeName === 'IMG' || element.nodeName === 'BUTTON') {
             return new TextSourceElement(element);
+        } else if (imposter && (element.nodeName === 'INPUT' || element.nodeName === 'TEXTAREA')) {
+            createImposter(element);
         }
     }
 
@@ -75,6 +104,7 @@ function textSourceFromPoint(point) {
         return new TextSourceRange(range);
     }
 
+    destroyImposters();
     return null;
 }
 
@@ -131,4 +161,44 @@ function extractSentence(source, extent) {
     }
 
     return content.substring(startPos, endPos).trim();
+}
+
+function buildAudioUrl(definition) {
+    let kana = definition.reading;
+    let kanji = definition.expression;
+
+    if (!kana && !kanji) {
+        return null;
+    }
+
+    if (!kana && wanakana.isHiragana(kanji)) {
+        kana = kanji;
+        kanji = null;
+    }
+
+    const params = [];
+    if (kanji) {
+        params.push(`kanji=${encodeURIComponent(kanji)}`);
+    }
+    if (kana) {
+        params.push(`kana=${encodeURIComponent(kana)}`);
+    }
+
+    return `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?${params.join('&')}`;
+}
+
+function buildAudioFilename(definition) {
+    if (!definition.reading && !definition.expression) {
+        return null;
+    }
+
+    let filename = 'yomichan';
+    if (definition.reading) {
+        filename += `_${definition.reading}`;
+    }
+    if (definition.expression) {
+        filename += `_${definition.expression}`;
+    }
+
+    return filename += '.mp3';
 }

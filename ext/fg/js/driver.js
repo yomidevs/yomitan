@@ -24,21 +24,16 @@ class Driver {
         this.lastMousePos = null;
         this.lastTextSource = null;
         this.pendingLookup = false;
-        this.enabled = false;
         this.options = null;
-
-        chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
-        window.addEventListener('mouseover', this.onMouseOver.bind(this));
-        window.addEventListener('mousedown', this.onMouseDown.bind(this));
-        window.addEventListener('mousemove', this.onMouseMove.bind(this));
-        window.addEventListener('resize', e => this.searchClear());
 
         getOptions().then(options => {
             this.options = options;
-            return isEnabled();
-        }).then(enabled => {
-            this.enabled = enabled;
-        });
+            window.addEventListener('mouseover', this.onMouseOver.bind(this));
+            window.addEventListener('mousedown', this.onMouseDown.bind(this));
+            window.addEventListener('mousemove', this.onMouseMove.bind(this));
+            window.addEventListener('resize', e => this.searchClear());
+            chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
+        }).catch(this.handleError.bind(this));
     }
 
     popupTimerSet(callback) {
@@ -63,7 +58,7 @@ class Driver {
         this.lastMousePos = {x: e.clientX, y: e.clientY};
         this.popupTimerClear();
 
-        if (!this.enabled) {
+        if (!this.options.general.enable) {
             return;
         }
 
@@ -75,7 +70,7 @@ class Driver {
             return;
         }
 
-        const searcher = () => this.searchAt(this.lastMousePos, false);
+        const searcher = () => this.searchAt(this.lastMousePos);
         if (!this.popup.isVisible() || e.shiftKey || e.which === 2 /* mmb */) {
             searcher();
         } else {
@@ -98,17 +93,13 @@ class Driver {
         callback();
     }
 
-    searchAt(point, hideNotFound) {
+    searchAt(point) {
         if (this.pendingLookup) {
             return;
         }
 
-        const textSource = textSourceFromPoint(point);
+        const textSource = textSourceFromPoint(point, this.options.scanning.imposter);
         if (textSource === null || !textSource.containsPoint(point)) {
-            if (hideNotFound) {
-                this.searchClear();
-            }
-
             return;
         }
 
@@ -119,14 +110,10 @@ class Driver {
         this.pendingLookup = true;
         this.searchTerms(textSource).then(found => {
             if (!found) {
-                this.searchKanji(textSource).then(found => {
-                    if (!found && hideNotFound) {
-                        this.searchClear();
-                    }
-                });
+                return this.searchKanji(textSource);
             }
         }).catch(error => {
-            window.alert('Error: ' + error);
+            this.handleError(error, textSource);
         }).then(() => {
             this.pendingLookup = false;
         });
@@ -143,13 +130,11 @@ class Driver {
                 textSource.setEndOffset(length);
 
                 const sentence = extractSentence(textSource, this.options.anki.sentenceExt);
-                definitions.forEach(definition => {
-                    definition.url = window.location.href;
-                    definition.sentence = sentence;
-                });
+                const url = window.location.href;
 
                 this.popup.showNextTo(textSource.getRect());
-                this.popup.showTermDefs(definitions, this.options);
+                this.popup.showTermDefs(definitions, this.options, {sentence, url});
+
                 this.lastTextSource = textSource;
                 if (this.options.scanning.selectText) {
                     textSource.select();
@@ -157,9 +142,6 @@ class Driver {
 
                 return true;
             }
-        }).catch(error => {
-            window.alert('Error: ' + error);
-            return false;
         });
     }
 
@@ -170,10 +152,12 @@ class Driver {
             if (definitions.length === 0) {
                 return false;
             } else {
-                definitions.forEach(definition => definition.url = window.location.href);
+                const sentence = extractSentence(textSource, this.options.anki.sentenceExt);
+                const url = window.location.href;
 
                 this.popup.showNextTo(textSource.getRect());
-                this.popup.showKanjiDefs(definitions, this.options);
+                this.popup.showKanjiDefs(definitions, this.options, {sentence, url});
+
                 this.lastTextSource = textSource;
                 if (this.options.scanning.selectText) {
                     textSource.select();
@@ -181,13 +165,11 @@ class Driver {
 
                 return true;
             }
-        }).catch(error => {
-            window.alert('Error: ' + error);
-            return false;
         });
     }
 
     searchClear() {
+        destroyImposters();
         this.popup.hide();
 
         if (this.options.scanning.selectText && this.lastTextSource !== null) {
@@ -197,14 +179,19 @@ class Driver {
         this.lastTextSource = null;
     }
 
-    api_setOptions(options) {
-        this.options = options;
+    handleError(error, textSource) {
+        if (window.orphaned) {
+            if (textSource) {
+                this.popup.showNextTo(textSource.getRect());
+                this.popup.showOrphaned();
+            }
+        } else {
+            showError(error);
+        }
     }
 
-    api_setEnabled(enabled) {
-        if (!(this.enabled = enabled)) {
-            this.searchClear();
-        }
+    api_setOptions(options) {
+        this.options = options;
     }
 }
 

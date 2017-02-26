@@ -28,7 +28,7 @@ function getFormData() {
     return optionsLoad().then(optionsOld => {
         const optionsNew = $.extend(true, {}, optionsOld);
 
-        optionsNew.general.autoStart = $('#activate-on-startup').prop('checked');
+        optionsNew.general.enable = $('#enable-search').prop('checked');
         optionsNew.general.audioPlayback = $('#audio-playback-buttons').prop('checked');
         optionsNew.general.groupResults = $('#group-terms-results').prop('checked');
         optionsNew.general.softKatakana = $('#soft-katakana-search').prop('checked');
@@ -37,6 +37,7 @@ function getFormData() {
 
         optionsNew.scanning.requireShift = $('#hold-shift-to-scan').prop('checked');
         optionsNew.scanning.selectText = $('#select-matched-text').prop('checked');
+        optionsNew.scanning.imposter = $('#search-form-text-fields').prop('checked');
         optionsNew.scanning.delay = parseInt($('#scan-delay').val(), 10);
         optionsNew.scanning.length = parseInt($('#scan-length').val(), 10);
 
@@ -44,6 +45,7 @@ function getFormData() {
         optionsNew.anki.tags = $('#card-tags').val().split(/[,; ]+/);
         optionsNew.anki.htmlCards = $('#generate-html-cards').prop('checked');
         optionsNew.anki.sentenceExt = parseInt($('#sentence-detection-extent').val(), 10);
+        optionsNew.anki.server = $('#interface-server').val();
         if (optionsOld.anki.enable) {
             optionsNew.anki.terms.deck = $('#anki-terms-deck').val();
             optionsNew.anki.terms.model = $('#anki-terms-model').val();
@@ -85,7 +87,7 @@ $(document).ready(() => {
     Handlebars.partials = Handlebars.templates;
 
     optionsLoad().then(options => {
-        $('#activate-on-startup').prop('checked', options.general.autoStart);
+        $('#enable-search').prop('checked', options.general.enable);
         $('#audio-playback-buttons').prop('checked', options.general.audioPlayback);
         $('#group-terms-results').prop('checked', options.general.groupResults);
         $('#soft-katakana-search').prop('checked', options.general.softKatakana);
@@ -94,6 +96,7 @@ $(document).ready(() => {
 
         $('#hold-shift-to-scan').prop('checked', options.scanning.requireShift);
         $('#select-matched-text').prop('checked', options.scanning.selectText);
+        $('#search-form-text-fields').prop('checked', options.scanning.imposter);
         $('#scan-delay').val(options.scanning.delay);
         $('#scan-length').val(options.scanning.length);
 
@@ -106,6 +109,7 @@ $(document).ready(() => {
         $('#card-tags').val(options.anki.tags.join(' '));
         $('#generate-html-cards').prop('checked', options.anki.htmlCards);
         $('#sentence-detection-extent').val(options.anki.sentenceExt);
+        $('#interface-server').val(options.anki.server);
         $('input, select').not('.anki-model').change(onOptionsChanged);
         $('.anki-model').change(onAnkiModelChanged);
 
@@ -164,11 +168,10 @@ function populateDictionaries(options) {
             ++dictCount;
         });
 
+        updateVisibility(options);
+
         $('.dict-enabled, .dict-priority').change(onOptionsChanged);
-        $('.dict-delete').click(onDictionaryDelete);
-    }).catch(error => {
-        showDictionaryError(error);
-    }).then(() => {
+    }).catch(showDictionaryError).then(() => {
         showDictionarySpinner(false);
         if (dictCount === 0) {
             dictWarning.show();
@@ -185,36 +188,17 @@ function onDictionaryPurge(e) {
     const dictControls = $('#dict-importer, #dict-groups').hide();
     const dictProgress = $('#dict-purge-progress').show();
 
-    return database().purge().catch(error => {
-        showDictionaryError(error);
-    }).then(() => {
+    return database().purge().catch(showDictionaryError).then(() => {
         showDictionarySpinner(false);
         dictControls.show();
         dictProgress.hide();
-        return optionsLoad().then(options => populateDictionaries(options));
-    });
-}
-
-function onDictionaryDelete() {
-    showDictionaryError(null);
-    showDictionarySpinner(true);
-
-    const dictGroup = $(this).closest('.dict-group');
-    const dictProgress = dictGroup.find('.dict-delete-progress').show();
-    const dictControls = dictGroup.find('.dict-group-controls').hide();
-    const setProgress = percent => {
-        dictProgress.find('.progress-bar').css('width', `${percent}%`);
-    };
-
-    setProgress(0.0);
-
-    database().deleteDictionary(dictGroup.data('title'), (total, current) => setProgress(current / total * 100.0)).catch(error => {
-        showDictionaryError(error);
-    }).then(() => {
-        showDictionarySpinner(false);
-        dictProgress.hide();
-        dictControls.show();
-        return optionsLoad().then(options => populateDictionaries(options));
+        return optionsLoad();
+    }).then(options => {
+        options.dictionaries = {};
+        return optionsSave(options).then(() => {
+            populateDictionaries(options);
+            yomichan().setOptions(options);
+        });
     });
 }
 
@@ -225,9 +209,7 @@ function onDictionaryImport() {
     const dictUrl = $('#dict-url');
     const dictImporter = $('#dict-importer').hide();
     const dictProgress = $('#dict-import-progress').show();
-    const setProgress = percent => {
-        dictProgress.find('.progress-bar').css('width', `${percent}%`);
-    };
+    const setProgress = percent => dictProgress.find('.progress-bar').css('width', `${percent}%`);
 
     setProgress(0.0);
 
@@ -235,11 +217,7 @@ function onDictionaryImport() {
         database().importDictionary(dictUrl.val(), (total, current) => setProgress(current / total * 100.0)).then(summary => {
             options.dictionaries[summary.title] = {enabled: true, priority: 0};
             return optionsSave(options).then(() => yomichan().setOptions(options));
-        }).then(() => {
-            return populateDictionaries(options);
-        }).catch(error => {
-            showDictionaryError(error);
-        }).then(() => {
+        }).then(() => populateDictionaries(options)).catch(showDictionaryError).then(() => {
             showDictionarySpinner(false);
             dictProgress.hide();
             dictImporter.show();
@@ -324,13 +302,7 @@ function populateAnkiDeckAndModel(options) {
             populateAnkiFields($('#anki-terms-model').val(options.anki.terms.model), options),
             populateAnkiFields($('#anki-kanji-model').val(options.anki.kanji.model), options)
         ]);
-    }).then(() => {
-        ankiFormat.show();
-    }).catch(error => {
-        showAnkiError(error);
-    }).then(() => {
-        showAnkiSpinner(false);
-    });
+    }).then(() => ankiFormat.show()).catch(showAnkiError).then(() => showAnkiSpinner(false));
 }
 
 function populateAnkiFields(element, options) {
@@ -345,7 +317,7 @@ function populateAnkiFields(element, options) {
 
     const markers = {
         'terms': ['audio', 'dictionary', 'expression', 'furigana', 'glossary', 'reading', 'sentence', 'tags', 'url'],
-        'kanji': ['character', 'dictionary', 'glossary', 'kunyomi', 'onyomi', 'url']
+        'kanji': ['character', 'dictionary', 'glossary', 'kunyomi', 'onyomi', 'sentence', 'tags', 'url']
     }[tabId] || {};
 
     return anki().getModelFieldNames(modelName).then(names => {
@@ -380,11 +352,7 @@ function onAnkiModelChanged(e) {
         optionsNew.anki[tabId].fields = {};
         populateAnkiFields(element, optionsNew).then(() => {
             optionsSave(optionsNew).then(() => yomichan().setOptions(optionsNew));
-        }).catch(error => {
-            showAnkiError(error);
-        }).then(() => {
-            showAnkiSpinner(false);
-        });
+        }).catch(showAnkiError).then(() => showAnkiSpinner(false));
     });
 }
 
@@ -397,15 +365,16 @@ function onOptionsChanged(e) {
         return optionsSave(optionsNew).then(() => {
             yomichan().setOptions(optionsNew);
             updateVisibility(optionsNew);
-            if (optionsNew.anki.enable !== optionsOld.anki.enable) {
+
+            const ankiUpdated =
+                optionsNew.anki.enable !== optionsOld.anki.enable ||
+                optionsNew.anki.server !== optionsOld.anki.server;
+
+            if (ankiUpdated) {
                 showAnkiError(null);
                 showAnkiSpinner(true);
                 return populateAnkiDeckAndModel(optionsNew);
             }
         });
-    }).catch(error => {
-        showAnkiError(error);
-    }).then(() => {
-        showAnkiSpinner(false);
-    });
+    }).catch(showAnkiError).then(() => showAnkiSpinner(false));
 }

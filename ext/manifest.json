@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Yomichan",
-    "version": "1.0.6",
+    "version": "1.0.15",
 
     "description": "Japanese dictionary with Anki integration",
     "icons": {"16": "img/icon16.png", "48": "img/icon48.png", "128": "img/icon128.png"},
@@ -32,13 +32,14 @@
     ],
     "web_accessible_resources": [
         "fg/css/frame.css",
+        "fg/frame.html",
         "fg/img/add_kanji.png",
         "fg/img/add_term_kana.png",
         "fg/img/add_term_kanji.png",
         "fg/img/play_audio.png",
         "fg/img/spinner.gif",
         "fg/js/frame.js",
-        "fg/frame.html",
+        "fg/mp3/button.mp3",
         "fg/ttf/kanji-stroke-orders.ttf",
         "fg/ttf/vl-gothic-regular.ttf"
     ],

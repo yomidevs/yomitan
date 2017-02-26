@@ -26,18 +26,12 @@ class Yomichan {
         this.translator = new Translator();
         this.anki = new AnkiNull();
         this.options = null;
-        this.setEnabled(false);
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
-        chrome.browserAction.onClicked.addListener(this.onBrowserAction.bind(this));
         chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
+        chrome.browserAction.onClicked.addListener(e => chrome.runtime.openOptionsPage());
 
-        this.translator.prepare().then(optionsLoad).then(options => {
-            this.setOptions(options);
-            if (this.options.general.autoStart) {
-                this.setEnabled(true);
-            }
-        });
+        this.translator.prepare().then(optionsLoad).then(this.setOptions.bind(this));
     }
 
     onInstalled(details) {
@@ -57,21 +51,28 @@ class Yomichan {
         return true;
     }
 
-    onBrowserAction() {
-        this.setEnabled(!this.enabled);
-    }
-
-    setEnabled(enabled) {
-        this.enabled = enabled;
-        this.tabInvokeAll('setEnabled', this.enabled);
-        chrome.browserAction.setBadgeText({text: enabled ? '' : 'off'});
-    }
+    // setEnabled(enabled) {
+    //     this.enabled = enabled;
+    //     this.tabInvokeAll('setEnabled', this.enabled);
+    //     chrome.browserAction.setBadgeText({text: enabled ? '' : 'off'});
+    // }
 
     setOptions(options) {
         this.options = options;
 
+        let usable = false;
+        for (const title in options.dictionaries) {
+            if (options.dictionaries[title].enabled) {
+                usable = true;
+                break;
+            }
+        }
+
+        chrome.browserAction.setBadgeBackgroundColor({color: '#f0ad4e'});
+        chrome.browserAction.setBadgeText({text: usable ? '' : '!'});
+
         if (options.anki.enable) {
-            this.anki = new AnkiConnect();
+            this.anki = new AnkiConnect(this.options.anki.server);
         } else {
             this.anki = new AnkiNull();
         }
@@ -81,7 +82,7 @@ class Yomichan {
 
     tabInvokeAll(action, params) {
         chrome.tabs.query({}, tabs => {
-            for (let tab of tabs) {
+            for (const tab of tabs) {
                 chrome.tabs.sendMessage(tab.id, {action, params}, () => null);
             }
         });
@@ -100,24 +101,27 @@ class Yomichan {
             note.deckName = this.options.anki.terms.deck;
             note.modelName = this.options.anki.terms.model;
 
-            const audio = {
-                kanji: definition.expression,
-                kana: definition.reading,
-                fields: []
-            };
+            if (definition.audio) {
+                const audio = {
+                    url: definition.audio.url,
+                    filename: definition.audio.filename,
+                    skipHash: '7e2c2f954ef6051373ba916f000168dc',
+                    fields: []
+                };
 
-            for (let name in fields) {
-                if (fields[name].includes('{audio}')) {
-                    audio.fields.push(name);
+                for (const name in fields) {
+                    if (fields[name].includes('{audio}')) {
+                        audio.fields.push(name);
+                    }
                 }
-            }
 
-            if (audio.fields.length > 0) {
-                note.audio = audio;
+                if (audio.fields.length > 0) {
+                    note.audio = audio;
+                }
             }
         }
 
-        for (let name in fields) {
+        for (const name in fields) {
             note.fields[name] = formatField(
                 fields[name],
                 definition,
@@ -127,10 +131,6 @@ class Yomichan {
         }
 
         return note;
-    }
-
-    api_getEnabled({callback}) {
-        callback({result: this.enabled});
     }
 
     api_getOptions({callback}) {
@@ -175,8 +175,8 @@ class Yomichan {
 
     api_canAddDefinitions({definitions, modes, callback}) {
         const notes = [];
-        for (let definition of definitions) {
-            for (let mode of modes) {
+        for (const definition of definitions) {
+            for (const mode of modes) {
                 notes.push(this.formatNote(definition, mode));
             }
         }

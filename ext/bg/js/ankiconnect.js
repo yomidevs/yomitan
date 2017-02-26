@@ -17,9 +17,10 @@
  */
 
 class AnkiConnect {
-    constructor() {
+    constructor(server) {
+        this.server = server;
         this.asyncPools = {};
-        this.localVersion = 1;
+        this.localVersion = 2;
         this.remoteVersion = null;
     }
 
@@ -50,8 +51,8 @@ class AnkiConnect {
 
         return this.ankiInvoke('version', {}, null).then(version => {
             this.remoteVersion = version;
-            if (this.remoteVersion !== this.localVersion) {
-                return Promise.reject('extension and plugin version mismatch');
+            if (this.remoteVersion < this.localVersion) {
+                return Promise.reject('extension and plugin versions incompatible');
             }
         });
     }
@@ -75,7 +76,7 @@ class AnkiConnect {
                 }
             });
 
-            xhr.open('POST', 'http://127.0.0.1:8765');
+            xhr.open('POST', this.server);
             xhr.send(JSON.stringify({action, params}));
         });
     }

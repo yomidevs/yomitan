@@ -45,7 +45,7 @@ class Database {
                 terms: '++id,dictionary,expression,reading',
                 kanji: '++,dictionary,character',
                 tagMeta: '++,dictionary',
-                dictionaries: '++,title,version',
+                dictionaries: '++,title,version'
             });
 
             return this.db.open();
@@ -153,82 +153,6 @@ class Database {
         }
 
         return this.db.dictionaries.toArray();
-    }
-
-    deleteDictionary(title, callback) {
-        if (this.db === null) {
-            return Promise.reject('database not initialized');
-        }
-
-        return this.db.dictionaries.where('title').equals(title).first(info => {
-            if (!info) {
-                return;
-            }
-
-            let termCounter = Promise.resolve(0);
-            if (info.hasTerms) {
-                termCounter = this.db.terms.where('dictionary').equals(title).count();
-            }
-
-            let kanjiCounter = Promise.resolve(0);
-            if (info.hasKanji) {
-                kanjiCounter = this.db.kanji.where('dictionary').equals(title).count();
-            }
-
-            return Promise.all([termCounter, kanjiCounter]).then(([termCount, kanjiCount]) => {
-                const rowLimit = 500;
-                const totalCount = termCount + kanjiCount;
-                let deletedCount = 0;
-
-                let termDeleter = Promise.resolve();
-                if (info.hasTerms) {
-                    const termDeleterFunc = () => {
-                        return this.db.terms.where('dictionary').equals(title).limit(rowLimit).delete().then(count => {
-                            if (count === 0) {
-                                return Promise.resolve();
-                            }
-
-                            deletedCount += count;
-                            if (callback) {
-                                callback(totalCount, deletedCount);
-                            }
-
-                            return termDeleterFunc();
-                        });
-                    };
-
-                    termDeleter = termDeleterFunc();
-                }
-
-                let kanjiDeleter = Promise.resolve();
-                if (info.hasKanji) {
-                    const kanjiDeleterFunc = () => {
-                        return this.db.kanji.where('dictionary').equals(title).limit(rowLimit).delete().then(count => {
-                            if (count === 0) {
-                                return Promise.resolve();
-                            }
-
-                            deletedCount += count;
-                            if (callback) {
-                                callback(totalCount, deletedCount);
-                            }
-
-                            return kanjiDeleterFunc();
-                        });
-                    };
-
-                    kanjiDeleter = kanjiDeleterFunc();
-                }
-
-                return Promise.all([termDeleter, kanjiDeleter]);
-            });
-        }).then(() => {
-            return this.db.tagMeta.where('dictionary').equals(title).delete();
-        }).then(() => {
-            return this.db.dictionaries.where('title').equals(title).delete();
-        }).then(() => {
-            delete this.cacheTagMeta[title];
-        });
     }
 
     importDictionary(indexUrl, callback) {

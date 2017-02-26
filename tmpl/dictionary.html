@@ -1,26 +1,10 @@
 <div class="dict-group well well-sm" data-title="{{title}}">
     <h4><span class="text-muted glyphicon glyphicon-book"></span> {{title}} <small>rev.{{revision}}</small></h4>
 
-    <!-- <div class="row"> -->
-    <!--     <div class="col-xs-8"> -->
-    <!--         <h4><span class="text-muted glyphicon glyphicon-book"></span> {{title}} <small>v.{{version}}</small></h4> -->
-    <!--     </div> -->
-    <!--     <div class="col-xs-4 text-right disabled"> -->
-    <!--         <button type="button" class="dict-group-controls dict-delete btn btn-danger">Delete</button> -->
-    <!--     </div> -->
-    <!-- </div> -->
-
-    <div class="dict-delete-progress">
-        Dictionary data is being deleted, please be patient...
-        <div class="progress">
-            <div class="progress-bar progress-bar-striped progress-bar-danger" style="width: 0%"></div>
-        </div>
-    </div>
-
-    <div class="checkbox dict-group-controls">
+    <div class="checkbox">
         <label><input type="checkbox" class="dict-enabled" {{#if enabled}}checked{{/if}}> Enable search</label>
     </div>
-    <div class="form-group dict-group-controls options-advanced">
+    <div class="form-group options-advanced">
         <label for="dict-{{title}}">Result priority</label>
         <input type="number" value="{{priority}}" id="dict-{{title}}" class="form-control dict-priority">
     </div>

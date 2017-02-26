@@ -3,11 +3,11 @@
     <head>
         <meta charset="UTF-8">
         <title>Yomichan Options</title>
-        <link rel="stylesheet" type="text/css" href="../lib/bootstrap-3.3.6-dist/css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="../lib/bootstrap-3.3.6-dist/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="../lib/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../lib/bootstrap-3.3.7-dist/css/bootstrap-theme.min.css">
         <style>
             #anki-spinner, #anki-general, #anki-error,
-            #dict-spinner, #dict-error, #dict-warning, #dict-purge-progress, #dict-import-progress, .dict-delete-progress,
+            #dict-spinner, #dict-error, #dict-warning, #dict-purge-progress, #dict-import-progress,
             .options-advanced {
                 display: none;
             }
@@ -26,7 +26,7 @@
                 <h3>General Options</h3>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="activate-on-startup"> Activate on startup</label>
+                    <label><input type="checkbox" id="enable-search"> Enable search</label>
                 </div>
 
                 <div class="checkbox">
@@ -60,6 +60,10 @@
 
                 <div class="checkbox">
                     <label><input type="checkbox" id="select-matched-text"> Select matched text</label>
+                </div>
+
+                <div class="checkbox">
+                    <label><input type="checkbox" id="search-form-text-fields"> Search form text fields</label>
                 </div>
 
                 <div class="form-group options-advanced">
@@ -111,9 +115,9 @@
                     <div class="input-group-btn">
                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
                         <ul class="dropdown-menu">
-                            <li><a href="#" data-url="edict">JMdict</a></li>
-                            <li><a href="#" data-url="enamdict">JMnedict</a></li>
-                            <li><a href="#" data-url="kanjidic">KANJIDIC2</a></li>
+                            <li><a href="#" data-url="edict">JMdict <span class="text-muted">(terms)</span></a></li>
+                            <li><a href="#" data-url="enamdict">JMnedict <span class="text-muted">(names)</span></a></li>
+                            <li><a href="#" data-url="kanjidic">KANJIDIC2 <span class="text-muted">(characters)</span></a></li>
                             <li role="separator" class="divider"></li>
                             <li><a href="#" data-url="http://localhost:9876/index.json">Local dictionary</a></li>
                         </ul>
@@ -159,6 +163,11 @@
                     <div class="form-group options-advanced">
                         <label for="sentence-detection-extent">Sentence detection extent</label>
                         <input type="number" min="1" id="sentence-detection-extent" class="form-control">
+                    </div>
+
+                    <div class="form-group options-advanced">
+                        <label for="interface-server">Interface server</label>
+                        <input type="text" id="interface-server" class="form-control">
                     </div>
 
                     <div id="anki-format">
@@ -228,8 +237,8 @@
             </div>
         </div>
 
-        <script src="../lib/jquery-2.2.2.min.js"></script>
-        <script src="../lib/bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
+        <script src="../lib/jquery-3.1.1.min.js"></script>
+        <script src="../lib/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
         <script src="../lib/handlebars.min.js"></script>
         <script src="js/templates.js"></script>
         <script src="js/gecko.js"></script>
