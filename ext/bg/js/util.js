@@ -19,7 +19,7 @@
 
 function kanjiLinks(options) {
     let result = '';
-    for (let c of options.fn(this)) {
+    for (const c of options.fn(this)) {
         if (isKanji(c)) {
             result += `<a href="#" class="kanji-link">${c}</a>`;
         } else {
@@ -41,7 +41,7 @@ function isKanji(c) {
 
 function enabledDicts(options) {
     const dictionaries = {};
-    for (let title in options.dictionaries) {
+    for (const title in options.dictionaries) {
         const dictionary = options.dictionaries[title];
         if (dictionary.enabled) {
             dictionaries[title] = dictionary;
@@ -104,7 +104,7 @@ function sortTermDefs(definitions, dictionaries=null) {
 
 function undupeTermDefs(definitions) {
     const definitionGroups = {};
-    for (let definition of definitions) {
+    for (const definition of definitions) {
         const definitionExisting = definitionGroups[definition.id];
         if (!definitionGroups.hasOwnProperty(definition.id) || definition.expression.length > definitionExisting.expression.length) {
             definitionGroups[definition.id] = definition;
@@ -112,7 +112,7 @@ function undupeTermDefs(definitions) {
     }
 
     const definitionsUnique = [];
-    for (let key in definitionGroups) {
+    for (const key in definitionGroups) {
         definitionsUnique.push(definitionGroups[key]);
     }
 
@@ -121,7 +121,7 @@ function undupeTermDefs(definitions) {
 
 function groupTermDefs(definitions, dictionaries) {
     const groups = {};
-    for (let definition of definitions) {
+    for (const definition of definitions) {
         const key = [definition.source, definition.expression].concat(definition.reasons);
         if (definition.reading) {
             key.push(definition.reading);
@@ -136,7 +136,7 @@ function groupTermDefs(definitions, dictionaries) {
     }
 
     const results = [];
-    for (let key in groups) {
+    for (const key in groups) {
         const groupDefs = groups[key];
         const firstDef = groupDefs[0];
         sortTermDefs(groupDefs, dictionaries);
@@ -160,7 +160,7 @@ function buildDictTag(name) {
 function buildTag(name, meta) {
     const tag = {name};
     const symbol = name.split(':')[0];
-    for (let prop in meta[symbol] || {}) {
+    for (const prop in meta[symbol] || {}) {
         tag[prop] = meta[symbol][prop];
     }
 
@@ -217,7 +217,7 @@ function formatField(field, definition, mode, options) {
         'url'
     ];
 
-    for (let marker of markers) {
+    for (const marker of markers) {
         const data = {
             marker,
             definition,
@@ -304,7 +304,7 @@ function importJsonDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
         }
 
         let chain = Promise.resolve();
-        for (let loader of loaders) {
+        for (const loader of loaders) {
             chain = chain.then(loader);
         }
 
