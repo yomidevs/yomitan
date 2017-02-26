@@ -26,8 +26,7 @@
         "page": "bg/options.html"
     },
     "permissions": [
-        "file://*/*",
-        "http://127.0.0.1/*",
+        "<all_urls>",
         "storage"
     ],
     "web_accessible_resources": [
