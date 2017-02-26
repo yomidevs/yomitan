@@ -22,7 +22,8 @@ class Driver {
         this.popup = new Popup();
         this.popupTimer = null;
         this.lastMousePos = null;
-        this.leftMouseDown = false;
+        this.mouseDownLeft = false;
+        this.mouseDownMiddle = false;
         this.lastTextSource = null;
         this.pendingLookup = false;
         this.options = null;
@@ -64,16 +65,16 @@ class Driver {
             return;
         }
 
-        if (this.leftMouseDown) {
+        if (this.mouseDownLeft) {
             return;
         }
 
-        if (this.options.scanning.requireShift && !e.shiftKey) {
+        if (this.options.scanning.requireShift && !e.shiftKey && !this.mouseDownMiddle) {
             return;
         }
 
         const searcher = () => this.searchAt(this.lastMousePos);
-        if (!this.popup.isVisible() || e.shiftKey || e.which === 2 /* mmb */) {
+        if (this.popup.isVisible()) {
             searcher();
         } else {
             this.popupTimerSet(searcher);
@@ -86,13 +87,17 @@ class Driver {
         this.searchClear();
 
         if (e.which === 1) {
-            this.leftMouseDown = true;
+            this.mouseDownLeft = true;
+        } else if (e.which === 2) {
+            this.mouseDownMiddle = true;
         }
     }
 
     onMouseUp(e) {
         if (e.which === 1) {
-            this.leftMouseDown = false;
+            this.mouseDownLeft = false;
+        } else if (e.which === 2) {
+            this.mouseDownMiddle = false;
         }
     }
 
