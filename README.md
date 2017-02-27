@@ -25,9 +25,10 @@ For development:
 ## Installation ##
 
 Yomichan can downloaded free of charge from the [Chrome Web
-Store](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami). If you find this extension
-helpful and appreciate the time that was spent developing it, I would kindly ask that you leave a positive review. Your
-support and feedback encourages continued development of this tool.
+Store](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami) and the [Firefox
+Add-ons](https://addons.mozilla.org/en-US/firefox/addon/yomichan/) portal. If you find this extension helpful and
+appreciate the time that was spent developing it, I would kindly ask that you leave a positive review. Your support and
+feedback encourages continued development of this tool.
 
 [![Chrome web store](https://foosoft.net/projects/yomichan/img/store.png)](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami)
 
