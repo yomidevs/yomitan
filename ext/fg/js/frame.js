@@ -192,7 +192,7 @@ class Frame {
         } else {
             audio = new Audio(url);
             audio.onloadeddata = () => {
-                if (audio.duration === 5.694694) {
+                if (audio.duration === 5.694694 || audio.duration === 5.720718) {
                     audio = new Audio('mp3/button.mp3');
                 }
 
