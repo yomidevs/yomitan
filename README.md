@@ -62,7 +62,7 @@ When using AnkiConnect, Anki must be kept running in the background for automati
 
 Before flashcards can be automatically created through Yomichan, Anki must be configured as follows:
 
-1.  In Chrome, open the Yomichan options page by right-clicking the ![](https://foosoft.net/projects/yomichan/img/logo.png) icon and selecting *Options*.
+1.  In your web browser, open the Yomichan options page by clicking the ![](https://foosoft.net/projects/yomichan/img/logo.png) icon.
 2.  Activate the *Terms* or the *Kanji* tab, depending on the type of card template you wish to configure.
 3.  Select the Anki deck and model to use when creating new flashcards (see the [Anki Manual](http://ankisrs.net/docs/manual.html) for more details).
 4.  Populate the model fields with markup representing contextual properties for the current vocabulary term or Kanji:
