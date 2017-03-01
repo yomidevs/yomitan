@@ -66,19 +66,41 @@ function addDefinition(definition, mode) {
     return invokeBgApi('addDefinition', {definition, mode});
 }
 
-function createImposter(element) {
-    const imposter = document.createElement('div');
-    const elementRect = element.getBoundingClientRect();
+function getElementOffset(element) {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft;
 
+    const clientTop = document.documentElement.clientTop || document.body.clientTop || 0;
+    const clientLeft = document.documentElement.clientLeft || document.body.clientLeft || 0;
+
+    const rect = element.getBoundingClientRect();
+    const top  = Math.round(rect.top +  scrollTop - clientTop);
+    const left = Math.round(rect.left + scrollLeft - clientLeft);
+
+    return {top, left};
+}
+
+function createImposter(element) {
+    const styleProps = window.getComputedStyle(element);
+    const stylePairs = [];
+    for (const key of styleProps) {
+        stylePairs.push(`${key}: ${styleProps[key]};`);
+    }
+
+    const offset = getElementOffset(element);
+    const imposter = document.createElement('div');
     imposter.className = 'yomichan-imposter';
     imposter.innerText = element.value;
-    imposter.style.cssText = window.getComputedStyle(element).cssText;
+    imposter.style.cssText = stylePairs.join('\n');
     imposter.style.position = 'absolute';
-    imposter.style.top = elementRect.top + 'px';
-    imposter.style.left = elementRect.left + 'px';
+    imposter.style.top = `${offset.top}px`;
+    imposter.style.left = `${offset.left}px`;
     imposter.style.zIndex = 2147483646;
-    document.body.appendChild(imposter);
+    if (element.nodeName === 'TEXTAREA' && styleProps.overflow === 'visible') {
+        imposter.style.overflow = 'auto';
+    }
 
+    document.body.appendChild(imposter);
     imposter.scrollTop = element.scrollTop;
     imposter.scrollLeft = element.scrollLeft;
 }
@@ -86,6 +108,12 @@ function createImposter(element) {
 function destroyImposters() {
     for (const element of document.getElementsByClassName('yomichan-imposter')) {
         element.parentNode.removeChild(element);
+    }
+}
+
+function hideImposters() {
+    for (const element of document.getElementsByClassName('yomichan-imposter')) {
+        element.style.visibility = 'hidden';
     }
 }
 
@@ -101,6 +129,7 @@ function textSourceFromPoint(point, imposter) {
 
     const range = document.caretRangeFromPoint(point.x, point.y);
     if (range !== null) {
+        hideImposters();
         return new TextSourceRange(range);
     }
 

@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Yomichan",
-    "version": "1.0.16",
+    "version": "1.0.17",
 
     "description": "Japanese dictionary with Anki integration",
     "icons": {"16": "img/icon16.png", "48": "img/icon48.png", "128": "img/icon128.png"},
@@ -10,7 +10,7 @@
     "author": "Alex Yatskov",
     "background": {"page": "bg/background.html"},
     "content_scripts": [{
-        "matches": ["*://*/*", "file://*/*"],
+        "matches": ["http://*/*", "https://*/*", "file://*/*"],
         "js": [
             "fg/js/gecko.js",
             "fg/js/source-range.js",

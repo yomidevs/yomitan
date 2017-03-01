@@ -31,10 +31,10 @@ class Popup {
     }
 
     showAt(rect) {
-        this.container.style.left = rect.x + 'px';
-        this.container.style.top = rect.y + 'px';
-        this.container.style.height = rect.height + 'px';
-        this.container.style.width = rect.width + 'px';
+        this.container.style.left = `${rect.x}px`;
+        this.container.style.top = `${rect.y}px`;
+        this.container.style.height = `${rect.height}px`;
+        this.container.style.width = `${rect.width}px`;
         this.container.style.visibility = 'visible';
     }
 
