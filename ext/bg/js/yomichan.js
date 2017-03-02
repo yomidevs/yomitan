@@ -29,7 +29,6 @@ class Yomichan {
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
         chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
-        chrome.browserAction.onClicked.addListener(e => chrome.runtime.openOptionsPage());
 
         this.translator.prepare().then(optionsLoad).then(this.setOptions.bind(this));
     }
@@ -50,12 +49,6 @@ class Yomichan {
 
         return true;
     }
-
-    // setEnabled(enabled) {
-    //     this.enabled = enabled;
-    //     this.tabInvokeAll('setEnabled', this.enabled);
-    //     chrome.browserAction.setBadgeText({text: enabled ? '' : 'off'});
-    // }
 
     setOptions(options) {
         this.options = options;
