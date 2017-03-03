@@ -17,7 +17,11 @@
  */
 
 
-function invokeBgApi(action, params) {
+/*
+ * Background
+ */
+
+function bgInvoke(action, params) {
     return new Promise((resolve, reject) => {
         try {
             chrome.runtime.sendMessage({action, params}, ({result, error}) => {
@@ -34,39 +38,40 @@ function invokeBgApi(action, params) {
     });
 }
 
-function showError(error) {
-    window.alert(`Error: ${error}`);
+function bgOptionsGet() {
+    return bgInvoke('optionsGet', {});
 }
 
-function getOptions() {
-    return invokeBgApi('getOptions', {});
+function bgTermsFind(text) {
+    return bgInvoke('termsFind', {text});
 }
 
-function findTerms(text) {
-    return invokeBgApi('findTerms', {text});
+function bgTermsFindGrouped(text) {
+    return bgInvoke('termsFindGrouped', {text});
 }
 
-function findTermsGrouped(text) {
-    return invokeBgApi('findTermsGrouped', {text});
+function bgKanjiFind(text) {
+    return bgInvoke('kanjiFind', {text});
 }
 
-function findKanji(text) {
-    return invokeBgApi('findKanji', {text});
+function bgTextRender(data, template) {
+    return bgInvoke('textRender', {data, template});
 }
 
-function renderText(data, template) {
-    return invokeBgApi('renderText', {data, template});
+function bgDefinitionsAddable(definitions, modes) {
+    return bgInvoke('definitionsAddable', {definitions, modes}).catch(() => null);
 }
 
-function canAddDefinitions(definitions, modes) {
-    return invokeBgApi('canAddDefinitions', {definitions, modes}).catch(() => null);
+function bgDefinitionAdd(definition, mode) {
+    return bgInvoke('definitionAdd', {definition, mode});
 }
 
-function addDefinition(definition, mode) {
-    return invokeBgApi('addDefinition', {definition, mode});
-}
 
-function getElementOffset(element) {
+/*
+ * Document
+ */
+
+function docOffsetCalc(element) {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
     const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft;
 
@@ -80,14 +85,14 @@ function getElementOffset(element) {
     return {top, left};
 }
 
-function createImposter(element) {
+function docImposterCreate(element) {
     const styleProps = window.getComputedStyle(element);
     const stylePairs = [];
     for (const key of styleProps) {
         stylePairs.push(`${key}: ${styleProps[key]};`);
     }
 
-    const offset = getElementOffset(element);
+    const offset = docOffsetCalc(element);
     const imposter = document.createElement('div');
     imposter.className = 'yomichan-imposter';
     imposter.innerText = element.value;
@@ -105,39 +110,39 @@ function createImposter(element) {
     imposter.scrollLeft = element.scrollLeft;
 }
 
-function destroyImposters() {
+function docImposterDestroy() {
     for (const element of document.getElementsByClassName('yomichan-imposter')) {
         element.parentNode.removeChild(element);
     }
 }
 
-function hideImposters() {
+function docImposterHide() {
     for (const element of document.getElementsByClassName('yomichan-imposter')) {
         element.style.visibility = 'hidden';
     }
 }
 
-function textSourceFromPoint(point, imposter) {
+function docRangeFromPoint(point, imposter) {
     const element = document.elementFromPoint(point.x, point.y);
     if (element !== null) {
         if (element.nodeName === 'IMG' || element.nodeName === 'BUTTON') {
             return new TextSourceElement(element);
         } else if (imposter && (element.nodeName === 'INPUT' || element.nodeName === 'TEXTAREA')) {
-            createImposter(element);
+            docImposterCreate(element);
         }
     }
 
     const range = document.caretRangeFromPoint(point.x, point.y);
     if (range !== null) {
-        hideImposters();
+        docImposterHide();
         return new TextSourceRange(range);
     }
 
-    destroyImposters();
+    docImposterDestroy();
     return null;
 }
 
-function extractSentence(source, extent) {
+function docSentenceExtract(source, extent) {
     const quotesFwd = {'「': '」', '『': '』', "'": "'", '"': '"'};
     const quotesBwd = {'」': '「', '』': '『', "'": "'", '"': '"'};
     const terminators = '…。．.？?！!';
@@ -192,7 +197,12 @@ function extractSentence(source, extent) {
     return content.substring(startPos, endPos).trim();
 }
 
-function buildAudioUrl(definition) {
+
+/*
+ * Audio
+ */
+
+function audioUrlBuild(definition) {
     let kana = definition.reading;
     let kanji = definition.expression;
 
@@ -216,7 +226,7 @@ function buildAudioUrl(definition) {
     return `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?${params.join('&')}`;
 }
 
-function buildAudioFilename(definition) {
+function audioFilenameBuild(definition) {
     if (!definition.reading && !definition.expression) {
         return null;
     }
@@ -230,4 +240,13 @@ function buildAudioFilename(definition) {
     }
 
     return filename += '.mp3';
+}
+
+
+/*
+ * Error
+ */
+
+function errorShow(error) {
+    window.alert(`Error: ${error}`);
 }

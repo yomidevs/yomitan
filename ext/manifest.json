@@ -16,10 +16,10 @@
         "matches": ["http://*/*", "https://*/*", "file://*/*"],
         "js": [
             "fg/js/gecko.js",
+            "fg/js/util.js",
             "fg/js/source-range.js",
             "fg/js/source-element.js",
             "fg/js/popup.js",
-            "fg/js/util.js",
             "fg/js/driver.js"
         ],
         "css": ["fg/css/client.css"]

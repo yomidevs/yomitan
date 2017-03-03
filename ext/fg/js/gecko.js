@@ -20,6 +20,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+
 if (!document.caretRangeFromPoint) {
     document.caretRangeFromPoint = (x, y) => {
         const position = document.caretPositionFromPoint(x,y);

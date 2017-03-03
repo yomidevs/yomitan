@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 class Frame {
     constructor() {
         this.definitions = [];
@@ -48,14 +49,14 @@ class Frame {
         this.showSpinner(false);
         window.scrollTo(0, 0);
 
-        renderText(params, 'terms.html').then(content => {
+        bgTextRender(params, 'terms.html').then(content => {
             $('#content').html(content);
             $('.action-add-note').click(this.onAddNote.bind(this));
 
             $('.kanji-link').click(e => {
                 e.preventDefault();
                 const character = $(e.target).text();
-                findKanji(character).then(definitions => this.api_showKanjiDefs({definitions, options, context}));
+                bgKanjiFind(character).then(definitions => this.api_showKanjiDefs({definitions, options, context}));
             });
 
             $('.action-play-audio').click(e => {
@@ -86,7 +87,7 @@ class Frame {
         this.showSpinner(false);
         window.scrollTo(0, 0);
 
-        renderText(params, 'kanji.html').then(content => {
+        bgTextRender(params, 'kanji.html').then(content => {
             $('#content').html(content);
             $('.action-add-note').click(this.onAddNote.bind(this));
 
@@ -115,19 +116,19 @@ class Frame {
 
         const definition = this.definitions[index];
         if (mode !== 'kanji') {
-            const url = buildAudioUrl(definition);
-            const filename = buildAudioFilename(definition);
+            const url = audioUrlBuild(definition);
+            const filename = audioFilenameBuild(definition);
             if (url && filename) {
                 definition.audio = {url, filename};
             }
         }
 
-        addDefinition(definition, mode).then(success => {
+        bgDefinitionAdd(definition, mode).then(success => {
             if (success) {
                 const button = this.findAddNoteButton(index, mode);
                 button.addClass('disabled');
             } else {
-                showError('note could not be added');
+                errorShow('note could not be added');
             }
         }).catch(error => {
             this.handleError(error);
@@ -137,7 +138,7 @@ class Frame {
     }
 
     updateAddNoteButtons(modes, sequence) {
-        canAddDefinitions(this.definitions, modes).then(states => {
+        bgDefinitionsAddable(this.definitions, modes).then(states => {
             if (states === null) {
                 return;
             }
@@ -180,7 +181,7 @@ class Frame {
             }
         }
 
-        const url = buildAudioUrl(definition);
+        const url = audioUrlBuild(definition);
         if (!url) {
             return;
         }
@@ -206,7 +207,7 @@ class Frame {
         if (window.orphaned) {
             this.api_showOrphaned();
         } else {
-            showError(error);
+            errorShow(error);
         }
     }
 }

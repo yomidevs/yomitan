@@ -28,7 +28,7 @@ class Driver {
         this.pendingLookup = false;
         this.options = null;
 
-        getOptions().then(options => {
+        bgOptionsGet().then(options => {
             this.options = options;
             window.addEventListener('mouseover', this.onMouseOver.bind(this));
             window.addEventListener('mousedown', this.onMouseDown.bind(this));
@@ -115,7 +115,7 @@ class Driver {
             return;
         }
 
-        const textSource = textSourceFromPoint(point, this.options.scanning.imposter);
+        const textSource = docRangeFromPoint(point, this.options.scanning.imposter);
         if (textSource === null || !textSource.containsPoint(point)) {
             return;
         }
@@ -139,14 +139,14 @@ class Driver {
     searchTerms(textSource) {
         textSource.setEndOffset(this.options.scanning.length);
 
-        const findFunc = this.options.general.groupResults ? findTermsGrouped : findTerms;
+        const findFunc = this.options.general.groupResults ? bgTermsFindGrouped : bgTermsFind;
         return findFunc(textSource.text()).then(({definitions, length}) => {
             if (definitions.length === 0) {
                 return false;
             } else {
                 textSource.setEndOffset(length);
 
-                const sentence = extractSentence(textSource, this.options.anki.sentenceExt);
+                const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
                 const url = window.location.href;
 
                 this.popup.showNextTo(textSource.getRect());
@@ -165,11 +165,11 @@ class Driver {
     searchKanji(textSource) {
         textSource.setEndOffset(1);
 
-        return findKanji(textSource.text()).then(definitions => {
+        return bgKanjiFind(textSource.text()).then(definitions => {
             if (definitions.length === 0) {
                 return false;
             } else {
-                const sentence = extractSentence(textSource, this.options.anki.sentenceExt);
+                const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
                 const url = window.location.href;
 
                 this.popup.showNextTo(textSource.getRect());
@@ -186,7 +186,7 @@ class Driver {
     }
 
     searchClear() {
-        destroyImposters();
+        docImposterDestroy();
         this.popup.hide();
 
         if (this.options.scanning.selectText && this.lastTextSource !== null) {
@@ -203,7 +203,7 @@ class Driver {
                 this.popup.showOrphaned();
             }
         } else {
-            showError(error);
+            errorShow(error);
         }
     }
 

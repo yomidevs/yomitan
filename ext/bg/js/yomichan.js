@@ -126,11 +126,11 @@ class Yomichan {
         return note;
     }
 
-    api_getOptions({callback}) {
+    api_optionsGet({callback}) {
         promiseCallback(optionsLoad(), callback);
     }
 
-    api_findKanji({text, callback}) {
+    api_kanjiFind({text, callback}) {
         promiseCallback(
             this.translator.findKanji(text, dictEnabled(this.options)).then(definitions => {
                 return definitions.slice(0, this.options.general.maxResults);
@@ -139,7 +139,7 @@ class Yomichan {
         );
     }
 
-    api_findTerms({text, callback}) {
+    api_termsFind({text, callback}) {
         promiseCallback(
             this.translator.findTerms(text, dictEnabled(this.options), this.options.general.softKatakana).then(({definitions, length}) => {
                 return {length, definitions: definitions.slice(0, this.options.general.maxResults)};
@@ -148,7 +148,7 @@ class Yomichan {
         );
     }
 
-    api_findTermsGrouped({text, callback}) {
+    api_termsFindGrouped({text, callback}) {
         promiseCallback(
             this.translator.findTermsGrouped(text, dictEnabled(this.options), this.options.general.softKatakana).then(({definitions, length}) => {
                 return {length, definitions: definitions.slice(0, this.options.general.maxResults)};
@@ -157,16 +157,16 @@ class Yomichan {
         );
     }
 
-    api_renderText({template, data, callback}) {
+    api_textRender({template, data, callback}) {
         callback({result: Handlebars.templates[template](data)});
     }
 
-    api_addDefinition({definition, mode, callback}) {
+    api_definitionAdd({definition, mode, callback}) {
         const note = this.formatNote(definition, mode);
         promiseCallback(this.anki.addNote(note), callback);
     }
 
-    api_canAddDefinitions({definitions, modes, callback}) {
+    api_definitionsAddable({definitions, modes, callback}) {
         const notes = [];
         for (const definition of definitions) {
             for (const mode of modes) {
