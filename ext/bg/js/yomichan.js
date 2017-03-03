@@ -115,7 +115,7 @@ class Yomichan {
         }
 
         for (const name in fields) {
-            note.fields[name] = formatField(
+            note.fields[name] = dictFieldFormat(
                 fields[name],
                 definition,
                 mode,
@@ -132,7 +132,7 @@ class Yomichan {
 
     api_findKanji({text, callback}) {
         promiseCallback(
-            this.translator.findKanji(text, optionsEnabledDicts(this.options)).then(definitions => {
+            this.translator.findKanji(text, dictEnabled(this.options)).then(definitions => {
                 return definitions.slice(0, this.options.general.maxResults);
             }),
             callback
@@ -141,7 +141,7 @@ class Yomichan {
 
     api_findTerms({text, callback}) {
         promiseCallback(
-            this.translator.findTerms(text, optionsEnabledDicts(this.options), this.options.general.softKatakana).then(({definitions, length}) => {
+            this.translator.findTerms(text, dictEnabled(this.options), this.options.general.softKatakana).then(({definitions, length}) => {
                 return {length, definitions: definitions.slice(0, this.options.general.maxResults)};
             }),
             callback
@@ -150,7 +150,7 @@ class Yomichan {
 
     api_findTermsGrouped({text, callback}) {
         promiseCallback(
-            this.translator.findTermsGrouped(text, optionsEnabledDicts(this.options), this.options.general.softKatakana).then(({definitions, length}) => {
+            this.translator.findTermsGrouped(text, dictEnabled(this.options), this.options.general.softKatakana).then(({definitions, length}) => {
                 return {length, definitions: definitions.slice(0, this.options.general.maxResults)};
             }),
             callback

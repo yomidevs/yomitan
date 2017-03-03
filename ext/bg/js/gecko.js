@@ -20,6 +20,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+
 if (!chrome.storage.sync) {
     // https://bugzilla.mozilla.org/show_bug.cgi?id=1220494
     chrome.storage.sync = chrome.storage.local;

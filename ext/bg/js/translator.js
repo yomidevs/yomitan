@@ -31,7 +31,7 @@ class Translator {
         }
 
         const promises = [
-            loadJsonInt('bg/lang/deinflect.json'),
+            jsonLoadInt('bg/lang/deinflect.json'),
             this.database.prepare()
         ];
 
@@ -56,8 +56,8 @@ class Translator {
             let definitions = [];
             for (const deinflection of deinflections) {
                 for (const definition of deinflection.definitions) {
-                    const tags = definition.tags.map(tag => buildTag(tag, definition.tagMeta));
-                    tags.push(buildDictTag(definition.dictionary));
+                    const tags = definition.tags.map(tag => dictTagBuild(tag, definition.tagMeta));
+                    tags.push(dictTagBuildSource(definition.dictionary));
                     definitions.push({
                         source: deinflection.source,
                         reasons: deinflection.reasons,
@@ -67,13 +67,13 @@ class Translator {
                         expression: definition.expression,
                         reading: definition.reading,
                         glossary: definition.glossary,
-                        tags: sortTags(tags)
+                        tags: dictTagsSort(tags)
                     });
                 }
             }
 
-            definitions = undupeTermDefs(definitions);
-            definitions = sortTermDefs(definitions, dictionaries);
+            definitions = dictTermsUndupe(definitions);
+            definitions = dictTermsSort(definitions, dictionaries);
 
             let length = 0;
             for (const definition of definitions) {
@@ -86,7 +86,7 @@ class Translator {
 
     findTermsGrouped(text, dictionaries, softKatakana) {
         return this.findTerms(text, dictionaries, softKatakana).then(({length, definitions}) => {
-            return {length, definitions: groupTermDefs(definitions, dictionaries)};
+            return {length, definitions: dictTermsGroup(definitions, dictionaries)};
         });
     }
 
@@ -105,9 +105,9 @@ class Translator {
         return Promise.all(promises).then(defSets => {
             const definitions = defSets.reduce((a, b) => a.concat(b), []);
             for (const definition of definitions) {
-                const tags = definition.tags.map(tag => buildTag(tag, definition.tagMeta));
-                tags.push(buildDictTag(definition.dictionary));
-                definition.tags = sortTags(tags);
+                const tags = definition.tags.map(tag => dictTagBuild(tag, definition.tagMeta));
+                tags.push(dictTagBuildSource(definition.dictionary));
+                definition.tags = dictTagsSort(tags);
             }
 
             return definitions;
@@ -140,8 +140,8 @@ class Translator {
 
     processKanji(definitions) {
         for (const definition of definitions) {
-            const tags = definition.tags.map(tag => buildTag(tag, definition.tagMeta));
-            definition.tags = sortTags(tags);
+            const tags = definition.tags.map(tag => dictTagBuild(tag, definition.tagMeta));
+            definition.tags = dictTagsSort(tags);
         }
 
         return definitions;

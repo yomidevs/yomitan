@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 class AnkiNull {
     addNote(note) {
         return Promise.reject('unsupported action');

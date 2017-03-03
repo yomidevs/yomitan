@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 $(document).ready(() => {
     $('#open-search').click(() => window.open(chrome.extension.getURL('bg/search.html')));
     $('#open-options').click(() => chrome.runtime.openOptionsPage());
@@ -27,7 +28,7 @@ $(document).ready(() => {
         toggle.bootstrapToggle();
         toggle.change(() => {
             options.general.enable = toggle.prop('checked');
-            optionsSave(options).then(() => getYomichan().setOptions(options));
+            optionsSave(options).then(() => instYomi().setOptions(options));
         });
     });
 });

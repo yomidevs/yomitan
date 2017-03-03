@@ -76,8 +76,8 @@ class Database {
                 results.push({
                     expression: row.expression,
                     reading: row.reading,
-                    tags: splitField(row.tags),
-                    rules: splitField(row.rules),
+                    tags: dictFieldSplit(row.tags),
+                    rules: dictFieldSplit(row.rules),
                     glossary: row.glossary,
                     score: row.score,
                     dictionary: row.dictionary,
@@ -105,9 +105,9 @@ class Database {
             if (dictionaries.includes(row.dictionary)) {
                 results.push({
                     character: row.character,
-                    onyomi: splitField(row.onyomi),
-                    kunyomi: splitField(row.kunyomi),
-                    tags: splitField(row.tags),
+                    onyomi: dictFieldSplit(row.onyomi),
+                    kunyomi: dictFieldSplit(row.kunyomi),
+                    tags: dictFieldSplit(row.tags),
                     glossary: row.meanings,
                     dictionary: row.dictionary
                 });
@@ -172,7 +172,7 @@ class Database {
                     const rows = [];
                     for (const tag in tagMeta || {}) {
                         const meta = tagMeta[tag];
-                        const row = sanitizeTag({
+                        const row = dictTagSanitize({
                             name: tag,
                             category: meta.category,
                             notes: meta.notes,
@@ -229,6 +229,6 @@ class Database {
             });
         };
 
-        return importJsonDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded).then(() => summary);
+        return jsonLoadDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded).then(() => summary);
     }
 }

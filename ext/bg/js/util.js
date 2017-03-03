@@ -17,27 +17,9 @@
  */
 
 
-function helperKanjiLinks(options) {
-    const isKanji = c => {
-        const code = c.charCodeAt(0);
-        return code >= 0x4e00 && code < 0x9fb0 || code >= 0x3400 && code < 0x4dc0;
-    };
-
-    let result = '';
-    for (const c of options.fn(this)) {
-        if (isKanji(c)) {
-            result += `<a href="#" class="kanji-link">${c}</a>`;
-        } else {
-            result += c;
-        }
-    }
-
-    return result;
-}
-
-function helperMultiLine(options) {
-    return options.fn(this).split('\n').join('<br>');
-}
+/*
+ * Promise
+ */
 
 function promiseCallback(promise, callback) {
     return promise.then(result => {
@@ -50,19 +32,175 @@ function promiseCallback(promise, callback) {
     });
 }
 
-function getYomichan() {
+
+/*
+ * Instance
+ */
+
+function instYomi() {
     return chrome.extension.getBackgroundPage().yomichan;
 }
 
-function getDatabase() {
-    return getYomichan().translator.database;
+function instDb() {
+    return instYomi().translator.database;
 }
 
-function getAnki() {
-    return getYomichan().anki;
+function instAnki() {
+    return instYomi().anki;
 }
 
-function sortTermDefs(definitions, dictionaries=null) {
+
+
+/*
+ * Options
+ */
+
+function optionsSetDefaults(options) {
+    const defaults = {
+        general: {
+            enable: true,
+            audioPlayback: true,
+            groupResults: true,
+            softKatakana: true,
+            maxResults: 32,
+            showAdvanced: false
+        },
+
+        scanning: {
+            requireShift: true,
+            selectText: true,
+            imposter: true,
+            delay: 15,
+            length: 10
+        },
+
+        dictionaries: {},
+
+        anki: {
+            enable: false,
+            server: 'http://127.0.0.1:8765',
+            tags: ['yomichan'],
+            htmlCards: true,
+            sentenceExt: 200,
+            terms: {deck: '', model: '', fields: {}},
+            kanji: {deck: '', model: '', fields: {}}
+        }
+    };
+
+    const combine = (target, source) => {
+        for (const key in source) {
+            if (!target.hasOwnProperty(key)) {
+                target[key] = source[key];
+            }
+        }
+    };
+
+    combine(options, defaults);
+    combine(options.general, defaults.general);
+    combine(options.scanning, defaults.scanning);
+    combine(options.anki, defaults.anki);
+    combine(options.anki.terms, defaults.anki.terms);
+    combine(options.anki.kanji, defaults.anki.kanji);
+
+    return options;
+}
+
+function optionsVersion(options) {
+    const fixups = [
+        () => {
+            const copy = (targetDict, targetKey, sourceDict, sourceKey) => {
+                targetDict[targetKey] = sourceDict.hasOwnProperty(sourceKey) ? sourceDict[sourceKey] : targetDict[targetKey];
+            };
+
+            copy(options.general, 'autoStart', options, 'activateOnStartup');
+            copy(options.general, 'audioPlayback', options, 'enableAudioPlayback');
+            copy(options.general, 'softKatakana', options, 'enableSoftKatakanaSearch');
+            copy(options.general, 'groupResults', options, 'groupTermResults');
+            copy(options.general, 'showAdvanced', options, 'showAdvancedOptions');
+
+            copy(options.scanning, 'requireShift', options, 'holdShiftToScan');
+            copy(options.scanning, 'selectText', options, 'selectMatchedText');
+            copy(options.scanning, 'delay', options, 'scanDelay');
+            copy(options.scanning, 'length', options, 'scanLength');
+
+            options.anki.enable = options.ankiMethod === 'ankiconnect';
+
+            copy(options.anki, 'tags', options, 'ankiCardTags');
+            copy(options.anki, 'sentenceExt', options, 'sentenceExtent');
+            copy(options.anki.terms, 'deck', options, 'ankiTermDeck');
+            copy(options.anki.terms, 'model', options, 'ankiTermModel');
+            copy(options.anki.terms, 'fields', options, 'ankiTermFields');
+            copy(options.anki.kanji, 'deck', options, 'ankiKanjiDeck');
+            copy(options.anki.kanji, 'model', options, 'ankiKanjiModel');
+            copy(options.anki.kanji, 'fields', options, 'ankiKanjiFields');
+
+            for (const title in options.dictionaries) {
+                const dictionary = options.dictionaries[title];
+                dictionary.enabled = dictionary.enableTerms || dictionary.enableKanji;
+                dictionary.priority = 0;
+            }
+        },
+        () => {
+            const fixupFields = fields => {
+                const fixups = {
+                    '{expression-furigana}': '{furigana}',
+                    '{glossary-list}': '{glossary}'
+                };
+
+                for (const name in fields) {
+                    for (const fixup in fixups) {
+                        fields[name] = fields[name].replace(fixup, fixups[fixup]);
+                    }
+                }
+            };
+
+            fixupFields(options.anki.terms.fields);
+            fixupFields(options.anki.kanji.fields);
+        }
+    ];
+
+    optionsSetDefaults(options);
+    if (!options.hasOwnProperty('version')) {
+        options.version = fixups.length;
+    }
+
+    while (options.version < fixups.length) {
+        fixups[options.version++]();
+    }
+
+    return options;
+}
+
+function optionsLoad() {
+    return new Promise((resolve, reject) => {
+        chrome.storage.sync.get(null, options => resolve(optionsVersion(options)));
+    });
+}
+
+function optionsSave(options) {
+    return new Promise((resolve, reject) => {
+        chrome.storage.sync.set(options, resolve);
+    });
+}
+
+
+/*
+ * Dictionary
+ */
+
+function dictEnabled(options) {
+    const dictionaries = {};
+    for (const title in options.dictionaries) {
+        const dictionary = options.dictionaries[title];
+        if (dictionary.enabled) {
+            dictionaries[title] = dictionary;
+        }
+    }
+
+    return dictionaries;
+}
+
+function dictTermsSort(definitions, dictionaries=null) {
     return definitions.sort((v1, v2) => {
         const sl1 = v1.source.length;
         const sl2 = v2.source.length;
@@ -102,7 +240,7 @@ function sortTermDefs(definitions, dictionaries=null) {
     });
 }
 
-function undupeTermDefs(definitions) {
+function dictTermsUndupe(definitions) {
     const definitionGroups = {};
     for (const definition of definitions) {
         const definitionExisting = definitionGroups[definition.id];
@@ -119,7 +257,7 @@ function undupeTermDefs(definitions) {
     return definitionsUnique;
 }
 
-function groupTermDefs(definitions, dictionaries) {
+function dictTermsGroup(definitions, dictionaries) {
     const groups = {};
     for (const definition of definitions) {
         const key = [definition.source, definition.expression].concat(definition.reasons);
@@ -139,7 +277,7 @@ function groupTermDefs(definitions, dictionaries) {
     for (const key in groups) {
         const groupDefs = groups[key];
         const firstDef = groupDefs[0];
-        sortTermDefs(groupDefs, dictionaries);
+        dictTermsSort(groupDefs, dictionaries);
         results.push({
             definitions: groupDefs,
             expression: firstDef.expression,
@@ -150,24 +288,24 @@ function groupTermDefs(definitions, dictionaries) {
         });
     }
 
-    return sortTermDefs(results);
+    return dictTermsSort(results);
 }
 
-function buildDictTag(name) {
-    return sanitizeTag({name, category: 'dictionary', order: 100});
+function dictTagBuildSource(name) {
+    return dictTagSanitize({name, category: 'dictionary', order: 100});
 }
 
-function buildTag(name, meta) {
+function dictTagBuild(name, meta) {
     const tag = {name};
     const symbol = name.split(':')[0];
     for (const prop in meta[symbol] || {}) {
         tag[prop] = meta[symbol][prop];
     }
 
-    return sanitizeTag(tag);
+    return dictTagSanitize(tag);
 }
 
-function sanitizeTag(tag) {
+function dictTagSanitize(tag) {
     tag.name = tag.name || 'untitled';
     tag.category = tag.category || 'default';
     tag.notes = tag.notes || '';
@@ -175,11 +313,7 @@ function sanitizeTag(tag) {
     return tag;
 }
 
-function splitField(field) {
-    return field.length === 0 ? [] : field.split(' ');
-}
-
-function sortTags(tags) {
+function dictTagsSort(tags) {
     return tags.sort((v1, v2) => {
         const order1 = v1.order;
         const order2 = v2.order;
@@ -201,7 +335,11 @@ function sortTags(tags) {
     });
 }
 
-function formatField(field, definition, mode, options) {
+function dictFieldSplit(field) {
+    return field.length === 0 ? [] : field.split(' ');
+}
+
+function dictFieldFormat(field, definition, mode, options) {
     const markers = [
         'audio',
         'character',
@@ -237,7 +375,12 @@ function formatField(field, definition, mode, options) {
     return field;
 }
 
-function loadJson(url) {
+
+/*
+ * Json
+ */
+
+function jsonLoad(url) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.overrideMimeType('application/json');
@@ -255,13 +398,13 @@ function loadJson(url) {
     });
 }
 
-function loadJsonInt(url) {
-    return loadJson(chrome.extension.getURL(url));
+function jsonLoadInt(url) {
+    return jsonLoad(chrome.extension.getURL(url));
 }
 
-function importJsonDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
+function jsonLoadDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
     const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
-    return loadJson(indexUrl).then(index => {
+    return jsonLoad(indexUrl).then(index => {
         if (!index.title || !index.version || !index.revision) {
             return Promise.reject('unrecognized dictionary format');
         }
@@ -285,7 +428,7 @@ function importJsonDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
 
         for (let i = 1; i <= index.termBanks; ++i) {
             const bankUrl = `${indexDir}/term_bank_${i}.json`;
-            loaders.push(() => loadJson(bankUrl).then(entries => termsLoaded(
+            loaders.push(() => jsonLoad(bankUrl).then(entries => termsLoaded(
                 index.title,
                 entries,
                 banksTotal,
@@ -295,7 +438,7 @@ function importJsonDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
 
         for (let i = 1; i <= index.kanjiBanks; ++i) {
             const bankUrl = `${indexDir}/kanji_bank_${i}.json`;
-            loaders.push(() => loadJson(bankUrl).then(entries => kanjiLoaded(
+            loaders.push(() => jsonLoad(bankUrl).then(entries => kanjiLoaded(
                 index.title,
                 entries,
                 banksTotal,
@@ -310,4 +453,31 @@ function importJsonDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
 
         return chain;
     });
+}
+
+
+/*
+ * Helpers
+ */
+
+function helperKanjiLinks(options) {
+    const isKanji = c => {
+        const code = c.charCodeAt(0);
+        return code >= 0x4e00 && code < 0x9fb0 || code >= 0x3400 && code < 0x4dc0;
+    };
+
+    let result = '';
+    for (const c of options.fn(this)) {
+        if (isKanji(c)) {
+            result += `<a href="#" class="kanji-link">${c}</a>`;
+        } else {
+            result += c;
+        }
+    }
+
+    return result;
+}
+
+function helperMultiLine(options) {
+    return options.fn(this).split('\n').join('<br>');
 }
