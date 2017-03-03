@@ -17,7 +17,12 @@
  */
 
 
-function kanjiLinks(options) {
+function helperKanjiLinks(options) {
+    const isKanji = c => {
+        const code = c.charCodeAt(0);
+        return code >= 0x4e00 && code < 0x9fb0 || code >= 0x3400 && code < 0x4dc0;
+    };
+
     let result = '';
     for (const c of options.fn(this)) {
         if (isKanji(c)) {
@@ -30,25 +35,8 @@ function kanjiLinks(options) {
     return result;
 }
 
-function multiLine(options) {
+function helperMultiLine(options) {
     return options.fn(this).split('\n').join('<br>');
-}
-
-function isKanji(c) {
-    const code = c.charCodeAt(0);
-    return code >= 0x4e00 && code < 0x9fb0 || code >= 0x3400 && code < 0x4dc0;
-}
-
-function enabledDicts(options) {
-    const dictionaries = {};
-    for (const title in options.dictionaries) {
-        const dictionary = options.dictionaries[title];
-        if (dictionary.enabled) {
-            dictionaries[title] = dictionary;
-        }
-    }
-
-    return dictionaries;
 }
 
 function promiseCallback(promise, callback) {
@@ -60,6 +48,18 @@ function promiseCallback(promise, callback) {
         /* eslint-enable */
         callback({error});
     });
+}
+
+function getYomichan() {
+    return chrome.extension.getBackgroundPage().yomichan;
+}
+
+function getDatabase() {
+    return getYomichan().translator.database;
+}
+
+function getAnki() {
+    return getYomichan().anki;
 }
 
 function sortTermDefs(definitions, dictionaries=null) {

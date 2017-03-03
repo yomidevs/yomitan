@@ -145,3 +145,15 @@ function optionsSave(options) {
         chrome.storage.sync.set(options, resolve);
     });
 }
+
+function optionsEnabledDicts(options) {
+    const dictionaries = {};
+    for (const title in options.dictionaries) {
+        const dictionary = options.dictionaries[title];
+        if (dictionary.enabled) {
+            dictionaries[title] = dictionary;
+        }
+    }
+
+    return dictionaries;
+}

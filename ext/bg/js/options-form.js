@@ -20,15 +20,10 @@
 //  General
 //
 
-function yomichan() {
-    return chrome.extension.getBackgroundPage().yomichan;
-}
-
 function getFormData() {
     return optionsLoad().then(optionsOld => {
         const optionsNew = $.extend(true, {}, optionsOld);
 
-        optionsNew.general.enable = $('#enable-search').prop('checked');
         optionsNew.general.audioPlayback = $('#audio-playback-buttons').prop('checked');
         optionsNew.general.groupResults = $('#group-terms-results').prop('checked');
         optionsNew.general.softKatakana = $('#soft-katakana-search').prop('checked');
@@ -87,7 +82,6 @@ $(document).ready(() => {
     Handlebars.partials = Handlebars.templates;
 
     optionsLoad().then(options => {
-        $('#enable-search').prop('checked', options.general.enable);
         $('#audio-playback-buttons').prop('checked', options.general.audioPlayback);
         $('#group-terms-results').prop('checked', options.general.groupResults);
         $('#soft-katakana-search').prop('checked', options.general.softKatakana);
@@ -123,10 +117,6 @@ $(document).ready(() => {
 //  Dictionary
 //
 
-function database() {
-    return yomichan().translator.database;
-}
-
 function showDictionaryError(error) {
     const dialog = $('#dict-error');
     if (error) {
@@ -153,7 +143,7 @@ function populateDictionaries(options) {
     const dictWarning = $('#dict-warning').hide();
 
     let dictCount = 0;
-    return database().getDictionaries().then(rows => {
+    return getDatabase().getDictionaries().then(rows => {
         rows.forEach(row => {
             const dictOptions = options.dictionaries[row.title] || {enableTerms: false, enableKanji: false, priority: 0};
             const html = Handlebars.templates['dictionary.html']({
@@ -188,7 +178,7 @@ function onDictionaryPurge(e) {
     const dictControls = $('#dict-importer, #dict-groups').hide();
     const dictProgress = $('#dict-purge-progress').show();
 
-    return database().purge().catch(showDictionaryError).then(() => {
+    return getDatabase().purge().catch(showDictionaryError).then(() => {
         showDictionarySpinner(false);
         dictControls.show();
         dictProgress.hide();
@@ -197,7 +187,7 @@ function onDictionaryPurge(e) {
         options.dictionaries = {};
         return optionsSave(options).then(() => {
             populateDictionaries(options);
-            yomichan().setOptions(options);
+            getYomichan().setOptions(options);
         });
     });
 }
@@ -214,9 +204,9 @@ function onDictionaryImport() {
     setProgress(0.0);
 
     optionsLoad().then(options => {
-        database().importDictionary(dictUrl.val(), (total, current) => setProgress(current / total * 100.0)).then(summary => {
+        getDatabase().importDictionary(dictUrl.val(), (total, current) => setProgress(current / total * 100.0)).then(summary => {
             options.dictionaries[summary.title] = {enabled: true, priority: 0};
-            return optionsSave(options).then(() => yomichan().setOptions(options));
+            return optionsSave(options).then(() => getYomichan().setOptions(options));
         }).then(() => populateDictionaries(options)).catch(showDictionaryError).then(() => {
             showDictionarySpinner(false);
             dictProgress.hide();
@@ -248,10 +238,6 @@ function onDictionaryUpdateUrl() {
 //
 //  Anki
 //
-
-function anki() {
-    return yomichan().anki;
-}
 
 function showAnkiSpinner(show) {
     const spinner = $('#anki-spinner');
@@ -286,7 +272,7 @@ function populateAnkiDeckAndModel(options) {
     showAnkiSpinner(true);
 
     const ankiFormat = $('#anki-format').hide();
-    return Promise.all([anki().getDeckNames(), anki().getModelNames()]).then(([deckNames, modelNames]) => {
+    return Promise.all([getAnki().getDeckNames(), getAnki().getModelNames()]).then(([deckNames, modelNames]) => {
         const ankiDeck = $('.anki-deck');
         ankiDeck.find('option').remove();
         deckNames.sort().forEach(name => ankiDeck.append($('<option/>', {value: name, text: name})));
@@ -320,7 +306,7 @@ function populateAnkiFields(element, options) {
         'kanji': ['character', 'dictionary', 'glossary', 'kunyomi', 'onyomi', 'sentence', 'tags', 'url']
     }[tabId] || {};
 
-    return anki().getModelFieldNames(modelName).then(names => {
+    return getAnki().getModelFieldNames(modelName).then(names => {
         names.forEach(name => {
             const value = options.anki[tabId].fields[name] || '';
             const html = Handlebars.templates['model.html']({name, markers, value});
@@ -351,7 +337,7 @@ function onAnkiModelChanged(e) {
 
         optionsNew.anki[tabId].fields = {};
         populateAnkiFields(element, optionsNew).then(() => {
-            optionsSave(optionsNew).then(() => yomichan().setOptions(optionsNew));
+            optionsSave(optionsNew).then(() => getYomichan().setOptions(optionsNew));
         }).catch(showAnkiError).then(() => showAnkiSpinner(false));
     });
 }
@@ -363,7 +349,7 @@ function onOptionsChanged(e) {
 
     getFormData().then(({optionsNew, optionsOld}) => {
         return optionsSave(optionsNew).then(() => {
-            yomichan().setOptions(optionsNew);
+            getYomichan().setOptions(optionsNew);
             updateVisibility(optionsNew);
 
             const ankiUpdated =

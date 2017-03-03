@@ -20,8 +20,8 @@
 class Yomichan {
     constructor() {
         Handlebars.partials = Handlebars.templates;
-        Handlebars.registerHelper('kanjiLinks', kanjiLinks);
-        Handlebars.registerHelper('multiLine', multiLine);
+        Handlebars.registerHelper('kanjiLinks', helperKanjiLinks);
+        Handlebars.registerHelper('multiLine', helperMultiLine);
 
         this.translator = new Translator();
         this.anki = new AnkiNull();
@@ -132,7 +132,7 @@ class Yomichan {
 
     api_findKanji({text, callback}) {
         promiseCallback(
-            this.translator.findKanji(text, enabledDicts(this.options)).then(definitions => {
+            this.translator.findKanji(text, optionsEnabledDicts(this.options)).then(definitions => {
                 return definitions.slice(0, this.options.general.maxResults);
             }),
             callback
@@ -141,7 +141,7 @@ class Yomichan {
 
     api_findTerms({text, callback}) {
         promiseCallback(
-            this.translator.findTerms(text, enabledDicts(this.options), this.options.general.softKatakana).then(({definitions, length}) => {
+            this.translator.findTerms(text, optionsEnabledDicts(this.options), this.options.general.softKatakana).then(({definitions, length}) => {
                 return {length, definitions: definitions.slice(0, this.options.general.maxResults)};
             }),
             callback
@@ -150,7 +150,7 @@ class Yomichan {
 
     api_findTermsGrouped({text, callback}) {
         promiseCallback(
-            this.translator.findTermsGrouped(text, enabledDicts(this.options), this.options.general.softKatakana).then(({definitions, length}) => {
+            this.translator.findTermsGrouped(text, optionsEnabledDicts(this.options), this.options.general.softKatakana).then(({definitions, length}) => {
                 return {length, definitions: definitions.slice(0, this.options.general.maxResults)};
             }),
             callback

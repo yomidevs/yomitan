@@ -18,18 +18,20 @@
     </head>
     <body>
         <p>
-            <input type="checkbox" data-toggle="toggle">
+            <input type="checkbox" id="enable-search">
         </p>
         <p>
             <div class="btn-group" style="white-space: nowrap">
-                <button type="button" id="open-search" class="btn btn-default btn-xs glyphicon glyphicon-search"></button>
-                <button type="button" id="open-options" class="btn btn-default btn-xs glyphicon glyphicon-cog"></button>
-                <button type="button" id="open-help" class="btn btn-default btn-xs glyphicon glyphicon-question-sign"></button>
+                <button type="button" id="open-search" title="Search" class="btn btn-default btn-xs glyphicon glyphicon-search"></button>
+                <button type="button" id="open-options" title="Options" class="btn btn-default btn-xs glyphicon glyphicon-wrench"></button>
+                <button type="button" id="open-help" title="Help" class="btn btn-default btn-xs glyphicon glyphicon-question-sign"></button>
             </div>
         </p>
         <script src="../lib/jquery-3.1.1.min.js"></script>
         <script src="../lib/bootstrap-toggle/bootstrap-toggle.min.js"></script>
         <script src="js/gecko.js"></script>
+        <script src="js/util.js"></script>
+        <script src="js/options.js"></script>
         <script src="js/popup.js"></script>
     </body>
 </html>
