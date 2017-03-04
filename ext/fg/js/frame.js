@@ -75,7 +75,7 @@ class Frame {
         const sequence = ++this.sequence;
         const params = {
             definitions,
-            addable: options.ankiMethod !== 'disabled'
+            addable: options.anki.enabled
         };
 
         definitions.forEach(definition => {
@@ -165,7 +165,7 @@ class Frame {
     }
 
     showSpinner(show) {
-        const spinner = $('.spinner');
+        const spinner = $('#spinner');
         if (show) {
             spinner.show();
         } else {

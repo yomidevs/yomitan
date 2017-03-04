@@ -21,11 +21,11 @@
 <p>
     <div class="actions">
         {{#if addable}}
-            <a href="#" title="Add term as expression" class="action-add-note pending disabled" data-mode="term_kanji" data-index="{{@index}}"><img src="img/add_term_kanji.png"></a>
-            <a href="#" title="Add term as reading" class="action-add-note pending disabled" data-mode="term_kana" data-index="{{@index}}"><img src="img/add_term_kana.png"></a>
+            <a href="#" title="Add term as expression" class="action-add-note pending disabled" data-mode="term_kanji" data-index="{{@index}}"><img src="/fg/img/add_term_kanji.png"></a>
+            <a href="#" title="Add term as reading" class="action-add-note pending disabled" data-mode="term_kana" data-index="{{@index}}"><img src="/fg/img/add_term_kana.png"></a>
         {{/if}}
         {{#if playback}}
-            <a href="#" title="Play audio" class="action-play-audio" data-index="{{@index}}"><img src="img/play_audio.png"></a>
+            <a href="#" title="Play audio" class="action-play-audio" data-index="{{@index}}"><img src="/fg/img/play_audio.png"></a>
         {{/if}}
     </div>
 
@@ -67,5 +67,5 @@
         {{> term grouped=../grouped addable=../addable playback=../playback}}
     {{/each}}
 {{else}}
-    <p>No results found</p>
+    <p>No results found.</p>
 {{/if}}

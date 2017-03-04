@@ -41,7 +41,7 @@ hr {
     margin-bottom: 0.8em;
 }
 
-.spinner {
+#spinner {
     bottom: 5px;
     display: none;
     position: fixed;

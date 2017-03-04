@@ -2,7 +2,7 @@
 <p>
     <div class="actions">
         {{#if addable}}
-            <a href="#" title="Add Kanji" class="action-add-note pending disabled" data-mode="kanji" data-index="{{@index}}"><img src="img/add_kanji.png"></a>
+            <a href="#" title="Add Kanji" class="action-add-note pending disabled" data-mode="kanji" data-index="{{@index}}"><img src="/fg/img/add_kanji.png"></a>
         {{/if}}
     </div>
 
@@ -55,5 +55,5 @@
         {{> kanji addable=../addable root=../root}}
     {{/each}}
 {{else}}
-    <p>No results found</p>
+    <p>No results found.</p>
 {{/if}}
