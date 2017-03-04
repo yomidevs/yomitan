@@ -3,7 +3,7 @@
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the entrys of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
@@ -16,40 +16,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* common styles */
+
+/*
+ * Fonts
+ */
 
 @font-face {
     font-family: kanji-stroke-orders;
-    src:         url('../ttf/kanji-stroke-orders.ttf');
+    src: url('../ttf/kanji-stroke-orders.ttf');
 }
+
 @font-face {
     font-family: vl-gothic-regular;
-    src:         url('../ttf/vl-gothic-regular.ttf');
+    src: url('../ttf/vl-gothic-regular.ttf');
 }
 
-body {
-    background-color: #fff;
-    color:            #333;
-    font-family:      helvetica neue, helvetica, arial, sans-serif;
-    font-size:        14px;
-    line-height:      1.42857143;
-    overflow-y:       auto;
-    padding:          5px;
+
+/*
+ * General
+ */
+
+hr {
+    margin-top: 0.8em;
+    margin-bottom: 0.8em;
 }
 
-.tag {
-    border-radius:  0.25em;
-    color:          #fff;
-    cursor:         default;
-    display:        inline;
-    font-size:      75%;
-    font-weight:    700;
-    line-height:    1;
-    padding:        0.2em 0.6em 0.3em;
-    text-align:     center;
-    vertical-align: baseline;
-    white-space:    nowrap;
+.spinner {
+    bottom: 5px;
+    display: none;
+    position: fixed;
+    right: 5px;
 }
+
+#orphan {
+    display: none;
+}
+
+
+/*
+ * Entries
+ */
 
 .tag-default {
     background-color: #8a8a91;
@@ -79,126 +85,64 @@ body {
     background-color: #aa66cc;
 }
 
-.action-bar {
+.actions .disabled {
+    pointer-events: none;
+    cursor: default;
+}
+
+.actions .disabled img {
+    -webkit-filter: grayscale(100%);
+    opacity: 0.25;
+}
+
+.actions .pending {
+    visibility: hidden;
+}
+
+.actions {
+    display: inline-block;
     float: right;
 }
 
-.action-bar:after {
-    clear:   both;
+.actions:after {
+    clear: both;
     content: '';
     display: block;
 }
 
-.action-bar .disabled {
-    pointer-events: none;
-    cursor:         default;
-}
-
-.action-bar .disabled img {
-    -webkit-filter: grayscale(100%);
-    opacity:        0.25;
-}
-
-.action-bar .pending {
-    visibility: hidden;
-}
-
-.spinner {
-    bottom:   5px;
-    display:  none;
-    position: fixed;
-    right:    5px;
-}
-
-hr {
-  background-color: #fff;
-  border:           none;
-  border-top:       1px dotted #ccc;
-  margin-top:       0.8em;
-  margin-bottom:    0.8em;
-  height:           1px;
-}
-
-#orphan {
-    display: none;
-}
-
-/* term styles */
-
-.term-expression {
-    display:     inline-block;
+.expression {
+    display: inline-block;
     font-family: vl-gothic-regular;
-    font-size:   24px;
+    font-size: 24px;
 }
 
-.term-expression a {
-    border-bottom:   1px #777 dashed;
-    color:           #333;
+.expression a {
+    border-bottom: 1px #777 dashed;
+    color: #333;
     text-decoration: none;
 }
 
-.term-reasons {
-    color:   #777;
+.reasons {
+    color: #777;
     display: inline-block;
 }
 
-.term-glossary ol, .term-glossary ul {
+.glossary ol, .glossary ul {
     padding-left: 1.4em;
 }
 
-.term-glossary li {
+.glossary li {
     color: #777;
 }
 
-.term-glossary-group {
-    margin-top:    0.4em;
-    margin-bottom: 0.4em;
+.glossary-item {
+    color: #000;
 }
 
-.term-glossary-item {
-    color:       #000;
-    font-family: vl-gothic-regular;
-}
-
-/* kanji styles */
-
-.kanji-glyph {
-    font-family:    kanji-stroke-orders;
-    font-size:      120px;
-    line-height:    120px;
-    padding:        0.01em;
+.glyph {
+    font-family: kanji-stroke-orders;
+    font-size: 120px;
+    line-height: 120px;
+    padding: 0.01em;
     vertical-align: top;
-}
-
-.kanji-reading table {
-    padding: 0.3em, 0.3em;
-}
-
-.kanji-reading th {
-    color:          #777;
-    font-weight:    bold;
-    text-align:     right;
-    vertical-align: top;
-}
-
-.kanji-reading td {
-    font-family: vl-gothic-regular;
-}
-
-.kanji-glossary ol {
-    padding-left: 1.4em;
-}
-
-.kanji-glossary li {
-    color: #777;
-}
-
-.kanji-glossary-group {
-    padding-bottom: 0.7em;
-    padding-top:    0.7em;
-}
-
-.kanji-glossary-item {
-    color:       #000;
-    font-family: vl-gothic-regular;
 }

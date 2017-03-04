@@ -1,14 +1,14 @@
 {{#*inline "kanji"}}
-<div class="kanji-definition">
-    <div class="action-bar">
+<p>
+    <div class="actions">
         {{#if addable}}
             <a href="#" title="Add Kanji" class="action-add-note pending disabled" data-mode="kanji" data-index="{{@index}}"><img src="img/add_kanji.png"></a>
         {{/if}}
     </div>
 
-    <div class="kanji-glyph">{{character}}</div>
+    <div class="glyph">{{character}}</div>
 
-    <div class="kanji-reading">
+    <div class="reading">
         <table>
             <tr>
                 <th>Kunyomi:</th>
@@ -29,24 +29,24 @@
         </table>
     </div>
 
-    <div class="kanji-tags">
+    <div>
         {{#each tags}}
-            <span class="tag tag-{{category}}" title="{{notes}}">{{name}}</span>
+            <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
         {{/each}}
     </div>
 
-    <div class="kanji-glossary">
+    <div class="glossary">
         {{#if glossary.[1]}}
-            <ol "kanji-glossary-group">
+            <ol>
                 {{#each glossary}}
-                    <li><span class="kanji-glossary-item">{{#multiLine}}{{.}}{{/multiLine}}</span></li>
+                    <li><span class="glossary-item">{{#multiLine}}{{.}}{{/multiLine}}</span></li>
                 {{/each}}
             </ol>
         {{else}}
-            <div class="kanji-glossary-group kanji-glossary-item">{{#multiLine}}{{glossary.[0]}}{{/multiLine}}</div>
+            <div class="glossary-item">{{#multiLine}}{{glossary.[0]}}{{/multiLine}}</div>
         {{/if}}
     </div>
-</div>
+</p>
 {{/inline}}
 
 {{#if definitions}}

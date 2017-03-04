@@ -16,15 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 iframe#yomichan-popup {
-    all:              initial;
+    all: initial;
     background-color: #fff;
-    border:           1px solid #999;
-    box-shadow:       0 0 10px rgba(0, 0, 0, .5);
-    height:           250px;
-    position:         fixed;
-    resize:           both;
-    visibility:       hidden;
-    width:            400px;
-    z-index:          2147483647;
+    border: 1px solid #999;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+    height: 250px;
+    position: fixed;
+    resize: both;
+    visibility: hidden;
+    width: 400px;
+    z-index: 2147483647;
 }

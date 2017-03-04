@@ -1,25 +1,25 @@
 {{#*inline "definition"}}
     {{#if tags}}
-        <div class="term-tags">
+        <div>
             {{#each tags}}
-                <span class="tag tag-{{category}}" title="{{notes}}">{{name}}</span>
+                <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
             {{/each}}
         </div>
     {{/if}}
     {{#if glossary.[1]}}
-        <ul class="term-glossary-group">
+        <ul>
             {{#each glossary}}
-                <li><span class="term-glossary-item">{{#multiLine}}{{.}}{{/multiLine}}</span></li>
+                <li><span class="glossary-item">{{#multiLine}}{{.}}{{/multiLine}}</span></li>
             {{/each}}
         </ul>
     {{else}}
-        <div class="term-glossary-group term-glossary-item">{{#multiLine}}{{glossary.[0]}}{{/multiLine}}</div>
+        <div class="glossary-item">{{#multiLine}}{{glossary.[0]}}{{/multiLine}}</div>
     {{/if}}
 {{/inline}}
 
 {{#*inline "term"}}
-<div class="term-definition">
-    <div class="action-bar">
+<p>
+    <div class="actions">
         {{#if addable}}
             <a href="#" title="Add term as expression" class="action-add-note pending disabled" data-mode="term_kanji" data-index="{{@index}}"><img src="img/add_term_kanji.png"></a>
             <a href="#" title="Add term as reading" class="action-add-note pending disabled" data-mode="term_kana" data-index="{{@index}}"><img src="img/add_term_kana.png"></a>
@@ -30,20 +30,20 @@
     </div>
 
     {{#if reading}}
-        <div class="term-expression"><ruby>{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}<rt>{{reading}}</rt></ruby></div>
+        <div class="expression"><ruby>{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}<rt>{{reading}}</rt></ruby></div>
     {{else}}
-        <div class="term-expression">{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}</div>
+        <div class="expression">{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}</div>
     {{/if}}
 
     {{#if reasons}}
-        <div class="term-reasons">
+        <div class="reasons">
             {{#each reasons}}
                 <span class="reasons">{{.}}</span> {{#unless @last}}&laquo;{{/unless}}
             {{/each}}
         </div>
     {{/if}}
 
-    <div class="term-glossary">
+    <div class="glossary">
     {{#if grouped}}
         {{#if definitions.[1]}}
         <ol>
@@ -58,7 +58,7 @@
         {{> definition}}
     {{/if}}
     </div>
-</div>
+</p>
 {{/inline}}
 
 {{#if definitions}}
