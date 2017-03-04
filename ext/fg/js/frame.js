@@ -36,7 +36,7 @@ class Frame {
         const params = {
             definitions,
             grouped: options.general.groupResults,
-            addable: options.ankiMethod !== 'disabled',
+            addable: options.anki.enabled,
             playback: options.general.audioPlayback
         };
 
@@ -49,7 +49,7 @@ class Frame {
         this.showSpinner(false);
         window.scrollTo(0, 0);
 
-        bgTextRender(params, 'terms.html').then(content => {
+        bgTextRender('terms.html', params).then(content => {
             $('#content').html(content);
             $('.action-add-note').click(this.onAddNote.bind(this));
 
@@ -87,7 +87,7 @@ class Frame {
         this.showSpinner(false);
         window.scrollTo(0, 0);
 
-        bgTextRender(params, 'kanji.html').then(content => {
+        bgTextRender('kanji.html', params).then(content => {
             $('#content').html(content);
             $('.action-add-note').click(this.onAddNote.bind(this));
 

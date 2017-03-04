@@ -17,3 +17,62 @@
  */
 
 
+function onSearch(e) {
+    e.preventDefault();
+
+    instYomi().termsFind($('#query').val()).then(({length, definitions}) => {
+        const options = instYomi().options;
+        const params = {
+            definitions,
+            grouped: options.general.groupResults,
+            addable: options.anki.enabled,
+            playback: options.general.audioPlayback
+        };
+
+        return instYomi().textRender('terms.html', params);
+    }).then(content => {
+        $('#content').html(content);
+    });
+
+    // const sequence = ++this.sequence;
+    // const params = {
+    //     definitions,
+    //     grouped: options.general.groupResults,
+    //     addable: options.ankiMethod !== 'disabled',
+    //     playback: options.general.audioPlayback
+    // };
+
+    // definitions.forEach(definition => {
+    //     definition.sentence = context.sentence;
+    //     definition.url = context.url;
+    // });
+
+    // this.definitions = definitions;
+    // this.showSpinner(false);
+    // window.scrollTo(0, 0);
+
+    // bgTextRender(params, 'terms.html').then(content => {
+    //     $('#content').html(content);
+    //     $('.action-add-note').click(this.onAddNote.bind(this));
+
+    //     $('.kanji-link').click(e => {
+    //         e.preventDefault();
+    //         const character = $(e.target).text();
+    //         bgKanjiFind(character).then(definitions => this.api_showKanjiDefs({definitions, options, context}));
+    //     });
+
+    //     $('.action-play-audio').click(e => {
+    //         e.preventDefault();
+    //         const index = $(e.currentTarget).data('index');
+    //         this.playAudio(this.definitions[index]);
+    //     });
+
+    //     this.updateAddNoteButtons(['term_kanji', 'term_kana'], sequence);
+    // }).catch(error => {
+    //     this.handleError(error);
+    // });
+}
+
+$(document).ready(() => {
+    $('#search').click(onSearch);
+});

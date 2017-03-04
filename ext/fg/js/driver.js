@@ -139,8 +139,7 @@ class Driver {
     searchTerms(textSource) {
         textSource.setEndOffset(this.options.scanning.length);
 
-        const findFunc = this.options.general.groupResults ? bgTermsFindGrouped : bgTermsFind;
-        return findFunc(textSource.text()).then(({definitions, length}) => {
+        return bgTermsFind(textSource.text()).then(({definitions, length}) => {
             if (definitions.length === 0) {
                 return false;
             } else {

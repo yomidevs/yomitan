@@ -46,15 +46,11 @@ function bgTermsFind(text) {
     return bgInvoke('termsFind', {text});
 }
 
-function bgTermsFindGrouped(text) {
-    return bgInvoke('termsFindGrouped', {text});
-}
-
 function bgKanjiFind(text) {
     return bgInvoke('kanjiFind', {text});
 }
 
-function bgTextRender(data, template) {
+function bgTextRender(template, data) {
     return bgInvoke('textRender', {data, template});
 }
 

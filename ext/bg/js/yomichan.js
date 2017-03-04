@@ -126,39 +126,40 @@ class Yomichan {
         return note;
     }
 
+    termsFind(text) {
+        const searcher = this.options.general.groupResults ?
+            this.translator.findTermsGrouped.bind(this.translator) :
+            this.translator.findTerms.bind(this.translator);
+
+        return searcher(text, dictEnabled(this.options), this.options.general.softKatakana).then(({definitions, length}) => {
+            return {length, definitions: definitions.slice(0, this.options.general.maxResults)};
+        });
+    }
+
+    kanjiFind(text) {
+        return this.translator.findKanji(text, dictEnabled(this.options)).then(definitions => {
+            return definitions.slice(0, this.options.general.maxResults);
+        });
+    }
+
+    textRender(template, data) {
+        return Handlebars.templates[template](data);
+    }
+
     api_optionsGet({callback}) {
         promiseCallback(optionsLoad(), callback);
     }
 
     api_kanjiFind({text, callback}) {
-        promiseCallback(
-            this.translator.findKanji(text, dictEnabled(this.options)).then(definitions => {
-                return definitions.slice(0, this.options.general.maxResults);
-            }),
-            callback
-        );
+        promiseCallback(this.kanjiFind(text), callback);
     }
 
     api_termsFind({text, callback}) {
-        promiseCallback(
-            this.translator.findTerms(text, dictEnabled(this.options), this.options.general.softKatakana).then(({definitions, length}) => {
-                return {length, definitions: definitions.slice(0, this.options.general.maxResults)};
-            }),
-            callback
-        );
-    }
-
-    api_termsFindGrouped({text, callback}) {
-        promiseCallback(
-            this.translator.findTermsGrouped(text, dictEnabled(this.options), this.options.general.softKatakana).then(({definitions, length}) => {
-                return {length, definitions: definitions.slice(0, this.options.general.maxResults)};
-            }),
-            callback
-        );
+        promiseCallback(this.termsFind(text), callback);
     }
 
     api_textRender({template, data, callback}) {
-        callback({result: Handlebars.templates[template](data)});
+        callback({result: this.textRender(template, data)});
     }
 
     api_definitionAdd({definition, mode, callback}) {
