@@ -1,12 +1,12 @@
 {
     "manifest_version": 2,
     "name": "Yomichan",
-    "version": "1.0.17",
+    "version": "1.0.18",
 
     "description": "Japanese dictionary with Anki integration",
-    "icons": {"16": "img/icon16.png", "48": "img/icon48.png", "128": "img/icon128.png"},
+    "icons": {"16": "mixed/img/icon16.png", "48": "mixed/img/icon48.png", "128": "mixed/img/icon128.png"},
     "browser_action": {
-        "default_icon": {"19": "img/icon19.png", "38": "img/icon38.png"},
+        "default_icon": {"19": "mixed/img/icon19.png", "38": "mixed/img/icon38.png"},
         "default_popup": "bg/popup.html"
     },
 
@@ -33,17 +33,17 @@
         "storage"
     ],
     "web_accessible_resources": [
-        "fg/css/frame.css",
         "fg/frame.html",
-        "fg/img/add_kanji.png",
-        "fg/img/add_term_kana.png",
-        "fg/img/add_term_kanji.png",
-        "fg/img/play_audio.png",
-        "fg/img/spinner.gif",
         "fg/js/frame.js",
-        "fg/mp3/button.mp3",
-        "fg/ttf/kanji-stroke-orders.ttf",
-        "fg/ttf/vl-gothic-regular.ttf"
+        "mixed/css/frame.css",
+        "mixed/img/add_kanji.png",
+        "mixed/img/add_term_kana.png",
+        "mixed/img/add_term_kanji.png",
+        "mixed/img/play_audio.png",
+        "mixed/img/spinner.gif",
+        "mixed/mp3/button.mp3",
+        "mixed/ttf/kanji-stroke-orders.ttf",
+        "mixed/ttf/vl-gothic-regular.ttf"
     ],
     "applications": {
         "gecko": {

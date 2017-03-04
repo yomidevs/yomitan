@@ -302,7 +302,7 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
 
   return "            <a href=\"#\" title=\"Add Kanji\" class=\"action-add-note pending disabled\" data-mode=\"kanji\" data-index=\""
     + container.escapeExpression(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"index","hash":{},"data":data}) : helper)))
-    + "\"><img src=\"/fg/img/add_kanji.png\"></a>\n";
+    + "\"><img src=\"/mixed/img/add_kanji.png\"></a>\n";
 },"4":function(container,depth0,helpers,partials,data) {
     var stack1;
 
@@ -459,15 +459,15 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
 
   return "            <a href=\"#\" title=\"Add term as expression\" class=\"action-add-note pending disabled\" data-mode=\"term_kanji\" data-index=\""
     + alias4(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"index","hash":{},"data":data}) : helper)))
-    + "\"><img src=\"/fg/img/add_term_kanji.png\"></a>\n            <a href=\"#\" title=\"Add term as reading\" class=\"action-add-note pending disabled\" data-mode=\"term_kana\" data-index=\""
+    + "\"><img src=\"/mixed/img/add_term_kanji.png\"></a>\n            <a href=\"#\" title=\"Add term as reading\" class=\"action-add-note pending disabled\" data-mode=\"term_kana\" data-index=\""
     + alias4(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"index","hash":{},"data":data}) : helper)))
-    + "\"><img src=\"/fg/img/add_term_kana.png\"></a>\n";
+    + "\"><img src=\"/mixed/img/add_term_kana.png\"></a>\n";
 },"15":function(container,depth0,helpers,partials,data) {
     var helper;
 
   return "            <a href=\"#\" title=\"Play audio\" class=\"action-play-audio\" data-index=\""
     + container.escapeExpression(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"index","hash":{},"data":data}) : helper)))
-    + "\"><img src=\"/fg/img/play_audio.png\"></a>\n";
+    + "\"><img src=\"/mixed/img/play_audio.png\"></a>\n";
 },"17":function(container,depth0,helpers,partials,data) {
     var stack1, helper, options, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", buffer = 
   "        <div class=\"expression\"><ruby>";

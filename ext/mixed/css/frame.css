@@ -23,12 +23,12 @@
 
 @font-face {
     font-family: kanji-stroke-orders;
-    src: url('../ttf/kanji-stroke-orders.ttf');
+    src: url('/mixed/ttf/kanji-stroke-orders.ttf');
 }
 
 @font-face {
     font-family: vl-gothic-regular;
-    src: url('../ttf/vl-gothic-regular.ttf');
+    src: url('/mixed/ttf/vl-gothic-regular.ttf');
 }
 
 
