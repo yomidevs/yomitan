@@ -189,36 +189,22 @@ function optionsVersion(options) {
 
 function optionsLoad() {
     return new Promise((resolve, reject) => {
-        if (chrome.storage.sync) {
-            chrome.storage.sync.getBytesInUse(null, resolve);
-        } else {
-            resolve(0);
-        }
-    }).then(bytes => {
-        if (bytes === 0) {
+        chrome.storage.local.get(null, store => resolve(store.options));
+    }).then(optionsStr => {
+        if (optionsStr) {
+            return JSON.parse(optionsStr);
+        } else if (chrome.storage.sync) {
             return new Promise((resolve, reject) => {
-                chrome.storage.local.get(null, store => {
-                    let options = {};
-                    try {
-                        options = JSON.parse(store.options);
-                    } catch (e) {
-                        // NOP
-                    }
-
-                    resolve(optionsVersion(options));
-                });
+                chrome.storage.sync.get(null, options => resolve(options));
             });
         } else {
-            return new Promise((resolve, reject) => {
-                chrome.storage.sync.get(null, options => resolve(optionsVersion(options)));
-            });
+            return {};
         }
+    }).catch(error => {
+        console.log(error);
+        return {};
     }).then(options => {
-        if (chrome.storage.sync) {
-            chrome.storage.sync.clear();
-        }
-
-        return options;
+        return optionsVersion(options);
     });
 }
 
