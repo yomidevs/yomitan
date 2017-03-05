@@ -388,8 +388,8 @@ function dictFieldFormat(field, definition, mode, options) {
             definition,
             group: options.general.groupResults,
             html: options.anki.htmlCards,
-            modeTermKanji: mode === 'term_kanji',
-            modeTermKana: mode === 'term_kana',
+            modeTermKanji: mode === 'term-kanji',
+            modeTermKana: mode === 'term-kana',
             modeKanji: mode === 'kanji'
         };
 

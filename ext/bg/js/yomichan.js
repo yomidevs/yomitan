@@ -149,7 +149,7 @@ window.yomichan = new class {
 
     onInstalled(details) {
         if (details.reason === 'install') {
-            chrome.tabs.create({url: chrome.extension.getURL('bg/guide.html')});
+            chrome.tabs.create({url: chrome.extension.getURL('/bg/guide.html')});
         }
     }
 

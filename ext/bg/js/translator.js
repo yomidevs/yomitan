@@ -31,7 +31,7 @@ class Translator {
         }
 
         const promises = [
-            jsonLoadInt('bg/lang/deinflect.json'),
+            jsonLoadInt('/bg/lang/deinflect.json'),
             this.database.prepare()
         ];
 

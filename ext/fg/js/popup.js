@@ -25,7 +25,7 @@ class Popup {
         this.container.id = 'yomichan-popup';
         this.container.addEventListener('mousedown', e => e.stopPropagation());
         this.container.addEventListener('scroll', e => e.stopPropagation());
-        this.container.setAttribute('src', chrome.extension.getURL('fg/frame.html'));
+        this.container.setAttribute('src', chrome.extension.getURL('/fg/frame.html'));
 
         document.body.appendChild(this.container);
     }

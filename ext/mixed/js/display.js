@@ -76,7 +76,7 @@ class Display {
                 }).catch(this.handleError.bind(this));
             });
 
-            return this.adderButtonsUpdate(['term_kanji', 'term_kana'], sequence);
+            return this.adderButtonsUpdate(['term-kanji', 'term-kana'], sequence);
         }).catch(this.handleError.bind(this));
     }
 
