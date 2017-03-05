@@ -50,8 +50,8 @@ function bgKanjiFind(text) {
     return bgInvoke('kanjiFind', {text});
 }
 
-function bgTextRender(template, data) {
-    return bgInvoke('textRender', {data, template});
+function bgTemplateRender(template, data) {
+    return bgInvoke('templateRender', {data, template});
 }
 
 function bgDefinitionsAddable(definitions, modes) {

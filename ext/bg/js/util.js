@@ -23,7 +23,7 @@
 
 function promiseCallback(promise, callback) {
     return promise.then(result => {
-       callback({result});
+        callback({result});
     }).catch(error => {
         /* eslint-disable */
         console.log(error);
@@ -49,6 +49,22 @@ function instAnki() {
     return instYomi().anki;
 }
 
+
+/*
+ * Foreground
+ */
+
+function fgBroadcast(action, params) {
+    chrome.tabs.query({}, tabs => {
+        for (const tab of tabs) {
+            chrome.tabs.sendMessage(tab.id, {action, params}, () => null);
+        }
+    });
+}
+
+function fgOptionsSet(options) {
+    fgBroadcast('optionsSet', options);
+}
 
 
 /*
@@ -188,6 +204,9 @@ function optionsSave(options) {
 
     return new Promise((resolve, reject) => {
         chrome.storage.sync.set(options, resolve);
+    }).then(() => {
+        instYomi().optionsSet(options);
+        fgOptionsSet(options);
     });
 }
 
@@ -468,7 +487,7 @@ function jsonLoadDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
  * Helpers
  */
 
-function helperKanjiLinks(options) {
+function handlebarsKanjiLinks(options) {
     const isKanji = c => {
         const code = c.charCodeAt(0);
         return code >= 0x4e00 && code < 0x9fb0 || code >= 0x3400 && code < 0x4dc0;
@@ -486,6 +505,16 @@ function helperKanjiLinks(options) {
     return result;
 }
 
-function helperMultiLine(options) {
+function handlebarsMultiLine(options) {
     return options.fn(this).split('\n').join('<br>');
+}
+
+function handlebarsRegister() {
+    Handlebars.partials = Handlebars.templates;
+    Handlebars.registerHelper('kanjiLinks', handlebarsKanjiLinks);
+    Handlebars.registerHelper('multiLine', handlebarsMultiLine);
+}
+
+function handlebarsRender(template, data) {
+    return Handlebars.templates[template](data);
 }

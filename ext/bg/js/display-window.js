@@ -31,8 +31,8 @@ window.displayWindow = new class extends Display {
         return instYomi().definitionsAddable(definitions, modes);
     }
 
-    textRender(template, data) {
-        return instYomi().textRender(template, data);
+    templateRender(template, data) {
+        return instYomi().templateRender(template, data);
     }
 
     kanjiFind(character) {

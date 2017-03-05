@@ -19,9 +19,7 @@
 
 window.yomichan = new class {
     constructor() {
-        Handlebars.partials = Handlebars.templates;
-        Handlebars.registerHelper('kanjiLinks', helperKanjiLinks);
-        Handlebars.registerHelper('multiLine', helperMultiLine);
+        handlebarsRegister();
 
         this.translator = new Translator();
         this.anki = new AnkiNull();
@@ -38,32 +36,22 @@ window.yomichan = new class {
     optionsSet(options) {
         this.options = options;
 
-        let usable = false;
+        let configured = false;
         for (const title in options.dictionaries) {
             if (options.dictionaries[title].enabled) {
-                usable = true;
+                configured = true;
                 break;
             }
         }
 
         chrome.browserAction.setBadgeBackgroundColor({color: '#f0ad4e'});
-        chrome.browserAction.setBadgeText({text: usable ? '' : '!'});
+        chrome.browserAction.setBadgeText({text: configured ? '' : '!'});
 
         if (options.anki.enable) {
             this.anki = new AnkiConnect(this.options.anki.server);
         } else {
             this.anki = new AnkiNull();
         }
-
-        this.tabInvokeAll('optionsSet', this.options);
-    }
-
-    tabInvokeAll(action, params) {
-        chrome.tabs.query({}, tabs => {
-            for (const tab of tabs) {
-                chrome.tabs.sendMessage(tab.id, {action, params}, () => null);
-            }
-        });
     }
 
     noteFormat(definition, mode) {
@@ -155,8 +143,8 @@ window.yomichan = new class {
         });
     }
 
-    textRender(template, data) {
-        return Promise.resolve(Handlebars.templates[template](data));
+    templateRender(template, data) {
+        return Promise.resolve(handlebarsRender(template, data));
     }
 
     onInstalled(details) {
@@ -179,8 +167,8 @@ window.yomichan = new class {
                 promiseCallback(this.termsFind(text), callback);
             }
 
-            api_textRender({template, data, callback}) {
-                promiseCallback(this.textRender(template, data), callback);
+            api_templateRender({template, data, callback}) {
+                promiseCallback(this.templateRender(template, data), callback);
             }
 
             api_definitionAdd({definition, mode, callback}) {

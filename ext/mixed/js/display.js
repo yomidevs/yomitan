@@ -34,7 +34,7 @@ class Display {
         throw 'override me';
     }
 
-    textRender(template, data) {
+    templateRender(template, data) {
         throw 'override me';
     }
 
@@ -64,7 +64,7 @@ class Display {
         this.definitions = definitions;
         this.spinner.hide();
 
-        this.textRender('terms.html', params).then(content => {
+        this.templateRender('terms.html', params).then(content => {
             this.container.html(content);
             $('.action-add-note').click(this.onActionAddNote.bind(this));
             $('.action-play-audio').click(this.onActionPlayAudio.bind(this));
@@ -90,7 +90,7 @@ class Display {
         this.definitions = definitions;
         this.spinner.hide();
 
-        this.textRender('kanji.html', params).then(content => {
+        this.templateRender('kanji.html', params).then(content => {
             this.container.html(content);
             $('.action-add-note').click(this.onActionAddNote.bind(this));
             return this.adderButtonsUpdate(['kanji'], sequence);

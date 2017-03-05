@@ -31,8 +31,8 @@ window.displayFrame = new class extends Display {
         return bgDefinitionsAddable(definitions, modes);
     }
 
-    textRender(template, data) {
-        return bgTextRender(template, data);
+    templateRender(template, data) {
+        return bgTemplateRender(template, data);
     }
 
     kanjiFind(character) {
