@@ -201,7 +201,6 @@ function optionsLoad() {
             return {};
         }
     }).catch(error => {
-        console.log(error);
         return {};
     }).then(options => {
         return optionsVersion(options);
