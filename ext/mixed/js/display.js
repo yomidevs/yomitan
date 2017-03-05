@@ -68,7 +68,14 @@ class Display {
             this.container.html(content);
             $('.action-add-note').click(this.onActionAddNote.bind(this));
             $('.action-play-audio').click(this.onActionPlayAudio.bind(this));
-            $('.kanji-link').click(e => this.onKanjiSearch(e, options));
+            $('.kanji-link').click(e => {
+                e.preventDefault();
+                const character = $(e.target).text();
+                this.kanjiFind(character).then(definitions => {
+                    this.showKanjiDefs(definitions, options, context);
+                }).catch(this.handleError.bind(this));
+            });
+
             return this.adderButtonsUpdate(['term_kanji', 'term_kana'], sequence);
         }).catch(this.handleError.bind(this));
     }
@@ -120,14 +127,6 @@ class Display {
                 }
             });
         });
-    }
-
-    onKanjiSearch(e, options) {
-        e.preventDefault();
-        const character = $(e.target).text();
-        this.kanjiFind(character).then(definitions => {
-            this.showKanjiDefs(definitions, options, context);
-        }).catch(this.handleError.bind(this));
     }
 
     onActionPlayAudio(e) {
