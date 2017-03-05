@@ -188,22 +188,29 @@ function optionsVersion(options) {
 }
 
 function optionsLoad() {
-    if (!chrome.storage.sync) {
-        chrome.storage.sync = chrome.storage.local;
-    }
-
     return new Promise((resolve, reject) => {
-        chrome.storage.sync.get(null, options => resolve(optionsVersion(options)));
+        if (chrome.storage.sync) {
+            chrome.storage.sync.getBytesInUse(null, resolve);
+        } else {
+            resolve(0);
+        }
+    }).then(bytes => {
+        const storage = bytes === 0 ? chrome.storage.local : chrome.storage.sync;
+        return new Promise((resolve, reject) => {
+            storage.get(null, options => resolve(optionsVersion(options)));
+        });
+    }).then(options => {
+        if (chrome.storage.sync) {
+            chrome.storage.sync.clear();
+        }
+
+        return options;
     });
 }
 
 function optionsSave(options) {
-    if (!chrome.storage.sync) {
-        chrome.storage.sync = chrome.storage.local;
-    }
-
     return new Promise((resolve, reject) => {
-        chrome.storage.sync.set(options, resolve);
+        chrome.storage.local.set(options, resolve);
     }).then(() => {
         instYomi().optionsSet(options);
         fgOptionsSet(options);
