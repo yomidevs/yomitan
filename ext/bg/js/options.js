@@ -80,7 +80,7 @@ function updateVisibility(options) {
 }
 
 $(document).ready(() => {
-    Handlebars.partials = Handlebars.templates;
+    handlebarsRegister();
 
     optionsLoad().then(options => {
         $('#audio-playback-buttons').prop('checked', options.general.audioPlayback);
@@ -148,7 +148,7 @@ function populateDictionaries(options) {
     return instDb().getDictionaries().then(rows => {
         rows.forEach(row => {
             const dictOptions = options.dictionaries[row.title] || {enableTerms: false, enableKanji: false, priority: 0};
-            const html = Handlebars.templates['dictionary.html']({
+            const html = handlebarsRender('dictionary.html', {
                 title: row.title,
                 version: row.version,
                 revision: row.revision,

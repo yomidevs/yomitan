@@ -195,10 +195,24 @@ function optionsLoad() {
             resolve(0);
         }
     }).then(bytes => {
-        const storage = bytes === 0 ? chrome.storage.local : chrome.storage.sync;
-        return new Promise((resolve, reject) => {
-            storage.get(null, options => resolve(optionsVersion(options)));
-        });
+        if (bytes === 0) {
+            return new Promise((resolve, reject) => {
+                chrome.storage.local.get(null, store => {
+                    let options = {};
+                    try {
+                        options = JSON.parse(store.options);
+                    } catch (e) {
+                        // NOP
+                    }
+
+                    resolve(optionsVersion(options));
+                });
+            });
+        } else {
+            return new Promise((resolve, reject) => {
+                chrome.storage.sync.get(null, options => resolve(optionsVersion(options)));
+            });
+        }
     }).then(options => {
         if (chrome.storage.sync) {
             chrome.storage.sync.clear();
@@ -210,7 +224,7 @@ function optionsLoad() {
 
 function optionsSave(options) {
     return new Promise((resolve, reject) => {
-        chrome.storage.local.set(options, resolve);
+        chrome.storage.local.set({options: JSON.stringify(options)}, resolve);
     }).then(() => {
         instYomi().optionsSet(options);
         fgOptionsSet(options);
