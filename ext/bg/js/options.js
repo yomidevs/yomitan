@@ -187,7 +187,7 @@ function onDictionaryPurge(e) {
         return optionsLoad();
     }).then(options => {
         options.dictionaries = {};
-        return optionsSave(options).then(populateDictionaries);
+        return optionsSave(options).then(() => populateDictionaries(options));
     });
 }
 

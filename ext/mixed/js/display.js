@@ -50,6 +50,7 @@ class Display {
         const sequence = ++this.sequence;
         const params = {
             definitions,
+            addable: options.anki.enable,
             grouped: options.general.groupResults,
             playback: options.general.audioPlayback
         };
@@ -84,7 +85,7 @@ class Display {
         const sequence = ++this.sequence;
         const params = {
             definitions,
-            addable: options.anki.enabled
+            addable: options.anki.enable
         };
 
         if (context) {
@@ -137,7 +138,7 @@ class Display {
 
     onActionAddNote(e) {
         e.preventDefault();
-        this.showSpinner(true);
+        this.spinner.show();
 
         const link = $(e.currentTarget);
         const index = link.data('index');
