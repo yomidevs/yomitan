@@ -17,7 +17,7 @@
  */
 
 
-class Yomichan {
+window.yomichan = new class {
     constructor() {
         Handlebars.partials = Handlebars.templates;
         Handlebars.registerHelper('kanjiLinks', helperKanjiLinks);
@@ -28,7 +28,9 @@ class Yomichan {
         this.options = null;
 
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
-        chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
+        if (chrome.runtime.onInstalled) {
+            chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
+        }
 
         this.translator.prepare().then(optionsLoad).then(this.setOptions.bind(this));
     }
@@ -142,8 +144,36 @@ class Yomichan {
         });
     }
 
+    definitionAdd(definition, mode) {
+        const note = this.formatNote(definition, mode);
+        return this.anki.addNote(note);
+    }
+
+    definitionsAddable(definitions, modes) {
+        const notes = [];
+        for (const definition of definitions) {
+            for (const mode of modes) {
+                notes.push(this.formatNote(definition, mode));
+            }
+        }
+
+        return this.anki.canAddNotes(notes).then(raw => {
+            const states = [];
+            for (let resultBase = 0; resultBase < raw.length; resultBase += modes.length) {
+                const state = {};
+                for (let modeOffset = 0; modeOffset < modes.length; ++modeOffset) {
+                    state[modes[modeOffset]] = raw[resultBase + modeOffset];
+                }
+
+                states.push(state);
+            }
+
+            return states;
+        });
+    }
+
     textRender(template, data) {
-        return Handlebars.templates[template](data);
+        return Promise.resolve(Handlebars.templates[template](data));
     }
 
     api_optionsGet({callback}) {
@@ -159,38 +189,14 @@ class Yomichan {
     }
 
     api_textRender({template, data, callback}) {
-        callback({result: this.textRender(template, data)});
+        promiseCallback(this.textRender(template, data), callback);
     }
 
     api_definitionAdd({definition, mode, callback}) {
-        const note = this.formatNote(definition, mode);
-        promiseCallback(this.anki.addNote(note), callback);
+        promiseCallback(this.definitionAdd(definition, mode), callback);
     }
 
     api_definitionsAddable({definitions, modes, callback}) {
-        const notes = [];
-        for (const definition of definitions) {
-            for (const mode of modes) {
-                notes.push(this.formatNote(definition, mode));
-            }
-        }
-
-        const promise = this.anki.canAddNotes(notes).then(raw => {
-            const states = [];
-            for (let resultBase = 0; resultBase < raw.length; resultBase += modes.length) {
-                const state = {};
-                for (let modeOffset = 0; modeOffset < modes.length; ++modeOffset) {
-                    state[modes[modeOffset]] = raw[resultBase + modeOffset];
-                }
-
-                states.push(state);
-            }
-
-            return states;
-        });
-
-        promiseCallback(promise, callback);
+        promiseCallback(this.definitionsAddable(definitions, modes), callback);
     }
-}
-
-window.yomichan = new Yomichan();
+};

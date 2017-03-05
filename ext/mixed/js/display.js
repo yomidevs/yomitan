@@ -30,7 +30,7 @@ class Display {
         throw 'override me';
     }
 
-    definitionsAddable(definitions, mode) {
+    definitionsAddable(definitions, modes) {
         throw 'override me';
     }
 

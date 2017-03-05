@@ -172,12 +172,20 @@ function optionsVersion(options) {
 }
 
 function optionsLoad() {
+    if (!chrome.storage.sync) {
+        chrome.storage.sync = chrome.storage.local;
+    }
+
     return new Promise((resolve, reject) => {
         chrome.storage.sync.get(null, options => resolve(optionsVersion(options)));
     });
 }
 
 function optionsSave(options) {
+    if (!chrome.storage.sync) {
+        chrome.storage.sync = chrome.storage.local;
+    }
+
     return new Promise((resolve, reject) => {
         chrome.storage.sync.set(options, resolve);
     });

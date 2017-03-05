@@ -17,55 +17,36 @@
  */
 
 
-window.displayFrame = new class extends Display {
+window.displayWindow = new class extends Display {
     constructor() {
         super($('#spinner'), $('#content'));
-        $(window).on('message', this.onMessage.bind(this));
+        $('#search').click(this.onSearch.bind(this));
     }
 
     definitionAdd(definition, mode) {
-        return bgDefinitionAdd(definition, mode);
+        return instYomi().definitionAdd(definition, mode);
     }
 
     definitionsAddable(definitions, modes) {
-        return bgDefinitionsAddable(definitions, modes);
+        return instYomi().definitionsAddable(definitions, modes);
     }
 
     textRender(template, data) {
-        return bgTextRender(template, data);
+        return instYomi().textRender(template, data);
     }
 
     kanjiFind(character) {
-        return bgKanjiFind(character);
+        return instYomi().kanjiFind(character);
     }
 
     handleError(error) {
-        if (window.orphaned) {
-            this.api_showOrphaned();
-        } else {
-            errorShow(error);
-        }
+        window.alert(`Error: ${error}`);
     }
 
-    onMessage(e) {
-        const {action, params} = e.originalEvent.data, method = this['api_' + action];
-        if (typeof(method) === 'function') {
-            method.call(this, params);
-        }
-    }
-
-    api_showTermDefs({definitions, options, context}) {
-        window.scrollTo(0, 0);
-        super.showTermDefs(definitions, options, context);
-    }
-
-    api_showKanjiDefs({definitions, options, context}) {
-        window.scrollTo(0, 0);
-        super.showKanjiDefs(defintions, options, context);
-    }
-
-    api_showOrphaned() {
-        $('#content').hide();
-        $('#orphan').show();
+    onSearch(e) {
+        e.preventDefault();
+        instYomi().termsFind($('#query').val()).then(({length, definitions}) => {
+            super.showTermDefs(definitions, instYomi().options);
+        }).catch(this.handleError.bind(this));
     }
 };
