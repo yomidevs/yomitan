@@ -67,13 +67,13 @@ class Display {
         this.textRender('terms.html', params).then(content => {
             this.container.html(content);
             $('.action-add-note').click(this.onActionAddNote.bind(this));
-            $('.kanji-link').click(this.onKanjiSearch.bind(this));
             $('.action-play-audio').click(this.onActionPlayAudio.bind(this));
+            $('.kanji-link').click(e => this.onKanjiSearch(e, options));
             return this.adderButtonsUpdate(['term_kanji', 'term_kana'], sequence);
         }).catch(this.handleError.bind(this));
     }
 
-    showKanjiDefs({definitions, options, context}) {
+    showKanjiDefs(definitions, options, context) {
         const sequence = ++this.sequence;
         const params = {
             definitions,
@@ -122,11 +122,11 @@ class Display {
         });
     }
 
-    onKanjiSearch(e) {
+    onKanjiSearch(e, options) {
         e.preventDefault();
         const character = $(e.target).text();
         this.kanjiFind(character).then(definitions => {
-            this.api_showKanjiDefs({definitions, options, context});
+            this.showKanjiDefs(definitions, options, context);
         }).catch(this.handleError.bind(this));
     }
 

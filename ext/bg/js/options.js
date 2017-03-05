@@ -189,7 +189,7 @@ function onDictionaryPurge(e) {
         options.dictionaries = {};
         return optionsSave(options).then(() => {
             populateDictionaries(options);
-            instYomi().setOptions(options);
+            instYomi().optionsSet(options);
         });
     });
 }
@@ -208,7 +208,7 @@ function onDictionaryImport() {
     optionsLoad().then(options => {
         instDb().importDictionary(dictUrl.val(), (total, current) => setProgress(current / total * 100.0)).then(summary => {
             options.dictionaries[summary.title] = {enabled: true, priority: 0};
-            return optionsSave(options).then(() => instYomi().setOptions(options));
+            return optionsSave(options).then(() => instYomi().optionsSet(options));
         }).then(() => populateDictionaries(options)).catch(showDictionaryError).then(() => {
             showDictionarySpinner(false);
             dictProgress.hide();
@@ -339,7 +339,7 @@ function onAnkiModelChanged(e) {
 
         optionsNew.anki[tabId].fields = {};
         populateAnkiFields(element, optionsNew).then(() => {
-            optionsSave(optionsNew).then(() => instYomi().setOptions(optionsNew));
+            optionsSave(optionsNew).then(() => instYomi().optionsSet(optionsNew));
         }).catch(showAnkiError).then(() => showAnkiSpinner(false));
     });
 }
@@ -351,7 +351,7 @@ function onOptionsChanged(e) {
 
     getFormData().then(({optionsNew, optionsOld}) => {
         return optionsSave(optionsNew).then(() => {
-            instYomi().setOptions(optionsNew);
+            instYomi().optionsSet(optionsNew);
             updateVisibility(optionsNew);
 
             const ankiUpdated =

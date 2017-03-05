@@ -28,7 +28,7 @@ $(document).ready(() => {
         toggle.bootstrapToggle();
         toggle.change(() => {
             options.general.enable = toggle.prop('checked');
-            optionsSave(options).then(() => instYomi().setOptions(options));
+            optionsSave(options).then(() => instYomi().optionsSet(options));
         });
     });
 });

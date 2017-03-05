@@ -41,31 +41,37 @@ window.displayFrame = new class extends Display {
 
     handleError(error) {
         if (window.orphaned) {
-            this.api_showOrphaned();
+            this.showOrphaned();
         } else {
             errorShow(error);
         }
     }
 
+    showOrphaned() {
+        $('#content').hide();
+        $('#orphan').show();
+    }
+
     onMessage(e) {
-        const {action, params} = e.originalEvent.data, method = this['api_' + action];
+        const handlers = new class {
+            api_showTermDefs({definitions, options, context}) {
+                window.scrollTo(0, 0);
+                this.showTermDefs(definitions, options, context);
+            }
+
+            api_showKanjiDefs({definitions, options, context}) {
+                window.scrollTo(0, 0);
+                this.showKanjiDefs(defintions, options, context);
+            }
+
+            api_showOrphaned() {
+                this.showOrphaned();
+            }
+        };
+
+        const {action, params} = e.originalEvent.data, method = handlers[`api_${action}`];
         if (typeof(method) === 'function') {
             method.call(this, params);
         }
-    }
-
-    api_showTermDefs({definitions, options, context}) {
-        window.scrollTo(0, 0);
-        super.showTermDefs(definitions, options, context);
-    }
-
-    api_showKanjiDefs({definitions, options, context}) {
-        window.scrollTo(0, 0);
-        super.showKanjiDefs(defintions, options, context);
-    }
-
-    api_showOrphaned() {
-        $('#content').hide();
-        $('#orphan').show();
     }
 };

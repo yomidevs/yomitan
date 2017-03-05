@@ -102,7 +102,13 @@ class Driver {
     }
 
     onBgMessage({action, params}, sender, callback) {
-        const method = this['api_' + action];
+        const handlers = new class {
+            api_optionsSet(options) {
+                this.options = options;
+            }
+        };
+
+        const method = handlers[`api_${action}`];
         if (typeof(method) === 'function') {
             method.call(this, params);
         }
@@ -204,10 +210,6 @@ class Driver {
         } else {
             errorShow(error);
         }
-    }
-
-    api_setOptions(options) {
-        this.options = options;
     }
 }
 
