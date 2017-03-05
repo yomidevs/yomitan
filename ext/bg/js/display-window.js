@@ -45,6 +45,7 @@ window.displayWindow = new class extends Display {
 
     onSearch(e) {
         e.preventDefault();
+        $('#intro').slideUp();
         instYomi().termsFind($('#query').val()).then(({length, definitions}) => {
             super.showTermDefs(definitions, instYomi().options);
         }).catch(this.handleError.bind(this));
