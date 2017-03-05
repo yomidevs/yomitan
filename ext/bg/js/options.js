@@ -54,7 +54,7 @@ function getFormData() {
         $('.dict-group').each((index, element) => {
             const dictionary = $(element);
             const title = dictionary.data('title');
-            const priority = parseInt(dictionary.find('.dict-priority').val(), 10);
+            const priority = parseFloat(dictionary.find('.dict-priority').val());
             const enabled = dictionary.find('.dict-enabled').prop('checked');
             optionsNew.dictionaries[title] = {priority, enabled};
         });
@@ -147,8 +147,8 @@ function populateDictionaries(options) {
     let dictCount = 0;
     return instDb().getDictionaries().then(rows => {
         rows.forEach(row => {
-            const dictOptions = options.dictionaries[row.title] || {enableTerms: false, enableKanji: false, priority: 0};
-            const html = handlebarsRender('dictionary.html', {
+            const dictOptions = options.dictionaries[row.title];
+            const dictHtml = handlebarsRender('dictionary.html', {
                 title: row.title,
                 version: row.version,
                 revision: row.revision,
@@ -156,13 +156,25 @@ function populateDictionaries(options) {
                 enabled: dictOptions.enabled
             });
 
-            dictGroups.append($(html));
+            dictGroups.append($(dictHtml));
             ++dictCount;
         });
 
         updateVisibility(options);
 
         $('.dict-enabled, .dict-priority').change(onOptionsChanged);
+        $('.dict-priority-up').click(e => {
+            const dictGroup = $(e.target).closest('.dict-group');
+            const dictPriority = dictGroup.find('.dict-priority');
+            dictPriority.val(parseFloat(dictPriority.val()) + 0.5);
+            onOptionsChanged(e);
+        });
+        $('.dict-priority-down').click(e => {
+            const dictGroup = $(e.target).closest('.dict-group');
+            const dictPriority = dictGroup.find('.dict-priority');
+            dictPriority.val(parseFloat(dictPriority.val()) - 0.5);
+            onOptionsChanged(e);
+        });
     }).catch(showDictionaryError).then(() => {
         showDictionarySpinner(false);
         if (dictCount === 0) {

@@ -7,19 +7,19 @@ templates['dictionary.html'] = template({"1":function(container,depth0,helpers,p
 
   return "<div class=\"dict-group well well-sm\" data-title=\""
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
-    + "\">\n    <h4><span class=\"text-muted glyphicon glyphicon-book\"></span> "
+    + "\">\n    <div class=\"row\">\n        <div class=\"col-xs-6\">\n            <h4><span class=\"text-muted glyphicon glyphicon-book\"></span> "
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
     + " <small>rev."
     + alias4(((helper = (helper = helpers.revision || (depth0 != null ? depth0.revision : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"revision","hash":{},"data":data}) : helper)))
-    + "</small></h4>\n\n    <div class=\"checkbox\">\n        <label><input type=\"checkbox\" class=\"dict-enabled\" "
+    + "</small></h4>\n\n            <div class=\"checkbox\">\n                <label><input type=\"checkbox\" class=\"dict-enabled\" "
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.enabled : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "> Enable search</label>\n    </div>\n    <div class=\"form-group options-advanced\">\n        <label for=\"dict-"
+    + "> Enable search</label>\n            </div>\n            <div class=\"form-group options-advanced\">\n                <label for=\"dict-"
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
-    + "\">Result priority</label>\n        <input type=\"number\" value=\""
+    + "\">Result priority</label>\n                <input type=\"number\" value=\""
     + alias4(((helper = (helper = helpers.priority || (depth0 != null ? depth0.priority : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"priority","hash":{},"data":data}) : helper)))
     + "\" id=\"dict-"
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
-    + "\" class=\"form-control dict-priority\">\n    </div>\n</div>\n";
+    + "\" class=\"form-control dict-priority\">\n            </div>\n        </div>\n        <div class=\"col-xs-6 text-right\">\n            <p><button class=\"dict-priority-up glyphicon glyphicon-arrow-up\" title=\"Increase priority\"></button></p>\n            <p><button class=\"dict-priority-down glyphicon glyphicon-arrow-down\" title=\"Decrease priority\"></button></p>\n        </div>\n    </div>\n</div>\n";
 },"useData":true});
 templates['fields.html'] = template({"1":function(container,depth0,helpers,partials,data) {
     var stack1;
