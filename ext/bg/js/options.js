@@ -21,7 +21,7 @@
  * General
  */
 
-function getFormData() {
+function formRead() {
     return optionsLoad().then(optionsOld => {
         const optionsNew = $.extend(true, {}, optionsOld);
 
@@ -42,6 +42,7 @@ function getFormData() {
         optionsNew.anki.htmlCards = $('#generate-html-cards').prop('checked');
         optionsNew.anki.sentenceExt = parseInt($('#sentence-detection-extent').val(), 10);
         optionsNew.anki.server = $('#interface-server').val();
+
         if (optionsOld.anki.enable) {
             optionsNew.anki.terms.deck = $('#anki-terms-deck').val();
             optionsNew.anki.terms.model = $('#anki-terms-model').val();
@@ -54,7 +55,7 @@ function getFormData() {
         $('.dict-group').each((index, element) => {
             const dictionary = $(element);
             const title = dictionary.data('title');
-            const priority = parseFloat(dictionary.find('.dict-priority').val());
+            const priority = parseInt(dictionary.find('.dict-priority').val(), 10);
             const enabled = dictionary.find('.dict-enabled').prop('checked');
             optionsNew.dictionaries[title] = {priority, enabled};
         });
@@ -77,6 +78,28 @@ function updateVisibility(options) {
     } else {
         advanced.hide();
     }
+}
+
+function onOptionsChanged(e) {
+    if (!e.originalEvent && !e.isTrigger) {
+        return;
+    }
+
+    formRead().then(({optionsNew, optionsOld}) => {
+        return optionsSave(optionsNew).then(() => {
+            updateVisibility(optionsNew);
+
+            const ankiUpdated =
+                optionsNew.anki.enable !== optionsOld.anki.enable ||
+                optionsNew.anki.server !== optionsOld.anki.server;
+
+            if (ankiUpdated) {
+                ankiErrorShow(null);
+                ankiSpinnerShow(true);
+                return ankiDeckAndModelPopulate(optionsNew);
+            }
+        });
+    }).catch(ankiErrorShow).then(() => ankiSpinnerShow(false));
 }
 
 $(document).ready(() => {
@@ -108,8 +131,8 @@ $(document).ready(() => {
         $('input, select').not('.anki-model').change(onOptionsChanged);
         $('.anki-model').change(onAnkiModelChanged);
 
-        populateDictionaries(options);
-        populateAnkiDeckAndModel(options);
+        dictionaryGroupsPopulate(options);
+        ankiDeckAndModelPopulate(options);
         updateVisibility(options);
     });
 });
@@ -119,7 +142,7 @@ $(document).ready(() => {
  * Dictionary
  */
 
-function showDictionaryError(error) {
+function dictionaryErrorShow(error) {
     const dialog = $('#dict-error');
     if (error) {
         dialog.show().find('span').text(error);
@@ -128,7 +151,7 @@ function showDictionaryError(error) {
     }
 }
 
-function showDictionarySpinner(show) {
+function dictionarySpinnerShow(show) {
     const spinner = $('#dict-spinner');
     if (show) {
         spinner.show();
@@ -137,16 +160,36 @@ function showDictionarySpinner(show) {
     }
 }
 
-function populateDictionaries(options) {
-    showDictionaryError(null);
-    showDictionarySpinner(true);
+function dictionaryGroupsSort() {
+    const dictGroups = $('#dict-groups');
+    const dictGroupChildren = dictGroups.children('.dict-group').sort((ca, cb) => {
+        const pa = parseInt($(ca).find('.dict-priority').val(), 10);
+        const pb = parseInt($(cb).find('.dict-priority').val(), 10);
+        if (pa < pb) {
+            return 1;
+        } else if (pa > pb) {
+            return -1;
+        } else {
+            return 0;
+        }
+    });
+
+    dictGroups.append(dictGroupChildren);
+}
+
+function dictionaryGroupsPopulate(options) {
+    dictionaryErrorShow(null);
+    dictionarySpinnerShow(true);
 
     const dictGroups = $('#dict-groups').empty();
     const dictWarning = $('#dict-warning').hide();
 
-    let dictCount = 0;
     return instDb().getDictionaries().then(rows => {
-        rows.forEach(row => {
+        if (rows.length === 0) {
+            dictWarning.show();
+        }
+
+        for (const row of dictRowsSort(rows, options)) {
             const dictOptions = options.dictionaries[row.title];
             const dictHtml = handlebarsRender('dictionary.html', {
                 title: row.title,
@@ -157,55 +200,40 @@ function populateDictionaries(options) {
             });
 
             dictGroups.append($(dictHtml));
-            ++dictCount;
-        });
+        }
 
         updateVisibility(options);
 
-        $('.dict-enabled, .dict-priority').change(onOptionsChanged);
-        $('.dict-priority-up').click(e => {
-            const dictGroup = $(e.target).closest('.dict-group');
-            const dictPriority = dictGroup.find('.dict-priority');
-            dictPriority.val(parseFloat(dictPriority.val()) + 0.5);
+        $('.dict-enabled, .dict-priority').change(e => {
+            dictionaryGroupsSort();
             onOptionsChanged(e);
         });
-        $('.dict-priority-down').click(e => {
-            const dictGroup = $(e.target).closest('.dict-group');
-            const dictPriority = dictGroup.find('.dict-priority');
-            dictPriority.val(parseFloat(dictPriority.val()) - 0.5);
-            onOptionsChanged(e);
-        });
-    }).catch(showDictionaryError).then(() => {
-        showDictionarySpinner(false);
-        if (dictCount === 0) {
-            dictWarning.show();
-        }
-    });
+    }).catch(dictionaryErrorShow).then(() => dictionarySpinnerShow(false));
 }
 
 function onDictionaryPurge(e) {
     e.preventDefault();
 
-    showDictionaryError(null);
-    showDictionarySpinner(true);
+    dictionaryErrorShow(null);
+    dictionarySpinnerShow(true);
 
     const dictControls = $('#dict-importer, #dict-groups').hide();
     const dictProgress = $('#dict-purge-progress').show();
 
-    return instDb().purge().catch(showDictionaryError).then(() => {
-        showDictionarySpinner(false);
+    instDb().purge().catch(dictionaryErrorShow).then(() => {
+        dictionarySpinnerShow(false);
         dictControls.show();
         dictProgress.hide();
         return optionsLoad();
     }).then(options => {
         options.dictionaries = {};
-        return optionsSave(options).then(() => populateDictionaries(options));
+        optionsSave(options).then(() => dictionaryGroupsPopulate(options));
     });
 }
 
 function onDictionaryImport() {
-    showDictionaryError(null);
-    showDictionarySpinner(true);
+    dictionaryErrorShow(null);
+    dictionarySpinnerShow(true);
 
     const dictUrl = $('#dict-url');
     const dictImporter = $('#dict-importer').hide();
@@ -218,8 +246,8 @@ function onDictionaryImport() {
         instDb().importDictionary(dictUrl.val(), (total, current) => setProgress(current / total * 100.0)).then(summary => {
             options.dictionaries[summary.title] = {enabled: true, priority: 0};
             return optionsSave(options);
-        }).then(() => populateDictionaries(options)).catch(showDictionaryError).then(() => {
-            showDictionarySpinner(false);
+        }).then(() => dictionaryGroupsPopulate(options)).catch(dictionaryErrorShow).then(() => {
+            dictionarySpinnerShow(false);
             dictProgress.hide();
             dictImporter.show();
             dictUrl.val('');
@@ -251,7 +279,7 @@ function onDictionaryUpdateUrl() {
  * Anki
  */
 
-function showAnkiSpinner(show) {
+function ankiSpinnerShow(show) {
     const spinner = $('#anki-spinner');
     if (show) {
         spinner.show();
@@ -260,7 +288,7 @@ function showAnkiSpinner(show) {
     }
 }
 
-function showAnkiError(error) {
+function ankiErrorShow(error) {
     const dialog = $('#anki-error');
     if (error) {
         dialog.show().find('span').text(error);
@@ -279,9 +307,9 @@ function ankiFieldsToDict(selection) {
     return result;
 }
 
-function populateAnkiDeckAndModel(options) {
-    showAnkiError(null);
-    showAnkiSpinner(true);
+function ankiDeckAndModelPopulate(options) {
+    ankiErrorShow(null);
+    ankiSpinnerShow(true);
 
     const ankiFormat = $('#anki-format').hide();
     return Promise.all([instAnki().getDeckNames(), instAnki().getModelNames()]).then(([deckNames, modelNames]) => {
@@ -297,13 +325,13 @@ function populateAnkiDeckAndModel(options) {
         modelNames.sort().forEach(name => ankiModel.append($('<option/>', {value: name, text: name})));
 
         return Promise.all([
-            populateAnkiFields($('#anki-terms-model').val(options.anki.terms.model), options),
-            populateAnkiFields($('#anki-kanji-model').val(options.anki.kanji.model), options)
+            ankiFieldsPopulate($('#anki-terms-model').val(options.anki.terms.model), options),
+            ankiFieldsPopulate($('#anki-kanji-model').val(options.anki.kanji.model), options)
         ]);
-    }).then(() => ankiFormat.show()).catch(showAnkiError).then(() => showAnkiSpinner(false));
+    }).then(() => ankiFormat.show()).catch(ankiErrorShow).then(() => ankiSpinnerShow(false));
 }
 
-function populateAnkiFields(element, options) {
+function ankiFieldsPopulate(element, options) {
     const tab = element.closest('.tab-pane');
     const tabId = tab.attr('id');
     const container = tab.find('tbody').empty();
@@ -339,39 +367,16 @@ function onAnkiModelChanged(e) {
         return;
     }
 
-    showAnkiError(null);
-    showAnkiSpinner(true);
+    ankiErrorShow(null);
+    ankiSpinnerShow(true);
 
     const element = $(this);
-    getFormData().then(({optionsNew, optionsOld}) => {
+    formRead().then(({optionsNew, optionsOld}) => {
         const tab = element.closest('.tab-pane');
         const tabId = tab.attr('id');
-
         optionsNew.anki[tabId].fields = {};
-        populateAnkiFields(element, optionsNew).then(() => {
+        ankiFieldsPopulate(element, optionsNew).then(() => {
             optionsSave(optionsNew);
-        }).catch(showAnkiError).then(() => showAnkiSpinner(false));
+        }).catch(ankiErrorShow).then(() => ankiSpinnerShow(false));
     });
-}
-
-function onOptionsChanged(e) {
-    if (!e.originalEvent && !e.isTrigger) {
-        return;
-    }
-
-    getFormData().then(({optionsNew, optionsOld}) => {
-        return optionsSave(optionsNew).then(() => {
-            updateVisibility(optionsNew);
-
-            const ankiUpdated =
-                optionsNew.anki.enable !== optionsOld.anki.enable ||
-                optionsNew.anki.server !== optionsOld.anki.server;
-
-            if (ankiUpdated) {
-                showAnkiError(null);
-                showAnkiSpinner(true);
-                return populateAnkiDeckAndModel(optionsNew);
-            }
-        });
-    }).catch(showAnkiError).then(() => showAnkiSpinner(false));
 }

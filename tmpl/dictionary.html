@@ -1,19 +1,11 @@
 <div class="dict-group well well-sm" data-title="{{title}}">
-    <div class="row">
-        <div class="col-xs-6">
-            <h4><span class="text-muted glyphicon glyphicon-book"></span> {{title}} <small>rev.{{revision}}</small></h4>
+    <h4><span class="text-muted glyphicon glyphicon-book"></span> {{title}} <small>rev.{{revision}}</small></h4>
 
-            <div class="checkbox">
-                <label><input type="checkbox" class="dict-enabled" {{#if enabled}}checked{{/if}}> Enable search</label>
-            </div>
-            <div class="form-group options-advanced">
-                <label for="dict-{{title}}">Result priority</label>
-                <input type="number" value="{{priority}}" id="dict-{{title}}" class="form-control dict-priority">
-            </div>
-        </div>
-        <div class="col-xs-6 text-right">
-            <p><button class="dict-priority-up glyphicon glyphicon-arrow-up" title="Increase priority"></button></p>
-            <p><button class="dict-priority-down glyphicon glyphicon-arrow-down" title="Decrease priority"></button></p>
-        </div>
+    <div class="checkbox">
+        <label><input type="checkbox" class="dict-enabled" {{#if enabled}}checked{{/if}}> Enable search</label>
+    </div>
+    <div class="form-group options-advanced">
+        <label for="dict-{{title}}">Result priority</label>
+        <input type="number" value="{{priority}}" id="dict-{{title}}" class="form-control dict-priority">
     </div>
 </div>

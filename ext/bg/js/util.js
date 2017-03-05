@@ -248,6 +248,20 @@ function dictEnabled(options) {
     return dictionaries;
 }
 
+function dictRowsSort(rows, options) {
+    return rows.sort((ra, rb) => {
+        const pa = options.dictionaries[ra.title].priority || 0;
+        const pb = options.dictionaries[rb.title].priority || 0;
+        if (pa > pb) {
+            return -1;
+        } else if (pa < pb) {
+            return 1;
+        } else {
+            return 0;
+        }
+    });
+}
+
 function dictTermsSort(definitions, dictionaries=null) {
     return definitions.sort((v1, v2) => {
         const sl1 = v1.source.length;
