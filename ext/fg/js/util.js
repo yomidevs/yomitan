@@ -119,6 +119,20 @@ function docImposterHide() {
 }
 
 function docRangeFromPoint(point, imposter) {
+    if (!document.elementFromPoint) {
+        document.elementFromPoint = (x, y) => {
+            const position = document.caretPositionFromPoint(x,y);
+            if (position === null) {
+                return null;
+            }
+
+            const range = document.createRange();
+            range.setStart(position.offsetNode, position.offset);
+            range.setEnd(position.offsetNode, position.offset);
+            return range;
+        };
+    }
+
     const element = document.elementFromPoint(point.x, point.y);
     if (element !== null) {
         if (element.nodeName === 'IMG' || element.nodeName === 'BUTTON') {
@@ -191,51 +205,6 @@ function docSentenceExtract(source, extent) {
     }
 
     return content.substring(startPos, endPos).trim();
-}
-
-
-/*
- * Audio
- */
-
-function audioUrlBuild(definition) {
-    let kana = definition.reading;
-    let kanji = definition.expression;
-
-    if (!kana && !kanji) {
-        return null;
-    }
-
-    if (!kana && wanakana.isHiragana(kanji)) {
-        kana = kanji;
-        kanji = null;
-    }
-
-    const params = [];
-    if (kanji) {
-        params.push(`kanji=${encodeURIComponent(kanji)}`);
-    }
-    if (kana) {
-        params.push(`kana=${encodeURIComponent(kana)}`);
-    }
-
-    return `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?${params.join('&')}`;
-}
-
-function audioFilenameBuild(definition) {
-    if (!definition.reading && !definition.expression) {
-        return null;
-    }
-
-    let filename = 'yomichan';
-    if (definition.reading) {
-        filename += `_${definition.reading}`;
-    }
-    if (definition.expression) {
-        filename += `_${definition.expression}`;
-    }
-
-    return filename += '.mp3';
 }
 
 

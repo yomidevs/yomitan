@@ -15,7 +15,6 @@
     "content_scripts": [{
         "matches": ["http://*/*", "https://*/*", "file://*/*"],
         "js": [
-            "fg/js/gecko.js",
             "fg/js/util.js",
             "fg/js/source-range.js",
             "fg/js/source-element.js",

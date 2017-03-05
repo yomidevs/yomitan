@@ -73,11 +73,11 @@ class Driver {
             return;
         }
 
-        const searcher = () => this.searchAt(this.lastMousePos);
+        const searchFunc = () => this.searchAt(this.lastMousePos);
         if (this.popup.isVisible()) {
-            searcher();
+            searchFunc();
         } else {
-            this.popupTimerSet(searcher);
+            this.popupTimerSet(searchFunc);
         }
     }
 
