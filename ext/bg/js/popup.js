@@ -18,7 +18,7 @@
 
 
 $(document).ready(() => {
-    $('#open-search').click(() => window.open(chrome.extension.getURL('bg/search.html')));
+    $('#open-search').click(() => window.open(chrome.extension.getURL('/bg/search.html')));
     $('#open-options').click(() => chrome.runtime.openOptionsPage());
     $('#open-help').click(() => window.open('http://foosoft.net/projects/yomichan'));
 

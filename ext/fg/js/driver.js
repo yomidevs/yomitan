@@ -17,7 +17,7 @@
  */
 
 
-class Driver {
+window.driver = new class {
     constructor() {
         this.popup = new Popup();
         this.popupTimer = null;
@@ -208,9 +208,7 @@ class Driver {
                 this.popup.showOrphaned();
             }
         } else {
-            errorShow(error);
+            window.alert(`Error: ${error}`);
         }
     }
-}
-
-window.driver = new Driver();
+};

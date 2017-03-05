@@ -234,6 +234,7 @@ function onDictionaryUpdateUrl() {
     $('#dict-import').prop('disabled', $(this).val().length === 0);
 }
 
+
 /*
  * Anki
  */

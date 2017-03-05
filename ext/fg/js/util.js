@@ -206,12 +206,3 @@ function docSentenceExtract(source, extent) {
 
     return content.substring(startPos, endPos).trim();
 }
-
-
-/*
- * Error
- */
-
-function errorShow(error) {
-    window.alert(`Error: ${error}`);
-}

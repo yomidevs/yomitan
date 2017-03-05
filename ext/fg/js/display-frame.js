@@ -43,7 +43,7 @@ window.displayFrame = new class extends Display {
         if (window.orphaned) {
             this.showOrphaned();
         } else {
-            errorShow(error);
+            window.alert(`Error: ${error}`);
         }
     }
 
