@@ -302,7 +302,7 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
 
   return "            <a href=\"#\" title=\"Add Kanji\" class=\"action-add-note pending disabled\" data-mode=\"kanji\" data-index=\""
     + container.escapeExpression(((helper = (helper = helpers.index || (data && data.index)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"index","hash":{},"data":data}) : helper)))
-    + "\"><img src=\"/mixed/img/add_kanji.png\"></a>\n";
+    + "\"><img src=\"/mixed/img/add-kanji.png\"></a>\n";
 },"4":function(container,depth0,helpers,partials,data) {
     var stack1;
 

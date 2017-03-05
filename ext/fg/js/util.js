@@ -119,8 +119,17 @@ function docImposterHide() {
 }
 
 function docRangeFromPoint(point, imposter) {
-    if (!document.elementFromPoint) {
-        document.elementFromPoint = (x, y) => {
+    const element = document.elementFromPoint(point.x, point.y);
+    if (element !== null) {
+        if (element.nodeName === 'IMG' || element.nodeName === 'BUTTON') {
+            return new TextSourceElement(element);
+        } else if (imposter && (element.nodeName === 'INPUT' || element.nodeName === 'TEXTAREA')) {
+            docImposterCreate(element);
+        }
+    }
+
+    if (!document.caretRangeFromPoint) {
+        document.caretRangeFromPoint = (x, y) => {
             const position = document.caretPositionFromPoint(x,y);
             if (position === null) {
                 return null;
@@ -131,15 +140,6 @@ function docRangeFromPoint(point, imposter) {
             range.setEnd(position.offsetNode, position.offset);
             return range;
         };
-    }
-
-    const element = document.elementFromPoint(point.x, point.y);
-    if (element !== null) {
-        if (element.nodeName === 'IMG' || element.nodeName === 'BUTTON') {
-            return new TextSourceElement(element);
-        } else if (imposter && (element.nodeName === 'INPUT' || element.nodeName === 'TEXTAREA')) {
-            docImposterCreate(element);
-        }
     }
 
     const range = document.caretRangeFromPoint(point.x, point.y);
