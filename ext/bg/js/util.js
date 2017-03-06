@@ -251,8 +251,8 @@ function dictEnabled(options) {
 
 function dictRowsSort(rows, options) {
     return rows.sort((ra, rb) => {
-        const pa = options.dictionaries[ra.title].priority || 0;
-        const pb = options.dictionaries[rb.title].priority || 0;
+        const pa = (options.dictionaries[ra.title] || {}).priority || 0;
+        const pb = (options.dictionaries[rb.title] || {}).priority || 0;
         if (pa > pb) {
             return -1;
         } else if (pa < pb) {

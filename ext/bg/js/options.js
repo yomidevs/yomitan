@@ -192,7 +192,7 @@ function dictionaryGroupsPopulate(options) {
         }
 
         for (const row of dictRowsSort(rows, options)) {
-            const dictOptions = options.dictionaries[row.title];
+            const dictOptions = options.dictionaries[row.title] || {enabled: false, priority: 0};
             const dictHtml = handlebarsRender('dictionary.html', {
                 title: row.title,
                 version: row.version,
