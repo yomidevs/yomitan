@@ -16,7 +16,6 @@ For basic functionality:
 
 For development:
 
-*   [7-Zip](http://www.7-zip.org/)
 *   [Git LFS](https://git-lfs.github.com/)
 *   [Go](https://golang.org/)
 *   [Handlebars](http://handlebarsjs.com/)
@@ -26,11 +25,21 @@ For development:
 
 Yomichan can downloaded free of charge from the [Chrome Web
 Store](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami) and the [Firefox
-Add-ons](https://addons.mozilla.org/en-US/firefox/addon/yomichan/) portal. If you find this extension helpful and
+Marketplace](https://addons.mozilla.org/en-US/firefox/addon/yomichan/). If you find this extension helpful and
 appreciate the time that was spent developing it, I would kindly ask that you leave a positive review. Your support and
 feedback encourages continued development of this tool.
 
-[![Chrome web store](https://foosoft.net/projects/yomichan/img/store.png)](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami)
+[![](https://foosoft.net/projects/yomichan/img/store.png)](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami)
+[![](https://foosoft.net/projects/yomichan/img/market.png)](https://addons.mozilla.org/en-US/firefox/addon/yomichan/)
+
+At present, Yomichan is sitting in a queue to be reviewed and signed by Mozilla. If you don't want to wait for several
+weeks for approval and wish to use this extension in Firefox today, you can follow the steps below:
+
+1.  Type `about:config` into the browser address bar.
+2.  Skip past the "voiding your warranty" nag screen.
+3.  Type `xpinstall.signatures.required` into the search bar on top.
+4.  Double-click the displayed entry to set its value to `false`.
+5.  Install extension as usual from the [Firefox Marketplace](https://addons.mozilla.org/en-US/firefox/addon/yomichan/).
 
 ## Basic Functionality ##
 
