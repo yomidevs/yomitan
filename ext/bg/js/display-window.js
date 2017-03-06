@@ -28,7 +28,7 @@ window.displayWindow = new class extends Display {
     }
 
     definitionsAddable(definitions, modes) {
-        return instYomi().definitionsAddable(definitions, modes);
+        return instYomi().definitionsAddable(definitions, modes).catch(() => []);
     }
 
     templateRender(template, data) {
