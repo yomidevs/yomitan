@@ -203,7 +203,7 @@ window.driver = new class {
 
     handleError(error, textSource) {
         if (window.orphaned) {
-            if (textSource) {
+            if (textSource && this.options.scanning.requireShift) {
                 this.popup.showNextTo(textSource.getRect());
                 this.popup.showOrphaned();
             }
