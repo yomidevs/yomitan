@@ -32,6 +32,7 @@ function formRead() {
         optionsNew.general.maxResults = parseInt($('#max-displayed-results').val(), 10);
 
         optionsNew.scanning.requireShift = $('#hold-shift-to-scan').prop('checked');
+        optionsNew.scanning.middleMouse = $('#middle-mouse-button-scan').prop('checked');
         optionsNew.scanning.selectText = $('#select-matched-text').prop('checked');
         optionsNew.scanning.imposter = $('#search-form-text-fields').prop('checked');
         optionsNew.scanning.delay = parseInt($('#scan-delay').val(), 10);
@@ -113,6 +114,7 @@ $(document).ready(() => {
         $('#max-displayed-results').val(options.general.maxResults);
 
         $('#hold-shift-to-scan').prop('checked', options.scanning.requireShift);
+        $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);
         $('#select-matched-text').prop('checked', options.scanning.selectText);
         $('#search-form-text-fields').prop('checked', options.scanning.imposter);
         $('#scan-delay').val(options.scanning.delay);

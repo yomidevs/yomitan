@@ -69,7 +69,7 @@ window.driver = new class {
             return;
         }
 
-        if (this.options.scanning.requireShift && !e.shiftKey && !this.mouseDownMiddle) {
+        if (this.options.scanning.requireShift && !e.shiftKey && !(this.mouseDownMiddle && this.options.scanning.middleMouse)) {
             return;
         }
 

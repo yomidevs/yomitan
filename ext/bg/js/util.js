@@ -84,6 +84,7 @@ function optionsSetDefaults(options) {
 
         scanning: {
             requireShift: true,
+            middleMouse: true,
             selectText: true,
             imposter: true,
             delay: 15,
