@@ -44,7 +44,7 @@ function formRead() {
         optionsNew.anki.sentenceExt = parseInt($('#sentence-detection-extent').val(), 10);
         optionsNew.anki.server = $('#interface-server').val();
 
-        if (optionsOld.anki.enable) {
+        if (optionsOld.anki.enable && !$('#anki-error').is(':visible')) {
             optionsNew.anki.terms.deck = $('#anki-terms-deck').val();
             optionsNew.anki.terms.model = $('#anki-terms-model').val();
             optionsNew.anki.terms.fields = ankiFieldsToDict($('#terms .anki-field-value'));
