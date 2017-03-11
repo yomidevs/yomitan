@@ -21,6 +21,7 @@ window.displayWindow = new class extends Display {
     constructor() {
         super($('#spinner'), $('#content'));
         $('#search').click(this.onSearch.bind(this));
+        window.wanakana.bind($('#query').get(0));
     }
 
     definitionAdd(definition, mode) {
