@@ -61,7 +61,7 @@ window.displayFrame = new class extends Display {
 
             api_showKanjiDefs({definitions, options, context}) {
                 window.scrollTo(0, 0);
-                this.showKanjiDefs(defintions, options, context);
+                this.showKanjiDefs(definitions, options, context);
             }
 
             api_showOrphaned() {

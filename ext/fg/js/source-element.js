@@ -39,7 +39,7 @@ class TextSourceElement {
             case 'IMG':
                 return this.element.getAttribute('alt');
             default:
-                return this.element.value;
+                return this.element.value || '';
         }
     }
 

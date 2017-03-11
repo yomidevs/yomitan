@@ -26,12 +26,6 @@
     src: url('/mixed/ttf/kanji-stroke-orders.ttf');
 }
 
-@font-face {
-    font-family: vl-gothic-regular;
-    src: url('/mixed/ttf/vl-gothic-regular.ttf');
-}
-
-
 /*
  * General
  */
@@ -112,7 +106,6 @@ hr {
 
 .expression {
     display: inline-block;
-    font-family: vl-gothic-regular;
     font-size: 24px;
 }
 
