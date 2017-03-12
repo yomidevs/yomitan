@@ -79,7 +79,10 @@ function optionsSetDefaults(options) {
             groupResults: true,
             softKatakana: true,
             maxResults: 32,
-            showAdvanced: false
+            showAdvanced: false,
+            popupWidth: 400,
+            popupHeight: 250,
+            popupOffset: 10
         },
 
         scanning: {

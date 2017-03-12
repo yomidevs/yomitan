@@ -154,7 +154,7 @@ window.driver = new class {
                 const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
                 const url = window.location.href;
 
-                this.popup.showNextTo(textSource.getRect());
+                this.popup.showNextTo(textSource.getRect(), this.options);
                 this.popup.showTermDefs(definitions, this.options, {sentence, url});
 
                 this.lastTextSource = textSource;
@@ -177,7 +177,7 @@ window.driver = new class {
                 const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
                 const url = window.location.href;
 
-                this.popup.showNextTo(textSource.getRect());
+                this.popup.showNextTo(textSource.getRect(), this.options);
                 this.popup.showKanjiDefs(definitions, this.options, {sentence, url});
 
                 this.lastTextSource = textSource;
@@ -204,7 +204,7 @@ window.driver = new class {
     handleError(error, textSource) {
         if (window.orphaned) {
             if (textSource && this.options.scanning.requireShift) {
-                this.popup.showNextTo(textSource.getRect());
+                this.popup.showNextTo(textSource.getRect(), this.options);
                 this.popup.showOrphaned();
             }
         } else {

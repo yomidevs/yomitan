@@ -30,6 +30,9 @@ function formRead() {
         optionsNew.general.softKatakana = $('#soft-katakana-search').prop('checked');
         optionsNew.general.showAdvanced = $('#show-advanced-options').prop('checked');
         optionsNew.general.maxResults = parseInt($('#max-displayed-results').val(), 10);
+        optionsNew.general.popupWidth = parseInt($('#popup-width').val(), 10);
+        optionsNew.general.popupHeight = parseInt($('#popup-height').val(), 10);
+        optionsNew.general.popupOffset = parseInt($('#popup-offset').val(), 10);
 
         optionsNew.scanning.requireShift = $('#hold-shift-to-scan').prop('checked');
         optionsNew.scanning.middleMouse = $('#middle-mouse-button-scan').prop('checked');
@@ -112,6 +115,9 @@ $(document).ready(() => {
         $('#soft-katakana-search').prop('checked', options.general.softKatakana);
         $('#show-advanced-options').prop('checked', options.general.showAdvanced);
         $('#max-displayed-results').val(options.general.maxResults);
+        $('#popup-width').val(options.general.popupWidth);
+        $('#popup-height').val(options.general.popupHeight);
+        $('#popup-offset').val(options.general.popupOffset);
 
         $('#hold-shift-to-scan').prop('checked', options.scanning.requireShift);
         $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);
