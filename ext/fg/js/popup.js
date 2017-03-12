@@ -45,16 +45,32 @@ class Popup {
 
         let x = elementRect.left;
         let width = containerWidth;
-        if (x + width >= window.innerWidth) {
-            width = Math.min(width, x);
-            x = window.innerWidth - width;
+        const overflowX = Math.max(x + width - document.body.clientWidth, 0);
+        if (overflowX > 0) {
+            if (x >= overflowX) {
+                x -= overflowX;
+            } else {
+                width = document.body.clientWidth;
+                x = 0;
+            }
         }
 
-        let y = elementRect.bottom + this.offset;
+        let y = 0;
         let height = containerHeight;
-        if (y + height >= window.innerHeight) {
-            height = Math.min(height, y);
-            y = elementRect.top - height - this.offset;
+        const yBelow = elementRect.bottom + this.offset;
+        const yAbove = elementRect.top - this.offset;
+        const overflowBelow = Math.max(yBelow + height - document.body.clientHeight, 0);
+        const overflowAbove = Math.max(height - yAbove, 0);
+        if (overflowBelow > 0 || overflowAbove > 0) {
+            if (overflowBelow < overflowAbove) {
+                height = Math.max(height - overflowBelow, 0);
+                y = yBelow;
+            } else {
+                height = Math.max(height - overflowAbove, 0);
+                y = Math.max(yAbove - height, 0);
+            }
+        } else {
+            y = yBelow;
         }
 
         this.showAt({x, y, width, height});
