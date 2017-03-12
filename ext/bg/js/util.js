@@ -191,6 +191,21 @@ function optionsVersion(options) {
                     options.dictionaries[title].enabled = true;
                 }
             }
+        },
+        () => {
+            let hasEnabledDict = false;
+            for (const title in options.dictionaries) {
+                if (options.dictionaries[title].enabled) {
+                    hasEnabledDict = true;
+                    break;
+                }
+            }
+
+            if (!hasEnabledDict) {
+                for (const title in options.dictionaries) {
+                    options.dictionaries[title].enabled = true;
+                }
+            }
         }
     ];
 
