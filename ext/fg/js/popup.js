@@ -20,12 +20,16 @@
 class Popup {
     constructor() {
         this.offset = 10;
+        this.minWidth = 400;
+        this.minHeight = 250;
 
         this.container = document.createElement('iframe');
         this.container.id = 'yomichan-popup';
         this.container.addEventListener('mousedown', e => e.stopPropagation());
         this.container.addEventListener('scroll', e => e.stopPropagation());
         this.container.setAttribute('src', chrome.extension.getURL('/fg/frame.html'));
+        this.container.style.width=`${this.minWidth}px`;
+        this.container.style.height=`${this.minHeight}px`;
 
         document.body.appendChild(this.container);
     }
@@ -43,23 +47,26 @@ class Popup {
         const containerHeight = parseInt(containerStyle.height);
         const containerWidth = parseInt(containerStyle.width);
 
+        const limitX = document.body.clientWidth;
+        const limitY = window.innerHeight;
+
         let x = elementRect.left;
-        let width = containerWidth;
-        const overflowX = Math.max(x + width - document.body.clientWidth, 0);
+        let width = Math.max(containerWidth, this.minWidth);
+        const overflowX = Math.max(x + width - limitX, 0);
         if (overflowX > 0) {
             if (x >= overflowX) {
                 x -= overflowX;
             } else {
-                width = document.body.clientWidth;
+                width = limitX;
                 x = 0;
             }
         }
 
         let y = 0;
-        let height = containerHeight;
+        let height = Math.max(containerHeight, this.minHeight);
         const yBelow = elementRect.bottom + this.offset;
         const yAbove = elementRect.top - this.offset;
-        const overflowBelow = Math.max(yBelow + height - document.body.clientHeight, 0);
+        const overflowBelow = Math.max(yBelow + height - limitY, 0);
         const overflowAbove = Math.max(height - yAbove, 0);
         if (overflowBelow > 0 || overflowAbove > 0) {
             if (overflowBelow < overflowAbove) {
