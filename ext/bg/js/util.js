@@ -210,15 +210,7 @@ function optionsLoad() {
     return new Promise((resolve, reject) => {
         chrome.storage.local.get(null, store => resolve(store.options));
     }).then(optionsStr => {
-        if (optionsStr) {
-            return JSON.parse(optionsStr);
-        } else if (chrome.storage.sync) {
-            return new Promise((resolve, reject) => {
-                chrome.storage.sync.get(null, options => resolve(options));
-            });
-        } else {
-            return {};
-        }
+        return optionsStr ? JSON.parse(optionsStr) : {};
     }).catch(error => {
         return {};
     }).then(options => {
