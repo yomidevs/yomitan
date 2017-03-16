@@ -66,14 +66,20 @@ class Display {
         this.spinner.hide();
 
         this.templateRender('terms.html', params).then(content => {
+            window.scrollTo(0, 0);
             this.container.html(content);
+
             $('.action-add-note').click(this.onActionAddNote.bind(this));
             $('.action-play-audio').click(this.onActionPlayAudio.bind(this));
             $('.kanji-link').click(e => {
                 e.preventDefault();
                 const character = $(e.target).text();
-                this.kanjiFind(character).then(definitions => {
-                    this.showKanjiDefs(definitions, options, context);
+                this.kanjiFind(character).then(kanjiDefs => {
+                    this.showKanjiDefs(
+                        kanjiDefs,
+                        options,
+                        {definitions, sentence: context.sentence, url: context.url}
+                    );
                 }).catch(this.handleError.bind(this));
             });
 
@@ -99,8 +105,21 @@ class Display {
         this.spinner.hide();
 
         this.templateRender('kanji.html', params).then(content => {
+            window.scrollTo(0, 0);
             this.container.html(content);
+
             $('.action-add-note').click(this.onActionAddNote.bind(this));
+            $('.term-source').click(e => {
+                e.preventDefault();
+                if (context.definitions) {
+                    this.showTermDefs(
+                        context.definitions,
+                        options,
+                        {sentence: context.sentence, url: context.url}
+                    );
+                }
+            });
+
             return this.adderButtonsUpdate(['kanji'], sequence);
         }).catch(this.handleError.bind(this));
     }

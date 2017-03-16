@@ -55,12 +55,10 @@ window.displayFrame = new class extends Display {
     onMessage(e) {
         const handlers = new class {
             api_showTermDefs({definitions, options, context}) {
-                window.scrollTo(0, 0);
                 this.showTermDefs(definitions, options, context);
             }
 
             api_showKanjiDefs({definitions, options, context}) {
-                window.scrollTo(0, 0);
                 this.showKanjiDefs(definitions, options, context);
             }
 
