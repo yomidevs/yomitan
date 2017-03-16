@@ -26,10 +26,19 @@ class Popup {
         this.container.setAttribute('src', chrome.extension.getURL('/fg/frame.html'));
         this.container.style.width='0px';
         this.container.style.height='0px';
-        document.body.appendChild(this.container);
+        this.injected = false;
+    }
+
+    inject() {
+        if (!this.injected) {
+            document.body.appendChild(this.container);
+            this.injected = true;
+        }
     }
 
     showAt(rect) {
+        this.inject();
+
         this.container.style.left = `${rect.x}px`;
         this.container.style.top = `${rect.y}px`;
         this.container.style.height = `${rect.height}px`;
@@ -38,6 +47,8 @@ class Popup {
     }
 
     showNextTo(elementRect, options) {
+        this.inject();
+
         const containerStyle = window.getComputedStyle(this.container);
         const containerHeight = parseInt(containerStyle.height);
         const containerWidth = parseInt(containerStyle.width);
@@ -83,7 +94,7 @@ class Popup {
     }
 
     isVisible() {
-        return this.container.style.visibility !== 'hidden';
+        return this.injected && this.container.style.visibility !== 'hidden';
     }
 
     showTermDefs(definitions, options, context) {
