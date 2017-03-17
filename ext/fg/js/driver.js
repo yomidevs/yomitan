@@ -153,9 +153,12 @@ window.driver = new class {
 
                 const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
                 const url = window.location.href;
-
-                this.popup.showNextTo(textSource.getRect(), this.options);
-                this.popup.showTermDefs(definitions, this.options, {sentence, url});
+                this.popup.showTermDefs(
+                    textSource.getRect(),
+                    definitions,
+                    this.options,
+                    {sentence, url}
+                );
 
                 this.lastTextSource = textSource;
                 if (this.options.scanning.selectText) {
@@ -176,9 +179,12 @@ window.driver = new class {
             } else {
                 const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
                 const url = window.location.href;
-
-                this.popup.showNextTo(textSource.getRect(), this.options);
-                this.popup.showKanjiDefs(definitions, this.options, {sentence, url});
+                this.popup.showKanjiDefs(
+                    textSource.getRect(),
+                    definitions,
+                    this.options,
+                    {sentence, url}
+                );
 
                 this.lastTextSource = textSource;
                 if (this.options.scanning.selectText) {
@@ -204,8 +210,7 @@ window.driver = new class {
     handleError(error, textSource) {
         if (window.orphaned) {
             if (textSource && this.options.scanning.requireShift) {
-                this.popup.showNextTo(textSource.getRect(), this.options);
-                this.popup.showOrphaned();
+                this.popup.showOrphaned(textSource.getRect(), this.options);
             }
         } else {
             window.alert(`Error: ${error}`);

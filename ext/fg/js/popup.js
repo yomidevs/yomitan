@@ -26,67 +26,65 @@ class Popup {
         this.container.setAttribute('src', chrome.extension.getURL('/fg/frame.html'));
         this.container.style.width = '0px';
         this.container.style.height = '0px';
-        this.injected = false;
+        this.injected = null;
     }
 
     inject() {
         if (!this.injected) {
-            document.body.appendChild(this.container);
-            this.injected = true;
+            this.injected = new Promise((resolve, reject) => {
+                this.container.addEventListener('load', resolve);
+                document.body.appendChild(this.container);
+            });
         }
+
+        return this.injected;
     }
 
-    showAt(rect) {
-        this.inject();
+    show(elementRect, options) {
+        return this.inject().then(() => {
+            const containerStyle = window.getComputedStyle(this.container);
+            const containerHeight = parseInt(containerStyle.height);
+            const containerWidth = parseInt(containerStyle.width);
 
-        this.container.style.left = `${rect.x}px`;
-        this.container.style.top = `${rect.y}px`;
-        this.container.style.height = `${rect.height}px`;
-        this.container.style.width = `${rect.width}px`;
-        this.container.style.visibility = 'visible';
-    }
+            const limitX = document.body.clientWidth;
+            const limitY = window.innerHeight;
 
-    showNextTo(elementRect, options) {
-        this.inject();
-
-        const containerStyle = window.getComputedStyle(this.container);
-        const containerHeight = parseInt(containerStyle.height);
-        const containerWidth = parseInt(containerStyle.width);
-
-        const limitX = document.body.clientWidth;
-        const limitY = window.innerHeight;
-
-        let x = elementRect.left;
-        let width = Math.max(containerWidth, options.general.popupWidth);
-        const overflowX = Math.max(x + width - limitX, 0);
-        if (overflowX > 0) {
-            if (x >= overflowX) {
-                x -= overflowX;
-            } else {
-                width = limitX;
-                x = 0;
+            let x = elementRect.left;
+            let width = Math.max(containerWidth, options.general.popupWidth);
+            const overflowX = Math.max(x + width - limitX, 0);
+            if (overflowX > 0) {
+                if (x >= overflowX) {
+                    x -= overflowX;
+                } else {
+                    width = limitX;
+                    x = 0;
+                }
             }
-        }
 
-        let y = 0;
-        let height = Math.max(containerHeight, options.general.popupHeight);
-        const yBelow = elementRect.bottom + options.general.popupOffset;
-        const yAbove = elementRect.top - options.general.popupOffset;
-        const overflowBelow = Math.max(yBelow + height - limitY, 0);
-        const overflowAbove = Math.max(height - yAbove, 0);
-        if (overflowBelow > 0 || overflowAbove > 0) {
-            if (overflowBelow < overflowAbove) {
-                height = Math.max(height - overflowBelow, 0);
+            let y = 0;
+            let height = Math.max(containerHeight, options.general.popupHeight);
+            const yBelow = elementRect.bottom + options.general.popupOffset;
+            const yAbove = elementRect.top - options.general.popupOffset;
+            const overflowBelow = Math.max(yBelow + height - limitY, 0);
+            const overflowAbove = Math.max(height - yAbove, 0);
+            if (overflowBelow > 0 || overflowAbove > 0) {
+                if (overflowBelow < overflowAbove) {
+                    height = Math.max(height - overflowBelow, 0);
+                    y = yBelow;
+                } else {
+                    height = Math.max(height - overflowAbove, 0);
+                    y = Math.max(yAbove - height, 0);
+                }
+            } else {
                 y = yBelow;
-            } else {
-                height = Math.max(height - overflowAbove, 0);
-                y = Math.max(yAbove - height, 0);
             }
-        } else {
-            y = yBelow;
-        }
 
-        this.showAt({x, y, width, height});
+            this.container.style.left = `${x}px`;
+            this.container.style.top = `${y}px`;
+            this.container.style.width = `${width}px`;
+            this.container.style.height = `${height}px`;
+            this.container.style.visibility = 'visible';
+        });
     }
 
     hide() {
@@ -97,16 +95,22 @@ class Popup {
         return this.injected && this.container.style.visibility !== 'hidden';
     }
 
-    showTermDefs(definitions, options, context) {
-        this.invokeApi('showTermDefs', {definitions, options, context});
+    showTermDefs(elementRect, definitions, options, context) {
+        this.show(elementRect, options).then(() => {
+            this.invokeApi('showTermDefs', {definitions, options, context});
+        });
     }
 
-    showKanjiDefs(definitions, options, context) {
-        this.invokeApi('showKanjiDefs', {definitions, options, context});
+    showKanjiDefs(elementRect, definitions, options, context) {
+        this.show(elementRect, options).then(() => {
+            this.invokeApi('showKanjiDefs', {definitions, options, context});
+        });
     }
 
-    showOrphaned() {
-        this.invokeApi('showOrphaned');
+    showOrphaned(elementRect, options) {
+        this.show(elementRect, options).then(() => {
+            this.invokeApi('showOrphaned');
+        });
     }
 
     invokeApi(action, params={}) {
