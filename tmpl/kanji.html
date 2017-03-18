@@ -2,10 +2,10 @@
 <div class="entry">
     <div class="actions">
         {{#if addable}}
-            <a href="#" title="Add Kanji" class="action-add-note pending disabled" data-mode="kanji" data-index="{{@index}}"><img src="/mixed/img/add-kanji.png"></a>
+        <a href="#" title="Add Kanji" class="action-add-note pending disabled" data-mode="kanji"><img src="/mixed/img/add-kanji.png" alt></a>
         {{/if}}
         {{#if source}}
-            <a href="#" title="Source term" class="source-term"><img src="/mixed/img/source-term.png"></a>
+        <a href="#" title="Source term" class="source-term"><img src="/mixed/img/source-term.png" alt></a>
         {{/if}}
     </div>
 
@@ -17,7 +17,7 @@
                 <th>Kunyomi:</th>
                 <td>
                     {{#each kunyomi}}
-                        {{.}}{{#unless @last}}, {{/unless}}
+                    {{.}}{{#unless @last}}, {{/unless}}
                     {{/each}}
                 </td>
             </tr>
@@ -25,7 +25,7 @@
                 <th>Onyomi:</th>
                 <td>
                     {{#each onyomi}}
-                        {{.}}{{#unless @last}}, {{/unless}}
+                    {{.}}{{#unless @last}}, {{/unless}}
                     {{/each}}
                 </td>
             </tr>
@@ -34,29 +34,29 @@
 
     <div>
         {{#each tags}}
-            <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
+        <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
         {{/each}}
     </div>
 
     <div class="glossary">
         {{#if glossary.[1]}}
-            <ol>
-                {{#each glossary}}
-                    <li><span class="glossary-item">{{#multiLine}}{{.}}{{/multiLine}}</span></li>
-                {{/each}}
-            </ol>
+        <ol>
+            {{#each glossary}}
+            <li><span class="glossary-item">{{#multiLine}}{{.}}{{/multiLine}}</span></li>
+            {{/each}}
+        </ol>
         {{else}}
-            <div class="glossary-item">{{#multiLine}}{{glossary.[0]}}{{/multiLine}}</div>
+        <div class="glossary-item">{{#multiLine}}{{glossary.[0]}}{{/multiLine}}</div>
         {{/if}}
     </div>
 </div>
 {{/inline}}
 
 {{#if definitions}}
-    {{#each definitions}}
-        {{#unless @first}}<hr>{{/unless}}
-        {{> kanji addable=../addable source=../source root=../root}}
-    {{/each}}
+{{#each definitions}}
+{{#unless @first}}<hr>{{/unless}}
+{{> kanji addable=../addable source=../source root=../root}}
+{{/each}}
 {{else}}
-    <p>No results found.</p>
+<p>No results found.</p>
 {{/if}}

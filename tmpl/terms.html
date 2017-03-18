@@ -1,71 +1,71 @@
 {{#*inline "definition"}}
-    {{#if tags}}
-        <div>
-            {{#each tags}}
-                <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
-            {{/each}}
-        </div>
-    {{/if}}
-    {{#if glossary.[1]}}
-        <ul>
-            {{#each glossary}}
-                <li><span class="glossary-item">{{#multiLine}}{{.}}{{/multiLine}}</span></li>
-            {{/each}}
-        </ul>
-    {{else}}
-        <div class="glossary-item">{{#multiLine}}{{glossary.[0]}}{{/multiLine}}</div>
-    {{/if}}
+{{#if tags}}
+<div>
+    {{#each tags}}
+    <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
+    {{/each}}
+</div>
+{{/if}}
+{{#if glossary.[1]}}
+<ul>
+    {{#each glossary}}
+    <li><span class="glossary-item">{{#multiLine}}{{.}}{{/multiLine}}</span></li>
+    {{/each}}
+</ul>
+{{else}}
+<div class="glossary-item">{{#multiLine}}{{glossary.[0]}}{{/multiLine}}</div>
+{{/if}}
 {{/inline}}
 
 {{#*inline "term"}}
 <div class="entry">
     <div class="actions">
         {{#if addable}}
-            <a href="#" title="Add term as expression" class="action-add-note pending disabled" data-mode="term-kanji" data-index="{{@index}}"><img src="/mixed/img/add-term-kanji.png"></a>
-            <a href="#" title="Add term as reading" class="action-add-note pending disabled" data-mode="term-kana" data-index="{{@index}}"><img src="/mixed/img/add-term-kana.png"></a>
+        <a href="#" title="Add expression" class="action-add-note pending disabled" data-mode="term-kanji"><img src="/mixed/img/add-term-kanji.png" alt></a>
+        <a href="#" title="Add reading" class="action-add-note pending disabled" data-mode="term-kana"><img src="/mixed/img/add-term-kana.png" alt></a>
         {{/if}}
         {{#if playback}}
-            <a href="#" title="Play audio" class="action-play-audio" data-index="{{@index}}"><img src="/mixed/img/play-audio.png"></a>
+        <a href="#" title="Play audio" class="action-play-audio"><img src="/mixed/img/play-audio.png" alt></a>
         {{/if}}
     </div>
 
     {{#if reading}}
-        <div class="expression"><ruby>{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}<rt>{{reading}}</rt></ruby></div>
+    <div class="expression"><ruby>{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}<rt>{{reading}}</rt></ruby></div>
     {{else}}
-        <div class="expression">{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}</div>
+    <div class="expression">{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}</div>
     {{/if}}
 
     {{#if reasons}}
-        <div class="reasons">
-            {{#each reasons}}
-                <span class="reasons">{{.}}</span> {{#unless @last}}&laquo;{{/unless}}
-            {{/each}}
-        </div>
+    <div class="reasons">
+        {{#each reasons}}
+        <span class="reasons">{{.}}</span> {{#unless @last}}&laquo;{{/unless}}
+        {{/each}}
+    </div>
     {{/if}}
 
     <div class="glossary">
-    {{#if grouped}}
+        {{#if grouped}}
         {{#if definitions.[1]}}
         <ol>
             {{#each definitions}}
-                <li>{{> definition}}</li>
+            <li>{{> definition}}</li>
             {{/each}}
         </ol>
         {{else}}
-            {{> definition definitions.[0]}}
+        {{> definition definitions.[0]}}
         {{/if}}
-    {{else}}
+        {{else}}
         {{> definition}}
-    {{/if}}
+        {{/if}}
     </div>
 </div>
 {{/inline}}
 
 {{#if definitions}}
-    {{#each definitions}}
-        {{#unless @first}}<hr>{{/unless}}
-        {{> term grouped=../grouped addable=../addable playback=../playback}}
-    {{/each}}
+{{#each definitions}}
+{{#unless @first}}<hr>{{/unless}}
+{{> term grouped=../grouped addable=../addable playback=../playback}}
+{{/each}}
 {{else}}
-    <p>No results found.</p>
+<p>No results found.</p>
 {{/if}}

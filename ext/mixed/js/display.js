@@ -47,6 +47,9 @@ class Display {
     }
 
     showTermDefs(definitions, options, context) {
+        this.spinner.hide();
+        this.definitions = definitions;
+
         const sequence = ++this.sequence;
         const params = {
             definitions,
@@ -56,26 +59,29 @@ class Display {
         };
 
         if (context) {
-            definitions.forEach(definition => {
+            for (const definition of definitions) {
                 definition.sentence = context.sentence;
                 definition.url = context.url;
-            });
+            }
         }
-
-        this.definitions = definitions;
-        this.spinner.hide();
 
         this.templateRender('terms.html', params).then(content => {
             this.container.html(content);
+
+            let offset = 0;
             if (context && context.hasOwnProperty('index') && context.index < definitions.length) {
                 const entry = $('.entry').eq(context.index);
-                window.scrollTo(0, entry.offset().top);
-            } else {
-                window.scrollTo(0, 0);
+                offset = entry.offset().top;
             }
 
+            window.scrollTo(0, offset);
+
             $('.action-add-note').click(this.onActionAddNote.bind(this));
-            $('.action-play-audio').click(this.onActionPlayAudio.bind(this));
+            $('.action-play-audio').click(e => {
+                e.preventDefault();
+                const index = Display.entryIndexFind($(e.currentTarget));
+                Display.audioPlay(this.definitions[index], this.audioCache);
+            });
             $('.kanji-link').click(e => {
                 e.preventDefault();
 
@@ -83,7 +89,7 @@ class Display {
                 if (context) {
                     context.source = {
                         definitions,
-                        index: $('.entry').index(link.closest('.entry'))
+                        index: Display.entryIndexFind(link)
                     };
                 }
 
@@ -97,6 +103,9 @@ class Display {
     }
 
     showKanjiDefs(definitions, options, context) {
+        this.spinner.hide();
+        this.definitions = definitions;
+
         const sequence = ++this.sequence;
         const params = {
             definitions,
@@ -105,18 +114,15 @@ class Display {
         };
 
         if (context) {
-            definitions.forEach(definition => {
+            for (const definition of definitions) {
                 definition.sentence = context.sentence;
                 definition.url = context.url;
-            });
+            }
         }
 
-        this.definitions = definitions;
-        this.spinner.hide();
-
         this.templateRender('kanji.html', params).then(content => {
-            window.scrollTo(0, 0);
             this.container.html(content);
+            window.scrollTo(0, 0);
 
             $('.action-add-note').click(this.onActionAddNote.bind(this));
             $('.source-term').click(e => {
@@ -132,10 +138,6 @@ class Display {
         }).catch(this.handleError.bind(this));
     }
 
-    adderButtonFind(index, mode) {
-        return $(`.action-add-note[data-index="${index}"][data-mode="${mode}"]`);
-    }
-
     adderButtonsUpdate(modes, sequence) {
         return this.definitionsAddable(this.definitions, modes).then(states => {
             if (states === null || sequence !== this.sequence) {
@@ -144,7 +146,7 @@ class Display {
 
             states.forEach((state, index) => {
                 for (const mode in state) {
-                    const button = this.adderButtonFind(index, mode);
+                    const button = Display.adderButtonFind(index, mode);
                     if (state[mode]) {
                         button.removeClass('disabled');
                     } else {
@@ -157,21 +159,15 @@ class Display {
         });
     }
 
-    onActionPlayAudio(e) {
-        e.preventDefault();
-        const index = $(e.currentTarget).data('index');
-        this.audioPlay(this.definitions[index]);
-    }
-
     onActionAddNote(e) {
         e.preventDefault();
         this.spinner.show();
 
         const link = $(e.currentTarget);
-        const index = link.data('index');
         const mode = link.data('mode');
-
+        const index = Display.entryIndexFind(link);
         const definition = this.definitions[index];
+
         if (mode !== 'kanji') {
             const url = Display.audioBuildUrl(definition);
             const filename = Display.audioBuildFilename(definition);
@@ -182,17 +178,16 @@ class Display {
 
         this.definitionAdd(definition, mode).then(success => {
             if (success) {
-                const button = this.adderButtonFind(index, mode);
-                button.addClass('disabled');
+                Display.adderButtonFind(index, mode).addClass('disabled');
             } else {
                 this.handleError('note could not be added');
             }
         }).catch(this.handleError.bind(this)).then(() => this.spinner.hide());
     }
 
-    audioPlay(definition) {
-        for (const key in this.audioCache) {
-            const audio = this.audioCache[key];
+    static audioPlay(definition, cache) {
+        for (const key in cache) {
+            const audio = cache[key];
             if (audio !== null) {
                 audio.pause();
             }
@@ -203,7 +198,7 @@ class Display {
             return;
         }
 
-        let audio = this.audioCache[url];
+        let audio = cache[url];
         if (audio) {
             audio.currentTime = 0;
             audio.play();
@@ -214,10 +209,18 @@ class Display {
                     audio = new Audio('/mixed/mp3/button.mp3');
                 }
 
-                this.audioCache[url] = audio;
+                cache[url] = audio;
                 audio.play();
             };
         }
+    }
+
+    static entryIndexFind(element) {
+        return $('.entry').index(element.closest('.entry'));
+    }
+
+    static adderButtonFind(index, mode) {
+        return $('.entry').eq(index).find(`.action-add-note[data-mode="${mode}"]`);
     }
 
     static audioBuildUrl(definition) {
