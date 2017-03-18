@@ -66,20 +66,29 @@ class Display {
         this.spinner.hide();
 
         this.templateRender('terms.html', params).then(content => {
-            window.scrollTo(0, 0);
             this.container.html(content);
+            if (context && context.hasOwnProperty('index') && context.index < definitions.length) {
+                const entry = $('.entry').eq(context.index);
+                window.scrollTo(0, entry.offset().top);
+            } else {
+                window.scrollTo(0, 0);
+            }
 
             $('.action-add-note').click(this.onActionAddNote.bind(this));
             $('.action-play-audio').click(this.onActionPlayAudio.bind(this));
             $('.kanji-link').click(e => {
                 e.preventDefault();
-                const character = $(e.target).text();
-                this.kanjiFind(character).then(kanjiDefs => {
-                    this.showKanjiDefs(
-                        kanjiDefs,
-                        options,
-                        {definitions, sentence: context.sentence, url: context.url}
-                    );
+
+                const link = $(e.target);
+                if (context) {
+                    context.source = {
+                        definitions,
+                        index: $('.entry').index(link.closest('.entry'))
+                    };
+                }
+
+                this.kanjiFind(link.text()).then(kanjiDefs => {
+                    this.showKanjiDefs(kanjiDefs, options, context);
                 }).catch(this.handleError.bind(this));
             });
 
@@ -111,12 +120,10 @@ class Display {
             $('.action-add-note').click(this.onActionAddNote.bind(this));
             $('.term-source').click(e => {
                 e.preventDefault();
-                if (context.definitions) {
-                    this.showTermDefs(
-                        context.definitions,
-                        options,
-                        {sentence: context.sentence, url: context.url}
-                    );
+
+                if (context && context.source) {
+                    context.index = context.source.index;
+                    this.showTermDefs(context.source.definitions, options, context);
                 }
             });
 

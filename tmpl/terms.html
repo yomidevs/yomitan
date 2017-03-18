@@ -18,7 +18,7 @@
 {{/inline}}
 
 {{#*inline "term"}}
-<p>
+<div class="entry">
     <div class="actions">
         {{#if addable}}
             <a href="#" title="Add term as expression" class="action-add-note pending disabled" data-mode="term-kanji" data-index="{{@index}}"><img src="/mixed/img/add-term-kanji.png"></a>
@@ -58,7 +58,7 @@
         {{> definition}}
     {{/if}}
     </div>
-</p>
+</div>
 {{/inline}}
 
 {{#if definitions}}
