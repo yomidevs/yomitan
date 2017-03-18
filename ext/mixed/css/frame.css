@@ -31,8 +31,8 @@
  */
 
 hr {
-    margin-top: 0.8em;
-    margin-bottom: 0.8em;
+    padding: 0px;
+    margin: 0px;
 }
 
 #spinner {

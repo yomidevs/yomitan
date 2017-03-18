@@ -31,18 +31,7 @@
         "<all_urls>",
         "storage"
     ],
-    "web_accessible_resources": [
-        "fg/frame.html",
-        "fg/js/frame.js",
-        "mixed/css/frame.css",
-        "mixed/img/add-kanji.png",
-        "mixed/img/add-term-kana.png",
-        "mixed/img/add-term-kanji.png",
-        "mixed/img/play-audio.png",
-        "mixed/img/spinner.gif",
-        "mixed/mp3/button.mp3",
-        "mixed/ttf/kanji-stroke-orders.ttf"
-    ],
+    "web_accessible_resources": ["fg/frame.html"],
     "applications": {
         "gecko": {
             "id": "alex@foosoft.net",

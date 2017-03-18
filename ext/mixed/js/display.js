@@ -100,6 +100,7 @@ class Display {
         const sequence = ++this.sequence;
         const params = {
             definitions,
+            source: context && context.source,
             addable: options.anki.enable
         };
 
@@ -118,7 +119,7 @@ class Display {
             this.container.html(content);
 
             $('.action-add-note').click(this.onActionAddNote.bind(this));
-            $('.term-source').click(e => {
+            $('.source-term').click(e => {
                 e.preventDefault();
 
                 if (context && context.source) {

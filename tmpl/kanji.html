@@ -4,6 +4,9 @@
         {{#if addable}}
             <a href="#" title="Add Kanji" class="action-add-note pending disabled" data-mode="kanji" data-index="{{@index}}"><img src="/mixed/img/add-kanji.png"></a>
         {{/if}}
+        {{#if source}}
+            <a href="#" title="Source term" class="source-term"><img src="/mixed/img/source-term.png"></a>
+        {{/if}}
     </div>
 
     <div class="glyph">{{character}}</div>
@@ -46,15 +49,13 @@
             <div class="glossary-item">{{#multiLine}}{{glossary.[0]}}{{/multiLine}}</div>
         {{/if}}
     </div>
-
-    <a href="#" class="term-source">Back</a>
 </div>
 {{/inline}}
 
 {{#if definitions}}
     {{#each definitions}}
         {{#unless @first}}<hr>{{/unless}}
-        {{> kanji addable=../addable root=../root}}
+        {{> kanji addable=../addable source=../source root=../root}}
     {{/each}}
 {{else}}
     <p>No results found.</p>
