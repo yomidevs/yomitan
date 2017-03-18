@@ -105,6 +105,9 @@ window.driver = new class {
         const handlers = new class {
             api_optionsSet(options) {
                 this.options = options;
+                if (!this.options.enable) {
+                    this.searchClear();
+                }
             }
         };
 
