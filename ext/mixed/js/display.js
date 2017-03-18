@@ -60,8 +60,8 @@ class Display {
 
         if (context) {
             for (const definition of definitions) {
-                definition.sentence = context.sentence;
-                definition.url = context.url;
+                definition.sentence = context.sentence || '';
+                definition.url = context.url || '';
             }
         }
 
@@ -86,12 +86,11 @@ class Display {
                 e.preventDefault();
 
                 const link = $(e.target);
-                if (context) {
-                    context.source = {
-                        definitions,
-                        index: Display.entryIndexFind(link)
-                    };
-                }
+                context = context || {};
+                context.source = {
+                    definitions,
+                    index: Display.entryIndexFind(link)
+                };
 
                 this.kanjiFind(link.text()).then(kanjiDefs => {
                     this.showKanjiDefs(kanjiDefs, options, context);
@@ -115,8 +114,8 @@ class Display {
 
         if (context) {
             for (const definition of definitions) {
-                definition.sentence = context.sentence;
-                definition.url = context.url;
+                definition.sentence = context.sentence || '';
+                definition.url = context.url || '';
             }
         }
 
