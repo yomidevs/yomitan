@@ -18,7 +18,7 @@
 
 
 $(document).ready(() => {
-    $('#open-search').click(() => window.open(chrome.extension.getURL('/bg/search.html')));
+    $('#open-search').click(() => commandExec('search'));
     $('#open-options').click(() => chrome.runtime.openOptionsPage());
     $('#open-help').click(() => window.open('http://foosoft.net/projects/yomichan'));
 
@@ -26,9 +26,6 @@ $(document).ready(() => {
         const toggle = $('#enable-search');
         toggle.prop('checked', options.general.enable).change();
         toggle.bootstrapToggle();
-        toggle.change(() => {
-            options.general.enable = toggle.prop('checked');
-            optionsSave(options).then(() => instYomi().optionsSet(options));
-        });
+        toggle.change(() => commandExec('toggle'));
     });
 });

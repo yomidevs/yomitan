@@ -25,12 +25,13 @@ window.yomichan = new class {
         this.anki = new AnkiNull();
         this.options = null;
 
-        chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
-        if (chrome.runtime.onInstalled) {
-            chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
-        }
-
-        this.translator.prepare().then(optionsLoad).then(this.optionsSet.bind(this));
+        this.translator.prepare().then(optionsLoad).then(this.optionsSet.bind(this)).then(() => {
+            chrome.commands.onCommand.addListener(this.onCommand.bind(this));
+            chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
+            if (chrome.runtime.onInstalled) {
+                chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
+            }
+        });
     }
 
     optionsSet(options) {
@@ -150,6 +151,15 @@ window.yomichan = new class {
     onInstalled(details) {
         if (details.reason === 'install') {
             chrome.tabs.create({url: chrome.extension.getURL('/bg/guide.html')});
+        }
+    }
+
+    onCommand(command) {
+        if (command === 'search') {
+            window.open(chrome.extension.getURL('/bg/search.html'));
+        } else if (command === 'toggle') {
+            this.options.general.enable = !this.options.general.enable;
+            optionsSave(this.options).then(() => this.optionsSet(this.options));
         }
     }
 

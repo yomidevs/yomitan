@@ -31,6 +31,20 @@
         "<all_urls>",
         "storage"
     ],
+    "commands": {
+        "toggle": {
+            "suggested_key": {
+                "default": "Alt+Delete"
+            },
+            "description": "Toggle text scanning"
+        },
+        "search": {
+            "suggested_key": {
+                "default": "Alt+Insert"
+            },
+            "description": "Open search window"
+        }
+    },
     "web_accessible_resources": ["fg/frame.html"],
     "applications": {
         "gecko": {

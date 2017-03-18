@@ -34,6 +34,15 @@ function promiseCallback(promise, callback) {
 
 
 /*
+ * Commands
+ */
+
+function commandExec(command) {
+    instYomi().onCommand(command);
+}
+
+
+/*
  * Instance
  */
 
