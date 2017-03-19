@@ -24,6 +24,9 @@ class Display {
         this.definitions = [];
         this.audioCache = {};
         this.sequence = 0;
+        this.index = 0;
+
+        $(document).keydown(this.onKeyDown.bind(this));
     }
 
     definitionAdd(definition, mode) {
@@ -47,6 +50,8 @@ class Display {
     }
 
     showTermDefs(definitions, options, context) {
+        window.focus();
+
         this.spinner.hide();
         this.definitions = definitions;
 
@@ -68,13 +73,8 @@ class Display {
         this.templateRender('terms.html', params).then(content => {
             this.container.html(content);
 
-            let offset = 0;
-            if (context && context.hasOwnProperty('index') && context.index < definitions.length) {
-                const entry = $('.entry').eq(context.index);
-                offset = entry.offset().top;
-            }
-
-            window.scrollTo(0, offset);
+            const index = context && context.hasOwnProperty('index') ? context.index : 0;
+            this.entryScroll(index);
 
             $('.action-add-note').click(this.onActionAddNote.bind(this));
             $('.action-play-audio').click(e => {
@@ -102,6 +102,8 @@ class Display {
     }
 
     showKanjiDefs(definitions, options, context) {
+        window.focus();
+
         this.spinner.hide();
         this.definitions = definitions;
 
@@ -121,7 +123,9 @@ class Display {
 
         this.templateRender('kanji.html', params).then(content => {
             this.container.html(content);
-            window.scrollTo(0, 0);
+
+            const index = context && context.hasOwnProperty('index') ? context.index : 0;
+            this.entryScroll(index);
 
             $('.action-add-note').click(this.onActionAddNote.bind(this));
             $('.source-term').click(e => {
@@ -158,6 +162,23 @@ class Display {
         });
     }
 
+    entryScroll(index, smooth) {
+        if (index < 0 || index >= this.definitions.length) {
+            return;
+        }
+
+        const body = $('body').stop();
+        const entry = $('.entry').eq(index);
+
+        if (smooth) {
+            body.animate({scrollTop: entry.offset().top}, 200);
+        } else {
+            body.scrollTop(entry.offset().top);
+        }
+
+        this.index = index;
+    }
+
     onActionAddNote(e) {
         e.preventDefault();
         this.spinner.show();
@@ -182,6 +203,22 @@ class Display {
                 this.handleError('note could not be added');
             }
         }).catch(this.handleError.bind(this)).then(() => this.spinner.hide());
+    }
+
+    onKeyDown(e) {
+        if (e.keyCode === 36 /* home */) {
+            e.preventDefault();
+            this.entryScroll(0, true);
+        } else if (e.keyCode === 35 /* end */) {
+            e.preventDefault();
+            this.entryScroll(this.definitions.length - 1, true);
+        } if (e.keyCode === 38 /* up */) {
+            e.preventDefault();
+            this.entryScroll(this.index - 1, true);
+        } else if (e.keyCode === 40 /* down */) {
+            e.preventDefault();
+            this.entryScroll(this.index + 1, true);
+        }
     }
 
     static audioPlay(definition, cache) {
