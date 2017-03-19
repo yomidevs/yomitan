@@ -54,6 +54,8 @@ class Display {
 
         this.spinner.hide();
         this.definitions = definitions;
+        this.context = context;
+        this.options = options;
 
         const sequence = ++this.sequence;
         const params = {
@@ -76,26 +78,9 @@ class Display {
             const index = context && context.hasOwnProperty('index') ? context.index : 0;
             this.entryScroll(index);
 
-            $('.action-add-note').click(this.onActionAddNote.bind(this));
-            $('.action-play-audio').click(e => {
-                e.preventDefault();
-                const index = Display.entryIndexFind($(e.currentTarget));
-                this.audioPlay(this.definitions[index]);
-            });
-            $('.kanji-link').click(e => {
-                e.preventDefault();
-
-                const link = $(e.target);
-                context = context || {};
-                context.source = {
-                    definitions,
-                    index: Display.entryIndexFind(link)
-                };
-
-                this.kanjiFind(link.text()).then(kanjiDefs => {
-                    this.showKanjiDefs(kanjiDefs, options, context);
-                }).catch(this.handleError.bind(this));
-            });
+            $('.action-add-note').click(this.onAddNote.bind(this));
+            $('.action-play-audio').click(this.onPlayAudio.bind(this));
+            $('.kanji-link').click(this.onKanjiLookup.bind(this));
 
             return this.adderButtonsUpdate(['term-kanji', 'term-kana'], sequence);
         }).catch(this.handleError.bind(this));
@@ -106,6 +91,8 @@ class Display {
 
         this.spinner.hide();
         this.definitions = definitions;
+        this.context = context;
+        this.options = options;
 
         const sequence = ++this.sequence;
         const params = {
@@ -127,15 +114,8 @@ class Display {
             const index = context && context.hasOwnProperty('index') ? context.index : 0;
             this.entryScroll(index);
 
-            $('.action-add-note').click(this.onActionAddNote.bind(this));
-            $('.source-term').click(e => {
-                e.preventDefault();
-
-                if (context && context.source) {
-                    context.index = context.source.index;
-                    this.showTermDefs(context.source.definitions, options, context);
-                }
-            });
+            $('.action-add-note').click(this.onAddNote.bind(this));
+            $('.source-term').click(this.onSourceTerm.bind(this));
 
             return this.adderButtonsUpdate(['kanji'], sequence);
         }).catch(this.handleError.bind(this));
@@ -182,30 +162,54 @@ class Display {
         this.index = index;
     }
 
-    onActionAddNote(e) {
+    onSourceTerm(e) {
         e.preventDefault();
-        this.spinner.show();
 
-        const link = $(e.currentTarget);
-        const mode = link.data('mode');
-        const index = Display.entryIndexFind(link);
-        const definition = this.definitions[index];
+        if (this.context && this.context.source) {
+            const context = {
+                url: this.context.source.url,
+                sentence: this.context.source.sentence,
+                index: this.context.source.index
+            };
 
-        if (mode !== 'kanji') {
-            const url = Display.audioBuildUrl(definition);
-            const filename = Display.audioBuildFilename(definition);
-            if (url && filename) {
-                definition.audio = {url, filename};
+            this.showTermDefs(this.context.source.definitions, this.options, context);
+        }
+    }
+
+    onKanjiLookup(e) {
+        e.preventDefault();
+
+        const link = $(e.target);
+        const context = {
+            source: {
+                definitions,
+                index: Display.entryIndexFind(link)
             }
+        };
+
+        if (this.context) {
+            context.sentence = this.context.sentence || '';
+            context.url = this.context.url || '';
         }
 
-        this.definitionAdd(definition, mode).then(success => {
-            if (success) {
-                Display.adderButtonFind(index, mode).addClass('disabled');
-            } else {
-                this.handleError('note could not be added');
-            }
-        }).catch(this.handleError.bind(this)).then(() => this.spinner.hide());
+        this.kanjiFind(link.text()).then(kanjiDefs => {
+            this.showKanjiDefs(kanjiDefs, options, context);
+        }).catch(this.handleError.bind(this));
+    }
+
+    onPlayAudio(e) {
+        e.preventDefault();
+
+        const index = Display.entryIndexFind($(e.currentTarget));
+        this.audioPlay(this.definitions[index]);
+    }
+
+    onAddNote(e) {
+        e.preventDefault();
+
+        const link = $(e.currentTarget);
+        const index = Display.entryIndexFind(link);
+        this.noteAdd(index, link.data('mode'));
     }
 
     onKeyDown(e) {
@@ -250,7 +254,33 @@ class Display {
         }
     }
 
-    audioPlay(definition) {
+    sourceTerm(index) {
+
+
+    }
+
+    noteAdd(index, mode) {
+        this.spinner.show();
+
+        const definition = this.definitions[index];
+        if (mode !== 'kanji') {
+            const url = Display.audioBuildUrl(definition);
+            const filename = Display.audioBuildFilename(definition);
+            if (url && filename) {
+                definition.audio = {url, filename};
+            }
+        }
+
+        this.definitionAdd(definition, mode).then(success => {
+            if (success) {
+                Display.adderButtonFind(index, mode).addClass('disabled');
+            } else {
+                this.handleError('note could not be added');
+            }
+        }).catch(this.handleError.bind(this)).then(() => this.spinner.hide());
+    }
+
+    audioPlay(index) {
         for (const key in this.audioCache) {
             const audio = this.audioCache[key];
             if (audio !== null) {
@@ -258,6 +288,7 @@ class Display {
             }
         }
 
+        const definition = this.definitions[index];
         const url = Display.audioBuildUrl(definition);
         if (!url) {
             return;
