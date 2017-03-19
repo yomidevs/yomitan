@@ -80,7 +80,7 @@ class Display {
             $('.action-play-audio').click(e => {
                 e.preventDefault();
                 const index = Display.entryIndexFind($(e.currentTarget));
-                Display.audioPlay(this.definitions[index], this.audioCache);
+                this.audioPlay(this.definitions[index]);
             });
             $('.kanji-link').click(e => {
                 e.preventDefault();
@@ -209,24 +209,46 @@ class Display {
     }
 
     onKeyDown(e) {
-        if (e.keyCode === 36 /* home */) {
+        const handlers = {
+            36: /* home */ () => {
+                this.entryScroll(0, true);
+            },
+
+            35: /* end */ () => {
+                this.entryScroll(this.definitions.length - 1, true);
+            },
+
+            38: /* up */ () => {
+                this.entryScroll(this.index - 1, true);
+            },
+
+            40: /* down */ () => {
+                this.entryScroll(this.index + 1, true);
+            },
+
+            209: /* [ */ () => {
+
+            },
+
+            221: /* ] */ () => {
+
+            },
+
+            220: /* \ */ () => {
+                this.audioPlay(this.definitions[this.index]);
+            }
+        };
+
+        const handler = handlers[e.keyCode];
+        if (handler) {
             e.preventDefault();
-            this.entryScroll(0, true);
-        } else if (e.keyCode === 35 /* end */) {
-            e.preventDefault();
-            this.entryScroll(this.definitions.length - 1, true);
-        } if (e.keyCode === 38 /* up */) {
-            e.preventDefault();
-            this.entryScroll(this.index - 1, true);
-        } else if (e.keyCode === 40 /* down */) {
-            e.preventDefault();
-            this.entryScroll(this.index + 1, true);
+            handler();
         }
     }
 
-    static audioPlay(definition, cache) {
-        for (const key in cache) {
-            const audio = cache[key];
+    audioPlay(definition) {
+        for (const key in this.audioCache) {
+            const audio = this.audioCache[key];
             if (audio !== null) {
                 audio.pause();
             }
@@ -237,7 +259,7 @@ class Display {
             return;
         }
 
-        let audio = cache[url];
+        let audio = this.audioCache[url];
         if (audio) {
             audio.currentTime = 0;
             audio.play();
@@ -248,7 +270,7 @@ class Display {
                     audio = new Audio('/mixed/mp3/button.mp3');
                 }
 
-                cache[url] = audio;
+                this.audioCache[url] = audio;
                 audio.play();
             };
         }
