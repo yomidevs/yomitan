@@ -167,13 +167,16 @@ class Display {
             return;
         }
 
+        $('.current').hide().eq(index).show();
+
         const body = $('body').stop();
         const entry = $('.entry').eq(index);
+        const target = index === 0 ? 0 : entry.offset().top;
 
         if (smooth) {
-            body.animate({scrollTop: entry.offset().top}, 200);
+            body.animate({scrollTop: target}, 200);
         } else {
-            body.scrollTop(entry.offset().top);
+            body.scrollTop(target);
         }
 
         this.index = index;
