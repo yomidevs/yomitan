@@ -236,6 +236,10 @@ class Display {
 
             220: /* \ */ () => {
                 this.audioPlay(this.definitions[this.index]);
+            },
+
+            8: /* backspace */ () => {
+
             }
         };
 
