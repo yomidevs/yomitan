@@ -23,6 +23,7 @@ class Display {
         this.container = container;
         this.definitions = [];
         this.audioCache = {};
+        this.resultCache = {};
         this.sequence = 0;
     }
 
@@ -80,7 +81,7 @@ class Display {
             $('.action-play-audio').click(e => {
                 e.preventDefault();
                 const index = Display.entryIndexFind($(e.currentTarget));
-                this.audioPlay(this.definitions[index], this.audioCache);
+                this.audioPlay(this.definitions[index]);
             });
             $('.kanji-link').click(e => {
                 e.preventDefault();
@@ -184,18 +185,18 @@ class Display {
         }).catch(this.handleError.bind(this)).then(() => this.spinner.hide());
     }
 
-    audioPlay(definition, cache) {
+    audioPlay(definition) {
         this.spinner.show();
 
-        for (const key in cache) {
-            const audio = cache[key];
+        for (const key in this.audioCache) {
+            const audio = this.audioCache[key];
             if (audio !== null) {
                 audio.pause();
             }
         }
 
-        Display.audioBuildUrl(definition).then(url => {
-            let audio = cache[url];
+        this.audioBuildUrl(definition).then(url => {
+            let audio = this.audioCache[url];
             if (audio) {
                 audio.currentTime = 0;
                 audio.play();
@@ -206,23 +207,21 @@ class Display {
                         audio = new Audio('/mixed/mp3/button.mp3');
                     }
 
-                    cache[url] = audio;
+                    this.audioCache[url] = audio;
                     audio.play();
                 };
             }
         }).catch(this.handleError.bind(this)).then(() => this.spinner.hide());
     }
 
-    static entryIndexFind(element) {
-        return $('.entry').index(element.closest('.entry'));
-    }
-
-    static adderButtonFind(index, mode) {
-        return $('.entry').eq(index).find(`.action-add-note[data-mode="${mode}"]`);
-    }
-
-    static audioBuildUrl(definition) {
+    audioBuildUrl(definition) {
         return new Promise((resolve, reject) => {
+            const response = this.resultCache[definition.expression];
+            if (response) {
+                resolve(response);
+                return;
+            }
+
             const data = {
                 post: 'dictionary_reference',
                 match_type: 'exact',
@@ -235,10 +234,14 @@ class Display {
             }
 
             const xhr = new XMLHttpRequest();
-            xhr.addEventListener('error', () => reject('failed to execute network request'));
-            xhr.addEventListener('load', () => resolve(xhr.responseText));
             xhr.open('POST', 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post');
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.addEventListener('error', () => reject('failed to execute network request'));
+            xhr.addEventListener('load', () => {
+                this.resultCache[definition.expression] = xhr.responseText;
+                resolve(xhr.responseText);
+            });
+
             xhr.send(params.join('&'));
         }).then(response => {
             const dom = new DOMParser().parseFromString(response, 'text/html');
@@ -270,30 +273,6 @@ class Display {
         });
     }
 
-    static audioBuildUrlOld(definition) {
-        let kana = definition.reading;
-        let kanji = definition.expression;
-
-        if (!kana && !kanji) {
-            return null;
-        }
-
-        if (!kana && wanakana.isHiragana(kanji)) {
-            kana = kanji;
-            kanji = null;
-        }
-
-        const params = [];
-        if (kanji) {
-            params.push(`kanji=${encodeURIComponent(kanji)}`);
-        }
-        if (kana) {
-            params.push(`kana=${encodeURIComponent(kana)}`);
-        }
-
-        return `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?${params.join('&')}`;
-    }
-
     static audioBuildFilename(definition) {
         if (!definition.reading && !definition.expression) {
             return null;
@@ -308,5 +287,13 @@ class Display {
         }
 
         return filename += '.mp3';
+    }
+
+    static entryIndexFind(element) {
+        return $('.entry').index(element.closest('.entry'));
+    }
+
+    static adderButtonFind(index, mode) {
+        return $('.entry').eq(index).find(`.action-add-note[data-mode="${mode}"]`);
     }
 }
