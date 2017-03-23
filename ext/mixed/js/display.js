@@ -80,7 +80,7 @@ class Display {
             $('.action-play-audio').click(e => {
                 e.preventDefault();
                 const index = Display.entryIndexFind($(e.currentTarget));
-                Display.audioPlay(this.definitions[index], this.audioCache);
+                this.audioPlay(this.definitions[index], this.audioCache);
             });
             $('.kanji-link').click(e => {
                 e.preventDefault();
@@ -168,7 +168,7 @@ class Display {
         const definition = this.definitions[index];
 
         if (mode !== 'kanji') {
-            const url = Display.audioBuildUrl(definition);
+            const url = Display.audioBuildUrlOld(definition);
             const filename = Display.audioBuildFilename(definition);
             if (url && filename) {
                 definition.audio = {url, filename};
@@ -184,7 +184,9 @@ class Display {
         }).catch(this.handleError.bind(this)).then(() => this.spinner.hide());
     }
 
-    static audioPlay(definition, cache) {
+    audioPlay(definition, cache) {
+        this.spinner.show();
+
         for (const key in cache) {
             const audio = cache[key];
             if (audio !== null) {
@@ -192,26 +194,23 @@ class Display {
             }
         }
 
-        const url = Display.audioBuildUrl(definition);
-        if (!url) {
-            return;
-        }
-
-        let audio = cache[url];
-        if (audio) {
-            audio.currentTime = 0;
-            audio.play();
-        } else {
-            audio = new Audio(url);
-            audio.onloadeddata = () => {
-                if (audio.duration === 5.694694 || audio.duration === 5.720718) {
-                    audio = new Audio('/mixed/mp3/button.mp3');
-                }
-
-                cache[url] = audio;
+        Display.audioBuildUrl(definition).then(url => {
+            let audio = cache[url];
+            if (audio) {
+                audio.currentTime = 0;
                 audio.play();
-            };
-        }
+            } else {
+                audio = new Audio(url);
+                audio.onloadeddata = () => {
+                    if (audio.duration === 5.694694 || audio.duration === 5.720718) {
+                        audio = new Audio('/mixed/mp3/button.mp3');
+                    }
+
+                    cache[url] = audio;
+                    audio.play();
+                };
+            }
+        }).catch(this.handleError.bind(this)).then(() => this.spinner.hide());
     }
 
     static entryIndexFind(element) {
@@ -223,6 +222,55 @@ class Display {
     }
 
     static audioBuildUrl(definition) {
+        return new Promise((resolve, reject) => {
+            const data = {
+                post: 'dictionary_reference',
+                match_type: 'exact',
+                search_query: definition.expression
+            };
+
+            const params = [];
+            for (const key in data) {
+                params.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`);
+            }
+
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('error', () => reject('failed to execute network request'));
+            xhr.addEventListener('load', () => resolve(xhr.responseText));
+            xhr.open('POST', 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post');
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.send(params.join('&'));
+        }).then(response => {
+            const dom = new DOMParser().parseFromString(response, 'text/html');
+            const entries = [];
+
+            for (const row of dom.getElementsByClassName('dc-result-row')) {
+                try {
+                    const url = row.getElementsByClassName('ill-onebuttonplayer').item(0).getAttribute('data-url');
+                    const expression = dom.getElementsByClassName('dc-vocab').item(0).innerText;
+                    const reading = dom.getElementsByClassName('dc-vocab_kana').item(0).innerText;
+
+                    if (url && expression && reading) {
+                        entries.push({url, expression, reading});
+                    }
+                } catch (e) {
+                    // NOP
+                }
+            }
+
+            return entries;
+        }).then(entries => {
+            for (const entry of entries) {
+                if (!definition.reading || definition.reading === entry.reading) {
+                    return entry.url;
+                }
+            }
+
+            return '/mixed/mp3/button.mp3';
+        });
+    }
+
+    static audioBuildUrlOld(definition) {
         let kana = definition.reading;
         let kanji = definition.expression;
 
