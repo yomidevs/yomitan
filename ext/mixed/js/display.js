@@ -23,6 +23,7 @@ class Display {
         this.container = container;
         this.definitions = [];
         this.audioCache = {};
+        this.responseCache = {};
         this.sequence = 0;
         this.index = 0;
 
@@ -261,91 +262,118 @@ class Display {
 
     noteAdd(index, mode) {
         this.spinner.show();
-
         const definition = this.definitions[index];
+
+        let promise = Promise.resolve();
         if (mode !== 'kanji') {
-            const url = Display.audioBuildUrl(definition);
             const filename = Display.audioBuildFilename(definition);
-            if (url && filename) {
-                definition.audio = {url, filename};
+            if (filename) {
+                promise = this.audioBuildUrl(definition).then(url => definition.audio = {url, filename}).catch(() => {});
             }
         }
 
-        this.definitionAdd(definition, mode).then(success => {
-            if (success) {
-                Display.adderButtonFind(index, mode).addClass('disabled');
-            } else {
-                this.handleError('note could not be added');
-            }
+        promise.then(() => {
+            return this.definitionAdd(definition, mode).then(success => {
+                if (success) {
+                    Display.adderButtonFind(index, mode).addClass('disabled');
+                } else {
+                    this.handleError('note could not be added');
+                }
+            });
         }).catch(this.handleError.bind(this)).then(() => this.spinner.hide());
     }
 
     audioPlay(index) {
-        for (const key in this.audioCache) {
-            const audio = this.audioCache[key];
-            if (audio !== null) {
-                audio.pause();
-            }
-        }
-
+        this.spinner.show();
         const definition = this.definitions[index];
-        const url = Display.audioBuildUrl(definition);
-        if (!url) {
-            return;
+
+        for (const key in this.audioCache) {
+            this.audioCache[key].pause();
         }
 
-        let audio = this.audioCache[url];
-        if (audio) {
-            audio.currentTime = 0;
-            audio.play();
-        } else {
-            audio = new Audio(url);
-            audio.onloadeddata = () => {
-                if (audio.duration === 5.694694 || audio.duration === 5.720718) {
-                    audio = new Audio('/mixed/mp3/button.mp3');
-                }
+        this.audioBuildUrl(definition).then(url => {
+            if (!url) {
+                url = '/mixed/mp3/button.mp3';
+            }
 
-                this.audioCache[url] = audio;
+            let audio = this.audioCache[url];
+            if (audio) {
+                audio.currentTime = 0;
                 audio.play();
+            } else {
+                audio = new Audio(url);
+                audio.onloadeddata = () => {
+                    if (audio.duration === 5.694694 || audio.duration === 5.720718) {
+                        audio = new Audio('/mixed/mp3/button.mp3');
+                    }
+
+                    this.audioCache[url] = audio;
+                    audio.play();
+                };
+            }
+        }).catch(this.handleError.bind(this)).then(() => this.spinner.hide());
+    }
+
+    audioBuildUrl(definition) {
+        return new Promise((resolve, reject) => {
+            const response = this.responseCache[definition.expression];
+            if (response) {
+                resolve(response);
+                return;
+            }
+
+            const data = {
+                post: 'dictionary_reference',
+                match_type: 'exact',
+                search_query: definition.expression
             };
-        }
-    }
 
-    static entryIndexFind(element) {
-        return $('.entry').index(element.closest('.entry'));
-    }
+            const params = [];
+            for (const key in data) {
+                params.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`);
+            }
 
-    static adderButtonFind(index, mode) {
-        return $('.entry').eq(index).find(`.action-add-note[data-mode="${mode}"]`);
-    }
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post');
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.addEventListener('error', () => reject('failed to scrape audio data'));
+            xhr.addEventListener('load', () => {
+                this.responseCache[definition.expression] = xhr.responseText;
+                resolve(xhr.responseText);
+            });
 
-    static audioBuildUrl(definition) {
-        let kana = definition.reading;
-        let kanji = definition.expression;
+            xhr.send(params.join('&'));
+        }).then(response => {
+            const dom = new DOMParser().parseFromString(response, 'text/html');
+            const entries = [];
 
-        if (!kana && !kanji) {
-            return null;
-        }
+            for (const row of dom.getElementsByClassName('dc-result-row')) {
+                try {
+                    const url = row.getElementsByClassName('ill-onebuttonplayer').item(0).getAttribute('data-url');
+                    const expression = dom.getElementsByClassName('dc-vocab').item(0).innerText;
+                    const reading = dom.getElementsByClassName('dc-vocab_kana').item(0).innerText;
 
-        if (!kana && wanakana.isHiragana(kanji)) {
-            kana = kanji;
-            kanji = null;
-        }
+                    if (url && expression && reading) {
+                        entries.push({url, expression, reading});
+                    }
+                } catch (e) {
+                    // NOP
+                }
+            }
 
-        const params = [];
-        if (kanji) {
-            params.push(`kanji=${encodeURIComponent(kanji)}`);
-        }
-        if (kana) {
-            params.push(`kana=${encodeURIComponent(kana)}`);
-        }
-
-        return `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?${params.join('&')}`;
+            return entries;
+        }).then(entries => {
+            for (const entry of entries) {
+                if (!definition.reading || definition.reading === entry.reading) {
+                    return entry.url;
+                }
+            }
+        });
     }
 
     static audioBuildFilename(definition) {
         if (!definition.reading && !definition.expression) {
-            return null;
+            return;
         }
 
         let filename = 'yomichan';
@@ -357,5 +385,13 @@ class Display {
         }
 
         return filename += '.mp3';
+    }
+
+    static entryIndexFind(element) {
+        return $('.entry').index(element.closest('.entry'));
+    }
+
+    static adderButtonFind(index, mode) {
+        return $('.entry').eq(index).find(`.action-add-note[data-mode="${mode}"]`);
     }
 }
