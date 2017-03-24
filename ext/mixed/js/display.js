@@ -23,7 +23,7 @@ class Display {
         this.container = container;
         this.definitions = [];
         this.audioCache = {};
-        this.resultCache = {};
+        this.responseCache = {};
         this.sequence = 0;
     }
 
@@ -168,20 +168,22 @@ class Display {
         const index = Display.entryIndexFind(link);
         const definition = this.definitions[index];
 
+        let promise = Promise.resolve();
         if (mode !== 'kanji') {
-            const url = Display.audioBuildUrlOld(definition);
             const filename = Display.audioBuildFilename(definition);
-            if (url && filename) {
-                definition.audio = {url, filename};
+            if (filename) {
+                promise = this.audioBuildUrl(definition).then(url => definition.audio = {url, filename});
             }
         }
 
-        this.definitionAdd(definition, mode).then(success => {
-            if (success) {
-                Display.adderButtonFind(index, mode).addClass('disabled');
-            } else {
-                this.handleError('note could not be added');
-            }
+        promise.then(() => {
+            return this.definitionAdd(definition, mode).then(success => {
+                if (success) {
+                    Display.adderButtonFind(index, mode).addClass('disabled');
+                } else {
+                    this.handleError('note could not be added');
+                }
+            });
         }).catch(this.handleError.bind(this)).then(() => this.spinner.hide());
     }
 
@@ -189,13 +191,14 @@ class Display {
         this.spinner.show();
 
         for (const key in this.audioCache) {
-            const audio = this.audioCache[key];
-            if (audio !== null) {
-                audio.pause();
-            }
+            this.audioCache[key].pause();
         }
 
         this.audioBuildUrl(definition).then(url => {
+            if (!url) {
+                url = '/mixed/mp3/button.mp3';
+            }
+
             let audio = this.audioCache[url];
             if (audio) {
                 audio.currentTime = 0;
@@ -216,7 +219,7 @@ class Display {
 
     audioBuildUrl(definition) {
         return new Promise((resolve, reject) => {
-            const response = this.resultCache[definition.expression];
+            const response = this.responseCache[definition.expression];
             if (response) {
                 resolve(response);
                 return;
@@ -236,9 +239,9 @@ class Display {
             const xhr = new XMLHttpRequest();
             xhr.open('POST', 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post');
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.addEventListener('error', () => reject('failed to execute network request'));
+            xhr.addEventListener('error', () => reject('failed to scrape audio data'));
             xhr.addEventListener('load', () => {
-                this.resultCache[definition.expression] = xhr.responseText;
+                this.responseCache[definition.expression] = xhr.responseText;
                 resolve(xhr.responseText);
             });
 
@@ -268,14 +271,12 @@ class Display {
                     return entry.url;
                 }
             }
-
-            return '/mixed/mp3/button.mp3';
         });
     }
 
     static audioBuildFilename(definition) {
         if (!definition.reading && !definition.expression) {
-            return null;
+            return;
         }
 
         let filename = 'yomichan';
