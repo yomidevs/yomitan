@@ -172,7 +172,7 @@ class Display {
         if (mode !== 'kanji') {
             const filename = Display.audioBuildFilename(definition);
             if (filename) {
-                promise = this.audioBuildUrl(definition).then(url => definition.audio = {url, filename});
+                promise = this.audioBuildUrl(definition).then(url => definition.audio = {url, filename}).catch(() => {});
             }
         }
 
