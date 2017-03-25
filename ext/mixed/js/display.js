@@ -256,7 +256,7 @@ class Display {
         if (mode !== 'kanji') {
             const filename = Display.audioBuildFilename(definition);
             if (filename) {
-                promise = this.audioBuildUrl(definition).then(url => definition.audio = {url, filename}).catch(() => {});
+                promise = audioBuildUrl(definition, this.responseCache).then(url => definition.audio = {url, filename}).catch(() => {});
             }
         }
 
@@ -279,7 +279,7 @@ class Display {
             this.audioCache[key].pause();
         }
 
-        this.audioBuildUrl(definition).then(url => {
+        audioBuildUrl(definition, this.responseCache).then(url => {
             if (!url) {
                 url = '/mixed/mp3/button.mp3';
             }
@@ -300,78 +300,6 @@ class Display {
                 };
             }
         }).catch(this.handleError.bind(this)).then(() => this.spinner.hide());
-    }
-
-    audioBuildUrl(definition) {
-        return new Promise((resolve, reject) => {
-            const response = this.responseCache[definition.expression];
-            if (response) {
-                resolve(response);
-            } else {
-                const data = {
-                    post: 'dictionary_reference',
-                    match_type: 'exact',
-                    search_query: definition.expression
-                };
-
-                const params = [];
-                for (const key in data) {
-                    params.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`);
-                }
-
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post');
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhr.addEventListener('error', () => reject('failed to scrape audio data'));
-                xhr.addEventListener('load', () => {
-                    this.responseCache[definition.expression] = xhr.responseText;
-                    resolve(xhr.responseText);
-                });
-
-                xhr.send(params.join('&'));
-            }
-        }).then(response => {
-            const dom = new DOMParser().parseFromString(response, 'text/html');
-            const entries = [];
-
-            for (const row of dom.getElementsByClassName('dc-result-row')) {
-                try {
-                    const url = row.getElementsByClassName('ill-onebuttonplayer').item(0).getAttribute('data-url');
-                    const expression = row.getElementsByClassName('dc-vocab').item(0).innerText;
-                    const reading = row.getElementsByClassName('dc-vocab_kana').item(0).innerText;
-
-                    if (url && expression && reading) {
-                        entries.push({url, expression, reading});
-                    }
-                } catch (e) {
-                    // NOP
-                }
-            }
-
-            return entries;
-        }).then(entries => {
-            for (const entry of entries) {
-                if (!definition.reading || definition.reading === entry.reading) {
-                    return entry.url;
-                }
-            }
-        });
-    }
-
-    static audioBuildFilename(definition) {
-        if (!definition.reading && !definition.expression) {
-            return;
-        }
-
-        let filename = 'yomichan';
-        if (definition.reading) {
-            filename += `_${definition.reading}`;
-        }
-        if (definition.expression) {
-            filename += `_${definition.expression}`;
-        }
-
-        return filename += '.mp3';
     }
 
     static entryIndexFind(element) {
