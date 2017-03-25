@@ -21,7 +21,7 @@
  * Audio
  */
 
-function audioBuildUrl(definition, cache) {
+function audioBuildUrl(definition, cache={}) {
     return new Promise((resolve, reject) => {
         const response = cache[definition.expression];
         if (response) {
@@ -77,4 +77,33 @@ function audioBuildFilename(definition) {
 
         return filename += '.mp3';
     }
+}
+
+function audioInject(definition, fields) {
+    const filename = audioBuildFilename(definition);
+    if (!filename) {
+        return Promise.resolve(true);
+    }
+
+    const audio = {
+        filename,
+        skipHash: '7e2c2f954ef6051373ba916f000168dc',
+        fields: []
+    };
+
+    for (const name in fields) {
+        if (fields[name].includes('{audio}')) {
+            audio.fields.push(name);
+        }
+    }
+
+    if (audio.fields.length === 0) {
+        return Promise.resolve(true);
+    }
+
+    return audioBuildUrl(definition).then(url => {
+        audio.url = url;
+        note.audio = audio;
+        return true;
+    }).catch(() => false);
 }

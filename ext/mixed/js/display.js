@@ -251,24 +251,13 @@ class Display {
 
     noteAdd(definition, mode) {
         this.spinner.show();
-
-        let promise = Promise.resolve();
-        if (mode !== 'kanji') {
-            const filename = Display.audioBuildFilename(definition);
-            if (filename) {
-                promise = audioBuildUrl(definition, this.responseCache).then(url => definition.audio = {url, filename}).catch(() => {});
+        return this.definitionAdd(definition, mode).then(success => {
+            if (success) {
+                const index = this.definitions.indexOf(definition);
+                Display.adderButtonFind(index, mode).addClass('disabled');
+            } else {
+                this.handleError('note could not be added');
             }
-        }
-
-        promise.then(() => {
-            return this.definitionAdd(definition, mode).then(success => {
-                if (success) {
-                    const index = this.definitions.indexOf(definition);
-                    Display.adderButtonFind(index, mode).addClass('disabled');
-                } else {
-                    this.handleError('note could not be added');
-                }
-            });
         }).catch(this.handleError.bind(this)).then(() => this.spinner.hide());
     }
 
