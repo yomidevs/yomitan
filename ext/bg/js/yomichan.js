@@ -192,32 +192,32 @@ window.yomichan = new class {
 
     onMessage(request, sender, callback) {
         const handlers = new class {
-            api_optionsGet({callback}) {
+            optionsGet({callback}) {
                 promiseCallback(optionsLoad(), callback);
             }
 
-            api_kanjiFind({text, callback}) {
+            kanjiFind({text, callback}) {
                 promiseCallback(this.kanjiFind(text), callback);
             }
 
-            api_termsFind({text, callback}) {
+            termsFind({text, callback}) {
                 promiseCallback(this.termsFind(text), callback);
             }
 
-            api_templateRender({template, data, callback}) {
+            templateRender({template, data, callback}) {
                 promiseCallback(this.templateRender(template, data), callback);
             }
 
-            api_definitionAdd({definition, mode, callback}) {
+            definitionAdd({definition, mode, callback}) {
                 promiseCallback(this.definitionAdd(definition, mode), callback);
             }
 
-            api_definitionsAddable({definitions, modes, callback}) {
+            definitionsAddable({definitions, modes, callback}) {
                 promiseCallback(this.definitionsAddable(definitions, modes), callback);
             }
         };
 
-        const {action, params} = request, method = handlers[`api_${action}`];
+        const {action, params} = request, method = handlers[action];
         if (typeof(method) === 'function') {
             params.callback = callback;
             method.call(this, params);

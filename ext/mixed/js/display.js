@@ -149,14 +149,14 @@ class Display {
 
         $('.current').hide().eq(index).show();
 
-        const body = $('body').stop();
+        const container = $('html,body').stop();
         const entry = $('.entry').eq(index);
         const target = index === 0 ? 0 : entry.offset().top;
 
         if (smooth) {
-            body.animate({scrollTop: target}, 200);
+            container.animate({scrollTop: target}, 200);
         } else {
-            body.scrollTop(target);
+            container.scrollTop(target);
         }
 
         this.index = index;
