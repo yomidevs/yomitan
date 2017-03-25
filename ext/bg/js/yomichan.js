@@ -70,6 +70,25 @@ window.yomichan = new class {
             fields = this.options.anki.terms.fields;
             note.deckName = this.options.anki.terms.deck;
             note.modelName = this.options.anki.terms.model;
+
+            if (definition.audio) {
+                const audio = {
+                    url: definition.audio.url,
+                    filename: definition.audio.filename,
+                    skipHash: '7e2c2f954ef6051373ba916f000168dc',
+                    fields: []
+                };
+
+                for (const name in fields) {
+                    if (fields[name].includes('{audio}')) {
+                        audio.fields.push(name);
+                    }
+                }
+
+                if (audio.fields.length > 0) {
+                    note.audio = audio;
+                }
+            }
         }
 
         for (const name in fields) {
@@ -102,7 +121,7 @@ window.yomichan = new class {
 
     definitionAdd(definition, mode) {
         let promise = Promise.resolve();
-        if (this.options.general.audioPlayback && mode !== 'kanji') {
+        if (mode !== 'kanji') {
             promise = audioInject(definition, this.options.anki.terms.fields);
         }
 

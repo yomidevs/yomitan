@@ -85,25 +85,20 @@ function audioInject(definition, fields) {
         return Promise.resolve(true);
     }
 
-    const audio = {
-        filename,
-        skipHash: '7e2c2f954ef6051373ba916f000168dc',
-        fields: []
-    };
-
+    let usesAudio = false;
     for (const name in fields) {
         if (fields[name].includes('{audio}')) {
-            audio.fields.push(name);
+            usesAudio = true;
+            break;
         }
     }
 
-    if (audio.fields.length === 0) {
+    if (!usesAudio) {
         return Promise.resolve(true);
     }
 
     return audioBuildUrl(definition).then(url => {
-        audio.url = url;
-        note.audio = audio;
+        definition.audio = {url, filename};
         return true;
     }).catch(() => false);
 }
