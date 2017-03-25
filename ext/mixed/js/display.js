@@ -55,8 +55,8 @@ class Display {
 
         this.spinner.hide();
         this.definitions = definitions;
-        this.context = context;
         this.options = options;
+        this.context = context;
 
         const sequence = ++this.sequence;
         const params = {
@@ -75,9 +75,7 @@ class Display {
 
         this.templateRender('terms.html', params).then(content => {
             this.container.html(content);
-
-            const index = context && context.hasOwnProperty('index') ? context.index : 0;
-            this.entryScroll(index);
+            this.entryScroll(context && context.index || 0);
 
             $('.action-add-note').click(this.onAddNote.bind(this));
             $('.action-play-audio').click(this.onPlayAudio.bind(this));
@@ -92,8 +90,8 @@ class Display {
 
         this.spinner.hide();
         this.definitions = definitions;
-        this.context = context;
         this.options = options;
+        this.context = context;
 
         const sequence = ++this.sequence;
         const params = {
@@ -111,9 +109,7 @@ class Display {
 
         this.templateRender('kanji.html', params).then(content => {
             this.container.html(content);
-
-            const index = context && context.hasOwnProperty('index') ? context.index : 0;
-            this.entryScroll(index);
+            this.entryScroll(context && context.index || 0);
 
             $('.action-add-note').click(this.onAddNote.bind(this));
             $('.source-term').click(this.onSourceTerm.bind(this));
@@ -183,34 +179,32 @@ class Display {
         const link = $(e.target);
         const context = {
             source: {
-                definitions,
+                definitions: this.definitions,
                 index: Display.entryIndexFind(link)
             }
         };
 
         if (this.context) {
-            context.sentence = this.context.sentence || '';
-            context.url = this.context.url || '';
+            context.sentence = this.context.sentence;
+            context.url = this.context.url;
         }
 
         this.kanjiFind(link.text()).then(kanjiDefs => {
-            this.showKanjiDefs(kanjiDefs, options, context);
+            this.showKanjiDefs(kanjiDefs, this.options, context);
         }).catch(this.handleError.bind(this));
     }
 
     onPlayAudio(e) {
         e.preventDefault();
-
         const index = Display.entryIndexFind($(e.currentTarget));
         this.audioPlay(this.definitions[index]);
     }
 
     onAddNote(e) {
         e.preventDefault();
-
         const link = $(e.currentTarget);
         const index = Display.entryIndexFind(link);
-        this.noteAdd(index, link.data('mode'));
+        this.noteAdd(this.definitions[index], link.data('mode'));
     }
 
     onKeyDown(e) {
@@ -255,14 +249,8 @@ class Display {
         }
     }
 
-    sourceTerm(index) {
-
-
-    }
-
-    noteAdd(index, mode) {
+    noteAdd(definition, mode) {
         this.spinner.show();
-        const definition = this.definitions[index];
 
         let promise = Promise.resolve();
         if (mode !== 'kanji') {
@@ -275,6 +263,7 @@ class Display {
         promise.then(() => {
             return this.definitionAdd(definition, mode).then(success => {
                 if (success) {
+                    const index = this.definitions.indexOf(definition);
                     Display.adderButtonFind(index, mode).addClass('disabled');
                 } else {
                     this.handleError('note could not be added');
@@ -283,9 +272,8 @@ class Display {
         }).catch(this.handleError.bind(this)).then(() => this.spinner.hide());
     }
 
-    audioPlay(index) {
+    audioPlay(definition) {
         this.spinner.show();
-        const definition = this.definitions[index];
 
         for (const key in this.audioCache) {
             this.audioCache[key].pause();
@@ -319,30 +307,29 @@ class Display {
             const response = this.responseCache[definition.expression];
             if (response) {
                 resolve(response);
-                return;
+            } else {
+                const data = {
+                    post: 'dictionary_reference',
+                    match_type: 'exact',
+                    search_query: definition.expression
+                };
+
+                const params = [];
+                for (const key in data) {
+                    params.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`);
+                }
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post');
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.addEventListener('error', () => reject('failed to scrape audio data'));
+                xhr.addEventListener('load', () => {
+                    this.responseCache[definition.expression] = xhr.responseText;
+                    resolve(xhr.responseText);
+                });
+
+                xhr.send(params.join('&'));
             }
-
-            const data = {
-                post: 'dictionary_reference',
-                match_type: 'exact',
-                search_query: definition.expression
-            };
-
-            const params = [];
-            for (const key in data) {
-                params.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`);
-            }
-
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post');
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.addEventListener('error', () => reject('failed to scrape audio data'));
-            xhr.addEventListener('load', () => {
-                this.responseCache[definition.expression] = xhr.responseText;
-                resolve(xhr.responseText);
-            });
-
-            xhr.send(params.join('&'));
         }).then(response => {
             const dom = new DOMParser().parseFromString(response, 'text/html');
             const entries = [];
