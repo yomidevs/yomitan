@@ -90,7 +90,7 @@ class Deinflection {
                 source: this.term,
                 rules: this.rules,
                 definitions: this.definitions,
-                reasons: [this.reason]
+                reasons: this.reason.length > 0 ? [this.reason] : []
             }];
         }
 
