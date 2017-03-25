@@ -140,9 +140,8 @@ class Display {
     }
 
     entryScroll(index, smooth) {
-        if (index < 0 || index >= this.definitions.length) {
-            return;
-        }
+        index = Math.min(index, this.definitions.length - 1);
+        index = Math.max(index, 0);
 
         $('.current').hide().eq(index).show();
 
@@ -215,6 +214,14 @@ class Display {
 
             35: /* end */ () => {
                 this.entryScroll(this.definitions.length - 1, true);
+            },
+
+            33: /* page up */ () => {
+                this.entryScroll(this.index - 3, true);
+            },
+
+            34: /* page down */ () => {
+                this.entryScroll(this.index + 3, true);
             },
 
             38: /* up */ () => {
