@@ -19,8 +19,8 @@
 
 $(document).ready(() => {
     $('#open-search').click(() => commandExec('search'));
-    $('#open-options').click(() => chrome.runtime.openOptionsPage());
-    $('#open-help').click(() => window.open('http://foosoft.net/projects/yomichan'));
+    $('#open-options').click(() => commandExec('options'));
+    $('#open-help').click(() => commandExec('help'));
 
     optionsLoad().then(options => {
         const toggle = $('#enable-search');

@@ -165,11 +165,28 @@ window.yomichan = new class {
     }
 
     onCommand(command) {
-        if (command === 'search') {
-            window.open(chrome.extension.getURL('/bg/search.html'));
-        } else if (command === 'toggle') {
-            this.options.general.enable = !this.options.general.enable;
-            optionsSave(this.options).then(() => this.optionsSet(this.options));
+        const handlers = {
+            search: () => {
+                chrome.tabs.create({url: chrome.extension.getURL('/bg/search.html')});
+            },
+
+            help: () => {
+                chrome.tabs.create({url: 'https://foosoft.net/projects/yomichan/'});
+            },
+
+            options: () => {
+                chrome.runtime.openOptionsPage();
+            },
+
+            toggle: () => {
+                this.options.general.enable = !this.options.general.enable;
+                optionsSave(this.options).then(() => this.optionsSet(this.options));
+            }
+        };
+
+        const handler = handlers[command];
+        if (handler) {
+            handler();
         }
     }
 
