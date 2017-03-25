@@ -337,8 +337,8 @@ class Display {
             for (const row of dom.getElementsByClassName('dc-result-row')) {
                 try {
                     const url = row.getElementsByClassName('ill-onebuttonplayer').item(0).getAttribute('data-url');
-                    const expression = dom.getElementsByClassName('dc-vocab').item(0).innerText;
-                    const reading = dom.getElementsByClassName('dc-vocab_kana').item(0).innerText;
+                    const expression = row.getElementsByClassName('dc-vocab').item(0).innerText;
+                    const reading = row.getElementsByClassName('dc-vocab_kana').item(0).innerText;
 
                     if (url && expression && reading) {
                         entries.push({url, expression, reading});
