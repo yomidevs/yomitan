@@ -207,6 +207,10 @@ class Display {
     }
 
     onKeyDown(e) {
+        const notifyParent = action => {
+            window.parent.postMessage(action, '*');
+        };
+
         const handlers = {
             36: /* home */ () => {
                 this.entryScroll(0, true);
@@ -246,6 +250,18 @@ class Display {
 
             8: /* backspace */ () => {
 
+            },
+
+            27: /* escape */ () => {
+                notifyParent('popupClose');
+            },
+
+            37: /* left */ () => {
+                notifyParent('scanLeft');
+            },
+
+            39: /* right */ () => {
+                notifyParent('scanRight');
             }
         };
 

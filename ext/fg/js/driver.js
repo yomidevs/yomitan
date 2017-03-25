@@ -35,6 +35,7 @@ window.driver = new class {
             window.addEventListener('mouseup', this.onMouseUp.bind(this));
             window.addEventListener('mousemove', this.onMouseMove.bind(this));
             window.addEventListener('resize', e => this.searchClear());
+            window.addEventListener('message', this.onFrameMessage.bind(this));
             chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
         }).catch(this.handleError.bind(this));
     }
@@ -98,6 +99,27 @@ window.driver = new class {
             this.mouseDownLeft = false;
         } else if (e.which === 2) {
             this.mouseDownMiddle = false;
+        }
+    }
+
+    onFrameMessage(e) {
+        const handlers = {
+            popupClose: () => {
+                this.searchClear();
+            },
+
+            scanLeft: () => {
+
+            },
+
+            scanRight: () => {
+
+            }
+        };
+
+        const handler = handlers[e.data];
+        if (handler) {
+            handler();
         }
     }
 
