@@ -50,6 +50,10 @@ class Display {
         throw 'override me';
     }
 
+    clearSearch() {
+        throw 'override me';
+    }
+
     showTermDefs(definitions, options, context) {
         window.focus();
 
@@ -207,17 +211,13 @@ class Display {
     }
 
     onKeyDown(e) {
-        const notifyParent = action => {
-            window.parent.postMessage(action, '*');
-        };
-
         const handlers = {
-            36: /* home */ () => {
-                this.entryScroll(0, true);
+            8: /* backspace */ () => {
+
             },
 
-            35: /* end */ () => {
-                this.entryScroll(this.definitions.length - 1, true);
+            27: /* escape */ () => {
+                this.clearSearch();
             },
 
             33: /* page up */ () => {
@@ -226,6 +226,14 @@ class Display {
 
             34: /* page down */ () => {
                 this.entryScroll(this.index + 3, true);
+            },
+
+            35: /* end */ () => {
+                this.entryScroll(this.definitions.length - 1, true);
+            },
+
+            36: /* home */ () => {
+                this.entryScroll(0, true);
             },
 
             38: /* up */ () => {
@@ -240,28 +248,12 @@ class Display {
 
             },
 
-            221: /* ] */ () => {
-
-            },
-
             220: /* \ */ () => {
                 this.audioPlay(this.definitions[this.index]);
             },
 
-            8: /* backspace */ () => {
+            221: /* ] */ () => {
 
-            },
-
-            27: /* escape */ () => {
-                notifyParent('popupClose');
-            },
-
-            37: /* left */ () => {
-                notifyParent('scanLeft');
-            },
-
-            39: /* right */ () => {
-                notifyParent('scanRight');
             }
         };
 

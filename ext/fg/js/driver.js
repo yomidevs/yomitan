@@ -46,14 +46,14 @@ window.driver = new class {
     }
 
     popupTimerClear() {
-        if (this.popupTimer !== null) {
+        if (this.popupTimer) {
             window.clearTimeout(this.popupTimer);
             this.popupTimer = null;
         }
     }
 
     onMouseOver(e) {
-        if (e.target === this.popup.container && this.popuptimer !== null) {
+        if (e.target === this.popup.container && this.popupTimer) {
             this.popupTimerClear();
         }
     }
@@ -106,14 +106,6 @@ window.driver = new class {
         const handlers = {
             popupClose: () => {
                 this.searchClear();
-            },
-
-            scanLeft: () => {
-
-            },
-
-            scanRight: () => {
-
             }
         };
 
@@ -147,11 +139,11 @@ window.driver = new class {
         }
 
         const textSource = docRangeFromPoint(point, this.options.scanning.imposter);
-        if (textSource === null || !textSource.containsPoint(point)) {
+        if (!textSource || !textSource.containsPoint(point)) {
             return;
         }
 
-        if (this.lastTextSource !== null && this.lastTextSource.equals(textSource)) {
+        if (this.lastTextSource && this.lastTextSource.equals(textSource)) {
             return;
         }
 
@@ -225,7 +217,7 @@ window.driver = new class {
         docImposterDestroy();
         this.popup.hide();
 
-        if (this.options.scanning.selectText && this.lastTextSource !== null) {
+        if (this.options.scanning.selectText && this.lastTextSource) {
             this.lastTextSource.deselect();
         }
 

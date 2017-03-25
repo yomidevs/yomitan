@@ -49,6 +49,10 @@ window.displayWindow = new class extends Display {
         window.alert(`Error: ${error}`);
     }
 
+    clearSearch() {
+        $('#query').focus().select();
+    }
+
     onSearch(e) {
         e.preventDefault();
         $('#intro').slideUp();

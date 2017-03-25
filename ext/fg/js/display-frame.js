@@ -47,6 +47,10 @@ window.displayFrame = new class extends Display {
         }
     }
 
+    clearSearch() {
+        window.parent.postMessage('popupClose', '*');
+    }
+
     showOrphaned() {
         $('#content').hide();
         $('#orphan').show();
