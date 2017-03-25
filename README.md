@@ -68,14 +68,15 @@ Yomichan provides advanced features not available in other browser-based diction
 ## Custom Dictionaries ##
 
 Yomichan supports the use of custom dictionaries including the esoteric but popular
-[EPWING](https://ja.wikipedia.org/wiki/EPWING) format. These dictionaries are often sought after by language learners
-for their correctness and excellent coverage of the Japanese language. 
+[EPWING](https://ja.wikipedia.org/wiki/EPWING) format. They were often utilized in portable electronic dictionaries
+similar to the ones pictured below. These dictionaries are often sought after by language learners for their correctness
+and excellent coverage of the Japanese language. 
 
 Unfortunately, as most of the dictionaries released in this format are proprietary I am unable to bundle them with
 Yomichan. You will need to procure these dictionaries yourself and import them with [Yomichan
 Import](https://foosoft.net/projects/yomichan-import). Please see the project page for additional details.
 
-[![Pocket dictionaries](https://foosoft.net/projects/yomichan/img/dictionary-thumb.png)](https://foosoft.net/projects/yomichan/img/dictionary.jpg)
+[![Pocket EPWING dictionaries](https://foosoft.net/projects/yomichan/img/dictionary-thumb.png)](https://foosoft.net/projects/yomichan/img/dictionary.jpg)
 
 ## Anki Integration ##
 
@@ -88,7 +89,9 @@ Please see the respective project page for more information about how to set up 
 Before flashcards can be automatically created, you must configure the templates used to create term and/or Kanji notes.
 If you are unfamiliar with Anki deck and model management, this would be a good time to reference the [Anki
 Manual](http://ankisrs.net/docs/manual.html). In short, you must specify what information should be included in the
-flashcards that Yomichan creates through AnkiConnect. This can be accomplished with the following steps:
+flashcards that Yomichan creates through AnkiConnect.
+
+Flashcard fields can be configured with the following steps:
 
 1.  Open the Yomichan options page and scroll down to the section labeled *Anki Options*.
 2.  Tick the checkbox labeled *Enable Anki integration* (Anki must be running with [AnkiConnect](https://foosoft.net/projects/anki-connect) installed).
@@ -121,6 +124,12 @@ flashcards that Yomichan creates through AnkiConnect. This can be accomplished w
     `{onyomi}` | Onyomi (Chinese reading) for the Kanji expressed as Hiragana.
     `{url}` | Address of the web page in which the Kanji appeared in.
 
+When creating your model for Yomichan, *please make sure that you pick a unique field to be first*; fields that will
+contain `{expression}` or `{character}` are ideal candidates. Anki does not require duplicate flashcards to be added to
+a deck and uses the first field in the model to check for duplicates. If, for example, you have `{reading}` configured
+to be the first field in your model and already have <ruby>橋<rt>はし</rt></ruby> in your deck, you will not be able to
+create a flashcard for <ruby>箸<rt>はし</rt></ruby>, because they share the same reading.
+
 ### Flashcard Creation ###
 
 Once Yomichan is configured, it becomes trivial to create new flashcards with a single click. You will see the following
@@ -129,10 +138,11 @@ icons next to term definitions.
 *   Clicking ![](https://foosoft.net/projects/yomichan/img/button-add-expression.png) adds the current expression as Kanji (e.g. 食べる).
 *   Clicking ![](https://foosoft.net/projects/yomichan/img/button-add-reading.png) adds the current expression as Hiragana or Katakana (e.g. たべる).
 
-These icons will appear grayed out if a flashcard cannot be created for the current definition (it already exists in the
-deck, for example). If all of the buttons appear grayed out then you should double-check your deck and model
-configuration settings (see the Flashcard Configuration section above). If no icons appear at all, please make sure that
-Anki is running in the background.
+Below are some troubleshooting tips you can try if you are unable to create new flashcards:
+
+*   Individual icons will appear grayed out if a flashcard cannot be created for the current definition (e.g. it already exists in the deck).
+*   If all of the buttons appear grayed out then you should double-check your deck and model configuration settings.
+*   If no icons appear at all, please make sure that Anki is running in the background and that [AnkiConnect](https://foosoft.net/projects/anki-connect) has been installed.
 
 ## Frequently Asked Questions ##
 
@@ -148,6 +158,25 @@ Anki is running in the background.
     It in order to be able use Yomichan with local files in Chrome, you must first tick the *Allow access to file URLs*
     checkbox for Yomichan on the Chrome extensions page. Due to restrictions placed on browser extensions by Chrome, it
     will likely never be possible to use Yomichan with PDF files.
+
+*   **Is it possible to delete individual dictionaries without resetting the database?**
+
+    Although it is technically possible to purge specific dictionaries, due to the limitations of the underlying
+    database system, this process is *extremely* slow. For example, it can take up to ten minutes to delete a term
+    dictionary of moderate size! Instead of including a borderline unusable feature in Yomichan, I disabled dictionary
+    deletion entirely.
+
+*   **Why doesn't Yomichan work after being removed and reinstalled on Firefox?**
+
+    Uninstalling Yomichan on Firefox may sometimes leave the dictionary database in an undefined state. Although most of
+    the data has been deleted, the metadata describing it appears unchanged. This can make it look like you have
+    dictionaries installed when you actually do not. Purge the database and reimport your dictionaries to fix this
+    problem.
+
+*   **Why aren't EPWING dictionaries bundled with Yomichan?**
+
+    The vast majority of EPWING dictionaries are proprietary, so unfortunately I am unable to legally include them in
+    this extension for copyright reasons.
 
 *   **When are you going to add support for $MYLANGUAGE?**
 
