@@ -211,7 +211,13 @@ class Display {
     }
 
     onKeyDown(e) {
-        const requireAlt = ['e', 'k', 'p'];
+        const noteTryAdd = mode => {
+            const button = Display.adderButtonFind(this.index, mode);
+            if (button.length !== 0 && !button.hasClass('disabled')) {
+                this.noteAdd(this.definitions[this.index], mode);
+            }
+        };
+
         const handlers = {
             27: /* escape */ () => {
                 this.clearSearch();
@@ -242,20 +248,26 @@ class Display {
             },
 
             69: /* e */ () => {
-                this.noteAdd(this.definitions[this.index], 'term-kanji');
+                noteTryAdd('term-kanji');
             },
 
             75: /* k */ () => {
-                this.noteAdd(this.definitions[this.index], 'term-kana');
+                noteTryAdd('kanji');
+            },
+
+            82: /* r */ () => {
+                noteTryAdd('term-kana');
             },
 
             80: /* p */ () => {
-                this.audioPlay(this.definitions[this.index]);
+                if (Display.adderButtonFind(this.index, 'kanji').length === 0) {
+                    this.audioPlay(this.definitions[this.index]);
+                }
             }
         };
 
         const handler = handlers[e.keyCode];
-        if (handler && (e.altKey || !requireAlt.includes(e.keyCode))) {
+        if (handler && (e.altKey || !['e', 'k', 'p'].includes(e.keyCode))) {
             e.preventDefault();
             handler();
         }
