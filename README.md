@@ -144,6 +144,40 @@ Below are some troubleshooting tips you can try if you are unable to create new 
 *   If all of the buttons appear grayed out then you should double-check your deck and model configuration settings.
 *   If no icons appear at all, please make sure that Anki is running in the background and that [AnkiConnect](https://foosoft.net/projects/anki-connect) has been installed.
 
+## Development ##
+
+Working on Yomichan and related tools is very time consuming and I am always on the lookout for code contributions from
+other developers who want to help out. I take pride in the high quality of the codebase and ask you to follow the
+following basic guidelines when creating pull requests:
+
+*   Please discuss large features before writing code.
+*   Follow the conventions and style of the existing code.
+*   Write clean, modern ES6 code (`const`/`let`, promises, arrow functions, etc.)
+*   Large pull requests without a clear scope will not be merged.
+*   Incomplete or non-standalone features will not be merged.
+
+### Templates ###
+
+Yomichan uses [Handlebars](http://handlebarsjs.com/) templates for user interface and Anki note formatting. The source
+templates are found in the `tmpl` directory and the compiled version is stored in the `ext/bg/js/templates.js` file. If
+you modify the source templates, you will need to also recompile them. If you are developing on Linux or Mac OS X, you
+can use the included `build_tmpl.sh` and `build_tmpl_auto.sh` (requires
+[inotify-tools](https://github.com/rvoicilas/inotify-tools/wiki)) shell scripts to do this for you. Otherwise, simply
+execute `handlebars tmpl/*.html -f ext/bg/js/templates.js` from the project's base directory.
+
+
+### Dependencies ###
+
+Yomichan relies on several third-party libraries to function. The following are links to homepages and snapshots of the
+exact versions used for distribution.
+
+*   Bootstrap Toggle: [homepage](http://www.bootstraptoggle.com/) - [snapshot](https://github.com/minhur/bootstrap-toggle/archive/b76c094.zip)
+*   Bootstrap: [homepage](http://getbootstrap.com/) - [snapshot](https://github.com/twbs/bootstrap/releases/download/v3.3.7/bootstrap-3.3.7-dist.zip)
+*   Dexie: [homepage](http://dexie.org/) - [snapshot](https://github.com/dfahlander/Dexie.js/archive/v2.0.0-beta.10.zip)
+*   Handlebars: [homepage](http://handlebarsjs.com/) - [snapshot](http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars.min-714a4c4.js)
+*   JQuery: [homepage](https://blog.jquery.com/) - [snapshot](https://code.jquery.com/jquery-3.2.1.min.js)
+*   WanaKana: [homepage](http://wanakana.com/) - [snapshot](https://raw.githubusercontent.com/WaniKani/WanaKana/f2152985f5f2953d74edfe1b6a78e0e329a7cdfb/lib/wanakana.min.js)
+
 ## Frequently Asked Questions ##
 
 *   **What happened to AnkiWeb integration? Why was it removed?**
