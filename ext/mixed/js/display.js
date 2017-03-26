@@ -25,6 +25,9 @@ class Display {
         this.audioCache = {};
         this.responseCache = {};
         this.sequence = 0;
+        this.index = 0;
+
+        $(document).keydown(this.onKeyDown.bind(this));
     }
 
     definitionAdd(definition, mode) {
@@ -47,9 +50,17 @@ class Display {
         throw 'override me';
     }
 
+    clearSearch() {
+        throw 'override me';
+    }
+
     showTermDefs(definitions, options, context) {
+        window.focus();
+
         this.spinner.hide();
         this.definitions = definitions;
+        this.options = options;
+        this.context = context;
 
         const sequence = ++this.sequence;
         const params = {
@@ -68,43 +79,23 @@ class Display {
 
         this.templateRender('terms.html', params).then(content => {
             this.container.html(content);
+            this.entryScroll(context && context.index || 0);
 
-            let offset = 0;
-            if (context && context.hasOwnProperty('index') && context.index < definitions.length) {
-                const entry = $('.entry').eq(context.index);
-                offset = entry.offset().top;
-            }
-
-            window.scrollTo(0, offset);
-
-            $('.action-add-note').click(this.onActionAddNote.bind(this));
-            $('.action-play-audio').click(e => {
-                e.preventDefault();
-                const index = Display.entryIndexFind($(e.currentTarget));
-                this.audioPlay(this.definitions[index]);
-            });
-            $('.kanji-link').click(e => {
-                e.preventDefault();
-
-                const link = $(e.target);
-                context = context || {};
-                context.source = {
-                    definitions,
-                    index: Display.entryIndexFind(link)
-                };
-
-                this.kanjiFind(link.text()).then(kanjiDefs => {
-                    this.showKanjiDefs(kanjiDefs, options, context);
-                }).catch(this.handleError.bind(this));
-            });
+            $('.action-add-note').click(this.onAddNote.bind(this));
+            $('.action-play-audio').click(this.onPlayAudio.bind(this));
+            $('.kanji-link').click(this.onKanjiLookup.bind(this));
 
             return this.adderButtonsUpdate(['term-kanji', 'term-kana'], sequence);
         }).catch(this.handleError.bind(this));
     }
 
     showKanjiDefs(definitions, options, context) {
+        window.focus();
+
         this.spinner.hide();
         this.definitions = definitions;
+        this.options = options;
+        this.context = context;
 
         const sequence = ++this.sequence;
         const params = {
@@ -122,17 +113,10 @@ class Display {
 
         this.templateRender('kanji.html', params).then(content => {
             this.container.html(content);
-            window.scrollTo(0, 0);
+            this.entryScroll(context && context.index || 0);
 
-            $('.action-add-note').click(this.onActionAddNote.bind(this));
-            $('.source-term').click(e => {
-                e.preventDefault();
-
-                if (context && context.source) {
-                    context.index = context.source.index;
-                    this.showTermDefs(context.source.definitions, options, context);
-                }
-            });
+            $('.action-add-note').click(this.onAddNote.bind(this));
+            $('.source-term').click(this.onSourceTerm.bind(this));
 
             return this.adderButtonsUpdate(['kanji'], sequence);
         }).catch(this.handleError.bind(this));
@@ -159,31 +143,186 @@ class Display {
         });
     }
 
-    onActionAddNote(e) {
-        e.preventDefault();
-        this.spinner.show();
+    entryScroll(index, smooth) {
+        index = Math.min(index, this.definitions.length - 1);
+        index = Math.max(index, 0);
 
-        const link = $(e.currentTarget);
-        const mode = link.data('mode');
-        const index = Display.entryIndexFind(link);
-        const definition = this.definitions[index];
+        $('.current').hide().eq(index).show();
 
-        let promise = Promise.resolve();
-        if (mode !== 'kanji') {
-            const filename = Display.audioBuildFilename(definition);
-            if (filename) {
-                promise = this.audioBuildUrl(definition).then(url => definition.audio = {url, filename}).catch(() => {});
-            }
+        const container = $('html,body').stop();
+        const entry = $('.entry').eq(index);
+        const target = index === 0 ? 0 : entry.offset().top;
+
+        if (smooth) {
+            container.animate({scrollTop: target}, 200);
+        } else {
+            container.scrollTop(target);
         }
 
-        promise.then(() => {
-            return this.definitionAdd(definition, mode).then(success => {
-                if (success) {
-                    Display.adderButtonFind(index, mode).addClass('disabled');
-                } else {
-                    this.handleError('note could not be added');
+        this.index = index;
+    }
+
+    onSourceTerm(e) {
+        e.preventDefault();
+        this.sourceBack();
+    }
+
+    onKanjiLookup(e) {
+        e.preventDefault();
+
+        const link = $(e.target);
+        const context = {
+            source: {
+                definitions: this.definitions,
+                index: Display.entryIndexFind(link)
+            }
+        };
+
+        if (this.context) {
+            context.sentence = this.context.sentence;
+            context.url = this.context.url;
+        }
+
+        this.kanjiFind(link.text()).then(kanjiDefs => {
+            this.showKanjiDefs(kanjiDefs, this.options, context);
+        }).catch(this.handleError.bind(this));
+    }
+
+    onPlayAudio(e) {
+        e.preventDefault();
+        const index = Display.entryIndexFind($(e.currentTarget));
+        this.audioPlay(this.definitions[index]);
+    }
+
+    onAddNote(e) {
+        e.preventDefault();
+        const link = $(e.currentTarget);
+        const index = Display.entryIndexFind(link);
+        this.noteAdd(this.definitions[index], link.data('mode'));
+    }
+
+    onKeyDown(e) {
+        const noteTryAdd = mode => {
+            const button = Display.adderButtonFind(this.index, mode);
+            if (button.length !== 0 && !button.hasClass('disabled')) {
+                this.noteAdd(this.definitions[this.index], mode);
+            }
+        };
+
+        const handlers = {
+            27: /* escape */ () => {
+                this.clearSearch();
+                return true;
+            },
+
+            33: /* page up */ () => {
+                if (e.altKey) {
+                    this.entryScroll(this.index - 3, true);
+                    return true;
                 }
-            });
+            },
+
+            34: /* page down */ () => {
+                if (e.altKey) {
+                    this.entryScroll(this.index + 3, true);
+                    return true;
+                }
+            },
+
+            35: /* end */ () => {
+                if (e.altKey) {
+                    this.entryScroll(this.definitions.length - 1, true);
+                    return true;
+                }
+            },
+
+            36: /* home */ () => {
+                if (e.altKey) {
+                    this.entryScroll(0, true);
+                    return true;
+                }
+            },
+
+            38: /* up */ () => {
+                if (e.altKey) {
+                    this.entryScroll(this.index - 1, true);
+                    return true;
+                }
+            },
+
+            40: /* down */ () => {
+                if (e.altKey) {
+                    this.entryScroll(this.index + 1, true);
+                    return true;
+                }
+            },
+
+            66: /* b */ () => {
+                if (e.altKey) {
+                    this.sourceBack();
+                    return true;
+                }
+            },
+
+            69: /* e */ () => {
+                if (e.altKey) {
+                    noteTryAdd('term-kanji');
+                    return true;
+                }
+            },
+
+            75: /* k */ () => {
+                if (e.altKey) {
+                    noteTryAdd('kanji');
+                    return true;
+                }
+            },
+
+            82: /* r */ () => {
+                if (e.altKey) {
+                    noteTryAdd('term-kana');
+                    return true;
+                }
+            },
+
+            80: /* p */ () => {
+                if (e.altKey) {
+                    if ($('.entry').eq(this.index).data('type') === 'term') {
+                        this.audioPlay(this.definitions[this.index]);
+                    }
+
+                    return true;
+                }
+            }
+        };
+
+        const handler = handlers[e.keyCode];
+        if (handler && handler()) {
+            e.preventDefault();
+        }
+    }
+
+    sourceBack() {
+        if (this.context && this.context.source) {
+            const context = {
+                url: this.context.source.url,
+                sentence: this.context.source.sentence,
+                index: this.context.source.index
+            };
+
+            this.showTermDefs(this.context.source.definitions, this.options, context);
+        }
+    }
+
+    noteAdd(definition, mode) {
+        this.spinner.show();
+        return this.definitionAdd(definition, mode).then(success => {
+            if (success) {
+                const index = this.definitions.indexOf(definition);
+                Display.adderButtonFind(index, mode).addClass('disabled');
+            } else {
+                this.handleError('note could not be added');
+            }
         }).catch(this.handleError.bind(this)).then(() => this.spinner.hide());
     }
 
@@ -194,7 +333,7 @@ class Display {
             this.audioCache[key].pause();
         }
 
-        this.audioBuildUrl(definition).then(url => {
+        audioBuildUrl(definition, this.responseCache).then(url => {
             if (!url) {
                 url = '/mixed/mp3/button.mp3';
             }
@@ -215,79 +354,6 @@ class Display {
                 };
             }
         }).catch(this.handleError.bind(this)).then(() => this.spinner.hide());
-    }
-
-    audioBuildUrl(definition) {
-        return new Promise((resolve, reject) => {
-            const response = this.responseCache[definition.expression];
-            if (response) {
-                resolve(response);
-                return;
-            }
-
-            const data = {
-                post: 'dictionary_reference',
-                match_type: 'exact',
-                search_query: definition.expression
-            };
-
-            const params = [];
-            for (const key in data) {
-                params.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`);
-            }
-
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post');
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.addEventListener('error', () => reject('failed to scrape audio data'));
-            xhr.addEventListener('load', () => {
-                this.responseCache[definition.expression] = xhr.responseText;
-                resolve(xhr.responseText);
-            });
-
-            xhr.send(params.join('&'));
-        }).then(response => {
-            const dom = new DOMParser().parseFromString(response, 'text/html');
-            const entries = [];
-
-            for (const row of dom.getElementsByClassName('dc-result-row')) {
-                try {
-                    const url = row.getElementsByClassName('ill-onebuttonplayer').item(0).getAttribute('data-url');
-                    const expression = dom.getElementsByClassName('dc-vocab').item(0).innerText;
-                    const reading = dom.getElementsByClassName('dc-vocab_kana').item(0).innerText;
-
-                    if (url && expression && reading) {
-                        entries.push({url, expression, reading});
-                    }
-                } catch (e) {
-                    // NOP
-                }
-            }
-
-            return entries;
-        }).then(entries => {
-            for (const entry of entries) {
-                if (!definition.reading || definition.reading === entry.reading) {
-                    return entry.url;
-                }
-            }
-        });
-    }
-
-    static audioBuildFilename(definition) {
-        if (!definition.reading && !definition.expression) {
-            return;
-        }
-
-        let filename = 'yomichan';
-        if (definition.reading) {
-            filename += `_${definition.reading}`;
-        }
-        if (definition.expression) {
-            filename += `_${definition.expression}`;
-        }
-
-        return filename += '.mp3';
     }
 
     static entryIndexFind(element) {

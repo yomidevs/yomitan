@@ -20,8 +20,13 @@
 window.displayWindow = new class extends Display {
     constructor() {
         super($('#spinner'), $('#content'));
-        $('#search').click(this.onSearch.bind(this));
-        window.wanakana.bind($('#query').get(0));
+
+        const search = $('#search');
+        search.click(this.onSearch.bind(this));
+
+        const query = $('#query');
+        query.on('input', () => search.prop('disabled', query.val().length === 0));
+        window.wanakana.bind(query.get(0));
     }
 
     definitionAdd(definition, mode) {
@@ -42,6 +47,10 @@ window.displayWindow = new class extends Display {
 
     handleError(error) {
         window.alert(`Error: ${error}`);
+    }
+
+    clearSearch() {
+        $('#query').focus().select();
     }
 
     onSearch(e) {

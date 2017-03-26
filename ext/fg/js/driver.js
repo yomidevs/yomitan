@@ -35,6 +35,7 @@ window.driver = new class {
             window.addEventListener('mouseup', this.onMouseUp.bind(this));
             window.addEventListener('mousemove', this.onMouseMove.bind(this));
             window.addEventListener('resize', e => this.searchClear());
+            window.addEventListener('message', this.onFrameMessage.bind(this));
             chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
         }).catch(this.handleError.bind(this));
     }
@@ -45,14 +46,14 @@ window.driver = new class {
     }
 
     popupTimerClear() {
-        if (this.popupTimer !== null) {
+        if (this.popupTimer) {
             window.clearTimeout(this.popupTimer);
             this.popupTimer = null;
         }
     }
 
     onMouseOver(e) {
-        if (e.target === this.popup.container && this.popuptimer !== null) {
+        if (e.target === this.popup.container && this.popupTimer) {
             this.popupTimerClear();
         }
     }
@@ -101,14 +102,30 @@ window.driver = new class {
         }
     }
 
-    onBgMessage({action, params}, sender, callback) {
-        const handlers = new class {
-            api_optionsSet(options) {
-                this.options = options;
+    onFrameMessage(e) {
+        const handlers = {
+            popupClose: () => {
+                this.searchClear();
             }
         };
 
-        const method = handlers[`api_${action}`];
+        const handler = handlers[e.data];
+        if (handler) {
+            handler();
+        }
+    }
+
+    onBgMessage({action, params}, sender, callback) {
+        const handlers = new class {
+            optionsSet(options) {
+                this.options = options;
+                if (!this.options.enable) {
+                    this.searchClear();
+                }
+            }
+        };
+
+        const method = handlers[action];
         if (typeof(method) === 'function') {
             method.call(this, params);
         }
@@ -122,11 +139,11 @@ window.driver = new class {
         }
 
         const textSource = docRangeFromPoint(point, this.options.scanning.imposter);
-        if (textSource === null || !textSource.containsPoint(point)) {
+        if (!textSource || !textSource.containsPoint(point)) {
             return;
         }
 
-        if (this.lastTextSource !== null && this.lastTextSource.equals(textSource)) {
+        if (this.lastTextSource && this.lastTextSource.equals(textSource)) {
             return;
         }
 
@@ -200,7 +217,7 @@ window.driver = new class {
         docImposterDestroy();
         this.popup.hide();
 
-        if (this.options.scanning.selectText && this.lastTextSource !== null) {
+        if (this.options.scanning.selectText && this.lastTextSource) {
             this.lastTextSource.deselect();
         }
 

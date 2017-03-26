@@ -47,6 +47,10 @@ window.displayFrame = new class extends Display {
         }
     }
 
+    clearSearch() {
+        window.parent.postMessage('popupClose', '*');
+    }
+
     showOrphaned() {
         $('#content').hide();
         $('#orphan').show();
@@ -54,20 +58,20 @@ window.displayFrame = new class extends Display {
 
     onMessage(e) {
         const handlers = new class {
-            api_showTermDefs({definitions, options, context}) {
+            showTermDefs({definitions, options, context}) {
                 this.showTermDefs(definitions, options, context);
             }
 
-            api_showKanjiDefs({definitions, options, context}) {
+            showKanjiDefs({definitions, options, context}) {
                 this.showKanjiDefs(definitions, options, context);
             }
 
-            api_showOrphaned() {
+            showOrphaned() {
                 this.showOrphaned();
             }
         };
 
-        const {action, params} = e.originalEvent.data, method = handlers[`api_${action}`];
+        const {action, params} = e.originalEvent.data, method = handlers[action];
         if (typeof(method) === 'function') {
             method.call(this, params);
         }

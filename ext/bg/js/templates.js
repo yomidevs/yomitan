@@ -284,7 +284,7 @@ templates['fields.html'] = template({"1":function(container,depth0,helpers,parti
 templates['kanji.html'] = template({"1":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : {};
 
-  return "<div class=\"entry\">\n    <div class=\"actions\">\n"
+  return "<div class=\"entry\" data-type=\"kanji\">\n    <div class=\"actions\">\n        <img src=\"/mixed/img/entry-current.png\" class=\"current\" title=\"Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)\" alt>\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.addable : depth0),{"name":"if","hash":{},"fn":container.program(2, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.source : depth0),{"name":"if","hash":{},"fn":container.program(4, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "    </div>\n\n    <div class=\"glyph\">"
@@ -299,9 +299,9 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
     + ((stack1 = helpers["if"].call(alias1,((stack1 = (depth0 != null ? depth0.glossary : depth0)) != null ? stack1["1"] : stack1),{"name":"if","hash":{},"fn":container.program(11, data, 0),"inverse":container.program(15, data, 0),"data":data})) != null ? stack1 : "")
     + "    </div>\n</div>\n";
 },"2":function(container,depth0,helpers,partials,data) {
-    return "        <a href=\"#\" title=\"Add Kanji\" class=\"action-add-note pending disabled\" data-mode=\"kanji\"><img src=\"/mixed/img/add-kanji.png\" alt></a>\n";
+    return "        <a href=\"#\" class=\"action-add-note pending disabled\" data-mode=\"kanji\"><img src=\"/mixed/img/add-kanji.png\" title=\"Add Kanji (Alt + K)\" alt></a>\n";
 },"4":function(container,depth0,helpers,partials,data) {
-    return "        <a href=\"#\" title=\"Source term\" class=\"source-term\"><img src=\"/mixed/img/source-term.png\" alt></a>\n";
+    return "        <a href=\"#\" class=\"source-term\"><img src=\"/mixed/img/source-term.png\" title=\"Source term (Alt + B)\" alt></a>\n";
 },"6":function(container,depth0,helpers,partials,data) {
     var stack1;
 
@@ -442,7 +442,7 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
 },"12":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=depth0 != null ? depth0 : {};
 
-  return "<div class=\"entry\">\n    <div class=\"actions\">\n"
+  return "<div class=\"entry\" data-type=\"term\">\n    <div class=\"actions\">\n        <img src=\"/mixed/img/entry-current.png\" class=\"current\" title=\"Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)\" alt>\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.addable : depth0),{"name":"if","hash":{},"fn":container.program(13, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.playback : depth0),{"name":"if","hash":{},"fn":container.program(15, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "    </div>\n\n"
@@ -453,9 +453,9 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.grouped : depth0),{"name":"if","hash":{},"fn":container.program(26, data, 0),"inverse":container.program(32, data, 0),"data":data})) != null ? stack1 : "")
     + "    </div>\n</div>\n";
 },"13":function(container,depth0,helpers,partials,data) {
-    return "        <a href=\"#\" title=\"Add expression\" class=\"action-add-note pending disabled\" data-mode=\"term-kanji\"><img src=\"/mixed/img/add-term-kanji.png\" alt></a>\n        <a href=\"#\" title=\"Add reading\" class=\"action-add-note pending disabled\" data-mode=\"term-kana\"><img src=\"/mixed/img/add-term-kana.png\" alt></a>\n";
+    return "        <a href=\"#\" class=\"action-add-note pending disabled\" data-mode=\"term-kanji\"><img src=\"/mixed/img/add-term-kanji.png\" title=\"Add expression (Alt + E)\" alt></a>\n        <a href=\"#\" class=\"action-add-note pending disabled\" data-mode=\"term-kana\"><img src=\"/mixed/img/add-term-kana.png\" title=\"Add reading (Alt + R)\" alt></a>\n";
 },"15":function(container,depth0,helpers,partials,data) {
-    return "        <a href=\"#\" title=\"Play audio\" class=\"action-play-audio\"><img src=\"/mixed/img/play-audio.png\" alt></a>\n";
+    return "        <a href=\"#\" class=\"action-play-audio\"><img src=\"/mixed/img/play-audio.png\" title=\"Play audio (Alt + P)\" alt></a>\n";
 },"17":function(container,depth0,helpers,partials,data) {
     var stack1, helper, options, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", buffer = 
   "    <div class=\"expression\"><ruby>";

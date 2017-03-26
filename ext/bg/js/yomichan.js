@@ -25,12 +25,13 @@ window.yomichan = new class {
         this.anki = new AnkiNull();
         this.options = null;
 
-        chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
-        if (chrome.runtime.onInstalled) {
-            chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
-        }
-
-        this.translator.prepare().then(optionsLoad).then(this.optionsSet.bind(this));
+        this.translator.prepare().then(optionsLoad).then(this.optionsSet.bind(this)).then(() => {
+            chrome.commands.onCommand.addListener(this.onCommand.bind(this));
+            chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
+            if (chrome.runtime.onInstalled) {
+                chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
+            }
+        });
     }
 
     optionsSet(options) {
@@ -55,7 +56,10 @@ window.yomichan = new class {
     }
 
     noteFormat(definition, mode) {
-        const note = {fields: {}, tags: this.options.anki.tags};
+        const note = {
+            fields: {},
+            tags: this.options.anki.tags
+        };
 
         let fields = [];
         if (mode === 'kanji') {
@@ -116,8 +120,15 @@ window.yomichan = new class {
     }
 
     definitionAdd(definition, mode) {
-        const note = this.noteFormat(definition, mode);
-        return this.anki.addNote(note);
+        let promise = Promise.resolve();
+        if (mode !== 'kanji') {
+            promise = audioInject(definition, this.options.anki.terms.fields);
+        }
+
+        return promise.then(() => {
+            const note = this.noteFormat(definition, mode);
+            return this.anki.addNote(note);
+        });
     }
 
     definitionsAddable(definitions, modes) {
@@ -153,34 +164,60 @@ window.yomichan = new class {
         }
     }
 
+    onCommand(command) {
+        const handlers = {
+            search: () => {
+                chrome.tabs.create({url: chrome.extension.getURL('/bg/search.html')});
+            },
+
+            help: () => {
+                chrome.tabs.create({url: 'https://foosoft.net/projects/yomichan/'});
+            },
+
+            options: () => {
+                chrome.runtime.openOptionsPage();
+            },
+
+            toggle: () => {
+                this.options.general.enable = !this.options.general.enable;
+                optionsSave(this.options).then(() => this.optionsSet(this.options));
+            }
+        };
+
+        const handler = handlers[command];
+        if (handler) {
+            handler();
+        }
+    }
+
     onMessage(request, sender, callback) {
         const handlers = new class {
-            api_optionsGet({callback}) {
+            optionsGet({callback}) {
                 promiseCallback(optionsLoad(), callback);
             }
 
-            api_kanjiFind({text, callback}) {
+            kanjiFind({text, callback}) {
                 promiseCallback(this.kanjiFind(text), callback);
             }
 
-            api_termsFind({text, callback}) {
+            termsFind({text, callback}) {
                 promiseCallback(this.termsFind(text), callback);
             }
 
-            api_templateRender({template, data, callback}) {
+            templateRender({template, data, callback}) {
                 promiseCallback(this.templateRender(template, data), callback);
             }
 
-            api_definitionAdd({definition, mode, callback}) {
+            definitionAdd({definition, mode, callback}) {
                 promiseCallback(this.definitionAdd(definition, mode), callback);
             }
 
-            api_definitionsAddable({definitions, modes, callback}) {
+            definitionsAddable({definitions, modes, callback}) {
                 promiseCallback(this.definitionsAddable(definitions, modes), callback);
             }
         };
 
-        const {action, params} = request, method = handlers[`api_${action}`];
+        const {action, params} = request, method = handlers[action];
         if (typeof(method) === 'function') {
             params.callback = callback;
             method.call(this, params);
