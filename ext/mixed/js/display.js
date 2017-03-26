@@ -164,16 +164,7 @@ class Display {
 
     onSourceTerm(e) {
         e.preventDefault();
-
-        if (this.context && this.context.source) {
-            const context = {
-                url: this.context.source.url,
-                sentence: this.context.source.sentence,
-                index: this.context.source.index
-            };
-
-            this.showTermDefs(this.context.source.definitions, this.options, context);
-        }
+        this.sourceBack();
     }
 
     onKanjiLookup(e) {
@@ -247,6 +238,10 @@ class Display {
                 this.entryScroll(this.index + 1, true);
             },
 
+            66: /* b */ () => {
+                this.sourceBack();
+            },
+
             69: /* e */ () => {
                 noteTryAdd('term-kanji');
             },
@@ -260,7 +255,7 @@ class Display {
             },
 
             80: /* p */ () => {
-                if (Display.adderButtonFind(this.index, 'kanji').length === 0) {
+                if ($('.entry').eq(this.index).data('type') === 'term') {
                     this.audioPlay(this.definitions[this.index]);
                 }
             }
@@ -270,6 +265,18 @@ class Display {
         if (handler && (e.altKey || !['e', 'k', 'p'].includes(e.keyCode))) {
             e.preventDefault();
             handler();
+        }
+    }
+
+    sourceBack() {
+        if (this.context && this.context.source) {
+            const context = {
+                url: this.context.source.url,
+                sentence: this.context.source.sentence,
+                index: this.context.source.index
+            };
+
+            this.showTermDefs(this.context.source.definitions, this.options, context);
         }
     }
 

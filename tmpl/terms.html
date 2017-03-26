@@ -18,15 +18,15 @@
 {{/inline}}
 
 {{#*inline "term"}}
-<div class="entry">
+<div class="entry" data-type="term">
     <div class="actions">
-        <img src="/mixed/img/entry-current.png" class="current" title="Current entry (arrows / home / end)" alt>
+        <img src="/mixed/img/entry-current.png" class="current" title="Current entry (Up/Down/Home/End/PgUp/PgDn)" alt>
         {{#if addable}}
-        <a href="#" class="action-add-note pending disabled" data-mode="term-kanji"><img src="/mixed/img/add-term-kanji.png" title="Add expression ([)" alt></a>
-        <a href="#" class="action-add-note pending disabled" data-mode="term-kana"><img src="/mixed/img/add-term-kana.png" title="Add reading (])" alt></a>
+        <a href="#" class="action-add-note pending disabled" data-mode="term-kanji"><img src="/mixed/img/add-term-kanji.png" title="Add expression (Alt + E)" alt></a>
+        <a href="#" class="action-add-note pending disabled" data-mode="term-kana"><img src="/mixed/img/add-term-kana.png" title="Add reading (Alt + R)" alt></a>
         {{/if}}
         {{#if playback}}
-        <a href="#" class="action-play-audio"><img src="/mixed/img/play-audio.png" title="Play audio (\)" alt></a>
+        <a href="#" class="action-play-audio"><img src="/mixed/img/play-audio.png" title="Play audio (Alt + P)" alt></a>
         {{/if}}
     </div>
 
