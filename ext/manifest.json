@@ -43,12 +43,6 @@
                 "default": "Alt+Insert"
             },
             "description": "Open search window"
-        },
-        "options": {
-            "suggested_key": {
-                "default": "Alt+End"
-            },
-            "description": "Open options page"
         }
     },
     "web_accessible_resources": ["fg/frame.html"],
