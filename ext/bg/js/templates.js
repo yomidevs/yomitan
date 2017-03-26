@@ -284,7 +284,7 @@ templates['fields.html'] = template({"1":function(container,depth0,helpers,parti
 templates['kanji.html'] = template({"1":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : {};
 
-  return "<div class=\"entry\" data-type=\"kanji\">\n    <div class=\"actions\">\n        <img src=\"/mixed/img/entry-current.png\" class=\"current\" title=\"Current entry (Up/Down/Home/End/PgUp/PgDn)\" alt>\n"
+  return "<div class=\"entry\" data-type=\"kanji\">\n    <div class=\"actions\">\n        <img src=\"/mixed/img/entry-current.png\" class=\"current\" title=\"Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)\" alt>\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.addable : depth0),{"name":"if","hash":{},"fn":container.program(2, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.source : depth0),{"name":"if","hash":{},"fn":container.program(4, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "    </div>\n\n    <div class=\"glyph\">"
@@ -442,7 +442,7 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
 },"12":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=depth0 != null ? depth0 : {};
 
-  return "<div class=\"entry\" data-type=\"term\">\n    <div class=\"actions\">\n        <img src=\"/mixed/img/entry-current.png\" class=\"current\" title=\"Current entry (Up/Down/Home/End/PgUp/PgDn)\" alt>\n"
+  return "<div class=\"entry\" data-type=\"term\">\n    <div class=\"actions\">\n        <img src=\"/mixed/img/entry-current.png\" class=\"current\" title=\"Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)\" alt>\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.addable : depth0),{"name":"if","hash":{},"fn":container.program(13, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.playback : depth0),{"name":"if","hash":{},"fn":container.program(15, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "    </div>\n\n"

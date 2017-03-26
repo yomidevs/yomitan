@@ -212,59 +212,93 @@ class Display {
         const handlers = {
             27: /* escape */ () => {
                 this.clearSearch();
+                return true;
             },
 
             33: /* page up */ () => {
-                this.entryScroll(this.index - 3, true);
+                if (e.altKey) {
+                    this.entryScroll(this.index - 3, true);
+                    return true;
+                }
             },
 
             34: /* page down */ () => {
-                this.entryScroll(this.index + 3, true);
+                if (e.altKey) {
+                    this.entryScroll(this.index + 3, true);
+                    return true;
+                }
             },
 
             35: /* end */ () => {
-                this.entryScroll(this.definitions.length - 1, true);
+                if (e.altKey) {
+                    this.entryScroll(this.definitions.length - 1, true);
+                    return true;
+                }
             },
 
             36: /* home */ () => {
-                this.entryScroll(0, true);
+                if (e.altKey) {
+                    this.entryScroll(0, true);
+                    return true;
+                }
             },
 
             38: /* up */ () => {
-                this.entryScroll(this.index - 1, true);
+                if (e.altKey) {
+                    this.entryScroll(this.index - 1, true);
+                    return true;
+                }
             },
 
             40: /* down */ () => {
-                this.entryScroll(this.index + 1, true);
+                if (e.altKey) {
+                    this.entryScroll(this.index + 1, true);
+                    return true;
+                }
             },
 
             66: /* b */ () => {
-                this.sourceBack();
+                if (e.altKey) {
+                    this.sourceBack();
+                    return true;
+                }
             },
 
             69: /* e */ () => {
-                noteTryAdd('term-kanji');
+                if (e.altKey) {
+                    noteTryAdd('term-kanji');
+                    return true;
+                }
             },
 
             75: /* k */ () => {
-                noteTryAdd('kanji');
+                if (e.altKey) {
+                    noteTryAdd('kanji');
+                    return true;
+                }
             },
 
             82: /* r */ () => {
-                noteTryAdd('term-kana');
+                if (e.altKey) {
+                    noteTryAdd('term-kana');
+                    return true;
+                }
             },
 
             80: /* p */ () => {
-                if ($('.entry').eq(this.index).data('type') === 'term') {
-                    this.audioPlay(this.definitions[this.index]);
+                if (e.altKey) {
+                    if ($('.entry').eq(this.index).data('type') === 'term') {
+                        this.audioPlay(this.definitions[this.index]);
+                    }
+
+                    return true;
                 }
             }
         };
 
         const handler = handlers[e.keyCode];
-        if (handler && (e.altKey || !['e', 'k', 'p'].includes(e.keyCode))) {
+        if (handler && handler()) {
             e.preventDefault();
-            handler();
         }
     }
 
