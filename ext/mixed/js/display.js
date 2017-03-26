@@ -211,11 +211,8 @@ class Display {
     }
 
     onKeyDown(e) {
+        const requireAlt = ['e', 'k', 'p'];
         const handlers = {
-            8: /* backspace */ () => {
-
-            },
-
             27: /* escape */ () => {
                 this.clearSearch();
             },
@@ -244,21 +241,21 @@ class Display {
                 this.entryScroll(this.index + 1, true);
             },
 
-            209: /* [ */ () => {
-
+            69: /* e */ () => {
+                this.noteAdd(this.definitions[this.index], 'term-kanji');
             },
 
-            220: /* \ */ () => {
+            75: /* k */ () => {
+                this.noteAdd(this.definitions[this.index], 'term-kana');
+            },
+
+            80: /* p */ () => {
                 this.audioPlay(this.definitions[this.index]);
-            },
-
-            221: /* ] */ () => {
-
             }
         };
 
         const handler = handlers[e.keyCode];
-        if (handler) {
+        if (handler && (e.altKey || !requireAlt.includes(e.keyCode))) {
             e.preventDefault();
             handler();
         }
