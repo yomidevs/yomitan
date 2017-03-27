@@ -37,16 +37,15 @@ window.yomichan = new class {
     optionsSet(options) {
         this.options = options;
 
-        let configured = false;
-        for (const title in options.dictionaries) {
-            if (options.dictionaries[title].enabled) {
-                configured = true;
-                break;
-            }
+        if (!options.general.enable) {
+            chrome.browserAction.setBadgeBackgroundColor({color: '#d9534f'});
+            chrome.browserAction.setBadgeText({text: 'off'});
+        } else if (!dictConfigured(options)) {
+            chrome.browserAction.setBadgeBackgroundColor({color: '#f0ad4e'});
+            chrome.browserAction.setBadgeText({text: '!'});
+        } else {
+            chrome.browserAction.setBadgeText({text: ''});
         }
-
-        chrome.browserAction.setBadgeBackgroundColor({color: '#f0ad4e'});
-        chrome.browserAction.setBadgeText({text: configured ? '' : '!'});
 
         if (options.anki.enable) {
             this.anki = new AnkiConnect(this.options.anki.server);
@@ -108,13 +107,13 @@ window.yomichan = new class {
             this.translator.findTermsGrouped.bind(this.translator) :
             this.translator.findTerms.bind(this.translator);
 
-        return searcher(text, dictEnabled(this.options), this.options.general.softKatakana).then(({definitions, length}) => {
+        return searcher(text, dictEnabledSet(this.options), this.options.general.softKatakana).then(({definitions, length}) => {
             return {length, definitions: definitions.slice(0, this.options.general.maxResults)};
         });
     }
 
     kanjiFind(text) {
-        return this.translator.findKanji(text, dictEnabled(this.options)).then(definitions => {
+        return this.translator.findKanji(text, dictEnabledSet(this.options)).then(definitions => {
             return definitions.slice(0, this.options.general.maxResults);
         });
     }

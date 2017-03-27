@@ -256,7 +256,7 @@ function optionsSave(options) {
  * Dictionary
  */
 
-function dictEnabled(options) {
+function dictEnabledSet(options) {
     const dictionaries = {};
     for (const title in options.dictionaries) {
         const dictionary = options.dictionaries[title];
@@ -266,6 +266,16 @@ function dictEnabled(options) {
     }
 
     return dictionaries;
+}
+
+function dictConfigured(options) {
+    for (const title in options.dictionaries) {
+        if (options.dictionaries[title].enabled) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 function dictRowsSort(rows, options) {
