@@ -189,37 +189,37 @@ window.yomichan = new class {
         }
     }
 
-    onMessage(request, sender, callback) {
-        const handlers = new class {
-            optionsGet({callback}) {
+    onMessage({action, params}, sender, callback) {
+        const handlers = {
+            optionsGet: ({callback}) => {
                 promiseCallback(optionsLoad(), callback);
-            }
+            },
 
-            kanjiFind({text, callback}) {
+            kanjiFind: ({text, callback}) => {
                 promiseCallback(this.kanjiFind(text), callback);
-            }
+            },
 
-            termsFind({text, callback}) {
+            termsFind: ({text, callback}) => {
                 promiseCallback(this.termsFind(text), callback);
-            }
+            },
 
-            templateRender({template, data, callback}) {
+            templateRender: ({template, data, callback}) => {
                 promiseCallback(this.templateRender(template, data), callback);
-            }
+            },
 
-            definitionAdd({definition, mode, callback}) {
+            definitionAdd: ({definition, mode, callback}) => {
                 promiseCallback(this.definitionAdd(definition, mode), callback);
-            }
+            },
 
-            definitionsAddable({definitions, modes, callback}) {
+            definitionsAddable: ({definitions, modes, callback}) => {
                 promiseCallback(this.definitionsAddable(definitions, modes), callback);
             }
         };
 
-        const {action, params} = request, method = handlers[action];
-        if (typeof(method) === 'function') {
+        const handler = handlers[action];
+        if (handler) {
             params.callback = callback;
-            method.call(this, params);
+            handler(params);
         }
 
         return true;

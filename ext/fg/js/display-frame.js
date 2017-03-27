@@ -57,23 +57,24 @@ window.displayFrame = new class extends Display {
     }
 
     onMessage(e) {
-        const handlers = new class {
-            showTermDefs({definitions, options, context}) {
+        const handlers = {
+            showTermDefs: ({definitions, options, context}) => {
                 this.showTermDefs(definitions, options, context);
-            }
+            },
 
-            showKanjiDefs({definitions, options, context}) {
+            showKanjiDefs: ({definitions, options, context}) => {
                 this.showKanjiDefs(definitions, options, context);
-            }
+            },
 
-            showOrphaned() {
+            showOrphaned: () => {
                 this.showOrphaned();
             }
         };
 
-        const {action, params} = e.originalEvent.data, method = handlers[action];
-        if (typeof(method) === 'function') {
-            method.call(this, params);
+        const {action, params} = e.originalEvent.data;
+        const handler = handlers[action];
+        if (handler) {
+            handler(params);
         }
     }
 };

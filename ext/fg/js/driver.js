@@ -116,8 +116,8 @@ window.driver = new class {
     }
 
     onBgMessage({action, params}, sender, callback) {
-        const handlers = new class {
-            optionsSet(options) {
+        const handlers = {
+            optionsSet: options => {
                 this.options = options;
                 if (!this.options.enable) {
                     this.searchClear();
@@ -125,9 +125,9 @@ window.driver = new class {
             }
         };
 
-        const method = handlers[action];
-        if (typeof(method) === 'function') {
-            method.call(this, params);
+        const handler = handlers[action];
+        if (handler) {
+            handler(params);
         }
 
         callback();
