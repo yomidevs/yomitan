@@ -350,8 +350,33 @@ function ankiFieldsPopulate(element, options) {
     }
 
     const markers = {
-        'terms': ['audio', 'dictionary', 'expression', 'furigana', 'glossary', 'reading', 'sentence', 'tags', 'url'],
-        'kanji': ['character', 'dictionary', 'glossary', 'kunyomi', 'onyomi', 'sentence', 'tags', 'url']
+        'terms': [
+            'audio',
+            'cloze-body',
+            'cloze-prefix',
+            'cloze-suffix',
+            'dictionary',
+            'expression',
+            'furigana',
+            'glossary',
+            'reading',
+            'sentence',
+            'tags',
+            'url'
+        ],
+        'kanji': [
+            'character',
+            'cloze-body',
+            'cloze-prefix',
+            'cloze-suffix',
+            'dictionary',
+            'glossary',
+            'kunyomi',
+            'onyomi',
+            'sentence',
+            'tags',
+            'url'
+        ]
     }[tabId] || {};
 
     return instAnki().getModelFieldNames(modelName).then(names => {

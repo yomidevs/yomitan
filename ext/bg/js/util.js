@@ -435,6 +435,9 @@ function dictFieldFormat(field, definition, mode, options) {
     const markers = [
         'audio',
         'character',
+        'cloze-body',
+        'cloze-prefix',
+        'cloze-suffix',
         'dictionary',
         'expression',
         'furigana',

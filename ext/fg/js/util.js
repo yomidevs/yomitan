@@ -213,6 +213,6 @@ function docClozeExtract(source, extent) {
         sentence: sentence.trim(),
         prefix: clozePrefix.trim(),
         body: clozeBody.trim(),
-        sufix: clozeSuffix.trim()
+        suffix: clozeSuffix.trim()
     };
 }

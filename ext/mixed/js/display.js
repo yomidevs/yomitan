@@ -22,10 +22,12 @@ class Display {
         this.spinner = spinner;
         this.container = container;
         this.definitions = [];
-        this.audioCache = {};
-        this.responseCache = {};
+        this.options = null;
+        this.context = null;
         this.sequence = 0;
         this.index = 0;
+        this.audioCache = {};
+        this.responseCache = {};
 
         $(document).keydown(this.onKeyDown.bind(this));
     }
@@ -72,8 +74,8 @@ class Display {
 
         if (context) {
             for (const definition of definitions) {
-                definition.sentence = context.sentence || '';
-                definition.url = context.url || '';
+                definition.cloze = context.cloze;
+                definition.url = context.url;
             }
         }
 
@@ -106,8 +108,8 @@ class Display {
 
         if (context) {
             for (const definition of definitions) {
-                definition.sentence = context.sentence || '';
-                definition.url = context.url || '';
+                definition.cloze = context.cloze;
+                definition.url = context.url;
             }
         }
 
@@ -179,7 +181,7 @@ class Display {
         };
 
         if (this.context) {
-            context.sentence = this.context.sentence;
+            context.cloze = this.context.cloze;
             context.url = this.context.url;
         }
 
@@ -306,7 +308,7 @@ class Display {
         if (this.context && this.context.source) {
             const context = {
                 url: this.context.source.url,
-                sentence: this.context.source.sentence,
+                cloze: this.context.source.cloze,
                 index: this.context.source.index
             };
 
