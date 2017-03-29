@@ -48,8 +48,9 @@
     "web_accessible_resources": ["fg/frame.html"],
     "applications": {
         "gecko": {
-            "id": "alex@foosoft.net",
-            "strict_min_version": "51.0"
+            "id": "yomichan-live@foosoft.net",
+            "strict_min_version": "51.0",
+            "update_url": "https://foosoft.net/projects/yomichan/dl/updates.json"
         }
     }
 }
