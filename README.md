@@ -20,22 +20,14 @@ Yomichan provides advanced features not available in other browser-based diction
 
 ## Browser Support ##
 
-*   Google Chrome (versions 45+)
+*   **Google Chrome** (versions 45+)
 
     [![](https://foosoft.net/projects/yomichan/img/chrome-web-store.png)](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami)
 
-*   Mozilla Firefox (versions 51+)
-
-    [![](https://foosoft.net/projects/yomichan/img/firefox-marketplace.png)](https://addons.mozilla.org/en-US/firefox/addon/yomichan/)
-
-    Yomichan is sitting in a queue to be reviewed and signed by Mozilla. This process can take months; if you wish to
-    use this extension today:
-
-    1.  Type `about:config` into the browser address bar.
-    2.  Skip past the "voiding your warranty" nag screen.
-    3.  Type `xpinstall.signatures.required` into the search bar on top.
-    4.  Double-click the displayed entry to set its value to `false`.
-    5.  Install extension as usual from the [Firefox Marketplace](https://addons.mozilla.org/en-US/firefox/addon/yomichan/).
+*   **Mozilla Firefox** (versions 51+)
+    *   [Locally hosted](https://foosoft.net/projects/yomichan/dl/latest.xpi) *(recommended)*: Latest and greatest, released simultaneously with the Chrome version.
+    *   [Marketplace hosted](https://addons.mozilla.org/en-US/firefox/addon/yomichan/): Officially hosted version,
+        likely to be substantially out of date (queued for initial approval).
 
 ## Basic Features ##
 
@@ -104,6 +96,9 @@ Flashcard fields can be configured with the following steps:
     Marker | Description
     -------|------------
     `{audio}` | Audio sample of a native speaker's pronunciation in MP3 format (if available).
+    `{cloze-body}` | Raw, inflected term as it appeared before being reduced to dictionary form by Yomichan.
+    `{cloze-prefix}` | Text for the containing `{sentence}` from the start up to the value of `{cloze-body}`.
+    `{cloze-suffix}` | Text for the containing `{sentence}` from the value of `{cloze-body}` to the end.
     `{dictionary}` | Name of the dictionary from which the card is being created (unavailable in *grouped* mode).
     `{expression}` | Term expressed as Kanji (will be displayed in Kana if Kanji is not available).
     `{furigana}` | Term expressed as Kanji with Furigana displayed above it (e.g. <ruby>日本語<rt>にほんご</rt></ruby>).
@@ -118,10 +113,14 @@ Flashcard fields can be configured with the following steps:
     Marker | Description
     -------|------------
     `{character}` | Unicode glyph representing the current Kanji.
+    `{cloze-body}` | Raw, inflected parent term as it appeared before being reduced to dictionary form by Yomichan.
+    `{cloze-prefix}` | Text for the containing `{sentence}` from the start up to the value of `{cloze-body}`.
+    `{cloze-suffix}` | Text for the containing `{sentence}` from the value of `{cloze-body}` to the end.
     `{dictionary}` | Name of the dictionary from which the card is being created.
     `{glossary}` | List of definitions for the Kanji.
     `{kunyomi}` | Kunyomi (Japanese reading) for the Kanji expressed as Katakana.
     `{onyomi}` | Onyomi (Chinese reading) for the Kanji expressed as Hiragana.
+    `{sentence}` | Sentence, quote, or phrase in which the character appears in the source content.
     `{url}` | Address of the web page in which the Kanji appeared in.
 
 When creating your model for Yomichan, *please make sure that you pick a unique field to be first*; fields that will
@@ -144,6 +143,32 @@ Below are some troubleshooting tips you can try if you are unable to create new 
 *   If all of the buttons appear grayed out then you should double-check your deck and model configuration settings.
 *   If no icons appear at all, please make sure that Anki is running in the background and that [AnkiConnect](https://foosoft.net/projects/anki-connect) has been installed.
 
+## Keyboard Shortcuts ##
+
+The following shortcuts are globally available:
+
+Shortcut | Action
+---------|-------
+<kbd>Alt</kbd> + <kbd>Insert</kbd> | Open search page.
+<kbd>Alt</kbd> + <kbd>Delete</kbd> | Toggle extension on/off.
+
+The following shortcuts are available on search results:
+
+Shortcut | Action
+---------|-------
+<kbd>Esc</kbd> | Cancel current search
+<kbd>Alt</kbd> + <kbd>PgUp</kbd> | Page up through results.
+<kbd>Alt</kbd> + <kbd>PgDn</kbd> | Page down through results.
+<kbd>Alt</kbd> + <kbd>End</kbd> | Go to last result.
+<kbd>Alt</kbd> + <kbd>Home</kbd> | Go to first result.
+<kbd>Alt</kbd> + <kbd>Up</kbd> | Go to previous result.
+<kbd>Alt</kbd> + <kbd>Down</kbd> | Go to next result.
+<kbd>Alt</kbd> + <kbd>b</kbd> | Go to back to source term.
+<kbd>Alt</kbd> + <kbd>e</kbd> | Add current term as expression to Anki.
+<kbd>Alt</kbd> + <kbd>r</kbd> | Add current term as reading to Anki.
+<kbd>Alt</kbd> + <kbd>p</kbd> | Play audio for current term.
+<kbd>Alt</kbd> + <kbd>k</kbd> | Add current Kanji to Anki.
+
 ## Development ##
 
 Working on Yomichan and related tools is very time consuming and I am always on the lookout for code contributions from
@@ -164,7 +189,6 @@ you modify the source templates, you will need to also recompile them. If you ar
 can use the included `build_tmpl.sh` and `build_tmpl_auto.sh` (requires
 [inotify-tools](https://github.com/rvoicilas/inotify-tools/wiki)) shell scripts to do this for you. Otherwise, simply
 execute `handlebars tmpl/*.html -f ext/bg/js/templates.js` from the project's base directory.
-
 
 ### Dependencies ###
 
