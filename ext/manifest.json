@@ -48,7 +48,7 @@
     "web_accessible_resources": ["fg/frame.html"],
     "applications": {
         "gecko": {
-            "id": "alex@foosoft.net",
+            "id": "yomichan-live@foosoft.net",
             "strict_min_version": "51.0"
         }
     }
