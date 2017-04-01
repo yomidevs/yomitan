@@ -29,7 +29,8 @@
     },
     "permissions": [
         "<all_urls>",
-        "storage"
+        "storage",
+        "clipboardWrite"
     ],
     "commands": {
         "toggle": {
