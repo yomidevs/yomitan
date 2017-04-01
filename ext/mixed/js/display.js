@@ -301,10 +301,7 @@ class Display {
         const handler = handlers[e.keyCode];
         if (handler && handler()) {
             e.preventDefault();
-            return true;
         }
-
-        return false;
     }
 
     sourceBack() {

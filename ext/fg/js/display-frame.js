@@ -83,13 +83,9 @@ window.displayFrame = new class extends Display {
     }
 
     onKeyDown(e) {
-        if (super.onKeyDown(e)) {
-            return true;
-        }
-
         const handlers = {
             67: /* c */ () => {
-                if (e.ctrlKey) {
+                if (e.ctrlKey && window.getSelection().toString() === '') {
                     this.selectionCopy();
                     return true;
                 }
@@ -99,9 +95,8 @@ window.displayFrame = new class extends Display {
         const handler = handlers[e.keyCode];
         if (handler && handler()) {
             e.preventDefault();
-            return true;
+        } else {
+            super.onKeyDown(e);
         }
-
-        return false;
     }
 };
