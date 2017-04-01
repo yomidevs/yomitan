@@ -75,7 +75,7 @@ window.driver = new class {
         }
 
         const searchFunc = () => this.searchAt(this.lastMousePos);
-        if (this.popup.isVisible()) {
+        if (this.options.scanning.requireShift) {
             searchFunc();
         } else {
             this.popupTimerSet(searchFunc);
