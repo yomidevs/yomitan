@@ -106,6 +106,10 @@ window.driver = new class {
         const handlers = {
             popupClose: () => {
                 this.searchClear();
+            },
+
+            selectionCopy: () => {
+                document.execCommand('copy');
             }
         };
 

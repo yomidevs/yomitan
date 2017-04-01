@@ -51,6 +51,10 @@ window.displayFrame = new class extends Display {
         window.parent.postMessage('popupClose', '*');
     }
 
+    selectionCopy() {
+        window.parent.postMessage('selectionCopy', '*');
+    }
+
     showOrphaned() {
         $('#content').hide();
         $('#orphan').show();
@@ -75,6 +79,24 @@ window.displayFrame = new class extends Display {
         const handler = handlers[action];
         if (handler) {
             handler(params);
+        }
+    }
+
+    onKeyDown(e) {
+        const handlers = {
+            67: /* c */ () => {
+                if (e.ctrlKey && window.getSelection().toString() === '') {
+                    this.selectionCopy();
+                    return true;
+                }
+            }
+        };
+
+        const handler = handlers[e.keyCode];
+        if (handler && handler()) {
+            e.preventDefault();
+        } else {
+            super.onKeyDown(e);
         }
     }
 };

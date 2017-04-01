@@ -85,6 +85,7 @@ function optionsSetDefaults(options) {
         general: {
             enable: true,
             audioPlayback: true,
+            audioVolume: 100,
             groupResults: true,
             softKatakana: true,
             maxResults: 32,
@@ -375,7 +376,7 @@ function dictTermsGroup(definitions, dictionaries) {
             expression: firstDef.expression,
             reading: firstDef.reading,
             reasons: firstDef.reasons,
-            score: groupDefs.reduce((x, y) => x.score > y.score ? x.score : y.score, Number.MIN_SAFE_INTEGER),
+            score: groupDefs.reduce((p, v) => v.score > p ? v.score : p, Number.MIN_SAFE_INTEGER),
             source: firstDef.source
         });
     }
