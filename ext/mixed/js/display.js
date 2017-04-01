@@ -343,6 +343,7 @@ class Display {
             let audio = this.audioCache[url];
             if (audio) {
                 audio.currentTime = 0;
+                audio.volume = this.options.general.audioVolume / 100.0;
                 audio.play();
             } else {
                 audio = new Audio(url);
@@ -352,6 +353,7 @@ class Display {
                     }
 
                     this.audioCache[url] = audio;
+                    audio.volume = this.options.general.audioVolume / 100.0;
                     audio.play();
                 };
             }

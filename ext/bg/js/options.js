@@ -26,6 +26,7 @@ function formRead() {
         const optionsNew = $.extend(true, {}, optionsOld);
 
         optionsNew.general.audioPlayback = $('#audio-playback-buttons').prop('checked');
+        optionsNew.general.audioVolume = $('#audio-playback-volume').val();
         optionsNew.general.groupResults = $('#group-terms-results').prop('checked');
         optionsNew.general.softKatakana = $('#soft-katakana-search').prop('checked');
         optionsNew.general.showAdvanced = $('#show-advanced-options').prop('checked');
@@ -111,6 +112,7 @@ $(document).ready(() => {
 
     optionsLoad().then(options => {
         $('#audio-playback-buttons').prop('checked', options.general.audioPlayback);
+        $('#audio-playback-volume').val(options.general.audioVolume);
         $('#group-terms-results').prop('checked', options.general.groupResults);
         $('#soft-katakana-search').prop('checked', options.general.softKatakana);
         $('#show-advanced-options').prop('checked', options.general.showAdvanced);

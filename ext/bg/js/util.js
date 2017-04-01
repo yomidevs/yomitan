@@ -85,6 +85,7 @@ function optionsSetDefaults(options) {
         general: {
             enable: true,
             audioPlayback: true,
+            audioVolume: 100,
             groupResults: true,
             softKatakana: true,
             maxResults: 32,
