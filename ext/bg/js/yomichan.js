@@ -121,7 +121,7 @@ window.yomichan = new class {
     definitionAdd(definition, mode) {
         let promise = Promise.resolve();
         if (mode !== 'kanji') {
-            promise = audioInject(definition, this.options.anki.terms.fields);
+            promise = audioInject(definition, this.options.anki.terms.fields, this.options.general.audioSource);
         }
 
         return promise.then(() => {

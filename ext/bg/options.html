@@ -37,8 +37,13 @@
                     <label><input type="checkbox" id="soft-katakana-search"> Soft Katakana search</label>
                 </div>
 
-                <div class="checkbox">
-                    <label><input type="checkbox" id="audio-playback-buttons"> Audio playback buttons</label>
+                <div class="form-group">
+                    <label for="audio-playback-source">Audio playback source</label>
+                    <select class="form-control" id="audio-playback-source">
+                        <option value="disabled">Disabled</option>
+                        <option value="jpod101">JapanesePod101</option>
+                        <option value="jpod101-alternate">JapanesePod101 (Alternate)</option>
+                    </select>
                 </div>
 
                 <div class="form-group options-advanced">
@@ -52,7 +57,7 @@
                 </div>
 
                 <div class="form-group options-advanced">
-                    <label>Popup size (in pixels)</label>
+                    <label>Popup size (width x height, in pixels)</label>
                     <div class="row">
                         <div class="col-xs-6"><input type="number" min="1" id="popup-width" class="form-control"></div>
                         <div class="col-xs-6"><input type="number" min="1" id="popup-height" class="form-control"></div>

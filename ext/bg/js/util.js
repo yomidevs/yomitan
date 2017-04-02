@@ -25,9 +25,6 @@ function promiseCallback(promise, callback) {
     return promise.then(result => {
         callback({result});
     }).catch(error => {
-        /* eslint-disable */
-        console.log(error);
-        /* eslint-enable */
         callback({error});
     });
 }
@@ -84,7 +81,7 @@ function optionsSetDefaults(options) {
     const defaults = {
         general: {
             enable: true,
-            audioPlayback: true,
+            audioSource: 'jpod101',
             audioVolume: 100,
             groupResults: true,
             softKatakana: true,
@@ -137,84 +134,15 @@ function optionsSetDefaults(options) {
 
 function optionsVersion(options) {
     const fixups = [
+        () => { },
+        () => { },
+        () => { },
+        () => { },
         () => {
-            const copy = (targetDict, targetKey, sourceDict, sourceKey) => {
-                targetDict[targetKey] = sourceDict.hasOwnProperty(sourceKey) ? sourceDict[sourceKey] : targetDict[targetKey];
-            };
-
-            copy(options.general, 'autoStart', options, 'activateOnStartup');
-            copy(options.general, 'audioPlayback', options, 'enableAudioPlayback');
-            copy(options.general, 'softKatakana', options, 'enableSoftKatakanaSearch');
-            copy(options.general, 'groupResults', options, 'groupTermResults');
-            copy(options.general, 'showAdvanced', options, 'showAdvancedOptions');
-
-            copy(options.scanning, 'requireShift', options, 'holdShiftToScan');
-            copy(options.scanning, 'selectText', options, 'selectMatchedText');
-            copy(options.scanning, 'delay', options, 'scanDelay');
-            copy(options.scanning, 'length', options, 'scanLength');
-
-            options.anki.enable = options.ankiMethod === 'ankiconnect';
-
-            copy(options.anki, 'tags', options, 'ankiCardTags');
-            copy(options.anki, 'sentenceExt', options, 'sentenceExtent');
-            copy(options.anki.terms, 'deck', options, 'ankiTermDeck');
-            copy(options.anki.terms, 'model', options, 'ankiTermModel');
-            copy(options.anki.terms, 'fields', options, 'ankiTermFields');
-            copy(options.anki.kanji, 'deck', options, 'ankiKanjiDeck');
-            copy(options.anki.kanji, 'model', options, 'ankiKanjiModel');
-            copy(options.anki.kanji, 'fields', options, 'ankiKanjiFields');
-
-            for (const title in options.dictionaries) {
-                const dictionary = options.dictionaries[title];
-                dictionary.enabled = dictionary.enableTerms || dictionary.enableKanji;
-                dictionary.priority = 0;
-            }
-        },
-        () => {
-            const fixupFields = fields => {
-                const fixups = {
-                    '{expression-furigana}': '{furigana}',
-                    '{glossary-list}': '{glossary}'
-                };
-
-                for (const name in fields) {
-                    for (const fixup in fixups) {
-                        fields[name] = fields[name].replace(fixup, fixups[fixup]);
-                    }
-                }
-            };
-
-            fixupFields(options.anki.terms.fields);
-            fixupFields(options.anki.kanji.fields);
-        },
-        () => {
-            let hasEnabledDict = false;
-            for (const title in options.dictionaries) {
-                if (options.dictionaries[title].enabled) {
-                    hasEnabledDict = true;
-                    break;
-                }
-            }
-
-            if (!hasEnabledDict) {
-                for (const title in options.dictionaries) {
-                    options.dictionaries[title].enabled = true;
-                }
-            }
-        },
-        () => {
-            let hasEnabledDict = false;
-            for (const title in options.dictionaries) {
-                if (options.dictionaries[title].enabled) {
-                    hasEnabledDict = true;
-                    break;
-                }
-            }
-
-            if (!hasEnabledDict) {
-                for (const title in options.dictionaries) {
-                    options.dictionaries[title].enabled = true;
-                }
+            if (options.general.audioPlayback) {
+                options.general.audioSource = 'jpod101';
+            } else {
+                options.general.audioSource = 'disabled';
             }
         }
     ];
