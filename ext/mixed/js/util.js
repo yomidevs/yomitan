@@ -21,48 +21,71 @@
  * Audio
  */
 
-function audioBuildUrl(definition, cache={}) {
-    return new Promise((resolve, reject) => {
-        const response = cache[definition.expression];
-        if (response) {
-            resolve(response);
-        } else {
-            const data = {
-                post: 'dictionary_reference',
-                match_type: 'exact',
-                search_query: definition.expression
-            };
+function audioBuildUrl(definition, mode, cache={}) {
+    if (mode === 'jpod101') {
+        let kana = definition.reading;
+        let kanji = definition.expression;
 
-            const params = [];
-            for (const key in data) {
-                params.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`);
-            }
-
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post');
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.addEventListener('error', () => reject('failed to scrape audio data'));
-            xhr.addEventListener('load', () => {
-                cache[definition.expression] = xhr.responseText;
-                resolve(xhr.responseText);
-            });
-
-            xhr.send(params.join('&'));
+        if (!kana && wanakana.isHiragana(kanji)) {
+            kana = kanji;
+            kanji = null;
         }
-    }).then(response => {
-        const dom = new DOMParser().parseFromString(response, 'text/html');
-        for (const row of dom.getElementsByClassName('dc-result-row')) {
-            try {
-                const url = row.getElementsByClassName('ill-onebuttonplayer').item(0).getAttribute('data-url');
-                const reading = row.getElementsByClassName('dc-vocab_kana').item(0).innerText;
-                if (url && reading && (!definition.reading || definition.reading === reading)) {
-                    return url;
+
+        const params = [];
+        if (kanji) {
+            params.push(`kanji=${encodeURIComponent(kanji)}`);
+        }
+        if (kana) {
+            params.push(`kana=${encodeURIComponent(kana)}`);
+        }
+
+        const url = `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?${params.join('&')}`;
+        return Promise.resolve(url);
+    } else if (mode === 'jpod101-alternate') {
+        return new Promise((resolve, reject) => {
+            const response = cache[definition.expression];
+            if (response) {
+                resolve(response);
+            } else {
+                const data = {
+                    post: 'dictionary_reference',
+                    match_type: 'exact',
+                    search_query: definition.expression
+                };
+
+                const params = [];
+                for (const key in data) {
+                    params.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`);
                 }
-            } catch (e) {
-                // NOP
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post');
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.addEventListener('error', () => reject('failed to scrape audio data'));
+                xhr.addEventListener('load', () => {
+                    cache[definition.expression] = xhr.responseText;
+                    resolve(xhr.responseText);
+                });
+
+                xhr.send(params.join('&'));
             }
-        }
-    });
+        }).then(response => {
+            const dom = new DOMParser().parseFromString(response, 'text/html');
+            for (const row of dom.getElementsByClassName('dc-result-row')) {
+                try {
+                    const url = row.getElementsByClassName('ill-onebuttonplayer').item(0).getAttribute('data-url');
+                    const reading = row.getElementsByClassName('dc-vocab_kana').item(0).innerText;
+                    if (url && reading && (!definition.reading || definition.reading === reading)) {
+                        return url;
+                    }
+                } catch (e) {
+                    // NOP
+                }
+            }
+        });
+    } else {
+        return Promise.reject('unsupported audio source');
+    }
 }
 
 function audioBuildFilename(definition) {
@@ -79,7 +102,7 @@ function audioBuildFilename(definition) {
     }
 }
 
-function audioInject(definition, fields) {
+function audioInject(definition, fields, mode) {
     const filename = audioBuildFilename(definition);
     if (!filename) {
         return Promise.resolve(true);
@@ -97,7 +120,7 @@ function audioInject(definition, fields) {
         return Promise.resolve(true);
     }
 
-    return audioBuildUrl(definition).then(url => {
+    return audioBuildUrl(definition, mode).then(url => {
         definition.audio = {url, filename};
         return true;
     }).catch(() => false);
