@@ -69,7 +69,7 @@ class Display {
             definitions,
             addable: options.anki.enable,
             grouped: options.general.groupResults,
-            playback: options.general.audioPlayback
+            playback: options.general.audioSource !== 'disabled'
         };
 
         if (context) {
@@ -335,7 +335,7 @@ class Display {
             this.audioCache[key].pause();
         }
 
-        audioBuildUrl(definition, this.responseCache).then(url => {
+        audioBuildUrl(definition, this.options.general.audioSource, this.responseCache).then(url => {
             if (!url) {
                 url = '/mixed/mp3/button.mp3';
             }
