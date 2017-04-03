@@ -103,6 +103,10 @@ function audioBuildFilename(definition) {
 }
 
 function audioInject(definition, fields, mode) {
+    if (mode === 'disabled') {
+        return Promise.resolve(true);
+    }
+
     const filename = audioBuildFilename(definition);
     if (!filename) {
         return Promise.resolve(true);
