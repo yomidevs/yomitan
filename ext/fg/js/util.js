@@ -205,14 +205,10 @@ function docClozeExtract(source, extent) {
     }
 
     const sentence = content.substring(startPos, endPos);
-    const clozePrefix = sentence.substring(0, position - startPos);
-    const clozeBody = source.text();
-    const clozeSuffix = sentence.substring(position - startPos + clozeBody.length);
+    const padding = sentence.length - sentence.replace(/^\s+/, '');
 
     return {
         sentence: sentence.trim(),
-        prefix: clozePrefix.trim(),
-        body: clozeBody.trim(),
-        suffix: clozeSuffix.trim()
+        offset: position - startPos - padding
     };
 }

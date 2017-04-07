@@ -18,6 +18,20 @@
 
 
 /*
+ * Cloze
+ */
+
+function clozeBuild(sentence, offset, source) {
+    return {
+        sentence: sentence.trim(),
+        prefix: sentence.substring(0, offset).trim(),
+        body: source.trim(),
+        suffix: sentence.substring(offset + source.length).trim()
+    };
+}
+
+
+/*
  * Audio
  */
 

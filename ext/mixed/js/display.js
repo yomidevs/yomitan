@@ -74,7 +74,7 @@ class Display {
 
         if (context) {
             for (const definition of definitions) {
-                definition.cloze = context.cloze;
+                definition.cloze = clozeBuild(context.cloze);
                 definition.url = context.url;
             }
         }
@@ -108,7 +108,7 @@ class Display {
 
         if (context) {
             for (const definition of definitions) {
-                definition.cloze = context.cloze;
+                definition.cloze = clozeBuild(context.cloze);
                 definition.url = context.url;
             }
         }
