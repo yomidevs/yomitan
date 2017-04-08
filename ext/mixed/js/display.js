@@ -74,7 +74,7 @@ class Display {
 
         if (context) {
             for (const definition of definitions) {
-                definition.cloze = clozeBuild(context.cloze);
+                definition.cloze = clozeBuild(context.sentence, definition.source);
                 definition.url = context.url;
             }
         }
@@ -108,7 +108,7 @@ class Display {
 
         if (context) {
             for (const definition of definitions) {
-                definition.cloze = clozeBuild(context.cloze);
+                definition.cloze = clozeBuild(context.sentence, definition.source);
                 definition.url = context.url;
             }
         }
@@ -181,7 +181,7 @@ class Display {
         };
 
         if (this.context) {
-            context.cloze = this.context.cloze;
+            context.sentence = this.context.sentence;
             context.url = this.context.url;
         }
 
@@ -308,7 +308,7 @@ class Display {
         if (this.context && this.context.source) {
             const context = {
                 url: this.context.source.url,
-                cloze: this.context.source.cloze,
+                sentence: this.context.source.sentence,
                 index: this.context.source.index
             };
 

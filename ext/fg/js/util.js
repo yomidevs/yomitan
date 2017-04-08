@@ -152,7 +152,7 @@ function docRangeFromPoint(point, imposter) {
     return null;
 }
 
-function docClozeExtract(source, extent) {
+function docSentenceExtract(source, extent) {
     const quotesFwd = {'「': '」', '『': '』', "'": "'", '"': '"'};
     const quotesBwd = {'」': '「', '』': '『', "'": "'", '"': '"'};
     const terminators = '…。．.？?！!';
@@ -204,11 +204,11 @@ function docClozeExtract(source, extent) {
         }
     }
 
-    const sentence = content.substring(startPos, endPos);
-    const padding = sentence.length - sentence.replace(/^\s+/, '');
+    const text = content.substring(startPos, endPos);
+    const padding = text.length - text.replace(/^\s+/, '');
 
     return {
-        sentence: sentence.trim(),
+        text: text.trim(),
         offset: position - startPos - padding
     };
 }

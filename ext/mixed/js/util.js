@@ -21,12 +21,12 @@
  * Cloze
  */
 
-function clozeBuild(sentence, offset, source) {
+function clozeBuild(sentence, source) {
     return {
-        sentence: sentence.trim(),
-        prefix: sentence.substring(0, offset).trim(),
+        sentence: sentence.text.trim(),
+        prefix: sentence.text.substring(0, sentence.offset).trim(),
         body: source.trim(),
-        suffix: sentence.substring(offset + source.length).trim()
+        suffix: sentence.text.substring(sentence.offset + source.length).trim()
     };
 }
 
