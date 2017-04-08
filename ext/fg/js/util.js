@@ -182,7 +182,7 @@ function docSentenceExtract(source, extent) {
 
     quoteStack = [];
 
-    let endPos = content.length - 1;
+    let endPos = content.length;
     for (let i = position; i <= endPos; ++i) {
         const c = content[i];
 
@@ -205,7 +205,7 @@ function docSentenceExtract(source, extent) {
     }
 
     const text = content.substring(startPos, endPos);
-    const padding = text.length - text.replace(/^\s+/, '');
+    const padding = text.length - text.replace(/^\s+/, '').length;
 
     return {
         text: text.trim(),

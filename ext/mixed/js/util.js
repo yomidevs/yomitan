@@ -22,12 +22,17 @@
  */
 
 function clozeBuild(sentence, source) {
-    return {
-        sentence: sentence.text.trim(),
-        prefix: sentence.text.substring(0, sentence.offset).trim(),
-        body: source.trim(),
-        suffix: sentence.text.substring(sentence.offset + source.length).trim()
+    const result = {
+        sentence: sentence.text.trim()
     };
+
+    if (source) {
+        result.prefix = sentence.text.substring(0, sentence.offset).trim();
+        result.body = source.trim();
+        result.suffix = sentence.text.substring(sentence.offset + source.length).trim();
+    }
+
+    return result;
 }
 
 

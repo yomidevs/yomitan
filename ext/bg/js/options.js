@@ -368,9 +368,6 @@ function ankiFieldsPopulate(element, options) {
         ],
         'kanji': [
             'character',
-            'cloze-body',
-            'cloze-prefix',
-            'cloze-suffix',
             'dictionary',
             'glossary',
             'kunyomi',
