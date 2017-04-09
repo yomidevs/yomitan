@@ -28,8 +28,8 @@ window.yomichan = new class {
         this.translator.prepare().then(optionsLoad).then(this.optionsSet.bind(this)).then(() => {
             chrome.commands.onCommand.addListener(this.onCommand.bind(this));
             chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
-            if (chrome.runtime.onInstalled) {
-                chrome.runtime.onInstalled.addListener(this.onInstalled.bind(this));
+            if (this.options.general.showGuide) {
+                chrome.tabs.create({url: chrome.extension.getURL('/bg/guide.html')});
             }
         });
     }
@@ -155,12 +155,6 @@ window.yomichan = new class {
 
     templateRender(template, data) {
         return Promise.resolve(handlebarsRender(template, data));
-    }
-
-    onInstalled(details) {
-        if (details.reason === 'install') {
-            chrome.tabs.create({url: chrome.extension.getURL('/bg/guide.html')});
-        }
     }
 
     onCommand(command) {

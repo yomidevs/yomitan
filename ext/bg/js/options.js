@@ -25,6 +25,7 @@ function formRead() {
     return optionsLoad().then(optionsOld => {
         const optionsNew = $.extend(true, {}, optionsOld);
 
+        optionsNew.general.showGuide = $('#show-usage-guide').prop('checked');
         optionsNew.general.audioSource = $('#audio-playback-source').val();
         optionsNew.general.audioVolume = $('#audio-playback-volume').val();
         optionsNew.general.groupResults = $('#group-terms-results').prop('checked');
@@ -111,6 +112,7 @@ $(document).ready(() => {
     handlebarsRegister();
 
     optionsLoad().then(options => {
+        $('#show-usage-guide').prop('checked', options.general.showGuide);
         $('#audio-playback-source').val(options.general.audioSource);
         $('#audio-playback-volume').val(options.general.audioVolume);
         $('#group-terms-results').prop('checked', options.general.groupResults);
