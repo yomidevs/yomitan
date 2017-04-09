@@ -74,7 +74,10 @@ class Display {
 
         if (context) {
             for (const definition of definitions) {
-                definition.cloze = clozeBuild(context.sentence, definition.source);
+                if (context.sentence) {
+                    definition.cloze = clozeBuild(context.sentence, definition.source);
+                }
+
                 definition.url = context.url;
             }
         }
@@ -108,7 +111,10 @@ class Display {
 
         if (context) {
             for (const definition of definitions) {
-                definition.cloze = clozeBuild(context.sentence);
+                if (context.sentence) {
+                    definition.cloze = clozeBuild(context.sentence);
+                }
+
                 definition.url = context.url;
             }
         }
