@@ -152,7 +152,7 @@ function docRangeFromPoint(point, imposter) {
     return null;
 }
 
-function docClozeExtract(source, extent) {
+function docSentenceExtract(source, extent) {
     const quotesFwd = {'「': '」', '『': '』', "'": "'", '"': '"'};
     const quotesBwd = {'」': '「', '』': '『', "'": "'", '"': '"'};
     const terminators = '…。．.？?！!';
@@ -182,7 +182,7 @@ function docClozeExtract(source, extent) {
 
     quoteStack = [];
 
-    let endPos = content.length - 1;
+    let endPos = content.length;
     for (let i = position; i <= endPos; ++i) {
         const c = content[i];
 
@@ -204,15 +204,11 @@ function docClozeExtract(source, extent) {
         }
     }
 
-    const sentence = content.substring(startPos, endPos);
-    const clozePrefix = sentence.substring(0, position - startPos);
-    const clozeBody = source.text();
-    const clozeSuffix = sentence.substring(position - startPos + clozeBody.length);
+    const text = content.substring(startPos, endPos);
+    const padding = text.length - text.replace(/^\s+/, '').length;
 
     return {
-        sentence: sentence.trim(),
-        prefix: clozePrefix.trim(),
-        body: clozeBody.trim(),
-        suffix: clozeSuffix.trim()
+        text: text.trim(),
+        offset: position - startPos - padding
     };
 }

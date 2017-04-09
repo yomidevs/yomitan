@@ -172,13 +172,13 @@ window.driver = new class {
             } else {
                 textSource.setEndOffset(length);
 
-                const cloze = docClozeExtract(textSource, this.options.anki.sentenceExt);
+                const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
                 const url = window.location.href;
                 this.popup.showTermDefs(
                     textSource.getRect(),
                     definitions,
                     this.options,
-                    {cloze, url}
+                    {sentence, url}
                 );
 
                 this.lastTextSource = textSource;
@@ -198,13 +198,13 @@ window.driver = new class {
             if (definitions.length === 0) {
                 return false;
             } else {
-                const cloze = docClozeExtract(textSource, this.options.anki.sentenceExt);
+                const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
                 const url = window.location.href;
                 this.popup.showKanjiDefs(
                     textSource.getRect(),
                     definitions,
                     this.options,
-                    {cloze, url}
+                    {sentence, url}
                 );
 
                 this.lastTextSource = textSource;

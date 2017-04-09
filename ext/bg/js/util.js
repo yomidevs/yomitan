@@ -89,7 +89,8 @@ function optionsSetDefaults(options) {
             showAdvanced: false,
             popupWidth: 400,
             popupHeight: 250,
-            popupOffset: 10
+            popupOffset: 10,
+            showGuide: true
         },
 
         scanning: {
@@ -144,6 +145,9 @@ function optionsVersion(options) {
             } else {
                 options.general.audioSource = 'disabled';
             }
+        },
+        () => {
+            options.general.showGuide = false;
         }
     ];
 
