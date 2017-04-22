@@ -31,6 +31,20 @@ function promiseCallback(promise, callback) {
 
 
 /*
+ * Japanese
+ */
+
+function jpIsKanji(c) {
+    const code = c.charCodeAt(0);
+    return code >= 0x4e00 && code < 0x9fb0 || code >= 0x3400 && code < 0x4dc0;
+}
+
+function jpIsKana(c) {
+    return wanakana.isKana(c);
+}
+
+
+/*
  * Commands
  */
 
@@ -98,6 +112,7 @@ function optionsSetDefaults(options) {
             middleMouse: true,
             selectText: true,
             imposter: true,
+            alphanumeric: true,
             delay: 15,
             length: 10
         },
@@ -489,14 +504,9 @@ function jsonLoadDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
  */
 
 function handlebarsKanjiLinks(options) {
-    const isKanji = c => {
-        const code = c.charCodeAt(0);
-        return code >= 0x4e00 && code < 0x9fb0 || code >= 0x3400 && code < 0x4dc0;
-    };
-
     let result = '';
     for (const c of options.fn(this)) {
-        if (isKanji(c)) {
+        if (jpIsKanji(c)) {
             result += `<a href="#" class="kanji-link">${c}</a>`;
         } else {
             result += c;
