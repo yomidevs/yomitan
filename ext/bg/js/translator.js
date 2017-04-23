@@ -41,9 +41,16 @@ class Translator {
         });
     }
 
-    findTerms(text, dictionaries, softKatakana) {
+    findTerms(text, dictionaries, softKatakana, alphanumeric) {
         const titles = Object.keys(dictionaries);
         const cache = {};
+
+        if (!alphanumeric && text.length > 0) {
+            const c = text[0];
+            if (!jpIsKana(c) && !jpIsKanji(c)) {
+                return Promise.resolve({length: 0, definitions: []});
+            }
+        }
 
         return this.findTermsDeinflected(text, titles, cache).then(deinfLiteral => {
             const textHiragana = wanakana._katakanaToHiragana(text);
@@ -84,8 +91,8 @@ class Translator {
         });
     }
 
-    findTermsGrouped(text, dictionaries, softKatakana) {
-        return this.findTerms(text, dictionaries, softKatakana).then(({length, definitions}) => {
+    findTermsGrouped(text, dictionaries, softKatakana, alphanumeric) {
+        return this.findTerms(text, dictionaries, softKatakana, alphanumeric).then(({length, definitions}) => {
             return {length, definitions: dictTermsGroup(definitions, dictionaries)};
         });
     }
