@@ -35,19 +35,23 @@ window.yomichan = new class {
     }
 
     optionsSet(options) {
-        this.options = options;
+        // In Firefox, setting options from the options UI somehow carries references
+        // to the DOM across to the background page, causing the options object to
+        // become a "DeadObject" after the options page is closed. The workaround used
+        // here is to create a deep copy of the options object.
+        this.options = JSON.parse(JSON.stringify(options));
 
-        if (!options.general.enable) {
+        if (!this.options.general.enable) {
             chrome.browserAction.setBadgeBackgroundColor({color: '#d9534f'});
             chrome.browserAction.setBadgeText({text: 'off'});
-        } else if (!dictConfigured(options)) {
+        } else if (!dictConfigured(this.options)) {
             chrome.browserAction.setBadgeBackgroundColor({color: '#f0ad4e'});
             chrome.browserAction.setBadgeText({text: '!'});
         } else {
             chrome.browserAction.setBadgeText({text: ''});
         }
 
-        if (options.anki.enable) {
+        if (this.options.anki.enable) {
             this.anki = new AnkiConnect(this.options.anki.server);
         } else {
             this.anki = new AnkiNull();
