@@ -20,28 +20,31 @@
 class TextSourceRange {
     constructor(range) {
         this.rng = range;
+        this.content = '';
     }
 
     clone() {
-        return new TextSourceRange(this.rng.cloneRange());
+        const tmp = new TextSourceRange(this.rng.cloneRange());
+        tmp.content = this.content;
+        return tmp;
     }
 
     text() {
-        return this.rng.toString();
+        return this.content;
     }
 
     setEndOffset(length) {
-        const lengthAdj = length + this.rng.startOffset;
-        const state = TextSourceRange.seekForward(this.rng.startContainer, lengthAdj);
+        const state = TextSourceRange.seekForward(this.rng.startContainer, this.rng.startOffset, length);
         this.rng.setEnd(state.node, state.offset);
-        return length - state.length;
+        this.content = state.content;
+        return length - state.remainder;
     }
 
     setStartOffset(length) {
-        const lengthAdj = length + (this.rng.startContainer.length - this.rng.startOffset);
-        const state = TextSourceRange.seekBackward(this.rng.startContainer, lengthAdj);
+        const state = TextSourceRange.seekBackward(this.rng.startContainer, this.rng.startOffset, length);
         this.rng.setStart(state.node, state.offset);
-        return length - state.length;
+        this.content = state.content;
+        return length - state.remainder;
     }
 
     containsPoint(point) {
@@ -80,8 +83,13 @@ class TextSourceRange {
         return other.rng && other.rng.compareBoundaryPoints(Range.START_TO_START, this.rng) === 0;
     }
 
-    static seekForward(node, length) {
-        const state = {node, length, offset: 0};
+    static shouldEnter(node) {
+        const skip = ['RT', 'SCRIPT', 'STYLE'];
+        return !skip.includes(node.nodeName);
+    }
+
+    static seekForward(node, offset, length) {
+        const state = {node, offset, remainder: length, content: ''};
         if (!TextSourceRange.seekForwardHelper(node, state)) {
             return state;
         }
@@ -99,11 +107,14 @@ class TextSourceRange {
 
     static seekForwardHelper(node, state) {
         if (node.nodeType === 3) {
-            const consumed = Math.min(node.length, state.length);
+            const offset = state.node === node ? state.offset : 0;
+            const remaining = node.length - offset;
+            const consumed = Math.min(remaining, state.remainder);
+            state.content = state.content + node.nodeValue.substring(offset, offset + consumed);
             state.node = node;
-            state.offset = consumed;
-            state.length -= consumed;
-        } else {
+            state.offset = offset + consumed;
+            state.remainder -= consumed;
+        } else if (TextSourceRange.shouldEnter(node)) {
             for (let i = 0; i < node.childNodes.length; ++i) {
                 if (!TextSourceRange.seekForwardHelper(node.childNodes[i], state)) {
                     break;
@@ -111,11 +122,11 @@ class TextSourceRange {
             }
         }
 
-        return state.length > 0;
+        return state.remainder > 0;
     }
 
-    static seekBackward(node, length) {
-        const state = {node, length, offset: node.length};
+    static seekBackward(node, offset, length) {
+        const state = {node, offset, remainder: length, content: ''};
         if (!TextSourceRange.seekBackwardHelper(node, state)) {
             return state;
         }
@@ -133,11 +144,14 @@ class TextSourceRange {
 
     static seekBackwardHelper(node, state) {
         if (node.nodeType === 3) {
-            const consumed = Math.min(node.length, state.length);
+            const offset = state.node === node ? state.offset : node.length;
+            const remaining = offset;
+            const consumed = Math.min(remaining, state.remainder);
+            state.content = node.nodeValue.substring(offset - consumed, offset) + state.content;
             state.node = node;
-            state.offset = node.length - consumed;
-            state.length -= consumed;
-        } else {
+            state.offset = offset - consumed;
+            state.remainder -= consumed;
+        } else if (TextSourceRange.shouldEnter(node)) {
             for (let i = node.childNodes.length - 1; i >= 0; --i) {
                 if (!TextSourceRange.seekBackwardHelper(node.childNodes[i], state)) {
                     break;
@@ -145,6 +159,6 @@ class TextSourceRange {
             }
         }
 
-        return state.length > 0;
+        return state.remainder > 0;
     }
 }
