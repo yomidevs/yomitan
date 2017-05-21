@@ -37,14 +37,14 @@ class TextSourceRange {
         const state = TextSourceRange.seekForward(this.rng.startContainer, this.rng.startOffset, length);
         this.rng.setEnd(state.node, state.offset);
         this.content = state.content;
-        return length - state.length;
+        return length - state.remainder;
     }
 
     setStartOffset(length) {
         const state = TextSourceRange.seekBackward(this.rng.startContainer, this.rng.startOffset, length);
         this.rng.setStart(state.node, state.offset);
         this.content = state.content;
-        return length - state.length;
+        return length - state.remainder;
     }
 
     containsPoint(point) {
