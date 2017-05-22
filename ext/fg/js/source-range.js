@@ -84,8 +84,22 @@ class TextSourceRange {
     }
 
     static shouldEnter(node) {
+        if (node.nodeType !== 1) {
+            return false;
+        }
+
         const skip = ['RT', 'SCRIPT', 'STYLE'];
-        return !skip.includes(node.nodeName);
+        if (skip.includes(node.nodeName)) {
+            return false;
+        }
+
+        const style = window.getComputedStyle(node);
+        const hidden =
+            style.visibility === 'hidden' ||
+            style.display === 'none' ||
+            parseFloat(style.fontSize) === 0;
+
+        return !hidden;
     }
 
     static seekForward(node, offset, length) {
@@ -106,7 +120,7 @@ class TextSourceRange {
     }
 
     static seekForwardHelper(node, state) {
-        if (node.nodeType === 3) {
+        if (node.nodeType === 3 && node.parentElement && TextSourceRange.shouldEnter(node.parentElement)) {
             const offset = state.node === node ? state.offset : 0;
             const remaining = node.length - offset;
             const consumed = Math.min(remaining, state.remainder);
@@ -143,7 +157,7 @@ class TextSourceRange {
     }
 
     static seekBackwardHelper(node, state) {
-        if (node.nodeType === 3) {
+        if (node.nodeType === 3 && node.parentElement && TextSourceRange.shouldEnter(node.parentElement)) {
             const offset = state.node === node ? state.offset : node.length;
             const remaining = offset;
             const consumed = Math.min(remaining, state.remainder);
