@@ -18,39 +18,40 @@
 
 
 class TextSourceElement {
-    constructor(element, length=-1) {
+    constructor(element, content='') {
         this.element = element;
-        this.length = length;
+        this.content = content;
     }
 
     clone() {
-        return new TextSourceElement(this.element, this.length);
+        return new TextSourceElement(this.element, this.content);
     }
 
     text() {
-        const text = this.textRaw();
-        return this.length < 0 ? text : text.substring(0, this.length);
-    }
-
-    textRaw() {
-        switch (this.element.nodeName) {
-            case 'BUTTON':
-                return this.element.innerHTML;
-            case 'IMG':
-                return this.element.getAttribute('alt');
-            default:
-                return this.element.value || '';
-        }
-    }
-
-    setStartOffset(length) {
-        // NOP
-        return 0;
+        return this.content;
     }
 
     setEndOffset(length) {
-        this.length = length;
-        return length;
+        switch (this.element.nodeName) {
+            case 'BUTTON':
+                this.content = this.element.innerHTML;
+                break;
+            case 'IMG':
+                this.content = this.element.getAttribute('alt');
+                break;
+            default:
+                this.content = this.element.value;
+                break;
+        }
+
+        this.content = this.content || '';
+        this.content = this.content.substring(0, length);
+
+        return this.content.length;
+    }
+
+    setStartOffset(length) {
+        return 0;
     }
 
     containsPoint(point) {
@@ -71,6 +72,6 @@ class TextSourceElement {
     }
 
     equals(other) {
-        return other.element && other.textRaw() === this.textRaw();
+        return other.element === this.element && other.content === this.content;
     }
 }

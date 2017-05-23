@@ -18,15 +18,13 @@
 
 
 class TextSourceRange {
-    constructor(range) {
-        this.rng = range;
-        this.content = '';
+    constructor(range, content='') {
+        this.range = range;
+        this.content = content;
     }
 
     clone() {
-        const tmp = new TextSourceRange(this.rng.cloneRange());
-        tmp.content = this.content;
-        return tmp;
+        return new TextSourceRange(this.range.cloneRange(), this.content);
     }
 
     text() {
@@ -34,15 +32,15 @@ class TextSourceRange {
     }
 
     setEndOffset(length) {
-        const state = TextSourceRange.seekForward(this.rng.startContainer, this.rng.startOffset, length);
-        this.rng.setEnd(state.node, state.offset);
+        const state = TextSourceRange.seekForward(this.range.startContainer, this.range.startOffset, length);
+        this.range.setEnd(state.node, state.offset);
         this.content = state.content;
         return length - state.remainder;
     }
 
     setStartOffset(length) {
-        const state = TextSourceRange.seekBackward(this.rng.startContainer, this.rng.startOffset, length);
-        this.rng.setStart(state.node, state.offset);
+        const state = TextSourceRange.seekBackward(this.range.startContainer, this.range.startOffset, length);
+        this.range.setStart(state.node, state.offset);
         this.content = state.content;
         return length - state.remainder;
     }
@@ -53,11 +51,11 @@ class TextSourceRange {
     }
 
     getRect() {
-        return this.rng.getBoundingClientRect();
+        return this.range.getBoundingClientRect();
     }
 
     getPaddedRect() {
-        const range = this.rng.cloneRange();
+        const range = this.range.cloneRange();
         const startOffset = range.startOffset;
         const endOffset = range.endOffset;
         const node = range.startContainer;
@@ -71,7 +69,7 @@ class TextSourceRange {
     select() {
         const selection = window.getSelection();
         selection.removeAllRanges();
-        selection.addRange(this.rng);
+        selection.addRange(this.range);
     }
 
     deselect() {
@@ -80,7 +78,7 @@ class TextSourceRange {
     }
 
     equals(other) {
-        return other.rng && other.rng.compareBoundaryPoints(Range.START_TO_START, this.rng) === 0;
+        return other.range && other.range.compareBoundaryPoints(Range.START_TO_START, this.range) === 0;
     }
 
     static shouldEnter(node) {
