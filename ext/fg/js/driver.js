@@ -144,6 +144,7 @@ window.driver = new class {
 
         const textSource = docRangeFromPoint(point, this.options.scanning.imposter);
         if (!textSource || !textSource.containsPoint(point)) {
+            docImposterDestroy();
             return;
         }
 
@@ -168,6 +169,7 @@ window.driver = new class {
 
         return bgTermsFind(textSource.text()).then(({definitions, length}) => {
             if (definitions.length === 0) {
+                docImposterDestroy();
                 return false;
             } else {
                 textSource.setEndOffset(length);
@@ -186,6 +188,7 @@ window.driver = new class {
                     textSource.select();
                 }
 
+                docImposterDestroy();
                 return true;
             }
         });

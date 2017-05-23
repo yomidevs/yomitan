@@ -112,12 +112,6 @@ function docImposterDestroy() {
     }
 }
 
-function docImposterHide() {
-    for (const element of document.getElementsByClassName('yomichan-imposter')) {
-        element.style.visibility = 'hidden';
-    }
-}
-
 function docRangeFromPoint(point, imposter) {
     const element = document.elementFromPoint(point.x, point.y);
     if (element !== null) {
@@ -144,11 +138,9 @@ function docRangeFromPoint(point, imposter) {
 
     const range = document.caretRangeFromPoint(point.x, point.y);
     if (range !== null) {
-        docImposterHide();
         return new TextSourceRange(range);
     }
 
-    docImposterDestroy();
     return null;
 }
 
