@@ -160,6 +160,7 @@ window.driver = new class {
         }).catch(error => {
             this.handleError(error, textSource);
         }).then(() => {
+            docImposterDestroy();
             this.pendingLookup = false;
         });
     }
@@ -169,7 +170,6 @@ window.driver = new class {
 
         return bgTermsFind(textSource.text()).then(({definitions, length}) => {
             if (definitions.length === 0) {
-                docImposterDestroy();
                 return false;
             } else {
                 textSource.setEndOffset(length);
@@ -188,7 +188,6 @@ window.driver = new class {
                     textSource.select();
                 }
 
-                docImposterDestroy();
                 return true;
             }
         });
