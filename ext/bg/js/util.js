@@ -99,6 +99,7 @@ function optionsSetDefaults(options) {
             audioVolume: 100,
             groupResults: true,
             softKatakana: true,
+            debugInfo: false,
             maxResults: 32,
             showAdvanced: false,
             popupWidth: 400,

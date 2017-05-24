@@ -30,6 +30,7 @@ function formRead() {
         optionsNew.general.audioVolume = $('#audio-playback-volume').val();
         optionsNew.general.groupResults = $('#group-terms-results').prop('checked');
         optionsNew.general.softKatakana = $('#soft-katakana-search').prop('checked');
+        optionsNew.general.debugInfo = $('#show-debug-info').prop('checked');
         optionsNew.general.showAdvanced = $('#show-advanced-options').prop('checked');
         optionsNew.general.maxResults = parseInt($('#max-displayed-results').val(), 10);
         optionsNew.general.popupWidth = parseInt($('#popup-width').val(), 10);
@@ -118,6 +119,7 @@ $(document).ready(() => {
         $('#audio-playback-volume').val(options.general.audioVolume);
         $('#group-terms-results').prop('checked', options.general.groupResults);
         $('#soft-katakana-search').prop('checked', options.general.softKatakana);
+        $('#show-debug-info').prop('checked', options.general.debugInfo);
         $('#show-advanced-options').prop('checked', options.general.showAdvanced);
         $('#max-displayed-results').val(options.general.maxResults);
         $('#popup-width').val(options.general.popupWidth);
