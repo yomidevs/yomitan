@@ -504,6 +504,11 @@ function jsonLoadDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
  * Helpers
  */
 
+function handlebarsDumpObject(options) {
+    const dump = JSON.stringify(options.fn(this), null, 4);
+    return Handlebars.Utils.escapeExpression(dump);
+}
+
 function handlebarsKanjiLinks(options) {
     let result = '';
     for (const c of options.fn(this)) {
@@ -523,6 +528,7 @@ function handlebarsMultiLine(options) {
 
 function handlebarsRegister() {
     Handlebars.partials = Handlebars.templates;
+    Handlebars.registerHelper('dumpObject', handlebarsDumpObject);
     Handlebars.registerHelper('kanjiLinks', handlebarsKanjiLinks);
     Handlebars.registerHelper('multiLine', handlebarsMultiLine);
 }

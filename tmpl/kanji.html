@@ -50,13 +50,17 @@
         <div class="glossary-item">{{#multiLine}}{{glossary.[0]}}{{/multiLine}}</div>
         {{/if}}
     </div>
+
+    {{#if debug}}
+    <pre>{{#dumpObject}}{{{.}}}{{/dumpObject}}</pre>
+    {{/if}}
 </div>
 {{/inline}}
 
 {{#if definitions}}
 {{#each definitions}}
 {{#unless @first}}<hr>{{/unless}}
-{{> kanji addable=../addable source=../source root=../root}}
+{{> kanji debug=../debug addable=../addable source=../source root=../root}}
 {{/each}}
 {{else}}
 <p>No results found.</p>
