@@ -86,6 +86,15 @@ function updateVisibility(options) {
     } else {
         advanced.hide();
     }
+
+    const debug = $('#debug');
+    if (options.general.debugInfo) {
+        const text = JSON.stringify(options, null, 4);
+        debug.html(handlebarsEscape(text));
+        debug.show();
+    } else {
+        debug.hide();
+    }
 }
 
 function onOptionsChanged(e) {

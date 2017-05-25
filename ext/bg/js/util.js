@@ -504,9 +504,13 @@ function jsonLoadDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
  * Helpers
  */
 
+function handlebarsEscape(text) {
+    return Handlebars.Utils.escapeExpression(text);
+}
+
 function handlebarsDumpObject(options) {
     const dump = JSON.stringify(options.fn(this), null, 4);
-    return Handlebars.Utils.escapeExpression(dump);
+    return handlebarsEscape(dump);
 }
 
 function handlebarsKanjiLinks(options) {
