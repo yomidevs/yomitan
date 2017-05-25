@@ -160,6 +160,11 @@ function docSentenceExtract(source, extent) {
     for (let i = position; i >= startPos; --i) {
         const c = content[i];
 
+        if (c === '\n') {
+            startPos = i + 1;
+            break;
+        }
+
         if (quoteStack.length === 0 && (terminators.includes(c) || c in quotesFwd)) {
             startPos = i + 1;
             break;
@@ -177,6 +182,11 @@ function docSentenceExtract(source, extent) {
     let endPos = content.length;
     for (let i = position; i <= endPos; ++i) {
         const c = content[i];
+
+        if (c === '\n') {
+            endPos = i + 1;
+            break;
+        }
 
         if (quoteStack.length === 0) {
             if (terminators.includes(c)) {
