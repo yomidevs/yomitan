@@ -142,7 +142,7 @@ window.driver = new class {
             return;
         }
 
-        const textSource = docRangeFromPoint(point, this.options.scanning.imposter);
+        const textSource = docRangeFromPoint(point);
         if (!textSource || !textSource.containsPoint(point)) {
             docImposterDestroy();
             return;

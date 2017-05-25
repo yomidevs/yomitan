@@ -112,12 +112,12 @@ function docImposterDestroy() {
     }
 }
 
-function docRangeFromPoint(point, imposter) {
+function docRangeFromPoint(point) {
     const element = document.elementFromPoint(point.x, point.y);
     if (element !== null) {
         if (element.nodeName === 'IMG' || element.nodeName === 'BUTTON') {
             return new TextSourceElement(element);
-        } else if (imposter && (element.nodeName === 'INPUT' || element.nodeName === 'TEXTAREA')) {
+        } else if (element.nodeName === 'INPUT' || element.nodeName === 'TEXTAREA') {
             docImposterCreate(element);
         }
     }

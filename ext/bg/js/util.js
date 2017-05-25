@@ -111,7 +111,6 @@ function optionsSetDefaults(options) {
             requireShift: true,
             middleMouse: true,
             selectText: true,
-            imposter: true,
             alphanumeric: true,
             delay: 15,
             length: 10
