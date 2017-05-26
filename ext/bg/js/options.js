@@ -27,7 +27,7 @@ function formRead() {
 
         optionsNew.general.showGuide = $('#show-usage-guide').prop('checked');
         optionsNew.general.audioSource = $('#audio-playback-source').val();
-        optionsNew.general.audioVolume = $('#audio-playback-volume').val();
+        optionsNew.general.audioVolume = parseFloat($('#audio-playback-volume').val());
         optionsNew.general.groupResults = $('#group-terms-results').prop('checked');
         optionsNew.general.debugInfo = $('#show-debug-info').prop('checked');
         optionsNew.general.showAdvanced = $('#show-advanced-options').prop('checked');
@@ -36,12 +36,12 @@ function formRead() {
         optionsNew.general.popupHeight = parseInt($('#popup-height').val(), 10);
         optionsNew.general.popupOffset = parseInt($('#popup-offset').val(), 10);
 
-        optionsNew.scanning.requireShift = $('#hold-shift-to-scan').prop('checked');
         optionsNew.scanning.middleMouse = $('#middle-mouse-button-scan').prop('checked');
         optionsNew.scanning.selectText = $('#select-matched-text').prop('checked');
         optionsNew.scanning.alphanumeric = $('#search-alphanumeric').prop('checked');
         optionsNew.scanning.delay = parseInt($('#scan-delay').val(), 10);
         optionsNew.scanning.length = parseInt($('#scan-length').val(), 10);
+        optionsNew.scanning.modifier = $('#scan-modifier-key').val();
 
         optionsNew.anki.enable = $('#anki-enable').prop('checked');
         optionsNew.anki.tags = $('#card-tags').val().split(/[,; ]+/);
@@ -132,12 +132,12 @@ $(document).ready(() => {
         $('#popup-height').val(options.general.popupHeight);
         $('#popup-offset').val(options.general.popupOffset);
 
-        $('#hold-shift-to-scan').prop('checked', options.scanning.requireShift);
         $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);
         $('#select-matched-text').prop('checked', options.scanning.selectText);
         $('#search-alphanumeric').prop('checked', options.scanning.alphanumeric);
         $('#scan-delay').val(options.scanning.delay);
         $('#scan-length').val(options.scanning.length);
+        $('#scan-modifier-key').val(options.scanning.modifier);
 
         $('#dict-purge').click(onDictionaryPurge);
         $('#dict-importer a').click(onDictionarySetUrl);

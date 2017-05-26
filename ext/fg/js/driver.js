@@ -70,15 +70,22 @@ window.driver = new class {
             return;
         }
 
-        if (this.options.scanning.requireShift && !e.shiftKey && !(this.mouseDownMiddle && this.options.scanning.middleMouse)) {
+        const mouseScan = this.mouseDownMiddle && this.options.scanning.middleMouse;
+        const keyScan =
+            this.options.scanning.modifier === 'alt' && e.altKey ||
+            this.options.scanning.modifier === 'ctrl' && e.ctrlKey ||
+            this.options.scanning.modifier === 'shift' && e.shiftKey ||
+            this.options.scanning.modifier === 'none';
+
+        if (!keyScan && !mouseScan) {
             return;
         }
 
         const searchFunc = () => this.searchAt(this.lastMousePos);
-        if (this.options.scanning.requireShift) {
-            searchFunc();
-        } else {
+        if (this.options.scanning.modifier === 'none') {
             this.popupTimerSet(searchFunc);
+        } else {
+            searchFunc();
         }
     }
 
@@ -232,7 +239,7 @@ window.driver = new class {
 
     handleError(error, textSource) {
         if (window.orphaned) {
-            if (textSource && this.options.scanning.requireShift) {
+            if (textSource && this.options.scanning.modifier !== 'none') {
                 this.popup.showOrphaned(textSource.getRect(), this.options);
             }
         } else {

@@ -83,10 +83,6 @@
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="hold-shift-to-scan"> Hold <kbd>Shift</kbd> to scan</label>
-                </div>
-
-                <div class="checkbox">
                     <label><input type="checkbox" id="select-matched-text"> Select matched text</label>
                 </div>
 
@@ -102,6 +98,16 @@
                 <div class="form-group options-advanced">
                     <label for="scan-length">Scan length (in characters)</label>
                     <input type="number" min="1" id="scan-length" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="scan-modifier-key">Scan modifier key</label>
+                    <select class="form-control" id="scan-modifier-key">
+                        <option value="none">None</option>
+                        <option value="alt">Alt</option>
+                        <option value="ctrl">Ctrl</option>
+                        <option value="shift">Shift</option>
+                    </select>
                 </div>
             </div>
 

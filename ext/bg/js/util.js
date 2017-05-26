@@ -108,12 +108,12 @@ function optionsSetDefaults(options) {
         },
 
         scanning: {
-            requireShift: true,
             middleMouse: true,
             selectText: true,
             alphanumeric: true,
             delay: 15,
-            length: 10
+            length: 10,
+            modifier: 'shift'
         },
 
         dictionaries: {},
@@ -149,10 +149,10 @@ function optionsSetDefaults(options) {
 
 function optionsVersion(options) {
     const fixups = [
-        () => { },
-        () => { },
-        () => { },
-        () => { },
+        () => {},
+        () => {},
+        () => {},
+        () => {},
         () => {
             if (options.general.audioPlayback) {
                 options.general.audioSource = 'jpod101';
@@ -162,6 +162,13 @@ function optionsVersion(options) {
         },
         () => {
             options.general.showGuide = false;
+        },
+        () => {
+            if (options.scanning.requireShift) {
+                options.scanning.modifier = 'shift';
+            } else {
+                options.scanning.modifier = 'none';
+            }
         }
     ];
 
