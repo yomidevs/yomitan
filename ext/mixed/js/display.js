@@ -69,7 +69,8 @@ class Display {
             definitions,
             addable: options.anki.enable,
             grouped: options.general.groupResults,
-            playback: options.general.audioSource !== 'disabled'
+            playback: options.general.audioSource !== 'disabled',
+            debug: options.general.debugInfo
         };
 
         if (context) {
@@ -106,7 +107,8 @@ class Display {
         const params = {
             definitions,
             source: context && context.source,
-            addable: options.anki.enable
+            addable: options.anki.enable,
+            debug: options.general.debugInfo
         };
 
         if (context) {

@@ -961,14 +961,6 @@
         },
         {
             "kanaIn": "って",
-            "kanaOut": "く",
-            "rulesIn": [],
-            "rulesOut": [
-                "v5"
-            ]
-        },
-        {
-            "kanaIn": "って",
             "kanaOut": "つ",
             "rulesIn": [],
             "rulesOut": [

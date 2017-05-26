@@ -112,18 +112,12 @@ function docImposterDestroy() {
     }
 }
 
-function docImposterHide() {
-    for (const element of document.getElementsByClassName('yomichan-imposter')) {
-        element.style.visibility = 'hidden';
-    }
-}
-
-function docRangeFromPoint(point, imposter) {
+function docRangeFromPoint(point) {
     const element = document.elementFromPoint(point.x, point.y);
     if (element !== null) {
         if (element.nodeName === 'IMG' || element.nodeName === 'BUTTON') {
             return new TextSourceElement(element);
-        } else if (imposter && (element.nodeName === 'INPUT' || element.nodeName === 'TEXTAREA')) {
+        } else if (element.nodeName === 'INPUT' || element.nodeName === 'TEXTAREA') {
             docImposterCreate(element);
         }
     }
@@ -144,11 +138,9 @@ function docRangeFromPoint(point, imposter) {
 
     const range = document.caretRangeFromPoint(point.x, point.y);
     if (range !== null) {
-        docImposterHide();
         return new TextSourceRange(range);
     }
 
-    docImposterDestroy();
     return null;
 }
 
@@ -168,6 +160,11 @@ function docSentenceExtract(source, extent) {
     for (let i = position; i >= startPos; --i) {
         const c = content[i];
 
+        if (c === '\n') {
+            startPos = i + 1;
+            break;
+        }
+
         if (quoteStack.length === 0 && (terminators.includes(c) || c in quotesFwd)) {
             startPos = i + 1;
             break;
@@ -185,6 +182,11 @@ function docSentenceExtract(source, extent) {
     let endPos = content.length;
     for (let i = position; i <= endPos; ++i) {
         const c = content[i];
+
+        if (c === '\n') {
+            endPos = i + 1;
+            break;
+        }
 
         if (quoteStack.length === 0) {
             if (terminators.includes(c)) {

@@ -98,7 +98,7 @@ function optionsSetDefaults(options) {
             audioSource: 'jpod101',
             audioVolume: 100,
             groupResults: true,
-            softKatakana: true,
+            debugInfo: false,
             maxResults: 32,
             showAdvanced: false,
             popupWidth: 400,
@@ -108,13 +108,12 @@ function optionsSetDefaults(options) {
         },
 
         scanning: {
-            requireShift: true,
             middleMouse: true,
             selectText: true,
-            imposter: true,
             alphanumeric: true,
             delay: 15,
-            length: 10
+            length: 10,
+            modifier: 'shift'
         },
 
         dictionaries: {},
@@ -150,10 +149,10 @@ function optionsSetDefaults(options) {
 
 function optionsVersion(options) {
     const fixups = [
-        () => { },
-        () => { },
-        () => { },
-        () => { },
+        () => {},
+        () => {},
+        () => {},
+        () => {},
         () => {
             if (options.general.audioPlayback) {
                 options.general.audioSource = 'jpod101';
@@ -163,6 +162,13 @@ function optionsVersion(options) {
         },
         () => {
             options.general.showGuide = false;
+        },
+        () => {
+            if (options.scanning.requireShift) {
+                options.scanning.modifier = 'shift';
+            } else {
+                options.scanning.modifier = 'none';
+            }
         }
     ];
 
@@ -503,6 +509,15 @@ function jsonLoadDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
  * Helpers
  */
 
+function handlebarsEscape(text) {
+    return Handlebars.Utils.escapeExpression(text);
+}
+
+function handlebarsDumpObject(options) {
+    const dump = JSON.stringify(options.fn(this), null, 4);
+    return handlebarsEscape(dump);
+}
+
 function handlebarsKanjiLinks(options) {
     let result = '';
     for (const c of options.fn(this)) {
@@ -522,6 +537,7 @@ function handlebarsMultiLine(options) {
 
 function handlebarsRegister() {
     Handlebars.partials = Handlebars.templates;
+    Handlebars.registerHelper('dumpObject', handlebarsDumpObject);
     Handlebars.registerHelper('kanjiLinks', handlebarsKanjiLinks);
     Handlebars.registerHelper('multiLine', handlebarsMultiLine);
 }

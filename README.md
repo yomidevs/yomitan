@@ -27,7 +27,7 @@ Yomichan provides advanced features not available in other browser-based diction
 *   **Mozilla Firefox** (versions 51+)
     *   [Locally hosted](https://foosoft.net/projects/yomichan/dl/latest.xpi) *(recommended)*: Latest and greatest, released simultaneously with the Chrome version.
     *   [Marketplace hosted](https://addons.mozilla.org/en-US/firefox/addon/yomichan/): Officially hosted version,
-        likely to be substantially out of date (queued for initial approval).
+        likely to be substantially out of date.
 
 ## Basic Features ##
 
@@ -89,7 +89,7 @@ Flashcard fields can be configured with the following steps:
 2.  Tick the checkbox labeled *Enable Anki integration* (Anki must be running with [AnkiConnect](https://foosoft.net/projects/anki-connect) installed).
 3.  Select the type of template to configure by clicking on either the *Terms* or *Kanji* tabs.
 4.  Select the Anki deck and model to use for new creating new flashcards of this type.
-5.  Fill out the displayed model fields with markers representing the information you wish to include:
+5.  Fill the model fields with markers corresponding to the information you wish to include (several can be used):
 
     #### Markers for Term Cards ####
 

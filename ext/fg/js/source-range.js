@@ -18,30 +18,31 @@
 
 
 class TextSourceRange {
-    constructor(range) {
-        this.rng = range;
+    constructor(range, content='') {
+        this.range = range;
+        this.content = content;
     }
 
     clone() {
-        return new TextSourceRange(this.rng.cloneRange());
+        return new TextSourceRange(this.range.cloneRange(), this.content);
     }
 
     text() {
-        return this.rng.toString();
+        return this.content;
     }
 
     setEndOffset(length) {
-        const lengthAdj = length + this.rng.startOffset;
-        const state = TextSourceRange.seekForward(this.rng.startContainer, lengthAdj);
-        this.rng.setEnd(state.node, state.offset);
-        return length - state.length;
+        const state = TextSourceRange.seekForward(this.range.startContainer, this.range.startOffset, length);
+        this.range.setEnd(state.node, state.offset);
+        this.content = state.content;
+        return length - state.remainder;
     }
 
     setStartOffset(length) {
-        const lengthAdj = length + (this.rng.startContainer.length - this.rng.startOffset);
-        const state = TextSourceRange.seekBackward(this.rng.startContainer, lengthAdj);
-        this.rng.setStart(state.node, state.offset);
-        return length - state.length;
+        const state = TextSourceRange.seekBackward(this.range.startContainer, this.range.startOffset, length);
+        this.range.setStart(state.node, state.offset);
+        this.content = state.content;
+        return length - state.remainder;
     }
 
     containsPoint(point) {
@@ -50,11 +51,11 @@ class TextSourceRange {
     }
 
     getRect() {
-        return this.rng.getBoundingClientRect();
+        return this.range.getBoundingClientRect();
     }
 
     getPaddedRect() {
-        const range = this.rng.cloneRange();
+        const range = this.range.cloneRange();
         const startOffset = range.startOffset;
         const endOffset = range.endOffset;
         const node = range.startContainer;
@@ -68,7 +69,7 @@ class TextSourceRange {
     select() {
         const selection = window.getSelection();
         selection.removeAllRanges();
-        selection.addRange(this.rng);
+        selection.addRange(this.range);
     }
 
     deselect() {
@@ -77,11 +78,30 @@ class TextSourceRange {
     }
 
     equals(other) {
-        return other.rng && other.rng.compareBoundaryPoints(Range.START_TO_START, this.rng) === 0;
+        return other.range && other.range.compareBoundaryPoints(Range.START_TO_START, this.range) === 0;
     }
 
-    static seekForward(node, length) {
-        const state = {node, length, offset: 0};
+    static shouldEnter(node) {
+        if (node.nodeType !== 1) {
+            return false;
+        }
+
+        const skip = ['RT', 'SCRIPT', 'STYLE'];
+        if (skip.includes(node.nodeName)) {
+            return false;
+        }
+
+        const style = window.getComputedStyle(node);
+        const hidden =
+            style.visibility === 'hidden' ||
+            style.display === 'none' ||
+            parseFloat(style.fontSize) === 0;
+
+        return !hidden;
+    }
+
+    static seekForward(node, offset, length) {
+        const state = {node, offset, remainder: length, content: ''};
         if (!TextSourceRange.seekForwardHelper(node, state)) {
             return state;
         }
@@ -98,12 +118,15 @@ class TextSourceRange {
     }
 
     static seekForwardHelper(node, state) {
-        if (node.nodeType === 3) {
-            const consumed = Math.min(node.length, state.length);
+        if (node.nodeType === 3 && node.parentElement && TextSourceRange.shouldEnter(node.parentElement)) {
+            const offset = state.node === node ? state.offset : 0;
+            const remaining = node.length - offset;
+            const consumed = Math.min(remaining, state.remainder);
+            state.content = state.content + node.nodeValue.substring(offset, offset + consumed);
             state.node = node;
-            state.offset = consumed;
-            state.length -= consumed;
-        } else {
+            state.offset = offset + consumed;
+            state.remainder -= consumed;
+        } else if (TextSourceRange.shouldEnter(node)) {
             for (let i = 0; i < node.childNodes.length; ++i) {
                 if (!TextSourceRange.seekForwardHelper(node.childNodes[i], state)) {
                     break;
@@ -111,11 +134,11 @@ class TextSourceRange {
             }
         }
 
-        return state.length > 0;
+        return state.remainder > 0;
     }
 
-    static seekBackward(node, length) {
-        const state = {node, length, offset: node.length};
+    static seekBackward(node, offset, length) {
+        const state = {node, offset, remainder: length, content: ''};
         if (!TextSourceRange.seekBackwardHelper(node, state)) {
             return state;
         }
@@ -132,12 +155,15 @@ class TextSourceRange {
     }
 
     static seekBackwardHelper(node, state) {
-        if (node.nodeType === 3) {
-            const consumed = Math.min(node.length, state.length);
+        if (node.nodeType === 3 && node.parentElement && TextSourceRange.shouldEnter(node.parentElement)) {
+            const offset = state.node === node ? state.offset : node.length;
+            const remaining = offset;
+            const consumed = Math.min(remaining, state.remainder);
+            state.content = node.nodeValue.substring(offset - consumed, offset) + state.content;
             state.node = node;
-            state.offset = node.length - consumed;
-            state.length -= consumed;
-        } else {
+            state.offset = offset - consumed;
+            state.remainder -= consumed;
+        } else if (TextSourceRange.shouldEnter(node)) {
             for (let i = node.childNodes.length - 1; i >= 0; --i) {
                 if (!TextSourceRange.seekBackwardHelper(node.childNodes[i], state)) {
                     break;
@@ -145,6 +171,6 @@ class TextSourceRange {
             }
         }
 
-        return state.length > 0;
+        return state.remainder > 0;
     }
 }

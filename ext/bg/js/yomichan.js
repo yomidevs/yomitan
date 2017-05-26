@@ -111,7 +111,7 @@ window.yomichan = new class {
             this.translator.findTermsGrouped.bind(this.translator) :
             this.translator.findTerms.bind(this.translator);
 
-        return searcher(text, dictEnabledSet(this.options), this.options.general.softKatakana, this.options.scanning.alphanumeric).then(({definitions, length}) => {
+        return searcher(text, dictEnabledSet(this.options), this.options.scanning.alphanumeric).then(({definitions, length}) => {
             return {length, definitions: definitions.slice(0, this.options.general.maxResults)};
         });
     }

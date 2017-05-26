@@ -41,7 +41,7 @@ class Translator {
         });
     }
 
-    findTerms(text, dictionaries, softKatakana, alphanumeric) {
+    findTerms(text, dictionaries, alphanumeric) {
         const titles = Object.keys(dictionaries);
         const cache = {};
 
@@ -54,10 +54,10 @@ class Translator {
 
         return this.findTermsDeinflected(text, titles, cache).then(deinfLiteral => {
             const textHiragana = wanakana._katakanaToHiragana(text);
-            if (text !== textHiragana && softKatakana) {
-                return this.findTermsDeinflected(textHiragana, titles, cache).then(deinfHiragana => deinfLiteral.concat(deinfHiragana));
-            } else {
+            if (text === textHiragana) {
                 return deinfLiteral;
+            } else {
+                return this.findTermsDeinflected(textHiragana, titles, cache).then(deinfHiragana => deinfLiteral.concat(deinfHiragana));
             }
         }).then(deinflections => {
             let definitions = [];
@@ -91,8 +91,8 @@ class Translator {
         });
     }
 
-    findTermsGrouped(text, dictionaries, softKatakana, alphanumeric) {
-        return this.findTerms(text, dictionaries, softKatakana, alphanumeric).then(({length, definitions}) => {
+    findTermsGrouped(text, dictionaries, alphanumeric) {
+        return this.findTerms(text, dictionaries, alphanumeric).then(({length, definitions}) => {
             return {length, definitions: dictTermsGroup(definitions, dictionaries)};
         });
     }

@@ -27,22 +27,21 @@ function formRead() {
 
         optionsNew.general.showGuide = $('#show-usage-guide').prop('checked');
         optionsNew.general.audioSource = $('#audio-playback-source').val();
-        optionsNew.general.audioVolume = $('#audio-playback-volume').val();
+        optionsNew.general.audioVolume = parseFloat($('#audio-playback-volume').val());
         optionsNew.general.groupResults = $('#group-terms-results').prop('checked');
-        optionsNew.general.softKatakana = $('#soft-katakana-search').prop('checked');
+        optionsNew.general.debugInfo = $('#show-debug-info').prop('checked');
         optionsNew.general.showAdvanced = $('#show-advanced-options').prop('checked');
         optionsNew.general.maxResults = parseInt($('#max-displayed-results').val(), 10);
         optionsNew.general.popupWidth = parseInt($('#popup-width').val(), 10);
         optionsNew.general.popupHeight = parseInt($('#popup-height').val(), 10);
         optionsNew.general.popupOffset = parseInt($('#popup-offset').val(), 10);
 
-        optionsNew.scanning.requireShift = $('#hold-shift-to-scan').prop('checked');
         optionsNew.scanning.middleMouse = $('#middle-mouse-button-scan').prop('checked');
         optionsNew.scanning.selectText = $('#select-matched-text').prop('checked');
-        optionsNew.scanning.imposter = $('#search-form-text-fields').prop('checked');
         optionsNew.scanning.alphanumeric = $('#search-alphanumeric').prop('checked');
         optionsNew.scanning.delay = parseInt($('#scan-delay').val(), 10);
         optionsNew.scanning.length = parseInt($('#scan-length').val(), 10);
+        optionsNew.scanning.modifier = $('#scan-modifier-key').val();
 
         optionsNew.anki.enable = $('#anki-enable').prop('checked');
         optionsNew.anki.tags = $('#card-tags').val().split(/[,; ]+/);
@@ -85,6 +84,15 @@ function updateVisibility(options) {
     } else {
         advanced.hide();
     }
+
+    const debug = $('#debug');
+    if (options.general.debugInfo) {
+        const text = JSON.stringify(options, null, 4);
+        debug.html(handlebarsEscape(text));
+        debug.show();
+    } else {
+        debug.hide();
+    }
 }
 
 function onOptionsChanged(e) {
@@ -117,20 +125,19 @@ $(document).ready(() => {
         $('#audio-playback-source').val(options.general.audioSource);
         $('#audio-playback-volume').val(options.general.audioVolume);
         $('#group-terms-results').prop('checked', options.general.groupResults);
-        $('#soft-katakana-search').prop('checked', options.general.softKatakana);
+        $('#show-debug-info').prop('checked', options.general.debugInfo);
         $('#show-advanced-options').prop('checked', options.general.showAdvanced);
         $('#max-displayed-results').val(options.general.maxResults);
         $('#popup-width').val(options.general.popupWidth);
         $('#popup-height').val(options.general.popupHeight);
         $('#popup-offset').val(options.general.popupOffset);
 
-        $('#hold-shift-to-scan').prop('checked', options.scanning.requireShift);
         $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);
         $('#select-matched-text').prop('checked', options.scanning.selectText);
-        $('#search-form-text-fields').prop('checked', options.scanning.imposter);
         $('#search-alphanumeric').prop('checked', options.scanning.alphanumeric);
         $('#scan-delay').val(options.scanning.delay);
         $('#scan-length').val(options.scanning.length);
+        $('#scan-modifier-key').val(options.scanning.modifier);
 
         $('#dict-purge').click(onDictionaryPurge);
         $('#dict-importer a').click(onDictionarySetUrl);
