@@ -18,20 +18,23 @@ Yomichan provides advanced features not available in other browser-based diction
     the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
 *   Clean, modern code makes it easy for developers to [contribute](https://github.com/FooSoft/yomichan) new features.
 
-## Browser Support ##
+## Downloads ##
 
 *   **Google Chrome** (versions 45+)
 
     [![](https://foosoft.net/projects/yomichan/img/chrome-web-store.png)](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami)
 
 *   **Mozilla Firefox** (versions 51+)
-    *   [Locally hosted](https://foosoft.net/projects/yomichan/dl/latest.xpi) *(recommended)*: Latest and greatest, released simultaneously with the Chrome version.
-    *   [Marketplace hosted](https://addons.mozilla.org/en-US/firefox/addon/yomichan/): Officially hosted version,
-        likely to be substantially out of date.
 
-## Basic Features ##
+    [![](https://foosoft.net/projects/yomichan/img/firefox-marketplace.png)](https://addons.mozilla.org/en-US/firefox/addon/yomichan/)
 
-1.  Click on the ![](https://foosoft.net/projects/yomichan/img/logo.png) icon in the browser toolbar to open the Yomichan actions dialog.
+    All extension versions must be reviewed before they are publicly accessible on the Firefox Marketplace. As this
+    review process can take several months to complete, the approved version of the extension is often out of date. If
+    you are interested in using the latest and greatest version, please consider using the [locally hosted](https://foosoft.net/projects/yomichan/dl/latest.xpi) version instead.
+
+## Basic Usage ##
+
+1.  Click on the ![](https://foosoft.net/projects/yomichan/img/yomichan-icon.png) icon in the browser toolbar to open the Yomichan actions dialog.
 
     [![Actions dialog](https://foosoft.net/projects/yomichan/img/ui-actions-thumb.png)](https://foosoft.net/projects/yomichan/img/ui-actions.png)
 
@@ -49,8 +52,8 @@ Yomichan provides advanced features not available in other browser-based diction
 
     [![Term search results](https://foosoft.net/projects/yomichan/img/ui-terms-thumb.png)](https://foosoft.net/projects/yomichan/img/ui-terms.png)
 
-5.  Click on the ![](https://foosoft.net/projects/yomichan/img/button-play-audio.png) icon to hear the term pronounced by a native speaker. If an audio sample is not
-    available, you will hear a short click instead.
+5.  Click on the ![](https://foosoft.net/projects/yomichan/img/btn-play-audio.png) icon to hear the term pronounced by a native speaker. If an audio sample is
+    not available, you will hear a short click instead.
 
 6.  Click on individual Kanji in the term definition results to view additional information about those characters
     including readings, meanings, and a stroke order diagram.
@@ -68,7 +71,7 @@ Unfortunately, as most of the dictionaries released in this format are proprieta
 Yomichan. You will need to procure these dictionaries yourself and import them with [Yomichan
 Import](https://foosoft.net/projects/yomichan-import). Please see the project page for additional details.
 
-[![Pocket EPWING dictionaries](https://foosoft.net/projects/yomichan/img/dictionary-thumb.png)](https://foosoft.net/projects/yomichan/img/dictionary.jpg)
+[![Pocket EPWING dictionaries](https://foosoft.net/projects/yomichan/img/epwing-devices-thumb.png)](https://foosoft.net/projects/yomichan/img/epwing-devices.jpg)
 
 ## Anki Integration ##
 
@@ -134,8 +137,8 @@ create a flashcard for <ruby>箸<rt>はし</rt></ruby>, because they share the s
 Once Yomichan is configured, it becomes trivial to create new flashcards with a single click. You will see the following
 icons next to term definitions.
 
-*   Clicking ![](https://foosoft.net/projects/yomichan/img/button-add-expression.png) adds the current expression as Kanji (e.g. 食べる).
-*   Clicking ![](https://foosoft.net/projects/yomichan/img/button-add-reading.png) adds the current expression as Hiragana or Katakana (e.g. たべる).
+*   Clicking ![](https://foosoft.net/projects/yomichan/img/btn-add-expression.png) adds the current expression as Kanji (e.g. 食べる).
+*   Clicking ![](https://foosoft.net/projects/yomichan/img/btn-add-reading.png) adds the current expression as Hiragana or Katakana (e.g. たべる).
 
 Below are some troubleshooting tips you can try if you are unable to create new flashcards:
 
@@ -204,6 +207,13 @@ exact versions used for distribution.
 
 ## Frequently Asked Questions ##
 
+*   **Will you add support for online dictionaries?**
+
+    Online dictionaries will never be implemented because it is impossible to support them in a robust way. In order to
+    perform Japanese deinflection, Yomichan must execute dozens of database queries per every single word. Factoring in
+    network latency and the fragility of web scraping, I do not believe that it is possible to realize a good user
+    experience.
+
 *   **What happened to AnkiWeb integration? Why was it removed?**
 
     The author of Anki wants to maintain tight control of AnkiWeb by restricting automated web requests, while at the
@@ -245,10 +255,10 @@ exact versions used for distribution.
 
 ## Screenshots ##
 
-[![Term definitions](https://foosoft.net/projects/yomichan/img/term-thumb.png)](https://foosoft.net/projects/yomichan/img/term.png)
-[![Kanji information](https://foosoft.net/projects/yomichan/img/kanji-thumb.png)](https://foosoft.net/projects/yomichan/img/kanji.png)
-[![General options](https://foosoft.net/projects/yomichan/img/options-general-thumb.png)](https://foosoft.net/projects/yomichan/img/options-general.png)
-[![Anki options](https://foosoft.net/projects/yomichan/img/options-anki-thumb.png)](https://foosoft.net/projects/yomichan/img/options-anki.png)
+[![Term definitions](https://foosoft.net/projects/yomichan/img/ss-terms-thumb.png)](https://foosoft.net/projects/yomichan/img/ss-terms.png)
+[![Kanji information](https://foosoft.net/projects/yomichan/img/ss-kanji-thumb.png)](https://foosoft.net/projects/yomichan/img/ss-kanji.png)
+[![Dictionary options](https://foosoft.net/projects/yomichan/img/ss-dictionaries-thumb.png)](https://foosoft.net/projects/yomichan/img/ss-dictionaries.png)
+[![Anki options](https://foosoft.net/projects/yomichan/img/ss-anki-thumb.png)](https://foosoft.net/projects/yomichan/img/ss-anki.png)
 
 ## License ##
 
