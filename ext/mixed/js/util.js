@@ -108,7 +108,7 @@ function audioBuildUrl(definition, mode, cache={}) {
 }
 
 function audioBuildFilename(definition) {
-    if (definition.reading && definition.expression) {
+    if (definition.reading || definition.expression) {
         let filename = 'yomichan';
         if (definition.reading) {
             filename += `_${definition.reading}`;
