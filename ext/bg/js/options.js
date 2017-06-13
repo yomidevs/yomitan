@@ -140,9 +140,7 @@ $(document).ready(() => {
         $('#scan-modifier-key').val(options.scanning.modifier);
 
         $('#dict-purge').click(onDictionaryPurge);
-        $('#dict-importer a').click(onDictionarySetUrl);
-        $('#dict-import').click(onDictionaryImport);
-        $('#dict-url').on('input', onDictionaryUpdateUrl);
+        $('#dict-file').change(onDictionaryImport);
 
         $('#anki-enable').prop('checked', options.anki.enable);
         $('#card-tags').val(options.anki.tags.join(' '));
@@ -253,48 +251,31 @@ function onDictionaryPurge(e) {
 }
 
 function onDictionaryImport() {
-    dictionaryErrorShow(null);
-    dictionarySpinnerShow(true);
+    alert('import');
 
-    const dictUrl = $('#dict-url');
-    const dictImporter = $('#dict-importer').hide();
-    const dictProgress = $('#dict-import-progress').show();
-    const setProgress = percent => dictProgress.find('.progress-bar').css('width', `${percent}%`);
+    // dictionaryErrorShow(null);
+    // dictionarySpinnerShow(true);
 
-    setProgress(0.0);
+    // const dictUrl = $('#dict-url');
+    // const dictImporter = $('#dict-importer').hide();
+    // const dictProgress = $('#dict-import-progress').show();
+    // const setProgress = percent => dictProgress.find('.progress-bar').css('width', `${percent}%`);
 
-    optionsLoad().then(options => {
-        instDb().importDictionary(dictUrl.val(), (total, current) => setProgress(current / total * 100.0)).then(summary => {
-            options.dictionaries[summary.title] = {enabled: true, priority: 0};
-            return optionsSave(options);
-        }).then(() => dictionaryGroupsPopulate(options)).catch(dictionaryErrorShow).then(() => {
-            dictionarySpinnerShow(false);
-            dictProgress.hide();
-            dictImporter.show();
-            dictUrl.val('');
-            dictUrl.trigger('input');
-        });
-    });
+    // setProgress(0.0);
+
+    // optionsLoad().then(options => {
+    //     instDb().importDictionary(dictUrl.val(), (total, current) => setProgress(current / total * 100.0)).then(summary => {
+    //         options.dictionaries[summary.title] = {enabled: true, priority: 0};
+    //         return optionsSave(options);
+    //     }).then(() => dictionaryGroupsPopulate(options)).catch(dictionaryErrorShow).then(() => {
+    //         dictionarySpinnerShow(false);
+    //         dictProgress.hide();
+    //         dictImporter.show();
+    //         dictUrl.val('');
+    //         dictUrl.trigger('input');
+    //     });
+    // });
 }
-
-function onDictionarySetUrl(e) {
-    e.preventDefault();
-
-    const dictUrl = $('#dict-url');
-    const url = $(this).data('url');
-    if (url.includes('/')) {
-        dictUrl.val(url);
-    } else {
-        dictUrl.val(chrome.extension.getURL(`bg/lang/dict/${url}/index.json`));
-    }
-
-    dictUrl.trigger('input');
-}
-
-function onDictionaryUpdateUrl() {
-    $('#dict-import').prop('disabled', $(this).val().length === 0);
-}
-
 
 /*
  * Anki

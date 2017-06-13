@@ -145,21 +145,8 @@
                     </div>
                 </div>
 
-                <div class="input-group" id="dict-importer">
-                    <div class="input-group-btn">
-                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
-                        <ul class="dropdown-menu">
-                            <li><a href="#" data-url="edict">JMdict <span class="text-muted">(terms)</span></a></li>
-                            <li><a href="#" data-url="enamdict">JMnedict <span class="text-muted">(names)</span></a></li>
-                            <li><a href="#" data-url="kanjidic">KANJIDIC2 <span class="text-muted">(characters)</span></a></li>
-                            <li role="separator" class="divider"></li>
-                            <li><a href="#" data-url="http://localhost:9876/index.json">Local dictionary</a></li>
-                        </ul>
-                    </div>
-                    <input type="text" id="dict-url" class="form-control" placeholder="Dictionary import URL">
-                    <div class="input-group-btn">
-                        <button type="button" id="dict-import" class="btn btn-primary" disabled>Import</button>
-                    </div>
+                <div id="dict-importer">
+                    <input type="file" id="dict-file">
                 </div>
             </div>
 
