@@ -254,19 +254,21 @@ function onDictionaryImport(e) {
     dictionaryErrorShow(null);
     dictionarySpinnerShow(true);
 
-    const dictUrl = $('#dict-url');
+    const dictFile = $('#dict-file');
     const dictImporter = $('#dict-importer').hide();
     const dictProgress = $('#dict-import-progress').show();
     const setProgress = percent => dictProgress.find('.progress-bar').css('width', `${percent}%`);
+    const updateProgress = (total, current) => setProgress(current / total * 100.0);
 
     setProgress(0.0);
 
     optionsLoad().then(options => {
-        return instDb().importDictionary(e.target.files[0], (total, current) => setProgress(current / total * 100.0)).then(summary => {
+        return instDb().importDictionary(e.target.files[0], updateProgress).then(summary => {
             options.dictionaries[summary.title] = {enabled: true, priority: 0};
             return optionsSave(options);
         }).then(() => dictionaryGroupsPopulate(options));
     }).catch(dictionaryErrorShow).then(() => {
+        dictFile.val('');
         dictionarySpinnerShow(false);
         dictProgress.hide();
         dictImporter.show();
