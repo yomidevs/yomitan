@@ -456,14 +456,7 @@ function jsonLoadInt(url) {
  */
 
 function zipLoadDb(archive, indexLoaded, termsLoaded, kanjiLoaded) {
-    return JSZip.loadAsync(archive).then(files => {
-        const fileMap = {};
-        files.forEach((path, file) => {
-            fileMap[path] = file;
-        });
-
-        return fileMap;
-    }).then(files => {
+    return JSZip.loadAsync(archive).then(files => files.files).then(files => {
         const indexFile = files['index.json'];
         if (!indexFile) {
             return Promise.reject('no dictionary index found in archive');
