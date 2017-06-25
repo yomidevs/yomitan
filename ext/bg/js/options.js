@@ -250,31 +250,27 @@ function onDictionaryPurge(e) {
     });
 }
 
-function onDictionaryImport() {
-    alert('import');
+function onDictionaryImport(e) {
+    dictionaryErrorShow(null);
+    dictionarySpinnerShow(true);
 
-    // dictionaryErrorShow(null);
-    // dictionarySpinnerShow(true);
+    const dictUrl = $('#dict-url');
+    const dictImporter = $('#dict-importer').hide();
+    const dictProgress = $('#dict-import-progress').show();
+    const setProgress = percent => dictProgress.find('.progress-bar').css('width', `${percent}%`);
 
-    // const dictUrl = $('#dict-url');
-    // const dictImporter = $('#dict-importer').hide();
-    // const dictProgress = $('#dict-import-progress').show();
-    // const setProgress = percent => dictProgress.find('.progress-bar').css('width', `${percent}%`);
+    setProgress(0.0);
 
-    // setProgress(0.0);
-
-    // optionsLoad().then(options => {
-    //     instDb().importDictionary(dictUrl.val(), (total, current) => setProgress(current / total * 100.0)).then(summary => {
-    //         options.dictionaries[summary.title] = {enabled: true, priority: 0};
-    //         return optionsSave(options);
-    //     }).then(() => dictionaryGroupsPopulate(options)).catch(dictionaryErrorShow).then(() => {
-    //         dictionarySpinnerShow(false);
-    //         dictProgress.hide();
-    //         dictImporter.show();
-    //         dictUrl.val('');
-    //         dictUrl.trigger('input');
-    //     });
-    // });
+    optionsLoad().then(options => {
+        return instDb().importDictionary(e.target.files[0], (total, current) => setProgress(current / total * 100.0)).then(summary => {
+            options.dictionaries[summary.title] = {enabled: true, priority: 0};
+            return optionsSave(options);
+        }).then(() => dictionaryGroupsPopulate(options));
+    }).catch(dictionaryErrorShow).then(() => {
+        dictionarySpinnerShow(false);
+        dictProgress.hide();
+        dictImporter.show();
+    });
 }
 
 /*

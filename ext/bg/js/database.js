@@ -155,7 +155,7 @@ class Database {
         return this.db.dictionaries.toArray();
     }
 
-    importDictionary(indexUrl, callback) {
+    importDictionary(archive, callback) {
         if (this.db === null) {
             return Promise.reject('database not initialized');
         }
@@ -204,7 +204,7 @@ class Database {
 
             return this.db.terms.bulkAdd(rows).then(() => {
                 if (callback) {
-                    callback(total, current, indexUrl);
+                    callback(total, current);
                 }
             });
         };
@@ -224,11 +224,11 @@ class Database {
 
             return this.db.kanji.bulkAdd(rows).then(() => {
                 if (callback) {
-                    callback(total, current, indexUrl);
+                    callback(total, current);
                 }
             });
         };
 
-        return jsonLoadDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded).then(() => summary);
+        return zipLoadDb(archive, indexLoaded, termsLoaded, kanjiLoaded).then(() => summary);
     }
 }

@@ -451,14 +451,30 @@ function jsonLoadInt(url) {
     return jsonLoad(chrome.extension.getURL(url));
 }
 
-function jsonLoadDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
-    const indexDir = indexUrl.slice(0, indexUrl.lastIndexOf('/'));
-    return jsonLoad(indexUrl).then(index => {
-        if (!index.title || !index.version || !index.revision) {
-            return Promise.reject('unrecognized dictionary format');
+/*
+ * Zip
+ */
+
+function zipLoadDb(archive, indexLoaded, termsLoaded, kanjiLoaded) {
+    return JSZip.loadAsync(archive).then(files => {
+        const fileMap = {};
+        files.forEach((path, file) => {
+            fileMap[path] = file;
+        });
+
+        return fileMap;
+    }).then(files => {
+        const indexFile = files['index.json'];
+        if (!indexFile) {
+            return Promise.reject('no dictionary index found in archive');
         }
 
-        if (indexLoaded !== null) {
+        return indexFile.async('string').then(indexJson => {
+            const index = JSON.parse(indexJson);
+            if (!index.title || !index.version || !index.revision) {
+                return Promise.reject('unrecognized dictionary format');
+            }
+
             return indexLoaded(
                 index.title,
                 index.version,
@@ -467,43 +483,44 @@ function jsonLoadDb(indexUrl, indexLoaded, termsLoaded, kanjiLoaded) {
                 index.termBanks > 0,
                 index.kanjiBanks > 0
             ).then(() => index);
-        }
+        }).then(index => {
+            const loaders = [];
+            const banksTotal = index.termBanks + index.kanjiBanks;
+            let banksLoaded = 0;
 
-        return index;
-    }).then(index => {
-        const loaders = [];
-        const banksTotal = index.termBanks + index.kanjiBanks;
-        let banksLoaded = 0;
+            for (let i = 1; i <= index.termBanks; ++i) {
+                const bankFile = files[`term_bank_${i}.json`];
+                if (!bankFile) {
+                    return Promise.reject('missing term bank file');
+                }
 
-        for (let i = 1; i <= index.termBanks; ++i) {
-            const bankUrl = `${indexDir}/term_bank_${i}.json`;
-            loaders.push(() => jsonLoad(bankUrl).then(entries => termsLoaded(
-                index.title,
-                entries,
-                banksTotal,
-                banksLoaded++
-            )));
-        }
+                loaders.push(() => bankFile.async('string').then(bankJson => {
+                    const bank = JSON.parse(bankJson);
+                    return termsLoaded(index.title, bank, banksTotal, banksLoaded++);
+                }));
+            }
 
-        for (let i = 1; i <= index.kanjiBanks; ++i) {
-            const bankUrl = `${indexDir}/kanji_bank_${i}.json`;
-            loaders.push(() => jsonLoad(bankUrl).then(entries => kanjiLoaded(
-                index.title,
-                entries,
-                banksTotal,
-                banksLoaded++
-            )));
-        }
+            for (let i = 1; i <= index.kanjiBanks; ++i) {
+                const bankFile = files[`kanji_bank_${i}.json`];
+                if (!bankFile) {
+                    return Promise.reject('missing kanji bank file');
+                }
 
-        let chain = Promise.resolve();
-        for (const loader of loaders) {
-            chain = chain.then(loader);
-        }
+                loaders.push(() => bankFile.async('string').then(bankJson => {
+                    const bank = JSON.parse(bankJson);
+                    return kanjiLoaded(index.title, bank, banksTotal, banksLoaded++);
+                }));
+            }
 
-        return chain;
+            let chain = Promise.resolve();
+            for (const loader of loaders) {
+                chain = chain.then(loader);
+            }
+
+            return chain;
+        });
     });
 }
-
 
 /*
  * Helpers
