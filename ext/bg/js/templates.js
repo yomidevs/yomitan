@@ -404,7 +404,7 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
 },"23":function(container,depth0,helpers,partials,data) {
     return "<hr>";
 },"25":function(container,depth0,helpers,partials,data) {
-    return "<p>No results found.</p>\n";
+    return "<p class=\"note\">No results found.</p>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
@@ -586,7 +586,7 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
 },"39":function(container,depth0,helpers,partials,data) {
     return "<hr>";
 },"41":function(container,depth0,helpers,partials,data) {
-    return "<p>No results found.</p>\n";
+    return "<p class=\"note\">No results found.</p>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
