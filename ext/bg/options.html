@@ -118,17 +118,19 @@
                 </div>
 
                 <p class="help-block">
-                    Yomichan can utilize both bundled and custom (see the <a href="https://foosoft.net/projects/yomichan-import">Yomichan Import</a>
-                    page for details) dictionaries. You can disable dictionaries that you no longer wish to use, or you can simply
-                    <a href="#" id="dict-purge">purge the database</a> to delete everything. Please make sure to wait for import
-                    and delete operations to complete before closing this page.
+                    Yomichan can import and use a variety of dictionary formats. Unneeded dictionaries can be disabled,
+                    or you can simply <a href="#" id="dict-purge">purge the database</a> to delete everything.
+                </p>
+                <p class="help-block">
+                    Please visit the <a href="https://foosoft.net/projects/yomichan" target="_blank">Yomichan</a> homepage to download free
+                    dictionaries that you can use with this extension.
                 </p>
 
                 <div id="dict-purge-progress" class="text-danger">Dictionary data is being purged, please be patient...</div>
 
                 <div class="alert alert-warning" id="dict-warning">
                     <strong>Warning:</strong>
-                    <span>No dictionaries found, use the importer below to install packaged and external dictionaries</span>
+                    <span>no dictionaries found; please use the importer below to install packaged dictionaries</span>
                 </div>
 
                 <div class="alert alert-danger" id="dict-error">
@@ -145,21 +147,8 @@
                     </div>
                 </div>
 
-                <div class="input-group" id="dict-importer">
-                    <div class="input-group-btn">
-                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
-                        <ul class="dropdown-menu">
-                            <li><a href="#" data-url="edict">JMdict <span class="text-muted">(terms)</span></a></li>
-                            <li><a href="#" data-url="enamdict">JMnedict <span class="text-muted">(names)</span></a></li>
-                            <li><a href="#" data-url="kanjidic">KANJIDIC2 <span class="text-muted">(characters)</span></a></li>
-                            <li role="separator" class="divider"></li>
-                            <li><a href="#" data-url="http://localhost:9876/index.json">Local dictionary</a></li>
-                        </ul>
-                    </div>
-                    <input type="text" id="dict-url" class="form-control" placeholder="Dictionary import URL">
-                    <div class="input-group-btn">
-                        <button type="button" id="dict-import" class="btn btn-primary" disabled>Import</button>
-                    </div>
+                <div id="dict-importer">
+                    <input type="file" id="dict-file">
                 </div>
             </div>
 
@@ -170,9 +159,9 @@
                 </div>
 
                 <p class="help-block">
-                    Yomichan features automatic flashcard creation for <a href="http://ankisrs.net/">Anki</a>, a free application
-                    designed to help you retain knowledge. This functionality requires prior installation of the
-                    <a href="https://foosoft.net/projects/anki-connect/">AnkiConnect</a> plugin for Anki.
+                    Yomichan supports automatic flashcard creation for <a href="http://ankisrs.net/" target="_blank">Anki</a>, a free application
+                    designed to help you remember. This feature requires installation of the
+                    <a href="https://foosoft.net/projects/anki-connect/" target="_blank">AnkiConnect</a> plugin.
                 </p>
 
                 <div class="alert alert-danger" id="anki-error">
@@ -263,12 +252,15 @@
                     <h3>Support Development</h3>
 
                     <p class="help-block">
-                        If you find Yomichan useful, please consider making a small donation as a way to show your appreciation for the countless hours
-                        that I have devoted to this extension. Seeing that people care about my work is great motivation for continuing to
-                        improve Yomichan!
+                        Yomichan is provided to you <em>completely free</em> of charge. Unlike numerous other "free" services, you are not
+                        shown ads, pestered with "offers", or have your browser usage information analyzed and sold to third parties.
+                    </p>
+                    <p class="help-block">
+                        If you find Yomichan useful, please consider making a small donation as a way to show your appreciation for the
+                        countless hours that I have devoted to this extension.
                     </p>
                     <p>
-                        <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4DBTN9A3CUAFN"><img src="/bg/img/paypal.gif" alt></a>
+                        <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4DBTN9A3CUAFN" target="_blank"><img src="/bg/img/paypal.gif" alt></a>
                     </p>
                 </div>
 
@@ -276,7 +268,7 @@
             </div>
 
             <div class="pull-right">
-                <small><a href="https://foosoft.net/projects/yomichan/">Homepage</a> &bull; <a href="legal.html">Legal</a></small>
+                <small><a href="https://foosoft.net/projects/yomichan/" target="_blank">Homepage</a> &bull; <a href="legal.html">Legal</a></small>
             </div>
         </div>
 

@@ -51,7 +51,7 @@ hr {
  * Entries
  */
 
-.entry {
+.entry, .note {
     padding-top: 10px;
     padding-bottom: 10px;
 }
