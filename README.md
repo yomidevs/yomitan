@@ -229,6 +229,7 @@ exact versions used for distribution.
 *   Dexie: [homepage](http://dexie.org/) - [snapshot](https://github.com/dfahlander/Dexie.js/archive/v2.0.0-beta.10.zip)
 *   Handlebars: [homepage](http://handlebarsjs.com/) - [snapshot](http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars.min-714a4c4.js)
 *   JQuery: [homepage](https://blog.jquery.com/) - [snapshot](https://code.jquery.com/jquery-3.2.1.min.js)
+*   JSZip: [homepage](http://stuk.github.io/jszip/) - [snapshot](https://raw.githubusercontent.com/Stuk/jszip/de7f52fbcba485737bef7923a83f0fad92d9f5bc/dist/jszip.min.js)
 *   WanaKana: [homepage](http://wanakana.com/) - [snapshot](https://raw.githubusercontent.com/WaniKani/WanaKana/f2152985f5f2953d74edfe1b6a78e0e329a7cdfb/lib/wanakana.min.js)
 
 ## Frequently Asked Questions ##
