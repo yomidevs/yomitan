@@ -32,6 +32,32 @@ Yomichan provides advanced features not available in other browser-based diction
     review process can take several months to complete, the approved version of the extension is often out of date. If
     you are interested in using the latest and greatest version, please consider using the [locally hosted](https://foosoft.net/projects/yomichan/dl/latest.xpi) version instead.
 
+## Dictionaries ##
+
+There are three free Japanese dictionaries available for Yomichan, with two of them having versions with glossaries in
+different languages. You must download and import the dictionaries you wish to use in order to enable Yomichan
+definition lookups. If you have proprietary EPWING dictionaries that you would like to use, please see the [Yomichan
+Import](https://foosoft.net/projects/yomichan-import) page to learn how to convert and import them into Yomichan.
+
+*   **JMdict** (Japanese vocabulary)
+    *   [jmdict_dutch.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_dutch.zip)
+    *   [jmdict_english.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_english.zip)
+    *   [jmdict_french.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_french.zip)
+    *   [jmdict_german.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_german.zip)
+    *   [jmdict_hungarian.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_hungarian.zip)
+    *   [jmdict_italian.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_italian.zip)
+    *   [jmdict_russian.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_russian.zip)
+    *   [jmdict_slovenian.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_slovenian.zip)
+    *   [jmdict_spanish.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_spanish.zip)
+    *   [jmdict_swedish.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_swedish.zip)
+*   **JMnedict** (Japanese names)
+    *   [jmnedict.zip](https://foosoft.net/projects/yomichan/dl/dict/jmnedict.zip)
+*   **KANJIDIC** (Japanese Kanji)
+    *   [kanjidic_english.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_english.zip)
+    *   [kanjidic_french.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_french.zip)
+    *   [kanjidic_portuguese.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_portuguese.zip)
+    *   [kanjidic_spanish.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_spanish.zip)
+
 ## Basic Usage ##
 
 1.  Click on the ![](https://foosoft.net/projects/yomichan/img/yomichan-icon.png) icon in the browser toolbar to open the Yomichan actions dialog.
