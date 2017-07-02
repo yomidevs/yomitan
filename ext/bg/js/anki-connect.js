@@ -26,7 +26,7 @@ class AnkiConnect {
     }
 
     addNote(note) {
-        return this.checkVersion().then(() => this.ankiInvoke('addNote', {note}, null));
+        return this.checkVersion().then(() => this.ankiInvoke('addNote', {note}));
     }
 
     canAddNotes(notes) {
@@ -34,15 +34,19 @@ class AnkiConnect {
     }
 
     getDeckNames() {
-        return this.checkVersion().then(() => this.ankiInvoke('deckNames', {}, null));
+        return this.checkVersion().then(() => this.ankiInvoke('deckNames', {}));
     }
 
     getModelNames() {
-        return this.checkVersion().then(() => this.ankiInvoke('modelNames', {}, null));
+        return this.checkVersion().then(() => this.ankiInvoke('modelNames', {}));
     }
 
     getModelFieldNames(modelName) {
-        return this.checkVersion().then(() => this.ankiInvoke('modelFieldNames', {modelName}, null));
+        return this.checkVersion().then(() => this.ankiInvoke('modelFieldNames', {modelName}));
+    }
+
+    guiBrowse(query) {
+        return this.checkVersion().then(() => this.ankiInvoke('guiBrowse', {query}));
     }
 
     checkVersion() {
@@ -60,13 +64,13 @@ class AnkiConnect {
 
     ankiInvoke(action, params, pool) {
         return new Promise((resolve, reject) => {
-            if (pool !== null && this.asyncPools.hasOwnProperty(pool)) {
+            if (pool && this.asyncPools.hasOwnProperty(pool)) {
                 this.asyncPools[pool].abort();
             }
 
             const xhr = new XMLHttpRequest();
             xhr.addEventListener('loadend', () => {
-                if (pool !== null) {
+                if (pool) {
                     delete this.asyncPools[pool];
                 }
 

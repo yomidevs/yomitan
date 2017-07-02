@@ -315,10 +315,10 @@ templates['fields.html'] = template({"1":function(container,depth0,helpers,parti
 templates['kanji.html'] = template({"1":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : {};
 
-  return "<div class=\"entry\" data-type=\"kanji\">\n    <div class=\"actions\">\n        <img src=\"/mixed/img/entry-current.png\" class=\"current\" title=\"Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)\" alt>\n"
+  return "<div class=\"entry\" data-type=\"kanji\">\n    <div class=\"actions\">\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.addable : depth0),{"name":"if","hash":{},"fn":container.program(2, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.source : depth0),{"name":"if","hash":{},"fn":container.program(4, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "    </div>\n\n    <div class=\"glyph\">"
+    + "        <img src=\"/mixed/img/entry-current.png\" class=\"current\" title=\"Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)\" alt>\n    </div>\n\n    <div class=\"glyph\">"
     + container.escapeExpression(((helper = (helper = helpers.character || (depth0 != null ? depth0.character : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"character","hash":{},"data":data}) : helper)))
     + "</div>\n\n    <div class=\"reading\">\n        <table>\n            <tr>\n                <th>Kunyomi:</th>\n                <td>\n"
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.kunyomi : depth0),{"name":"each","hash":{},"fn":container.program(6, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
@@ -332,7 +332,7 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.debug : depth0),{"name":"if","hash":{},"fn":container.program(18, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "</div>\n";
 },"2":function(container,depth0,helpers,partials,data) {
-    return "        <a href=\"#\" class=\"action-add-note pending disabled\" data-mode=\"kanji\"><img src=\"/mixed/img/add-kanji.png\" title=\"Add Kanji (Alt + K)\" alt></a>\n";
+    return "        <a href=\"#\" class=\"action-view-note pending disabled\"><img src=\"/mixed/img/view-note.png\" title=\"View added note (Alt + V)\" alt></a>\n        <a href=\"#\" class=\"action-add-note pending disabled\" data-mode=\"kanji\"><img src=\"/mixed/img/add-kanji.png\" title=\"Add Kanji (Alt + K)\" alt></a>\n";
 },"4":function(container,depth0,helpers,partials,data) {
     return "        <a href=\"#\" class=\"source-term\"><img src=\"/mixed/img/source-term.png\" title=\"Source term (Alt + B)\" alt></a>\n";
 },"6":function(container,depth0,helpers,partials,data) {
@@ -486,10 +486,10 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
 },"12":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=depth0 != null ? depth0 : {};
 
-  return "<div class=\"entry\" data-type=\"term\">\n    <div class=\"actions\">\n        <img src=\"/mixed/img/entry-current.png\" class=\"current\" title=\"Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)\" alt>\n"
+  return "<div class=\"entry\" data-type=\"term\">\n    <div class=\"actions\">\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.addable : depth0),{"name":"if","hash":{},"fn":container.program(13, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.playback : depth0),{"name":"if","hash":{},"fn":container.program(15, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "    </div>\n\n"
+    + "        <img src=\"/mixed/img/entry-current.png\" class=\"current\" title=\"Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)\" alt>\n    </div>\n\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.reading : depth0),{"name":"if","hash":{},"fn":container.program(17, data, 0),"inverse":container.program(20, data, 0),"data":data})) != null ? stack1 : "")
     + "\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.reasons : depth0),{"name":"if","hash":{},"fn":container.program(22, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
@@ -499,7 +499,7 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.debug : depth0),{"name":"if","hash":{},"fn":container.program(34, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "</div>\n";
 },"13":function(container,depth0,helpers,partials,data) {
-    return "        <a href=\"#\" class=\"action-add-note pending disabled\" data-mode=\"term-kanji\"><img src=\"/mixed/img/add-term-kanji.png\" title=\"Add expression (Alt + E)\" alt></a>\n        <a href=\"#\" class=\"action-add-note pending disabled\" data-mode=\"term-kana\"><img src=\"/mixed/img/add-term-kana.png\" title=\"Add reading (Alt + R)\" alt></a>\n";
+    return "        <a href=\"#\" class=\"action-view-note pending disabled\"><img src=\"/mixed/img/view-note.png\" title=\"View added note (Alt + V)\" alt></a>\n        <a href=\"#\" class=\"action-add-note pending disabled\" data-mode=\"term-kanji\"><img src=\"/mixed/img/add-term-kanji.png\" title=\"Add expression (Alt + E)\" alt></a>\n        <a href=\"#\" class=\"action-add-note pending disabled\" data-mode=\"term-kana\"><img src=\"/mixed/img/add-term-kana.png\" title=\"Add reading (Alt + R)\" alt></a>\n";
 },"15":function(container,depth0,helpers,partials,data) {
     return "        <a href=\"#\" class=\"action-play-audio\"><img src=\"/mixed/img/play-audio.png\" title=\"Play audio (Alt + P)\" alt></a>\n";
 },"17":function(container,depth0,helpers,partials,data) {

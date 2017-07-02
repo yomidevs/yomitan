@@ -37,4 +37,8 @@ class AnkiNull {
     getModelFieldNames(modelName) {
         return Promise.resolve([]);
     }
+
+    guiBrowse(query) {
+        return Promise.resolve([]);
+    }
 }

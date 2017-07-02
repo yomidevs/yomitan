@@ -62,6 +62,9 @@ function bgDefinitionAdd(definition, mode) {
     return bgInvoke('definitionAdd', {definition, mode});
 }
 
+function bgNoteView(noteId) {
+    return bgInvoke('noteView', {noteId});
+}
 
 /*
  * Document

@@ -40,6 +40,10 @@ class Display {
         throw 'override me';
     }
 
+    noteView(noteId) {
+        throw 'override me';
+    }
+
     templateRender(template, data) {
         throw 'override me';
     }
@@ -88,6 +92,7 @@ class Display {
             this.entryScroll(context && context.index || 0);
 
             $('.action-add-note').click(this.onAddNote.bind(this));
+            $('.action-view-note').click(this.onViewNote.bind(this));
             $('.action-play-audio').click(this.onPlayAudio.bind(this));
             $('.kanji-link').click(this.onKanjiLookup.bind(this));
 
@@ -134,7 +139,7 @@ class Display {
 
     adderButtonsUpdate(modes, sequence) {
         return this.definitionsAddable(this.definitions, modes).then(states => {
-            if (states === null || sequence !== this.sequence) {
+            if (!states || sequence !== this.sequence) {
                 return;
             }
 
@@ -211,11 +216,25 @@ class Display {
         this.noteAdd(this.definitions[index], link.data('mode'));
     }
 
+    onViewNote(e) {
+        e.preventDefault();
+        const link = $(e.currentTarget);
+        const index = Display.entryIndexFind(link);
+        this.noteView(link.data('noteId'));
+    }
+
     onKeyDown(e) {
         const noteTryAdd = mode => {
             const button = Display.adderButtonFind(this.index, mode);
             if (button.length !== 0 && !button.hasClass('disabled')) {
                 this.noteAdd(this.definitions[this.index], mode);
+            }
+        };
+
+        const noteTryView = mode => {
+            const button = Display.viewerButtonFind(this.index);
+            if (button.length !== 0 && !button.hasClass('disabled')) {
+                this.noteView(button.data('noteId'));
             }
         };
 
@@ -303,6 +322,12 @@ class Display {
 
                     return true;
                 }
+            },
+
+            86: /* v */ () => {
+                if (e.altKey) {
+                    noteTryView();
+                }
             }
         };
 
@@ -326,10 +351,11 @@ class Display {
 
     noteAdd(definition, mode) {
         this.spinner.show();
-        return this.definitionAdd(definition, mode).then(success => {
-            if (success) {
+        return this.definitionAdd(definition, mode).then(noteId => {
+            if (noteId) {
                 const index = this.definitions.indexOf(definition);
                 Display.adderButtonFind(index, mode).addClass('disabled');
+                Display.viewerButtonFind(index).removeClass('pending disabled').data('noteId', noteId);
             } else {
                 this.handleError('note could not be added');
             }
@@ -374,5 +400,9 @@ class Display {
 
     static adderButtonFind(index, mode) {
         return $('.entry').eq(index).find(`.action-add-note[data-mode="${mode}"]`);
+    }
+
+    static viewerButtonFind(index) {
+        return $('.entry').eq(index).find('.action-view-note');
     }
 }

@@ -37,6 +37,10 @@ window.displayWindow = new class extends Display {
         return instYomi().definitionsAddable(definitions, modes).catch(() => []);
     }
 
+    noteView(noteId) {
+        return instYomi().noteView(noteId);
+    }
+
     templateRender(template, data) {
         return instYomi().templateRender(template, data);
     }

@@ -31,6 +31,10 @@ window.displayFrame = new class extends Display {
         return bgDefinitionsAddable(definitions, modes);
     }
 
+    noteView(noteId) {
+        return bgNoteView(noteId);
+    }
+
     templateRender(template, data) {
         return bgTemplateRender(template, data);
     }

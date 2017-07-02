@@ -157,6 +157,10 @@ window.yomichan = new class {
         });
     }
 
+    noteView(noteId) {
+        return this.anki.guiBrowse(`nid:${noteId}`);
+    }
+
     templateRender(template, data) {
         return Promise.resolve(handlebarsRender(template, data));
     }
@@ -211,6 +215,10 @@ window.yomichan = new class {
 
             definitionsAddable: ({definitions, modes, callback}) => {
                 promiseCallback(this.definitionsAddable(definitions, modes), callback);
+            },
+
+            noteView: ({noteId}) => {
+                promiseCallback(this.noteView(noteId), callback);
             }
         };
 
