@@ -53,7 +53,7 @@ class Translator {
         }
 
         return this.findTermsDeinflected(text, titles, cache).then(deinfLiteral => {
-            const textHiragana = wanakana._katakanaToHiragana(text);
+            const textHiragana = jpKatakanaToHiragana(text);
             if (text === textHiragana) {
                 return deinfLiteral;
             } else {

@@ -43,6 +43,10 @@ function jpIsKana(c) {
     return wanakana.isKana(c);
 }
 
+function jpKatakanaToHiragana(text) {
+    return wanakana._katakanaToHiragana(text);
+}
+
 
 /*
  * Commands

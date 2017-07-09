@@ -35,7 +35,7 @@ class Database {
     }
 
     prepare() {
-        if (!this.db) {
+        if (this.db) {
             return Promise.reject('database already initialized');
         }
 
