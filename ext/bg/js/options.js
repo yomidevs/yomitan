@@ -337,7 +337,7 @@ function ankiFieldsPopulate(element, options) {
     const container = tab.find('tbody').empty();
 
     const modelName = element.val();
-    if (modelName === null) {
+    if (!modelName) {
         return Promise.resolve();
     }
 

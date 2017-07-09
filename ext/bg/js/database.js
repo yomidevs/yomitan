@@ -35,7 +35,7 @@ class Database {
     }
 
     prepare() {
-        if (this.db !== null) {
+        if (!this.db) {
             return Promise.reject('database already initialized');
         }
 
@@ -53,7 +53,7 @@ class Database {
     }
 
     purge() {
-        if (this.db === null) {
+        if (!this.db) {
             return Promise.reject('database not initialized');
         }
 
@@ -66,7 +66,7 @@ class Database {
     }
 
     findTerms(term, dictionaries) {
-        if (this.db === null) {
+        if (!this.db) {
             return Promise.reject('database not initialized');
         }
 
@@ -96,7 +96,7 @@ class Database {
     }
 
     findKanji(kanji, dictionaries) {
-        if (this.db === null) {
+        if (!this.db) {
             return Promise.reject('database not initialized');
         }
 
@@ -124,7 +124,7 @@ class Database {
     }
 
     cacheTagMeta(dictionaries) {
-        if (this.db === null) {
+        if (!this.db) {
             return Promise.reject('database not initialized');
         }
 
@@ -148,7 +148,7 @@ class Database {
     }
 
     getDictionaries() {
-        if (this.db === null) {
+        if (!this.db) {
             return Promise.reject('database not initialized');
         }
 
@@ -156,7 +156,7 @@ class Database {
     }
 
     importDictionary(archive, callback) {
-        if (this.db === null) {
+        if (!this.db) {
             return Promise.reject('database not initialized');
         }
 

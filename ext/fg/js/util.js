@@ -117,7 +117,7 @@ function docImposterDestroy() {
 
 function docRangeFromPoint(point) {
     const element = document.elementFromPoint(point.x, point.y);
-    if (element !== null) {
+    if (element) {
         if (element.nodeName === 'IMG' || element.nodeName === 'BUTTON') {
             return new TextSourceElement(element);
         } else if (element.nodeName === 'INPUT' || element.nodeName === 'TEXTAREA') {
@@ -128,23 +128,19 @@ function docRangeFromPoint(point) {
     if (!document.caretRangeFromPoint) {
         document.caretRangeFromPoint = (x, y) => {
             const position = document.caretPositionFromPoint(x,y);
-            if (position === null) {
-                return null;
+            if (position) {
+                const range = document.createRange();
+                range.setStart(position.offsetNode, position.offset);
+                range.setEnd(position.offsetNode, position.offset);
+                return range;
             }
-
-            const range = document.createRange();
-            range.setStart(position.offsetNode, position.offset);
-            range.setEnd(position.offsetNode, position.offset);
-            return range;
         };
     }
 
     const range = document.caretRangeFromPoint(point.x, point.y);
-    if (range !== null) {
+    if (range) {
         return new TextSourceRange(range);
     }
-
-    return null;
 }
 
 function docSentenceExtract(source, extent) {
