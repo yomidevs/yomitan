@@ -23,7 +23,7 @@
         ],
         "css": ["fg/css/client.css"]
     }],
-    "minimum_chrome_version": "45.0.0.0",
+    "minimum_chrome_version": "57.0.0.0",
     "options_ui": {
         "page": "bg/options.html"
     },
@@ -50,7 +50,7 @@
     "applications": {
         "gecko": {
             "id": "yomichan-live@foosoft.net",
-            "strict_min_version": "51.0",
+            "strict_min_version": "52.0",
             "update_url": "https://foosoft.net/projects/yomichan/dl/updates.json"
         }
     }
