@@ -87,14 +87,12 @@ class Translator {
         return {length, definitions};
     }
 
-    async findTermsDeinflected(text, dictionaries, cache) {
-        await this.prepare();
-
+    async findTermsDeinflected(text, titles, cache) {
         const definer = async term => {
             if (cache.hasOwnProperty(term)) {
                 return cache[term];
             } else {
-                return cache[term] = await this.database.findTerms(term, dictionaries);
+                return cache[term] = await this.database.findTerms(term, titles);
             }
         };
 
@@ -108,8 +106,6 @@ class Translator {
     }
 
     async findKanji(text, dictionaries) {
-        await this.prepare();
-
         let definitions = [];
         const processed = {};
         const titles = Object.keys(dictionaries);
@@ -128,7 +124,6 @@ class Translator {
 
         return definitions;
     }
-
 
     static loadRules(url) {
         return new Promise((resolve, reject) => {

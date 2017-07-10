@@ -25,9 +25,12 @@ window.yomichan = new class {
         this.anki = new AnkiNull();
         this.options = null;
 
-        this.translator.prepare().then(optionsLoad).then(this.optionsSet.bind(this)).then(() => {
+        this.translator.prepare().then(optionsLoad).then(options => {
+            this.optionsSet(options);
+
             chrome.commands.onCommand.addListener(this.onCommand.bind(this));
             chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
+
             if (this.options.general.showGuide) {
                 chrome.tabs.create({url: chrome.extension.getURL('/bg/guide.html')});
             }
