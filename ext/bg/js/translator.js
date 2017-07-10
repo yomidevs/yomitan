@@ -19,17 +19,19 @@
 
 class Translator {
     constructor() {
-        this.database = new Database();
-        this.deinflector = new Deinflector();
-        this.loaded = false;
+        this.database = null;
+        this.deinflector = null;
     }
 
     async prepare() {
-        if (!this.loaded) {
-            const reasons = await jsonLoadInt('/bg/lang/deinflect.json');
-            this.deinflector.setReasons(reasons);
+        if (!this.database) {
+            this.database = new Database();
             await this.database.prepare();
-            this.loaded = true;
+        }
+
+        if (!this.deinflector) {
+            const reasons = await jsonLoadInt('/bg/lang/deinflect.json');
+            this.deinflector = new Deinflector(reasons);
         }
     }
 
