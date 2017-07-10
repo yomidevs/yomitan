@@ -30,7 +30,8 @@ class Translator {
         }
 
         if (!this.deinflector) {
-            const reasons = await jsonLoadInt('/bg/lang/deinflect.json');
+            const url = chrome.extension.getURL('/bg/lang/deinflect.json');
+            const reasons = await Translator.loadRules(url);
             this.deinflector = new Deinflector(reasons);
         }
     }
@@ -126,5 +127,24 @@ class Translator {
         }
 
         return definitions;
+    }
+
+
+    static loadRules(url) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.overrideMimeType('application/json');
+            xhr.addEventListener('load', () => resolve(xhr.responseText));
+            xhr.addEventListener('error', () => reject('failed to execute network request'));
+            xhr.open('GET', url);
+            xhr.send();
+        }).then(responseText => {
+            try {
+                return JSON.parse(responseText);
+            }
+            catch (e) {
+                return Promise.reject('invalid JSON response');
+            }
+        });
     }
 }

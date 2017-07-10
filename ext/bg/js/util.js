@@ -430,32 +430,6 @@ function dictFieldFormat(field, definition, mode, options) {
 
 
 /*
- * Json
- */
-
-function jsonLoad(url) {
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.overrideMimeType('application/json');
-        xhr.addEventListener('load', () => resolve(xhr.responseText));
-        xhr.addEventListener('error', () => reject('failed to execute network request'));
-        xhr.open('GET', url);
-        xhr.send();
-    }).then(responseText => {
-        try {
-            return JSON.parse(responseText);
-        }
-        catch (e) {
-            return Promise.reject('invalid JSON response');
-        }
-    });
-}
-
-function jsonLoadInt(url) {
-    return jsonLoad(chrome.extension.getURL(url));
-}
-
-/*
  * Helpers
  */
 
