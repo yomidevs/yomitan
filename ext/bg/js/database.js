@@ -224,7 +224,53 @@ class Database {
             await this.db.kanji.bulkAdd(rows);
         };
 
-        await zipLoadDb(archive, indexLoaded, termsLoaded, kanjiLoaded);
+        await Database.importDictionaryZip(archive, indexLoaded, termsLoaded, kanjiLoaded);
         return summary;
+    }
+
+    static async importDictionaryZip(archive, indexLoaded, termsLoaded, kanjiLoaded) {
+        const files = (await JSZip.loadAsync(archive)).files;
+
+        const indexFile = files['index.json'];
+        if (!indexFile) {
+            throw 'no dictionary index found in archive';
+        }
+
+        const index = JSON.parse(await indexFile.async('string'));
+        if (!index.title || !index.version || !index.revision) {
+            throw 'unrecognized dictionary format';
+        }
+
+        await indexLoaded(
+            index.title,
+            index.version,
+            index.revision,
+            index.tagMeta || {},
+            index.termBanks > 0,
+            index.kanjiBanks > 0
+        );
+
+        const banksTotal = index.termBanks + index.kanjiBanks;
+        let banksLoaded = 0;
+
+        for (let i = 1; i <= index.termBanks; ++i) {
+            const bankFile = files[`term_bank_${i}.json`];
+            if (bankFile) {
+                const bank = JSON.parse(await bankFile.async('string'));
+                await termsLoaded(index.title, bank, banksTotal, banksLoaded++);
+            } else {
+                throw 'missing term bank file';
+            }
+        }
+
+        for (let i = 1; i <= index.kanjiBanks; ++i) {
+            const bankFile = files[`kanji_bank_${i}.json`];
+            if (bankFile) {
+                const bank = JSON.parse(await bankFile.async('string'));
+                await kanjiLoaded(index.title, bank, banksTotal, banksLoaded++);
+            } else {
+                throw 'missing kanji bank file';
+            }
+        }
     }
 }
