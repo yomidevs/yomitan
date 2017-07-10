@@ -69,14 +69,14 @@ class Database {
         await this.prepare();
     }
 
-    async findTerms(term, dictionaries) {
+    async findTerms(term, titles) {
         if (!this.db) {
             throw 'database not initialized';
         }
 
         const results = [];
         await this.db.terms.where('expression').equals(term).or('reading').equals(term).each(row => {
-            if (dictionaries.includes(row.dictionary)) {
+            if (titles.includes(row.dictionary)) {
                 results.push({
                     expression: row.expression,
                     reading: row.reading,
@@ -90,7 +90,7 @@ class Database {
             }
         });
 
-        await this.cacheTagMeta(dictionaries);
+        await this.cacheTagMeta(titles);
         for (const result of results) {
             result.tagMeta = this.tagCache[result.dictionary] || {};
         }
@@ -98,14 +98,14 @@ class Database {
         return results;
     }
 
-    async findKanji(kanji, dictionaries) {
+    async findKanji(kanji, titles) {
         if (!this.db) {
             return Promise.reject('database not initialized');
         }
 
         const results = [];
         await this.db.kanji.where('character').equals(kanji).each(row => {
-            if (dictionaries.includes(row.dictionary)) {
+            if (titles.includes(row.dictionary)) {
                 results.push({
                     character: row.character,
                     onyomi: dictFieldSplit(row.onyomi),
@@ -117,7 +117,7 @@ class Database {
             }
         });
 
-        await this.cacheTagMeta(dictionaries);
+        await this.cacheTagMeta(titles);
         for (const result of results) {
             result.tagMeta = this.tagCache[result.dictionary] || {};
         }
@@ -125,29 +125,29 @@ class Database {
         return results;
     }
 
-    async cacheTagMeta(dictionaries) {
+    async cacheTagMeta(titles) {
         if (!this.db) {
             throw 'database not initialized';
         }
 
-        for (const dictionary of dictionaries) {
-            if (!this.tagCache[dictionary]) {
+        for (const title of titles) {
+            if (!this.tagCache[title]) {
                 const tagMeta = {};
-                await this.db.tagMeta.where('dictionary').equals(dictionary).each(row => {
+                await this.db.tagMeta.where('dictionary').equals(title).each(row => {
                     tagMeta[row.name] = {category: row.category, notes: row.notes, order: row.order};
                 });
 
-                this.tagCache[dictionary] = tagMeta;
+                this.tagCache[title] = tagMeta;
             }
         }
     }
 
     async getDictionaries() {
-        if (!this.db) {
+        if (this.db) {
+            return this.db.dictionaries.toArray();
+        } else {
             throw 'database not initialized';
         }
-
-        return this.db.dictionaries.toArray();
     }
 
     async importDictionary(archive, callback) {

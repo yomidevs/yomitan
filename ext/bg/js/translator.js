@@ -19,135 +19,107 @@
 
 class Translator {
     constructor() {
-        this.loaded = false;
-        this.ruleMeta = null;
         this.database = new Database();
         this.deinflector = new Deinflector();
+        this.loaded = false;
     }
 
-    prepare() {
-        if (this.loaded) {
-            return Promise.resolve();
-        }
-
-        const promises = [
-            jsonLoadInt('/bg/lang/deinflect.json'),
-            this.database.prepare()
-        ];
-
-        return Promise.all(promises).then(([reasons]) => {
+    async prepare() {
+        if (!this.loaded) {
+            const reasons = await jsonLoadInt('/bg/lang/deinflect.json');
             this.deinflector.setReasons(reasons);
+            await this.database.prepare();
             this.loaded = true;
-        });
+        }
     }
 
-    findTerms(text, dictionaries, alphanumeric) {
-        const titles = Object.keys(dictionaries);
-        const cache = {};
+    async findTermsGrouped(text, dictionaries, alphanumeric) {
+        const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
+        return {length, definitions: dictTermsGroup(definitions, dictionaries)};
+    }
 
+    async findTerms(text, dictionaries, alphanumeric) {
         if (!alphanumeric && text.length > 0) {
             const c = text[0];
             if (!jpIsKana(c) && !jpIsKanji(c)) {
-                return Promise.resolve({length: 0, definitions: []});
+                return {length: 0, definitions: []};
             }
         }
 
-        return this.findTermsDeinflected(text, titles, cache).then(deinfLiteral => {
-            const textHiragana = jpKatakanaToHiragana(text);
-            if (text === textHiragana) {
-                return deinfLiteral;
-            } else {
-                return this.findTermsDeinflected(textHiragana, titles, cache).then(deinfHiragana => deinfLiteral.concat(deinfHiragana));
-            }
-        }).then(deinflections => {
-            let definitions = [];
-            for (const deinflection of deinflections) {
-                for (const definition of deinflection.definitions) {
-                    const tags = definition.tags.map(tag => dictTagBuild(tag, definition.tagMeta));
-                    tags.push(dictTagBuildSource(definition.dictionary));
-                    definitions.push({
-                        source: deinflection.source,
-                        reasons: deinflection.reasons,
-                        score: definition.score,
-                        id: definition.id,
-                        dictionary: definition.dictionary,
-                        expression: definition.expression,
-                        reading: definition.reading,
-                        glossary: definition.glossary,
-                        tags: dictTagsSort(tags)
-                    });
-                }
-            }
-
-            definitions = dictTermsUndupe(definitions);
-            definitions = dictTermsSort(definitions, dictionaries);
-
-            let length = 0;
-            for (const definition of definitions) {
-                length = Math.max(length, definition.source.length);
-            }
-
-            return {length, definitions};
-        });
-    }
-
-    findTermsGrouped(text, dictionaries, alphanumeric) {
-        return this.findTerms(text, dictionaries, alphanumeric).then(({length, definitions}) => {
-            return {length, definitions: dictTermsGroup(definitions, dictionaries)};
-        });
-    }
-
-    findKanji(text, dictionaries) {
+        const cache = {};
         const titles = Object.keys(dictionaries);
-        const processed = {};
-        const promises = [];
+        let deinflections = await this.findTermsDeinflected(text, titles, cache);
+        const textHiragana = jpKatakanaToHiragana(text);
+        if (text !== textHiragana) {
+            deinflections = deinflections.concat(await this.findTermsDeinflected(textHiragana, titles, cache));
+        }
 
+        let definitions = [];
+        for (const deinflection of deinflections) {
+            for (const definition of deinflection.definitions) {
+                const tags = definition.tags.map(tag => dictTagBuild(tag, definition.tagMeta));
+                tags.push(dictTagBuildSource(definition.dictionary));
+                definitions.push({
+                    source: deinflection.source,
+                    reasons: deinflection.reasons,
+                    score: definition.score,
+                    id: definition.id,
+                    dictionary: definition.dictionary,
+                    expression: definition.expression,
+                    reading: definition.reading,
+                    glossary: definition.glossary,
+                    tags: dictTagsSort(tags)
+                });
+            }
+        }
+
+        definitions = dictTermsUndupe(definitions);
+        definitions = dictTermsSort(definitions, dictionaries);
+
+        let length = 0;
+        for (const definition of definitions) {
+            length = Math.max(length, definition.source.length);
+        }
+
+        return {length, definitions};
+    }
+
+    async findTermsDeinflected(text, dictionaries, cache) {
+        await this.prepare();
+
+        const definer = async term => {
+            if (cache.hasOwnProperty(term)) {
+                return cache[term];
+            } else {
+                return cache[term] = await this.database.findTerms(term, dictionaries);
+            }
+        };
+
+        let deinflections = [];
+        for (let i = text.length; i > 0; --i) {
+            const textSlice = text.slice(0, i);
+            deinflections = deinflections.concat(await this.deinflector.deinflect(textSlice, definer));
+        }
+
+        return deinflections;
+    }
+
+    async findKanji(text, dictionaries) {
+        await this.prepare();
+
+        let definitions = [];
+        const processed = {};
+        const titles = Object.keys(dictionaries);
         for (const c of text) {
             if (!processed[c]) {
-                promises.push(this.database.findKanji(c, titles));
+                definitions = definitions.concat(await this.database.findKanji(c, titles));
                 processed[c] = true;
             }
         }
 
-        return Promise.all(promises).then(defSets => {
-            const definitions = defSets.reduce((a, b) => a.concat(b), []);
-            for (const definition of definitions) {
-                const tags = definition.tags.map(tag => dictTagBuild(tag, definition.tagMeta));
-                tags.push(dictTagBuildSource(definition.dictionary));
-                definition.tags = dictTagsSort(tags);
-            }
-
-            return definitions;
-        });
-    }
-
-    findTermsDeinflected(text, dictionaries, cache) {
-        const definer = term => {
-            if (cache.hasOwnProperty(term)) {
-                return Promise.resolve(cache[term]);
-            }
-
-            return this.database.findTerms(term, dictionaries).then(definitions => cache[term] = definitions);
-        };
-
-        const promises = [];
-        for (let i = text.length; i > 0; --i) {
-            promises.push(this.deinflector.deinflect(text.slice(0, i), definer));
-        }
-
-        return Promise.all(promises).then(results => {
-            let deinflections = [];
-            for (const result of results) {
-                deinflections = deinflections.concat(result);
-            }
-
-            return deinflections;
-        });
-    }
-
-    processKanji(definitions) {
         for (const definition of definitions) {
             const tags = definition.tags.map(tag => dictTagBuild(tag, definition.tagMeta));
+            tags.push(dictTagBuildSource(definition.dictionary));
             definition.tags = dictTagsSort(tags);
         }
 
