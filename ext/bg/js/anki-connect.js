@@ -20,69 +20,50 @@
 class AnkiConnect {
     constructor(server) {
         this.server = server;
-        this.asyncPools = {};
         this.localVersion = 2;
-        this.remoteVersion = null;
+        this.remoteVersion = 0;
     }
 
-    addNote(note) {
-        return this.checkVersion().then(() => this.ankiInvoke('addNote', {note}));
+    async addNote(note) {
+        await this.checkVersion();
+        return await this.ankiInvoke('addNote', {note});
     }
 
-    canAddNotes(notes) {
-        return this.checkVersion().then(() => this.ankiInvoke('canAddNotes', {notes}, 'notes'));
+    async canAddNotes(notes) {
+        await this.checkVersion();
+        return await this.ankiInvoke('canAddNotes', {notes});
     }
 
-    getDeckNames() {
-        return this.checkVersion().then(() => this.ankiInvoke('deckNames', {}));
+    async getDeckNames() {
+        await this.checkVersion();
+        return await this.ankiInvoke('deckNames');
     }
 
-    getModelNames() {
-        return this.checkVersion().then(() => this.ankiInvoke('modelNames', {}));
+    async getModelNames() {
+        await this.checkVersion();
+        return await this.ankiInvoke('modelNames');
     }
 
-    getModelFieldNames(modelName) {
-        return this.checkVersion().then(() => this.ankiInvoke('modelFieldNames', {modelName}));
+    async getModelFieldNames(modelName) {
+        await this.checkVersion();
+        return await this.ankiInvoke('modelFieldNames', {modelName});
     }
 
-    guiBrowse(query) {
-        return this.checkVersion().then(() => this.ankiInvoke('guiBrowse', {query}));
+    async guiBrowse(query) {
+        await this.checkVersion();
+        return await this.ankiInvoke('guiBrowse', {query});
     }
 
-    checkVersion() {
-        if (this.localVersion === this.remoteVersion) {
-            return Promise.resolve(true);
-        }
-
-        return this.ankiInvoke('version', {}, null).then(version => {
-            this.remoteVersion = version;
+    async checkVersion() {
+        if (this.remoteVersion < this.localVersion) {
+            this.remoteVersion = await this.ankiInvoke('version');
             if (this.remoteVersion < this.localVersion) {
                 return Promise.reject('extension and plugin versions incompatible');
             }
-        });
+        }
     }
 
-    ankiInvoke(action, params, pool) {
-        return new Promise((resolve, reject) => {
-            if (pool && this.asyncPools.hasOwnProperty(pool)) {
-                this.asyncPools[pool].abort();
-            }
-
-            const xhr = new XMLHttpRequest();
-            xhr.addEventListener('loadend', () => {
-                if (pool) {
-                    delete this.asyncPools[pool];
-                }
-
-                if (xhr.responseText) {
-                    resolve(JSON.parse(xhr.responseText));
-                } else {
-                    reject('unable to connect to plugin');
-                }
-            });
-
-            xhr.open('POST', this.server);
-            xhr.send(JSON.stringify({action, params}));
-        });
+    ankiInvoke(action, params) {
+        return jsonRequest(this.server, 'POST', {action, params, version: this.localVersion});
     }
 }

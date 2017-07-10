@@ -18,27 +18,27 @@
 
 
 class AnkiNull {
-    addNote(note) {
-        return Promise.reject('unsupported action');
+    async addNote(note) {
+        return null;
     }
 
-    canAddNotes(notes) {
-        return Promise.resolve([]);
+    async canAddNotes(notes) {
+        return [];
     }
 
-    getDeckNames() {
-        return Promise.resolve([]);
+    async getDeckNames() {
+        return [];
     }
 
-    getModelNames() {
-        return Promise.resolve([]);
+    async getModelNames() {
+        return [];
     }
 
-    getModelFieldNames(modelName) {
-        return Promise.resolve([]);
+    async getModelFieldNames(modelName) {
+        return [];
     }
 
-    guiBrowse(query) {
-        return Promise.resolve([]);
+    async guiBrowse(query) {
+        return [];
     }
 }
