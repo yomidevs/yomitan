@@ -32,8 +32,7 @@ class Database {
             if (db.verno !== this.version) {
                 await db.delete();
             }
-        }
-        catch(error) {
+        } catch(e) {
             // NOP
         }
     }
