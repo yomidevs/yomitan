@@ -17,10 +17,6 @@
  */
 
 
-/*
- * Audio
- */
-
 async function audioBuildUrl(definition, mode, cache={}) {
     if (mode === 'jpod101') {
         let kana = definition.reading;
