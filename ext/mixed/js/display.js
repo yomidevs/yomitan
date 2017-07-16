@@ -80,7 +80,7 @@ class Display {
         if (context) {
             for (const definition of definitions) {
                 if (context.sentence) {
-                    definition.cloze = clozeBuild(context.sentence, definition.source);
+                    definition.cloze = Display.clozeBuild(context.sentence, definition.source);
                 }
 
                 definition.url = context.url;
@@ -119,7 +119,7 @@ class Display {
         if (context) {
             for (const definition of definitions) {
                 if (context.sentence) {
-                    definition.cloze = clozeBuild(context.sentence);
+                    definition.cloze = Display.clozeBuild(context.sentence);
                 }
 
                 definition.url = context.url;
@@ -392,6 +392,20 @@ class Display {
                 };
             }
         }).catch(this.handleError.bind(this)).then(() => this.spinner.hide());
+    }
+
+    static clozeBuild(sentence, source) {
+        const result = {
+            sentence: sentence.text.trim()
+        };
+
+        if (source) {
+            result.prefix = sentence.text.substring(0, sentence.offset).trim();
+            result.body = source.trim();
+            result.suffix = sentence.text.substring(sentence.offset + source.length).trim();
+        }
+
+        return result;
     }
 
     static entryIndexFind(element) {
