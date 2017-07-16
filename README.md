@@ -132,7 +132,7 @@ Flashcard fields can be configured with the following steps:
     `{expression}` | Term expressed as Kanji (will be displayed in Kana if Kanji is not available).
     `{furigana}` | Term expressed as Kanji with Furigana displayed above it (e.g. <ruby>日本語<rt>にほんご</rt></ruby>).
     `{glossary}` | List of definitions for the term (output format depends on whether running in *grouped* mode).
-    `{glossary-brief}` | Shorter version of `{glossary}`, without `{tags}`
+    `{glossary-brief}` | Shorter version of `{glossary}`, without `{tags}`.
     `{reading}` | Kana reading for the term (empty for terms where the expression is the reading).
     `{sentence}` | Sentence, quote, or phrase in which the term appears in the source content.
     `{tags}` | Grammar and usage tags providing information about the term (unavailable in *grouped* mode).
