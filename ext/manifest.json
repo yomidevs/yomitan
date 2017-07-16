@@ -25,7 +25,7 @@
     }],
     "minimum_chrome_version": "57.0.0.0",
     "options_ui": {
-        "page": "bg/options.html"
+        "page": "bg/settings.html"
     },
     "permissions": [
         "<all_urls>",
