@@ -351,6 +351,7 @@ function ankiFieldsPopulate(element, options) {
             'expression',
             'furigana',
             'glossary',
+            'glossary-brief',
             'reading',
             'sentence',
             'tags',

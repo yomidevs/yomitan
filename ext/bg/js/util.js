@@ -400,6 +400,7 @@ function dictFieldFormat(field, definition, mode, options) {
         'expression',
         'furigana',
         'glossary',
+        'glossary-brief',
         'kunyomi',
         'onyomi',
         'reading',
