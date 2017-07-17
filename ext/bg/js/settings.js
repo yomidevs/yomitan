@@ -94,7 +94,7 @@ function formUpdateVisibility(options) {
     }
 }
 
-async function onFormOptionsChanged(e) { (async () => {
+async function onFormOptionsChanged(e) {(async () => {
     if (!e.originalEvent && !e.isTrigger) {
         return;
     }
@@ -243,7 +243,7 @@ async function dictionaryGroupsPopulate(options) {
     });
 }
 
-async function onDictionaryPurge(e) { (async () => {
+async function onDictionaryPurge(e) {(async () => {
     e.preventDefault();
 
     const dictControls = $('#dict-importer, #dict-groups').hide();
@@ -269,7 +269,7 @@ async function onDictionaryPurge(e) { (async () => {
     }
 })();}
 
-function onDictionaryImport(e) { (async () => {
+function onDictionaryImport(e) {(async () => {
     const dictFile = $('#dict-file');
     const dictControls = $('#dict-importer').hide();
     const dictProgress = $('#dict-import-progress').show();
@@ -414,7 +414,7 @@ function onAnkiMarkerClicked(e) {
     $(link).closest('.input-group').find('.anki-field-value').val(`{${link.text}}`).trigger('change');
 }
 
-function onAnkiModelChanged(e) { (async () => {
+function onAnkiModelChanged(e) {(async () => {
     if (!e.originalEvent) {
         return;
     }
