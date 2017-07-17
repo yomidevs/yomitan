@@ -49,7 +49,7 @@ async function formRead() {
     optionsNew.anki.sentenceExt = parseInt($('#sentence-detection-extent').val(), 10);
     optionsNew.anki.server = $('#interface-server').val();
 
-    if (optionsOld.anki.enable && !$('#anki-error').is(':visible')) {
+    if (optionsOld.anki.enable && !ankiErrorShown()) {
         optionsNew.anki.terms.deck = $('#anki-terms-deck').val();
         optionsNew.anki.terms.model = $('#anki-terms-model').val();
         optionsNew.anki.terms.fields = ankiFieldsToDict($('#terms .anki-field-value'));
@@ -69,7 +69,7 @@ async function formRead() {
     return {optionsNew, optionsOld};
 }
 
-function updateVisibility(options) {
+function formUpdateVisibility(options) {
     const general = $('#anki-general');
     if (options.anki.enable) {
         general.show();
@@ -94,7 +94,7 @@ function updateVisibility(options) {
     }
 }
 
-async function onOptionsChanged(e) { (async () => {
+async function onFormOptionsChanged(e) { (async () => {
     if (!e.originalEvent && !e.isTrigger) {
         return;
     }
@@ -106,7 +106,7 @@ async function onOptionsChanged(e) { (async () => {
         const {optionsNew, optionsOld} = await formRead();
         await optionsSave(optionsNew);
 
-        updateVisibility(optionsNew);
+        formUpdateVisibility(optionsNew);
 
         const ankiUpdated =
             optionsNew.anki.enable !== optionsOld.anki.enable ||
@@ -153,7 +153,7 @@ function onReady() {(async () => {
     $('#generate-html-cards').prop('checked', options.anki.htmlCards);
     $('#sentence-detection-extent').val(options.anki.sentenceExt);
     $('#interface-server').val(options.anki.server);
-    $('input, select').not('.anki-model').change(onOptionsChanged);
+    $('input, select').not('.anki-model').change(onFormOptionsChanged);
     $('.anki-model').change(onAnkiModelChanged);
 
     try {
@@ -168,7 +168,7 @@ function onReady() {(async () => {
         ankiErrorShow(e);
     }
 
-    updateVisibility(options);
+    formUpdateVisibility(options);
 })();}
 
 $(document).ready(onReady);
@@ -235,11 +235,11 @@ async function dictionaryGroupsPopulate(options) {
         dictGroups.append($(dictHtml));
     }
 
-    updateVisibility(options);
+    formUpdateVisibility(options);
 
     $('.dict-enabled, .dict-priority').change(e => {
         dictionaryGroupsSort();
-        onOptionsChanged(e);
+        onFormOptionsChanged(e);
     });
 }
 
@@ -322,6 +322,10 @@ function ankiErrorShow(error) {
     }
 }
 
+function ankiErrorShown() {
+    return $('#anki-error').is(':visible');
+}
+
 function ankiFieldsToDict(selection) {
     const result = {};
     selection.each((index, element) => {
@@ -333,6 +337,11 @@ function ankiFieldsToDict(selection) {
 
 async function ankiDeckAndModelPopulate(options) {
     const ankiFormat = $('#anki-format').hide();
+    const ankiTermsModel = $('#anki-terms-model').val(options.anki.terms.model);
+    const ankiKanjiModel = $('#anki-kanji-model').val(options.anki.kanji.model);
+
+    $('#anki-terms-deck').val(options.anki.terms.deck);
+    $('#anki-kanji-deck').val(options.anki.kanji.deck);
 
     const deckNames = await instAnki().getDeckNames();
     const ankiDeck = $('.anki-deck');
@@ -344,11 +353,8 @@ async function ankiDeckAndModelPopulate(options) {
     ankiModel.find('option').remove();
     modelNames.sort().forEach(name => ankiModel.append($('<option/>', {value: name, text: name})));
 
-    $('#anki-terms-deck').val(options.anki.terms.deck);
-    await ankiFieldsPopulate($('#anki-terms-model').val(options.anki.terms.model), options);
-
-    $('#anki-kanji-deck').val(options.anki.kanji.deck);
-    await ankiFieldsPopulate($('#anki-kanji-model').val(options.anki.kanji.model), options);
+    await ankiFieldsPopulate(ankiTermsModel, options);
+    await ankiFieldsPopulate(ankiKanjiModel, options);
 
     ankiFormat.show();
 }
@@ -397,12 +403,14 @@ async function ankiFieldsPopulate(element, options) {
         container.append($(html));
     }
 
-    tab.find('.anki-field-value').change(onOptionsChanged);
-    tab.find('.marker-link').click(e => {
-        e.preventDefault();
-        const link = e.target;
-        $(link).closest('.input-group').find('.anki-field-value').val(`{${link.text}}`).trigger('change');
-    });
+    tab.find('.anki-field-value').change(onFormOptionsChanged);
+    tab.find('.marker-link').click(onAnkiMarkerClicked);
+}
+
+function onAnkiMarkerClicked(e) {
+    e.preventDefault();
+    const link = e.target;
+    $(link).closest('.input-group').find('.anki-field-value').val(`{${link.text}}`).trigger('change');
 }
 
 function onAnkiModelChanged(e) { (async () => {
