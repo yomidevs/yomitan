@@ -195,6 +195,14 @@ window.yomichan = new class {
     }
 
     onMessage({action, params}, sender, callback) {
+        const promiseCallback = (promise, callback) => {
+            return promise.then(result => {
+                callback({result});
+            }).catch(error => {
+                callback({error});
+            });
+        };
+
         const handlers = {
             optionsGet: ({callback}) => {
                 promiseCallback(optionsLoad(), callback);

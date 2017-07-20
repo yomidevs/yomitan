@@ -18,19 +18,6 @@
 
 
 /*
- * Promise
- */
-
-function promiseCallback(promise, callback) {
-    return promise.then(result => {
-        callback({result});
-    }).catch(error => {
-        callback({error});
-    });
-}
-
-
-/*
  * Commands
  */
 
@@ -70,31 +57,4 @@ function fgBroadcast(action, params) {
 
 function fgOptionsSet(options) {
     fgBroadcast('optionsSet', options);
-}
-
-
-/*
- * JSON
- */
-
-function jsonRequest(url, action, params) {
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.overrideMimeType('application/json');
-        xhr.addEventListener('load', () => resolve(xhr.responseText));
-        xhr.addEventListener('error', () => reject('failed to execute network request'));
-        xhr.open(action, url);
-        if (params) {
-            xhr.send(JSON.stringify(params));
-        } else {
-            xhr.send();
-        }
-    }).then(responseText => {
-        try {
-            return JSON.parse(responseText);
-        }
-        catch (e) {
-            return Promise.reject('invalid JSON response');
-        }
-    });
 }

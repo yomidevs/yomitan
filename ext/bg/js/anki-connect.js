@@ -64,6 +64,6 @@ class AnkiConnect {
     }
 
     ankiInvoke(action, params) {
-        return jsonRequest(this.server, 'POST', {action, params, version: this.localVersion});
+        return requestJson(this.server, 'POST', {action, params, version: this.localVersion});
     }
 }
