@@ -18,6 +18,8 @@
 
 
 $(document).ready(() => {
+    const commandExec = command => instYomi().onCommand(command);
+
     $('#open-search').click(() => commandExec('search'));
     $('#open-options').click(() => commandExec('options'));
     $('#open-help').click(() => commandExec('help'));

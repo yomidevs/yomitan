@@ -17,19 +17,6 @@
  */
 
 
-/*
- * Commands
- */
-
-function commandExec(command) {
-    instYomi().onCommand(command);
-}
-
-
-/*
- * Instance
- */
-
 function instYomi() {
     return chrome.extension.getBackgroundPage().yomichan;
 }
@@ -40,21 +27,4 @@ function instDb() {
 
 function instAnki() {
     return instYomi().anki;
-}
-
-
-/*
- * Foreground
- */
-
-function fgBroadcast(action, params) {
-    chrome.tabs.query({}, tabs => {
-        for (const tab of tabs) {
-            chrome.tabs.sendMessage(tab.id, {action, params}, () => null);
-        }
-    });
-}
-
-function fgOptionsSet(options) {
-    fgBroadcast('optionsSet', options);
 }

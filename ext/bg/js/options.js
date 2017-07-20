@@ -127,6 +127,5 @@ function optionsSave(options) {
         chrome.storage.local.set({options: JSON.stringify(options)}, resolve);
     }).then(() => {
         instYomi().optionsSet(options);
-        fgOptionsSet(options);
     });
 }

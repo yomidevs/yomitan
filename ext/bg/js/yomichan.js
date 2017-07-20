@@ -59,6 +59,12 @@ window.yomichan = new class {
         } else {
             this.anki = new AnkiNull();
         }
+
+        chrome.tabs.query({}, tabs => {
+            for (const tab of tabs) {
+                chrome.tabs.sendMessage(tab.id, {action: 'optionsSet', params: options}, () => null);
+            }
+        });
     }
 
     noteFormat(definition, mode) {
