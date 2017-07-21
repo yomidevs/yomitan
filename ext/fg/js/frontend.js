@@ -17,7 +17,7 @@
  */
 
 
-window.driver = new class {
+window.frontend = new class {
     constructor() {
         this.popup = new Popup();
         this.popupTimer = null;
