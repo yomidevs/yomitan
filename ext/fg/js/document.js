@@ -17,59 +17,6 @@
  */
 
 
-/*
- * Background
- */
-
-function bgInvoke(action, params) {
-    return new Promise((resolve, reject) => {
-        try {
-            chrome.runtime.sendMessage({action, params}, ({result, error}) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(result);
-                }
-            });
-        } catch (e) {
-            window.orphaned = true;
-            reject(e.message);
-        }
-    });
-}
-
-function bgOptionsGet() {
-    return bgInvoke('optionsGet', {});
-}
-
-function bgTermsFind(text) {
-    return bgInvoke('termsFind', {text});
-}
-
-function bgKanjiFind(text) {
-    return bgInvoke('kanjiFind', {text});
-}
-
-function bgTemplateRender(template, data) {
-    return bgInvoke('templateRender', {data, template});
-}
-
-function bgDefinitionsAddable(definitions, modes) {
-    return bgInvoke('definitionsAddable', {definitions, modes}).catch(() => null);
-}
-
-function bgDefinitionAdd(definition, mode) {
-    return bgInvoke('definitionAdd', {definition, mode});
-}
-
-function bgNoteView(noteId) {
-    return bgInvoke('noteView', {noteId});
-}
-
-/*
- * Document
- */
-
 function docOffsetCalc(element) {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
     const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft;
