@@ -17,7 +17,7 @@
  */
 
 
-window.frontend = new class {
+window.yomichanFrontend = new class {
     constructor() {
         this.popup = new Popup();
         this.popupTimer = null;

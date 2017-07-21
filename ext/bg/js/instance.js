@@ -18,7 +18,7 @@
 
 
 function instYomi() {
-    return chrome.extension.getBackgroundPage().yomichan;
+    return chrome.extension.getBackgroundPage().yomichanBackend;
 }
 
 function instDb() {

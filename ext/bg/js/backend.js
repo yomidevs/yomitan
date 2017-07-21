@@ -17,7 +17,7 @@
  */
 
 
-window.yomichan = new class {
+window.yomichanBackend = new class {
     constructor() {
         handlebarsRegister();
 
