@@ -28,7 +28,7 @@ function bgInvoke(action, params={}) {
                 }
             });
         } catch (e) {
-            window.orphaned = true;
+            window.yomichanOrphaned = true;
             reject(e.message);
         }
     });

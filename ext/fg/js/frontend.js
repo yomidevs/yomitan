@@ -238,7 +238,7 @@ window.yomichanFrontend = new class {
     }
 
     handleError(error, textSource) {
-        if (window.orphaned) {
+        if (window.yomichanOrphaned) {
             if (textSource && this.options.scanning.modifier !== 'none') {
                 this.popup.showOrphaned(textSource.getRect(), this.options);
             }

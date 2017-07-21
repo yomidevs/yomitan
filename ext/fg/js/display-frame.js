@@ -44,7 +44,7 @@ window.displayFrame = new class extends Display {
     }
 
     handleError(error) {
-        if (window.orphaned) {
+        if (window.yomichanOrphaned) {
             this.showOrphaned();
         } else {
             window.alert(`Error: ${error}`);
