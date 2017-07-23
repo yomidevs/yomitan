@@ -24,23 +24,23 @@ window.displayFrame = new class extends Display {
     }
 
     definitionAdd(definition, mode) {
-        return bgDefinitionAdd(definition, mode);
+        return apiDefinitionAdd(definition, mode);
     }
 
     definitionsAddable(definitions, modes) {
-        return bgDefinitionsAddable(definitions, modes);
+        return apiDefinitionsAddable(definitions, modes);
     }
 
     noteView(noteId) {
-        return bgNoteView(noteId);
+        return apiNoteView(noteId);
     }
 
     templateRender(template, data) {
-        return bgTemplateRender(template, data);
+        return apiTemplateRender(template, data);
     }
 
     kanjiFind(character) {
-        return bgKanjiFind(character);
+        return apiKanjiFind(character);
     }
 
     handleError(error) {

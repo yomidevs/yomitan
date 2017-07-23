@@ -17,7 +17,7 @@
  */
 
 
-function bgInvoke(action, params={}) {
+function apiInvoke(action, params={}) {
     return new Promise((resolve, reject) => {
         try {
             chrome.runtime.sendMessage({action, params}, ({result, error}) => {
@@ -34,30 +34,30 @@ function bgInvoke(action, params={}) {
     });
 }
 
-function bgOptionsGet() {
-    return bgInvoke('optionsGet');
+function apiOptionsGet() {
+    return apiInvoke('optionsGet');
 }
 
-function bgTermsFind(text) {
-    return bgInvoke('termsFind', {text});
+function apiTermsFind(text) {
+    return apiInvoke('termsFind', {text});
 }
 
-function bgKanjiFind(text) {
-    return bgInvoke('kanjiFind', {text});
+function apiKanjiFind(text) {
+    return apiInvoke('kanjiFind', {text});
 }
 
-function bgTemplateRender(template, data) {
-    return bgInvoke('templateRender', {data, template});
+function apiTemplateRender(template, data) {
+    return apiInvoke('templateRender', {data, template});
 }
 
-function bgDefinitionsAddable(definitions, modes) {
-    return bgInvoke('definitionsAddable', {definitions, modes}).catch(() => null);
+function apiDefinitionsAddable(definitions, modes) {
+    return apiInvoke('definitionsAddable', {definitions, modes}).catch(() => null);
 }
 
-function bgDefinitionAdd(definition, mode) {
-    return bgInvoke('definitionAdd', {definition, mode});
+function apiDefinitionAdd(definition, mode) {
+    return apiInvoke('definitionAdd', {definition, mode});
 }
 
-function bgNoteView(noteId) {
-    return bgInvoke('noteView', {noteId});
+function apiNoteView(noteId) {
+    return apiInvoke('noteView', {noteId});
 }

@@ -18,7 +18,7 @@
             "fg/js/document.js",
             "fg/js/source-range.js",
             "fg/js/source-element.js",
-            "fg/js/background.js",
+            "fg/js/api.js",
             "fg/js/popup.js",
             "fg/js/frontend.js"
         ],

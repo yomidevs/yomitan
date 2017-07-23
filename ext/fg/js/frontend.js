@@ -28,7 +28,7 @@ window.yomichanFrontend = new class {
         this.pendingLookup = false;
         this.options = null;
 
-        bgOptionsGet().then(options => {
+        apiOptionsGet().then(options => {
             this.options = options;
             window.addEventListener('mouseover', this.onMouseOver.bind(this));
             window.addEventListener('mousedown', this.onMouseDown.bind(this));
@@ -175,7 +175,7 @@ window.yomichanFrontend = new class {
     searchTerms(textSource) {
         textSource.setEndOffset(this.options.scanning.length);
 
-        return bgTermsFind(textSource.text()).then(({definitions, length}) => {
+        return apiTermsFind(textSource.text()).then(({definitions, length}) => {
             if (definitions.length === 0) {
                 return false;
             } else {
@@ -203,7 +203,7 @@ window.yomichanFrontend = new class {
     searchKanji(textSource) {
         textSource.setEndOffset(1);
 
-        return bgKanjiFind(textSource.text()).then(definitions => {
+        return apiKanjiFind(textSource.text()).then(definitions => {
             if (definitions.length === 0) {
                 return false;
             } else {
