@@ -17,7 +17,7 @@
  */
 
 
-window.yomichanBackend = new class {
+class Backend {
     constructor() {
         handlebarsRegister();
 
@@ -26,225 +26,20 @@ window.yomichanBackend = new class {
         this.options = null;
 
         this.translator.prepare().then(optionsLoad).then(options => {
-            this.optionsSet(options);
+            apiOptionsSet(options);
 
-            chrome.commands.onCommand.addListener(this.onCommand.bind(this));
-            chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
+            chrome.commands.onCommand.addListener(utilCommandDispatch);
+            chrome.runtime.onMessage.addListener(utilMessageDispatch);
 
-            if (this.options.general.showGuide) {
+            if (options.general.showGuide) {
                 chrome.tabs.create({url: chrome.extension.getURL('/bg/guide.html')});
             }
         });
     }
 
-    optionsSet(options) {
-        // In Firefox, setting options from the options UI somehow carries references
-        // to the DOM across to the background page, causing the options object to
-        // become a "DeadObject" after the options page is closed. The workaround used
-        // here is to create a deep copy of the options object.
-        this.options = JSON.parse(JSON.stringify(options));
-
-        if (!this.options.general.enable) {
-            chrome.browserAction.setBadgeBackgroundColor({color: '#d9534f'});
-            chrome.browserAction.setBadgeText({text: 'off'});
-        } else if (!dictConfigured(this.options)) {
-            chrome.browserAction.setBadgeBackgroundColor({color: '#f0ad4e'});
-            chrome.browserAction.setBadgeText({text: '!'});
-        } else {
-            chrome.browserAction.setBadgeText({text: ''});
-        }
-
-        if (this.options.anki.enable) {
-            this.anki = new AnkiConnect(this.options.anki.server);
-        } else {
-            this.anki = new AnkiNull();
-        }
-
-        chrome.tabs.query({}, tabs => {
-            for (const tab of tabs) {
-                chrome.tabs.sendMessage(tab.id, {action: 'optionsSet', params: options}, () => null);
-            }
-        });
-    }
-
-    noteFormat(definition, mode) {
-        const note = {
-            fields: {},
-            tags: this.options.anki.tags
-        };
-
-        let fields = [];
-        if (mode === 'kanji') {
-            fields = this.options.anki.kanji.fields;
-            note.deckName = this.options.anki.kanji.deck;
-            note.modelName = this.options.anki.kanji.model;
-        } else {
-            fields = this.options.anki.terms.fields;
-            note.deckName = this.options.anki.terms.deck;
-            note.modelName = this.options.anki.terms.model;
-
-            if (definition.audio) {
-                const audio = {
-                    url: definition.audio.url,
-                    filename: definition.audio.filename,
-                    skipHash: '7e2c2f954ef6051373ba916f000168dc',
-                    fields: []
-                };
-
-                for (const name in fields) {
-                    if (fields[name].includes('{audio}')) {
-                        audio.fields.push(name);
-                    }
-                }
-
-                if (audio.fields.length > 0) {
-                    note.audio = audio;
-                }
-            }
-        }
-
-        for (const name in fields) {
-            note.fields[name] = dictFieldFormat(
-                fields[name],
-                definition,
-                mode,
-                this.options
-            );
-        }
-
-        return note;
-    }
-
-    termsFind(text) {
-        const searcher = this.options.general.groupResults ?
-            this.translator.findTermsGrouped.bind(this.translator) :
-            this.translator.findTerms.bind(this.translator);
-
-        return searcher(text, dictEnabledSet(this.options), this.options.scanning.alphanumeric).then(({definitions, length}) => {
-            return {length, definitions: definitions.slice(0, this.options.general.maxResults)};
-        });
-    }
-
-    kanjiFind(text) {
-        return this.translator.findKanji(text, dictEnabledSet(this.options)).then(definitions => {
-            return definitions.slice(0, this.options.general.maxResults);
-        });
-    }
-
-    definitionAdd(definition, mode) {
-        let promise = Promise.resolve();
-        if (mode !== 'kanji') {
-            promise = audioInject(definition, this.options.anki.terms.fields, this.options.general.audioSource);
-        }
-
-        return promise.then(() => {
-            const note = this.noteFormat(definition, mode);
-            return this.anki.addNote(note);
-        });
-    }
-
-    definitionsAddable(definitions, modes) {
-        const notes = [];
-        for (const definition of definitions) {
-            for (const mode of modes) {
-                notes.push(this.noteFormat(definition, mode));
-            }
-        }
-
-        return this.anki.canAddNotes(notes).then(raw => {
-            const states = [];
-            for (let resultBase = 0; resultBase < raw.length; resultBase += modes.length) {
-                const state = {};
-                for (let modeOffset = 0; modeOffset < modes.length; ++modeOffset) {
-                    state[modes[modeOffset]] = raw[resultBase + modeOffset];
-                }
-
-                states.push(state);
-            }
-
-            return states;
-        });
-    }
-
-    noteView(noteId) {
-        return this.anki.guiBrowse(`nid:${noteId}`);
-    }
-
-    templateRender(template, data) {
-        return Promise.resolve(handlebarsRender(template, data));
-    }
-
-    onCommand(command) {
-        const handlers = {
-            search: () => {
-                chrome.tabs.create({url: chrome.extension.getURL('/bg/search.html')});
-            },
-
-            help: () => {
-                chrome.tabs.create({url: 'https://foosoft.net/projects/yomichan/'});
-            },
-
-            options: () => {
-                chrome.runtime.openOptionsPage();
-            },
-
-            toggle: () => {
-                this.options.general.enable = !this.options.general.enable;
-                optionsSave(this.options).then(() => this.optionsSet(this.options));
-            }
-        };
-
-        const handler = handlers[command];
-        if (handler) {
-            handler();
-        }
-    }
-
-    onMessage({action, params}, sender, callback) {
-        const promiseCallback = (promise, callback) => {
-            return promise.then(result => {
-                callback({result});
-            }).catch(error => {
-                callback({error});
-            });
-        };
-
-        const handlers = {
-            optionsGet: ({callback}) => {
-                promiseCallback(optionsLoad(), callback);
-            },
-
-            kanjiFind: ({text, callback}) => {
-                promiseCallback(this.kanjiFind(text), callback);
-            },
-
-            termsFind: ({text, callback}) => {
-                promiseCallback(this.termsFind(text), callback);
-            },
-
-            templateRender: ({template, data, callback}) => {
-                promiseCallback(this.templateRender(template, data), callback);
-            },
-
-            definitionAdd: ({definition, mode, callback}) => {
-                promiseCallback(this.definitionAdd(definition, mode), callback);
-            },
-
-            definitionsAddable: ({definitions, modes, callback}) => {
-                promiseCallback(this.definitionsAddable(definitions, modes), callback);
-            },
-
-            noteView: ({noteId}) => {
-                promiseCallback(this.noteView(noteId), callback);
-            }
-        };
-
-        const handler = handlers[action];
-        if (handler) {
-            params.callback = callback;
-            handler(params);
-        }
-
-        return true;
+    static instance() {
+        return chrome.extension.getBackgroundPage().yomichanBackend;
     }
 };
+
+window.yomichanBackend = new Backend();

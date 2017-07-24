@@ -32,26 +32,6 @@ class Display {
         $(document).keydown(this.onKeyDown.bind(this));
     }
 
-    definitionAdd(definition, mode) {
-        throw 'override me';
-    }
-
-    definitionsAddable(definitions, modes) {
-        throw 'override me';
-    }
-
-    noteView(noteId) {
-        throw 'override me';
-    }
-
-    templateRender(template, data) {
-        throw 'override me';
-    }
-
-    kanjiFind(character) {
-        throw 'override me';
-    }
-
     handleError(error) {
         throw 'override me';
     }
@@ -87,7 +67,7 @@ class Display {
             }
         }
 
-        this.templateRender('terms.html', params).then(content => {
+        apiTemplateRender('terms.html', params).then(content => {
             this.container.html(content);
             this.entryScroll(context && context.index || 0);
 
@@ -126,7 +106,7 @@ class Display {
             }
         }
 
-        this.templateRender('kanji.html', params).then(content => {
+        apiTemplateRender('kanji.html', params).then(content => {
             this.container.html(content);
             this.entryScroll(context && context.index || 0);
 
@@ -138,7 +118,7 @@ class Display {
     }
 
     adderButtonsUpdate(modes, sequence) {
-        return this.definitionsAddable(this.definitions, modes).then(states => {
+        return apiDefinitionsAddable(this.definitions, modes).then(states => {
             if (!states || sequence !== this.sequence) {
                 return;
             }
@@ -198,7 +178,7 @@ class Display {
             context.url = this.context.url;
         }
 
-        this.kanjiFind(link.text()).then(kanjiDefs => {
+        apiKanjiFind(link.text()).then(kanjiDefs => {
             this.showKanjiDefs(kanjiDefs, this.options, context);
         }).catch(this.handleError.bind(this));
     }
@@ -220,7 +200,7 @@ class Display {
         e.preventDefault();
         const link = $(e.currentTarget);
         const index = Display.entryIndexFind(link);
-        this.noteView(link.data('noteId'));
+        apiNoteView(link.data('noteId'));
     }
 
     onKeyDown(e) {
@@ -234,7 +214,7 @@ class Display {
         const noteTryView = mode => {
             const button = Display.viewerButtonFind(this.index);
             if (button.length !== 0 && !button.hasClass('disabled')) {
-                this.noteView(button.data('noteId'));
+                apiNoteView(button.data('noteId'));
             }
         };
 
@@ -351,7 +331,7 @@ class Display {
 
     noteAdd(definition, mode) {
         this.spinner.show();
-        return this.definitionAdd(definition, mode).then(noteId => {
+        return apiDefinitionAdd(definition, mode).then(noteId => {
             if (noteId) {
                 const index = this.definitions.indexOf(definition);
                 Display.adderButtonFind(index, mode).addClass('disabled');

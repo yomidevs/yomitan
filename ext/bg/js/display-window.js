@@ -29,26 +29,6 @@ window.displayWindow = new class extends Display {
         window.wanakana.bind(query.get(0));
     }
 
-    definitionAdd(definition, mode) {
-        return instYomi().definitionAdd(definition, mode);
-    }
-
-    definitionsAddable(definitions, modes) {
-        return instYomi().definitionsAddable(definitions, modes).catch(() => []);
-    }
-
-    noteView(noteId) {
-        return instYomi().noteView(noteId);
-    }
-
-    templateRender(template, data) {
-        return instYomi().templateRender(template, data);
-    }
-
-    kanjiFind(character) {
-        return instYomi().kanjiFind(character);
-    }
-
     handleError(error) {
         window.alert(`Error: ${error}`);
     }
