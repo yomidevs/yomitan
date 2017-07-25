@@ -18,16 +18,14 @@
 
 
 $(document).ready(() => {
-    const commandExec = command => instYomi().onCommand(command);
-
-    $('#open-search').click(() => commandExec('search'));
-    $('#open-options').click(() => commandExec('options'));
-    $('#open-help').click(() => commandExec('help'));
+    $('#open-search').click(() => utilCommandDispatch('search'));
+    $('#open-options').click(() => utilCommandDispatch('options'));
+    $('#open-help').click(() => utilCommandDispatch('help'));
 
     optionsLoad().then(options => {
         const toggle = $('#enable-search');
         toggle.prop('checked', options.general.enable).change();
         toggle.bootstrapToggle();
-        toggle.change(() => commandExec('toggle'));
+        toggle.change(() => utilCommandDispatch('toggle'));
     });
 });
