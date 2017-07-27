@@ -189,20 +189,19 @@ class Database {
         };
 
         const termsLoaded = (title, entries, total, current) => {
-            const rows = [];
-            for (const [expression, reading, tags, rules, score, ...glossary] of entries) {
-                rows.push({
-                    expression,
-                    reading,
-                    tags,
-                    rules,
-                    score,
-                    glossary,
-                    dictionary: title
-                });
-            }
-
-            return this.db.terms.bulkAdd(rows).then(() => {
+            return this.db.transaction('rw', this.db.terms, function() {
+                for (const [expression, reading, tags, rules, score, ...glossary] of entries) {
+                    this.db.terms.add({
+                        expression,
+                        reading,
+                        tags,
+                        rules,
+                        score,
+                        glossary,
+                        dictionary: title
+                    });
+                }
+            }).then(() => {
                 if (callback) {
                     callback(total, current);
                 }
