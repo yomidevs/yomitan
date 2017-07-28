@@ -17,6 +17,10 @@
  */
 
 
+/*
+ * Helpers
+ */
+
 function utilMessageDispatch({action, params}, sender, callback) {
     const forward = (promise, callback) => {
         return promise.then(result => {
@@ -92,7 +96,7 @@ function utilCommandDispatch(command) {
 }
 
 function utilNoteFormat(definition, mode) {
-    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    const yomichan = chrome.extension.getBackgroundPage().yomichan;
     const options = yomichan.options;
     const note = {fields: {}, tags: options.anki.tags};
     let fields = [];
@@ -133,12 +137,17 @@ function utilNoteFormat(definition, mode) {
     return note;
 }
 
+
+/*
+ * API
+ */
+
 async function apiOptionsSet(options) {
     // In Firefox, setting options from the options UI somehow carries references
     // to the DOM across to the background page, causing the options object to
     // become a "DeadObject" after the options page is closed. The workaround used
     // here is to create a deep copy of the options object.
-    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    const yomichan = chrome.extension.getBackgroundPage().yomichan;
     yomichan.options = JSON.parse(JSON.stringify(options));
 
     if (!options.general.enable) {
@@ -165,12 +174,12 @@ async function apiOptionsSet(options) {
 }
 
 async function apiOptionsGet() {
-    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    const yomichan = chrome.extension.getBackgroundPage().yomichan;
     return yomichan.options;
 }
 
 async function apiTermsFind(text) {
-    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    const yomichan = chrome.extension.getBackgroundPage().yomichan;
     const options = yomichan.options;
     const translator = yomichan.translator;
 
@@ -191,14 +200,14 @@ async function apiTermsFind(text) {
 }
 
 async function apiKanjiFind(text) {
-    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    const yomichan = chrome.extension.getBackgroundPage().yomichan;
     const options = yomichan.options;
     const definitions = await yomichan.translator.findKanji(text, dictEnabledSet(options));
     return definitions.slice(0, options.general.maxResults);
 }
 
 async function apiDefinitionAdd(definition, mode) {
-    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    const yomichan = chrome.extension.getBackgroundPage().yomichan;
 
     if (mode !== 'kanji') {
         const options = yomichan.options;
@@ -220,7 +229,7 @@ async function apiDefinitionsAddable(definitions, modes) {
         }
     }
 
-    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    const yomichan = chrome.extension.getBackgroundPage().yomichan;
     const results = await yomichan.anki.canAddNotes(notes);
     const states = [];
     for (let resultBase = 0; resultBase < results.length; resultBase += modes.length) {
@@ -236,7 +245,7 @@ async function apiDefinitionsAddable(definitions, modes) {
 }
 
 async function apiNoteView(noteId) {
-    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    const yomichan = chrome.extension.getBackgroundPage().yomichan;
     return yomichan.anki.guiBrowse(`nid:${noteId}`);
 }
 
