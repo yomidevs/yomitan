@@ -18,6 +18,41 @@
 
 
 /*
+ * Utilities
+ */
+
+function utilAnkiGetModelNames() {
+    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    return yomichan.anki.getModelNames();
+}
+
+function utilAnkiGetDeckNames() {
+    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    return yomichan.anki.getDeckNames();
+}
+
+function utilAnkiGetModelFieldNames(modelName) {
+    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    return yomichan.anki.utilAnkiGetModelFieldNames(modelName);
+}
+
+function utilDatabaseGetDictionaries() {
+    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    return yomichan.translator.database.getDictionaries();
+}
+
+function utilDatabasePurge() {
+    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    return yomichan.translator.database.purge();
+}
+
+function utilDatabaseImport(data, progress) {
+    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    return yomichan.translator.database.importDictionary(data, progress);
+}
+
+
+/*
  * General
  */
 
@@ -217,7 +252,7 @@ async function dictionaryGroupsPopulate(options) {
     const dictGroups = $('#dict-groups').empty();
     const dictWarning = $('#dict-warning').hide();
 
-    const dictRows = await instDb().getDictionaries();
+    const dictRows = await utilDatabaseGetDictionaries();
     if (dictRows.length === 0) {
         dictWarning.show();
     }
@@ -253,7 +288,7 @@ async function onDictionaryPurge(e) {(async () => {
         dictionaryErrorShow();
         dictionarySpinnerShow(true);
 
-        await instDb().purge();
+        await utilDatabasePurge();
         const options = await optionsLoad();
         options.dictionaries = {};
         await optionsSave(options);
@@ -283,7 +318,7 @@ function onDictionaryImport(e) {(async () => {
         setProgress(0.0);
 
         const options = await optionsLoad();
-        const summary = await instDb().importDictionary(e.target.files[0], updateProgress);
+        const summary = await utilDatabaseImport(e.target.files[0], updateProgress);
         options.dictionaries[summary.title] = {enabled: true, priority: 0};
         await optionsSave(options);
 
@@ -344,12 +379,12 @@ async function ankiDeckAndModelPopulate(options) {
     $('#anki-terms-deck').val(options.anki.terms.deck);
     $('#anki-kanji-deck').val(options.anki.kanji.deck);
 
-    const deckNames = await instAnki().getDeckNames();
+    const deckNames = await utilAnkiGetDeckNames();
     const ankiDeck = $('.anki-deck');
     ankiDeck.find('option').remove();
     deckNames.sort().forEach(name => ankiDeck.append($('<option/>', {value: name, text: name})));
 
-    const modelNames = await instAnki().getModelNames();
+    const modelNames = await utilAnkiGetModelNames();
     const ankiModel = $('.anki-model');
     ankiModel.find('option').remove();
     modelNames.sort().forEach(name => ankiModel.append($('<option/>', {value: name, text: name})));
@@ -398,7 +433,7 @@ async function ankiFieldsPopulate(element, options) {
         ]
     }[tabId] || {};
 
-    for (const name of await instAnki().getModelFieldNames(modelName)) {
+    for (const name of await utilAnkiGetModelFieldNames(modelName)) {
         const value = options.anki[tabId].fields[name] || '';
         const html = Handlebars.templates['model.html']({name, markers, value});
         container.append($(html));

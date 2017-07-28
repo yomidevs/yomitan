@@ -17,7 +17,7 @@
  */
 
 
-class Backend {
+window.yomichanBackend = new class {
     constructor() {
         handlebarsRegister();
 
@@ -36,10 +36,4 @@ class Backend {
             }
         });
     }
-
-    static instance() {
-        return chrome.extension.getBackgroundPage().yomichanBackend;
-    }
-}
-
-window.yomichanBackend = new Backend();
+};

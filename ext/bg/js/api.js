@@ -92,7 +92,8 @@ function utilCommandDispatch(command) {
 }
 
 function utilNoteFormat(definition, mode) {
-    const options = Backend.instance().options;
+    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    const options = yomichan.options;
     const note = {fields: {}, tags: options.anki.tags};
     let fields = [];
 
@@ -137,7 +138,8 @@ async function apiOptionsSet(options) {
     // to the DOM across to the background page, causing the options object to
     // become a "DeadObject" after the options page is closed. The workaround used
     // here is to create a deep copy of the options object.
-    Backend.instance().options = JSON.parse(JSON.stringify(options));
+    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    yomichan.options = JSON.parse(JSON.stringify(options));
 
     if (!options.general.enable) {
         chrome.browserAction.setBadgeBackgroundColor({color: '#d9534f'});
@@ -150,9 +152,9 @@ async function apiOptionsSet(options) {
     }
 
     if (options.anki.enable) {
-        Backend.instance().anki = new AnkiConnect(options.anki.server);
+        yomichan.anki = new AnkiConnect(options.anki.server);
     } else {
-        Backend.instance().anki = new AnkiNull();
+        yomichan.anki = new AnkiNull();
     }
 
     chrome.tabs.query({}, tabs => {
@@ -163,12 +165,14 @@ async function apiOptionsSet(options) {
 }
 
 async function apiOptionsGet() {
-    return Backend.instance().options;
+    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    return yomichan.options;
 }
 
 async function apiTermsFind(text) {
-    const options = Backend.instance().options;
-    const translator = Backend.instance().translator;
+    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    const options = yomichan.options;
+    const translator = yomichan.translator;
 
     const searcher = options.general.groupResults ?
         translator.findTermsGrouped.bind(translator) :
@@ -187,14 +191,17 @@ async function apiTermsFind(text) {
 }
 
 async function apiKanjiFind(text) {
-    const options = Backend.instance().options;
-    const definitions = await Backend.instance().translator.findKanji(text, dictEnabledSet(options));
+    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    const options = yomichan.options;
+    const definitions = await yomichan.translator.findKanji(text, dictEnabledSet(options));
     return definitions.slice(0, options.general.maxResults);
 }
 
 async function apiDefinitionAdd(definition, mode) {
+    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+
     if (mode !== 'kanji') {
-        const options = Backend.instance().options;
+        const options = yomichan.options;
         await audioInject(
             definition,
             options.anki.terms.fields,
@@ -202,7 +209,7 @@ async function apiDefinitionAdd(definition, mode) {
         );
     }
 
-    return Backend.instance().anki.addNote(utilNoteFormat(definition, mode));
+    return yomichan.anki.addNote(utilNoteFormat(definition, mode));
 }
 
 async function apiDefinitionsAddable(definitions, modes) {
@@ -213,7 +220,8 @@ async function apiDefinitionsAddable(definitions, modes) {
         }
     }
 
-    const results = await Backend.instance().anki.canAddNotes(notes);
+    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    const results = await yomichan.anki.canAddNotes(notes);
     const states = [];
     for (let resultBase = 0; resultBase < results.length; resultBase += modes.length) {
         const state = {};
@@ -228,7 +236,8 @@ async function apiDefinitionsAddable(definitions, modes) {
 }
 
 async function apiNoteView(noteId) {
-    return Backend.instance().anki.guiBrowse(`nid:${noteId}`);
+    const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
+    return yomichan.anki.guiBrowse(`nid:${noteId}`);
 }
 
 async function apiTemplateRender(template, data) {
