@@ -33,7 +33,7 @@ function utilAnkiGetDeckNames() {
 
 function utilAnkiGetModelFieldNames(modelName) {
     const yomichan = chrome.extension.getBackgroundPage().yomichanBackend;
-    return yomichan.anki.utilAnkiGetModelFieldNames(modelName);
+    return yomichan.anki.getModelFieldNames(modelName);
 }
 
 function utilDatabaseGetDictionaries() {
