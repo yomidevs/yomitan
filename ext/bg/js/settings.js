@@ -158,8 +158,6 @@ async function onFormOptionsChanged(e) {(async () => {
 })();}
 
 function onReady() {(async () => {
-    handlebarsRegister();
-
     const options = await optionsLoad();
 
     $('#show-usage-guide').prop('checked', options.general.showGuide);

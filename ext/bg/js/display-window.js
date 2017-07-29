@@ -37,11 +37,15 @@ window.displayWindow = new class extends Display {
         $('#query').focus().select();
     }
 
-    onSearch(e) {
+    async onSearch(e) {
         e.preventDefault();
-        $('#intro').slideUp();
-        instYomi().termsFind($('#query').val()).then(({length, definitions}) => {
-            super.showTermDefs(definitions, instYomi().options);
-        }).catch(this.handleError.bind(this));
+
+        try {
+            $('#intro').slideUp();
+            const {length, definitions} = await apiTermsFind($('#query').val());
+            super.showTermDefs(definitions, await apiOptionsGet());
+        } catch (e) {
+            this.handleError(e);
+        }
     }
 };

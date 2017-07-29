@@ -43,13 +43,13 @@ function handlebarsMultiLine(options) {
     return options.fn(this).split('\n').join('<br>');
 }
 
-function handlebarsRegister() {
-    Handlebars.partials = Handlebars.templates;
-    Handlebars.registerHelper('dumpObject', handlebarsDumpObject);
-    Handlebars.registerHelper('kanjiLinks', handlebarsKanjiLinks);
-    Handlebars.registerHelper('multiLine', handlebarsMultiLine);
-}
-
 function handlebarsRender(template, data) {
+    if (Handlebars.partials !== Handlebars.templates) {
+        Handlebars.partials = Handlebars.templates;
+        Handlebars.registerHelper('dumpObject', handlebarsDumpObject);
+        Handlebars.registerHelper('kanjiLinks', handlebarsKanjiLinks);
+        Handlebars.registerHelper('multiLine', handlebarsMultiLine);
+    }
+
     return Handlebars.templates[template](data);
 }

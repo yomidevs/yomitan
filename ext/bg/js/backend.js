@@ -19,8 +19,6 @@
 
 window.yomichan = new class {
     constructor() {
-        handlebarsRegister();
-
         this.translator = new Translator();
         this.anki = new AnkiNull();
         this.options = null;

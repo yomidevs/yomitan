@@ -225,7 +225,7 @@ function dictFieldFormat(field, definition, mode, options) {
 
         field = field.replace(
             `{${marker}}`,
-            Handlebars.templates['fields.html'](data).trim()
+            handlebarsRender('fields.html', data)
         );
     }
 
