@@ -84,8 +84,9 @@ function utilCommandDispatch(command) {
         },
 
         toggle: () => {
-            this.options.general.enable = !this.options.general.enable;
-            optionsSave(this.options).then(() => this.optionsSet(this.options));
+            const options = chrome.extension.getBackgroundPage().yomichan.options;
+            options.general.enable = !options.general.enable;
+            optionsSave(options).then(() => apiOptionsSet(options));
         }
     };
 
@@ -96,8 +97,7 @@ function utilCommandDispatch(command) {
 }
 
 function utilNoteFormat(definition, mode) {
-    const yomichan = chrome.extension.getBackgroundPage().yomichan;
-    const options = yomichan.options;
+    const options = chrome.extension.getBackgroundPage().yomichan.options;
     const note = {fields: {}, tags: options.anki.tags};
     let fields = [];
 
@@ -174,8 +174,7 @@ async function apiOptionsSet(options) {
 }
 
 async function apiOptionsGet() {
-    const yomichan = chrome.extension.getBackgroundPage().yomichan;
-    return yomichan.options;
+    return chrome.extension.getBackgroundPage().yomichan.options;
 }
 
 async function apiTermsFind(text) {

@@ -58,7 +58,7 @@ class AnkiConnect {
         if (this.remoteVersion < this.localVersion) {
             this.remoteVersion = await this.ankiInvoke('version');
             if (this.remoteVersion < this.localVersion) {
-                return Promise.reject('extension and plugin versions incompatible');
+                throw 'extension and plugin versions incompatible';
             }
         }
     }
