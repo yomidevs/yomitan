@@ -132,7 +132,6 @@ Flashcard fields can be configured with the following steps:
     `{expression}` | Term expressed as Kanji (will be displayed in Kana if Kanji is not available).
     `{furigana}` | Term expressed as Kanji with Furigana displayed above it (e.g. <ruby>日本語<rt>にほんご</rt></ruby>).
     `{glossary}` | List of definitions for the term (output format depends on whether running in *grouped* mode).
-    `{glossary-brief}` | Shorter version of `{glossary}`, without `{tags}`.
     `{reading}` | Kana reading for the term (empty for terms where the expression is the reading).
     `{sentence}` | Sentence, quote, or phrase in which the term appears in the source content.
     `{tags}` | Grammar and usage tags providing information about the term (unavailable in *grouped* mode).
@@ -290,4 +289,16 @@ exact versions used for distribution.
 
 ## License ##
 
-GPL
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
