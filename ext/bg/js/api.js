@@ -17,56 +17,6 @@
  */
 
 
-/*
- * Helpers
- */
-
-function utilNoteFormat(definition, mode) {
-    const options = chrome.extension.getBackgroundPage().yomichan.options;
-    const note = {fields: {}, tags: options.anki.tags};
-    let fields = [];
-
-    if (mode === 'kanji') {
-        fields = options.anki.kanji.fields;
-        note.deckName = options.anki.kanji.deck;
-        note.modelName = options.anki.kanji.model;
-    } else {
-        fields = options.anki.terms.fields;
-        note.deckName = options.anki.terms.deck;
-        note.modelName = options.anki.terms.model;
-
-        if (definition.audio) {
-            const audio = {
-                url: definition.audio.url,
-                filename: definition.audio.filename,
-                skipHash: '7e2c2f954ef6051373ba916f000168dc',
-                fields: []
-            };
-
-            for (const name in fields) {
-                if (fields[name].includes('{audio}')) {
-                    audio.fields.push(name);
-                }
-            }
-
-            if (audio.fields.length > 0) {
-                note.audio = audio;
-            }
-        }
-    }
-
-    for (const name in fields) {
-        note.fields[name] = dictFieldFormat(fields[name], definition, mode, options);
-    }
-
-    return note;
-}
-
-
-/*
- * API
- */
-
 async function apiCommandExec(command) {
     const handlers = {
         search: () => {
@@ -159,9 +109,9 @@ async function apiKanjiFind(text) {
 
 async function apiDefinitionAdd(definition, mode) {
     const yomichan = chrome.extension.getBackgroundPage().yomichan;
+    const options = yomichan.options;
 
     if (mode !== 'kanji') {
-        const options = yomichan.options;
         await audioInject(
             definition,
             options.anki.terms.fields,
@@ -169,18 +119,20 @@ async function apiDefinitionAdd(definition, mode) {
         );
     }
 
-    return yomichan.anki.addNote(utilNoteFormat(definition, mode));
+    return yomichan.anki.addNote(dictNoteFormat(definition, mode, options));
 }
 
 async function apiDefinitionsAddable(definitions, modes) {
+    const yomichan = chrome.extension.getBackgroundPage().yomichan;
+    const options = yomichan.options;
+
     const notes = [];
     for (const definition of definitions) {
         for (const mode of modes) {
-            notes.push(utilNoteFormat(definition, mode));
+            notes.push(dictNoteFormat(definition, mode, options));
         }
     }
 
-    const yomichan = chrome.extension.getBackgroundPage().yomichan;
     const results = await yomichan.anki.canAddNotes(notes);
     const states = [];
     for (let resultBase = 0; resultBase < results.length; resultBase += modes.length) {
