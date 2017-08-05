@@ -26,8 +26,54 @@ window.yomichan = new class {
         this.translator.prepare().then(optionsLoad).then(options => {
             apiOptionsSet(options);
 
-            chrome.commands.onCommand.addListener(utilCommandDispatch);
-            chrome.runtime.onMessage.addListener(utilMessageDispatch);
+            chrome.commands.onCommand.addListener(apiCommandExec);
+            chrome.runtime.onMessage.addListener(({action, params}, sender, callback) => {
+                const forward = (promise, callback) => {
+                    return promise.then(result => {
+                        callback({result});
+                    }).catch(error => {
+                        callback({error});
+                    });
+                };
+
+                const handlers = {
+                    optionsGet: ({callback}) => {
+                        forward(optionsLoad(), callback);
+                    },
+
+                    kanjiFind: ({text, callback}) => {
+                        forward(apiKanjiFind(text), callback);
+                    },
+
+                    termsFind: ({text, callback}) => {
+                        forward(apiTermsFind(text), callback);
+                    },
+
+                    templateRender: ({template, data, callback}) => {
+                        forward(apiTemplateRender(template, data), callback);
+                    },
+
+                    definitionAdd: ({definition, mode, callback}) => {
+                        forward(apiDefinitionAdd(definition, mode), callback);
+                    },
+
+                    definitionsAddable: ({definitions, modes, callback}) => {
+                        forward(apiDefinitionsAddable(definitions, modes), callback);
+                    },
+
+                    noteView: ({noteId}) => {
+                        forward(apiNoteView(noteId), callback);
+                    }
+                };
+
+                const handler = handlers[action];
+                if (handler) {
+                    params.callback = callback;
+                    handler(params);
+                }
+
+                return true;
+            });
 
             if (options.general.showGuide) {
                 chrome.tabs.create({url: chrome.extension.getURL('/bg/guide.html')});

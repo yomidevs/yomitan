@@ -21,81 +21,6 @@
  * Helpers
  */
 
-function utilMessageDispatch({action, params}, sender, callback) {
-    const forward = (promise, callback) => {
-        return promise.then(result => {
-            callback({result});
-        }).catch(error => {
-            callback({error});
-        });
-    };
-
-    const handlers = {
-        optionsGet: ({callback}) => {
-            forward(optionsLoad(), callback);
-        },
-
-        kanjiFind: ({text, callback}) => {
-            forward(apiKanjiFind(text), callback);
-        },
-
-        termsFind: ({text, callback}) => {
-            forward(apiTermsFind(text), callback);
-        },
-
-        templateRender: ({template, data, callback}) => {
-            forward(apiTemplateRender(template, data), callback);
-        },
-
-        definitionAdd: ({definition, mode, callback}) => {
-            forward(apiDefinitionAdd(definition, mode), callback);
-        },
-
-        definitionsAddable: ({definitions, modes, callback}) => {
-            forward(apiDefinitionsAddable(definitions, modes), callback);
-        },
-
-        noteView: ({noteId}) => {
-            forward(apiNoteView(noteId), callback);
-        }
-    };
-
-    const handler = handlers[action];
-    if (handler) {
-        params.callback = callback;
-        handler(params);
-    }
-
-    return true;
-}
-
-function utilCommandDispatch(command) {
-    const handlers = {
-        search: () => {
-            chrome.tabs.create({url: chrome.extension.getURL('/bg/search.html')});
-        },
-
-        help: () => {
-            chrome.tabs.create({url: 'https://foosoft.net/projects/yomichan/'});
-        },
-
-        options: () => {
-            chrome.runtime.openOptionsPage();
-        },
-
-        toggle: () => {
-            const options = chrome.extension.getBackgroundPage().yomichan.options;
-            options.general.enable = !options.general.enable;
-            optionsSave(options).then(() => apiOptionsSet(options));
-        }
-    };
-
-    const handler = handlers[command];
-    if (handler) {
-        handler();
-    }
-}
-
 function utilNoteFormat(definition, mode) {
     const options = chrome.extension.getBackgroundPage().yomichan.options;
     const note = {fields: {}, tags: options.anki.tags};
@@ -141,6 +66,33 @@ function utilNoteFormat(definition, mode) {
 /*
  * API
  */
+
+async function apiCommandExec(command) {
+    const handlers = {
+        search: () => {
+            chrome.tabs.create({url: chrome.extension.getURL('/bg/search.html')});
+        },
+
+        help: () => {
+            chrome.tabs.create({url: 'https://foosoft.net/projects/yomichan/'});
+        },
+
+        options: () => {
+            chrome.runtime.openOptionsPage();
+        },
+
+        toggle: () => {
+            const options = chrome.extension.getBackgroundPage().yomichan.options;
+            options.general.enable = !options.general.enable;
+            optionsSave(options).then(() => apiOptionsSet(options));
+        }
+    };
+
+    const handler = handlers[command];
+    if (handler) {
+        handler();
+    }
+}
 
 async function apiOptionsSet(options) {
     // In Firefox, setting options from the options UI somehow carries references

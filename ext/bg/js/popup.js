@@ -18,14 +18,14 @@
 
 
 $(document).ready(() => {
-    $('#open-search').click(() => utilCommandDispatch('search'));
-    $('#open-options').click(() => utilCommandDispatch('options'));
-    $('#open-help').click(() => utilCommandDispatch('help'));
+    $('#open-search').click(() => apiCommandExec('search'));
+    $('#open-options').click(() => apiCommandExec('options'));
+    $('#open-help').click(() => apiCommandExec('help'));
 
     optionsLoad().then(options => {
         const toggle = $('#enable-search');
         toggle.prop('checked', options.general.enable).change();
         toggle.bootstrapToggle();
-        toggle.change(() => utilCommandDispatch('toggle'));
+        toggle.change(() => apiCommandExec('toggle'));
     });
 });
