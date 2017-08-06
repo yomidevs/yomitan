@@ -21,12 +21,11 @@ window.displayWindow = new class extends Display {
     constructor() {
         super($('#spinner'), $('#content'));
 
-        const search = $('#search');
-        search.click(this.onSearch.bind(this));
+        this.search = $('#search').click(this.onSearch.bind(this));
+        this.query = $('#query').on('input', this.inputSearch.bind(this));
+        this.intro = $('#intro');
 
-        const query = $('#query');
-        query.on('input', () => search.prop('disabled', query.val().length === 0));
-        window.wanakana.bind(query.get(0));
+        window.wanakana.bind(this.query.get(0));
     }
 
     handleError(error) {
@@ -34,15 +33,19 @@ window.displayWindow = new class extends Display {
     }
 
     clearSearch() {
-        $('#query').focus().select();
+        this.query.focus().select();
+    }
+
+    inputSearch() {
+        this.search.prop('disabled', this.query.val().length === 0);
     }
 
     async onSearch(e) {
         e.preventDefault();
 
         try {
-            $('#intro').slideUp();
-            const {length, definitions} = await apiTermsFind($('#query').val());
+            this.intro.slideUp();
+            const {length, definitions} = await apiTermsFind(this.query.val());
             super.showTermDefs(definitions, await apiOptionsGet());
         } catch (e) {
             this.handleError(e);

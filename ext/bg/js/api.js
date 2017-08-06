@@ -35,7 +35,7 @@ async function apiOptionsSet(options) {
     // to the DOM across to the background page, causing the options object to
     // become a "DeadObject" after the options page is closed. The workaround used
     // here is to create a deep copy of the options object.
-    backend().optionsSet(JSON.parse(JSON.stringify(options)));
+    backend().onOptionsUpdated(JSON.parse(JSON.stringify(options)));
 }
 
 async function apiOptionsGet() {

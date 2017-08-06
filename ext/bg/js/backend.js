@@ -36,7 +36,7 @@ window.yomichan_backend = new class {
         }
     }
 
-    optionsSet(options) {
+    onOptionsUpdated(options) {
         this.options = options;
 
         if (!options.general.enable) {
