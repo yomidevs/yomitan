@@ -17,30 +17,19 @@
  */
 
 
-function apiOptionsGet() {
-    return utilInvoke('optionsGet');
-}
-
-function apiTermsFind(text) {
-    return utilInvoke('termsFind', {text});
-}
-
-function apiKanjiFind(text) {
-    return utilInvoke('kanjiFind', {text});
-}
-
-function apiTemplateRender(template, data) {
-    return utilInvoke('templateRender', {data, template});
-}
-
-function apiDefinitionsAddable(definitions, modes) {
-    return utilInvoke('definitionsAddable', {definitions, modes}).catch(() => null);
-}
-
-function apiDefinitionAdd(definition, mode) {
-    return utilInvoke('definitionAdd', {definition, mode});
-}
-
-function apiNoteView(noteId) {
-    return utilInvoke('noteView', {noteId});
+function utilInvoke(action, params={}) {
+    return new Promise((resolve, reject) => {
+        try {
+            chrome.runtime.sendMessage({action, params}, ({result, error}) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            });
+        } catch (e) {
+            window.yomichanOrphaned = true;
+            reject(e.message);
+        }
+    });
 }
