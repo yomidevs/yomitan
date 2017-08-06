@@ -17,39 +17,6 @@
  */
 
 
-/*
- * Utilities
- */
-
-function utilAnkiGetModelNames() {
-    return backend().anki.getModelNames();
-}
-
-function utilAnkiGetDeckNames() {
-    return backend().anki.getDeckNames();
-}
-
-function utilAnkiGetModelFieldNames(modelName) {
-    return backend().anki.getModelFieldNames(modelName);
-}
-
-function utilDatabaseGetDictionaries() {
-    return backend().translator.database.getDictionaries();
-}
-
-function utilDatabasePurge() {
-    return backend().translator.database.purge();
-}
-
-function utilDatabaseImport(data, progress) {
-    return backend().translator.database.importDictionary(data, progress);
-}
-
-
-/*
- * General
- */
-
 async function formRead() {
     const optionsOld = await optionsLoad();
     const optionsNew = $.extend(true, {}, optionsOld);

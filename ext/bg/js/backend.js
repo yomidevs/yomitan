@@ -50,9 +50,9 @@ window.yomichan_backend = new class {
         }
 
         if (options.anki.enable) {
-            backend().anki = new AnkiConnect(options.anki.server);
+            this.anki = new AnkiConnect(options.anki.server);
         } else {
-            backend().anki = new AnkiNull();
+            this.anki = new AnkiNull();
         }
 
         chrome.tabs.query({}, tabs => {

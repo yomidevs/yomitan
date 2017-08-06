@@ -17,34 +17,21 @@
  */
 
 
-/*
- * Backend
- */
-
-function backend() {
-    return chrome.extension.getBackgroundPage().yomichan_backend;
-}
-
-
-/*
- * API
- */
-
 async function apiOptionsSet(options) {
     // In Firefox, setting options from the options UI somehow carries references
     // to the DOM across to the background page, causing the options object to
     // become a "DeadObject" after the options page is closed. The workaround used
     // here is to create a deep copy of the options object.
-    backend().onOptionsUpdated(JSON.parse(JSON.stringify(options)));
+    utilBackend().onOptionsUpdated(JSON.parse(JSON.stringify(options)));
 }
 
 async function apiOptionsGet() {
-    return backend().options;
+    return utilBackend().options;
 }
 
 async function apiTermsFind(text) {
-    const options = backend().options;
-    const translator = backend().translator;
+    const options = utilBackend().options;
+    const translator = utilBackend().translator;
 
     const searcher = options.general.groupResults ?
         translator.findTermsGrouped.bind(translator) :
@@ -63,13 +50,13 @@ async function apiTermsFind(text) {
 }
 
 async function apiKanjiFind(text) {
-    const options = backend().options;
-    const definitions = await backend().translator.findKanji(text, dictEnabledSet(options));
+    const options = utilBackend().options;
+    const definitions = await utilBackend().translator.findKanji(text, dictEnabledSet(options));
     return definitions.slice(0, options.general.maxResults);
 }
 
 async function apiDefinitionAdd(definition, mode) {
-    const options = backend().options;
+    const options = utilBackend().options;
 
     if (mode !== 'kanji') {
         await audioInject(
@@ -79,18 +66,18 @@ async function apiDefinitionAdd(definition, mode) {
         );
     }
 
-    return backend().anki.addNote(dictNoteFormat(definition, mode, options));
+    return utilBackend().anki.addNote(dictNoteFormat(definition, mode, options));
 }
 
 async function apiDefinitionsAddable(definitions, modes) {
     const notes = [];
     for (const definition of definitions) {
         for (const mode of modes) {
-            notes.push(dictNoteFormat(definition, mode, backend().options));
+            notes.push(dictNoteFormat(definition, mode, utilBackend().options));
         }
     }
 
-    const results = await backend().anki.canAddNotes(notes);
+    const results = await utilBackend().anki.canAddNotes(notes);
     const states = [];
     for (let resultBase = 0; resultBase < results.length; resultBase += modes.length) {
         const state = {};
@@ -105,7 +92,7 @@ async function apiDefinitionsAddable(definitions, modes) {
 }
 
 async function apiNoteView(noteId) {
-    return backend().anki.guiBrowse(`nid:${noteId}`);
+    return utilBackend().anki.guiBrowse(`nid:${noteId}`);
 }
 
 async function apiTemplateRender(template, data) {
@@ -127,7 +114,7 @@ async function apiCommandExec(command) {
         },
 
         toggle: async () => {
-            const options = backend().options;
+            const options = utilBackend().options;
             options.general.enable = !options.general.enable;
             await optionsSave(options);
             await apiOptionsSet(options);
