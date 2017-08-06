@@ -22,33 +22,27 @@
  */
 
 function utilAnkiGetModelNames() {
-    const yomichan = chrome.extension.getBackgroundPage().yomichan;
-    return yomichan.anki.getModelNames();
+    return backend().anki.getModelNames();
 }
 
 function utilAnkiGetDeckNames() {
-    const yomichan = chrome.extension.getBackgroundPage().yomichan;
-    return yomichan.anki.getDeckNames();
+    return backend().anki.getDeckNames();
 }
 
 function utilAnkiGetModelFieldNames(modelName) {
-    const yomichan = chrome.extension.getBackgroundPage().yomichan;
-    return yomichan.anki.getModelFieldNames(modelName);
+    return backend().anki.getModelFieldNames(modelName);
 }
 
 function utilDatabaseGetDictionaries() {
-    const yomichan = chrome.extension.getBackgroundPage().yomichan;
-    return yomichan.translator.database.getDictionaries();
+    return backend().translator.database.getDictionaries();
 }
 
 function utilDatabasePurge() {
-    const yomichan = chrome.extension.getBackgroundPage().yomichan;
-    return yomichan.translator.database.purge();
+    return backend().translator.database.purge();
 }
 
 function utilDatabaseImport(data, progress) {
-    const yomichan = chrome.extension.getBackgroundPage().yomichan;
-    return yomichan.translator.database.importDictionary(data, progress);
+    return backend().translator.database.importDictionary(data, progress);
 }
 
 

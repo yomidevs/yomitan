@@ -17,67 +17,102 @@
  */
 
 
-window.yomichan = new class {
+window.yomichan_backend = new class {
     constructor() {
         this.translator = new Translator();
         this.anki = new AnkiNull();
         this.options = null;
+    }
 
-        this.translator.prepare().then(optionsLoad).then(options => {
-            apiOptionsSet(options);
+    async prepare() {
+        await this.translator.prepare();
+        await apiOptionsSet(await optionsLoad());
 
-            chrome.commands.onCommand.addListener(apiCommandExec);
-            chrome.runtime.onMessage.addListener(({action, params}, sender, callback) => {
-                const forward = (promise, callback) => {
-                    return promise.then(result => {
-                        callback({result});
-                    }).catch(error => {
-                        callback({error});
-                    });
-                };
+        chrome.commands.onCommand.addListener(this.onCommand.bind(this));
+        chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
 
-                const handlers = {
-                    optionsGet: ({callback}) => {
-                        forward(optionsLoad(), callback);
-                    },
+        if (this.options.general.showGuide) {
+            chrome.tabs.create({url: chrome.extension.getURL('/bg/guide.html')});
+        }
+    }
 
-                    kanjiFind: ({text, callback}) => {
-                        forward(apiKanjiFind(text), callback);
-                    },
+    optionsSet(options) {
+        this.options = options;
 
-                    termsFind: ({text, callback}) => {
-                        forward(apiTermsFind(text), callback);
-                    },
+        if (!options.general.enable) {
+            chrome.browserAction.setBadgeBackgroundColor({color: '#d9534f'});
+            chrome.browserAction.setBadgeText({text: 'off'});
+        } else if (!dictConfigured(options)) {
+            chrome.browserAction.setBadgeBackgroundColor({color: '#f0ad4e'});
+            chrome.browserAction.setBadgeText({text: '!'});
+        } else {
+            chrome.browserAction.setBadgeText({text: ''});
+        }
 
-                    templateRender: ({template, data, callback}) => {
-                        forward(apiTemplateRender(template, data), callback);
-                    },
+        if (options.anki.enable) {
+            backend().anki = new AnkiConnect(options.anki.server);
+        } else {
+            backend().anki = new AnkiNull();
+        }
 
-                    definitionAdd: ({definition, mode, callback}) => {
-                        forward(apiDefinitionAdd(definition, mode), callback);
-                    },
-
-                    definitionsAddable: ({definitions, modes, callback}) => {
-                        forward(apiDefinitionsAddable(definitions, modes), callback);
-                    },
-
-                    noteView: ({noteId}) => {
-                        forward(apiNoteView(noteId), callback);
-                    }
-                };
-
-                const handler = handlers[action];
-                if (handler) {
-                    params.callback = callback;
-                    handler(params);
-                }
-
-                return true;
-            });
-
-            if (options.general.showGuide) {
-                chrome.tabs.create({url: chrome.extension.getURL('/bg/guide.html')});
+        chrome.tabs.query({}, tabs => {
+            for (const tab of tabs) {
+                chrome.tabs.sendMessage(tab.id, {action: 'optionsSet', params: options}, () => null);
             }
         });
     }
+
+    onCommand(command) {
+        apiCommandExec(command);
+    }
+
+    onMessage({action, params}, sender, callback) {
+        const forward = (promise, callback) => {
+            return promise.then(result => {
+                callback({result});
+            }).catch(error => {
+                callback({error});
+            });
+        };
+
+        const handlers = {
+            optionsGet: ({callback}) => {
+                forward(optionsLoad(), callback);
+            },
+
+            kanjiFind: ({text, callback}) => {
+                forward(apiKanjiFind(text), callback);
+            },
+
+            termsFind: ({text, callback}) => {
+                forward(apiTermsFind(text), callback);
+            },
+
+            templateRender: ({template, data, callback}) => {
+                forward(apiTemplateRender(template, data), callback);
+            },
+
+            definitionAdd: ({definition, mode, callback}) => {
+                forward(apiDefinitionAdd(definition, mode), callback);
+            },
+
+            definitionsAddable: ({definitions, modes, callback}) => {
+                forward(apiDefinitionsAddable(definitions, modes), callback);
+            },
+
+            noteView: ({noteId}) => {
+                forward(apiNoteView(noteId), callback);
+            }
+        };
+
+        const handler = handlers[action];
+        if (handler) {
+            params.callback = callback;
+            handler(params);
+        }
+
+        return true;
+    }
 };
+
+window.yomichan_backend.prepare();
