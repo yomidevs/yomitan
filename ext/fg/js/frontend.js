@@ -32,29 +32,17 @@ window.yomichan_frontend = new class {
     async prepare() {
         try {
             this.options = await apiOptionsGet();
+
+            window.addEventListener('message', e => this.onFrameMessage(e));
+            window.addEventListener('mousedown', e => this.onMouseDown(e));
+            window.addEventListener('mousemove', e => this.onMouseMove(e));
+            window.addEventListener('mouseover', e => this.onMouseOver(e));
+            window.addEventListener('mouseup', e => this.onMouseUp(e));
+            window.addEventListener('resize', e => this.onResize(e));
+
+            chrome.runtime.onMessage.addListener(({action, params}, sender, callback) => this.onBgMessage(action, params, sender, callback));
         } catch (e) {
             this.onError(e);
-        }
-
-        window.addEventListener('message', this.onFrameMessage.bind(this));
-        window.addEventListener('mousedown', this.onMouseDown.bind(this));
-        window.addEventListener('mousemove', this.onMouseMove.bind(this));
-        window.addEventListener('mouseover', this.onMouseOver.bind(this));
-        window.addEventListener('mouseup', this.onMouseUp.bind(this));
-        window.addEventListener('resize', this.onResize.bind(this));
-
-        chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
-    }
-
-    popupTimerSet(callback) {
-        this.popupTimerClear();
-        this.popupTimer = window.setTimeout(callback, this.options.scanning.delay);
-    }
-
-    popupTimerClear() {
-        if (this.popupTimer) {
-            window.clearTimeout(this.popupTimer);
-            this.popupTimer = null;
         }
     }
 
@@ -132,7 +120,11 @@ window.yomichan_frontend = new class {
         }
     }
 
-    onBgMessage({action, params}, sender, callback) {
+    onResize() {
+        this.onSearchClear();
+    }
+
+    onBgMessage(action, params, sender, callback) {
         const handlers = {
             optionsSet: options => {
                 this.options = options;
@@ -150,37 +142,55 @@ window.yomichan_frontend = new class {
         callback();
     }
 
-    onResize() {
-        this.onSearchClear();
+    onError(error) {
+        if (window.yomichan_orphaned) {
+            if (this.lastTextSource && this.options.scanning.modifier !== 'none') {
+                this.popup.showOrphaned(this.lastTextSource.getRect(), this.options);
+            }
+        } else {
+            window.alert(`Error: ${error}`);
+        }
+    }
+
+    popupTimerSet(callback) {
+        this.popupTimerClear();
+        this.popupTimer = window.setTimeout(callback, this.options.scanning.delay);
+    }
+
+    popupTimerClear() {
+        if (this.popupTimer) {
+            window.clearTimeout(this.popupTimer);
+            this.popupTimer = null;
+        }
     }
 
     async searchAt(point) {
-        if (this.pendingLookup) {
-            return;
-        }
-
-        const textSource = docRangeFromPoint(point);
-        if (!textSource || !textSource.containsPoint(point)) {
-            docImposterDestroy();
-            return;
-        }
-
-        if (this.lastTextSource && this.lastTextSource.equals(textSource)) {
-            return;
-        }
-
-        this.pendingLookup = true;
-
         try {
+            if (this.pendingLookup) {
+                return;
+            }
+
+            const textSource = docRangeFromPoint(point);
+            if (!textSource || !textSource.containsPoint(point)) {
+                docImposterDestroy();
+                return;
+            }
+
+            if (this.lastTextSource && this.lastTextSource.equals(textSource)) {
+                return;
+            }
+
+            this.pendingLookup = true;
+
             if (!await this.searchTerms(textSource)) {
                 await this.searchKanji(textSource);
             }
         } catch (e) {
             this.onError(e);
+        } finally {
+            docImposterDestroy();
+            this.pendingLookup = false;
         }
-
-        docImposterDestroy();
-        this.pendingLookup = false;
     }
 
     async searchTerms(textSource) {
@@ -245,14 +255,6 @@ window.yomichan_frontend = new class {
 
         this.lastTextSource = null;
     }
+}();
 
-    handleError(error, textSource) {
-        if (window.yomichan_orphaned) {
-            if (textSource && this.options.scanning.modifier !== 'none') {
-                this.popup.showOrphaned(textSource.getRect(), this.options);
-            }
-        } else {
-            window.alert(`Error: ${error}`);
-        }
-    }
-};
+window.yomichan_frontend.prepare();

@@ -40,51 +40,51 @@ class Popup {
         return this.injected;
     }
 
-    show(elementRect, options) {
-        return this.inject().then(() => {
-            const containerStyle = window.getComputedStyle(this.container);
-            const containerHeight = parseInt(containerStyle.height);
-            const containerWidth = parseInt(containerStyle.width);
+    async show(elementRect, options) {
+        await this.inject();
 
-            const limitX = document.body.clientWidth;
-            const limitY = window.innerHeight;
+        const containerStyle = window.getComputedStyle(this.container);
+        const containerHeight = parseInt(containerStyle.height);
+        const containerWidth = parseInt(containerStyle.width);
 
-            let x = elementRect.left;
-            let width = Math.max(containerWidth, options.general.popupWidth);
-            const overflowX = Math.max(x + width - limitX, 0);
-            if (overflowX > 0) {
-                if (x >= overflowX) {
-                    x -= overflowX;
-                } else {
-                    width = limitX;
-                    x = 0;
-                }
-            }
+        const limitX = document.body.clientWidth;
+        const limitY = window.innerHeight;
 
-            let y = 0;
-            let height = Math.max(containerHeight, options.general.popupHeight);
-            const yBelow = elementRect.bottom + options.general.popupOffset;
-            const yAbove = elementRect.top - options.general.popupOffset;
-            const overflowBelow = Math.max(yBelow + height - limitY, 0);
-            const overflowAbove = Math.max(height - yAbove, 0);
-            if (overflowBelow > 0 || overflowAbove > 0) {
-                if (overflowBelow < overflowAbove) {
-                    height = Math.max(height - overflowBelow, 0);
-                    y = yBelow;
-                } else {
-                    height = Math.max(height - overflowAbove, 0);
-                    y = Math.max(yAbove - height, 0);
-                }
+        let x = elementRect.left;
+        let width = Math.max(containerWidth, options.general.popupWidth);
+        const overflowX = Math.max(x + width - limitX, 0);
+        if (overflowX > 0) {
+            if (x >= overflowX) {
+                x -= overflowX;
             } else {
-                y = yBelow;
+                width = limitX;
+                x = 0;
             }
+        }
 
-            this.container.style.left = `${x}px`;
-            this.container.style.top = `${y}px`;
-            this.container.style.width = `${width}px`;
-            this.container.style.height = `${height}px`;
-            this.container.style.visibility = 'visible';
-        });
+        let y = 0;
+        let height = Math.max(containerHeight, options.general.popupHeight);
+        const yBelow = elementRect.bottom + options.general.popupOffset;
+        const yAbove = elementRect.top - options.general.popupOffset;
+        const overflowBelow = Math.max(yBelow + height - limitY, 0);
+        const overflowAbove = Math.max(height - yAbove, 0);
+        if (overflowBelow > 0 || overflowAbove > 0) {
+            if (overflowBelow < overflowAbove) {
+                height = Math.max(height - overflowBelow, 0);
+                y = yBelow;
+            } else {
+                height = Math.max(height - overflowAbove, 0);
+                y = Math.max(yAbove - height, 0);
+            }
+        } else {
+            y = yBelow;
+        }
+
+        this.container.style.left = `${x}px`;
+        this.container.style.top = `${y}px`;
+        this.container.style.width = `${width}px`;
+        this.container.style.height = `${height}px`;
+        this.container.style.visibility = 'visible';
     }
 
     hide() {
@@ -95,25 +95,22 @@ class Popup {
         return this.injected && this.container.style.visibility !== 'hidden';
     }
 
-    showTermDefs(elementRect, definitions, options, context) {
-        this.show(elementRect, options).then(() => {
-            this.invokeApi('showTermDefs', {definitions, options, context});
-        });
+    async termsShow(elementRect, definitions, options, context) {
+        await this.show(elementRect, options);
+        this.invokeApi('termsShow', {definitions, options, context});
     }
 
-    showKanjiDefs(elementRect, definitions, options, context) {
-        this.show(elementRect, options).then(() => {
-            this.invokeApi('showKanjiDefs', {definitions, options, context});
-        });
-    }
-
-    showOrphaned(elementRect, options) {
-        this.show(elementRect, options).then(() => {
-            this.invokeApi('showOrphaned');
-        });
+    async kanjiShow(elementRect, definitions, options, context) {
+        await this.show(elementRect, options);
+        this.invokeApi('termsShow', {definitions, options, context});
     }
 
     invokeApi(action, params={}) {
         this.container.contentWindow.postMessage({action, params}, '*');
+    }
+
+    async onOrphaned(elementRect, options) {
+        await this.show(elementRect, options);
+        this.invokeApi('orphaned');
     }
 }
