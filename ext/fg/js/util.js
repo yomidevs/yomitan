@@ -28,7 +28,7 @@ function utilInvoke(action, params={}) {
                 }
             });
         } catch (e) {
-            window.yomichanOrphaned = true;
+            window.yomichan_orphaned = true;
             reject(e.message);
         }
     });

@@ -17,26 +17,26 @@
  */
 
 
-window.displayWindow = new class extends Display {
+window.yomichan_window = new class extends Display {
     constructor() {
         super($('#spinner'), $('#content'));
 
         this.search = $('#search').click(this.onSearch.bind(this));
-        this.query = $('#query').on('input', this.inputSearch.bind(this));
+        this.query = $('#query').on('input', this.onSearchInput.bind(this));
         this.intro = $('#intro');
 
         window.wanakana.bind(this.query.get(0));
     }
 
-    handleError(error) {
+    onError(error) {
         window.alert(`Error: ${error}`);
     }
 
-    clearSearch() {
+    onSearchClear() {
         this.query.focus().select();
     }
 
-    inputSearch() {
+    onSearchInput() {
         this.search.prop('disabled', this.query.val().length === 0);
     }
 
@@ -46,9 +46,9 @@ window.displayWindow = new class extends Display {
         try {
             this.intro.slideUp();
             const {length, definitions} = await apiTermsFind(this.query.val());
-            super.showTermDefs(definitions, await apiOptionsGet());
+            super.termsShow(definitions, await apiOptionsGet());
         } catch (e) {
-            this.handleError(e);
+            this.onError(e);
         }
     }
 };

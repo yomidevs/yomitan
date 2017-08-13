@@ -17,65 +17,45 @@
  */
 
 
-window.displayFrame = new class extends Display {
+window.yomichan_frame = new class extends Display {
     constructor() {
         super($('#spinner'), $('#content'));
         $(window).on('message', this.onMessage.bind(this));
     }
 
-    definitionAdd(definition, mode) {
-        return apiDefinitionAdd(definition, mode);
-    }
-
-    definitionsAddable(definitions, modes) {
-        return apiDefinitionsAddable(definitions, modes);
-    }
-
-    noteView(noteId) {
-        return apiNoteView(noteId);
-    }
-
-    templateRender(template, data) {
-        return apiTemplateRender(template, data);
-    }
-
-    kanjiFind(character) {
-        return apiKanjiFind(character);
-    }
-
-    handleError(error) {
-        if (window.yomichanOrphaned) {
-            this.showOrphaned();
+    onError(error) {
+        if (window.yomichan_orphaned) {
+            this.onOrphaned();
         } else {
             window.alert(`Error: ${error}`);
         }
     }
 
-    clearSearch() {
+    onOrphaned() {
+        $('#definitions').hide();
+        $('#error-orphaned').show();
+    }
+
+    onSearchClear() {
         window.parent.postMessage('popupClose', '*');
     }
 
-    selectionCopy() {
+    onSelectionCopy() {
         window.parent.postMessage('selectionCopy', '*');
-    }
-
-    showOrphaned() {
-        $('#content').hide();
-        $('#orphan').show();
     }
 
     onMessage(e) {
         const handlers = {
-            showTermDefs: ({definitions, options, context}) => {
-                this.showTermDefs(definitions, options, context);
+            termsShow: ({definitions, options, context}) => {
+                this.termsShow(definitions, options, context);
             },
 
-            showKanjiDefs: ({definitions, options, context}) => {
-                this.showKanjiDefs(definitions, options, context);
+            kanjiShow: ({definitions, options, context}) => {
+                this.kanjiShow(definitions, options, context);
             },
 
-            showOrphaned: () => {
-                this.showOrphaned();
+            orphaned: () => {
+                this.onOrphaned();
             }
         };
 
@@ -89,8 +69,8 @@ window.displayFrame = new class extends Display {
     onKeyDown(e) {
         const handlers = {
             67: /* c */ () => {
-                if (e.ctrlKey && window.getSelection().toString() === '') {
-                    this.selectionCopy();
+                if (e.ctrlKey && !window.getSelection().toString()) {
+                    this.onSelectionCopy();
                     return true;
                 }
             }

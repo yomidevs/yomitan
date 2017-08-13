@@ -17,7 +17,7 @@
  */
 
 
-window.yomichanFrontend = new class {
+window.yomichan_frontend = new class {
     constructor() {
         this.popup = new Popup();
         this.popupTimer = null;
@@ -27,17 +27,23 @@ window.yomichanFrontend = new class {
         this.lastTextSource = null;
         this.pendingLookup = false;
         this.options = null;
+    }
 
-        apiOptionsGet().then(options => {
-            this.options = options;
-            window.addEventListener('mouseover', this.onMouseOver.bind(this));
-            window.addEventListener('mousedown', this.onMouseDown.bind(this));
-            window.addEventListener('mouseup', this.onMouseUp.bind(this));
-            window.addEventListener('mousemove', this.onMouseMove.bind(this));
-            window.addEventListener('resize', e => this.searchClear());
-            window.addEventListener('message', this.onFrameMessage.bind(this));
-            chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
-        }).catch(this.handleError.bind(this));
+    async prepare() {
+        try {
+            this.options = await apiOptionsGet();
+        } catch (e) {
+            this.onError(e);
+        }
+
+        window.addEventListener('message', this.onFrameMessage.bind(this));
+        window.addEventListener('mousedown', this.onMouseDown.bind(this));
+        window.addEventListener('mousemove', this.onMouseMove.bind(this));
+        window.addEventListener('mouseover', this.onMouseOver.bind(this));
+        window.addEventListener('mouseup', this.onMouseUp.bind(this));
+        window.addEventListener('resize', this.onResize.bind(this));
+
+        chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
     }
 
     popupTimerSet(callback) {
@@ -144,7 +150,11 @@ window.yomichanFrontend = new class {
         callback();
     }
 
-    searchAt(point) {
+    onResize() {
+        this.onSearchClear();
+    }
+
+    async searchAt(point) {
         if (this.pendingLookup) {
             return;
         }
@@ -160,70 +170,69 @@ window.yomichanFrontend = new class {
         }
 
         this.pendingLookup = true;
-        this.searchTerms(textSource).then(found => {
-            if (!found) {
-                return this.searchKanji(textSource);
+
+        try {
+            if (!await this.searchTerms(textSource)) {
+                await this.searchKanji(textSource);
             }
-        }).catch(error => {
-            this.handleError(error, textSource);
-        }).then(() => {
-            docImposterDestroy();
-            this.pendingLookup = false;
-        });
+        } catch (e) {
+            this.onError(e);
+        }
+
+        docImposterDestroy();
+        this.pendingLookup = false;
     }
 
-    searchTerms(textSource) {
+    async searchTerms(textSource) {
         textSource.setEndOffset(this.options.scanning.length);
 
-        return apiTermsFind(textSource.text()).then(({definitions, length}) => {
-            if (definitions.length === 0) {
-                return false;
-            } else {
-                textSource.setEndOffset(length);
+        const {definitions, length} = await apiTermsFind(textSource.text());
+        if (definitions.length === 0) {
+            return false;
+        }
 
-                const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
-                const url = window.location.href;
-                this.popup.showTermDefs(
-                    textSource.getRect(),
-                    definitions,
-                    this.options,
-                    {sentence, url}
-                );
+        textSource.setEndOffset(length);
 
-                this.lastTextSource = textSource;
-                if (this.options.scanning.selectText) {
-                    textSource.select();
-                }
+        const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
+        const url = window.location.href;
+        this.popup.termsShow(
+            textSource.getRect(),
+            definitions,
+            this.options,
+            {sentence, url}
+        );
 
-                return true;
-            }
-        });
+        this.lastTextSource = textSource;
+        if (this.options.scanning.selectText) {
+            textSource.select();
+        }
+
+        return true;
     }
 
-    searchKanji(textSource) {
+    async searchKanji(textSource) {
         textSource.setEndOffset(1);
 
-        return apiKanjiFind(textSource.text()).then(definitions => {
-            if (definitions.length === 0) {
-                return false;
-            } else {
-                const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
-                const url = window.location.href;
-                this.popup.showKanjiDefs(
-                    textSource.getRect(),
-                    definitions,
-                    this.options,
-                    {sentence, url}
-                );
+        const definitions = await apiKanjiFind(textSource.text());
+        if (definitions.length === 0) {
+            return false;
+        }
 
-                this.lastTextSource = textSource;
-                if (this.options.scanning.selectText) {
-                    textSource.select();
-                }
+        const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
+        const url = window.location.href;
+        this.popup.showKanji(
+            textSource.getRect(),
+            definitions,
+            this.options,
+            {sentence, url}
+        );
 
-                return true;
-            }
-        });
+        this.lastTextSource = textSource;
+        if (this.options.scanning.selectText) {
+            textSource.select();
+        }
+
+        return true;
     }
 
     searchClear() {
@@ -238,7 +247,7 @@ window.yomichanFrontend = new class {
     }
 
     handleError(error, textSource) {
-        if (window.yomichanOrphaned) {
+        if (window.yomichan_orphaned) {
             if (textSource && this.options.scanning.modifier !== 'none') {
                 this.popup.showOrphaned(textSource.getRect(), this.options);
             }
