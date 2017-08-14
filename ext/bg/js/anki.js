@@ -67,3 +67,29 @@ class AnkiConnect {
         return requestJson(this.server, 'POST', {action, params, version: this.localVersion});
     }
 }
+
+class AnkiNull {
+    async addNote(note) {
+        return null;
+    }
+
+    async canAddNotes(notes) {
+        return [];
+    }
+
+    async getDeckNames() {
+        return [];
+    }
+
+    async getModelNames() {
+        return [];
+    }
+
+    async getModelFieldNames(modelName) {
+        return [];
+    }
+
+    async guiBrowse(query) {
+        return [];
+    }
+}

@@ -17,7 +17,7 @@
  */
 
 
-window.yomichan_backend = new class {
+class Backend {
     constructor() {
         this.translator = new Translator();
         this.anki = new AnkiNull();
@@ -113,6 +113,7 @@ window.yomichan_backend = new class {
 
         return true;
     }
-};
+}
 
+window.yomichan_backend = new Backend();
 window.yomichan_backend.prepare();
