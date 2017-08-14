@@ -17,7 +17,7 @@
  */
 
 
-window.yomichan_frontend = new class {
+class Frontend {
     constructor() {
         this.popup = new Popup();
         this.popupTimer = null;
@@ -121,7 +121,7 @@ window.yomichan_frontend = new class {
     }
 
     onResize() {
-        this.onSearchClear();
+        this.searchClear();
     }
 
     onBgMessage(action, params, sender, callback) {
@@ -255,6 +255,7 @@ window.yomichan_frontend = new class {
 
         this.lastTextSource = null;
     }
-}();
+}
 
+window.yomichan_frontend = new Frontend();
 window.yomichan_frontend.prepare();

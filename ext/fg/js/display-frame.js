@@ -19,7 +19,7 @@
 
 window.yomichan_frame = new class extends Display {
     constructor() {
-        super($('#spinner'), $('#content'));
+        super($('#spinner'), $('#definitions'));
         $(window).on('message', this.onMessage.bind(this));
     }
 
