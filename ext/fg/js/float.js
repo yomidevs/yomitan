@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 class DisplayFloat extends Display {
     constructor() {
         super($('#spinner'), $('#definitions'));
-        $(window).on('message', e => this.onMessage(e));
+        $(window).on('message', utilAsync(this.onMessage.bind(this)));
     }
 
     onError(error) {

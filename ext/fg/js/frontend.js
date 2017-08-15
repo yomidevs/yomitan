@@ -33,14 +33,14 @@ class Frontend {
         try {
             this.options = await apiOptionsGet();
 
-            window.addEventListener('message', e => this.onFrameMessage(e));
-            window.addEventListener('mousedown', e => this.onMouseDown(e));
-            window.addEventListener('mousemove', e => this.onMouseMove(e));
-            window.addEventListener('mouseover', e => this.onMouseOver(e));
-            window.addEventListener('mouseup', e => this.onMouseUp(e));
-            window.addEventListener('resize', e => this.onResize(e));
+            window.addEventListener('message', this.onFrameMessage.bind(this));
+            window.addEventListener('mousedown', this.onMouseDown.bind(this));
+            window.addEventListener('mousemove', this.onMouseMove.bind(this));
+            window.addEventListener('mouseover', this.onMouseOver.bind(this));
+            window.addEventListener('mouseup', this.onMouseUp.bind(this));
+            window.addEventListener('resize', this.onResize.bind(this));
 
-            chrome.runtime.onMessage.addListener(({action, params}, sender, callback) => this.onBgMessage(action, params, sender, callback));
+            chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
         } catch (e) {
             this.onError(e);
         }
@@ -124,7 +124,7 @@ class Frontend {
         this.searchClear();
     }
 
-    onBgMessage(action, params, sender, callback) {
+    onBgMessage({action, params}, sender, callback) {
         const handlers = {
             optionsSet: options => {
                 this.options = options;
