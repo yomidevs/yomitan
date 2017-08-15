@@ -27,5 +27,14 @@ function jpIsKana(c) {
 }
 
 function jpKatakanaToHiragana(text) {
-    return wanakana._katakanaToHiragana(text);
+    let result = '';
+    for (const c of text) {
+        if (wanakana.isKatakana(c)) {
+            result += wanakana.toHiragana(c);
+        } else {
+            result += c;
+        }
+    }
+
+    return result;
 }
