@@ -40,7 +40,7 @@ class Backend {
         this.options = options;
 
         if (!options.general.enable) {
-            chrome.browserAction.setBadgeBackgroundColor({color: '#d9534f'});
+            chrome.browserAction.setBadgeBackgroundColor({color: '#555555'});
             chrome.browserAction.setBadgeText({text: 'off'});
         } else if (!dictConfigured(options)) {
             chrome.browserAction.setBadgeBackgroundColor({color: '#f0ad4e'});
