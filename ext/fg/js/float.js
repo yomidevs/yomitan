@@ -17,10 +17,10 @@
  */
 
 
-window.yomichan_frame = new class extends Display {
+class DisplayFloat extends Display {
     constructor() {
         super($('#spinner'), $('#definitions'));
-        $(window).on('message', this.onMessage.bind(this));
+        $(window).on('message', e => this.onMessage(e));
     }
 
     onError(error) {
@@ -83,4 +83,6 @@ window.yomichan_frame = new class extends Display {
             super.onKeyDown(e);
         }
     }
-};
+}
+
+window.yomichan_display = new DisplayFloat();

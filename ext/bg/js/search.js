@@ -17,7 +17,7 @@
  */
 
 
-window.yomichan_window = new class extends Display {
+class DisplaySearch extends Display {
     constructor() {
         super($('#spinner'), $('#content'));
 
@@ -51,4 +51,6 @@ window.yomichan_window = new class extends Display {
             this.onError(e);
         }
     }
-};
+}
+
+window.yomichan_search = new DisplaySearch();

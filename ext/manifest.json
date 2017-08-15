@@ -7,7 +7,7 @@
     "icons": {"16": "mixed/img/icon16.png", "48": "mixed/img/icon48.png", "128": "mixed/img/icon128.png"},
     "browser_action": {
         "default_icon": {"19": "mixed/img/icon19.png", "38": "mixed/img/icon38.png"},
-        "default_popup": "bg/popup.html"
+        "default_popup": "bg/context.html"
     },
 
     "author": "Alex Yatskov",
@@ -20,7 +20,6 @@
             "fg/js/popup.js",
             "fg/js/source.js",
             "fg/js/util.js",
-
             "fg/js/frontend.js"
         ],
         "css": ["fg/css/client.css"]
@@ -48,7 +47,7 @@
             "description": "Open search window"
         }
     },
-    "web_accessible_resources": ["fg/frame.html"],
+    "web_accessible_resources": ["fg/float.html"],
     "applications": {
         "gecko": {
             "id": "yomichan-live@foosoft.net",
