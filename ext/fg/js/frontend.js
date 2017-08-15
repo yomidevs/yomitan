@@ -230,7 +230,7 @@ class Frontend {
 
         const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
         const url = window.location.href;
-        this.popup.showKanji(
+        this.popup.kanjiShow(
             textSource.getRect(),
             definitions,
             this.options,

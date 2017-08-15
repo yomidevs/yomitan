@@ -42,7 +42,7 @@ class Display {
 
     onSourceTermView(e) {
         e.preventDefault();
-        this.sourceBack();
+        this.sourceTermView();
     }
 
     async onKanjiLookup(e) {
@@ -154,7 +154,7 @@ class Display {
 
             66: /* b */ () => {
                 if (e.altKey) {
-                    this.sourceBack();
+                    this.sourceTermView();
                     return true;
                 }
             },
@@ -276,6 +276,7 @@ class Display {
             this.entryScrollIntoView(context && context.index || 0);
 
             $('.action-add-note').click(this.onNoteAdd.bind(this));
+            $('.action-view-note').click(this.onNoteView.bind(this));
             $('.source-term').click(this.onSourceTermView.bind(this));
 
             await this.adderButtonUpdate(['kanji'], sequence);
@@ -288,7 +289,7 @@ class Display {
         try {
             this.spinner.show();
 
-            const states = apiDefinitionsAddable(this.definitions, modes);
+            const states = await apiDefinitionsAddable(this.definitions, modes);
             if (!states || sequence !== this.sequence) {
                 return;
             }
@@ -332,7 +333,7 @@ class Display {
         this.index = index;
     }
 
-    sourceBack() {
+    sourceTermView() {
         if (this.context && this.context.source) {
             const context = {
                 url: this.context.source.url,

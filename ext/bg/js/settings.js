@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -90,12 +90,12 @@ function formUpdateVisibility(options) {
     }
 }
 
-async function onFormOptionsChanged(e) {(async () => {
-    if (!e.originalEvent && !e.isTrigger) {
-        return;
-    }
-
+async function onFormOptionsChanged(e) {
     try {
+        if (!e.originalEvent && !e.isTrigger) {
+            return;
+        }
+
         ankiErrorShow();
         ankiSpinnerShow(true);
 
@@ -116,9 +116,9 @@ async function onFormOptionsChanged(e) {(async () => {
     } finally {
         ankiSpinnerShow(false);
     }
-})();}
+}
 
-function onReady() {(async () => {
+async function onReady() {
     const options = await optionsLoad();
 
     $('#show-usage-guide').prop('checked', options.general.showGuide);
@@ -139,16 +139,16 @@ function onReady() {(async () => {
     $('#scan-length').val(options.scanning.length);
     $('#scan-modifier-key').val(options.scanning.modifier);
 
-    $('#dict-purge').click(onDictionaryPurge);
-    $('#dict-file').change(onDictionaryImport);
+    $('#dict-purge').click(utilAsync(onDictionaryPurge));
+    $('#dict-file').change(utilAsync(onDictionaryImport));
 
     $('#anki-enable').prop('checked', options.anki.enable);
     $('#card-tags').val(options.anki.tags.join(' '));
     $('#generate-html-cards').prop('checked', options.anki.htmlCards);
     $('#sentence-detection-extent').val(options.anki.sentenceExt);
     $('#interface-server').val(options.anki.server);
-    $('input, select').not('.anki-model').change(onFormOptionsChanged);
-    $('.anki-model').change(onAnkiModelChanged);
+    $('input, select').not('.anki-model').change(utilAsync(onFormOptionsChanged));
+    $('.anki-model').change(utilAsync(onAnkiModelChanged));
 
     try {
         await dictionaryGroupsPopulate(options);
@@ -163,9 +163,9 @@ function onReady() {(async () => {
     }
 
     formUpdateVisibility(options);
-})();}
+}
 
-$(document).ready(onReady);
+$(document).ready(utilAsync(onReady));
 
 
 /*
@@ -237,7 +237,7 @@ async function dictionaryGroupsPopulate(options) {
     });
 }
 
-async function onDictionaryPurge(e) {(async () => {
+async function onDictionaryPurge(e) {
     e.preventDefault();
 
     const dictControls = $('#dict-importer, #dict-groups').hide();
@@ -261,9 +261,9 @@ async function onDictionaryPurge(e) {(async () => {
         dictControls.show();
         dictProgress.hide();
     }
-})();}
+}
 
-function onDictionaryImport(e) {(async () => {
+async function onDictionaryImport(e) {
     const dictFile = $('#dict-file');
     const dictControls = $('#dict-importer').hide();
     const dictProgress = $('#dict-import-progress').show();
@@ -291,7 +291,7 @@ function onDictionaryImport(e) {(async () => {
         dictControls.show();
         dictProgress.hide();
     }
-})();}
+}
 
 
 /*
@@ -398,7 +398,7 @@ async function ankiFieldsPopulate(element, options) {
         container.append($(html));
     }
 
-    tab.find('.anki-field-value').change(onFormOptionsChanged);
+    tab.find('.anki-field-value').change(utilAsync(onFormOptionsChanged));
     tab.find('.marker-link').click(onAnkiMarkerClicked);
 }
 
@@ -408,12 +408,12 @@ function onAnkiMarkerClicked(e) {
     $(link).closest('.input-group').find('.anki-field-value').val(`{${link.text}}`).trigger('change');
 }
 
-function onAnkiModelChanged(e) {(async () => {
-    if (!e.originalEvent) {
-        return;
-    }
-
+async function onAnkiModelChanged(e) {
     try {
+        if (!e.originalEvent) {
+            return;
+        }
+
         ankiErrorShow();
         ankiSpinnerShow(true);
 
@@ -431,4 +431,4 @@ function onAnkiModelChanged(e) {(async () => {
     } finally {
         ankiSpinnerShow(false);
     }
-})();}
+}

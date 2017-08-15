@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,10 @@
  */
 
 
+function apiOptionsSet(options) {
+    return utilInvoke('optionsSet', {options});
+}
+
 function apiOptionsGet() {
     return utilInvoke('optionsGet');
 }
@@ -29,18 +33,22 @@ function apiKanjiFind(text) {
     return utilInvoke('kanjiFind', {text});
 }
 
-function apiTemplateRender(template, data) {
-    return utilInvoke('templateRender', {data, template});
+function apiDefinitionAdd(definition, mode) {
+    return utilInvoke('definitionAdd', {definition, mode});
 }
 
 function apiDefinitionsAddable(definitions, modes) {
     return utilInvoke('definitionsAddable', {definitions, modes}).catch(() => null);
 }
 
-function apiDefinitionAdd(definition, mode) {
-    return utilInvoke('definitionAdd', {definition, mode});
-}
-
 function apiNoteView(noteId) {
     return utilInvoke('noteView', {noteId});
+}
+
+function apiTemplateRender(template, data) {
+    return utilInvoke('templateRender', {data, template});
+}
+
+function apiCommandExec(command) {
+    return utilInvoke('commandExec', {command});
 }

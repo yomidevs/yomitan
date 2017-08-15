@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -77,7 +77,11 @@ class Backend {
 
         const handlers = {
             optionsGet: ({callback}) => {
-                forward(optionsLoad(), callback);
+                forward(apiOptionsGet(), callback);
+            },
+
+            optionsSet: ({options, callback}) => {
+                forward(apiOptionsSet(options), callback);
             },
 
             kanjiFind: ({text, callback}) => {
@@ -86,10 +90,6 @@ class Backend {
 
             termsFind: ({text, callback}) => {
                 forward(apiTermsFind(text), callback);
-            },
-
-            templateRender: ({template, data, callback}) => {
-                forward(apiTemplateRender(template, data), callback);
             },
 
             definitionAdd: ({definition, mode, callback}) => {
@@ -102,6 +102,14 @@ class Backend {
 
             noteView: ({noteId}) => {
                 forward(apiNoteView(noteId), callback);
+            },
+
+            templateRender: ({template, data, callback}) => {
+                forward(apiTemplateRender(template, data), callback);
+            },
+
+            commandExec: ({command, callback}) => {
+                forward(apiCommandExec(command), callback);
             }
         };
 

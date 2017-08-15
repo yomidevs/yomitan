@@ -102,7 +102,7 @@ class Popup {
 
     async kanjiShow(elementRect, definitions, options, context) {
         await this.show(elementRect, options);
-        this.invokeApi('termsShow', {definitions, options, context});
+        this.invokeApi('kanjiShow', {definitions, options, context});
     }
 
     invokeApi(action, params={}) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,9 +41,8 @@ class DisplaySearch extends Display {
     }
 
     async onSearch(e) {
-        e.preventDefault();
-
         try {
+            e.preventDefault();
             this.intro.slideUp();
             const {length, definitions} = await apiTermsFind(this.query.val());
             super.termsShow(definitions, await apiOptionsGet());

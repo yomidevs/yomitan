@@ -17,7 +17,7 @@
  */
 
 
-$(document).ready(() => {
+$(document).ready(utilAsync(() => {
     $('#open-search').click(() => apiCommandExec('search'));
     $('#open-options').click(() => apiCommandExec('options'));
     $('#open-help').click(() => apiCommandExec('help'));
@@ -28,4 +28,4 @@ $(document).ready(() => {
         toggle.bootstrapToggle();
         toggle.change(() => apiCommandExec('toggle'));
     });
-});
+}));

@@ -17,6 +17,10 @@
  */
 
 
+/*
+ * AnkiConnect
+ */
+
 class AnkiConnect {
     constructor(server) {
         this.server = server;
@@ -67,6 +71,11 @@ class AnkiConnect {
         return requestJson(this.server, 'POST', {action, params, version: this.localVersion});
     }
 }
+
+
+/*
+ * AnkiNull
+ */
 
 class AnkiNull {
     async addNote(note) {
