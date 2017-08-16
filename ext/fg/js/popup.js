@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -87,6 +87,11 @@ class Popup {
         this.container.style.visibility = 'visible';
     }
 
+    async showOrphaned(elementRect, options) {
+        await this.show(elementRect, options);
+        this.invokeApi('orphaned');
+    }
+
     hide() {
         this.container.style.visibility = 'hidden';
     }
@@ -107,10 +112,5 @@ class Popup {
 
     invokeApi(action, params={}) {
         this.container.contentWindow.postMessage({action, params}, '*');
-    }
-
-    async onOrphaned(elementRect, options) {
-        await this.show(elementRect, options);
-        this.invokeApi('orphaned');
     }
 }

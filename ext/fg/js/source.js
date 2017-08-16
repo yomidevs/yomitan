@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+/*
+ * TextSourceRange
+ */
 
 class TextSourceRange {
     constructor(range, content='') {
@@ -175,6 +179,10 @@ class TextSourceRange {
     }
 }
 
+
+/*
+ * TextSourceElement
+ */
 
 class TextSourceElement {
     constructor(element, content='') {

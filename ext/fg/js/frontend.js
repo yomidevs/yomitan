@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ class Frontend {
     constructor() {
         this.popup = new Popup();
         this.popupTimer = null;
-        this.lastMousePos = null;
+        this.mousePosLast = null;
         this.mouseDownLeft = false;
         this.mouseDownMiddle = false;
-        this.lastTextSource = null;
+        this.textSourceLast = null;
         this.pendingLookup = false;
         this.options = null;
     }
@@ -53,7 +53,7 @@ class Frontend {
     }
 
     onMouseMove(e) {
-        this.lastMousePos = {x: e.clientX, y: e.clientY};
+        this.mousePosLast = {x: e.clientX, y: e.clientY};
         this.popupTimerClear();
 
         if (!this.options.general.enable) {
@@ -75,7 +75,7 @@ class Frontend {
             return;
         }
 
-        const searchFunc = () => this.searchAt(this.lastMousePos);
+        const searchFunc = () => this.searchAt(this.mousePosLast);
         if (this.options.scanning.modifier === 'none') {
             this.popupTimerSet(searchFunc);
         } else {
@@ -84,7 +84,7 @@ class Frontend {
     }
 
     onMouseDown(e) {
-        this.lastMousePos = {x: e.clientX, y: e.clientY};
+        this.mousePosLast = {x: e.clientX, y: e.clientY};
         this.popupTimerClear();
         this.searchClear();
 
@@ -143,13 +143,7 @@ class Frontend {
     }
 
     onError(error) {
-        if (window.yomichan_orphaned) {
-            if (this.lastTextSource && this.options.scanning.modifier !== 'none') {
-                this.popup.showOrphaned(this.lastTextSource.getRect(), this.options);
-            }
-        } else {
-            window.alert(`Error: ${error}`);
-        }
+        window.alert(`Error: ${error}`);
     }
 
     popupTimerSet(callback) {
@@ -165,18 +159,20 @@ class Frontend {
     }
 
     async searchAt(point) {
+        let textSource = null;
+
         try {
             if (this.pendingLookup) {
                 return;
             }
 
-            const textSource = docRangeFromPoint(point);
+            textSource = docRangeFromPoint(point);
             if (!textSource || !textSource.containsPoint(point)) {
                 docImposterDestroy();
                 return;
             }
 
-            if (this.lastTextSource && this.lastTextSource.equals(textSource)) {
+            if (this.textSourceLast && this.textSourceLast.equals(textSource)) {
                 return;
             }
 
@@ -186,7 +182,13 @@ class Frontend {
                 await this.searchKanji(textSource);
             }
         } catch (e) {
-            this.onError(e);
+            if (window.yomichan_orphaned) {
+                if (textSource && this.options.scanning.modifier !== 'none') {
+                    this.popup.showOrphaned(textSource.getRect(), this.options);
+                }
+            } else {
+                this.onError(e);
+            }
         } finally {
             docImposterDestroy();
             this.pendingLookup = false;
@@ -212,7 +214,7 @@ class Frontend {
             {sentence, url}
         );
 
-        this.lastTextSource = textSource;
+        this.textSourceLast = textSource;
         if (this.options.scanning.selectText) {
             textSource.select();
         }
@@ -237,7 +239,7 @@ class Frontend {
             {sentence, url}
         );
 
-        this.lastTextSource = textSource;
+        this.textSourceLast = textSource;
         if (this.options.scanning.selectText) {
             textSource.select();
         }
@@ -249,11 +251,11 @@ class Frontend {
         docImposterDestroy();
         this.popup.hide();
 
-        if (this.options.scanning.selectText && this.lastTextSource) {
-            this.lastTextSource.deselect();
+        if (this.options.scanning.selectText && this.textSourceLast) {
+            this.textSourceLast.deselect();
         }
 
-        this.lastTextSource = null;
+        this.textSourceLast = null;
     }
 }
 
