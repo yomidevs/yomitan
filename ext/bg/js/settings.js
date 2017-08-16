@@ -96,9 +96,6 @@ async function onFormOptionsChanged(e) {
             return;
         }
 
-        ankiErrorShow();
-        ankiSpinnerShow(true);
-
         const {optionsNew, optionsOld} = await formRead();
         await optionsSave(optionsNew);
 
@@ -109,7 +106,9 @@ async function onFormOptionsChanged(e) {
             optionsNew.anki.server !== optionsOld.anki.server;
 
         if (ankiUpdated) {
+            ankiSpinnerShow(true);
             await ankiDeckAndModelPopulate(optionsNew);
+            ankiErrorShow();
         }
     } catch (e) {
         ankiErrorShow(e);
@@ -414,9 +413,6 @@ async function onAnkiModelChanged(e) {
             return;
         }
 
-        ankiErrorShow();
-        ankiSpinnerShow(true);
-
         const element = $(this);
         const tab = element.closest('.tab-pane');
         const tabId = tab.attr('id');
@@ -425,7 +421,9 @@ async function onAnkiModelChanged(e) {
         optionsNew.anki[tabId].fields = {};
         await optionsSave(optionsNew);
 
+        ankiSpinnerShow(true);
         await ankiFieldsPopulate(element, optionsNew);
+        ankiErrorShow();
     } catch (e) {
         ankiErrorShow(e);
     } finally {
