@@ -22,6 +22,10 @@ function utilAsync(func) {
     };
 }
 
+function utilIsolate(data) {
+    return JSON.parse(JSON.stringify(data));
+}
+
 function utilBackend() {
     return chrome.extension.getBackgroundPage().yomichan_backend;
 }
