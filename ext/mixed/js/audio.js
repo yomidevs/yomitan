@@ -79,7 +79,35 @@ async function audioBuildUrl(definition, mode, cache={}) {
                 }
             }
         });
-    } else {
+    } else if (mode === 'jisho') {
+        return new Promise((resolve, reject) => {
+            const response = cache[definition.expression];
+            if (response) {
+                resolve(response);
+            } else {
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', `http://jisho.org/search/${definition.expression}`);
+                xhr.addEventListener('error', () => reject('failed to scrape audio data'));
+                xhr.addEventListener('load', () => {
+                    cache[definition.expression] = xhr.responseText;
+                    resolve(xhr.responseText);
+                });
+
+                xhr.send();
+            }
+        }).then(response => {
+            try {
+                const dom = new DOMParser().parseFromString(response, 'text/html');
+                const audio = dom.getElementById(`audio_${definition.expression}:${definition.reading}`);
+                if (audio) {
+                    return audio.getElementsByTagName('source').item(0).getAttribute('src');
+                }
+            } catch (e) {
+                // NOP
+            }
+        });
+    }
+    else {
         return Promise.resolve();
     }
 }

@@ -127,3 +127,6 @@ async function apiCommandExec(command) {
     }
 }
 
+async function apiAudioGetUrl(definition, source) {
+    return audioBuildUrl(definition, source);
+}

@@ -110,6 +110,10 @@ class Backend {
 
             commandExec: ({command, callback}) => {
                 forward(apiCommandExec(command), callback);
+            },
+
+            audioGetUrl: ({definition, source, callback}) => {
+                forward(apiAudioGetUrl(definition, source), callback);
             }
         };
 

@@ -52,3 +52,7 @@ function apiTemplateRender(template, data) {
 function apiCommandExec(command) {
     return utilInvoke('commandExec', {command});
 }
+
+function apiAudioGetUrl(definition, source) {
+    return utilInvoke('audioGetUrl', {definition, source});
+}

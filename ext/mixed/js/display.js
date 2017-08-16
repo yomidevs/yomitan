@@ -27,7 +27,6 @@ class Display {
         this.sequence = 0;
         this.index = 0;
         this.audioCache = {};
-        this.responseCache = {};
 
         $(document).keydown(this.onKeyDown.bind(this));
     }
@@ -368,7 +367,7 @@ class Display {
         try {
             this.spinner.show();
 
-            let url = await audioBuildUrl(definition, this.options.general.audioSource, this.responseCache);
+            let url = await apiAudioGetUrl(definition, this.options.general.audioSource);
             if (!url) {
                 url = '/mixed/mp3/button.mp3';
             }
