@@ -17,24 +17,24 @@
  */
 
 
-class AnkiNull {
-    addNote(note) {
-        return Promise.reject('unsupported action');
+function jpIsKanji(c) {
+    const code = c.charCodeAt(0);
+    return code >= 0x4e00 && code < 0x9fb0 || code >= 0x3400 && code < 0x4dc0;
+}
+
+function jpIsKana(c) {
+    return wanakana.isKana(c);
+}
+
+function jpKatakanaToHiragana(text) {
+    let result = '';
+    for (const c of text) {
+        if (wanakana.isKatakana(c)) {
+            result += wanakana.toHiragana(c);
+        } else {
+            result += c;
+        }
     }
 
-    canAddNotes(notes) {
-        return Promise.resolve([]);
-    }
-
-    getDeckNames() {
-        return Promise.resolve([]);
-    }
-
-    getModelNames() {
-        return Promise.resolve([]);
-    }
-
-    getModelFieldNames(modelName) {
-        return Promise.resolve([]);
-    }
+    return result;
 }

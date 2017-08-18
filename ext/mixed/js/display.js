@@ -27,188 +27,65 @@ class Display {
         this.sequence = 0;
         this.index = 0;
         this.audioCache = {};
-        this.responseCache = {};
 
         $(document).keydown(this.onKeyDown.bind(this));
     }
 
-    definitionAdd(definition, mode) {
+    onError(error) {
         throw 'override me';
     }
 
-    definitionsAddable(definitions, modes) {
+    onSearchClear() {
         throw 'override me';
     }
 
-    templateRender(template, data) {
-        throw 'override me';
-    }
-
-    kanjiFind(character) {
-        throw 'override me';
-    }
-
-    handleError(error) {
-        throw 'override me';
-    }
-
-    clearSearch() {
-        throw 'override me';
-    }
-
-    showTermDefs(definitions, options, context) {
-        window.focus();
-
-        this.spinner.hide();
-        this.definitions = definitions;
-        this.options = options;
-        this.context = context;
-
-        const sequence = ++this.sequence;
-        const params = {
-            definitions,
-            addable: options.anki.enable,
-            grouped: options.general.groupResults,
-            playback: options.general.audioSource !== 'disabled',
-            debug: options.general.debugInfo
-        };
-
-        if (context) {
-            for (const definition of definitions) {
-                if (context.sentence) {
-                    definition.cloze = clozeBuild(context.sentence, definition.source);
-                }
-
-                definition.url = context.url;
-            }
-        }
-
-        this.templateRender('terms.html', params).then(content => {
-            this.container.html(content);
-            this.entryScroll(context && context.index || 0);
-
-            $('.action-add-note').click(this.onAddNote.bind(this));
-            $('.action-play-audio').click(this.onPlayAudio.bind(this));
-            $('.kanji-link').click(this.onKanjiLookup.bind(this));
-
-            return this.adderButtonsUpdate(['term-kanji', 'term-kana'], sequence);
-        }).catch(this.handleError.bind(this));
-    }
-
-    showKanjiDefs(definitions, options, context) {
-        window.focus();
-
-        this.spinner.hide();
-        this.definitions = definitions;
-        this.options = options;
-        this.context = context;
-
-        const sequence = ++this.sequence;
-        const params = {
-            definitions,
-            source: context && context.source,
-            addable: options.anki.enable,
-            debug: options.general.debugInfo
-        };
-
-        if (context) {
-            for (const definition of definitions) {
-                if (context.sentence) {
-                    definition.cloze = clozeBuild(context.sentence);
-                }
-
-                definition.url = context.url;
-            }
-        }
-
-        this.templateRender('kanji.html', params).then(content => {
-            this.container.html(content);
-            this.entryScroll(context && context.index || 0);
-
-            $('.action-add-note').click(this.onAddNote.bind(this));
-            $('.source-term').click(this.onSourceTerm.bind(this));
-
-            return this.adderButtonsUpdate(['kanji'], sequence);
-        }).catch(this.handleError.bind(this));
-    }
-
-    adderButtonsUpdate(modes, sequence) {
-        return this.definitionsAddable(this.definitions, modes).then(states => {
-            if (states === null || sequence !== this.sequence) {
-                return;
-            }
-
-            states.forEach((state, index) => {
-                for (const mode in state) {
-                    const button = Display.adderButtonFind(index, mode);
-                    if (state[mode]) {
-                        button.removeClass('disabled');
-                    } else {
-                        button.addClass('disabled');
-                    }
-
-                    button.removeClass('pending');
-                }
-            });
-        });
-    }
-
-    entryScroll(index, smooth) {
-        index = Math.min(index, this.definitions.length - 1);
-        index = Math.max(index, 0);
-
-        $('.current').hide().eq(index).show();
-
-        const container = $('html,body').stop();
-        const entry = $('.entry').eq(index);
-        const target = index === 0 ? 0 : entry.offset().top;
-
-        if (smooth) {
-            container.animate({scrollTop: target}, 200);
-        } else {
-            container.scrollTop(target);
-        }
-
-        this.index = index;
-    }
-
-    onSourceTerm(e) {
+    onSourceTermView(e) {
         e.preventDefault();
-        this.sourceBack();
+        this.sourceTermView();
     }
 
-    onKanjiLookup(e) {
-        e.preventDefault();
+    async onKanjiLookup(e) {
+        try {
+            e.preventDefault();
 
-        const link = $(e.target);
-        const context = {
-            source: {
-                definitions: this.definitions,
-                index: Display.entryIndexFind(link)
+            const link = $(e.target);
+            const context = {
+                source: {
+                    definitions: this.definitions,
+                    index: Display.entryIndexFind(link)
+                }
+            };
+
+            if (this.context) {
+                context.sentence = this.context.sentence;
+                context.url = this.context.url;
             }
-        };
 
-        if (this.context) {
-            context.sentence = this.context.sentence;
-            context.url = this.context.url;
+            const kanjiDefs = await apiKanjiFind(link.text());
+            this.kanjiShow(kanjiDefs, this.options, context);
+        } catch (e) {
+            this.onError(e);
         }
-
-        this.kanjiFind(link.text()).then(kanjiDefs => {
-            this.showKanjiDefs(kanjiDefs, this.options, context);
-        }).catch(this.handleError.bind(this));
     }
 
-    onPlayAudio(e) {
+    onAudioPlay(e) {
         e.preventDefault();
         const index = Display.entryIndexFind($(e.currentTarget));
         this.audioPlay(this.definitions[index]);
     }
 
-    onAddNote(e) {
+    onNoteAdd(e) {
         e.preventDefault();
         const link = $(e.currentTarget);
         const index = Display.entryIndexFind(link);
         this.noteAdd(this.definitions[index], link.data('mode'));
+    }
+
+    onNoteView(e) {
+        e.preventDefault();
+        const link = $(e.currentTarget);
+        const index = Display.entryIndexFind(link);
+        apiNoteView(link.data('noteId'));
     }
 
     onKeyDown(e) {
@@ -219,57 +96,64 @@ class Display {
             }
         };
 
+        const noteTryView = mode => {
+            const button = Display.viewerButtonFind(this.index);
+            if (button.length !== 0 && !button.hasClass('disabled')) {
+                apiNoteView(button.data('noteId'));
+            }
+        };
+
         const handlers = {
             27: /* escape */ () => {
-                this.clearSearch();
+                this.onSearchClear();
                 return true;
             },
 
             33: /* page up */ () => {
                 if (e.altKey) {
-                    this.entryScroll(this.index - 3, true);
+                    this.entryScrollIntoView(this.index - 3, true);
                     return true;
                 }
             },
 
             34: /* page down */ () => {
                 if (e.altKey) {
-                    this.entryScroll(this.index + 3, true);
+                    this.entryScrollIntoView(this.index + 3, true);
                     return true;
                 }
             },
 
             35: /* end */ () => {
                 if (e.altKey) {
-                    this.entryScroll(this.definitions.length - 1, true);
+                    this.entryScrollIntoView(this.definitions.length - 1, true);
                     return true;
                 }
             },
 
             36: /* home */ () => {
                 if (e.altKey) {
-                    this.entryScroll(0, true);
+                    this.entryScrollIntoView(0, true);
                     return true;
                 }
             },
 
             38: /* up */ () => {
                 if (e.altKey) {
-                    this.entryScroll(this.index - 1, true);
+                    this.entryScrollIntoView(this.index - 1, true);
                     return true;
                 }
             },
 
             40: /* down */ () => {
                 if (e.altKey) {
-                    this.entryScroll(this.index + 1, true);
+                    this.entryScrollIntoView(this.index + 1, true);
                     return true;
                 }
             },
 
             66: /* b */ () => {
                 if (e.altKey) {
-                    this.sourceBack();
+                    this.sourceTermView();
                     return true;
                 }
             },
@@ -303,6 +187,12 @@ class Display {
 
                     return true;
                 }
+            },
+
+            86: /* v */ () => {
+                if (e.altKey) {
+                    noteTryView();
+                }
             }
         };
 
@@ -312,7 +202,133 @@ class Display {
         }
     }
 
-    sourceBack() {
+    async termsShow(definitions, options, context) {
+        try {
+            window.focus();
+
+            this.definitions = definitions;
+            this.options = options;
+            this.context = context;
+
+            const sequence = ++this.sequence;
+            const params = {
+                definitions,
+                addable: options.anki.enable,
+                grouped: options.general.groupResults,
+                playback: options.general.audioSource !== 'disabled',
+                debug: options.general.debugInfo
+            };
+
+            if (context) {
+                for (const definition of definitions) {
+                    if (context.sentence) {
+                        definition.cloze = Display.clozeBuild(context.sentence, definition.source);
+                    }
+
+                    definition.url = context.url;
+                }
+            }
+
+            const content = await apiTemplateRender('terms.html', params);
+            this.container.html(content);
+            this.entryScrollIntoView(context && context.index || 0);
+
+            $('.action-add-note').click(this.onNoteAdd.bind(this));
+            $('.action-view-note').click(this.onNoteView.bind(this));
+            $('.action-play-audio').click(this.onAudioPlay.bind(this));
+            $('.kanji-link').click(this.onKanjiLookup.bind(this));
+
+            await this.adderButtonUpdate(['term-kanji', 'term-kana'], sequence);
+        } catch (e) {
+            this.onError(e);
+        }
+    }
+
+    async kanjiShow(definitions, options, context) {
+        try {
+            window.focus();
+
+            this.definitions = definitions;
+            this.options = options;
+            this.context = context;
+
+            const sequence = ++this.sequence;
+            const params = {
+                definitions,
+                source: context && context.source,
+                addable: options.anki.enable,
+                debug: options.general.debugInfo
+            };
+
+            if (context) {
+                for (const definition of definitions) {
+                    if (context.sentence) {
+                        definition.cloze = Display.clozeBuild(context.sentence);
+                    }
+
+                    definition.url = context.url;
+                }
+            }
+
+            const content = await apiTemplateRender('kanji.html', params);
+            this.container.html(content);
+            this.entryScrollIntoView(context && context.index || 0);
+
+            $('.action-add-note').click(this.onNoteAdd.bind(this));
+            $('.action-view-note').click(this.onNoteView.bind(this));
+            $('.source-term').click(this.onSourceTermView.bind(this));
+
+            await this.adderButtonUpdate(['kanji'], sequence);
+        } catch (e) {
+            this.onError(e);
+        }
+    }
+
+    async adderButtonUpdate(modes, sequence) {
+        try {
+            const states = await apiDefinitionsAddable(this.definitions, modes);
+            if (!states || sequence !== this.sequence) {
+                return;
+            }
+
+            for (let i = 0; i < states.length; ++i) {
+                const state = states[i];
+                for (const mode in state) {
+                    const button = Display.adderButtonFind(i, mode);
+                    if (state[mode]) {
+                        button.removeClass('disabled');
+                    } else {
+                        button.addClass('disabled');
+                    }
+
+                    button.removeClass('pending');
+                }
+            }
+        } catch (e) {
+            this.onError(e);
+        }
+    }
+
+    entryScrollIntoView(index, smooth) {
+        index = Math.min(index, this.definitions.length - 1);
+        index = Math.max(index, 0);
+
+        $('.current').hide().eq(index).show();
+
+        const container = $('html,body').stop();
+        const entry = $('.entry').eq(index);
+        const target = index === 0 ? 0 : entry.offset().top;
+
+        if (smooth) {
+            container.animate({scrollTop: target}, 200);
+        } else {
+            container.scrollTop(target);
+        }
+
+        this.index = index;
+    }
+
+    sourceTermView() {
         if (this.context && this.context.source) {
             const context = {
                 url: this.context.source.url,
@@ -320,32 +336,40 @@ class Display {
                 index: this.context.source.index
             };
 
-            this.showTermDefs(this.context.source.definitions, this.options, context);
+            this.termsShow(this.context.source.definitions, this.options, context);
         }
     }
 
-    noteAdd(definition, mode) {
-        this.spinner.show();
-        return this.definitionAdd(definition, mode).then(success => {
-            if (success) {
+    async noteAdd(definition, mode) {
+        try {
+            this.spinner.show();
+
+            const noteId = await apiDefinitionAdd(definition, mode);
+            if (noteId) {
                 const index = this.definitions.indexOf(definition);
                 Display.adderButtonFind(index, mode).addClass('disabled');
+                Display.viewerButtonFind(index).removeClass('pending disabled').data('noteId', noteId);
             } else {
-                this.handleError('note could not be added');
+                throw 'note could note be added';
             }
-        }).catch(this.handleError.bind(this)).then(() => this.spinner.hide());
+        } catch (e) {
+            this.onError(e);
+        } finally {
+            this.spinner.hide();
+        }
     }
 
-    audioPlay(definition) {
-        this.spinner.show();
+    async audioPlay(definition) {
+        try {
+            this.spinner.show();
 
-        for (const key in this.audioCache) {
-            this.audioCache[key].pause();
-        }
-
-        audioBuildUrl(definition, this.options.general.audioSource, this.responseCache).then(url => {
+            let url = await apiAudioGetUrl(definition, this.options.general.audioSource);
             if (!url) {
                 url = '/mixed/mp3/button.mp3';
+            }
+
+            for (const key in this.audioCache) {
+                this.audioCache[key].pause();
             }
 
             let audio = this.audioCache[url];
@@ -365,7 +389,25 @@ class Display {
                     audio.play();
                 };
             }
-        }).catch(this.handleError.bind(this)).then(() => this.spinner.hide());
+        } catch (e) {
+            this.onError(e);
+        } finally {
+            this.spinner.hide();
+        }
+    }
+
+    static clozeBuild(sentence, source) {
+        const result = {
+            sentence: sentence.text.trim()
+        };
+
+        if (source) {
+            result.prefix = sentence.text.substring(0, sentence.offset).trim();
+            result.body = source.trim();
+            result.suffix = sentence.text.substring(sentence.offset + source.length).trim();
+        }
+
+        return result;
     }
 
     static entryIndexFind(element) {
@@ -374,5 +416,9 @@ class Display {
 
     static adderButtonFind(index, mode) {
         return $('.entry').eq(index).find(`.action-add-note[data-mode="${mode}"]`);
+    }
+
+    static viewerButtonFind(index) {
+        return $('.entry').eq(index).find('.action-view-note');
     }
 }

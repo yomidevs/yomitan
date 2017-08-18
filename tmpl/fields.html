@@ -1,13 +1,17 @@
 {{#*inline "glossary-single"}}
     {{~#if html~}}
-        {{~#if tags~}}<i>({{#each tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})</i> {{/if~}}
+        {{~#unless brief~}}
+            {{~#if tags~}}<i>({{#each tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})</i> {{/if~}}
+        {{~/unless~}}
         {{~#if glossary.[1]~}}
             <ul>{{#each glossary}}<li>{{#multiLine}}{{.}}{{/multiLine}}</li>{{/each}}</ul>
         {{~else~}}
             {{~#multiLine}}{{glossary.[0]}}{{/multiLine~}}
         {{~/if~}}
     {{~else~}}
-        {{~#if tags~}}({{#each tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}}) {{/if~}}
+        {{~#unless brief~}}
+            {{~#if tags~}}({{#each tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}}) {{/if~}}
+        {{~/unless~}}
         {{~#if glossary.[1]~}}
             {{#each glossary}}{{.}}{{#unless @last}}, {{/unless}}{{/each}}
         {{~else~}}
@@ -58,16 +62,20 @@
     {{~else~}}
         {{~#if group~}}
             {{~#if definition.definitions.[1]~}}
-                {{~#if html}}<ol>{{#each definition.definitions}}<li>{{> glossary-single html=../html}}</li>{{/each}}</ol>
-                {{~else}}{{#each definition.definitions}} * {{> glossary-single html=../html}}{{/each}}{{/if~}}
+                {{~#if html}}<ol>{{#each definition.definitions}}<li>{{> glossary-single html=../html brief=../brief}}</li>{{/each}}</ol>
+                {{~else}}{{#each definition.definitions}} * {{> glossary-single html=../html brief=../brief}}{{/each}}{{/if~}}
             {{~else~}}
-                {{~> glossary-single definition.definitions.[0] html=html~}}
+                {{~> glossary-single definition.definitions.[0] html=html brief=brief~}}
             {{~/if~}}
         {{~else~}}
-            {{~> glossary-single definition html=html~}}
+            {{~> glossary-single definition html=html brief=brief~}}
         {{~/if~}}
     {{~/if~}}
     {{~#if html}}</div>{{/if~}}
+{{/inline}}
+
+{{#*inline "glossary-brief"}}
+    {{~> glossary brief=true ~}}
 {{/inline}}
 
 {{#*inline "kunyomi"}}

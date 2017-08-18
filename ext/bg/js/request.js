@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2017  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,25 +17,24 @@
  */
 
 
-function utilAsync(func) {
-    return function(...args) {
-        func.apply(this, args);
-    };
-}
-
-function utilInvoke(action, params={}) {
+function requestJson(url, action, params) {
     return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.overrideMimeType('application/json');
+        xhr.addEventListener('load', () => resolve(xhr.responseText));
+        xhr.addEventListener('error', () => reject('failed to execute network request'));
+        xhr.open(action, url);
+        if (params) {
+            xhr.send(JSON.stringify(params));
+        } else {
+            xhr.send();
+        }
+    }).then(responseText => {
         try {
-            chrome.runtime.sendMessage({action, params}, ({result, error}) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(result);
-                }
-            });
-        } catch (e) {
-            window.yomichan_orphaned = true;
-            reject(e.message);
+            return JSON.parse(responseText);
+        }
+        catch (e) {
+            return Promise.reject('invalid JSON response');
         }
     });
 }
