@@ -17,30 +17,7 @@
  */
 
 
-/*
- * Cloze
- */
-
-function clozeBuild(sentence, source) {
-    const result = {
-        sentence: sentence.text.trim()
-    };
-
-    if (source) {
-        result.prefix = sentence.text.substring(0, sentence.offset).trim();
-        result.body = source.trim();
-        result.suffix = sentence.text.substring(sentence.offset + source.length).trim();
-    }
-
-    return result;
-}
-
-
-/*
- * Audio
- */
-
-function audioBuildUrl(definition, mode, cache={}) {
+async function audioBuildUrl(definition, mode, cache={}) {
     if (mode === 'jpod101') {
         let kana = definition.reading;
         let kanji = definition.expression;
@@ -102,8 +79,36 @@ function audioBuildUrl(definition, mode, cache={}) {
                 }
             }
         });
-    } else {
-        return Promise.reject('unsupported audio source');
+    } else if (mode === 'jisho') {
+        return new Promise((resolve, reject) => {
+            const response = cache[definition.expression];
+            if (response) {
+                resolve(response);
+            } else {
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', `http://jisho.org/search/${definition.expression}`);
+                xhr.addEventListener('error', () => reject('failed to scrape audio data'));
+                xhr.addEventListener('load', () => {
+                    cache[definition.expression] = xhr.responseText;
+                    resolve(xhr.responseText);
+                });
+
+                xhr.send();
+            }
+        }).then(response => {
+            try {
+                const dom = new DOMParser().parseFromString(response, 'text/html');
+                const audio = dom.getElementById(`audio_${definition.expression}:${definition.reading}`);
+                if (audio) {
+                    return audio.getElementsByTagName('source').item(0).getAttribute('src');
+                }
+            } catch (e) {
+                // NOP
+            }
+        });
+    }
+    else {
+        return Promise.resolve();
     }
 }
 
@@ -121,16 +126,7 @@ function audioBuildFilename(definition) {
     }
 }
 
-function audioInject(definition, fields, mode) {
-    if (mode === 'disabled') {
-        return Promise.resolve(true);
-    }
-
-    const filename = audioBuildFilename(definition);
-    if (!filename) {
-        return Promise.resolve(true);
-    }
-
+async function audioInject(definition, fields, mode) {
     let usesAudio = false;
     for (const name in fields) {
         if (fields[name].includes('{audio}')) {
@@ -140,11 +136,19 @@ function audioInject(definition, fields, mode) {
     }
 
     if (!usesAudio) {
-        return Promise.resolve(true);
+        return true;
     }
 
-    return audioBuildUrl(definition, mode).then(url => {
-        definition.audio = {url, filename};
+    try {
+        const url = await audioBuildUrl(definition, mode);
+        const filename = audioBuildFilename(definition);
+
+        if (url && filename) {
+            definition.audio = {url, filename};
+        }
+
         return true;
-    }).catch(() => false);
+    } catch (e) {
+        return false;
+    }
 }

@@ -17,15 +17,15 @@
  */
 
 
-$(document).ready(() => {
-    $('#open-search').click(() => commandExec('search'));
-    $('#open-options').click(() => commandExec('options'));
-    $('#open-help').click(() => commandExec('help'));
+$(document).ready(utilAsync(() => {
+    $('#open-search').click(() => apiCommandExec('search'));
+    $('#open-options').click(() => apiCommandExec('options'));
+    $('#open-help').click(() => apiCommandExec('help'));
 
     optionsLoad().then(options => {
         const toggle = $('#enable-search');
         toggle.prop('checked', options.general.enable).change();
         toggle.bootstrapToggle();
-        toggle.change(() => commandExec('toggle'));
+        toggle.change(() => apiCommandExec('toggle'));
     });
-});
+}));

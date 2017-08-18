@@ -1,13 +1,13 @@
 {
     "manifest_version": 2,
     "name": "Yomichan",
-    "version": "1.2.0",
+    "version": "1.3.0",
 
     "description": "Japanese dictionary with Anki integration",
     "icons": {"16": "mixed/img/icon16.png", "48": "mixed/img/icon48.png", "128": "mixed/img/icon128.png"},
     "browser_action": {
         "default_icon": {"19": "mixed/img/icon19.png", "38": "mixed/img/icon38.png"},
-        "default_popup": "bg/popup.html"
+        "default_popup": "bg/context.html"
     },
 
     "author": "Alex Yatskov",
@@ -15,17 +15,18 @@
     "content_scripts": [{
         "matches": ["http://*/*", "https://*/*", "file://*/*"],
         "js": [
-            "fg/js/util.js",
-            "fg/js/source-range.js",
-            "fg/js/source-element.js",
+            "fg/js/api.js",
+            "fg/js/document.js",
             "fg/js/popup.js",
-            "fg/js/driver.js"
+            "fg/js/source.js",
+            "fg/js/util.js",
+            "fg/js/frontend.js"
         ],
         "css": ["fg/css/client.css"]
     }],
-    "minimum_chrome_version": "45.0.0.0",
+    "minimum_chrome_version": "57.0.0.0",
     "options_ui": {
-        "page": "bg/options.html"
+        "page": "bg/settings.html"
     },
     "permissions": [
         "<all_urls>",
@@ -46,11 +47,11 @@
             "description": "Open search window"
         }
     },
-    "web_accessible_resources": ["fg/frame.html"],
+    "web_accessible_resources": ["fg/float.html"],
     "applications": {
         "gecko": {
             "id": "alex@foosoft.net",
-            "strict_min_version": "51.0"
+            "strict_min_version": "52.0"
         }
     }
 }

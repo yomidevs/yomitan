@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,61 +17,45 @@
  */
 
 
-window.displayFrame = new class extends Display {
+class DisplayFloat extends Display {
     constructor() {
-        super($('#spinner'), $('#content'));
-        $(window).on('message', this.onMessage.bind(this));
+        super($('#spinner'), $('#definitions'));
+        $(window).on('message', utilAsync(this.onMessage.bind(this)));
     }
 
-    definitionAdd(definition, mode) {
-        return bgDefinitionAdd(definition, mode);
-    }
-
-    definitionsAddable(definitions, modes) {
-        return bgDefinitionsAddable(definitions, modes);
-    }
-
-    templateRender(template, data) {
-        return bgTemplateRender(template, data);
-    }
-
-    kanjiFind(character) {
-        return bgKanjiFind(character);
-    }
-
-    handleError(error) {
-        if (window.orphaned) {
-            this.showOrphaned();
+    onError(error) {
+        if (window.yomichan_orphaned) {
+            this.onOrphaned();
         } else {
             window.alert(`Error: ${error}`);
         }
     }
 
-    clearSearch() {
+    onOrphaned() {
+        $('#definitions').hide();
+        $('#error-orphaned').show();
+    }
+
+    onSearchClear() {
         window.parent.postMessage('popupClose', '*');
     }
 
-    selectionCopy() {
+    onSelectionCopy() {
         window.parent.postMessage('selectionCopy', '*');
-    }
-
-    showOrphaned() {
-        $('#content').hide();
-        $('#orphan').show();
     }
 
     onMessage(e) {
         const handlers = {
-            showTermDefs: ({definitions, options, context}) => {
-                this.showTermDefs(definitions, options, context);
+            termsShow: ({definitions, options, context}) => {
+                this.termsShow(definitions, options, context);
             },
 
-            showKanjiDefs: ({definitions, options, context}) => {
-                this.showKanjiDefs(definitions, options, context);
+            kanjiShow: ({definitions, options, context}) => {
+                this.kanjiShow(definitions, options, context);
             },
 
-            showOrphaned: () => {
-                this.showOrphaned();
+            orphaned: () => {
+                this.onOrphaned();
             }
         };
 
@@ -85,8 +69,8 @@ window.displayFrame = new class extends Display {
     onKeyDown(e) {
         const handlers = {
             67: /* c */ () => {
-                if (e.ctrlKey && window.getSelection().toString() === '') {
-                    this.selectionCopy();
+                if (e.ctrlKey && !window.getSelection().toString()) {
+                    this.onSelectionCopy();
                     return true;
                 }
             }
@@ -99,4 +83,6 @@ window.displayFrame = new class extends Display {
             super.onKeyDown(e);
         }
     }
-};
+}
+
+window.yomichan_display = new DisplayFloat();

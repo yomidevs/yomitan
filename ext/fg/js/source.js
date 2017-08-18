@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+/*
+ * TextSourceRange
+ */
 
 class TextSourceRange {
     constructor(range, content='') {
@@ -172,5 +176,69 @@ class TextSourceRange {
         }
 
         return state.remainder > 0;
+    }
+}
+
+
+/*
+ * TextSourceElement
+ */
+
+class TextSourceElement {
+    constructor(element, content='') {
+        this.element = element;
+        this.content = content;
+    }
+
+    clone() {
+        return new TextSourceElement(this.element, this.content);
+    }
+
+    text() {
+        return this.content;
+    }
+
+    setEndOffset(length) {
+        switch (this.element.nodeName) {
+            case 'BUTTON':
+                this.content = this.element.innerHTML;
+                break;
+            case 'IMG':
+                this.content = this.element.getAttribute('alt');
+                break;
+            default:
+                this.content = this.element.value;
+                break;
+        }
+
+        this.content = this.content || '';
+        this.content = this.content.substring(0, length);
+
+        return this.content.length;
+    }
+
+    setStartOffset(length) {
+        return 0;
+    }
+
+    containsPoint(point) {
+        const rect = this.getRect();
+        return point.x >= rect.left && point.x <= rect.right;
+    }
+
+    getRect() {
+        return this.element.getBoundingClientRect();
+    }
+
+    select() {
+        // NOP
+    }
+
+    deselect() {
+        // NOP
+    }
+
+    equals(other) {
+        return other.element === this.element && other.content === this.content;
     }
 }

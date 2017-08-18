@@ -229,6 +229,7 @@ exact versions used for distribution.
 *   Dexie: [homepage](http://dexie.org/) - [snapshot](https://github.com/dfahlander/Dexie.js/archive/v2.0.0-beta.10.zip)
 *   Handlebars: [homepage](http://handlebarsjs.com/) - [snapshot](http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars.min-714a4c4.js)
 *   JQuery: [homepage](https://blog.jquery.com/) - [snapshot](https://code.jquery.com/jquery-3.2.1.min.js)
+*   JSZip: [homepage](http://stuk.github.io/jszip/) - [snapshot](https://raw.githubusercontent.com/Stuk/jszip/de7f52fbcba485737bef7923a83f0fad92d9f5bc/dist/jszip.min.js)
 *   WanaKana: [homepage](http://wanakana.com/) - [snapshot](https://raw.githubusercontent.com/WaniKani/WanaKana/f2152985f5f2953d74edfe1b6a78e0e329a7cdfb/lib/wanakana.min.js)
 
 ## Frequently Asked Questions ##
@@ -288,4 +289,16 @@ exact versions used for distribution.
 
 ## License ##
 
-GPL
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
