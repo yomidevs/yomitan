@@ -46,6 +46,7 @@ function docImposterCreate(element) {
     imposter.style.position = 'absolute';
     imposter.style.top = `${offset.top}px`;
     imposter.style.left = `${offset.left}px`;
+    imposter.style.opacity = 0;
     imposter.style.zIndex = 2147483646;
     if (element.nodeName === 'TEXTAREA' && styleProps.overflow === 'visible') {
         imposter.style.overflow = 'auto';
