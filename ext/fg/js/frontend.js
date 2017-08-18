@@ -21,7 +21,6 @@ class Frontend {
     constructor() {
         this.popup = new Popup();
         this.popupTimer = null;
-        this.mousePosLast = null;
         this.mouseDownLeft = false;
         this.mouseDownMiddle = false;
         this.textSourceLast = null;
@@ -53,7 +52,6 @@ class Frontend {
     }
 
     onMouseMove(e) {
-        this.mousePosLast = {x: e.clientX, y: e.clientY};
         this.popupTimerClear();
 
         if (!this.options.general.enable) {
@@ -61,6 +59,10 @@ class Frontend {
         }
 
         if (this.mouseDownLeft) {
+            return;
+        }
+
+        if (this.pendingLookup) {
             return;
         }
 
@@ -75,11 +77,19 @@ class Frontend {
             return;
         }
 
-        const searchFunc = () => this.searchAt(this.mousePosLast);
+        const search = async () => {
+            try {
+                await this.searchAt({x: e.clientX, y: e.clientY});
+                this.pendingLookup = false;
+            } catch (e) {
+                this.onError(e);
+            }
+        };
+
         if (this.options.scanning.modifier === 'none') {
-            this.popupTimerSet(searchFunc);
+            this.popupTimerSet(search);
         } else {
-            searchFunc();
+            search();
         }
     }
 

@@ -286,8 +286,6 @@ class Display {
 
     async adderButtonUpdate(modes, sequence) {
         try {
-            this.spinner.show();
-
             const states = await apiDefinitionsAddable(this.definitions, modes);
             if (!states || sequence !== this.sequence) {
                 return;
@@ -308,8 +306,6 @@ class Display {
             }
         } catch (e) {
             this.onError(e);
-        } finally {
-            this.spinner.hide();
         }
     }
 
