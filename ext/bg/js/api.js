@@ -18,11 +18,11 @@
 
 
 async function apiOptionsSet(options) {
-    utilBackend().onOptionsUpdated(utilIsolate(options));
+    utilBackend().onOptionsUpdated(options);
 }
 
 async function apiOptionsGet() {
-    return utilIsolate(utilBackend().options);
+    return utilBackend().options;
 }
 
 async function apiTermsFind(text) {

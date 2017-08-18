@@ -37,7 +37,7 @@ class Backend {
     }
 
     onOptionsUpdated(options) {
-        this.options = options;
+        this.options = utilIsolate(options);
 
         if (!options.general.enable) {
             chrome.browserAction.setBadgeBackgroundColor({color: '#555555'});
