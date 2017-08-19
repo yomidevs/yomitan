@@ -24,7 +24,7 @@ Yomichan provides advanced features not available in other browser-based diction
 
     [![](https://foosoft.net/projects/yomichan/img/chrome-web-store.png)](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami)
 
-*   **Mozilla Firefox** (versions 51+)
+*   **Mozilla Firefox** (versions 52+)
 
     [![](https://foosoft.net/projects/yomichan/img/firefox-marketplace.png)](https://addons.mozilla.org/en-US/firefox/addon/yomichan/)
 
