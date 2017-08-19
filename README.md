@@ -39,7 +39,7 @@ different languages. You must download and import the dictionaries you wish to u
 definition lookups. If you have proprietary EPWING dictionaries that you would like to use, please see the [Yomichan
 Import](https://foosoft.net/projects/yomichan-import) page to learn how to convert and import them into Yomichan.
 
-*   **JMdict** (Japanese vocabulary)
+*   **[JMdict](http://www.edrdg.org/enamdict/enamdict_doc.html)** (Japanese vocabulary)
     *   [jmdict_dutch.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_dutch.zip)
     *   [jmdict_english.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_english.zip)
     *   [jmdict_french.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_french.zip)
@@ -50,13 +50,15 @@ Import](https://foosoft.net/projects/yomichan-import) page to learn how to conve
     *   [jmdict_slovenian.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_slovenian.zip)
     *   [jmdict_spanish.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_spanish.zip)
     *   [jmdict_swedish.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_swedish.zip)
-*   **JMnedict** (Japanese names)
+*   **[JMnedict](http://www.edrdg.org/enamdict/enamdict_doc.html)** (Japanese names)
     *   [jmnedict.zip](https://foosoft.net/projects/yomichan/dl/dict/jmnedict.zip)
-*   **KANJIDIC** (Japanese Kanji)
+*   **[KANJIDIC](http://nihongo.monash.edu/kanjidic2/index.html)** (Japanese Kanji)
     *   [kanjidic_english.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_english.zip)
     *   [kanjidic_french.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_french.zip)
     *   [kanjidic_portuguese.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_portuguese.zip)
     *   [kanjidic_spanish.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_spanish.zip)
+*   **[KireiCake](https://kireicake.com/rikaicakes/)** (Japanese slang)
+    *   [kireicake.zip](https://foosoft.net/projects/yomichan/dl/dict/kireicake.zip)
 
 ## Basic Usage ##
 
