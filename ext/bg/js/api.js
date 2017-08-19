@@ -85,8 +85,6 @@ async function apiDefinitionsAddable(definitions, modes) {
 
             states.push(state);
         }
-
-        return states;
     } catch (e) {
         // NOP
     }
