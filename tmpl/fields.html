@@ -44,9 +44,19 @@
 
 {{#*inline "furigana"}}
     {{~#if html~}}
-        {{~#if definition.reading}}<ruby>{{definition.expression}}<rt>{{definition.reading}}</rt></ruby>{{else}}{{definition.expression}}{{/if~}}
+        {{~#definition.furigana~}}
+            {{~#if furigana~}}
+                <ruby>{{text}}<rt>{{furigana}}</rt></ruby>
+            {{~else~}}
+                {{text}}
+            {{/if~}}
+        {{~/definition.furigana~}}
     {{~else~}}
-        {{~#if definition.reading}}{{definition.expression}} [{{definition.reading}}]{{else}}{{definition.expression}}{{/if~}}
+        {{#definition.furigana}}
+            {{~#furigana}} {{/furigana~}}
+            {{text}}
+            {{~#furigana}}[{{.}}]{{/furigana~}}
+        {{/definition.furigana}} 
     {{~/if~}}
 {{/inline}}
 

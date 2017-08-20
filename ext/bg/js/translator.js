@@ -71,7 +71,8 @@ class Translator {
                     expression: definition.expression,
                     reading: definition.reading,
                     glossary: definition.glossary,
-                    tags: dictTagsSort(tags)
+                    tags: dictTagsSort(tags), 
+                    furigana: distributeFurigana(definition.expression, definition.reading) 
                 });
             }
         }
