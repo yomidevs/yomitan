@@ -66,22 +66,27 @@ async function apiDefinitionAdd(definition, mode) {
 }
 
 async function apiDefinitionsAddable(definitions, modes) {
-    const notes = [];
-    for (const definition of definitions) {
-        for (const mode of modes) {
-            notes.push(dictNoteFormat(definition, mode, utilBackend().options));
-        }
-    }
-
-    const results = await utilBackend().anki.canAddNotes(notes);
     const states = [];
-    for (let resultBase = 0; resultBase < results.length; resultBase += modes.length) {
-        const state = {};
-        for (let modeOffset = 0; modeOffset < modes.length; ++modeOffset) {
-            state[modes[modeOffset]] = results[resultBase + modeOffset];
+
+    try {
+        const notes = [];
+        for (const definition of definitions) {
+            for (const mode of modes) {
+                notes.push(dictNoteFormat(definition, mode, utilBackend().options));
+            }
         }
 
-        states.push(state);
+        const results = await utilBackend().anki.canAddNotes(notes);
+        for (let resultBase = 0; resultBase < results.length; resultBase += modes.length) {
+            const state = {};
+            for (let modeOffset = 0; modeOffset < modes.length; ++modeOffset) {
+                state[modes[modeOffset]] = results[resultBase + modeOffset];
+            }
+
+            states.push(state);
+        }
+    } catch (e) {
+        // NOP
     }
 
     return states;

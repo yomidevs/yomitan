@@ -331,11 +331,6 @@ function ankiFieldsToDict(selection) {
 
 async function ankiDeckAndModelPopulate(options) {
     const ankiFormat = $('#anki-format').hide();
-    const ankiTermsModel = $('#anki-terms-model').val(options.anki.terms.model);
-    const ankiKanjiModel = $('#anki-kanji-model').val(options.anki.kanji.model);
-
-    $('#anki-terms-deck').val(options.anki.terms.deck);
-    $('#anki-kanji-deck').val(options.anki.kanji.deck);
 
     const deckNames = await utilAnkiGetDeckNames();
     const ankiDeck = $('.anki-deck');
@@ -347,8 +342,11 @@ async function ankiDeckAndModelPopulate(options) {
     ankiModel.find('option').remove();
     modelNames.sort().forEach(name => ankiModel.append($('<option/>', {value: name, text: name})));
 
-    await ankiFieldsPopulate(ankiTermsModel, options);
-    await ankiFieldsPopulate(ankiKanjiModel, options);
+    $('#anki-terms-deck').val(options.anki.terms.deck);
+    await ankiFieldsPopulate($('#anki-terms-model').val(options.anki.terms.model), options);
+
+    $('#anki-kanji-deck').val(options.anki.kanji.deck);
+    await ankiFieldsPopulate($('#anki-kanji-model').val(options.anki.kanji.model), options);
 
     ankiFormat.show();
 }

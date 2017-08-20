@@ -51,5 +51,5 @@ function handlebarsRender(template, data) {
         Handlebars.registerHelper('multiLine', handlebarsMultiLine);
     }
 
-    return Handlebars.templates[template](data);
+    return Handlebars.templates[template](data).trim();
 }

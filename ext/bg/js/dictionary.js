@@ -223,10 +223,7 @@ function dictFieldFormat(field, definition, mode, options) {
             modeKanji: mode === 'kanji'
         };
 
-        field = field.replace(
-            `{${marker}}`,
-            handlebarsRender('fields.html', data)
-        );
+        field = field.replace(`{${marker}}`, handlebarsRender('fields.html', data));
     }
 
     return field;
