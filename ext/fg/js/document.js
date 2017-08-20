@@ -76,7 +76,7 @@ function docRangeFromPoint(point) {
     if (!document.caretRangeFromPoint) {
         document.caretRangeFromPoint = (x, y) => {
             const position = document.caretPositionFromPoint(x,y);
-            if (position) {
+            if (position && position.offsetNode) {
                 const range = document.createRange();
                 range.setStart(position.offsetNode, position.offset);
                 range.setEnd(position.offsetNode, position.offset);
