@@ -22,7 +22,8 @@
             "fg/js/util.js",
             "fg/js/frontend.js"
         ],
-        "css": ["fg/css/client.css"]
+        "css": ["fg/css/client.css"],
+        "all_frames": true
     }],
     "minimum_chrome_version": "57.0.0.0",
     "options_ui": {
