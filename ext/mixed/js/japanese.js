@@ -39,80 +39,80 @@ function jpKatakanaToHiragana(text) {
     return result;
 }
 
-function distributeFurigana(word, reading) { 
-    reading = reading || wanakana.toHiragana(word); 
-    function span(str, pred) { 
-        let i = 0; 
-        while (i < str.length && pred(str[i])) { 
-            i++; 
-        } 
-        return [str.substring(0, i), str.substring(i)]; 
-    } 
-    const isKanji = c => jpIsKanji(c) || 
-        c == "\u3005"; /* kurikaeshi */ 
-    const isKana = c => jpIsKana(c) || 
-        c == "\u30fc"; /* chouonpu */ 
-    function parse(word) { 
-        const res = []; 
-        while (word.length > 0) { 
-            const c = word.charAt(0); 
-            if (isKana(c)) { 
-                const [text, rest] = span(word, isKana); 
-                res.push({ type: "kana", text }); 
-                word = rest; 
-            } else if (isKanji(c)) { 
-                const [text, rest] = span(word, isKanji); 
-                res.push({ type: "kanji", text }); 
-                word = rest; 
-            } else return null; 
-        } 
-        return res; 
-    } 
- 
-    let fallback = () => [{ text: word, furigana: reading }]; 
-    let parts = parse(word); 
-    if (parts == null) return fallback(); 
-    let parti = 0; 
-    let readingi = 0; 
-    let res = []; 
-    let current = null; 
-    function backtrack() { 
-        parti--; 
-        const prev = res.pop(); 
-        current = prev.furigana; 
-    } 
-    while (parti < parts.length) { 
-        const part = parts[parti]; 
-        switch (part.type) { 
-            case 'kana': 
-                if (reading.startsWith(wanakana.toHiragana(part.text), readingi)) { 
-                    if (parti == parts.length - 1 && readingi != reading.length - part.text.length) { 
-                        backtrack(); 
-                    } else { 
-                        readingi += part.text.length; 
-                        res.push({ text: part.text }); 
-                        parti++; 
-                    } 
-                } else backtrack(); 
-                break; 
-            case "kanji": 
-                current = current || ""; 
-                if (parti == parts.length - 1) { 
-                    // last part, consume all 
-                    current += reading.substring(readingi); 
-                } else { 
-                    const nextText = parts[parti + 1].text; 
-                    let end = reading.indexOf(nextText, readingi + 1); // consume at least one character 
-                    if (end == -1) { 
-                        return fallback(); 
-                    } 
-                    current += reading.substring(readingi, end); 
-                    readingi = end; 
-                } 
-                res.push({ text: part.text, furigana: current }); 
-                current = null; 
-                parti++; 
-        } 
-    } 
+function distributeFurigana(word, reading) {
+    reading = reading || wanakana.toHiragana(word);
+    function span(str, pred) {
+        let i = 0;
+        while (i < str.length && pred(str[i])) {
+            i++;
+        }
+        return [str.substring(0, i), str.substring(i)];
+    }
+    const isKanji = c => jpIsKanji(c) ||
+        c === '\u3005'; /* kurikaeshi */
+    const isKana = c => jpIsKana(c) ||
+        c === '\u30fc'; /* chouonpu */
+    function parse(word) {
+        const res = [];
+        while (word.length > 0) {
+            const c = word.charAt(0);
+            if (isKana(c)) {
+                const [text, rest] = span(word, isKana);
+                res.push({ type: 'kana', text });
+                word = rest;
+            } else if (isKanji(c)) {
+                const [text, rest] = span(word, isKanji);
+                res.push({ type: 'kanji', text });
+                word = rest;
+            } else return null;
+        }
+        return res;
+    }
+
+    const fallback = () => [{ text: word, furigana: reading }];
+    const parts = parse(word);
+    if (!parts) return fallback();
+    let parti = 0;
+    let readingi = 0;
+    const res = [];
+    let current = null;
+    function backtrack() {
+        parti--;
+        const prev = res.pop();
+        current = prev.furigana;
+    }
+    while (parti < parts.length) {
+        const part = parts[parti];
+        switch (part.type) {
+            case 'kana':
+                if (reading.startsWith(wanakana.toHiragana(part.text), readingi)) {
+                    if (parti === parts.length - 1 && readingi !== reading.length - part.text.length) {
+                        backtrack();
+                    } else {
+                        readingi += part.text.length;
+                        res.push({ text: part.text });
+                        parti++;
+                    }
+                } else backtrack();
+                break;
+            case 'kanji':
+                current = current || '';
+                if (parti === parts.length - 1) {
+                    // last part, consume all
+                    current += reading.substring(readingi);
+                } else {
+                    const nextText = parts[parti + 1].text;
+                    const end = reading.indexOf(nextText, readingi + 1); // consume at least one character
+                    if (end === -1) {
+                        return fallback();
+                    }
+                    current += reading.substring(readingi, end);
+                    readingi = end;
+                }
+                res.push({ text: part.text, furigana: current });
+                current = null;
+                parti++;
+        }
+    }
     return res;
-} 
+}
