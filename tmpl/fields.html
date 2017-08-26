@@ -43,7 +43,15 @@
 {{/inline}}
 
 {{#*inline "furigana"}}
-    {{#furigana}}{{{definition}}}{{/furigana}}
+    {{~#if html~}}
+        {{#furigana}}{{{definition}}}{{/furigana}}
+    {{~else~}}
+        {{#furiganaPlain}}{{{definition}}}{{/furiganaPlain}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "furigana-plain"}}
+    {{#furiganaPlain}}{{{definition}}}{{/furiganaPlain}}
 {{/inline}}
 
 {{#*inline "glossary"}}

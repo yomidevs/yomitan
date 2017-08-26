@@ -42,6 +42,22 @@ function handlebarsFurigana(options) {
     return result;
 }
 
+function handlebarsFuriganaPlain(options) {
+    const definition = options.fn(this);
+    const segs = jpDistributeFurigana(definition.expression, definition.reading);
+
+    let result = '';
+    for (const seg of segs) {
+        if (seg.furigana) {
+            result += `${seg.text}[${seg.furigana}]`;
+        } else {
+            result += seg.text;
+        }
+    }
+
+    return result;
+}
+
 function handlebarsKanjiLinks(options) {
     let result = '';
     for (const c of options.fn(this)) {
@@ -64,6 +80,7 @@ function handlebarsRender(template, data) {
         Handlebars.partials = Handlebars.templates;
         Handlebars.registerHelper('dumpObject', handlebarsDumpObject);
         Handlebars.registerHelper('furigana', handlebarsFurigana);
+        Handlebars.registerHelper('furiganaPlain', handlebarsFuriganaPlain);
         Handlebars.registerHelper('kanjiLinks', handlebarsKanjiLinks);
         Handlebars.registerHelper('multiLine', handlebarsMultiLine);
     }

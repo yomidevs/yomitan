@@ -124,150 +124,168 @@ templates['fields.html'] = template({"1":function(container,depth0,helpers,parti
 
   return container.escapeExpression(container.lambda(((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.expression : stack1), depth0));
 },"34":function(container,depth0,helpers,partials,data) {
-    var stack1, helper, options, buffer = 
-  "    ";
-  stack1 = ((helper = (helper = helpers.furigana || (depth0 != null ? depth0.furigana : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"furigana","hash":{},"fn":container.program(35, data, 0),"inverse":container.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),options) : helper));
+    var stack1;
+
+  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? depth0.html : depth0),{"name":"if","hash":{},"fn":container.program(35, data, 0),"inverse":container.program(38, data, 0),"data":data})) != null ? stack1 : "");
+},"35":function(container,depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = "";
+
+  stack1 = ((helper = (helper = helpers.furigana || (depth0 != null ? depth0.furigana : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"furigana","hash":{},"fn":container.program(36, data, 0),"inverse":container.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),options) : helper));
   if (!helpers.furigana) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
   if (stack1 != null) { buffer += stack1; }
-  return buffer + "\n";
-},"35":function(container,depth0,helpers,partials,data) {
+  return buffer;
+},"36":function(container,depth0,helpers,partials,data) {
     var stack1, helper;
 
   return ((stack1 = ((helper = (helper = helpers.definition || (depth0 != null ? depth0.definition : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"definition","hash":{},"data":data}) : helper))) != null ? stack1 : "");
-},"37":function(container,depth0,helpers,partials,data,blockParams,depths) {
+},"38":function(container,depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = "";
+
+  stack1 = ((helper = (helper = helpers.furiganaPlain || (depth0 != null ? depth0.furiganaPlain : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"furiganaPlain","hash":{},"fn":container.program(36, data, 0),"inverse":container.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),options) : helper));
+  if (!helpers.furiganaPlain) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer;
+},"40":function(container,depth0,helpers,partials,data) {
+    var stack1, helper, options, buffer = 
+  "    ";
+  stack1 = ((helper = (helper = helpers.furiganaPlain || (depth0 != null ? depth0.furiganaPlain : depth0)) != null ? helper : helpers.helperMissing),(options={"name":"furiganaPlain","hash":{},"fn":container.program(36, data, 0),"inverse":container.noop,"data":data}),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),options) : helper));
+  if (!helpers.furiganaPlain) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer + "\n";
+},"42":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, alias1=depth0 != null ? depth0 : (container.nullContext || {});
 
-  return ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.html : depth0),{"name":"if","hash":{},"fn":container.program(38, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.modeKanji : depth0),{"name":"if","hash":{},"fn":container.program(40, data, 0, blockParams, depths),"inverse":container.program(49, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
-    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.html : depth0),{"name":"if","hash":{},"fn":container.program(62, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "");
-},"38":function(container,depth0,helpers,partials,data) {
-    return "<div style=\"text-align: left;\">";
-},"40":function(container,depth0,helpers,partials,data) {
-    var stack1;
-
-  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = ((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.glossary : stack1)) != null ? stack1["1"] : stack1),{"name":"if","hash":{},"fn":container.program(41, data, 0),"inverse":container.program(47, data, 0),"data":data})) != null ? stack1 : "");
-},"41":function(container,depth0,helpers,partials,data) {
-    var stack1;
-
-  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? depth0.html : depth0),{"name":"if","hash":{},"fn":container.program(42, data, 0),"inverse":container.program(45, data, 0),"data":data})) != null ? stack1 : "");
-},"42":function(container,depth0,helpers,partials,data) {
-    var stack1;
-
-  return "<ol>"
-    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.glossary : stack1),{"name":"each","hash":{},"fn":container.program(43, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "</ol>";
+  return ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.html : depth0),{"name":"if","hash":{},"fn":container.program(43, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.modeKanji : depth0),{"name":"if","hash":{},"fn":container.program(45, data, 0, blockParams, depths),"inverse":container.program(54, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.html : depth0),{"name":"if","hash":{},"fn":container.program(67, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "");
 },"43":function(container,depth0,helpers,partials,data) {
-    return "<li>"
-    + container.escapeExpression(container.lambda(depth0, depth0))
-    + "</li>";
+    return "<div style=\"text-align: left;\">";
 },"45":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.glossary : stack1),{"name":"each","hash":{},"fn":container.program(20, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = ((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.glossary : stack1)) != null ? stack1["1"] : stack1),{"name":"if","hash":{},"fn":container.program(46, data, 0),"inverse":container.program(52, data, 0),"data":data})) != null ? stack1 : "");
+},"46":function(container,depth0,helpers,partials,data) {
+    var stack1;
+
+  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? depth0.html : depth0),{"name":"if","hash":{},"fn":container.program(47, data, 0),"inverse":container.program(50, data, 0),"data":data})) != null ? stack1 : "");
 },"47":function(container,depth0,helpers,partials,data) {
     var stack1;
 
+  return "<ol>"
+    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.glossary : stack1),{"name":"each","hash":{},"fn":container.program(48, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "</ol>";
+},"48":function(container,depth0,helpers,partials,data) {
+    return "<li>"
+    + container.escapeExpression(container.lambda(depth0, depth0))
+    + "</li>";
+},"50":function(container,depth0,helpers,partials,data) {
+    var stack1;
+
+  return ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.glossary : stack1),{"name":"each","hash":{},"fn":container.program(20, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+},"52":function(container,depth0,helpers,partials,data) {
+    var stack1;
+
   return container.escapeExpression(container.lambda(((stack1 = ((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.glossary : stack1)) != null ? stack1["0"] : stack1), depth0));
-},"49":function(container,depth0,helpers,partials,data,blockParams,depths) {
+},"54":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
-  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? depth0.group : depth0),{"name":"if","hash":{},"fn":container.program(50, data, 0, blockParams, depths),"inverse":container.program(60, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "");
-},"50":function(container,depth0,helpers,partials,data,blockParams,depths) {
+  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? depth0.group : depth0),{"name":"if","hash":{},"fn":container.program(55, data, 0, blockParams, depths),"inverse":container.program(65, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "");
+},"55":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
-  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = ((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.definitions : stack1)) != null ? stack1["1"] : stack1),{"name":"if","hash":{},"fn":container.program(51, data, 0, blockParams, depths),"inverse":container.program(58, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "");
-},"51":function(container,depth0,helpers,partials,data,blockParams,depths) {
+  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = ((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.definitions : stack1)) != null ? stack1["1"] : stack1),{"name":"if","hash":{},"fn":container.program(56, data, 0, blockParams, depths),"inverse":container.program(63, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "");
+},"56":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
-  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? depth0.html : depth0),{"name":"if","hash":{},"fn":container.program(52, data, 0, blockParams, depths),"inverse":container.program(55, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "");
-},"52":function(container,depth0,helpers,partials,data,blockParams,depths) {
+  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? depth0.html : depth0),{"name":"if","hash":{},"fn":container.program(57, data, 0, blockParams, depths),"inverse":container.program(60, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "");
+},"57":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
   return "<ol>"
-    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.definitions : stack1),{"name":"each","hash":{},"fn":container.program(53, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.definitions : stack1),{"name":"each","hash":{},"fn":container.program(58, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "</ol>";
-},"53":function(container,depth0,helpers,partials,data,blockParams,depths) {
+},"58":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
   return "<li>"
     + ((stack1 = container.invokePartial(partials["glossary-single"],depth0,{"name":"glossary-single","hash":{"brief":(depths[1] != null ? depths[1].brief : depths[1]),"html":(depths[1] != null ? depths[1].html : depths[1])},"data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
     + "</li>";
-},"55":function(container,depth0,helpers,partials,data,blockParams,depths) {
+},"60":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
-  return ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.definitions : stack1),{"name":"each","hash":{},"fn":container.program(56, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "");
-},"56":function(container,depth0,helpers,partials,data,blockParams,depths) {
+  return ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.definitions : stack1),{"name":"each","hash":{},"fn":container.program(61, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+},"61":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
   return " * "
     + ((stack1 = container.invokePartial(partials["glossary-single"],depth0,{"name":"glossary-single","hash":{"brief":(depths[1] != null ? depths[1].brief : depths[1]),"html":(depths[1] != null ? depths[1].html : depths[1])},"data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
-},"58":function(container,depth0,helpers,partials,data) {
+},"63":function(container,depth0,helpers,partials,data) {
     var stack1;
 
   return ((stack1 = container.invokePartial(partials["glossary-single"],((stack1 = ((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.definitions : stack1)) != null ? stack1["0"] : stack1),{"name":"glossary-single","hash":{"brief":(depth0 != null ? depth0.brief : depth0),"html":(depth0 != null ? depth0.html : depth0)},"data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
-},"60":function(container,depth0,helpers,partials,data) {
+},"65":function(container,depth0,helpers,partials,data) {
     var stack1;
 
   return ((stack1 = container.invokePartial(partials["glossary-single"],(depth0 != null ? depth0.definition : depth0),{"name":"glossary-single","hash":{"brief":(depth0 != null ? depth0.brief : depth0),"html":(depth0 != null ? depth0.html : depth0)},"data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
-},"62":function(container,depth0,helpers,partials,data) {
+},"67":function(container,depth0,helpers,partials,data) {
     return "</div>";
-},"64":function(container,depth0,helpers,partials,data) {
+},"69":function(container,depth0,helpers,partials,data) {
     var stack1;
 
   return ((stack1 = container.invokePartial(partials.glossary,depth0,{"name":"glossary","hash":{"brief":true},"data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
-},"66":function(container,depth0,helpers,partials,data) {
+},"71":function(container,depth0,helpers,partials,data) {
     var stack1;
 
   return ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.kunyomi : stack1),{"name":"each","hash":{},"fn":container.program(20, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
-},"68":function(container,depth0,helpers,partials,data) {
-    var stack1;
-
-  return ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.onyomi : stack1),{"name":"each","hash":{},"fn":container.program(20, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
-},"70":function(container,depth0,helpers,partials,data) {
-    var stack1;
-
-  return ((stack1 = helpers.unless.call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? depth0.modeTermKana : depth0),{"name":"unless","hash":{},"fn":container.program(30, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
-},"72":function(container,depth0,helpers,partials,data) {
-    var stack1;
-
-  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.cloze : stack1),{"name":"if","hash":{},"fn":container.program(73, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
 },"73":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return container.escapeExpression(container.lambda(((stack1 = ((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.cloze : stack1)) != null ? stack1.sentence : stack1), depth0));
+  return ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.onyomi : stack1),{"name":"each","hash":{},"fn":container.program(20, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
 },"75":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.cloze : stack1),{"name":"if","hash":{},"fn":container.program(76, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
-},"76":function(container,depth0,helpers,partials,data) {
+  return ((stack1 = helpers.unless.call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? depth0.modeTermKana : depth0),{"name":"unless","hash":{},"fn":container.program(30, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+},"77":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return container.escapeExpression(container.lambda(((stack1 = ((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.cloze : stack1)) != null ? stack1.prefix : stack1), depth0));
+  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.cloze : stack1),{"name":"if","hash":{},"fn":container.program(78, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
 },"78":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.cloze : stack1),{"name":"if","hash":{},"fn":container.program(79, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
-},"79":function(container,depth0,helpers,partials,data) {
+  return container.escapeExpression(container.lambda(((stack1 = ((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.cloze : stack1)) != null ? stack1.sentence : stack1), depth0));
+},"80":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return container.escapeExpression(container.lambda(((stack1 = ((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.cloze : stack1)) != null ? stack1.body : stack1), depth0));
+  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.cloze : stack1),{"name":"if","hash":{},"fn":container.program(81, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
 },"81":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.cloze : stack1),{"name":"if","hash":{},"fn":container.program(82, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
-},"82":function(container,depth0,helpers,partials,data) {
+  return container.escapeExpression(container.lambda(((stack1 = ((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.cloze : stack1)) != null ? stack1.prefix : stack1), depth0));
+},"83":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return container.escapeExpression(container.lambda(((stack1 = ((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.cloze : stack1)) != null ? stack1.suffix : stack1), depth0));
+  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.cloze : stack1),{"name":"if","hash":{},"fn":container.program(84, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
 },"84":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.tags : stack1),{"name":"each","hash":{},"fn":container.program(5, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+  return container.escapeExpression(container.lambda(((stack1 = ((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.cloze : stack1)) != null ? stack1.body : stack1), depth0));
 },"86":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? depth0.html : depth0),{"name":"if","hash":{},"fn":container.program(87, data, 0),"inverse":container.program(89, data, 0),"data":data})) != null ? stack1 : "");
+  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.cloze : stack1),{"name":"if","hash":{},"fn":container.program(87, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
 },"87":function(container,depth0,helpers,partials,data) {
+    var stack1;
+
+  return container.escapeExpression(container.lambda(((stack1 = ((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.cloze : stack1)) != null ? stack1.suffix : stack1), depth0));
+},"89":function(container,depth0,helpers,partials,data) {
+    var stack1;
+
+  return ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.tags : stack1),{"name":"each","hash":{},"fn":container.program(5, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+},"91":function(container,depth0,helpers,partials,data) {
+    var stack1;
+
+  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? depth0.html : depth0),{"name":"if","hash":{},"fn":container.program(92, data, 0),"inverse":container.program(94, data, 0),"data":data})) != null ? stack1 : "");
+},"92":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=container.lambda, alias2=container.escapeExpression;
 
   return "<a href=\""
@@ -275,14 +293,14 @@ templates['fields.html'] = template({"1":function(container,depth0,helpers,parti
     + "\">"
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.url : stack1), depth0))
     + "</a>";
-},"89":function(container,depth0,helpers,partials,data) {
+},"94":function(container,depth0,helpers,partials,data) {
     var stack1;
 
   return container.escapeExpression(container.lambda(((stack1 = (depth0 != null ? depth0.definition : depth0)) != null ? stack1.url : stack1), depth0));
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
-  return "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+  return "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
     + ((stack1 = container.invokePartial(helpers.lookup.call(depth0 != null ? depth0 : (container.nullContext || {}),depth0,"marker",{"name":"lookup","hash":{},"data":data}),depth0,{"data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
 },"main_d":  function(fn, props, container, depth0, data, blockParams, depths) {
 
@@ -294,17 +312,18 @@ templates['fields.html'] = template({"1":function(container,depth0,helpers,parti
   fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(26, data, 0, blockParams, depths),"inverse":container.noop,"args":["dictionary"],"data":data}) || fn;
   fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(28, data, 0, blockParams, depths),"inverse":container.noop,"args":["expression"],"data":data}) || fn;
   fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(34, data, 0, blockParams, depths),"inverse":container.noop,"args":["furigana"],"data":data}) || fn;
-  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(37, data, 0, blockParams, depths),"inverse":container.noop,"args":["glossary"],"data":data}) || fn;
-  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(64, data, 0, blockParams, depths),"inverse":container.noop,"args":["glossary-brief"],"data":data}) || fn;
-  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(66, data, 0, blockParams, depths),"inverse":container.noop,"args":["kunyomi"],"data":data}) || fn;
-  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(68, data, 0, blockParams, depths),"inverse":container.noop,"args":["onyomi"],"data":data}) || fn;
-  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(70, data, 0, blockParams, depths),"inverse":container.noop,"args":["reading"],"data":data}) || fn;
-  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(72, data, 0, blockParams, depths),"inverse":container.noop,"args":["sentence"],"data":data}) || fn;
-  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(75, data, 0, blockParams, depths),"inverse":container.noop,"args":["cloze-prefix"],"data":data}) || fn;
-  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(78, data, 0, blockParams, depths),"inverse":container.noop,"args":["cloze-body"],"data":data}) || fn;
-  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(81, data, 0, blockParams, depths),"inverse":container.noop,"args":["cloze-suffix"],"data":data}) || fn;
-  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(84, data, 0, blockParams, depths),"inverse":container.noop,"args":["tags"],"data":data}) || fn;
-  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(86, data, 0, blockParams, depths),"inverse":container.noop,"args":["url"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(40, data, 0, blockParams, depths),"inverse":container.noop,"args":["furigana-plain"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(42, data, 0, blockParams, depths),"inverse":container.noop,"args":["glossary"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(69, data, 0, blockParams, depths),"inverse":container.noop,"args":["glossary-brief"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(71, data, 0, blockParams, depths),"inverse":container.noop,"args":["kunyomi"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(73, data, 0, blockParams, depths),"inverse":container.noop,"args":["onyomi"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(75, data, 0, blockParams, depths),"inverse":container.noop,"args":["reading"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(77, data, 0, blockParams, depths),"inverse":container.noop,"args":["sentence"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(80, data, 0, blockParams, depths),"inverse":container.noop,"args":["cloze-prefix"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(83, data, 0, blockParams, depths),"inverse":container.noop,"args":["cloze-body"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(86, data, 0, blockParams, depths),"inverse":container.noop,"args":["cloze-suffix"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(89, data, 0, blockParams, depths),"inverse":container.noop,"args":["tags"],"data":data}) || fn;
+  fn = decorators.inline(fn,props,container,{"name":"inline","hash":{},"fn":container.program(91, data, 0, blockParams, depths),"inverse":container.noop,"args":["url"],"data":data}) || fn;
   return fn;
   }
 
