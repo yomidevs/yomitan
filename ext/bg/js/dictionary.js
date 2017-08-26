@@ -137,8 +137,7 @@ function dictTermsGroup(definitions, dictionaries) {
             reading: firstDef.reading,
             reasons: firstDef.reasons,
             score: groupDefs.reduce((p, v) => v.score > p ? v.score : p, Number.MIN_SAFE_INTEGER),
-            source: firstDef.source, 
-            furigana: firstDef.furigana
+            source: firstDef.source
         });
     }
 
