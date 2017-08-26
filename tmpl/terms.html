@@ -31,11 +31,7 @@
         <img src="/mixed/img/entry-current.png" class="current" title="Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)" alt>
     </div>
 
-    {{#if reading}}
-    <div class="expression"><ruby>{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}<rt>{{reading}}</rt></ruby></div>
-    {{else}}
-    <div class="expression">{{#kanjiLinks}}{{expression}}{{/kanjiLinks}}</div>
-    {{/if}}
+    <div class="expression">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</div>
 
     {{#if reasons}}
     <div class="reasons">

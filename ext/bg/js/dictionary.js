@@ -202,6 +202,7 @@ function dictFieldFormat(field, definition, mode, options) {
         'dictionary',
         'expression',
         'furigana',
+        'furigana-plain',
         'glossary',
         'glossary-brief',
         'kunyomi',

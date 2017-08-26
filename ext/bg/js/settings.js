@@ -370,6 +370,7 @@ async function ankiFieldsPopulate(element, options) {
             'dictionary',
             'expression',
             'furigana',
+            'furigana-plain',
             'glossary',
             'glossary-brief',
             'reading',

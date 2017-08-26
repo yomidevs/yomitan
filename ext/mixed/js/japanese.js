@@ -38,3 +38,51 @@ function jpKatakanaToHiragana(text) {
 
     return result;
 }
+
+function jpDistributeFurigana(expression, reading) {
+    const fallback = [{furigana: reading, text: expression}];
+    if (!reading) {
+        return fallback;
+    }
+
+    const segmentize = (reading, groups) => {
+        if (groups.length === 0) {
+            return [];
+        }
+
+        const group = groups[0];
+        if (group.mode === 'kana') {
+            if (reading.startsWith(group.text)) {
+                const readingUsed = reading.substring(0, group.text.length);
+                const readingLeft = reading.substring(group.text.length);
+                const segs = segmentize(readingLeft, groups.splice(1));
+                if (segs) {
+                    return [{text: readingUsed}].concat(segs);
+                }
+            }
+        } else {
+            for (let i = reading.length; i >= group.text.length; --i) {
+                const readingUsed = reading.substring(0, i);
+                const readingLeft = reading.substring(i);
+                const segs = segmentize(readingLeft, groups.slice(1));
+                if (segs) {
+                    return [{text: group.text, furigana: readingUsed}].concat(segs);
+                }
+            }
+        }
+    };
+
+    const groups = [];
+    let modePrev = null;
+    for (const c of expression) {
+        const modeCurr = jpIsKanji(c) || c.charCodeAt(0) === 0x3005 /* noma */ ? 'kanji' : 'kana';
+        if (modeCurr === modePrev) {
+            groups[groups.length - 1].text += c;
+        } else {
+            groups.push({mode: modeCurr, text: c});
+            modePrev = modeCurr;
+        }
+    }
+
+    return segmentize(reading, groups) || fallback;
+}
