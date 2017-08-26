@@ -9,7 +9,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A indexPartCULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -39,80 +39,50 @@ function jpKatakanaToHiragana(text) {
     return result;
 }
 
-function distributeFurigana(word, reading) {
-    reading = reading || wanakana.toHiragana(word);
-    function span(str, pred) {
-        let i = 0;
-        while (i < str.length && pred(str[i])) {
-            i++;
-        }
-        return [str.substring(0, i), str.substring(i)];
-    }
-    const isKanji = c => jpIsKanji(c) ||
-        c === '\u3005'; /* kurikaeshi */
-    const isKana = c => jpIsKana(c) ||
-        c === '\u30fc'; /* chouonpu */
-    function parse(word) {
-        const res = [];
-        while (word.length > 0) {
-            const c = word.charAt(0);
-            if (isKana(c)) {
-                const [text, rest] = span(word, isKana);
-                res.push({ type: 'kana', text });
-                word = rest;
-            } else if (isKanji(c)) {
-                const [text, rest] = span(word, isKanji);
-                res.push({ type: 'kanji', text });
-                word = rest;
-            } else return null;
-        }
-        return res;
+function jpDistributeFurigana(expression, reading) {
+    const fallback = [{furigana: reading, text: expression}];
+    if (!reading) {
+        return fallback;
     }
 
-    const fallback = () => [{ text: word, furigana: reading }];
-    const parts = parse(word);
-    if (!parts) return fallback();
-    let parti = 0;
-    let readingi = 0;
-    const res = [];
-    let current = null;
-    function backtrack() {
-        parti--;
-        const prev = res.pop();
-        current = prev.furigana;
-    }
-    while (parti < parts.length) {
-        const part = parts[parti];
-        switch (part.type) {
-            case 'kana':
-                if (reading.startsWith(wanakana.toHiragana(part.text), readingi)) {
-                    if (parti === parts.length - 1 && readingi !== reading.length - part.text.length) {
-                        backtrack();
-                    } else {
-                        readingi += part.text.length;
-                        res.push({ text: part.text });
-                        parti++;
-                    }
-                } else backtrack();
-                break;
-            case 'kanji':
-                current = current || '';
-                if (parti === parts.length - 1) {
-                    // last part, consume all
-                    current += reading.substring(readingi);
-                } else {
-                    const nextText = parts[parti + 1].text;
-                    const end = reading.indexOf(nextText, readingi + 1); // consume at least one character
-                    if (end === -1) {
-                        return fallback();
-                    }
-                    current += reading.substring(readingi, end);
-                    readingi = end;
+    const segmentize = (reading, groups) => {
+        if (groups.length === 0) {
+            return [];
+        }
+
+        const group = groups[0];
+        if (group.mode === 'kana') {
+            if (reading.startsWith(group.text)) {
+                const readingUsed = reading.substring(0, group.text.length);
+                const readingLeft = reading.substring(group.text.length);
+                const segs = segmentize(readingLeft, groups.splice(1));
+                if (segs) {
+                    return [{text: readingUsed}].concat(segs);
                 }
-                res.push({ text: part.text, furigana: current });
-                current = null;
-                parti++;
+            }
+        } else {
+            for (let i = reading.length; i >= group.text.length; --i) {
+                const readingUsed = reading.substring(0, i);
+                const readingLeft = reading.substring(i);
+                const segs = segmentize(readingLeft, groups.slice(1));
+                if (segs) {
+                    return [{text: group.text, furigana: readingUsed}].concat(segs);
+                }
+            }
+        }
+    };
+
+    const groups = [];
+    let modePrev = null;
+    for (const c of expression) {
+        const modeCurr = jpIsKanji(c) || c.charCodeAt(0) === 0x3005 /* noma */ ? 'kanji' : 'kana';
+        if (modeCurr === modePrev) {
+            groups[groups.length - 1].text += c;
+        } else {
+            groups.push({mode: modeCurr, text: c});
+            modePrev = modeCurr;
         }
     }
-    return res;
+
+    return segmentize(reading, groups) || fallback;
 }

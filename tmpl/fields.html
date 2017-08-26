@@ -43,21 +43,7 @@
 {{/inline}}
 
 {{#*inline "furigana"}}
-    {{~#if html~}}
-        {{~#definition.furigana~}}
-            {{~#if furigana~}}
-                <ruby>{{text}}<rt>{{furigana}}</rt></ruby>
-            {{~else~}}
-                {{text}}
-            {{/if~}}
-        {{~/definition.furigana~}}
-    {{~else~}}
-        {{#definition.furigana}}
-            {{~#furigana}} {{/furigana~}}
-            {{text}}
-            {{~#furigana}}[{{.}}]{{/furigana~}}
-        {{/definition.furigana}} 
-    {{~/if~}}
+    {{#furigana}}{{{definition}}}{{/furigana}}
 {{/inline}}
 
 {{#*inline "glossary"}}
