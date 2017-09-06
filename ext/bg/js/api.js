@@ -96,25 +96,25 @@ async function apiNoteView(noteId) {
     return utilBackend().anki.guiBrowse(`nid:${noteId}`);
 }
 
-async function apiTemplateRender(template, data) {
-    return handlebarsRender(template, data);
-}
+async function apiTemplateRender(template, data, dynamic) {
+    if (dynamic) {
+        return new Promise((resolve, reject) => {
+            const sequence = utilBackend().sequenceNew();
+            const handler = event => {
+                if (event.data.sequence === sequence) {
+                    resolve(event.data.result);
+                    window.removeEventListener('message', handler);
+                }
+            };
 
-async function apiTemplateRenderDynamic(template, data) {
-    return new Promise((resolve, reject) => {
-        const sequence = utilBackend().sequenceNew();
-        const handler = event => {
-            if (event.data.sequence === sequence) {
-                resolve(event.data.result);
-                window.removeEventListener('message', handler);
-            }
-        };
+            window.addEventListener('message', handler);
 
-        window.addEventListener('message', handler);
-
-        const sandbox = utilBackend().sandbox();
-        sandbox.postMessage({template, data, sequence, command: 'render'}, '*');
-    });
+            const sandbox = utilBackend().sandbox();
+            sandbox.postMessage({template, data, sequence, command: 'render'}, '*');
+        });
+    } else {
+        return handlebarsRender(template, data);
+    }
 }
 
 async function apiCommandExec(command) {

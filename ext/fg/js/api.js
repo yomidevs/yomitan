@@ -45,8 +45,8 @@ function apiNoteView(noteId) {
     return utilInvoke('noteView', {noteId});
 }
 
-function apiTemplateRender(template, data) {
-    return utilInvoke('templateRender', {data, template});
+function apiTemplateRender(template, data, dynamic) {
+    return utilInvoke('templateRender', {data, template, dynamic});
 }
 
 function apiCommandExec(command) {

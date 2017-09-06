@@ -113,8 +113,8 @@ class Backend {
                 forward(apiNoteView(noteId), callback);
             },
 
-            templateRender: ({template, data, callback}) => {
-                forward(apiTemplateRender(template, data), callback);
+            templateRender: ({template, data, dynamic, callback}) => {
+                forward(apiTemplateRender(template, data, dynamic), callback);
             },
 
             commandExec: ({command, callback}) => {
