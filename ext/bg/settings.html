@@ -8,8 +8,7 @@
         <style>
             #anki-spinner, #anki-general, #anki-error,
             #dict-spinner, #dict-error, #dict-warning, #dict-purge-progress, #dict-import-progress,
-            #debug,
-            .options-advanced {
+            #debug, .options-advanced {
                 display: none;
             }
 
@@ -18,6 +17,12 @@
                 border-left: 1px #ddd solid;
                 border-right: 1px #ddd solid;
                 padding: 10px;
+            }
+
+            #field-templates {
+                font-family: monospace;
+                overflow-x: hidden;
+                white-space: nowrap;
             }
         </style>
     </head>
@@ -175,10 +180,6 @@
                 </div>
 
                 <div id="anki-general">
-                    <div class="checkbox options-advanced">
-                        <label><input type="checkbox" id="generate-html-cards"> Generate HTML cards</label>
-                    </div>
-
                     <div class="form-group">
                         <label for="card-tags">Card tags (comma or space separated)</label>
                         <input type="text" id="card-tags" class="form-control">
@@ -192,6 +193,11 @@
                     <div class="form-group options-advanced">
                         <label for="interface-server">Interface server</label>
                         <input type="text" id="interface-server" class="form-control">
+                    </div>
+
+                    <div class="form-group options-advanced">
+                        <label for="field-templates">Field templates (<a href="#" id="field-templates-reset">reset to defaults</a>)</label>
+                        <textarea class="form-control" rows="10" id="field-templates"></textarea>
                     </div>
 
                     <div id="anki-format">

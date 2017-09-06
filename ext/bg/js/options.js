@@ -17,6 +17,115 @@
  */
 
 
+function optionsFieldTemplates() {
+    return `
+{{#*inline "glossary-single"}}
+    {{~#unless brief~}}
+        {{~#if tags~}}<i>({{#each tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})</i> {{/if~}}
+    {{~/unless~}}
+    {{~#if glossary.[1]~}}
+        <ul>{{#each glossary}}<li>{{#multiLine}}{{.}}{{/multiLine}}</li>{{/each}}</ul>
+    {{~else~}}
+        {{~#multiLine}}{{glossary.[0]}}{{/multiLine~}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "audio"}}{{/inline}}
+
+{{#*inline "character"}}
+    {{~definition.character~}}
+{{/inline}}
+
+{{#*inline "dictionary"}}
+    {{~definition.dictionary~}}
+{{/inline}}
+
+{{#*inline "expression"}}
+    {{~#if modeTermKana~}}
+        {{~#if definition.reading~}}
+            {{definition.reading}}
+        {{~else~}}
+            {{definition.expression}}
+        {{~/if~}}
+    {{~else~}}
+        {{definition.expression}}
+    {{~/if~}}
+{{/inline}}
+
+{{#*inline "furigana"}}
+    {{#furigana}}{{{definition}}}{{/furigana}}
+{{/inline}}
+
+{{#*inline "furigana-plain"}}
+    {{#furiganaPlain}}{{{definition}}}{{/furiganaPlain}}
+{{/inline}}
+
+{{#*inline "glossary"}}
+    <div style="text-align: left;">
+    {{~#if modeKanji~}}
+        {{~#if definition.glossary.[1]~}}
+            <ol>{{#each definition.glossary}}<li>{{.}}</li>{{/each}}</ol>
+        {{~else~}}
+            {{definition.glossary.[0]}}
+        {{~/if~}}
+    {{~else~}}
+        {{~#if group~}}
+            {{~#if definition.definitions.[1]~}}
+                <ol>{{#each definition.definitions}}<li>{{> glossary-single brief=../brief}}</li>{{/each}}</ol>
+            {{~else~}}
+                {{~> glossary-single definition.definitions.[0] brief=brief~}}
+            {{~/if~}}
+        {{~else~}}
+            {{~> glossary-single definition brief=brief~}}
+        {{~/if~}}
+    {{~/if~}}
+    </div>
+{{/inline}}
+
+{{#*inline "glossary-brief"}}
+    {{~> glossary brief=true ~}}
+{{/inline}}
+
+{{#*inline "kunyomi"}}
+    {{~#each definition.kunyomi}}{{.}}{{#unless @last}}, {{/unless}}{{/each~}}
+{{/inline}}
+
+{{#*inline "onyomi"}}
+    {{~#each definition.onyomi}}{{.}}{{#unless @last}}, {{/unless}}{{/each~}}
+{{/inline}}
+
+{{#*inline "reading"}}
+    {{~#unless modeTermKana}}{{definition.reading}}{{/unless~}}
+{{/inline}}
+
+{{#*inline "sentence"}}
+    {{~#if definition.cloze}}{{definition.cloze.sentence}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-prefix"}}
+    {{~#if definition.cloze}}{{definition.cloze.prefix}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-body"}}
+    {{~#if definition.cloze}}{{definition.cloze.body}}{{/if~}}
+{{/inline}}
+
+{{#*inline "cloze-suffix"}}
+    {{~#if definition.cloze}}{{definition.cloze.suffix}}{{/if~}}
+{{/inline}}
+
+{{#*inline "tags"}}
+    {{~#each definition.tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each~}}
+{{/inline}}
+
+{{#*inline "url"}}
+    <a href="{{definition.url}}">{{definition.url}}</a>
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}
+`.trim();
+}
+
 function optionsSetDefaults(options) {
     const defaults = {
         general: {
@@ -48,10 +157,10 @@ function optionsSetDefaults(options) {
             enable: false,
             server: 'http://127.0.0.1:8765',
             tags: ['yomichan'],
-            htmlCards: true,
             sentenceExt: 200,
             terms: {deck: '', model: '', fields: {}},
-            kanji: {deck: '', model: '', fields: {}}
+            kanji: {deck: '', model: '', fields: {}},
+            fieldTemplates: optionsFieldTemplates()
         }
     };
 

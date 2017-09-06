@@ -218,7 +218,6 @@ function dictFieldFormat(field, definition, mode, options) {
             marker,
             definition,
             group: options.general.groupResults,
-            html: options.anki.htmlCards,
             modeTermKanji: mode === 'term-kanji',
             modeTermKana: mode === 'term-kana',
             modeKanji: mode === 'kanji'
