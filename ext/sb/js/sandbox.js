@@ -24,7 +24,7 @@
 window.addEventListener('message', event => {
     if (event.data.command === 'render') {
         const template = Handlebars.compile(event.data.template || '');
-        const result = template(event.data.context || {});
-        event.source.postMessage({result, sequence: event.data.sequence});
+        const result = template(event.data.data || {});
+        event.source.postMessage({result, sequence: event.data.sequence}, '*');
     }
 });

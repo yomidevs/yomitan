@@ -22,6 +22,7 @@ class Backend {
         this.translator = new Translator();
         this.anki = new AnkiNull();
         this.options = null;
+        this.sequence = 0;
     }
 
     async prepare() {
@@ -34,6 +35,14 @@ class Backend {
         if (this.options.general.showGuide) {
             chrome.tabs.create({url: chrome.extension.getURL('/bg/guide.html')});
         }
+    }
+
+    sequenceNew() {
+        return this.sequence++;
+    }
+
+    sandbox() {
+        return document.getElementById('sandbox').contentWindow;
     }
 
     onOptionsUpdated(options) {

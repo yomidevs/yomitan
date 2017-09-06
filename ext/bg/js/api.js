@@ -100,6 +100,23 @@ async function apiTemplateRender(template, data) {
     return handlebarsRender(template, data);
 }
 
+async function apiTemplateRenderDynamic(template, data) {
+    return new Promise((resolve, reject) => {
+        const sequence = utilBackend().sequenceNew();
+        const handler = event => {
+            if (event.data.sequence === sequence) {
+                resolve(event.data.result);
+                window.removeEventListener('message', handler);
+            }
+        };
+
+        window.addEventListener('message', handler);
+
+        const sandbox = utilBackend().sandbox();
+        sandbox.postMessage({template, data, sequence, command: 'render'}, '*');
+    });
+}
+
 async function apiCommandExec(command) {
     const handlers = {
         search: () => {
