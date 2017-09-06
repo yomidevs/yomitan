@@ -62,7 +62,8 @@ async function apiDefinitionAdd(definition, mode) {
         );
     }
 
-    return utilBackend().anki.addNote(dictNoteFormat(definition, mode, options));
+    const note = await dictNoteFormat(definition, mode, options);
+    return utilBackend().anki.addNote(note);
 }
 
 async function apiDefinitionsAddable(definitions, modes) {
@@ -72,7 +73,8 @@ async function apiDefinitionsAddable(definitions, modes) {
         const notes = [];
         for (const definition of definitions) {
             for (const mode of modes) {
-                notes.push(dictNoteFormat(definition, mode, utilBackend().options));
+                const note = await dictNoteFormat(definition, mode, utilBackend().options);
+                notes.push(note);
             }
         }
 
