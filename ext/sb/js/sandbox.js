@@ -23,7 +23,14 @@
 
 window.addEventListener('message', event => {
     if (event.data.command === 'render') {
-        const template = Handlebars.compile(event.data.template || '');
+        window.yomichan_cache = window.yomichan_cache || {};
+
+        let template = window.yomichan_cache[event.data.template];
+        if (!template) {
+            template = Handlebars.compile(event.data.template || '');
+            window.yomichan_cache[event.data.template] = template;
+        }
+
         const result = template(event.data.data || {});
         event.source.postMessage({result, sequence: event.data.sequence}, '*');
     }
