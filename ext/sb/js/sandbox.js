@@ -31,7 +31,16 @@ window.addEventListener('message', event => {
             window.yomichan_cache[event.data.template] = template;
         }
 
-        const result = template(event.data.data || {});
-        event.source.postMessage({result, sequence: event.data.sequence}, '*');
+        let result = null;
+        let command = null;
+        try {
+            command = 'render';
+            result = template(event.data.data || {});
+        } catch (e) {
+            command = 'error';
+            result = e;
+        }
+
+        event.source.postMessage({result, command, sequence: event.data.sequence}, '*');
     }
 });

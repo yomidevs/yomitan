@@ -104,7 +104,12 @@ async function apiTemplateRender(template, data, dynamic) {
             const sequence = utilBackend().sequenceNew();
             const handler = event => {
                 if (event.data.sequence === sequence) {
-                    resolve(event.data.result);
+                    if (event.data.command === 'error') {
+                        reject(event.data.result);
+                    } else {
+                        resolve(event.data.result);
+                    }
+
                     window.removeEventListener('message', handler);
                 }
             };
