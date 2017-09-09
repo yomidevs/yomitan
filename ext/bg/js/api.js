@@ -100,27 +100,9 @@ async function apiNoteView(noteId) {
 
 async function apiTemplateRender(template, data, dynamic) {
     if (dynamic) {
-        return new Promise((resolve, reject) => {
-            const sequence = utilBackend().sequenceNew();
-            const handler = event => {
-                if (event.data.sequence === sequence) {
-                    if (event.data.command === 'error') {
-                        reject(event.data.result);
-                    } else {
-                        resolve(event.data.result);
-                    }
-
-                    window.removeEventListener('message', handler);
-                }
-            };
-
-            window.addEventListener('message', handler);
-
-            const sandbox = utilBackend().sandbox();
-            sandbox.postMessage({template, data, sequence, command: 'render'}, '*');
-        });
+        return handlebarsRenderDynamic(template, data);
     } else {
-        return handlebarsRender(template, data);
+        return handlebarsRenderStatic(template, data);
     }
 }
 

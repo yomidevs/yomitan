@@ -75,7 +75,7 @@ function handlebarsMultiLine(options) {
     return options.fn(this).split('\n').join('<br>');
 }
 
-function handlebarsRender(template, data) {
+function handlebarsRegisterHelpers() {
     if (Handlebars.partials !== Handlebars.templates) {
         Handlebars.partials = Handlebars.templates;
         Handlebars.registerHelper('dumpObject', handlebarsDumpObject);
@@ -84,6 +84,21 @@ function handlebarsRender(template, data) {
         Handlebars.registerHelper('kanjiLinks', handlebarsKanjiLinks);
         Handlebars.registerHelper('multiLine', handlebarsMultiLine);
     }
+}
 
-    return Handlebars.templates[template](data).trim();
+function handlebarsRenderStatic(name, data) {
+    handlebarsRegisterHelpers();
+    return Handlebars.templates[name](data).trim();
+}
+
+function handlebarsRenderDynamic(template, data) {
+    handlebarsRegisterHelpers();
+
+    Handlebars.yomichan_cache = Handlebars.yomichan_cache || {};
+    let instance = Handlebars.yomichan_cache[template];
+    if (!instance) {
+        instance = Handlebars.yomichan_cache[template] = Handlebars.compile(template);
+    }
+
+    return instance(data).trim();
 }

@@ -218,7 +218,7 @@ async function dictionaryGroupsPopulate(options) {
 
     for (const dictRow of dictRowsSort(dictRows, options)) {
         const dictOptions = options.dictionaries[dictRow.title] || {enabled: false, priority: 0};
-        const dictHtml = handlebarsRender('dictionary.html', {
+        const dictHtml = await apiTemplateRender('dictionary.html', {
             title: dictRow.title,
             version: dictRow.version,
             revision: dictRow.revision,
