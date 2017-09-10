@@ -240,6 +240,15 @@ exact versions used for distribution.
 
 ## Frequently Asked Questions ##
 
+*   **Can I still create cards without HTML formatting? The option for it is gone!**
+
+    Developing Yomichan is a constant balance between including useful features and keeping complexity at a minimum.
+    With the new user-editable card template system, it is possible to create text-only cards without having to double
+    the number field of templates in the extension itself. If you would like to stop HTML tags from being added to your
+    cards, simply copy the contents of the <a href="dl/fields.txt">text-only field template</a> into the template box on
+    the Anki settings page (make sure you have the *Show advanced options* checkbox ticked), making sure to replace the
+    existing values.
+
 *   **Will you add support for online dictionaries?**
 
     Online dictionaries will never be implemented because it is impossible to support them in a robust way. In order to
