@@ -41,9 +41,9 @@ async function formRead() {
 
     optionsNew.anki.enable = $('#anki-enable').prop('checked');
     optionsNew.anki.tags = $('#card-tags').val().split(/[,; ]+/);
-    optionsNew.anki.htmlCards = $('#generate-html-cards').prop('checked');
     optionsNew.anki.sentenceExt = parseInt($('#sentence-detection-extent').val(), 10);
     optionsNew.anki.server = $('#interface-server').val();
+    optionsNew.anki.fieldTemplates = $('#field-templates').val();
 
     if (optionsOld.anki.enable && !ankiErrorShown()) {
         optionsNew.anki.terms.deck = $('#anki-terms-deck').val();
@@ -143,10 +143,11 @@ async function onReady() {
 
     $('#anki-enable').prop('checked', options.anki.enable);
     $('#card-tags').val(options.anki.tags.join(' '));
-    $('#generate-html-cards').prop('checked', options.anki.htmlCards);
     $('#sentence-detection-extent').val(options.anki.sentenceExt);
     $('#interface-server').val(options.anki.server);
-    $('input, select').not('.anki-model').change(utilAsync(onFormOptionsChanged));
+    $('#field-templates').val(options.anki.fieldTemplates);
+    $('#field-templates-reset').click(utilAsync(onAnkiFieldTemplatesReset));
+    $('input, select, textarea').not('.anki-model').change(utilAsync(onFormOptionsChanged));
     $('.anki-model').change(utilAsync(onAnkiModelChanged));
 
     try {
@@ -217,7 +218,7 @@ async function dictionaryGroupsPopulate(options) {
 
     for (const dictRow of dictRowsSort(dictRows, options)) {
         const dictOptions = options.dictionaries[dictRow.title] || {enabled: false, priority: 0};
-        const dictHtml = handlebarsRender('dictionary.html', {
+        const dictHtml = await apiTemplateRender('dictionary.html', {
             title: dictRow.title,
             version: dictRow.version,
             revision: dictRow.revision,
@@ -427,5 +428,16 @@ async function onAnkiModelChanged(e) {
         ankiErrorShow(e);
     } finally {
         ankiSpinnerShow(false);
+    }
+}
+
+async function onAnkiFieldTemplatesReset(e) {
+    try {
+        e.preventDefault();
+        const options = await optionsLoad();
+        $('#field-templates').val(options.anki.fieldTemplates = optionsFieldTemplates());
+        await optionsSave(options);
+    } catch (e) {
+        ankiErrorShow(e);
     }
 }

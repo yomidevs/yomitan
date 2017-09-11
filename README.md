@@ -39,6 +39,9 @@ different languages. You must download and import the dictionaries you wish to u
 definition lookups. If you have proprietary EPWING dictionaries that you would like to use, please see the [Yomichan
 Import](https://foosoft.net/projects/yomichan-import) page to learn how to convert and import them into Yomichan.
 
+Please be aware that the non-English dictionaries contain fewer entries than their English counterparts. Even if your
+primary language is not English, you may consider also importing the English version for better coverage.
+
 *   **[JMdict](http://www.edrdg.org/enamdict/enamdict_doc.html)** (Japanese vocabulary)
     *   [jmdict_dutch.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_dutch.zip)
     *   [jmdict_english.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_english.zip)
@@ -133,6 +136,7 @@ Flashcard fields can be configured with the following steps:
     `{dictionary}` | Name of the dictionary from which the card is being created (unavailable in *grouped* mode).
     `{expression}` | Term expressed as Kanji (will be displayed in Kana if Kanji is not available).
     `{furigana}` | Term expressed as Kanji with Furigana displayed above it (e.g. <ruby>日本語<rt>にほんご</rt></ruby>).
+    `{furigana-plain}` | Term expressed as Kanji with Furigana displayed next to it in brackets (e.g. 日本語[にほんご]).
     `{glossary}` | List of definitions for the term (output format depends on whether running in *grouped* mode).
     `{reading}` | Kana reading for the term (empty for terms where the expression is the reading).
     `{sentence}` | Sentence, quote, or phrase in which the term appears in the source content.
@@ -235,6 +239,15 @@ exact versions used for distribution.
 *   WanaKana: [homepage](http://wanakana.com/) - [snapshot](https://raw.githubusercontent.com/WaniKani/WanaKana/7c4a052/gh-pages/assets/js/wanakana.min.js)
 
 ## Frequently Asked Questions ##
+
+*   **Can I still create cards without HTML formatting? The option for it is gone!**
+
+    Developing Yomichan is a constant balance between including useful features and keeping complexity at a minimum.
+    With the new user-editable card template system, it is possible to create text-only cards without having to double
+    the number field of templates in the extension itself. If you would like to stop HTML tags from being added to your
+    cards, simply copy the contents of the <a href="dl/fields.txt">text-only field template</a> into the template box on
+    the Anki settings page (make sure you have the *Show advanced options* checkbox ticked), making sure to replace the
+    existing values.
 
 *   **Will you add support for online dictionaries?**
 

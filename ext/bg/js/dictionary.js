@@ -192,7 +192,7 @@ function dictFieldSplit(field) {
     return field.length === 0 ? [] : field.split(' ');
 }
 
-function dictFieldFormat(field, definition, mode, options) {
+async function dictFieldFormat(field, definition, mode, options) {
     const markers = [
         'audio',
         'character',
@@ -218,19 +218,19 @@ function dictFieldFormat(field, definition, mode, options) {
             marker,
             definition,
             group: options.general.groupResults,
-            html: options.anki.htmlCards,
             modeTermKanji: mode === 'term-kanji',
             modeTermKana: mode === 'term-kana',
             modeKanji: mode === 'kanji'
         };
 
-        field = field.replace(`{${marker}}`, handlebarsRender('fields.html', data));
+        const html = await apiTemplateRender(options.anki.fieldTemplates, data, true);
+        field = field.replace(`{${marker}}`, html);
     }
 
     return field;
 }
 
-function dictNoteFormat(definition, mode, options) {
+async function dictNoteFormat(definition, mode, options) {
     const note = {fields: {}, tags: options.anki.tags};
     let fields = [];
 
@@ -264,7 +264,7 @@ function dictNoteFormat(definition, mode, options) {
     }
 
     for (const name in fields) {
-        note.fields[name] = dictFieldFormat(fields[name], definition, mode, options);
+        note.fields[name] = await dictFieldFormat(fields[name], definition, mode, options);
     }
 
     return note;

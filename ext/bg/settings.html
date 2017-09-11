@@ -8,8 +8,7 @@
         <style>
             #anki-spinner, #anki-general, #anki-error,
             #dict-spinner, #dict-error, #dict-warning, #dict-purge-progress, #dict-import-progress,
-            #debug,
-            .options-advanced {
+            #debug, .options-advanced {
                 display: none;
             }
 
@@ -18,6 +17,12 @@
                 border-left: 1px #ddd solid;
                 border-right: 1px #ddd solid;
                 padding: 10px;
+            }
+
+            #field-templates {
+                font-family: monospace;
+                overflow-x: hidden;
+                white-space: pre;
             }
         </style>
     </head>
@@ -175,10 +180,6 @@
                 </div>
 
                 <div id="anki-general">
-                    <div class="checkbox options-advanced">
-                        <label><input type="checkbox" id="generate-html-cards"> Generate HTML cards</label>
-                    </div>
-
                     <div class="form-group">
                         <label for="card-tags">Card tags (comma or space separated)</label>
                         <input type="text" id="card-tags" class="form-control">
@@ -246,27 +247,37 @@
                                 </table>
                             </div>
                         </div>
+
+                        <div class="options-advanced">
+                            <p class="help-block">
+                                Fields are formatted using the <a href="http://handlebarsjs.com/">Handlebars.js</a> template rendering
+                                engine. Advanced users can modify these templates for ultimate control of what information gets included in
+                                their Anki cards. If you encounter problems with your changes you can always <a href="#" id="field-templates-reset">reset to default</a>
+                                template settings.
+                            </p>
+                            <textarea class="form-control" rows="10" id="field-templates"></textarea>
+                        </div>
                     </div>
                 </div>
-
-                <div>
-                    <h3>Support Development</h3>
-
-                    <p class="help-block">
-                        Yomichan is provided to you <em>completely free</em> of charge. Unlike numerous other "free" services, you are not
-                        shown ads, pestered with "offers", or have your browser usage information analyzed and sold to third parties.
-                    </p>
-                    <p class="help-block">
-                        If you find Yomichan useful, please consider making a small donation as a way to show your appreciation for the
-                        countless hours that I have devoted to this extension.
-                    </p>
-                    <p>
-                        <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4DBTN9A3CUAFN" target="_blank"><img src="/bg/img/paypal.gif" alt></a>
-                    </p>
-                </div>
-
-                <pre id="debug"></pre>
             </div>
+
+            <div>
+                <h3>Support Development</h3>
+
+                <p class="help-block">
+                    Yomichan is provided to you <em>completely free</em> of charge. Unlike numerous other "free" services, you are not
+                    shown ads, pestered with "offers", or have your browser usage information analyzed and sold to third parties.
+                </p>
+                <p class="help-block">
+                    If you find Yomichan useful, please consider making a small donation as a way to show your appreciation for the
+                    countless hours that I have devoted to this extension.
+                </p>
+                <p>
+                    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4DBTN9A3CUAFN" target="_blank"><img src="/bg/img/paypal.gif" alt></a>
+                </p>
+            </div>
+
+            <pre id="debug"></pre>
 
             <div class="pull-right">
                 <small><a href="https://foosoft.net/projects/yomichan/" target="_blank">Homepage</a> &bull; <a href="legal.html">Legal</a></small>
