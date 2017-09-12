@@ -171,7 +171,7 @@ class Database {
                 });
             }
 
-            await this.db.terms.bulkAdd(rows);
+            await this.db.terms.bulkAdd(utilIsolate(rows));
         };
 
         const kanjiDataLoaded = async (title, entries, total, current)  => {
@@ -191,7 +191,7 @@ class Database {
                 });
             }
 
-            await this.db.kanji.bulkAdd(rows);
+            await this.db.kanji.bulkAdd(utilIsolate(rows));
         };
 
         const tagDataLoaded = async (title, entries, total, current) => {
@@ -212,7 +212,7 @@ class Database {
                 rows.push(row);
             }
 
-            await this.db.tagMeta.bulkAdd(rows);
+            await this.db.tagMeta.bulkAdd(utilIsolate(rows));
         };
 
         return await Database.importDictionaryZip(
