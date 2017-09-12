@@ -187,20 +187,19 @@ class Database {
                 callback(total, current);
             }
 
-            const rows = [];
-            for (const [expression, reading, tags, rules, score, ...glossary] of entries) {
-                rows.push({
-                    expression,
-                    reading,
-                    tags,
-                    rules,
-                    score,
-                    glossary,
-                    dictionary: title
-                });
-            }
-
-            await this.db.terms.bulkAdd(rows);
+            await this.db.transaction('rw', this.db.terms, async function() {
+                for (const [expression, reading, tags, rules, score, ...glossary] of entries) {
+                    this.db.terms.add({
+                        expression,
+                        reading,
+                        tags,
+                        rules,
+                        score,
+                        glossary,
+                        dictionary: title
+                    });
+                }
+            });
         };
 
         const kanjiLoaded = async (title, entries, total, current)  => {
@@ -208,19 +207,18 @@ class Database {
                 callback(total, current);
             }
 
-            const rows = [];
-            for (const [character, onyomi, kunyomi, tags, ...meanings] of entries) {
-                rows.push({
-                    character,
-                    onyomi,
-                    kunyomi,
-                    tags,
-                    meanings,
-                    dictionary: title
-                });
-            }
-
-            await this.db.kanji.bulkAdd(rows);
+            await this.db.transaction('rw', this.db.kanji, async function() {
+                for (const [character, onyomi, kunyomi, tags, ...meanings] of entries) {
+                    this.db.kanji.add({
+                        character,
+                        onyomi,
+                        kunyomi,
+                        tags,
+                        meanings,
+                        dictionary: title
+                    });
+                }
+            });
         };
 
         await Database.importDictionaryZip(archive, indexLoaded, termsLoaded, kanjiLoaded);
