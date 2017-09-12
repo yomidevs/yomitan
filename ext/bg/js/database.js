@@ -144,22 +144,6 @@ class Database {
             return Promise.reject('database not initialized');
         }
 
-        // const rows = [];
-        // for (const tag in tagMeta || {}) {
-        //     const meta = tagMeta[tag];
-        //     const row = dictTagSanitize({
-        //         name: tag,
-        //         category: meta.category,
-        //         notes: meta.notes,
-        //         order: meta.order,
-        //         dictionary: title
-        //     });
-
-        //     rows.push(row);
-        // }
-
-        // await this.db.tagMeta.bulkAdd(rows);
-
         const indexDataLoaded = async summary => {
             const count = await this.db.dictionaries.where('title').equals(summary.title).count();
             if (count > 0) {
@@ -210,6 +194,27 @@ class Database {
             await this.db.kanji.bulkAdd(rows);
         };
 
+        const tagDataLoaded = async (title, entries, total, current) => {
+            if (callback) {
+                callback(total, current);
+            }
+
+            const rows = [];
+            for (const [name, category, order, notes] of entries) {
+                const row = dictTagSanitize({
+                    name,
+                    category,
+                    order,
+                    notes,
+                    dictionary: title
+                });
+
+                rows.push(row);
+            }
+
+            await this.db.tagMeta.bulkAdd(rows);
+        };
+
         return await Database.importDictionaryZip(
             archive,
             indexDataLoaded,
@@ -217,7 +222,7 @@ class Database {
             null,
             kanjiDataLoaded,
             null,
-            null
+            tagDataLoaded
         );
     }
 
@@ -247,16 +252,6 @@ class Database {
             await indexDataLoaded(summary);
         }
 
-        if (tagDataLoaded && index.tagMeta) {
-            const tags = [];
-            for (const name of index.tagMeta) {
-                const tag = index.tagMeta;
-                tags.push([name, tag.category, tag.order, tag.notes]);
-            }
-
-            tagDataLoaded(tags);
-        }
-
         const buildTermBankName      = index => `term_bank_${index + 1}.json`;
         const buildTermFreqBankName  = index => `termfreq_bank_${index + 1}.json`;
         const buildKanjiBankName     = index => `kanji_bank_${index + 1}.json`;
@@ -273,23 +268,33 @@ class Database {
         };
 
         const termBankCount      = countBanks(buildTermBankName);
-        const kanjiBankCount     = countBanks(buildTermBankName);
-        const termFreqBankCount  = countBanks(buildTermBankName);
-        const kanjiFreqBankCount = countBanks(buildTermBankName);
-        const tagBankCount       = countBanks(buildTermBankName);
+        const termFreqBankCount  = countBanks(buildTermFreqBankName);
+        const kanjiBankCount     = countBanks(buildKanjiBankName);
+        const kanjiFreqBankCount = countBanks(buildKanjiFreqBankName);
+        const tagBankCount       = countBanks(buildTagBankName);
 
         let bankLoadedCount = 0;
-        const bankTotalCount =
+        let bankTotalCount =
             termBankCount +
-            hanjiBankCount +
             termFreqBankCount +
+            kanjiBankCount +
             kanjiFreqBankCount +
             tagBankCount;
+
+        if (tagDataLoaded && index.tagMeta) {
+            const bank = [];
+            for (const name in index.tagMeta) {
+                const tag = index.tagMeta[name];
+                bank.push([name, tag.category, tag.order, tag.notes]);
+            }
+
+            tagDataLoaded(index.title, bank, ++bankTotalCount, bankLoadedCount++);
+        }
 
         const loadBank = async (namer, count, callback) => {
             if (callback) {
                 for (let i = 0; i < count; ++i) {
-                    const bankFile = namer(i);
+                    const bankFile = files[namer(i)];
                     const bank = JSON.parse(await bankFile.async('string'));
                     await callback(index.title, bank, bankTotalCount, bankLoadedCount++);
                 }
