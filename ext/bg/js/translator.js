@@ -51,10 +51,10 @@ class Translator {
 
         const cache = {};
         const titles = Object.keys(dictionaries);
-        let deinflections = await this.findTermsDeinflected(text, titles, cache);
+        let deinflections = await this.findTermDeinflections(text, titles, cache);
         const textHiragana = jpKatakanaToHiragana(text);
         if (text !== textHiragana) {
-            deinflections = deinflections.concat(await this.findTermsDeinflected(textHiragana, titles, cache));
+            deinflections = deinflections.concat(await this.findTermDeinflections(textHiragana, titles, cache));
         }
 
         let definitions = [];
@@ -94,7 +94,7 @@ class Translator {
         return {length, definitions};
     }
 
-    async findTermsDeinflected(text, titles, cache) {
+    async findTermDeinflections(text, titles, cache) {
         const definer = async term => {
             if (cache.hasOwnProperty(term)) {
                 return cache[term];
