@@ -20,7 +20,6 @@
 class Database {
     constructor() {
         this.db = null;
-        this.version = 2;
         this.tagCache = {};
     }
 
@@ -177,7 +176,7 @@ class Database {
         const indexDataLoaded = async summary => {
             const count = await this.db.dictionaries.where('title').equals(summary.title).count();
             if (count > 0) {
-                throw `dictionary "${title}" is already imported`;
+                throw `dictionary "${summary.title}" is already imported`;
             }
 
             await this.db.dictionaries.add(summary);
@@ -299,9 +298,9 @@ class Database {
         kanjiFreqDataLoaded,
         tagDataLoaded
     ) {
-        const files = (await JSZip.loadAsync(archive)).files;
+        const zip = await JSZip.loadAsync(archive);
 
-        const indexFile = files['index.json'];
+        const indexFile = zip.files['index.json'];
         if (!indexFile) {
             throw 'no dictionary index found in archive';
         }
@@ -324,7 +323,7 @@ class Database {
 
         const countBanks = namer => {
             let count = 0;
-            while (files[namer(count)]) {
+            while (zip.files[namer(count)]) {
                 ++count;
             }
 
@@ -358,7 +357,7 @@ class Database {
         const loadBank = async (namer, count, callback) => {
             if (callback) {
                 for (let i = 0; i < count; ++i) {
-                    const bankFile = files[namer(i)];
+                    const bankFile = zip.files[namer(i)];
                     const bank = JSON.parse(await bankFile.async('string'));
                     await callback(index.title, bank, bankTotalCount, bankLoadedCount++);
                 }
