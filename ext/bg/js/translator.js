@@ -127,6 +127,7 @@ class Translator {
             const tags = definition.tags.map(tag => dictTagBuild(tag, definition.tagMeta));
             tags.push(dictTagBuildSource(definition.dictionary));
             definition.tags = dictTagsSort(tags);
+            definition.frequencies = await this.database.findKanjiFreq(definition.character, titles);
         }
 
         return definitions;

@@ -129,6 +129,21 @@ class Database {
         return results;
     }
 
+    async findKanjiFreq(kanji, titles) {
+        if (!this.db) {
+            throw 'database not initialized';
+        }
+
+        const results = [];
+        await this.db.kanjiFreq.where('character').equals(kanji).each(row => {
+            if (titles.includes(row.dictionary)) {
+                results.push({frequency: row.frequency, dictionary: row.dictionary});
+            }
+        });
+
+        return results;
+    }
+
     async cacheTagMeta(titles) {
         if (!this.db) {
             throw 'database not initialized';
@@ -186,7 +201,7 @@ class Database {
                 });
             }
 
-            await this.db.terms.bulkAdd(utilIsolate(rows));
+            await this.db.terms.bulkAdd(rows);
         };
 
         const termFreqDataLoaded = async (title, entries, total, current) => {
@@ -203,7 +218,7 @@ class Database {
                 });
             }
 
-            await this.db.termFreq.bulkAdd(utilIsolate(rows));
+            await this.db.termFreq.bulkAdd(rows);
         };
 
         const kanjiDataLoaded = async (title, entries, total, current)  => {
@@ -223,7 +238,24 @@ class Database {
                 });
             }
 
-            await this.db.kanji.bulkAdd(utilIsolate(rows));
+            await this.db.kanji.bulkAdd(rows);
+        };
+
+        const kanjiFreqDataLoaded = async (title, entries, total, current) => {
+            if (callback) {
+                callback(total, current);
+            }
+
+            const rows = [];
+            for (const [character, frequency] of entries) {
+                rows.push({
+                    character,
+                    frequency,
+                    dictionary: title
+                });
+            }
+
+            await this.db.kanjiFreq.bulkAdd(rows);
         };
 
         const tagDataLoaded = async (title, entries, total, current) => {
@@ -244,7 +276,7 @@ class Database {
                 rows.push(row);
             }
 
-            await this.db.tagMeta.bulkAdd(utilIsolate(rows));
+            await this.db.tagMeta.bulkAdd(rows);
         };
 
         return await Database.importDictionaryZip(
@@ -253,7 +285,7 @@ class Database {
             termDataLoaded,
             termFreqDataLoaded,
             kanjiDataLoaded,
-            null,
+            kanjiFreqDataLoaded,
             tagDataLoaded
         );
     }

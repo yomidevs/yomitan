@@ -82,7 +82,9 @@ function formUpdateVisibility(options) {
 
     const debug = $('#debug');
     if (options.general.debugInfo) {
-        const text = JSON.stringify(options, null, 4);
+        const temp = utilIsolate(options);
+        temp.anki.fieldTemplates = '...';
+        const text = JSON.stringify(temp, null, 4);
         debug.html(handlebarsEscape(text));
         debug.show();
     } else {
