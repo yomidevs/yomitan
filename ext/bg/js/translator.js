@@ -60,7 +60,7 @@ class Translator {
         let definitions = [];
         for (const deinflection of deinflections) {
             for (const definition of deinflection.definitions) {
-                const tags = definition.tags.map(tag => dictTagBuild(tag, definition.tagMeta));
+                const tags = await this.buildTags(definition.tags, titles);
                 tags.push(dictTagBuildSource(definition.dictionary));
 
                 let frequencies = await this.database.findTermFreq(definition.expression, titles);
@@ -124,12 +124,29 @@ class Translator {
         }
 
         for (const definition of definitions) {
-            const tags = definition.tags.map(tag => dictTagBuild(tag, definition.tagMeta));
+            const tags = await this.buildTags(definition.tags, titles);
             tags.push(dictTagBuildSource(definition.dictionary));
+
             definition.tags = dictTagsSort(tags);
             definition.frequencies = await this.database.findKanjiFreq(definition.character, titles);
         }
 
         return definitions;
+    }
+
+    async buildTags(names, titles) {
+        const results = [];
+        for (const name of names) {
+            const meta = await this.database.findTag(name.split(':')[0], titles);
+
+            const result = {name};
+            for (const prop in meta || {}) {
+                result[prop] = meta[prop];
+            }
+
+            results.push(dictTagSanitize(result));
+        }
+
+        return results;
     }
 }

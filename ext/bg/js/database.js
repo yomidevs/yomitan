@@ -20,7 +20,6 @@
 class Database {
     constructor() {
         this.db = null;
-        this.tagCache = {};
     }
 
     async prepare() {
@@ -38,7 +37,7 @@ class Database {
         this.db.version(3).stores({
             termFreq:     '++,dictionary,expression',
             kanjiFreq:    '++,dictionary,character',
-            tagMeta:      '++,dictionary'
+            tagMeta:      '++,dictionary,name'
         });
 
         await this.db.open();
@@ -52,7 +51,6 @@ class Database {
         this.db.close();
         await this.db.delete();
         this.db = null;
-        this.tagCache = {};
 
         await this.prepare();
     }
@@ -77,11 +75,6 @@ class Database {
                 });
             }
         });
-
-        await this.cacheTagMeta(titles);
-        for (const result of results) {
-            result.tagMeta = this.tagCache[result.dictionary] || {};
-        }
 
         return results;
     }
@@ -120,11 +113,6 @@ class Database {
             }
         });
 
-        await this.cacheTagMeta(titles);
-        for (const result of results) {
-            result.tagMeta = this.tagCache[result.dictionary] || {};
-        }
-
         return results;
     }
 
@@ -143,21 +131,19 @@ class Database {
         return results;
     }
 
-    async cacheTagMeta(titles) {
+    async findTag(name, titles) {
         if (!this.db) {
             throw 'database not initialized';
         }
 
-        for (const title of titles) {
-            if (!this.tagCache[title]) {
-                const tagMeta = {};
-                await this.db.tagMeta.where('dictionary').equals(title).each(row => {
-                    tagMeta[row.name] = {category: row.category, notes: row.notes, order: row.order};
-                });
-
-                this.tagCache[title] = tagMeta;
+        let result = null;
+        await this.db.tagMeta.where('name').equals(name).each(row => {
+            if (titles.includes(row.dictionary)) {
+                result = row;
             }
-        }
+        });
+
+        return result;
     }
 
     async getDictionaries() {
