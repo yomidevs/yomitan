@@ -87,6 +87,21 @@ class Database {
         return results;
     }
 
+    async findTermFreq(term, titles) {
+        if (!this.db) {
+            throw 'database not initialized';
+        }
+
+        const results = [];
+        await this.db.termFreq.where('expression').equals(term).each(row => {
+            if (titles.includes(row.dictionary)) {
+                results.push({frequency: row.frequency, dictionary: row.dictionary});
+            }
+        });
+
+        return results;
+    }
+
     async findKanji(kanji, titles) {
         if (!this.db) {
             return Promise.reject('database not initialized');
@@ -174,6 +189,23 @@ class Database {
             await this.db.terms.bulkAdd(utilIsolate(rows));
         };
 
+        const termFreqDataLoaded = async (title, entries, total, current) => {
+            if (callback) {
+                callback(total, current);
+            }
+
+            const rows = [];
+            for (const [expression, frequency] of entries) {
+                rows.push({
+                    expression,
+                    frequency,
+                    dictionary: title
+                });
+            }
+
+            await this.db.termFreq.bulkAdd(utilIsolate(rows));
+        };
+
         const kanjiDataLoaded = async (title, entries, total, current)  => {
             if (callback) {
                 callback(total, current);
@@ -219,7 +251,7 @@ class Database {
             archive,
             indexDataLoaded,
             termDataLoaded,
-            null,
+            termFreqDataLoaded,
             kanjiDataLoaded,
             null,
             tagDataLoaded

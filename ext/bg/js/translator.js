@@ -62,7 +62,14 @@ class Translator {
             for (const definition of deinflection.definitions) {
                 const tags = definition.tags.map(tag => dictTagBuild(tag, definition.tagMeta));
                 tags.push(dictTagBuildSource(definition.dictionary));
+
+                let frequencies = await this.database.findTermFreq(definition.expression, titles);
+                if (frequencies.length === 0) {
+                    frequencies = await this.database.findTermFreq(definition.reading, titles);
+                }
+
                 definitions.push({
+                    frequencies,
                     source: deinflection.source,
                     reasons: deinflection.reasons,
                     score: definition.score,
