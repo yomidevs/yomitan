@@ -137,11 +137,13 @@ class Translator {
     async buildTags(names, title) {
         const results = [];
         for (const name of names) {
-            const meta = await this.database.findTag(name.split(':')[0], title);
+            const meta = await this.database.findTagForTitle(name.split(':')[0], title);
 
             const result = {name};
             for (const prop in meta || {}) {
-                result[prop] = meta[prop];
+                if (prop !== 'name') {
+                    result[prop] = meta[prop];
+                }
             }
 
             results.push(dictTagSanitize(result));

@@ -133,7 +133,7 @@ class Database {
         return results;
     }
 
-    async findTag(name, title) {
+    async findTagForTitle(name, title) {
         if (!this.db) {
             throw 'database not initialized';
         }
