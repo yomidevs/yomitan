@@ -154,7 +154,7 @@ class Database {
         return result;
     }
 
-    async getDictionaries() {
+    async getTitles() {
         if (this.db) {
             return this.db.dictionaries.toArray();
         } else {

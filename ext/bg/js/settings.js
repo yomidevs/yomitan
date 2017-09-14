@@ -213,7 +213,7 @@ async function dictionaryGroupsPopulate(options) {
     const dictGroups = $('#dict-groups').empty();
     const dictWarning = $('#dict-warning').hide();
 
-    const dictRows = await utilDatabaseGetDictionaries();
+    const dictRows = await utilDatabaseGetTitles();
     if (dictRows.length === 0) {
         dictWarning.show();
     }
