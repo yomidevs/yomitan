@@ -20,6 +20,7 @@
 class Database {
     constructor() {
         this.db = null;
+        this.tagCache = {};
     }
 
     async prepare() {
@@ -51,6 +52,7 @@ class Database {
         this.db.close();
         await this.db.delete();
         this.db = null;
+        this.tagCache = {};
 
         await this.prepare();
     }
@@ -131,17 +133,23 @@ class Database {
         return results;
     }
 
-    async findTag(name, titles) {
+    async findTag(name, title) {
         if (!this.db) {
             throw 'database not initialized';
         }
 
-        let result = null;
-        await this.db.tagMeta.where('name').equals(name).each(row => {
-            if (titles.includes(row.dictionary)) {
-                result = row;
-            }
-        });
+        this.tagCache[title] = this.tagCache[title] || {};
+
+        let result = this.tagCache[title][name];
+        if (!result) {
+            await this.db.tagMeta.where('name').equals(name).each(row => {
+                if (title === row.dictionary) {
+                    result = row;
+                }
+            });
+
+            this.tagCache[title][name] = result;
+        }
 
         return result;
     }

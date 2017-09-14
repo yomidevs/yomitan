@@ -148,16 +148,6 @@ function dictTagBuildSource(name) {
     return dictTagSanitize({name, category: 'dictionary', order: 100});
 }
 
-function dictTagBuild(name, meta) {
-    const tag = {name};
-    const symbol = name.split(':')[0];
-    for (const prop in meta[symbol] || {}) {
-        tag[prop] = meta[symbol][prop];
-    }
-
-    return dictTagSanitize(tag);
-}
-
 function dictTagSanitize(tag) {
     tag.name = tag.name || 'untitled';
     tag.category = tag.category || 'default';
