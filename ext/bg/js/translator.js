@@ -37,8 +37,26 @@ class Translator {
     }
 
     async findTermsGrouped(text, dictionaries, alphanumeric) {
+        const titles = Object.keys(dictionaries);
         const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
-        return {length, definitions: dictTermsGroup(definitions, dictionaries)};
+
+        const definitionsGrouped = dictTermsGroup(definitions, dictionaries);
+        for (const definition of definitionsGrouped) {
+            this.buildTermFrequencies(definition, titles);
+        }
+
+        return {length, definitions: definitionsGrouped};
+    }
+
+    async findTermsSplit(text, dictionaries, alphanumeric) {
+        const titles = Object.keys(dictionaries);
+        const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
+
+        for (const definition of definitions) {
+            this.buildTermFrequencies(definition, titles);
+        }
+
+        return {length, definitions};
     }
 
     async findTerms(text, dictionaries, alphanumeric) {
@@ -63,13 +81,7 @@ class Translator {
                 const tags = await this.buildTags(definition.tags, definition.dictionary);
                 tags.push(dictTagBuildSource(definition.dictionary));
 
-                let frequencies = await this.database.findTermFreq(definition.expression, titles);
-                if (frequencies.length === 0) {
-                    frequencies = await this.database.findTermFreq(definition.reading, titles);
-                }
-
                 definitions.push({
-                    frequencies,
                     source: deinflection.source,
                     reasons: deinflection.reasons,
                     score: definition.score,
@@ -132,6 +144,13 @@ class Translator {
         }
 
         return definitions;
+    }
+
+    async buildTermFrequencies(definition, titles) {
+        definition.frequencies = await this.database.findTermFreq(definition.expression, titles);
+        if (definition.frequencies.length === 0) {
+            definition.frequencies = await this.database.findTermFreq(definition.reading, titles);
+        }
     }
 
     async buildTags(names, title) {

@@ -31,7 +31,7 @@ async function apiTermsFind(text) {
 
     const searcher = options.general.groupResults ?
         translator.findTermsGrouped.bind(translator) :
-        translator.findTerms.bind(translator);
+        translator.findTermsSplit.bind(translator);
 
     const {definitions, length} = await searcher(
         text,
