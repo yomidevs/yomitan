@@ -78,7 +78,7 @@ class Translator {
         let definitions = [];
         for (const deinflection of deinflections) {
             for (const definition of deinflection.definitions) {
-                const tags = await this.buildTags(definition.tags, definition.dictionary);
+                const tags = await this.expandTags(definition);
                 tags.push(dictTagBuildSource(definition.dictionary));
 
                 definitions.push({
@@ -136,9 +136,8 @@ class Translator {
         }
 
         for (const definition of definitions) {
-            const tags = await this.buildTags(definition.tags, definition.dictionary);
+            const tags = await this.expandTags(definition);
             tags.push(dictTagBuildSource(definition.dictionary));
-
             definition.tags = dictTagsSort(tags);
             definition.frequencies = await this.database.findKanjiFreq(definition.character, titles);
         }
@@ -153,21 +152,22 @@ class Translator {
         }
     }
 
-    async buildTags(names, title) {
-        const results = [];
-        for (const name of names) {
-            const meta = await this.database.findTagForTitle(name.split(':')[0], title);
+    async expandTags(definition) {
+        const tags = [];
+        for (const name of definition.tags) {
+            const base = name.split(':')[0];
+            const meta = await this.database.findTagForTitle(base, definition.dictionary);
 
-            const result = {name};
+            const tag = {name};
             for (const prop in meta || {}) {
                 if (prop !== 'name') {
-                    result[prop] = meta[prop];
+                    tag[prop] = meta[prop];
                 }
             }
 
-            results.push(dictTagSanitize(result));
+            tags.push(dictTagSanitize(tag));
         }
 
-        return results;
+        return tags;
     }
 }
