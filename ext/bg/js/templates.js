@@ -31,7 +31,7 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
     + container.escapeExpression(((helper = (helper = helpers.character || (depth0 != null ? depth0.character : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"character","hash":{},"data":data}) : helper)))
     + "</div>\n\n    <div>\n"
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.tags : depth0),{"name":"each","hash":{},"fn":container.program(6, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "    </div>\n\n    <br>\n\n    <table class=\"table table-condensed\">\n        <tr>\n            <th>Readings</th>\n            <th>Glossary</th>\n            <th>Statistics</th>\n        </tr>\n        <tr>\n            <td class=\"reading\">\n"
+    + "    </div>\n\n    <table class=\"table table-condensed glyph-data\">\n        <tr>\n            <th>Readings</th>\n            <th>Glossary</th>\n            <th>Statistics</th>\n        </tr>\n        <tr>\n            <td class=\"reading\">\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.kunyomi : depth0),{"name":"if","hash":{},"fn":container.program(8, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.onyomi : depth0),{"name":"if","hash":{},"fn":container.program(11, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "            </td>\n            <td class=\"glossary\">\n"

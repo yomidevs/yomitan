@@ -148,3 +148,7 @@ hr {
     padding: 0.01em;
     vertical-align: top;
 }
+
+.glyph-data {
+    margin-top: 10px;
+}
