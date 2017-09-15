@@ -31,10 +31,10 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
     + container.escapeExpression(((helper = (helper = helpers.character || (depth0 != null ? depth0.character : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"character","hash":{},"data":data}) : helper)))
     + "</div>\n\n    <div>\n"
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.tags : depth0),{"name":"each","hash":{},"fn":container.program(6, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "    </div>\n\n    <table class=\"table table-condensed glyph-data\">\n        <tr>\n            <th>Readings</th>\n            <th>Glossary</th>\n            <th>Statistics</th>\n        </tr>\n        <tr>\n            <td class=\"reading\">\n"
+    + "    </div>\n\n    <table class=\"table table-condensed glyph-data\">\n        <tr>\n            <th>Readings</th>\n            <th>Glossary</th>\n            <th>Statistics</th>\n        </tr>\n        <tr>\n            <td class=\"reading\">\n                <dl>\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.kunyomi : depth0),{"name":"if","hash":{},"fn":container.program(8, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.onyomi : depth0),{"name":"if","hash":{},"fn":container.program(11, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "            </td>\n            <td class=\"glossary\">\n"
+    + "                </dl>\n            </td>\n            <td class=\"glossary\">\n"
     + ((stack1 = helpers["if"].call(alias1,((stack1 = (depth0 != null ? depth0.glossary : depth0)) != null ? stack1["1"] : stack1),{"name":"if","hash":{},"fn":container.program(13, data, 0),"inverse":container.program(16, data, 0),"data":data})) != null ? stack1 : "")
     + "            </td>\n            <td></td>\n        </tr>\n    </table>\n\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.debug : depth0),{"name":"if","hash":{},"fn":container.program(18, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
@@ -56,9 +56,8 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
 },"8":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "                <dl>\n                    <dt>Kun</dt>\n"
-    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? depth0.kunyomi : depth0),{"name":"each","hash":{},"fn":container.program(9, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "                </dl>\n";
+  return "                    <dt>Kun-Yomi</dt>\n"
+    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? depth0.kunyomi : depth0),{"name":"each","hash":{},"fn":container.program(9, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
 },"9":function(container,depth0,helpers,partials,data) {
     return "                    <dd>"
     + container.escapeExpression(container.lambda(depth0, depth0))
@@ -66,9 +65,8 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
 },"11":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return "                <dl>\n                    <dt>On</dt>\n"
-    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? depth0.onyomi : depth0),{"name":"each","hash":{},"fn":container.program(9, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "                </dl>\n";
+  return "                    <dt>On-Yomi</dt>\n"
+    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? depth0.onyomi : depth0),{"name":"each","hash":{},"fn":container.program(9, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
 },"13":function(container,depth0,helpers,partials,data) {
     var stack1;
 

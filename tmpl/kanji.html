@@ -27,22 +27,20 @@
         </tr>
         <tr>
             <td class="reading">
-                {{#if kunyomi}}
                 <dl>
-                    <dt>Kun</dt>
+                    {{#if kunyomi}}
+                    <dt>Kun-Yomi</dt>
                     {{#each kunyomi}}
                     <dd>{{.}}</dd>
                     {{/each}}
-                </dl>
-                {{/if}}
-                {{#if onyomi}}
-                <dl>
-                    <dt>On</dt>
+                    {{/if}}
+                    {{#if onyomi}}
+                    <dt>On-Yomi</dt>
                     {{#each onyomi}}
                     <dd>{{.}}</dd>
                     {{/each}}
+                    {{/if}}
                 </dl>
-                {{/if}}
             </td>
             <td class="glossary">
                 {{#if glossary.[1]}}
