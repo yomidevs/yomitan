@@ -41,6 +41,14 @@
     </div>
     {{/if}}
 
+    {{#if frequencies}}
+    <div>
+        {{#each frequencies}}
+        <span class="label label-default tag-frequency">{{dictionary}}:{{frequency}}</span>
+        {{/each}}
+    </div>
+    {{/if}}
+
     <div class="glossary">
         {{#if grouped}}
         {{#if definitions.[1]}}

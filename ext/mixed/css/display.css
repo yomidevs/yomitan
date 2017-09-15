@@ -84,6 +84,10 @@ hr {
     background-color: #aa66cc;
 }
 
+.tag-frequency {
+    background-color: #5cb85c;
+}
+
 .actions .disabled {
     pointer-events: none;
     cursor: default;

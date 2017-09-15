@@ -42,7 +42,7 @@ class Translator {
 
         const definitionsGrouped = dictTermsGroup(definitions, dictionaries);
         for (const definition of definitionsGrouped) {
-            this.buildTermFrequencies(definition, titles);
+            await this.buildTermFrequencies(definition, titles);
         }
 
         return {length, definitions: definitionsGrouped};
@@ -53,7 +53,7 @@ class Translator {
         const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
 
         for (const definition of definitions) {
-            this.buildTermFrequencies(definition, titles);
+            await this.buildTermFrequencies(definition, titles);
         }
 
         return {length, definitions};
