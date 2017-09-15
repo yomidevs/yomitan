@@ -13,44 +13,53 @@
 
     <div class="glyph">{{character}}</div>
 
-    <div class="reading">
-        <table>
-            <tr>
-                <th>Kunyomi:</th>
-                <td>
-                    {{#each kunyomi}}
-                    {{.}}{{#unless @last}}, {{/unless}}
-                    {{/each}}
-                </td>
-            </tr>
-            <tr>
-                <th>Onyomi:</th>
-                <td>
-                    {{#each onyomi}}
-                    {{.}}{{#unless @last}}, {{/unless}}
-                    {{/each}}
-                </td>
-            </tr>
-        </table>
-    </div>
-
     <div>
         {{#each tags}}
         <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
         {{/each}}
     </div>
 
-    <div class="glossary">
-        {{#if glossary.[1]}}
-        <ol>
-            {{#each glossary}}
-            <li><span class="glossary-item">{{#multiLine}}{{.}}{{/multiLine}}</span></li>
-            {{/each}}
-        </ol>
-        {{else}}
-        <div class="glossary-item">{{#multiLine}}{{glossary.[0]}}{{/multiLine}}</div>
-        {{/if}}
-    </div>
+    <br>
+
+    <table class="table table-condensed">
+        <tr>
+            <th>Readings</th>
+            <th>Glossary</th>
+            <th>Statistics</th>
+        </tr>
+        <tr>
+            <td class="reading">
+                {{#if kunyomi}}
+                <dl>
+                    <dt>Kun</dt>
+                    {{#each kunyomi}}
+                    <dd>{{.}}</dd>
+                    {{/each}}
+                </dl>
+                {{/if}}
+                {{#if onyomi}}
+                <dl>
+                    <dt>On</dt>
+                    {{#each onyomi}}
+                    <dd>{{.}}</dd>
+                    {{/each}}
+                </dl>
+                {{/if}}
+            </td>
+            <td class="glossary">
+                {{#if glossary.[1]}}
+                <ol>
+                    {{#each glossary}}
+                    <li><span class="glossary-item">{{.}}</span></li>
+                    {{/each}}
+                </ol>
+                {{else}}
+                <span class="glossary-item">{{glossary.[0]}}</span>
+                {{/if}}
+            </td>
+            <td></td>
+        </tr>
+    </table>
 
     {{#if debug}}
     <pre>{{#dumpObject}}{{{.}}}{{/dumpObject}}</pre>
