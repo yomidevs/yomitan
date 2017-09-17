@@ -169,16 +169,11 @@ class Frontend {
     }
 
     async searchAt(point) {
-        let textSource = null;
+        const textSource = docRangeFromPoint(point);
+        let hideResults = false;
 
         try {
             if (this.pendingLookup) {
-                return;
-            }
-
-            textSource = docRangeFromPoint(point);
-            if (!textSource || !textSource.containsPoint(point)) {
-                docImposterDestroy();
                 return;
             }
 
@@ -186,10 +181,9 @@ class Frontend {
                 return;
             }
 
-            this.pendingLookup = true;
-
-            if (!await this.searchTerms(textSource)) {
-                await this.searchKanji(textSource);
+            if (textSource && textSource.containsPoint(point)) {
+                this.pendingLookup = true;
+                hideResults = !await this.searchTerms(textSource) && !await this.searchKanji(textSource);
             }
         } catch (e) {
             if (window.yomichan_orphaned) {
@@ -201,6 +195,11 @@ class Frontend {
             }
         } finally {
             docImposterDestroy();
+
+            if (hideResults && this.options.scanning.autoHideResults) {
+                this.popup.hide();
+            }
+
             this.pendingLookup = false;
         }
     }
