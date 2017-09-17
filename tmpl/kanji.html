@@ -53,7 +53,33 @@
                 <span class="glossary-item">{{glossary.[0]}}</span>
                 {{/if}}
             </td>
-            <td></td>
+            <td>
+                <dl>
+                    {{#if stats}}
+                    {{#each stats}}
+                    <dd><b>{{@key}}</b>: {{.}}</dd>
+                    {{/each}}
+                    {{else}}
+                    No statistical data found
+                    {{/if}}
+                </dl>
+            </td>
+        </tr>
+        <tr>
+            <th colspan="3">Dictionary Indices</th>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <dl>
+                    {{#if indices}}
+                    {{#each indices}}
+                    <dd><b>{{@key}}</b>: {{.}}</dd>
+                    {{/each}}
+                    {{else}}
+                    No index data found
+                    {{/if}}
+                </dl>
+            </td>
         </tr>
     </table>
 
@@ -69,5 +95,5 @@
 {{> kanji debug=../debug addable=../addable source=../source root=../root}}
 {{/each}}
 {{else}}
-<p class="note">No results found.</p>
+<p class="note">No results found</p>
 {{/if}}
