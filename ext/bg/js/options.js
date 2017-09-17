@@ -147,7 +147,7 @@ function optionsSetDefaults(options) {
             selectText: true,
             alphanumeric: true,
             autoHideResults: false,
-            delay: 15,
+            delay: 20,
             length: 10,
             modifier: 'shift'
         },

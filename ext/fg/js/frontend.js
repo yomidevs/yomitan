@@ -80,7 +80,6 @@ class Frontend {
         const search = async () => {
             try {
                 await this.searchAt({x: e.clientX, y: e.clientY});
-                this.pendingLookup = false;
             } catch (e) {
                 this.onError(e);
             }
@@ -169,19 +168,15 @@ class Frontend {
     }
 
     async searchAt(point) {
+        if (this.pendingLookup || this.popup.containsPoint(point)) {
+            return;
+        }
+
         const textSource = docRangeFromPoint(point);
-        let hideResults = false;
+        let hideResults = !textSource || !textSource.containsPoint(point);
 
         try {
-            if (this.pendingLookup) {
-                return;
-            }
-
-            if (this.textSourceLast && this.textSourceLast.equals(textSource)) {
-                return;
-            }
-
-            if (textSource && textSource.containsPoint(point)) {
+            if (!hideResults && (!this.textSourceLast || !this.textSourceLast.equals(textSource))) {
                 this.pendingLookup = true;
                 hideResults = !await this.searchTerms(textSource) && !await this.searchKanji(textSource);
             }
@@ -194,10 +189,10 @@ class Frontend {
                 this.onError(e);
             }
         } finally {
-            docImposterDestroy();
-
             if (hideResults && this.options.scanning.autoHideResults) {
-                this.popup.hide();
+                this.searchClear();
+            } else {
+                docImposterDestroy();
             }
 
             this.pendingLookup = false;
