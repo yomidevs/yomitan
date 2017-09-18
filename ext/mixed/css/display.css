@@ -152,3 +152,11 @@ hr {
 .glyph-data {
     margin-top: 10px;
 }
+
+.info-output {
+    width: 100%;
+}
+
+.info-output td {
+    text-align: right;
+}

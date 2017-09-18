@@ -13,11 +13,21 @@
 
     <div class="glyph">{{character}}</div>
 
+    {{#if frequencies}}
+    <div>
+        {{#each frequencies}}
+        <span class="label label-default tag-frequency">{{dictionary}}:{{frequency}}</span>
+        {{/each}}
+    </div>
+    {{/if}}
+
+    {{#if tags}}
     <div>
         {{#each tags}}
         <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
         {{/each}}
     </div>
+    {{/if}}
 
     <table class="table table-condensed glyph-data">
         <tr>
@@ -48,15 +58,18 @@
                 {{/if}}
             </td>
             <td>
-                <dl>
-                    {{#if stats}}
+                {{#if stats}}
+                <table class="info-output">
                     {{#each stats}}
-                    <dd><b>{{@key}}</b>: {{.}}</dd>
+                    <tr>
+                        <th>{{#if notes}}{{notes}}{{else}}{{name}}{{/if}}</th>
+                        <td>{{value}}</td>
+                    </tr>
                     {{/each}}
-                    {{else}}
-                    No statistical data found
-                    {{/if}}
-                </dl>
+                </table>
+                {{else}}
+                No statistical data found
+                {{/if}}
             </td>
         </tr>
         <tr>
@@ -64,15 +77,18 @@
         </tr>
         <tr>
             <td colspan="3">
-                <dl>
-                    {{#if indices}}
+                {{#if indices}}
+                <table class="info-output">
                     {{#each indices}}
-                    <dd><b>{{@key}}</b>: {{.}}</dd>
+                    <tr>
+                        <th>{{#if notes}}{{notes}}{{else}}{{name}}{{/if}}</th>
+                        <td>{{value}}</td>
+                    </tr>
                     {{/each}}
-                    {{else}}
-                    No index data found
-                    {{/if}}
-                </dl>
+                </table>
+                {{else}}
+                No index data found
+                {{/if}}
             </td>
         </tr>
     </table>

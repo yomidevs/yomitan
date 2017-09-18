@@ -78,7 +78,7 @@ class Translator {
         let definitions = [];
         for (const deinflection of deinflections) {
             for (const definition of deinflection.definitions) {
-                const tags = await this.expandTags(definition);
+                const tags = await this.expandTags(definition.tags, definition.dictionary);
                 tags.push(dictTagBuildSource(definition.dictionary));
 
                 definitions.push({
@@ -136,9 +136,12 @@ class Translator {
         }
 
         for (const definition of definitions) {
-            const tags = await this.expandTags(definition);
+            const tags = await this.expandTags(definition.tags, definition.dictionary);
             tags.push(dictTagBuildSource(definition.dictionary));
+
             definition.tags = dictTagsSort(tags);
+            definition.stats = await this.expandTaggedValues(definition.stats, definition.dictionary);
+            definition.indices = await this.expandTaggedValues(definition.indices, definition.dictionary);
             definition.frequencies = await this.database.findKanjiFreq(definition.character, titles);
         }
 
@@ -152,13 +155,32 @@ class Translator {
         }
     }
 
-    async expandTags(definition) {
+    async expandTags(names, title) {
         const tags = [];
-        for (const name of definition.tags) {
+        for (const name of names) {
             const base = name.split(':')[0];
-            const meta = await this.database.findTagForTitle(base, definition.dictionary);
+            const meta = await this.database.findTagForTitle(base, title);
 
             const tag = {name};
+            for (const prop in meta || {}) {
+                if (prop !== 'name') {
+                    tag[prop] = meta[prop];
+                }
+            }
+
+            tags.push(dictTagSanitize(tag));
+        }
+
+        return tags;
+    }
+
+    async expandTaggedValues(items, title) {
+        const tags = [];
+        for (const name in items) {
+            const base = name.split(':')[0];
+            const meta = await this.database.findTagForTitle(base, title);
+
+            const tag = {name, value: items[name]};
             for (const prop in meta || {}) {
                 if (prop !== 'name') {
                     tag[prop] = meta[prop];
