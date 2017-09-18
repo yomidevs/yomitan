@@ -140,8 +140,7 @@ class Translator {
             tags.push(dictTagBuildSource(definition.dictionary));
 
             definition.tags = dictTagsSort(tags);
-            definition.stats = await this.expandTaggedValues(definition.stats, definition.dictionary);
-            definition.indices = await this.expandTaggedValues(definition.indices, definition.dictionary);
+            definition.stats = await this.expandStats(definition.stats, definition.dictionary);
             definition.frequencies = await this.database.findKanjiFreq(definition.character, titles);
         }
 
@@ -174,22 +173,22 @@ class Translator {
         return tags;
     }
 
-    async expandTaggedValues(items, title) {
-        const tags = [];
+    async expandStats(items, title) {
+        const stats = [];
         for (const name in items) {
             const base = name.split(':')[0];
             const meta = await this.database.findTagForTitle(base, title);
 
-            const tag = {name, value: items[name]};
+            const stat = {name, value: items[name]};
             for (const prop in meta || {}) {
                 if (prop !== 'name') {
-                    tag[prop] = meta[prop];
+                    stat[prop] = meta[prop];
                 }
             }
 
-            tags.push(dictTagSanitize(tag));
+            stats.push(dictTagSanitize(stat));
         }
 
-        return tags;
+        return stats;
     }
 }

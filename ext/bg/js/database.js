@@ -110,7 +110,6 @@ class Database {
                     kunyomi: dictFieldSplit(row.kunyomi),
                     tags: dictFieldSplit(row.tags),
                     glossary: row.meanings,
-                    indices: row.indices,
                     stats: row.stats,
                     dictionary: row.dictionary
                 });
@@ -252,14 +251,13 @@ class Database {
                     });
                 }
             } else {
-                for (const [character, onyomi, kunyomi, tags, meanings, indices, stats] of entries) {
+                for (const [character, onyomi, kunyomi, tags, meanings, stats] of entries) {
                     rows.push({
                         character,
                         onyomi,
                         kunyomi,
                         tags,
                         meanings,
-                        indices,
                         stats,
                         dictionary: summary.title
                     });
