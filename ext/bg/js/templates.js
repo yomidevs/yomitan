@@ -39,7 +39,7 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
     + "                </dl>\n            </td>\n            <td class=\"glossary\">\n"
     + ((stack1 = helpers["if"].call(alias1,((stack1 = (depth0 != null ? depth0.glossary : depth0)) != null ? stack1["1"] : stack1),{"name":"if","hash":{},"fn":container.program(14, data, 0),"inverse":container.program(17, data, 0),"data":data})) != null ? stack1 : "")
     + "            </td>\n            <td></td>\n        </tr>\n        <tr>\n            <th colspan=\"3\">Dictionary Indices</th>\n        </tr>\n        <tr>\n            <td colspan=\"3\">\n"
-    + ((stack1 = helpers["if"].call(alias1,((stack1 = (depth0 != null ? depth0.stats : depth0)) != null ? stack1["default"] : stack1),{"name":"if","hash":{},"fn":container.program(19, data, 0),"inverse":container.program(25, data, 0),"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers["if"].call(alias1,((stack1 = (depth0 != null ? depth0.stats : depth0)) != null ? stack1.index : stack1),{"name":"if","hash":{},"fn":container.program(19, data, 0),"inverse":container.program(25, data, 0),"data":data})) != null ? stack1 : "")
     + "            </td>\n        </tr>\n    </table>\n\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.debug : depth0),{"name":"if","hash":{},"fn":container.program(27, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "</div>\n";
@@ -101,7 +101,7 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
     var stack1;
 
   return "                <table class=\"info-output\">\n"
-    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.stats : depth0)) != null ? stack1["default"] : stack1),{"name":"each","hash":{},"fn":container.program(20, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),((stack1 = (depth0 != null ? depth0.stats : depth0)) != null ? stack1.index : stack1),{"name":"each","hash":{},"fn":container.program(20, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "                </table>\n";
 },"20":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {});
