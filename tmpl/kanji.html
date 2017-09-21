@@ -64,9 +64,9 @@
         </tr>
         <tr>
             <td colspan="3">
-                {{#if stats.indices}}
+                {{#if stats.default}}
                 <table class="info-output">
-                    {{#each stats.indices}}
+                    {{#each stats.default}}
                     <tr>
                         <th>{{#if notes}}{{notes}}{{else}}{{name}}{{/if}}</th>
                         <td>{{value}}</td>

@@ -178,7 +178,7 @@ class Translator {
         for (const name in items) {
             const base = name.split(':')[0];
             const meta = await this.database.findTagForTitle(base, title);
-            const group = stats[meta.category] || [];
+            const group = stats[meta.category] = stats[meta.category] || [];
 
             const stat = {name, value: items[name]};
             for (const prop in meta || {}) {
