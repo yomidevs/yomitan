@@ -57,29 +57,16 @@
                 <span class="glossary-item">{{glossary.[0]}}</span>
                 {{/if}}
             </td>
-            <td>
-                {{#if stats}}
-                <table class="info-output">
-                    {{#each stats}}
-                    <tr>
-                        <th>{{#if notes}}{{notes}}{{else}}{{name}}{{/if}}</th>
-                        <td>{{value}}</td>
-                    </tr>
-                    {{/each}}
-                </table>
-                {{else}}
-                No statistical data found
-                {{/if}}
-            </td>
+            <td></td>
         </tr>
         <tr>
             <th colspan="3">Dictionary Indices</th>
         </tr>
         <tr>
             <td colspan="3">
-                {{#if indices}}
+                {{#if stats.indices}}
                 <table class="info-output">
-                    {{#each indices}}
+                    {{#each stats.indices}}
                     <tr>
                         <th>{{#if notes}}{{notes}}{{else}}{{name}}{{/if}}</th>
                         <td>{{value}}</td>
