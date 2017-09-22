@@ -48,7 +48,7 @@ No data found
         <tr>
             <th>Glossary</th>
             <th>Readings</th>
-            <th>Stats</th>
+            <th>Statistics</th>
         </tr>
         <tr>
             <td class="glossary">
@@ -59,20 +59,22 @@ No data found
                 {{/if}}
             </td>
             <td class="reading">
-                <dl>{{#each onyomi}}<dd>{{.}}</dd>{{/each}}</dl>
-                <dl>{{#each kunyomi}}<dd>{{.}}</dd>{{/each}}</dl>
+                {{#if onyomi}}<dl>{{#each onyomi}}<dd>{{.}}</dd>{{/each}}</dl>{{/if}}
+                {{#if kunyomi}}<dl>{{#each kunyomi}}<dd>{{.}}</dd>{{/each}}</dl>{{/if}}
             </td>
             <td>{{> table data=stats.misc}}</td>
         </tr>
         <tr>
-            <th>Query</th>
-            <th></th>
-            <th>Code</th>
+            <th colspan="3">Classifications</th>
         </tr>
         <tr>
-            <td>{{> table data=stats.query}}</td>
-            <td></td>
-            <td>{{> table data=stats.code}}</td>
+            <td colspan="3">{{> table data=stats.query}}</td>
+        </tr>
+        <tr>
+            <th colspan="3">Codepoints</th>
+        </tr>
+        <tr>
+            <td colspan="3">{{> table data=stats.code}}</td>
         </tr>
         <tr>
             <th colspan="3">Dictionary Indices</th>
