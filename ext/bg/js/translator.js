@@ -190,6 +190,18 @@ class Translator {
             group.push(dictTagSanitize(stat));
         }
 
+        for (const category in stats) {
+            stats[category].sort((a, b) => {
+                if (a.notes < b.notes) {
+                    return -1;
+                } else if (a.notes > b.notes) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            });
+        }
+
         return stats;
     }
 }
