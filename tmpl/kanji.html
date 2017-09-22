@@ -1,3 +1,18 @@
+{{#*inline "table"}}
+{{#if data}}
+<table class="info-output">
+    {{#each data}}
+    <tr>
+        <th>{{#if notes}}{{notes}}{{else}}{{name}}{{/if}}</th>
+        <td>{{value}}</td>
+    </tr>
+    {{/each}}
+</table>
+{{else}}
+No data found
+{{/if}}
+{{/inline}}
+
 {{#*inline "kanji"}}
 <div class="entry" data-type="kanji">
     <div class="actions">
@@ -31,52 +46,40 @@
 
     <table class="table table-condensed glyph-data">
         <tr>
-            <th>Readings</th>
             <th>Glossary</th>
-            <th>Statistics</th>
+            <th>On'Yomi</th>
+            <th>Kun'Yomi</th>
         </tr>
         <tr>
-            <td class="reading">
-                <dl>
-                    {{#each kunyomi}}
-                    <dd>{{.}}</dd>
-                    {{/each}}
-                    {{#each onyomi}}
-                    <dd>{{.}}</dd>
-                    {{/each}}
-                </dl>
-            </td>
             <td class="glossary">
                 {{#if glossary.[1]}}
-                <ol>
-                    {{#each glossary}}
-                    <li><span class="glossary-item">{{.}}</span></li>
-                    {{/each}}
-                </ol>
+                <ol>{{#each glossary}}<li><span class="glossary-item">{{.}}</span></li>{{/each}}</ol>
                 {{else}}
                 <span class="glossary-item">{{glossary.[0]}}</span>
                 {{/if}}
             </td>
-            <td></td>
+            <td class="reading">
+                <dl>{{#each onyomi}}<dd>{{.}}</dd>{{/each}}</dl>
+            </td>
+            <td class="reading">
+                <dl>{{#each kunyomi}}<dd>{{.}}</dd>{{/each}}</dl>
+            </td>
+        </tr>
+        <tr>
+            <th>Stats</th>
+            <th>Query</th>
+            <th>Code</th>
+        </tr>
+        <tr>
+            <td>{{> table data=stats.misc}}</td>
+            <td>{{> table data=stats.query}}</td>
+            <td>{{> table data=stats.code}}</td>
         </tr>
         <tr>
             <th colspan="3">Dictionary Indices</th>
         </tr>
         <tr>
-            <td colspan="3">
-                {{#if stats.index}}
-                <table class="info-output">
-                    {{#each stats.index}}
-                    <tr>
-                        <th>{{#if notes}}{{notes}}{{else}}{{name}}{{/if}}</th>
-                        <td>{{value}}</td>
-                    </tr>
-                    {{/each}}
-                </table>
-                {{else}}
-                No index data found
-                {{/if}}
-            </td>
+            <td colspan="3">{{> table data=stats.index}}</td>
         </tr>
     </table>
 
