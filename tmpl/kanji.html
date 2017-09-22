@@ -47,8 +47,8 @@ No data found
     <table class="table table-condensed glyph-data">
         <tr>
             <th>Glossary</th>
-            <th>On'Yomi</th>
-            <th>Kun'Yomi</th>
+            <th>Readings</th>
+            <th>Stats</th>
         </tr>
         <tr>
             <td class="glossary">
@@ -60,19 +60,18 @@ No data found
             </td>
             <td class="reading">
                 <dl>{{#each onyomi}}<dd>{{.}}</dd>{{/each}}</dl>
-            </td>
-            <td class="reading">
                 <dl>{{#each kunyomi}}<dd>{{.}}</dd>{{/each}}</dl>
             </td>
+            <td>{{> table data=stats.misc}}</td>
         </tr>
         <tr>
-            <th>Stats</th>
             <th>Query</th>
+            <th></th>
             <th>Code</th>
         </tr>
         <tr>
-            <td>{{> table data=stats.misc}}</td>
             <td>{{> table data=stats.query}}</td>
+            <td></td>
             <td>{{> table data=stats.code}}</td>
         </tr>
         <tr>
