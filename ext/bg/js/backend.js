@@ -71,7 +71,7 @@ class Backend {
             return promise.then(result => {
                 callback({result});
             }).catch(error => {
-                callback({error});
+                callback({error: error.toString ? error.toString() : error});
             });
         };
 

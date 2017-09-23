@@ -152,7 +152,7 @@ class Frontend {
     }
 
     onError(error) {
-        window.alert(`Error: ${error}`);
+        window.alert(`Error: ${error.toString ? error.toString() : error}`);
     }
 
     popupTimerSet(callback) {

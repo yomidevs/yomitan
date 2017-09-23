@@ -27,7 +27,7 @@ class DisplayFloat extends Display {
         if (window.yomichan_orphaned) {
             this.onOrphaned();
         } else {
-            window.alert(`Error: ${error}`);
+            window.alert(`Error: ${error.toString ? error.toString() : error}`);
         }
     }
 
