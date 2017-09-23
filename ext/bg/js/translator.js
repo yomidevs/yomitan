@@ -143,8 +143,7 @@ class Translator {
             definition.stats = await this.expandStats(definition.stats, definition.dictionary);
 
             definition.frequencies = [];
-            const metas = await this.database.findKanjiMeta(definition.character, titles);
-            for (const meta of metas) {
+            for (const meta of await this.database.findKanjiMeta(definition.character, titles)) {
                 if (meta.mode === 'freq') {
                     definition.frequencies.push({
                         character: meta.character,
@@ -159,13 +158,8 @@ class Translator {
     }
 
     async buildTermFrequencies(definition, titles) {
-        let metas = await this.database.findTermMeta(definition.expression, titles);
-        if (metas.length === 0) {
-            metas = await this.database.findTermMeta(definition.reading, titles);
-        }
-
         definition.frequencies = [];
-        for (const meta of metas) {
+        for (const meta of await this.database.findTermMeta(definition.expression, titles)) {
             if (meta.mode === 'freq') {
                 definition.frequencies.push({
                     expression: meta.expression,
