@@ -22,7 +22,7 @@ function requestJson(url, action, params) {
         const xhr = new XMLHttpRequest();
         xhr.overrideMimeType('application/json');
         xhr.addEventListener('load', () => resolve(xhr.responseText));
-        xhr.addEventListener('error', () => reject('failed to execute network request'));
+        xhr.addEventListener('error', () => reject('Failed to connect'));
         xhr.open(action, url);
         if (params) {
             xhr.send(JSON.stringify(params));
@@ -34,7 +34,7 @@ function requestJson(url, action, params) {
             return JSON.parse(responseText);
         }
         catch (e) {
-            return Promise.reject('invalid JSON response');
+            return Promise.reject('Invalid response');
         }
     });
 }

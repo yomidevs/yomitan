@@ -32,11 +32,11 @@ class Display {
     }
 
     onError(error) {
-        throw 'override me';
+        throw 'Override me';
     }
 
     onSearchClear() {
-        throw 'override me';
+        throw 'Override me';
     }
 
     onSourceTermView(e) {
@@ -350,7 +350,7 @@ class Display {
                 Display.adderButtonFind(index, mode).addClass('disabled');
                 Display.viewerButtonFind(index).removeClass('pending disabled').data('noteId', noteId);
             } else {
-                throw 'note could note be added';
+                throw 'Note could note be added';
             }
         } catch (e) {
             this.onError(e);

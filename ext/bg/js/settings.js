@@ -142,7 +142,7 @@ async function onReady() {
     $('#scan-length').val(options.scanning.length);
     $('#scan-modifier-key').val(options.scanning.modifier);
 
-    $('#dict-purge').click(utilAsync(onDictionaryPurge));
+    $('#dict-purge-link').click(utilAsync(onDictionaryPurge));
     $('#dict-file').change(utilAsync(onDictionaryImport));
 
     $('#anki-enable').prop('checked', options.anki.enable);
@@ -179,7 +179,7 @@ $(document).ready(utilAsync(onReady));
 function dictionaryErrorShow(error) {
     const dialog = $('#dict-error');
     if (error) {
-        dialog.show().find('span').text(error);
+        dialog.show().text(error);
     } else {
         dialog.hide();
     }
@@ -245,7 +245,7 @@ async function onDictionaryPurge(e) {
     e.preventDefault();
 
     const dictControls = $('#dict-importer, #dict-groups').hide();
-    const dictProgress = $('#dict-purge-progress').show();
+    const dictProgress = $('#dict-purge').show();
 
     try {
         dictionaryErrorShow();
@@ -314,7 +314,7 @@ function ankiSpinnerShow(show) {
 function ankiErrorShow(error) {
     const dialog = $('#anki-error');
     if (error) {
-        dialog.show().find('span').text(error);
+        dialog.show().text(error);
     }
     else {
         dialog.hide();

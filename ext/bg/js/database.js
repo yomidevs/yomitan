@@ -25,7 +25,7 @@ class Database {
 
     async prepare() {
         if (this.db) {
-            throw 'database already initialized';
+            throw 'Database already initialized';
         }
 
         this.db = new Dexie('dict');
@@ -46,7 +46,7 @@ class Database {
 
     async purge() {
         if (!this.db) {
-            throw 'database not initialized';
+            throw 'Database not initialized';
         }
 
         this.db.close();
@@ -59,7 +59,7 @@ class Database {
 
     async findTerms(term, titles) {
         if (!this.db) {
-            throw 'database not initialized';
+            throw 'Database not initialized';
         }
 
         const results = [];
@@ -83,7 +83,7 @@ class Database {
 
     async findTermFreq(term, titles) {
         if (!this.db) {
-            throw 'database not initialized';
+            throw 'Database not initialized';
         }
 
         const results = [];
@@ -98,7 +98,7 @@ class Database {
 
     async findKanji(kanji, titles) {
         if (!this.db) {
-            return Promise.reject('database not initialized');
+            throw 'Database not initialized';
         }
 
         const results = [];
@@ -121,7 +121,7 @@ class Database {
 
     async findKanjiFreq(kanji, titles) {
         if (!this.db) {
-            throw 'database not initialized';
+            throw 'Database not initialized';
         }
 
         const results = [];
@@ -136,7 +136,7 @@ class Database {
 
     async findTagForTitle(name, title) {
         if (!this.db) {
-            throw 'database not initialized';
+            throw 'Database not initialized';
         }
 
         this.tagCache[title] = this.tagCache[title] || {};
@@ -159,23 +159,23 @@ class Database {
         if (this.db) {
             return this.db.dictionaries.toArray();
         } else {
-            throw 'database not initialized';
+            throw 'Database not initialized';
         }
     }
 
     async importDictionary(archive, callback) {
         if (!this.db) {
-            return Promise.reject('database not initialized');
+            throw 'Database not initialized';
         }
 
         const indexDataLoaded = async summary => {
             if (summary.version > 2) {
-                throw 'unsupported dictionary version';
+                throw 'Unsupported dictionary version';
             }
 
             const count = await this.db.dictionaries.where('title').equals(summary.title).count();
             if (count > 0) {
-                throw `dictionary "${summary.title}" is already imported`;
+                throw 'Dictionary is already imported';
             }
 
             await this.db.dictionaries.add(summary);
@@ -329,12 +329,12 @@ class Database {
 
         const indexFile = zip.files['index.json'];
         if (!indexFile) {
-            throw 'no dictionary index found in archive';
+            throw 'No dictionary index found in archive';
         }
 
         const index = JSON.parse(await indexFile.async('string'));
         if (!index.title || !index.revision) {
-            throw 'unrecognized dictionary format';
+            throw 'Unrecognized dictionary format';
         }
 
         const summary = {
