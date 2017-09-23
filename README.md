@@ -62,8 +62,8 @@ primary language is not English, you may consider also importing the English ver
     *   [kanjidic_french.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_french.zip) ([ver. 1.3.5 and older](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_french_old.zip))
     *   [kanjidic_portuguese.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_portuguese.zip) ([ver. 1.3.5 and older](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_portuguese_old.zip))
     *   [kanjidic_spanish.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_spanish.zip) ([ver. 1.3.5 and older](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_spanish_old.zip))
-*   **[Innocent Corpus](https://forum.koohii.com/post-168613.html#pid168613)** (Frequency lists)
-    *   [innocent_corpus.zip](https://foosoft.net/projects/yomichan/dl/dict/innocent_corpus.zip) (occurrences of terms and Kanji in 5000+ novels)
+*   **[Innocent Corpus](https://forum.koohii.com/post-168613.html#pid168613)** (Frequency list of terms and Kanji in 5000+ novels)
+    *   [innocent_corpus.zip](https://foosoft.net/projects/yomichan/dl/dict/innocent_corpus.zip)
 
 ## Basic Usage ##
 
