@@ -80,7 +80,6 @@ class Frontend {
         const search = async () => {
             try {
                 await this.searchAt({x: e.clientX, y: e.clientY});
-                this.pendingLookup = false;
             } catch (e) {
                 this.onError(e);
             }
@@ -153,7 +152,7 @@ class Frontend {
     }
 
     onError(error) {
-        window.alert(`Error: ${error}`);
+        window.alert(`Error: ${error.toString ? error.toString() : error}`);
     }
 
     popupTimerSet(callback) {
@@ -169,27 +168,17 @@ class Frontend {
     }
 
     async searchAt(point) {
-        let textSource = null;
+        if (this.pendingLookup || this.popup.containsPoint(point)) {
+            return;
+        }
+
+        const textSource = docRangeFromPoint(point);
+        let hideResults = !textSource || !textSource.containsPoint(point);
 
         try {
-            if (this.pendingLookup) {
-                return;
-            }
-
-            textSource = docRangeFromPoint(point);
-            if (!textSource || !textSource.containsPoint(point)) {
-                docImposterDestroy();
-                return;
-            }
-
-            if (this.textSourceLast && this.textSourceLast.equals(textSource)) {
-                return;
-            }
-
-            this.pendingLookup = true;
-
-            if (!await this.searchTerms(textSource)) {
-                await this.searchKanji(textSource);
+            if (!hideResults && (!this.textSourceLast || !this.textSourceLast.equals(textSource))) {
+                this.pendingLookup = true;
+                hideResults = !await this.searchTerms(textSource) && !await this.searchKanji(textSource);
             }
         } catch (e) {
             if (window.yomichan_orphaned) {
@@ -200,7 +189,12 @@ class Frontend {
                 this.onError(e);
             }
         } finally {
-            docImposterDestroy();
+            if (hideResults && this.options.scanning.autoHideResults) {
+                this.searchClear();
+            } else {
+                docImposterDestroy();
+            }
+
             this.pendingLookup = false;
         }
     }

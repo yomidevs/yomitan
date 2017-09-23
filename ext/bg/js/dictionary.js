@@ -55,14 +55,6 @@ function dictRowsSort(rows, options) {
 
 function dictTermsSort(definitions, dictionaries=null) {
     return definitions.sort((v1, v2) => {
-        const sl1 = v1.source.length;
-        const sl2 = v2.source.length;
-        if (sl1 > sl2) {
-            return -1;
-        } else if (sl1 < sl2) {
-            return 1;
-        }
-
         if (dictionaries !== null) {
             const p1 = (dictionaries[v1.dictionary] || {}).priority || 0;
             const p2 = (dictionaries[v2.dictionary] || {}).priority || 0;
@@ -73,11 +65,11 @@ function dictTermsSort(definitions, dictionaries=null) {
             }
         }
 
-        const s1 = v1.score;
-        const s2 = v2.score;
-        if (s1 > s2) {
+        const sl1 = v1.source.length;
+        const sl2 = v2.source.length;
+        if (sl1 > sl2) {
             return -1;
-        } else if (s1 < s2) {
+        } else if (sl1 < sl2) {
             return 1;
         }
 
@@ -86,6 +78,14 @@ function dictTermsSort(definitions, dictionaries=null) {
         if (rl1 < rl2) {
             return -1;
         } else if (rl1 > rl2) {
+            return 1;
+        }
+
+        const s1 = v1.score;
+        const s2 = v2.score;
+        if (s1 > s2) {
+            return -1;
+        } else if (s1 < s2) {
             return 1;
         }
 
@@ -146,16 +146,6 @@ function dictTermsGroup(definitions, dictionaries) {
 
 function dictTagBuildSource(name) {
     return dictTagSanitize({name, category: 'dictionary', order: 100});
-}
-
-function dictTagBuild(name, meta) {
-    const tag = {name};
-    const symbol = name.split(':')[0];
-    for (const prop in meta[symbol] || {}) {
-        tag[prop] = meta[symbol][prop];
-    }
-
-    return dictTagSanitize(tag);
 }
 
 function dictTagSanitize(tag) {

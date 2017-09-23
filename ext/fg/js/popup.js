@@ -100,6 +100,21 @@ class Popup {
         return this.injected && this.container.style.visibility !== 'hidden';
     }
 
+    containsPoint(point) {
+        if (!this.isVisible()) {
+            return false;
+        }
+
+        const rect = this.container.getBoundingClientRect();
+        const contained =
+            point.x >= rect.left &&
+            point.y >= rect.top &&
+            point.x < rect.right &&
+            point.y < rect.bottom;
+
+        return contained;
+    }
+
     async termsShow(elementRect, definitions, options, context) {
         await this.show(elementRect, options);
         this.invokeApi('termsShow', {definitions, options, context});

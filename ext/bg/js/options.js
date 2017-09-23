@@ -146,7 +146,8 @@ function optionsSetDefaults(options) {
             middleMouse: true,
             selectText: true,
             alphanumeric: true,
-            delay: 15,
+            autoHideResults: false,
+            delay: 20,
             length: 10,
             modifier: 'shift'
         },

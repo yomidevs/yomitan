@@ -82,7 +82,7 @@ class TextSourceRange {
     }
 
     equals(other) {
-        return other.range && other.range.compareBoundaryPoints(Range.START_TO_START, this.range) === 0;
+        return other && other.range && other.range.compareBoundaryPoints(Range.START_TO_START, this.range) === 0;
     }
 
     static shouldEnter(node) {
@@ -239,6 +239,6 @@ class TextSourceElement {
     }
 
     equals(other) {
-        return other.element === this.element && other.content === this.content;
+        return other && other.element === this.element && other.content === this.content;
     }
 }

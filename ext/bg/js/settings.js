@@ -35,6 +35,7 @@ async function formRead() {
     optionsNew.scanning.middleMouse = $('#middle-mouse-button-scan').prop('checked');
     optionsNew.scanning.selectText = $('#select-matched-text').prop('checked');
     optionsNew.scanning.alphanumeric = $('#search-alphanumeric').prop('checked');
+    optionsNew.scanning.autoHideResults = $('#auto-hide-results').prop('checked');
     optionsNew.scanning.delay = parseInt($('#scan-delay').val(), 10);
     optionsNew.scanning.length = parseInt($('#scan-length').val(), 10);
     optionsNew.scanning.modifier = $('#scan-modifier-key').val();
@@ -82,7 +83,9 @@ function formUpdateVisibility(options) {
 
     const debug = $('#debug');
     if (options.general.debugInfo) {
-        const text = JSON.stringify(options, null, 4);
+        const temp = utilIsolate(options);
+        temp.anki.fieldTemplates = '...';
+        const text = JSON.stringify(temp, null, 4);
         debug.html(handlebarsEscape(text));
         debug.show();
     } else {
@@ -134,11 +137,12 @@ async function onReady() {
     $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);
     $('#select-matched-text').prop('checked', options.scanning.selectText);
     $('#search-alphanumeric').prop('checked', options.scanning.alphanumeric);
+    $('#auto-hide-results').prop('checked', options.scanning.autoHideResults);
     $('#scan-delay').val(options.scanning.delay);
     $('#scan-length').val(options.scanning.length);
     $('#scan-modifier-key').val(options.scanning.modifier);
 
-    $('#dict-purge').click(utilAsync(onDictionaryPurge));
+    $('#dict-purge-link').click(utilAsync(onDictionaryPurge));
     $('#dict-file').change(utilAsync(onDictionaryImport));
 
     $('#anki-enable').prop('checked', options.anki.enable);
@@ -175,7 +179,33 @@ $(document).ready(utilAsync(onReady));
 function dictionaryErrorShow(error) {
     const dialog = $('#dict-error');
     if (error) {
-        dialog.show().find('span').text(error);
+        const overrides = [
+            [
+                'A mutation operation was attempted on a database that did not allow mutations.',
+                'Access to IndexedDB appears to be restricted. Firefox seems to require that the history preference is set to "Remember history" before IndexedDB use of any kind is allowed.'
+            ],
+            [
+                'The operation failed for reasons unrelated to the database itself and not covered by any other error code.',
+                'Unable to access IndexedDB due to a possibly corrupt user profile. Try using the "Refresh Firefox" feature to reset your user profile.'
+            ],
+            [
+                'BulkError',
+                'Unable to finish importing dictionary data into IndexedDB. This may indicate that you do not have sufficient disk space available to complete this operation.'
+            ]
+        ];
+
+        if (error.toString) {
+            error = error.toString();
+        }
+
+        for (const [match, subst] of overrides) {
+            if (error.includes(match)) {
+                error = subst;
+                break;
+            }
+        }
+
+        dialog.show().text(error);
     } else {
         dialog.hide();
     }
@@ -211,7 +241,7 @@ async function dictionaryGroupsPopulate(options) {
     const dictGroups = $('#dict-groups').empty();
     const dictWarning = $('#dict-warning').hide();
 
-    const dictRows = await utilDatabaseGetDictionaries();
+    const dictRows = await utilDatabaseGetTitles();
     if (dictRows.length === 0) {
         dictWarning.show();
     }
@@ -241,7 +271,7 @@ async function onDictionaryPurge(e) {
     e.preventDefault();
 
     const dictControls = $('#dict-importer, #dict-groups').hide();
-    const dictProgress = $('#dict-purge-progress').show();
+    const dictProgress = $('#dict-purge').show();
 
     try {
         dictionaryErrorShow();
@@ -310,7 +340,7 @@ function ankiSpinnerShow(show) {
 function ankiErrorShow(error) {
     const dialog = $('#anki-error');
     if (error) {
-        dialog.show().find('span').text(error);
+        dialog.show().text(error);
     }
     else {
         dialog.hide();

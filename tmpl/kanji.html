@@ -1,3 +1,18 @@
+{{#*inline "table"}}
+{{#if data}}
+<table class="info-output">
+    {{#each data}}
+    <tr>
+        <th>{{#if notes}}{{notes}}{{else}}{{name}}{{/if}}</th>
+        <td>{{value}}</td>
+    </tr>
+    {{/each}}
+</table>
+{{else}}
+No data found
+{{/if}}
+{{/inline}}
+
 {{#*inline "kanji"}}
 <div class="entry" data-type="kanji">
     <div class="actions">
@@ -13,44 +28,61 @@
 
     <div class="glyph">{{character}}</div>
 
-    <div class="reading">
-        <table>
-            <tr>
-                <th>Kunyomi:</th>
-                <td>
-                    {{#each kunyomi}}
-                    {{.}}{{#unless @last}}, {{/unless}}
-                    {{/each}}
-                </td>
-            </tr>
-            <tr>
-                <th>Onyomi:</th>
-                <td>
-                    {{#each onyomi}}
-                    {{.}}{{#unless @last}}, {{/unless}}
-                    {{/each}}
-                </td>
-            </tr>
-        </table>
+    {{#if frequencies}}
+    <div>
+        {{#each frequencies}}
+        <span class="label label-default tag-frequency">{{dictionary}}:{{frequency}}</span>
+        {{/each}}
     </div>
+    {{/if}}
 
+    {{#if tags}}
     <div>
         {{#each tags}}
         <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
         {{/each}}
     </div>
+    {{/if}}
 
-    <div class="glossary">
-        {{#if glossary.[1]}}
-        <ol>
-            {{#each glossary}}
-            <li><span class="glossary-item">{{#multiLine}}{{.}}{{/multiLine}}</span></li>
-            {{/each}}
-        </ol>
-        {{else}}
-        <div class="glossary-item">{{#multiLine}}{{glossary.[0]}}{{/multiLine}}</div>
-        {{/if}}
-    </div>
+    <table class="table table-condensed glyph-data">
+        <tr>
+            <th>Glossary</th>
+            <th>Readings</th>
+            <th>Statistics</th>
+        </tr>
+        <tr>
+            <td class="glossary">
+                {{#if glossary.[1]}}
+                <ol>{{#each glossary}}<li><span class="glossary-item">{{.}}</span></li>{{/each}}</ol>
+                {{else}}
+                <span class="glossary-item">{{glossary.[0]}}</span>
+                {{/if}}
+            </td>
+            <td class="reading">
+                {{#if onyomi}}<dl>{{#each onyomi}}<dd>{{.}}</dd>{{/each}}</dl>{{/if}}
+                {{#if kunyomi}}<dl>{{#each kunyomi}}<dd>{{.}}</dd>{{/each}}</dl>{{/if}}
+            </td>
+            <td>{{> table data=stats.misc}}</td>
+        </tr>
+        <tr>
+            <th colspan="3">Classifications</th>
+        </tr>
+        <tr>
+            <td colspan="3">{{> table data=stats.class}}</td>
+        </tr>
+        <tr>
+            <th colspan="3">Codepoints</th>
+        </tr>
+        <tr>
+            <td colspan="3">{{> table data=stats.code}}</td>
+        </tr>
+        <tr>
+            <th colspan="3">Dictionary Indices</th>
+        </tr>
+        <tr>
+            <td colspan="3">{{> table data=stats.index}}</td>
+        </tr>
+    </table>
 
     {{#if debug}}
     <pre>{{#dumpObject}}{{{.}}}{{/dumpObject}}</pre>
@@ -64,5 +96,5 @@
 {{> kanji debug=../debug addable=../addable source=../source root=../root}}
 {{/each}}
 {{else}}
-<p class="note">No results found.</p>
+<p class="note">No results found</p>
 {{/if}}
