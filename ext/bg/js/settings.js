@@ -182,15 +182,15 @@ function dictionaryErrorShow(error) {
         const overrides = [
             [
                 'A mutation operation was attempted on a database that did not allow mutations.',
-                'Access to IndexedDB is restricted; please change history settings to "Remember history" to use this extension'
+                'Access to IndexedDB appears to be restricted. Firefox seems to require that the history preference is set to "Remember history" before IndexedDB use of any kind is allowed.'
             ],
             [
                 'The operation failed for reasons unrelated to the database itself and not covered by any other error code.',
-                'Unable to access IndexedDB; please use the "Refresh Firefox" feature to reset your user profile'
+                'Unable to access IndexedDB due to a possibly corrupt user profile. Try using the "Refresh Firefox" feature to reset your user profile.'
             ],
             [
                 'BulkError',
-                'Unable to import dictionary data into IndexedDB; make sure you have sufficient disk space available'
+                'Unable to finish importing dictionary data into IndexedDB. This may indicate that you do not have sufficient disk space available to complete this operation.'
             ]
         ];
 
