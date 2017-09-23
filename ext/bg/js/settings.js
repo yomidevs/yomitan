@@ -179,6 +179,32 @@ $(document).ready(utilAsync(onReady));
 function dictionaryErrorShow(error) {
     const dialog = $('#dict-error');
     if (error) {
+        const overrides = [
+            [
+                'A mutation operation was attempted on a database that did not allow mutations.',
+                'Access to IndexedDB is restricted; please change history settings to "Remember history" to use this extension'
+            ],
+            [
+                'The operation failed for reasons unrelated to the database itself and not covered by any other error code.',
+                'Unable to access IndexedDB; please use the "Refresh Firefox" feature to reset your user profile'
+            ],
+            [
+                'BulkError',
+                'Unable to import dictionary data into IndexedDB; make sure you have sufficient disk space available'
+            ]
+        ];
+
+        if (error.toString) {
+            error = error.toString();
+        }
+
+        for (const [match, subst] of overrides) {
+            if (error.includes(match)) {
+                error = subst;
+                break;
+            }
+        }
+
         dialog.show().text(error);
     } else {
         dialog.hide();
