@@ -141,16 +141,38 @@ class Translator {
 
             definition.tags = dictTagsSort(tags);
             definition.stats = await this.expandStats(definition.stats, definition.dictionary);
-            definition.frequencies = await this.database.findKanjiFreq(definition.character, titles);
+
+            definition.frequencies = [];
+            const metas = await this.database.findKanjiMeta(definition.character, titles);
+            for (const meta of metas) {
+                if (meta.mode === 'freq') {
+                    definition.frequencies.push({
+                        character: meta.character,
+                        frequency: meta.data,
+                        dictionary: meta.dictionary
+                    });
+                }
+            }
         }
 
         return definitions;
     }
 
     async buildTermFrequencies(definition, titles) {
-        definition.frequencies = await this.database.findTermFreq(definition.expression, titles);
-        if (definition.frequencies.length === 0) {
-            definition.frequencies = await this.database.findTermFreq(definition.reading, titles);
+        let metas = await this.database.findTermMeta(definition.expression, titles);
+        if (metas.length === 0) {
+            metas = await this.database.findTermMeta(definition.reading, titles);
+        }
+
+        definition.frequencies = [];
+        for (const meta of metas) {
+            if (meta.mode === 'freq') {
+                definition.frequencies.push({
+                    expression: meta.expression,
+                    frequency: meta.data,
+                    dictionary: meta.dictionary
+                });
+            }
         }
     }
 

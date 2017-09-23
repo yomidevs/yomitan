@@ -36,9 +36,9 @@ class Database {
             dictionaries: '++,title,version'
         });
         this.db.version(3).stores({
-            termFreq:     '++,dictionary,expression',
-            kanjiFreq:    '++,dictionary,character',
-            tagMeta:      '++,dictionary,name'
+            termMeta:  '++,dictionary,expression',
+            kanjiMeta: '++,dictionary,character',
+            tagMeta:   '++,dictionary,name'
         });
 
         await this.db.open();
@@ -81,15 +81,19 @@ class Database {
         return results;
     }
 
-    async findTermFreq(term, titles) {
+    async findTermMeta(term, titles) {
         if (!this.db) {
             throw 'Database not initialized';
         }
 
         const results = [];
-        await this.db.termFreq.where('expression').equals(term).each(row => {
+        await this.db.termMeta.where('expression').equals(term).each(row => {
             if (titles.includes(row.dictionary)) {
-                results.push({frequency: row.frequency, dictionary: row.dictionary});
+                results.push({
+                    mode: row.mode,
+                    data: row.data,
+                    dictionary: row.dictionary
+                });
             }
         });
 
@@ -119,15 +123,19 @@ class Database {
         return results;
     }
 
-    async findKanjiFreq(kanji, titles) {
+    async findKanjiMeta(kanji, titles) {
         if (!this.db) {
             throw 'Database not initialized';
         }
 
         const results = [];
-        await this.db.kanjiFreq.where('character').equals(kanji).each(row => {
+        await this.db.kanjiMeta.where('character').equals(kanji).each(row => {
             if (titles.includes(row.dictionary)) {
-                results.push({frequency: row.frequency, dictionary: row.dictionary});
+                results.push({
+                    mode: row.mode,
+                    data: row.data,
+                    dictionary: row.dictionary
+                });
             }
         });
 
@@ -216,21 +224,22 @@ class Database {
             await this.db.terms.bulkAdd(rows);
         };
 
-        const termFreqDataLoaded = async (summary, entries, total, current) => {
+        const termMetaDataLoaded = async (summary, entries, total, current) => {
             if (callback) {
                 callback(total, current);
             }
 
             const rows = [];
-            for (const [expression, frequency] of entries) {
+            for (const [expression, mode, data] of entries) {
                 rows.push({
                     expression,
-                    frequency,
+                    mode,
+                    data,
                     dictionary: summary.title
                 });
             }
 
-            await this.db.termFreq.bulkAdd(rows);
+            await this.db.termMeta.bulkAdd(rows);
         };
 
         const kanjiDataLoaded = async (summary, entries, total, current)  => {
@@ -267,21 +276,22 @@ class Database {
             await this.db.kanji.bulkAdd(rows);
         };
 
-        const kanjiFreqDataLoaded = async (summary, entries, total, current) => {
+        const kanjiMetaDataLoaded = async (summary, entries, total, current) => {
             if (callback) {
                 callback(total, current);
             }
 
             const rows = [];
-            for (const [character, frequency] of entries) {
+            for (const [character, mode, data] of entries) {
                 rows.push({
                     character,
-                    frequency,
+                    mode,
+                    data,
                     dictionary: summary.title
                 });
             }
 
-            await this.db.kanjiFreq.bulkAdd(rows);
+            await this.db.kanjiMeta.bulkAdd(rows);
         };
 
         const tagDataLoaded = async (summary, entries, total, current) => {
@@ -309,9 +319,9 @@ class Database {
             archive,
             indexDataLoaded,
             termDataLoaded,
-            termFreqDataLoaded,
+            termMetaDataLoaded,
             kanjiDataLoaded,
-            kanjiFreqDataLoaded,
+            kanjiMetaDataLoaded,
             tagDataLoaded
         );
     }
@@ -320,9 +330,9 @@ class Database {
         archive,
         indexDataLoaded,
         termDataLoaded,
-        termFreqDataLoaded,
+        termMetaDataLoaded,
         kanjiDataLoaded,
-        kanjiFreqDataLoaded,
+        kanjiMetaDataLoaded,
         tagDataLoaded
     ) {
         const zip = await JSZip.loadAsync(archive);
@@ -348,9 +358,9 @@ class Database {
         }
 
         const buildTermBankName      = index => `term_bank_${index + 1}.json`;
-        const buildTermFreqBankName  = index => `termfreq_bank_${index + 1}.json`;
+        const buildTermMetaBankName  = index => `term_meta_bank_${index + 1}.json`;
         const buildKanjiBankName     = index => `kanji_bank_${index + 1}.json`;
-        const buildKanjiFreqBankName = index => `kanjifreq_bank_${index + 1}.json`;
+        const buildKanjiMetaBankName = index => `kanji_meta_bank_${index + 1}.json`;
         const buildTagBankName       = index => `tag_bank_${index + 1}.json`;
 
         const countBanks = namer => {
@@ -363,17 +373,17 @@ class Database {
         };
 
         const termBankCount      = countBanks(buildTermBankName);
-        const termFreqBankCount  = countBanks(buildTermFreqBankName);
+        const termMetaBankCount  = countBanks(buildTermMetaBankName);
         const kanjiBankCount     = countBanks(buildKanjiBankName);
-        const kanjiFreqBankCount = countBanks(buildKanjiFreqBankName);
+        const kanjiMetaBankCount = countBanks(buildKanjiMetaBankName);
         const tagBankCount       = countBanks(buildTagBankName);
 
         let bankLoadedCount = 0;
         let bankTotalCount =
             termBankCount +
-            termFreqBankCount +
+            termMetaBankCount +
             kanjiBankCount +
-            kanjiFreqBankCount +
+            kanjiMetaBankCount +
             tagBankCount;
 
         if (tagDataLoaded && index.tagMeta) {
@@ -397,9 +407,9 @@ class Database {
         };
 
         await loadBank(summary, buildTermBankName, termBankCount, termDataLoaded);
-        await loadBank(summary, buildTermFreqBankName, termFreqBankCount, termFreqDataLoaded);
+        await loadBank(summary, buildTermMetaBankName, termMetaBankCount, termMetaDataLoaded);
         await loadBank(summary, buildKanjiBankName, kanjiBankCount, kanjiDataLoaded);
-        await loadBank(summary, buildKanjiFreqBankName, kanjiFreqBankCount, kanjiFreqDataLoaded);
+        await loadBank(summary, buildKanjiMetaBankName, kanjiMetaBankCount, kanjiMetaDataLoaded);
         await loadBank(summary, buildTagBankName, tagBankCount, tagDataLoaded);
 
         return summary;
