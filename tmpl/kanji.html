@@ -48,9 +48,7 @@ No data found
         <tr>
             <th>Glossary</th>
             <th>Readings</th>
-            {{#if stats}}
             <th>Statistics</th>
-            {{/if}}
         </tr>
         <tr>
             <td class="glossary">
@@ -64,11 +62,8 @@ No data found
                 {{#if onyomi}}<dl>{{#each onyomi}}<dd>{{.}}</dd>{{/each}}</dl>{{/if}}
                 {{#if kunyomi}}<dl>{{#each kunyomi}}<dd>{{.}}</dd>{{/each}}</dl>{{/if}}
             </td>
-            {{#if stats}}
             <td>{{> table data=stats.misc}}</td>
-            {{/if}}
         </tr>
-        {{#if stats}}
         <tr>
             <th colspan="3">Classifications</th>
         </tr>
@@ -87,7 +82,6 @@ No data found
         <tr>
             <td colspan="3">{{> table data=stats.index}}</td>
         </tr>
-        {{/if}}
     </table>
 
     {{#if debug}}
