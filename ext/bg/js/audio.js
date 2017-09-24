@@ -57,7 +57,7 @@ async function audioBuildUrl(definition, mode, cache={}) {
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post');
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhr.addEventListener('error', () => reject('failed to scrape audio data'));
+                xhr.addEventListener('error', () => reject('Failed to scrape audio data'));
                 xhr.addEventListener('load', () => {
                     cache[definition.expression] = xhr.responseText;
                     resolve(xhr.responseText);
@@ -87,7 +87,7 @@ async function audioBuildUrl(definition, mode, cache={}) {
             } else {
                 const xhr = new XMLHttpRequest();
                 xhr.open('GET', `http://jisho.org/search/${definition.expression}`);
-                xhr.addEventListener('error', () => reject('failed to scrape audio data'));
+                xhr.addEventListener('error', () => reject('Failed to scrape audio data'));
                 xhr.addEventListener('load', () => {
                     cache[definition.expression] = xhr.responseText;
                     resolve(xhr.responseText);

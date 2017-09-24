@@ -20,36 +20,25 @@
 class Database {
     constructor() {
         this.db = null;
-        this.version = 2;
         this.tagCache = {};
-    }
-
-    async sanitize() {
-        try {
-            const db = new Dexie('dict');
-            await db.open();
-            db.close();
-            if (db.verno !== this.version) {
-                await db.delete();
-            }
-        } catch(e) {
-            // NOP
-        }
     }
 
     async prepare() {
         if (this.db) {
-            throw 'database already initialized';
+            throw 'Database already initialized';
         }
 
-        await this.sanitize();
-
         this.db = new Dexie('dict');
-        this.db.version(this.version).stores({
-            terms: '++id,dictionary,expression,reading',
-            kanji: '++,dictionary,character',
-            tagMeta: '++,dictionary',
+        this.db.version(2).stores({
+            terms:        '++id,dictionary,expression,reading',
+            kanji:        '++,dictionary,character',
+            tagMeta:      '++,dictionary',
             dictionaries: '++,title,version'
+        });
+        this.db.version(3).stores({
+            termMeta:  '++,dictionary,expression',
+            kanjiMeta: '++,dictionary,character',
+            tagMeta:   '++,dictionary,name'
         });
 
         await this.db.open();
@@ -57,7 +46,7 @@ class Database {
 
     async purge() {
         if (!this.db) {
-            throw 'database not initialized';
+            throw 'Database not initialized';
         }
 
         this.db.close();
@@ -70,7 +59,7 @@ class Database {
 
     async findTerms(term, titles) {
         if (!this.db) {
-            throw 'database not initialized';
+            throw 'Database not initialized';
         }
 
         const results = [];
@@ -89,17 +78,31 @@ class Database {
             }
         });
 
-        await this.cacheTagMeta(titles);
-        for (const result of results) {
-            result.tagMeta = this.tagCache[result.dictionary] || {};
+        return results;
+    }
+
+    async findTermMeta(term, titles) {
+        if (!this.db) {
+            throw 'Database not initialized';
         }
+
+        const results = [];
+        await this.db.termMeta.where('expression').equals(term).each(row => {
+            if (titles.includes(row.dictionary)) {
+                results.push({
+                    mode: row.mode,
+                    data: row.data,
+                    dictionary: row.dictionary
+                });
+            }
+        });
 
         return results;
     }
 
     async findKanji(kanji, titles) {
         if (!this.db) {
-            return Promise.reject('database not initialized');
+            throw 'Database not initialized';
         }
 
         const results = [];
@@ -111,69 +114,199 @@ class Database {
                     kunyomi: dictFieldSplit(row.kunyomi),
                     tags: dictFieldSplit(row.tags),
                     glossary: row.meanings,
+                    stats: row.stats,
                     dictionary: row.dictionary
                 });
             }
         });
 
-        await this.cacheTagMeta(titles);
-        for (const result of results) {
-            result.tagMeta = this.tagCache[result.dictionary] || {};
+        return results;
+    }
+
+    async findKanjiMeta(kanji, titles) {
+        if (!this.db) {
+            throw 'Database not initialized';
         }
+
+        const results = [];
+        await this.db.kanjiMeta.where('character').equals(kanji).each(row => {
+            if (titles.includes(row.dictionary)) {
+                results.push({
+                    mode: row.mode,
+                    data: row.data,
+                    dictionary: row.dictionary
+                });
+            }
+        });
 
         return results;
     }
 
-    async cacheTagMeta(titles) {
+    async findTagForTitle(name, title) {
         if (!this.db) {
-            throw 'database not initialized';
+            throw 'Database not initialized';
         }
 
-        for (const title of titles) {
-            if (!this.tagCache[title]) {
-                const tagMeta = {};
-                await this.db.tagMeta.where('dictionary').equals(title).each(row => {
-                    tagMeta[row.name] = {category: row.category, notes: row.notes, order: row.order};
-                });
+        this.tagCache[title] = this.tagCache[title] || {};
 
-                this.tagCache[title] = tagMeta;
-            }
+        let result = this.tagCache[title][name];
+        if (!result) {
+            await this.db.tagMeta.where('name').equals(name).each(row => {
+                if (title === row.dictionary) {
+                    result = row;
+                }
+            });
+
+            this.tagCache[title][name] = result;
         }
+
+        return result;
     }
 
-    async getDictionaries() {
+    async getTitles() {
         if (this.db) {
             return this.db.dictionaries.toArray();
         } else {
-            throw 'database not initialized';
+            throw 'Database not initialized';
         }
     }
 
     async importDictionary(archive, callback) {
         if (!this.db) {
-            return Promise.reject('database not initialized');
+            throw 'Database not initialized';
         }
 
-        let summary = null;
-        const indexLoaded = async (title, version, revision, tagMeta, hasTerms, hasKanji) => {
-            summary = {title, version, revision, hasTerms, hasKanji};
-
-            const count = await this.db.dictionaries.where('title').equals(title).count();
-            if (count > 0) {
-                throw `dictionary "${title}" is already imported`;
+        const indexDataLoaded = async summary => {
+            if (summary.version > 2) {
+                throw 'Unsupported dictionary version';
             }
 
-            await this.db.dictionaries.add({title, version, revision, hasTerms, hasKanji});
+            const count = await this.db.dictionaries.where('title').equals(summary.title).count();
+            if (count > 0) {
+                throw 'Dictionary is already imported';
+            }
+
+            await this.db.dictionaries.add(summary);
+        };
+
+        const termDataLoaded = async (summary, entries, total, current) => {
+            if (callback) {
+                callback(total, current);
+            }
 
             const rows = [];
-            for (const tag in tagMeta || {}) {
-                const meta = tagMeta[tag];
+            if (summary.version === 1) {
+                for (const [expression, reading, tags, rules, score, ...glossary] of entries) {
+                    rows.push({
+                        expression,
+                        reading,
+                        tags,
+                        rules,
+                        score,
+                        glossary,
+                        dictionary: summary.title
+                    });
+                }
+            } else {
+                for (const [expression, reading, tags, rules, score, glossary] of entries) {
+                    rows.push({
+                        expression,
+                        reading,
+                        tags,
+                        rules,
+                        score,
+                        glossary,
+                        dictionary: summary.title
+                    });
+                }
+            }
+
+            await this.db.terms.bulkAdd(rows);
+        };
+
+        const termMetaDataLoaded = async (summary, entries, total, current) => {
+            if (callback) {
+                callback(total, current);
+            }
+
+            const rows = [];
+            for (const [expression, mode, data] of entries) {
+                rows.push({
+                    expression,
+                    mode,
+                    data,
+                    dictionary: summary.title
+                });
+            }
+
+            await this.db.termMeta.bulkAdd(rows);
+        };
+
+        const kanjiDataLoaded = async (summary, entries, total, current)  => {
+            if (callback) {
+                callback(total, current);
+            }
+
+            const rows = [];
+            if (summary.version === 1) {
+                for (const [character, onyomi, kunyomi, tags, ...meanings] of entries) {
+                    rows.push({
+                        character,
+                        onyomi,
+                        kunyomi,
+                        tags,
+                        meanings,
+                        dictionary: summary.title
+                    });
+                }
+            } else {
+                for (const [character, onyomi, kunyomi, tags, meanings, stats] of entries) {
+                    rows.push({
+                        character,
+                        onyomi,
+                        kunyomi,
+                        tags,
+                        meanings,
+                        stats,
+                        dictionary: summary.title
+                    });
+                }
+            }
+
+            await this.db.kanji.bulkAdd(rows);
+        };
+
+        const kanjiMetaDataLoaded = async (summary, entries, total, current) => {
+            if (callback) {
+                callback(total, current);
+            }
+
+            const rows = [];
+            for (const [character, mode, data] of entries) {
+                rows.push({
+                    character,
+                    mode,
+                    data,
+                    dictionary: summary.title
+                });
+            }
+
+            await this.db.kanjiMeta.bulkAdd(rows);
+        };
+
+        const tagDataLoaded = async (summary, entries, total, current) => {
+            if (callback) {
+                callback(total, current);
+            }
+
+            const rows = [];
+            for (const [name, category, order, notes] of entries) {
                 const row = dictTagSanitize({
-                    name: tag,
-                    category: meta.category,
-                    notes: meta.notes,
-                    order: meta.order,
-                    dictionary: title
+                    name,
+                    category,
+                    order,
+                    notes,
+                    dictionary: summary.title
                 });
 
                 rows.push(row);
@@ -182,94 +315,103 @@ class Database {
             await this.db.tagMeta.bulkAdd(rows);
         };
 
-        const termsLoaded = async (title, entries, total, current) => {
-            if (callback) {
-                callback(total, current);
-            }
-
-            const rows = [];
-            for (const [expression, reading, tags, rules, score, ...glossary] of entries) {
-                rows.push({
-                    expression,
-                    reading,
-                    tags,
-                    rules,
-                    score,
-                    glossary,
-                    dictionary: title
-                });
-            }
-
-            await this.db.terms.bulkAdd(rows);
-        };
-
-        const kanjiLoaded = async (title, entries, total, current)  => {
-            if (callback) {
-                callback(total, current);
-            }
-
-            const rows = [];
-            for (const [character, onyomi, kunyomi, tags, ...meanings] of entries) {
-                rows.push({
-                    character,
-                    onyomi,
-                    kunyomi,
-                    tags,
-                    meanings,
-                    dictionary: title
-                });
-            }
-
-            await this.db.kanji.bulkAdd(rows);
-        };
-
-        await Database.importDictionaryZip(archive, indexLoaded, termsLoaded, kanjiLoaded);
-        return summary;
+        return await Database.importDictionaryZip(
+            archive,
+            indexDataLoaded,
+            termDataLoaded,
+            termMetaDataLoaded,
+            kanjiDataLoaded,
+            kanjiMetaDataLoaded,
+            tagDataLoaded
+        );
     }
 
-    static async importDictionaryZip(archive, indexLoaded, termsLoaded, kanjiLoaded) {
-        const files = (await JSZip.loadAsync(archive)).files;
+    static async importDictionaryZip(
+        archive,
+        indexDataLoaded,
+        termDataLoaded,
+        termMetaDataLoaded,
+        kanjiDataLoaded,
+        kanjiMetaDataLoaded,
+        tagDataLoaded
+    ) {
+        const zip = await JSZip.loadAsync(archive);
 
-        const indexFile = files['index.json'];
+        const indexFile = zip.files['index.json'];
         if (!indexFile) {
-            throw 'no dictionary index found in archive';
+            throw 'No dictionary index found in archive';
         }
 
         const index = JSON.parse(await indexFile.async('string'));
-        if (!index.title || !index.version || !index.revision) {
-            throw 'unrecognized dictionary format';
+        if (!index.title || !index.revision) {
+            throw 'Unrecognized dictionary format';
         }
 
-        await indexLoaded(
-            index.title,
-            index.version,
-            index.revision,
-            index.tagMeta || {},
-            index.termBanks > 0,
-            index.kanjiBanks > 0
-        );
+        const summary = {
+            title: index.title,
+            revision: index.revision,
+            version: index.format || index.version
+        };
 
-        const banksTotal = index.termBanks + index.kanjiBanks;
-        let banksLoaded = 0;
+        if (indexDataLoaded) {
+            await indexDataLoaded(summary);
+        }
 
-        for (let i = 1; i <= index.termBanks; ++i) {
-            const bankFile = files[`term_bank_${i}.json`];
-            if (bankFile) {
-                const bank = JSON.parse(await bankFile.async('string'));
-                await termsLoaded(index.title, bank, banksTotal, banksLoaded++);
-            } else {
-                throw 'missing term bank file';
+        const buildTermBankName      = index => `term_bank_${index + 1}.json`;
+        const buildTermMetaBankName  = index => `term_meta_bank_${index + 1}.json`;
+        const buildKanjiBankName     = index => `kanji_bank_${index + 1}.json`;
+        const buildKanjiMetaBankName = index => `kanji_meta_bank_${index + 1}.json`;
+        const buildTagBankName       = index => `tag_bank_${index + 1}.json`;
+
+        const countBanks = namer => {
+            let count = 0;
+            while (zip.files[namer(count)]) {
+                ++count;
             }
+
+            return count;
+        };
+
+        const termBankCount      = countBanks(buildTermBankName);
+        const termMetaBankCount  = countBanks(buildTermMetaBankName);
+        const kanjiBankCount     = countBanks(buildKanjiBankName);
+        const kanjiMetaBankCount = countBanks(buildKanjiMetaBankName);
+        const tagBankCount       = countBanks(buildTagBankName);
+
+        let bankLoadedCount = 0;
+        let bankTotalCount =
+            termBankCount +
+            termMetaBankCount +
+            kanjiBankCount +
+            kanjiMetaBankCount +
+            tagBankCount;
+
+        if (tagDataLoaded && index.tagMeta) {
+            const bank = [];
+            for (const name in index.tagMeta) {
+                const tag = index.tagMeta[name];
+                bank.push([name, tag.category, tag.order, tag.notes]);
+            }
+
+            tagDataLoaded(summary, bank, ++bankTotalCount, bankLoadedCount++);
         }
 
-        for (let i = 1; i <= index.kanjiBanks; ++i) {
-            const bankFile = files[`kanji_bank_${i}.json`];
-            if (bankFile) {
-                const bank = JSON.parse(await bankFile.async('string'));
-                await kanjiLoaded(index.title, bank, banksTotal, banksLoaded++);
-            } else {
-                throw 'missing kanji bank file';
+        const loadBank = async (summary, namer, count, callback) => {
+            if (callback) {
+                for (let i = 0; i < count; ++i) {
+                    const bankFile = zip.files[namer(i)];
+                    const bank = JSON.parse(await bankFile.async('string'));
+                    await callback(summary, bank, bankTotalCount, bankLoadedCount++);
+                }
             }
-        }
+        };
+
+        await loadBank(summary, buildTermBankName, termBankCount, termDataLoaded);
+        await loadBank(summary, buildTermMetaBankName, termMetaBankCount, termMetaDataLoaded);
+        await loadBank(summary, buildKanjiBankName, kanjiBankCount, kanjiDataLoaded);
+        await loadBank(summary, buildKanjiMetaBankName, kanjiMetaBankCount, kanjiMetaDataLoaded);
+        await loadBank(summary, buildTagBankName, tagBankCount, tagDataLoaded);
+
+        return summary;
     }
 }

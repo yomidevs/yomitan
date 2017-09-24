@@ -84,6 +84,10 @@ hr {
     background-color: #aa66cc;
 }
 
+.tag-frequency {
+    background-color: #5cb85c;
+}
+
 .actions .disabled {
     pointer-events: none;
     cursor: default;
@@ -143,4 +147,16 @@ hr {
     line-height: 120px;
     padding: 0.01em;
     vertical-align: top;
+}
+
+.glyph-data {
+    margin-top: 10px;
+}
+
+.info-output {
+    width: 100%;
+}
+
+.info-output td {
+    text-align: right;
 }

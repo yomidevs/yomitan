@@ -42,8 +42,8 @@ function utilAnkiGetModelFieldNames(modelName) {
     return utilBackend().anki.getModelFieldNames(modelName);
 }
 
-function utilDatabaseGetDictionaries() {
-    return utilBackend().translator.database.getDictionaries();
+function utilDatabaseGetTitles() {
+    return utilBackend().translator.database.getTitles();
 }
 
 function utilDatabasePurge() {

@@ -7,7 +7,7 @@
         <link rel="stylesheet" type="text/css" href="/mixed/lib/bootstrap/css/bootstrap-theme.min.css">
         <style>
             #anki-spinner, #anki-general, #anki-error,
-            #dict-spinner, #dict-error, #dict-warning, #dict-purge-progress, #dict-import-progress,
+            #dict-spinner, #dict-error, #dict-warning, #dict-purge, #dict-import-progress,
             #debug, .options-advanced {
                 display: none;
             }
@@ -96,6 +96,10 @@
                     <label><input type="checkbox" id="search-alphanumeric"> Search alphanumeric text</label>
                 </div>
 
+                <div class="checkbox">
+                    <label><input type="checkbox" id="auto-hide-results"> Automatically hide results</label>
+                </div>
+
                 <div class="form-group options-advanced">
                     <label for="scan-delay">Scan delay (in milliseconds)</label>
                     <input type="number" min="1" id="scan-delay" class="form-control">
@@ -125,24 +129,16 @@
 
                 <p class="help-block">
                     Yomichan can import and use a variety of dictionary formats. Unneeded dictionaries can be disabled,
-                    or you can simply <a href="#" id="dict-purge">purge the database</a> to delete everything.
+                    or you can simply <a href="#" id="dict-purge-link">purge the database</a> to delete everything.
                 </p>
                 <p class="help-block">
                     Please visit the <a href="https://foosoft.net/projects/yomichan" target="_blank">Yomichan</a> homepage to download free
                     dictionaries that you can use with this extension.
                 </p>
 
-                <div id="dict-purge-progress" class="text-danger">Dictionary data is being purged, please be patient...</div>
-
-                <div class="alert alert-warning" id="dict-warning">
-                    <strong>Warning:</strong>
-                    <span>no dictionaries found; please use the importer below to install packaged dictionaries</span>
-                </div>
-
-                <div class="alert alert-danger" id="dict-error">
-                    <strong>Error:</strong>
-                    <span></span>
-                </div>
+                <div class="text-danger" id="dict-purge">Dictionary data is being purged, please be patient...</div>
+                <div class="alert alert-warning" id="dict-warning">No dictionaries have been installed</div>
+                <div class="alert alert-danger" id="dict-error"></div>
 
                 <div id="dict-groups"></div>
 
@@ -170,10 +166,7 @@
                     <a href="https://foosoft.net/projects/anki-connect/" target="_blank">AnkiConnect</a> plugin.
                 </p>
 
-                <div class="alert alert-danger" id="anki-error">
-                    <strong>Error:</strong>
-                    <span></span>
-                </div>
+                <div class="alert alert-danger" id="anki-error"></div>
 
                 <div class="checkbox">
                     <label><input type="checkbox" id="anki-enable"> Enable Anki integration</label>

@@ -55,13 +55,15 @@ primary language is not English, you may consider also importing the English ver
     *   [jmdict_swedish.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_swedish.zip)
 *   **[JMnedict](http://www.edrdg.org/enamdict/enamdict_doc.html)** (Japanese names)
     *   [jmnedict.zip](https://foosoft.net/projects/yomichan/dl/dict/jmnedict.zip)
-*   **[KANJIDIC](http://nihongo.monash.edu/kanjidic2/index.html)** (Japanese Kanji)
-    *   [kanjidic_english.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_english.zip)
-    *   [kanjidic_french.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_french.zip)
-    *   [kanjidic_portuguese.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_portuguese.zip)
-    *   [kanjidic_spanish.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_spanish.zip)
 *   **[KireiCake](https://kireicake.com/rikaicakes/)** (Japanese slang)
     *   [kireicake.zip](https://foosoft.net/projects/yomichan/dl/dict/kireicake.zip)
+*   **[KANJIDIC](http://nihongo.monash.edu/kanjidic2/index.html)** (Japanese Kanji)
+    *   [kanjidic_english.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_english.zip) ([ver. 1.3.5 and older](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_english_old.zip))
+    *   [kanjidic_french.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_french.zip) ([ver. 1.3.5 and older](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_french_old.zip))
+    *   [kanjidic_portuguese.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_portuguese.zip) ([ver. 1.3.5 and older](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_portuguese_old.zip))
+    *   [kanjidic_spanish.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_spanish.zip) ([ver. 1.3.5 and older](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_spanish_old.zip))
+*   **[Innocent Corpus](https://forum.koohii.com/post-168613.html#pid168613)** (Frequency list of terms and Kanji in 5000+ novels)
+    *   [innocent_corpus.zip](https://foosoft.net/projects/yomichan/dl/dict/innocent_corpus.zip)
 
 ## Basic Usage ##
 
@@ -239,6 +241,12 @@ exact versions used for distribution.
 *   WanaKana: [homepage](http://wanakana.com/) - [snapshot](https://raw.githubusercontent.com/WaniKani/WanaKana/7c4a052/gh-pages/assets/js/wanakana.min.js)
 
 ## Frequently Asked Questions ##
+
+*   **Why does the Kanji results page display "No data found" for several fields?**
+
+    You are using data from the KANJIDIC dictionary that was exported for an earlier version of Yomichan. It does not
+    contain the additional information which newer versions of Yomichan expect. Please purge your database and install
+    the latest version of the KANJIDIC to see additional information about characters.
 
 *   **Can I still create cards without HTML formatting? The option for it is gone!**
 

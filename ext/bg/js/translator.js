@@ -37,8 +37,26 @@ class Translator {
     }
 
     async findTermsGrouped(text, dictionaries, alphanumeric) {
+        const titles = Object.keys(dictionaries);
         const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
-        return {length, definitions: dictTermsGroup(definitions, dictionaries)};
+
+        const definitionsGrouped = dictTermsGroup(definitions, dictionaries);
+        for (const definition of definitionsGrouped) {
+            await this.buildTermFrequencies(definition, titles);
+        }
+
+        return {length, definitions: definitionsGrouped};
+    }
+
+    async findTermsSplit(text, dictionaries, alphanumeric) {
+        const titles = Object.keys(dictionaries);
+        const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
+
+        for (const definition of definitions) {
+            await this.buildTermFrequencies(definition, titles);
+        }
+
+        return {length, definitions};
     }
 
     async findTerms(text, dictionaries, alphanumeric) {
@@ -51,17 +69,18 @@ class Translator {
 
         const cache = {};
         const titles = Object.keys(dictionaries);
-        let deinflections = await this.findTermsDeinflected(text, titles, cache);
+        let deinflections = await this.findTermDeinflections(text, titles, cache);
         const textHiragana = jpKatakanaToHiragana(text);
         if (text !== textHiragana) {
-            deinflections = deinflections.concat(await this.findTermsDeinflected(textHiragana, titles, cache));
+            deinflections = deinflections.concat(await this.findTermDeinflections(textHiragana, titles, cache));
         }
 
         let definitions = [];
         for (const deinflection of deinflections) {
             for (const definition of deinflection.definitions) {
-                const tags = definition.tags.map(tag => dictTagBuild(tag, definition.tagMeta));
+                const tags = await this.expandTags(definition.tags, definition.dictionary);
                 tags.push(dictTagBuildSource(definition.dictionary));
+
                 definitions.push({
                     source: deinflection.source,
                     reasons: deinflection.reasons,
@@ -87,7 +106,7 @@ class Translator {
         return {length, definitions};
     }
 
-    async findTermsDeinflected(text, titles, cache) {
+    async findTermDeinflections(text, titles, cache) {
         const definer = async term => {
             if (cache.hasOwnProperty(term)) {
                 return cache[term];
@@ -117,11 +136,88 @@ class Translator {
         }
 
         for (const definition of definitions) {
-            const tags = definition.tags.map(tag => dictTagBuild(tag, definition.tagMeta));
+            const tags = await this.expandTags(definition.tags, definition.dictionary);
             tags.push(dictTagBuildSource(definition.dictionary));
+
             definition.tags = dictTagsSort(tags);
+            definition.stats = await this.expandStats(definition.stats, definition.dictionary);
+
+            definition.frequencies = [];
+            for (const meta of await this.database.findKanjiMeta(definition.character, titles)) {
+                if (meta.mode === 'freq') {
+                    definition.frequencies.push({
+                        character: meta.character,
+                        frequency: meta.data,
+                        dictionary: meta.dictionary
+                    });
+                }
+            }
         }
 
         return definitions;
+    }
+
+    async buildTermFrequencies(definition, titles) {
+        definition.frequencies = [];
+        for (const meta of await this.database.findTermMeta(definition.expression, titles)) {
+            if (meta.mode === 'freq') {
+                definition.frequencies.push({
+                    expression: meta.expression,
+                    frequency: meta.data,
+                    dictionary: meta.dictionary
+                });
+            }
+        }
+    }
+
+    async expandTags(names, title) {
+        const tags = [];
+        for (const name of names) {
+            const base = name.split(':')[0];
+            const meta = await this.database.findTagForTitle(base, title);
+
+            const tag = {name};
+            for (const prop in meta || {}) {
+                if (prop !== 'name') {
+                    tag[prop] = meta[prop];
+                }
+            }
+
+            tags.push(dictTagSanitize(tag));
+        }
+
+        return tags;
+    }
+
+    async expandStats(items, title) {
+        const stats = {};
+        for (const name in items) {
+            const base = name.split(':')[0];
+            const meta = await this.database.findTagForTitle(base, title);
+            const group = stats[meta.category] = stats[meta.category] || [];
+
+            const stat = {name, value: items[name]};
+            for (const prop in meta || {}) {
+                if (prop !== 'name') {
+                    stat[prop] = meta[prop];
+                }
+            }
+
+            group.push(dictTagSanitize(stat));
+        }
+
+        for (const category in stats) {
+            stats[category].sort((a, b) => {
+                if (a.notes < b.notes) {
+                    return -1;
+                } else if (a.notes > b.notes) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            });
+        }
+
+        return stats;
     }
 }

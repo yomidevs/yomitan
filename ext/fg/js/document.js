@@ -86,7 +86,7 @@ function docRangeFromPoint(point) {
     }
 
     const range = document.caretRangeFromPoint(point.x, point.y);
-    if (range) {
+    if (range && range.startContainer.nodeType === 3 && range.endContainer.nodeType === 3) {
         return new TextSourceRange(range);
     }
 }
