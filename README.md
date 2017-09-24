@@ -12,10 +12,8 @@ Yomichan provides advanced features not available in other browser-based diction
 *   On-demand audio playback for select dictionary definitions.
 *   Kanji stroke order diagrams are just a click away for most characters.
 *   Custom search page for easily executing custom search queries.
-*   Support for multiple dictionary formats including [EPWING](https://ja.wikipedia.org/wiki/EPWING) via
-    the [Yomichan Import](https://foosoft.net/projects/yomichan-import) tool.
-*   Automatic note creation for the [Anki](https://apps.ankiweb.net/) flashcard program via
-    the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
+*   Support for multiple dictionary formats including [EPWING](https://ja.wikipedia.org/wiki/EPWING) via the [Yomichan Import](https://foosoft.net/projects/yomichan-import) tool.
+*   Automatic note creation for the [Anki](https://apps.ankiweb.net/) flashcard program via the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
 *   Clean, modern code makes it easy for developers to [contribute](https://github.com/FooSoft/yomichan) new features.
 
 ## Downloads ##
@@ -28,13 +26,9 @@ Yomichan provides advanced features not available in other browser-based diction
 
     [![](https://foosoft.net/projects/yomichan/img/firefox-marketplace.png)](https://addons.mozilla.org/en-US/firefox/addon/yomichan/)
 
-    All extension versions must be reviewed before they are publicly accessible on the Firefox Marketplace. As this
-    review process can take several months to complete, the approved version of the extension is often out of date. If
-    you are interested in using the latest and greatest version, please consider using the [locally hosted](https://foosoft.net/projects/yomichan/dl/latest.xpi) version instead.
-
 ## Dictionaries ##
 
-There are three free Japanese dictionaries available for Yomichan, with two of them having versions with glossaries in
+There are several free Japanese dictionaries available for Yomichan, with two of them having glossaries available in
 different languages. You must download and import the dictionaries you wish to use in order to enable Yomichan
 definition lookups. If you have proprietary EPWING dictionaries that you would like to use, please see the [Yomichan
 Import](https://foosoft.net/projects/yomichan-import) page to learn how to convert and import them into Yomichan.
@@ -55,41 +49,44 @@ primary language is not English, you may consider also importing the English ver
     *   [jmdict_swedish.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_swedish.zip)
 *   **[JMnedict](http://www.edrdg.org/enamdict/enamdict_doc.html)** (Japanese names)
     *   [jmnedict.zip](https://foosoft.net/projects/yomichan/dl/dict/jmnedict.zip)
+*   **[KireiCake](https://kireicake.com/rikaicakes/)** (Japanese slang)
+    *   [kireicake.zip](https://foosoft.net/projects/yomichan/dl/dict/kireicake.zip)
 *   **[KANJIDIC](http://nihongo.monash.edu/kanjidic2/index.html)** (Japanese Kanji)
     *   [kanjidic_english.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_english.zip)
     *   [kanjidic_french.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_french.zip)
     *   [kanjidic_portuguese.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_portuguese.zip)
     *   [kanjidic_spanish.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_spanish.zip)
-*   **[KireiCake](https://kireicake.com/rikaicakes/)** (Japanese slang)
-    *   [kireicake.zip](https://foosoft.net/projects/yomichan/dl/dict/kireicake.zip)
+*   **[Innocent Corpus](https://forum.koohii.com/post-168613.html#pid168613)** (Term and Kanji frequencies across 5000+ novels)
+    *   [innocent_corpus.zip](https://foosoft.net/projects/yomichan/dl/dict/innocent_corpus.zip)
 
 ## Basic Usage ##
 
 1.  Click on the ![](https://foosoft.net/projects/yomichan/img/yomichan-icon.png) icon in the browser toolbar to open the Yomichan actions dialog.
 
-    [![Actions dialog](https://foosoft.net/projects/yomichan/img/ui-actions-thumb.png)](https://foosoft.net/projects/yomichan/img/ui-actions.png)
+    [![](https://foosoft.net/projects/yomichan/img/ui-actions-thumb.png)](https://foosoft.net/projects/yomichan/img/ui-actions.png)
 
-2.  Click on the *monkey wrench* icon in the middle to open the options page.
+2.  Click on the *spanner/monkey wrench* icon in the middle to open the options page.
 
 3.  Import the dictionaries you wish to use for term and Kanji searches. If you do not have any dictionaries installed
     (or enabled), Yomichan will warn you that it is not ready for use by displaying an orange exclamation mark over its
     icon. This exclamation mark will disappear once you have installed and enabled at least one dictionary.
 
-    [![Dictionary importer](https://foosoft.net/projects/yomichan/img/ui-import-thumb.png)](https://foosoft.net/projects/yomichan/img/ui-import.png)
+    [![](https://foosoft.net/projects/yomichan/img/ui-import-thumb.png)](https://foosoft.net/projects/yomichan/img/ui-import.png)
 
 4.  Hold down the <kbd>Shift</kbd> key or the middle mouse button as you move your mouse over text to display a popup
     window containing term definitions. This window will only be shown if definitions were found and it can be dismissed
     by clicking anywhere outside of it.
 
-    [![Term search results](https://foosoft.net/projects/yomichan/img/ui-terms-thumb.png)](https://foosoft.net/projects/yomichan/img/ui-terms.png)
+    [![](https://foosoft.net/projects/yomichan/img/ui-terms-thumb.png)](https://foosoft.net/projects/yomichan/img/ui-terms.png)
 
 5.  Click on the ![](https://foosoft.net/projects/yomichan/img/btn-play-audio.png) icon to hear the term pronounced by a native speaker. If an audio sample is
-    not available, you will hear a short click instead.
+    not available, you will hear a short click instead. You can configure the sources used to retrieve audio samples in
+    the options page.
 
 6.  Click on individual Kanji in the term definition results to view additional information about those characters
-    including readings, meanings, and a stroke order diagram.
+    including stroke order diagrams, readings, meanings, as well as other useful data.
 
-    [![Kanji search results](https://foosoft.net/projects/yomichan/img/ui-kanji-thumb.png)](https://foosoft.net/projects/yomichan/img/ui-kanji.png)
+    [![](https://foosoft.net/projects/yomichan/img/ui-kanji-thumb.png)](https://foosoft.net/projects/yomichan/img/ui-kanji.png)
 
 ## Custom Dictionaries ##
 
@@ -123,7 +120,9 @@ Flashcard fields can be configured with the following steps:
 2.  Tick the checkbox labeled *Enable Anki integration* (Anki must be running with [AnkiConnect](https://foosoft.net/projects/anki-connect) installed).
 3.  Select the type of template to configure by clicking on either the *Terms* or *Kanji* tabs.
 4.  Select the Anki deck and model to use for new creating new flashcards of this type.
-5.  Fill the model fields with markers corresponding to the information you wish to include (several can be used):
+5.  Fill the model fields with markers corresponding to the information you wish to include (several can be used at
+    once). Advanced users can also configure the actual [Handlebars](http://handlebarsjs.com/) templates used to create
+    the flashcard contents (this is strictly optional).
 
     #### Markers for Term Cards ####
 
@@ -159,10 +158,10 @@ Flashcard fields can be configured with the following steps:
     `{url}` | Address of the web page in which the Kanji appeared in.
 
 When creating your model for Yomichan, *please make sure that you pick a unique field to be first*; fields that will
-contain `{expression}` or `{character}` are ideal candidates. Anki does not require duplicate flashcards to be added to
-a deck and uses the first field in the model to check for duplicates. If, for example, you have `{reading}` configured
-to be the first field in your model and already have <ruby>橋<rt>はし</rt></ruby> in your deck, you will not be able to
-create a flashcard for <ruby>箸<rt>はし</rt></ruby>, because they share the same reading.
+contain `{expression}` or `{character}` are ideal candidates for this. Anki does not require duplicate flashcards to be
+added to a deck and uses the first field in the model to check for duplicates. If, for example, you have `{reading}`
+configured to be the first field in your model and already have <ruby>橋<rt>はし</rt></ruby> in your deck, you will not
+be able to create a flashcard for <ruby>箸<rt>はし</rt></ruby>, because they share the same reading.
 
 ### Flashcard Creation ###
 
@@ -211,24 +210,24 @@ other developers who want to help out. I take pride in the high quality of the c
 following basic guidelines when creating pull requests:
 
 *   Please discuss large features before writing code.
-*   Follow the conventions and style of the existing code.
-*   Write clean, modern ES6 code (`const`/`let`, promises, arrow functions, etc.)
+*   Follow the [conventions and style](https://raw.githubusercontent.com/FooSoft/dotfiles/master/.eslintrc.json) of the existing code.
+*   Write clean, modern ES6 code (`const`/`let`, `await`, arrow functions, etc.)
 *   Large pull requests without a clear scope will not be merged.
 *   Incomplete or non-standalone features will not be merged.
 
 ### Templates ###
 
-Yomichan uses [Handlebars](http://handlebarsjs.com/) templates for user interface and Anki note formatting. The source
-templates are found in the `tmpl` directory and the compiled version is stored in the `ext/bg/js/templates.js` file. If
-you modify the source templates, you will need to also recompile them. If you are developing on Linux or Mac OS X, you
-can use the included `build_tmpl.sh` and `build_tmpl_auto.sh` (requires
-[inotify-tools](https://github.com/rvoicilas/inotify-tools/wiki)) shell scripts to do this for you. Otherwise, simply
-execute `handlebars tmpl/*.html -f ext/bg/js/templates.js` from the project's base directory.
+Yomichan uses [Handlebars](http://handlebarsjs.com/) templates for user interface generation. The source templates are
+found in the `tmpl` directory and the compiled version is stored in the `ext/bg/js/templates.js` file. If you modify the
+source templates, you will need to also recompile them. If you are developing on Linux or Mac OS X, you can use the
+included `build_tmpl.sh` and `build_tmpl_auto.sh` shell scripts to do this for you
+([inotify-tools](https://github.com/rvoicilas/inotify-tools/wiki) required). Otherwise, simply execute `handlebars
+tmpl/*.html -f ext/bg/js/templates.js` from the project's base directory to compile all the templates.
 
 ### Dependencies ###
 
-Yomichan relies on several third-party libraries to function. The following are links to homepages and snapshots of the
-exact versions used for distribution.
+Yomichan uses several third-party libraries to function. Below are links to homepages and snapshots of the exact
+versions packaged.
 
 *   Bootstrap Toggle: [homepage](http://www.bootstraptoggle.com/) - [snapshot](https://github.com/minhur/bootstrap-toggle/archive/b76c094.zip)
 *   Bootstrap: [homepage](http://getbootstrap.com/) - [snapshot](https://github.com/twbs/bootstrap/releases/download/v3.3.7/bootstrap-3.3.7-dist.zip)
@@ -239,6 +238,13 @@ exact versions used for distribution.
 *   WanaKana: [homepage](http://wanakana.com/) - [snapshot](https://raw.githubusercontent.com/WaniKani/WanaKana/7c4a052/gh-pages/assets/js/wanakana.min.js)
 
 ## Frequently Asked Questions ##
+
+*   **Why does the Kanji results page display "No data found" for several fields?**
+
+    You are using data from the KANJIDIC dictionary that was exported for an earlier version of Yomichan. It does not
+    contain the additional information which newer versions of Yofomichan expect. Unfortunately, since major browser
+    implementations of IndexedDB do not provide reliable means for selective bulk data deletion, you will need purge
+    your database and install the latest version of the KANJIDIC to see additional information about characters.
 
 *   **Can I still create cards without HTML formatting? The option for it is gone!**
 
@@ -256,32 +262,18 @@ exact versions used for distribution.
     network latency and the fragility of web scraping, I do not believe that it is possible to realize a good user
     experience.
 
-*   **What happened to AnkiWeb integration? Why was it removed?**
+*   **Is it possible to use Yomichan with files saved locally on my computer with Chrome?**
 
-    The author of Anki wants to maintain tight control of AnkiWeb by restricting automated web requests, while at the
-    same time not providing an API for adding or removing flash cards. As circumventing these limitations led to account
-    restrictions placed on users of this extension, I was forced to remove this feature. Note that it is still possible
-    to automatically generate flashcards with the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
-
-*   **Is it possible to use Yomichan with files saved locally on my computer?**
-
-    It in order to be able use Yomichan with local files in Chrome, you must first tick the *Allow access to file URLs*
-    checkbox for Yomichan on the Chrome extensions page. Due to restrictions placed on browser extensions by Chrome, it
+    In order to use Yomichan with local files in Chrome, you must first tick the *Allow access to file URLs* checkbox
+    for Yomichan on the extensions page. Due to the restrictions placed on browser addons in the WebExtensions model, it
     will likely never be possible to use Yomichan with PDF files.
 
-*   **Is it possible to delete individual dictionaries without resetting the database?**
+*   **Is it possible to delete individual dictionaries without purging the database?**
 
-    Although it is technically possible to purge specific dictionaries, due to the limitations of the underlying
-    database system, this process is *extremely* slow. For example, it can take up to ten minutes to delete a term
-    dictionary of moderate size! Instead of including a borderline unusable feature in Yomichan, I disabled dictionary
-    deletion entirely.
-
-*   **Why doesn't Yomichan work after being removed and reinstalled on Firefox?**
-
-    Uninstalling Yomichan on Firefox may sometimes leave the dictionary database in an undefined state. Although most of
-    the data has been deleted, the metadata describing it appears unchanged. This can make it look like you have
-    dictionaries installed when you actually do not. Purge the database and reimport your dictionaries to fix this
-    problem.
+    Although it is technically possible to purge specific dictionaries, due to the limitations of the underlying browser
+    IndexedDB system, this process is *extremely* slow. For example, it can take up to ten minutes to delete a single
+    moderately-sized term dictionary! Instead of including a borderline unusable feature in Yomichan, I have chosen to
+    disable dictionary deletion entirely.
 
 *   **Why aren't EPWING dictionaries bundled with Yomichan?**
 
@@ -290,10 +282,9 @@ exact versions used for distribution.
 
 *   **When are you going to add support for $MYLANGUAGE?**
 
-    Developing Yomichan required a significant understanding of Japanese sentence structure and grammar. I presently
-    have no time to invest in learning yet another language; therefore other languages will not be supported. I will
-    also not be accepting pull request containing this functionality, as I will ultimately be the one maintaining your
-    code.
+    Developing Yomichan requires a significant understanding of Japanese sentence structure and grammar. I have no time
+    to invest in learning yet another language; therefore other languages will not be supported. I will also not accept
+    pull request containing this functionality, as I will ultimately be the one maintaining your code.
 
 ## Screenshots ##
 
@@ -316,4 +307,3 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
