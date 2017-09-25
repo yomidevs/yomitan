@@ -29,6 +29,7 @@ class Display {
         this.audioCache = {};
 
         $(document).keydown(this.onKeyDown.bind(this));
+        $(document).on('wheel', this.onWheel.bind(this));
     }
 
     onError(error) {
@@ -199,6 +200,25 @@ class Display {
         const handler = handlers[e.keyCode];
         if (handler && handler()) {
             e.preventDefault();
+        }
+    }
+
+    onWheel(e) {
+        const event = e.originalEvent;
+        const handler = () => {
+            if (event.altKey) {
+                if (event.deltaY < 0) { // scroll up
+                    this.entryScrollIntoView(this.index - 1, true);
+                    return true;
+                } else if (event.deltaY > 0) { // scroll down
+                    this.entryScrollIntoView(this.index + 1, true);
+                    return true;
+                }
+            }
+        };
+
+        if (handler()) {
+            event.preventDefault();
         }
     }
 
