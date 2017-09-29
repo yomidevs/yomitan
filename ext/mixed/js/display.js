@@ -234,7 +234,8 @@ class Display {
             const params = {
                 definitions,
                 addable: options.anki.enable,
-                grouped: options.general.groupResults,
+                grouped: options.general.resultOutputMode === 'group',
+                merged: options.general.resultOutputMode === 'merge',
                 playback: options.general.audioSource !== 'disabled',
                 debug: options.general.debugInfo
             };

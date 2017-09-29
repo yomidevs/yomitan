@@ -48,6 +48,18 @@ class Translator {
         return {length, definitions: definitionsGrouped};
     }
 
+    async findTermsMerged(text, dictionaries, alphanumeric) {
+        const titles = Object.keys(dictionaries);
+        const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
+
+        const definitionsMerged = dictTermsGroup(definitions, dictionaries);
+        // for (const definition of definitionsMerged) {
+        //     await this.buildTermFrequencies(definition, titles);
+        // }
+
+        return {length, definitions: definitionsMerged};
+    }
+
     async findTermsSplit(text, dictionaries, alphanumeric) {
         const titles = Object.keys(dictionaries);
         const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
@@ -90,7 +102,8 @@ class Translator {
                     expression: definition.expression,
                     reading: definition.reading,
                     glossary: definition.glossary,
-                    tags: dictTagsSort(tags)
+                    tags: dictTagsSort(tags),
+                    sequence: definition.sequence
                 });
             }
         }

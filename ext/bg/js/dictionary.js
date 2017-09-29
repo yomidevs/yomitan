@@ -207,7 +207,8 @@ async function dictFieldFormat(field, definition, mode, options) {
         const data = {
             marker,
             definition,
-            group: options.general.groupResults,
+            group: options.general.resultOutputMode === 'group',
+            merge: options.general.resultOutputMode === 'merge',
             modeTermKanji: mode === 'term-kanji',
             modeTermKana: mode === 'term-kana',
             modeKanji: mode === 'kanji'

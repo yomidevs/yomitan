@@ -22,9 +22,9 @@ async function formRead() {
     const optionsNew = $.extend(true, {}, optionsOld);
 
     optionsNew.general.showGuide = $('#show-usage-guide').prop('checked');
+    optionsNew.general.resultOutputMode = $('#result-output-mode').val();
     optionsNew.general.audioSource = $('#audio-playback-source').val();
     optionsNew.general.audioVolume = parseFloat($('#audio-playback-volume').val());
-    optionsNew.general.groupResults = $('#group-terms-results').prop('checked');
     optionsNew.general.debugInfo = $('#show-debug-info').prop('checked');
     optionsNew.general.showAdvanced = $('#show-advanced-options').prop('checked');
     optionsNew.general.maxResults = parseInt($('#max-displayed-results').val(), 10);
@@ -124,9 +124,9 @@ async function onReady() {
     const options = await optionsLoad();
 
     $('#show-usage-guide').prop('checked', options.general.showGuide);
+    $('#result-output-mode').val(options.general.resultOutputMode);
     $('#audio-playback-source').val(options.general.audioSource);
     $('#audio-playback-volume').val(options.general.audioVolume);
-    $('#group-terms-results').prop('checked', options.general.groupResults);
     $('#show-debug-info').prop('checked', options.general.debugInfo);
     $('#show-advanced-options').prop('checked', options.general.showAdvanced);
     $('#max-displayed-results').val(options.general.maxResults);

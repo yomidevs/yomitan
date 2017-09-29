@@ -208,7 +208,7 @@ class Database {
                     });
                 }
             } else {
-                for (const [expression, reading, tags, rules, score, glossary] of entries) {
+                for (const [expression, reading, tags, rules, score, glossary, sequence] of entries) {
                     rows.push({
                         expression,
                         reading,
@@ -216,6 +216,7 @@ class Database {
                         rules,
                         score,
                         glossary,
+                        sequence,
                         dictionary: summary.title
                     });
                 }
