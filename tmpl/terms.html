@@ -31,7 +31,12 @@
         <img src="/mixed/img/entry-current.png" class="current" title="Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)" alt>
     </div>
 
+    {{#if merged}}
+    <div class="expression">{{#kanjiLinks}}{{#expressions}}{{{.}}}{{/expressions}}{{/kanjiLinks}}</div>
+    <div>{{#readings}}{{{.}}}{{/readings}}</div>
+    {{else}}
     <div class="expression">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</div>
+    {{/if}}
 
     {{#if reasons}}
     <div class="reasons">
@@ -60,6 +65,16 @@
         {{else}}
         {{> definition definitions.[0]}}
         {{/if}}
+        {{else if merged}}
+        {{#if definitions.[1]}}
+        <ol>
+            {{#each definitions}}
+            <li>{{> definition}}</li>
+            {{/each}}
+        </ol>
+        {{else}}
+        {{> definition definitions.[0]}}
+        {{/if}}
         {{else}}
         {{> definition}}
         {{/if}}
@@ -74,7 +89,7 @@
 {{#if definitions}}
 {{#each definitions}}
 {{#unless @first}}<hr>{{/unless}}
-{{> term debug=../debug grouped=../grouped addable=../addable playback=../playback}}
+{{> term debug=../debug grouped=../grouped merged=../merged addable=../addable playback=../playback}}
 {{/each}}
 {{else}}
 <p class="note">No results found.</p>
