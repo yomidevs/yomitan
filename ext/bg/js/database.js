@@ -30,7 +30,7 @@ class Database {
 
         this.db = new Dexie('dict');
         this.db.version(2).stores({
-            terms:        '++id,dictionary,expression,reading',
+            terms:        '++id,dictionary,expression,reading,sequence',
             kanji:        '++,dictionary,character',
             tagMeta:      '++,dictionary',
             dictionaries: '++,title,version'
@@ -73,12 +73,35 @@ class Database {
                     glossary: row.glossary,
                     score: row.score,
                     dictionary: row.dictionary,
-                    id: row.id
+                    id: row.id,
+                    sequence: row.sequence
                 });
             }
         });
 
         return results;
+    }
+
+    async findEntry(sequence) {
+        if (!this.db) {
+            throw 'Database not initialized';
+        }
+
+        const entry = [];
+        await this.db.terms.where('sequence').equals(sequence).each(row => {
+            entry.push({
+                expression: row.expression,
+                reading: row.reading,
+                tags: dictFieldSplit(row.tags),
+                rules: dictFieldSplit(row.rules),
+                glossary: row.glossary,
+                score: row.score,
+                dictionary: row.dictionary,
+                id: row.id
+            });
+        });
+
+        return entry;
     }
 
     async findTermMeta(term, titles) {

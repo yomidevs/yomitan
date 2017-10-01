@@ -205,6 +205,13 @@ function optionsVersion(options) {
             } else {
                 options.scanning.modifier = 'none';
             }
+        },
+        () => {
+            if (options.general.groupResults) {
+                options.general.resultOutputMode = 'group';
+            } else {
+                options.general.resultOutputMode = 'split';
+            }
         }
     ];
 

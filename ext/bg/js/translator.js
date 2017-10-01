@@ -49,15 +49,78 @@ class Translator {
     }
 
     async findTermsMerged(text, dictionaries, alphanumeric) {
-        const titles = Object.keys(dictionaries);
+        // const titles = Object.keys(dictionaries);
         const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
 
-        const definitionsMerged = dictTermsGroup(definitions, dictionaries);
+        // const definitionsMerged = dictTermsMerge(definitions, dictionaries, this.database);
         // for (const definition of definitionsMerged) {
         //     await this.buildTermFrequencies(definition, titles);
         // }
 
-        return {length, definitions: definitionsMerged};
+        const sequences = {};
+        const stray = [];
+        for (const definition of definitions) {
+            if (typeof definition.sequence !== 'undefined') {
+                if (!sequences[definition.sequence]) {
+                    sequences[definition.sequence] = {
+                        reasons: definition.reasons,
+                        score: Number.MIN_SAFE_INTEGER,
+                        expression: new Set(),
+                        reading: new Set(),
+                        source: definition.source,
+                        definitions: []
+                    };
+                }
+                const seq = sequences[definition.sequence];
+                seq.score = Math.max(seq.score, definition.score);
+            } else {
+                stray.push(definition);
+            }
+        }
+
+        const definitionsMerged = dictTermsGroup(stray, dictionaries);
+        for (const sequence in sequences) {
+            const entry = await this.database.findEntry(Number(sequence));
+
+            const result = sequences[sequence];
+            const glossaries = new Map();
+            for (const definition of entry) {
+
+                const gloss = definition.glossary.join('||');
+                if (!glossaries.get(gloss)) {
+                    const tags = await this.expandTags(definition.tags, definition.dictionary);
+                    tags.push(dictTagBuildSource(definition.dictionary));
+                    glossaries.set(gloss, {
+                        expressions: new Set(),
+                        readings: new Set(),
+                        tags: dictTagsSort(tags), // TODO: use correct tags
+                        source: result.source,
+                        reasons: [],
+                        score: definition.score,
+                        id: definition.id,
+                        dictionary: definition.dictionary
+                    });
+                }
+                glossaries.get(gloss).expressions.add(definition.expression);
+                glossaries.get(gloss).readings.add(definition.reading);
+
+                result.expression.add(definition.expression);
+                result.reading.add(definition.reading);
+            }
+
+            for (const gloss of glossaries.keys()) {
+                const definition = glossaries.get(gloss);
+                definition.glossary = gloss.split('||');
+                result.definitions.push(definition);
+            }
+            //dictTermsSort(groupDefs, dictionaries)
+
+            result.expression = Array.from(result.expression).join(', ');
+            result.reading = Array.from(result.reading).join(', ');
+            definitionsMerged.push(result);
+        }
+
+        return {length, definitions: dictTermsSort(definitionsMerged)};
     }
 
     async findTermsSplit(text, dictionaries, alphanumeric) {
