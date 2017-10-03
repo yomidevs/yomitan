@@ -71,16 +71,6 @@ function handlebarsKanjiLinks(options) {
     return result;
 }
 
-function handlebarsExpressions(options) {
-    const definition = options.fn(this);
-    return definition.expression;
-}
-
-function handlebarsReadings(options) {
-    const definition = options.fn(this);
-    return definition.reading;
-}
-
 function handlebarsMultiLine(options) {
     return options.fn(this).split('\n').join('<br>');
 }
@@ -93,8 +83,6 @@ function handlebarsRegisterHelpers() {
         Handlebars.registerHelper('furiganaPlain', handlebarsFuriganaPlain);
         Handlebars.registerHelper('kanjiLinks', handlebarsKanjiLinks);
         Handlebars.registerHelper('multiLine', handlebarsMultiLine);
-        Handlebars.registerHelper('expressions', handlebarsExpressions);
-        Handlebars.registerHelper('readings', handlebarsReadings);
     }
 }
 

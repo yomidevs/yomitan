@@ -30,7 +30,7 @@ class Database {
 
         this.db = new Dexie('dict');
         this.db.version(2).stores({
-            terms:        '++id,dictionary,expression,reading,sequence',
+            terms:        '++id,dictionary,expression,reading',
             kanji:        '++,dictionary,character',
             tagMeta:      '++,dictionary',
             dictionaries: '++,title,version'
@@ -39,6 +39,9 @@ class Database {
             termMeta:  '++,dictionary,expression',
             kanjiMeta: '++,dictionary,character',
             tagMeta:   '++,dictionary,name'
+        });
+        this.db.version(4).stores({
+            terms: '++id,dictionary,expression,reading,sequence'
         });
 
         await this.db.open();
@@ -74,7 +77,7 @@ class Database {
                     score: row.score,
                     dictionary: row.dictionary,
                     id: row.id,
-                    sequence: row.sequence
+                    sequence: typeof row.sequence === 'undefined' ? -1 : row.sequence
                 });
             }
         });
@@ -82,14 +85,15 @@ class Database {
         return results;
     }
 
-    async findEntry(sequence) {
+    async findTermsBySequence(sequence, dictionary) {
         if (!this.db) {
             throw 'Database not initialized';
         }
 
-        const entry = [];
+        const results = [];
         await this.db.terms.where('sequence').equals(sequence).each(row => {
-            entry.push({
+            // if (dictionary === row.dictionary) {
+            results.push({
                 expression: row.expression,
                 reading: row.reading,
                 tags: dictFieldSplit(row.tags),
@@ -97,11 +101,12 @@ class Database {
                 glossary: row.glossary,
                 score: row.score,
                 dictionary: row.dictionary,
-                id: row.id
+                id: row.id,
+                sequence: typeof row.sequence === 'undefined' ? -1 : row.sequence
             });
         });
 
-        return entry;
+        return results;
     }
 
     async findTermMeta(term, titles) {

@@ -144,6 +144,77 @@ function dictTermsGroup(definitions, dictionaries) {
     return dictTermsSort(results);
 }
 
+function dictTermsMergeBySequence(definitions) {
+    const definitionsBySequence = {'-1': []};
+    for (const definition of definitions) {
+        if (definition.sequence > 0) {
+            if (!definitionsBySequence[definition.sequence]) {
+                definitionsBySequence[definition.sequence] = {
+                    reasons: definition.reasons,
+                    score: Number.MIN_SAFE_INTEGER,
+                    expression: new Set(),
+                    reading: new Set(),
+                    expressions: new Map(),
+                    source: definition.source,
+                    dictionary: definition.dictionary,
+                    definitions: []
+                };
+            }
+            const score = Math.max(definitionsBySequence[definition.sequence].score, definition.score);
+            definitionsBySequence[definition.sequence].score = score;
+        } else {
+            definitionsBySequence['-1'].push(definition);
+        }
+    }
+
+    return definitionsBySequence;
+}
+
+function dictTermsMergeByGloss(result, definitions) {
+    const definitionsByGloss = {};
+    for (const definition of definitions) {
+
+        const gloss = JSON.stringify(definition.glossary);
+        if (!definitionsByGloss[gloss]) {
+            definitionsByGloss[gloss] = {
+                expression: new Set(),
+                reading: new Set(),
+                tags: new Set(),
+                source: result.source,
+                reasons: [],
+                score: definition.score,
+                id: definition.id,
+                dictionary: definition.dictionary
+            };
+        }
+
+        definitionsByGloss[gloss].expression.add(definition.expression);
+        definitionsByGloss[gloss].reading.add(definition.reading);
+
+        result.expression.add(definition.expression);
+        result.reading.add(definition.reading);
+
+        // result->expressions[ Expression1[ Reading1[ Tag1, Tag2 ] ], Expression2, ... ]
+        if (!result.expressions.has(definition.expression)) {
+            result.expressions.set(definition.expression, new Map());
+        }
+        if (!result.expressions.get(definition.expression).has(definition.reading)) {
+            result.expressions.get(definition.expression).set(definition.reading, new Set());
+        }
+
+        for (const tag of definition.tags) {
+            if (dictIsJmdictTermTag(tag)) {
+                // TODO: expand tags
+                result.expressions.get(definition.expression).get(definition.reading).add(tag);
+            } else {
+                definitionsByGloss[gloss].tags.add(tag);
+            }
+        }
+    }
+
+    return definitionsByGloss;
+}
+
 function dictTagBuildSource(name) {
     return dictTagSanitize({name, category: 'dictionary', order: 100});
 }
@@ -176,6 +247,45 @@ function dictTagsSort(tags) {
 
         return 0;
     });
+}
+
+function dictIsJmdictTermTag(tag) {
+    return [
+        'P',
+        'news',
+        'ichi',
+        'spec',
+        'gai',
+        'ik',
+        'iK',
+        'ok',
+        'oK',
+        'ek',
+        'eK',
+        'io',
+        'oik',
+        'ateji',
+        'gikun'
+    ].includes(tag);
+}
+
+function dictJmdictTermTagsRare(tags) {
+    const rareTags = [
+        'ik',
+        'iK',
+        'ok',
+        'oK',
+        'ek',
+        'eK',
+        'io',
+        'oik'
+    ];
+    for (const tag of tags) {
+        if (rareTags.includes(tag)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function dictFieldSplit(field) {

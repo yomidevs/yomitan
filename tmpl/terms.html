@@ -1,4 +1,13 @@
 {{#*inline "definition"}}
+{{#if only}}
+<div>
+    (
+    {{~#each only~}}
+    {{{.}}}{{#unless @last}}, {{/unless}}
+    {{/each}}
+    only)
+</div>
+{{/if}}
 {{#if tags}}
 <div>
     {{#each tags}}
@@ -32,8 +41,12 @@
     </div>
 
     {{#if merged}}
-    <div class="expression">{{#kanjiLinks}}{{#expressions}}{{{.}}}{{/expressions}}{{/kanjiLinks}}</div>
-    <div>{{#readings}}{{{.}}}{{/readings}}</div>
+    {{#each expressions}}
+    <div class="expression">
+        <span class="expression-{{jmdictTermFrequency}}">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</span>
+        {{#unless @last}}、{{/unless}}
+    </div>
+    {{/each}}
     {{else}}
     <div class="expression">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</div>
     {{/if}}

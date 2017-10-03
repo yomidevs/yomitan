@@ -124,6 +124,14 @@ hr {
     text-decoration: none;
 }
 
+.expression-popular, .expression-popular a {
+    color: #0275d8;
+}
+
+.expression-rare, .expression-rare a {
+    color: #999;
+}
+
 .reasons {
     color: #777;
     display: inline-block;

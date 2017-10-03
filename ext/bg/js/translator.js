@@ -49,75 +49,77 @@ class Translator {
     }
 
     async findTermsMerged(text, dictionaries, alphanumeric) {
-        // const titles = Object.keys(dictionaries);
+        const titles = Object.keys(dictionaries);
         const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
 
-        // const definitionsMerged = dictTermsMerge(definitions, dictionaries, this.database);
-        // for (const definition of definitionsMerged) {
-        //     await this.buildTermFrequencies(definition, titles);
-        // }
+        const definitionsBySequence = dictTermsMergeBySequence(definitions);
 
-        const sequences = {};
-        const stray = [];
-        for (const definition of definitions) {
-            if (typeof definition.sequence !== 'undefined') {
-                if (!sequences[definition.sequence]) {
-                    sequences[definition.sequence] = {
-                        reasons: definition.reasons,
-                        score: Number.MIN_SAFE_INTEGER,
-                        expression: new Set(),
-                        reading: new Set(),
-                        source: definition.source,
-                        definitions: []
-                    };
-                }
-                const seq = sequences[definition.sequence];
-                seq.score = Math.max(seq.score, definition.score);
-            } else {
-                stray.push(definition);
-            }
-        }
-
-        const definitionsMerged = dictTermsGroup(stray, dictionaries);
-        for (const sequence in sequences) {
-            const entry = await this.database.findEntry(Number(sequence));
-
-            const result = sequences[sequence];
-            const glossaries = new Map();
-            for (const definition of entry) {
-
-                const gloss = definition.glossary.join('||');
-                if (!glossaries.get(gloss)) {
-                    const tags = await this.expandTags(definition.tags, definition.dictionary);
-                    tags.push(dictTagBuildSource(definition.dictionary));
-                    glossaries.set(gloss, {
-                        expressions: new Set(),
-                        readings: new Set(),
-                        tags: dictTagsSort(tags), // TODO: use correct tags
-                        source: result.source,
-                        reasons: [],
-                        score: definition.score,
-                        id: definition.id,
-                        dictionary: definition.dictionary
-                    });
-                }
-                glossaries.get(gloss).expressions.add(definition.expression);
-                glossaries.get(gloss).readings.add(definition.reading);
-
-                result.expression.add(definition.expression);
-                result.reading.add(definition.reading);
+        const definitionsMerged = dictTermsGroup(definitionsBySequence['-1'], dictionaries);
+        for (const sequence in definitionsBySequence) {
+            if (!(sequence > 0)) {
+                continue;
             }
 
-            for (const gloss of glossaries.keys()) {
-                const definition = glossaries.get(gloss);
-                definition.glossary = gloss.split('||');
+            const result = definitionsBySequence[sequence];
+
+            const rawDefinitionsBySequence = await this.database.findTermsBySequence(Number(sequence));
+            const definitionsByGloss = dictTermsMergeByGloss(result, rawDefinitionsBySequence);
+
+            // postprocess glossaries
+            for (const gloss in definitionsByGloss) {
+                const definition = definitionsByGloss[gloss];
+                definition.glossary = JSON.parse(gloss);
+
+                const tags = await this.expandTags(definition.tags, definition.dictionary);
+                tags.push(dictTagBuildSource(definition.dictionary));
+                definition.tags = dictTagsSort(tags);
+
+                definition.only = [];
+                if (!utilSetEqual(definition.expression, result.expression)) {
+                    for (const expression of utilSetIntersection(definition.expression, result.expression)) {
+                        definition.only.push(expression);
+                    }
+                }
+                if (!utilSetEqual(definition.reading, result.reading)) {
+                    for (const reading of utilSetIntersection(definition.reading, result.reading)) {
+                        definition.only.push(reading);
+                    }
+                }
+
                 result.definitions.push(definition);
             }
-            //dictTermsSort(groupDefs, dictionaries)
+
+            result.definitions.sort(definition => -definition.id);
+
+            // turn the Map()/Set() mess to [{expression: E1, reading: R1}, {...}] and tag popular/normal/rare instead of actual tags
+            const expressions = [];
+            for (const expression of result.expressions.keys()) {
+                for (const reading of result.expressions.get(expression).keys()) {
+                    expressions.push({
+                        expression: expression,
+                        reading: reading,
+                        jmdictTermFrequency: (tags => {
+                            if (tags.has('P')) {
+                                return 'popular';
+                            } else if (dictJmdictTermTagsRare(tags)) {
+                                return 'rare';
+                            } else {
+                                return 'normal';
+                            }
+                        })(result.expressions.get(expression).get(reading))
+                    });
+                }
+            }
+
+            result.expressions = expressions;
 
             result.expression = Array.from(result.expression).join(', ');
             result.reading = Array.from(result.reading).join(', ');
             definitionsMerged.push(result);
+        }
+
+        for (const definition of definitionsMerged) {
+            await this.buildTermFrequencies(definition, titles);
         }
 
         return {length, definitions: dictTermsSort(definitionsMerged)};
@@ -234,14 +236,23 @@ class Translator {
     }
 
     async buildTermFrequencies(definition, titles) {
-        definition.frequencies = [];
-        for (const meta of await this.database.findTermMeta(definition.expression, titles)) {
-            if (meta.mode === 'freq') {
-                definition.frequencies.push({
-                    expression: meta.expression,
-                    frequency: meta.data,
-                    dictionary: meta.dictionary
-                });
+        let terms = [];
+        if (definition.expressions) {
+            terms = terms.concat(definition.expressions);
+        } else {
+            terms.push(definition);
+        }
+
+        for (const term of terms) {
+            term.frequencies = [];
+            for (const meta of await this.database.findTermMeta(term.expression, titles)) {
+                if (meta.mode === 'freq') {
+                    term.frequencies.push({
+                        expression: meta.expression,
+                        frequency: meta.data,
+                        dictionary: meta.dictionary
+                    });
+                }
             }
         }
     }
