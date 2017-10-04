@@ -43,8 +43,7 @@
     {{#if merged}}
     {{#each expressions}}
     <div class="expression">
-        <span class="expression-{{jmdictTermFrequency}}">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</span>
-        {{#unless @last}}、{{/unless}}
+        <span class="expression-{{jmdictTermFrequency}}">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</span>{{#unless @last}}、{{/unless}}
     </div>
     {{/each}}
     {{else}}
