@@ -154,6 +154,10 @@ function optionsSetDefaults(options) {
 
         dictionaries: {},
 
+        dictionary: {
+            main: ''
+        },
+
         anki: {
             enable: false,
             server: 'http://127.0.0.1:8765',

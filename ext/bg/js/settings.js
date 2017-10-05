@@ -60,7 +60,11 @@ async function formRead() {
         const title = dictionary.data('title');
         const priority = parseInt(dictionary.find('.dict-priority').val(), 10);
         const enabled = dictionary.find('.dict-enabled').prop('checked');
-        optionsNew.dictionaries[title] = {priority, enabled};
+        const main = dictionary.find('.dict-main').prop('checked');
+        if (main) {
+            optionsNew.dictionary.main = title;
+        }
+        optionsNew.dictionaries[title] = {priority, enabled, main};
     });
 
     return {optionsNew, optionsOld};
@@ -237,6 +241,18 @@ function dictionaryGroupsSort() {
     dictGroups.append(dictGroupChildren);
 }
 
+function dictionarySetMain(e) {
+    const mainDictionary = $(e.target).closest('.dict-group');
+    const mainDictionaryTitle = mainDictionary.data('title');
+
+    $('.dict-group').each((index, element) => {
+        const dictionary = $(element);
+        if (dictionary.data('title') !== mainDictionaryTitle) {
+            dictionary.find('.dict-main').prop('checked', false);
+        }
+    });
+}
+
 async function dictionaryGroupsPopulate(options) {
     const dictGroups = $('#dict-groups').empty();
     const dictWarning = $('#dict-warning').hide();
@@ -247,13 +263,14 @@ async function dictionaryGroupsPopulate(options) {
     }
 
     for (const dictRow of dictRowsSort(dictRows, options)) {
-        const dictOptions = options.dictionaries[dictRow.title] || {enabled: false, priority: 0};
+        const dictOptions = options.dictionaries[dictRow.title] || {enabled: false, priority: 0, main: false};
         const dictHtml = await apiTemplateRender('dictionary.html', {
             title: dictRow.title,
             version: dictRow.version,
             revision: dictRow.revision,
             priority: dictOptions.priority,
-            enabled: dictOptions.enabled
+            enabled: dictOptions.enabled,
+            main: dictOptions.main
         });
 
         dictGroups.append($(dictHtml));
@@ -263,6 +280,11 @@ async function dictionaryGroupsPopulate(options) {
 
     $('.dict-enabled, .dict-priority').change(e => {
         dictionaryGroupsSort();
+        onFormOptionsChanged(e);
+    });
+
+    $('.dict-main').change(e => {
+        dictionarySetMain(e);
         onFormOptionsChanged(e);
     });
 }
@@ -308,7 +330,7 @@ async function onDictionaryImport(e) {
 
         const options = await optionsLoad();
         const summary = await utilDatabaseImport(e.target.files[0], updateProgress);
-        options.dictionaries[summary.title] = {enabled: true, priority: 0};
+        options.dictionaries[summary.title] = {enabled: true, priority: 0, main: false};
         await optionsSave(options);
 
         await dictionaryGroupsPopulate(options);

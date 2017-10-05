@@ -144,10 +144,10 @@ function dictTermsGroup(definitions, dictionaries) {
     return dictTermsSort(results);
 }
 
-function dictTermsMergeBySequence(definitions) {
+function dictTermsMergeBySequence(definitions, mainDictionary) {
     const definitionsBySequence = {'-1': []};
     for (const definition of definitions) {
-        if (definition.sequence > 0) {
+        if (mainDictionary === definition.dictionary && definition.sequence > 0) {
             if (!definitionsBySequence[definition.sequence]) {
                 definitionsBySequence[definition.sequence] = {
                     reasons: definition.reasons,
