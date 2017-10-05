@@ -55,7 +55,8 @@ class Translator {
 
         const definitionsBySequence = dictTermsMergeBySequence(definitions, options.dictionary.main);
 
-        const definitionsMerged = dictTermsGroup(definitionsBySequence['-1'], dictionaries);
+        // const definitionsMerged = dictTermsGroup(definitionsBySequence['-1'], dictionaries);
+        const definitionsMerged = [];
         for (const sequence in definitionsBySequence) {
             if (!(sequence > 0)) {
                 continue;
@@ -114,9 +115,41 @@ class Translator {
 
             result.expressions = expressions;
 
-            result.expression = Array.from(result.expression).join(', ');
-            result.reading = Array.from(result.reading).join(', ');
+            // result.expression = Array.from(result.expression).join(', ');
+            // result.reading = Array.from(result.reading).join(', ');
             definitionsMerged.push(result);
+        }
+
+        const postMergedIndices = new Set();
+        const mergeeIndicesByGloss = {};
+        for (const [i, definition] of definitionsBySequence['-1'].entries()) {
+            for (const [j, mergedDefinition] of definitionsMerged.entries()) {
+                if (mergedDefinition.expression.has(definition.expression)) {
+                    if (mergedDefinition.reading.has(definition.reading) || (definition.reading === '' && mergedDefinition.reading.size === 0)) {
+                        if (!mergeeIndicesByGloss[definition.glossary]) {
+                            mergeeIndicesByGloss[definition.glossary] = new Set();
+                        }
+                        if (mergeeIndicesByGloss[definition.glossary].has(j)) {
+                            continue;
+                        }
+                        mergedDefinition.definitions.push(definition);
+                        mergeeIndicesByGloss[definition.glossary].add(j);
+                        postMergedIndices.add(i);
+                    }
+                }
+            }
+        }
+
+        const strayDefinitions = [];
+        for (const [i, definition] of definitionsBySequence['-1'].entries()) {
+            if (postMergedIndices.has(i)) {
+                continue;
+            }
+            strayDefinitions.push(definition);
+        }
+
+        for (const groupedDefinition of dictTermsGroup(strayDefinitions, dictionaries)) {
+            definitionsMerged.push(groupedDefinition);
         }
 
         for (const definition of definitionsMerged) {

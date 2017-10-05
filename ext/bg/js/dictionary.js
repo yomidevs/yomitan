@@ -89,7 +89,7 @@ function dictTermsSort(definitions, dictionaries=null) {
             return 1;
         }
 
-        return v2.expression.localeCompare(v1.expression);
+        return v2.expression.toString().localeCompare(v1.expression.toString());
     });
 }
 
