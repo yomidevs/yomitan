@@ -170,9 +170,31 @@ function dictTermsMergeBySequence(definitions, mainDictionary) {
     return definitionsBySequence;
 }
 
-function dictTermsMergeByGloss(result, definitions) {
-    const definitionsByGloss = {};
-    for (const definition of definitions) {
+function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
+    const definitionsByGloss = appendTo || {};
+    for (const [index, definition] of definitions.entries()) {
+        if (appendTo) {
+            let match = false;
+            for (const expression of result.expressions.keys()) {
+                if (definition.expression === expression) {
+                    for (const reading of result.expressions.get(expression).keys()) {
+                        if (definition.reading === reading) {
+                            match = true;
+                            break;
+                        }
+                    }
+                }
+                if (match) {
+                    break;
+                }
+            }
+
+            if (!match) {
+                continue;
+            } else if (mergedIndices) {
+                mergedIndices.add(index);
+            }
+        }
 
         const gloss = JSON.stringify(definition.glossary);
         if (!definitionsByGloss[gloss]) {
@@ -180,6 +202,7 @@ function dictTermsMergeByGloss(result, definitions) {
                 expression: new Set(),
                 reading: new Set(),
                 tags: new Set(),
+                glossary: definition.glossary,
                 source: result.source,
                 reasons: [],
                 score: definition.score,
@@ -208,6 +231,21 @@ function dictTermsMergeByGloss(result, definitions) {
                 result.expressions.get(definition.expression).get(definition.reading).add(tag);
             } else {
                 definitionsByGloss[gloss].tags.add(tag);
+            }
+        }
+    }
+
+    for (const gloss in definitionsByGloss) {
+        const definition = definitionsByGloss[gloss];
+        definition.only = [];
+        if (!utilSetEqual(definition.expression, result.expression)) {
+            for (const expression of utilSetIntersection(definition.expression, result.expression)) {
+                definition.only.push(expression);
+            }
+        }
+        if (!utilSetEqual(definition.reading, result.reading)) {
+            for (const reading of utilSetIntersection(definition.reading, result.reading)) {
+                definition.only.push(reading);
             }
         }
     }

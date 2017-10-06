@@ -55,8 +55,8 @@ class Translator {
 
         const definitionsBySequence = dictTermsMergeBySequence(definitions, options.dictionary.main);
 
-        // const definitionsMerged = dictTermsGroup(definitionsBySequence['-1'], dictionaries);
         const definitionsMerged = [];
+        const mergedByTermIndices = new Set();
         for (const sequence in definitionsBySequence) {
             if (!(sequence > 0)) {
                 continue;
@@ -66,32 +66,19 @@ class Translator {
 
             const rawDefinitionsBySequence = await this.database.findTermsBySequence(Number(sequence), options.dictionary.main);
             const definitionsByGloss = dictTermsMergeByGloss(result, rawDefinitionsBySequence);
+            dictTermsMergeByGloss(result, definitionsBySequence['-1'], definitionsByGloss, mergedByTermIndices);
 
-            // postprocess glossaries
             for (const gloss in definitionsByGloss) {
                 const definition = definitionsByGloss[gloss];
-                definition.glossary = JSON.parse(gloss);
 
                 const tags = await this.expandTags(definition.tags, definition.dictionary);
                 tags.push(dictTagBuildSource(definition.dictionary));
                 definition.tags = dictTagsSort(tags);
 
-                definition.only = [];
-                if (!utilSetEqual(definition.expression, result.expression)) {
-                    for (const expression of utilSetIntersection(definition.expression, result.expression)) {
-                        definition.only.push(expression);
-                    }
-                }
-                if (!utilSetEqual(definition.reading, result.reading)) {
-                    for (const reading of utilSetIntersection(definition.reading, result.reading)) {
-                        definition.only.push(reading);
-                    }
-                }
-
                 result.definitions.push(definition);
             }
 
-            result.definitions.sort(definition => -definition.id);
+            dictTermsSort(result.definitions, dictionaries);
 
             // turn the Map()/Set() mess to [{expression: E1, reading: R1}, {...}] and tag popular/normal/rare instead of actual tags
             const expressions = [];
@@ -120,34 +107,7 @@ class Translator {
             definitionsMerged.push(result);
         }
 
-        const postMergedIndices = new Set();
-        const mergeeIndicesByGloss = {};
-        for (const [i, definition] of definitionsBySequence['-1'].entries()) {
-            for (const [j, mergedDefinition] of definitionsMerged.entries()) {
-                if (mergedDefinition.expression.has(definition.expression)) {
-                    if (mergedDefinition.reading.has(definition.reading) || (definition.reading === '' && mergedDefinition.reading.size === 0)) {
-                        if (!mergeeIndicesByGloss[definition.glossary]) {
-                            mergeeIndicesByGloss[definition.glossary] = new Set();
-                        }
-                        if (mergeeIndicesByGloss[definition.glossary].has(j)) {
-                            continue;
-                        }
-                        mergedDefinition.definitions.push(definition);
-                        mergeeIndicesByGloss[definition.glossary].add(j);
-                        postMergedIndices.add(i);
-                    }
-                }
-            }
-        }
-
-        const strayDefinitions = [];
-        for (const [i, definition] of definitionsBySequence['-1'].entries()) {
-            if (postMergedIndices.has(i)) {
-                continue;
-            }
-            strayDefinitions.push(definition);
-        }
-
+        const strayDefinitions = definitionsBySequence['-1'].filter((definition, index) => !mergedByTermIndices.has(index));
         for (const groupedDefinition of dictTermsGroup(strayDefinitions, dictionaries)) {
             definitionsMerged.push(groupedDefinition);
         }
@@ -294,6 +254,9 @@ class Translator {
     async expandTags(names, title) {
         const tags = [];
         for (const name of names) {
+            if (typeof name !== 'string') {
+                continue;
+            }
             const base = name.split(':')[0];
             const meta = await this.database.findTagForTitle(base, title);
 
