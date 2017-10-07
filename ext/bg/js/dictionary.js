@@ -227,7 +227,6 @@ function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
 
         for (const tag of definition.tags) {
             if (dictIsJmdictTermTag(tag)) {
-                // TODO: expand tags
                 result.expressions.get(definition.expression).get(definition.reading).add(tag);
             } else {
                 definitionsByGloss[gloss].tags.add(tag);

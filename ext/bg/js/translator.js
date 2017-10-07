@@ -84,9 +84,11 @@ class Translator {
             const expressions = [];
             for (const expression of result.expressions.keys()) {
                 for (const reading of result.expressions.get(expression).keys()) {
+                    const tags = await this.expandTags(result.expressions.get(expression).get(reading), result.dictionary);
                     expressions.push({
                         expression: expression,
                         reading: reading,
+                        tags: dictTagsSort(tags),
                         jmdictTermFrequency: (tags => {
                             if (tags.has('P')) {
                                 return 'popular';
@@ -109,6 +111,7 @@ class Translator {
 
         const strayDefinitions = definitionsBySequence['-1'].filter((definition, index) => !mergedByTermIndices.has(index));
         for (const groupedDefinition of dictTermsGroup(strayDefinitions, dictionaries)) {
+            groupedDefinition.expressions = [{expression: groupedDefinition.expression, reading: groupedDefinition.reading}];
             definitionsMerged.push(groupedDefinition);
         }
 

@@ -71,8 +71,10 @@ class Display {
 
     onAudioPlay(e) {
         e.preventDefault();
-        const index = Display.entryIndexFind($(e.currentTarget));
-        this.audioPlay(this.definitions[index]);
+        const link = $(e.currentTarget);
+        const definitionIndex = Display.entryIndexFind(link);
+        const expressionIndex = $(e.currentTarget).closest('.entry').find('.expression .action-play-audio').index(link);
+        this.audioPlay(this.definitions[definitionIndex], expressionIndex);
     }
 
     onNoteAdd(e) {
@@ -380,11 +382,11 @@ class Display {
         }
     }
 
-    async audioPlay(definition) {
+    async audioPlay(definition, expressionIndex) {
         try {
             this.spinner.show();
 
-            let url = await apiAudioGetUrl(definition, this.options.general.audioSource);
+            let url = await apiAudioGetUrl(expressionIndex === -1 ? definition : definition.expressions[expressionIndex], this.options.general.audioSource);
             if (!url) {
                 url = '/mixed/mp3/button.mp3';
             }

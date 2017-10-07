@@ -34,16 +34,30 @@
         <a href="#" class="action-add-note pending disabled" data-mode="term-kanji"><img src="/mixed/img/add-term-kanji.png" title="Add expression (Alt + E)" alt></a>
         <a href="#" class="action-add-note pending disabled" data-mode="term-kana"><img src="/mixed/img/add-term-kana.png" title="Add reading (Alt + R)" alt></a>
         {{/if}}
+        {{#unless merged}}
         {{#if playback}}
         <a href="#" class="action-play-audio"><img src="/mixed/img/play-audio.png" title="Play audio (Alt + P)" alt></a>
         {{/if}}
+        {{/unless}}
         <img src="/mixed/img/entry-current.png" class="current" title="Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)" alt>
     </div>
 
     {{#if merged}}
     {{#each expressions}}
     <div class="expression">
-        <span class="expression-{{jmdictTermFrequency}}">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</span>{{#unless @last}}、{{/unless}}
+        <span class="expression-{{jmdictTermFrequency}}">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</span><!--
+     --><div class="peek-wrapper">
+            {{~#if ../playback~}}
+            <a href="#" class="action-play-audio"><img src="/mixed/img/play-audio.png" title="Play audio" alt></a><br>
+            {{/if}}
+            {{~#if tags~}}
+                {{~#each tags~}}
+                <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
+                {{/each}}
+            {{/if}}<!--
+         --><span style="display: inline-block;"></span><!--
+     --></div><!--
+     -->{{~#unless @last~}}、{{/unless}}
     </div>
     {{/each}}
     {{else}}

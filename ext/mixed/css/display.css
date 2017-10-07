@@ -118,18 +118,32 @@ hr {
     font-size: 24px;
 }
 
-.expression a {
+.expression .kanji-link {
     border-bottom: 1px #777 dashed;
     color: #333;
     text-decoration: none;
 }
 
-.expression-popular, .expression-popular a {
+.expression-popular, .expression-popular .kanji-link {
     color: #0275d8;
 }
 
-.expression-rare, .expression-rare a {
+.expression-rare, .expression-rare .kanji-link {
     color: #999;
+}
+
+.expression .peek-wrapper {
+    font-size: 14px;
+    white-space: nowrap;
+    display: inline-block;
+    position: relative;
+    width: 0px;
+    height: 0px;
+    visibility: hidden;
+}
+
+.expression:hover .peek-wrapper {
+    visibility: visible;
 }
 
 .reasons {
