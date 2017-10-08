@@ -46,6 +46,10 @@ hr {
     display: none;
 }
 
+.invisible {
+    visibility: hidden;
+}
+
 
 /*
  * Entries

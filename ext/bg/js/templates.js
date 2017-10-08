@@ -305,9 +305,9 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
   return buffer + "</span><!--\n     --><div class=\"peek-wrapper\">"
     + ((stack1 = helpers["if"].call(alias1,(depths[1] != null ? depths[1].playback : depths[1]),{"name":"if","hash":{},"fn":container.program(27, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.tags : depth0),{"name":"if","hash":{},"fn":container.program(29, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "<!--\n         --><span style=\"display: inline-block;\"></span><!--\n     --></div><!--\n     -->"
-    + ((stack1 = helpers.unless.call(alias1,(data && data.last),{"name":"unless","hash":{},"fn":container.program(32, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "\n    </div>\n";
+    + "<!--\n         --><span style=\"display: inline-block;\"></span><!--\n     --></div><!--\n     --><span class=\""
+    + ((stack1 = helpers["if"].call(alias1,(data && data.last),{"name":"if","hash":{},"fn":container.program(32, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\">、</span><!--\n --></div>\n";
 },"24":function(container,depth0,helpers,partials,data) {
     var stack1, helper, options;
 
@@ -337,7 +337,7 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
     + alias4(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"name","hash":{},"data":data}) : helper)))
     + "</span>\n";
 },"32":function(container,depth0,helpers,partials,data) {
-    return "、";
+    return "invisible";
 },"34":function(container,depth0,helpers,partials,data) {
     var stack1, helper, options, buffer = 
   "    <div class=\"expression\">";

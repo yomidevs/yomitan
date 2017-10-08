@@ -73,7 +73,7 @@ class Display {
         e.preventDefault();
         const link = $(e.currentTarget);
         const definitionIndex = Display.entryIndexFind(link);
-        const expressionIndex = $(e.currentTarget).closest('.entry').find('.expression .action-play-audio').index(link);
+        const expressionIndex = link.closest('.entry').find('.expression .action-play-audio').index(link);
         this.audioPlay(this.definitions[definitionIndex], expressionIndex);
     }
 
@@ -185,7 +185,7 @@ class Display {
             80: /* p */ () => {
                 if (e.altKey) {
                     if ($('.entry').eq(this.index).data('type') === 'term') {
-                        this.audioPlay(this.definitions[this.index]);
+                        this.audioPlay(this.definitions[this.index], -1);
                     }
 
                     return true;
