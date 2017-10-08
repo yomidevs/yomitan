@@ -16,7 +16,26 @@ Yomichan provides advanced features not available in other browser-based diction
 *   Automatic note creation for the [Anki](https://apps.ankiweb.net/) flashcard program via the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
 *   Clean, modern code makes it easy for developers to [contribute](https://github.com/FooSoft/yomichan) new features.
 
-## Downloads ##
+## Table of Contents ##
+
+*   [Installation](https://foosoft.net/projects/yomichan/#installation)
+*   [Dictionaries](https://foosoft.net/projects/yomichan/#dictionaries)
+*   [Basic Usage](https://foosoft.net/projects/yomichan/#basic-usage)
+*   [Custom Dictionaries](https://foosoft.net/projects/yomichan/#custom-dictionaries)
+*   [Anki Integration](https://foosoft.net/projects/yomichan/#anki-integration)
+    *   [Flashcard Configuration](https://foosoft.net/projects/yomichan/#flashcard-configuration)
+    *   [Flashcard Creation](https://foosoft.net/projects/yomichan/#flashcard-creation)
+*   [Keyboard Shortcuts](https://foosoft.net/projects/yomichan/#keyboard-shortcuts)
+*   [Development](https://foosoft.net/projects/yomichan/#development)
+    *   [Templates](https://foosoft.net/projects/yomichan/#templates)
+    *   [Dependencies](https://foosoft.net/projects/yomichan/#dependencies)
+*   [Frequently Asked Questions](https://foosoft.net/projects/yomichan/#frequently-asked-questions)
+*   [Screenshots](https://foosoft.net/projects/yomichan/#screenshots)
+*   [License](https://foosoft.net/projects/yomichan/#license)
+
+## Installation ##
+
+Download and install Yomichan from your browser's web store:
 
 *   **Google Chrome** (versions 45+)
 
@@ -239,52 +258,72 @@ versions packaged.
 
 ## Frequently Asked Questions ##
 
-*   **Why does the Kanji results page display "No data found" for several fields?**
+**I'm having problems importing dictionaries in Firefox, what do I do?**
 
-    You are using data from the KANJIDIC dictionary that was exported for an earlier version of Yomichan. It does not
-    contain the additional information which newer versions of Yofomichan expect. Unfortunately, since major browser
-    implementations of IndexedDB do not provide reliable means for selective bulk data deletion, you will need purge
-    your database and install the latest version of the KANJIDIC to see additional information about characters.
+Yomichan uses the cross-browser IndexedDB system for storing imported dictionary data into your user profile. Although
+everything "just works" in Chrome, depending on settings, Firefox users can run into problems due browser bugs.
+Yomichan catches errors and tries to offer suggestions about how to work around Firefox issues, but in general at least
+one of the following solutions should work for you:
 
-*   **Can I still create cards without HTML formatting? The option for it is gone!**
+*   Make sure you have cookies enabled. It appears that disabling them also disables IndexedDB for some reason. You
+    can still have cookies be disabled on other sites; just make sure to add the Yomichan extension to the whitelist of
+    whatever tool you are using to restrict cookies. You can get the extension "URL" by looking at the address bar when
+    you have the search page open.
+*   Make sure that you have sufficient disk space available on the drive Firefox uses to store your user profile.
+    Firefox limits the amount of space that can be used by IndexedDB to a small fraction of the disk space actually
+    available on your computer.
+*   Make sure that you have history set to "Remember history" enabled in your privacy settings. When this option is
+    set to "Never remember history", IndexedDB access is once again disabled for an inexplicable reason.
+*   As a last resort, try using the [Refresh Firefox](https://support.mozilla.org/en-US/kb/reset-preferences-fix-problems)
+    feature to reset your user profile. It appears that the Firefox profile system can corrupt itself preventing
+    IndexedDB from being accessible to Yomichan.
 
-    Developing Yomichan is a constant balance between including useful features and keeping complexity at a minimum.
-    With the new user-editable card template system, it is possible to create text-only cards without having to double
-    the number field of templates in the extension itself. If you would like to stop HTML tags from being added to your
-    cards, simply copy the contents of the <a href="dl/fields.txt">text-only field template</a> into the template box on
-    the Anki settings page (make sure you have the *Show advanced options* checkbox ticked), making sure to replace the
-    existing values.
+**Why does the Kanji results page display "No data found" for several fields?**
 
-*   **Will you add support for online dictionaries?**
+You are using data from the KANJIDIC dictionary that was exported for an earlier version of Yomichan. It does not
+contain the additional information which newer versions of Yofomichan expect. Unfortunately, since major browser
+implementations of IndexedDB do not provide reliable means for selective bulk data deletion, you will need purge
+your database and install the latest version of the KANJIDIC to see additional information about characters.
 
-    Online dictionaries will never be implemented because it is impossible to support them in a robust way. In order to
-    perform Japanese deinflection, Yomichan must execute dozens of database queries per every single word. Factoring in
-    network latency and the fragility of web scraping, I do not believe that it is possible to realize a good user
-    experience.
+**Can I still create cards without HTML formatting? The option for it is gone!**
 
-*   **Is it possible to use Yomichan with files saved locally on my computer with Chrome?**
+Developing Yomichan is a constant balance between including useful features and keeping complexity at a minimum.
+With the new user-editable card template system, it is possible to create text-only cards without having to double
+the number field of templates in the extension itself. If you would like to stop HTML tags from being added to your
+cards, simply copy the contents of the <a href="dl/fields.txt">text-only field template</a> into the template box on
+the Anki settings page (make sure you have the *Show advanced options* checkbox ticked), making sure to replace the
+existing values.
 
-    In order to use Yomichan with local files in Chrome, you must first tick the *Allow access to file URLs* checkbox
-    for Yomichan on the extensions page. Due to the restrictions placed on browser addons in the WebExtensions model, it
-    will likely never be possible to use Yomichan with PDF files.
+**Will you add support for online dictionaries?**
 
-*   **Is it possible to delete individual dictionaries without purging the database?**
+Online dictionaries will never be implemented because it is impossible to support them in a robust way. In order to
+perform Japanese deinflection, Yomichan must execute dozens of database queries per every single word. Factoring in
+network latency and the fragility of web scraping, I do not believe that it is possible to realize a good user
+experience.
 
-    Although it is technically possible to purge specific dictionaries, due to the limitations of the underlying browser
-    IndexedDB system, this process is *extremely* slow. For example, it can take up to ten minutes to delete a single
-    moderately-sized term dictionary! Instead of including a borderline unusable feature in Yomichan, I have chosen to
-    disable dictionary deletion entirely.
+**Is it possible to use Yomichan with files saved locally on my computer with Chrome?**
 
-*   **Why aren't EPWING dictionaries bundled with Yomichan?**
+In order to use Yomichan with local files in Chrome, you must first tick the *Allow access to file URLs* checkbox
+for Yomichan on the extensions page. Due to the restrictions placed on browser addons in the WebExtensions model, it
+will likely never be possible to use Yomichan with PDF files.
 
-    The vast majority of EPWING dictionaries are proprietary, so unfortunately I am unable to legally include them in
-    this extension for copyright reasons.
+**Is it possible to delete individual dictionaries without purging the database?**
 
-*   **When are you going to add support for $MYLANGUAGE?**
+Although it is technically possible to purge specific dictionaries, due to the limitations of the underlying browser
+IndexedDB system, this process is *extremely* slow. For example, it can take up to ten minutes to delete a single
+moderately-sized term dictionary! Instead of including a borderline unusable feature in Yomichan, I have chosen to
+disable dictionary deletion entirely.
 
-    Developing Yomichan requires a significant understanding of Japanese sentence structure and grammar. I have no time
-    to invest in learning yet another language; therefore other languages will not be supported. I will also not accept
-    pull request containing this functionality, as I will ultimately be the one maintaining your code.
+**Why aren't EPWING dictionaries bundled with Yomichan?**
+
+The vast majority of EPWING dictionaries are proprietary, so unfortunately I am unable to legally include them in
+this extension for copyright reasons.
+
+**When are you going to add support for $MYLANGUAGE?**
+
+Developing Yomichan requires a significant understanding of Japanese sentence structure and grammar. I have no time
+to invest in learning yet another language; therefore other languages will not be supported. I will also not accept
+pull request containing this functionality, as I will ultimately be the one maintaining your code.
 
 ## Screenshots ##
 
