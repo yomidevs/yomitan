@@ -228,8 +228,10 @@ function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
         for (const tag of definition.tags) {
             if (dictIsJmdictTermTag(tag)) {
                 result.expressions.get(definition.expression).get(definition.reading).add(tag);
-            } else {
+            } else if (typeof tag === 'string') {
                 definitionsByGloss[gloss].tags.add(tag);
+            } else if (tag.category && tag.category !== 'dictionary') {
+                definitionsByGloss[gloss].tags.add(tag.name);
             }
         }
     }
