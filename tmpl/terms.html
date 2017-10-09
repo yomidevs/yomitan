@@ -48,14 +48,22 @@
         <span class="expression-{{jmdictTermFrequency}}">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</span><!--
      --><div class="peek-wrapper">
             {{~#if ../playback~}}
-            <a href="#" class="action-play-audio"><img src="/mixed/img/play-audio.png" title="Play audio" alt></a><br>
+            <a href="#" class="action-play-audio"><img src="/mixed/img/play-audio.png" title="Play audio" alt></a>
             {{/if}}
             {{~#if tags~}}
+            <div class="tags">
                 {{~#each tags~}}
                 <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
                 {{/each}}
+            </div>
+            {{/if}}
+            {{~#if frequencies~}}
+            <div class="frequencies">
+                {{~#each frequencies~}}
+                <span class="label label-default tag-frequency">{{dictionary}}:{{frequency}}</span>
+                {{/each}}
+            </div>
             {{/if}}<!--
-         --><span style="display: inline-block;"></span><!--
      --></div><!--
      --><span class="{{#if @last}}invisible{{/if}}">、</span><!--
  --></div>

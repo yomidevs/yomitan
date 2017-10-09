@@ -146,6 +146,24 @@ hr {
     visibility: hidden;
 }
 
+.expression .peek-wrapper .action-play-audio {
+    position: absolute;
+    left: 0px;
+    bottom: 10px;
+}
+
+.expression .peek-wrapper .tags {
+    position: absolute;
+    left: 0px;
+    bottom: -10px;
+}
+
+.expression .peek-wrapper .frequencies {
+    position: absolute;
+    left: 0px;
+    bottom: -30px;
+}
+
 .expression:hover .peek-wrapper {
     visibility: visible;
 }
