@@ -185,7 +185,7 @@ class Display {
             80: /* p */ () => {
                 if (e.altKey) {
                     if ($('.entry').eq(this.index).data('type') === 'term') {
-                        this.audioPlay(this.definitions[this.index], -1);
+                        this.audioPlay(this.definitions[this.index], this.options.general.resultOutputMode === 'merge' ? 0 : -1);
                     }
 
                     return true;
