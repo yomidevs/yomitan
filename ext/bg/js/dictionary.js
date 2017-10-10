@@ -196,7 +196,7 @@ function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
             }
         }
 
-        const gloss = JSON.stringify(definition.glossary);
+        const gloss = JSON.stringify(definition.glossary.concat(definition.dictionary));
         if (!definitionsByGloss[gloss]) {
             definitionsByGloss[gloss] = {
                 expression: new Set(),
