@@ -136,6 +136,7 @@ function dictTermsGroup(definitions, dictionaries) {
             expression: firstDef.expression,
             reading: firstDef.reading,
             reasons: firstDef.reasons,
+            termTags: groupDefs[0].termTags,
             score: groupDefs.reduce((p, v) => v.score > p ? v.score : p, Number.MIN_SAFE_INTEGER),
             source: firstDef.source
         });
@@ -226,13 +227,15 @@ function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
         }
 
         for (const tag of definition.tags) {
-            if (dictIsJmdictTermTag(tag)) {
-                result.expressions.get(definition.expression).get(definition.reading).add(tag);
-            } else if (typeof tag === 'string') {
+            if (typeof tag === 'string') {
                 definitionsByGloss[gloss].tags.add(tag);
             } else if (tag.category && tag.category !== 'dictionary') {
                 definitionsByGloss[gloss].tags.add(tag.name);
             }
+        }
+
+        for (const tag of definition.termTags) {
+            result.expressions.get(definition.expression).get(definition.reading).add(tag);
         }
     }
 
@@ -288,34 +291,12 @@ function dictTagsSort(tags) {
     });
 }
 
-function dictIsJmdictTermTag(tag) {
-    return [
-        'P',
-        'news',
-        'ichi',
-        'spec',
-        'gai',
-        'ik',
-        'iK',
-        'ok',
-        'oK',
-        'ek',
-        'eK',
-        'io',
-        'oik',
-        'ateji',
-        'gikun'
-    ].includes(tag);
-}
-
 function dictJmdictTermTagsRare(tags) {
     const rareTags = [
         'ik',
         'iK',
         'ok',
         'oK',
-        'ek',
-        'eK',
         'io',
         'oik'
     ];

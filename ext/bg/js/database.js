@@ -68,10 +68,12 @@ class Database {
         const results = [];
         await this.db.terms.where('expression').equals(term).or('reading').equals(term).each(row => {
             if (titles.includes(row.dictionary)) {
+                const tags = row.tags.split('\t');
                 results.push({
                     expression: row.expression,
                     reading: row.reading,
-                    tags: dictFieldSplit(row.tags),
+                    tags: dictFieldSplit(tags[0]),
+                    termTags: tags.length > 1 ? dictFieldSplit(tags[1]) : [],
                     rules: dictFieldSplit(row.rules),
                     glossary: row.glossary,
                     score: row.score,
@@ -93,10 +95,12 @@ class Database {
         const results = [];
         await this.db.terms.where('sequence').equals(sequence).each(row => {
             if (row.dictionary === mainDictionary) {
+                const tags = row.tags.split('\t');
                 results.push({
                     expression: row.expression,
                     reading: row.reading,
-                    tags: dictFieldSplit(row.tags),
+                    tags: dictFieldSplit(tags[0]),
+                    termTags: tags.length > 1 ? dictFieldSplit(tags[1]) : [],
                     rules: dictFieldSplit(row.rules),
                     glossary: row.glossary,
                     score: row.score,

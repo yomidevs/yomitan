@@ -154,6 +154,7 @@ class Translator {
             for (const definition of deinflection.definitions) {
                 const tags = await this.expandTags(definition.tags, definition.dictionary);
                 tags.push(dictTagBuildSource(definition.dictionary));
+                const termTags = await this.expandTags(definition.termTags, definition.dictionary);
 
                 definitions.push({
                     source: deinflection.source,
@@ -165,6 +166,7 @@ class Translator {
                     reading: definition.reading,
                     glossary: definition.glossary,
                     tags: dictTagsSort(tags),
+                    termTags: dictTagsSort(termTags),
                     sequence: definition.sequence
                 });
             }

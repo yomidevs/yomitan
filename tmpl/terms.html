@@ -80,6 +80,14 @@
     </div>
     {{/if}}
 
+    {{#if termTags}}
+    <div>
+        {{#each termTags}}
+        <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
+        {{/each}}
+    </div>
+    {{/if}}
+
     {{#if frequencies}}
     <div>
         {{#each frequencies}}
