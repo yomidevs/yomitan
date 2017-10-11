@@ -61,9 +61,6 @@ async function formRead() {
         const priority = parseInt(dictionary.find('.dict-priority').val(), 10);
         const enabled = dictionary.find('.dict-enabled').prop('checked');
         const main = dictionary.find('.dict-main').prop('checked');
-        if (main) {
-            optionsNew.dictionary.main = title;
-        }
         optionsNew.dictionaries[title] = {priority, enabled, main};
     });
 
@@ -302,7 +299,6 @@ async function onDictionaryPurge(e) {
         await utilDatabasePurge();
         const options = await optionsLoad();
         options.dictionaries = {};
-        options.dictionary.main = '';
         await optionsSave(options);
 
         await dictionaryGroupsPopulate(options);

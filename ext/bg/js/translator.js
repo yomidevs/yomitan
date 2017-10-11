@@ -50,10 +50,11 @@ class Translator {
 
     async findTermsMerged(text, dictionaries, alphanumeric) {
         const options = await apiOptionsGet();
+        const mainDictionary = Object.keys(options.dictionaries).filter(dict => options.dictionaries[dict].main).concat([''])[0];
         const titles = Object.keys(dictionaries);
         const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
 
-        const definitionsBySequence = dictTermsMergeBySequence(definitions, options.dictionary.main);
+        const definitionsBySequence = dictTermsMergeBySequence(definitions, mainDictionary);
 
         const definitionsMerged = [];
         const mergedByTermIndices = new Set();
@@ -64,7 +65,7 @@ class Translator {
 
             const result = definitionsBySequence[sequence];
 
-            const rawDefinitionsBySequence = await this.database.findTermsBySequence(Number(sequence), options.dictionary.main);
+            const rawDefinitionsBySequence = await this.database.findTermsBySequence(Number(sequence), mainDictionary);
             const definitionsByGloss = dictTermsMergeByGloss(result, rawDefinitionsBySequence);
             dictTermsMergeByGloss(result, definitionsBySequence['-1'], definitionsByGloss, mergedByTermIndices);
 
