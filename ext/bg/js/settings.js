@@ -302,6 +302,7 @@ async function onDictionaryPurge(e) {
         await utilDatabasePurge();
         const options = await optionsLoad();
         options.dictionaries = {};
+        options.dictionary.main = '';
         await optionsSave(options);
 
         await dictionaryGroupsPopulate(options);
