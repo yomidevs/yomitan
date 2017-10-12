@@ -115,8 +115,8 @@ function dictTermsCompressTags(definitions) {
     let lastPos = '';
 
     for (const definition of definitions) {
-        const dictionary = JSON.stringify(definition.tags.filter(tag => tag.category === 'dictionary').map(tag => tag.name).sort());
-        const pos = JSON.stringify(definition.tags.filter(tag => tag.category === 'pos').map(tag => tag.name).sort());
+        const dictionary = JSON.stringify(definition.definitionTags.filter(tag => tag.category === 'dictionary').map(tag => tag.name).sort());
+        const pos = JSON.stringify(definition.definitionTags.filter(tag => tag.category === 'pos').map(tag => tag.name).sort());
 
         const filterOutCategories = [];
 
@@ -133,7 +133,7 @@ function dictTermsCompressTags(definitions) {
             lastPos = pos;
         }
 
-        definition.tags = definition.tags.filter(tag => !filterOutCategories.includes(tag.category));
+        definition.definitionTags = definition.definitionTags.filter(tag => !filterOutCategories.includes(tag.category));
     }
 }
 
@@ -229,7 +229,7 @@ function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
             definitionsByGloss[gloss] = {
                 expression: new Set(),
                 reading: new Set(),
-                tags: new Set(),
+                definitionTags: new Set(),
                 glossary: definition.glossary,
                 source: result.source,
                 reasons: [],
@@ -253,11 +253,11 @@ function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
             result.expressions.get(definition.expression).set(definition.reading, new Set());
         }
 
-        for (const tag of definition.tags) {
+        for (const tag of definition.definitionTags) {
             if (typeof tag === 'string') {
-                definitionsByGloss[gloss].tags.add(tag);
+                definitionsByGloss[gloss].definitionTags.add(tag);
             } else if (tag.category && tag.category !== 'dictionary') {
-                definitionsByGloss[gloss].tags.add(tag.name);
+                definitionsByGloss[gloss].definitionTags.add(tag.name);
             }
         }
 

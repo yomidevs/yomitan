@@ -68,12 +68,11 @@ class Database {
         const results = [];
         await this.db.terms.where('expression').equals(term).or('reading').equals(term).each(row => {
             if (titles.includes(row.dictionary)) {
-                const tags = row.tags.split('\t');
                 results.push({
                     expression: row.expression,
                     reading: row.reading,
-                    tags: dictFieldSplit(tags[0]),
-                    termTags: tags.length > 1 ? dictFieldSplit(tags[1]) : [],
+                    definitionTags: dictFieldSplit(row.definitionTags),
+                    termTags: dictFieldSplit(row.termTags || ''),
                     rules: dictFieldSplit(row.rules),
                     glossary: row.glossary,
                     score: row.score,
@@ -95,12 +94,11 @@ class Database {
         const results = [];
         await this.db.terms.where('sequence').equals(sequence).each(row => {
             if (row.dictionary === mainDictionary) {
-                const tags = row.tags.split('\t');
                 results.push({
                     expression: row.expression,
                     reading: row.reading,
-                    tags: dictFieldSplit(tags[0]),
-                    termTags: tags.length > 1 ? dictFieldSplit(tags[1]) : [],
+                    definitionTags: dictFieldSplit(row.definitionTags),
+                    termTags: dictFieldSplit(row.termTags || ''),
                     rules: dictFieldSplit(row.rules),
                     glossary: row.glossary,
                     score: row.score,
@@ -229,11 +227,11 @@ class Database {
 
             const rows = [];
             if (summary.version === 1) {
-                for (const [expression, reading, tags, rules, score, ...glossary] of entries) {
+                for (const [expression, reading, definitionTags, rules, score, ...glossary] of entries) {
                     rows.push({
                         expression,
                         reading,
-                        tags,
+                        definitionTags,
                         rules,
                         score,
                         glossary,
@@ -241,15 +239,16 @@ class Database {
                     });
                 }
             } else {
-                for (const [expression, reading, tags, rules, score, glossary, sequence] of entries) {
+                for (const [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] of entries) {
                     rows.push({
                         expression,
                         reading,
-                        tags,
+                        definitionTags,
                         rules,
                         score,
                         glossary,
                         sequence,
+                        termTags,
                         dictionary: summary.title
                     });
                 }

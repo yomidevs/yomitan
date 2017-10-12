@@ -79,9 +79,9 @@ class Translator {
             for (const gloss in definitionsByGloss) {
                 const definition = definitionsByGloss[gloss];
 
-                const tags = await this.expandTags(definition.tags, definition.dictionary);
+                const tags = await this.expandTags(definition.definitionTags, definition.dictionary);
                 tags.push(dictTagBuildSource(definition.dictionary));
-                definition.tags = dictTagsSort(tags);
+                definition.definitionTags = dictTagsSort(tags);
 
                 result.definitions.push(definition);
             }
@@ -166,8 +166,8 @@ class Translator {
         let definitions = [];
         for (const deinflection of deinflections) {
             for (const definition of deinflection.definitions) {
-                const tags = await this.expandTags(definition.tags, definition.dictionary);
-                tags.push(dictTagBuildSource(definition.dictionary));
+                const definitionTags = await this.expandTags(definition.definitionTags, definition.dictionary);
+                definitionTags.push(dictTagBuildSource(definition.dictionary));
                 const termTags = await this.expandTags(definition.termTags, definition.dictionary);
 
                 definitions.push({
@@ -179,7 +179,7 @@ class Translator {
                     expression: definition.expression,
                     reading: definition.reading,
                     glossary: definition.glossary,
-                    tags: dictTagsSort(tags),
+                    definitionTags: dictTagsSort(definitionTags),
                     termTags: dictTagsSort(termTags),
                     sequence: definition.sequence
                 });
