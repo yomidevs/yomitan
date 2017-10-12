@@ -139,7 +139,8 @@ function optionsSetDefaults(options) {
             popupWidth: 400,
             popupHeight: 250,
             popupOffset: 10,
-            showGuide: true
+            showGuide: true,
+            compactTags: false
         },
 
         scanning: {

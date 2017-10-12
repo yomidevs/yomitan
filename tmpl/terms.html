@@ -1,4 +1,11 @@
 {{#*inline "definition"}}
+{{#if tags}}
+<div>
+    {{#each tags}}
+    <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
+    {{/each}}
+</div>
+{{/if}}
 {{#if only}}
 <div>
     (
@@ -6,13 +13,6 @@
     {{{.}}}{{#unless @last}}, {{/unless}}
     {{/each}}
     only)
-</div>
-{{/if}}
-{{#if tags}}
-<div>
-    {{#each tags}}
-    <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
-    {{/each}}
 </div>
 {{/if}}
 {{#if glossary.[1]}}

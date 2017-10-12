@@ -110,6 +110,32 @@ function dictTermsUndupe(definitions) {
     return definitionsUnique;
 }
 
+function dictTermsCompressTags(definitions) {
+    let lastDictionary = '';
+    let lastPos = '';
+
+    for (const definition of definitions) {
+        const dictionary = JSON.stringify(definition.tags.filter(tag => tag.category === 'dictionary').map(tag => tag.name).sort());
+        const pos = JSON.stringify(definition.tags.filter(tag => tag.category === 'pos').map(tag => tag.name).sort());
+
+        const filterOutCategories = [];
+
+        if (lastDictionary === dictionary) {
+            filterOutCategories.push('dictionary');
+        } else {
+            lastDictionary = dictionary;
+        }
+
+        if (lastPos === pos) {
+            filterOutCategories.push('pos');
+        } else {
+            lastPos = pos;
+        }
+
+        definition.tags = definition.tags.filter(tag => !filterOutCategories.includes(tag.category));
+    }
+}
+
 function dictTermsGroup(definitions, dictionaries) {
     const groups = {};
     for (const definition of definitions) {

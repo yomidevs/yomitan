@@ -37,12 +37,19 @@ class Translator {
     }
 
     async findTermsGrouped(text, dictionaries, alphanumeric) {
+        const options = await apiOptionsGet();
         const titles = Object.keys(dictionaries);
         const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
 
         const definitionsGrouped = dictTermsGroup(definitions, dictionaries);
         for (const definition of definitionsGrouped) {
             await this.buildTermFrequencies(definition, titles);
+        }
+
+        if (options.general.compactTags) {
+            for (const definition of definitionsGrouped) {
+                dictTermsCompressTags(definition.definitions);
+            }
         }
 
         return {length, definitions: definitionsGrouped};
@@ -118,6 +125,12 @@ class Translator {
 
         for (const definition of definitionsMerged) {
             await this.buildTermFrequencies(definition, titles);
+        }
+
+        if (options.general.compactTags) {
+            for (const definition of definitionsMerged) {
+                dictTermsCompressTags(definition.definitions);
+            }
         }
 
         return {length, definitions: dictTermsSort(definitionsMerged)};

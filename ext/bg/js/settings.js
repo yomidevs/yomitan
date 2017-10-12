@@ -22,6 +22,7 @@ async function formRead() {
     const optionsNew = $.extend(true, {}, optionsOld);
 
     optionsNew.general.showGuide = $('#show-usage-guide').prop('checked');
+    optionsNew.general.compactTags = $('#compact-tags').prop('checked');
     optionsNew.general.resultOutputMode = $('#result-output-mode').val();
     optionsNew.general.audioSource = $('#audio-playback-source').val();
     optionsNew.general.audioVolume = parseFloat($('#audio-playback-volume').val());
@@ -125,6 +126,7 @@ async function onReady() {
     const options = await optionsLoad();
 
     $('#show-usage-guide').prop('checked', options.general.showGuide);
+    $('#compact-tags').prop('checked', options.general.compactTags);
     $('#result-output-mode').val(options.general.resultOutputMode);
     $('#audio-playback-source').val(options.general.audioSource);
     $('#audio-playback-volume').val(options.general.audioVolume);
