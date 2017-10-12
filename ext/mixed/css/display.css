@@ -92,6 +92,10 @@ hr {
     background-color: #5cb85c;
 }
 
+.tag-pos {
+    background-color: #565656;
+}
+
 .actions .disabled {
     pointer-events: none;
     cursor: default;
