@@ -124,6 +124,7 @@ function dictTermsCompressTags(definitions) {
             filterOutCategories.push('dictionary');
         } else {
             lastDictionary = dictionary;
+            lastPos = '';
         }
 
         if (lastPos === pos) {
