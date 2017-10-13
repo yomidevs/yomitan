@@ -112,11 +112,11 @@ function dictTermsUndupe(definitions) {
 
 function dictTermsCompressTags(definitions) {
     let lastDictionary = '';
-    let lastPos = '';
+    let lastPartOfSpeech = '';
 
     for (const definition of definitions) {
         const dictionary = JSON.stringify(definition.definitionTags.filter(tag => tag.category === 'dictionary').map(tag => tag.name).sort());
-        const pos = JSON.stringify(definition.definitionTags.filter(tag => tag.category === 'pos').map(tag => tag.name).sort());
+        const partOfSpeech = JSON.stringify(definition.definitionTags.filter(tag => tag.category === 'partOfSpeech').map(tag => tag.name).sort());
 
         const filterOutCategories = [];
 
@@ -124,13 +124,13 @@ function dictTermsCompressTags(definitions) {
             filterOutCategories.push('dictionary');
         } else {
             lastDictionary = dictionary;
-            lastPos = '';
+            lastPartOfSpeech = '';
         }
 
-        if (lastPos === pos) {
-            filterOutCategories.push('pos');
+        if (lastPartOfSpeech === partOfSpeech) {
+            filterOutCategories.push('partOfSpeech');
         } else {
-            lastPos = pos;
+            lastPartOfSpeech = partOfSpeech;
         }
 
         definition.definitionTags = definition.definitionTags.filter(tag => !filterOutCategories.includes(tag.category));
