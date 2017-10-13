@@ -76,7 +76,7 @@ function docRangeFromPoint(point) {
     if (!document.caretRangeFromPoint) {
         document.caretRangeFromPoint = (x, y) => {
             const position = document.caretPositionFromPoint(x,y);
-            if (position && position.offsetNode) {
+            if (position && position.offsetNode && position.offsetNode.nodeType === Node.TEXT_NODE) {
                 const range = document.createRange();
                 range.setStart(position.offsetNode, position.offset);
                 range.setEnd(position.offsetNode, position.offset);
@@ -86,7 +86,7 @@ function docRangeFromPoint(point) {
     }
 
     const range = document.caretRangeFromPoint(point.x, point.y);
-    if (range && range.startContainer.nodeType === 3 && range.endContainer.nodeType === 3) {
+    if (range) {
         return new TextSourceRange(range);
     }
 }
