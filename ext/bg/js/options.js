@@ -141,7 +141,7 @@ function optionsSetDefaults(options) {
             popupOffset: 10,
             showGuide: true,
             compactTags: false,
-            tagLineBreak: false,
+            tagLineBreak: true,
             compactGlossaries: false
         },
 
