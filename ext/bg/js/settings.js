@@ -23,7 +23,6 @@ async function formRead() {
 
     optionsNew.general.showGuide = $('#show-usage-guide').prop('checked');
     optionsNew.general.compactTags = $('#compact-tags').prop('checked');
-    optionsNew.general.tagLineBreak = $('#tag-line-break').prop('checked');
     optionsNew.general.compactGlossaries = $('#compact-glossaries').prop('checked');
     optionsNew.general.resultOutputMode = $('#result-output-mode').val();
     optionsNew.general.audioSource = $('#audio-playback-source').val();
@@ -130,7 +129,6 @@ async function onReady() {
 
     $('#show-usage-guide').prop('checked', options.general.showGuide);
     $('#compact-tags').prop('checked', options.general.compactTags);
-    $('#tag-line-break').prop('checked', options.general.tagLineBreak);
     $('#compact-glossaries').prop('checked', options.general.compactGlossaries);
     $('#result-output-mode').val(options.general.resultOutputMode);
     $('#audio-playback-source').val(options.general.audioSource);

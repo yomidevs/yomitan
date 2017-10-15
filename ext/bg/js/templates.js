@@ -215,7 +215,7 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
     var stack1, alias1=depth0 != null ? depth0 : (container.nullContext || {});
 
   return "<div "
-    + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.tagLineBreak : depth0),{"name":"unless","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.compactGlossaries : depth0),{"name":"if","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ">\n"
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.definitionTags : depth0),{"name":"each","hash":{},"fn":container.program(5, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "</div>\n";
@@ -438,12 +438,12 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
     var stack1;
 
   return "            <li>"
-    + ((stack1 = container.invokePartial(partials.definition,depth0,{"name":"definition","hash":{"compactGlossaries":(depths[1] != null ? depths[1].compactGlossaries : depths[1]),"tagLineBreak":(depths[1] != null ? depths[1].tagLineBreak : depths[1])},"data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
+    + ((stack1 = container.invokePartial(partials.definition,depth0,{"name":"definition","hash":{"compactGlossaries":(depths[1] != null ? depths[1].compactGlossaries : depths[1])},"data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
     + "</li>\n";
 },"58":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return ((stack1 = container.invokePartial(partials.definition,((stack1 = (depth0 != null ? depth0.definitions : depth0)) != null ? stack1["0"] : stack1),{"name":"definition","hash":{"compactGlossaries":(depth0 != null ? depth0.compactGlossaries : depth0),"tagLineBreak":(depth0 != null ? depth0.tagLineBreak : depth0)},"data":data,"indent":"        ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
+  return ((stack1 = container.invokePartial(partials.definition,((stack1 = (depth0 != null ? depth0.definitions : depth0)) != null ? stack1["0"] : stack1),{"name":"definition","hash":{"compactGlossaries":(depth0 != null ? depth0.compactGlossaries : depth0)},"data":data,"indent":"        ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
 },"60":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
@@ -451,7 +451,7 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
 },"61":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return ((stack1 = container.invokePartial(partials.definition,depth0,{"name":"definition","hash":{"compactGlossaries":(depth0 != null ? depth0.compactGlossaries : depth0),"tagLineBreak":(depth0 != null ? depth0.tagLineBreak : depth0)},"data":data,"indent":"        ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
+  return ((stack1 = container.invokePartial(partials.definition,depth0,{"name":"definition","hash":{"compactGlossaries":(depth0 != null ? depth0.compactGlossaries : depth0)},"data":data,"indent":"        ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
     + "        ";
 },"63":function(container,depth0,helpers,partials,data) {
     var stack1, helper, options, buffer = 
@@ -469,7 +469,7 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
 
   return ((stack1 = helpers.unless.call(depth0 != null ? depth0 : (container.nullContext || {}),(data && data.first),{"name":"unless","hash":{},"fn":container.program(67, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "\n"
-    + ((stack1 = container.invokePartial(partials.term,depth0,{"name":"term","hash":{"compactGlossaries":(depths[1] != null ? depths[1].compactGlossaries : depths[1]),"tagLineBreak":(depths[1] != null ? depths[1].tagLineBreak : depths[1]),"playback":(depths[1] != null ? depths[1].playback : depths[1]),"addable":(depths[1] != null ? depths[1].addable : depths[1]),"merged":(depths[1] != null ? depths[1].merged : depths[1]),"grouped":(depths[1] != null ? depths[1].grouped : depths[1]),"debug":(depths[1] != null ? depths[1].debug : depths[1])},"data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
+    + ((stack1 = container.invokePartial(partials.term,depth0,{"name":"term","hash":{"compactGlossaries":(depths[1] != null ? depths[1].compactGlossaries : depths[1]),"playback":(depths[1] != null ? depths[1].playback : depths[1]),"addable":(depths[1] != null ? depths[1].addable : depths[1]),"merged":(depths[1] != null ? depths[1].merged : depths[1]),"grouped":(depths[1] != null ? depths[1].grouped : depths[1]),"debug":(depths[1] != null ? depths[1].debug : depths[1])},"data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
 },"67":function(container,depth0,helpers,partials,data) {
     return "<hr>";
 },"69":function(container,depth0,helpers,partials,data) {

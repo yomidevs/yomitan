@@ -1,6 +1,6 @@
 {{#*inline "definition"}}
 {{#if definitionTags}}
-<div {{#unless tagLineBreak}}style="display: inline-block;"{{/unless}}>
+<div {{#if compactGlossaries}}style="display: inline-block;"{{/if}}>
     {{#each definitionTags}}
     <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
     {{/each}}
@@ -100,24 +100,24 @@
         {{#if definitions.[1]}}
         <ol>
             {{#each definitions}}
-            <li>{{> definition tagLineBreak=../tagLineBreak compactGlossaries=../compactGlossaries}}</li>
+            <li>{{> definition compactGlossaries=../compactGlossaries}}</li>
             {{/each}}
         </ol>
         {{else}}
-        {{> definition definitions.[0] tagLineBreak=tagLineBreak compactGlossaries=compactGlossaries}}
+        {{> definition definitions.[0] compactGlossaries=compactGlossaries}}
         {{/if}}
         {{else if merged}}
         {{#if definitions.[1]}}
         <ol>
             {{#each definitions}}
-            <li>{{> definition tagLineBreak=../tagLineBreak compactGlossaries=../compactGlossaries}}</li>
+            <li>{{> definition compactGlossaries=../compactGlossaries}}</li>
             {{/each}}
         </ol>
         {{else}}
-        {{> definition definitions.[0] tagLineBreak=tagLineBreak compactGlossaries=compactGlossaries}}
+        {{> definition definitions.[0] compactGlossaries=compactGlossaries}}
         {{/if}}
         {{else}}
-        {{> definition tagLineBreak=tagLineBreak compactGlossaries=compactGlossaries}}
+        {{> definition compactGlossaries=compactGlossaries}}
         {{/if}}
     </div>
 
@@ -130,7 +130,7 @@
 {{#if definitions}}
 {{#each definitions}}
 {{#unless @first}}<hr>{{/unless}}
-{{> term debug=../debug grouped=../grouped merged=../merged addable=../addable playback=../playback tagLineBreak=../tagLineBreak compactGlossaries=../compactGlossaries}}
+{{> term debug=../debug grouped=../grouped merged=../merged addable=../addable playback=../playback compactGlossaries=../compactGlossaries}}
 {{/each}}
 {{else}}
 <p class="note">No results found.</p>

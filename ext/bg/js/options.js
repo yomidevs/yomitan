@@ -141,7 +141,6 @@ function optionsSetDefaults(options) {
             popupOffset: 10,
             showGuide: true,
             compactTags: false,
-            tagLineBreak: true,
             compactGlossaries: false
         },
 
@@ -216,7 +215,6 @@ function optionsVersion(options) {
                 options.general.resultOutputMode = 'split';
             }
             options.general.compactTags = false;
-            options.general.tagLineBreak = true;
             options.general.compactGlossaries = false;
         }
     ];
