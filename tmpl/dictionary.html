@@ -3,6 +3,11 @@
 
     <div class="checkbox">
         <label><input type="checkbox" class="dict-enabled" {{#if enabled}}checked{{/if}}> Enable search</label>
+    </div>
+    <div class="checkbox options-advanced">
+        <label><input type="checkbox" class="dict-allow-secondary-searches" {{#if allowSecondarySearches}}checked{{/if}}> Allow secondary searches</label>
+    </div>
+    <div class="radio">
         <label><input type="radio" class="dict-main" {{#if main}}checked{{/if}}> Set as main dictionary</label>
     </div>
     <div class="form-group options-advanced">

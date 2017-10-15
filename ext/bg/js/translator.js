@@ -58,6 +58,7 @@ class Translator {
     async findTermsMerged(text, dictionaries, alphanumeric) {
         const options = await apiOptionsGet();
         const mainDictionary = Object.keys(options.dictionaries).filter(dict => options.dictionaries[dict].main).concat([''])[0];
+        const secondarySearchTitles = Object.keys(options.dictionaries).filter(dict => options.dictionaries[dict].allowSecondarySearches);
         const titles = Object.keys(dictionaries);
         const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
 
@@ -74,7 +75,23 @@ class Translator {
 
             const rawDefinitionsBySequence = await this.database.findTermsBySequence(Number(sequence), mainDictionary);
             const definitionsByGloss = dictTermsMergeByGloss(result, rawDefinitionsBySequence);
-            dictTermsMergeByGloss(result, definitionsBySequence['-1'], definitionsByGloss, mergedByTermIndices);
+
+            const secondarySearchResults = [];
+            if (secondarySearchTitles.length) {
+                for (const expression of result.expressions.keys()) {
+                    if (expression === text) {
+                        continue;
+                    }
+
+                    for (const reading of result.expressions.get(expression).keys()) {
+                        for (const definition of await this.database.findTermsExact(expression, reading, secondarySearchTitles)) {
+                            secondarySearchResults.push(definition);
+                        }
+                    }
+                }
+            }
+
+            dictTermsMergeByGloss(result, definitionsBySequence['-1'].concat(secondarySearchResults), definitionsByGloss, mergedByTermIndices);
 
             for (const gloss in definitionsByGloss) {
                 const definition = definitionsByGloss[gloss];
@@ -88,7 +105,6 @@ class Translator {
 
             dictTermsSort(result.definitions, dictionaries);
 
-            // turn the Map()/Set() mess to [{expression: E1, reading: R1}, {...}] and tag popular/normal/rare instead of actual tags
             const expressions = [];
             for (const expression of result.expressions.keys()) {
                 for (const reading of result.expressions.get(expression).keys()) {

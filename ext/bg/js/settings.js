@@ -62,7 +62,8 @@ async function formRead() {
         const priority = parseInt(dictionary.find('.dict-priority').val(), 10);
         const enabled = dictionary.find('.dict-enabled').prop('checked');
         const main = dictionary.find('.dict-main').prop('checked');
-        optionsNew.dictionaries[title] = {priority, enabled, main};
+        const allowSecondarySearches = dictionary.find('.dict-allow-secondary-searches').prop('checked');
+        optionsNew.dictionaries[title] = {priority, enabled, main, allowSecondarySearches};
     });
 
     return {optionsNew, optionsOld};
@@ -262,14 +263,15 @@ async function dictionaryGroupsPopulate(options) {
     }
 
     for (const dictRow of dictRowsSort(dictRows, options)) {
-        const dictOptions = options.dictionaries[dictRow.title] || {enabled: false, priority: 0, main: false};
+        const dictOptions = options.dictionaries[dictRow.title] || {enabled: false, priority: 0, main: false, allowSecondarySearches: false};
         const dictHtml = await apiTemplateRender('dictionary.html', {
             title: dictRow.title,
             version: dictRow.version,
             revision: dictRow.revision,
             priority: dictOptions.priority,
             enabled: dictOptions.enabled,
-            main: dictOptions.main
+            main: dictOptions.main,
+            allowSecondarySearches: dictOptions.allowSecondarySearches
         });
 
         dictGroups.append($(dictHtml));
@@ -277,7 +279,7 @@ async function dictionaryGroupsPopulate(options) {
 
     formUpdateVisibility(options);
 
-    $('.dict-enabled, .dict-priority').change(e => {
+    $('.dict-enabled, .dict-priority, .dict-allow-secondary-searches').change(e => {
         dictionaryGroupsSort();
         onFormOptionsChanged(e);
     });
@@ -329,7 +331,7 @@ async function onDictionaryImport(e) {
 
         const options = await optionsLoad();
         const summary = await utilDatabaseImport(e.target.files[0], updateProgress);
-        options.dictionaries[summary.title] = {enabled: true, priority: 0, main: false};
+        options.dictionaries[summary.title] = {enabled: true, priority: 0, main: false, allowSecondarySearches: false};
         await optionsSave(options);
 
         await dictionaryGroupsPopulate(options);

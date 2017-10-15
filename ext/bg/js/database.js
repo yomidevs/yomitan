@@ -86,6 +86,32 @@ class Database {
         return results;
     }
 
+    async findTermsExact(term, reading, titles) {
+        if (!this.db) {
+            throw 'Database not initialized';
+        }
+
+        const results = [];
+        await this.db.terms.where('expression').equals(term).each(row => {
+            if (row.reading === reading && titles.includes(row.dictionary)) {
+                results.push({
+                    expression: row.expression,
+                    reading: row.reading,
+                    definitionTags: dictFieldSplit(row.definitionTags),
+                    termTags: dictFieldSplit(row.termTags || ''),
+                    rules: dictFieldSplit(row.rules),
+                    glossary: row.glossary,
+                    score: row.score,
+                    dictionary: row.dictionary,
+                    id: row.id,
+                    sequence: typeof row.sequence === 'undefined' ? -1 : row.sequence
+                });
+            }
+        });
+
+        return results;
+    }
+
     async findTermsBySequence(sequence, mainDictionary) {
         if (!this.db) {
             throw 'Database not initialized';
