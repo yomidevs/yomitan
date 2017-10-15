@@ -40,6 +40,14 @@
                 </div>
 
                 <div class="checkbox">
+                    <label><input type="checkbox" id="tag-line-break"> Line break after tags</label>
+                </div>
+
+                <div class="checkbox">
+                    <label><input type="checkbox" id="compact-glossaries"> Compact glossaries</label>
+                </div>
+
+                <div class="checkbox">
                     <label><input type="checkbox" id="show-advanced-options"> Show advanced options</label>
                 </div>
 
@@ -48,9 +56,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="result-output-mode">Result output mode</label>
+                    <label for="result-output-mode">Result grouping</label>
                     <select class="form-control" id="result-output-mode">
-                        <option value="group">Group results by written form and reading</option>
+                        <option value="group">Group results by term-reading pairs</option>
                         <option value="merge">Group results by main dictionary entry ID (experimental)</option>
                         <option value="split">Split definitions to their own results</option>
                     </select>

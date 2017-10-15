@@ -181,12 +181,30 @@ hr {
     padding-left: 1.4em;
 }
 
+.glossary ul.compact {
+    display: inline;
+    list-style: none;
+    padding-left: 0px;
+}
+
+.glossary .compact li {
+    display: inline;
+}
+
+.glossary .compact li:not(:first-child):before {
+    content: " | ";
+}
+
 .glossary li {
     color: #777;
 }
 
 .glossary-item {
     color: #000;
+}
+
+div.glossary-item.compact {
+    display: inline;
 }
 
 .glyph {

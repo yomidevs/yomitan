@@ -239,6 +239,8 @@ class Display {
                 grouped: options.general.resultOutputMode === 'group',
                 merged: options.general.resultOutputMode === 'merge',
                 playback: options.general.audioSource !== 'disabled',
+                tagLineBreak: options.general.tagLineBreak,
+                compactGlossaries: options.general.compactGlossaries,
                 debug: options.general.debugInfo
             };
 
