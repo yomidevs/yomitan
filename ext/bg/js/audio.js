@@ -140,8 +140,13 @@ async function audioInject(definition, fields, mode) {
     }
 
     try {
-        const url = await audioBuildUrl(definition, mode);
-        const filename = audioBuildFilename(definition);
+        let audioSourceDefinition = definition;
+        if (definition.hasOwnProperty('expressions')) {
+            audioSourceDefinition = definition.expressions[0];
+        }
+
+        const url = await audioBuildUrl(audioSourceDefinition, mode);
+        const filename = audioBuildFilename(audioSourceDefinition);
 
         if (url && filename) {
             definition.audio = {url, filename};
