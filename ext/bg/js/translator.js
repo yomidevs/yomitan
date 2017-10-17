@@ -112,7 +112,7 @@ class Translator {
                     expressions.push({
                         expression: expression,
                         reading: reading,
-                        tags: dictTagsSort(tags),
+                        termTags: dictTagsSort(tags),
                         jmdictTermFrequency: (tags => {
                             if (tags.has('P')) {
                                 return 'popular';

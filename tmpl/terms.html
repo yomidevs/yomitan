@@ -50,9 +50,9 @@
             {{~#if ../playback~}}
             <a href="#" class="action-play-audio"><img src="/mixed/img/play-audio.png" title="Play audio" alt></a>
             {{/if}}
-            {{~#if tags~}}
+            {{~#if termTags~}}
             <div class="tags">
-                {{~#each tags~}}
+                {{~#each termTags~}}
                 <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
                 {{/each}}
             </div>
