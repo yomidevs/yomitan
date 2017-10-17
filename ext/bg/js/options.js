@@ -50,17 +50,17 @@ function optionsFieldTemplates() {
         {{~#if modeTermKana~}}
             {{~#each definition.reading~}}
                 {{{.}}}
-                {{~#unless @last}}, {{/unless~}}
+                {{~#unless @last}}、{{/unless~}}
             {{~else~}}
                 {{~#each definition.expression~}}
                     {{{.}}}
-                    {{~#unless @last}}, {{/unless~}}
+                    {{~#unless @last}}、{{/unless~}}
                 {{~/each~}}
             {{~/each~}}
         {{~else~}}
             {{~#each definition.expression~}}
                 {{{.}}}
-                {{~#unless @last}}, {{/unless~}}
+                {{~#unless @last}}、{{/unless~}}
             {{~/each~}}
         {{~/if~}}
     {{~else~}}
@@ -80,7 +80,7 @@ function optionsFieldTemplates() {
     {{~#if merge~}}
         {{~#each definition.expressions~}}
             {{~#furigana}}{{{.}}}{{/furigana~}}
-            {{~#unless @last}}, {{/unless~}}
+            {{~#unless @last}}、{{/unless~}}
         {{~/each~}}
     {{~else~}}
         {{#furigana}}{{{definition}}}{{/furigana}}
@@ -91,7 +91,7 @@ function optionsFieldTemplates() {
     {{~#if merge~}}
         {{~#each definition.expressions~}}
             {{~#furiganaPlain}}{{{.}}}{{/furiganaPlain~}}
-            {{~#unless @last}}, {{/unless~}}
+            {{~#unless @last}}、{{/unless~}}
         {{~/each~}}
     {{~else~}}
         {{#furiganaPlain}}{{{definition}}}{{/furiganaPlain}}
@@ -143,7 +143,7 @@ function optionsFieldTemplates() {
         {{~#if merge~}}
             {{~#each definition.reading~}}
                 {{{.}}}
-                {{~#unless @last}}, {{/unless~}}
+                {{~#unless @last}}、{{/unless~}}
             {{~/each~}}
         {{~else~}}
             {{~definition.reading~}}
