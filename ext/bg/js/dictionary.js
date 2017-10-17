@@ -368,7 +368,8 @@ async function dictFieldFormat(field, definition, mode, options) {
             merge: options.general.resultOutputMode === 'merge',
             modeTermKanji: mode === 'term-kanji',
             modeTermKana: mode === 'term-kana',
-            modeKanji: mode === 'kanji'
+            modeKanji: mode === 'kanji',
+            compactGlossaries: options.general.compactGlossaries
         };
 
         const html = await apiTemplateRender(options.anki.fieldTemplates, data, true);

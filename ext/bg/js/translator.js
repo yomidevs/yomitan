@@ -128,8 +128,9 @@ class Translator {
 
             result.expressions = expressions;
 
-            // result.expression = Array.from(result.expression).join(', ');
-            // result.reading = Array.from(result.reading).join(', ');
+            result.expression = Array.from(result.expression);
+            result.reading = Array.from(result.reading);
+
             definitionsMerged.push(result);
         }
 
