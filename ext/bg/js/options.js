@@ -269,11 +269,15 @@ function optionsVersion(options) {
             }
             options.general.compactTags = false;
             options.general.compactGlossaries = false;
-            options.anki.fieldTemplates = '{{#if merge}}\n' +
-                                        optionsFieldTemplates() +
-                                        '\n{{else}}\n' +
-                                        options.anki.fieldTemplates +
-                                        '\n{{/if}}';
+            if (utilStringHashCode(options.anki.fieldTemplates) !== -1895236672) { // a3c8508031a1073629803d0616a2ee416cd3cccc
+                options.anki.fieldTemplates = '{{#if merge}}\n' +
+                                            optionsFieldTemplates() +
+                                            '\n{{else}}\n' +
+                                            options.anki.fieldTemplates +
+                                            '\n{{/if}}';
+            } else {
+                options.anki.fieldTemplates = optionsFieldTemplates();
+            }
         }
     ];
 

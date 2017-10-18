@@ -52,6 +52,21 @@ function utilSetDifference(setA, setB) {
     );
 }
 
+function utilStringHashCode(string) {
+    let hashCode = 0;
+
+    if (string.length === 0) {
+        return hashCode;
+    }
+
+    for (let i = 0, charCode = string.charCodeAt(i); i < string.length; i++) {
+        hashCode = ((hashCode << 5) - hashCode) + charCode;
+        hashCode |= 0;
+    }
+
+    return hashCode;
+}
+
 function utilBackend() {
     return chrome.extension.getBackgroundPage().yomichan_backend;
 }
