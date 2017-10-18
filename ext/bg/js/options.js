@@ -269,7 +269,7 @@ function optionsVersion(options) {
             }
             options.general.compactTags = false;
             options.general.compactGlossaries = false;
-            if (utilStringHashCode(options.anki.fieldTemplates) !== -1895236672) { // a3c8508031a1073629803d0616a2ee416cd3cccc
+            if (utilStringHashCode(options.anki.fieldTemplates) !== -805327496) { // a3c8508031a1073629803d0616a2ee416cd3cccc
                 options.anki.fieldTemplates = '{{#if merge}}\n' +
                                             optionsFieldTemplates() +
                                             '\n{{else}}\n' +

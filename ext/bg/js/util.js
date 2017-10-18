@@ -59,7 +59,7 @@ function utilStringHashCode(string) {
         return hashCode;
     }
 
-    for (let i = 0, charCode = string.charCodeAt(i); i < string.length; i++) {
+    for (let i = 0, charCode = string.charCodeAt(i); i < string.length; charCode = string.charCodeAt(++i)) {
         hashCode = ((hashCode << 5) - hashCode) + charCode;
         hashCode |= 0;
     }
