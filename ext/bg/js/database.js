@@ -71,7 +71,7 @@ class Database {
                 results.push({
                     expression: row.expression,
                     reading: row.reading,
-                    definitionTags: dictFieldSplit(row.definitionTags),
+                    definitionTags: dictFieldSplit(row.definitionTags || row.tags || ''),
                     termTags: dictFieldSplit(row.termTags || ''),
                     rules: dictFieldSplit(row.rules),
                     glossary: row.glossary,
@@ -97,7 +97,7 @@ class Database {
                 results.push({
                     expression: row.expression,
                     reading: row.reading,
-                    definitionTags: dictFieldSplit(row.definitionTags),
+                    definitionTags: dictFieldSplit(row.definitionTags || row.tags || ''),
                     termTags: dictFieldSplit(row.termTags || ''),
                     rules: dictFieldSplit(row.rules),
                     glossary: row.glossary,
@@ -123,7 +123,7 @@ class Database {
                 results.push({
                     expression: row.expression,
                     reading: row.reading,
-                    definitionTags: dictFieldSplit(row.definitionTags),
+                    definitionTags: dictFieldSplit(row.definitionTags || row.tags || ''),
                     termTags: dictFieldSplit(row.termTags || ''),
                     rules: dictFieldSplit(row.rules),
                     glossary: row.glossary,
