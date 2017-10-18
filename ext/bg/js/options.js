@@ -269,14 +269,11 @@ function optionsVersion(options) {
             }
             options.general.compactTags = false;
             options.general.compactGlossaries = false;
-            if (options.anki.fieldTemplates !== optionsFieldTemplates()) {
-                options.anki.fieldTemplates = '{{#if merge}}\n' +
-                                            optionsFieldTemplates() +
-                                            '\n{{else}}\n' +
-                                            options.anki.fieldTemplates +
-                                            '\n{{/if}}';
-
-            }
+            options.anki.fieldTemplates = '{{#if merge}}\n' +
+                                        optionsFieldTemplates() +
+                                        '\n{{else}}\n' +
+                                        options.anki.fieldTemplates +
+                                        '\n{{/if}}';
         }
     ];
 
