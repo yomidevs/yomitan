@@ -67,7 +67,7 @@ class Translator {
         const definitionsMerged = [];
         const mergedByTermIndices = new Set();
         for (const sequence in definitionsBySequence) {
-            if (!(sequence > 0)) {
+            if (!(sequence >= 0)) {
                 continue;
             }
 
