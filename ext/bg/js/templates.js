@@ -313,7 +313,7 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
 },"29":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, helper, options, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=helpers.helperMissing, alias3="function", buffer = 
   "    <div class=\"expression\">\n        <span class=\"expression-"
-    + container.escapeExpression(((helper = (helper = helpers.jmdictTermFrequency || (depth0 != null ? depth0.jmdictTermFrequency : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"jmdictTermFrequency","hash":{},"data":data}) : helper)))
+    + container.escapeExpression(((helper = (helper = helpers.termFrequency || (depth0 != null ? depth0.termFrequency : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"termFrequency","hash":{},"data":data}) : helper)))
     + "\">";
   stack1 = ((helper = (helper = helpers.kanjiLinks || (depth0 != null ? depth0.kanjiLinks : depth0)) != null ? helper : alias2),(options={"name":"kanjiLinks","hash":{},"fn":container.program(30, data, 0, blockParams, depths),"inverse":container.noop,"data":data}),(typeof helper === alias3 ? helper.call(alias1,options) : helper));
   if (!helpers.kanjiLinks) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}

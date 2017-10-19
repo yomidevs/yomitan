@@ -45,7 +45,7 @@
     {{#if merged}}
     {{#each expressions}}
     <div class="expression">
-        <span class="expression-{{jmdictTermFrequency}}">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</span><!--
+        <span class="expression-{{termFrequency}}">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</span><!--
      --><div class="peek-wrapper">
             {{~#if ../playback~}}
             <a href="#" class="action-play-audio"><img src="/mixed/img/play-audio.png" title="Play audio" alt></a>

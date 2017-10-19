@@ -113,15 +113,15 @@ class Translator {
                         expression: expression,
                         reading: reading,
                         termTags: dictTagsSort(tags),
-                        jmdictTermFrequency: (tags => {
-                            if (tags.has('P')) {
+                        termFrequency: (score => {
+                            if (score > 0) {
                                 return 'popular';
-                            } else if (dictJmdictTermTagsRare(tags)) {
+                            } else if (score < 0) {
                                 return 'rare';
                             } else {
                                 return 'normal';
                             }
-                        })(result.expressions.get(expression).get(reading))
+                        })(dictTermTagScore(result.expressions.get(expression).get(reading)))
                     });
                 }
             }

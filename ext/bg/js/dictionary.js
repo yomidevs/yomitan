@@ -318,21 +318,24 @@ function dictTagsSort(tags) {
     });
 }
 
-function dictJmdictTermTagsRare(tags) {
-    const rareTags = [
-        'ik',
-        'iK',
-        'ok',
-        'oK',
-        'io',
-        'oik'
-    ];
+function dictTermTagScore(tags) {
+    let score = 0;
+
+    const tagScores = {
+        'ik': -5,
+        'iK': -5,
+        'ok': -5,
+        'oK': -5,
+        'io': -5,
+        'oik': -5,
+        'P': 10
+    };
+
     for (const tag of tags) {
-        if (rareTags.includes(tag)) {
-            return true;
-        }
+        score += tagScores[tag] || 0;
     }
-    return false;
+
+    return score;
 }
 
 function dictFieldSplit(field) {
