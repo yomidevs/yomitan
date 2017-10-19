@@ -79,7 +79,7 @@ function optionsFieldTemplates() {
 {{#*inline "furigana"}}
     {{~#if merge~}}
         {{~#each definition.expressions~}}
-            {{~#furigana}}{{{.}}}{{/furigana~}}
+            <span style="color: {{#termFrequencyColor}}{{termFrequency}}{{/termFrequencyColor}}">{{~#furigana}}{{{.}}}{{/furigana~}}</span>
             {{~#unless @last}}、{{/unless~}}
         {{~/each~}}
     {{~else~}}

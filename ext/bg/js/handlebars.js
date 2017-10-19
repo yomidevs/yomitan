@@ -75,6 +75,18 @@ function handlebarsMultiLine(options) {
     return options.fn(this).split('\n').join('<br>');
 }
 
+function handlebarsTermFrequencyColor(options) {
+    const termFrequency = options.fn(this);
+
+    if (termFrequency === 'popular') {
+        return '#0275d8';
+    } else if (termFrequency === 'rare') {
+        return '#999';
+    } else {
+        return 'inherit';
+    }
+}
+
 function handlebarsRegisterHelpers() {
     if (Handlebars.partials !== Handlebars.templates) {
         Handlebars.partials = Handlebars.templates;
@@ -83,6 +95,7 @@ function handlebarsRegisterHelpers() {
         Handlebars.registerHelper('furiganaPlain', handlebarsFuriganaPlain);
         Handlebars.registerHelper('kanjiLinks', handlebarsKanjiLinks);
         Handlebars.registerHelper('multiLine', handlebarsMultiLine);
+        Handlebars.registerHelper('termFrequencyColor', handlebarsTermFrequencyColor);
     }
 }
 
