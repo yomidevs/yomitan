@@ -90,7 +90,7 @@ function optionsFieldTemplates() {
 {{#*inline "furigana-plain"}}
     {{~#if merge~}}
         {{~#each definition.expressions~}}
-            {{~#furiganaPlain}}{{{.}}}{{/furiganaPlain~}}
+            <span style="color: {{#termFrequencyColor}}{{termFrequency}}{{/termFrequencyColor}}">{{~#furiganaPlain}}{{{.}}}{{/furiganaPlain~}}</span>
             {{~#unless @last}}、{{/unless~}}
         {{~/each~}}
     {{~else~}}
