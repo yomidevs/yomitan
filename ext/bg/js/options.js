@@ -19,6 +19,15 @@
 
 function optionsFieldTemplates() {
     return `
+<style>
+.expression-popular {
+    color: #0275d8;
+}
+
+.expression-rare {
+    color: #999;
+}
+</style>
 {{#*inline "glossary-single"}}
     {{~#unless brief~}}
         {{~#if definitionTags~}}<i>({{#each definitionTags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})</i> {{/if~}}
@@ -79,7 +88,7 @@ function optionsFieldTemplates() {
 {{#*inline "furigana"}}
     {{~#if merge~}}
         {{~#each definition.expressions~}}
-            <span style="color: {{#termFrequencyColor}}{{termFrequency}}{{/termFrequencyColor}}">{{~#furigana}}{{{.}}}{{/furigana~}}</span>
+            <span class="expression-{{termFrequency}}">{{~#furigana}}{{{.}}}{{/furigana~}}</span>
             {{~#unless @last}}、{{/unless~}}
         {{~/each~}}
     {{~else~}}
@@ -90,7 +99,7 @@ function optionsFieldTemplates() {
 {{#*inline "furigana-plain"}}
     {{~#if merge~}}
         {{~#each definition.expressions~}}
-            <span style="color: {{#termFrequencyColor}}{{termFrequency}}{{/termFrequencyColor}}">{{~#furiganaPlain}}{{{.}}}{{/furiganaPlain~}}</span>
+            <span class="expression-{{termFrequency}}">{{~#furiganaPlain}}{{{.}}}{{/furiganaPlain~}}</span>
             {{~#unless @last}}、{{/unless~}}
         {{~/each~}}
     {{~else~}}
