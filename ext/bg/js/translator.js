@@ -66,7 +66,7 @@ class Translator {
         const definitionsMerged = [];
         const mergedByTermIndices = new Set();
         for (const sequence in definitionsBySequence) {
-            if (!(sequence >= 0)) {
+            if (sequence < 0) {
                 continue;
             }
 
@@ -83,7 +83,7 @@ class Translator {
             const definitionsByGloss = dictTermsMergeByGloss(result, rawDefinitionsBySequence);
 
             const secondarySearchResults = [];
-            if (secondarySearchTitles.length) {
+            if (secondarySearchTitles.length > 0) {
                 for (const expression of result.expressions.keys()) {
                     if (expression === text) {
                         continue;
