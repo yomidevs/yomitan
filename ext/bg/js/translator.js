@@ -121,7 +121,7 @@ class Translator {
                             } else {
                                 return 'normal';
                             }
-                        })(dictTermTagScore(result.expressions.get(expression).get(reading)))
+                        })(tags.map(tag => tag.score).reduce((p, v) => p + v, 0))
                     });
                 }
             }

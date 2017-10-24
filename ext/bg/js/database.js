@@ -359,12 +359,13 @@ class Database {
             }
 
             const rows = [];
-            for (const [name, category, order, notes] of entries) {
+            for (const [name, category, order, notes, score] of entries) {
                 const row = dictTagSanitize({
                     name,
                     category,
                     order,
                     notes,
+                    score,
                     dictionary: summary.title
                 });
 
@@ -449,7 +450,7 @@ class Database {
             const bank = [];
             for (const name in index.tagMeta) {
                 const tag = index.tagMeta[name];
-                bank.push([name, tag.category, tag.order, tag.notes]);
+                bank.push([name, tag.category, tag.order, tag.notes, tag.score]);
             }
 
             tagDataLoaded(summary, bank, ++bankTotalCount, bankLoadedCount++);

@@ -293,6 +293,7 @@ function dictTagSanitize(tag) {
     tag.category = tag.category || 'default';
     tag.notes = tag.notes || '';
     tag.order = tag.order || 0;
+    tag.score = tag.score || 0;
     return tag;
 }
 
@@ -316,26 +317,6 @@ function dictTagsSort(tags) {
 
         return 0;
     });
-}
-
-function dictTermTagScore(tags) {
-    let score = 0;
-
-    const tagScores = {
-        'ik': -5,
-        'iK': -5,
-        'ok': -5,
-        'oK': -5,
-        'io': -5,
-        'oik': -5,
-        'P': 10
-    };
-
-    for (const tag of tags) {
-        score += tagScores[tag] || 0;
-    }
-
-    return score;
 }
 
 function dictFieldSplit(field) {
