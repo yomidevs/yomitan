@@ -218,7 +218,7 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.definitionTags : depth0),{"name":"each","hash":{},"fn":container.program(5, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "</div>\n";
 },"3":function(container,depth0,helpers,partials,data) {
-    return "style=\"display: inline-block;\"";
+    return "class=\"compact-info\"";
 },"5":function(container,depth0,helpers,partials,data) {
     var helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
@@ -254,7 +254,7 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.glossary : depth0),{"name":"each","hash":{},"fn":container.program(14, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "</ul>\n";
 },"12":function(container,depth0,helpers,partials,data) {
-    return "class=\"compact\"";
+    return "class=\"compact-glossary\"";
 },"14":function(container,depth0,helpers,partials,data) {
     var stack1, helper, options, buffer = 
   "    <li><span class=\"glossary-item\">";
@@ -274,7 +274,7 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
   if (stack1 != null) { buffer += stack1; }
   return buffer + "</div>\n";
 },"18":function(container,depth0,helpers,partials,data) {
-    return "compact";
+    return "compact-glossary";
 },"20":function(container,depth0,helpers,partials,data) {
     var stack1;
 

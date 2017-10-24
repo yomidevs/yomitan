@@ -177,21 +177,25 @@ hr {
     display: inline-block;
 }
 
+.compact-info {
+    display: inline-block;
+}
+
 .glossary ol, .glossary ul {
     padding-left: 1.4em;
 }
 
-.glossary ul.compact {
+.glossary ul.compact-glossary {
     display: inline;
     list-style: none;
     padding-left: 0px;
 }
 
-.glossary .compact li {
+.glossary .compact-glossary li {
     display: inline;
 }
 
-.glossary .compact li:not(:first-child):before {
+.glossary .compact-glossary li:not(:first-child):before {
     content: " | ";
 }
 
@@ -203,7 +207,7 @@ hr {
     color: #000;
 }
 
-div.glossary-item.compact {
+div.glossary-item.compact-glossary {
     display: inline;
 }
 

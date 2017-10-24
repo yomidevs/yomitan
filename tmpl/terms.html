@@ -1,13 +1,13 @@
 {{#*inline "definition"}}
 {{#if definitionTags}}
-<div {{#if compactGlossaries}}style="display: inline-block;"{{/if}}>
+<div {{#if compactGlossaries}}class="compact-info"{{/if}}>
     {{#each definitionTags}}
     <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
     {{/each}}
 </div>
 {{/if}}
 {{#if only}}
-<div {{#if compactGlossaries}}style="display: inline-block;"{{/if}}>
+<div {{#if compactGlossaries}}class="compact-info"{{/if}}>
     (
     {{~#each only~}}
     {{{.}}}{{#unless @last}}, {{/unless}}
@@ -16,13 +16,13 @@
 </div>
 {{/if}}
 {{#if glossary.[1]}}
-<ul {{#if compactGlossaries}}class="compact"{{/if}}>
+<ul {{#if compactGlossaries}}class="compact-glossary"{{/if}}>
     {{#each glossary}}
     <li><span class="glossary-item">{{#multiLine}}{{.}}{{/multiLine}}</span></li>
     {{/each}}
 </ul>
 {{else}}
-<div class="glossary-item {{#if compactGlossaries}}compact{{/if}}">{{#multiLine}}{{glossary.[0]}}{{/multiLine}}</div>
+<div class="glossary-item {{#if compactGlossaries}}compact-glossary{{/if}}">{{#multiLine}}{{glossary.[0]}}{{/multiLine}}</div>
 {{/if}}
 {{/inline}}
 
