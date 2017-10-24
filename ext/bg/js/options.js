@@ -203,7 +203,8 @@ function optionsSetDefaults(options) {
             popupOffset: 10,
             showGuide: true,
             compactTags: false,
-            compactGlossaries: false
+            compactGlossaries: false,
+            mainDictionary: ''
         },
 
         scanning: {

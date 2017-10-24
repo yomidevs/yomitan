@@ -228,6 +228,21 @@ class Database {
         }
     }
 
+    async getTitlesWithSequences() {
+        if (!this.db) {
+            throw 'Database not initialized';
+        }
+
+        const titles = [];
+        await this.db.dictionaries.each(row => {
+            if (row.hasSequences) {
+                titles.push(row.title);
+            }
+        });
+
+        return titles;
+    }
+
     async importDictionary(archive, callback) {
         if (!this.db) {
             throw 'Database not initialized';

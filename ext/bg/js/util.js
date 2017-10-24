@@ -87,6 +87,10 @@ function utilDatabaseGetTitles() {
     return utilBackend().translator.database.getTitles();
 }
 
+function utilDatabaseGetTitlesWithSequences() {
+    return utilBackend().translator.database.getTitlesWithSequences();
+}
+
 function utilDatabasePurge() {
     return utilBackend().translator.database.purge();
 }
