@@ -229,7 +229,7 @@ function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
             definitionsByGloss[gloss] = {
                 expression: new Set(),
                 reading: new Set(),
-                definitionTags: new Set(),
+                definitionTags: [],
                 glossary: definition.glossary,
                 source: result.source,
                 reasons: [],
@@ -254,10 +254,8 @@ function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
         }
 
         for (const tag of definition.definitionTags) {
-            if (typeof tag === 'string') {
-                definitionsByGloss[gloss].definitionTags.add(tag);
-            } else if (tag.category && tag.category !== 'dictionary') {
-                definitionsByGloss[gloss].definitionTags.add(tag.name);
+            if (!definitionsByGloss[gloss].definitionTags.find(existingTag => existingTag.name === tag.name)) {
+                definitionsByGloss[gloss].definitionTags.push(tag);
             }
         }
 

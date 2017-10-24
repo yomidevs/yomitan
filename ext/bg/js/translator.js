@@ -73,6 +73,13 @@ class Translator {
             const result = definitionsBySequence[sequence];
 
             const rawDefinitionsBySequence = await this.database.findTermsBySequence(Number(sequence), options.general.mainDictionary);
+
+            for (const definition of rawDefinitionsBySequence) {
+                const tags = await this.expandTags(definition.definitionTags, definition.dictionary);
+                tags.push(dictTagBuildSource(definition.dictionary));
+                definition.definitionTags = tags;
+            }
+
             const definitionsByGloss = dictTermsMergeByGloss(result, rawDefinitionsBySequence);
 
             const secondarySearchResults = [];
@@ -84,6 +91,9 @@ class Translator {
 
                     for (const reading of result.expressions.get(expression).keys()) {
                         for (const definition of await this.database.findTermsExact(expression, reading, secondarySearchTitles)) {
+                            const tags = await this.expandTags(definition.definitionTags, definition.dictionary);
+                            tags.push(dictTagBuildSource(definition.dictionary));
+                            definition.definitionTags = tags;
                             secondarySearchResults.push(definition);
                         }
                     }
@@ -94,11 +104,7 @@ class Translator {
 
             for (const gloss in definitionsByGloss) {
                 const definition = definitionsByGloss[gloss];
-
-                const tags = await this.expandTags(definition.definitionTags, definition.dictionary);
-                tags.push(dictTagBuildSource(definition.dictionary));
-                definition.definitionTags = dictTagsSort(tags);
-
+                dictTagsSort(definition.definitionTags);
                 result.definitions.push(definition);
             }
 
@@ -289,9 +295,6 @@ class Translator {
     async expandTags(names, title) {
         const tags = [];
         for (const name of names) {
-            if (typeof name !== 'string') {
-                continue;
-            }
             const base = name.split(':')[0];
             const meta = await this.database.findTagForTitle(base, title);
 
