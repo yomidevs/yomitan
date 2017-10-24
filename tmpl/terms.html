@@ -43,31 +43,31 @@
     </div>
 
     {{#if merged}}
-    {{#each expressions}}
-    <div class="expression">
-        <span class="expression-{{termFrequency}}">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</span><!--
+    {{~#each expressions~}}
+    <div class="expression"><!--
+     --><span class="expression-{{termFrequency}}">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</span><!--
      --><div class="peek-wrapper">
             {{~#if ../playback~}}
             <a href="#" class="action-play-audio"><img src="/mixed/img/play-audio.png" title="Play audio" alt></a>
-            {{/if}}
+            {{~/if~}}
             {{~#if termTags~}}
             <div class="tags">
                 {{~#each termTags~}}
                 <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
-                {{/each}}
+                {{~/each~}}
             </div>
-            {{/if}}
+            {{~/if~}}
             {{~#if frequencies~}}
             <div class="frequencies">
                 {{~#each frequencies~}}
                 <span class="label label-default tag-frequency">{{dictionary}}:{{frequency}}</span>
-                {{/each}}
+                {{~/each~}}
             </div>
-            {{/if}}<!--
-     --></div><!--
+            {{~/if~}}
+        </div><!--
      --><span class="{{#if @last}}invisible{{/if}}">、</span><!--
  --></div>
-    {{/each}}
+    {{~/each~}}
     {{else}}
     <div class="expression">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</div>
     {{#if termTags}}
