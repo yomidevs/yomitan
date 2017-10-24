@@ -233,7 +233,7 @@ class Database {
             throw 'Database not initialized';
         }
 
-        const indexDataLoaded = async summary => {
+        const indexDataValid = async summary => {
             if (summary.version > 2) {
                 throw 'Unsupported dictionary version';
             }
@@ -242,7 +242,9 @@ class Database {
             if (count > 0) {
                 throw 'Dictionary is already imported';
             }
+        };
 
+        const indexDataLoaded = async summary => {
             await this.db.dictionaries.add(summary);
         };
 
@@ -279,6 +281,8 @@ class Database {
                     });
                 }
             }
+
+            summary.hasSequences = rows.every(row => row.sequence >= 0);
 
             await this.db.terms.bulkAdd(rows);
         };
@@ -377,6 +381,7 @@ class Database {
 
         return await Database.importDictionaryZip(
             archive,
+            indexDataValid,
             indexDataLoaded,
             termDataLoaded,
             termMetaDataLoaded,
@@ -388,6 +393,7 @@ class Database {
 
     static async importDictionaryZip(
         archive,
+        indexDataValid,
         indexDataLoaded,
         termDataLoaded,
         termMetaDataLoaded,
@@ -413,9 +419,7 @@ class Database {
             version: index.format || index.version
         };
 
-        if (indexDataLoaded) {
-            await indexDataLoaded(summary);
-        }
+        await indexDataValid(summary);
 
         const buildTermBankName      = index => `term_bank_${index + 1}.json`;
         const buildTermMetaBankName  = index => `term_meta_bank_${index + 1}.json`;
@@ -471,6 +475,10 @@ class Database {
         await loadBank(summary, buildKanjiBankName, kanjiBankCount, kanjiDataLoaded);
         await loadBank(summary, buildKanjiMetaBankName, kanjiMetaBankCount, kanjiMetaDataLoaded);
         await loadBank(summary, buildTagBankName, tagBankCount, tagDataLoaded);
+
+        if (indexDataLoaded) {
+            await indexDataLoaded(summary);
+        }
 
         return summary;
     }
