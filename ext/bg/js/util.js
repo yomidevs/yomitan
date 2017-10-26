@@ -26,6 +26,43 @@ function utilIsolate(data) {
     return JSON.parse(JSON.stringify(data));
 }
 
+function utilSetEqual(setA, setB) {
+    if (setA.size !== setB.size) {
+        return false;
+    }
+
+    for (const value of setA) {
+        if (!setB.has(value)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function utilSetIntersection(setA, setB) {
+    return new Set(
+        [...setA].filter(value => setB.has(value))
+    );
+}
+
+function utilSetDifference(setA, setB) {
+    return new Set(
+        [...setA].filter(value => !setB.has(value))
+    );
+}
+
+function utilStringHashCode(string) {
+    let hashCode = 0;
+
+    for (let i = 0, charCode = string.charCodeAt(i); i < string.length; charCode = string.charCodeAt(++i)) {
+        hashCode = ((hashCode << 5) - hashCode) + charCode;
+        hashCode |= 0;
+    }
+
+    return hashCode;
+}
+
 function utilBackend() {
     return chrome.extension.getBackgroundPage().yomichan_backend;
 }
@@ -44,6 +81,10 @@ function utilAnkiGetModelFieldNames(modelName) {
 
 function utilDatabaseGetTitles() {
     return utilBackend().translator.database.getTitles();
+}
+
+function utilDatabaseGetTitlesWithSequences() {
+    return utilBackend().translator.database.getTitlesWithSequences();
 }
 
 function utilDatabasePurge() {

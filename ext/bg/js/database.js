@@ -40,6 +40,9 @@ class Database {
             kanjiMeta: '++,dictionary,character',
             tagMeta:   '++,dictionary,name'
         });
+        this.db.version(4).stores({
+            terms: '++id,dictionary,expression,reading,sequence'
+        });
 
         await this.db.open();
     }
@@ -68,12 +71,66 @@ class Database {
                 results.push({
                     expression: row.expression,
                     reading: row.reading,
-                    tags: dictFieldSplit(row.tags),
+                    definitionTags: dictFieldSplit(row.definitionTags || row.tags || ''),
+                    termTags: dictFieldSplit(row.termTags || ''),
                     rules: dictFieldSplit(row.rules),
                     glossary: row.glossary,
                     score: row.score,
                     dictionary: row.dictionary,
-                    id: row.id
+                    id: row.id,
+                    sequence: typeof row.sequence === 'undefined' ? -1 : row.sequence
+                });
+            }
+        });
+
+        return results;
+    }
+
+    async findTermsExact(term, reading, titles) {
+        if (!this.db) {
+            throw 'Database not initialized';
+        }
+
+        const results = [];
+        await this.db.terms.where('expression').equals(term).each(row => {
+            if (row.reading === reading && titles.includes(row.dictionary)) {
+                results.push({
+                    expression: row.expression,
+                    reading: row.reading,
+                    definitionTags: dictFieldSplit(row.definitionTags || row.tags || ''),
+                    termTags: dictFieldSplit(row.termTags || ''),
+                    rules: dictFieldSplit(row.rules),
+                    glossary: row.glossary,
+                    score: row.score,
+                    dictionary: row.dictionary,
+                    id: row.id,
+                    sequence: typeof row.sequence === 'undefined' ? -1 : row.sequence
+                });
+            }
+        });
+
+        return results;
+    }
+
+    async findTermsBySequence(sequence, mainDictionary) {
+        if (!this.db) {
+            throw 'Database not initialized';
+        }
+
+        const results = [];
+        await this.db.terms.where('sequence').equals(sequence).each(row => {
+            if (row.dictionary === mainDictionary) {
+                results.push({
+                    expression: row.expression,
+                    reading: row.reading,
+                    definitionTags: dictFieldSplit(row.definitionTags || row.tags || ''),
+                    termTags: dictFieldSplit(row.termTags || ''),
+                    rules: dictFieldSplit(row.rules),
+                    glossary: row.glossary,
+                    score: row.score,
+                    dictionary: row.dictionary,
+                    id: row.id,
+                    sequence: typeof row.sequence === 'undefined' ? -1 : row.sequence
                 });
             }
         });
@@ -171,12 +228,27 @@ class Database {
         }
     }
 
+    async getTitlesWithSequences() {
+        if (!this.db) {
+            throw 'Database not initialized';
+        }
+
+        const titles = [];
+        await this.db.dictionaries.each(row => {
+            if (row.hasSequences) {
+                titles.push(row.title);
+            }
+        });
+
+        return titles;
+    }
+
     async importDictionary(archive, callback) {
         if (!this.db) {
             throw 'Database not initialized';
         }
 
-        const indexDataLoaded = async summary => {
+        const indexDataValid = async summary => {
             if (summary.version > 2) {
                 throw 'Unsupported dictionary version';
             }
@@ -185,7 +257,9 @@ class Database {
             if (count > 0) {
                 throw 'Dictionary is already imported';
             }
+        };
 
+        const indexDataLoaded = async summary => {
             await this.db.dictionaries.add(summary);
         };
 
@@ -196,11 +270,11 @@ class Database {
 
             const rows = [];
             if (summary.version === 1) {
-                for (const [expression, reading, tags, rules, score, ...glossary] of entries) {
+                for (const [expression, reading, definitionTags, rules, score, ...glossary] of entries) {
                     rows.push({
                         expression,
                         reading,
-                        tags,
+                        definitionTags,
                         rules,
                         score,
                         glossary,
@@ -208,18 +282,22 @@ class Database {
                     });
                 }
             } else {
-                for (const [expression, reading, tags, rules, score, glossary] of entries) {
+                for (const [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] of entries) {
                     rows.push({
                         expression,
                         reading,
-                        tags,
+                        definitionTags,
                         rules,
                         score,
                         glossary,
+                        sequence,
+                        termTags,
                         dictionary: summary.title
                     });
                 }
             }
+
+            summary.hasSequences = rows.every(row => row.sequence >= 0);
 
             await this.db.terms.bulkAdd(rows);
         };
@@ -300,12 +378,13 @@ class Database {
             }
 
             const rows = [];
-            for (const [name, category, order, notes] of entries) {
+            for (const [name, category, order, notes, score] of entries) {
                 const row = dictTagSanitize({
                     name,
                     category,
                     order,
                     notes,
+                    score,
                     dictionary: summary.title
                 });
 
@@ -317,6 +396,7 @@ class Database {
 
         return await Database.importDictionaryZip(
             archive,
+            indexDataValid,
             indexDataLoaded,
             termDataLoaded,
             termMetaDataLoaded,
@@ -328,6 +408,7 @@ class Database {
 
     static async importDictionaryZip(
         archive,
+        indexDataValid,
         indexDataLoaded,
         termDataLoaded,
         termMetaDataLoaded,
@@ -353,9 +434,7 @@ class Database {
             version: index.format || index.version
         };
 
-        if (indexDataLoaded) {
-            await indexDataLoaded(summary);
-        }
+        await indexDataValid(summary);
 
         const buildTermBankName      = index => `term_bank_${index + 1}.json`;
         const buildTermMetaBankName  = index => `term_meta_bank_${index + 1}.json`;
@@ -390,7 +469,7 @@ class Database {
             const bank = [];
             for (const name in index.tagMeta) {
                 const tag = index.tagMeta[name];
-                bank.push([name, tag.category, tag.order, tag.notes]);
+                bank.push([name, tag.category, tag.order, tag.notes, tag.score]);
             }
 
             tagDataLoaded(summary, bank, ++bankTotalCount, bankLoadedCount++);
@@ -411,6 +490,10 @@ class Database {
         await loadBank(summary, buildKanjiBankName, kanjiBankCount, kanjiDataLoaded);
         await loadBank(summary, buildKanjiMetaBankName, kanjiMetaBankCount, kanjiMetaDataLoaded);
         await loadBank(summary, buildTagBankName, tagBankCount, tagDataLoaded);
+
+        if (indexDataLoaded) {
+            await indexDataLoaded(summary);
+        }
 
         return summary;
     }

@@ -1,19 +1,28 @@
 {{#*inline "definition"}}
-{{#if tags}}
-<div>
-    {{#each tags}}
+{{#if definitionTags}}
+<div {{#if compactGlossaries}}class="compact-info"{{/if}}>
+    {{#each definitionTags}}
     <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
     {{/each}}
 </div>
 {{/if}}
+{{#if only}}
+<div {{#if compactGlossaries}}class="compact-info"{{/if}}>
+    (
+    {{~#each only~}}
+    {{{.}}}{{#unless @last}}, {{/unless}}
+    {{/each}}
+    only)
+</div>
+{{/if}}
 {{#if glossary.[1]}}
-<ul>
+<ul {{#if compactGlossaries}}class="compact-glossary"{{/if}}>
     {{#each glossary}}
     <li><span class="glossary-item">{{#multiLine}}{{.}}{{/multiLine}}</span></li>
     {{/each}}
 </ul>
 {{else}}
-<div class="glossary-item">{{#multiLine}}{{glossary.[0]}}{{/multiLine}}</div>
+<div class="glossary-item {{#if compactGlossaries}}compact-glossary{{/if}}">{{#multiLine}}{{glossary.[0]}}{{/multiLine}}</div>
 {{/if}}
 {{/inline}}
 
@@ -25,13 +34,50 @@
         <a href="#" class="action-add-note pending disabled" data-mode="term-kanji"><img src="/mixed/img/add-term-kanji.png" title="Add expression (Alt + E)" alt></a>
         <a href="#" class="action-add-note pending disabled" data-mode="term-kana"><img src="/mixed/img/add-term-kana.png" title="Add reading (Alt + R)" alt></a>
         {{/if}}
+        {{#unless merged}}
         {{#if playback}}
         <a href="#" class="action-play-audio"><img src="/mixed/img/play-audio.png" title="Play audio (Alt + P)" alt></a>
         {{/if}}
+        {{/unless}}
         <img src="/mixed/img/entry-current.png" class="current" title="Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)" alt>
     </div>
 
+    {{#if merged}}
+    {{~#each expressions~}}
+    <div class="expression"><!--
+     --><span class="expression-{{termFrequency}}">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</span><!--
+     --><div class="peek-wrapper">
+            {{~#if ../playback~}}
+            <a href="#" class="action-play-audio"><img src="/mixed/img/play-audio.png" title="Play audio" alt></a>
+            {{~/if~}}
+            {{~#if termTags~}}
+            <div class="tags">
+                {{~#each termTags}}
+                <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
+                {{/each~}}
+            </div>
+            {{~/if~}}
+            {{~#if frequencies~}}
+            <div class="frequencies">
+                {{~#each frequencies}}
+                <span class="label label-default tag-frequency">{{dictionary}}:{{frequency}}</span>
+                {{/each~}}
+            </div>
+            {{~/if~}}
+        </div><!--
+     --><span class="{{#if @last}}invisible{{/if}}">、</span><!--
+ --></div>
+    {{~/each~}}
+    {{else}}
     <div class="expression">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</div>
+    {{#if termTags}}
+    <div style="display: inline-block;">
+        {{#each termTags}}
+        <span class="label label-default tag-{{category}}" title="{{notes}}">{{name}}</span>
+        {{/each}}
+    </div>
+    {{/if}}
+    {{/if}}
 
     {{#if reasons}}
     <div class="reasons">
@@ -54,14 +100,24 @@
         {{#if definitions.[1]}}
         <ol>
             {{#each definitions}}
-            <li>{{> definition}}</li>
+            <li>{{> definition compactGlossaries=../compactGlossaries}}</li>
             {{/each}}
         </ol>
         {{else}}
-        {{> definition definitions.[0]}}
+        {{> definition definitions.[0] compactGlossaries=compactGlossaries}}
+        {{/if}}
+        {{else if merged}}
+        {{#if definitions.[1]}}
+        <ol>
+            {{#each definitions}}
+            <li>{{> definition compactGlossaries=../compactGlossaries}}</li>
+            {{/each}}
+        </ol>
+        {{else}}
+        {{> definition definitions.[0] compactGlossaries=compactGlossaries}}
         {{/if}}
         {{else}}
-        {{> definition}}
+        {{> definition compactGlossaries=compactGlossaries}}
         {{/if}}
     </div>
 
@@ -74,7 +130,7 @@
 {{#if definitions}}
 {{#each definitions}}
 {{#unless @first}}<hr>{{/unless}}
-{{> term debug=../debug grouped=../grouped addable=../addable playback=../playback}}
+{{> term debug=../debug grouped=../grouped merged=../merged addable=../addable playback=../playback compactGlossaries=../compactGlossaries}}
 {{/each}}
 {{else}}
 <p class="note">No results found.</p>

@@ -22,9 +22,12 @@ async function formRead() {
     const optionsNew = $.extend(true, {}, optionsOld);
 
     optionsNew.general.showGuide = $('#show-usage-guide').prop('checked');
+    optionsNew.general.compactTags = $('#compact-tags').prop('checked');
+    optionsNew.general.compactGlossaries = $('#compact-glossaries').prop('checked');
+    optionsNew.general.resultOutputMode = $('#result-output-mode').val();
+    optionsNew.general.mainDictionary = $('#main-dictionary').val();
     optionsNew.general.audioSource = $('#audio-playback-source').val();
     optionsNew.general.audioVolume = parseFloat($('#audio-playback-volume').val());
-    optionsNew.general.groupResults = $('#group-terms-results').prop('checked');
     optionsNew.general.debugInfo = $('#show-debug-info').prop('checked');
     optionsNew.general.showAdvanced = $('#show-advanced-options').prop('checked');
     optionsNew.general.maxResults = parseInt($('#max-displayed-results').val(), 10);
@@ -60,7 +63,8 @@ async function formRead() {
         const title = dictionary.data('title');
         const priority = parseInt(dictionary.find('.dict-priority').val(), 10);
         const enabled = dictionary.find('.dict-enabled').prop('checked');
-        optionsNew.dictionaries[title] = {priority, enabled};
+        const allowSecondarySearches = dictionary.find('.dict-allow-secondary-searches').prop('checked');
+        optionsNew.dictionaries[title] = {priority, enabled, allowSecondarySearches};
     });
 
     return {optionsNew, optionsOld};
@@ -81,6 +85,13 @@ function formUpdateVisibility(options) {
         advanced.hide();
     }
 
+    const merge = $('.options-merge');
+    if (options.general.resultOutputMode === 'merge') {
+        merge.show();
+    } else {
+        merge.hide();
+    }
+
     const debug = $('#debug');
     if (options.general.debugInfo) {
         const temp = utilIsolate(options);
@@ -93,6 +104,29 @@ function formUpdateVisibility(options) {
     }
 }
 
+async function formMainDictionaryOptionsPopulate(options) {
+    const select = $('#main-dictionary').empty();
+
+    let titles = await utilDatabaseGetTitlesWithSequences();
+    titles = titles.filter(title => options.dictionaries[title].enabled);
+    const formOptionsHtml = [];
+    let mainDictionarySelected = false;
+    for (const title of titles) {
+        if (options.general.mainDictionary === title) {
+            mainDictionarySelected = true;
+        }
+        formOptionsHtml.push(`<option value="${title}"${options.general.mainDictionary === title ? ' selected' : ''}>${title}</option>`);
+    }
+
+    if (!mainDictionarySelected) {
+        options.general.mainDictionary = '';
+    }
+
+    const notSelectedOptionHtml = `<option class="text-muted" value=""${!mainDictionarySelected ? ' selected' : ''}>Not selected</option>`;
+
+    select.append($([notSelectedOptionHtml].concat(formOptionsHtml).join('')));
+}
+
 async function onFormOptionsChanged(e) {
     try {
         if (!e.originalEvent && !e.isTrigger) {
@@ -100,6 +134,7 @@ async function onFormOptionsChanged(e) {
         }
 
         const {optionsNew, optionsOld} = await formRead();
+        await formMainDictionaryOptionsPopulate(optionsNew);
         await optionsSave(optionsNew);
 
         formUpdateVisibility(optionsNew);
@@ -124,9 +159,12 @@ async function onReady() {
     const options = await optionsLoad();
 
     $('#show-usage-guide').prop('checked', options.general.showGuide);
+    $('#compact-tags').prop('checked', options.general.compactTags);
+    $('#compact-glossaries').prop('checked', options.general.compactGlossaries);
+    $('#result-output-mode').val(options.general.resultOutputMode);
+    $('#main-dictionary').val(options.general.mainDictionary);
     $('#audio-playback-source').val(options.general.audioSource);
     $('#audio-playback-volume').val(options.general.audioVolume);
-    $('#group-terms-results').prop('checked', options.general.groupResults);
     $('#show-debug-info').prop('checked', options.general.debugInfo);
     $('#show-advanced-options').prop('checked', options.general.showAdvanced);
     $('#max-displayed-results').val(options.general.maxResults);
@@ -165,6 +203,8 @@ async function onReady() {
     } catch (e) {
         ankiErrorShow(e);
     }
+
+    await formMainDictionaryOptionsPopulate(options);
 
     formUpdateVisibility(options);
 }
@@ -247,13 +287,14 @@ async function dictionaryGroupsPopulate(options) {
     }
 
     for (const dictRow of dictRowsSort(dictRows, options)) {
-        const dictOptions = options.dictionaries[dictRow.title] || {enabled: false, priority: 0};
+        const dictOptions = options.dictionaries[dictRow.title] || {enabled: false, priority: 0, allowSecondarySearches: false};
         const dictHtml = await apiTemplateRender('dictionary.html', {
             title: dictRow.title,
             version: dictRow.version,
             revision: dictRow.revision,
             priority: dictOptions.priority,
-            enabled: dictOptions.enabled
+            enabled: dictOptions.enabled,
+            allowSecondarySearches: dictOptions.allowSecondarySearches
         });
 
         dictGroups.append($(dictHtml));
@@ -261,7 +302,7 @@ async function dictionaryGroupsPopulate(options) {
 
     formUpdateVisibility(options);
 
-    $('.dict-enabled, .dict-priority').change(e => {
+    $('.dict-enabled, .dict-priority, .dict-allow-secondary-searches').change(e => {
         dictionaryGroupsSort();
         onFormOptionsChanged(e);
     });
@@ -280,9 +321,11 @@ async function onDictionaryPurge(e) {
         await utilDatabasePurge();
         const options = await optionsLoad();
         options.dictionaries = {};
+        options.general.mainDictionary = '';
         await optionsSave(options);
 
         await dictionaryGroupsPopulate(options);
+        await formMainDictionaryOptionsPopulate(options);
     } catch (e) {
         dictionaryErrorShow(e);
     } finally {
@@ -308,10 +351,14 @@ async function onDictionaryImport(e) {
 
         const options = await optionsLoad();
         const summary = await utilDatabaseImport(e.target.files[0], updateProgress);
-        options.dictionaries[summary.title] = {enabled: true, priority: 0};
+        options.dictionaries[summary.title] = {enabled: true, priority: 0, allowSecondarySearches: false};
+        if (summary.hasSequences && !options.general.mainDictionary) {
+            options.general.mainDictionary = summary.title;
+        }
         await optionsSave(options);
 
         await dictionaryGroupsPopulate(options);
+        await formMainDictionaryOptionsPopulate(options);
     } catch (e) {
         dictionaryErrorShow(e);
     } finally {

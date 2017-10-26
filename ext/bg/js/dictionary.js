@@ -89,7 +89,7 @@ function dictTermsSort(definitions, dictionaries=null) {
             return 1;
         }
 
-        return v2.expression.localeCompare(v1.expression);
+        return v2.expression.toString().localeCompare(v1.expression.toString());
     });
 }
 
@@ -108,6 +108,33 @@ function dictTermsUndupe(definitions) {
     }
 
     return definitionsUnique;
+}
+
+function dictTermsCompressTags(definitions) {
+    let lastDictionary = '';
+    let lastPartOfSpeech = '';
+
+    for (const definition of definitions) {
+        const dictionary = JSON.stringify(definition.definitionTags.filter(tag => tag.category === 'dictionary').map(tag => tag.name).sort());
+        const partOfSpeech = JSON.stringify(definition.definitionTags.filter(tag => tag.category === 'partOfSpeech').map(tag => tag.name).sort());
+
+        const filterOutCategories = [];
+
+        if (lastDictionary === dictionary) {
+            filterOutCategories.push('dictionary');
+        } else {
+            lastDictionary = dictionary;
+            lastPartOfSpeech = '';
+        }
+
+        if (lastPartOfSpeech === partOfSpeech) {
+            filterOutCategories.push('partOfSpeech');
+        } else {
+            lastPartOfSpeech = partOfSpeech;
+        }
+
+        definition.definitionTags = definition.definitionTags.filter(tag => !filterOutCategories.includes(tag.category));
+    }
 }
 
 function dictTermsGroup(definitions, dictionaries) {
@@ -136,12 +163,123 @@ function dictTermsGroup(definitions, dictionaries) {
             expression: firstDef.expression,
             reading: firstDef.reading,
             reasons: firstDef.reasons,
+            termTags: groupDefs[0].termTags,
             score: groupDefs.reduce((p, v) => v.score > p ? v.score : p, Number.MIN_SAFE_INTEGER),
             source: firstDef.source
         });
     }
 
     return dictTermsSort(results);
+}
+
+function dictTermsMergeBySequence(definitions, mainDictionary) {
+    const definitionsBySequence = {'-1': []};
+    for (const definition of definitions) {
+        if (mainDictionary === definition.dictionary && definition.sequence >= 0) {
+            if (!definitionsBySequence[definition.sequence]) {
+                definitionsBySequence[definition.sequence] = {
+                    reasons: definition.reasons,
+                    score: Number.MIN_SAFE_INTEGER,
+                    expression: new Set(),
+                    reading: new Set(),
+                    expressions: new Map(),
+                    source: definition.source,
+                    dictionary: definition.dictionary,
+                    definitions: []
+                };
+            }
+            const score = Math.max(definitionsBySequence[definition.sequence].score, definition.score);
+            definitionsBySequence[definition.sequence].score = score;
+        } else {
+            definitionsBySequence['-1'].push(definition);
+        }
+    }
+
+    return definitionsBySequence;
+}
+
+function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
+    const definitionsByGloss = appendTo || {};
+    for (const [index, definition] of definitions.entries()) {
+        if (appendTo) {
+            let match = false;
+            for (const expression of result.expressions.keys()) {
+                if (definition.expression === expression) {
+                    for (const reading of result.expressions.get(expression).keys()) {
+                        if (definition.reading === reading) {
+                            match = true;
+                            break;
+                        }
+                    }
+                }
+                if (match) {
+                    break;
+                }
+            }
+
+            if (!match) {
+                continue;
+            } else if (mergedIndices) {
+                mergedIndices.add(index);
+            }
+        }
+
+        const gloss = JSON.stringify(definition.glossary.concat(definition.dictionary));
+        if (!definitionsByGloss[gloss]) {
+            definitionsByGloss[gloss] = {
+                expression: new Set(),
+                reading: new Set(),
+                definitionTags: [],
+                glossary: definition.glossary,
+                source: result.source,
+                reasons: [],
+                score: definition.score,
+                id: definition.id,
+                dictionary: definition.dictionary
+            };
+        }
+
+        definitionsByGloss[gloss].expression.add(definition.expression);
+        definitionsByGloss[gloss].reading.add(definition.reading);
+
+        result.expression.add(definition.expression);
+        result.reading.add(definition.reading);
+
+        // result->expressions[ Expression1[ Reading1[ Tag1, Tag2 ] ], Expression2, ... ]
+        if (!result.expressions.has(definition.expression)) {
+            result.expressions.set(definition.expression, new Map());
+        }
+        if (!result.expressions.get(definition.expression).has(definition.reading)) {
+            result.expressions.get(definition.expression).set(definition.reading, new Set());
+        }
+
+        for (const tag of definition.definitionTags) {
+            if (!definitionsByGloss[gloss].definitionTags.find(existingTag => existingTag.name === tag.name)) {
+                definitionsByGloss[gloss].definitionTags.push(tag);
+            }
+        }
+
+        for (const tag of definition.termTags) {
+            result.expressions.get(definition.expression).get(definition.reading).add(tag);
+        }
+    }
+
+    for (const gloss in definitionsByGloss) {
+        const definition = definitionsByGloss[gloss];
+        definition.only = [];
+        if (!utilSetEqual(definition.expression, result.expression)) {
+            for (const expression of utilSetIntersection(definition.expression, result.expression)) {
+                definition.only.push(expression);
+            }
+        }
+        if (!utilSetEqual(definition.reading, result.reading)) {
+            for (const reading of utilSetIntersection(definition.reading, result.reading)) {
+                definition.only.push(reading);
+            }
+        }
+    }
+
+    return definitionsByGloss;
 }
 
 function dictTagBuildSource(name) {
@@ -153,6 +291,7 @@ function dictTagSanitize(tag) {
     tag.category = tag.category || 'default';
     tag.notes = tag.notes || '';
     tag.order = tag.order || 0;
+    tag.score = tag.score || 0;
     return tag;
 }
 
@@ -207,10 +346,12 @@ async function dictFieldFormat(field, definition, mode, options) {
         const data = {
             marker,
             definition,
-            group: options.general.groupResults,
+            group: options.general.resultOutputMode === 'group',
+            merge: options.general.resultOutputMode === 'merge',
             modeTermKanji: mode === 'term-kanji',
             modeTermKana: mode === 'term-kana',
-            modeKanji: mode === 'kanji'
+            modeKanji: mode === 'kanji',
+            compactGlossaries: options.general.compactGlossaries
         };
 
         const html = await apiTemplateRender(options.anki.fieldTemplates, data, true);

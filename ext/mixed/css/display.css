@@ -46,6 +46,10 @@ hr {
     display: none;
 }
 
+.invisible {
+    visibility: hidden;
+}
+
 
 /*
  * Entries
@@ -88,6 +92,10 @@ hr {
     background-color: #5cb85c;
 }
 
+.tag-partOfSpeech {
+    background-color: #565656;
+}
+
 .actions .disabled {
     pointer-events: none;
     cursor: default;
@@ -118,10 +126,50 @@ hr {
     font-size: 24px;
 }
 
-.expression a {
+.expression .kanji-link {
     border-bottom: 1px #777 dashed;
     color: #333;
     text-decoration: none;
+}
+
+.expression-popular, .expression-popular .kanji-link {
+    color: #0275d8;
+}
+
+.expression-rare, .expression-rare .kanji-link {
+    color: #999;
+}
+
+.expression .peek-wrapper {
+    font-size: 14px;
+    white-space: nowrap;
+    display: inline-block;
+    position: relative;
+    width: 0px;
+    height: 0px;
+    visibility: hidden;
+}
+
+.expression .peek-wrapper .action-play-audio {
+    position: absolute;
+    left: 0px;
+    bottom: 10px;
+}
+
+.expression .peek-wrapper .tags {
+    position: absolute;
+    left: 0px;
+    bottom: -10px;
+}
+
+.expression .peek-wrapper .frequencies {
+    position: absolute;
+    left: 0px;
+    bottom: -30px;
+}
+
+.expression:hover .peek-wrapper {
+    visibility: visible;
 }
 
 .reasons {
@@ -129,8 +177,26 @@ hr {
     display: inline-block;
 }
 
+.compact-info {
+    display: inline-block;
+}
+
 .glossary ol, .glossary ul {
     padding-left: 1.4em;
+}
+
+.glossary ul.compact-glossary {
+    display: inline;
+    list-style: none;
+    padding-left: 0px;
+}
+
+.glossary .compact-glossary li {
+    display: inline;
+}
+
+.glossary .compact-glossary li:not(:first-child):before {
+    content: " | ";
 }
 
 .glossary li {
@@ -139,6 +205,10 @@ hr {
 
 .glossary-item {
     color: #000;
+}
+
+div.glossary-item.compact-glossary {
+    display: inline;
 }
 
 .glyph {

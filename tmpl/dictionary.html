@@ -4,6 +4,9 @@
     <div class="checkbox">
         <label><input type="checkbox" class="dict-enabled" {{#if enabled}}checked{{/if}}> Enable search</label>
     </div>
+    <div class="checkbox options-advanced">
+        <label><input type="checkbox" class="dict-allow-secondary-searches" {{#if allowSecondarySearches}}checked{{/if}}> Allow secondary searches</label>
+    </div>
     <div class="form-group options-advanced">
         <label for="dict-{{title}}">Result priority</label>
         <input type="number" value="{{priority}}" id="dict-{{title}}" class="form-control dict-priority">
