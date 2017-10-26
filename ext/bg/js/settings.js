@@ -111,7 +111,7 @@ async function formMainDictionaryOptionsPopulate(options) {
     titles = titles.filter(title => options.dictionaries[title].enabled);
     const formOptionsHtml = [];
     let mainDictionarySelected = false;
-    for (title of titles) {
+    for (const title of titles) {
         if (options.general.mainDictionary === title) {
             mainDictionarySelected = true;
         }
