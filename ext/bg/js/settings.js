@@ -122,7 +122,7 @@ async function formMainDictionaryOptionsPopulate(options) {
         options.general.mainDictionary = '';
     }
 
-    const notSelectedOptionHtml = `<option value=""${!mainDictionarySelected ? ' selected' : ''}>(Not selected)</option>`;
+    const notSelectedOptionHtml = `<option class="text-muted" value=""${!mainDictionarySelected ? ' selected' : ''}>Not selected</option>`;
 
     select.append($([notSelectedOptionHtml].concat(formOptionsHtml).join('')));
 }
