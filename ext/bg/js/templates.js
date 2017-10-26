@@ -361,11 +361,11 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
 },"39":function(container,depth0,helpers,partials,data) {
     var helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
-  return "<span class=\"label label-default tag-frequency\">"
+  return "                <span class=\"label label-default tag-frequency\">"
     + alias4(((helper = (helper = helpers.dictionary || (depth0 != null ? depth0.dictionary : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"dictionary","hash":{},"data":data}) : helper)))
     + ":"
     + alias4(((helper = (helper = helpers.frequency || (depth0 != null ? depth0.frequency : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"frequency","hash":{},"data":data}) : helper)))
-    + "</span>";
+    + "</span>\n";
 },"41":function(container,depth0,helpers,partials,data) {
     return "invisible";
 },"43":function(container,depth0,helpers,partials,data) {
