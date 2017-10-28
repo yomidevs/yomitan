@@ -185,7 +185,8 @@ class Display {
             80: /* p */ () => {
                 if (e.altKey) {
                     if ($('.entry').eq(this.index).data('type') === 'term') {
-                        this.audioPlay(this.definitions[this.index], this.options.general.resultOutputMode === 'merge' ? 0 : -1);
+                        const expressionIndex = this.options.general.resultOutputMode === 'merge' ? 0 : -1;
+                        this.audioPlay(this.definitions[this.index], expressionIndex);
                     }
 
                     return true;
@@ -387,7 +388,8 @@ class Display {
         try {
             this.spinner.show();
 
-            let url = await apiAudioGetUrl(expressionIndex === -1 ? definition : definition.expressions[expressionIndex], this.options.general.audioSource);
+            const expression = expressionIndex === -1 ? definition : definition.expressions[expressionIndex];
+            let url = await apiAudioGetUrl(expression, this.options.general.audioSource);
             if (!url) {
                 url = '/mixed/mp3/button.mp3';
             }

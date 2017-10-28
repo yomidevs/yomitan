@@ -55,7 +55,7 @@
                     <label for="result-output-mode">Result grouping</label>
                     <select class="form-control" id="result-output-mode">
                         <option value="group">Group results by term-reading pairs</option>
-                        <option value="merge">Group results by main dictionary entry ID (experimental)</option>
+                        <option value="merge">Group results by main dictionary entry</option>
                         <option value="split">Split definitions to their own results</option>
                     </select>
                 </div>
@@ -140,11 +140,6 @@
                     <h3>Dictionaries</h3>
                 </div>
 
-                <div class="form-group options-merge">
-                    <label for="main-dictionary">Main dictionary</label>
-                    <select class="form-control" id="main-dictionary"></select>
-                </div>
-
                 <p class="help-block">
                     Yomichan can import and use a variety of dictionary formats. Unneeded dictionaries can be disabled,
                     or you can simply <a href="#" id="dict-purge-link">purge the database</a> to delete everything.
@@ -159,6 +154,11 @@
                 <div class="alert alert-danger" id="dict-error"></div>
 
                 <div id="dict-groups"></div>
+
+                <div class="form-group options-merge">
+                    <label for="main-dictionary">Main dictionary</label>
+                    <select class="form-control" id="main-dictionary"></select>
+                </div>
 
                 <div id="dict-import-progress">
                     Dictionary data is being imported, please be patient...
