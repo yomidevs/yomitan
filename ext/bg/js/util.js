@@ -75,16 +75,12 @@ function utilAnkiGetDeckNames() {
     return utilBackend().anki.getDeckNames();
 }
 
+function utilDatabaseSummarize() {
+    return utilBackend().translator.database.summarize();
+}
+
 function utilAnkiGetModelFieldNames(modelName) {
     return utilBackend().anki.getModelFieldNames(modelName);
-}
-
-function utilDatabaseGetTitles() {
-    return utilBackend().translator.database.getTitles();
-}
-
-function utilDatabaseGetTitlesWithSequences() {
-    return utilBackend().translator.database.getTitlesWithSequences();
 }
 
 function utilDatabasePurge() {

@@ -220,27 +220,12 @@ class Database {
         return result;
     }
 
-    async getTitles() {
+    async summarize() {
         if (this.db) {
             return this.db.dictionaries.toArray();
         } else {
             throw 'Database not initialized';
         }
-    }
-
-    async getTitlesWithSequences() {
-        if (!this.db) {
-            throw 'Database not initialized';
-        }
-
-        const titles = [];
-        await this.db.dictionaries.each(row => {
-            if (row.hasSequences) {
-                titles.push(row.title);
-            }
-        });
-
-        return titles;
     }
 
     async importDictionary(archive, callback) {

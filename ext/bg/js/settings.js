@@ -109,12 +109,12 @@ async function formMainDictionaryOptionsPopulate(options) {
     select.append($('<option class="text-muted" value="">Not selected</option>'));
 
     let mainDictionary = '';
-    const formOptions = [$];
-    const titles = await utilDatabaseGetTitlesWithSequences();
-    for (const title of titles) {
-        select.append($(`<option value="${title}">${title}</option>`));
-        if (title === options.general.mainDictionary) {
-            mainDictionary = title;
+    for (const dictRow of await utilDatabaseSummarize()) {
+        if (dictRow.hasSequences) {
+            select.append($(`<option value="${dictRow.title}">${dictRow.title}</option>`));
+            if (dictRow.title === options.general.mainDictionary) {
+                mainDictionary = dictRow.title;
+            }
         }
     }
 
@@ -271,7 +271,7 @@ async function dictionaryGroupsPopulate(options) {
     const dictGroups = $('#dict-groups').empty();
     const dictWarning = $('#dict-warning').hide();
 
-    const dictRows = await utilDatabaseGetTitles();
+    const dictRows = await utilDatabaseSummarize();
     if (dictRows.length === 0) {
         dictWarning.show();
     }
