@@ -60,11 +60,11 @@ async function formRead() {
     optionsNew.general.mainDictionary = $('#dict-main').val();
     $('.dict-group').each((index, element) => {
         const dictionary = $(element);
-        const title = dictionary.data('title');
-        const priority = parseInt(dictionary.find('.dict-priority').val(), 10);
-        const enabled = dictionary.find('.dict-enabled').prop('checked');
-        const allowSecondarySearches = dictionary.find('.dict-allow-secondary-searches').prop('checked');
-        optionsNew.dictionaries[title] = {priority, enabled, allowSecondarySearches};
+        optionsNew.dictionaries[dictionary.data('title')] = {
+            priority: parseInt(dictionary.find('.dict-priority').val(), 10),
+            enabled: dictionary.find('.dict-enabled').prop('checked'),
+            allowSecondarySearches: dictionary.find('.dict-allow-secondary-searches').prop('checked')
+        };
     });
 
     return {optionsNew, optionsOld};
@@ -277,14 +277,20 @@ async function dictionaryGroupsPopulate(options) {
     }
 
     for (const dictRow of dictRowsSort(dictRows, options)) {
-        const dictOptions = options.dictionaries[dictRow.title] || {enabled: false, priority: 0, allowSecondarySearches: false};
+        const dictOptions = options.dictionaries[dictRow.title] || {
+            enabled: false,
+            priority: 0,
+            allowSecondarySearches: false
+        };
+
         const dictHtml = await apiTemplateRender('dictionary.html', {
+            enabled: dictOptions.enabled,
+            priority: dictOptions.priority,
+            allowSecondarySearches: dictOptions.allowSecondarySearches,
             title: dictRow.title,
             version: dictRow.version,
             revision: dictRow.revision,
-            priority: dictOptions.priority,
-            enabled: dictOptions.enabled,
-            allowSecondarySearches: dictOptions.allowSecondarySearches
+            outdated: dictRow.version < 3
         });
 
         dictGroups.append($(dictHtml));

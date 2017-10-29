@@ -234,7 +234,7 @@ class Database {
         }
 
         const indexDataLoaded = async summary => {
-            if (summary.version > 2) {
+            if (summary.version > 3) {
                 throw 'Unsupported dictionary version';
             }
 

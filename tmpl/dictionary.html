@@ -1,5 +1,8 @@
 <div class="dict-group well well-sm" data-title="{{title}}">
     <h4><span class="text-muted glyphicon glyphicon-book"></span> {{title}} <small>rev.{{revision}}</small></h4>
+    {{#if outdated}}
+    <p class="text-warning">This dictionary is outdated and may not support new extension features; please import the latest version.</p>
+    {{/if}}
 
     <div class="checkbox">
         <label><input type="checkbox" class="dict-enabled" {{#if enabled}}checked{{/if}}> Enable search</label>
