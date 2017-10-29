@@ -110,7 +110,7 @@ async function formMainDictionaryOptionsPopulate(options) {
 
     let mainDictionary = '';
     for (const dictRow of await utilDatabaseSummarize()) {
-        if (dictRow.hasSequences) {
+        if (dictRow.sequenced) {
             select.append($(`<option value="${dictRow.title}">${dictRow.title}</option>`));
             if (dictRow.title === options.general.mainDictionary) {
                 mainDictionary = dictRow.title;
@@ -342,7 +342,7 @@ async function onDictionaryImport(e) {
         const options = await optionsLoad();
         const summary = await utilDatabaseImport(e.target.files[0], updateProgress);
         options.dictionaries[summary.title] = {enabled: true, priority: 0, allowSecondarySearches: false};
-        if (summary.hasSequences && options.general.mainDictionary === '') {
+        if (summary.sequenced && options.general.mainDictionary === '') {
             options.general.mainDictionary = summary.title;
         }
         await optionsSave(options);
