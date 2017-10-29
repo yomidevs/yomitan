@@ -25,7 +25,6 @@ async function formRead() {
     optionsNew.general.compactTags = $('#compact-tags').prop('checked');
     optionsNew.general.compactGlossaries = $('#compact-glossaries').prop('checked');
     optionsNew.general.resultOutputMode = $('#result-output-mode').val();
-    optionsNew.general.mainDictionary = $('#main-dictionary').val();
     optionsNew.general.audioSource = $('#audio-playback-source').val();
     optionsNew.general.audioVolume = parseFloat($('#audio-playback-volume').val());
     optionsNew.general.debugInfo = $('#show-debug-info').prop('checked');
@@ -58,6 +57,7 @@ async function formRead() {
         optionsNew.anki.kanji.fields = ankiFieldsToDict($('#kanji .anki-field-value'));
     }
 
+    optionsNew.general.mainDictionary = $('#dict-main').val();
     $('.dict-group').each((index, element) => {
         const dictionary = $(element);
         const title = dictionary.data('title');
@@ -85,11 +85,11 @@ function formUpdateVisibility(options) {
         advanced.hide();
     }
 
-    const merge = $('.options-merge');
+    const mainGroup = $('#dict-main-group');
     if (options.general.resultOutputMode === 'merge') {
-        merge.show();
+        mainGroup.show();
     } else {
-        merge.hide();
+        mainGroup.hide();
     }
 
     const debug = $('#debug');
@@ -105,40 +105,32 @@ function formUpdateVisibility(options) {
 }
 
 async function formMainDictionaryOptionsPopulate(options) {
-    const select = $('#main-dictionary').empty();
+    const select = $('#dict-main').empty();
+    select.append($('<option class="text-muted" value="">Not selected</option>'));
 
-    let titles = await utilDatabaseGetTitlesWithSequences();
-    titles = titles.filter(title => options.dictionaries[title].enabled);
-    const formOptionsHtml = [];
-    let mainDictionarySelected = false;
+    let mainDictionary = '';
+    const formOptions = [$];
+    const titles = await utilDatabaseGetTitlesWithSequences();
     for (const title of titles) {
-        if (options.general.mainDictionary === title) {
-            mainDictionarySelected = true;
+        select.append($(`<option value="${title}">${title}</option>`));
+        if (title === options.general.mainDictionary) {
+            mainDictionary = title;
         }
-        formOptionsHtml.push(`<option value="${title}"${options.general.mainDictionary === title ? ' selected' : ''}>${title}</option>`);
     }
 
-    if (!mainDictionarySelected) {
-        options.general.mainDictionary = '';
-    }
-
-    const notSelectedOptionHtml = `<option class="text-muted" value=""${!mainDictionarySelected ? ' selected' : ''}>Not selected</option>`;
-
-    select.append($([notSelectedOptionHtml].concat(formOptionsHtml).join('')));
+    select.val(mainDictionary);
 }
 
 async function onFormOptionsChanged(e) {
+    if (!e.originalEvent && !e.isTrigger) {
+        return;
+    }
+
+    const {optionsNew, optionsOld} = await formRead();
+    await optionsSave(optionsNew);
+    formUpdateVisibility(optionsNew);
+
     try {
-        if (!e.originalEvent && !e.isTrigger) {
-            return;
-        }
-
-        const {optionsNew, optionsOld} = await formRead();
-        await formMainDictionaryOptionsPopulate(optionsNew);
-        await optionsSave(optionsNew);
-
-        formUpdateVisibility(optionsNew);
-
         const ankiUpdated =
             optionsNew.anki.enable !== optionsOld.anki.enable ||
             optionsNew.anki.server !== optionsOld.anki.server;
@@ -162,7 +154,6 @@ async function onReady() {
     $('#compact-tags').prop('checked', options.general.compactTags);
     $('#compact-glossaries').prop('checked', options.general.compactGlossaries);
     $('#result-output-mode').val(options.general.resultOutputMode);
-    $('#main-dictionary').val(options.general.mainDictionary);
     $('#audio-playback-source').val(options.general.audioSource);
     $('#audio-playback-volume').val(options.general.audioVolume);
     $('#show-debug-info').prop('checked', options.general.debugInfo);
@@ -194,6 +185,7 @@ async function onReady() {
 
     try {
         await dictionaryGroupsPopulate(options);
+        await formMainDictionaryOptionsPopulate(options);
     } catch (e) {
         dictionaryErrorShow(e);
     }
@@ -203,8 +195,6 @@ async function onReady() {
     } catch (e) {
         ankiErrorShow(e);
     }
-
-    await formMainDictionaryOptionsPopulate(options);
 
     formUpdateVisibility(options);
 }
@@ -311,7 +301,7 @@ async function dictionaryGroupsPopulate(options) {
 async function onDictionaryPurge(e) {
     e.preventDefault();
 
-    const dictControls = $('#dict-importer, #dict-groups').hide();
+    const dictControls = $('#dict-importer, #dict-groups, #dict-main-group').hide();
     const dictProgress = $('#dict-purge').show();
 
     try {
@@ -352,7 +342,7 @@ async function onDictionaryImport(e) {
         const options = await optionsLoad();
         const summary = await utilDatabaseImport(e.target.files[0], updateProgress);
         options.dictionaries[summary.title] = {enabled: true, priority: 0, allowSecondarySearches: false};
-        if (summary.hasSequences && !options.general.mainDictionary) {
+        if (summary.hasSequences && options.general.mainDictionary === '') {
             options.general.mainDictionary = summary.title;
         }
         await optionsSave(options);
