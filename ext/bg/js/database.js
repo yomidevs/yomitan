@@ -40,6 +40,9 @@ class Database {
             kanjiMeta: '++,dictionary,character',
             tagMeta:   '++,dictionary,name'
         });
+        this.db.version(4).stores({
+            terms: '++id,dictionary,expression,reading,sequence'
+        });
 
         await this.db.open();
     }
@@ -68,12 +71,66 @@ class Database {
                 results.push({
                     expression: row.expression,
                     reading: row.reading,
-                    tags: dictFieldSplit(row.tags),
+                    definitionTags: dictFieldSplit(row.definitionTags || row.tags || ''),
+                    termTags: dictFieldSplit(row.termTags || ''),
                     rules: dictFieldSplit(row.rules),
                     glossary: row.glossary,
                     score: row.score,
                     dictionary: row.dictionary,
-                    id: row.id
+                    id: row.id,
+                    sequence: typeof row.sequence === 'undefined' ? -1 : row.sequence
+                });
+            }
+        });
+
+        return results;
+    }
+
+    async findTermsExact(term, reading, titles) {
+        if (!this.db) {
+            throw 'Database not initialized';
+        }
+
+        const results = [];
+        await this.db.terms.where('expression').equals(term).each(row => {
+            if (row.reading === reading && titles.includes(row.dictionary)) {
+                results.push({
+                    expression: row.expression,
+                    reading: row.reading,
+                    definitionTags: dictFieldSplit(row.definitionTags || row.tags || ''),
+                    termTags: dictFieldSplit(row.termTags || ''),
+                    rules: dictFieldSplit(row.rules),
+                    glossary: row.glossary,
+                    score: row.score,
+                    dictionary: row.dictionary,
+                    id: row.id,
+                    sequence: typeof row.sequence === 'undefined' ? -1 : row.sequence
+                });
+            }
+        });
+
+        return results;
+    }
+
+    async findTermsBySequence(sequence, mainDictionary) {
+        if (!this.db) {
+            throw 'Database not initialized';
+        }
+
+        const results = [];
+        await this.db.terms.where('sequence').equals(sequence).each(row => {
+            if (row.dictionary === mainDictionary) {
+                results.push({
+                    expression: row.expression,
+                    reading: row.reading,
+                    definitionTags: dictFieldSplit(row.definitionTags || row.tags || ''),
+                    termTags: dictFieldSplit(row.termTags || ''),
+                    rules: dictFieldSplit(row.rules),
+                    glossary: row.glossary,
+                    score: row.score,
+                    dictionary: row.dictionary,
+                    id: row.id,
+                    sequence: typeof row.sequence === 'undefined' ? -1 : row.sequence
                 });
             }
         });
@@ -163,7 +220,7 @@ class Database {
         return result;
     }
 
-    async getTitles() {
+    async summarize() {
         if (this.db) {
             return this.db.dictionaries.toArray();
         } else {
@@ -177,7 +234,7 @@ class Database {
         }
 
         const indexDataLoaded = async summary => {
-            if (summary.version > 2) {
+            if (summary.version > 3) {
                 throw 'Unsupported dictionary version';
             }
 
@@ -196,11 +253,11 @@ class Database {
 
             const rows = [];
             if (summary.version === 1) {
-                for (const [expression, reading, tags, rules, score, ...glossary] of entries) {
+                for (const [expression, reading, definitionTags, rules, score, ...glossary] of entries) {
                     rows.push({
                         expression,
                         reading,
-                        tags,
+                        definitionTags,
                         rules,
                         score,
                         glossary,
@@ -208,14 +265,16 @@ class Database {
                     });
                 }
             } else {
-                for (const [expression, reading, tags, rules, score, glossary] of entries) {
+                for (const [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] of entries) {
                     rows.push({
                         expression,
                         reading,
-                        tags,
+                        definitionTags,
                         rules,
                         score,
                         glossary,
+                        sequence,
+                        termTags,
                         dictionary: summary.title
                     });
                 }
@@ -300,12 +359,13 @@ class Database {
             }
 
             const rows = [];
-            for (const [name, category, order, notes] of entries) {
+            for (const [name, category, order, notes, score] of entries) {
                 const row = dictTagSanitize({
                     name,
                     category,
                     order,
                     notes,
+                    score,
                     dictionary: summary.title
                 });
 
@@ -350,12 +410,11 @@ class Database {
         const summary = {
             title: index.title,
             revision: index.revision,
+            sequenced: index.sequenced,
             version: index.format || index.version
         };
 
-        if (indexDataLoaded) {
-            await indexDataLoaded(summary);
-        }
+        await indexDataLoaded(summary);
 
         const buildTermBankName      = index => `term_bank_${index + 1}.json`;
         const buildTermMetaBankName  = index => `term_meta_bank_${index + 1}.json`;
@@ -390,7 +449,7 @@ class Database {
             const bank = [];
             for (const name in index.tagMeta) {
                 const tag = index.tagMeta[name];
-                bank.push([name, tag.category, tag.order, tag.notes]);
+                bank.push([name, tag.category, tag.order, tag.notes, tag.score]);
             }
 
             tagDataLoaded(summary, bank, ++bankTotalCount, bankLoadedCount++);

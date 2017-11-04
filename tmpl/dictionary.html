@@ -1,8 +1,14 @@
 <div class="dict-group well well-sm" data-title="{{title}}">
     <h4><span class="text-muted glyphicon glyphicon-book"></span> {{title}} <small>rev.{{revision}}</small></h4>
+    {{#if outdated}}
+    <p class="text-warning">This dictionary is outdated and may not support new extension features; please import the latest version.</p>
+    {{/if}}
 
     <div class="checkbox">
         <label><input type="checkbox" class="dict-enabled" {{#if enabled}}checked{{/if}}> Enable search</label>
+    </div>
+    <div class="checkbox options-advanced">
+        <label><input type="checkbox" class="dict-allow-secondary-searches" {{#if allowSecondarySearches}}checked{{/if}}> Allow secondary searches</label>
     </div>
     <div class="form-group options-advanced">
         <label for="dict-{{title}}">Result priority</label>

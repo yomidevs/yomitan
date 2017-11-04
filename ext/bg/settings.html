@@ -36,7 +36,11 @@
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="group-terms-results"> Group term results</label>
+                    <label><input type="checkbox" id="compact-tags"> Compact tags</label>
+                </div>
+
+                <div class="checkbox">
+                    <label><input type="checkbox" id="compact-glossaries"> Compact glossaries</label>
                 </div>
 
                 <div class="checkbox">
@@ -45,6 +49,15 @@
 
                 <div class="checkbox options-advanced">
                     <label><input type="checkbox" id="show-debug-info"> Show debug information</label>
+                </div>
+
+                <div class="form-group">
+                    <label for="result-output-mode">Result grouping</label>
+                    <select class="form-control" id="result-output-mode">
+                        <option value="group">Group results by term-reading pairs</option>
+                        <option value="merge">Group results by main dictionary entry</option>
+                        <option value="split">Split definitions to their own results</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -132,9 +145,13 @@
                     or you can simply <a href="#" id="dict-purge-link">purge the database</a> to delete everything.
                 </p>
                 <p class="help-block">
-                    Please visit the <a href="https://foosoft.net/projects/yomichan" target="_blank">Yomichan</a> homepage to download free
-                    dictionaries that you can use with this extension.
+                    Deleting individual dictionaries is not currently feasible due to limitations of browser database technology.
                 </p>
+
+                <div class="form-group" id="dict-main-group">
+                    <label for="dict-main">Main dictionary for merged mode</label>
+                    <select class="form-control" id="dict-main"></select>
+                </div>
 
                 <div class="text-danger" id="dict-purge">Dictionary data is being purged, please be patient...</div>
                 <div class="alert alert-warning" id="dict-warning">No dictionaries have been installed</div>
@@ -150,6 +167,11 @@
                 </div>
 
                 <div id="dict-importer">
+                    <p class="help-block">
+                        Select a dictionary to import for use below. Please visit the Yomichan homepage to
+                        <a href="https://foosoft.net/projects/yomichan" target="_blank">download free dictionaries</a>
+                        for use with this extension and to learn about importing proprietary EPWING dictionaries.
+                    </p>
                     <input type="file" id="dict-file">
                 </div>
             </div>

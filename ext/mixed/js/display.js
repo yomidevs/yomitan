@@ -29,6 +29,7 @@ class Display {
         this.audioCache = {};
 
         $(document).keydown(this.onKeyDown.bind(this));
+        $(document).on('wheel', this.onWheel.bind(this));
     }
 
     onError(error) {
@@ -70,8 +71,10 @@ class Display {
 
     onAudioPlay(e) {
         e.preventDefault();
-        const index = Display.entryIndexFind($(e.currentTarget));
-        this.audioPlay(this.definitions[index]);
+        const link = $(e.currentTarget);
+        const definitionIndex = Display.entryIndexFind(link);
+        const expressionIndex = link.closest('.entry').find('.expression .action-play-audio').index(link);
+        this.audioPlay(this.definitions[definitionIndex], expressionIndex);
     }
 
     onNoteAdd(e) {
@@ -182,7 +185,8 @@ class Display {
             80: /* p */ () => {
                 if (e.altKey) {
                     if ($('.entry').eq(this.index).data('type') === 'term') {
-                        this.audioPlay(this.definitions[this.index]);
+                        const expressionIndex = this.options.general.resultOutputMode === 'merge' ? 0 : -1;
+                        this.audioPlay(this.definitions[this.index], expressionIndex);
                     }
 
                     return true;
@@ -202,6 +206,25 @@ class Display {
         }
     }
 
+    onWheel(e) {
+        const event = e.originalEvent;
+        const handler = () => {
+            if (event.altKey) {
+                if (event.deltaY < 0) { // scroll up
+                    this.entryScrollIntoView(this.index - 1, true);
+                    return true;
+                } else if (event.deltaY > 0) { // scroll down
+                    this.entryScrollIntoView(this.index + 1, true);
+                    return true;
+                }
+            }
+        };
+
+        if (handler()) {
+            event.preventDefault();
+        }
+    }
+
     async termsShow(definitions, options, context) {
         try {
             window.focus();
@@ -214,8 +237,10 @@ class Display {
             const params = {
                 definitions,
                 addable: options.anki.enable,
-                grouped: options.general.groupResults,
+                grouped: options.general.resultOutputMode === 'group',
+                merged: options.general.resultOutputMode === 'merge',
                 playback: options.general.audioSource !== 'disabled',
+                compactGlossaries: options.general.compactGlossaries,
                 debug: options.general.debugInfo
             };
 
@@ -359,11 +384,12 @@ class Display {
         }
     }
 
-    async audioPlay(definition) {
+    async audioPlay(definition, expressionIndex) {
         try {
             this.spinner.show();
 
-            let url = await apiAudioGetUrl(definition, this.options.general.audioSource);
+            const expression = expressionIndex === -1 ? definition : definition.expressions[expressionIndex];
+            let url = await apiAudioGetUrl(expression, this.options.general.audioSource);
             if (!url) {
                 url = '/mixed/mp3/button.mp3';
             }

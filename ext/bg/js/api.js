@@ -29,9 +29,11 @@ async function apiTermsFind(text) {
     const options = utilBackend().options;
     const translator = utilBackend().translator;
 
-    const searcher = options.general.groupResults ?
-        translator.findTermsGrouped.bind(translator) :
-        translator.findTermsSplit.bind(translator);
+    const searcher = {
+        'merge': translator.findTermsMerged,
+        'split': translator.findTermsSplit,
+        'group': translator.findTermsGrouped
+    }[options.general.resultOutputMode].bind(translator);
 
     const {definitions, length} = await searcher(
         text,

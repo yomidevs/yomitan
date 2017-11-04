@@ -19,12 +19,26 @@
 
 function optionsFieldTemplates() {
     return `
+<style>
+.expression-popular {
+    color: #0275d8;
+}
+
+.expression-rare {
+    color: #999;
+}
+</style>
 {{#*inline "glossary-single"}}
     {{~#unless brief~}}
-        {{~#if tags~}}<i>({{#each tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})</i> {{/if~}}
+        {{~#if definitionTags~}}<i>({{#each definitionTags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})</i> {{/if~}}
+        {{~#if only~}}({{#each only}}{{{.}}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
     {{~/unless~}}
     {{~#if glossary.[1]~}}
-        <ul>{{#each glossary}}<li>{{#multiLine}}{{.}}{{/multiLine}}</li>{{/each}}</ul>
+        {{~#if compactGlossaries~}}
+            {{#each glossary}}{{#multiLine}}{{.}}{{/multiLine}}{{#unless @last}} | {{/unless}}{{/each}}
+        {{~else~}}
+            <ul>{{#each glossary}}<li>{{#multiLine}}{{.}}{{/multiLine}}</li>{{/each}}</ul>
+        {{~/if~}}
     {{~else~}}
         {{~#multiLine}}{{glossary.[0]}}{{/multiLine~}}
     {{~/if~}}
@@ -41,23 +55,56 @@ function optionsFieldTemplates() {
 {{/inline}}
 
 {{#*inline "expression"}}
-    {{~#if modeTermKana~}}
-        {{~#if definition.reading~}}
-            {{definition.reading}}
+    {{~#if merge~}}
+        {{~#if modeTermKana~}}
+            {{~#each definition.reading~}}
+                {{{.}}}
+                {{~#unless @last}}、{{/unless~}}
+            {{~else~}}
+                {{~#each definition.expression~}}
+                    {{{.}}}
+                    {{~#unless @last}}、{{/unless~}}
+                {{~/each~}}
+            {{~/each~}}
+        {{~else~}}
+            {{~#each definition.expression~}}
+                {{{.}}}
+                {{~#unless @last}}、{{/unless~}}
+            {{~/each~}}
+        {{~/if~}}
+    {{~else~}}
+        {{~#if modeTermKana~}}
+            {{~#if definition.reading~}}
+                {{definition.reading}}
+            {{~else~}}
+                {{definition.expression}}
+            {{~/if~}}
         {{~else~}}
             {{definition.expression}}
         {{~/if~}}
-    {{~else~}}
-        {{definition.expression}}
     {{~/if~}}
 {{/inline}}
 
 {{#*inline "furigana"}}
-    {{#furigana}}{{{definition}}}{{/furigana}}
+    {{~#if merge~}}
+        {{~#each definition.expressions~}}
+            <span class="expression-{{termFrequency}}">{{~#furigana}}{{{.}}}{{/furigana~}}</span>
+            {{~#unless @last}}、{{/unless~}}
+        {{~/each~}}
+    {{~else~}}
+        {{#furigana}}{{{definition}}}{{/furigana}}
+    {{~/if~}}
 {{/inline}}
 
 {{#*inline "furigana-plain"}}
-    {{#furiganaPlain}}{{{definition}}}{{/furiganaPlain}}
+    {{~#if merge~}}
+        {{~#each definition.expressions~}}
+            <span class="expression-{{termFrequency}}">{{~#furiganaPlain}}{{{.}}}{{/furiganaPlain~}}</span>
+            {{~#unless @last}}、{{/unless~}}
+        {{~/each~}}
+    {{~else~}}
+        {{#furiganaPlain}}{{{definition}}}{{/furiganaPlain}}
+    {{~/if~}}
 {{/inline}}
 
 {{#*inline "glossary"}}
@@ -71,12 +118,18 @@ function optionsFieldTemplates() {
     {{~else~}}
         {{~#if group~}}
             {{~#if definition.definitions.[1]~}}
-                <ol>{{#each definition.definitions}}<li>{{> glossary-single brief=../brief}}</li>{{/each}}</ol>
+                <ol>{{#each definition.definitions}}<li>{{> glossary-single brief=../brief compactGlossaries=../compactGlossaries}}</li>{{/each}}</ol>
             {{~else~}}
-                {{~> glossary-single definition.definitions.[0] brief=brief~}}
+                {{~> glossary-single definition.definitions.[0] brief=brief compactGlossaries=compactGlossaries~}}
+            {{~/if~}}
+        {{~else if merge~}}
+            {{~#if definition.definitions.[1]~}}
+                <ol>{{#each definition.definitions}}<li>{{> glossary-single brief=../brief compactGlossaries=../compactGlossaries}}</li>{{/each}}</ol>
+            {{~else~}}
+                {{~> glossary-single definition.definitions.[0] brief=brief compactGlossaries=compactGlossaries~}}
             {{~/if~}}
         {{~else~}}
-            {{~> glossary-single definition brief=brief~}}
+            {{~> glossary-single definition brief=brief compactGlossaries=compactGlossaries~}}
         {{~/if~}}
     {{~/if~}}
     </div>
@@ -95,7 +148,16 @@ function optionsFieldTemplates() {
 {{/inline}}
 
 {{#*inline "reading"}}
-    {{~#unless modeTermKana}}{{definition.reading}}{{/unless~}}
+    {{~#unless modeTermKana~}}
+        {{~#if merge~}}
+            {{~#each definition.reading~}}
+                {{{.}}}
+                {{~#unless @last}}、{{/unless~}}
+            {{~/each~}}
+        {{~else~}}
+            {{~definition.reading~}}
+        {{~/if~}}
+    {{~/unless~}}
 {{/inline}}
 
 {{#*inline "sentence"}}
@@ -115,7 +177,7 @@ function optionsFieldTemplates() {
 {{/inline}}
 
 {{#*inline "tags"}}
-    {{~#each definition.tags}}{{name}}{{#unless @last}}, {{/unless}}{{/each~}}
+    {{~#each definition.definitionTags}}{{name}}{{#unless @last}}, {{/unless}}{{/each~}}
 {{/inline}}
 
 {{#*inline "url"}}
@@ -132,14 +194,17 @@ function optionsSetDefaults(options) {
             enable: true,
             audioSource: 'jpod101',
             audioVolume: 100,
-            groupResults: true,
+            resultOutputMode: 'group',
             debugInfo: false,
             maxResults: 32,
             showAdvanced: false,
             popupWidth: 400,
             popupHeight: 250,
             popupOffset: 10,
-            showGuide: true
+            showGuide: true,
+            compactTags: false,
+            compactGlossaries: false,
+            mainDictionary: ''
         },
 
         scanning: {
@@ -204,6 +269,24 @@ function optionsVersion(options) {
                 options.scanning.modifier = 'shift';
             } else {
                 options.scanning.modifier = 'none';
+            }
+        },
+        () => {
+            if (options.general.groupResults) {
+                options.general.resultOutputMode = 'group';
+            } else {
+                options.general.resultOutputMode = 'split';
+            }
+            if (utilStringHashCode(options.anki.fieldTemplates) !== -805327496) { // a3c8508031a1073629803d0616a2ee416cd3cccc
+                options.anki.fieldTemplates = `
+{{#if merge}}
+${optionsFieldTemplates()}
+{{else}}
+${options.anki.fieldTemplates}
+{{/if}}
+`.trim();
+            } else {
+                options.anki.fieldTemplates = optionsFieldTemplates();
             }
         }
     ];
