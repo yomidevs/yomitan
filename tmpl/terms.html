@@ -44,9 +44,7 @@
 
     {{#if merged}}
     {{~#each expressions~}}
-    <div class="expression">
-        <span class="expression-{{termFrequency}}">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</span>
-        <div class="peek-wrapper">
+    <div class="expression"><span class="expression-{{termFrequency}}">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</span><div class="peek-wrapper">
             {{~#if ../playback~}}
             <a href="#" class="action-play-audio"><img src="/mixed/img/play-audio.png" title="Play audio" alt></a>
             {{~/if~}}
@@ -64,9 +62,7 @@
                 {{/each~}}
             </div>
             {{~/if~}}
-        </div>
-        <span class="{{#if @last}}invisible{{/if}}">、</span>
-    </div>
+    </div><span class="{{#if @last}}invisible{{/if}}">、</span></div>
     {{~/each~}}
     {{else}}
     <div class="expression">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</div>
