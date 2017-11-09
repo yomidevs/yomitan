@@ -245,22 +245,26 @@ function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
         result.expression.add(definition.expression);
         result.reading.add(definition.reading);
 
-        // result->expressions[ Expression1[ Reading1[ Tag1, Tag2 ] ], Expression2, ... ]
-        if (!result.expressions.has(definition.expression)) {
-            result.expressions.set(definition.expression, new Map());
-        }
-        if (!result.expressions.get(definition.expression).has(definition.reading)) {
-            result.expressions.get(definition.expression).set(definition.reading, new Set());
-        }
-
         for (const tag of definition.definitionTags) {
             if (!definitionsByGloss[gloss].definitionTags.find(existingTag => existingTag.name === tag.name)) {
                 definitionsByGloss[gloss].definitionTags.push(tag);
             }
         }
 
-        for (const tag of definition.termTags) {
-            result.expressions.get(definition.expression).get(definition.reading).add(tag);
+        if (!appendTo) {
+            // result->expressions[ Expression1[ Reading1[ Tag1, Tag2 ] ], Expression2, ... ]
+            if (!result.expressions.has(definition.expression)) {
+                result.expressions.set(definition.expression, new Map());
+            }
+            if (!result.expressions.get(definition.expression).has(definition.reading)) {
+                result.expressions.get(definition.expression).set(definition.reading, []);
+            }
+
+            for (const tag of definition.termTags) {
+                if (!result.expressions.get(definition.expression).get(definition.reading).find(existingTag => existingTag.name === tag.name)) {
+                    result.expressions.get(definition.expression).get(definition.reading).push(tag);
+                }
+            }
         }
     }
 
