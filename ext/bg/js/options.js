@@ -19,15 +19,6 @@
 
 function optionsFieldTemplates() {
     return `
-<style>
-.expression-popular {
-    color: #0275d8;
-}
-
-.expression-rare {
-    color: #999;
-}
-</style>
 {{#*inline "glossary-single"}}
     {{~#unless brief~}}
         {{~#if definitionTags~}}<i>({{#each definitionTags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})</i> {{/if~}}
@@ -277,15 +268,14 @@ function optionsVersion(options) {
             } else {
                 options.general.resultOutputMode = 'split';
             }
-            if (utilStringHashCode(options.anki.fieldTemplates) !== -805327496) { // a3c8508031a1073629803d0616a2ee416cd3cccc
-                options.anki.fieldTemplates = `
-{{#if merge}}
-${optionsFieldTemplates()}
-{{else}}
-${options.anki.fieldTemplates}
-{{/if}}
-`.trim();
+            if (utilStringHashCode(options.anki.fieldTemplates) !== -805327496) {
+                options.anki.fieldTemplates = `{{#if merge}}${optionsFieldTemplates()}{{else}}${options.anki.fieldTemplates}{{/if}}`;
             } else {
+                options.anki.fieldTemplates = optionsFieldTemplates();
+            }
+        },
+        () => {
+            if (utilStringHashCode(options.anki.fieldTemplates) === 1285806040) {
                 options.anki.fieldTemplates = optionsFieldTemplates();
             }
         }
