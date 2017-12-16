@@ -20,6 +20,8 @@
 class DisplayFloat extends Display {
     constructor() {
         super($('#spinner'), $('#definitions'));
+        this.autoPlayAudioTimer = null;
+
         $(window).on('message', utilAsync(this.onMessage.bind(this)));
     }
 
@@ -54,6 +56,10 @@ class DisplayFloat extends Display {
                 this.kanjiShow(definitions, options, context);
             },
 
+            clearAutoPlayTimer: () => {
+                this.clearAutoPlayTimer();
+            },
+
             orphaned: () => {
                 this.onOrphaned();
             }
@@ -81,6 +87,18 @@ class DisplayFloat extends Display {
             e.preventDefault();
         } else {
             super.onKeyDown(e);
+        }
+    }
+
+    autoPlayAudio() {
+        this.clearAutoPlayTimer();
+        this.autoPlayAudioTimer = window.setTimeout(() => super.autoPlayAudio(), 400);
+    }
+
+    clearAutoPlayTimer() {
+        if (this.autoPlayAudioTimer) {
+            window.clearTimeout(this.autoPlayAudioTimer);
+            this.autoPlayAudioTimer = null;
         }
     }
 }
