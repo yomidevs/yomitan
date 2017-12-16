@@ -254,6 +254,7 @@ class Frontend {
     searchClear() {
         docImposterDestroy();
         this.popup.hide();
+        this.popup.clearAutoPlayTimer();
 
         if (this.options.scanning.selectText && this.textSourceLast) {
             this.textSourceLast.deselect();
