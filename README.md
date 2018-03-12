@@ -61,7 +61,6 @@ primary language is not English, you may consider also importing the English ver
     *   [jmdict_french.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_french.zip)
     *   [jmdict_german.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_german.zip)
     *   [jmdict_hungarian.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_hungarian.zip)
-    *   [jmdict_italian.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_italian.zip)
     *   [jmdict_russian.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_russian.zip)
     *   [jmdict_slovenian.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_slovenian.zip)
     *   [jmdict_spanish.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_spanish.zip)
