@@ -185,6 +185,7 @@ function optionsSetDefaults(options) {
             enable: true,
             audioSource: 'jpod101',
             audioVolume: 100,
+            autoPlayAudio: false,
             resultOutputMode: 'group',
             debugInfo: false,
             maxResults: 32,

@@ -185,8 +185,7 @@ class Display {
             80: /* p */ () => {
                 if (e.altKey) {
                     if ($('.entry').eq(this.index).data('type') === 'term') {
-                        const expressionIndex = this.options.general.resultOutputMode === 'merge' ? 0 : -1;
-                        this.audioPlay(this.definitions[this.index], expressionIndex);
+                        this.audioPlay(this.definitions[this.index], this.firstExpressionIndex);
                     }
 
                     return true;
@@ -258,6 +257,10 @@ class Display {
             this.container.html(content);
             this.entryScrollIntoView(context && context.index || 0);
 
+            if (this.options.general.autoPlayAudio && this.options.general.audioSource !== 'disabled') {
+                this.autoPlayAudio();
+            }
+
             $('.action-add-note').click(this.onNoteAdd.bind(this));
             $('.action-view-note').click(this.onNoteView.bind(this));
             $('.action-play-audio').click(this.onAudioPlay.bind(this));
@@ -307,6 +310,10 @@ class Display {
         } catch (e) {
             this.onError(e);
         }
+    }
+
+    autoPlayAudio() {
+        this.audioPlay(this.definitions[0], this.firstExpressionIndex);
     }
 
     async adderButtonUpdate(modes, sequence) {
@@ -420,6 +427,10 @@ class Display {
         } finally {
             this.spinner.hide();
         }
+    }
+
+    get firstExpressionIndex() {
+        return this.options.general.resultOutputMode === 'merge' ? 0 : -1;
     }
 
     static clozeBuild(sentence, source) {

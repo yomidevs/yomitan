@@ -75,9 +75,11 @@ class Translator {
             const rawDefinitionsBySequence = await this.database.findTermsBySequence(Number(sequence), options.general.mainDictionary);
 
             for (const definition of rawDefinitionsBySequence) {
-                const tags = await this.expandTags(definition.definitionTags, definition.dictionary);
-                tags.push(dictTagBuildSource(definition.dictionary));
-                definition.definitionTags = tags;
+                const definitionTags = await this.expandTags(definition.definitionTags, definition.dictionary);
+                definitionTags.push(dictTagBuildSource(definition.dictionary));
+                definition.definitionTags = definitionTags;
+                const termTags = await this.expandTags(definition.termTags, definition.dictionary);
+                definition.termTags = termTags;
             }
 
             const definitionsByGloss = dictTermsMergeByGloss(result, rawDefinitionsBySequence);
@@ -91,9 +93,11 @@ class Translator {
 
                     for (const reading of result.expressions.get(expression).keys()) {
                         for (const definition of await this.database.findTermsExact(expression, reading, secondarySearchTitles)) {
-                            const tags = await this.expandTags(definition.definitionTags, definition.dictionary);
-                            tags.push(dictTagBuildSource(definition.dictionary));
-                            definition.definitionTags = tags;
+                            const definitionTags = await this.expandTags(definition.definitionTags, definition.dictionary);
+                            definitionTags.push(dictTagBuildSource(definition.dictionary));
+                            definition.definitionTags = definitionTags;
+                            const termTags = await this.expandTags(definition.termTags, definition.dictionary);
+                            definition.termTags = termTags;
                             secondarySearchResults.push(definition);
                         }
                     }
@@ -113,11 +117,11 @@ class Translator {
             const expressions = [];
             for (const expression of result.expressions.keys()) {
                 for (const reading of result.expressions.get(expression).keys()) {
-                    const tags = await this.expandTags(result.expressions.get(expression).get(reading), result.dictionary);
+                    const termTags = result.expressions.get(expression).get(reading);
                     expressions.push({
                         expression: expression,
                         reading: reading,
-                        termTags: dictTagsSort(tags),
+                        termTags: dictTagsSort(termTags),
                         termFrequency: (score => {
                             if (score > 0) {
                                 return 'popular';
@@ -126,7 +130,7 @@ class Translator {
                             } else {
                                 return 'normal';
                             }
-                        })(tags.map(tag => tag.score).reduce((p, v) => p + v, 0))
+                        })(termTags.map(tag => tag.score).reduce((p, v) => p + v, 0))
                     });
                 }
             }

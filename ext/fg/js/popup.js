@@ -125,6 +125,12 @@ class Popup {
         this.invokeApi('kanjiShow', {definitions, options, context});
     }
 
+    clearAutoPlayTimer() {
+        if (this.injected) {
+            this.invokeApi('clearAutoPlayTimer');
+        }
+    }
+
     invokeApi(action, params={}) {
         this.container.contentWindow.postMessage({action, params}, '*');
     }

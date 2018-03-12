@@ -24,6 +24,7 @@ async function formRead() {
     optionsNew.general.showGuide = $('#show-usage-guide').prop('checked');
     optionsNew.general.compactTags = $('#compact-tags').prop('checked');
     optionsNew.general.compactGlossaries = $('#compact-glossaries').prop('checked');
+    optionsNew.general.autoPlayAudio = $('#auto-play-audio').prop('checked');
     optionsNew.general.resultOutputMode = $('#result-output-mode').val();
     optionsNew.general.audioSource = $('#audio-playback-source').val();
     optionsNew.general.audioVolume = parseFloat($('#audio-playback-volume').val());
@@ -153,6 +154,7 @@ async function onReady() {
     $('#show-usage-guide').prop('checked', options.general.showGuide);
     $('#compact-tags').prop('checked', options.general.compactTags);
     $('#compact-glossaries').prop('checked', options.general.compactGlossaries);
+    $('#auto-play-audio').prop('checked', options.general.autoPlayAudio);
     $('#result-output-mode').val(options.general.resultOutputMode);
     $('#audio-playback-source').val(options.general.audioSource);
     $('#audio-playback-volume').val(options.general.audioVolume);
