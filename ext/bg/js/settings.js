@@ -33,7 +33,8 @@ async function formRead() {
     optionsNew.general.maxResults = parseInt($('#max-displayed-results').val(), 10);
     optionsNew.general.popupWidth = parseInt($('#popup-width').val(), 10);
     optionsNew.general.popupHeight = parseInt($('#popup-height').val(), 10);
-    optionsNew.general.popupOffset = parseInt($('#popup-offset').val(), 10);
+    optionsNew.general.popupHorizontalOffset = parseInt($('#popup-horizontal-offset').val(), 0);
+    optionsNew.general.popupVerticalOffset = parseInt($('#popup-vertical-offset').val(), 10);
 
     optionsNew.scanning.middleMouse = $('#middle-mouse-button-scan').prop('checked');
     optionsNew.scanning.selectText = $('#select-matched-text').prop('checked');
@@ -163,7 +164,8 @@ async function onReady() {
     $('#max-displayed-results').val(options.general.maxResults);
     $('#popup-width').val(options.general.popupWidth);
     $('#popup-height').val(options.general.popupHeight);
-    $('#popup-offset').val(options.general.popupOffset);
+    $('#popup-horizontal-offset').val(options.general.popupHorizontalOffset);
+    $('#popup-vertical-offset').val(options.general.popupVerticalOffset);
 
     $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);
     $('#select-matched-text').prop('checked', options.scanning.selectText);

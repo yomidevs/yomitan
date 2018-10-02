@@ -50,7 +50,7 @@ class Popup {
         const limitX = document.body.clientWidth;
         const limitY = window.innerHeight;
 
-        let x = elementRect.left;
+        let x = elementRect.left + options.general.popupHorizontalOffset;
         let width = Math.max(containerWidth, options.general.popupWidth);
         const overflowX = Math.max(x + width - limitX, 0);
         if (overflowX > 0) {
@@ -64,8 +64,8 @@ class Popup {
 
         let y = 0;
         let height = Math.max(containerHeight, options.general.popupHeight);
-        const yBelow = elementRect.bottom + options.general.popupOffset;
-        const yAbove = elementRect.top - options.general.popupOffset;
+        const yBelow = elementRect.bottom + options.general.popupVerticalOffset;
+        const yAbove = elementRect.top - options.general.popupVerticalOffset;
         const overflowBelow = Math.max(yBelow + height - limitY, 0);
         const overflowAbove = Math.max(height - yAbove, 0);
         if (overflowBelow > 0 || overflowAbove > 0) {
