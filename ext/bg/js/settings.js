@@ -36,6 +36,7 @@ async function formRead() {
     optionsNew.general.popupOffset = parseInt($('#popup-offset').val(), 10);
 
     optionsNew.scanning.middleMouse = $('#middle-mouse-button-scan').prop('checked');
+    optionsNew.scanning.touchInputEnabled = $('#touch-input-enabled').prop('checked');
     optionsNew.scanning.selectText = $('#select-matched-text').prop('checked');
     optionsNew.scanning.alphanumeric = $('#search-alphanumeric').prop('checked');
     optionsNew.scanning.autoHideResults = $('#auto-hide-results').prop('checked');
@@ -166,6 +167,7 @@ async function onReady() {
     $('#popup-offset').val(options.general.popupOffset);
 
     $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);
+    $('#touch-input-enabled').prop('checked', options.scanning.touchInputEnabled);
     $('#select-matched-text').prop('checked', options.scanning.selectText);
     $('#search-alphanumeric').prop('checked', options.scanning.alphanumeric);
     $('#auto-hide-results').prop('checked', options.scanning.autoHideResults);

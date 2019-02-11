@@ -201,6 +201,7 @@ function optionsSetDefaults(options) {
 
         scanning: {
             middleMouse: true,
+            touchInputEnabled: true,
             selectText: true,
             alphanumeric: true,
             autoHideResults: false,

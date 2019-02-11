@@ -26,6 +26,14 @@ class Frontend {
         this.textSourceLast = null;
         this.pendingLookup = false;
         this.options = null;
+
+        this.primaryTouchIdentifier = null;
+        this.contextMenuChecking = false;
+        this.contextMenuPrevent = false;
+        this.contextMenuPreviousRange = null;
+        this.mouseDownPrevent = false;
+        this.clickPrevent = false;
+        this.scrollPrevent = false;
     }
 
     async prepare() {
@@ -38,6 +46,15 @@ class Frontend {
             window.addEventListener('mouseover', this.onMouseOver.bind(this));
             window.addEventListener('mouseup', this.onMouseUp.bind(this));
             window.addEventListener('resize', this.onResize.bind(this));
+
+            if (this.options.scanning.touchInputEnabled) {
+                window.addEventListener('click', this.onClick.bind(this));
+                window.addEventListener('touchstart', this.onTouchStart.bind(this));
+                window.addEventListener('touchend', this.onTouchEnd.bind(this));
+                window.addEventListener('touchcancel', this.onTouchCancel.bind(this));
+                window.addEventListener('touchmove', this.onTouchMove.bind(this), {passive: false});
+                window.addEventListener('contextmenu', this.onContextMenu.bind(this));
+            }
 
             chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
         } catch (e) {
@@ -79,7 +96,7 @@ class Frontend {
 
         const search = async () => {
             try {
-                await this.searchAt({x: e.clientX, y: e.clientY});
+                await this.searchAt({x: e.clientX, y: e.clientY}, Frontend.SearchType.Mouse);
             } catch (e) {
                 this.onError(e);
             }
@@ -93,6 +110,14 @@ class Frontend {
     }
 
     onMouseDown(e) {
+        if (this.mouseDownPrevent) {
+            this.setMouseDownPrevent(false, false);
+            this.setClickPrevent(true);
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+
         this.mousePosLast = {x: e.clientX, y: e.clientY};
         this.popupTimerClear();
         this.searchClear();
@@ -133,6 +158,85 @@ class Frontend {
         this.searchClear();
     }
 
+    onClick(e) {
+        if (this.clickPrevent) {
+            this.setClickPrevent(false);
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    }
+
+    onTouchStart(e) {
+        if (this.primaryTouchIdentifier !== null && this.getIndexOfTouch(e.touches, this.primaryTouchIdentifier) >= 0) {
+            return;
+        }
+
+        this.setPrimaryTouch(this.getPrimaryTouch(e.changedTouches));
+    }
+
+    onTouchEnd(e) {
+        if (this.primaryTouchIdentifier === null) {
+            return;
+        }
+
+        if (this.getIndexOfTouch(e.changedTouches, this.primaryTouchIdentifier) < 0) {
+            return;
+        }
+
+        this.setPrimaryTouch(this.getPrimaryTouch(this.excludeTouches(e.touches, e.changedTouches)));
+    }
+
+    onTouchCancel(e) {
+        this.onTouchEnd(e);
+    }
+
+    onTouchMove(e) {
+        if (!this.scrollPrevent || this.primaryTouchIdentifier === null) {
+            return;
+        }
+
+        const touches = e.changedTouches;
+        const index = this.getIndexOfTouch(touches, this.primaryTouchIdentifier);
+        if (index < 0) {
+            return;
+        }
+
+        const touch = touches[index];
+        this.searchFromTouch(touch.clientX, touch.clientY, Frontend.SearchType.TouchMove);
+
+        e.preventDefault(); // Disable scroll
+    }
+
+    onContextMenu(e) {
+        if (this.contextMenuPrevent) {
+            this.setContextMenuPrevent(false, false);
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    }
+
+    onAfterSearch(newRange, type, searched, success) {
+        if (type === Frontend.SearchType.Mouse) {
+            return;
+        }
+
+        if (
+            !this.contextMenuChecking ||
+            (this.contextMenuPreviousRange === null ? newRange === null : this.contextMenuPreviousRange.equals(newRange))) {
+            return;
+        }
+
+        if (type === Frontend.SearchType.TouchStart && newRange !== null) {
+            this.scrollPrevent = true;
+        }
+
+        this.setContextMenuPrevent(true, false);
+        this.setMouseDownPrevent(true, false);
+        this.contextMenuChecking = false;
+    }
+
     onBgMessage({action, params}, sender, callback) {
         const handlers = {
             optionsSet: options => {
@@ -167,18 +271,22 @@ class Frontend {
         }
     }
 
-    async searchAt(point) {
+    async searchAt(point, type) {
         if (this.pendingLookup || this.popup.containsPoint(point)) {
             return;
         }
 
         const textSource = docRangeFromPoint(point);
         let hideResults = !textSource || !textSource.containsPoint(point);
+        let searched = false;
+        let success = false;
 
         try {
             if (!hideResults && (!this.textSourceLast || !this.textSourceLast.equals(textSource))) {
+                searched = true;
                 this.pendingLookup = true;
                 hideResults = !await this.searchTerms(textSource) && !await this.searchKanji(textSource);
+                success = true;
             }
         } catch (e) {
             if (window.yomichan_orphaned) {
@@ -196,6 +304,7 @@ class Frontend {
             }
 
             this.pendingLookup = false;
+            this.onAfterSearch(this.textSourceLast, type, searched, success);
         }
     }
 
@@ -262,7 +371,97 @@ class Frontend {
 
         this.textSourceLast = null;
     }
+
+    getPrimaryTouch(touchList) {
+        return touchList.length > 0 ? touchList[0] : null;
+    }
+
+    getIndexOfTouch(touchList, identifier) {
+        for (let i = 0, ii = touchList.length; i < ii; ++i) {
+            let t = touchList[i];
+            if (t.identifier === identifier) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    excludeTouches(touchList, excludeTouchList) {
+        const result = [];
+        for (let i = 0, ii = touchList.length; i < ii; ++i) {
+            let r = result[i];
+            if (this.getIndexOfTouch(excludeTouchList, r.identifier) < 0) {
+                result.push(r);
+            }
+        }
+        return result;
+    }
+
+    setPrimaryTouch(touch) {
+        if (touch === null) {
+            this.primaryTouchIdentifier = null;
+            this.contextMenuPreviousRange = null;
+            this.contextMenuChecking = false;
+            this.scrollPrevent = false;
+            this.setContextMenuPrevent(false, true);
+            this.setMouseDownPrevent(false, true);
+            this.setClickPrevent(false);
+        }
+        else {
+            this.primaryTouchIdentifier = touch.identifier;
+            this.contextMenuPreviousRange = this.textSourceLast ? this.textSourceLast.clone() : null;
+            this.contextMenuChecking = true;
+            this.scrollPrevent = false;
+            this.setContextMenuPrevent(false, false);
+            this.setMouseDownPrevent(false, false);
+            this.setClickPrevent(false);
+
+            this.searchFromTouch(touch.clientX, touch.clientY, Frontend.SearchType.TouchStart);
+        }
+    }
+
+    setContextMenuPrevent(value, delay) {
+        if (!delay) {
+            this.contextMenuPrevent = value;
+        }
+    }
+
+    setMouseDownPrevent(value, delay) {
+        if (!delay) {
+            this.mouseDownPrevent = value;
+        }
+    }
+
+    setClickPrevent(value) {
+        this.clickPrevent = value;
+    }
+
+    searchFromTouch(x, y, type) {
+        this.popupTimerClear();
+
+        if (!this.options.general.enable || this.pendingLookup) {
+            return;
+        }
+
+        const pos = {x: x, y: y};
+
+        const search = async () => {
+            try {
+                await this.searchAt(pos, type);
+            } catch (e) {
+                this.onError(e);
+            }
+        };
+
+        search();
+    }
 }
+
+Frontend.SearchType = {
+    Mouse: 0,
+    TouchStart: 1,
+    TouchMove: 2
+};
 
 window.yomichan_frontend = new Frontend();
 window.yomichan_frontend.prepare();
