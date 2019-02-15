@@ -190,6 +190,7 @@ function optionsSetDefaults(options) {
             debugInfo: false,
             maxResults: 32,
             showAdvanced: false,
+            popupDisplayMode: 'default',
             popupWidth: 400,
             popupHeight: 250,
             popupOffset: 10,
