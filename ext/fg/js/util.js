@@ -26,11 +26,15 @@ function utilAsync(func) {
 function utilInvoke(action, params={}) {
     return new Promise((resolve, reject) => {
         try {
-            chrome.runtime.sendMessage({action, params}, ({result, error}) => {
-                if (error) {
-                    reject(error);
+            chrome.runtime.sendMessage({action, params}, (response) => {
+                if (response !== null && typeof response === 'object') {
+                    if (response.error) {
+                        reject(response.error);
+                    } else {
+                        resolve(response.result);
+                    }
                 } else {
-                    resolve(result);
+                    reject(`Unexpected response of type ${typeof response}`);
                 }
             });
         } catch (e) {
