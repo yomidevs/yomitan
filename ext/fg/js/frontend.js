@@ -96,7 +96,7 @@ class Frontend {
 
         const search = async () => {
             try {
-                await this.searchAt({x: e.clientX, y: e.clientY}, Frontend.SearchType.Mouse);
+                await this.searchAt({x: e.clientX, y: e.clientY}, 'mouse');
             } catch (e) {
                 this.onError(e);
             }
@@ -203,7 +203,7 @@ class Frontend {
         }
 
         const touch = touches[index];
-        this.searchFromTouch(touch.clientX, touch.clientY, Frontend.SearchType.TouchMove);
+        this.searchFromTouch(touch.clientX, touch.clientY, 'touchMove');
 
         e.preventDefault(); // Disable scroll
     }
@@ -218,7 +218,7 @@ class Frontend {
     }
 
     onAfterSearch(newRange, type, searched, success) {
-        if (type === Frontend.SearchType.Mouse) {
+        if (type === 'mouse') {
             return;
         }
 
@@ -228,7 +228,7 @@ class Frontend {
             return;
         }
 
-        if (type === Frontend.SearchType.TouchStart && newRange !== null) {
+        if (type === 'touchStart' && newRange !== null) {
             this.scrollPrevent = true;
         }
 
@@ -377,7 +377,7 @@ class Frontend {
     }
 
     getIndexOfTouch(touchList, identifier) {
-        for (let i = 0, ii = touchList.length; i < ii; ++i) {
+        for (let i in touchList) {
             let t = touchList[i];
             if (t.identifier === identifier) {
                 return i;
@@ -388,8 +388,7 @@ class Frontend {
 
     excludeTouches(touchList, excludeTouchList) {
         const result = [];
-        for (let i = 0, ii = touchList.length; i < ii; ++i) {
-            let r = result[i];
+        for (let r of touchList) {
             if (this.getIndexOfTouch(excludeTouchList, r.identifier) < 0) {
                 result.push(r);
             }
@@ -416,7 +415,7 @@ class Frontend {
             this.setMouseDownPrevent(false, false);
             this.setClickPrevent(false);
 
-            this.searchFromTouch(touch.clientX, touch.clientY, Frontend.SearchType.TouchStart);
+            this.searchFromTouch(touch.clientX, touch.clientY, 'touchStart');
         }
     }
 
@@ -443,11 +442,9 @@ class Frontend {
             return;
         }
 
-        const pos = {x: x, y: y};
-
         const search = async () => {
             try {
-                await this.searchAt(pos, type);
+                await this.searchAt({x, y}, type);
             } catch (e) {
                 this.onError(e);
             }
@@ -456,12 +453,6 @@ class Frontend {
         search();
     }
 }
-
-Frontend.SearchType = {
-    Mouse: 0,
-    TouchStart: 1,
-    TouchMove: 2
-};
 
 window.yomichan_frontend = new Frontend();
 window.yomichan_frontend.prepare();
