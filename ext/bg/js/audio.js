@@ -69,10 +69,10 @@ async function audioBuildUrl(definition, mode, cache={}) {
             const dom = new DOMParser().parseFromString(response, 'text/html');
             for (const row of dom.getElementsByClassName('dc-result-row')) {
                 try {
-                    const url = row.getElementsByClassName('ill-onebuttonplayer').item(0).getAttribute('data-url');
+                    const url = row.querySelector('audio>source[src]').getAttribute('src');
                     const reading = row.getElementsByClassName('dc-vocab_kana').item(0).innerText;
                     if (url && reading && (!definition.reading || definition.reading === reading)) {
-                        return url;
+                        return audioUrlNormalize(url, 'https://www.japanesepod101.com', '/learningcenter/reference/');
                     }
                 } catch (e) {
                     // NOP
@@ -86,7 +86,7 @@ async function audioBuildUrl(definition, mode, cache={}) {
                 resolve(response);
             } else {
                 const xhr = new XMLHttpRequest();
-                xhr.open('GET', `http://jisho.org/search/${definition.expression}`);
+                xhr.open('GET', `https://jisho.org/search/${definition.expression}`);
                 xhr.addEventListener('error', () => reject('Failed to scrape audio data'));
                 xhr.addEventListener('load', () => {
                     cache[definition.expression] = xhr.responseText;
@@ -100,7 +100,10 @@ async function audioBuildUrl(definition, mode, cache={}) {
                 const dom = new DOMParser().parseFromString(response, 'text/html');
                 const audio = dom.getElementById(`audio_${definition.expression}:${definition.reading}`);
                 if (audio) {
-                    return audio.getElementsByTagName('source').item(0).getAttribute('src');
+                    const url = audio.getElementsByTagName('source').item(0).getAttribute('src');
+                    if (url) {
+                        return audioUrlNormalize(url, 'https://jisho.org', '/search/');
+                    }
                 }
             } catch (e) {
                 // NOP
@@ -110,6 +113,24 @@ async function audioBuildUrl(definition, mode, cache={}) {
     else {
         return Promise.resolve();
     }
+}
+
+function audioUrlNormalize(url, baseUrl, basePath) {
+    if (url) {
+        if (url[0] === '/') {
+            if (url.length >= 2 && url[1] === '/') {
+                // Begins with "//"
+                url = baseUrl.substr(0, baseUrl.indexOf(':') + 1) + url;
+            } else {
+                // Begins with "/"
+                url = baseUrl + url;
+            }
+        } else if (!/^[a-z][a-z0-9\+\-\.]*:/i.test(url)) {
+            // No URI scheme => relative path
+            url = baseUrl + basePath + url;
+        }
+    }
+    return url;
 }
 
 function audioBuildFilename(definition) {
