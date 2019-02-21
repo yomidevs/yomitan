@@ -72,7 +72,7 @@ async function audioBuildUrl(definition, mode, cache={}) {
                     const url = row.querySelector('audio>source[src]').getAttribute('src');
                     const reading = row.getElementsByClassName('dc-vocab_kana').item(0).innerText;
                     if (url && reading && (!definition.reading || definition.reading === reading)) {
-                        return normalizeAudioUrl(url, 'https://www.japanesepod101.com', '/learningcenter/reference/');
+                        return audioUrlNormalize(url, 'https://www.japanesepod101.com', '/learningcenter/reference/');
                     }
                 } catch (e) {
                     // NOP
@@ -102,7 +102,7 @@ async function audioBuildUrl(definition, mode, cache={}) {
                 if (audio) {
                     const url = audio.getElementsByTagName('source').item(0).getAttribute('src');
                     if (url) {
-                        return normalizeAudioUrl(url, 'https://jisho.org', '/search/');
+                        return audioUrlNormalize(url, 'https://jisho.org', '/search/');
                     }
                 }
             } catch (e) {
@@ -115,7 +115,7 @@ async function audioBuildUrl(definition, mode, cache={}) {
     }
 }
 
-function normalizeAudioUrl(url, baseUrl, basePath) {
+function audioUrlNormalize(url, baseUrl, basePath) {
     if (url) {
         if (url[0] === '/') {
             if (url.length >= 2 && url[1] === '/') {
