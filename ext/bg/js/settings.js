@@ -364,6 +364,10 @@ async function onDictionaryPurge(e) {
 
         dictControls.show();
         dictProgress.hide();
+
+        if (storageEstimate.mostRecent !== null) {
+            storageUpdateStats();
+        }
     }
 }
 
@@ -377,7 +381,12 @@ async function onDictionaryImport(e) {
         dictionarySpinnerShow(true);
 
         const setProgress = percent => dictProgress.find('.progress-bar').css('width', `${percent}%`);
-        const updateProgress = (total, current) => setProgress(current / total * 100.0);
+        const updateProgress = (total, current) => {
+            setProgress(current / total * 100.0);
+            if (storageEstimate.mostRecent !== null && !storageUpdateStats.isUpdating) {
+                storageUpdateStats();
+            }
+        };
         setProgress(0.0);
 
         const exceptions = [];
@@ -588,16 +597,17 @@ function storageBytesToLabeledString(size) {
         size /= base;
         ++labelIndex;
     }
-    const label = size.toFixed(1).replace(/\.0+$/, "");
+    const label = size.toFixed(1);
     return `${label}${labels[labelIndex]}`;
 }
 
 async function storageEstimate() {
     try {
-        return await navigator.storage.estimate();
+        return (storageEstimate.mostRecent = await navigator.storage.estimate());
     } catch (e) { }
     return null;
 }
+storageEstimate.mostRecent = null;
 
 async function storageInfoInitialize() {
     const browser = await getBrowser();
@@ -611,8 +621,8 @@ async function storageInfoInitialize() {
     document.querySelector("#storage-refresh").addEventListener('click', () => storageShowInfo(), false);
 }
 
-async function storageShowInfo() {
-    storageSpinnerShow(true);
+async function storageUpdateStats() {
+    storageUpdateStats.isUpdating = true;
 
     const estimate = await storageEstimate();
     const valid = (estimate !== null);
@@ -621,6 +631,16 @@ async function storageShowInfo() {
         document.querySelector("#storage-usage").textContent = storageBytesToLabeledString(estimate.usage);
         document.querySelector("#storage-quota").textContent = storageBytesToLabeledString(estimate.quota);
     }
+
+    storageUpdateStats.isUpdating = false;
+    return valid;
+}
+storageUpdateStats.isUpdating = false;
+
+async function storageShowInfo() {
+    storageSpinnerShow(true);
+
+    const valid = await storageUpdateStats();
     document.querySelector("#storage-use").classList.toggle("storage-hidden", !valid);
     document.querySelector("#storage-error").classList.toggle("storage-hidden", valid);
 
