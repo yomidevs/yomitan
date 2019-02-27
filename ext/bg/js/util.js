@@ -87,6 +87,6 @@ function utilDatabasePurge() {
     return utilBackend().translator.database.purge();
 }
 
-function utilDatabaseImport(data, progress) {
-    return utilBackend().translator.database.importDictionary(data, progress);
+function utilDatabaseImport(data, progress, exceptions) {
+    return utilBackend().translator.database.importDictionary(data, progress, exceptions);
 }

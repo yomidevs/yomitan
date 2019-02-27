@@ -193,7 +193,7 @@ async function onReady() {
         await dictionaryGroupsPopulate(options);
         await formMainDictionaryOptionsPopulate(options);
     } catch (e) {
-        dictionaryErrorShow(e);
+        dictionaryErrorsShow([e]);
     }
 
     try {
@@ -214,36 +214,63 @@ $(document).ready(utilAsync(onReady));
  * Dictionary
  */
 
-function dictionaryErrorShow(error) {
+function dictionaryErrorToString(error) {
+    if (error.toString) {
+        error = error.toString();
+    } else {
+        error = `${error}`;
+    }
+
+    for (const [match, subst] of dictionaryErrorToString.overrides) {
+        if (error.includes(match)) {
+            error = subst;
+            break;
+        }
+    }
+
+    return error;
+}
+dictionaryErrorToString.overrides = [
+    [
+        'A mutation operation was attempted on a database that did not allow mutations.',
+        'Access to IndexedDB appears to be restricted. Firefox seems to require that the history preference is set to "Remember history" before IndexedDB use of any kind is allowed.'
+    ],
+    [
+        'The operation failed for reasons unrelated to the database itself and not covered by any other error code.',
+        'Unable to access IndexedDB due to a possibly corrupt user profile. Try using the "Refresh Firefox" feature to reset your user profile.'
+    ],
+    [
+        'BulkError',
+        'Unable to finish importing dictionary data into IndexedDB. This may indicate that you do not have sufficient disk space available to complete this operation.'
+    ]
+];
+
+function dictionaryErrorsShow(errors) {
     const dialog = $('#dict-error');
-    if (error) {
-        const overrides = [
-            [
-                'A mutation operation was attempted on a database that did not allow mutations.',
-                'Access to IndexedDB appears to be restricted. Firefox seems to require that the history preference is set to "Remember history" before IndexedDB use of any kind is allowed.'
-            ],
-            [
-                'The operation failed for reasons unrelated to the database itself and not covered by any other error code.',
-                'Unable to access IndexedDB due to a possibly corrupt user profile. Try using the "Refresh Firefox" feature to reset your user profile.'
-            ],
-            [
-                'BulkError',
-                'Unable to finish importing dictionary data into IndexedDB. This may indicate that you do not have sufficient disk space available to complete this operation.'
-            ]
-        ];
+    dialog.show().text('');
 
-        if (error.toString) {
-            error = error.toString();
+    if (errors !== null && errors.length > 0) {
+        const uniqueErrors = {};
+        for (let e of errors) {
+            e = dictionaryErrorToString(e);
+            uniqueErrors[e] = uniqueErrors.hasOwnProperty(e) ? uniqueErrors[e] + 1 : 1;
         }
 
-        for (const [match, subst] of overrides) {
-            if (error.includes(match)) {
-                error = subst;
-                break;
+        for (const e in uniqueErrors) {
+            const count = uniqueErrors[e];
+            const div = document.createElement('p');
+            if (count > 1) {
+                div.textContent = `${e} `;
+                const em = document.createElement('em');
+                em.textContent = `(${count})`;
+                div.appendChild(em);
+            } else {
+                div.textContent = `${e}`;
             }
+            dialog.append($(div));
         }
 
-        dialog.show().text(error);
+        dialog.show();
     } else {
         dialog.hide();
     }
@@ -319,7 +346,7 @@ async function onDictionaryPurge(e) {
     const dictProgress = $('#dict-purge').show();
 
     try {
-        dictionaryErrorShow();
+        dictionaryErrorsShow(null);
         dictionarySpinnerShow(true);
 
         await utilDatabasePurge();
@@ -331,7 +358,7 @@ async function onDictionaryPurge(e) {
         await dictionaryGroupsPopulate(options);
         await formMainDictionaryOptionsPopulate(options);
     } catch (e) {
-        dictionaryErrorShow(e);
+        dictionaryErrorsShow([e]);
     } finally {
         dictionarySpinnerShow(false);
 
@@ -346,25 +373,32 @@ async function onDictionaryImport(e) {
     const dictProgress = $('#dict-import-progress').show();
 
     try {
-        dictionaryErrorShow();
+        dictionaryErrorsShow(null);
         dictionarySpinnerShow(true);
 
         const setProgress = percent => dictProgress.find('.progress-bar').css('width', `${percent}%`);
         const updateProgress = (total, current) => setProgress(current / total * 100.0);
         setProgress(0.0);
 
+        const exceptions = [];
         const options = await optionsLoad();
-        const summary = await utilDatabaseImport(e.target.files[0], updateProgress);
+        const summary = await utilDatabaseImport(e.target.files[0], updateProgress, exceptions);
         options.dictionaries[summary.title] = {enabled: true, priority: 0, allowSecondarySearches: false};
         if (summary.sequenced && options.general.mainDictionary === '') {
             options.general.mainDictionary = summary.title;
         }
+
+        if (exceptions.length > 0) {
+            exceptions.push(`Dictionary may not have been imported properly: ${exceptions.length} error${exceptions.length === 1 ? '' : 's'} reported.`);
+            dictionaryErrorsShow(exceptions);
+        }
+
         await optionsSave(options);
 
         await dictionaryGroupsPopulate(options);
         await formMainDictionaryOptionsPopulate(options);
     } catch (e) {
-        dictionaryErrorShow(e);
+        dictionaryErrorsShow([e]);
     } finally {
         dictionarySpinnerShow(false);
 
