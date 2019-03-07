@@ -85,14 +85,24 @@ function docRangeFromPoint(point) {
                 range.setEnd(position.offsetNode, position.offset);
                 return range;
             }
+            return null;
         };
     }
 
     const range = document.caretRangeFromPoint(point.x, point.y);
+    if (range === null) {
+        return;
+    }
 
     if(imposter !== null) imposter.style.zIndex = -2147483646;
 
-    const rect = range.getClientRects()[0];
+    const rects = range.getClientRects();
+
+    if (rects.length === 0) {
+        return;
+    }
+
+    const rect = rects[0];
     if (point.y > rect.bottom + 2) {
         return;
     }
