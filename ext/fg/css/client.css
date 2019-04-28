@@ -27,3 +27,25 @@ iframe#yomichan-float {
     visibility: hidden;
     z-index: 2147483647;
 }
+
+iframe#yomichan-float.yomichan-float-full-width {
+    border-left: none;
+    border-right: none;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    resize: none;
+}
+
+iframe#yomichan-float.yomichan-float-full-width:not(.yomichan-float-above) {
+    border-bottom: none;
+    top: auto !important;
+    bottom: 0 !important;
+}
+
+iframe#yomichan-float.yomichan-float-full-width.yomichan-float-above {
+    border-top: none;
+    top: 0 !important;
+    bottom: auto !important;
+}

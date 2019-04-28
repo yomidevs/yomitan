@@ -31,11 +31,13 @@ async function formRead() {
     optionsNew.general.debugInfo = $('#show-debug-info').prop('checked');
     optionsNew.general.showAdvanced = $('#show-advanced-options').prop('checked');
     optionsNew.general.maxResults = parseInt($('#max-displayed-results').val(), 10);
+    optionsNew.general.popupDisplayMode = $('#popup-display-mode').val();
     optionsNew.general.popupWidth = parseInt($('#popup-width').val(), 10);
     optionsNew.general.popupHeight = parseInt($('#popup-height').val(), 10);
     optionsNew.general.popupOffset = parseInt($('#popup-offset').val(), 10);
 
     optionsNew.scanning.middleMouse = $('#middle-mouse-button-scan').prop('checked');
+    optionsNew.scanning.touchInputEnabled = $('#touch-input-enabled').prop('checked');
     optionsNew.scanning.selectText = $('#select-matched-text').prop('checked');
     optionsNew.scanning.alphanumeric = $('#search-alphanumeric').prop('checked');
     optionsNew.scanning.autoHideResults = $('#auto-hide-results').prop('checked');
@@ -161,11 +163,13 @@ async function onReady() {
     $('#show-debug-info').prop('checked', options.general.debugInfo);
     $('#show-advanced-options').prop('checked', options.general.showAdvanced);
     $('#max-displayed-results').val(options.general.maxResults);
+    $('#popup-display-mode').val(options.general.popupDisplayMode);
     $('#popup-width').val(options.general.popupWidth);
     $('#popup-height').val(options.general.popupHeight);
     $('#popup-offset').val(options.general.popupOffset);
 
     $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);
+    $('#touch-input-enabled').prop('checked', options.scanning.touchInputEnabled);
     $('#select-matched-text').prop('checked', options.scanning.selectText);
     $('#search-alphanumeric').prop('checked', options.scanning.alphanumeric);
     $('#auto-hide-results').prop('checked', options.scanning.autoHideResults);

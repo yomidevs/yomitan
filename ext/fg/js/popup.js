@@ -62,6 +62,7 @@ class Popup {
             }
         }
 
+        let above = false;
         let y = 0;
         let height = Math.max(containerHeight, options.general.popupHeight);
         const yBelow = elementRect.bottom + options.general.popupOffset;
@@ -75,11 +76,14 @@ class Popup {
             } else {
                 height = Math.max(height - overflowAbove, 0);
                 y = Math.max(yAbove - height, 0);
+                above = true;
             }
         } else {
             y = yBelow;
         }
 
+        this.container.classList.toggle('yomichan-float-full-width', options.general.popupDisplayMode === 'full-width');
+        this.container.classList.toggle('yomichan-float-above', above);
         this.container.style.left = `${x}px`;
         this.container.style.top = `${y}px`;
         this.container.style.width = `${width}px`;

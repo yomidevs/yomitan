@@ -27,6 +27,10 @@
     }],
     "minimum_chrome_version": "57.0.0.0",
     "options_page": "bg/settings.html",
+    "options_ui": {
+        "page": "bg/settings.html",
+        "open_in_tab": true
+    },
     "permissions": [
         "<all_urls>",
         "storage",
