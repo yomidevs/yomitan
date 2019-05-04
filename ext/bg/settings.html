@@ -9,7 +9,7 @@
         <style>
             #anki-spinner, #anki-general, #anki-error,
             #dict-spinner, #dict-error, #dict-warning, #dict-purge, #dict-import-progress,
-            #debug, .options-advanced {
+            #debug, .options-advanced, .storage-hidden, #storage-spinner {
                 display: none;
             }
 
@@ -28,6 +28,17 @@
 
             .bottom-links {
                 padding-bottom: 1em;
+            }
+
+            [data-show-for-browser] {
+                display: none;
+            }
+
+            [data-browser=edge] [data-show-for-browser~=edge],
+            [data-browser=chrome] [data-show-for-browser~=chrome],
+            [data-browser=firefox] [data-show-for-browser~=firefox],
+            [data-browser=firefox-mobile] [data-show-for-browser~=firefox-mobile] {
+                display: initial;
             }
         </style>
     </head>
@@ -194,6 +205,40 @@
                         for use with this extension and to learn about importing proprietary EPWING dictionaries.
                     </p>
                     <input type="file" id="dict-file">
+                </div>
+            </div>
+
+            <div id="storage-info" class="storage-hidden">
+                <div>
+                    <img src="/mixed/img/spinner.gif" class="pull-right" id="storage-spinner" />
+                    <h3>Storage</h3>
+                </div>
+
+                <div id="storage-use" class="storage-hidden">
+                    <p class="help-block">
+                        Yomichan is using approximately <strong id="storage-usage"></strong> of <strong id="storage-quota"></strong>.
+                    </p>
+                </div>
+
+                <div id="storage-error" class="storage-hidden">
+                    <p class="help-block">
+                        Could not detect how much storage Yomichan is using.
+                    </p>
+                    <div data-show-for-browser="firefox firefox-mobile"><div class="alert alert-danger options-advanced">
+                        On Firefox and Firefox for Android, the storage information feature may be hidden behind a browser flag.
+
+                        If you would like to enable this flag, open <a href="about:config" target="_blank">about:config</a> and search for the
+                        <strong>dom.storageManager.enabled</strong> option. If this option has a value of <strong>false</strong>, toggling it to
+                        <strong>true</strong> may allow storage information to be calculated.
+                    </div></div>
+                </div>
+
+                <div data-show-for-browser="firefox-mobile"><div class="alert alert-warning">
+                    If you are using Firefox for Android, you will have to make sure you have enough free space on your device to install dictionaries.
+                </div></div>
+
+                <div>
+                    <input type="button" value="Refresh" id="storage-refresh" />
                 </div>
             </div>
 

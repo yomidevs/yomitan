@@ -203,6 +203,8 @@ async function onReady() {
     }
 
     formUpdateVisibility(options);
+
+    storageInfoInitialize();
 }
 
 $(document).ready(utilAsync(onReady));
@@ -518,5 +520,84 @@ async function onAnkiFieldTemplatesReset(e) {
         await optionsSave(options);
     } catch (e) {
         ankiErrorShow(e);
+    }
+}
+
+
+/*
+ * Storage
+ */
+
+async function getBrowser() {
+    if (typeof chrome !== "undefined") {
+        if (typeof browser !== "undefined") {
+            try {
+                const info = await browser.runtime.getBrowserInfo();
+                if (info.name === "Fennec") {
+                    return "firefox-mobile";
+                }
+            } catch (e) { }
+            return "firefox";
+        } else {
+            return "chrome";
+        }
+    } else {
+        return "edge";
+    }
+}
+
+function storageBytesToLabeledString(size) {
+    const base = 1000;
+    const labels = ["bytes", "KB", "MB", "GB"];
+    let labelIndex = 0;
+    while (size >= base) {
+        size /= base;
+        ++labelIndex;
+    }
+    const label = size.toFixed(1).replace(/\.0+$/, "");
+    return `${label}${labels[labelIndex]}`;
+}
+
+async function storageEstimate() {
+    try {
+        return await navigator.storage.estimate();
+    } catch (e) { }
+    return null;
+}
+
+async function storageInfoInitialize() {
+    const browser = await getBrowser();
+    const container = document.querySelector("#storage-info");
+    container.setAttribute("data-browser", browser);
+
+    await storageShowInfo();
+
+    container.classList.remove("storage-hidden");
+
+    document.querySelector("#storage-refresh").addEventListener('click', () => storageShowInfo(), false);
+}
+
+async function storageShowInfo() {
+    storageSpinnerShow(true);
+
+    const estimate = await storageEstimate();
+    const valid = (estimate !== null);
+
+    if (valid) {
+        document.querySelector("#storage-usage").textContent = storageBytesToLabeledString(estimate.usage);
+        document.querySelector("#storage-quota").textContent = storageBytesToLabeledString(estimate.quota);
+    }
+    document.querySelector("#storage-use").classList.toggle("storage-hidden", !valid);
+    document.querySelector("#storage-error").classList.toggle("storage-hidden", valid);
+
+    storageSpinnerShow(false);
+}
+
+function storageSpinnerShow(show) {
+    const spinner = $('#storage-spinner');
+    if (show) {
+        spinner.show();
+    } else {
+        spinner.hide();
     }
 }
