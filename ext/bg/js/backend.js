@@ -28,7 +28,9 @@ class Backend {
         await this.translator.prepare();
         await apiOptionsSet(await optionsLoad());
 
-        chrome.commands.onCommand.addListener(this.onCommand.bind(this));
+        if (chrome.commands !== null && typeof chrome.commands === 'object') {
+            chrome.commands.onCommand.addListener(this.onCommand.bind(this));
+        }
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
 
         if (this.options.general.showGuide) {
@@ -40,13 +42,13 @@ class Backend {
         this.options = utilIsolate(options);
 
         if (!options.general.enable) {
-            chrome.browserAction.setBadgeBackgroundColor({color: '#555555'});
-            chrome.browserAction.setBadgeText({text: 'off'});
+            this.setExtensionBadgeBackgroundColor('#555555');
+            this.setExtensionBadgeText('off');
         } else if (!dictConfigured(options)) {
-            chrome.browserAction.setBadgeBackgroundColor({color: '#f0ad4e'});
-            chrome.browserAction.setBadgeText({text: '!'});
+            this.setExtensionBadgeBackgroundColor('#f0ad4e');
+            this.setExtensionBadgeText('!');
         } else {
-            chrome.browserAction.setBadgeText({text: ''});
+            this.setExtensionBadgeText('');
         }
 
         if (options.anki.enable) {
@@ -124,6 +126,18 @@ class Backend {
         }
 
         return true;
+    }
+
+    setExtensionBadgeBackgroundColor(color) {
+        if (typeof chrome.browserAction.setBadgeBackgroundColor === 'function') {
+            chrome.browserAction.setBadgeBackgroundColor({color});
+        }
+    }
+    
+    setExtensionBadgeText(text) {
+        if (typeof chrome.browserAction.setBadgeText === 'function') {
+            chrome.browserAction.setBadgeText({text});
+        }
     }
 }
 

@@ -228,10 +228,46 @@ class Database {
         }
     }
 
-    async importDictionary(archive, callback) {
+    async importDictionary(archive, progressCallback, exceptions) {
         if (!this.db) {
             throw 'Database not initialized';
         }
+
+        const maxTransactionLength = 1000;
+        const bulkAdd = async (table, items, total, current) => {
+            if (items.length < maxTransactionLength) {
+                if (progressCallback) {
+                    progressCallback(total, current);
+                }
+
+                try {
+                    await table.bulkAdd(items);
+                } catch (e) {
+                    if (exceptions) {
+                        exceptions.push(e);
+                    } else {
+                        throw e;
+                    }
+                }
+            } else {
+                for (let i = 0; i < items.length; i += maxTransactionLength) {
+                    if (progressCallback) {
+                        progressCallback(total, current + i / items.length);
+                    }
+
+                    let count = Math.min(maxTransactionLength, items.length - i);
+                    try {
+                        await table.bulkAdd(items.slice(i, i + count));
+                    } catch (e) {
+                        if (exceptions) {
+                            exceptions.push(e);
+                        } else {
+                            throw e;
+                        }
+                    }
+                }
+            }
+        };
 
         const indexDataLoaded = async summary => {
             if (summary.version > 3) {
@@ -247,10 +283,6 @@ class Database {
         };
 
         const termDataLoaded = async (summary, entries, total, current) => {
-            if (callback) {
-                callback(total, current);
-            }
-
             const rows = [];
             if (summary.version === 1) {
                 for (const [expression, reading, definitionTags, rules, score, ...glossary] of entries) {
@@ -280,14 +312,10 @@ class Database {
                 }
             }
 
-            await this.db.terms.bulkAdd(rows);
+            await bulkAdd(this.db.terms, rows, total, current);
         };
 
         const termMetaDataLoaded = async (summary, entries, total, current) => {
-            if (callback) {
-                callback(total, current);
-            }
-
             const rows = [];
             for (const [expression, mode, data] of entries) {
                 rows.push({
@@ -298,14 +326,10 @@ class Database {
                 });
             }
 
-            await this.db.termMeta.bulkAdd(rows);
+            await bulkAdd(this.db.termMeta, rows, total, current);
         };
 
         const kanjiDataLoaded = async (summary, entries, total, current)  => {
-            if (callback) {
-                callback(total, current);
-            }
-
             const rows = [];
             if (summary.version === 1) {
                 for (const [character, onyomi, kunyomi, tags, ...meanings] of entries) {
@@ -332,14 +356,10 @@ class Database {
                 }
             }
 
-            await this.db.kanji.bulkAdd(rows);
+            await bulkAdd(this.db.kanji, rows, total, current);
         };
 
         const kanjiMetaDataLoaded = async (summary, entries, total, current) => {
-            if (callback) {
-                callback(total, current);
-            }
-
             const rows = [];
             for (const [character, mode, data] of entries) {
                 rows.push({
@@ -350,14 +370,10 @@ class Database {
                 });
             }
 
-            await this.db.kanjiMeta.bulkAdd(rows);
+            await bulkAdd(this.db.kanjiMeta, rows, total, current);
         };
 
         const tagDataLoaded = async (summary, entries, total, current) => {
-            if (callback) {
-                callback(total, current);
-            }
-
             const rows = [];
             for (const [name, category, order, notes, score] of entries) {
                 const row = dictTagSanitize({
@@ -372,7 +388,7 @@ class Database {
                 rows.push(row);
             }
 
-            await this.db.tagMeta.bulkAdd(rows);
+            await bulkAdd(this.db.tagMeta, rows, total, current);
         };
 
         return await Database.importDictionaryZip(
