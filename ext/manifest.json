@@ -54,7 +54,7 @@
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
     "applications": {
         "gecko": {
-            "id": "alex-testing@foosoft.net",
+            "id": "alex.testing@foosoft.net",
             "strict_min_version": "52.0"
         }
     }
