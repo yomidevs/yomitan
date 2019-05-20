@@ -34,7 +34,8 @@ async function formRead() {
     optionsNew.general.popupDisplayMode = $('#popup-display-mode').val();
     optionsNew.general.popupWidth = parseInt($('#popup-width').val(), 10);
     optionsNew.general.popupHeight = parseInt($('#popup-height').val(), 10);
-    optionsNew.general.popupOffset = parseInt($('#popup-offset').val(), 10);
+    optionsNew.general.popupHorizontalOffset = parseInt($('#popup-horizontal-offset').val(), 0);
+    optionsNew.general.popupVerticalOffset = parseInt($('#popup-vertical-offset').val(), 10);
 
     optionsNew.scanning.middleMouse = $('#middle-mouse-button-scan').prop('checked');
     optionsNew.scanning.touchInputEnabled = $('#touch-input-enabled').prop('checked');
@@ -166,7 +167,8 @@ async function onReady() {
     $('#popup-display-mode').val(options.general.popupDisplayMode);
     $('#popup-width').val(options.general.popupWidth);
     $('#popup-height').val(options.general.popupHeight);
-    $('#popup-offset').val(options.general.popupOffset);
+    $('#popup-horizontal-offset').val(options.general.popupHorizontalOffset);
+    $('#popup-vertical-offset').val(options.general.popupVerticalOffset);
 
     $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);
     $('#touch-input-enabled').prop('checked', options.scanning.touchInputEnabled);
