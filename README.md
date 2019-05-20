@@ -35,13 +35,19 @@ Yomichan provides advanced features not available in other browser-based diction
 
 ## Installation ##
 
-Download and install Yomichan from your browser's web store:
+Yomichan comes in two flavors: *stable* and *testing*. Over the years, this extension has evolved to contain many
+complex features, which have become increasingly difficult for me to test across different browsers, versions, and
+environments. All new changes are initially introduced into the *testing* version, and when I am reasonably confident
+that they are bug free, they will get promoted to the *stable* version. If you are technically savvy and don't mind
+submitting issues on GitHub, try the *testing* version, otherwise the *stable* version will be your best bet.
 
-*   **Google Chrome** (versions 45+)
+*   **Google Chrome**
+    ([stable](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami) or [testing](https://chrome.google.com/webstore/detail/yomichan-testing/bcknnfebhefllbjhagijobjklocakpdm))
 
     [![](https://foosoft.net/projects/yomichan/img/chrome-web-store.png)](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami)
 
-*   **Mozilla Firefox** (versions 52+)
+*   **Mozilla Firefox**
+    ([stable](https://addons.mozilla.org/en-US/firefox/addon/yomichan/) or [testing](https://foosoft.net/projects/yomichan/dl/yomichan_testing.xpi))
 
     [![](https://foosoft.net/projects/yomichan/img/firefox-marketplace.png)](https://addons.mozilla.org/en-US/firefox/addon/yomichan/)
 
