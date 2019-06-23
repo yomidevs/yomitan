@@ -33,7 +33,8 @@ class Popup {
         if (!this.injected) {
             this.injected = new Promise((resolve, reject) => {
                 this.container.addEventListener('load', resolve);
-                document.body.appendChild(this.container);
+                this.observeFullscreen();
+                this.onFullscreenChanged();
             });
         }
 
@@ -137,5 +138,33 @@ class Popup {
 
     invokeApi(action, params={}) {
         this.container.contentWindow.postMessage({action, params}, '*');
+    }
+
+    observeFullscreen() {
+        const fullscreenEvents = [
+            'fullscreenchange',
+            'MSFullscreenChange',
+            'mozfullscreenchange',
+            'webkitfullscreenchange'
+        ];
+        for (const eventName of fullscreenEvents) {
+            document.addEventListener(eventName, () => this.onFullscreenChanged(), false);
+        }
+    }
+
+    getFullscreenElement() {
+        return (
+            document.fullscreenElement ||
+            document.msFullscreenElement ||
+            document.mozFullScreenElement ||
+            document.webkitFullscreenElement
+        );
+    }
+
+    onFullscreenChanged() {
+        const parent = (this.getFullscreenElement() || document.body || null);
+        if (parent !== null && this.container.parentNode !== parent) {
+            parent.appendChild(this.container);
+        }
     }
 }
