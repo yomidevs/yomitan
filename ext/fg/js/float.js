@@ -21,6 +21,7 @@ class DisplayFloat extends Display {
     constructor() {
         super($('#spinner'), $('#definitions'));
         this.autoPlayAudioTimer = null;
+        this.styleNode = null;
 
         $(window).on('message', utilAsync(this.onMessage.bind(this)));
     }
@@ -62,6 +63,13 @@ class DisplayFloat extends Display {
 
             orphaned: () => {
                 this.onOrphaned();
+            },
+
+            setOptions: (options) => {
+                const css = options.general.customPopupCss;
+                if (css) {
+                    this.setStyle(css);
+                }
             }
         };
 
@@ -99,6 +107,20 @@ class DisplayFloat extends Display {
         if (this.autoPlayAudioTimer) {
             window.clearTimeout(this.autoPlayAudioTimer);
             this.autoPlayAudioTimer = null;
+        }
+    }
+
+    setStyle(css) {
+        const parent = document.head;
+
+        if (this.styleNode === null) {
+            this.styleNode = document.createElement('style');
+        }
+
+        this.styleNode.textContent = css;
+
+        if (this.styleNode.parentNode !== parent) {
+            parent.appendChild(this.styleNode);
         }
     }
 }
