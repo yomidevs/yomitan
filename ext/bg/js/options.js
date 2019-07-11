@@ -198,7 +198,8 @@ function optionsSetDefaults(options) {
             showGuide: true,
             compactTags: false,
             compactGlossaries: false,
-            mainDictionary: ''
+            mainDictionary: '',
+            customPopupCss: ''
         },
 
         scanning: {

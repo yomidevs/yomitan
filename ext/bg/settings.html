@@ -30,6 +30,15 @@
                 padding-bottom: 1em;
             }
 
+            #custom-popup-css {
+                width: 100%;
+                min-height: 34px;
+                height: 96px;
+                resize: vertical;
+                font-family: 'Courier New', Courier, monospace;
+                white-space: pre;
+            }
+
             [data-show-for-browser] {
                 display: none;
             }
@@ -122,6 +131,11 @@
                         <div class="col-xs-6"><input type="number" min="0" id="popup-horizontal-offset" class="form-control"></div>
                         <div class="col-xs-6"><input type="number" min="0" id="popup-vertical-offset" class="form-control"></div>
                     </div>
+                </div>
+
+                <div class="form-group options-advanced">
+                    <label for="custom-popup-css">Custom popup CSS</label>
+                    <div><textarea autocomplete="off" spellcheck="false" wrap="soft" id="custom-popup-css" class="form-control"></textarea></div>
                 </div>
             </div>
 

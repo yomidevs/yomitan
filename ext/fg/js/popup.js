@@ -29,10 +29,17 @@ class Popup {
         this.injected = null;
     }
 
-    inject() {
+    inject(options) {
         if (!this.injected) {
             this.injected = new Promise((resolve, reject) => {
-                this.container.addEventListener('load', resolve);
+                this.container.addEventListener('load', () => {
+                    this.invokeApi('setOptions', {
+                        general: {
+                            customPopupCss: options.general.customPopupCss
+                        }
+                    });
+                    resolve();
+                });
                 this.observeFullscreen();
                 this.onFullscreenChanged();
             });
@@ -42,7 +49,7 @@ class Popup {
     }
 
     async show(elementRect, options) {
-        await this.inject();
+        await this.inject(options);
 
         const containerStyle = window.getComputedStyle(this.container);
         const containerHeight = parseInt(containerStyle.height);
