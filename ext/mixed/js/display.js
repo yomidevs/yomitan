@@ -265,6 +265,7 @@ class Display {
             $('.action-view-note').click(this.onNoteView.bind(this));
             $('.action-play-audio').click(this.onAudioPlay.bind(this));
             $('.kanji-link').click(this.onKanjiLookup.bind(this));
+            $('.glossary li').click(this.onTermLookup.bind(this));
 
             await this.adderButtonUpdate(['term-kanji', 'term-kana'], sequence);
         } catch (e) {

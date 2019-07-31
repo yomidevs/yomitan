@@ -123,6 +123,41 @@ class DisplayFloat extends Display {
             parent.appendChild(this.styleNode);
         }
     }
+
+    async onTermLookup(e) {
+        try {
+            e.preventDefault();
+
+            const clickedElement = $(e.target);
+            const textSource = docRangeFromPoint({x: e.clientX, y: e.clientY});
+            textSource.setEndOffset(this.options.scanning.length);
+
+            const {definitions, length} = await apiTermsFind(textSource.text());
+            if (definitions.length === 0) {
+                return false;
+            }
+
+            textSource.setEndOffset(length);
+
+            const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
+
+            const context = {
+                source: {
+                    definitions: this.definitions,
+                    index: Display.entryIndexFind(clickedElement)
+                }
+            };
+
+            if (this.context) {
+                context.sentence = sentence;
+                context.url = this.context.url;
+            }
+
+            this.termsShow(definitions, this.options, context);
+        } catch (e) {
+            this.onError(e);
+        }
+    }
 }
 
 window.yomichan_display = new DisplayFloat();
