@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Display} from '../../mixed/js/display.js';
 
 class DisplaySearch extends Display {
     constructor() {
