@@ -106,6 +106,7 @@ class Popup {
 
     hide() {
         this.container.style.visibility = 'hidden';
+        this.container.blur();
     }
 
     isVisible() {
