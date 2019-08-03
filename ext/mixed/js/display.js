@@ -278,6 +278,7 @@ class Display {
             const sequence = ++this.sequence;
             const params = {
                 definitions,
+                source: context && context.source,
                 addable: options.anki.enable,
                 grouped: options.general.resultOutputMode === 'group',
                 merged: options.general.resultOutputMode === 'merge',
@@ -309,6 +310,7 @@ class Display {
             $('.action-view-note').click(this.onNoteView.bind(this));
             $('.action-play-audio').click(this.onAudioPlay.bind(this));
             $('.kanji-link').click(this.onKanjiLookup.bind(this));
+            $('.source-term').click(this.onSourceTermView.bind(this));
             $('.glossary-item').click(this.onTermLookup.bind(this));
 
             await this.adderButtonUpdate(['term-kanji', 'term-kana'], sequence);
