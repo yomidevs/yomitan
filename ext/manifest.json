@@ -25,7 +25,7 @@
         "css": ["fg/css/client.css"],
         "all_frames": true
     }],
-    "minimum_chrome_version": "61.0.0.0",
+    "minimum_chrome_version": "57.0.0.0",
     "options_page": "bg/settings.html",
     "options_ui": {
         "page": "bg/settings.html",
@@ -55,7 +55,7 @@
     "applications": {
         "gecko": {
             "id": "alex.testing@foosoft.net",
-            "strict_min_version": "60.0"
+            "strict_min_version": "52.0"
         }
     }
 }
