@@ -102,6 +102,10 @@ function docRangeFromPoint(point) {
             return new TextSourceRange(range);
         }
     }
+
+    if (navigator.userAgent.match(/Firefox/)) {
+        return new TextSourceRange(range);
+    }
 }
 
 function docSentenceExtract(source, extent) {
