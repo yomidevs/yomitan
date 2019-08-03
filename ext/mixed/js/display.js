@@ -55,7 +55,8 @@ class Display {
             const context = {
                 source: {
                     definitions: this.definitions,
-                    index: Display.entryIndexFind(link)
+                    index: Display.entryIndexFind(link),
+                    scroll: $('html,body').scrollTop()
                 }
             };
 
@@ -94,7 +95,8 @@ class Display {
             const context = {
                 source: {
                     definitions: this.definitions,
-                    index: Display.entryIndexFind(clickedElement)
+                    index: Display.entryIndexFind(clickedElement),
+                    scroll: $('html,body').scrollTop()
                 }
             };
 
@@ -155,42 +157,42 @@ class Display {
 
             33: /* page up */ () => {
                 if (e.altKey) {
-                    this.entryScrollIntoView(this.index - 3, true);
+                    this.entryScrollIntoView(this.index - 3, null, true);
                     return true;
                 }
             },
 
             34: /* page down */ () => {
                 if (e.altKey) {
-                    this.entryScrollIntoView(this.index + 3, true);
+                    this.entryScrollIntoView(this.index + 3, null, true);
                     return true;
                 }
             },
 
             35: /* end */ () => {
                 if (e.altKey) {
-                    this.entryScrollIntoView(this.definitions.length - 1, true);
+                    this.entryScrollIntoView(this.definitions.length - 1, null, true);
                     return true;
                 }
             },
 
             36: /* home */ () => {
                 if (e.altKey) {
-                    this.entryScrollIntoView(0, true);
+                    this.entryScrollIntoView(0, null, true);
                     return true;
                 }
             },
 
             38: /* up */ () => {
                 if (e.altKey) {
-                    this.entryScrollIntoView(this.index - 1, true);
+                    this.entryScrollIntoView(this.index - 1, null, true);
                     return true;
                 }
             },
 
             40: /* down */ () => {
                 if (e.altKey) {
-                    this.entryScrollIntoView(this.index + 1, true);
+                    this.entryScrollIntoView(this.index + 1, null, true);
                     return true;
                 }
             },
@@ -251,10 +253,10 @@ class Display {
         const handler = () => {
             if (event.altKey) {
                 if (event.deltaY < 0) { // scroll up
-                    this.entryScrollIntoView(this.index - 1, true);
+                    this.entryScrollIntoView(this.index - 1, null, true);
                     return true;
                 } else if (event.deltaY > 0) { // scroll down
-                    this.entryScrollIntoView(this.index + 1, true);
+                    this.entryScrollIntoView(this.index + 1, null, true);
                     return true;
                 }
             }
@@ -296,7 +298,8 @@ class Display {
 
             const content = await apiTemplateRender('terms.html', params);
             this.container.html(content);
-            this.entryScrollIntoView(context && context.index || 0);
+            const {index, scroll} = context || {};
+            this.entryScrollIntoView(index || 0, scroll);
 
             if (this.options.general.autoPlayAudio && this.options.general.audioSource !== 'disabled') {
                 this.autoPlayAudio();
@@ -342,7 +345,8 @@ class Display {
 
             const content = await apiTemplateRender('kanji.html', params);
             this.container.html(content);
-            this.entryScrollIntoView(context && context.index || 0);
+            const {index, scroll} = context || {};
+            this.entryScrollIntoView(index || 0, scroll);
 
             $('.action-add-note').click(this.onNoteAdd.bind(this));
             $('.action-view-note').click(this.onNoteView.bind(this));
@@ -383,7 +387,7 @@ class Display {
         }
     }
 
-    entryScrollIntoView(index, smooth) {
+    entryScrollIntoView(index, scroll, smooth) {
         index = Math.min(index, this.definitions.length - 1);
         index = Math.max(index, 0);
 
@@ -391,7 +395,13 @@ class Display {
 
         const container = $('html,body').stop();
         const entry = $('.entry').eq(index);
-        const target = index === 0 ? 0 : entry.offset().top;
+        let target;
+
+        if (scroll) {
+            target = scroll;
+        } else {
+            target = index === 0 ? 0 : entry.offset().top;
+        }
 
         if (smooth) {
             container.animate({scrollTop: target}, 200);
@@ -408,6 +418,7 @@ class Display {
                 url: this.context.source.url,
                 sentence: this.context.source.sentence,
                 index: this.context.source.index,
+                scroll: this.context.source.scroll,
                 source: this.context.source.source
             };
 
