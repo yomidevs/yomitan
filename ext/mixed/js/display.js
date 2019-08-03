@@ -62,6 +62,7 @@ class Display {
             if (this.context) {
                 context.sentence = this.context.sentence;
                 context.url = this.context.url;
+                context.source.source = this.context.source;
             }
 
             const kanjiDefs = await apiKanjiFind(link.text());
@@ -100,6 +101,7 @@ class Display {
             if (this.context) {
                 context.sentence = sentence;
                 context.url = this.context.url;
+                context.source.source = this.context.source;
             }
 
             this.termsShow(definitions, this.options, context);
@@ -405,7 +407,8 @@ class Display {
             const context = {
                 url: this.context.source.url,
                 sentence: this.context.source.sentence,
-                index: this.context.source.index
+                index: this.context.source.index,
+                source: this.context.source.source
             };
 
             this.termsShow(this.context.source.definitions, this.options, context);
