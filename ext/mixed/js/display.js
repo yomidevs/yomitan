@@ -28,6 +28,8 @@ class Display {
         this.index = 0;
         this.audioCache = {};
 
+        this.dependencies = {};
+
         $(document).keydown(this.onKeyDown.bind(this));
         $(document).on('wheel', this.onWheel.bind(this));
     }
@@ -53,17 +55,58 @@ class Display {
             const context = {
                 source: {
                     definitions: this.definitions,
-                    index: Display.entryIndexFind(link)
+                    index: Display.entryIndexFind(link),
+                    scroll: $('html,body').scrollTop()
                 }
             };
 
             if (this.context) {
                 context.sentence = this.context.sentence;
                 context.url = this.context.url;
+                context.source.source = this.context.source;
             }
 
             const kanjiDefs = await apiKanjiFind(link.text());
             this.kanjiShow(kanjiDefs, this.options, context);
+        } catch (e) {
+            this.onError(e);
+        }
+    }
+
+    async onTermLookup(e) {
+        try {
+            e.preventDefault();
+
+            const {docRangeFromPoint, docSentenceExtract} = this.dependencies;
+
+            const clickedElement = $(e.target);
+            const textSource = docRangeFromPoint({x: e.clientX, y: e.clientY});
+            textSource.setEndOffset(this.options.scanning.length);
+
+            const {definitions, length} = await apiTermsFind(textSource.text());
+            if (definitions.length === 0) {
+                return false;
+            }
+
+            textSource.setEndOffset(length);
+
+            const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
+
+            const context = {
+                source: {
+                    definitions: this.definitions,
+                    index: Display.entryIndexFind(clickedElement),
+                    scroll: $('html,body').scrollTop()
+                }
+            };
+
+            if (this.context) {
+                context.sentence = sentence;
+                context.url = this.context.url;
+                context.source.source = this.context.source;
+            }
+
+            this.termsShow(definitions, this.options, context);
         } catch (e) {
             this.onError(e);
         }
@@ -114,42 +157,42 @@ class Display {
 
             33: /* page up */ () => {
                 if (e.altKey) {
-                    this.entryScrollIntoView(this.index - 3, true);
+                    this.entryScrollIntoView(this.index - 3, null, true);
                     return true;
                 }
             },
 
             34: /* page down */ () => {
                 if (e.altKey) {
-                    this.entryScrollIntoView(this.index + 3, true);
+                    this.entryScrollIntoView(this.index + 3, null, true);
                     return true;
                 }
             },
 
             35: /* end */ () => {
                 if (e.altKey) {
-                    this.entryScrollIntoView(this.definitions.length - 1, true);
+                    this.entryScrollIntoView(this.definitions.length - 1, null, true);
                     return true;
                 }
             },
 
             36: /* home */ () => {
                 if (e.altKey) {
-                    this.entryScrollIntoView(0, true);
+                    this.entryScrollIntoView(0, null, true);
                     return true;
                 }
             },
 
             38: /* up */ () => {
                 if (e.altKey) {
-                    this.entryScrollIntoView(this.index - 1, true);
+                    this.entryScrollIntoView(this.index - 1, null, true);
                     return true;
                 }
             },
 
             40: /* down */ () => {
                 if (e.altKey) {
-                    this.entryScrollIntoView(this.index + 1, true);
+                    this.entryScrollIntoView(this.index + 1, null, true);
                     return true;
                 }
             },
@@ -210,10 +253,10 @@ class Display {
         const handler = () => {
             if (event.altKey) {
                 if (event.deltaY < 0) { // scroll up
-                    this.entryScrollIntoView(this.index - 1, true);
+                    this.entryScrollIntoView(this.index - 1, null, true);
                     return true;
                 } else if (event.deltaY > 0) { // scroll down
-                    this.entryScrollIntoView(this.index + 1, true);
+                    this.entryScrollIntoView(this.index + 1, null, true);
                     return true;
                 }
             }
@@ -235,6 +278,7 @@ class Display {
             const sequence = ++this.sequence;
             const params = {
                 definitions,
+                source: context && context.source,
                 addable: options.anki.enable,
                 grouped: options.general.resultOutputMode === 'group',
                 merged: options.general.resultOutputMode === 'merge',
@@ -255,7 +299,8 @@ class Display {
 
             const content = await apiTemplateRender('terms.html', params);
             this.container.html(content);
-            this.entryScrollIntoView(context && context.index || 0);
+            const {index, scroll} = context || {};
+            this.entryScrollIntoView(index || 0, scroll);
 
             if (this.options.general.autoPlayAudio && this.options.general.audioSource !== 'disabled') {
                 this.autoPlayAudio();
@@ -265,6 +310,8 @@ class Display {
             $('.action-view-note').click(this.onNoteView.bind(this));
             $('.action-play-audio').click(this.onAudioPlay.bind(this));
             $('.kanji-link').click(this.onKanjiLookup.bind(this));
+            $('.source-term').click(this.onSourceTermView.bind(this));
+            $('.glossary-item').click(this.onTermLookup.bind(this));
 
             await this.adderButtonUpdate(['term-kanji', 'term-kana'], sequence);
         } catch (e) {
@@ -300,7 +347,8 @@ class Display {
 
             const content = await apiTemplateRender('kanji.html', params);
             this.container.html(content);
-            this.entryScrollIntoView(context && context.index || 0);
+            const {index, scroll} = context || {};
+            this.entryScrollIntoView(index || 0, scroll);
 
             $('.action-add-note').click(this.onNoteAdd.bind(this));
             $('.action-view-note').click(this.onNoteView.bind(this));
@@ -341,7 +389,7 @@ class Display {
         }
     }
 
-    entryScrollIntoView(index, smooth) {
+    entryScrollIntoView(index, scroll, smooth) {
         index = Math.min(index, this.definitions.length - 1);
         index = Math.max(index, 0);
 
@@ -349,7 +397,13 @@ class Display {
 
         const container = $('html,body').stop();
         const entry = $('.entry').eq(index);
-        const target = index === 0 ? 0 : entry.offset().top;
+        let target;
+
+        if (scroll) {
+            target = scroll;
+        } else {
+            target = index === 0 ? 0 : entry.offset().top;
+        }
 
         if (smooth) {
             container.animate({scrollTop: target}, 200);
@@ -365,7 +419,9 @@ class Display {
             const context = {
                 url: this.context.source.url,
                 sentence: this.context.source.sentence,
-                index: this.context.source.index
+                index: this.context.source.index,
+                scroll: this.context.source.scroll,
+                source: this.context.source.source
             };
 
             this.termsShow(this.context.source.definitions, this.options, context);
