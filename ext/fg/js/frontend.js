@@ -172,7 +172,12 @@ class Frontend {
             return;
         }
 
-        this.setPrimaryTouch(this.getPrimaryTouch(e.changedTouches));
+        let touch = this.getPrimaryTouch(e.changedTouches);
+        if (this.selectionContainsPoint(window.getSelection(), touch.clientX, touch.clientY)) {
+            touch = null;
+        }
+
+        this.setPrimaryTouch(touch);
     }
 
     onTouchEnd(e) {
@@ -451,6 +456,18 @@ class Frontend {
         };
 
         search();
+    }
+
+    selectionContainsPoint(selection, x, y) {
+        for (let i = 0; i < selection.rangeCount; ++i) {
+            const range = selection.getRangeAt(i);
+            for (const rect of range.getClientRects()) {
+                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
 
