@@ -17,6 +17,8 @@
  */
 
 
+const IS_FIREFOX = /Firefox/.test(navigator.userAgent);
+
 function docOffsetCalc(element) {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
     const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft;
@@ -69,43 +71,23 @@ function docRangeFromPoint(point) {
     const element = document.elementFromPoint(point.x, point.y);
     let imposter = null;
     if (element) {
-        if (element.nodeName === 'IMG' || element.nodeName === 'BUTTON') {
-            return new TextSourceElement(element);
-        } else if (element.nodeName === 'INPUT' || element.nodeName === 'TEXTAREA') {
-            imposter = docImposterCreate(element);
+        switch (element.nodeName) {
+            case 'IMG':
+            case 'BUTTON':
+                return new TextSourceElement(element);
+            case 'INPUT':
+            case 'TEXTAREA':
+                imposter = docImposterCreate(element);
+                break;
         }
-    }
-
-    if (!document.caretRangeFromPoint) {
-        document.caretRangeFromPoint = (x, y) => {
-            const position = document.caretPositionFromPoint(x,y);
-            if (position && position.offsetNode && position.offsetNode.nodeType === Node.TEXT_NODE) {
-                const range = document.createRange();
-                range.setStart(position.offsetNode, position.offset);
-                range.setEnd(position.offsetNode, position.offset);
-                return range;
-            }
-            return null;
-        };
     }
 
     const range = document.caretRangeFromPoint(point.x, point.y);
-    if (range === null) {
-        return;
+    if (imposter !== null) {
+        imposter.style.zIndex = -2147483646;
     }
 
-    if(imposter !== null) imposter.style.zIndex = -2147483646;
-
-    const rects = range.getClientRects();
-    for (const rect of rects) {
-        if (point.y <= rect.bottom + 2) {
-            return new TextSourceRange(range);
-        }
-    }
-
-    if (navigator.userAgent.match(/Firefox/)) {
-        return new TextSourceRange(range);
-    }
+    return range !== null && isPointInRange(point, range) ? new TextSourceRange(range) : null;
 }
 
 function docSentenceExtract(source, extent) {
@@ -176,5 +158,35 @@ function docSentenceExtract(source, extent) {
     return {
         text: text.trim(),
         offset: position - startPos - padding
+    };
+}
+
+function isPointInRange(point, range) {
+    if (IS_FIREFOX) {
+        // Always return true on Firefox due to an issue where range.getClientRects()
+        // does not return a correct set of rects for characters at the beginning of a line.
+        return true;
+    }
+
+    const y = point.y - 2;
+    for (const rect of range.getClientRects()) {
+        if (y <= rect.bottom) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+if (typeof document.caretRangeFromPoint !== 'function') {
+    document.caretRangeFromPoint = (x, y) => {
+        const position = document.caretPositionFromPoint(x, y);
+        if (position && position.offsetNode && position.offsetNode.nodeType === Node.TEXT_NODE) {
+            const range = document.createRange();
+            range.setStart(position.offsetNode, position.offset);
+            range.setEnd(position.offsetNode, position.offset);
+            return range;
+        }
+        return null;
     };
 }
