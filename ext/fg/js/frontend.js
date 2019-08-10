@@ -290,7 +290,8 @@ class Frontend {
             if (!hideResults && (!this.textSourceLast || !this.textSourceLast.equals(textSource))) {
                 searched = true;
                 this.pendingLookup = true;
-                hideResults = !await this.searchTerms(textSource) && !await this.searchKanji(textSource);
+                const focus = (type === 'mouse');
+                hideResults = !await this.searchTerms(textSource, focus) && !await this.searchKanji(textSource, focus);
                 success = true;
             }
         } catch (e) {
@@ -313,7 +314,7 @@ class Frontend {
         }
     }
 
-    async searchTerms(textSource) {
+    async searchTerms(textSource, focus) {
         textSource.setEndOffset(this.options.scanning.length);
 
         const {definitions, length} = await apiTermsFind(textSource.text());
@@ -329,7 +330,7 @@ class Frontend {
             textSource.getRect(),
             definitions,
             this.options,
-            {sentence, url}
+            {sentence, url, focus}
         );
 
         this.textSourceLast = textSource;
@@ -340,7 +341,7 @@ class Frontend {
         return true;
     }
 
-    async searchKanji(textSource) {
+    async searchKanji(textSource, focus) {
         textSource.setEndOffset(1);
 
         const definitions = await apiKanjiFind(textSource.text());
@@ -354,7 +355,7 @@ class Frontend {
             textSource.getRect(),
             definitions,
             this.options,
-            {sentence, url}
+            {sentence, url, focus}
         );
 
         this.textSourceLast = textSource;
