@@ -299,7 +299,7 @@ class Translator {
     async expandTags(names, title) {
         const tags = [];
         for (const name of names) {
-            const base = name.split(':')[0];
+            const base = Translator.getNameBase(name);
             const meta = await this.database.findTagForTitle(base, title);
 
             const tag = {name};
@@ -318,7 +318,7 @@ class Translator {
     async expandStats(items, title) {
         const stats = {};
         for (const name in items) {
-            const base = name.split(':')[0];
+            const base = Translator.getNameBase(name);
             const meta = await this.database.findTagForTitle(base, title);
             const group = stats[meta.category] = stats[meta.category] || [];
 
@@ -345,5 +345,10 @@ class Translator {
         }
 
         return stats;
+    }
+
+    static getNameBase(name) {
+        const pos = name.indexOf(':');
+        return (pos >= 0 ? name.substr(0, pos) : name);
     }
 }
