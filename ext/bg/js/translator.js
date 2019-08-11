@@ -186,7 +186,7 @@ class Translator {
         let deinflections = await this.findTermDeinflections(text, titles, cache);
         const textHiragana = jpKatakanaToHiragana(text);
         if (text !== textHiragana) {
-            deinflections = deinflections.concat(await this.findTermDeinflections(textHiragana, titles, cache));
+            deinflections.push(...await this.findTermDeinflections(textHiragana, titles, cache));
         }
 
         let definitions = [];
@@ -235,7 +235,7 @@ class Translator {
         let deinflections = [];
         for (let i = text.length; i > 0; --i) {
             const textSlice = text.slice(0, i);
-            deinflections = deinflections.concat(await this.deinflector.deinflect(textSlice, definer));
+            deinflections.push(...await this.deinflector.deinflect(textSlice, definer));
         }
 
         return deinflections;
@@ -247,7 +247,7 @@ class Translator {
         const titles = Object.keys(dictionaries);
         for (const c of text) {
             if (!processed[c]) {
-                definitions = definitions.concat(await this.database.findKanji(c, titles));
+                definitions.push(...await this.database.findKanji(c, titles));
                 processed[c] = true;
             }
         }
@@ -277,7 +277,7 @@ class Translator {
     async buildTermFrequencies(definition, titles) {
         let terms = [];
         if (definition.expressions) {
-            terms = terms.concat(definition.expressions);
+            terms.push(...definition.expressions);
         } else {
             terms.push(definition);
         }
