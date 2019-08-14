@@ -83,7 +83,8 @@ class Display {
             const textSource = docRangeFromPoint({x: e.clientX, y: e.clientY});
             textSource.setEndOffset(this.options.scanning.length);
 
-            const {definitions, length} = await apiTermsFind(textSource.text());
+            const {text} = textSource.text();
+            const {definitions, length} = await apiTermsFind(text);
             if (definitions.length === 0) {
                 return false;
             }

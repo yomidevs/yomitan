@@ -16,6 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// \u200c (Zero-width non-joiner) appears on Google Docs from Chrome 76 onwards
+const IGNORE_TEXT_PATTERN = /\u200c/g;
+
 
 /*
  * TextSourceRange
@@ -32,7 +35,13 @@ class TextSourceRange {
     }
 
     text() {
-        return this.content;
+        let strippedIndices = [];
+        const text = this.content.replace(IGNORE_TEXT_PATTERN, (match, offset) => {
+            strippedIndices.push(offset);
+            return '';
+        });
+
+        return {text, strippedIndices};
     }
 
     setEndOffset(length) {
@@ -195,7 +204,13 @@ class TextSourceElement {
     }
 
     text() {
-        return this.content;
+        let strippedIndices = [];
+        const text = this.content.replace(IGNORE_TEXT_PATTERN, (match, offset) => {
+            strippedIndices.push(offset);
+            return '';
+        });
+
+        return {text, strippedIndices};
     }
 
     setEndOffset(length) {

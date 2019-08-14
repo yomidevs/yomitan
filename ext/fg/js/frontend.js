@@ -311,9 +311,17 @@ class Frontend {
     async searchTerms(textSource) {
         textSource.setEndOffset(this.options.scanning.length);
 
-        const {definitions, length} = await apiTermsFind(textSource.text());
+        const {text, strippedIndices} = textSource.text();
+        let {definitions, length} = await apiTermsFind(text);
         if (definitions.length === 0) {
             return false;
+        }
+        for (let index of strippedIndices) {
+            if (index < length) {
+                length++;
+            } else {
+                break;
+            }
         }
 
         textSource.setEndOffset(length);
@@ -338,7 +346,8 @@ class Frontend {
     async searchKanji(textSource) {
         textSource.setEndOffset(1);
 
-        const definitions = await apiKanjiFind(textSource.text());
+        const {text} = textSource.text();
+        const definitions = await apiKanjiFind(text);
         if (definitions.length === 0) {
             return false;
         }
