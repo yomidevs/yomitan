@@ -17,7 +17,7 @@
  */
 
 // \u200c (Zero-width non-joiner) appears on Google Docs from Chrome 76 onwards
-const IGNORE_TEXT_PATTERN = /\u200c/g;
+const IGNORE_TEXT_PATTERN = /\u200c/;
 
 
 /*
@@ -35,13 +35,7 @@ class TextSourceRange {
     }
 
     text() {
-        let strippedIndices = [];
-        const text = this.content.replace(IGNORE_TEXT_PATTERN, (match, offset) => {
-            strippedIndices.push(offset);
-            return '';
-        });
-
-        return {text, strippedIndices};
+        return this.content;
     }
 
     setEndOffset(length) {
@@ -133,11 +127,23 @@ class TextSourceRange {
     static seekForwardHelper(node, state) {
         if (node.nodeType === 3 && node.parentElement && TextSourceRange.shouldEnter(node.parentElement)) {
             const offset = state.node === node ? state.offset : 0;
-            const remaining = node.length - offset;
-            const consumed = Math.min(remaining, state.remainder);
-            state.content = state.content + node.nodeValue.substring(offset, offset + consumed);
+
+            let consumed = 0;
+            let stripped = 0;
+            while (state.remainder - consumed > 0) {
+                const currentChar = node.nodeValue[offset + consumed + stripped];
+                if (!currentChar) {
+                    break;
+                } else if (currentChar.match(IGNORE_TEXT_PATTERN)) {
+                    stripped++;
+                } else {
+                    consumed++;
+                    state.content += currentChar;
+                }
+            }
+
             state.node = node;
-            state.offset = offset + consumed;
+            state.offset = offset + consumed + stripped;
             state.remainder -= consumed;
         } else if (TextSourceRange.shouldEnter(node)) {
             for (let i = 0; i < node.childNodes.length; ++i) {
@@ -170,11 +176,23 @@ class TextSourceRange {
     static seekBackwardHelper(node, state) {
         if (node.nodeType === 3 && node.parentElement && TextSourceRange.shouldEnter(node.parentElement)) {
             const offset = state.node === node ? state.offset : node.length;
-            const remaining = offset;
-            const consumed = Math.min(remaining, state.remainder);
-            state.content = node.nodeValue.substring(offset - consumed, offset) + state.content;
+
+            let consumed = 0;
+            let stripped = 0;
+            while (state.remainder - consumed > 0) {
+                const currentChar = node.nodeValue[offset - consumed - stripped]; // negative indices are undefined in JS
+                if (!currentChar) {
+                    break;
+                } else if (currentChar.match(IGNORE_TEXT_PATTERN)) {
+                    stripped++;
+                } else {
+                    consumed++;
+                    state.content = currentChar + state.content;
+                }
+            }
+
             state.node = node;
-            state.offset = offset - consumed;
+            state.offset = offset - consumed - stripped;
             state.remainder -= consumed;
         } else if (TextSourceRange.shouldEnter(node)) {
             for (let i = node.childNodes.length - 1; i >= 0; --i) {
@@ -204,13 +222,7 @@ class TextSourceElement {
     }
 
     text() {
-        let strippedIndices = [];
-        const text = this.content.replace(IGNORE_TEXT_PATTERN, (match, offset) => {
-            strippedIndices.push(offset);
-            return '';
-        });
-
-        return {text, strippedIndices};
+        return this.content;
     }
 
     setEndOffset(length) {
@@ -226,8 +238,18 @@ class TextSourceElement {
                 break;
         }
 
-        this.content = this.content || '';
-        this.content = this.content.substring(0, length);
+        let consumed = 0;
+        let content = '';
+        for (let currentChar of this.content) {
+            if (consumed >= length) {
+                break;
+            } else if (!currentChar.match(IGNORE_TEXT_PATTERN)) {
+                consumed++;
+                content += currentChar;
+            }
+        }
+
+        this.content = content;
 
         return this.content.length;
     }
