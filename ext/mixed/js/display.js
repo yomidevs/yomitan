@@ -508,8 +508,8 @@ class Display {
             await this.setPopupVisible(false);
             await Display.delay(1); // Wait for popup to be hidden.
 
-            const format = 'png';
-            const dataUrl = await apiScreenshotGet({format});
+            const {format, quality} = this.options.anki.screenshot;
+            const dataUrl = await apiScreenshotGet({format, quality});
             if (!dataUrl || dataUrl.error) { return; }
 
             return {dataUrl, format};
