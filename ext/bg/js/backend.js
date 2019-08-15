@@ -94,8 +94,8 @@ class Backend {
                 forward(apiTermsFind(text), callback);
             },
 
-            definitionAdd: ({definition, mode, callback}) => {
-                forward(apiDefinitionAdd(definition, mode), callback);
+            definitionAdd: ({definition, mode, context, callback}) => {
+                forward(apiDefinitionAdd(definition, mode, context), callback);
             },
 
             definitionsAddable: ({definitions, modes, callback}) => {
@@ -116,6 +116,14 @@ class Backend {
 
             audioGetUrl: ({definition, source, callback}) => {
                 forward(apiAudioGetUrl(definition, source), callback);
+            },
+
+            screenshotGet: ({options}) => {
+                forward(apiScreenshotGet(options, sender), callback);
+            },
+
+            forward: ({action, params}) => {
+                forward(apiForward(action, params, sender), callback);
             }
         };
 

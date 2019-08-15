@@ -33,8 +33,8 @@ function apiKanjiFind(text) {
     return utilInvoke('kanjiFind', {text});
 }
 
-function apiDefinitionAdd(definition, mode) {
-    return utilInvoke('definitionAdd', {definition, mode});
+function apiDefinitionAdd(definition, mode, context) {
+    return utilInvoke('definitionAdd', {definition, mode, context});
 }
 
 function apiDefinitionsAddable(definitions, modes) {
@@ -53,6 +53,10 @@ function apiCommandExec(command) {
     return utilInvoke('commandExec', {command});
 }
 
-function apiAudioGetUrl(definition, source) {
-    return utilInvoke('audioGetUrl', {definition, source});
+function apiScreenshotGet(options) {
+    return utilInvoke('screenshotGet', {options});
+}
+
+function apiForward(action, params) {
+    return utilInvoke('forward', {action, params});
 }

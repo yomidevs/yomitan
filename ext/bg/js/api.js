@@ -53,7 +53,7 @@ async function apiKanjiFind(text) {
     return definitions.slice(0, options.general.maxResults);
 }
 
-async function apiDefinitionAdd(definition, mode) {
+async function apiDefinitionAdd(definition, mode, context) {
     const options = utilBackend().options;
 
     if (mode !== 'kanji') {
@@ -61,6 +61,14 @@ async function apiDefinitionAdd(definition, mode) {
             definition,
             options.anki.terms.fields,
             options.general.audioSource
+        );
+    }
+
+    if (context.screenshot) {
+        await apiInjectScreenshot(
+            definition,
+            options.anki.terms.fields,
+            context.screenshot
         );
     }
 
@@ -138,4 +146,62 @@ async function apiCommandExec(command) {
 
 async function apiAudioGetUrl(definition, source) {
     return audioBuildUrl(definition, source);
+}
+
+async function apiInjectScreenshot(definition, fields, screenshot) {
+    let usesScreenshot = false;
+    for (const name in fields) {
+        if (fields[name].includes('{screenshot}')) {
+            usesScreenshot = true;
+            break;
+        }
+    }
+
+    if (!usesScreenshot) {
+        return;
+    }
+
+    const dateToString = (date) => {
+        const year = date.getUTCFullYear();
+        const month = date.getUTCMonth().toString().padStart(2, '0');
+        const day = date.getUTCDate().toString().padStart(2, '0');
+        const hours = date.getUTCHours().toString().padStart(2, '0');
+        const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+        const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+        return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
+    };
+
+    const now = new Date(Date.now());
+    const filename = `yomichan_browser_screenshot_${definition.reading}_${dateToString(now)}.${screenshot.format}`;
+    const data = screenshot.dataUrl.replace(/^data:[\w\W]*?,/, '');
+
+    try {
+        await utilBackend().anki.storeMediaFile(filename, data);
+    } catch (e) {
+        return;
+    }
+
+    definition.screenshotFileName = filename;
+}
+
+function apiScreenshotGet(options, sender) {
+    if (!(sender && sender.tab)) {
+        return Promise.resolve();
+    }
+
+    const windowId = sender.tab.windowId;
+    return new Promise((resolve) => {
+        chrome.tabs.captureVisibleTab(windowId, options, (dataUrl) => resolve(dataUrl));
+    });
+}
+
+function apiForward(action, params, sender) {
+    if (!(sender && sender.tab)) {
+        return Promise.resolve();
+    }
+
+    const tabId = sender.tab.id;
+    return new Promise((resolve) => {
+        chrome.tabs.sendMessage(tabId, {action, params}, (response) => resolve(response));
+    });
 }

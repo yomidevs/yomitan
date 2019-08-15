@@ -58,6 +58,11 @@ class AnkiConnect {
         return await this.ankiInvoke('guiBrowse', {query});
     }
 
+    async storeMediaFile(filename, dataBase64) {
+        await this.checkVersion();
+        return await this.ankiInvoke('storeMediaFile', {filename, data: dataBase64});
+    }
+
     async checkVersion() {
         if (this.remoteVersion < this.localVersion) {
             this.remoteVersion = await this.ankiInvoke('version');

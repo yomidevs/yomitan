@@ -244,6 +244,10 @@ class Frontend {
                 if (!this.options.enable) {
                     this.searchClear();
                 }
+            },
+
+            popupSetVisible: ({visible}) => {
+                this.popup.setVisible(visible);
             }
         };
 

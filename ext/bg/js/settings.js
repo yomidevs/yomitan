@@ -505,7 +505,8 @@ async function ankiFieldsPopulate(element, options) {
             'reading',
             'sentence',
             'tags',
-            'url'
+            'url',
+            'screenshot'
         ],
         'kanji': [
             'character',

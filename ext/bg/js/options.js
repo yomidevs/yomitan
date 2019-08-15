@@ -175,6 +175,10 @@ function optionsFieldTemplates() {
     <a href="{{definition.url}}">{{definition.url}}</a>
 {{/inline}}
 
+{{#*inline "screenshot"}}
+    <img src="{{definition.screenshotFileName}}" />
+{{/inline}}
+
 {{~> (lookup . "marker") ~}}
 `.trim();
 }
@@ -281,6 +285,11 @@ function optionsVersion(options) {
         },
         () => {
             if (utilStringHashCode(options.anki.fieldTemplates) === 1285806040) {
+                options.anki.fieldTemplates = optionsFieldTemplates();
+            }
+        },
+        () => {
+            if (utilStringHashCode(options.anki.fieldTemplates) === -250091611) {
                 options.anki.fieldTemplates = optionsFieldTemplates();
             }
         }

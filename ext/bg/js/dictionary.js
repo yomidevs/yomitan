@@ -343,7 +343,8 @@ async function dictFieldFormat(field, definition, mode, options) {
         'reading',
         'sentence',
         'tags',
-        'url'
+        'url',
+        'screenshot'
     ];
 
     for (const marker of markers) {
