@@ -269,7 +269,7 @@ class Display {
 
     async termsShow(definitions, options, context) {
         try {
-            if (context && context.focus) {
+            if (!context || context.focus !== false) {
                 window.focus();
             }
 
@@ -323,7 +323,7 @@ class Display {
 
     async kanjiShow(definitions, options, context) {
         try {
-            if (context && context.focus) {
+            if (!context || context.focus !== false) {
                 window.focus();
             }
 
