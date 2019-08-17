@@ -81,6 +81,9 @@ class Display {
 
             const clickedElement = $(e.target);
             const textSource = docRangeFromPoint({x: e.clientX, y: e.clientY});
+            if (textSource === null) {
+                return false;
+            }
             textSource.setEndOffset(this.options.scanning.length);
 
             const {definitions, length} = await apiTermsFind(textSource.text());
