@@ -24,9 +24,10 @@ function utilAsync(func) {
 }
 
 function utilInvoke(action, params={}) {
+    const data = {action, params};
     return new Promise((resolve, reject) => {
         try {
-            chrome.runtime.sendMessage({action, params}, (response) => {
+            chrome.runtime.sendMessage(data, (response) => {
                 utilCheckLastError(chrome.runtime.lastError);
                 if (response !== null && typeof response === 'object') {
                     if (response.error) {
@@ -35,7 +36,8 @@ function utilInvoke(action, params={}) {
                         resolve(response.result);
                     }
                 } else {
-                    reject(`Unexpected response of type ${typeof response}`);
+                    const message = response === null ? 'Unexpected null response' : `Unexpected response of type ${typeof response}`;
+                    reject(`${message} (${JSON.stringify(data)})`);
                 }
             });
         } catch (e) {

@@ -21,7 +21,9 @@
             "mixed/js/extension.js",
             "fg/js/api.js",
             "fg/js/document.js",
+            "fg/js/frontend-api-receiver.js",
             "fg/js/popup.js",
+            "fg/js/popup-proxy-host.js",
             "fg/js/source.js",
             "fg/js/util.js",
             "fg/js/frontend.js"

@@ -18,12 +18,15 @@
 
 
 class Popup {
-    constructor() {
+    constructor(id) {
+        this.id = id;
+        this.parent = null;
+        this.children = [];
         this.container = document.createElement('iframe');
         this.container.id = 'yomichan-float';
         this.container.addEventListener('mousedown', e => e.stopPropagation());
         this.container.addEventListener('scroll', e => e.stopPropagation());
-        this.container.setAttribute('src', chrome.extension.getURL('/fg/float.html'));
+        this.container.setAttribute('src', chrome.extension.getURL(`/fg/float.html?id=${id}`));
         this.container.style.width = '0px';
         this.container.style.height = '0px';
         this.injected = null;
@@ -77,6 +80,8 @@ class Popup {
         container.style.width = `${width}px`;
         container.style.height = `${height}px`;
         container.style.visibility = 'visible';
+
+        this.hideChildren();
     }
 
     static getPositionForHorizontalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral) {
@@ -178,8 +183,34 @@ class Popup {
     }
 
     hide() {
-        this.container.style.visibility = 'hidden';
+        this.hideContainer();
         this.container.blur();
+        this.hideChildren();
+    }
+
+    hideChildren() {
+        if (this.children.length === 0) {
+            return;
+        }
+
+        const targets = this.children.slice(0);
+        while (targets.length > 0) {
+            const target = targets.shift();
+            if (target.isContainerHidden()) { continue; }
+
+            target.hideContainer();
+            for (const child of target.children) {
+                targets.push(child);
+            }
+        }
+    }
+
+    hideContainer() {
+        this.container.style.visibility = 'hidden';
+    }
+
+    isContainerHidden() {
+        return (this.container.style.visibility === 'hidden');
     }
 
     isVisible() {
@@ -207,6 +238,14 @@ class Popup {
             point.y < rect.bottom;
 
         return contained;
+    }
+
+    async containsPointAsync(point) {
+        return containsPoint(point);
+    }
+
+    containsPointIsAsync() {
+        return false;
     }
 
     async termsShow(elementRect, writingMode, definitions, options, context) {

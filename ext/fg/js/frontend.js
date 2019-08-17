@@ -18,8 +18,8 @@
 
 
 class Frontend {
-    constructor() {
-        this.popup = new Popup();
+    constructor(popup) {
+        this.popup = popup;
         this.popupTimer = null;
         this.mouseDownLeft = false;
         this.mouseDownMiddle = false;
@@ -34,6 +34,25 @@ class Frontend {
         this.mouseDownPrevent = false;
         this.clickPrevent = false;
         this.scrollPrevent = false;
+    }
+
+    static create() {
+        const floatUrl = chrome.extension.getURL('/fg/float.html');
+        const currentUrl = location.href.replace(/[\?#][\w\W]*$/, "");
+        const isNested = (currentUrl === floatUrl);
+
+        let id = null;
+        if (isNested) {
+            const match = /[&?]id=([^&]*?)(?:&|$)/.exec(location.href);
+            if (match !== null) {
+                id = match[1];
+            }
+        }
+
+        const popup = isNested ? new PopupProxy(id) : PopupProxyHost.instance.createPopup();
+        const frontend = new Frontend(popup);
+        frontend.prepare();
+        return frontend;
     }
 
     async prepare() {
@@ -259,9 +278,8 @@ class Frontend {
         const handler = handlers[action];
         if (handler) {
             handler(params);
+            callback();
         }
-
-        callback();
     }
 
     onError(error) {
@@ -281,7 +299,10 @@ class Frontend {
     }
 
     async searchAt(point, type) {
-        if (this.pendingLookup || this.popup.containsPoint(point)) {
+        if (
+            this.pendingLookup ||
+            (this.popup.containsPointIsAsync() ? await this.popup.containsPointAsync(point) : this.popup.containsPoint(point))
+        ) {
             return;
         }
 
@@ -482,5 +503,4 @@ class Frontend {
     }
 }
 
-window.yomichan_frontend = new Frontend();
-window.yomichan_frontend.prepare();
+window.yomichan_frontend = Frontend.create();

@@ -22,6 +22,8 @@ class Backend {
         this.translator = new Translator();
         this.anki = new AnkiNull();
         this.options = null;
+
+        this.apiForwarder = new BackendApiForwarder();
     }
 
     async prepare() {
