@@ -64,7 +64,7 @@ async function apiDefinitionAdd(definition, mode, context) {
         );
     }
 
-    if (context.screenshot) {
+    if (context && context.screenshot) {
         await apiInjectScreenshot(
             definition,
             options.anki.terms.fields,

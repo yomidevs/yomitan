@@ -49,6 +49,10 @@ function apiTemplateRender(template, data, dynamic) {
     return utilInvoke('templateRender', {data, template, dynamic});
 }
 
+function apiAudioGetUrl(definition, source) {
+    return utilInvoke('audioGetUrl', {definition, source});
+}
+
 function apiCommandExec(command) {
     return utilInvoke('commandExec', {command});
 }
