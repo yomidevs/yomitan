@@ -175,6 +175,10 @@ function optionsFieldTemplates() {
     <a href="{{definition.url}}">{{definition.url}}</a>
 {{/inline}}
 
+{{#*inline "screenshot"}}
+    <img src="{{definition.screenshotFileName}}" />
+{{/inline}}
+
 {{~> (lookup . "marker") ~}}
 `.trim();
 }
@@ -220,6 +224,7 @@ function optionsSetDefaults(options) {
             server: 'http://127.0.0.1:8765',
             tags: ['yomichan'],
             sentenceExt: 200,
+            screenshot: {format: 'png', quality: 92},
             terms: {deck: '', model: '', fields: {}},
             kanji: {deck: '', model: '', fields: {}},
             fieldTemplates: optionsFieldTemplates()
@@ -281,6 +286,11 @@ function optionsVersion(options) {
         },
         () => {
             if (utilStringHashCode(options.anki.fieldTemplates) === 1285806040) {
+                options.anki.fieldTemplates = optionsFieldTemplates();
+            }
+        },
+        () => {
+            if (utilStringHashCode(options.anki.fieldTemplates) === -250091611) {
                 options.anki.fieldTemplates = optionsFieldTemplates();
             }
         }

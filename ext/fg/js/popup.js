@@ -113,6 +113,14 @@ class Popup {
         return this.injected && this.container.style.visibility !== 'hidden';
     }
 
+    setVisible(visible) {
+        if (visible) {
+            this.container.style.setProperty('display', '');
+        } else {
+            this.container.style.setProperty('display', 'none', 'important');
+        }
+    }
+
     containsPoint(point) {
         if (!this.isVisible()) {
             return false;

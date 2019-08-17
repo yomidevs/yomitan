@@ -51,6 +51,8 @@ async function formRead() {
     optionsNew.anki.tags = $('#card-tags').val().split(/[,; ]+/);
     optionsNew.anki.sentenceExt = parseInt($('#sentence-detection-extent').val(), 10);
     optionsNew.anki.server = $('#interface-server').val();
+    optionsNew.anki.screenshot.format = $('#screenshot-format').val();
+    optionsNew.anki.screenshot.quality = parseInt($('#screenshot-quality').val(), 10);
     optionsNew.anki.fieldTemplates = $('#field-templates').val();
 
     if (optionsOld.anki.enable && !ankiErrorShown()) {
@@ -188,6 +190,8 @@ async function onReady() {
     $('#card-tags').val(options.anki.tags.join(' '));
     $('#sentence-detection-extent').val(options.anki.sentenceExt);
     $('#interface-server').val(options.anki.server);
+    $('#screenshot-format').val(options.anki.screenshot.format);
+    $('#screenshot-quality').val(options.anki.screenshot.quality);
     $('#field-templates').val(options.anki.fieldTemplates);
     $('#field-templates-reset').click(utilAsync(onAnkiFieldTemplatesReset));
     $('input, select, textarea').not('.anki-model').change(utilAsync(onFormOptionsChanged));
@@ -505,7 +509,8 @@ async function ankiFieldsPopulate(element, options) {
             'reading',
             'sentence',
             'tags',
-            'url'
+            'url',
+            'screenshot'
         ],
         'kanji': [
             'character',

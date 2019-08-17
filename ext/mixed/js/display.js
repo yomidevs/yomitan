@@ -435,7 +435,15 @@ class Display {
         try {
             this.spinner.show();
 
-            const noteId = await apiDefinitionAdd(definition, mode);
+            const context = {};
+            if (this.noteUsesScreenshot()) {
+                const screenshot = await this.getScreenshot();
+                if (screenshot) {
+                    context.screenshot = screenshot;
+                }
+            }
+
+            const noteId = await apiDefinitionAdd(definition, mode, context);
             if (noteId) {
                 const index = this.definitions.indexOf(definition);
                 Display.adderButtonFind(index, mode).addClass('disabled');
@@ -488,8 +496,37 @@ class Display {
         }
     }
 
+    noteUsesScreenshot() {
+        const fields = this.options.anki.terms.fields;
+        for (const name in fields) {
+            if (fields[name].includes('{screenshot}')) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    async getScreenshot() {
+        try {
+            await this.setPopupVisible(false);
+            await Display.delay(1); // Wait for popup to be hidden.
+
+            const {format, quality} = this.options.anki.screenshot;
+            const dataUrl = await apiScreenshotGet({format, quality});
+            if (!dataUrl || dataUrl.error) { return; }
+
+            return {dataUrl, format};
+        } finally {
+            await this.setPopupVisible(true);
+        }
+    }
+
     get firstExpressionIndex() {
         return this.options.general.resultOutputMode === 'merge' ? 0 : -1;
+    }
+
+    setPopupVisible(visible) {
+        return apiForward('popupSetVisible', {visible});
     }
 
     static clozeBuild(sentence, source) {
@@ -516,5 +553,9 @@ class Display {
 
     static viewerButtonFind(index) {
         return $('.entry').eq(index).find('.action-view-note');
+    }
+
+    static delay(time) {
+        return new Promise((resolve) => setTimeout(resolve, time));
     }
 }
