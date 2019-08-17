@@ -192,7 +192,7 @@ class Frontend {
     }
 
     onTouchMove(e) {
-        if (!this.scrollPrevent || this.primaryTouchIdentifier === null) {
+        if (!this.scrollPrevent || !e.cancelable || this.primaryTouchIdentifier === null) {
             return;
         }
 
