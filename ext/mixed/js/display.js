@@ -272,7 +272,9 @@ class Display {
 
     async termsShow(definitions, options, context) {
         try {
-            window.focus();
+            if (!context || context.focus !== false) {
+                window.focus();
+            }
 
             this.definitions = definitions;
             this.options = options;
@@ -324,7 +326,9 @@ class Display {
 
     async kanjiShow(definitions, options, context) {
         try {
-            window.focus();
+            if (!context || context.focus !== false) {
+                window.focus();
+            }
 
             this.definitions = definitions;
             this.options = options;
