@@ -36,9 +36,10 @@ class PopupProxyHost {
 
     createPopup(parentId) {
         const parent = (typeof parentId === 'string' && this.popups.hasOwnProperty(parentId) ? this.popups[parentId] : null);
+        const depth = (parent !== null ? parent.depth + 1 : 0);
         const id = `${this.nextId}`;
         ++this.nextId;
-        const popup = new Popup(id);
+        const popup = new Popup(id, depth);
         if (parent !== null) {
             popup.parent = parent;
             parent.children.push(popup);

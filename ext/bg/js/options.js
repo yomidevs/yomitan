@@ -219,7 +219,8 @@ function optionsSetDefaults(options) {
             delay: 20,
             length: 10,
             modifier: 'shift',
-            deepDomScan: false
+            deepDomScan: false,
+            popupNestingMaxDepth: 0
         },
 
         dictionaries: {},

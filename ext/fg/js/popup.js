@@ -18,15 +18,16 @@
 
 
 class Popup {
-    constructor(id) {
+    constructor(id, depth) {
         this.id = id;
+        this.depth = depth;
         this.parent = null;
         this.children = [];
         this.container = document.createElement('iframe');
         this.container.id = 'yomichan-float';
         this.container.addEventListener('mousedown', e => e.stopPropagation());
         this.container.addEventListener('scroll', e => e.stopPropagation());
-        this.container.setAttribute('src', chrome.extension.getURL(`/fg/float.html?id=${id}`));
+        this.container.setAttribute('src', chrome.extension.getURL(`/fg/float.html?id=${id}&depth=${depth}`));
         this.container.style.width = '0px';
         this.container.style.height = '0px';
         this.injected = null;

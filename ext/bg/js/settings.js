@@ -51,6 +51,7 @@ async function formRead() {
     optionsNew.scanning.delay = parseInt($('#scan-delay').val(), 10);
     optionsNew.scanning.length = parseInt($('#scan-length').val(), 10);
     optionsNew.scanning.modifier = $('#scan-modifier-key').val();
+    optionsNew.scanning.popupNestingMaxDepth = parseInt($('#popup-nesting-max-depth').val(), 10);
 
     optionsNew.anki.enable = $('#anki-enable').prop('checked');
     optionsNew.anki.tags = $('#card-tags').val().split(/[,; ]+/);
@@ -192,6 +193,7 @@ async function onReady() {
     $('#scan-delay').val(options.scanning.delay);
     $('#scan-length').val(options.scanning.length);
     $('#scan-modifier-key').val(options.scanning.modifier);
+    $('#popup-nesting-max-depth').val(options.scanning.popupNestingMaxDepth);
 
     $('#dict-purge-link').click(utilAsync(onDictionaryPurge));
     $('#dict-file').change(utilAsync(onDictionaryImport));
