@@ -220,7 +220,8 @@ function optionsSetDefaults(options) {
             length: 10,
             modifier: 'shift',
             deepDomScan: false,
-            popupNestingMaxDepth: 0
+            popupNestingMaxDepth: 0,
+            enableOnSearchPage: true
         },
 
         dictionaries: {},
