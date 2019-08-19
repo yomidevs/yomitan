@@ -37,23 +37,9 @@ class Frontend {
     }
 
     static create() {
-        const floatUrl = chrome.extension.getURL('/fg/float.html');
-        const currentUrl = location.href.replace(/[\?#][\w\W]*$/, "");
-        const isNested = (currentUrl === floatUrl);
-
-        let id = null;
-        let parentFrameId = null;
-        if (isNested) {
-            let match = /[&?]id=([^&]*?)(?:&|$)/.exec(location.href);
-            if (match !== null) {
-                id = match[1];
-            }
-
-            match = /[&?]parent=(\d+)(?:&|$)/.exec(location.href);
-            if (match !== null) {
-                parentFrameId = parseInt(match[1], 10);
-            }
-        }
+        const initializationData = window.frontendInitializationData;
+        const isNested = (initializationData !== null && typeof initializationData === 'object');
+        const {id, parentFrameId} = initializationData || {};
 
         const popup = isNested ? new PopupProxy(id, parentFrameId) : PopupProxyHost.instance.createPopup(null);
         const frontend = new Frontend(popup);

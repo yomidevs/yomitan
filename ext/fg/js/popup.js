@@ -29,6 +29,7 @@ class Popup {
         this.container.id = 'yomichan-float';
         this.container.addEventListener('mousedown', e => e.stopPropagation());
         this.container.addEventListener('scroll', e => e.stopPropagation());
+        this.container.setAttribute('src', chrome.extension.getURL('/fg/float.html'));
         this.container.style.width = '0px';
         this.container.style.height = '0px';
         this.injectPromise = null;
@@ -53,9 +54,13 @@ class Popup {
         }
 
         return new Promise((resolve) => {
-            const parent = (typeof this.frameId === 'number' ? this.frameId : '');
-            this.container.setAttribute('src', chrome.extension.getURL(`/fg/float.html?id=${this.id}&depth=${this.depth}&parent=${parent}`));
+            const parentFrameId = (typeof this.frameId === 'number' ? this.frameId : null);
             this.container.addEventListener('load', () => {
+                this.invokeApi('popupNestedInitialize', {
+                    id: this.id,
+                    depth: this.depth,
+                    parentFrameId
+                });
                 this.invokeApi('setOptions', {
                     general: {
                         customPopupCss: options.general.customPopupCss

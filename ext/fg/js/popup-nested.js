@@ -17,19 +17,22 @@
  */
 
 
-async function popupNestedSetup() {
+let popupNestedInitialized = false;
+
+async function popupNestedInitialize(id, depth, parentFrameId) {
+    if (popupNestedInitialized) {
+        return;
+    }
+    popupNestedInitialized = true;
+
     const options = await apiOptionsGet();
     const popupNestingMaxDepth = options.scanning.popupNestingMaxDepth;
-
-    let depth = null;
-    const match = /[&?]depth=([^&]*?)(?:&|$)/.exec(location.href);
-    if (match !== null) {
-        depth = parseInt(match[1], 10);
-    }
 
     if (!(typeof popupNestingMaxDepth === 'number' && typeof depth === 'number' && depth < popupNestingMaxDepth)) {
         return;
     }
+
+    window.frontendInitializationData = {id, depth, parentFrameId};
 
     const scriptSrcs = [
         '/fg/js/frontend-api-sender.js',
@@ -44,5 +47,3 @@ async function popupNestedSetup() {
         document.body.appendChild(script);
     }
 }
-
-popupNestedSetup();
