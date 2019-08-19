@@ -180,7 +180,7 @@ class TextSourceRange {
             let consumed = 0;
             let stripped = 0;
             while (state.remainder - consumed > 0) {
-                const currentChar = node.nodeValue[offset - consumed - stripped]; // negative indices are undefined in JS
+                const currentChar = node.nodeValue[offset - 1 - consumed - stripped]; // negative indices are undefined in JS
                 if (!currentChar) {
                     break;
                 } else if (currentChar.match(IGNORE_TEXT_PATTERN)) {
