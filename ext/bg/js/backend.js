@@ -127,6 +127,10 @@ class Backend {
 
             forward: ({action, params}) => {
                 forward(apiForward(action, params, sender), callback);
+            },
+
+            frameInformationGet: () => {
+                forward(apiFrameInformationGet(sender), callback);
             }
         };
 

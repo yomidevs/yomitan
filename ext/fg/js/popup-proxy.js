@@ -18,12 +18,14 @@
 
 
 class PopupProxy {
-    constructor(parentId) {
+    constructor(parentId, parentFrameId) {
         this.parentId = parentId;
+        this.parentFrameId = parentFrameId;
         this.id = null;
         this.idPromise = null;
         this.parent = null;
         this.children = [];
+        this.depth = 0;
 
         this.container = null;
 
@@ -102,7 +104,10 @@ class PopupProxy {
     }
 
     invokeHostApi(action, params={}) {
-        return this.apiSender.invoke(action, params, 'popup-proxy-host');
+        if (typeof this.parentFrameId !== 'number') {
+            return Promise.reject('Invalid frame');
+        }
+        return this.apiSender.invoke(action, params, `popup-proxy-host#${this.parentFrameId}`);
     }
 
     static DOMRectToJson(domRect) {

@@ -18,38 +18,55 @@
 
 
 class Popup {
-    constructor(id, depth) {
+    constructor(id, depth, frameIdPromise) {
         this.id = id;
         this.depth = depth;
+        this.frameIdPromise = frameIdPromise;
+        this.frameId = null;
         this.parent = null;
         this.children = [];
         this.container = document.createElement('iframe');
         this.container.id = 'yomichan-float';
         this.container.addEventListener('mousedown', e => e.stopPropagation());
         this.container.addEventListener('scroll', e => e.stopPropagation());
-        this.container.setAttribute('src', chrome.extension.getURL(`/fg/float.html?id=${id}&depth=${depth}`));
         this.container.style.width = '0px';
         this.container.style.height = '0px';
-        this.injected = null;
+        this.injectPromise = null;
+        this.isInjected = false;
     }
 
     inject(options) {
-        if (!this.injected) {
-            this.injected = new Promise((resolve, reject) => {
-                this.container.addEventListener('load', () => {
-                    this.invokeApi('setOptions', {
-                        general: {
-                            customPopupCss: options.general.customPopupCss
-                        }
-                    });
-                    resolve();
-                });
-                this.observeFullscreen();
-                this.onFullscreenChanged();
-            });
+        if (this.injectPromise === null) {
+            this.injectPromise = this.createInjectPromise(options);
+        }
+        return this.injectPromise;
+    }
+
+    async createInjectPromise(options) {
+        try {
+            const {frameId} = await this.frameIdPromise;
+            if (typeof frameId === 'number') {
+                this.frameId = frameId;
+            }
+        } catch (e) {
+            // NOP
         }
 
-        return this.injected;
+        return new Promise((resolve) => {
+            const parent = (typeof this.frameId === 'number' ? this.frameId : '');
+            this.container.setAttribute('src', chrome.extension.getURL(`/fg/float.html?id=${this.id}&depth=${this.depth}&parent=${parent}`));
+            this.container.addEventListener('load', () => {
+                this.invokeApi('setOptions', {
+                    general: {
+                        customPopupCss: options.general.customPopupCss
+                    }
+                });
+                resolve();
+            });
+            this.observeFullscreen();
+            this.onFullscreenChanged();
+            this.isInjected = true;
+        });
     }
 
     async show(elementRect, writingMode, options) {
@@ -215,7 +232,7 @@ class Popup {
     }
 
     isVisible() {
-        return this.injected && this.container.style.visibility !== 'hidden';
+        return this.isInjected && this.container.style.visibility !== 'hidden';
     }
 
     setVisible(visible) {
@@ -260,7 +277,7 @@ class Popup {
     }
 
     clearAutoPlayTimer() {
-        if (this.injected) {
+        if (this.isInjected) {
             this.invokeApi('clearAutoPlayTimer');
         }
     }

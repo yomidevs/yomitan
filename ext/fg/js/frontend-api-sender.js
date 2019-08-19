@@ -19,6 +19,7 @@
 
 class FrontendApiSender {
     constructor() {
+        this.senderId = FrontendApiSender.generateId(16);
         this.ackTimeout = 3000; // 3 seconds
         this.responseTimeout = 10000; // 10 seconds
         this.callbacks = {};
@@ -43,11 +44,12 @@ class FrontendApiSender {
             this.callbacks[id] = info;
             info.timer = setTimeout(() => this.onError(id, 'Timeout (ack)'), this.ackTimeout);
 
-            this.port.postMessage({id, action, params, target});
+            this.port.postMessage({id, action, params, target, senderId: this.senderId});
         });
     }
 
-    onMessage({type, id, data}) {
+    onMessage({type, id, data, senderId}) {
+        if (senderId !== this.senderId) { return; }
         switch (type) {
             case 'ack':
                 this.onAck(id);
@@ -69,7 +71,7 @@ class FrontendApiSender {
 
     onAck(id) {
         if (!this.callbacks.hasOwnProperty(id)) {
-            console.warn(`ID ${id} not found`);
+            console.warn(`ID ${id} not found for ack`);
             return;
         }
 

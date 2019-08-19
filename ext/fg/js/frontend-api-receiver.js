@@ -31,7 +31,7 @@ class FrontendApiReceiver {
         port.onMessage.addListener(this.onMessage.bind(this, port));
     }
 
-    onMessage(port, {id, action, params, target}) {
+    onMessage(port, {id, action, params, target, senderId}) {
         if (
             target !== this.source ||
             !this.handlers.hasOwnProperty(action)
@@ -39,24 +39,24 @@ class FrontendApiReceiver {
             return;
         }
 
-        this.sendAck(port, id);
+        this.sendAck(port, id, senderId);
 
         const handler = this.handlers[action];
         handler(params).then(
             result => {
-                this.sendResult(port, id, {result});
+                this.sendResult(port, id, senderId, {result});
             },
             e => {
                 const error = typeof e.toString === 'function' ? e.toString() : e;
-                this.sendResult(port, id, {error});
+                this.sendResult(port, id, senderId, {error});
             });
     }
 
-    sendAck(port, id) {
-        port.postMessage({type: 'ack', id});
+    sendAck(port, id, senderId) {
+        port.postMessage({type: 'ack', id, senderId});
     }
 
-    sendResult(port, id, data) {
-        port.postMessage({type: 'result', id, data});
+    sendResult(port, id, senderId, data) {
+        port.postMessage({type: 'result', id, senderId, data});
     }
 }

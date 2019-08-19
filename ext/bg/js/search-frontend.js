@@ -25,8 +25,8 @@ async function searchFrontendSetup() {
         '/fg/js/api.js',
         '/fg/js/frontend-api-receiver.js',
         '/fg/js/popup.js',
-        '/fg/js/popup-proxy-host.js',
         '/fg/js/util.js',
+        '/fg/js/popup-proxy-host.js',
         '/fg/js/frontend.js'
     ];
     for (const src of scriptSrcs) {

@@ -42,14 +42,20 @@ class Frontend {
         const isNested = (currentUrl === floatUrl);
 
         let id = null;
+        let parentFrameId = null;
         if (isNested) {
-            const match = /[&?]id=([^&]*?)(?:&|$)/.exec(location.href);
+            let match = /[&?]id=([^&]*?)(?:&|$)/.exec(location.href);
             if (match !== null) {
                 id = match[1];
             }
+
+            match = /[&?]parent=(\d+)(?:&|$)/.exec(location.href);
+            if (match !== null) {
+                parentFrameId = parseInt(match[1], 10);
+            }
         }
 
-        const popup = isNested ? new PopupProxy(id) : PopupProxyHost.instance.createPopup();
+        const popup = isNested ? new PopupProxy(id, parentFrameId) : PopupProxyHost.instance.createPopup(null);
         const frontend = new Frontend(popup);
         frontend.prepare();
         return frontend;

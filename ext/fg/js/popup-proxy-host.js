@@ -21,7 +21,22 @@ class PopupProxyHost {
     constructor() {
         this.popups = {};
         this.nextId = 0;
-        this.apiReceiver = new FrontendApiReceiver('popup-proxy-host', {
+        this.apiReceiver = null;
+        this.frameIdPromise = null;
+    }
+
+    static create() {
+        const popupProxyHost = new PopupProxyHost();
+        popupProxyHost.prepare();
+        return popupProxyHost;
+    }
+
+    async prepare() {
+        this.frameIdPromise = apiFrameInformationGet();
+        const {frameId} = await this.frameIdPromise;
+        if (typeof frameId !== 'number') { return; }
+
+        this.apiReceiver = new FrontendApiReceiver(`popup-proxy-host#${frameId}`, {
             createNestedPopup: ({parentId}) => this.createNestedPopup(parentId),
             show: ({id, elementRect, options}) => this.show(id, elementRect, options),
             showOrphaned: ({id, elementRect, options}) => this.show(id, elementRect, options),
@@ -39,7 +54,7 @@ class PopupProxyHost {
         const depth = (parent !== null ? parent.depth + 1 : 0);
         const id = `${this.nextId}`;
         ++this.nextId;
-        const popup = new Popup(id, depth);
+        const popup = new Popup(id, depth, this.frameIdPromise);
         if (parent !== null) {
             popup.parent = parent;
             parent.children.push(popup);
@@ -116,4 +131,4 @@ class PopupProxyHost {
     }
 }
 
-PopupProxyHost.instance = new PopupProxyHost();
+PopupProxyHost.instance = PopupProxyHost.create();

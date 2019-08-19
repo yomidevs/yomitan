@@ -64,3 +64,7 @@ function apiScreenshotGet(options) {
 function apiForward(action, params) {
     return utilInvoke('forward', {action, params});
 }
+
+function apiFrameInformationGet() {
+    return utilInvoke('frameInformationGet');
+}
