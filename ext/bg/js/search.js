@@ -25,7 +25,7 @@ class DisplaySearch extends Display {
         this.query = $('#query').on('input', this.onSearchInput.bind(this));
         this.intro = $('#intro');
 
-        this.dependencies = {...this.dependencies, ...{docRangeFromPoint, docSentenceExtract}};
+        this.dependencies = Object.assign({}, this.dependencies, {docRangeFromPoint, docSentenceExtract});
 
         window.wanakana.bind(this.query.get(0));
     }

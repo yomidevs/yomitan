@@ -87,6 +87,20 @@ function utilDatabasePurge() {
     return utilBackend().translator.database.purge();
 }
 
-function utilDatabaseImport(data, progress, exceptions) {
+async function utilDatabaseImport(data, progress, exceptions) {
+    // Edge cannot read data on the background page due to the File object
+    // being created from a different window. Read on the same page instead.
+    if (EXTENSION_IS_BROWSER_EDGE) {
+        data = await utilReadFile(data);
+    }
     return utilBackend().translator.database.importDictionary(data, progress, exceptions);
+}
+
+function utilReadFile(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsBinaryString(file);
+    });
 }

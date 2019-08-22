@@ -11,10 +11,14 @@
     },
 
     "author": "Alex Yatskov",
-    "background": {"page": "bg/background.html"},
+    "background": {
+        "page": "bg/background.html",
+        "persistent": true
+    },
     "content_scripts": [{
         "matches": ["http://*/*", "https://*/*", "file://*/*"],
         "js": [
+            "mixed/js/extension.js",
             "fg/js/api.js",
             "fg/js/document.js",
             "fg/js/popup.js",

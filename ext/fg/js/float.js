@@ -23,7 +23,7 @@ class DisplayFloat extends Display {
         this.autoPlayAudioTimer = null;
         this.styleNode = null;
 
-        this.dependencies = {...this.dependencies, ...{docRangeFromPoint, docSentenceExtract}};
+        this.dependencies = Object.assign({}, this.dependencies, {docRangeFromPoint, docSentenceExtract});
 
         $(window).on('message', utilAsync(this.onMessage.bind(this)));
     }
