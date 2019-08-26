@@ -18,7 +18,7 @@
 
 
 class Frontend {
-    constructor(popup) {
+    constructor(popup, ignoreNodes) {
         this.popup = popup;
         this.popupTimer = null;
         this.mouseDownLeft = false;
@@ -26,6 +26,7 @@ class Frontend {
         this.textSourceLast = null;
         this.pendingLookup = false;
         this.options = null;
+        this.ignoreNodes = (Array.isArray(ignoreNodes) && ignoreNodes.length > 0 ? ignoreNodes.join(',') : null);
 
         this.primaryTouchIdentifier = null;
         this.contextMenuChecking = false;
@@ -39,10 +40,10 @@ class Frontend {
     static create() {
         const initializationData = window.frontendInitializationData;
         const isNested = (initializationData !== null && typeof initializationData === 'object');
-        const {id, parentFrameId} = initializationData || {};
+        const {id, parentFrameId, ignoreNodes} = isNested ? initializationData : {};
 
         const popup = isNested ? new PopupProxy(id, parentFrameId) : PopupProxyHost.instance.createPopup(null);
-        const frontend = new Frontend(popup);
+        const frontend = new Frontend(popup, ignoreNodes);
         frontend.prepare();
         return frontend;
     }
@@ -337,9 +338,14 @@ class Frontend {
     }
 
     async searchTerms(textSource, focus) {
-        textSource.setEndOffset(this.options.scanning.length);
+        this.setTextSourceScanLength(textSource, this.options.scanning.length);
 
-        const {definitions, length} = await apiTermsFind(textSource.text());
+        const searchText = textSource.text();
+        if (searchText.length === 0) {
+            return;
+        }
+
+        const {definitions, length} = await apiTermsFind(searchText);
         if (definitions.length === 0) {
             return false;
         }
@@ -365,9 +371,14 @@ class Frontend {
     }
 
     async searchKanji(textSource, focus) {
-        textSource.setEndOffset(1);
+        this.setTextSourceScanLength(textSource, 1);
 
-        const definitions = await apiKanjiFind(textSource.text());
+        const searchText = textSource.text();
+        if (searchText.length === 0) {
+            return;
+        }
+
+        const definitions = await apiKanjiFind(searchText);
         if (definitions.length === 0) {
             return false;
         }
@@ -492,6 +503,67 @@ class Frontend {
             }
         }
         return false;
+    }
+
+    setTextSourceScanLength(textSource, length) {
+        textSource.setEndOffset(length);
+        if (this.ignoreNodes === null || !textSource.range) {
+            return;
+        }
+
+        length = textSource.text().length;
+        while (textSource.range && length > 0) {
+            const nodes = Frontend.getNodesInRange(textSource.range);
+            if (Frontend.isValidScanningNodeList(nodes, this.ignoreNodes)) {
+                break;
+            }
+            --length;
+            textSource.setEndOffset(length);
+        }
+    }
+
+    static getNodesInRange(range) {
+        const end = range.endContainer;
+        const nodes = [];
+        for (let node = range.startContainer; node !== null; node = Frontend.getNextNode(node)) {
+            nodes.push(node);
+            if (node === end) { break; }
+        }
+        return nodes;
+    }
+
+    static getNextNode(node) {
+        let next = node.firstChild;
+        if (next === null) {
+            while (true) {
+                next = node.nextSibling;
+                if (next !== null) { break; }
+
+                next = node.parentNode;
+                if (node === null) { break; }
+
+                node = next;
+            }
+        }
+        return next;
+    }
+
+    static isValidScanningNodeList(nodeList, selector) {
+        for (const node of nodeList) {
+            if (!Frontend.isValidScanningNode(node, selector)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static isValidScanningNode(node, selector) {
+        for (; node !== null; node = node.parentNode) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                return !node.matches(selector);
+            }
+        }
+        return true;
     }
 }
 

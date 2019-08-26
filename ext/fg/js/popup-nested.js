@@ -32,7 +32,9 @@ async function popupNestedInitialize(id, depth, parentFrameId) {
         return;
     }
 
-    window.frontendInitializationData = {id, depth, parentFrameId};
+    const ignoreNodes = options.scanning.enableOnPopupExpressions ? [] : [ '.expression', '.expression *' ];
+
+    window.frontendInitializationData = {id, depth, parentFrameId, ignoreNodes};
 
     const scriptSrcs = [
         '/fg/js/frontend-api-sender.js',

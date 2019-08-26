@@ -221,6 +221,7 @@ function optionsSetDefaults(options) {
             modifier: 'shift',
             deepDomScan: false,
             popupNestingMaxDepth: 0,
+            enableOnPopupExpressions: false,
             enableOnSearchPage: true
         },
 
