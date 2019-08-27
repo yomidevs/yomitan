@@ -27,6 +27,7 @@ function utilInvoke(action, params={}) {
     return new Promise((resolve, reject) => {
         try {
             chrome.runtime.sendMessage({action, params}, (response) => {
+                utilCheckLastError(chrome.runtime.lastError);
                 if (response !== null && typeof response === 'object') {
                     if (response.error) {
                         reject(response.error);
@@ -42,4 +43,8 @@ function utilInvoke(action, params={}) {
             reject(e.message);
         }
     });
+}
+
+function utilCheckLastError(e) {
+    // NOP
 }
