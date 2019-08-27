@@ -110,7 +110,7 @@ class PopupProxyHost {
 
     async containsPoint(id, point) {
         const popup = this.getPopup(id);
-        return popup.containsPointIsAsync() ? await popup.containsPointAsync(point) : popup.containsPoint(point);
+        return await popup.containsPoint(point);
     }
 
     async termsShow(id, elementRect, definitions, options, context) {

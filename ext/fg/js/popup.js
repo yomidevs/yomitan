@@ -248,7 +248,7 @@ class Popup {
         }
     }
 
-    containsPoint(point) {
+    async containsPoint(point) {
         if (!this.isVisible()) {
             return false;
         }

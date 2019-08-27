@@ -69,19 +69,11 @@ class PopupProxy {
         return await this.invokeHostApi('setVisible', {id, visible});
     }
 
-    containsPoint() {
-        throw 'Non-async function not supported';
-    }
-
-    async containsPointAsync(point) {
+    async containsPoint(point) {
         if (this.id === null) {
             return false;
         }
         return await this.invokeHostApi('containsPoint', {id: this.id, point});
-    }
-
-    containsPointIsAsync() {
-        return true;
     }
 
     async termsShow(elementRect, definitions, options, context) {

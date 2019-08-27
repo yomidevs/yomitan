@@ -294,7 +294,7 @@ class Frontend {
     async searchAt(point, type) {
         if (
             this.pendingLookup ||
-            (this.popup.containsPointIsAsync() ? await this.popup.containsPointAsync(point) : this.popup.containsPoint(point))
+            await this.popup.containsPoint(point)
         ) {
             return;
         }
