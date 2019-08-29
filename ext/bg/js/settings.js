@@ -116,7 +116,7 @@ async function formMainDictionaryOptionsPopulate(options) {
     select.append($('<option class="text-muted" value="">Not selected</option>'));
 
     let mainDictionary = '';
-    for (const dictRow of await utilDatabaseSummarize()) {
+    for (const dictRow of toIterable(await utilDatabaseSummarize())) {
         if (dictRow.sequenced) {
             select.append($(`<option value="${dictRow.title}">${dictRow.title}</option>`));
             if (dictRow.title === options.general.mainDictionary) {
@@ -314,12 +314,12 @@ async function dictionaryGroupsPopulate(options) {
     const dictGroups = $('#dict-groups').empty();
     const dictWarning = $('#dict-warning').hide();
 
-    const dictRows = await utilDatabaseSummarize();
+    const dictRows = toIterable(await utilDatabaseSummarize());
     if (dictRows.length === 0) {
         dictWarning.show();
     }
 
-    for (const dictRow of dictRowsSort(dictRows, options)) {
+    for (const dictRow of toIterable(dictRowsSort(dictRows, options))) {
         const dictOptions = options.dictionaries[dictRow.title] || {
             enabled: false,
             priority: 0,
@@ -581,20 +581,19 @@ async function onAnkiFieldTemplatesReset(e) {
  */
 
 async function getBrowser() {
-    if (typeof chrome !== "undefined") {
-        if (typeof browser !== "undefined") {
-            try {
-                const info = await browser.runtime.getBrowserInfo();
-                if (info.name === "Fennec") {
-                    return "firefox-mobile";
-                }
-            } catch (e) { }
-            return "firefox";
-        } else {
-            return "chrome";
-        }
+    if (EXTENSION_IS_BROWSER_EDGE) {
+        return 'edge';
+    }
+    if (typeof browser !== 'undefined') {
+        try {
+            const info = await browser.runtime.getBrowserInfo();
+            if (info.name === 'Fennec') {
+                return 'firefox-mobile';
+            }
+        } catch (e) { }
+        return 'firefox';
     } else {
-        return "edge";
+        return 'chrome';
     }
 }
 
