@@ -298,14 +298,12 @@ class Translator {
         const tags = [];
         for (const name of names) {
             const base = Translator.getNameBase(name);
-            const meta = await this.database.findTagForTitle(base, title);
-
-            const tag = {name};
-            for (const prop in meta || {}) {
-                if (prop !== 'name') {
-                    tag[prop] = meta[prop];
-                }
+            let meta = this.database.findTagForTitleCached(base, title);
+            if (typeof meta === 'undefined') {
+                meta = await this.database.findTagForTitle(base, title);
             }
+
+            const tag = Object.assign({}, meta !== null ? meta : {}, {name});
 
             tags.push(dictTagSanitize(tag));
         }
@@ -317,15 +315,17 @@ class Translator {
         const stats = {};
         for (const name in items) {
             const base = Translator.getNameBase(name);
-            const meta = await this.database.findTagForTitle(base, title);
-            const group = stats[meta.category] = stats[meta.category] || [];
-
-            const stat = {name, value: items[name]};
-            for (const prop in meta || {}) {
-                if (prop !== 'name') {
-                    stat[prop] = meta[prop];
+            let meta = this.database.findTagForTitleCached(base, title);
+            if (typeof meta === 'undefined') {
+                meta = await this.database.findTagForTitle(base, title);
+                if (meta === null) {
+                    continue;
                 }
             }
+
+            const group = stats[meta.category] = stats[meta.category] || [];
+
+            const stat = Object.assign({}, meta, {name, value: items[name]});
 
             group.push(dictTagSanitize(stat));
         }

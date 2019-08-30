@@ -166,23 +166,30 @@ class Database {
         return results;
     }
 
+    findTagForTitleCached(name, title) {
+        if (this.tagCache.hasOwnProperty(title)) {
+            const cache = this.tagCache[title];
+            if (cache.hasOwnProperty(name)) {
+                return cache[name];
+            }
+        }
+    }
+
     async findTagForTitle(name, title) {
         if (!this.db) {
             throw 'Database not initialized';
         }
 
-        this.tagCache[title] = this.tagCache[title] || {};
+        const cache = (this.tagCache.hasOwnProperty(title) ? this.tagCache[title] : (this.tagCache[title] = {}));
 
-        let result = this.tagCache[title][name];
-        if (!result) {
-            await this.db.tagMeta.where('name').equals(name).each(row => {
-                if (title === row.dictionary) {
-                    result = row;
-                }
-            });
+        let result = null;
+        await this.db.tagMeta.where('name').equals(name).each(row => {
+            if (title === row.dictionary) {
+                result = row;
+            }
+        });
 
-            this.tagCache[title][name] = result;
-        }
+        cache[name] = result;
 
         return result;
     }
