@@ -599,7 +599,7 @@ async function getBrowser() {
 
 function storageBytesToLabeledString(size) {
     const base = 1000;
-    const labels = ["bytes", "KB", "MB", "GB"];
+    const labels = ['bytes', 'KB', 'MB', 'GB'];
     let labelIndex = 0;
     while (size >= base) {
         size /= base;
@@ -619,14 +619,14 @@ storageEstimate.mostRecent = null;
 
 async function storageInfoInitialize() {
     const browser = await getBrowser();
-    const container = document.querySelector("#storage-info");
-    container.setAttribute("data-browser", browser);
+    const container = document.querySelector('#storage-info');
+    container.setAttribute('data-browser', browser);
 
     await storageShowInfo();
 
-    container.classList.remove("storage-hidden");
+    container.classList.remove('storage-hidden');
 
-    document.querySelector("#storage-refresh").addEventListener('click', () => storageShowInfo(), false);
+    document.querySelector('#storage-refresh').addEventListener('click', () => storageShowInfo(), false);
 }
 
 async function storageUpdateStats() {
@@ -636,8 +636,8 @@ async function storageUpdateStats() {
     const valid = (estimate !== null);
 
     if (valid) {
-        document.querySelector("#storage-usage").textContent = storageBytesToLabeledString(estimate.usage);
-        document.querySelector("#storage-quota").textContent = storageBytesToLabeledString(estimate.quota);
+        document.querySelector('#storage-usage').textContent = storageBytesToLabeledString(estimate.usage);
+        document.querySelector('#storage-quota').textContent = storageBytesToLabeledString(estimate.quota);
     }
 
     storageUpdateStats.isUpdating = false;
@@ -649,8 +649,8 @@ async function storageShowInfo() {
     storageSpinnerShow(true);
 
     const valid = await storageUpdateStats();
-    document.querySelector("#storage-use").classList.toggle("storage-hidden", !valid);
-    document.querySelector("#storage-error").classList.toggle("storage-hidden", valid);
+    document.querySelector('#storage-use').classList.toggle('storage-hidden', !valid);
+    document.querySelector('#storage-error').classList.toggle('storage-hidden', valid);
 
     storageSpinnerShow(false);
 }
