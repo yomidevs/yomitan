@@ -165,6 +165,7 @@ Flashcard fields can be configured with the following steps:
     `{sentence}` | Sentence, quote, or phrase in which the term appears in the source content.
     `{tags}` | Grammar and usage tags providing information about the term (unavailable in *grouped* mode).
     `{url}` | Address of the web page in which the term appeared in.
+    `{screenshot}` | Screenshot of the web page taken at the time the term was added.
 
     #### Markers for Kanji Cards ####
 
@@ -180,6 +181,7 @@ Flashcard fields can be configured with the following steps:
     `{onyomi}` | Onyomi (Chinese reading) for the Kanji expressed as Hiragana.
     `{sentence}` | Sentence, quote, or phrase in which the character appears in the source content.
     `{url}` | Address of the web page in which the Kanji appeared in.
+    `{screenshot}` | Screenshot of the web page taken at the time the Kanji was added.
 
 When creating your model for Yomichan, *please make sure that you pick a unique field to be first*; fields that will
 contain `{expression}` or `{character}` are ideal candidates for this. Anki does not require duplicate flashcards to be
