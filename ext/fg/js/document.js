@@ -17,8 +17,6 @@
  */
 
 
-const IS_FIREFOX = /Firefox/.test(navigator.userAgent);
-
 function docOffsetCalc(element) {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
     const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft;
@@ -162,20 +160,47 @@ function docSentenceExtract(source, extent) {
 }
 
 function isPointInRange(point, range) {
-    if (IS_FIREFOX) {
-        // Always return true on Firefox due to an issue where range.getClientRects()
-        // does not return a correct set of rects for characters at the beginning of a line.
+    // Scan forward
+    const nodePre = range.endContainer;
+    const offsetPre = range.endOffset;
+    try {
+        const {node, offset} = TextSourceRange.seekForward(range.endContainer, range.endOffset, 1);
+        range.setEnd(node, offset);
+
+        if (isPointInAnyRect(point, range.getClientRects())) {
+            return true;
+        }
+    } finally {
+        range.setEnd(nodePre, offsetPre);
+    }
+
+    // Scan backward
+    const {node, offset} = TextSourceRange.seekBackward(range.startContainer, range.startOffset, 1);
+    range.setStart(node, offset);
+
+    if (isPointInAnyRect(point, range.getClientRects())) {
+        // This purposefully leaves the starting offset as modified and sets teh range length to 0.
+        range.setEnd(node, offset);
         return true;
     }
 
-    const y = point.y - 2;
-    for (const rect of range.getClientRects()) {
-        if (y <= rect.bottom) {
+    // No match
+    return false;
+}
+
+function isPointInAnyRect(point, rects) {
+    for (const rect of rects) {
+        if (isPointInRect(point, rect)) {
             return true;
         }
     }
-
     return false;
+}
+
+function isPointInRect(point, rect) {
+    return (
+        point.x >= rect.left && point.x < rect.right &&
+        point.y >= rect.top && point.y < rect.bottom);
 }
 
 if (typeof document.caretRangeFromPoint !== 'function') {
