@@ -68,18 +68,7 @@ class Database {
         const results = [];
         await this.db.terms.where('expression').equals(term).or('reading').equals(term).each(row => {
             if (titles.includes(row.dictionary)) {
-                results.push({
-                    expression: row.expression,
-                    reading: row.reading,
-                    definitionTags: dictFieldSplit(row.definitionTags || row.tags || ''),
-                    termTags: dictFieldSplit(row.termTags || ''),
-                    rules: dictFieldSplit(row.rules),
-                    glossary: row.glossary,
-                    score: row.score,
-                    dictionary: row.dictionary,
-                    id: row.id,
-                    sequence: typeof row.sequence === 'undefined' ? -1 : row.sequence
-                });
+                results.push(Database.createTerm(row));
             }
         });
 
@@ -94,18 +83,7 @@ class Database {
         const results = [];
         await this.db.terms.where('expression').equals(term).each(row => {
             if (row.reading === reading && titles.includes(row.dictionary)) {
-                results.push({
-                    expression: row.expression,
-                    reading: row.reading,
-                    definitionTags: dictFieldSplit(row.definitionTags || row.tags || ''),
-                    termTags: dictFieldSplit(row.termTags || ''),
-                    rules: dictFieldSplit(row.rules),
-                    glossary: row.glossary,
-                    score: row.score,
-                    dictionary: row.dictionary,
-                    id: row.id,
-                    sequence: typeof row.sequence === 'undefined' ? -1 : row.sequence
-                });
+                results.push(Database.createTerm(row));
             }
         });
 
@@ -120,18 +98,7 @@ class Database {
         const results = [];
         await this.db.terms.where('sequence').equals(sequence).each(row => {
             if (row.dictionary === mainDictionary) {
-                results.push({
-                    expression: row.expression,
-                    reading: row.reading,
-                    definitionTags: dictFieldSplit(row.definitionTags || row.tags || ''),
-                    termTags: dictFieldSplit(row.termTags || ''),
-                    rules: dictFieldSplit(row.rules),
-                    glossary: row.glossary,
-                    score: row.score,
-                    dictionary: row.dictionary,
-                    id: row.id,
-                    sequence: typeof row.sequence === 'undefined' ? -1 : row.sequence
-                });
+                results.push(Database.createTerm(row));
             }
         });
 
@@ -488,5 +455,20 @@ class Database {
         await loadBank(summary, buildTagBankName, tagBankCount, tagDataLoaded);
 
         return summary;
+    }
+
+    static createTerm(row) {
+        return {
+            expression: row.expression,
+            reading: row.reading,
+            definitionTags: dictFieldSplit(row.definitionTags || row.tags || ''),
+            termTags: dictFieldSplit(row.termTags || ''),
+            rules: dictFieldSplit(row.rules),
+            glossary: row.glossary,
+            score: row.score,
+            dictionary: row.dictionary,
+            id: row.id,
+            sequence: typeof row.sequence === 'undefined' ? -1 : row.sequence
+        };
     }
 }
