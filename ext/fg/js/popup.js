@@ -207,7 +207,7 @@ class Popup {
 
     hide() {
         this.hideContainer();
-        this.container.blur();
+        this.focusParent();
         this.hideChildren();
     }
 
@@ -245,6 +245,14 @@ class Popup {
             this.container.style.setProperty('display', '');
         } else {
             this.container.style.setProperty('display', 'none', 'important');
+        }
+    }
+
+    focusParent() {
+        if (this.parent && this.parent.container) {
+            this.parent.container.focus();
+        } else {
+            this.container.blur();
         }
     }
 
