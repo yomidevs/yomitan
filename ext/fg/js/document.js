@@ -105,8 +105,8 @@ function docRangeFromPoint({x, y}) {
         }
     }
 
-    const range = document.caretRangeFromPoint(x, y);
-    if (range !== null && isPointInRange(point, range)) {
+    const range = caretRangeFromPoint(x, y);
+    if (range !== null) {
         if (imposter !== null) {
             docSetImposterStyle(imposterContainer.style, 'z-index', '-2147483646');
             docSetImposterStyle(imposter.style, 'pointer-events', 'none');
@@ -235,15 +235,29 @@ function isPointInRect(x, y, rect) {
         y >= rect.top && y < rect.bottom);
 }
 
-if (typeof document.caretRangeFromPoint !== 'function') {
-    document.caretRangeFromPoint = (x, y) => {
-        const position = document.caretPositionFromPoint(x, y);
-        if (position && position.offsetNode && position.offsetNode.nodeType === Node.TEXT_NODE) {
+const caretRangeFromPoint = (() => {
+    if (typeof document.caretRangeFromPoint === 'function') {
+        // Chrome, Edge
+        return (x, y) => document.caretRangeFromPoint(x, y);
+    }
+
+    if (typeof document.caretPositionFromPoint === 'function') {
+        // Firefox
+        return (x, y) => {
+            const position = document.caretPositionFromPoint(x, y);
+            const node = position.offsetNode;
+            if (node === null) {
+                return null;
+            }
+
             const range = document.createRange();
-            range.setStart(position.offsetNode, position.offset);
-            range.setEnd(position.offsetNode, position.offset);
+            const offset = (node.nodeType === Node.TEXT_NODE ? position.offset : 0);
+            range.setStart(node, offset);
+            range.setEnd(node, offset);
             return range;
-        }
-        return null;
-    };
-}
+        };
+    }
+
+    // No support
+    return () => null;
+})();
