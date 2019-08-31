@@ -41,9 +41,7 @@ class Translator {
         const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
 
         const definitionsGrouped = dictTermsGroup(definitions, dictionaries);
-        for (const definition of definitionsGrouped) {
-            await this.buildTermFrequencies(definition, titles);
-        }
+        await this.buildTermFrequencies(definitionsGrouped, titles);
 
         if (options.general.compactTags) {
             for (const definition of definitionsGrouped) {
@@ -147,9 +145,7 @@ class Translator {
             definitionsMerged.push(groupedDefinition);
         }
 
-        for (const definition of definitionsMerged) {
-            await this.buildTermFrequencies(definition, titles);
-        }
+        await this.buildTermFrequencies(definitionsMerged, titles);
 
         if (options.general.compactTags) {
             for (const definition of definitionsMerged) {
@@ -164,9 +160,7 @@ class Translator {
         const titles = Object.keys(dictionaries);
         const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
 
-        for (const definition of definitions) {
-            await this.buildTermFrequencies(definition, titles);
-        }
+        await this.buildTermFrequencies(definitions, titles);
 
         return {length, definitions};
     }
@@ -179,13 +173,9 @@ class Translator {
             }
         }
 
-        const cache = {};
-        const titles = Object.keys(dictionaries);
-        let deinflections = await this.findTermDeinflections(text, titles, cache);
         const textHiragana = jpKatakanaToHiragana(text);
-        if (text !== textHiragana) {
-            deinflections.push(...await this.findTermDeinflections(textHiragana, titles, cache));
-        }
+        const titles = Object.keys(dictionaries);
+        const deinflections = await this.findTermDeinflections(text, textHiragana, titles);
 
         let definitions = [];
         for (const deinflection of deinflections) {
@@ -221,22 +211,58 @@ class Translator {
         return {length, definitions};
     }
 
-    async findTermDeinflections(text, titles, cache) {
-        const definer = async term => {
-            if (cache.hasOwnProperty(term)) {
-                return cache[term];
-            } else {
-                return cache[term] = await this.database.findTerms(term, titles);
-            }
-        };
+    async findTermDeinflections(text, text2, titles) {
+        const deinflections = (text === text2 ? this.getDeinflections(text) : this.getDeinflections2(text, text2));
 
-        let deinflections = [];
+        if (deinflections.length === 0) {
+            return [];
+        }
+
+        const definitions = await this.database.findTermsBulk(deinflections.map(e => e.term), titles);
+
+        for (const d of definitions) {
+            deinflections[d.index].definitions.push(d);
+        }
+
+        return deinflections.filter(e => e.definitions.length > 0);
+    }
+
+    getDeinflections(text) {
+        const deinflections = [];
+        const deinflectionsKeys = {};
+
         for (let i = text.length; i > 0; --i) {
             const textSlice = text.slice(0, i);
-            deinflections.push(...await this.deinflector.deinflect(textSlice, definer));
+            Translator.addUniqueDeinflections(this.deinflector.deinflect(textSlice), deinflections, deinflectionsKeys);
         }
 
         return deinflections;
+    }
+
+    getDeinflections2(text, text2) {
+        const deinflections = [];
+        const deinflectionsKeys = {};
+
+        for (let i = text.length; i > 0; --i) {
+            const textSlice = text.slice(0, i);
+            const text2Slice = text2.slice(0, i);
+            Translator.addUniqueDeinflections(this.deinflector.deinflect(textSlice), deinflections, deinflectionsKeys);
+            if (textSlice !== text2Slice) {
+                Translator.addUniqueDeinflections(this.deinflector.deinflect(text2Slice), deinflections, deinflectionsKeys);
+            }
+        }
+
+        return deinflections;
+    }
+
+    static addUniqueDeinflections(newValues, deinflections, deinflectionsKeys) {
+        for (const value of newValues) {
+            const key = value.term;
+            if (!deinflectionsKeys.hasOwnProperty(key)) {
+                deinflections.push(value);
+                deinflectionsKeys[key] = true;
+            }
+        }
     }
 
     async findKanji(text, dictionaries) {
@@ -272,24 +298,51 @@ class Translator {
         return definitions;
     }
 
-    async buildTermFrequencies(definition, titles) {
-        let terms = [];
-        if (definition.expressions) {
-            terms.push(...definition.expressions);
-        } else {
-            terms.push(definition);
+    async buildTermFrequencies(definitions, titles) {
+        const terms = [];
+        for (const definition of definitions) {
+            if (definition.expressions) {
+                terms.push(...definition.expressions);
+            } else {
+                terms.push(definition);
+            }
         }
 
-        for (const term of terms) {
+        if (terms.length === 0) {
+            return;
+        }
+
+        // Create mapping of unique terms
+        const expressionsUnique = [];
+        const termsUnique = [];
+        const termsUniqueMap = {};
+        for (let i = 0, ii = terms.length; i < ii; ++i) {
+            const term = terms[i];
+            const expression = term.expression;
             term.frequencies = [];
-            for (const meta of await this.database.findTermMeta(term.expression, titles)) {
-                if (meta.mode === 'freq') {
-                    term.frequencies.push({
-                        expression: meta.expression,
-                        frequency: meta.data,
-                        dictionary: meta.dictionary
-                    });
-                }
+
+            if (termsUniqueMap.hasOwnProperty(expression)) {
+                termsUniqueMap[expression].push(term);
+            } else {
+                const termList = [term];
+                expressionsUnique.push(expression);
+                termsUnique.push(termList);
+                termsUniqueMap[expression] = termList;
+            }
+        }
+
+        const metas = await this.database.findTermMetaBulk(expressionsUnique, titles);
+        for (const meta of metas) {
+            if (meta.mode !== 'freq') {
+                continue;
+            }
+
+            for (const term of termsUnique[meta.index]) {
+                term.frequencies.push({
+                    expression: meta.expression,
+                    frequency: meta.data,
+                    dictionary: meta.dictionary
+                });
             }
         }
     }

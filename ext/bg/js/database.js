@@ -75,6 +75,32 @@ class Database {
         return results;
     }
 
+    async findTermsBulk(terms, titles) {
+        const promises = [];
+        const visited = {};
+        const results = [];
+        const createResult = Database.createTerm;
+        const filter = (row) => titles.includes(row.dictionary);
+
+        const db = this.db.backendDB();
+        const dbTransaction = db.transaction(['terms'], 'readonly');
+        const dbTerms = dbTransaction.objectStore('terms');
+        const dbIndex1 = dbTerms.index('expression');
+        const dbIndex2 = dbTerms.index('reading');
+
+        for (let i = 0; i < terms.length; ++i) {
+            const only = IDBKeyRange.only(terms[i]);
+            promises.push(
+                Database.getAll(dbIndex1, only, i, visited, filter, createResult, results),
+                Database.getAll(dbIndex2, only, i, visited, filter, createResult, results)
+            );
+        }
+
+        await Promise.all(promises);
+
+        return results;
+    }
+
     async findTermsExact(term, reading, titles) {
         if (!this.db) {
             throw 'Database not initialized';
@@ -120,6 +146,28 @@ class Database {
                 });
             }
         });
+
+        return results;
+    }
+
+    async findTermMetaBulk(terms, titles) {
+        const promises = [];
+        const visited = {};
+        const results = [];
+        const createResult = Database.createTermMeta;
+        const filter = (row) => titles.includes(row.dictionary);
+
+        const db = this.db.backendDB();
+        const dbTransaction = db.transaction(['termMeta'], 'readonly');
+        const dbTerms = dbTransaction.objectStore('termMeta');
+        const dbIndex = dbTerms.index('expression');
+
+        for (let i = 0; i < terms.length; ++i) {
+            const only = IDBKeyRange.only(terms[i]);
+            promises.push(Database.getAll(dbIndex, only, i, visited, filter, createResult, results));
+        }
+
+        await Promise.all(promises);
 
         return results;
     }
@@ -464,8 +512,9 @@ class Database {
         return summary;
     }
 
-    static createTerm(row) {
+    static createTerm(row, index) {
         return {
+            index,
             expression: row.expression,
             reading: row.reading,
             definitionTags: dictFieldSplit(row.definitionTags || row.tags || ''),
@@ -477,5 +526,55 @@ class Database {
             id: row.id,
             sequence: typeof row.sequence === 'undefined' ? -1 : row.sequence
         };
+    }
+
+    static createTermMeta(row, index) {
+        return {
+            index,
+            mode: row.mode,
+            data: row.data,
+            dictionary: row.dictionary
+        };
+    }
+
+    static getAll(dbIndex, query, index, visited, filter, createResult, results) {
+        const fn = typeof dbIndex.getAll === 'function' ? Database.getAllFast : Database.getAllUsingCursor;
+        return fn(dbIndex, query, index, visited, filter, createResult, results);
+    }
+
+    static getAllFast(dbIndex, query, index, visited, filter, createResult, results) {
+        return new Promise((resolve, reject) => {
+            const request = dbIndex.getAll(query);
+            request.onerror = (e) => reject(e);
+            request.onsuccess = (e) => {
+                for (const row of e.target.result) {
+                    if (filter(row, index) && !visited.hasOwnProperty(row.id)) {
+                        visited[row.id] = true;
+                        results.push(createResult(row, index));
+                    }
+                }
+                resolve();
+            };
+        });
+    }
+
+    static getAllUsingCursor(dbIndex, query, index, visited, filter, createResult, results) {
+        return new Promise((resolve, reject) => {
+            const request = dbIndex.openCursor(query, 'next');
+            request.onerror = (e) => reject(e);
+            request.onsuccess = (e) => {
+                const cursor = e.target.result;
+                if (cursor) {
+                    const row = cursor.value;
+                    if (filter(row, index) && !visited.hasOwnProperty(row.id)) {
+                        visited[row.id] = true;
+                        results.push(createResult(row, index));
+                    }
+                    cursor.continue();
+                } else {
+                    resolve();
+                }
+            };
+        });
     }
 }
