@@ -30,7 +30,7 @@ function docOffsetCalc(elementRect) {
     return {top, left};
 }
 
-function docImposterCreate(element) {
+function docImposterCreate(element, isTextarea) {
     const styleProps = window.getComputedStyle(element);
     const stylePairs = [];
     for (const key of styleProps) {
@@ -49,8 +49,14 @@ function docImposterCreate(element) {
     imposter.style.opacity = 0;
     imposter.style.zIndex = 2147483646;
     imposter.style.margin = '0';
-    if (element.nodeName === 'TEXTAREA' && styleProps.overflow === 'visible') {
-        imposter.style.overflow = 'auto';
+    if (isTextarea) {
+        if (styleProps.overflow === 'visible') {
+            imposter.style.overflow = 'auto';
+        }
+    } else {
+        imposter.style.overflow = 'hidden';
+        imposter.style.whiteSpace = 'nowrap';
+        imposter.style.lineHeight = styleProps.height;
     }
 
     document.body.appendChild(imposter);
@@ -79,8 +85,10 @@ function docRangeFromPoint(point) {
             case 'BUTTON':
                 return new TextSourceElement(element);
             case 'INPUT':
+                imposter = docImposterCreate(element, false);
+                break;
             case 'TEXTAREA':
-                imposter = docImposterCreate(element);
+                imposter = docImposterCreate(element, true);
                 break;
         }
     }
