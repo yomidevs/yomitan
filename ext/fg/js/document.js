@@ -17,6 +17,8 @@
  */
 
 
+const REGEX_TRANSPARENT_COLOR = /rgba\s*\([^\)]*,\s*0(?:\.0+)?\s*\)/;
+
 function docSetImposterStyle(style, propertyName, value) {
     style.setProperty(propertyName, value, 'important');
 }
@@ -88,10 +90,11 @@ function docImposterCreate(element, isTextarea) {
 }
 
 function docRangeFromPoint({x, y}) {
-    const element = document.elementFromPoint(x, y);
+    const elements = document.elementsFromPoint(x, y);
     let imposter = null;
     let imposterContainer = null;
-    if (element) {
+    if (elements.length > 0) {
+        const element = elements[0];
         switch (element.nodeName) {
             case 'IMG':
             case 'BUTTON':
@@ -105,7 +108,7 @@ function docRangeFromPoint({x, y}) {
         }
     }
 
-    const range = caretRangeFromPoint(x, y);
+    const range = caretRangeFromPointExt(x, y, elements);
     if (range !== null) {
         if (imposter !== null) {
             docSetImposterStyle(imposterContainer.style, 'z-index', '-2147483646');
@@ -261,3 +264,75 @@ const caretRangeFromPoint = (() => {
     // No support
     return () => null;
 })();
+
+function caretRangeFromPointExt(x, y, elements) {
+    const modifications = [];
+    try {
+        let i = 0;
+        while (true) {
+            const range = caretRangeFromPoint(x, y);
+            if (range === null) {
+                return null;
+            }
+
+            const inRange = isPointInRange(x, y, range);
+            if (inRange) {
+                return range;
+            }
+
+            i = disableTransparentElement(elements, i, modifications);
+            if (i < 0) {
+                return null;
+            }
+        }
+    } finally {
+        if (modifications.length > 0) {
+            restoreElementStyleModifications(modifications);
+        }
+    }
+}
+
+function disableTransparentElement(elements, i, modifications) {
+    while (true) {
+        if (i >= elements.length) {
+            return -1;
+        }
+
+        const element = elements[i++];
+        if (isElementTransparent(element)) {
+            const style = element.hasAttribute('style') ? element.getAttribute('style') : null;
+            modifications.push({element, style});
+            element.style.pointerEvents = 'none';
+            return i;
+        }
+    }
+}
+
+function restoreElementStyleModifications(modifications) {
+    for (const {element, style} of modifications) {
+        if (style === null) {
+            element.removeAttribute('style');
+        } else {
+            element.setAttribute('style', style);
+        }
+    }
+}
+
+function isElementTransparent(element) {
+    if (
+        element === document.body ||
+        element === document.documentElement
+    ) {
+        return false;
+    }
+    const style = window.getComputedStyle(element);
+    return (
+        parseFloat(style.opacity) < 0 ||
+        style.visibility === 'hidden' ||
+        (style.backgroundImage === 'none' && isColorTransparent(style.backgroundColor))
+    );
+}
+
+function isColorTransparent(cssColor) {
+    return REGEX_TRANSPARENT_COLOR.test(cssColor);
+}
