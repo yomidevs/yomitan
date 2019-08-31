@@ -24,8 +24,8 @@ function docOffsetCalc(elementRect) {
     const clientTop = document.documentElement.clientTop || document.body.clientTop || 0;
     const clientLeft = document.documentElement.clientLeft || document.body.clientLeft || 0;
 
-    const top  = Math.round(elementRect.top +  scrollTop - clientTop);
-    const left = Math.round(elementRect.left + scrollLeft - clientLeft);
+    const top  = elementRect.top +  scrollTop - clientTop;
+    const left = elementRect.left + scrollLeft - clientLeft;
 
     return {top, left};
 }
