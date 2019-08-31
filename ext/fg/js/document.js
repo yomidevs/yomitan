@@ -17,16 +17,15 @@
  */
 
 
-function docOffsetCalc(element) {
+function docOffsetCalc(elementRect) {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
     const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft;
 
     const clientTop = document.documentElement.clientTop || document.body.clientTop || 0;
     const clientLeft = document.documentElement.clientLeft || document.body.clientLeft || 0;
 
-    const rect = element.getBoundingClientRect();
-    const top  = Math.round(rect.top +  scrollTop - clientTop);
-    const left = Math.round(rect.left + scrollLeft - clientLeft);
+    const top  = Math.round(elementRect.top +  scrollTop - clientTop);
+    const left = Math.round(elementRect.left + scrollLeft - clientLeft);
 
     return {top, left};
 }
@@ -38,7 +37,8 @@ function docImposterCreate(element) {
         stylePairs.push(`${key}: ${styleProps[key]};`);
     }
 
-    const offset = docOffsetCalc(element);
+    const elementRect = element.getBoundingClientRect();
+    const offset = docOffsetCalc(elementRect);
     const imposter = document.createElement('div');
     imposter.className = 'yomichan-imposter';
     imposter.innerText = element.value;
@@ -48,11 +48,22 @@ function docImposterCreate(element) {
     imposter.style.left = `${offset.left}px`;
     imposter.style.opacity = 0;
     imposter.style.zIndex = 2147483646;
+    imposter.style.margin = '0';
     if (element.nodeName === 'TEXTAREA' && styleProps.overflow === 'visible') {
         imposter.style.overflow = 'auto';
     }
 
     document.body.appendChild(imposter);
+
+    // Adjust size
+    const imposterRect = imposter.getBoundingClientRect();
+    if (imposterRect.width !== elementRect.width || imposterRect.height !== elementRect.height) {
+        const width = parseFloat(styleProps.width) + (elementRect.width - imposterRect.width);
+        const height = parseFloat(styleProps.height) + (elementRect.height - imposterRect.height);
+        imposter.style.width = `${width}px`;
+        imposter.style.height = `${height}px`;
+    }
+
     imposter.scrollTop = element.scrollTop;
     imposter.scrollLeft = element.scrollLeft;
 
