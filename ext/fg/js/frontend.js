@@ -56,6 +56,7 @@ class Frontend {
             window.addEventListener('mousedown', this.onMouseDown.bind(this));
             window.addEventListener('mousemove', this.onMouseMove.bind(this));
             window.addEventListener('mouseover', this.onMouseOver.bind(this));
+            window.addEventListener('mouseout', this.onMouseOut.bind(this));
             window.addEventListener('mouseup', this.onMouseUp.bind(this));
             window.addEventListener('resize', this.onResize.bind(this));
 
@@ -147,6 +148,10 @@ class Frontend {
         } else if (e.which === 2) {
             this.mouseDownMiddle = false;
         }
+    }
+
+    onMouseOut(e) {
+        this.popupTimerClear();
     }
 
     onFrameMessage(e) {
