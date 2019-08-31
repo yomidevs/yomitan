@@ -87,8 +87,8 @@ function docImposterCreate(element, isTextarea) {
     return [imposter, container];
 }
 
-function docRangeFromPoint(point) {
-    const element = document.elementFromPoint(point.x, point.y);
+function docRangeFromPoint({x, y}) {
+    const element = document.elementFromPoint(x, y);
     let imposter = null;
     let imposterContainer = null;
     if (element) {
@@ -105,7 +105,7 @@ function docRangeFromPoint(point) {
         }
     }
 
-    const range = document.caretRangeFromPoint(point.x, point.y);
+    const range = document.caretRangeFromPoint(x, y);
     if (range !== null && isPointInRange(point, range)) {
         if (imposter !== null) {
             docSetImposterStyle(imposterContainer.style, 'z-index', '-2147483646');
@@ -191,7 +191,7 @@ function docSentenceExtract(source, extent) {
     };
 }
 
-function isPointInRange(point, range) {
+function isPointInRange(x, y, range) {
     // Scan forward
     const nodePre = range.endContainer;
     const offsetPre = range.endOffset;
@@ -199,7 +199,7 @@ function isPointInRange(point, range) {
         const {node, offset} = TextSourceRange.seekForward(range.endContainer, range.endOffset, 1);
         range.setEnd(node, offset);
 
-        if (isPointInAnyRect(point, range.getClientRects())) {
+        if (isPointInAnyRect(x, y, range.getClientRects())) {
             return true;
         }
     } finally {
@@ -210,7 +210,7 @@ function isPointInRange(point, range) {
     const {node, offset} = TextSourceRange.seekBackward(range.startContainer, range.startOffset, 1);
     range.setStart(node, offset);
 
-    if (isPointInAnyRect(point, range.getClientRects())) {
+    if (isPointInAnyRect(x, y, range.getClientRects())) {
         // This purposefully leaves the starting offset as modified and sets teh range length to 0.
         range.setEnd(node, offset);
         return true;
@@ -220,19 +220,19 @@ function isPointInRange(point, range) {
     return false;
 }
 
-function isPointInAnyRect(point, rects) {
+function isPointInAnyRect(x, y, rects) {
     for (const rect of rects) {
-        if (isPointInRect(point, rect)) {
+        if (isPointInRect(x, y, rect)) {
             return true;
         }
     }
     return false;
 }
 
-function isPointInRect(point, rect) {
+function isPointInRect(x, y, rect) {
     return (
-        point.x >= rect.left && point.x < rect.right &&
-        point.y >= rect.top && point.y < rect.bottom);
+        x >= rect.left && x < rect.right &&
+        y >= rect.top && y < rect.bottom);
 }
 
 if (typeof document.caretRangeFromPoint !== 'function') {
