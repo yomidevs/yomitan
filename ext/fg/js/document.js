@@ -94,6 +94,7 @@ function docRangeFromPoint(point) {
     const range = document.caretRangeFromPoint(point.x, point.y);
     if (imposter !== null) {
         imposter.style.zIndex = -2147483646;
+        imposter.style.pointerEvents = 'none';
     }
 
     return range !== null && isPointInRange(point, range) ? new TextSourceRange(range) : null;
