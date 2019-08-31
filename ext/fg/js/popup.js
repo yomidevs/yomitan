@@ -91,13 +91,15 @@ class Popup {
             }
         }
 
+        const preferBelow = (optionsGeneral.popupHorizontalTextPosition === 'below');
+
         const verticalOffset = optionsGeneral.popupVerticalOffset;
         const [y, h, below] = Popup.limitGeometry(
             elementRect.top - verticalOffset,
             elementRect.bottom + verticalOffset,
             height,
             maxHeight,
-            true
+            preferBelow
         );
 
         return [x, y, width, h, below];

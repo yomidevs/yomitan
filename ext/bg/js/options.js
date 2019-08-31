@@ -201,6 +201,7 @@ function optionsSetDefaults(options) {
             popupVerticalOffset: 10,
             popupHorizontalOffset2: 10,
             popupVerticalOffset2: 0,
+            popupHorizontalTextPosition: 'below',
             popupVerticalTextPosition: 'before',
             showGuide: true,
             compactTags: false,
