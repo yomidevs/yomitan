@@ -32,10 +32,13 @@ async function formRead() {
     optionsNew.general.showAdvanced = $('#show-advanced-options').prop('checked');
     optionsNew.general.maxResults = parseInt($('#max-displayed-results').val(), 10);
     optionsNew.general.popupDisplayMode = $('#popup-display-mode').val();
+    optionsNew.general.popupVerticalTextPosition = $('#popup-vertical-text-position').val();
     optionsNew.general.popupWidth = parseInt($('#popup-width').val(), 10);
     optionsNew.general.popupHeight = parseInt($('#popup-height').val(), 10);
     optionsNew.general.popupHorizontalOffset = parseInt($('#popup-horizontal-offset').val(), 0);
     optionsNew.general.popupVerticalOffset = parseInt($('#popup-vertical-offset').val(), 10);
+    optionsNew.general.popupHorizontalOffset2 = parseInt($('#popup-horizontal-offset2').val(), 0);
+    optionsNew.general.popupVerticalOffset2 = parseInt($('#popup-vertical-offset2').val(), 10);
     optionsNew.general.customPopupCss = $('#custom-popup-css').val();
 
     optionsNew.scanning.middleMouse = $('#middle-mouse-button-scan').prop('checked');
@@ -168,10 +171,13 @@ async function onReady() {
     $('#show-advanced-options').prop('checked', options.general.showAdvanced);
     $('#max-displayed-results').val(options.general.maxResults);
     $('#popup-display-mode').val(options.general.popupDisplayMode);
+    $('#popup-vertical-text-position').val(options.general.popupVerticalTextPosition);
     $('#popup-width').val(options.general.popupWidth);
     $('#popup-height').val(options.general.popupHeight);
     $('#popup-horizontal-offset').val(options.general.popupHorizontalOffset);
     $('#popup-vertical-offset').val(options.general.popupVerticalOffset);
+    $('#popup-horizontal-offset2').val(options.general.popupHorizontalOffset2);
+    $('#popup-vertical-offset2').val(options.general.popupVerticalOffset2);
     $('#custom-popup-css').val(options.general.customPopupCss);
 
     $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);

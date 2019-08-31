@@ -301,7 +301,11 @@ class Frontend {
         } catch (e) {
             if (window.yomichan_orphaned) {
                 if (textSource && this.options.scanning.modifier !== 'none') {
-                    this.popup.showOrphaned(textSource.getRect(), this.options);
+                    this.popup.showOrphaned(
+                        textSource.getRect(),
+                        textSource.getWritingMode(),
+                        this.options
+                    );
                 }
             } else {
                 this.onError(e);
@@ -332,6 +336,7 @@ class Frontend {
         const url = window.location.href;
         this.popup.termsShow(
             textSource.getRect(),
+            textSource.getWritingMode(),
             definitions,
             this.options,
             {sentence, url, focus}
@@ -357,6 +362,7 @@ class Frontend {
         const url = window.location.href;
         this.popup.kanjiShow(
             textSource.getRect(),
+            textSource.getWritingMode(),
             definitions,
             this.options,
             {sentence, url, focus}
