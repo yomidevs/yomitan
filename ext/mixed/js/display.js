@@ -84,16 +84,22 @@ class Display {
             if (textSource === null) {
                 return false;
             }
-            textSource.setEndOffset(this.options.scanning.length);
 
-            const {definitions, length} = await apiTermsFind(textSource.text());
-            if (definitions.length === 0) {
-                return false;
+            let definitions, length, sentence;
+            try {
+                textSource.setEndOffset(this.options.scanning.length);
+
+                ({definitions, length} = await apiTermsFind(textSource.text()));
+                if (definitions.length === 0) {
+                    return false;
+                }
+
+                textSource.setEndOffset(length);
+
+                sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
+            } finally {
+                textSource.cleanup();
             }
-
-            textSource.setEndOffset(length);
-
-            const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
 
             const context = {
                 source: {

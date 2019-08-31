@@ -25,13 +25,20 @@ const IGNORE_TEXT_PATTERN = /\u200c/;
  */
 
 class TextSourceRange {
-    constructor(range, content='') {
+    constructor(range, content, imposter) {
         this.range = range;
         this.content = content;
+        this.imposter = imposter;
     }
 
     clone() {
-        return new TextSourceRange(this.range.cloneRange(), this.content);
+        return new TextSourceRange(this.range.cloneRange(), this.content, this.imposter);
+    }
+
+    cleanup() {
+        if (this.imposter !== null && this.imposter.parentNode !== null) {
+            this.imposter.parentNode.removeChild(this.imposter);
+        }
     }
 
     text() {
@@ -219,6 +226,10 @@ class TextSourceElement {
 
     clone() {
         return new TextSourceElement(this.element, this.content);
+    }
+
+    cleanup() {
+        // NOP
     }
 
     text() {

@@ -70,12 +70,6 @@ function docImposterCreate(element) {
     return imposter;
 }
 
-function docImposterDestroy() {
-    for (const element of document.getElementsByClassName('yomichan-imposter')) {
-        element.parentNode.removeChild(element);
-    }
-}
-
 function docRangeFromPoint(point) {
     const element = document.elementFromPoint(point.x, point.y);
     let imposter = null;
@@ -92,12 +86,18 @@ function docRangeFromPoint(point) {
     }
 
     const range = document.caretRangeFromPoint(point.x, point.y);
-    if (imposter !== null) {
-        imposter.style.zIndex = -2147483646;
-        imposter.style.pointerEvents = 'none';
+    if (range !== null && isPointInRange(point, range)) {
+        if (imposter !== null) {
+            imposter.style.zIndex = -2147483646;
+            imposter.style.pointerEvents = 'none';
+        }
+        return new TextSourceRange(range, '', imposter);
+    } else {
+        if (imposter !== null) {
+            imposter.parentNode.removeChild(imposter);
+        }
+        return null;
     }
-
-    return range !== null && isPointInRange(point, range) ? new TextSourceRange(range) : null;
 }
 
 function docSentenceExtract(source, extent) {

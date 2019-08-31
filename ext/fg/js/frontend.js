@@ -307,10 +307,11 @@ class Frontend {
                 this.onError(e);
             }
         } finally {
+            if (textSource !== null) {
+                textSource.cleanup();
+            }
             if (hideResults && this.options.scanning.autoHideResults) {
                 this.searchClear();
-            } else {
-                docImposterDestroy();
             }
 
             this.pendingLookup = false;
@@ -371,7 +372,6 @@ class Frontend {
     }
 
     searchClear() {
-        docImposterDestroy();
         this.popup.hide();
         this.popup.clearAutoPlayTimer();
 
