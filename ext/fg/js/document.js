@@ -17,6 +17,10 @@
  */
 
 
+function docSetImposterStyle(style, propertyName, value) {
+    style.setProperty(propertyName, value, 'important');
+}
+
 function docOffsetCalc(elementRect) {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
     const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft;
@@ -31,32 +35,34 @@ function docOffsetCalc(elementRect) {
 }
 
 function docImposterCreate(element, isTextarea) {
-    const styleProps = window.getComputedStyle(element);
-    const stylePairs = [];
-    for (const key of styleProps) {
-        stylePairs.push(`${key}: ${styleProps[key]};`);
-    }
-
+    const elementStyle = window.getComputedStyle(element);
     const elementRect = element.getBoundingClientRect();
     const offset = docOffsetCalc(elementRect);
     const imposter = document.createElement('div');
+    const imposterStyle = imposter.style;
+
     imposter.className = 'yomichan-imposter';
     imposter.innerText = element.value;
-    imposter.style.cssText = stylePairs.join('\n');
-    imposter.style.position = 'absolute';
-    imposter.style.top = `${offset.top}px`;
-    imposter.style.left = `${offset.left}px`;
-    imposter.style.opacity = 0;
-    imposter.style.zIndex = 2147483646;
-    imposter.style.margin = '0';
+
+    for (let i = 0, ii = elementStyle.length; i < ii; ++i) {
+        const property = elementStyle[i];
+        docSetImposterStyle(imposterStyle, property, elementStyle.getPropertyValue(property));
+    }
+    docSetImposterStyle(imposterStyle, 'position', 'absolute');
+    docSetImposterStyle(imposterStyle, 'top', `${offset.top}px`);
+    docSetImposterStyle(imposterStyle, 'left', `${offset.left}px`);
+    docSetImposterStyle(imposterStyle, 'opacity', '0');
+    docSetImposterStyle(imposterStyle, 'z-index', '2147483646');
+    docSetImposterStyle(imposterStyle, 'margin', '0');
+
     if (isTextarea) {
-        if (styleProps.overflow === 'visible') {
-            imposter.style.overflow = 'auto';
+        if (elementStyle.overflow === 'visible') {
+            docSetImposterStyle(imposterStyle, 'overflow', 'auto');
         }
     } else {
-        imposter.style.overflow = 'hidden';
-        imposter.style.whiteSpace = 'nowrap';
-        imposter.style.lineHeight = styleProps.height;
+        docSetImposterStyle(imposterStyle, 'overflow', 'hidden');
+        docSetImposterStyle(imposterStyle, 'white-space', 'nowrap');
+        docSetImposterStyle(imposterStyle, 'line-height', elementStyle.height);
     }
 
     document.body.appendChild(imposter);
@@ -64,10 +70,10 @@ function docImposterCreate(element, isTextarea) {
     // Adjust size
     const imposterRect = imposter.getBoundingClientRect();
     if (imposterRect.width !== elementRect.width || imposterRect.height !== elementRect.height) {
-        const width = parseFloat(styleProps.width) + (elementRect.width - imposterRect.width);
-        const height = parseFloat(styleProps.height) + (elementRect.height - imposterRect.height);
-        imposter.style.width = `${width}px`;
-        imposter.style.height = `${height}px`;
+        const width = parseFloat(elementStyle.width) + (elementRect.width - imposterRect.width);
+        const height = parseFloat(elementStyle.height) + (elementRect.height - imposterRect.height);
+        docSetImposterStyle(imposterStyle, 'width', `${width}px`);
+        docSetImposterStyle(imposterStyle, 'height', `${height}px`);
     }
 
     imposter.scrollTop = element.scrollTop;
@@ -96,8 +102,9 @@ function docRangeFromPoint(point) {
     const range = document.caretRangeFromPoint(point.x, point.y);
     if (range !== null && isPointInRange(point, range)) {
         if (imposter !== null) {
-            imposter.style.zIndex = -2147483646;
-            imposter.style.pointerEvents = 'none';
+            const imposterStyle = imposter.style;
+            docSetImposterStyle(imposterStyle, 'z-index', '-2147483646');
+            docSetImposterStyle(imposterStyle, 'pointer-events', 'none');
         }
         return new TextSourceRange(range, '', imposter);
     } else {
