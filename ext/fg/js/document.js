@@ -269,15 +269,19 @@ function caretRangeFromPointExt(x, y, elements) {
     const modifications = [];
     try {
         let i = 0;
+        let startContinerPre = null;
         while (true) {
             const range = caretRangeFromPoint(x, y);
             if (range === null) {
                 return null;
             }
 
-            const inRange = isPointInRange(x, y, range);
-            if (inRange) {
-                return range;
+            const startContainer = range.startContainer;
+            if (startContinerPre !== startContainer) {
+                if (isPointInRange(x, y, range)) {
+                    return range;
+                }
+                startContinerPre = startContainer;
             }
 
             i = disableTransparentElement(elements, i, modifications);
