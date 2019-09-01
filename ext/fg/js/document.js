@@ -219,7 +219,7 @@ function isPointInRange(x, y, range) {
     range.setStart(node, offset);
 
     if (!isWhitespace(content) && isPointInAnyRect(x, y, range.getClientRects())) {
-        // This purposefully leaves the starting offset as modified and sets teh range length to 0.
+        // This purposefully leaves the starting offset as modified and sets the range length to 0.
         range.setEnd(node, offset);
         return true;
     }
