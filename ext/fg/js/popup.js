@@ -239,9 +239,15 @@ class Popup {
     }
 
     focusParent() {
-        this.container.blur();
         if (this.parent && this.parent.container) {
-            this.parent.container.focus();
+            // Chrome doesn't like focusing iframe without contentWindow.
+            this.parent.container.contentWindow.focus();
+        } else {
+            // Firefox doesn't like focusing window without first blurring the iframe.
+            // this.container.contentWindow.blur() doesn't work on Firefox for some reason.
+            this.container.blur();
+            // This is needed for Chrome.
+            window.focus();
         }
     }
 
