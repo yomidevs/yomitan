@@ -89,7 +89,7 @@ function docImposterCreate(element, isTextarea) {
     return [imposter, container];
 }
 
-function docRangeFromPoint({x, y}) {
+function docRangeFromPoint({x, y}, options) {
     const elements = document.elementsFromPoint(x, y);
     let imposter = null;
     let imposterContainer = null;
@@ -108,7 +108,7 @@ function docRangeFromPoint({x, y}) {
         }
     }
 
-    const range = caretRangeFromPointExt(x, y, elements);
+    const range = caretRangeFromPointExt(x, y, options.scanning.deepDomScan ? elements : []);
     if (range !== null) {
         if (imposter !== null) {
             docSetImposterStyle(imposterContainer.style, 'z-index', '-2147483646');
