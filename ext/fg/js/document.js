@@ -195,6 +195,11 @@ function docSentenceExtract(source, extent) {
 }
 
 function isPointInRange(x, y, range) {
+    // Require a text node to start
+    if (range.startContainer.nodeType !== Node.TEXT_NODE) {
+        return false;
+    }
+
     // Scan forward
     const nodePre = range.endContainer;
     const offsetPre = range.endOffset;
