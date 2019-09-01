@@ -21,27 +21,32 @@ function docSetImposterStyle(style, propertyName, value) {
     style.setProperty(propertyName, value, 'important');
 }
 
-function docOffsetCalc(elementRect) {
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft;
-
-    const clientTop = document.documentElement.clientTop || document.body.clientTop || 0;
-    const clientLeft = document.documentElement.clientLeft || document.body.clientLeft || 0;
-
-    const top  = elementRect.top +  scrollTop - clientTop;
-    const left = elementRect.left + scrollLeft - clientLeft;
-
-    return {top, left};
-}
-
 function docImposterCreate(element, isTextarea) {
     const elementStyle = window.getComputedStyle(element);
     const elementRect = element.getBoundingClientRect();
-    const offset = docOffsetCalc(elementRect);
+    const documentRect = document.documentElement.getBoundingClientRect();
+    const left = elementRect.left - documentRect.left;
+    const top = elementRect.top - documentRect.top;
+
+    // Container
+    const container = document.createElement('div');
+    const containerStyle = container.style;
+    docSetImposterStyle(containerStyle, 'all', 'initial');
+    docSetImposterStyle(containerStyle, 'position', 'absolute');
+    docSetImposterStyle(containerStyle, 'left', '0');
+    docSetImposterStyle(containerStyle, 'top', '0');
+    docSetImposterStyle(containerStyle, 'width', `${documentRect.width}px`);
+    docSetImposterStyle(containerStyle, 'height', `${documentRect.height}px`);
+    docSetImposterStyle(containerStyle, 'overflow', 'hidden');
+    docSetImposterStyle(containerStyle, 'opacity', '0');
+
+    docSetImposterStyle(containerStyle, 'pointer-events', 'none');
+    docSetImposterStyle(containerStyle, 'z-index', '2147483646');
+
+    // Imposter
     const imposter = document.createElement('div');
     const imposterStyle = imposter.style;
 
-    imposter.className = 'yomichan-imposter';
     imposter.innerText = element.value;
 
     for (let i = 0, ii = elementStyle.length; i < ii; ++i) {
@@ -49,11 +54,10 @@ function docImposterCreate(element, isTextarea) {
         docSetImposterStyle(imposterStyle, property, elementStyle.getPropertyValue(property));
     }
     docSetImposterStyle(imposterStyle, 'position', 'absolute');
-    docSetImposterStyle(imposterStyle, 'top', `${offset.top}px`);
-    docSetImposterStyle(imposterStyle, 'left', `${offset.left}px`);
-    docSetImposterStyle(imposterStyle, 'opacity', '0');
-    docSetImposterStyle(imposterStyle, 'z-index', '2147483646');
+    docSetImposterStyle(imposterStyle, 'top', `${top}px`);
+    docSetImposterStyle(imposterStyle, 'left', `${left}px`);
     docSetImposterStyle(imposterStyle, 'margin', '0');
+    docSetImposterStyle(imposterStyle, 'pointer-events', 'auto');
 
     if (isTextarea) {
         if (elementStyle.overflow === 'visible') {
@@ -65,7 +69,8 @@ function docImposterCreate(element, isTextarea) {
         docSetImposterStyle(imposterStyle, 'line-height', elementStyle.height);
     }
 
-    document.body.appendChild(imposter);
+    container.appendChild(imposter);
+    document.body.appendChild(container);
 
     // Adjust size
     const imposterRect = imposter.getBoundingClientRect();
@@ -79,22 +84,23 @@ function docImposterCreate(element, isTextarea) {
     imposter.scrollTop = element.scrollTop;
     imposter.scrollLeft = element.scrollLeft;
 
-    return imposter;
+    return [imposter, container];
 }
 
 function docRangeFromPoint(point) {
     const element = document.elementFromPoint(point.x, point.y);
     let imposter = null;
+    let imposterContainer = null;
     if (element) {
         switch (element.nodeName) {
             case 'IMG':
             case 'BUTTON':
                 return new TextSourceElement(element);
             case 'INPUT':
-                imposter = docImposterCreate(element, false);
+                [imposter, imposterContainer] = docImposterCreate(element, false);
                 break;
             case 'TEXTAREA':
-                imposter = docImposterCreate(element, true);
+                [imposter, imposterContainer] = docImposterCreate(element, true);
                 break;
         }
     }
@@ -102,14 +108,13 @@ function docRangeFromPoint(point) {
     const range = document.caretRangeFromPoint(point.x, point.y);
     if (range !== null && isPointInRange(point, range)) {
         if (imposter !== null) {
-            const imposterStyle = imposter.style;
-            docSetImposterStyle(imposterStyle, 'z-index', '-2147483646');
-            docSetImposterStyle(imposterStyle, 'pointer-events', 'none');
+            docSetImposterStyle(imposterContainer.style, 'z-index', '-2147483646');
+            docSetImposterStyle(imposter.style, 'pointer-events', 'none');
         }
-        return new TextSourceRange(range, '', imposter);
+        return new TextSourceRange(range, '', imposterContainer);
     } else {
-        if (imposter !== null) {
-            imposter.parentNode.removeChild(imposter);
+        if (imposterContainer !== null) {
+            imposterContainer.parentNode.removeChild(imposterContainer);
         }
         return null;
     }
