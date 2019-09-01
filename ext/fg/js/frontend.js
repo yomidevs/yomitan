@@ -515,57 +515,13 @@ class Frontend {
 
         length = textSource.text().length;
         while (textSource.range && length > 0) {
-            const nodes = Frontend.getNodesInRange(textSource.range);
-            if (Frontend.isValidScanningNodeList(nodes, this.ignoreNodes)) {
+            const nodes = TextSourceRange.getNodesInRange(textSource.range);
+            if (!TextSourceRange.anyNodeMatchesSelector(nodes, this.ignoreNodes)) {
                 break;
             }
             --length;
             textSource.setEndOffset(length);
         }
-    }
-
-    static getNodesInRange(range) {
-        const end = range.endContainer;
-        const nodes = [];
-        for (let node = range.startContainer; node !== null; node = Frontend.getNextNode(node)) {
-            nodes.push(node);
-            if (node === end) { break; }
-        }
-        return nodes;
-    }
-
-    static getNextNode(node) {
-        let next = node.firstChild;
-        if (next === null) {
-            while (true) {
-                next = node.nextSibling;
-                if (next !== null) { break; }
-
-                next = node.parentNode;
-                if (node === null) { break; }
-
-                node = next;
-            }
-        }
-        return next;
-    }
-
-    static isValidScanningNodeList(nodeList, selector) {
-        for (const node of nodeList) {
-            if (!Frontend.isValidScanningNode(node, selector)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    static isValidScanningNode(node, selector) {
-        for (; node !== null; node = node.parentNode) {
-            if (node.nodeType === Node.ELEMENT_NODE) {
-                return !node.matches(selector);
-            }
-        }
-        return true;
     }
 }
 
