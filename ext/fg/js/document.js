@@ -199,10 +199,10 @@ function isPointInRange(x, y, range) {
     const nodePre = range.endContainer;
     const offsetPre = range.endOffset;
     try {
-        const {node, offset} = TextSourceRange.seekForward(range.endContainer, range.endOffset, 1);
+        const {node, offset, content} = TextSourceRange.seekForward(range.endContainer, range.endOffset, 1);
         range.setEnd(node, offset);
 
-        if (isPointInAnyRect(x, y, range.getClientRects())) {
+        if (!isWhitespace(content) && isPointInAnyRect(x, y, range.getClientRects())) {
             return true;
         }
     } finally {
@@ -210,10 +210,10 @@ function isPointInRange(x, y, range) {
     }
 
     // Scan backward
-    const {node, offset} = TextSourceRange.seekBackward(range.startContainer, range.startOffset, 1);
+    const {node, offset, content} = TextSourceRange.seekBackward(range.startContainer, range.startOffset, 1);
     range.setStart(node, offset);
 
-    if (isPointInAnyRect(x, y, range.getClientRects())) {
+    if (!isWhitespace(content) && isPointInAnyRect(x, y, range.getClientRects())) {
         // This purposefully leaves the starting offset as modified and sets teh range length to 0.
         range.setEnd(node, offset);
         return true;
@@ -221,6 +221,10 @@ function isPointInRange(x, y, range) {
 
     // No match
     return false;
+}
+
+function isWhitespace(string) {
+    return string.trim().length === 0;
 }
 
 function isPointInAnyRect(x, y, rects) {
