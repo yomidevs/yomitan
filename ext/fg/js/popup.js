@@ -24,7 +24,7 @@ class Popup {
         this.frameIdPromise = frameIdPromise;
         this.frameId = null;
         this.parent = null;
-        this.children = [];
+        this.child = null;
         this.container = document.createElement('iframe');
         this.container.id = 'yomichan-float';
         this.container.addEventListener('mousedown', e => e.stopPropagation());
@@ -212,19 +212,9 @@ class Popup {
     }
 
     hideChildren() {
-        if (this.children.length === 0) {
-            return;
-        }
-
-        const targets = this.children.slice(0);
-        while (targets.length > 0) {
-            const target = targets.shift();
-            if (target.isContainerHidden()) { continue; }
-
-            target.hide();
-            for (const child of target.children) {
-                targets.push(child);
-            }
+        // recursively hides all children
+        if (this.child && !this.child.isContainerHidden()) {
+            this.child.hide();
         }
     }
 

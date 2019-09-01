@@ -57,7 +57,7 @@ class PopupProxyHost {
         const popup = new Popup(id, depth, this.frameIdPromise);
         if (parent !== null) {
             popup.parent = parent;
-            parent.children.push(popup);
+            parent.child = popup;
         }
         this.popups[id] = popup;
         return popup;

@@ -24,7 +24,7 @@ class PopupProxy {
         this.id = null;
         this.idPromise = null;
         this.parent = null;
-        this.children = [];
+        this.child = null;
         this.depth = 0;
 
         this.container = null;
