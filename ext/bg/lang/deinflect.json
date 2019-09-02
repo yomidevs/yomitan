@@ -784,6 +784,150 @@
             "rulesOut": [
                 "adj-i"
             ]
+        },
+        {
+            "kanaIn": "のたもうたら",
+            "kanaOut": "のたまう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "いったら",
+            "kanaOut": "いく",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "おうたら",
+            "kanaOut": "おう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "こうたら",
+            "kanaOut": "こう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "そうたら",
+            "kanaOut": "そう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "とうたら",
+            "kanaOut": "とう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "行ったら",
+            "kanaOut": "行く",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "逝ったら",
+            "kanaOut": "逝く",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "往ったら",
+            "kanaOut": "往く",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "請うたら",
+            "kanaOut": "請う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "乞うたら",
+            "kanaOut": "乞う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "恋うたら",
+            "kanaOut": "恋う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "問うたら",
+            "kanaOut": "問う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "負うたら",
+            "kanaOut": "負う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "沿うたら",
+            "kanaOut": "沿う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "添うたら",
+            "kanaOut": "添う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "副うたら",
+            "kanaOut": "副う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "厭うたら",
+            "kanaOut": "厭う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
         }
     ],
     "-tari": [
@@ -891,6 +1035,150 @@
             "rulesOut": [
                 "adj-i"
             ]
+        },
+        {
+            "kanaIn": "のたもうたり",
+            "kanaOut": "のたまう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "いったり",
+            "kanaOut": "いく",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "おうたり",
+            "kanaOut": "おう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "こうたり",
+            "kanaOut": "こう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "そうたり",
+            "kanaOut": "そう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "とうたり",
+            "kanaOut": "とう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "行ったり",
+            "kanaOut": "行く",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "逝ったり",
+            "kanaOut": "逝く",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "往ったり",
+            "kanaOut": "往く",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "請うたり",
+            "kanaOut": "請う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "乞うたり",
+            "kanaOut": "乞う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "恋うたり",
+            "kanaOut": "恋う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "問うたり",
+            "kanaOut": "問う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "負うたり",
+            "kanaOut": "負う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "沿うたり",
+            "kanaOut": "沿う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "添うたり",
+            "kanaOut": "添う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "副うたり",
+            "kanaOut": "副う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "厭うたり",
+            "kanaOut": "厭う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
         }
     ],
     "-te": [
@@ -994,6 +1282,150 @@
         {
             "kanaIn": "んで",
             "kanaOut": "む",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "のたもうて",
+            "kanaOut": "のたまう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "いって",
+            "kanaOut": "いく",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "おうて",
+            "kanaOut": "おう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "こうて",
+            "kanaOut": "こう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "そうて",
+            "kanaOut": "そう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "とうて",
+            "kanaOut": "とう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "行って",
+            "kanaOut": "行く",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "逝って",
+            "kanaOut": "逝く",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "往って",
+            "kanaOut": "往く",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "請うて",
+            "kanaOut": "請う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "乞うて",
+            "kanaOut": "乞う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "恋うて",
+            "kanaOut": "恋う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "問うて",
+            "kanaOut": "問う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "負うて",
+            "kanaOut": "負う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "沿うて",
+            "kanaOut": "沿う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "添うて",
+            "kanaOut": "添う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "副うて",
+            "kanaOut": "副う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "厭うて",
+            "kanaOut": "厭う",
             "rulesIn": [],
             "rulesOut": [
                 "v5"
@@ -1251,6 +1683,16 @@
             ]
         },
         {
+            "kanaIn": "させる",
+            "kanaOut": "す",
+            "rulesIn": [
+                "v1"
+            ],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
             "kanaIn": "たせる",
             "kanaOut": "つ",
             "rulesIn": [
@@ -1495,6 +1937,14 @@
             "rulesIn": [],
             "rulesOut": [
                 "v5"
+            ]
+        },
+        {
+            "kanaIn": "き",
+            "kanaOut": "くる",
+            "rulesIn": [],
+            "rulesOut": [
+                "vk"
             ]
         },
         {
@@ -1881,6 +2331,16 @@
             ]
         },
         {
+            "kanaIn": "される",
+            "kanaOut": "す",
+            "rulesIn": [
+                "v1"
+            ],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
             "kanaIn": "たれる",
             "kanaOut": "つ",
             "rulesIn": [
@@ -1929,12 +2389,10 @@
             "rulesOut": [
                 "v5"
             ]
-        }
-    ],
-    "passive or causative": [
+        },
         {
-            "kanaIn": "される",
-            "kanaOut": "す",
+            "kanaIn": "られる",
+            "kanaOut": "る",
             "rulesIn": [
                 "v1"
             ],
@@ -2047,6 +2505,150 @@
             "rulesIn": [],
             "rulesOut": [
                 "adj-i"
+            ]
+        },
+        {
+            "kanaIn": "のたもうた",
+            "kanaOut": "のたまう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "いった",
+            "kanaOut": "いく",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "おうた",
+            "kanaOut": "おう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "こうた",
+            "kanaOut": "こう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "そうた",
+            "kanaOut": "そう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "とうた",
+            "kanaOut": "とう",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "行った",
+            "kanaOut": "行く",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "逝った",
+            "kanaOut": "逝く",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "往った",
+            "kanaOut": "往く",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "請うた",
+            "kanaOut": "請う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "乞うた",
+            "kanaOut": "乞う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "恋うた",
+            "kanaOut": "恋う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "問うた",
+            "kanaOut": "問う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "負うた",
+            "kanaOut": "負う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "沿うた",
+            "kanaOut": "沿う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "添うた",
+            "kanaOut": "添う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "副うた",
+            "kanaOut": "副う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "厭うた",
+            "kanaOut": "厭う",
+            "rulesIn": [],
+            "rulesOut": [
+                "v5"
             ]
         }
     ],
@@ -2674,7 +3276,6 @@
             ],
             "rulesOut": [
                 "v1",
-                "v5",
                 "vk"
             ]
         },
@@ -2785,6 +3386,211 @@
             "rulesIn": [],
             "rulesOut": [
                 "vs"
+            ]
+        }
+    ],
+    "causative passive": [
+        {
+            "kanaIn": "かされる",
+            "kanaOut": "く",
+            "rulesIn": [
+                "v1"
+            ],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "がされる",
+            "kanaOut": "ぐ",
+            "rulesIn": [
+                "v1"
+            ],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "たされる",
+            "kanaOut": "つ",
+            "rulesIn": [
+                "v1"
+            ],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "なされる",
+            "kanaOut": "ぬ",
+            "rulesIn": [
+                "v1"
+            ],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "ばされる",
+            "kanaOut": "ぶ",
+            "rulesIn": [
+                "v1"
+            ],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "まされる",
+            "kanaOut": "む",
+            "rulesIn": [
+                "v1"
+            ],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "らされる",
+            "kanaOut": "る",
+            "rulesIn": [
+                "v1"
+            ],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "わされる",
+            "kanaOut": "う",
+            "rulesIn": [
+                "v1"
+            ],
+            "rulesOut": [
+                "v5"
+            ]
+        }
+    ],
+    "-toku": [
+        {
+            "kanaIn": "いとく",
+            "kanaOut": "く",
+            "rulesIn": [
+                "v5"
+            ],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "いどく",
+            "kanaOut": "ぐ",
+            "rulesIn": [
+                "v5"
+            ],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "きとく",
+            "kanaOut": "くる",
+            "rulesIn": [
+                "v5"
+            ],
+            "rulesOut": [
+                "vk"
+            ]
+        },
+        {
+            "kanaIn": "しとく",
+            "kanaOut": "す",
+            "rulesIn": [
+                "v5"
+            ],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "しとく",
+            "kanaOut": "する",
+            "rulesIn": [
+                "v5"
+            ],
+            "rulesOut": [
+                "vs"
+            ]
+        },
+        {
+            "kanaIn": "っとく",
+            "kanaOut": "う",
+            "rulesIn": [
+                "v5"
+            ],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "っとく",
+            "kanaOut": "つ",
+            "rulesIn": [
+                "v5"
+            ],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "っとく",
+            "kanaOut": "る",
+            "rulesIn": [
+                "v5"
+            ],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "んどく",
+            "kanaOut": "ぬ",
+            "rulesIn": [
+                "v5"
+            ],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "んどく",
+            "kanaOut": "ぶ",
+            "rulesIn": [
+                "v5"
+            ],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "んどく",
+            "kanaOut": "む",
+            "rulesIn": [
+                "v5"
+            ],
+            "rulesOut": [
+                "v5"
+            ]
+        },
+        {
+            "kanaIn": "とく",
+            "kanaOut": "る",
+            "rulesIn": [
+                "v5"
+            ],
+            "rulesOut": [
+                "v1",
+                "vk"
             ]
         }
     ]
