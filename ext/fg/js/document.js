@@ -17,6 +17,8 @@
  */
 
 
+const REGEX_TRANSPARENT_COLOR = /rgba\s*\([^\)]*,\s*0(?:\.0+)?\s*\)/;
+
 function docSetImposterStyle(style, propertyName, value) {
     style.setProperty(propertyName, value, 'important');
 }
@@ -87,11 +89,12 @@ function docImposterCreate(element, isTextarea) {
     return [imposter, container];
 }
 
-function docRangeFromPoint(point) {
-    const element = document.elementFromPoint(point.x, point.y);
+function docRangeFromPoint({x, y}, options) {
+    const elements = document.elementsFromPoint(x, y);
     let imposter = null;
     let imposterContainer = null;
-    if (element) {
+    if (elements.length > 0) {
+        const element = elements[0];
         switch (element.nodeName) {
             case 'IMG':
             case 'BUTTON':
@@ -105,8 +108,8 @@ function docRangeFromPoint(point) {
         }
     }
 
-    const range = document.caretRangeFromPoint(point.x, point.y);
-    if (range !== null && isPointInRange(point, range)) {
+    const range = caretRangeFromPointExt(x, y, options.scanning.deepDomScan ? elements : []);
+    if (range !== null) {
         if (imposter !== null) {
             docSetImposterStyle(imposterContainer.style, 'z-index', '-2147483646');
             docSetImposterStyle(imposter.style, 'pointer-events', 'none');
@@ -191,15 +194,20 @@ function docSentenceExtract(source, extent) {
     };
 }
 
-function isPointInRange(point, range) {
+function isPointInRange(x, y, range) {
+    // Require a text node to start
+    if (range.startContainer.nodeType !== Node.TEXT_NODE) {
+        return false;
+    }
+
     // Scan forward
     const nodePre = range.endContainer;
     const offsetPre = range.endOffset;
     try {
-        const {node, offset} = TextSourceRange.seekForward(range.endContainer, range.endOffset, 1);
+        const {node, offset, content} = TextSourceRange.seekForward(range.endContainer, range.endOffset, 1);
         range.setEnd(node, offset);
 
-        if (isPointInAnyRect(point, range.getClientRects())) {
+        if (!isWhitespace(content) && isPointInAnyRect(x, y, range.getClientRects())) {
             return true;
         }
     } finally {
@@ -207,11 +215,11 @@ function isPointInRange(point, range) {
     }
 
     // Scan backward
-    const {node, offset} = TextSourceRange.seekBackward(range.startContainer, range.startOffset, 1);
+    const {node, offset, content} = TextSourceRange.seekBackward(range.startContainer, range.startOffset, 1);
     range.setStart(node, offset);
 
-    if (isPointInAnyRect(point, range.getClientRects())) {
-        // This purposefully leaves the starting offset as modified and sets teh range length to 0.
+    if (!isWhitespace(content) && isPointInAnyRect(x, y, range.getClientRects())) {
+        // This purposefully leaves the starting offset as modified and sets the range length to 0.
         range.setEnd(node, offset);
         return true;
     }
@@ -220,30 +228,124 @@ function isPointInRange(point, range) {
     return false;
 }
 
-function isPointInAnyRect(point, rects) {
+function isWhitespace(string) {
+    return string.trim().length === 0;
+}
+
+function isPointInAnyRect(x, y, rects) {
     for (const rect of rects) {
-        if (isPointInRect(point, rect)) {
+        if (isPointInRect(x, y, rect)) {
             return true;
         }
     }
     return false;
 }
 
-function isPointInRect(point, rect) {
+function isPointInRect(x, y, rect) {
     return (
-        point.x >= rect.left && point.x < rect.right &&
-        point.y >= rect.top && point.y < rect.bottom);
+        x >= rect.left && x < rect.right &&
+        y >= rect.top && y < rect.bottom);
 }
 
-if (typeof document.caretRangeFromPoint !== 'function') {
-    document.caretRangeFromPoint = (x, y) => {
-        const position = document.caretPositionFromPoint(x, y);
-        if (position && position.offsetNode && position.offsetNode.nodeType === Node.TEXT_NODE) {
+const caretRangeFromPoint = (() => {
+    if (typeof document.caretRangeFromPoint === 'function') {
+        // Chrome, Edge
+        return (x, y) => document.caretRangeFromPoint(x, y);
+    }
+
+    if (typeof document.caretPositionFromPoint === 'function') {
+        // Firefox
+        return (x, y) => {
+            const position = document.caretPositionFromPoint(x, y);
+            const node = position.offsetNode;
+            if (node === null) {
+                return null;
+            }
+
             const range = document.createRange();
-            range.setStart(position.offsetNode, position.offset);
-            range.setEnd(position.offsetNode, position.offset);
+            const offset = (node.nodeType === Node.TEXT_NODE ? position.offset : 0);
+            range.setStart(node, offset);
+            range.setEnd(node, offset);
             return range;
+        };
+    }
+
+    // No support
+    return () => null;
+})();
+
+function caretRangeFromPointExt(x, y, elements) {
+    const modifications = [];
+    try {
+        let i = 0;
+        let startContinerPre = null;
+        while (true) {
+            const range = caretRangeFromPoint(x, y);
+            if (range === null) {
+                return null;
+            }
+
+            const startContainer = range.startContainer;
+            if (startContinerPre !== startContainer) {
+                if (isPointInRange(x, y, range)) {
+                    return range;
+                }
+                startContinerPre = startContainer;
+            }
+
+            i = disableTransparentElement(elements, i, modifications);
+            if (i < 0) {
+                return null;
+            }
         }
-        return null;
-    };
+    } finally {
+        if (modifications.length > 0) {
+            restoreElementStyleModifications(modifications);
+        }
+    }
+}
+
+function disableTransparentElement(elements, i, modifications) {
+    while (true) {
+        if (i >= elements.length) {
+            return -1;
+        }
+
+        const element = elements[i++];
+        if (isElementTransparent(element)) {
+            const style = element.hasAttribute('style') ? element.getAttribute('style') : null;
+            modifications.push({element, style});
+            element.style.pointerEvents = 'none';
+            return i;
+        }
+    }
+}
+
+function restoreElementStyleModifications(modifications) {
+    for (const {element, style} of modifications) {
+        if (style === null) {
+            element.removeAttribute('style');
+        } else {
+            element.setAttribute('style', style);
+        }
+    }
+}
+
+function isElementTransparent(element) {
+    if (
+        element === document.body ||
+        element === document.documentElement
+    ) {
+        return false;
+    }
+    const style = window.getComputedStyle(element);
+    return (
+        parseFloat(style.opacity) < 0 ||
+        style.visibility === 'hidden' ||
+        (style.backgroundImage === 'none' && isColorTransparent(style.backgroundColor))
+    );
+}
+
+function isColorTransparent(cssColor) {
+    return REGEX_TRANSPARENT_COLOR.test(cssColor);
 }
