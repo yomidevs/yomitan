@@ -26,6 +26,7 @@ iframe#yomichan-float {
     resize: both;
     visibility: hidden;
     z-index: 2147483647;
+    box-sizing: border-box;
 }
 
 iframe#yomichan-float.yomichan-float-full-width {

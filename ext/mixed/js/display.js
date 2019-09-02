@@ -80,20 +80,26 @@ class Display {
             const {docRangeFromPoint, docSentenceExtract} = this.dependencies;
 
             const clickedElement = $(e.target);
-            const textSource = docRangeFromPoint({x: e.clientX, y: e.clientY});
+            const textSource = docRangeFromPoint({x: e.clientX, y: e.clientY}, this.options);
             if (textSource === null) {
                 return false;
             }
-            textSource.setEndOffset(this.options.scanning.length);
 
-            const {definitions, length} = await apiTermsFind(textSource.text());
-            if (definitions.length === 0) {
-                return false;
+            let definitions, length, sentence;
+            try {
+                textSource.setEndOffset(this.options.scanning.length);
+
+                ({definitions, length} = await apiTermsFind(textSource.text()));
+                if (definitions.length === 0) {
+                    return false;
+                }
+
+                textSource.setEndOffset(length);
+
+                sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
+            } finally {
+                textSource.cleanup();
             }
-
-            textSource.setEndOffset(length);
-
-            const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
 
             const context = {
                 source: {

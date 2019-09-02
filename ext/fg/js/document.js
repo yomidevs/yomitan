@@ -17,77 +17,110 @@
  */
 
 
-const IS_FIREFOX = /Firefox/.test(navigator.userAgent);
+const REGEX_TRANSPARENT_COLOR = /rgba\s*\([^\)]*,\s*0(?:\.0+)?\s*\)/;
 
-function docOffsetCalc(element) {
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft;
-
-    const clientTop = document.documentElement.clientTop || document.body.clientTop || 0;
-    const clientLeft = document.documentElement.clientLeft || document.body.clientLeft || 0;
-
-    const rect = element.getBoundingClientRect();
-    const top  = Math.round(rect.top +  scrollTop - clientTop);
-    const left = Math.round(rect.left + scrollLeft - clientLeft);
-
-    return {top, left};
+function docSetImposterStyle(style, propertyName, value) {
+    style.setProperty(propertyName, value, 'important');
 }
 
-function docImposterCreate(element) {
-    const styleProps = window.getComputedStyle(element);
-    const stylePairs = [];
-    for (const key of styleProps) {
-        stylePairs.push(`${key}: ${styleProps[key]};`);
-    }
+function docImposterCreate(element, isTextarea) {
+    const elementStyle = window.getComputedStyle(element);
+    const elementRect = element.getBoundingClientRect();
+    const documentRect = document.documentElement.getBoundingClientRect();
+    const left = elementRect.left - documentRect.left;
+    const top = elementRect.top - documentRect.top;
 
-    const offset = docOffsetCalc(element);
+    // Container
+    const container = document.createElement('div');
+    const containerStyle = container.style;
+    docSetImposterStyle(containerStyle, 'all', 'initial');
+    docSetImposterStyle(containerStyle, 'position', 'absolute');
+    docSetImposterStyle(containerStyle, 'left', '0');
+    docSetImposterStyle(containerStyle, 'top', '0');
+    docSetImposterStyle(containerStyle, 'width', `${documentRect.width}px`);
+    docSetImposterStyle(containerStyle, 'height', `${documentRect.height}px`);
+    docSetImposterStyle(containerStyle, 'overflow', 'hidden');
+    docSetImposterStyle(containerStyle, 'opacity', '0');
+
+    docSetImposterStyle(containerStyle, 'pointer-events', 'none');
+    docSetImposterStyle(containerStyle, 'z-index', '2147483646');
+
+    // Imposter
     const imposter = document.createElement('div');
-    imposter.className = 'yomichan-imposter';
+    const imposterStyle = imposter.style;
+
     imposter.innerText = element.value;
-    imposter.style.cssText = stylePairs.join('\n');
-    imposter.style.position = 'absolute';
-    imposter.style.top = `${offset.top}px`;
-    imposter.style.left = `${offset.left}px`;
-    imposter.style.opacity = 0;
-    imposter.style.zIndex = 2147483646;
-    if (element.nodeName === 'TEXTAREA' && styleProps.overflow === 'visible') {
-        imposter.style.overflow = 'auto';
+
+    for (let i = 0, ii = elementStyle.length; i < ii; ++i) {
+        const property = elementStyle[i];
+        docSetImposterStyle(imposterStyle, property, elementStyle.getPropertyValue(property));
+    }
+    docSetImposterStyle(imposterStyle, 'position', 'absolute');
+    docSetImposterStyle(imposterStyle, 'top', `${top}px`);
+    docSetImposterStyle(imposterStyle, 'left', `${left}px`);
+    docSetImposterStyle(imposterStyle, 'margin', '0');
+    docSetImposterStyle(imposterStyle, 'pointer-events', 'auto');
+
+    if (isTextarea) {
+        if (elementStyle.overflow === 'visible') {
+            docSetImposterStyle(imposterStyle, 'overflow', 'auto');
+        }
+    } else {
+        docSetImposterStyle(imposterStyle, 'overflow', 'hidden');
+        docSetImposterStyle(imposterStyle, 'white-space', 'nowrap');
+        docSetImposterStyle(imposterStyle, 'line-height', elementStyle.height);
     }
 
-    document.body.appendChild(imposter);
+    container.appendChild(imposter);
+    document.body.appendChild(container);
+
+    // Adjust size
+    const imposterRect = imposter.getBoundingClientRect();
+    if (imposterRect.width !== elementRect.width || imposterRect.height !== elementRect.height) {
+        const width = parseFloat(elementStyle.width) + (elementRect.width - imposterRect.width);
+        const height = parseFloat(elementStyle.height) + (elementRect.height - imposterRect.height);
+        docSetImposterStyle(imposterStyle, 'width', `${width}px`);
+        docSetImposterStyle(imposterStyle, 'height', `${height}px`);
+    }
+
     imposter.scrollTop = element.scrollTop;
     imposter.scrollLeft = element.scrollLeft;
 
-    return imposter;
+    return [imposter, container];
 }
 
-function docImposterDestroy() {
-    for (const element of document.getElementsByClassName('yomichan-imposter')) {
-        element.parentNode.removeChild(element);
-    }
-}
-
-function docRangeFromPoint(point) {
-    const element = document.elementFromPoint(point.x, point.y);
+function docRangeFromPoint({x, y}, options) {
+    const elements = document.elementsFromPoint(x, y);
     let imposter = null;
-    if (element) {
+    let imposterContainer = null;
+    if (elements.length > 0) {
+        const element = elements[0];
         switch (element.nodeName) {
             case 'IMG':
             case 'BUTTON':
                 return new TextSourceElement(element);
             case 'INPUT':
+                [imposter, imposterContainer] = docImposterCreate(element, false);
+                break;
             case 'TEXTAREA':
-                imposter = docImposterCreate(element);
+                [imposter, imposterContainer] = docImposterCreate(element, true);
                 break;
         }
     }
 
-    const range = document.caretRangeFromPoint(point.x, point.y);
-    if (imposter !== null) {
-        imposter.style.zIndex = -2147483646;
+    const range = caretRangeFromPointExt(x, y, options.scanning.deepDomScan ? elements : []);
+    if (range !== null) {
+        if (imposter !== null) {
+            docSetImposterStyle(imposterContainer.style, 'z-index', '-2147483646');
+            docSetImposterStyle(imposter.style, 'pointer-events', 'none');
+        }
+        return new TextSourceRange(range, '', imposterContainer);
+    } else {
+        if (imposterContainer !== null) {
+            imposterContainer.parentNode.removeChild(imposterContainer);
+        }
+        return null;
     }
-
-    return range !== null && isPointInRange(point, range) ? new TextSourceRange(range) : null;
 }
 
 function docSentenceExtract(source, extent) {
@@ -161,32 +194,158 @@ function docSentenceExtract(source, extent) {
     };
 }
 
-function isPointInRange(point, range) {
-    if (IS_FIREFOX) {
-        // Always return true on Firefox due to an issue where range.getClientRects()
-        // does not return a correct set of rects for characters at the beginning of a line.
+function isPointInRange(x, y, range) {
+    // Require a text node to start
+    if (range.startContainer.nodeType !== Node.TEXT_NODE) {
+        return false;
+    }
+
+    // Scan forward
+    const nodePre = range.endContainer;
+    const offsetPre = range.endOffset;
+    try {
+        const {node, offset, content} = TextSourceRange.seekForward(range.endContainer, range.endOffset, 1);
+        range.setEnd(node, offset);
+
+        if (!isWhitespace(content) && isPointInAnyRect(x, y, range.getClientRects())) {
+            return true;
+        }
+    } finally {
+        range.setEnd(nodePre, offsetPre);
+    }
+
+    // Scan backward
+    const {node, offset, content} = TextSourceRange.seekBackward(range.startContainer, range.startOffset, 1);
+    range.setStart(node, offset);
+
+    if (!isWhitespace(content) && isPointInAnyRect(x, y, range.getClientRects())) {
+        // This purposefully leaves the starting offset as modified and sets the range length to 0.
+        range.setEnd(node, offset);
         return true;
     }
 
-    const y = point.y - 2;
-    for (const rect of range.getClientRects()) {
-        if (y <= rect.bottom) {
-            return true;
-        }
-    }
-
+    // No match
     return false;
 }
 
-if (typeof document.caretRangeFromPoint !== 'function') {
-    document.caretRangeFromPoint = (x, y) => {
-        const position = document.caretPositionFromPoint(x, y);
-        if (position && position.offsetNode && position.offsetNode.nodeType === Node.TEXT_NODE) {
-            const range = document.createRange();
-            range.setStart(position.offsetNode, position.offset);
-            range.setEnd(position.offsetNode, position.offset);
-            return range;
+function isWhitespace(string) {
+    return string.trim().length === 0;
+}
+
+function isPointInAnyRect(x, y, rects) {
+    for (const rect of rects) {
+        if (isPointInRect(x, y, rect)) {
+            return true;
         }
-        return null;
-    };
+    }
+    return false;
+}
+
+function isPointInRect(x, y, rect) {
+    return (
+        x >= rect.left && x < rect.right &&
+        y >= rect.top && y < rect.bottom);
+}
+
+const caretRangeFromPoint = (() => {
+    if (typeof document.caretRangeFromPoint === 'function') {
+        // Chrome, Edge
+        return (x, y) => document.caretRangeFromPoint(x, y);
+    }
+
+    if (typeof document.caretPositionFromPoint === 'function') {
+        // Firefox
+        return (x, y) => {
+            const position = document.caretPositionFromPoint(x, y);
+            const node = position.offsetNode;
+            if (node === null) {
+                return null;
+            }
+
+            const range = document.createRange();
+            const offset = (node.nodeType === Node.TEXT_NODE ? position.offset : 0);
+            range.setStart(node, offset);
+            range.setEnd(node, offset);
+            return range;
+        };
+    }
+
+    // No support
+    return () => null;
+})();
+
+function caretRangeFromPointExt(x, y, elements) {
+    const modifications = [];
+    try {
+        let i = 0;
+        let startContinerPre = null;
+        while (true) {
+            const range = caretRangeFromPoint(x, y);
+            if (range === null) {
+                return null;
+            }
+
+            const startContainer = range.startContainer;
+            if (startContinerPre !== startContainer) {
+                if (isPointInRange(x, y, range)) {
+                    return range;
+                }
+                startContinerPre = startContainer;
+            }
+
+            i = disableTransparentElement(elements, i, modifications);
+            if (i < 0) {
+                return null;
+            }
+        }
+    } finally {
+        if (modifications.length > 0) {
+            restoreElementStyleModifications(modifications);
+        }
+    }
+}
+
+function disableTransparentElement(elements, i, modifications) {
+    while (true) {
+        if (i >= elements.length) {
+            return -1;
+        }
+
+        const element = elements[i++];
+        if (isElementTransparent(element)) {
+            const style = element.hasAttribute('style') ? element.getAttribute('style') : null;
+            modifications.push({element, style});
+            element.style.pointerEvents = 'none';
+            return i;
+        }
+    }
+}
+
+function restoreElementStyleModifications(modifications) {
+    for (const {element, style} of modifications) {
+        if (style === null) {
+            element.removeAttribute('style');
+        } else {
+            element.setAttribute('style', style);
+        }
+    }
+}
+
+function isElementTransparent(element) {
+    if (
+        element === document.body ||
+        element === document.documentElement
+    ) {
+        return false;
+    }
+    const style = window.getComputedStyle(element);
+    return (
+        parseFloat(style.opacity) < 0 ||
+        style.visibility === 'hidden' ||
+        (style.backgroundImage === 'none' && isColorTransparent(style.backgroundColor))
+    );
+}
+
+function isColorTransparent(cssColor) {
+    return REGEX_TRANSPARENT_COLOR.test(cssColor);
 }

@@ -285,7 +285,7 @@ class Frontend {
             return;
         }
 
-        const textSource = docRangeFromPoint(point);
+        const textSource = docRangeFromPoint(point, this.options);
         let hideResults = !textSource || !textSource.containsPoint(point);
         let searched = false;
         let success = false;
@@ -301,16 +301,21 @@ class Frontend {
         } catch (e) {
             if (window.yomichan_orphaned) {
                 if (textSource && this.options.scanning.modifier !== 'none') {
-                    this.popup.showOrphaned(textSource.getRect(), this.options);
+                    this.popup.showOrphaned(
+                        textSource.getRect(),
+                        textSource.getWritingMode(),
+                        this.options
+                    );
                 }
             } else {
                 this.onError(e);
             }
         } finally {
+            if (textSource !== null) {
+                textSource.cleanup();
+            }
             if (hideResults && this.options.scanning.autoHideResults) {
                 this.searchClear();
-            } else {
-                docImposterDestroy();
             }
 
             this.pendingLookup = false;
@@ -332,6 +337,7 @@ class Frontend {
         const url = window.location.href;
         this.popup.termsShow(
             textSource.getRect(),
+            textSource.getWritingMode(),
             definitions,
             this.options,
             {sentence, url, focus}
@@ -357,6 +363,7 @@ class Frontend {
         const url = window.location.href;
         this.popup.kanjiShow(
             textSource.getRect(),
+            textSource.getWritingMode(),
             definitions,
             this.options,
             {sentence, url, focus}
@@ -371,7 +378,6 @@ class Frontend {
     }
 
     searchClear() {
-        docImposterDestroy();
         this.popup.hide();
         this.popup.clearAutoPlayTimer();
 

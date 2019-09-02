@@ -199,6 +199,10 @@ function optionsSetDefaults(options) {
             popupHeight: 250,
             popupHorizontalOffset: 0,
             popupVerticalOffset: 10,
+            popupHorizontalOffset2: 10,
+            popupVerticalOffset2: 0,
+            popupHorizontalTextPosition: 'below',
+            popupVerticalTextPosition: 'before',
             showGuide: true,
             compactTags: false,
             compactGlossaries: false,
@@ -214,7 +218,8 @@ function optionsSetDefaults(options) {
             autoHideResults: false,
             delay: 20,
             length: 10,
-            modifier: 'shift'
+            modifier: 'shift',
+            deepDomScan: false
         },
 
         dictionaries: {},

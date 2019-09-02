@@ -57,9 +57,10 @@ class Backend {
             this.anki = new AnkiNull();
         }
 
+        const callback = () => this.checkLastError(chrome.runtime.lastError);
         chrome.tabs.query({}, tabs => {
             for (const tab of tabs) {
-                chrome.tabs.sendMessage(tab.id, {action: 'optionsSet', params: options}, () => null);
+                chrome.tabs.sendMessage(tab.id, {action: 'optionsSet', params: options}, callback);
             }
         });
     }
@@ -146,6 +147,10 @@ class Backend {
         if (typeof chrome.browserAction.setBadgeText === 'function') {
             chrome.browserAction.setBadgeText({text});
         }
+    }
+
+    checkLastError(e) {
+        // NOP
     }
 }
 

@@ -32,10 +32,14 @@ async function formRead() {
     optionsNew.general.showAdvanced = $('#show-advanced-options').prop('checked');
     optionsNew.general.maxResults = parseInt($('#max-displayed-results').val(), 10);
     optionsNew.general.popupDisplayMode = $('#popup-display-mode').val();
+    optionsNew.general.popupHorizontalTextPosition = $('#popup-horizontal-text-position').val();
+    optionsNew.general.popupVerticalTextPosition = $('#popup-vertical-text-position').val();
     optionsNew.general.popupWidth = parseInt($('#popup-width').val(), 10);
     optionsNew.general.popupHeight = parseInt($('#popup-height').val(), 10);
     optionsNew.general.popupHorizontalOffset = parseInt($('#popup-horizontal-offset').val(), 0);
     optionsNew.general.popupVerticalOffset = parseInt($('#popup-vertical-offset').val(), 10);
+    optionsNew.general.popupHorizontalOffset2 = parseInt($('#popup-horizontal-offset2').val(), 0);
+    optionsNew.general.popupVerticalOffset2 = parseInt($('#popup-vertical-offset2').val(), 10);
     optionsNew.general.customPopupCss = $('#custom-popup-css').val();
 
     optionsNew.scanning.middleMouse = $('#middle-mouse-button-scan').prop('checked');
@@ -43,6 +47,7 @@ async function formRead() {
     optionsNew.scanning.selectText = $('#select-matched-text').prop('checked');
     optionsNew.scanning.alphanumeric = $('#search-alphanumeric').prop('checked');
     optionsNew.scanning.autoHideResults = $('#auto-hide-results').prop('checked');
+    optionsNew.scanning.deepDomScan = $('#deep-dom-scan').prop('checked');
     optionsNew.scanning.delay = parseInt($('#scan-delay').val(), 10);
     optionsNew.scanning.length = parseInt($('#scan-length').val(), 10);
     optionsNew.scanning.modifier = $('#scan-modifier-key').val();
@@ -116,7 +121,7 @@ async function formMainDictionaryOptionsPopulate(options) {
     select.append($('<option class="text-muted" value="">Not selected</option>'));
 
     let mainDictionary = '';
-    for (const dictRow of await utilDatabaseSummarize()) {
+    for (const dictRow of toIterable(await utilDatabaseSummarize())) {
         if (dictRow.sequenced) {
             select.append($(`<option value="${dictRow.title}">${dictRow.title}</option>`));
             if (dictRow.title === options.general.mainDictionary) {
@@ -168,10 +173,14 @@ async function onReady() {
     $('#show-advanced-options').prop('checked', options.general.showAdvanced);
     $('#max-displayed-results').val(options.general.maxResults);
     $('#popup-display-mode').val(options.general.popupDisplayMode);
+    $('#popup-horizontal-text-position').val(options.general.popupHorizontalTextPosition);
+    $('#popup-vertical-text-position').val(options.general.popupVerticalTextPosition);
     $('#popup-width').val(options.general.popupWidth);
     $('#popup-height').val(options.general.popupHeight);
     $('#popup-horizontal-offset').val(options.general.popupHorizontalOffset);
     $('#popup-vertical-offset').val(options.general.popupVerticalOffset);
+    $('#popup-horizontal-offset2').val(options.general.popupHorizontalOffset2);
+    $('#popup-vertical-offset2').val(options.general.popupVerticalOffset2);
     $('#custom-popup-css').val(options.general.customPopupCss);
 
     $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);
@@ -179,6 +188,7 @@ async function onReady() {
     $('#select-matched-text').prop('checked', options.scanning.selectText);
     $('#search-alphanumeric').prop('checked', options.scanning.alphanumeric);
     $('#auto-hide-results').prop('checked', options.scanning.autoHideResults);
+    $('#deep-dom-scan').prop('checked', options.scanning.deepDomScan);
     $('#scan-delay').val(options.scanning.delay);
     $('#scan-length').val(options.scanning.length);
     $('#scan-modifier-key').val(options.scanning.modifier);
@@ -314,12 +324,12 @@ async function dictionaryGroupsPopulate(options) {
     const dictGroups = $('#dict-groups').empty();
     const dictWarning = $('#dict-warning').hide();
 
-    const dictRows = await utilDatabaseSummarize();
+    const dictRows = toIterable(await utilDatabaseSummarize());
     if (dictRows.length === 0) {
         dictWarning.show();
     }
 
-    for (const dictRow of dictRowsSort(dictRows, options)) {
+    for (const dictRow of toIterable(dictRowsSort(dictRows, options))) {
         const dictOptions = options.dictionaries[dictRow.title] || {
             enabled: false,
             priority: 0,
@@ -581,26 +591,25 @@ async function onAnkiFieldTemplatesReset(e) {
  */
 
 async function getBrowser() {
-    if (typeof chrome !== "undefined") {
-        if (typeof browser !== "undefined") {
-            try {
-                const info = await browser.runtime.getBrowserInfo();
-                if (info.name === "Fennec") {
-                    return "firefox-mobile";
-                }
-            } catch (e) { }
-            return "firefox";
-        } else {
-            return "chrome";
-        }
+    if (EXTENSION_IS_BROWSER_EDGE) {
+        return 'edge';
+    }
+    if (typeof browser !== 'undefined') {
+        try {
+            const info = await browser.runtime.getBrowserInfo();
+            if (info.name === 'Fennec') {
+                return 'firefox-mobile';
+            }
+        } catch (e) { }
+        return 'firefox';
     } else {
-        return "edge";
+        return 'chrome';
     }
 }
 
 function storageBytesToLabeledString(size) {
     const base = 1000;
-    const labels = ["bytes", "KB", "MB", "GB"];
+    const labels = ['bytes', 'KB', 'MB', 'GB'];
     let labelIndex = 0;
     while (size >= base) {
         size /= base;
@@ -620,14 +629,14 @@ storageEstimate.mostRecent = null;
 
 async function storageInfoInitialize() {
     const browser = await getBrowser();
-    const container = document.querySelector("#storage-info");
-    container.setAttribute("data-browser", browser);
+    const container = document.querySelector('#storage-info');
+    container.setAttribute('data-browser', browser);
 
     await storageShowInfo();
 
-    container.classList.remove("storage-hidden");
+    container.classList.remove('storage-hidden');
 
-    document.querySelector("#storage-refresh").addEventListener('click', () => storageShowInfo(), false);
+    document.querySelector('#storage-refresh').addEventListener('click', () => storageShowInfo(), false);
 }
 
 async function storageUpdateStats() {
@@ -637,8 +646,8 @@ async function storageUpdateStats() {
     const valid = (estimate !== null);
 
     if (valid) {
-        document.querySelector("#storage-usage").textContent = storageBytesToLabeledString(estimate.usage);
-        document.querySelector("#storage-quota").textContent = storageBytesToLabeledString(estimate.quota);
+        document.querySelector('#storage-usage').textContent = storageBytesToLabeledString(estimate.usage);
+        document.querySelector('#storage-quota').textContent = storageBytesToLabeledString(estimate.quota);
     }
 
     storageUpdateStats.isUpdating = false;
@@ -650,8 +659,8 @@ async function storageShowInfo() {
     storageSpinnerShow(true);
 
     const valid = await storageUpdateStats();
-    document.querySelector("#storage-use").classList.toggle("storage-hidden", !valid);
-    document.querySelector("#storage-error").classList.toggle("storage-hidden", valid);
+    document.querySelector('#storage-use').classList.toggle('storage-hidden', !valid);
+    document.querySelector('#storage-error').classList.toggle('storage-hidden', valid);
 
     storageSpinnerShow(false);
 }

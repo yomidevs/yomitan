@@ -48,59 +48,132 @@ class Popup {
         return this.injected;
     }
 
-    async show(elementRect, options) {
+    async show(elementRect, writingMode, options) {
         await this.inject(options);
 
-        const containerStyle = window.getComputedStyle(this.container);
-        const containerHeight = parseInt(containerStyle.height);
-        const containerWidth = parseInt(containerStyle.width);
+        const optionsGeneral = options.general;
+        const container = this.container;
+        const containerRect = container.getBoundingClientRect();
+        const getPosition = (
+            writingMode === 'horizontal-tb' || optionsGeneral.popupVerticalTextPosition === 'default' ?
+            Popup.getPositionForHorizontalText :
+            Popup.getPositionForVerticalText
+        );
 
-        const limitX = document.body.clientWidth;
-        const limitY = window.innerHeight;
+        const [x, y, width, height, below] = getPosition(
+            elementRect,
+            Math.max(containerRect.width, optionsGeneral.popupWidth),
+            Math.max(containerRect.height, optionsGeneral.popupHeight),
+            document.body.clientWidth,
+            window.innerHeight,
+            optionsGeneral,
+            writingMode
+        );
 
-        let x = elementRect.left + options.general.popupHorizontalOffset;
-        let width = Math.max(containerWidth, options.general.popupWidth);
-        const overflowX = Math.max(x + width - limitX, 0);
+        container.classList.toggle('yomichan-float-full-width', optionsGeneral.popupDisplayMode === 'full-width');
+        container.classList.toggle('yomichan-float-above', !below);
+        container.style.left = `${x}px`;
+        container.style.top = `${y}px`;
+        container.style.width = `${width}px`;
+        container.style.height = `${height}px`;
+        container.style.visibility = 'visible';
+    }
+
+    static getPositionForHorizontalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral) {
+        let x = elementRect.left + optionsGeneral.popupHorizontalOffset;
+        const overflowX = Math.max(x + width - maxWidth, 0);
         if (overflowX > 0) {
             if (x >= overflowX) {
                 x -= overflowX;
             } else {
-                width = limitX;
+                width = maxWidth;
                 x = 0;
             }
         }
 
-        let above = false;
-        let y = 0;
-        let height = Math.max(containerHeight, options.general.popupHeight);
-        const yBelow = elementRect.bottom + options.general.popupVerticalOffset;
-        const yAbove = elementRect.top - options.general.popupVerticalOffset;
-        const overflowBelow = Math.max(yBelow + height - limitY, 0);
-        const overflowAbove = Math.max(height - yAbove, 0);
-        if (overflowBelow > 0 || overflowAbove > 0) {
-            if (overflowBelow < overflowAbove) {
-                height = Math.max(height - overflowBelow, 0);
-                y = yBelow;
-            } else {
-                height = Math.max(height - overflowAbove, 0);
-                y = Math.max(yAbove - height, 0);
-                above = true;
-            }
-        } else {
-            y = yBelow;
-        }
+        const preferBelow = (optionsGeneral.popupHorizontalTextPosition === 'below');
 
-        this.container.classList.toggle('yomichan-float-full-width', options.general.popupDisplayMode === 'full-width');
-        this.container.classList.toggle('yomichan-float-above', above);
-        this.container.style.left = `${x}px`;
-        this.container.style.top = `${y}px`;
-        this.container.style.width = `${width}px`;
-        this.container.style.height = `${height}px`;
-        this.container.style.visibility = 'visible';
+        const verticalOffset = optionsGeneral.popupVerticalOffset;
+        const [y, h, below] = Popup.limitGeometry(
+            elementRect.top - verticalOffset,
+            elementRect.bottom + verticalOffset,
+            height,
+            maxHeight,
+            preferBelow
+        );
+
+        return [x, y, width, h, below];
     }
 
-    async showOrphaned(elementRect, options) {
-        await this.show(elementRect, options);
+    static getPositionForVerticalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral, writingMode) {
+        const preferRight = Popup.isVerticalTextPopupOnRight(optionsGeneral.popupVerticalTextPosition, writingMode);
+        const horizontalOffset = optionsGeneral.popupHorizontalOffset2;
+        const verticalOffset = optionsGeneral.popupVerticalOffset2;
+
+        const [x, w] = Popup.limitGeometry(
+            elementRect.left - horizontalOffset,
+            elementRect.right + horizontalOffset,
+            width,
+            maxWidth,
+            preferRight
+        );
+        const [y, h, below] = Popup.limitGeometry(
+            elementRect.bottom - verticalOffset,
+            elementRect.top + verticalOffset,
+            height,
+            maxHeight,
+            true
+        );
+        return [x, y, w, h, below];
+    }
+
+    static isVerticalTextPopupOnRight(positionPreference, writingMode) {
+        switch (positionPreference) {
+            case 'before':
+                return !Popup.isWritingModeLeftToRight(writingMode);
+            case 'after':
+                return Popup.isWritingModeLeftToRight(writingMode);
+            case 'left':
+                return false;
+            case 'right':
+                return true;
+        }
+    }
+
+    static isWritingModeLeftToRight(writingMode) {
+        switch (writingMode) {
+            case 'vertical-lr':
+            case 'sideways-lr':
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    static limitGeometry(positionBefore, positionAfter, size, limit, preferAfter) {
+        let after = preferAfter;
+        let position = 0;
+        const overflowBefore = Math.max(0, size - positionBefore);
+        const overflowAfter = Math.max(0, positionAfter + size - limit);
+        if (overflowAfter > 0 || overflowBefore > 0) {
+            if (overflowAfter < overflowBefore) {
+                size = Math.max(0, size - overflowAfter);
+                position = positionAfter;
+                after = true;
+            } else {
+                size = Math.max(0, size - overflowBefore);
+                position = Math.max(0, positionBefore - size);
+                after = false;
+            }
+        } else {
+            position = preferAfter ? positionAfter : positionBefore - size;
+        }
+
+        return [position, size, after];
+    }
+
+    async showOrphaned(elementRect, writingMode, options) {
+        await this.show(elementRect, writingMode, options);
         this.invokeApi('orphaned');
     }
 
@@ -136,13 +209,13 @@ class Popup {
         return contained;
     }
 
-    async termsShow(elementRect, definitions, options, context) {
-        await this.show(elementRect, options);
+    async termsShow(elementRect, writingMode, definitions, options, context) {
+        await this.show(elementRect, writingMode, options);
         this.invokeApi('termsShow', {definitions, options, context});
     }
 
-    async kanjiShow(elementRect, definitions, options, context) {
-        await this.show(elementRect, options);
+    async kanjiShow(elementRect, writingMode, definitions, options, context) {
+        await this.show(elementRect, writingMode, options);
         this.invokeApi('kanjiShow', {definitions, options, context});
     }
 
