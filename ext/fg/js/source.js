@@ -68,6 +68,10 @@ class TextSourceRange {
         return this.range.getBoundingClientRect();
     }
 
+    getWritingMode() {
+        return TextSourceRange.getElementWritingMode(TextSourceRange.getParentElement(this.range.startContainer));
+    }
+
     getPaddedRect() {
         const range = this.range.cloneRange();
         const startOffset = range.startOffset;
@@ -211,6 +215,23 @@ class TextSourceRange {
 
         return state.remainder > 0;
     }
+
+    static getParentElement(node) {
+        while (node !== null && node.nodeType !== Node.ELEMENT_NODE) {
+            node = node.parentNode;
+        }
+        return node;
+    }
+
+    static getElementWritingMode(element) {
+        if (element === null) {
+            return 'horizontal-tb';
+        }
+
+        const style = window.getComputedStyle(element);
+        const writingMode = style.writingMode;
+        return typeof writingMode === 'string' ? writingMode : 'horizontal-tb';
+    }
 }
 
 
@@ -276,6 +297,10 @@ class TextSourceElement {
 
     getRect() {
         return this.element.getBoundingClientRect();
+    }
+
+    getWritingMode() {
+        return 'horizontal-tb';
     }
 
     select() {
