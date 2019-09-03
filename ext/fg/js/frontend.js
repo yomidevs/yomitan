@@ -286,7 +286,7 @@ class Frontend {
         }
 
         const textSource = docRangeFromPoint(point, this.options);
-        let hideResults = !textSource || !textSource.containsPoint(point);
+        let hideResults = textSource === null;
         let searched = false;
         let success = false;
 

@@ -59,29 +59,12 @@ class TextSourceRange {
         return length - state.remainder;
     }
 
-    containsPoint(point) {
-        const rect = this.getPaddedRect();
-        return point.x >= rect.left && point.x <= rect.right;
-    }
-
     getRect() {
         return this.range.getBoundingClientRect();
     }
 
     getWritingMode() {
         return TextSourceRange.getElementWritingMode(TextSourceRange.getParentElement(this.range.startContainer));
-    }
-
-    getPaddedRect() {
-        const range = this.range.cloneRange();
-        const startOffset = range.startOffset;
-        const endOffset = range.endOffset;
-        const node = range.startContainer;
-
-        range.setStart(node, Math.max(0, startOffset - 1));
-        range.setEnd(node, Math.min(node.length, endOffset + 1));
-
-        return range.getBoundingClientRect();
     }
 
     select() {
@@ -288,11 +271,6 @@ class TextSourceElement {
 
     setStartOffset(length) {
         return 0;
-    }
-
-    containsPoint(point) {
-        const rect = this.getRect();
-        return point.x >= rect.left && point.x <= rect.right;
     }
 
     getRect() {
