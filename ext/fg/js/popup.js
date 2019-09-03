@@ -251,26 +251,13 @@ class Popup {
         }
     }
 
-    async containsPoint(point) {
-        if (!this.isVisible()) {
-            return false;
+    async containsPoint({x, y}) {
+        for (let popup = this; popup !== null && popup.isVisible(); popup = popup.child) {
+            const rect = popup.container.getBoundingClientRect();
+            if (x >= rect.left && y >= rect.top && x < rect.right && y < rect.bottom) {
+                return true;
+            }
         }
-
-        const rect = this.container.getBoundingClientRect();
-        const contained =
-            point.x >= rect.left &&
-            point.y >= rect.top &&
-            point.x < rect.right &&
-            point.y < rect.bottom;
-
-        return contained;
-    }
-
-    async containsPointAsync(point) {
-        return containsPoint(point);
-    }
-
-    containsPointIsAsync() {
         return false;
     }
 
