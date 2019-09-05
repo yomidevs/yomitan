@@ -305,14 +305,19 @@ function optionsVersion(options) {
     ];
 
     optionsSetDefaults(options);
-    if (!options.hasOwnProperty('version')) {
-        options.version = fixups.length;
+
+    let version = options.version;
+    if (typeof version !== 'number' || !Number.isFinite(version)) {
+        version = fixups.length;
+    } else {
+        version = Math.max(0, Math.floor(version));
     }
 
-    while (options.version < fixups.length) {
-        fixups[options.version++]();
+    for (; version < fixups.length; ++version) {
+        fixups[version]();
     }
 
+    options.version = version;
     return options;
 }
 
