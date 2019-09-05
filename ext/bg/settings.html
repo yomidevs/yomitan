@@ -49,6 +49,16 @@
             [data-browser=firefox-mobile] [data-show-for-browser~=firefox-mobile] {
                 display: initial;
             }
+
+            @media screen and (max-width: 740px) {
+                .col-xs-6 {
+                    float: none;
+                    width: 100%;
+                }
+                .col-xs-6+.col-xs-6 {
+                    margin-top: 15px;
+                }
+            }
         </style>
     </head>
     <body>
