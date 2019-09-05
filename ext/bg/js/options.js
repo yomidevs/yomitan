@@ -183,8 +183,8 @@ function optionsFieldTemplates() {
 `.trim();
 }
 
-function optionsSetDefaults(options) {
-    const defaults = {
+function optionsCreateDefaults() {
+    return {
         general: {
             enable: true,
             audioSource: 'jpod101',
@@ -238,6 +238,10 @@ function optionsSetDefaults(options) {
             fieldTemplates: optionsFieldTemplates()
         }
     };
+}
+
+function optionsSetDefaults(options) {
+    const defaults = optionsCreateDefaults();
 
     const combine = (target, source) => {
         for (const key in source) {
