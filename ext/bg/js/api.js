@@ -205,3 +205,8 @@ function apiForward(action, params, sender) {
         chrome.tabs.sendMessage(tabId, {action, params}, (response) => resolve(response));
     });
 }
+
+function apiFrameInformationGet(sender) {
+    const frameId = sender.frameId;
+    return Promise.resolve({frameId});
+}

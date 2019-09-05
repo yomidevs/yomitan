@@ -22,6 +22,8 @@ class Backend {
         this.translator = new Translator();
         this.anki = new AnkiNull();
         this.options = null;
+
+        this.apiForwarder = new BackendApiForwarder();
     }
 
     async prepare() {
@@ -125,6 +127,10 @@ class Backend {
 
             forward: ({action, params}) => {
                 forward(apiForward(action, params, sender), callback);
+            },
+
+            frameInformationGet: () => {
+                forward(apiFrameInformationGet(sender), callback);
             }
         };
 

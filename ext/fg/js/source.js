@@ -232,6 +232,50 @@ class TextSourceRange {
         const writingMode = style.writingMode;
         return typeof writingMode === 'string' ? writingMode : 'horizontal-tb';
     }
+
+    static getNodesInRange(range) {
+        const end = range.endContainer;
+        const nodes = [];
+        for (let node = range.startContainer; node !== null; node = TextSourceRange.getNextNode(node)) {
+            nodes.push(node);
+            if (node === end) { break; }
+        }
+        return nodes;
+    }
+
+    static getNextNode(node) {
+        let next = node.firstChild;
+        if (next === null) {
+            while (true) {
+                next = node.nextSibling;
+                if (next !== null) { break; }
+
+                next = node.parentNode;
+                if (node === null) { break; }
+
+                node = next;
+            }
+        }
+        return next;
+    }
+
+    static anyNodeMatchesSelector(nodeList, selector) {
+        for (const node of nodeList) {
+            if (TextSourceRange.nodeMatchesSelector(node, selector)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static nodeMatchesSelector(node, selector) {
+        for (; node !== null; node = node.parentNode) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                return node.matches(selector);
+            }
+        }
+        return false;
+    }
 }
 
 
