@@ -140,16 +140,17 @@ function dictTermsCompressTags(definitions) {
 function dictTermsGroup(definitions, dictionaries) {
     const groups = {};
     for (const definition of definitions) {
-        const key = [definition.source, definition.expression].concat(definition.reasons);
+        const key = [definition.source, definition.expression];
+        key.push(...definition.reasons);
         if (definition.reading) {
             key.push(definition.reading);
         }
 
-        const group = groups[key];
-        if (group) {
-            group.push(definition);
+        const keyString = key.toString();
+        if (groups.hasOwnProperty(keyString)) {
+            groups[keyString].push(definition);
         } else {
-            groups[key] = [definition];
+            groups[keyString] = [definition];
         }
     }
 
