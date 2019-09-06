@@ -323,10 +323,23 @@ function optionsVersion(options) {
 
 function optionsLoad() {
     return new Promise((resolve, reject) => {
-        chrome.storage.local.get(null, store => resolve(store.options));
+        chrome.storage.local.get(['options'], store => {
+            const error = chrome.runtime.lastError;
+            if (error) {
+                reject(error);
+            } else {
+                resolve(store.options);
+            }
+        });
     }).then(optionsStr => {
-        return optionsStr ? JSON.parse(optionsStr) : {};
-    }).catch(error => {
+        if (typeof optionsStr === 'string') {
+            const options = JSON.parse(optionsStr);
+            if (typeof options === 'object' && options !== null && !Array.isArray(options)) {
+                return options;
+            }
+        }
+        return {};
+    }).catch(() => {
         return {};
     }).then(options => {
         return optionsVersion(options);
@@ -334,7 +347,7 @@ function optionsLoad() {
 }
 
 function optionsSave(options) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         chrome.storage.local.set({options: JSON.stringify(options)}, resolve);
     }).then(() => {
         apiOptionsSet(options);
