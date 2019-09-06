@@ -17,6 +17,57 @@
  */
 
 
+function optionsApplyUpdates(options, updates) {
+    const targetVersion = updates.length;
+    const currentVersion = options.version;
+    if (typeof currentVersion === 'number' && Number.isFinite(currentVersion)) {
+        for (let i = Math.max(0, Math.floor(currentVersion)); i < targetVersion; ++i) {
+            const update = updates[i];
+            if (update !== null) {
+                update(options);
+            }
+        }
+    }
+
+    options.version = targetVersion;
+    return options;
+}
+
+const optionsVersionUpdates = [
+    null,
+    null,
+    null,
+    null,
+    (options) => {
+        options.general.audioSource = options.general.audioPlayback ? 'jpod101' : 'disabled';
+    },
+    (options) => {
+        options.general.showGuide = false;
+    },
+    (options) => {
+        options.scanning.modifier = options.scanning.requireShift ? 'shift' : 'none';
+    },
+    (options) => {
+        const fieldTemplatesDefault = profileCreateDefaultFieldTemplates();
+        options.general.resultOutputMode = options.general.groupResults ? 'group' : 'split';
+        options.anki.fieldTemplates = (
+            (utilStringHashCode(options.anki.fieldTemplates) !== -805327496) ?
+            `{{#if merge}}${fieldTemplatesDefault}{{else}}${options.anki.fieldTemplates}{{/if}}` :
+            fieldTemplatesDefault
+        );
+    },
+    (options) => {
+        if (utilStringHashCode(options.anki.fieldTemplates) === 1285806040) {
+            options.anki.fieldTemplates = profileCreateDefaultFieldTemplates();
+        }
+    },
+    (options) => {
+        if (utilStringHashCode(options.anki.fieldTemplates) === -250091611) {
+            options.anki.fieldTemplates = profileCreateDefaultFieldTemplates();
+        }
+    }
+];
+
 function optionsFieldTemplates() {
     return `
 {{#*inline "glossary-single"}}
@@ -262,67 +313,8 @@ function optionsSetDefaults(options) {
 }
 
 function optionsVersion(options) {
-    const fixups = [
-        () => {},
-        () => {},
-        () => {},
-        () => {},
-        () => {
-            if (options.general.audioPlayback) {
-                options.general.audioSource = 'jpod101';
-            } else {
-                options.general.audioSource = 'disabled';
-            }
-        },
-        () => {
-            options.general.showGuide = false;
-        },
-        () => {
-            if (options.scanning.requireShift) {
-                options.scanning.modifier = 'shift';
-            } else {
-                options.scanning.modifier = 'none';
-            }
-        },
-        () => {
-            if (options.general.groupResults) {
-                options.general.resultOutputMode = 'group';
-            } else {
-                options.general.resultOutputMode = 'split';
-            }
-            if (utilStringHashCode(options.anki.fieldTemplates) !== -805327496) {
-                options.anki.fieldTemplates = `{{#if merge}}${optionsFieldTemplates()}{{else}}${options.anki.fieldTemplates}{{/if}}`;
-            } else {
-                options.anki.fieldTemplates = optionsFieldTemplates();
-            }
-        },
-        () => {
-            if (utilStringHashCode(options.anki.fieldTemplates) === 1285806040) {
-                options.anki.fieldTemplates = optionsFieldTemplates();
-            }
-        },
-        () => {
-            if (utilStringHashCode(options.anki.fieldTemplates) === -250091611) {
-                options.anki.fieldTemplates = optionsFieldTemplates();
-            }
-        }
-    ];
-
     optionsSetDefaults(options);
-
-    let version = options.version;
-    if (typeof version !== 'number' || !Number.isFinite(version)) {
-        version = fixups.length;
-    } else {
-        version = Math.max(0, Math.floor(version));
-    }
-
-    for (; version < fixups.length; ++version) {
-        fixups[version]();
-    }
-
-    options.version = version;
-    return options;
+    return optionsApplyUpdates(options, optionsVersionUpdates);
 }
 
 function optionsLoad() {
