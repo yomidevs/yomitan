@@ -152,7 +152,7 @@ function docSentenceExtract(source, extent) {
         if (quoteStack.length > 0 && c === quoteStack[0]) {
             quoteStack.pop();
         } else if (c in quotesBwd) {
-            quoteStack = [quotesBwd[c]].concat(quoteStack);
+            quoteStack.unshift(quotesBwd[c]);
         }
     }
 
@@ -181,7 +181,7 @@ function docSentenceExtract(source, extent) {
         if (quoteStack.length > 0 && c === quoteStack[0]) {
             quoteStack.pop();
         } else if (c in quotesFwd) {
-            quoteStack = [quotesFwd[c]].concat(quoteStack);
+            quoteStack.unshift(quotesFwd[c]);
         }
     }
 

@@ -18,7 +18,13 @@
 
 
 class Popup {
-    constructor() {
+    constructor(id, depth, frameIdPromise) {
+        this.id = id;
+        this.depth = depth;
+        this.frameIdPromise = frameIdPromise;
+        this.frameId = null;
+        this.parent = null;
+        this.child = null;
         this.container = document.createElement('iframe');
         this.container.id = 'yomichan-float';
         this.container.addEventListener('mousedown', e => e.stopPropagation());
@@ -26,26 +32,46 @@ class Popup {
         this.container.setAttribute('src', chrome.extension.getURL('/fg/float.html'));
         this.container.style.width = '0px';
         this.container.style.height = '0px';
-        this.injected = null;
+        this.injectPromise = null;
+        this.isInjected = false;
     }
 
     inject(options) {
-        if (!this.injected) {
-            this.injected = new Promise((resolve, reject) => {
-                this.container.addEventListener('load', () => {
-                    this.invokeApi('setOptions', {
-                        general: {
-                            customPopupCss: options.general.customPopupCss
-                        }
-                    });
-                    resolve();
-                });
-                this.observeFullscreen();
-                this.onFullscreenChanged();
-            });
+        if (this.injectPromise === null) {
+            this.injectPromise = this.createInjectPromise(options);
+        }
+        return this.injectPromise;
+    }
+
+    async createInjectPromise(options) {
+        try {
+            const {frameId} = await this.frameIdPromise;
+            if (typeof frameId === 'number') {
+                this.frameId = frameId;
+            }
+        } catch (e) {
+            // NOP
         }
 
-        return this.injected;
+        return new Promise((resolve) => {
+            const parentFrameId = (typeof this.frameId === 'number' ? this.frameId : null);
+            this.container.addEventListener('load', () => {
+                this.invokeApi('popupNestedInitialize', {
+                    id: this.id,
+                    depth: this.depth,
+                    parentFrameId
+                });
+                this.invokeApi('setOptions', {
+                    general: {
+                        customPopupCss: options.general.customPopupCss
+                    }
+                });
+                resolve();
+            });
+            this.observeFullscreen();
+            this.onFullscreenChanged();
+            this.isInjected = true;
+        });
     }
 
     async show(elementRect, writingMode, options) {
@@ -77,6 +103,8 @@ class Popup {
         container.style.width = `${width}px`;
         container.style.height = `${height}px`;
         container.style.visibility = 'visible';
+
+        this.hideChildren();
     }
 
     static getPositionForHorizontalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral) {
@@ -178,12 +206,28 @@ class Popup {
     }
 
     hide() {
+        this.hideChildren();
+        this.hideContainer();
+        this.focusParent();
+    }
+
+    hideChildren() {
+        // recursively hides all children
+        if (this.child && !this.child.isContainerHidden()) {
+            this.child.hide();
+        }
+    }
+
+    hideContainer() {
         this.container.style.visibility = 'hidden';
-        this.container.blur();
+    }
+
+    isContainerHidden() {
+        return (this.container.style.visibility === 'hidden');
     }
 
     isVisible() {
-        return this.injected && this.container.style.visibility !== 'hidden';
+        return this.isInjected && this.container.style.visibility !== 'hidden';
     }
 
     setVisible(visible) {
@@ -194,19 +238,27 @@ class Popup {
         }
     }
 
-    containsPoint(point) {
-        if (!this.isVisible()) {
-            return false;
+    focusParent() {
+        if (this.parent && this.parent.container) {
+            // Chrome doesn't like focusing iframe without contentWindow.
+            this.parent.container.contentWindow.focus();
+        } else {
+            // Firefox doesn't like focusing window without first blurring the iframe.
+            // this.container.contentWindow.blur() doesn't work on Firefox for some reason.
+            this.container.blur();
+            // This is needed for Chrome.
+            window.focus();
         }
+    }
 
-        const rect = this.container.getBoundingClientRect();
-        const contained =
-            point.x >= rect.left &&
-            point.y >= rect.top &&
-            point.x < rect.right &&
-            point.y < rect.bottom;
-
-        return contained;
+    async containsPoint({x, y}) {
+        for (let popup = this; popup !== null && popup.isVisible(); popup = popup.child) {
+            const rect = popup.container.getBoundingClientRect();
+            if (x >= rect.left && y >= rect.top && x < rect.right && y < rect.bottom) {
+                return true;
+            }
+        }
+        return false;
     }
 
     async termsShow(elementRect, writingMode, definitions, options, context) {
@@ -220,7 +272,7 @@ class Popup {
     }
 
     clearAutoPlayTimer() {
-        if (this.injected) {
+        if (this.isInjected) {
             this.invokeApi('clearAutoPlayTimer');
         }
     }

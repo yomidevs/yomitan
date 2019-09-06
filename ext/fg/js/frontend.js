@@ -18,14 +18,15 @@
 
 
 class Frontend {
-    constructor() {
-        this.popup = new Popup();
+    constructor(popup, ignoreNodes) {
+        this.popup = popup;
         this.popupTimer = null;
         this.mouseDownLeft = false;
         this.mouseDownMiddle = false;
         this.textSourceLast = null;
         this.pendingLookup = false;
         this.options = null;
+        this.ignoreNodes = (Array.isArray(ignoreNodes) && ignoreNodes.length > 0 ? ignoreNodes.join(',') : null);
 
         this.primaryTouchIdentifier = null;
         this.contextMenuChecking = false;
@@ -36,6 +37,17 @@ class Frontend {
         this.scrollPrevent = false;
     }
 
+    static create() {
+        const initializationData = window.frontendInitializationData;
+        const isNested = (initializationData !== null && typeof initializationData === 'object');
+        const {id, parentFrameId, ignoreNodes} = isNested ? initializationData : {};
+
+        const popup = isNested ? new PopupProxy(id, parentFrameId) : PopupProxyHost.instance.createPopup(null);
+        const frontend = new Frontend(popup, ignoreNodes);
+        frontend.prepare();
+        return frontend;
+    }
+
     async prepare() {
         try {
             this.options = await apiOptionsGet();
@@ -44,6 +56,7 @@ class Frontend {
             window.addEventListener('mousedown', this.onMouseDown.bind(this));
             window.addEventListener('mousemove', this.onMouseMove.bind(this));
             window.addEventListener('mouseover', this.onMouseOver.bind(this));
+            window.addEventListener('mouseout', this.onMouseOut.bind(this));
             window.addEventListener('mouseup', this.onMouseUp.bind(this));
             window.addEventListener('resize', this.onResize.bind(this));
 
@@ -135,6 +148,10 @@ class Frontend {
         } else if (e.which === 2) {
             this.mouseDownMiddle = false;
         }
+    }
+
+    onMouseOut(e) {
+        this.popupTimerClear();
     }
 
     onFrameMessage(e) {
@@ -259,9 +276,8 @@ class Frontend {
         const handler = handlers[action];
         if (handler) {
             handler(params);
+            callback();
         }
-
-        callback();
     }
 
     onError(error) {
@@ -281,12 +297,12 @@ class Frontend {
     }
 
     async searchAt(point, type) {
-        if (this.pendingLookup || this.popup.containsPoint(point)) {
+        if (this.pendingLookup || await this.popup.containsPoint(point)) {
             return;
         }
 
         const textSource = docRangeFromPoint(point, this.options);
-        let hideResults = !textSource || !textSource.containsPoint(point);
+        let hideResults = textSource === null;
         let searched = false;
         let success = false;
 
@@ -324,9 +340,14 @@ class Frontend {
     }
 
     async searchTerms(textSource, focus) {
-        textSource.setEndOffset(this.options.scanning.length);
+        this.setTextSourceScanLength(textSource, this.options.scanning.length);
 
-        const {definitions, length} = await apiTermsFind(textSource.text());
+        const searchText = textSource.text();
+        if (searchText.length === 0) {
+            return;
+        }
+
+        const {definitions, length} = await apiTermsFind(searchText);
         if (definitions.length === 0) {
             return false;
         }
@@ -352,9 +373,14 @@ class Frontend {
     }
 
     async searchKanji(textSource, focus) {
-        textSource.setEndOffset(1);
+        this.setTextSourceScanLength(textSource, 1);
 
-        const definitions = await apiKanjiFind(textSource.text());
+        const searchText = textSource.text();
+        if (searchText.length === 0) {
+            return;
+        }
+
+        const definitions = await apiKanjiFind(searchText);
         if (definitions.length === 0) {
             return false;
         }
@@ -480,7 +506,23 @@ class Frontend {
         }
         return false;
     }
+
+    setTextSourceScanLength(textSource, length) {
+        textSource.setEndOffset(length);
+        if (this.ignoreNodes === null || !textSource.range) {
+            return;
+        }
+
+        length = textSource.text().length;
+        while (textSource.range && length > 0) {
+            const nodes = TextSourceRange.getNodesInRange(textSource.range);
+            if (!TextSourceRange.anyNodeMatchesSelector(nodes, this.ignoreNodes)) {
+                break;
+            }
+            --length;
+            textSource.setEndOffset(length);
+        }
+    }
 }
 
-window.yomichan_frontend = new Frontend();
-window.yomichan_frontend.prepare();
+window.yomichan_frontend = Frontend.create();

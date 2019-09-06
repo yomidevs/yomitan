@@ -72,6 +72,10 @@ class DisplayFloat extends Display {
                 if (css) {
                     this.setStyle(css);
                 }
+            },
+
+            popupNestedInitialize: ({id, depth, parentFrameId}) => {
+                popupNestedInitialize(id, depth, parentFrameId);
             }
         };
 

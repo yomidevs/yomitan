@@ -193,6 +193,14 @@
                 </div>
 
                 <div class="checkbox options-advanced">
+                    <label><input type="checkbox" id="enable-scanning-of-popup-expressions"> Enable scanning of popup expressions</label>
+                </div>
+
+                <div class="checkbox">
+                    <label><input type="checkbox" id="enable-scanning-on-search-page"> Enable scanning on search page</label>
+                </div>
+
+                <div class="checkbox options-advanced">
                     <label><input type="checkbox" id="deep-dom-scan"> Deep DOM scan</label>
                 </div>
 
@@ -214,6 +222,11 @@
                         <option value="ctrl">Ctrl</option>
                         <option value="shift">Shift</option>
                     </select>
+                </div>
+
+                <div class="form-group options-advanced">
+                    <label for="popup-nesting-max-depth">Maximum nested popup depth</label>
+                    <input type="number" min="0" id="popup-nesting-max-depth" class="form-control">
                 </div>
             </div>
 

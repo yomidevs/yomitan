@@ -186,7 +186,7 @@ class Translator {
         let deinflections = await this.findTermDeinflections(text, titles, cache);
         const textHiragana = jpKatakanaToHiragana(text);
         if (text !== textHiragana) {
-            deinflections = deinflections.concat(await this.findTermDeinflections(textHiragana, titles, cache));
+            deinflections.push(...await this.findTermDeinflections(textHiragana, titles, cache));
         }
 
         let definitions = [];
@@ -235,7 +235,7 @@ class Translator {
         let deinflections = [];
         for (let i = text.length; i > 0; --i) {
             const textSlice = text.slice(0, i);
-            deinflections = deinflections.concat(await this.deinflector.deinflect(textSlice, definer));
+            deinflections.push(...await this.deinflector.deinflect(textSlice, definer));
         }
 
         return deinflections;
@@ -247,7 +247,7 @@ class Translator {
         const titles = Object.keys(dictionaries);
         for (const c of text) {
             if (!processed[c]) {
-                definitions = definitions.concat(await this.database.findKanji(c, titles));
+                definitions.push(...await this.database.findKanji(c, titles));
                 processed[c] = true;
             }
         }
@@ -277,7 +277,7 @@ class Translator {
     async buildTermFrequencies(definition, titles) {
         let terms = [];
         if (definition.expressions) {
-            terms = terms.concat(definition.expressions);
+            terms.push(...definition.expressions);
         } else {
             terms.push(definition);
         }
@@ -299,7 +299,7 @@ class Translator {
     async expandTags(names, title) {
         const tags = [];
         for (const name of names) {
-            const base = name.split(':')[0];
+            const base = Translator.getNameBase(name);
             const meta = await this.database.findTagForTitle(base, title);
 
             const tag = {name};
@@ -318,7 +318,7 @@ class Translator {
     async expandStats(items, title) {
         const stats = {};
         for (const name in items) {
-            const base = name.split(':')[0];
+            const base = Translator.getNameBase(name);
             const meta = await this.database.findTagForTitle(base, title);
             const group = stats[meta.category] = stats[meta.category] || [];
 
@@ -345,5 +345,10 @@ class Translator {
         }
 
         return stats;
+    }
+
+    static getNameBase(name) {
+        const pos = name.indexOf(':');
+        return (pos >= 0 ? name.substr(0, pos) : name);
     }
 }
