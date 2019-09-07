@@ -40,9 +40,9 @@ class Frontend {
     static create() {
         const initializationData = window.frontendInitializationData;
         const isNested = (initializationData !== null && typeof initializationData === 'object');
-        const {id, parentFrameId, ignoreNodes} = isNested ? initializationData : {};
+        const {id, depth, parentFrameId, ignoreNodes} = isNested ? initializationData : {};
 
-        const popup = isNested ? new PopupProxy(id, parentFrameId) : PopupProxyHost.instance.createPopup(null);
+        const popup = isNested ? new PopupProxy(depth + 1, id, parentFrameId) : PopupProxyHost.instance.createPopup(null);
         const frontend = new Frontend(popup, ignoreNodes);
         frontend.prepare();
         return frontend;
