@@ -38,7 +38,8 @@ async function apiTermsFind(text) {
     const {definitions, length} = await searcher(
         text,
         dictEnabledSet(options),
-        options.scanning.alphanumeric
+        options.scanning.alphanumeric,
+        options
     );
 
     return {
