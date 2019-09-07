@@ -150,6 +150,13 @@ class Backend {
         this.anki = options.anki.enable ? new AnkiConnect(options.anki.server) : new AnkiNull();
     }
 
+    async getFullOptions() {
+        if (this.isPreparedPromise !== null) {
+            await this.isPreparedPromise;
+        }
+        return this.options;
+    }
+
     async getOptions(optionsContext) {
         if (this.isPreparedPromise !== null) {
             await this.isPreparedPromise;

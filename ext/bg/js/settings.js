@@ -148,7 +148,7 @@ async function onFormOptionsChanged(e) {
     const optionsAnkiServerOld = options.anki.server;
 
     await formRead(options);
-    await optionsSave(options);
+    await apiOptionsSave();
     formUpdateVisibility(options);
 
     try {
@@ -385,7 +385,7 @@ async function onDictionaryPurge(e) {
         const options = await apiOptionsGet(optionsContext);
         options.dictionaries = {};
         options.general.mainDictionary = '';
-        await optionsSave(options);
+        await apiOptionsSave();
 
         await dictionaryGroupsPopulate(options);
         await formMainDictionaryOptionsPopulate(options);
@@ -435,7 +435,7 @@ async function onDictionaryImport(e) {
             dictionaryErrorsShow(exceptions);
         }
 
-        await optionsSave(options);
+        await apiOptionsSave();
 
         await dictionaryGroupsPopulate(options);
         await formMainDictionaryOptionsPopulate(options);
@@ -579,7 +579,7 @@ async function onAnkiModelChanged(e) {
         const options = await apiOptionsGet(optionsContext);
         await formRead(options);
         options.anki[tabId].fields = {};
-        await optionsSave(options);
+        await apiOptionsSave();
 
         ankiSpinnerShow(true);
         await ankiFieldsPopulate(element, options);
@@ -599,7 +599,7 @@ async function onAnkiFieldTemplatesReset(e) {
         const fieldTemplates = optionsFieldTemplates();
         options.anki.fieldTemplates = fieldTemplates;
         $('#field-templates').val(fieldTemplates);
-        await optionsSave(options);
+        await apiOptionsSave();
     } catch (e) {
         ankiErrorShow(e);
     }

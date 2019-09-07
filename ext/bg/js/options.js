@@ -343,9 +343,14 @@ function optionsLoad() {
 }
 
 function optionsSave(options) {
-    return new Promise((resolve) => {
-        chrome.storage.local.set({options: JSON.stringify(options)}, resolve);
-    }).then(() => {
-        utilBackend().onOptionsUpdated(options);
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.set({options: JSON.stringify(options)}, () => {
+            const error = chrome.runtime.lastError;
+            if (error) {
+                reject(error);
+            } else {
+                resolve();
+            }
+        });
     });
 }

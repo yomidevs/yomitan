@@ -21,6 +21,13 @@ function apiOptionsGet(optionsContext) {
     return utilBackend().getOptions(optionsContext);
 }
 
+async function apiOptionsSave() {
+    const backend = utilBackend();
+    const options = await backend.getFullOptions();
+    await optionsSave(options);
+    backend.onOptionsUpdated(options);
+}
+
 async function apiTermsFind(text, optionsContext) {
     const options = await apiOptionsGet(optionsContext);
     const translator = utilBackend().translator;
@@ -132,7 +139,7 @@ async function apiCommandExec(command) {
             const optionsContext = {depth: 0};
             const options = await apiOptionsGet(optionsContext);
             options.general.enable = !options.general.enable;
-            await optionsSave(options);
+            await apiOptionsSave();
         }
     };
 
