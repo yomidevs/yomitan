@@ -17,10 +17,6 @@
  */
 
 
-async function apiOptionsSet(options) {
-    utilBackend().onOptionsUpdated(options);
-}
-
 function apiOptionsGetSync() {
     return utilBackend().options;
 }

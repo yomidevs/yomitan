@@ -346,6 +346,6 @@ function optionsSave(options) {
     return new Promise((resolve) => {
         chrome.storage.local.set({options: JSON.stringify(options)}, resolve);
     }).then(() => {
-        apiOptionsSet(options);
+        utilBackend().onOptionsUpdated(options);
     });
 }

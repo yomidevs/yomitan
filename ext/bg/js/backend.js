@@ -28,7 +28,7 @@ class Backend {
 
     async prepare() {
         await this.translator.prepare();
-        await apiOptionsSet(await optionsLoad());
+        this.onOptionsUpdated(await optionsLoad());
 
         if (chrome.commands !== null && typeof chrome.commands === 'object') {
             chrome.commands.onCommand.addListener(this.onCommand.bind(this));
@@ -41,7 +41,8 @@ class Backend {
     }
 
     onOptionsUpdated(options) {
-        this.options = utilIsolate(options);
+        options = utilIsolate(options);
+        this.options = options;
 
         if (!options.general.enable) {
             this.setExtensionBadgeBackgroundColor('#555555');
@@ -53,11 +54,7 @@ class Backend {
             this.setExtensionBadgeText('');
         }
 
-        if (options.anki.enable) {
-            this.anki = new AnkiConnect(options.anki.server);
-        } else {
-            this.anki = new AnkiNull();
-        }
+        this.anki = options.anki.enable ? new AnkiConnect(options.anki.server) : new AnkiNull();
 
         const callback = () => this.checkLastError(chrome.runtime.lastError);
         chrome.tabs.query({}, tabs => {
@@ -144,7 +141,7 @@ class Backend {
             chrome.browserAction.setBadgeBackgroundColor({color});
         }
     }
-    
+
     setExtensionBadgeText(text) {
         if (typeof chrome.browserAction.setBadgeText === 'function') {
             chrome.browserAction.setBadgeText({text});
