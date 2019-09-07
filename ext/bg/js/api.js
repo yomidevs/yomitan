@@ -138,7 +138,6 @@ async function apiCommandExec(command) {
             const options = apiOptionsGetSync();
             options.general.enable = !options.general.enable;
             await optionsSave(options);
-            await apiOptionsSet(options);
         }
     };
 

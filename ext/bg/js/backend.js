@@ -85,10 +85,6 @@ class Backend {
                 forward(apiOptionsGet(), callback);
             },
 
-            optionsSet: ({options, callback}) => {
-                forward(apiOptionsSet(options), callback);
-            },
-
             kanjiFind: ({text, callback}) => {
                 forward(apiKanjiFind(text), callback);
             },

@@ -17,10 +17,6 @@
  */
 
 
-function apiOptionsSet(options) {
-    return utilInvoke('optionsSet', {options});
-}
-
 function apiOptionsGet() {
     return utilInvoke('optionsGet');
 }
