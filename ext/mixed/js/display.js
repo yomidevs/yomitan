@@ -27,6 +27,7 @@ class Display {
         this.sequence = 0;
         this.index = 0;
         this.audioCache = {};
+        this.optionsContext = {};
 
         this.dependencies = {};
 
@@ -66,7 +67,7 @@ class Display {
                 context.source.source = this.context.source;
             }
 
-            const kanjiDefs = await apiKanjiFind(link.text());
+            const kanjiDefs = await apiKanjiFind(link.text(), this.optionsContext);
             this.kanjiShow(kanjiDefs, this.options, context);
         } catch (e) {
             this.onError(e);
@@ -89,7 +90,7 @@ class Display {
             try {
                 textSource.setEndOffset(this.options.scanning.length);
 
-                ({definitions, length} = await apiTermsFind(textSource.text()));
+                ({definitions, length} = await apiTermsFind(textSource.text(), this.optionsContext));
                 if (definitions.length === 0) {
                     return false;
                 }
@@ -379,7 +380,7 @@ class Display {
 
     async adderButtonUpdate(modes, sequence) {
         try {
-            const states = await apiDefinitionsAddable(this.definitions, modes);
+            const states = await apiDefinitionsAddable(this.definitions, modes, this.optionsContext);
             if (!states || sequence !== this.sequence) {
                 return;
             }
@@ -453,7 +454,7 @@ class Display {
                 }
             }
 
-            const noteId = await apiDefinitionAdd(definition, mode, context);
+            const noteId = await apiDefinitionAdd(definition, mode, context, this.optionsContext);
             if (noteId) {
                 const index = this.definitions.indexOf(definition);
                 Display.adderButtonFind(index, mode).addClass('disabled');

@@ -17,16 +17,16 @@
  */
 
 
-function apiOptionsGetSync() {
+function apiOptionsGetSync(optionsContext) {
     return utilBackend().options;
 }
 
-async function apiOptionsGet() {
-    return apiOptionsGetSync();
+async function apiOptionsGet(optionsContext) {
+    return apiOptionsGetSync(optionsContext);
 }
 
-async function apiTermsFind(text) {
-    const options = apiOptionsGetSync();
+async function apiTermsFind(text, optionsContext) {
+    const options = apiOptionsGetSync(optionsContext);
     const translator = utilBackend().translator;
 
     const searcher = {
@@ -48,14 +48,14 @@ async function apiTermsFind(text) {
     };
 }
 
-async function apiKanjiFind(text) {
-    const options = apiOptionsGetSync();
+async function apiKanjiFind(text, optionsContext) {
+    const options = apiOptionsGetSync(optionsContext);
     const definitions = await utilBackend().translator.findKanji(text, dictEnabledSet(options));
     return definitions.slice(0, options.general.maxResults);
 }
 
-async function apiDefinitionAdd(definition, mode, context) {
-    const options = apiOptionsGetSync();
+async function apiDefinitionAdd(definition, mode, context, optionsContext) {
+    const options = apiOptionsGetSync(optionsContext);
 
     if (mode !== 'kanji') {
         await audioInject(
@@ -77,14 +77,15 @@ async function apiDefinitionAdd(definition, mode, context) {
     return utilBackend().anki.addNote(note);
 }
 
-async function apiDefinitionsAddable(definitions, modes) {
+async function apiDefinitionsAddable(definitions, modes, optionsContext) {
+    const options = apiOptionsGetSync(optionsContext);
     const states = [];
 
     try {
         const notes = [];
         for (const definition of definitions) {
             for (const mode of modes) {
-                const note = await dictNoteFormat(definition, mode, apiOptionsGetSync());
+                const note = await dictNoteFormat(definition, mode, options);
                 notes.push(note);
             }
         }
@@ -132,7 +133,8 @@ async function apiCommandExec(command) {
         },
 
         toggle: async () => {
-            const options = apiOptionsGetSync();
+            const optionsContext = {depth: 0};
+            const options = apiOptionsGetSync(optionsContext);
             options.general.enable = !options.general.enable;
             await optionsSave(options);
         }

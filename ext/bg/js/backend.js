@@ -78,24 +78,24 @@ class Backend {
         };
 
         const handlers = {
-            optionsGet: ({callback}) => {
-                forward(apiOptionsGet(), callback);
+            optionsGet: ({optionsContext, callback}) => {
+                forward(apiOptionsGet(optionsContext), callback);
             },
 
-            kanjiFind: ({text, callback}) => {
-                forward(apiKanjiFind(text), callback);
+            kanjiFind: ({text, optionsContext, callback}) => {
+                forward(apiKanjiFind(text, optionsContext), callback);
             },
 
-            termsFind: ({text, callback}) => {
-                forward(apiTermsFind(text), callback);
+            termsFind: ({text, optionsContext, callback}) => {
+                forward(apiTermsFind(text, optionsContext), callback);
             },
 
-            definitionAdd: ({definition, mode, context, callback}) => {
-                forward(apiDefinitionAdd(definition, mode, context), callback);
+            definitionAdd: ({definition, mode, context, optionsContext, callback}) => {
+                forward(apiDefinitionAdd(definition, mode, context, optionsContext), callback);
             },
 
-            definitionsAddable: ({definitions, modes, callback}) => {
-                forward(apiDefinitionsAddable(definitions, modes), callback);
+            definitionsAddable: ({definitions, modes, optionsContext, callback}) => {
+                forward(apiDefinitionsAddable(definitions, modes, optionsContext), callback);
             },
 
             noteView: ({noteId}) => {

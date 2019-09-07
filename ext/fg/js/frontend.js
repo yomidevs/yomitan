@@ -28,6 +28,10 @@ class Frontend {
         this.options = null;
         this.ignoreNodes = (Array.isArray(ignoreNodes) && ignoreNodes.length > 0 ? ignoreNodes.join(',') : null);
 
+        this.optionsContext = {
+            depth: popup.depth
+        };
+
         this.primaryTouchIdentifier = null;
         this.contextMenuChecking = false;
         this.contextMenuPrevent = false;
@@ -50,7 +54,7 @@ class Frontend {
 
     async prepare() {
         try {
-            this.options = await apiOptionsGet();
+            this.options = await apiOptionsGet(this.optionsContext);
 
             window.addEventListener('message', this.onFrameMessage.bind(this));
             window.addEventListener('mousedown', this.onMouseDown.bind(this));
@@ -282,7 +286,7 @@ class Frontend {
     }
 
     async updateOptions() {
-        this.options = await apiOptionsGet();
+        this.options = await apiOptionsGet(this.optionsContext);
         if (!this.options.enable) {
             this.searchClear();
         }
@@ -351,7 +355,7 @@ class Frontend {
             return;
         }
 
-        const {definitions, length} = await apiTermsFind(searchText);
+        const {definitions, length} = await apiTermsFind(searchText, this.optionsContext);
         if (definitions.length === 0) {
             return false;
         }
@@ -384,7 +388,7 @@ class Frontend {
             return;
         }
 
-        const definitions = await apiKanjiFind(searchText);
+        const definitions = await apiKanjiFind(searchText, this.optionsContext);
         if (definitions.length === 0) {
             return false;
         }
