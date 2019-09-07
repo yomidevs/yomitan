@@ -330,7 +330,7 @@ function optionsLoad() {
     }).then(optionsStr => {
         if (typeof optionsStr === 'string') {
             const options = JSON.parse(optionsStr);
-            if (typeof options === 'object' && options !== null && !Array.isArray(options)) {
+            if (utilIsObject(options)) {
                 return options;
             }
         }
