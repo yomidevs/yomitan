@@ -18,7 +18,7 @@
 
 
 function apiOptionsGetSync(optionsContext) {
-    return utilBackend().options;
+    return utilBackend().getOptions(optionsContext);
 }
 
 async function apiOptionsGet(optionsContext) {

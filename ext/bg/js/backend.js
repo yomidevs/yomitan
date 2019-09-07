@@ -22,6 +22,9 @@ class Backend {
         this.translator = new Translator();
         this.anki = new AnkiNull();
         this.options = null;
+        this.optionsContext = {
+            depth: 0
+        };
 
         this.apiForwarder = new BackendApiForwarder();
     }
@@ -35,26 +38,15 @@ class Backend {
         }
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
 
-        if (this.options.general.showGuide) {
+        const options = this.getOptions(this.optionsContext);
+        if (options.general.showGuide) {
             chrome.tabs.create({url: chrome.extension.getURL('/bg/guide.html')});
         }
     }
 
     onOptionsUpdated(options) {
-        options = utilIsolate(options);
-        this.options = options;
-
-        if (!options.general.enable) {
-            this.setExtensionBadgeBackgroundColor('#555555');
-            this.setExtensionBadgeText('off');
-        } else if (!dictConfigured(options)) {
-            this.setExtensionBadgeBackgroundColor('#f0ad4e');
-            this.setExtensionBadgeText('!');
-        } else {
-            this.setExtensionBadgeText('');
-        }
-
-        this.anki = options.anki.enable ? new AnkiConnect(options.anki.server) : new AnkiNull();
+        this.options = utilIsolate(options);
+        this.applyOptions();
 
         const callback = () => this.checkLastError(chrome.runtime.lastError);
         chrome.tabs.query({}, tabs => {
@@ -134,6 +126,25 @@ class Backend {
         }
 
         return true;
+    }
+
+    applyOptions() {
+        const options = this.getOptions(this.optionsContext);
+        if (!options.general.enable) {
+            this.setExtensionBadgeBackgroundColor('#555555');
+            this.setExtensionBadgeText('off');
+        } else if (!dictConfigured(options)) {
+            this.setExtensionBadgeBackgroundColor('#f0ad4e');
+            this.setExtensionBadgeText('!');
+        } else {
+            this.setExtensionBadgeText('');
+        }
+
+        this.anki = options.anki.enable ? new AnkiConnect(options.anki.server) : new AnkiNull();
+    }
+
+    getOptions(optionsContext) {
+        return this.options;
     }
 
     setExtensionBadgeBackgroundColor(color) {
