@@ -26,6 +26,9 @@ class Backend {
             depth: 0
         };
 
+        this.isPreparedResolve = null;
+        this.isPreparedPromise = new Promise((resolve) => (this.isPreparedResolve = resolve));
+
         this.apiForwarder = new BackendApiForwarder();
     }
 
@@ -38,10 +41,14 @@ class Backend {
         }
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
 
-        const options = this.getOptions(this.optionsContext);
+        const options = this.getOptionsSync(this.optionsContext);
         if (options.general.showGuide) {
             chrome.tabs.create({url: chrome.extension.getURL('/bg/guide.html')});
         }
+
+        this.isPreparedResolve();
+        this.isPreparedResolve = null;
+        this.isPreparedPromise = null;
     }
 
     onOptionsUpdated(options) {
@@ -129,7 +136,7 @@ class Backend {
     }
 
     applyOptions() {
-        const options = this.getOptions(this.optionsContext);
+        const options = this.getOptionsSync(this.optionsContext);
         if (!options.general.enable) {
             this.setExtensionBadgeBackgroundColor('#555555');
             this.setExtensionBadgeText('off');
@@ -143,7 +150,14 @@ class Backend {
         this.anki = options.anki.enable ? new AnkiConnect(options.anki.server) : new AnkiNull();
     }
 
-    getOptions(optionsContext) {
+    async getOptions(optionsContext) {
+        if (this.isPreparedPromise !== null) {
+            await this.isPreparedPromise;
+        }
+        return this.getOptionsSync(optionsContext);
+    }
+
+    getOptionsSync(optionsContext) {
         return this.options;
     }
 
