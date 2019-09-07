@@ -16,6 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+function getOptionsContext() {
+    return {
+        depth: 0
+    };
+}
 
 async function formRead(options) {
     options.general.showGuide = $('#show-usage-guide').prop('checked');
@@ -137,7 +142,8 @@ async function onFormOptionsChanged(e) {
         return;
     }
 
-    const options = await optionsLoad();
+    const optionsContext = getOptionsContext();
+    const options = await apiOptionsGet(optionsContext);
     const optionsAnkiEnableOld = options.anki.enable;
     const optionsAnkiServerOld = options.anki.server;
 
@@ -163,7 +169,8 @@ async function onFormOptionsChanged(e) {
 }
 
 async function onReady() {
-    const options = await optionsLoad();
+    const optionsContext = getOptionsContext();
+    const options = await apiOptionsGet(optionsContext);
 
     $('#show-usage-guide').prop('checked', options.general.showGuide);
     $('#compact-tags').prop('checked', options.general.compactTags);
@@ -374,7 +381,8 @@ async function onDictionaryPurge(e) {
         dictionarySpinnerShow(true);
 
         await utilDatabasePurge();
-        const options = await optionsLoad();
+        const optionsContext = getOptionsContext();
+        const options = await apiOptionsGet(optionsContext);
         options.dictionaries = {};
         options.general.mainDictionary = '';
         await optionsSave(options);
@@ -414,8 +422,9 @@ async function onDictionaryImport(e) {
         setProgress(0.0);
 
         const exceptions = [];
-        const options = await optionsLoad();
         const summary = await utilDatabaseImport(e.target.files[0], updateProgress, exceptions);
+        const optionsContext = getOptionsContext();
+        const options = await apiOptionsGet(optionsContext);
         options.dictionaries[summary.title] = {enabled: true, priority: 0, allowSecondarySearches: false};
         if (summary.sequenced && options.general.mainDictionary === '') {
             options.general.mainDictionary = summary.title;
@@ -566,7 +575,8 @@ async function onAnkiModelChanged(e) {
         const tab = element.closest('.tab-pane');
         const tabId = tab.attr('id');
 
-        const options = await optionsLoad();
+        const optionsContext = getOptionsContext();
+        const options = await apiOptionsGet(optionsContext);
         await formRead(options);
         options.anki[tabId].fields = {};
         await optionsSave(options);
@@ -584,8 +594,11 @@ async function onAnkiModelChanged(e) {
 async function onAnkiFieldTemplatesReset(e) {
     try {
         e.preventDefault();
-        const options = await optionsLoad();
-        $('#field-templates').val(options.anki.fieldTemplates = optionsFieldTemplates());
+        const optionsContext = getOptionsContext();
+        const options = await apiOptionsGet(optionsContext);
+        const fieldTemplates = optionsFieldTemplates();
+        options.anki.fieldTemplates = fieldTemplates;
+        $('#field-templates').val(fieldTemplates);
         await optionsSave(options);
     } catch (e) {
         ankiErrorShow(e);
