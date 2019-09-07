@@ -21,12 +21,16 @@ async function apiOptionsSet(options) {
     utilBackend().onOptionsUpdated(options);
 }
 
-async function apiOptionsGet() {
+function apiOptionsGetSync() {
     return utilBackend().options;
 }
 
+async function apiOptionsGet() {
+    return apiOptionsGetSync();
+}
+
 async function apiTermsFind(text) {
-    const options = utilBackend().options;
+    const options = apiOptionsGetSync();
     const translator = utilBackend().translator;
 
     const searcher = {
@@ -48,13 +52,13 @@ async function apiTermsFind(text) {
 }
 
 async function apiKanjiFind(text) {
-    const options = utilBackend().options;
+    const options = apiOptionsGetSync();
     const definitions = await utilBackend().translator.findKanji(text, dictEnabledSet(options));
     return definitions.slice(0, options.general.maxResults);
 }
 
 async function apiDefinitionAdd(definition, mode, context) {
-    const options = utilBackend().options;
+    const options = apiOptionsGetSync();
 
     if (mode !== 'kanji') {
         await audioInject(
@@ -83,7 +87,7 @@ async function apiDefinitionsAddable(definitions, modes) {
         const notes = [];
         for (const definition of definitions) {
             for (const mode of modes) {
-                const note = await dictNoteFormat(definition, mode, utilBackend().options);
+                const note = await dictNoteFormat(definition, mode, apiOptionsGetSync());
                 notes.push(note);
             }
         }
@@ -131,7 +135,7 @@ async function apiCommandExec(command) {
         },
 
         toggle: async () => {
-            const options = utilBackend().options;
+            const options = apiOptionsGetSync();
             options.general.enable = !options.general.enable;
             await optionsSave(options);
             await apiOptionsSet(options);
