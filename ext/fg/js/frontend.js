@@ -261,7 +261,7 @@ class Frontend {
 
     onBgMessage({action, params}, sender, callback) {
         const handlers = {
-            optionsSet: options => {
+            optionsSet: ({options}) => {
                 this.options = options;
                 if (!this.options.enable) {
                     this.searchClear();
