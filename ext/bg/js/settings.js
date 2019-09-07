@@ -643,7 +643,7 @@ async function onAnkiFieldTemplatesReset(e) {
         e.preventDefault();
         const optionsContext = getOptionsContext();
         const options = await apiOptionsGet(optionsContext);
-        const fieldTemplates = optionsFieldTemplates();
+        const fieldTemplates = profileOptionsGetDefaultFieldTemplates();
         options.anki.fieldTemplates = fieldTemplates;
         $('#field-templates').val(fieldTemplates);
         await settingsSaveOptions();

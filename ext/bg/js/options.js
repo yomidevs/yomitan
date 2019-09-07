@@ -17,7 +17,11 @@
  */
 
 
-function optionsApplyUpdates(options, updates) {
+/*
+ * Generic options functions
+ */
+
+function optionsGenericApplyUpdates(options, updates) {
     const targetVersion = updates.length;
     const currentVersion = options.version;
     if (typeof currentVersion === 'number' && Number.isFinite(currentVersion)) {
@@ -33,7 +37,12 @@ function optionsApplyUpdates(options, updates) {
     return options;
 }
 
-const optionsVersionUpdates = [
+
+/*
+ * Per-profile options
+ */
+
+const profileOptionsVersionUpdates = [
     null,
     null,
     null,
@@ -48,7 +57,7 @@ const optionsVersionUpdates = [
         options.scanning.modifier = options.scanning.requireShift ? 'shift' : 'none';
     },
     (options) => {
-        const fieldTemplatesDefault = optionsFieldTemplates();
+        const fieldTemplatesDefault = profileOptionsGetDefaultFieldTemplates();
         options.general.resultOutputMode = options.general.groupResults ? 'group' : 'split';
         options.anki.fieldTemplates = (
             (utilStringHashCode(options.anki.fieldTemplates) !== -805327496) ?
@@ -58,17 +67,17 @@ const optionsVersionUpdates = [
     },
     (options) => {
         if (utilStringHashCode(options.anki.fieldTemplates) === 1285806040) {
-            options.anki.fieldTemplates = optionsFieldTemplates();
+            options.anki.fieldTemplates = profileOptionsGetDefaultFieldTemplates();
         }
     },
     (options) => {
         if (utilStringHashCode(options.anki.fieldTemplates) === -250091611) {
-            options.anki.fieldTemplates = optionsFieldTemplates();
+            options.anki.fieldTemplates = profileOptionsGetDefaultFieldTemplates();
         }
     }
 ];
 
-function optionsFieldTemplates() {
+function profileOptionsGetDefaultFieldTemplates() {
     return `
 {{#*inline "glossary-single"}}
     {{~#unless brief~}}
@@ -234,7 +243,7 @@ function optionsFieldTemplates() {
 `.trim();
 }
 
-function optionsCreateDefaults() {
+function profileOptionsCreateDefaults() {
     return {
         general: {
             enable: true,
@@ -286,13 +295,13 @@ function optionsCreateDefaults() {
             screenshot: {format: 'png', quality: 92},
             terms: {deck: '', model: '', fields: {}},
             kanji: {deck: '', model: '', fields: {}},
-            fieldTemplates: optionsFieldTemplates()
+            fieldTemplates: profileOptionsGetDefaultFieldTemplates()
         }
     };
 }
 
-function optionsSetDefaults(options) {
-    const defaults = optionsCreateDefaults();
+function profileOptionsSetDefaults(options) {
+    const defaults = profileOptionsCreateDefaults();
 
     const combine = (target, source) => {
         for (const key in source) {
@@ -312,9 +321,59 @@ function optionsSetDefaults(options) {
     return options;
 }
 
-function optionsVersion(options) {
-    optionsSetDefaults(options);
-    return optionsApplyUpdates(options, optionsVersionUpdates);
+function profileOptionsUpdateVersion(options) {
+    profileOptionsSetDefaults(options);
+    return optionsGenericApplyUpdates(options, profileOptionsVersionUpdates);
+}
+
+
+/*
+ * Global options
+ */
+
+const optionsVersionUpdates = [];
+
+function optionsUpdateVersion(options, defaultProfileOptions) {
+    // Ensure profiles is an array
+    if (!Array.isArray(options.profiles)) {
+        options.profiles = [];
+    }
+
+    // Remove invalid
+    const profiles = options.profiles;
+    for (let i = profiles.length - 1; i >= 0; --i) {
+        if (!utilIsObject(profiles[i])) {
+            profiles.splice(i, 1);
+        }
+    }
+
+    // Require at least one profile
+    if (profiles.length === 0) {
+        profiles.push({
+            name: 'Default',
+            options: defaultProfileOptions
+        });
+    }
+
+    // Ensure profileCurrent is valid
+    const profileCurrent = options.profileCurrent;
+    if (!(
+        typeof profileCurrent === 'number' &&
+        Number.isFinite(profileCurrent) &&
+        Math.floor(profileCurrent) === profileCurrent &&
+        profileCurrent >= 0 &&
+        profileCurrent < profiles.length
+    )) {
+        options.profileCurrent = 0;
+    }
+
+    // Update profile options
+    for (const profile of profiles) {
+        profile.options = profileOptionsUpdateVersion(profile.options);
+    }
+
+    // Generic updates
+    return optionsGenericApplyUpdates(options, optionsVersionUpdates);
 }
 
 function optionsLoad() {
@@ -338,7 +397,11 @@ function optionsLoad() {
     }).catch(() => {
         return {};
     }).then(options => {
-        return optionsVersion(options);
+        return (
+            Array.isArray(options.profiles) ?
+            optionsUpdateVersion(options, {}) :
+            optionsUpdateVersion({}, options)
+        );
     });
 }
 

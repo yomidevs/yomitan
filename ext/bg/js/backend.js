@@ -165,7 +165,15 @@ class Backend {
     }
 
     getOptionsSync(optionsContext) {
-        return this.options;
+        return this.getProfileSync(optionsContext).options;
+    }
+
+    getProfileSync(optionsContext) {
+        const profiles = this.options.profiles;
+        if (typeof optionsContext.index === 'number') {
+            return profiles[optionsContext.index];
+        }
+        return this.options.profiles[this.options.profileCurrent];
     }
 
     setExtensionBadgeBackgroundColor(color) {
