@@ -261,11 +261,8 @@ class Frontend {
 
     onBgMessage({action, params}, sender, callback) {
         const handlers = {
-            optionsSet: ({options}) => {
-                this.options = options;
-                if (!this.options.enable) {
-                    this.searchClear();
-                }
+            optionsUpdate: () => {
+                this.updateOptions();
             },
 
             popupSetVisible: ({visible}) => {
@@ -282,6 +279,13 @@ class Frontend {
 
     onError(error) {
         console.log(error);
+    }
+
+    async updateOptions() {
+        this.options = await apiOptionsGet();
+        if (!this.options.enable) {
+            this.searchClear();
+        }
     }
 
     popupTimerSet(callback) {

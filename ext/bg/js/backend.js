@@ -59,7 +59,7 @@ class Backend {
         const callback = () => this.checkLastError(chrome.runtime.lastError);
         chrome.tabs.query({}, tabs => {
             for (const tab of tabs) {
-                chrome.tabs.sendMessage(tab.id, {action: 'optionsSet', params: {options}}, callback);
+                chrome.tabs.sendMessage(tab.id, {action: 'optionsUpdate', params: {}}, callback);
             }
         });
     }
