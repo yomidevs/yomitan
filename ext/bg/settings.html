@@ -222,14 +222,6 @@
                 </div>
 
                 <div class="checkbox options-advanced">
-                    <label><input type="checkbox" id="enable-scanning-of-popup-expressions"> Enable scanning of popup expressions</label>
-                </div>
-
-                <div class="checkbox">
-                    <label><input type="checkbox" id="enable-scanning-on-search-page"> Enable scanning on search page</label>
-                </div>
-
-                <div class="checkbox options-advanced">
                     <label><input type="checkbox" id="deep-dom-scan"> Deep DOM scan</label>
                 </div>
 
@@ -252,9 +244,26 @@
                         <option value="shift">Shift</option>
                     </select>
                 </div>
+            </div>
 
-                <div class="form-group options-advanced">
-                    <label for="popup-nesting-max-depth">Maximum nested popup depth</label>
+            <div id="popup-content-scanning">
+                <h3>Popup Content Scanning Options</h3>
+
+                <p class="help-block">
+                    Yomichan is able to create additional popups in order to scan the content of other popups.
+                    This feature can be enabled if the <strong>Maximum number of additional popups</strong> option is set to a value greater than 0.
+                </p>
+
+                <div class="checkbox">
+                    <label><input type="checkbox" id="enable-scanning-on-search-page"> Enable scanning on search page</label>
+                </div>
+
+                <div class="checkbox">
+                    <label><input type="checkbox" id="enable-scanning-of-popup-expressions"> Enable scanning of popup expressions</label>
+                </div>
+
+                <div class="form-group">
+                    <label for="popup-nesting-max-depth">Maximum number of additional popups</label>
                     <input type="number" min="0" id="popup-nesting-max-depth" class="form-control">
                 </div>
             </div>
