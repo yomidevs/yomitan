@@ -121,9 +121,6 @@ async function formWrite(options) {
     $('#scan-modifier-key').val(options.scanning.modifier);
     $('#popup-nesting-max-depth').val(options.scanning.popupNestingMaxDepth);
 
-    $('#dict-purge-link').click(utilAsync(onDictionaryPurge));
-    $('#dict-file').change(utilAsync(onDictionaryImport));
-
     $('#anki-enable').prop('checked', options.anki.enable);
     $('#card-tags').val(options.anki.tags.join(' '));
     $('#sentence-detection-extent').val(options.anki.sentenceExt);
@@ -131,9 +128,6 @@ async function formWrite(options) {
     $('#screenshot-format').val(options.anki.screenshot.format);
     $('#screenshot-quality').val(options.anki.screenshot.quality);
     $('#field-templates').val(options.anki.fieldTemplates);
-    $('#field-templates-reset').click(utilAsync(onAnkiFieldTemplatesReset));
-    $('input, select, textarea').not('.anki-model').change(utilAsync(onFormOptionsChanged));
-    $('.anki-model').change(utilAsync(onAnkiModelChanged));
 
     try {
         await dictionaryGroupsPopulate(options);
@@ -149,6 +143,15 @@ async function formWrite(options) {
     }
 
     formUpdateVisibility(options);
+}
+
+function formSetupEventListeners() {
+    $('#dict-purge-link').click(utilAsync(onDictionaryPurge));
+    $('#dict-file').change(utilAsync(onDictionaryImport));
+
+    $('#field-templates-reset').click(utilAsync(onAnkiFieldTemplatesReset));
+    $('input, select, textarea').not('.anki-model').not('.profile-form *').change(utilAsync(onFormOptionsChanged));
+    $('.anki-model').change(utilAsync(onAnkiModelChanged));
 }
 
 function formUpdateVisibility(options) {
@@ -237,6 +240,7 @@ async function onReady() {
     const optionsContext = getOptionsContext();
     const options = await apiOptionsGet(optionsContext);
 
+    formSetupEventListeners();
     await formWrite(options);
 
     storageInfoInitialize();
