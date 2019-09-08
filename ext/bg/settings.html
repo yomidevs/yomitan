@@ -67,6 +67,58 @@
     </head>
     <body>
         <div class="container-fluid">
+            <div class="profile-form">
+                <h3>Profiles</h3>
+
+                <p class="help-block">
+                    Profiles allow you to create multiple configurations and quickly switch between them.
+                </p>
+
+                <div class="form-group">
+                    <label for="profile-active">Active profile</label>
+                    <select class="form-control" id="profile-active"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="profile-target">Modifying profile</label>
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="profile-add" title="Add"><span class="glyphicon glyphicon-plus"></span></button>
+                            <button class="btn btn-default" id="profile-move-up" title="Move up"><span class="glyphicon glyphicon-arrow-up"></span></button>
+                            <button class="btn btn-default" id="profile-move-down" title="Move down"><span class="glyphicon glyphicon-arrow-down"></span></button>
+                            <button class="btn btn-default" id="profile-copy" title="Copy"><span class="glyphicon glyphicon-copy"></span></button>
+                        </div>
+                        <select class="form-control profile-form-manual" id="profile-target"></select>
+                        <div class="input-group-btn">
+                            <button class="btn btn-danger" id="profile-remove" title="Remove"><span class="glyphicon glyphicon-remove"></span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="profile-name">Profile name</label>
+                    <input type="text" id="profile-name" class="form-control">
+                </div>
+
+                <div class="modal fade" tabindex="-1" role="dialog" id="profile-remove-modal">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Confirm profile removal</h4>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to delete the profile <em id="profile-remove-modal-profile-name"></em>?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger" id="profile-remove-confirm">Remove Profile</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div>
                 <h3>General Options</h3>
 
@@ -498,6 +550,7 @@
         <script src="/bg/js/templates.js"></script>
         <script src="/bg/js/util.js"></script>
 
+        <script src="/bg/js/settings-profiles.js"></script>
         <script src="/bg/js/settings.js"></script>
     </body>
 </html>

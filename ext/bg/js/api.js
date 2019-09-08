@@ -21,9 +21,13 @@ function apiOptionsGet(optionsContext) {
     return utilBackend().getOptions(optionsContext);
 }
 
+function apiOptionsGetFull() {
+    return utilBackend().getFullOptions();
+}
+
 async function apiOptionsSave(source) {
     const backend = utilBackend();
-    const options = await backend.getFullOptions();
+    const options = await apiOptionsGetFull();
     await optionsSave(options);
     backend.onOptionsUpdated(source);
 }

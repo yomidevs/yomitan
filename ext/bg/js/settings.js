@@ -16,12 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function getOptionsContext() {
-    return {
-        depth: 0
-    };
-}
-
 async function formRead(options) {
     options.general.enable = $('#enable').prop('checked');
     options.general.showGuide = $('#show-usage-guide').prop('checked');
@@ -239,11 +233,8 @@ async function onFormOptionsChanged(e) {
 }
 
 async function onReady() {
-    const optionsContext = getOptionsContext();
-    const options = await apiOptionsGet(optionsContext);
-
     formSetupEventListeners();
-    await formWrite(options);
+    await profileOptionsSetup();
 
     storageInfoInitialize();
 
