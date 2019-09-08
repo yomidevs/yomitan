@@ -86,6 +86,71 @@ async function formRead(options) {
     });
 }
 
+async function formWrite(options) {
+    $('#show-usage-guide').prop('checked', options.general.showGuide);
+    $('#compact-tags').prop('checked', options.general.compactTags);
+    $('#compact-glossaries').prop('checked', options.general.compactGlossaries);
+    $('#auto-play-audio').prop('checked', options.general.autoPlayAudio);
+    $('#result-output-mode').val(options.general.resultOutputMode);
+    $('#audio-playback-source').val(options.general.audioSource);
+    $('#audio-playback-volume').val(options.general.audioVolume);
+    $('#show-debug-info').prop('checked', options.general.debugInfo);
+    $('#show-advanced-options').prop('checked', options.general.showAdvanced);
+    $('#max-displayed-results').val(options.general.maxResults);
+    $('#popup-display-mode').val(options.general.popupDisplayMode);
+    $('#popup-horizontal-text-position').val(options.general.popupHorizontalTextPosition);
+    $('#popup-vertical-text-position').val(options.general.popupVerticalTextPosition);
+    $('#popup-width').val(options.general.popupWidth);
+    $('#popup-height').val(options.general.popupHeight);
+    $('#popup-horizontal-offset').val(options.general.popupHorizontalOffset);
+    $('#popup-vertical-offset').val(options.general.popupVerticalOffset);
+    $('#popup-horizontal-offset2').val(options.general.popupHorizontalOffset2);
+    $('#popup-vertical-offset2').val(options.general.popupVerticalOffset2);
+    $('#custom-popup-css').val(options.general.customPopupCss);
+
+    $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);
+    $('#touch-input-enabled').prop('checked', options.scanning.touchInputEnabled);
+    $('#select-matched-text').prop('checked', options.scanning.selectText);
+    $('#search-alphanumeric').prop('checked', options.scanning.alphanumeric);
+    $('#auto-hide-results').prop('checked', options.scanning.autoHideResults);
+    $('#deep-dom-scan').prop('checked', options.scanning.deepDomScan);
+    $('#enable-scanning-of-popup-expressions').prop('checked', options.scanning.enableOnPopupExpressions);
+    $('#enable-scanning-on-search-page').prop('checked', options.scanning.enableOnSearchPage);
+    $('#scan-delay').val(options.scanning.delay);
+    $('#scan-length').val(options.scanning.length);
+    $('#scan-modifier-key').val(options.scanning.modifier);
+    $('#popup-nesting-max-depth').val(options.scanning.popupNestingMaxDepth);
+
+    $('#dict-purge-link').click(utilAsync(onDictionaryPurge));
+    $('#dict-file').change(utilAsync(onDictionaryImport));
+
+    $('#anki-enable').prop('checked', options.anki.enable);
+    $('#card-tags').val(options.anki.tags.join(' '));
+    $('#sentence-detection-extent').val(options.anki.sentenceExt);
+    $('#interface-server').val(options.anki.server);
+    $('#screenshot-format').val(options.anki.screenshot.format);
+    $('#screenshot-quality').val(options.anki.screenshot.quality);
+    $('#field-templates').val(options.anki.fieldTemplates);
+    $('#field-templates-reset').click(utilAsync(onAnkiFieldTemplatesReset));
+    $('input, select, textarea').not('.anki-model').change(utilAsync(onFormOptionsChanged));
+    $('.anki-model').change(utilAsync(onAnkiModelChanged));
+
+    try {
+        await dictionaryGroupsPopulate(options);
+        await formMainDictionaryOptionsPopulate(options);
+    } catch (e) {
+        dictionaryErrorsShow([e]);
+    }
+
+    try {
+        await ankiDeckAndModelPopulate(options);
+    } catch (e) {
+        ankiErrorShow(e);
+    }
+
+    formUpdateVisibility(options);
+}
+
 function formUpdateVisibility(options) {
     const general = $('#anki-general');
     if (options.anki.enable) {
@@ -172,68 +237,7 @@ async function onReady() {
     const optionsContext = getOptionsContext();
     const options = await apiOptionsGet(optionsContext);
 
-    $('#show-usage-guide').prop('checked', options.general.showGuide);
-    $('#compact-tags').prop('checked', options.general.compactTags);
-    $('#compact-glossaries').prop('checked', options.general.compactGlossaries);
-    $('#auto-play-audio').prop('checked', options.general.autoPlayAudio);
-    $('#result-output-mode').val(options.general.resultOutputMode);
-    $('#audio-playback-source').val(options.general.audioSource);
-    $('#audio-playback-volume').val(options.general.audioVolume);
-    $('#show-debug-info').prop('checked', options.general.debugInfo);
-    $('#show-advanced-options').prop('checked', options.general.showAdvanced);
-    $('#max-displayed-results').val(options.general.maxResults);
-    $('#popup-display-mode').val(options.general.popupDisplayMode);
-    $('#popup-horizontal-text-position').val(options.general.popupHorizontalTextPosition);
-    $('#popup-vertical-text-position').val(options.general.popupVerticalTextPosition);
-    $('#popup-width').val(options.general.popupWidth);
-    $('#popup-height').val(options.general.popupHeight);
-    $('#popup-horizontal-offset').val(options.general.popupHorizontalOffset);
-    $('#popup-vertical-offset').val(options.general.popupVerticalOffset);
-    $('#popup-horizontal-offset2').val(options.general.popupHorizontalOffset2);
-    $('#popup-vertical-offset2').val(options.general.popupVerticalOffset2);
-    $('#custom-popup-css').val(options.general.customPopupCss);
-
-    $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);
-    $('#touch-input-enabled').prop('checked', options.scanning.touchInputEnabled);
-    $('#select-matched-text').prop('checked', options.scanning.selectText);
-    $('#search-alphanumeric').prop('checked', options.scanning.alphanumeric);
-    $('#auto-hide-results').prop('checked', options.scanning.autoHideResults);
-    $('#deep-dom-scan').prop('checked', options.scanning.deepDomScan);
-    $('#enable-scanning-of-popup-expressions').prop('checked', options.scanning.enableOnPopupExpressions);
-    $('#enable-scanning-on-search-page').prop('checked', options.scanning.enableOnSearchPage);
-    $('#scan-delay').val(options.scanning.delay);
-    $('#scan-length').val(options.scanning.length);
-    $('#scan-modifier-key').val(options.scanning.modifier);
-    $('#popup-nesting-max-depth').val(options.scanning.popupNestingMaxDepth);
-
-    $('#dict-purge-link').click(utilAsync(onDictionaryPurge));
-    $('#dict-file').change(utilAsync(onDictionaryImport));
-
-    $('#anki-enable').prop('checked', options.anki.enable);
-    $('#card-tags').val(options.anki.tags.join(' '));
-    $('#sentence-detection-extent').val(options.anki.sentenceExt);
-    $('#interface-server').val(options.anki.server);
-    $('#screenshot-format').val(options.anki.screenshot.format);
-    $('#screenshot-quality').val(options.anki.screenshot.quality);
-    $('#field-templates').val(options.anki.fieldTemplates);
-    $('#field-templates-reset').click(utilAsync(onAnkiFieldTemplatesReset));
-    $('input, select, textarea').not('.anki-model').change(utilAsync(onFormOptionsChanged));
-    $('.anki-model').change(utilAsync(onAnkiModelChanged));
-
-    try {
-        await dictionaryGroupsPopulate(options);
-        await formMainDictionaryOptionsPopulate(options);
-    } catch (e) {
-        dictionaryErrorsShow([e]);
-    }
-
-    try {
-        await ankiDeckAndModelPopulate(options);
-    } catch (e) {
-        ankiErrorShow(e);
-    }
-
-    formUpdateVisibility(options);
+    await formWrite(options);
 
     storageInfoInitialize();
 }
