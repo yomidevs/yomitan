@@ -17,6 +17,57 @@
  */
 
 
+function optionsApplyUpdates(options, updates) {
+    const targetVersion = updates.length;
+    const currentVersion = options.version;
+    if (typeof currentVersion === 'number' && Number.isFinite(currentVersion)) {
+        for (let i = Math.max(0, Math.floor(currentVersion)); i < targetVersion; ++i) {
+            const update = updates[i];
+            if (update !== null) {
+                update(options);
+            }
+        }
+    }
+
+    options.version = targetVersion;
+    return options;
+}
+
+const optionsVersionUpdates = [
+    null,
+    null,
+    null,
+    null,
+    (options) => {
+        options.general.audioSource = options.general.audioPlayback ? 'jpod101' : 'disabled';
+    },
+    (options) => {
+        options.general.showGuide = false;
+    },
+    (options) => {
+        options.scanning.modifier = options.scanning.requireShift ? 'shift' : 'none';
+    },
+    (options) => {
+        const fieldTemplatesDefault = profileCreateDefaultFieldTemplates();
+        options.general.resultOutputMode = options.general.groupResults ? 'group' : 'split';
+        options.anki.fieldTemplates = (
+            (utilStringHashCode(options.anki.fieldTemplates) !== -805327496) ?
+            `{{#if merge}}${fieldTemplatesDefault}{{else}}${options.anki.fieldTemplates}{{/if}}` :
+            fieldTemplatesDefault
+        );
+    },
+    (options) => {
+        if (utilStringHashCode(options.anki.fieldTemplates) === 1285806040) {
+            options.anki.fieldTemplates = profileCreateDefaultFieldTemplates();
+        }
+    },
+    (options) => {
+        if (utilStringHashCode(options.anki.fieldTemplates) === -250091611) {
+            options.anki.fieldTemplates = profileCreateDefaultFieldTemplates();
+        }
+    }
+];
+
 function optionsFieldTemplates() {
     return `
 {{#*inline "glossary-single"}}
@@ -183,8 +234,8 @@ function optionsFieldTemplates() {
 `.trim();
 }
 
-function optionsSetDefaults(options) {
-    const defaults = {
+function optionsCreateDefaults() {
+    return {
         general: {
             enable: true,
             audioSource: 'jpod101',
@@ -238,6 +289,10 @@ function optionsSetDefaults(options) {
             fieldTemplates: optionsFieldTemplates()
         }
     };
+}
+
+function optionsSetDefaults(options) {
+    const defaults = optionsCreateDefaults();
 
     const combine = (target, source) => {
         for (const key in source) {
@@ -258,70 +313,29 @@ function optionsSetDefaults(options) {
 }
 
 function optionsVersion(options) {
-    const fixups = [
-        () => {},
-        () => {},
-        () => {},
-        () => {},
-        () => {
-            if (options.general.audioPlayback) {
-                options.general.audioSource = 'jpod101';
-            } else {
-                options.general.audioSource = 'disabled';
-            }
-        },
-        () => {
-            options.general.showGuide = false;
-        },
-        () => {
-            if (options.scanning.requireShift) {
-                options.scanning.modifier = 'shift';
-            } else {
-                options.scanning.modifier = 'none';
-            }
-        },
-        () => {
-            if (options.general.groupResults) {
-                options.general.resultOutputMode = 'group';
-            } else {
-                options.general.resultOutputMode = 'split';
-            }
-            if (utilStringHashCode(options.anki.fieldTemplates) !== -805327496) {
-                options.anki.fieldTemplates = `{{#if merge}}${optionsFieldTemplates()}{{else}}${options.anki.fieldTemplates}{{/if}}`;
-            } else {
-                options.anki.fieldTemplates = optionsFieldTemplates();
-            }
-        },
-        () => {
-            if (utilStringHashCode(options.anki.fieldTemplates) === 1285806040) {
-                options.anki.fieldTemplates = optionsFieldTemplates();
-            }
-        },
-        () => {
-            if (utilStringHashCode(options.anki.fieldTemplates) === -250091611) {
-                options.anki.fieldTemplates = optionsFieldTemplates();
-            }
-        }
-    ];
-
     optionsSetDefaults(options);
-    if (!options.hasOwnProperty('version')) {
-        options.version = fixups.length;
-    }
-
-    while (options.version < fixups.length) {
-        fixups[options.version++]();
-    }
-
-    return options;
+    return optionsApplyUpdates(options, optionsVersionUpdates);
 }
 
 function optionsLoad() {
     return new Promise((resolve, reject) => {
-        chrome.storage.local.get(null, store => resolve(store.options));
+        chrome.storage.local.get(['options'], store => {
+            const error = chrome.runtime.lastError;
+            if (error) {
+                reject(error);
+            } else {
+                resolve(store.options);
+            }
+        });
     }).then(optionsStr => {
-        return optionsStr ? JSON.parse(optionsStr) : {};
-    }).catch(error => {
+        if (typeof optionsStr === 'string') {
+            const options = JSON.parse(optionsStr);
+            if (typeof options === 'object' && options !== null && !Array.isArray(options)) {
+                return options;
+            }
+        }
+        return {};
+    }).catch(() => {
         return {};
     }).then(options => {
         return optionsVersion(options);
@@ -329,9 +343,9 @@ function optionsLoad() {
 }
 
 function optionsSave(options) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         chrome.storage.local.set({options: JSON.stringify(options)}, resolve);
     }).then(() => {
-        apiOptionsSet(options);
+        utilBackend().onOptionsUpdated(options);
     });
 }
