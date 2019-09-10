@@ -94,7 +94,10 @@ async function profileFormWrite(optionsFull) {
         $('#profile-condition-groups'),
         $('#profile-add-condition-group')
     );
-    profileConditionsContainer.save = () => apiOptionsSave();
+    profileConditionsContainer.save = () => {
+        apiOptionsSave();
+        conditionsClearCaches(profileConditionsDescriptor);
+    };
 }
 
 function profileOptionsPopulateSelect(select, profiles, currentValue, ignoreIndices) {

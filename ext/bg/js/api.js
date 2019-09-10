@@ -140,7 +140,10 @@ async function apiCommandExec(command) {
         },
 
         toggle: async () => {
-            const optionsContext = {depth: 0};
+            const optionsContext = {
+                depth: 0,
+                url: window.location.href
+            };
             const options = await apiOptionsGet(optionsContext);
             options.general.enable = !options.general.enable;
             await apiOptionsSave('popup');

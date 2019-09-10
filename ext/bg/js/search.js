@@ -22,7 +22,8 @@ class DisplaySearch extends Display {
         super($('#spinner'), $('#content'));
 
         this.optionsContext = {
-            depth: 0
+            depth: 0,
+            url: window.location.href
         };
 
         this.search = $('#search').click(this.onSearch.bind(this));

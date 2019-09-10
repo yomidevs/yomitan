@@ -32,27 +32,27 @@ const profileConditionsDescriptor = {
         operators: {
             equal: {
                 name: '=',
-                test: (value, optionValue) => (value === optionValue)
+                test: ({depth}, optionValue) => (depth === optionValue)
             },
             notEqual: {
                 name: '\u2260',
-                test: (value, optionValue) => (value !== optionValue)
+                test: ({depth}, optionValue) => (depth !== optionValue)
             },
             lessThan: {
                 name: '<',
-                test: (value, optionValue) => (value < optionValue)
+                test: ({depth}, optionValue) => (depth < optionValue)
             },
             greaterThan: {
                 name: '>',
-                test: (value, optionValue) => (value > optionValue)
+                test: ({depth}, optionValue) => (depth > optionValue)
             },
             lessThanOrEqual: {
                 name: '\u2264',
-                test: (value, optionValue) => (value <= optionValue)
+                test: ({depth}, optionValue) => (depth <= optionValue)
             },
             greaterThanOrEqual: {
                 name: '\u2265',
-                test: (value, optionValue) => (value >= optionValue)
+                test: ({depth}, optionValue) => (depth >= optionValue)
             }
         }
     },
@@ -69,7 +69,7 @@ const profileConditionsDescriptor = {
                 transform: (optionValue) => optionValue.split(/[,;\s]+/).map(v => v.trim().toLowerCase()).filter(v => v.length > 0),
                 transformReverse: (transformedOptionValue) => transformedOptionValue.join(', '),
                 validateTransformed: (transformedOptionValue) => (transformedOptionValue.length > 0),
-                test: (value, transformedOptionValue) => (transformedOptionValue.indexOf(new URL(value).hostname.toLowerCase()) >= 0)
+                test: ({url}, transformedOptionValue) => (transformedOptionValue.indexOf(new URL(url).hostname.toLowerCase()) >= 0)
             },
             matchRegExp: {
                 name: 'Matches RegExp',
@@ -78,7 +78,7 @@ const profileConditionsDescriptor = {
                 transformCache: {},
                 transform: (optionValue) => new RegExp(optionValue, 'i'),
                 transformReverse: (transformedOptionValue) => transformedOptionValue.source,
-                test: (value, transformedOptionValue) => (transformedOptionValue !== null && transformedOptionValue.test(value))
+                test: ({url}, transformedOptionValue) => (transformedOptionValue !== null && transformedOptionValue.test(url))
             }
         }
     }

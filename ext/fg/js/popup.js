@@ -59,7 +59,8 @@ class Popup {
                 this.invokeApi('popupNestedInitialize', {
                     id: this.id,
                     depth: this.depth,
-                    parentFrameId
+                    parentFrameId,
+                    url: this.url
                 });
                 this.invokeApi('setOptions', {
                     general: {
@@ -310,5 +311,9 @@ class Popup {
         if (parent !== null && this.container.parentNode !== parent) {
             parent.appendChild(this.container);
         }
+    }
+
+    get url() {
+        return window.location.href;
     }
 }

@@ -24,7 +24,8 @@ class DisplayFloat extends Display {
         this.styleNode = null;
 
         this.optionsContext = {
-            depth: 0
+            depth: 0,
+            url: window.location.href
         };
 
         this.dependencies = Object.assign({}, this.dependencies, {docRangeFromPoint, docSentenceExtract});
@@ -78,9 +79,10 @@ class DisplayFloat extends Display {
                 }
             },
 
-            popupNestedInitialize: ({id, depth, parentFrameId}) => {
+            popupNestedInitialize: ({id, depth, parentFrameId, url}) => {
                 this.optionsContext.depth = depth;
-                popupNestedInitialize(id, depth, parentFrameId);
+                this.optionsContext.url = url;
+                popupNestedInitialize(id, depth, parentFrameId, url);
             }
         };
 

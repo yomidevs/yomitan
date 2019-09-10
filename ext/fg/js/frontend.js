@@ -27,7 +27,8 @@ class Frontend {
         this.ignoreNodes = (Array.isArray(ignoreNodes) && ignoreNodes.length > 0 ? ignoreNodes.join(',') : null);
 
         this.optionsContext = {
-            depth: popup.depth
+            depth: popup.depth,
+            url: popup.url
         };
 
         this.primaryTouchIdentifier = null;
@@ -42,9 +43,9 @@ class Frontend {
     static create() {
         const initializationData = window.frontendInitializationData;
         const isNested = (initializationData !== null && typeof initializationData === 'object');
-        const {id, depth, parentFrameId, ignoreNodes} = isNested ? initializationData : {};
+        const {id, depth, parentFrameId, ignoreNodes, url} = isNested ? initializationData : {};
 
-        const popup = isNested ? new PopupProxy(depth + 1, id, parentFrameId) : PopupProxyHost.instance.createPopup(null);
+        const popup = isNested ? new PopupProxy(depth + 1, id, parentFrameId, url) : PopupProxyHost.instance.createPopup(null);
         const frontend = new Frontend(popup, ignoreNodes);
         frontend.prepare();
         return frontend;
@@ -52,7 +53,7 @@ class Frontend {
 
     async prepare() {
         try {
-            this.options = await apiOptionsGet(this.optionsContext);
+            this.options = await apiOptionsGet(this.getOptionsContext());
 
             window.addEventListener('message', this.onFrameMessage.bind(this));
             window.addEventListener('mousedown', this.onMouseDown.bind(this));
@@ -262,7 +263,7 @@ class Frontend {
     }
 
     async updateOptions() {
-        this.options = await apiOptionsGet(this.optionsContext);
+        this.options = await apiOptionsGet(this.getOptionsContext());
         if (!this.options.enable) {
             this.searchClear();
         }
@@ -330,7 +331,7 @@ class Frontend {
             return;
         }
 
-        const {definitions, length} = await apiTermsFind(searchText, this.optionsContext);
+        const {definitions, length} = await apiTermsFind(searchText, this.getOptionsContext());
         if (definitions.length === 0) {
             return false;
         }
@@ -363,7 +364,7 @@ class Frontend {
             return;
         }
 
-        const definitions = await apiKanjiFind(searchText, this.optionsContext);
+        const definitions = await apiKanjiFind(searchText, this.getOptionsContext());
         if (definitions.length === 0) {
             return false;
         }
@@ -505,6 +506,11 @@ class Frontend {
             --length;
             textSource.setEndOffset(length);
         }
+    }
+
+    getOptionsContext() {
+        this.optionsContext.url = this.popup.url;
+        return this.optionsContext;
     }
 
     static isScanningModifierPressed(scanningModifier, mouseEvent) {
