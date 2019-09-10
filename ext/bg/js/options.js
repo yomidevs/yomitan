@@ -329,6 +329,22 @@ function profileOptionsUpdateVersion(options) {
 
 /*
  * Global options
+ *
+ * Each profile has an array named "conditionGroups", which is an array of condition groups
+ * which enable the contextual selection of profiles. The structure of the array is as follows:
+ * [
+ *     {
+ *         conditions: [
+ *             {
+ *                 type: "string",
+ *                 operator: "string",
+ *                 value: "string"
+ *             },
+ *             // ...
+ *         ]
+ *     },
+ *     // ...
+ * ]
  */
 
 const optionsVersionUpdates = [];
@@ -351,7 +367,8 @@ function optionsUpdateVersion(options, defaultProfileOptions) {
     if (profiles.length === 0) {
         profiles.push({
             name: 'Default',
-            options: defaultProfileOptions
+            options: defaultProfileOptions,
+            conditionGroups: []
         });
     }
 
@@ -369,6 +386,9 @@ function optionsUpdateVersion(options, defaultProfileOptions) {
 
     // Update profile options
     for (const profile of profiles) {
+        if (!Array.isArray(profile.conditionGroups)) {
+            profile.conditionGroups = [];
+        }
         profile.options = profileOptionsUpdateVersion(profile.options);
     }
 
