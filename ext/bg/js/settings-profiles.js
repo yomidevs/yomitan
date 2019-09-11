@@ -41,6 +41,8 @@ function profileOptionsSetupEventListeners() {
     $('#profile-remove-confirm').click(utilAsync(onProfileRemoveConfirm));
     $('#profile-copy').click(utilAsync(onProfileCopy));
     $('#profile-copy-confirm').click(utilAsync(onProfileCopyConfirm));
+    $('#profile-move-up').click(() => onProfileMove(-1));
+    $('#profile-move-down').click(() => onProfileMove(1));
     $('.profile-form').find('input, select, textarea').not('.profile-form-manual').change(utilAsync(onProfileOptionsChanged));
 }
 
@@ -75,6 +77,8 @@ async function profileFormWrite(optionsFull) {
     profileOptionsPopulateSelect($('#profile-target'), optionsFull.profiles, currentProfileIndex, null);
     $('#profile-remove').prop('disabled', optionsFull.profiles.length <= 1);
     $('#profile-copy').prop('disabled', optionsFull.profiles.length <= 1);
+    $('#profile-move-up').prop('disabled', currentProfileIndex <= 0);
+    $('#profile-move-down').prop('disabled', currentProfileIndex >= optionsFull.profiles.length - 1);
 
     $('#profile-name').val(profile.name);
 }
@@ -205,6 +209,27 @@ async function onProfileRemoveConfirm() {
 
 function onProfileNameChanged() {
     $('#profile-active, #profile-target').find(`[value="${currentProfileIndex}"]`).text(this.value);
+}
+
+async function onProfileMove(offset) {
+    const optionsFull = await apiOptionsGetFull();
+    const index = currentProfileIndex + offset;
+    if (index < 0 || index >= optionsFull.profiles.length) {
+        return;
+    }
+
+    const profile = optionsFull.profiles[currentProfileIndex];
+    optionsFull.profiles.splice(currentProfileIndex, 1);
+    optionsFull.profiles.splice(index, 0, profile);
+
+    if (optionsFull.profileCurrent === currentProfileIndex) {
+        optionsFull.profileCurrent = index;
+    }
+
+    currentProfileIndex = index;
+
+    await profileOptionsUpdateTarget(optionsFull);
+    await settingsSaveOptions();
 }
 
 async function onProfileCopy() {
