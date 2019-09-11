@@ -39,6 +39,8 @@ function profileOptionsSetupEventListeners() {
     $('#profile-add').click(utilAsync(onProfileAdd));
     $('#profile-remove').click(utilAsync(onProfileRemove));
     $('#profile-remove-confirm').click(utilAsync(onProfileRemoveConfirm));
+    $('#profile-copy').click(utilAsync(onProfileCopy));
+    $('#profile-copy-confirm').click(utilAsync(onProfileCopyConfirm));
     $('.profile-form').find('input, select, textarea').not('.profile-form-manual').change(utilAsync(onProfileOptionsChanged));
 }
 
@@ -69,17 +71,22 @@ async function profileFormRead(optionsFull) {
 async function profileFormWrite(optionsFull) {
     const profile = optionsFull.profiles[currentProfileIndex];
 
-    profileOptionsPopulateSelect($('#profile-active'), optionsFull.profiles, optionsFull.profileCurrent);
-    profileOptionsPopulateSelect($('#profile-target'), optionsFull.profiles, currentProfileIndex);
+    profileOptionsPopulateSelect($('#profile-active'), optionsFull.profiles, optionsFull.profileCurrent, null);
+    profileOptionsPopulateSelect($('#profile-target'), optionsFull.profiles, currentProfileIndex, null);
     $('#profile-remove').prop('disabled', optionsFull.profiles.length <= 1);
+    $('#profile-copy').prop('disabled', optionsFull.profiles.length <= 1);
 
     $('#profile-name').val(profile.name);
 }
 
-function profileOptionsPopulateSelect(select, profiles, currentValue) {
+function profileOptionsPopulateSelect(select, profiles, currentValue, ignoreIndices) {
     select.empty();
 
+
     for (let i = 0; i < profiles.length; ++i) {
+        if (ignoreIndices !== null && ignoreIndices.indexOf(i) >= 0) {
+            continue;
+        }
         const profile = profiles[i];
         select.append($(`<option value="${i}">${profile.name}</option>`));
     }
@@ -198,4 +205,30 @@ async function onProfileRemoveConfirm() {
 
 function onProfileNameChanged() {
     $('#profile-active, #profile-target').find(`[value="${currentProfileIndex}"]`).text(this.value);
+}
+
+async function onProfileCopy() {
+    const optionsFull = await apiOptionsGetFull();
+    if (optionsFull.profiles.length <= 1) {
+        return;
+    }
+
+    profileOptionsPopulateSelect($('#profile-copy-source'), optionsFull.profiles, currentProfileIndex === 0 ? 1 : 0, [currentProfileIndex]);
+    $('#profile-copy-modal').modal('show');
+}
+
+async function onProfileCopyConfirm() {
+    $('#profile-copy-modal').modal('hide');
+
+    const optionsFull = await apiOptionsGetFull();
+    const index = tryGetIntegerValue('#profile-copy-source', 0, optionsFull.profiles.length);
+    if (index === null || index === currentProfileIndex) {
+        return;
+    }
+
+    const profile = utilIsolate(optionsFull.profiles[index].options);
+    optionsFull.profiles[currentProfileIndex].options = profile;
+
+    await profileOptionsUpdateTarget(optionsFull);
+    await settingsSaveOptions();
 }
