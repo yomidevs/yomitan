@@ -173,7 +173,11 @@ async function onProfileAdd() {
     await apiOptionsSave();
 }
 
-async function onProfileRemove() {
+async function onProfileRemove(e) {
+    if (e.shiftKey) {
+        return await onProfileRemoveConfirm();
+    }
+
     const optionsFull = await apiOptionsGetFull();
     if (optionsFull.profiles.length <= 1) {
         return;
