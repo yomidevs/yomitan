@@ -21,11 +21,11 @@ function apiOptionsGet(optionsContext) {
     return utilBackend().getOptions(optionsContext);
 }
 
-async function apiOptionsSave() {
+async function apiOptionsSave(source) {
     const backend = utilBackend();
     const options = await backend.getFullOptions();
     await optionsSave(options);
-    backend.onOptionsUpdated();
+    backend.onOptionsUpdated(source);
 }
 
 async function apiTermsFind(text, optionsContext) {
@@ -139,7 +139,7 @@ async function apiCommandExec(command) {
             const optionsContext = {depth: 0};
             const options = await apiOptionsGet(optionsContext);
             options.general.enable = !options.general.enable;
-            await apiOptionsSave();
+            await apiOptionsSave('popup');
         }
     };
 

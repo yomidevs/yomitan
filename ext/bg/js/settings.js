@@ -218,7 +218,7 @@ async function onFormOptionsChanged(e) {
     const optionsAnkiServerOld = options.anki.server;
 
     await formRead(options);
-    await apiOptionsSave();
+    await settingsSaveOptions();
     formUpdateVisibility(options);
 
     try {
@@ -246,9 +246,42 @@ async function onReady() {
     await formWrite(options);
 
     storageInfoInitialize();
+
+    chrome.runtime.onMessage.addListener(onMessage);
 }
 
 $(document).ready(utilAsync(onReady));
+
+
+/*
+ * Remote options updates
+ */
+
+function settingsGetSource() {
+    return new Promise((resolve) => {
+        chrome.tabs.getCurrent((tab) => resolve(`settings${tab ? tab.id : ''}`));
+    });
+}
+
+async function settingsSaveOptions() {
+    const source = await settingsGetSource();
+    await apiOptionsSave(source);
+}
+
+async function onOptionsUpdate({source}) {
+    const thisSource = await settingsGetSource();
+    if (source === thisSource) { return; }
+
+    const optionsContext = getOptionsContext();
+    const options = await apiOptionsGet(optionsContext);
+    await formWrite(options);
+}
+
+function onMessage({action, params}) {
+    if (action === 'optionsUpdate') {
+        onOptionsUpdate(params);
+    }
+}
 
 
 /*
@@ -395,7 +428,7 @@ async function onDictionaryPurge(e) {
         const options = await apiOptionsGet(optionsContext);
         options.dictionaries = {};
         options.general.mainDictionary = '';
-        await apiOptionsSave();
+        await settingsSaveOptions();
 
         await dictionaryGroupsPopulate(options);
         await formMainDictionaryOptionsPopulate(options);
@@ -445,7 +478,7 @@ async function onDictionaryImport(e) {
             dictionaryErrorsShow(exceptions);
         }
 
-        await apiOptionsSave();
+        await settingsSaveOptions();
 
         await dictionaryGroupsPopulate(options);
         await formMainDictionaryOptionsPopulate(options);
@@ -589,7 +622,7 @@ async function onAnkiModelChanged(e) {
         const options = await apiOptionsGet(optionsContext);
         await formRead(options);
         options.anki[tabId].fields = {};
-        await apiOptionsSave();
+        await settingsSaveOptions();
 
         ankiSpinnerShow(true);
         await ankiFieldsPopulate(element, options);
@@ -609,7 +642,7 @@ async function onAnkiFieldTemplatesReset(e) {
         const fieldTemplates = optionsFieldTemplates();
         options.anki.fieldTemplates = fieldTemplates;
         $('#field-templates').val(fieldTemplates);
-        await apiOptionsSave();
+        await settingsSaveOptions();
     } catch (e) {
         ankiErrorShow(e);
     }
