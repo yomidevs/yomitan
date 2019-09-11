@@ -25,7 +25,7 @@ async function apiOptionsSave() {
     const backend = utilBackend();
     const options = await backend.getFullOptions();
     await optionsSave(options);
-    backend.onOptionsUpdated(options);
+    backend.onOptionsUpdated();
 }
 
 async function apiTermsFind(text, optionsContext) {

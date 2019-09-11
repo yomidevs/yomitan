@@ -34,7 +34,8 @@ class Backend {
 
     async prepare() {
         await this.translator.prepare();
-        this.onOptionsUpdated(await optionsLoad());
+        this.options = await optionsLoad();
+        this.onOptionsUpdated();
 
         if (chrome.commands !== null && typeof chrome.commands === 'object') {
             chrome.commands.onCommand.addListener(this.onCommand.bind(this));
@@ -51,8 +52,7 @@ class Backend {
         this.isPreparedPromise = null;
     }
 
-    onOptionsUpdated(options) {
-        this.options = utilIsolate(options);
+    onOptionsUpdated() {
         this.applyOptions();
 
         const callback = () => this.checkLastError(chrome.runtime.lastError);
