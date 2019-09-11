@@ -48,7 +48,7 @@ const optionsVersionUpdates = [
         options.scanning.modifier = options.scanning.requireShift ? 'shift' : 'none';
     },
     (options) => {
-        const fieldTemplatesDefault = profileCreateDefaultFieldTemplates();
+        const fieldTemplatesDefault = optionsFieldTemplates();
         options.general.resultOutputMode = options.general.groupResults ? 'group' : 'split';
         options.anki.fieldTemplates = (
             (utilStringHashCode(options.anki.fieldTemplates) !== -805327496) ?
@@ -58,12 +58,12 @@ const optionsVersionUpdates = [
     },
     (options) => {
         if (utilStringHashCode(options.anki.fieldTemplates) === 1285806040) {
-            options.anki.fieldTemplates = profileCreateDefaultFieldTemplates();
+            options.anki.fieldTemplates = optionsFieldTemplates();
         }
     },
     (options) => {
         if (utilStringHashCode(options.anki.fieldTemplates) === -250091611) {
-            options.anki.fieldTemplates = profileCreateDefaultFieldTemplates();
+            options.anki.fieldTemplates = optionsFieldTemplates();
         }
     }
 ];
