@@ -116,18 +116,24 @@ class PopupProxyHost {
     async termsShow(id, elementRect, writingMode, definitions, options, context) {
         const popup = this.getPopup(id);
         elementRect = this.jsonRectToDOMRect(popup, elementRect);
+        if (!PopupProxyHost.popupCanShow(popup)) { return false; }
         return await popup.termsShow(elementRect, writingMode, definitions, options, context);
     }
 
     async kanjiShow(id, elementRect, writingMode, definitions, options, context) {
         const popup = this.getPopup(id);
         elementRect = this.jsonRectToDOMRect(popup, elementRect);
+        if (!PopupProxyHost.popupCanShow(popup)) { return false; }
         return await popup.kanjiShow(elementRect, writingMode, definitions, options, context);
     }
 
     async clearAutoPlayTimer(id) {
         const popup = this.getPopup(id);
         return popup.clearAutoPlayTimer();
+    }
+
+    static popupCanShow(popup) {
+        return popup.parent === null || popup.parent.isVisible();
     }
 }
 
