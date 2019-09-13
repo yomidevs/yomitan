@@ -18,14 +18,14 @@
 
 
 class PopupProxy {
-    constructor(parentId, parentFrameId) {
+    constructor(depth, parentId, parentFrameId) {
         this.parentId = parentId;
         this.parentFrameId = parentFrameId;
         this.id = null;
         this.idPromise = null;
         this.parent = null;
         this.child = null;
-        this.depth = 0;
+        this.depth = depth;
 
         this.container = null;
 

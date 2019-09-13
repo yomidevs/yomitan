@@ -23,6 +23,10 @@ class DisplayFloat extends Display {
         this.autoPlayAudioTimer = null;
         this.styleNode = null;
 
+        this.optionsContext = {
+            depth: 0
+        };
+
         this.dependencies = Object.assign({}, this.dependencies, {docRangeFromPoint, docSentenceExtract});
 
         $(window).on('message', utilAsync(this.onMessage.bind(this)));
@@ -75,6 +79,7 @@ class DisplayFloat extends Display {
             },
 
             popupNestedInitialize: ({id, depth, parentFrameId}) => {
+                this.optionsContext.depth = depth;
                 popupNestedInitialize(id, depth, parentFrameId);
             }
         };

@@ -22,44 +22,43 @@ class Backend {
         this.translator = new Translator();
         this.anki = new AnkiNull();
         this.options = null;
+        this.optionsContext = {
+            depth: 0
+        };
+
+        this.isPreparedResolve = null;
+        this.isPreparedPromise = new Promise((resolve) => (this.isPreparedResolve = resolve));
 
         this.apiForwarder = new BackendApiForwarder();
     }
 
     async prepare() {
         await this.translator.prepare();
-        this.onOptionsUpdated(await optionsLoad());
+        this.options = await optionsLoad();
+        this.onOptionsUpdated('background');
 
         if (chrome.commands !== null && typeof chrome.commands === 'object') {
             chrome.commands.onCommand.addListener(this.onCommand.bind(this));
         }
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
 
-        if (this.options.general.showGuide) {
+        const options = this.getOptionsSync(this.optionsContext);
+        if (options.general.showGuide) {
             chrome.tabs.create({url: chrome.extension.getURL('/bg/guide.html')});
         }
+
+        this.isPreparedResolve();
+        this.isPreparedResolve = null;
+        this.isPreparedPromise = null;
     }
 
-    onOptionsUpdated(options) {
-        options = utilIsolate(options);
-        this.options = options;
-
-        if (!options.general.enable) {
-            this.setExtensionBadgeBackgroundColor('#555555');
-            this.setExtensionBadgeText('off');
-        } else if (!dictConfigured(options)) {
-            this.setExtensionBadgeBackgroundColor('#f0ad4e');
-            this.setExtensionBadgeText('!');
-        } else {
-            this.setExtensionBadgeText('');
-        }
-
-        this.anki = options.anki.enable ? new AnkiConnect(options.anki.server) : new AnkiNull();
+    onOptionsUpdated(source) {
+        this.applyOptions();
 
         const callback = () => this.checkLastError(chrome.runtime.lastError);
         chrome.tabs.query({}, tabs => {
             for (const tab of tabs) {
-                chrome.tabs.sendMessage(tab.id, {action: 'optionsSet', params: {options}}, callback);
+                chrome.tabs.sendMessage(tab.id, {action: 'optionsUpdate', params: {source}}, callback);
             }
         });
     }
@@ -78,24 +77,24 @@ class Backend {
         };
 
         const handlers = {
-            optionsGet: ({callback}) => {
-                forward(apiOptionsGet(), callback);
+            optionsGet: ({optionsContext, callback}) => {
+                forward(apiOptionsGet(optionsContext), callback);
             },
 
-            kanjiFind: ({text, callback}) => {
-                forward(apiKanjiFind(text), callback);
+            kanjiFind: ({text, optionsContext, callback}) => {
+                forward(apiKanjiFind(text, optionsContext), callback);
             },
 
-            termsFind: ({text, callback}) => {
-                forward(apiTermsFind(text), callback);
+            termsFind: ({text, optionsContext, callback}) => {
+                forward(apiTermsFind(text, optionsContext), callback);
             },
 
-            definitionAdd: ({definition, mode, context, callback}) => {
-                forward(apiDefinitionAdd(definition, mode, context), callback);
+            definitionAdd: ({definition, mode, context, optionsContext, callback}) => {
+                forward(apiDefinitionAdd(definition, mode, context, optionsContext), callback);
             },
 
-            definitionsAddable: ({definitions, modes, callback}) => {
-                forward(apiDefinitionsAddable(definitions, modes), callback);
+            definitionsAddable: ({definitions, modes, optionsContext, callback}) => {
+                forward(apiDefinitionsAddable(definitions, modes, optionsContext), callback);
             },
 
             noteView: ({noteId}) => {
@@ -134,6 +133,39 @@ class Backend {
         }
 
         return true;
+    }
+
+    applyOptions() {
+        const options = this.getOptionsSync(this.optionsContext);
+        if (!options.general.enable) {
+            this.setExtensionBadgeBackgroundColor('#555555');
+            this.setExtensionBadgeText('off');
+        } else if (!dictConfigured(options)) {
+            this.setExtensionBadgeBackgroundColor('#f0ad4e');
+            this.setExtensionBadgeText('!');
+        } else {
+            this.setExtensionBadgeText('');
+        }
+
+        this.anki = options.anki.enable ? new AnkiConnect(options.anki.server) : new AnkiNull();
+    }
+
+    async getFullOptions() {
+        if (this.isPreparedPromise !== null) {
+            await this.isPreparedPromise;
+        }
+        return this.options;
+    }
+
+    async getOptions(optionsContext) {
+        if (this.isPreparedPromise !== null) {
+            await this.isPreparedPromise;
+        }
+        return this.getOptionsSync(optionsContext);
+    }
+
+    getOptionsSync(optionsContext) {
+        return this.options;
     }
 
     setExtensionBadgeBackgroundColor(color) {

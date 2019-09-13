@@ -330,7 +330,7 @@ function optionsLoad() {
     }).then(optionsStr => {
         if (typeof optionsStr === 'string') {
             const options = JSON.parse(optionsStr);
-            if (typeof options === 'object' && options !== null && !Array.isArray(options)) {
+            if (utilIsObject(options)) {
                 return options;
             }
         }
@@ -343,9 +343,14 @@ function optionsLoad() {
 }
 
 function optionsSave(options) {
-    return new Promise((resolve) => {
-        chrome.storage.local.set({options: JSON.stringify(options)}, resolve);
-    }).then(() => {
-        utilBackend().onOptionsUpdated(options);
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.set({options: JSON.stringify(options)}, () => {
+            const error = chrome.runtime.lastError;
+            if (error) {
+                reject(error);
+            } else {
+                resolve();
+            }
+        });
     });
 }

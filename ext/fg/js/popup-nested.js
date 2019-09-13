@@ -25,7 +25,8 @@ async function popupNestedInitialize(id, depth, parentFrameId) {
     }
     popupNestedInitialized = true;
 
-    const options = await apiOptionsGet();
+    const optionsContext = {depth};
+    const options = await apiOptionsGet(optionsContext);
     const popupNestingMaxDepth = options.scanning.popupNestingMaxDepth;
 
     if (!(typeof popupNestingMaxDepth === 'number' && typeof depth === 'number' && depth < popupNestingMaxDepth)) {
