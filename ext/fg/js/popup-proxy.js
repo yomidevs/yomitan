@@ -76,16 +76,16 @@ class PopupProxy {
         return await this.invokeHostApi('containsPoint', {id: this.id, point});
     }
 
-    async termsShow(elementRect, definitions, options, context) {
+    async termsShow(elementRect, writingMode, definitions, options, context) {
         const id = await this.getPopupId();
         elementRect = PopupProxy.DOMRectToJson(elementRect);
-        return await this.invokeHostApi('termsShow', {id, elementRect, definitions, options, context});
+        return await this.invokeHostApi('termsShow', {id, elementRect, writingMode, definitions, options, context});
     }
 
-    async kanjiShow(elementRect, definitions, options, context) {
+    async kanjiShow(elementRect, writingMode, definitions, options, context) {
         const id = await this.getPopupId();
         elementRect = PopupProxy.DOMRectToJson(elementRect);
-        return await this.invokeHostApi('kanjiShow', {id, elementRect, definitions, options, context});
+        return await this.invokeHostApi('kanjiShow', {id, elementRect, writingMode, definitions, options, context});
     }
 
     async clearAutoPlayTimer() {
