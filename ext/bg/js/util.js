@@ -26,6 +26,11 @@ function utilIsolate(data) {
     return JSON.parse(JSON.stringify(data));
 }
 
+function utilBackgroundIsolate(data) {
+    const backgroundPage = chrome.extension.getBackgroundPage();
+    return backgroundPage.utilIsolate(data);
+}
+
 function utilSetEqual(setA, setB) {
     if (setA.size !== setB.size) {
         return false;
