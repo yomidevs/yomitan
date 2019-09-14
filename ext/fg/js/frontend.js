@@ -126,7 +126,6 @@ class Frontend {
             return false;
         }
 
-        this.mousePosLast = {x: e.clientX, y: e.clientY};
         this.popupTimerClear();
         this.searchClear();
     }
