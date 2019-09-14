@@ -69,11 +69,11 @@ class PopupProxy {
         return await this.invokeHostApi('setVisible', {id, visible});
     }
 
-    async containsPoint(point) {
+    async containsPoint(x, y) {
         if (this.id === null) {
             return false;
         }
-        return await this.invokeHostApi('containsPoint', {id: this.id, point});
+        return await this.invokeHostApi('containsPoint', {id: this.id, x, y});
     }
 
     async termsShow(elementRect, writingMode, definitions, options, context) {

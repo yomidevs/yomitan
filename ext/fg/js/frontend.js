@@ -104,7 +104,7 @@ class Frontend {
 
         const search = async () => {
             try {
-                await this.searchAt({x: e.clientX, y: e.clientY}, 'mouse');
+                await this.searchAt(e.clientX, e.clientY, 'mouse');
             } catch (e) {
                 this.onError(e);
             }
@@ -280,12 +280,12 @@ class Frontend {
         }
     }
 
-    async searchAt(point, type) {
-        if (this.pendingLookup || await this.popup.containsPoint(point)) {
+    async searchAt(x, y, type) {
+        if (this.pendingLookup || await this.popup.containsPoint(x, y)) {
             return;
         }
 
-        const textSource = docRangeFromPoint(point, this.options);
+        const textSource = docRangeFromPoint(x, y, this.options);
         let hideResults = textSource === null;
         let searched = false;
         let success = false;
@@ -470,7 +470,7 @@ class Frontend {
 
         const search = async () => {
             try {
-                await this.searchAt({x, y}, type);
+                await this.searchAt(x, y, type);
             } catch (e) {
                 this.onError(e);
             }

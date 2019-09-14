@@ -89,7 +89,7 @@ function docImposterCreate(element, isTextarea) {
     return [imposter, container];
 }
 
-function docRangeFromPoint({x, y}, options) {
+function docRangeFromPoint(x, y, options) {
     const elements = document.elementsFromPoint(x, y);
     let imposter = null;
     let imposterContainer = null;
