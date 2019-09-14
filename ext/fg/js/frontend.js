@@ -21,8 +21,6 @@ class Frontend {
     constructor(popup, ignoreNodes) {
         this.popup = popup;
         this.popupTimer = null;
-        this.mouseDownLeft = false;
-        this.mouseDownMiddle = false;
         this.textSourceLast = null;
         this.pendingLookup = false;
         this.options = null;
@@ -61,7 +59,6 @@ class Frontend {
             window.addEventListener('mousemove', this.onMouseMove.bind(this));
             window.addEventListener('mouseover', this.onMouseOver.bind(this));
             window.addEventListener('mouseout', this.onMouseOut.bind(this));
-            window.addEventListener('mouseup', this.onMouseUp.bind(this));
             window.addEventListener('resize', this.onResize.bind(this));
 
             if (this.options.scanning.touchInputEnabled) {
@@ -88,26 +85,20 @@ class Frontend {
     onMouseMove(e) {
         this.popupTimerClear();
 
-        if (!this.options.general.enable) {
+        if (
+            this.pendingLookup ||
+            !this.options.general.enable ||
+            (e.buttons & 0x1) !== 0x0 // Left mouse button
+        ) {
             return;
         }
 
-        if (this.mouseDownLeft) {
-            return;
-        }
-
-        if (this.pendingLookup) {
-            return;
-        }
-
-        const mouseScan = this.mouseDownMiddle && this.options.scanning.middleMouse;
-        const keyScan =
-            this.options.scanning.modifier === 'alt' && e.altKey ||
-            this.options.scanning.modifier === 'ctrl' && e.ctrlKey ||
-            this.options.scanning.modifier === 'shift' && e.shiftKey ||
-            this.options.scanning.modifier === 'none';
-
-        if (!keyScan && !mouseScan) {
+        const scanningOptions = this.options.scanning;
+        const scanningModifier = scanningOptions.modifier;
+        if (!(
+            Frontend.isScanningModifierPressed(scanningModifier, e) ||
+            (scanningOptions.middleMouse && (e.buttons & 0x4) !== 0x0) // Middle mouse button
+        )) {
             return;
         }
 
@@ -119,7 +110,7 @@ class Frontend {
             }
         };
 
-        if (this.options.scanning.modifier === 'none') {
+        if (scanningModifier === 'none') {
             this.popupTimerSet(search);
         } else {
             search();
@@ -138,20 +129,6 @@ class Frontend {
         this.mousePosLast = {x: e.clientX, y: e.clientY};
         this.popupTimerClear();
         this.searchClear();
-
-        if (e.which === 1) {
-            this.mouseDownLeft = true;
-        } else if (e.which === 2) {
-            this.mouseDownMiddle = true;
-        }
-    }
-
-    onMouseUp(e) {
-        if (e.which === 1) {
-            this.mouseDownLeft = false;
-        } else if (e.which === 2) {
-            this.mouseDownMiddle = false;
-        }
     }
 
     onMouseOut(e) {
@@ -529,6 +506,16 @@ class Frontend {
             }
             --length;
             textSource.setEndOffset(length);
+        }
+    }
+
+    static isScanningModifierPressed(scanningModifier, mouseEvent) {
+        switch (scanningModifier) {
+            case 'alt': return mouseEvent.altKey;
+            case 'ctrl': return mouseEvent.ctrlKey;
+            case 'shift': return mouseEvent.shiftKey;
+            case 'none': return true;
+            default: return false;
         }
     }
 }
