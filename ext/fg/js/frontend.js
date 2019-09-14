@@ -77,7 +77,7 @@ class Frontend {
     }
 
     onMouseOver(e) {
-        if (e.target === this.popup.container && this.popupTimer) {
+        if (e.target === this.popup.container && this.popupTimer !== null) {
             this.popupTimerClear();
         }
     }
@@ -269,12 +269,11 @@ class Frontend {
     }
 
     popupTimerSet(callback) {
-        this.popupTimerClear();
         this.popupTimer = window.setTimeout(callback, this.options.scanning.delay);
     }
 
     popupTimerClear() {
-        if (this.popupTimer) {
+        if (this.popupTimer !== null) {
             window.clearTimeout(this.popupTimer);
             this.popupTimer = null;
         }
