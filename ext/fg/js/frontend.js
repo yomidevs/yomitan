@@ -219,8 +219,8 @@ class Frontend {
         }
     }
 
-    onAfterSearch(newRange, type, searched, success) {
-        if (type === 'mouse') {
+    onAfterSearch(newRange, cause, searched, success) {
+        if (cause === 'mouse') {
             return;
         }
 
@@ -230,7 +230,7 @@ class Frontend {
             return;
         }
 
-        if (type === 'touchStart' && newRange !== null) {
+        if (cause === 'touchStart' && newRange !== null) {
             this.scrollPrevent = true;
         }
 
@@ -280,7 +280,7 @@ class Frontend {
         }
     }
 
-    async searchAt(x, y, type) {
+    async searchAt(x, y, cause) {
         if (this.pendingLookup || await this.popup.containsPoint(x, y)) {
             return;
         }
@@ -294,7 +294,7 @@ class Frontend {
             if (!hideResults && (!this.textSourceLast || !this.textSourceLast.equals(textSource))) {
                 searched = true;
                 this.pendingLookup = true;
-                const focus = (type === 'mouse');
+                const focus = (cause === 'mouse');
                 hideResults = !await this.searchTerms(textSource, focus) && !await this.searchKanji(textSource, focus);
                 success = true;
             }
@@ -319,7 +319,7 @@ class Frontend {
             }
 
             this.pendingLookup = false;
-            this.onAfterSearch(this.textSourceLast, type, searched, success);
+            this.onAfterSearch(this.textSourceLast, cause, searched, success);
         }
     }
 
@@ -461,7 +461,7 @@ class Frontend {
         this.clickPrevent = value;
     }
 
-    searchFromTouch(x, y, type) {
+    searchFromTouch(x, y, cause) {
         this.popupTimerClear();
 
         if (!this.options.general.enable || this.pendingLookup) {
@@ -470,7 +470,7 @@ class Frontend {
 
         const search = async () => {
             try {
-                await this.searchAt(x, y, type);
+                await this.searchAt(x, y, cause);
             } catch (e) {
                 this.onError(e);
             }
