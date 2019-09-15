@@ -150,16 +150,16 @@ class Display {
 
     onKeyDown(e) {
         const noteTryAdd = mode => {
-            const button = Display.adderButtonFind(this.index, mode);
-            if (button.length !== 0 && !button.hasClass('disabled')) {
+            const button = this.adderButtonFind(this.index, mode);
+            if (button !== null && !button.classList.contains('disabled')) {
                 this.noteAdd(this.definitions[this.index], mode);
             }
         };
 
         const noteTryView = mode => {
-            const button = Display.viewerButtonFind(this.index);
-            if (button.length !== 0 && !button.hasClass('disabled')) {
-                apiNoteView(button.data('noteId'));
+            const button = this.viewerButtonFind(this.index);
+            if (button !== null && !button.classList.contains('disabled')) {
+                apiNoteView(button.dataset.noteId);
             }
         };
 
@@ -241,7 +241,8 @@ class Display {
 
             80: /* p */ () => {
                 if (e.altKey) {
-                    if ($('.entry').eq(this.index).data('type') === 'term') {
+                    const entry = this.getEntry(this.index);
+                    if (entry !== null && entry.dataset.type === 'term') {
                         this.audioPlay(this.definitions[this.index], this.firstExpressionIndex);
                     }
 
@@ -393,14 +394,13 @@ class Display {
             for (let i = 0; i < states.length; ++i) {
                 const state = states[i];
                 for (const mode in state) {
-                    const button = Display.adderButtonFind(i, mode);
-                    if (state[mode]) {
-                        button.removeClass('disabled');
-                    } else {
-                        button.addClass('disabled');
+                    const button = this.adderButtonFind(i, mode);
+                    if (button === null) {
+                        continue;
                     }
 
-                    button.removeClass('pending');
+                    button.classList.toggle('disabled', !state[mode]);
+                    button.classList.remove('pending');
                 }
             }
         } catch (e) {
@@ -462,8 +462,15 @@ class Display {
             const noteId = await apiDefinitionAdd(definition, mode, context, this.optionsContext);
             if (noteId) {
                 const index = this.definitions.indexOf(definition);
-                Display.adderButtonFind(index, mode).addClass('disabled');
-                Display.viewerButtonFind(index).removeClass('pending disabled').data('noteId', noteId);
+                const adderButton = this.adderButtonFind(index, mode);
+                if (adderButton !== null) {
+                    adderButton.classList.add('disabled');
+                }
+                const viewerButton = this.viewerButtonFind(index);
+                if (viewerButton !== null) {
+                    viewerButton.classList.remove('pending', 'disabled');
+                    viewerButton.dataset.noteId = noteId;
+                }
             } else {
                 throw 'Note could note be added';
             }
@@ -549,6 +556,11 @@ class Display {
         this.spinner.style.display = visible ? 'block' : '';
     }
 
+    getEntry(index) {
+        const entries = this.container.querySelectorAll('.entry');
+        return index >= 0 && index < entries.length ? entries[index] : null;
+    }
+
     static clozeBuild(sentence, source) {
         const result = {
             sentence: sentence.text.trim()
@@ -568,12 +580,14 @@ class Display {
         return entry !== null ? Display.indexOf(this.container.querySelectorAll('.entry'), entry) : -1;
     }
 
-    static adderButtonFind(index, mode) {
-        return $('.entry').eq(index).find(`.action-add-note[data-mode="${mode}"]`);
+    adderButtonFind(index, mode) {
+        const entry = this.getEntry(index);
+        return entry !== null ? entry.querySelector(`.action-add-note[data-mode="${mode}"]`) : null;
     }
 
-    static viewerButtonFind(index) {
-        return $('.entry').eq(index).find('.action-view-note');
+    viewerButtonFind(index) {
+        const entry = this.getEntry(index);
+        return entry !== null ? entry.querySelector('.action-view-note') : null;
     }
 
     static delay(time) {
