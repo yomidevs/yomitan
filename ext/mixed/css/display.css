@@ -230,3 +230,7 @@ div.glossary-item.compact-glossary {
 .info-output td {
     text-align: right;
 }
+
+.entry:not(.entry-current) .current {
+    display: none;
+}

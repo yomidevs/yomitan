@@ -412,16 +412,23 @@ class Display {
         index = Math.min(index, this.definitions.length - 1);
         index = Math.max(index, 0);
 
-        $('.current').hide().eq(index).show();
+        const entryPre = this.getEntry(this.index);
+        if (entryPre !== null) {
+            entryPre.classList.remove('entry-current');
+        }
+
+        const entry = this.getEntry(index);
+        if (entry !== null) {
+            entry.classList.add('entry-current');
+        }
 
         this.windowScroll.stop();
-        const entry = $('.entry').eq(index);
         let target;
 
         if (scroll) {
             target = scroll;
         } else {
-            target = index === 0 ? 0 : entry.offset().top;
+            target = index === 0 || entry === null ? 0 : Display.getElementTop(entry);
         }
 
         if (smooth) {
@@ -605,5 +612,11 @@ class Display {
 
     addEventListeners(selector, ...args) {
         this.container.querySelectorAll(selector).forEach((node) => node.addEventListener(...args));
+    }
+
+    static getElementTop(element) {
+        const elementRect = element.getBoundingClientRect();
+        const documentRect = document.documentElement.getBoundingClientRect();
+        return elementRect.top - documentRect.top;
     }
 }
