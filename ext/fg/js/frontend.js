@@ -21,8 +21,6 @@ class Frontend {
     constructor(popup, ignoreNodes) {
         this.popup = popup;
         this.popupTimer = null;
-        this.mouseDownLeft = false;
-        this.mouseDownMiddle = false;
         this.textSourceLast = null;
         this.pendingLookup = false;
         this.options = null;
@@ -61,7 +59,6 @@ class Frontend {
             window.addEventListener('mousemove', this.onMouseMove.bind(this));
             window.addEventListener('mouseover', this.onMouseOver.bind(this));
             window.addEventListener('mouseout', this.onMouseOut.bind(this));
-            window.addEventListener('mouseup', this.onMouseUp.bind(this));
             window.addEventListener('resize', this.onResize.bind(this));
 
             if (this.options.scanning.touchInputEnabled) {
@@ -80,7 +77,7 @@ class Frontend {
     }
 
     onMouseOver(e) {
-        if (e.target === this.popup.container && this.popupTimer) {
+        if (e.target === this.popup.container && this.popupTimer !== null) {
             this.popupTimerClear();
         }
     }
@@ -88,38 +85,32 @@ class Frontend {
     onMouseMove(e) {
         this.popupTimerClear();
 
-        if (!this.options.general.enable) {
+        if (
+            this.pendingLookup ||
+            !this.options.general.enable ||
+            (e.buttons & 0x1) !== 0x0 // Left mouse button
+        ) {
             return;
         }
 
-        if (this.mouseDownLeft) {
-            return;
-        }
-
-        if (this.pendingLookup) {
-            return;
-        }
-
-        const mouseScan = this.mouseDownMiddle && this.options.scanning.middleMouse;
-        const keyScan =
-            this.options.scanning.modifier === 'alt' && e.altKey ||
-            this.options.scanning.modifier === 'ctrl' && e.ctrlKey ||
-            this.options.scanning.modifier === 'shift' && e.shiftKey ||
-            this.options.scanning.modifier === 'none';
-
-        if (!keyScan && !mouseScan) {
+        const scanningOptions = this.options.scanning;
+        const scanningModifier = scanningOptions.modifier;
+        if (!(
+            Frontend.isScanningModifierPressed(scanningModifier, e) ||
+            (scanningOptions.middleMouse && (e.buttons & 0x4) !== 0x0) // Middle mouse button
+        )) {
             return;
         }
 
         const search = async () => {
             try {
-                await this.searchAt({x: e.clientX, y: e.clientY}, 'mouse');
+                await this.searchAt(e.clientX, e.clientY, 'mouse');
             } catch (e) {
                 this.onError(e);
             }
         };
 
-        if (this.options.scanning.modifier === 'none') {
+        if (scanningModifier === 'none') {
             this.popupTimerSet(search);
         } else {
             search();
@@ -135,23 +126,8 @@ class Frontend {
             return false;
         }
 
-        this.mousePosLast = {x: e.clientX, y: e.clientY};
         this.popupTimerClear();
         this.searchClear();
-
-        if (e.which === 1) {
-            this.mouseDownLeft = true;
-        } else if (e.which === 2) {
-            this.mouseDownMiddle = true;
-        }
-    }
-
-    onMouseUp(e) {
-        if (e.which === 1) {
-            this.mouseDownLeft = false;
-        } else if (e.which === 2) {
-            this.mouseDownMiddle = false;
-        }
     }
 
     onMouseOut(e) {
@@ -243,8 +219,8 @@ class Frontend {
         }
     }
 
-    onAfterSearch(newRange, type, searched, success) {
-        if (type === 'mouse') {
+    onAfterSearch(newRange, cause, searched, success) {
+        if (cause === 'mouse') {
             return;
         }
 
@@ -254,7 +230,7 @@ class Frontend {
             return;
         }
 
-        if (type === 'touchStart' && newRange !== null) {
+        if (cause === 'touchStart' && newRange !== null) {
             this.scrollPrevent = true;
         }
 
@@ -293,23 +269,22 @@ class Frontend {
     }
 
     popupTimerSet(callback) {
-        this.popupTimerClear();
         this.popupTimer = window.setTimeout(callback, this.options.scanning.delay);
     }
 
     popupTimerClear() {
-        if (this.popupTimer) {
+        if (this.popupTimer !== null) {
             window.clearTimeout(this.popupTimer);
             this.popupTimer = null;
         }
     }
 
-    async searchAt(point, type) {
-        if (this.pendingLookup || await this.popup.containsPoint(point)) {
+    async searchAt(x, y, cause) {
+        if (this.pendingLookup || await this.popup.containsPoint(x, y)) {
             return;
         }
 
-        const textSource = docRangeFromPoint(point, this.options);
+        const textSource = docRangeFromPoint(x, y, this.options);
         let hideResults = textSource === null;
         let searched = false;
         let success = false;
@@ -318,7 +293,7 @@ class Frontend {
             if (!hideResults && (!this.textSourceLast || !this.textSourceLast.equals(textSource))) {
                 searched = true;
                 this.pendingLookup = true;
-                const focus = (type === 'mouse');
+                const focus = (cause === 'mouse');
                 hideResults = !await this.searchTerms(textSource, focus) && !await this.searchKanji(textSource, focus);
                 success = true;
             }
@@ -343,7 +318,7 @@ class Frontend {
             }
 
             this.pendingLookup = false;
-            this.onAfterSearch(this.textSourceLast, type, searched, success);
+            this.onAfterSearch(this.textSourceLast, cause, searched, success);
         }
     }
 
@@ -485,7 +460,7 @@ class Frontend {
         this.clickPrevent = value;
     }
 
-    searchFromTouch(x, y, type) {
+    searchFromTouch(x, y, cause) {
         this.popupTimerClear();
 
         if (!this.options.general.enable || this.pendingLookup) {
@@ -494,7 +469,7 @@ class Frontend {
 
         const search = async () => {
             try {
-                await this.searchAt({x, y}, type);
+                await this.searchAt(x, y, cause);
             } catch (e) {
                 this.onError(e);
             }
@@ -529,6 +504,16 @@ class Frontend {
             }
             --length;
             textSource.setEndOffset(length);
+        }
+    }
+
+    static isScanningModifierPressed(scanningModifier, mouseEvent) {
+        switch (scanningModifier) {
+            case 'alt': return mouseEvent.altKey;
+            case 'ctrl': return mouseEvent.ctrlKey;
+            case 'shift': return mouseEvent.shiftKey;
+            case 'none': return true;
+            default: return false;
         }
     }
 }

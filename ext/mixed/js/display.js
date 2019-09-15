@@ -81,7 +81,7 @@ class Display {
             const {docRangeFromPoint, docSentenceExtract} = this.dependencies;
 
             const clickedElement = $(e.target);
-            const textSource = docRangeFromPoint({x: e.clientX, y: e.clientY}, this.options);
+            const textSource = docRangeFromPoint(e.clientX, e.clientY, this.options);
             if (textSource === null) {
                 return false;
             }
