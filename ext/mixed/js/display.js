@@ -31,8 +31,8 @@ class Display {
 
         this.dependencies = {};
 
-        $(document).keydown(this.onKeyDown.bind(this));
-        $(document).on('wheel', this.onWheel.bind(this));
+        document.addEventListener('keydown', this.onKeyDown.bind(this));
+        document.addEventListener('wheel', this.onWheel.bind(this), {passive: false});
     }
 
     onError(error) {
@@ -259,13 +259,12 @@ class Display {
     }
 
     onWheel(e) {
-        const event = e.originalEvent;
         const handler = () => {
-            if (event.altKey) {
-                if (event.deltaY < 0) { // scroll up
+            if (e.altKey) {
+                if (e.deltaY < 0) { // scroll up
                     this.entryScrollIntoView(this.index - 1, null, true);
                     return true;
-                } else if (event.deltaY > 0) { // scroll down
+                } else if (e.deltaY > 0) { // scroll down
                     this.entryScrollIntoView(this.index + 1, null, true);
                     return true;
                 }
@@ -273,7 +272,7 @@ class Display {
         };
 
         if (handler()) {
-            event.preventDefault();
+            e.preventDefault();
         }
     }
 
@@ -318,13 +317,13 @@ class Display {
                 this.autoPlayAudio();
             }
 
-            $('.action-add-note').click(this.onNoteAdd.bind(this));
-            $('.action-view-note').click(this.onNoteView.bind(this));
-            $('.action-play-audio').click(this.onAudioPlay.bind(this));
-            $('.kanji-link').click(this.onKanjiLookup.bind(this));
-            $('.source-term').click(this.onSourceTermView.bind(this));
+            this.addEventListeners('.action-add-note', 'click', this.onNoteAdd.bind(this));
+            this.addEventListeners('.action-view-note', 'click', this.onNoteView.bind(this));
+            this.addEventListeners('.action-play-audio', 'click', this.onAudioPlay.bind(this));
+            this.addEventListeners('.kanji-link', 'click', this.onKanjiLookup.bind(this));
+            this.addEventListeners('.source-term', 'click', this.onSourceTermView.bind(this));
             if (this.options.scanning.enablePopupSearch) {
-                $('.glossary-item').click(this.onTermLookup.bind(this));
+                this.addEventListeners('.glossary-item', 'click', this.onTermLookup.bind(this));
             }
 
             await this.adderButtonUpdate(['term-kanji', 'term-kana'], sequence);
@@ -366,9 +365,9 @@ class Display {
             const {index, scroll} = context || {};
             this.entryScrollIntoView(index || 0, scroll);
 
-            $('.action-add-note').click(this.onNoteAdd.bind(this));
-            $('.action-view-note').click(this.onNoteView.bind(this));
-            $('.source-term').click(this.onSourceTermView.bind(this));
+            this.addEventListeners('.action-add-note', 'click', this.onNoteAdd.bind(this));
+            this.addEventListeners('.action-view-note', 'click', this.onNoteView.bind(this));
+            this.addEventListeners('.source-term', 'click', this.onSourceTermView.bind(this));
 
             await this.adderButtonUpdate(['kanji'], sequence);
         } catch (e) {
@@ -584,5 +583,9 @@ class Display {
             }
         }
         return -1;
+    }
+
+    addEventListeners(selector, ...args) {
+        this.container.querySelectorAll(selector).forEach((node) => node.addEventListener(...args));
     }
 }
