@@ -19,7 +19,7 @@
 
 class DisplaySearch extends Display {
     constructor() {
-        super($('#spinner'), $('#content'));
+        super(document.querySelector('#spinner'), document.querySelector('#content'));
 
         this.optionsContext = {
             depth: 0,

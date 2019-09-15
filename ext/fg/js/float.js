@@ -19,7 +19,7 @@
 
 class DisplayFloat extends Display {
     constructor() {
-        super($('#spinner'), $('#definitions'));
+        super(document.querySelector('#spinner'), document.querySelector('#definitions'));
         this.autoPlayAudioTimer = null;
         this.styleNode = null;
 

@@ -310,7 +310,7 @@ class Display {
             }
 
             const content = await apiTemplateRender('terms.html', params);
-            this.container.html(content);
+            this.container.innerHTML = content;
             const {index, scroll} = context || {};
             this.entryScrollIntoView(index || 0, scroll);
 
@@ -362,7 +362,7 @@ class Display {
             }
 
             const content = await apiTemplateRender('kanji.html', params);
-            this.container.html(content);
+            this.container.innerHTML = content;
             const {index, scroll} = context || {};
             this.entryScrollIntoView(index || 0, scroll);
 
@@ -446,7 +446,7 @@ class Display {
 
     async noteAdd(definition, mode) {
         try {
-            this.spinner.show();
+            this.setSpinnerVisible(true);
 
             const context = {};
             if (this.noteUsesScreenshot()) {
@@ -467,13 +467,13 @@ class Display {
         } catch (e) {
             this.onError(e);
         } finally {
-            this.spinner.hide();
+            this.setSpinnerVisible(false);
         }
     }
 
     async audioPlay(definition, expressionIndex) {
         try {
-            this.spinner.show();
+            this.setSpinnerVisible(true);
 
             const expression = expressionIndex === -1 ? definition : definition.expressions[expressionIndex];
             let url = await apiAudioGetUrl(expression, this.options.general.audioSource);
@@ -505,7 +505,7 @@ class Display {
         } catch (e) {
             this.onError(e);
         } finally {
-            this.spinner.hide();
+            this.setSpinnerVisible(false);
         }
     }
 
@@ -542,6 +542,10 @@ class Display {
         return apiForward('popupSetVisible', {visible});
     }
 
+    setSpinnerVisible(visible) {
+        this.spinner.style.display = visible ? 'block' : '';
+    }
+
     static clozeBuild(sentence, source) {
         const result = {
             sentence: sentence.text.trim()
@@ -558,7 +562,7 @@ class Display {
 
     entryIndexFind(element) {
         const entry = element.closest('.entry');
-        return entry !== null ? Display.indexOf(this.container.get(0).querySelectorAll('.entry'), entry) : -1;
+        return entry !== null ? Display.indexOf(this.container.querySelectorAll('.entry'), entry) : -1;
     }
 
     static adderButtonFind(index, mode) {
