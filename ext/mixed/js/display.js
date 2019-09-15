@@ -31,6 +31,8 @@ class Display {
 
         this.dependencies = {};
 
+        this.windowScroll = new WindowScroll();
+
         document.addEventListener('keydown', this.onKeyDown.bind(this));
         document.addEventListener('wheel', this.onWheel.bind(this), {passive: false});
     }
@@ -53,11 +55,12 @@ class Display {
             e.preventDefault();
 
             const link = e.target;
+            this.windowScroll.toY(0);
             const context = {
                 source: {
                     definitions: this.definitions,
                     index: this.entryIndexFind(link),
-                    scroll: $('html,body').scrollTop()
+                    scroll: this.windowScroll.y
                 }
             };
 
@@ -102,11 +105,12 @@ class Display {
                 textSource.cleanup();
             }
 
+            this.windowScroll.toY(0);
             const context = {
                 source: {
                     definitions: this.definitions,
                     index: this.entryIndexFind(clickedElement),
-                    scroll: $('html,body').scrollTop()
+                    scroll: this.windowScroll.y
                 }
             };
 
@@ -410,7 +414,7 @@ class Display {
 
         $('.current').hide().eq(index).show();
 
-        const container = $('html,body').stop();
+        this.windowScroll.stop();
         const entry = $('.entry').eq(index);
         let target;
 
@@ -421,9 +425,9 @@ class Display {
         }
 
         if (smooth) {
-            container.animate({scrollTop: target}, 200);
+            this.windowScroll.animate(this.windowScroll.x, target, 200);
         } else {
-            container.scrollTop(target);
+            this.windowScroll.toY(target);
         }
 
         this.index = index;
