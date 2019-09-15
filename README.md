@@ -61,7 +61,7 @@ Import](https://foosoft.net/projects/yomichan-import) page to learn how to conve
 Please be aware that the non-English dictionaries contain fewer entries than their English counterparts. Even if your
 primary language is not English, you may consider also importing the English version for better coverage.
 
-*   **[JMdict](http://www.edrdg.org/enamdict/enamdict_doc.html)** (Japanese vocabulary)
+*   **[JMdict](https://www.edrdg.org/enamdict/enamdict_doc.html)** (Japanese vocabulary)
     *   [jmdict\_dutch.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_dutch.zip)
     *   [jmdict\_english.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_english.zip)
     *   [jmdict\_french.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_french.zip)
@@ -71,7 +71,7 @@ primary language is not English, you may consider also importing the English ver
     *   [jmdict\_slovenian.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_slovenian.zip)
     *   [jmdict\_spanish.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_spanish.zip)
     *   [jmdict\_swedish.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_swedish.zip)
-*   **[JMnedict](http://www.edrdg.org/enamdict/enamdict_doc.html)** (Japanese names)
+*   **[JMnedict](https://www.edrdg.org/enamdict/enamdict_doc.html)** (Japanese names)
     *   [jmnedict.zip](https://foosoft.net/projects/yomichan/dl/dict/jmnedict.zip)
 *   **[KireiCake](https://kireicake.com/rikaicakes/)** (Japanese slang)
     *   [kireicake.zip](https://foosoft.net/projects/yomichan/dl/dict/kireicake.zip)
@@ -127,7 +127,7 @@ Import](https://foosoft.net/projects/yomichan-import). Please see the project pa
 
 ## Anki Integration ##
 
-Yomichan features automatic flashcard creation for [Anki](http://ankisrs.net/), a free application designed to help you
+Yomichan features automatic flashcard creation for [Anki](https://apps.ankiweb.net/), a free application designed to help you
 retain knowledge. This feature requires the prior installation of an Anki plugin called [AnkiConnect](https://foosoft.net/projects/anki-connect).
 Please see the respective project page for more information about how to set up this software.
 
@@ -135,7 +135,7 @@ Please see the respective project page for more information about how to set up 
 
 Before flashcards can be automatically created, you must configure the templates used to create term and/or Kanji notes.
 If you are unfamiliar with Anki deck and model management, this would be a good time to reference the [Anki
-Manual](http://ankisrs.net/docs/manual.html). In short, you must specify what information should be included in the
+Manual](https://apps.ankiweb.net/docs/manual.html). In short, you must specify what information should be included in the
 flashcards that Yomichan creates through AnkiConnect.
 
 Flashcard fields can be configured with the following steps:
@@ -145,7 +145,7 @@ Flashcard fields can be configured with the following steps:
 3.  Select the type of template to configure by clicking on either the *Terms* or *Kanji* tabs.
 4.  Select the Anki deck and model to use for new creating new flashcards of this type.
 5.  Fill the model fields with markers corresponding to the information you wish to include (several can be used at
-    once). Advanced users can also configure the actual [Handlebars](http://handlebarsjs.com/) templates used to create
+    once). Advanced users can also configure the actual [Handlebars](https://handlebarsjs.com/) templates used to create
     the flashcard contents (this is strictly optional).
 
     #### Markers for Term Cards ####
@@ -243,7 +243,7 @@ following basic guidelines when creating pull requests:
 
 ### Templates ###
 
-Yomichan uses [Handlebars](http://handlebarsjs.com/) templates for user interface generation. The source templates are
+Yomichan uses [Handlebars](https://handlebarsjs.com/) templates for user interface generation. The source templates are
 found in the `tmpl` directory and the compiled version is stored in the `ext/bg/js/templates.js` file. If you modify the
 source templates, you will need to also recompile them. If you are developing on Linux or Mac OS X, you can use the
 included `build_tmpl.sh` and `build_tmpl_auto.sh` shell scripts to do this for you
@@ -255,13 +255,13 @@ tmpl/*.html -f ext/bg/js/templates.js` from the project's base directory to comp
 Yomichan uses several third-party libraries to function. Below are links to homepages and snapshots of the exact
 versions packaged.
 
-*   Bootstrap Toggle: [homepage](http://www.bootstraptoggle.com/) - [snapshot](https://github.com/minhur/bootstrap-toggle/archive/b76c094.zip)
-*   Bootstrap: [homepage](http://getbootstrap.com/) - [snapshot](https://github.com/twbs/bootstrap/releases/download/v3.3.7/bootstrap-3.3.7-dist.zip)
-*   Dexie: [homepage](http://dexie.org/) - [snapshot](https://github.com/dfahlander/Dexie.js/archive/v2.0.0-beta.10.zip)
-*   Handlebars: [homepage](http://handlebarsjs.com/) - [snapshot](http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars.min-714a4c4.js)
+*   Bootstrap Toggle: [homepage](https://www.bootstraptoggle.com/) - [snapshot](https://github.com/minhur/bootstrap-toggle/archive/b76c094.zip)
+*   Bootstrap: [homepage](https://getbootstrap.com/) - [snapshot](https://github.com/twbs/bootstrap/releases/download/v3.3.7/bootstrap-3.3.7-dist.zip)
+*   Dexie: [homepage](https://dexie.org/) - [snapshot](https://github.com/dfahlander/Dexie.js/archive/v2.0.0-beta.10.zip)
+*   Handlebars: [homepage](https://handlebarsjs.com/) - [snapshot](http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars.min-714a4c4.js)
 *   JQuery: [homepage](https://blog.jquery.com/) - [snapshot](https://code.jquery.com/jquery-3.2.1.min.js)
-*   JSZip: [homepage](http://stuk.github.io/jszip/) - [snapshot](https://raw.githubusercontent.com/Stuk/jszip/de7f52fbcba485737bef7923a83f0fad92d9f5bc/dist/jszip.min.js)
-*   WanaKana: [homepage](http://wanakana.com/) - [snapshot](https://raw.githubusercontent.com/WaniKani/WanaKana/7c4a052/gh-pages/assets/js/wanakana.min.js)
+*   JSZip: [homepage](https://stuk.github.io/jszip/) - [snapshot](https://raw.githubusercontent.com/Stuk/jszip/de7f52fbcba485737bef7923a83f0fad92d9f5bc/dist/jszip.min.js)
+*   WanaKana: [homepage](https://wanakana.com/) - [snapshot](https://raw.githubusercontent.com/WaniKani/WanaKana/7c4a052/gh-pages/assets/js/wanakana.min.js)
 
 ## Frequently Asked Questions ##
 
