@@ -52,11 +52,11 @@ class Display {
         try {
             e.preventDefault();
 
-            const link = $(e.target);
+            const link = e.target;
             const context = {
                 source: {
                     definitions: this.definitions,
-                    index: Display.entryIndexFind(link),
+                    index: this.entryIndexFind(link),
                     scroll: $('html,body').scrollTop()
                 }
             };
@@ -67,7 +67,7 @@ class Display {
                 context.source.source = this.context.source;
             }
 
-            const kanjiDefs = await apiKanjiFind(link.text(), this.optionsContext);
+            const kanjiDefs = await apiKanjiFind(link.textContent, this.optionsContext);
             this.kanjiShow(kanjiDefs, this.options, context);
         } catch (e) {
             this.onError(e);
@@ -80,7 +80,7 @@ class Display {
 
             const {docRangeFromPoint, docSentenceExtract} = this.dependencies;
 
-            const clickedElement = $(e.target);
+            const clickedElement = e.target;
             const textSource = docRangeFromPoint(e.clientX, e.clientY, this.options);
             if (textSource === null) {
                 return false;
@@ -105,7 +105,7 @@ class Display {
             const context = {
                 source: {
                     definitions: this.definitions,
-                    index: Display.entryIndexFind(clickedElement),
+                    index: this.entryIndexFind(clickedElement),
                     scroll: $('html,body').scrollTop()
                 }
             };
@@ -124,24 +124,24 @@ class Display {
 
     onAudioPlay(e) {
         e.preventDefault();
-        const link = $(e.currentTarget);
-        const definitionIndex = Display.entryIndexFind(link);
-        const expressionIndex = link.closest('.entry').find('.expression .action-play-audio').index(link);
+        const link = e.currentTarget;
+        const entry = link.closest('.entry');
+        const definitionIndex = this.entryIndexFind(entry);
+        const expressionIndex = Display.indexOf(entry.querySelectorAll('.expression .action-play-audio'), link);
         this.audioPlay(this.definitions[definitionIndex], expressionIndex);
     }
 
     onNoteAdd(e) {
         e.preventDefault();
-        const link = $(e.currentTarget);
-        const index = Display.entryIndexFind(link);
-        this.noteAdd(this.definitions[index], link.data('mode'));
+        const link = e.currentTarget;
+        const index = this.entryIndexFind(link);
+        this.noteAdd(this.definitions[index], link.dataset.mode);
     }
 
     onNoteView(e) {
         e.preventDefault();
-        const link = $(e.currentTarget);
-        const index = Display.entryIndexFind(link);
-        apiNoteView(link.data('noteId'));
+        const link = e.currentTarget;
+        apiNoteView(link.dataset.noteId);
     }
 
     onKeyDown(e) {
@@ -556,8 +556,9 @@ class Display {
         return result;
     }
 
-    static entryIndexFind(element) {
-        return $('.entry').index(element.closest('.entry'));
+    entryIndexFind(element) {
+        const entry = element.closest('.entry');
+        return entry !== null ? Display.indexOf(this.container.get(0).querySelectorAll('.entry'), entry) : -1;
     }
 
     static adderButtonFind(index, mode) {
@@ -570,5 +571,14 @@ class Display {
 
     static delay(time) {
         return new Promise((resolve) => setTimeout(resolve, time));
+    }
+
+    static indexOf(nodeList, node) {
+        for (let i = 0, ii = nodeList.length; i < ii; ++i) {
+            if (nodeList[i] === node) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
