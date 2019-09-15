@@ -60,7 +60,7 @@ async function formRead(options) {
 
     const optionsAnkiEnableOld = options.anki.enable;
     options.anki.enable = $('#anki-enable').prop('checked');
-    options.anki.tags = $('#card-tags').val().split(/[,; ]+/);
+    options.anki.tags = utilBackgroundIsolate($('#card-tags').val().split(/[,; ]+/));
     options.anki.sentenceExt = parseInt($('#sentence-detection-extent').val(), 10);
     options.anki.server = $('#interface-server').val();
     options.anki.screenshot.format = $('#screenshot-format').val();
@@ -70,20 +70,20 @@ async function formRead(options) {
     if (optionsAnkiEnableOld && !ankiErrorShown()) {
         options.anki.terms.deck = $('#anki-terms-deck').val();
         options.anki.terms.model = $('#anki-terms-model').val();
-        options.anki.terms.fields = ankiFieldsToDict($('#terms .anki-field-value'));
+        options.anki.terms.fields = utilBackgroundIsolate(ankiFieldsToDict($('#terms .anki-field-value')));
         options.anki.kanji.deck = $('#anki-kanji-deck').val();
         options.anki.kanji.model = $('#anki-kanji-model').val();
-        options.anki.kanji.fields = ankiFieldsToDict($('#kanji .anki-field-value'));
+        options.anki.kanji.fields = utilBackgroundIsolate(ankiFieldsToDict($('#kanji .anki-field-value')));
     }
 
     options.general.mainDictionary = $('#dict-main').val();
     $('.dict-group').each((index, element) => {
         const dictionary = $(element);
-        options.dictionaries[dictionary.data('title')] = {
+        options.dictionaries[dictionary.data('title')] = utilBackgroundIsolate({
             priority: parseInt(dictionary.find('.dict-priority').val(), 10),
             enabled: dictionary.find('.dict-enabled').prop('checked'),
             allowSecondarySearches: dictionary.find('.dict-allow-secondary-searches').prop('checked')
-        };
+        });
     });
 }
 
@@ -426,7 +426,7 @@ async function onDictionaryPurge(e) {
         await utilDatabasePurge();
         const optionsContext = getOptionsContext();
         const options = await apiOptionsGet(optionsContext);
-        options.dictionaries = {};
+        options.dictionaries = utilBackgroundIsolate({});
         options.general.mainDictionary = '';
         await settingsSaveOptions();
 
@@ -468,7 +468,11 @@ async function onDictionaryImport(e) {
         const summary = await utilDatabaseImport(e.target.files[0], updateProgress, exceptions);
         const optionsContext = getOptionsContext();
         const options = await apiOptionsGet(optionsContext);
-        options.dictionaries[summary.title] = {enabled: true, priority: 0, allowSecondarySearches: false};
+        options.dictionaries[summary.title] = utilBackgroundIsolate({
+            enabled: true,
+            priority: 0,
+            allowSecondarySearches: false
+        });
         if (summary.sequenced && options.general.mainDictionary === '') {
             options.general.mainDictionary = summary.title;
         }
@@ -621,7 +625,7 @@ async function onAnkiModelChanged(e) {
         const optionsContext = getOptionsContext();
         const options = await apiOptionsGet(optionsContext);
         await formRead(options);
-        options.anki[tabId].fields = {};
+        options.anki[tabId].fields = utilBackgroundIsolate({});
         await settingsSaveOptions();
 
         ankiSpinnerShow(true);
