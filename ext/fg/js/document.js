@@ -105,7 +105,7 @@ function docRangeFromPoint(x, y, options) {
     let imposterContainer = null;
     if (elements.length > 0) {
         const element = elements[0];
-        switch (element.nodeName) {
+        switch (element.nodeName.toUpperCase()) {
             case 'IMG':
             case 'BUTTON':
                 return new TextSourceElement(element);
