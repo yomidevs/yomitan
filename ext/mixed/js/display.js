@@ -28,6 +28,7 @@ class Display {
         this.index = 0;
         this.audioCache = {};
         this.optionsContext = {};
+        this.eventListeners = [];
 
         this.dependencies = {};
 
@@ -283,6 +284,8 @@ class Display {
 
     async termsShow(definitions, options, context) {
         try {
+            this.clearEventListeners();
+
             if (!context || context.focus !== false) {
                 window.focus();
             }
@@ -339,6 +342,8 @@ class Display {
 
     async kanjiShow(definitions, options, context) {
         try {
+            this.clearEventListeners();
+
             if (!context || context.focus !== false) {
                 window.focus();
             }
@@ -610,8 +615,18 @@ class Display {
         return -1;
     }
 
-    addEventListeners(selector, ...args) {
-        this.container.querySelectorAll(selector).forEach((node) => node.addEventListener(...args));
+    addEventListeners(selector, type, listener, options) {
+        this.container.querySelectorAll(selector).forEach((node) => {
+            node.addEventListener(type, listener, options);
+            this.eventListeners.push([node, type, listener, options]);
+        });
+    }
+
+    clearEventListeners() {
+        for (const [node, type, listener, options] of this.eventListeners) {
+            node.removeEventListener(type, listener, options);
+        }
+        this.eventListeners = [];
     }
 
     static getElementTop(element) {
