@@ -30,7 +30,7 @@ class DisplayFloat extends Display {
 
         this.dependencies = Object.assign({}, this.dependencies, {docRangeFromPoint, docSentenceExtract});
 
-        $(window).on('message', utilAsync(this.onMessage.bind(this)));
+        window.addEventListener('message', (e) => this.onMessage(e), false);
     }
 
     onError(error) {
@@ -42,8 +42,16 @@ class DisplayFloat extends Display {
     }
 
     onOrphaned() {
-        $('#definitions').hide();
-        $('#error-orphaned').show();
+        const definitions = document.querySelector('#definitions');
+        const errorOrphaned = document.querySelector('#error-orphaned');
+
+        if (definitions !== null) {
+            definitions.style.setProperty('display', 'none', 'important');
+        }
+
+        if (errorOrphaned !== null) {
+            errorOrphaned.style.setProperty('display', 'block', 'important');
+        }
     }
 
     onSearchClear() {
@@ -86,7 +94,7 @@ class DisplayFloat extends Display {
             }
         };
 
-        const {action, params} = e.originalEvent.data;
+        const {action, params} = e.data;
         const handler = handlers[action];
         if (handler) {
             handler(params);
