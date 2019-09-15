@@ -239,9 +239,12 @@ class Popup {
     }
 
     focusParent() {
-        if (this.parent && this.parent.container) {
+        if (this.parent !== null) {
             // Chrome doesn't like focusing iframe without contentWindow.
-            this.parent.container.contentWindow.focus();
+            const contentWindow = this.parent.container.contentWindow;
+            if (contentWindow !== null) {
+                contentWindow.focus();
+            }
         } else {
             // Firefox doesn't like focusing window without first blurring the iframe.
             // this.container.contentWindow.blur() doesn't work on Firefox for some reason.
