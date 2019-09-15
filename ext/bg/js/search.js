@@ -26,14 +26,20 @@ class DisplaySearch extends Display {
             url: window.location.href
         };
 
-        this.search = $('#search').click(this.onSearch.bind(this));
-        this.query = $('#query').on('input', this.onSearchInput.bind(this));
+        this.search = document.querySelector('#search');
+        this.query = document.querySelector('#query');
         this.intro = document.querySelector('#intro');
         this.introHidden = false;
 
         this.dependencies = Object.assign({}, this.dependencies, {docRangeFromPoint, docSentenceExtract});
 
-        window.wanakana.bind(this.query.get(0));
+        if (this.search !== null) {
+            this.search.addEventListener('click', (e) => this.onSearch(e), false);
+        }
+        if (this.query !== null) {
+            this.query.addEventListener('input', () => this.onSearchInput(), false);
+            window.wanakana.bind(this.query);
+        }
     }
 
     onError(error) {
@@ -41,18 +47,27 @@ class DisplaySearch extends Display {
     }
 
     onSearchClear() {
-        this.query.focus().select();
+        if (this.query === null) {
+            return;
+        }
+
+        this.query.focus();
+        this.query.select();
     }
 
     onSearchInput() {
-        this.search.prop('disabled', this.query.val().length === 0);
+        this.search.disabled = (this.query === null || this.query.value.length === 0);
     }
 
     async onSearch(e) {
+        if (this.query === null) {
+            return;
+        }
+
         try {
             e.preventDefault();
             this.hideIntro();
-            const {length, definitions} = await apiTermsFind(this.query.val(), this.optionsContext);
+            const {length, definitions} = await apiTermsFind(this.query.value, this.optionsContext);
             super.termsShow(definitions, await apiOptionsGet(this.optionsContext));
         } catch (e) {
             this.onError(e);
