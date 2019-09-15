@@ -165,7 +165,7 @@ async function onTargetProfileChanged() {
 
 async function onProfileAdd() {
     const optionsFull = await apiOptionsGetFull();
-    const profile = utilIsolate(optionsFull.profiles[currentProfileIndex]);
+    const profile = utilBackgroundIsolate(optionsFull.profiles[currentProfileIndex]);
     profile.name = profileOptionsCreateCopyName(profile.name, optionsFull.profiles, 100);
     optionsFull.profiles.push(profile);
     currentProfileIndex = optionsFull.profiles.length - 1;
@@ -255,8 +255,8 @@ async function onProfileCopyConfirm() {
         return;
     }
 
-    const profile = utilIsolate(optionsFull.profiles[index].options);
-    optionsFull.profiles[currentProfileIndex].options = profile;
+    const profileOptions = utilBackgroundIsolate(optionsFull.profiles[index].options);
+    optionsFull.profiles[currentProfileIndex].options = profileOptions;
 
     await profileOptionsUpdateTarget(optionsFull);
     await settingsSaveOptions();
