@@ -16,10 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function getOptionsContext() {
-    return {
-        depth: 0
-    };
+async function getOptionsArray() {
+    const optionsFull = await apiOptionsGetFull();
+    return optionsFull.profiles.map(profile => profile.options);
 }
 
 async function formRead(options) {
@@ -239,11 +238,8 @@ async function onFormOptionsChanged(e) {
 }
 
 async function onReady() {
-    const optionsContext = getOptionsContext();
-    const options = await apiOptionsGet(optionsContext);
-
     formSetupEventListeners();
-    await formWrite(options);
+    await profileOptionsSetup();
 
     storageInfoInitialize();
 
@@ -424,12 +420,14 @@ async function onDictionaryPurge(e) {
         dictionarySpinnerShow(true);
 
         await utilDatabasePurge();
-        const optionsContext = getOptionsContext();
-        const options = await apiOptionsGet(optionsContext);
-        options.dictionaries = utilBackgroundIsolate({});
-        options.general.mainDictionary = '';
+        for (const options of await getOptionsArray()) {
+            options.dictionaries = utilBackgroundIsolate({});
+            options.general.mainDictionary = '';
+        }
         await settingsSaveOptions();
 
+        const optionsContext = getOptionsContext();
+        const options = await apiOptionsGet(optionsContext);
         await dictionaryGroupsPopulate(options);
         await formMainDictionaryOptionsPopulate(options);
     } catch (e) {
@@ -466,24 +464,25 @@ async function onDictionaryImport(e) {
 
         const exceptions = [];
         const summary = await utilDatabaseImport(e.target.files[0], updateProgress, exceptions);
-        const optionsContext = getOptionsContext();
-        const options = await apiOptionsGet(optionsContext);
-        options.dictionaries[summary.title] = utilBackgroundIsolate({
-            enabled: true,
-            priority: 0,
-            allowSecondarySearches: false
-        });
-        if (summary.sequenced && options.general.mainDictionary === '') {
-            options.general.mainDictionary = summary.title;
+        for (const options of await getOptionsArray()) {
+            options.dictionaries[summary.title] = utilBackgroundIsolate({
+                enabled: true,
+                priority: 0,
+                allowSecondarySearches: false
+            });
+            if (summary.sequenced && options.general.mainDictionary === '') {
+                options.general.mainDictionary = summary.title;
+            }
         }
+        await settingsSaveOptions();
 
         if (exceptions.length > 0) {
             exceptions.push(`Dictionary may not have been imported properly: ${exceptions.length} error${exceptions.length === 1 ? '' : 's'} reported.`);
             dictionaryErrorsShow(exceptions);
         }
 
-        await settingsSaveOptions();
-
+        const optionsContext = getOptionsContext();
+        const options = await apiOptionsGet(optionsContext);
         await dictionaryGroupsPopulate(options);
         await formMainDictionaryOptionsPopulate(options);
     } catch (e) {
@@ -643,7 +642,7 @@ async function onAnkiFieldTemplatesReset(e) {
         e.preventDefault();
         const optionsContext = getOptionsContext();
         const options = await apiOptionsGet(optionsContext);
-        const fieldTemplates = optionsFieldTemplates();
+        const fieldTemplates = profileOptionsGetDefaultFieldTemplates();
         options.anki.fieldTemplates = fieldTemplates;
         $('#field-templates').val(fieldTemplates);
         await settingsSaveOptions();
