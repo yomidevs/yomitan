@@ -98,6 +98,7 @@ async function profileFormWrite(optionsFull) {
         apiOptionsSave();
         conditionsClearCaches(profileConditionsDescriptor);
     };
+    profileConditionsContainer.isolate = utilBackgroundIsolate;
 }
 
 function profileOptionsPopulateSelect(select, profiles, currentValue, ignoreIndices) {

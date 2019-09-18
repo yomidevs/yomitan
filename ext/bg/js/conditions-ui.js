@@ -56,6 +56,11 @@ ConditionsUI.Container = class Container {
         // Override
     }
 
+    isolate(object) {
+        // Override
+        return object;
+    }
+
     remove(child) {
         const index = this.children.indexOf(child);
         if (index < 0) {
@@ -68,9 +73,9 @@ ConditionsUI.Container = class Container {
     }
 
     onAddConditionGroup() {
-        const conditionGroup = {
+        const conditionGroup = this.isolate({
             conditions: [this.createDefaultCondition(this.conditionNameDefault)]
-        };
+        });
         this.conditionGroups.push(conditionGroup);
         this.save();
         this.children.push(new ConditionsUI.ConditionGroup(this, conditionGroup));
@@ -139,6 +144,10 @@ ConditionsUI.ConditionGroup = class ConditionGroup {
         this.parent.save();
     }
 
+    isolate(object) {
+        return this.parent.isolate(object);
+    }
+
     remove(child) {
         const index = this.children.indexOf(child);
         if (index < 0) {
@@ -155,7 +164,7 @@ ConditionsUI.ConditionGroup = class ConditionGroup {
     }
 
     onAddCondition() {
-        const condition = this.parent.createDefaultCondition(this.parent.conditionNameDefault);
+        const condition = this.isolate(this.parent.createDefaultCondition(this.parent.conditionNameDefault));
         this.conditionGroup.conditions.push(condition);
         this.children.push(new ConditionsUI.Condition(this, condition));
     }
