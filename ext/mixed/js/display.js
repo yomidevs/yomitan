@@ -150,117 +150,13 @@ class Display {
     }
 
     onKeyDown(e) {
-        const noteTryAdd = mode => {
-            const button = this.adderButtonFind(this.index, mode);
-            if (button !== null && !button.classList.contains('disabled')) {
-                this.noteAdd(this.definitions[this.index], mode);
+        const key = Display.getKeyFromEvent(e);
+        const handlers = Display.onKeyDownHandlers;
+        if (handlers.hasOwnProperty(key)) {
+            const handler = handlers[key];
+            if (handler(this, e)) {
+                e.preventDefault();
             }
-        };
-
-        const noteTryView = mode => {
-            const button = this.viewerButtonFind(this.index);
-            if (button !== null && !button.classList.contains('disabled')) {
-                apiNoteView(button.dataset.noteId);
-            }
-        };
-
-        const handlers = {
-            27: /* escape */ () => {
-                this.onSearchClear();
-                return true;
-            },
-
-            33: /* page up */ () => {
-                if (e.altKey) {
-                    this.entryScrollIntoView(this.index - 3, null, true);
-                    return true;
-                }
-            },
-
-            34: /* page down */ () => {
-                if (e.altKey) {
-                    this.entryScrollIntoView(this.index + 3, null, true);
-                    return true;
-                }
-            },
-
-            35: /* end */ () => {
-                if (e.altKey) {
-                    this.entryScrollIntoView(this.definitions.length - 1, null, true);
-                    return true;
-                }
-            },
-
-            36: /* home */ () => {
-                if (e.altKey) {
-                    this.entryScrollIntoView(0, null, true);
-                    return true;
-                }
-            },
-
-            38: /* up */ () => {
-                if (e.altKey) {
-                    this.entryScrollIntoView(this.index - 1, null, true);
-                    return true;
-                }
-            },
-
-            40: /* down */ () => {
-                if (e.altKey) {
-                    this.entryScrollIntoView(this.index + 1, null, true);
-                    return true;
-                }
-            },
-
-            66: /* b */ () => {
-                if (e.altKey) {
-                    this.sourceTermView();
-                    return true;
-                }
-            },
-
-            69: /* e */ () => {
-                if (e.altKey) {
-                    noteTryAdd('term-kanji');
-                    return true;
-                }
-            },
-
-            75: /* k */ () => {
-                if (e.altKey) {
-                    noteTryAdd('kanji');
-                    return true;
-                }
-            },
-
-            82: /* r */ () => {
-                if (e.altKey) {
-                    noteTryAdd('term-kana');
-                    return true;
-                }
-            },
-
-            80: /* p */ () => {
-                if (e.altKey) {
-                    const entry = this.getEntry(this.index);
-                    if (entry !== null && entry.dataset.type === 'term') {
-                        this.audioPlay(this.definitions[this.index], this.firstExpressionIndex);
-                    }
-
-                    return true;
-                }
-            },
-
-            86: /* v */ () => {
-                if (e.altKey) {
-                    noteTryView();
-                }
-            }
-        };
-
-        const handler = handlers[e.keyCode];
-        if (handler && handler()) {
-            e.preventDefault();
         }
     }
 
@@ -459,6 +355,20 @@ class Display {
         }
     }
 
+    noteTryAdd(mode) {
+        const button = this.adderButtonFind(this.index, mode);
+        if (button !== null && !button.classList.contains('disabled')) {
+            this.noteAdd(this.definitions[this.index], mode);
+        }
+    }
+
+    noteTryView() {
+        const button = this.viewerButtonFind(this.index);
+        if (button !== null && !button.classList.contains('disabled')) {
+            apiNoteView(button.dataset.noteId);
+        }
+    }
+
     async noteAdd(definition, mode) {
         try {
             this.setSpinnerVisible(true);
@@ -634,4 +544,115 @@ class Display {
         const documentRect = document.documentElement.getBoundingClientRect();
         return elementRect.top - documentRect.top;
     }
+
+    static getKeyFromEvent(event) {
+        const key = event.key;
+        return key.length === 1 ? key.toUpperCase() : key;
+    }
 }
+
+Display.onKeyDownHandlers = {
+    'Escape': (self) => {
+        self.onSearchClear();
+        return true;
+    },
+
+    'PageUp': (self, e) => {
+        if (e.altKey) {
+            self.entryScrollIntoView(self.index - 3, null, true);
+            return true;
+        }
+        return false;
+    },
+
+    'PageDown': (self, e) => {
+        if (e.altKey) {
+            self.entryScrollIntoView(self.index + 3, null, true);
+            return true;
+        }
+        return false;
+    },
+
+    'End': (self, e) => {
+        if (e.altKey) {
+            self.entryScrollIntoView(self.definitions.length - 1, null, true);
+            return true;
+        }
+        return false;
+    },
+
+    'Home': (self, e) => {
+        if (e.altKey) {
+            self.entryScrollIntoView(0, null, true);
+            return true;
+        }
+        return false;
+    },
+
+    'ArrowUp': (self, e) => {
+        if (e.altKey) {
+            self.entryScrollIntoView(self.index - 1, null, true);
+            return true;
+        }
+        return false;
+    },
+
+    'ArrowDown': (self, e) => {
+        if (e.altKey) {
+            self.entryScrollIntoView(self.index + 1, null, true);
+            return true;
+        }
+        return false;
+    },
+
+    'B': (self, e) => {
+        if (e.altKey) {
+            self.sourceTermView();
+            return true;
+        }
+        return false;
+    },
+
+    'E': (self, e) => {
+        if (e.altKey) {
+            self.noteTryAdd('term-kanji');
+            return true;
+        }
+        return false;
+    },
+
+    'K': (self, e) => {
+        if (e.altKey) {
+            self.noteTryAdd('kanji');
+            return true;
+        }
+        return false;
+    },
+
+    'R': (self, e) => {
+        if (e.altKey) {
+            self.noteTryAdd('term-kana');
+            return true;
+        }
+        return false;
+    },
+
+    'P': (self, e) => {
+        if (e.altKey) {
+            const entry = self.getEntry(self.index);
+            if (entry !== null && entry.dataset.type === 'term') {
+                self.audioPlay(self.definitions[self.index], self.firstExpressionIndex);
+            }
+            return true;
+        }
+        return false;
+    },
+
+    'V': (self, e) => {
+        if (e.altKey) {
+            self.noteTryView();
+            return true;
+        }
+        return false;
+    }
+};

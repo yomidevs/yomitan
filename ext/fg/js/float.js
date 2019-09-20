@@ -102,21 +102,16 @@ class DisplayFloat extends Display {
     }
 
     onKeyDown(e) {
-        const handlers = {
-            67: /* c */ () => {
-                if (e.ctrlKey && !window.getSelection().toString()) {
-                    this.onSelectionCopy();
-                    return true;
-                }
+        const key = Display.getKeyFromEvent(e);
+        const handlers = DisplayFloat.onKeyDownHandlers;
+        if (handlers.hasOwnProperty(key)) {
+            const handler = handlers[key];
+            if (handler(this, e)) {
+                e.preventDefault();
+                return;
             }
-        };
-
-        const handler = handlers[e.keyCode];
-        if (handler && handler()) {
-            e.preventDefault();
-        } else {
-            super.onKeyDown(e);
         }
+        super.onKeyDown(e);
     }
 
     autoPlayAudio() {
@@ -145,5 +140,15 @@ class DisplayFloat extends Display {
         }
     }
 }
+
+DisplayFloat.onKeyDownHandlers = {
+    'C': (self, e) => {
+        if (e.ctrlKey && !window.getSelection().toString()) {
+            self.onSelectionCopy();
+            return true;
+        }
+        return false;
+    }
+};
 
 window.yomichan_display = new DisplayFloat();
