@@ -267,6 +267,9 @@ const caretRangeFromPoint = (() => {
         // Firefox
         return (x, y) => {
             const position = document.caretPositionFromPoint(x, y);
+            if (position === null) {
+                return null;
+            }
             const node = position.offsetNode;
             if (node === null) {
                 return null;
