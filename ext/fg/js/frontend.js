@@ -269,7 +269,12 @@ class Frontend {
     }
 
     popupTimerSet(callback) {
-        this.popupTimer = window.setTimeout(callback, this.options.scanning.delay);
+        const delay = this.options.scanning.delay;
+        if (delay > 0) {
+            this.popupTimer = window.setTimeout(callback, delay);
+        } else {
+            Promise.resolve().then(callback);
+        }
     }
 
     popupTimerClear() {
