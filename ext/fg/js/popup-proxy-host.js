@@ -42,9 +42,9 @@ class PopupProxyHost {
             showOrphaned: ({id, elementRect, options}) => this.show(id, elementRect, options),
             hide: ({id}) => this.hide(id),
             setVisible: ({id, visible}) => this.setVisible(id, visible),
-            containsPoint: ({id, point}) => this.containsPoint(id, point),
-            termsShow: ({id, elementRect, definitions, options, context}) => this.termsShow(id, elementRect, definitions, options, context),
-            kanjiShow: ({id, elementRect, definitions, options, context}) => this.kanjiShow(id, elementRect, definitions, options, context),
+            containsPoint: ({id, x, y}) => this.containsPoint(id, x, y),
+            termsShow: ({id, elementRect, writingMode, definitions, options, context}) => this.termsShow(id, elementRect, writingMode, definitions, options, context),
+            kanjiShow: ({id, elementRect, writingMode, definitions, options, context}) => this.kanjiShow(id, elementRect, writingMode, definitions, options, context),
             clearAutoPlayTimer: ({id}) => this.clearAutoPlayTimer(id)
         });
     }
@@ -108,26 +108,32 @@ class PopupProxyHost {
         return popup.setVisible(visible);
     }
 
-    async containsPoint(id, point) {
+    async containsPoint(id, x, y) {
         const popup = this.getPopup(id);
-        return await popup.containsPoint(point);
+        return await popup.containsPoint(x, y);
     }
 
-    async termsShow(id, elementRect, definitions, options, context) {
+    async termsShow(id, elementRect, writingMode, definitions, options, context) {
         const popup = this.getPopup(id);
         elementRect = this.jsonRectToDOMRect(popup, elementRect);
-        return await popup.termsShow(elementRect, definitions, options, context);
+        if (!PopupProxyHost.popupCanShow(popup)) { return false; }
+        return await popup.termsShow(elementRect, writingMode, definitions, options, context);
     }
 
-    async kanjiShow(id, elementRect, definitions, options, context) {
+    async kanjiShow(id, elementRect, writingMode, definitions, options, context) {
         const popup = this.getPopup(id);
         elementRect = this.jsonRectToDOMRect(popup, elementRect);
-        return await popup.kanjiShow(elementRect, definitions, options, context);
+        if (!PopupProxyHost.popupCanShow(popup)) { return false; }
+        return await popup.kanjiShow(elementRect, writingMode, definitions, options, context);
     }
 
     async clearAutoPlayTimer(id) {
         const popup = this.getPopup(id);
         return popup.clearAutoPlayTimer();
+    }
+
+    static popupCanShow(popup) {
+        return popup.parent === null || popup.parent.isVisible();
     }
 }
 

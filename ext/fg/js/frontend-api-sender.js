@@ -26,14 +26,16 @@ class FrontendApiSender {
         this.disconnected = false;
         this.nextId = 0;
 
-        this.port = chrome.runtime.connect(null, {name: 'backend-api-forwarder'});
-        this.port.onDisconnect.addListener(this.onDisconnect.bind(this));
-        this.port.onMessage.addListener(this.onMessage.bind(this));
+        this.port = null;
     }
 
     invoke(action, params, target) {
         if (this.disconnected) {
             return Promise.reject('Disconnected');
+        }
+
+        if (this.port === null) {
+            this.createPort();
         }
 
         const id = `${this.nextId}`;
@@ -46,6 +48,12 @@ class FrontendApiSender {
 
             this.port.postMessage({id, action, params, target, senderId: this.senderId});
         });
+    }
+
+    createPort() {
+        this.port = chrome.runtime.connect(null, {name: 'backend-api-forwarder'});
+        this.port.onDisconnect.addListener(this.onDisconnect.bind(this));
+        this.port.onMessage.addListener(this.onMessage.bind(this));
     }
 
     onMessage({type, id, data, senderId}) {

@@ -59,7 +59,8 @@ class Popup {
                 this.invokeApi('popupNestedInitialize', {
                     id: this.id,
                     depth: this.depth,
-                    parentFrameId
+                    parentFrameId,
+                    url: this.url
                 });
                 this.invokeApi('setOptions', {
                     general: {
@@ -239,9 +240,12 @@ class Popup {
     }
 
     focusParent() {
-        if (this.parent && this.parent.container) {
+        if (this.parent !== null) {
             // Chrome doesn't like focusing iframe without contentWindow.
-            this.parent.container.contentWindow.focus();
+            const contentWindow = this.parent.container.contentWindow;
+            if (contentWindow !== null) {
+                contentWindow.focus();
+            }
         } else {
             // Firefox doesn't like focusing window without first blurring the iframe.
             // this.container.contentWindow.blur() doesn't work on Firefox for some reason.
@@ -251,7 +255,7 @@ class Popup {
         }
     }
 
-    async containsPoint({x, y}) {
+    async containsPoint(x, y) {
         for (let popup = this; popup !== null && popup.isVisible(); popup = popup.child) {
             const rect = popup.container.getBoundingClientRect();
             if (x >= rect.left && y >= rect.top && x < rect.right && y < rect.bottom) {
@@ -307,5 +311,9 @@ class Popup {
         if (parent !== null && this.container.parentNode !== parent) {
             parent.appendChild(this.container);
         }
+    }
+
+    get url() {
+        return window.location.href;
     }
 }

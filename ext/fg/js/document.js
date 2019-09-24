@@ -89,13 +89,23 @@ function docImposterCreate(element, isTextarea) {
     return [imposter, container];
 }
 
-function docRangeFromPoint({x, y}, options) {
-    const elements = document.elementsFromPoint(x, y);
+function docElementsFromPoint(x, y, all) {
+    if (all) {
+        return document.elementsFromPoint(x, y);
+    }
+
+    const e = document.elementFromPoint(x, y);
+    return e !== null ? [e] : [];
+}
+
+function docRangeFromPoint(x, y, options) {
+    const deepDomScan = options.scanning.deepDomScan;
+    const elements = docElementsFromPoint(x, y, deepDomScan);
     let imposter = null;
     let imposterContainer = null;
     if (elements.length > 0) {
         const element = elements[0];
-        switch (element.nodeName) {
+        switch (element.nodeName.toUpperCase()) {
             case 'IMG':
             case 'BUTTON':
                 return new TextSourceElement(element);
@@ -108,7 +118,7 @@ function docRangeFromPoint({x, y}, options) {
         }
     }
 
-    const range = caretRangeFromPointExt(x, y, options.scanning.deepDomScan ? elements : []);
+    const range = caretRangeFromPointExt(x, y, deepDomScan ? elements : []);
     if (range !== null) {
         if (imposter !== null) {
             docSetImposterStyle(imposterContainer.style, 'z-index', '-2147483646');
@@ -257,6 +267,9 @@ const caretRangeFromPoint = (() => {
         // Firefox
         return (x, y) => {
             const position = document.caretPositionFromPoint(x, y);
+            if (position === null) {
+                return null;
+            }
             const node = position.offsetNode;
             if (node === null) {
                 return null;

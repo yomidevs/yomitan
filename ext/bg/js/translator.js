@@ -36,8 +36,7 @@ class Translator {
         }
     }
 
-    async findTermsGrouped(text, dictionaries, alphanumeric) {
-        const options = await apiOptionsGet();
+    async findTermsGrouped(text, dictionaries, alphanumeric, options) {
         const titles = Object.keys(dictionaries);
         const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
 
@@ -55,8 +54,7 @@ class Translator {
         return {length, definitions: definitionsGrouped};
     }
 
-    async findTermsMerged(text, dictionaries, alphanumeric) {
-        const options = await apiOptionsGet();
+    async findTermsMerged(text, dictionaries, alphanumeric, options) {
         const secondarySearchTitles = Object.keys(options.dictionaries).filter(dict => options.dictionaries[dict].allowSecondarySearches);
         const titles = Object.keys(dictionaries);
         const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);

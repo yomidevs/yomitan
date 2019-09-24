@@ -23,6 +23,11 @@ class DisplayFloat extends Display {
         this.autoPlayAudioTimer = null;
         this.styleNode = null;
 
+        this.optionsContext = {
+            depth: 0,
+            url: window.location.href
+        };
+
         this.dependencies = Object.assign({}, this.dependencies, {docRangeFromPoint, docSentenceExtract});
 
         $(window).on('message', utilAsync(this.onMessage.bind(this)));
@@ -74,8 +79,10 @@ class DisplayFloat extends Display {
                 }
             },
 
-            popupNestedInitialize: ({id, depth, parentFrameId}) => {
-                popupNestedInitialize(id, depth, parentFrameId);
+            popupNestedInitialize: ({id, depth, parentFrameId, url}) => {
+                this.optionsContext.depth = depth;
+                this.optionsContext.url = url;
+                popupNestedInitialize(id, depth, parentFrameId, url);
             }
         };
 

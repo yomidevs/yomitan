@@ -17,16 +17,23 @@
  */
 
 
-async function apiOptionsSet(options) {
-    utilBackend().onOptionsUpdated(options);
+function apiOptionsGet(optionsContext) {
+    return utilBackend().getOptions(optionsContext);
 }
 
-async function apiOptionsGet() {
-    return utilBackend().options;
+function apiOptionsGetFull() {
+    return utilBackend().getFullOptions();
 }
 
-async function apiTermsFind(text) {
-    const options = utilBackend().options;
+async function apiOptionsSave(source) {
+    const backend = utilBackend();
+    const options = await apiOptionsGetFull();
+    await optionsSave(options);
+    backend.onOptionsUpdated(source);
+}
+
+async function apiTermsFind(text, optionsContext) {
+    const options = await apiOptionsGet(optionsContext);
     const translator = utilBackend().translator;
 
     const searcher = {
@@ -38,7 +45,8 @@ async function apiTermsFind(text) {
     const {definitions, length} = await searcher(
         text,
         dictEnabledSet(options),
-        options.scanning.alphanumeric
+        options.scanning.alphanumeric,
+        options
     );
 
     return {
@@ -47,14 +55,14 @@ async function apiTermsFind(text) {
     };
 }
 
-async function apiKanjiFind(text) {
-    const options = utilBackend().options;
+async function apiKanjiFind(text, optionsContext) {
+    const options = await apiOptionsGet(optionsContext);
     const definitions = await utilBackend().translator.findKanji(text, dictEnabledSet(options));
     return definitions.slice(0, options.general.maxResults);
 }
 
-async function apiDefinitionAdd(definition, mode, context) {
-    const options = utilBackend().options;
+async function apiDefinitionAdd(definition, mode, context, optionsContext) {
+    const options = await apiOptionsGet(optionsContext);
 
     if (mode !== 'kanji') {
         await audioInject(
@@ -76,14 +84,15 @@ async function apiDefinitionAdd(definition, mode, context) {
     return utilBackend().anki.addNote(note);
 }
 
-async function apiDefinitionsAddable(definitions, modes) {
+async function apiDefinitionsAddable(definitions, modes, optionsContext) {
+    const options = await apiOptionsGet(optionsContext);
     const states = [];
 
     try {
         const notes = [];
         for (const definition of definitions) {
             for (const mode of modes) {
-                const note = await dictNoteFormat(definition, mode, utilBackend().options);
+                const note = await dictNoteFormat(definition, mode, options);
                 notes.push(note);
             }
         }
@@ -131,10 +140,13 @@ async function apiCommandExec(command) {
         },
 
         toggle: async () => {
-            const options = utilBackend().options;
+            const optionsContext = {
+                depth: 0,
+                url: window.location.href
+            };
+            const options = await apiOptionsGet(optionsContext);
             options.general.enable = !options.general.enable;
-            await optionsSave(options);
-            await apiOptionsSet(options);
+            await apiOptionsSave('popup');
         }
     };
 

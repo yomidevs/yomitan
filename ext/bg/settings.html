@@ -30,6 +30,59 @@
                 padding-bottom: 1em;
             }
 
+            .label-light {
+                font-weight: normal;
+            }
+
+            .form-control.is-invalid {
+                border-color: #f00000;
+            }
+
+            .condition>.condition-prefix:after {
+                content: "IF";
+            }
+            .condition:nth-child(n+2)>.condition-prefix:after {
+                content: "AND";
+            }
+
+            .input-group .condition-prefix,
+            .input-group .condition-group-separator-label {
+                width: 60px;
+                text-align: center;
+            }
+            .input-group .condition-group-separator-label {
+                padding: 6px 12px;
+                font-weight: bold;
+                display: inline-block;
+            }
+            .input-group .condition-type,
+            .input-group .condition-operator {
+                width: auto;
+                text-align: center;
+                text-align-last: center;
+            }
+
+            .condition-group>.condition>div:first-child {
+                border-bottom-left-radius: 0;
+            }
+            .condition-group>.condition:nth-child(n+2)>div:first-child {
+                border-top-left-radius: 0;
+            }
+            .condition-group>.condition:nth-child(n+2)>div:last-child>button {
+                border-top-right-radius: 0;
+            }
+            .condition-group>.condition:nth-last-child(n+2)>div:last-child>button {
+                border-bottom-right-radius: 0;
+            }
+            .condition-group-options>.condition-add {
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+            }
+
+            .condition-groups>*:last-of-type {
+                display: none;
+            }
+
             #custom-popup-css {
                 width: 100%;
                 min-height: 34px;
@@ -49,12 +102,132 @@
             [data-browser=firefox-mobile] [data-show-for-browser~=firefox-mobile] {
                 display: initial;
             }
+
+            @media screen and (max-width: 740px) {
+                .col-xs-6 {
+                    float: none;
+                    width: 100%;
+                }
+                .col-xs-6+.col-xs-6 {
+                    margin-top: 15px;
+                }
+            }
         </style>
     </head>
     <body>
         <div class="container-fluid">
+            <div class="profile-form">
+                <h3>Profiles</h3>
+
+                <p class="help-block">
+                    Profiles allow you to create multiple configurations and quickly switch between them or use them in different contexts.
+                </p>
+
+                <div class="form-group">
+                    <label for="profile-active">Active profile</label>
+                    <select class="form-control" id="profile-active"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="profile-target">Modifying profile</label>
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="profile-add" title="Add"><span class="glyphicon glyphicon-plus"></span></button>
+                            <button class="btn btn-default" id="profile-move-up" title="Move up"><span class="glyphicon glyphicon-arrow-up"></span></button>
+                            <button class="btn btn-default" id="profile-move-down" title="Move down"><span class="glyphicon glyphicon-arrow-down"></span></button>
+                            <button class="btn btn-default" id="profile-copy" title="Copy"><span class="glyphicon glyphicon-copy"></span></button>
+                        </div>
+                        <select class="form-control profile-form-manual" id="profile-target"></select>
+                        <div class="input-group-btn">
+                            <button class="btn btn-danger" id="profile-remove" title="Remove"><span class="glyphicon glyphicon-remove"></span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="profile-name">Profile name</label>
+                    <input type="text" id="profile-name" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label>Usage conditions</label>
+
+                    <p class="help-block">
+                        Usage conditions can be assigned such that certain profiles are automatically used in different contexts.
+                        For example, when <a href="#popup-content-scanning">Popup Content Scanning</a> is enabled, different profiles can be used
+                        depending on the level of the popup.
+                    </p>
+
+                    <p class="help-block">
+                        Conditions are organized into groups which represent how the conditions are checked.
+                        If all of the conditions in any group are met, then the profile will automatically be used for that context.
+                        If no conditions are specified, the profile will only be used if it is selected as the <strong>Active profile</strong>.
+                    </p>
+
+                    <div class="condition-groups" id="profile-condition-groups"></div>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-default" id="profile-add-condition-group">Add Condition Group</button>
+                </div>
+
+                <div class="modal fade" tabindex="-1" role="dialog" id="profile-copy-modal">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Copy Profile</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p>Select which profile to copy options from:</p>
+                                <select class="form-control" id="profile-copy-source"></select>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" id="profile-copy-confirm">Copy Profile</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" tabindex="-1" role="dialog" id="profile-remove-modal">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Confirm profile removal</h4>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to delete the profile <em id="profile-remove-modal-profile-name"></em>?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger" id="profile-remove-confirm">Remove Profile</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <template id="condition-template"><div class="input-group condition">
+                    <div class="input-group-addon condition-prefix"></div>
+                    <div class="input-group-btn"><select class="form-control btn btn-default condition-type"><optgroup label="Type"></optgroup></select></div>
+                    <div class="input-group-btn"><select class="form-control btn btn-default condition-operator"><optgroup label="Operator"></optgroup></select></div>
+                    <input type="text" class="form-control" />
+                    <div class="input-group-btn"><button class="btn btn-danger condition-remove" title="Remove"><span class="glyphicon glyphicon-remove"></span></button></div>
+                </div></template>
+                <template id="condition-group-separator-template"><div class="input-group">
+                    <div class="condition-group-separator-label">OR</div>
+                </div></template>
+                <template id="condition-group-options-template"><div class="condition-group-options">
+                    <button class="btn btn-default condition-add"><span class="glyphicon glyphicon-plus"></span></button>
+                </div></template>
+            </div>
+
             <div>
                 <h3>General Options</h3>
+
+                <div class="checkbox">
+                    <label><input type="checkbox" id="enable"> Enable content scanning</label>
+                </div>
 
                 <div class="checkbox">
                     <label><input type="checkbox" id="show-usage-guide"> Show usage guide on startup</label>
@@ -107,6 +280,16 @@
                     </select>
                 </div>
 
+                <div class="form-group options-advanced">
+                    <label for="audio-playback-volume">Audio playback volume <span class="label-light">(percent)</span></label>
+                    <input type="number" min="0" max="100" id="audio-playback-volume" class="form-control">
+                </div>
+
+                <div class="form-group options-advanced">
+                    <label for="max-displayed-results">Maximum displayed results</label>
+                    <input type="number" min="1" id="max-displayed-results" class="form-control">
+                </div>
+
                 <div class="form-group">
                     <div class="row">
                         <div class="col-xs-6">
@@ -130,36 +313,41 @@
                 </div>
 
                 <div class="form-group options-advanced">
-                    <label for="audio-playback-volume">Audio playback volume (percent)</label>
-                    <input type="number" min="0" max="100" id="audio-playback-volume" class="form-control">
-                </div>
-
-                <div class="form-group options-advanced">
-                    <label for="max-displayed-results">Maximum displayed results</label>
-                    <input type="number" min="1" id="max-displayed-results" class="form-control">
-                </div>
-
-                <div class="form-group options-advanced">
-                    <label>Popup size (width &times; height, in pixels)</label>
                     <div class="row">
-                        <div class="col-xs-6"><input type="number" min="1" id="popup-width" class="form-control"></div>
-                        <div class="col-xs-6"><input type="number" min="1" id="popup-height" class="form-control"></div>
+                        <div class="col-xs-6">
+                            <label for="popup-display-mode">Popup width <span class="label-light">(in pixels)</span></label>
+                            <input type="number" min="1" id="popup-width" class="form-control">
+                        </div>
+                        <div class="col-xs-6">
+                            <label for="popup-display-mode">Popup height <span class="label-light">(in pixels)</span></label>
+                            <input type="number" min="1" id="popup-height" class="form-control">
+                        </div>
                     </div>
                 </div>
 
                 <div class="form-group options-advanced">
-                    <label>Popup offset (horizontal, vertical; in pixels)</label>
                     <div class="row">
-                        <div class="col-xs-6"><input type="number" min="0" id="popup-horizontal-offset" class="form-control"></div>
-                        <div class="col-xs-6"><input type="number" min="0" id="popup-vertical-offset" class="form-control"></div>
+                        <div class="col-xs-6">
+                            <label for="popup-display-mode">Horizontal popup offset <span class="label-light">(in pixels)</span></label>
+                            <input type="number" min="0" id="popup-horizontal-offset" class="form-control">
+                        </div>
+                        <div class="col-xs-6">
+                            <label for="popup-display-mode">Vertical popup offset <span class="label-light">(in pixels)</span></label>
+                            <input type="number" min="0" id="popup-vertical-offset" class="form-control">
+                        </div>
                     </div>
                 </div>
 
                 <div class="form-group options-advanced">
-                    <label>Popup offset for vertical text (horizontal, vertical; in pixels)</label>
                     <div class="row">
-                        <div class="col-xs-6"><input type="number" min="0" id="popup-horizontal-offset2" class="form-control"></div>
-                        <div class="col-xs-6"><input type="number" min="0" id="popup-vertical-offset2" class="form-control"></div>
+                        <div class="col-xs-6">
+                            <label for="popup-display-mode">Horizontal popup offset for vertical text <span class="label-light">(in pixels)</span></label>
+                            <input type="number" min="0" id="popup-horizontal-offset2" class="form-control">
+                        </div>
+                        <div class="col-xs-6">
+                            <label for="popup-display-mode">Vertical popup offset for vertical text <span class="label-light">(in pixels)</span></label>
+                            <input type="number" min="0" id="popup-vertical-offset2" class="form-control">
+                        </div>
                     </div>
                 </div>
 
@@ -193,24 +381,16 @@
                 </div>
 
                 <div class="checkbox options-advanced">
-                    <label><input type="checkbox" id="enable-scanning-of-popup-expressions"> Enable scanning of popup expressions</label>
-                </div>
-
-                <div class="checkbox">
-                    <label><input type="checkbox" id="enable-scanning-on-search-page"> Enable scanning on search page</label>
-                </div>
-
-                <div class="checkbox options-advanced">
                     <label><input type="checkbox" id="deep-dom-scan"> Deep DOM scan</label>
                 </div>
 
                 <div class="form-group options-advanced">
-                    <label for="scan-delay">Scan delay (in milliseconds)</label>
+                    <label for="scan-delay">Scan delay <span class="label-light">(in milliseconds)</span></label>
                     <input type="number" min="1" id="scan-delay" class="form-control">
                 </div>
 
                 <div class="form-group options-advanced">
-                    <label for="scan-length">Scan length (in characters)</label>
+                    <label for="scan-length">Scan length <span class="label-light">(in characters)</span></label>
                     <input type="number" min="1" id="scan-length" class="form-control">
                 </div>
 
@@ -223,9 +403,26 @@
                         <option value="shift">Shift</option>
                     </select>
                 </div>
+            </div>
 
-                <div class="form-group options-advanced">
-                    <label for="popup-nesting-max-depth">Maximum nested popup depth</label>
+            <div id="popup-content-scanning">
+                <h3>Popup Content Scanning Options</h3>
+
+                <p class="help-block">
+                    Yomichan is able to create additional popups in order to scan the content of other popups.
+                    This feature can be enabled if the <strong>Maximum number of additional popups</strong> option is set to a value greater than 0.
+                </p>
+
+                <div class="checkbox">
+                    <label><input type="checkbox" id="enable-scanning-on-search-page"> Enable scanning on search page</label>
+                </div>
+
+                <div class="checkbox">
+                    <label><input type="checkbox" id="enable-scanning-of-popup-expressions"> Enable scanning of popup expressions</label>
+                </div>
+
+                <div class="form-group">
+                    <label for="popup-nesting-max-depth">Maximum number of additional popups</label>
                     <input type="number" min="0" id="popup-nesting-max-depth" class="form-control">
                 </div>
             </div>
@@ -265,7 +462,7 @@
                 <div id="dict-importer">
                     <p class="help-block">
                         Select a dictionary to import for use below. Please visit the Yomichan homepage to
-                        <a href="https://foosoft.net/projects/yomichan" target="_blank">download free dictionaries</a>
+                        <a href="https://foosoft.net/projects/yomichan" target="_blank" rel="noopener">download free dictionaries</a>
                         for use with this extension and to learn about importing proprietary EPWING dictionaries.
                     </p>
                     <input type="file" id="dict-file">
@@ -291,7 +488,7 @@
                     <div data-show-for-browser="firefox firefox-mobile"><div class="alert alert-danger options-advanced">
                         On Firefox and Firefox for Android, the storage information feature may be hidden behind a browser flag.
 
-                        If you would like to enable this flag, open <a href="about:config" target="_blank">about:config</a> and search for the
+                        If you would like to enable this flag, open <a href="about:config" target="_blank" rel="noopener">about:config</a> and search for the
                         <strong>dom.storageManager.enabled</strong> option. If this option has a value of <strong>false</strong>, toggling it to
                         <strong>true</strong> may allow storage information to be calculated.
                     </div></div>
@@ -313,9 +510,9 @@
                 </div>
 
                 <p class="help-block">
-                    Yomichan supports automatic flashcard creation for <a href="http://ankisrs.net/" target="_blank">Anki</a>, a free application
+                    Yomichan supports automatic flashcard creation for <a href="https://apps.ankiweb.net/" target="_blank" rel="noopener">Anki</a>, a free application
                     designed to help you remember. This feature requires installation of the
-                    <a href="https://foosoft.net/projects/anki-connect/" target="_blank">AnkiConnect</a> plugin.
+                    <a href="https://foosoft.net/projects/anki-connect/" target="_blank" rel="noopener">AnkiConnect</a> plugin.
                 </p>
 
                 <div class="alert alert-danger" id="anki-error"></div>
@@ -326,12 +523,12 @@
 
                 <div id="anki-general">
                     <div class="form-group">
-                        <label for="card-tags">Card tags (comma or space separated)</label>
+                        <label for="card-tags">Card tags <span class="label-light">(comma or space separated)</span></label>
                         <input type="text" id="card-tags" class="form-control">
                     </div>
 
                     <div class="form-group options-advanced">
-                        <label for="sentence-detection-extent">Sentence detection extent (in characters)</label>
+                        <label for="sentence-detection-extent">Sentence detection extent <span class="label-light">(in characters)</span></label>
                         <input type="number" min="1" id="sentence-detection-extent" class="form-control">
                     </div>
 
@@ -349,7 +546,7 @@
                     </div>
 
                     <div class="form-group options-advanced">
-                        <label for="screenshot-quality">Screenshot quality (JPEG only)</label>
+                        <label for="screenshot-quality">Screenshot quality <span class="label-light">(JPEG only)</span></label>
                         <input type="number" min="0" max="100" step="1" id="screenshot-quality" class="form-control">
                     </div>
 
@@ -408,12 +605,12 @@
 
                         <div class="options-advanced">
                             <p class="help-block">
-                                Fields are formatted using the <a href="http://handlebarsjs.com/">Handlebars.js</a> template rendering
+                                Fields are formatted using the <a href="https://handlebarsjs.com/" target="_blank" rel="noopener">Handlebars.js</a> template rendering
                                 engine. Advanced users can modify these templates for ultimate control of what information gets included in
                                 their Anki cards. If you encounter problems with your changes you can always <a href="#" id="field-templates-reset">reset to default</a>
                                 template settings.
                             </p>
-                            <textarea class="form-control" rows="10" id="field-templates"></textarea>
+                            <textarea autocomplete="off" spellcheck="false" wrap="soft" class="form-control" rows="10" id="field-templates"></textarea>
                         </div>
                     </div>
                 </div>
@@ -431,14 +628,14 @@
                     countless hours that I have devoted to this extension.
                 </p>
                 <p>
-                    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4DBTN9A3CUAFN" target="_blank"><img src="/bg/img/paypal.gif" alt></a>
+                    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4DBTN9A3CUAFN" target="_blank" rel="noopener"><img src="/bg/img/paypal.gif" alt></a>
                 </p>
             </div>
 
             <pre id="debug"></pre>
 
             <div class="pull-right bottom-links">
-                <small><a href="search.html">Search</a> &bull; <a href="https://foosoft.net/projects/yomichan/" target="_blank">Homepage</a> &bull; <a href="legal.html">Legal</a></small>
+                <small><a href="search.html">Search</a> &bull; <a href="https://foosoft.net/projects/yomichan/" target="_blank" rel="noopener">Homepage</a> &bull; <a href="legal.html">Legal</a></small>
             </div>
         </div>
 
@@ -450,12 +647,16 @@
 
         <script src="/bg/js/anki.js"></script>
         <script src="/bg/js/api.js"></script>
+        <script src="/bg/js/conditions.js"></script>
+        <script src="/bg/js/conditions-ui.js"></script>
         <script src="/bg/js/dictionary.js"></script>
         <script src="/bg/js/handlebars.js"></script>
         <script src="/bg/js/options.js"></script>
+        <script src="/bg/js/profile-conditions.js"></script>
         <script src="/bg/js/templates.js"></script>
         <script src="/bg/js/util.js"></script>
 
+        <script src="/bg/js/settings-profiles.js"></script>
         <script src="/bg/js/settings.js"></script>
     </body>
 </html>

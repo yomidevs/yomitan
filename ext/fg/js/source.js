@@ -88,7 +88,7 @@ class TextSourceRange {
         }
 
         const skip = ['RT', 'SCRIPT', 'STYLE'];
-        if (skip.includes(node.nodeName)) {
+        if (skip.includes(node.nodeName.toUpperCase())) {
             return false;
         }
 
@@ -285,7 +285,7 @@ class TextSourceElement {
     }
 
     setEndOffset(length) {
-        switch (this.element.nodeName) {
+        switch (this.element.nodeName.toUpperCase()) {
             case 'BUTTON':
                 this.content = this.element.innerHTML;
                 break;

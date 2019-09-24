@@ -17,28 +17,24 @@
  */
 
 
-function apiOptionsSet(options) {
-    return utilInvoke('optionsSet', {options});
+function apiOptionsGet(optionsContext) {
+    return utilInvoke('optionsGet', {optionsContext});
 }
 
-function apiOptionsGet() {
-    return utilInvoke('optionsGet');
+function apiTermsFind(text, optionsContext) {
+    return utilInvoke('termsFind', {text, optionsContext});
 }
 
-function apiTermsFind(text) {
-    return utilInvoke('termsFind', {text});
+function apiKanjiFind(text, optionsContext) {
+    return utilInvoke('kanjiFind', {text, optionsContext});
 }
 
-function apiKanjiFind(text) {
-    return utilInvoke('kanjiFind', {text});
+function apiDefinitionAdd(definition, mode, context, optionsContext) {
+    return utilInvoke('definitionAdd', {definition, mode, context, optionsContext});
 }
 
-function apiDefinitionAdd(definition, mode, context) {
-    return utilInvoke('definitionAdd', {definition, mode, context});
-}
-
-function apiDefinitionsAddable(definitions, modes) {
-    return utilInvoke('definitionsAddable', {definitions, modes}).catch(() => null);
+function apiDefinitionsAddable(definitions, modes, optionsContext) {
+    return utilInvoke('definitionsAddable', {definitions, modes, optionsContext}).catch(() => null);
 }
 
 function apiNoteView(noteId) {

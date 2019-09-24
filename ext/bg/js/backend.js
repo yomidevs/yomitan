@@ -22,47 +22,44 @@ class Backend {
         this.translator = new Translator();
         this.anki = new AnkiNull();
         this.options = null;
+        this.optionsContext = {
+            depth: 0,
+            url: window.location.href
+        };
+
+        this.isPreparedResolve = null;
+        this.isPreparedPromise = new Promise((resolve) => (this.isPreparedResolve = resolve));
 
         this.apiForwarder = new BackendApiForwarder();
     }
 
     async prepare() {
         await this.translator.prepare();
-        await apiOptionsSet(await optionsLoad());
+        this.options = await optionsLoad();
+        this.onOptionsUpdated('background');
 
         if (chrome.commands !== null && typeof chrome.commands === 'object') {
             chrome.commands.onCommand.addListener(this.onCommand.bind(this));
         }
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
 
-        if (this.options.general.showGuide) {
+        const options = this.getOptionsSync(this.optionsContext);
+        if (options.general.showGuide) {
             chrome.tabs.create({url: chrome.extension.getURL('/bg/guide.html')});
         }
+
+        this.isPreparedResolve();
+        this.isPreparedResolve = null;
+        this.isPreparedPromise = null;
     }
 
-    onOptionsUpdated(options) {
-        this.options = utilIsolate(options);
-
-        if (!options.general.enable) {
-            this.setExtensionBadgeBackgroundColor('#555555');
-            this.setExtensionBadgeText('off');
-        } else if (!dictConfigured(options)) {
-            this.setExtensionBadgeBackgroundColor('#f0ad4e');
-            this.setExtensionBadgeText('!');
-        } else {
-            this.setExtensionBadgeText('');
-        }
-
-        if (options.anki.enable) {
-            this.anki = new AnkiConnect(options.anki.server);
-        } else {
-            this.anki = new AnkiNull();
-        }
+    onOptionsUpdated(source) {
+        this.applyOptions();
 
         const callback = () => this.checkLastError(chrome.runtime.lastError);
         chrome.tabs.query({}, tabs => {
             for (const tab of tabs) {
-                chrome.tabs.sendMessage(tab.id, {action: 'optionsSet', params: options}, callback);
+                chrome.tabs.sendMessage(tab.id, {action: 'optionsUpdate', params: {source}}, callback);
             }
         });
     }
@@ -81,28 +78,24 @@ class Backend {
         };
 
         const handlers = {
-            optionsGet: ({callback}) => {
-                forward(apiOptionsGet(), callback);
+            optionsGet: ({optionsContext, callback}) => {
+                forward(apiOptionsGet(optionsContext), callback);
             },
 
-            optionsSet: ({options, callback}) => {
-                forward(apiOptionsSet(options), callback);
+            kanjiFind: ({text, optionsContext, callback}) => {
+                forward(apiKanjiFind(text, optionsContext), callback);
             },
 
-            kanjiFind: ({text, callback}) => {
-                forward(apiKanjiFind(text), callback);
+            termsFind: ({text, optionsContext, callback}) => {
+                forward(apiTermsFind(text, optionsContext), callback);
             },
 
-            termsFind: ({text, callback}) => {
-                forward(apiTermsFind(text), callback);
+            definitionAdd: ({definition, mode, context, optionsContext, callback}) => {
+                forward(apiDefinitionAdd(definition, mode, context, optionsContext), callback);
             },
 
-            definitionAdd: ({definition, mode, context, callback}) => {
-                forward(apiDefinitionAdd(definition, mode, context), callback);
-            },
-
-            definitionsAddable: ({definitions, modes, callback}) => {
-                forward(apiDefinitionsAddable(definitions, modes), callback);
+            definitionsAddable: ({definitions, modes, optionsContext, callback}) => {
+                forward(apiDefinitionsAddable(definitions, modes, optionsContext), callback);
             },
 
             noteView: ({noteId}) => {
@@ -143,12 +136,86 @@ class Backend {
         return true;
     }
 
+    applyOptions() {
+        const options = this.getOptionsSync(this.optionsContext);
+        if (!options.general.enable) {
+            this.setExtensionBadgeBackgroundColor('#555555');
+            this.setExtensionBadgeText('off');
+        } else if (!dictConfigured(options)) {
+            this.setExtensionBadgeBackgroundColor('#f0ad4e');
+            this.setExtensionBadgeText('!');
+        } else {
+            this.setExtensionBadgeText('');
+        }
+
+        this.anki = options.anki.enable ? new AnkiConnect(options.anki.server) : new AnkiNull();
+    }
+
+    async getFullOptions() {
+        if (this.isPreparedPromise !== null) {
+            await this.isPreparedPromise;
+        }
+        return this.options;
+    }
+
+    async getOptions(optionsContext) {
+        if (this.isPreparedPromise !== null) {
+            await this.isPreparedPromise;
+        }
+        return this.getOptionsSync(optionsContext);
+    }
+
+    getOptionsSync(optionsContext) {
+        return this.getProfileSync(optionsContext).options;
+    }
+
+    getProfileSync(optionsContext) {
+        const profiles = this.options.profiles;
+        if (typeof optionsContext.index === 'number') {
+            return profiles[optionsContext.index];
+        }
+        const profile = this.getProfileFromContext(optionsContext);
+        return profile !== null ? profile : this.options.profiles[this.options.profileCurrent];
+    }
+
+    getProfileFromContext(optionsContext) {
+        for (const profile of this.options.profiles) {
+            const conditionGroups = profile.conditionGroups;
+            if (conditionGroups.length > 0 && Backend.testConditionGroups(conditionGroups, optionsContext)) {
+                return profile;
+            }
+        }
+        return null;
+    }
+
+    static testConditionGroups(conditionGroups, data) {
+        if (conditionGroups.length === 0) { return false; }
+
+        for (const conditionGroup of conditionGroups) {
+            const conditions = conditionGroup.conditions;
+            if (conditions.length > 0 && Backend.testConditions(conditions, data)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    static testConditions(conditions, data) {
+        for (const condition of conditions) {
+            if (!conditionsTestValue(profileConditionsDescriptor, condition.type, condition.operator, condition.value, data)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     setExtensionBadgeBackgroundColor(color) {
         if (typeof chrome.browserAction.setBadgeBackgroundColor === 'function') {
             chrome.browserAction.setBadgeBackgroundColor({color});
         }
     }
-    
+
     setExtensionBadgeText(text) {
         if (typeof chrome.browserAction.setBadgeText === 'function') {
             chrome.browserAction.setBadgeText({text});

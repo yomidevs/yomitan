@@ -17,7 +17,67 @@
  */
 
 
-function optionsFieldTemplates() {
+/*
+ * Generic options functions
+ */
+
+function optionsGenericApplyUpdates(options, updates) {
+    const targetVersion = updates.length;
+    const currentVersion = options.version;
+    if (typeof currentVersion === 'number' && Number.isFinite(currentVersion)) {
+        for (let i = Math.max(0, Math.floor(currentVersion)); i < targetVersion; ++i) {
+            const update = updates[i];
+            if (update !== null) {
+                update(options);
+            }
+        }
+    }
+
+    options.version = targetVersion;
+    return options;
+}
+
+
+/*
+ * Per-profile options
+ */
+
+const profileOptionsVersionUpdates = [
+    null,
+    null,
+    null,
+    null,
+    (options) => {
+        options.general.audioSource = options.general.audioPlayback ? 'jpod101' : 'disabled';
+    },
+    (options) => {
+        options.general.showGuide = false;
+    },
+    (options) => {
+        options.scanning.modifier = options.scanning.requireShift ? 'shift' : 'none';
+    },
+    (options) => {
+        const fieldTemplatesDefault = profileOptionsGetDefaultFieldTemplates();
+        options.general.resultOutputMode = options.general.groupResults ? 'group' : 'split';
+        options.anki.fieldTemplates = (
+            (utilStringHashCode(options.anki.fieldTemplates) !== -805327496) ?
+            `{{#if merge}}${fieldTemplatesDefault}{{else}}${options.anki.fieldTemplates}{{/if}}` :
+            fieldTemplatesDefault
+        );
+    },
+    (options) => {
+        if (utilStringHashCode(options.anki.fieldTemplates) === 1285806040) {
+            options.anki.fieldTemplates = profileOptionsGetDefaultFieldTemplates();
+        }
+    },
+    (options) => {
+        if (utilStringHashCode(options.anki.fieldTemplates) === -250091611) {
+            options.anki.fieldTemplates = profileOptionsGetDefaultFieldTemplates();
+        }
+    }
+];
+
+function profileOptionsGetDefaultFieldTemplates() {
     return `
 {{#*inline "glossary-single"}}
     {{~#unless brief~}}
@@ -183,8 +243,8 @@ function optionsFieldTemplates() {
 `.trim();
 }
 
-function optionsSetDefaults(options) {
-    const defaults = {
+function profileOptionsCreateDefaults() {
+    return {
         general: {
             enable: true,
             audioSource: 'jpod101',
@@ -235,9 +295,13 @@ function optionsSetDefaults(options) {
             screenshot: {format: 'png', quality: 92},
             terms: {deck: '', model: '', fields: {}},
             kanji: {deck: '', model: '', fields: {}},
-            fieldTemplates: optionsFieldTemplates()
+            fieldTemplates: profileOptionsGetDefaultFieldTemplates()
         }
     };
+}
+
+function profileOptionsSetDefaults(options) {
+    const defaults = profileOptionsCreateDefaults();
 
     const combine = (target, source) => {
         for (const key in source) {
@@ -257,81 +321,119 @@ function optionsSetDefaults(options) {
     return options;
 }
 
-function optionsVersion(options) {
-    const fixups = [
-        () => {},
-        () => {},
-        () => {},
-        () => {},
-        () => {
-            if (options.general.audioPlayback) {
-                options.general.audioSource = 'jpod101';
-            } else {
-                options.general.audioSource = 'disabled';
-            }
-        },
-        () => {
-            options.general.showGuide = false;
-        },
-        () => {
-            if (options.scanning.requireShift) {
-                options.scanning.modifier = 'shift';
-            } else {
-                options.scanning.modifier = 'none';
-            }
-        },
-        () => {
-            if (options.general.groupResults) {
-                options.general.resultOutputMode = 'group';
-            } else {
-                options.general.resultOutputMode = 'split';
-            }
-            if (utilStringHashCode(options.anki.fieldTemplates) !== -805327496) {
-                options.anki.fieldTemplates = `{{#if merge}}${optionsFieldTemplates()}{{else}}${options.anki.fieldTemplates}{{/if}}`;
-            } else {
-                options.anki.fieldTemplates = optionsFieldTemplates();
-            }
-        },
-        () => {
-            if (utilStringHashCode(options.anki.fieldTemplates) === 1285806040) {
-                options.anki.fieldTemplates = optionsFieldTemplates();
-            }
-        },
-        () => {
-            if (utilStringHashCode(options.anki.fieldTemplates) === -250091611) {
-                options.anki.fieldTemplates = optionsFieldTemplates();
-            }
+function profileOptionsUpdateVersion(options) {
+    profileOptionsSetDefaults(options);
+    return optionsGenericApplyUpdates(options, profileOptionsVersionUpdates);
+}
+
+
+/*
+ * Global options
+ *
+ * Each profile has an array named "conditionGroups", which is an array of condition groups
+ * which enable the contextual selection of profiles. The structure of the array is as follows:
+ * [
+ *     {
+ *         conditions: [
+ *             {
+ *                 type: "string",
+ *                 operator: "string",
+ *                 value: "string"
+ *             },
+ *             // ...
+ *         ]
+ *     },
+ *     // ...
+ * ]
+ */
+
+const optionsVersionUpdates = [];
+
+function optionsUpdateVersion(options, defaultProfileOptions) {
+    // Ensure profiles is an array
+    if (!Array.isArray(options.profiles)) {
+        options.profiles = [];
+    }
+
+    // Remove invalid
+    const profiles = options.profiles;
+    for (let i = profiles.length - 1; i >= 0; --i) {
+        if (!utilIsObject(profiles[i])) {
+            profiles.splice(i, 1);
         }
-    ];
-
-    optionsSetDefaults(options);
-    if (!options.hasOwnProperty('version')) {
-        options.version = fixups.length;
     }
 
-    while (options.version < fixups.length) {
-        fixups[options.version++]();
+    // Require at least one profile
+    if (profiles.length === 0) {
+        profiles.push({
+            name: 'Default',
+            options: defaultProfileOptions,
+            conditionGroups: []
+        });
     }
 
-    return options;
+    // Ensure profileCurrent is valid
+    const profileCurrent = options.profileCurrent;
+    if (!(
+        typeof profileCurrent === 'number' &&
+        Number.isFinite(profileCurrent) &&
+        Math.floor(profileCurrent) === profileCurrent &&
+        profileCurrent >= 0 &&
+        profileCurrent < profiles.length
+    )) {
+        options.profileCurrent = 0;
+    }
+
+    // Update profile options
+    for (const profile of profiles) {
+        if (!Array.isArray(profile.conditionGroups)) {
+            profile.conditionGroups = [];
+        }
+        profile.options = profileOptionsUpdateVersion(profile.options);
+    }
+
+    // Generic updates
+    return optionsGenericApplyUpdates(options, optionsVersionUpdates);
 }
 
 function optionsLoad() {
     return new Promise((resolve, reject) => {
-        chrome.storage.local.get(null, store => resolve(store.options));
+        chrome.storage.local.get(['options'], store => {
+            const error = chrome.runtime.lastError;
+            if (error) {
+                reject(error);
+            } else {
+                resolve(store.options);
+            }
+        });
     }).then(optionsStr => {
-        return optionsStr ? JSON.parse(optionsStr) : {};
-    }).catch(error => {
+        if (typeof optionsStr === 'string') {
+            const options = JSON.parse(optionsStr);
+            if (utilIsObject(options)) {
+                return options;
+            }
+        }
+        return {};
+    }).catch(() => {
         return {};
     }).then(options => {
-        return optionsVersion(options);
+        return (
+            Array.isArray(options.profiles) ?
+            optionsUpdateVersion(options, {}) :
+            optionsUpdateVersion({}, options)
+        );
     });
 }
 
 function optionsSave(options) {
     return new Promise((resolve, reject) => {
-        chrome.storage.local.set({options: JSON.stringify(options)}, resolve);
-    }).then(() => {
-        apiOptionsSet(options);
+        chrome.storage.local.set({options: JSON.stringify(options)}, () => {
+            const error = chrome.runtime.lastError;
+            if (error) {
+                reject(error);
+            } else {
+                resolve();
+            }
+        });
     });
 }

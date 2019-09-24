@@ -16,73 +16,143 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+async function getOptionsArray() {
+    const optionsFull = await apiOptionsGetFull();
+    return optionsFull.profiles.map(profile => profile.options);
+}
 
-async function formRead() {
-    const optionsOld = await optionsLoad();
-    const optionsNew = $.extend(true, {}, optionsOld);
+async function formRead(options) {
+    options.general.enable = $('#enable').prop('checked');
+    options.general.showGuide = $('#show-usage-guide').prop('checked');
+    options.general.compactTags = $('#compact-tags').prop('checked');
+    options.general.compactGlossaries = $('#compact-glossaries').prop('checked');
+    options.general.autoPlayAudio = $('#auto-play-audio').prop('checked');
+    options.general.resultOutputMode = $('#result-output-mode').val();
+    options.general.audioSource = $('#audio-playback-source').val();
+    options.general.audioVolume = parseFloat($('#audio-playback-volume').val());
+    options.general.debugInfo = $('#show-debug-info').prop('checked');
+    options.general.showAdvanced = $('#show-advanced-options').prop('checked');
+    options.general.maxResults = parseInt($('#max-displayed-results').val(), 10);
+    options.general.popupDisplayMode = $('#popup-display-mode').val();
+    options.general.popupHorizontalTextPosition = $('#popup-horizontal-text-position').val();
+    options.general.popupVerticalTextPosition = $('#popup-vertical-text-position').val();
+    options.general.popupWidth = parseInt($('#popup-width').val(), 10);
+    options.general.popupHeight = parseInt($('#popup-height').val(), 10);
+    options.general.popupHorizontalOffset = parseInt($('#popup-horizontal-offset').val(), 0);
+    options.general.popupVerticalOffset = parseInt($('#popup-vertical-offset').val(), 10);
+    options.general.popupHorizontalOffset2 = parseInt($('#popup-horizontal-offset2').val(), 0);
+    options.general.popupVerticalOffset2 = parseInt($('#popup-vertical-offset2').val(), 10);
+    options.general.customPopupCss = $('#custom-popup-css').val();
 
-    optionsNew.general.showGuide = $('#show-usage-guide').prop('checked');
-    optionsNew.general.compactTags = $('#compact-tags').prop('checked');
-    optionsNew.general.compactGlossaries = $('#compact-glossaries').prop('checked');
-    optionsNew.general.autoPlayAudio = $('#auto-play-audio').prop('checked');
-    optionsNew.general.resultOutputMode = $('#result-output-mode').val();
-    optionsNew.general.audioSource = $('#audio-playback-source').val();
-    optionsNew.general.audioVolume = parseFloat($('#audio-playback-volume').val());
-    optionsNew.general.debugInfo = $('#show-debug-info').prop('checked');
-    optionsNew.general.showAdvanced = $('#show-advanced-options').prop('checked');
-    optionsNew.general.maxResults = parseInt($('#max-displayed-results').val(), 10);
-    optionsNew.general.popupDisplayMode = $('#popup-display-mode').val();
-    optionsNew.general.popupHorizontalTextPosition = $('#popup-horizontal-text-position').val();
-    optionsNew.general.popupVerticalTextPosition = $('#popup-vertical-text-position').val();
-    optionsNew.general.popupWidth = parseInt($('#popup-width').val(), 10);
-    optionsNew.general.popupHeight = parseInt($('#popup-height').val(), 10);
-    optionsNew.general.popupHorizontalOffset = parseInt($('#popup-horizontal-offset').val(), 0);
-    optionsNew.general.popupVerticalOffset = parseInt($('#popup-vertical-offset').val(), 10);
-    optionsNew.general.popupHorizontalOffset2 = parseInt($('#popup-horizontal-offset2').val(), 0);
-    optionsNew.general.popupVerticalOffset2 = parseInt($('#popup-vertical-offset2').val(), 10);
-    optionsNew.general.customPopupCss = $('#custom-popup-css').val();
+    options.scanning.middleMouse = $('#middle-mouse-button-scan').prop('checked');
+    options.scanning.touchInputEnabled = $('#touch-input-enabled').prop('checked');
+    options.scanning.selectText = $('#select-matched-text').prop('checked');
+    options.scanning.alphanumeric = $('#search-alphanumeric').prop('checked');
+    options.scanning.autoHideResults = $('#auto-hide-results').prop('checked');
+    options.scanning.deepDomScan = $('#deep-dom-scan').prop('checked');
+    options.scanning.enableOnPopupExpressions = $('#enable-scanning-of-popup-expressions').prop('checked');
+    options.scanning.enableOnSearchPage = $('#enable-scanning-on-search-page').prop('checked');
+    options.scanning.delay = parseInt($('#scan-delay').val(), 10);
+    options.scanning.length = parseInt($('#scan-length').val(), 10);
+    options.scanning.modifier = $('#scan-modifier-key').val();
+    options.scanning.popupNestingMaxDepth = parseInt($('#popup-nesting-max-depth').val(), 10);
 
-    optionsNew.scanning.middleMouse = $('#middle-mouse-button-scan').prop('checked');
-    optionsNew.scanning.touchInputEnabled = $('#touch-input-enabled').prop('checked');
-    optionsNew.scanning.selectText = $('#select-matched-text').prop('checked');
-    optionsNew.scanning.alphanumeric = $('#search-alphanumeric').prop('checked');
-    optionsNew.scanning.autoHideResults = $('#auto-hide-results').prop('checked');
-    optionsNew.scanning.deepDomScan = $('#deep-dom-scan').prop('checked');
-    optionsNew.scanning.enableOnPopupExpressions = $('#enable-scanning-of-popup-expressions').prop('checked');
-    optionsNew.scanning.enableOnSearchPage = $('#enable-scanning-on-search-page').prop('checked');
-    optionsNew.scanning.delay = parseInt($('#scan-delay').val(), 10);
-    optionsNew.scanning.length = parseInt($('#scan-length').val(), 10);
-    optionsNew.scanning.modifier = $('#scan-modifier-key').val();
-    optionsNew.scanning.popupNestingMaxDepth = parseInt($('#popup-nesting-max-depth').val(), 10);
+    const optionsAnkiEnableOld = options.anki.enable;
+    options.anki.enable = $('#anki-enable').prop('checked');
+    options.anki.tags = utilBackgroundIsolate($('#card-tags').val().split(/[,; ]+/));
+    options.anki.sentenceExt = parseInt($('#sentence-detection-extent').val(), 10);
+    options.anki.server = $('#interface-server').val();
+    options.anki.screenshot.format = $('#screenshot-format').val();
+    options.anki.screenshot.quality = parseInt($('#screenshot-quality').val(), 10);
+    options.anki.fieldTemplates = $('#field-templates').val();
 
-    optionsNew.anki.enable = $('#anki-enable').prop('checked');
-    optionsNew.anki.tags = $('#card-tags').val().split(/[,; ]+/);
-    optionsNew.anki.sentenceExt = parseInt($('#sentence-detection-extent').val(), 10);
-    optionsNew.anki.server = $('#interface-server').val();
-    optionsNew.anki.screenshot.format = $('#screenshot-format').val();
-    optionsNew.anki.screenshot.quality = parseInt($('#screenshot-quality').val(), 10);
-    optionsNew.anki.fieldTemplates = $('#field-templates').val();
-
-    if (optionsOld.anki.enable && !ankiErrorShown()) {
-        optionsNew.anki.terms.deck = $('#anki-terms-deck').val();
-        optionsNew.anki.terms.model = $('#anki-terms-model').val();
-        optionsNew.anki.terms.fields = ankiFieldsToDict($('#terms .anki-field-value'));
-        optionsNew.anki.kanji.deck = $('#anki-kanji-deck').val();
-        optionsNew.anki.kanji.model = $('#anki-kanji-model').val();
-        optionsNew.anki.kanji.fields = ankiFieldsToDict($('#kanji .anki-field-value'));
+    if (optionsAnkiEnableOld && !ankiErrorShown()) {
+        options.anki.terms.deck = $('#anki-terms-deck').val();
+        options.anki.terms.model = $('#anki-terms-model').val();
+        options.anki.terms.fields = utilBackgroundIsolate(ankiFieldsToDict($('#terms .anki-field-value')));
+        options.anki.kanji.deck = $('#anki-kanji-deck').val();
+        options.anki.kanji.model = $('#anki-kanji-model').val();
+        options.anki.kanji.fields = utilBackgroundIsolate(ankiFieldsToDict($('#kanji .anki-field-value')));
     }
 
-    optionsNew.general.mainDictionary = $('#dict-main').val();
+    options.general.mainDictionary = $('#dict-main').val();
     $('.dict-group').each((index, element) => {
         const dictionary = $(element);
-        optionsNew.dictionaries[dictionary.data('title')] = {
+        options.dictionaries[dictionary.data('title')] = utilBackgroundIsolate({
             priority: parseInt(dictionary.find('.dict-priority').val(), 10),
             enabled: dictionary.find('.dict-enabled').prop('checked'),
             allowSecondarySearches: dictionary.find('.dict-allow-secondary-searches').prop('checked')
-        };
+        });
     });
+}
 
-    return {optionsNew, optionsOld};
+async function formWrite(options) {
+    $('#enable').prop('checked', options.general.enable);
+    $('#show-usage-guide').prop('checked', options.general.showGuide);
+    $('#compact-tags').prop('checked', options.general.compactTags);
+    $('#compact-glossaries').prop('checked', options.general.compactGlossaries);
+    $('#auto-play-audio').prop('checked', options.general.autoPlayAudio);
+    $('#result-output-mode').val(options.general.resultOutputMode);
+    $('#audio-playback-source').val(options.general.audioSource);
+    $('#audio-playback-volume').val(options.general.audioVolume);
+    $('#show-debug-info').prop('checked', options.general.debugInfo);
+    $('#show-advanced-options').prop('checked', options.general.showAdvanced);
+    $('#max-displayed-results').val(options.general.maxResults);
+    $('#popup-display-mode').val(options.general.popupDisplayMode);
+    $('#popup-horizontal-text-position').val(options.general.popupHorizontalTextPosition);
+    $('#popup-vertical-text-position').val(options.general.popupVerticalTextPosition);
+    $('#popup-width').val(options.general.popupWidth);
+    $('#popup-height').val(options.general.popupHeight);
+    $('#popup-horizontal-offset').val(options.general.popupHorizontalOffset);
+    $('#popup-vertical-offset').val(options.general.popupVerticalOffset);
+    $('#popup-horizontal-offset2').val(options.general.popupHorizontalOffset2);
+    $('#popup-vertical-offset2').val(options.general.popupVerticalOffset2);
+    $('#custom-popup-css').val(options.general.customPopupCss);
+
+    $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);
+    $('#touch-input-enabled').prop('checked', options.scanning.touchInputEnabled);
+    $('#select-matched-text').prop('checked', options.scanning.selectText);
+    $('#search-alphanumeric').prop('checked', options.scanning.alphanumeric);
+    $('#auto-hide-results').prop('checked', options.scanning.autoHideResults);
+    $('#deep-dom-scan').prop('checked', options.scanning.deepDomScan);
+    $('#enable-scanning-of-popup-expressions').prop('checked', options.scanning.enableOnPopupExpressions);
+    $('#enable-scanning-on-search-page').prop('checked', options.scanning.enableOnSearchPage);
+    $('#scan-delay').val(options.scanning.delay);
+    $('#scan-length').val(options.scanning.length);
+    $('#scan-modifier-key').val(options.scanning.modifier);
+    $('#popup-nesting-max-depth').val(options.scanning.popupNestingMaxDepth);
+
+    $('#anki-enable').prop('checked', options.anki.enable);
+    $('#card-tags').val(options.anki.tags.join(' '));
+    $('#sentence-detection-extent').val(options.anki.sentenceExt);
+    $('#interface-server').val(options.anki.server);
+    $('#screenshot-format').val(options.anki.screenshot.format);
+    $('#screenshot-quality').val(options.anki.screenshot.quality);
+    $('#field-templates').val(options.anki.fieldTemplates);
+
+    try {
+        await dictionaryGroupsPopulate(options);
+        await formMainDictionaryOptionsPopulate(options);
+    } catch (e) {
+        dictionaryErrorsShow([e]);
+    }
+
+    try {
+        await ankiDeckAndModelPopulate(options);
+    } catch (e) {
+        ankiErrorShow(e);
+    }
+
+    formUpdateVisibility(options);
+}
+
+function formSetupEventListeners() {
+    $('#dict-purge-link').click(utilAsync(onDictionaryPurge));
+    $('#dict-file').change(utilAsync(onDictionaryImport));
+
+    $('#field-templates-reset').click(utilAsync(onAnkiFieldTemplatesReset));
+    $('input, select, textarea').not('.anki-model').not('.profile-form *').change(utilAsync(onFormOptionsChanged));
+    $('.anki-model').change(utilAsync(onAnkiModelChanged));
 }
 
 function formUpdateVisibility(options) {
@@ -141,18 +211,23 @@ async function onFormOptionsChanged(e) {
         return;
     }
 
-    const {optionsNew, optionsOld} = await formRead();
-    await optionsSave(optionsNew);
-    formUpdateVisibility(optionsNew);
+    const optionsContext = getOptionsContext();
+    const options = await apiOptionsGet(optionsContext);
+    const optionsAnkiEnableOld = options.anki.enable;
+    const optionsAnkiServerOld = options.anki.server;
+
+    await formRead(options);
+    await settingsSaveOptions();
+    formUpdateVisibility(options);
 
     try {
         const ankiUpdated =
-            optionsNew.anki.enable !== optionsOld.anki.enable ||
-            optionsNew.anki.server !== optionsOld.anki.server;
+            options.anki.enable !== optionsAnkiEnableOld ||
+            options.anki.server !== optionsAnkiServerOld;
 
         if (ankiUpdated) {
             ankiSpinnerShow(true);
-            await ankiDeckAndModelPopulate(optionsNew);
+            await ankiDeckAndModelPopulate(options);
             ankiErrorShow();
         }
     } catch (e) {
@@ -163,75 +238,46 @@ async function onFormOptionsChanged(e) {
 }
 
 async function onReady() {
-    const options = await optionsLoad();
-
-    $('#show-usage-guide').prop('checked', options.general.showGuide);
-    $('#compact-tags').prop('checked', options.general.compactTags);
-    $('#compact-glossaries').prop('checked', options.general.compactGlossaries);
-    $('#auto-play-audio').prop('checked', options.general.autoPlayAudio);
-    $('#result-output-mode').val(options.general.resultOutputMode);
-    $('#audio-playback-source').val(options.general.audioSource);
-    $('#audio-playback-volume').val(options.general.audioVolume);
-    $('#show-debug-info').prop('checked', options.general.debugInfo);
-    $('#show-advanced-options').prop('checked', options.general.showAdvanced);
-    $('#max-displayed-results').val(options.general.maxResults);
-    $('#popup-display-mode').val(options.general.popupDisplayMode);
-    $('#popup-horizontal-text-position').val(options.general.popupHorizontalTextPosition);
-    $('#popup-vertical-text-position').val(options.general.popupVerticalTextPosition);
-    $('#popup-width').val(options.general.popupWidth);
-    $('#popup-height').val(options.general.popupHeight);
-    $('#popup-horizontal-offset').val(options.general.popupHorizontalOffset);
-    $('#popup-vertical-offset').val(options.general.popupVerticalOffset);
-    $('#popup-horizontal-offset2').val(options.general.popupHorizontalOffset2);
-    $('#popup-vertical-offset2').val(options.general.popupVerticalOffset2);
-    $('#custom-popup-css').val(options.general.customPopupCss);
-
-    $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);
-    $('#touch-input-enabled').prop('checked', options.scanning.touchInputEnabled);
-    $('#select-matched-text').prop('checked', options.scanning.selectText);
-    $('#search-alphanumeric').prop('checked', options.scanning.alphanumeric);
-    $('#auto-hide-results').prop('checked', options.scanning.autoHideResults);
-    $('#deep-dom-scan').prop('checked', options.scanning.deepDomScan);
-    $('#enable-scanning-of-popup-expressions').prop('checked', options.scanning.enableOnPopupExpressions);
-    $('#enable-scanning-on-search-page').prop('checked', options.scanning.enableOnSearchPage);
-    $('#scan-delay').val(options.scanning.delay);
-    $('#scan-length').val(options.scanning.length);
-    $('#scan-modifier-key').val(options.scanning.modifier);
-    $('#popup-nesting-max-depth').val(options.scanning.popupNestingMaxDepth);
-
-    $('#dict-purge-link').click(utilAsync(onDictionaryPurge));
-    $('#dict-file').change(utilAsync(onDictionaryImport));
-
-    $('#anki-enable').prop('checked', options.anki.enable);
-    $('#card-tags').val(options.anki.tags.join(' '));
-    $('#sentence-detection-extent').val(options.anki.sentenceExt);
-    $('#interface-server').val(options.anki.server);
-    $('#screenshot-format').val(options.anki.screenshot.format);
-    $('#screenshot-quality').val(options.anki.screenshot.quality);
-    $('#field-templates').val(options.anki.fieldTemplates);
-    $('#field-templates-reset').click(utilAsync(onAnkiFieldTemplatesReset));
-    $('input, select, textarea').not('.anki-model').change(utilAsync(onFormOptionsChanged));
-    $('.anki-model').change(utilAsync(onAnkiModelChanged));
-
-    try {
-        await dictionaryGroupsPopulate(options);
-        await formMainDictionaryOptionsPopulate(options);
-    } catch (e) {
-        dictionaryErrorsShow([e]);
-    }
-
-    try {
-        await ankiDeckAndModelPopulate(options);
-    } catch (e) {
-        ankiErrorShow(e);
-    }
-
-    formUpdateVisibility(options);
+    formSetupEventListeners();
+    await profileOptionsSetup();
 
     storageInfoInitialize();
+
+    chrome.runtime.onMessage.addListener(onMessage);
 }
 
 $(document).ready(utilAsync(onReady));
+
+
+/*
+ * Remote options updates
+ */
+
+function settingsGetSource() {
+    return new Promise((resolve) => {
+        chrome.tabs.getCurrent((tab) => resolve(`settings${tab ? tab.id : ''}`));
+    });
+}
+
+async function settingsSaveOptions() {
+    const source = await settingsGetSource();
+    await apiOptionsSave(source);
+}
+
+async function onOptionsUpdate({source}) {
+    const thisSource = await settingsGetSource();
+    if (source === thisSource) { return; }
+
+    const optionsContext = getOptionsContext();
+    const options = await apiOptionsGet(optionsContext);
+    await formWrite(options);
+}
+
+function onMessage({action, params}) {
+    if (action === 'optionsUpdate') {
+        onOptionsUpdate(params);
+    }
+}
 
 
 /*
@@ -374,11 +420,14 @@ async function onDictionaryPurge(e) {
         dictionarySpinnerShow(true);
 
         await utilDatabasePurge();
-        const options = await optionsLoad();
-        options.dictionaries = {};
-        options.general.mainDictionary = '';
-        await optionsSave(options);
+        for (const options of await getOptionsArray()) {
+            options.dictionaries = utilBackgroundIsolate({});
+            options.general.mainDictionary = '';
+        }
+        await settingsSaveOptions();
 
+        const optionsContext = getOptionsContext();
+        const options = await apiOptionsGet(optionsContext);
         await dictionaryGroupsPopulate(options);
         await formMainDictionaryOptionsPopulate(options);
     } catch (e) {
@@ -414,20 +463,26 @@ async function onDictionaryImport(e) {
         setProgress(0.0);
 
         const exceptions = [];
-        const options = await optionsLoad();
         const summary = await utilDatabaseImport(e.target.files[0], updateProgress, exceptions);
-        options.dictionaries[summary.title] = {enabled: true, priority: 0, allowSecondarySearches: false};
-        if (summary.sequenced && options.general.mainDictionary === '') {
-            options.general.mainDictionary = summary.title;
+        for (const options of await getOptionsArray()) {
+            options.dictionaries[summary.title] = utilBackgroundIsolate({
+                enabled: true,
+                priority: 0,
+                allowSecondarySearches: false
+            });
+            if (summary.sequenced && options.general.mainDictionary === '') {
+                options.general.mainDictionary = summary.title;
+            }
         }
+        await settingsSaveOptions();
 
         if (exceptions.length > 0) {
             exceptions.push(`Dictionary may not have been imported properly: ${exceptions.length} error${exceptions.length === 1 ? '' : 's'} reported.`);
             dictionaryErrorsShow(exceptions);
         }
 
-        await optionsSave(options);
-
+        const optionsContext = getOptionsContext();
+        const options = await apiOptionsGet(optionsContext);
         await dictionaryGroupsPopulate(options);
         await formMainDictionaryOptionsPopulate(options);
     } catch (e) {
@@ -566,12 +621,14 @@ async function onAnkiModelChanged(e) {
         const tab = element.closest('.tab-pane');
         const tabId = tab.attr('id');
 
-        const {optionsNew, optionsOld} = await formRead();
-        optionsNew.anki[tabId].fields = {};
-        await optionsSave(optionsNew);
+        const optionsContext = getOptionsContext();
+        const options = await apiOptionsGet(optionsContext);
+        await formRead(options);
+        options.anki[tabId].fields = utilBackgroundIsolate({});
+        await settingsSaveOptions();
 
         ankiSpinnerShow(true);
-        await ankiFieldsPopulate(element, optionsNew);
+        await ankiFieldsPopulate(element, options);
         ankiErrorShow();
     } catch (e) {
         ankiErrorShow(e);
@@ -583,9 +640,12 @@ async function onAnkiModelChanged(e) {
 async function onAnkiFieldTemplatesReset(e) {
     try {
         e.preventDefault();
-        const options = await optionsLoad();
-        $('#field-templates').val(options.anki.fieldTemplates = optionsFieldTemplates());
-        await optionsSave(options);
+        const optionsContext = getOptionsContext();
+        const options = await apiOptionsGet(optionsContext);
+        const fieldTemplates = profileOptionsGetDefaultFieldTemplates();
+        options.anki.fieldTemplates = fieldTemplates;
+        $('#field-templates').val(fieldTemplates);
+        await settingsSaveOptions();
     } catch (e) {
         ankiErrorShow(e);
     }

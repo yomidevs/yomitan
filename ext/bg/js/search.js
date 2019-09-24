@@ -21,6 +21,11 @@ class DisplaySearch extends Display {
     constructor() {
         super($('#spinner'), $('#content'));
 
+        this.optionsContext = {
+            depth: 0,
+            url: window.location.href
+        };
+
         this.search = $('#search').click(this.onSearch.bind(this));
         this.query = $('#query').on('input', this.onSearchInput.bind(this));
         this.intro = $('#intro');
@@ -46,8 +51,8 @@ class DisplaySearch extends Display {
         try {
             e.preventDefault();
             this.intro.slideUp();
-            const {length, definitions} = await apiTermsFind(this.query.val());
-            super.termsShow(definitions, await apiOptionsGet());
+            const {length, definitions} = await apiTermsFind(this.query.val(), this.optionsContext);
+            super.termsShow(definitions, await apiOptionsGet(this.optionsContext));
         } catch (e) {
             this.onError(e);
         }

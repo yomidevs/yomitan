@@ -18,14 +18,15 @@
 
 
 class PopupProxy {
-    constructor(parentId, parentFrameId) {
+    constructor(depth, parentId, parentFrameId, url) {
         this.parentId = parentId;
         this.parentFrameId = parentFrameId;
         this.id = null;
         this.idPromise = null;
         this.parent = null;
         this.child = null;
-        this.depth = 0;
+        this.depth = depth;
+        this.url = url;
 
         this.container = null;
 
@@ -69,23 +70,23 @@ class PopupProxy {
         return await this.invokeHostApi('setVisible', {id, visible});
     }
 
-    async containsPoint(point) {
+    async containsPoint(x, y) {
         if (this.id === null) {
             return false;
         }
-        return await this.invokeHostApi('containsPoint', {id: this.id, point});
+        return await this.invokeHostApi('containsPoint', {id: this.id, x, y});
     }
 
-    async termsShow(elementRect, definitions, options, context) {
+    async termsShow(elementRect, writingMode, definitions, options, context) {
         const id = await this.getPopupId();
         elementRect = PopupProxy.DOMRectToJson(elementRect);
-        return await this.invokeHostApi('termsShow', {id, elementRect, definitions, options, context});
+        return await this.invokeHostApi('termsShow', {id, elementRect, writingMode, definitions, options, context});
     }
 
-    async kanjiShow(elementRect, definitions, options, context) {
+    async kanjiShow(elementRect, writingMode, definitions, options, context) {
         const id = await this.getPopupId();
         elementRect = PopupProxy.DOMRectToJson(elementRect);
-        return await this.invokeHostApi('kanjiShow', {id, elementRect, definitions, options, context});
+        return await this.invokeHostApi('kanjiShow', {id, elementRect, writingMode, definitions, options, context});
     }
 
     async clearAutoPlayTimer() {
