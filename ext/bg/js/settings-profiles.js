@@ -17,6 +17,7 @@
  */
 
 let currentProfileIndex = 0;
+let profileConditionsContainer = null;
 
 function getOptionsContext() {
     return {
@@ -81,6 +82,23 @@ async function profileFormWrite(optionsFull) {
     $('#profile-move-down').prop('disabled', currentProfileIndex >= optionsFull.profiles.length - 1);
 
     $('#profile-name').val(profile.name);
+
+    if (profileConditionsContainer !== null) {
+        profileConditionsContainer.cleanup();
+    }
+
+    profileConditionsContainer = new ConditionsUI.Container(
+        profileConditionsDescriptor,
+        'popupLevel',
+        profile.conditionGroups,
+        $('#profile-condition-groups'),
+        $('#profile-add-condition-group')
+    );
+    profileConditionsContainer.save = () => {
+        apiOptionsSave();
+        conditionsClearCaches(profileConditionsDescriptor);
+    };
+    profileConditionsContainer.isolate = utilBackgroundIsolate;
 }
 
 function profileOptionsPopulateSelect(select, profiles, currentValue, ignoreIndices) {

@@ -18,7 +18,10 @@
 
 
 async function searchFrontendSetup() {
-    const optionsContext = {depth: 0};
+    const optionsContext = {
+        depth: 0,
+        url: window.location.href
+    };
     const options = await apiOptionsGet(optionsContext);
     if (!options.scanning.enableOnSearchPage) { return; }
 

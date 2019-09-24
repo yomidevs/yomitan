@@ -34,6 +34,55 @@
                 font-weight: normal;
             }
 
+            .form-control.is-invalid {
+                border-color: #f00000;
+            }
+
+            .condition>.condition-prefix:after {
+                content: "IF";
+            }
+            .condition:nth-child(n+2)>.condition-prefix:after {
+                content: "AND";
+            }
+
+            .input-group .condition-prefix,
+            .input-group .condition-group-separator-label {
+                width: 60px;
+                text-align: center;
+            }
+            .input-group .condition-group-separator-label {
+                padding: 6px 12px;
+                font-weight: bold;
+                display: inline-block;
+            }
+            .input-group .condition-type,
+            .input-group .condition-operator {
+                width: auto;
+                text-align: center;
+                text-align-last: center;
+            }
+
+            .condition-group>.condition>div:first-child {
+                border-bottom-left-radius: 0;
+            }
+            .condition-group>.condition:nth-child(n+2)>div:first-child {
+                border-top-left-radius: 0;
+            }
+            .condition-group>.condition:nth-child(n+2)>div:last-child>button {
+                border-top-right-radius: 0;
+            }
+            .condition-group>.condition:nth-last-child(n+2)>div:last-child>button {
+                border-bottom-right-radius: 0;
+            }
+            .condition-group-options>.condition-add {
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+            }
+
+            .condition-groups>*:last-of-type {
+                display: none;
+            }
+
             #custom-popup-css {
                 width: 100%;
                 min-height: 34px;
@@ -71,7 +120,7 @@
                 <h3>Profiles</h3>
 
                 <p class="help-block">
-                    Profiles allow you to create multiple configurations and quickly switch between them.
+                    Profiles allow you to create multiple configurations and quickly switch between them or use them in different contexts.
                 </p>
 
                 <div class="form-group">
@@ -98,6 +147,27 @@
                 <div class="form-group">
                     <label for="profile-name">Profile name</label>
                     <input type="text" id="profile-name" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label>Usage conditions</label>
+
+                    <p class="help-block">
+                        Usage conditions can be assigned such that certain profiles are automatically used in different contexts.
+                        For example, when <a href="#popup-content-scanning">Popup Content Scanning</a> is enabled, different profiles can be used
+                        depending on the level of the popup.
+                    </p>
+
+                    <p class="help-block">
+                        Conditions are organized into groups which represent how the conditions are checked.
+                        If all of the conditions in any group are met, then the profile will automatically be used for that context.
+                        If no conditions are specified, the profile will only be used if it is selected as the <strong>Active profile</strong>.
+                    </p>
+
+                    <div class="condition-groups" id="profile-condition-groups"></div>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-default" id="profile-add-condition-group">Add Condition Group</button>
                 </div>
 
                 <div class="modal fade" tabindex="-1" role="dialog" id="profile-copy-modal">
@@ -136,6 +206,20 @@
                         </div>
                     </div>
                 </div>
+
+                <template id="condition-template"><div class="input-group condition">
+                    <div class="input-group-addon condition-prefix"></div>
+                    <div class="input-group-btn"><select class="form-control btn btn-default condition-type"><optgroup label="Type"></optgroup></select></div>
+                    <div class="input-group-btn"><select class="form-control btn btn-default condition-operator"><optgroup label="Operator"></optgroup></select></div>
+                    <input type="text" class="form-control" />
+                    <div class="input-group-btn"><button class="btn btn-danger condition-remove" title="Remove"><span class="glyphicon glyphicon-remove"></span></button></div>
+                </div></template>
+                <template id="condition-group-separator-template"><div class="input-group">
+                    <div class="condition-group-separator-label">OR</div>
+                </div></template>
+                <template id="condition-group-options-template"><div class="condition-group-options">
+                    <button class="btn btn-default condition-add"><span class="glyphicon glyphicon-plus"></span></button>
+                </div></template>
             </div>
 
             <div>
@@ -563,9 +647,12 @@
 
         <script src="/bg/js/anki.js"></script>
         <script src="/bg/js/api.js"></script>
+        <script src="/bg/js/conditions.js"></script>
+        <script src="/bg/js/conditions-ui.js"></script>
         <script src="/bg/js/dictionary.js"></script>
         <script src="/bg/js/handlebars.js"></script>
         <script src="/bg/js/options.js"></script>
+        <script src="/bg/js/profile-conditions.js"></script>
         <script src="/bg/js/templates.js"></script>
         <script src="/bg/js/util.js"></script>
 

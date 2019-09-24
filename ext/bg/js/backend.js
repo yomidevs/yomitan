@@ -23,7 +23,8 @@ class Backend {
         this.anki = new AnkiNull();
         this.options = null;
         this.optionsContext = {
-            depth: 0
+            depth: 0,
+            url: window.location.href
         };
 
         this.isPreparedResolve = null;
@@ -173,7 +174,40 @@ class Backend {
         if (typeof optionsContext.index === 'number') {
             return profiles[optionsContext.index];
         }
-        return this.options.profiles[this.options.profileCurrent];
+        const profile = this.getProfileFromContext(optionsContext);
+        return profile !== null ? profile : this.options.profiles[this.options.profileCurrent];
+    }
+
+    getProfileFromContext(optionsContext) {
+        for (const profile of this.options.profiles) {
+            const conditionGroups = profile.conditionGroups;
+            if (conditionGroups.length > 0 && Backend.testConditionGroups(conditionGroups, optionsContext)) {
+                return profile;
+            }
+        }
+        return null;
+    }
+
+    static testConditionGroups(conditionGroups, data) {
+        if (conditionGroups.length === 0) { return false; }
+
+        for (const conditionGroup of conditionGroups) {
+            const conditions = conditionGroup.conditions;
+            if (conditions.length > 0 && Backend.testConditions(conditions, data)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    static testConditions(conditions, data) {
+        for (const condition of conditions) {
+            if (!conditionsTestValue(profileConditionsDescriptor, condition.type, condition.operator, condition.value, data)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     setExtensionBadgeBackgroundColor(color) {

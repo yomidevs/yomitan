@@ -19,13 +19,13 @@
 
 let popupNestedInitialized = false;
 
-async function popupNestedInitialize(id, depth, parentFrameId) {
+async function popupNestedInitialize(id, depth, parentFrameId, url) {
     if (popupNestedInitialized) {
         return;
     }
     popupNestedInitialized = true;
 
-    const optionsContext = {depth};
+    const optionsContext = {depth, url};
     const options = await apiOptionsGet(optionsContext);
     const popupNestingMaxDepth = options.scanning.popupNestingMaxDepth;
 
@@ -35,7 +35,7 @@ async function popupNestedInitialize(id, depth, parentFrameId) {
 
     const ignoreNodes = options.scanning.enableOnPopupExpressions ? [] : [ '.expression', '.expression *' ];
 
-    window.frontendInitializationData = {id, depth, parentFrameId, ignoreNodes};
+    window.frontendInitializationData = {id, depth, parentFrameId, ignoreNodes, url};
 
     const scriptSrcs = [
         '/fg/js/frontend-api-sender.js',

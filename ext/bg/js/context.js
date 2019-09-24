@@ -22,7 +22,10 @@ $(document).ready(utilAsync(() => {
     $('#open-options').click(() => apiCommandExec('options'));
     $('#open-help').click(() => apiCommandExec('help'));
 
-    const optionsContext = {depth: 0};
+    const optionsContext = {
+        depth: 0,
+        url: window.location.href
+    };
     apiOptionsGet(optionsContext).then(options => {
         const toggle = $('#enable-search');
         toggle.prop('checked', options.general.enable).change();
