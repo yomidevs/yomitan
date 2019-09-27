@@ -323,7 +323,9 @@ class Display {
             $('.action-play-audio').click(this.onAudioPlay.bind(this));
             $('.kanji-link').click(this.onKanjiLookup.bind(this));
             $('.source-term').click(this.onSourceTermView.bind(this));
-            $('.glossary-item').click(this.onTermLookup.bind(this));
+            if (this.options.scanning.enablePopupSearch) {
+                $('.glossary-item').click(this.onTermLookup.bind(this));
+            }
 
             await this.adderButtonUpdate(['term-kanji', 'term-kana'], sequence);
         } catch (e) {

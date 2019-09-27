@@ -50,6 +50,7 @@ async function formRead(options) {
     options.scanning.alphanumeric = $('#search-alphanumeric').prop('checked');
     options.scanning.autoHideResults = $('#auto-hide-results').prop('checked');
     options.scanning.deepDomScan = $('#deep-dom-scan').prop('checked');
+    options.scanning.enablePopupSearch = $('#enable-search-within-first-popup').prop('checked');
     options.scanning.enableOnPopupExpressions = $('#enable-scanning-of-popup-expressions').prop('checked');
     options.scanning.enableOnSearchPage = $('#enable-scanning-on-search-page').prop('checked');
     options.scanning.delay = parseInt($('#scan-delay').val(), 10);
@@ -115,6 +116,7 @@ async function formWrite(options) {
     $('#search-alphanumeric').prop('checked', options.scanning.alphanumeric);
     $('#auto-hide-results').prop('checked', options.scanning.autoHideResults);
     $('#deep-dom-scan').prop('checked', options.scanning.deepDomScan);
+    $('#enable-search-within-first-popup').prop('checked', options.scanning.enablePopupSearch);
     $('#enable-scanning-of-popup-expressions').prop('checked', options.scanning.enableOnPopupExpressions);
     $('#enable-scanning-on-search-page').prop('checked', options.scanning.enableOnSearchPage);
     $('#scan-delay').val(options.scanning.delay);
