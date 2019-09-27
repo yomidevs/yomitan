@@ -281,6 +281,7 @@ function profileOptionsCreateDefaults() {
             modifier: 'shift',
             deepDomScan: false,
             popupNestingMaxDepth: 0,
+            enablePopupSearch: false,
             enableOnPopupExpressions: false,
             enableOnSearchPage: true
         },
