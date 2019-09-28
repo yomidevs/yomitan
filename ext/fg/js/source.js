@@ -87,9 +87,11 @@ class TextSourceRange {
             return false;
         }
 
-        const skip = ['RT', 'SCRIPT', 'STYLE'];
-        if (skip.includes(node.nodeName.toUpperCase())) {
-            return false;
+        switch (node.nodeName.toUpperCase()) {
+            case 'RT':
+            case 'SCRIPT':
+            case 'STYLE':
+                return false;
         }
 
         const style = window.getComputedStyle(node);
