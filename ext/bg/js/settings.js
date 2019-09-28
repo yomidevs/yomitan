@@ -240,6 +240,8 @@ async function onFormOptionsChanged(e) {
 }
 
 async function onReady() {
+    showExtensionInformation();
+
     formSetupEventListeners();
     await profileOptionsSetup();
 
@@ -740,4 +742,17 @@ function storageSpinnerShow(show) {
     } else {
         spinner.hide();
     }
+}
+
+
+/*
+ * Information
+ */
+
+function showExtensionInformation() {
+    const node = document.getElementById('extension-info');
+    if (node === null) { return; }
+
+    const manifest = chrome.runtime.getManifest();
+    node.textContent = `${manifest.name} v${manifest.version}`;
 }
