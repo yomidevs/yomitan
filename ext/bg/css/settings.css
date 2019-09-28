@@ -48,6 +48,20 @@
     border-color: #f00000;
 }
 
+.condition {
+    display: flex;
+    -flex-wrap: wrap;
+}
+.condition-input {
+    flex: 1 1 auto;
+}
+.condition-line-break {
+    flex: 1 0 100%;
+    display: none;
+}
+.condition>.input-group-btn {
+    width: auto;
+}
 .condition>.condition-prefix:after {
     content: "IF";
 }
@@ -55,6 +69,9 @@
     content: "AND";
 }
 
+.input-group .condition-prefix {
+    flex: 0 0 auto;
+}
 .input-group .condition-prefix,
 .input-group .condition-group-separator-label {
     width: 60px;
@@ -120,5 +137,18 @@
     }
     .col-xs-6+.col-xs-6 {
         margin-top: 15px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .condition {
+        flex-wrap: wrap;
+    }
+    .condition-input {
+        order: 2;
+    }
+    .condition-line-break {
+        display: block;
+        order: 1;
     }
 }
