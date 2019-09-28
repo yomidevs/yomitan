@@ -19,20 +19,27 @@
 
 class DisplaySearch extends Display {
     constructor() {
-        super($('#spinner'), $('#content'));
+        super(document.querySelector('#spinner'), document.querySelector('#content'));
 
         this.optionsContext = {
             depth: 0,
             url: window.location.href
         };
 
-        this.search = $('#search').click(this.onSearch.bind(this));
-        this.query = $('#query').on('input', this.onSearchInput.bind(this));
-        this.intro = $('#intro');
+        this.search = document.querySelector('#search');
+        this.query = document.querySelector('#query');
+        this.intro = document.querySelector('#intro');
+        this.introHidden = false;
 
         this.dependencies = Object.assign({}, this.dependencies, {docRangeFromPoint, docSentenceExtract});
 
-        window.wanakana.bind(this.query.get(0));
+        if (this.search !== null) {
+            this.search.addEventListener('click', (e) => this.onSearch(e), false);
+        }
+        if (this.query !== null) {
+            this.query.addEventListener('input', () => this.onSearchInput(), false);
+            window.wanakana.bind(this.query);
+        }
     }
 
     onError(error) {
@@ -40,22 +47,49 @@ class DisplaySearch extends Display {
     }
 
     onSearchClear() {
-        this.query.focus().select();
+        if (this.query === null) {
+            return;
+        }
+
+        this.query.focus();
+        this.query.select();
     }
 
     onSearchInput() {
-        this.search.prop('disabled', this.query.val().length === 0);
+        this.search.disabled = (this.query === null || this.query.value.length === 0);
     }
 
     async onSearch(e) {
+        if (this.query === null) {
+            return;
+        }
+
         try {
             e.preventDefault();
-            this.intro.slideUp();
-            const {length, definitions} = await apiTermsFind(this.query.val(), this.optionsContext);
+            this.hideIntro();
+            const {length, definitions} = await apiTermsFind(this.query.value, this.optionsContext);
             super.termsShow(definitions, await apiOptionsGet(this.optionsContext));
         } catch (e) {
             this.onError(e);
         }
+    }
+
+    hideIntro() {
+        if (this.introHidden) {
+            return;
+        }
+
+        this.introHidden = true;
+
+        if (this.intro === null) {
+            return;
+        }
+
+        const size = this.intro.getBoundingClientRect();
+        this.intro.style.height = `${size.height}px`;
+        this.intro.style.transition = 'height 0.4s ease-in-out 0s';
+        window.getComputedStyle(this.intro).getPropertyValue('height'); // Commits height so next line can start animation
+        this.intro.style.height = '0';
     }
 }
 
