@@ -234,7 +234,7 @@ class TextSourceRange {
                 if (next !== null) { break; }
 
                 next = node.parentNode;
-                if (node === null) { break; }
+                if (next === null) { break; }
 
                 node = next;
             }
