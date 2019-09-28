@@ -95,12 +95,10 @@ class TextSourceRange {
         }
 
         const style = window.getComputedStyle(node);
-        const hidden =
+        return !(
             style.visibility === 'hidden' ||
             style.display === 'none' ||
-            parseFloat(style.fontSize) === 0;
-
-        return !hidden;
+            parseFloat(style.fontSize) === 0);
     }
 
     static seekForward(node, offset, length) {
