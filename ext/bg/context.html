@@ -14,20 +14,20 @@
 
             .btn-group {
                 display: flex;
+                margin-top: 10px;
+                white-space: nowrap;
             }
         </style>
     </head>
     <body>
-        <p>
+        <div>
             <input type="checkbox" id="enable-search">
-        </p>
-        <p>
-            <div class="btn-group" style="white-space: nowrap">
-                <button type="button" id="open-search" title="Search (Alt + Insert)" class="btn btn-default btn-xs glyphicon glyphicon-search"></button>
-                <button type="button" id="open-options" title="Options" class="btn btn-default btn-xs glyphicon glyphicon-wrench"></button>
-                <button type="button" id="open-help" title="Help" class="btn btn-default btn-xs glyphicon glyphicon-question-sign"></button>
-            </div>
-        </p>
+        </div>
+        <div class="btn-group">
+            <button type="button" id="open-search" title="Search (Alt + Insert)" class="btn btn-default btn-xs glyphicon glyphicon-search"></button>
+            <button type="button" id="open-options" title="Options" class="btn btn-default btn-xs glyphicon glyphicon-wrench"></button>
+            <button type="button" id="open-help" title="Help" class="btn btn-default btn-xs glyphicon glyphicon-question-sign"></button>
+        </div>
 
         <script src="/mixed/lib/jquery.min.js"></script>
         <script src="/mixed/lib/bootstrap-toggle/bootstrap-toggle.min.js"></script>
