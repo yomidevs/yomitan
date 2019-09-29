@@ -151,6 +151,7 @@ async function formWrite(options) {
 function formSetupEventListeners() {
     $('#dict-purge-link').click(utilAsync(onDictionaryPurge));
     $('#dict-file').change(utilAsync(onDictionaryImport));
+    $('#dict-file-button').click(onDictionaryImportButtonClick);
 
     $('#field-templates-reset').click(utilAsync(onAnkiFieldTemplatesReset));
     $('input, select, textarea').not('.anki-model').not('.profile-form *').change(utilAsync(onFormOptionsChanged));
@@ -446,6 +447,11 @@ async function onDictionaryPurge(e) {
             storageUpdateStats();
         }
     }
+}
+
+function onDictionaryImportButtonClick() {
+    const dictFile = document.querySelector('#dict-file');
+    dictFile.click();
 }
 
 async function onDictionaryImport(e) {

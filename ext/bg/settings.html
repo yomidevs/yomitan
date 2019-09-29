@@ -368,7 +368,8 @@
                         <a href="https://foosoft.net/projects/yomichan" target="_blank" rel="noopener">download free dictionaries</a>
                         for use with this extension and to learn about importing proprietary EPWING dictionaries.
                     </p>
-                    <input type="file" id="dict-file">
+                    <button class="btn btn-primary" id="dict-file-button">Import Dictionary</button>
+                    <div hidden><input type="file" id="dict-file"></div>
                 </div>
             </div>
 
@@ -402,7 +403,7 @@
                 </div></div>
 
                 <div>
-                    <input type="button" value="Refresh" id="storage-refresh" />
+                    <button class="btn btn-default" id="storage-refresh">Refresh</button>
                 </div>
             </div>
 
