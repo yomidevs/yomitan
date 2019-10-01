@@ -117,7 +117,7 @@ primary language is not English, you may consider also importing the English ver
 Yomichan supports the use of custom dictionaries including the esoteric but popular
 [EPWING](https://ja.wikipedia.org/wiki/EPWING) format. They were often utilized in portable electronic dictionaries
 similar to the ones pictured below. These dictionaries are often sought after by language learners for their correctness
-and excellent coverage of the Japanese language. 
+and excellent coverage of the Japanese language.
 
 Unfortunately, as most of the dictionaries released in this format are proprietary I am unable to bundle them with
 Yomichan. You will need to procure these dictionaries yourself and import them with [Yomichan
@@ -252,16 +252,16 @@ tmpl/*.html -f ext/bg/js/templates.js` from the project's base directory to comp
 
 ### Dependencies ###
 
-Yomichan uses several third-party libraries to function. Below are links to homepages and snapshots of the exact
+Yomichan uses several third-party libraries to function. Below are links to homepages, snapshots, and licenses of the exact
 versions packaged.
 
-*   Bootstrap Toggle: [homepage](https://www.bootstraptoggle.com/) - [snapshot](https://github.com/minhur/bootstrap-toggle/archive/b76c094.zip)
-*   Bootstrap: [homepage](https://getbootstrap.com/) - [snapshot](https://github.com/twbs/bootstrap/releases/download/v3.3.7/bootstrap-3.3.7-dist.zip)
-*   Dexie: [homepage](https://dexie.org/) - [snapshot](https://github.com/dfahlander/Dexie.js/archive/v2.0.0-beta.10.zip)
-*   Handlebars: [homepage](https://handlebarsjs.com/) - [snapshot](http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars.min-714a4c4.js)
-*   JQuery: [homepage](https://blog.jquery.com/) - [snapshot](https://code.jquery.com/jquery-3.2.1.min.js)
-*   JSZip: [homepage](https://stuk.github.io/jszip/) - [snapshot](https://raw.githubusercontent.com/Stuk/jszip/de7f52fbcba485737bef7923a83f0fad92d9f5bc/dist/jszip.min.js)
-*   WanaKana: [homepage](https://wanakana.com/) - [snapshot](https://raw.githubusercontent.com/WaniKani/WanaKana/7c4a052/gh-pages/assets/js/wanakana.min.js)
+*   Bootstrap: [homepage](https://getbootstrap.com/) - [snapshot](https://github.com/twbs/bootstrap/releases/download/v3.3.7/bootstrap-3.3.7-dist.zip) - [license](https://github.com/twbs/bootstrap/blob/v3.3.7/LICENSE)
+*   Bootstrap Toggle: [homepage](https://www.bootstraptoggle.com/) - [snapshot](https://github.com/minhur/bootstrap-toggle/archive/b76c094.zip) - [license](https://github.com/minhur/bootstrap-toggle/blob/2.2.0/LICENSE)
+*   Dexie: [homepage](https://dexie.org/) - [snapshot](https://github.com/dfahlander/Dexie.js/archive/v2.0.0-beta.10.zip) - [license](https://github.com/dfahlander/Dexie.js/blob/v2.0.0-beta.10/LICENSE)
+*   Handlebars: [homepage](https://handlebarsjs.com/) - [snapshot](http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars.min-714a4c4.js) - [license](https://github.com/wycats/handlebars.js/blob/v4.0.6/LICENSE)
+*   jQuery: [homepage](https://blog.jquery.com/) - [snapshot](https://code.jquery.com/jquery-3.2.1.min.js) - [license](https://github.com/jquery/jquery/blob/3.2.1/LICENSE.txt)
+*   JSZip: [homepage](https://stuk.github.io/jszip/) - [snapshot](https://raw.githubusercontent.com/Stuk/jszip/de7f52fbcba485737bef7923a83f0fad92d9f5bc/dist/jszip.min.js) - [license](https://github.com/Stuk/jszip/blob/v3.1.3/LICENSE.markdown)
+*   WanaKana: [homepage](https://wanakana.com/) - [snapshot](https://raw.githubusercontent.com/WaniKani/WanaKana/7c4a052/gh-pages/assets/js/wanakana.min.js) - [license](https://github.com/WaniKani/WanaKana/blob/2.2.3/LICENSE)
 
 ## Frequently Asked Questions ##
 

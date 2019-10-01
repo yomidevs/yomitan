@@ -151,6 +151,7 @@ async function formWrite(options) {
 function formSetupEventListeners() {
     $('#dict-purge-link').click(utilAsync(onDictionaryPurge));
     $('#dict-file').change(utilAsync(onDictionaryImport));
+    $('#dict-file-button').click(onDictionaryImportButtonClick);
 
     $('#field-templates-reset').click(utilAsync(onAnkiFieldTemplatesReset));
     $('input, select, textarea').not('.anki-model').not('.profile-form *').change(utilAsync(onFormOptionsChanged));
@@ -240,6 +241,8 @@ async function onFormOptionsChanged(e) {
 }
 
 async function onReady() {
+    showExtensionInformation();
+
     formSetupEventListeners();
     await profileOptionsSetup();
 
@@ -444,6 +447,11 @@ async function onDictionaryPurge(e) {
             storageUpdateStats();
         }
     }
+}
+
+function onDictionaryImportButtonClick() {
+    const dictFile = document.querySelector('#dict-file');
+    dictFile.click();
 }
 
 async function onDictionaryImport(e) {
@@ -740,4 +748,17 @@ function storageSpinnerShow(show) {
     } else {
         spinner.hide();
     }
+}
+
+
+/*
+ * Information
+ */
+
+function showExtensionInformation() {
+    const node = document.getElementById('extension-info');
+    if (node === null) { return; }
+
+    const manifest = chrome.runtime.getManifest();
+    node.textContent = `${manifest.name} v${manifest.version}`;
 }
