@@ -83,120 +83,142 @@ class TextSourceRange {
     }
 
     static shouldEnter(node) {
-        if (node.nodeType !== 1) {
-            return false;
-        }
-
-        const skip = ['RT', 'SCRIPT', 'STYLE'];
-        if (skip.includes(node.nodeName.toUpperCase())) {
-            return false;
+        switch (node.nodeName.toUpperCase()) {
+            case 'RT':
+            case 'SCRIPT':
+            case 'STYLE':
+                return false;
         }
 
         const style = window.getComputedStyle(node);
-        const hidden =
+        return !(
             style.visibility === 'hidden' ||
             style.display === 'none' ||
-            parseFloat(style.fontSize) === 0;
+            parseFloat(style.fontSize) === 0);
+    }
 
-        return !hidden;
+    static getRubyElement(node) {
+        node = TextSourceRange.getParentElement(node);
+        if (node !== null && node.nodeName.toUpperCase() === "RT") {
+            node = node.parentNode;
+            return (node !== null && node.nodeName.toUpperCase() === "RUBY") ? node : null;
+        }
+        return null;
     }
 
     static seekForward(node, offset, length) {
         const state = {node, offset, remainder: length, content: ''};
-        if (!TextSourceRange.seekForwardHelper(node, state)) {
-            return state;
+        const TEXT_NODE = Node.TEXT_NODE;
+        const ELEMENT_NODE = Node.ELEMENT_NODE;
+        let resetOffset = false;
+
+        const ruby = TextSourceRange.getRubyElement(node);
+        if (ruby !== null) {
+            node = ruby;
+            resetOffset = true;
         }
 
-        for (let current = node; current !== null; current = current.parentElement) {
-            for (let sibling = current.nextSibling; sibling !== null; sibling = sibling.nextSibling) {
-                if (!TextSourceRange.seekForwardHelper(sibling, state)) {
-                    return state;
+        while (node !== null) {
+            let visitChildren = true;
+            const nodeType = node.nodeType;
+
+            if (nodeType === TEXT_NODE) {
+                state.node = node;
+                if (TextSourceRange.seekForwardTextNode(state, resetOffset)) {
+                    break;
                 }
+                resetOffset = true;
+            } else if (nodeType === ELEMENT_NODE) {
+                visitChildren = TextSourceRange.shouldEnter(node);
             }
+
+            node = TextSourceRange.getNextNode(node, visitChildren);
         }
 
         return state;
     }
 
-    static seekForwardHelper(node, state) {
-        if (node.nodeType === 3 && node.parentElement && TextSourceRange.shouldEnter(node.parentElement)) {
-            const offset = state.node === node ? state.offset : 0;
+    static seekForwardTextNode(state, resetOffset) {
+        const nodeValue = state.node.nodeValue;
+        const nodeValueLength = nodeValue.length;
+        let content = state.content;
+        let offset = resetOffset ? 0 : state.offset;
+        let remainder = state.remainder;
+        let result = false;
 
-            let consumed = 0;
-            let stripped = 0;
-            while (state.remainder - consumed > 0) {
-                const currentChar = node.nodeValue[offset + consumed + stripped];
-                if (!currentChar) {
-                    break;
-                } else if (currentChar.match(IGNORE_TEXT_PATTERN)) {
-                    stripped++;
-                } else {
-                    consumed++;
-                    state.content += currentChar;
-                }
-            }
-
-            state.node = node;
-            state.offset = offset + consumed + stripped;
-            state.remainder -= consumed;
-        } else if (TextSourceRange.shouldEnter(node)) {
-            for (let i = 0; i < node.childNodes.length; ++i) {
-                if (!TextSourceRange.seekForwardHelper(node.childNodes[i], state)) {
+        for (; offset < nodeValueLength; ++offset) {
+            const c = nodeValue[offset];
+            if (!IGNORE_TEXT_PATTERN.test(c)) {
+                content += c;
+                if (--remainder <= 0) {
+                    result = true;
+                    ++offset;
                     break;
                 }
             }
         }
 
-        return state.remainder > 0;
+        state.offset = offset;
+        state.content = content;
+        state.remainder = remainder;
+        return result;
     }
 
     static seekBackward(node, offset, length) {
         const state = {node, offset, remainder: length, content: ''};
-        if (!TextSourceRange.seekBackwardHelper(node, state)) {
-            return state;
+        const TEXT_NODE = Node.TEXT_NODE;
+        const ELEMENT_NODE = Node.ELEMENT_NODE;
+        let resetOffset = false;
+
+        const ruby = TextSourceRange.getRubyElement(node);
+        if (ruby !== null) {
+            node = ruby;
+            resetOffset = true;
         }
 
-        for (let current = node; current !== null; current = current.parentElement) {
-            for (let sibling = current.previousSibling; sibling !== null; sibling = sibling.previousSibling) {
-                if (!TextSourceRange.seekBackwardHelper(sibling, state)) {
-                    return state;
+        while (node !== null) {
+            let visitChildren = true;
+            const nodeType = node.nodeType;
+
+            if (nodeType === TEXT_NODE) {
+                state.node = node;
+                if (TextSourceRange.seekBackwardTextNode(state, resetOffset)) {
+                    break;
                 }
+                resetOffset = true;
+            } else if (nodeType === ELEMENT_NODE) {
+                visitChildren = TextSourceRange.shouldEnter(node);
             }
+
+            node = TextSourceRange.getPreviousNode(node, visitChildren);
         }
 
         return state;
     }
 
-    static seekBackwardHelper(node, state) {
-        if (node.nodeType === 3 && node.parentElement && TextSourceRange.shouldEnter(node.parentElement)) {
-            const offset = state.node === node ? state.offset : node.length;
+    static seekBackwardTextNode(state, resetOffset) {
+        const nodeValue = state.node.nodeValue;
+        let content = state.content;
+        let offset = resetOffset ? nodeValue.length : state.offset;
+        let remainder = state.remainder;
+        let result = false;
 
-            let consumed = 0;
-            let stripped = 0;
-            while (state.remainder - consumed > 0) {
-                const currentChar = node.nodeValue[offset - 1 - consumed - stripped]; // negative indices are undefined in JS
-                if (!currentChar) {
-                    break;
-                } else if (currentChar.match(IGNORE_TEXT_PATTERN)) {
-                    stripped++;
-                } else {
-                    consumed++;
-                    state.content = currentChar + state.content;
-                }
-            }
-
-            state.node = node;
-            state.offset = offset - consumed - stripped;
-            state.remainder -= consumed;
-        } else if (TextSourceRange.shouldEnter(node)) {
-            for (let i = node.childNodes.length - 1; i >= 0; --i) {
-                if (!TextSourceRange.seekBackwardHelper(node.childNodes[i], state)) {
+        for (; offset > 0; --offset) {
+            const c = nodeValue[offset - 1];
+            if (!IGNORE_TEXT_PATTERN.test(c)) {
+                content = c + content;
+                if (--remainder <= 0) {
+                    result = true;
+                    --offset;
                     break;
                 }
             }
         }
 
-        return state.remainder > 0;
+        state.offset = offset;
+        state.content = content;
+        state.remainder = remainder;
+        return result;
     }
 
     static getParentElement(node) {
@@ -219,22 +241,38 @@ class TextSourceRange {
     static getNodesInRange(range) {
         const end = range.endContainer;
         const nodes = [];
-        for (let node = range.startContainer; node !== null; node = TextSourceRange.getNextNode(node)) {
+        for (let node = range.startContainer; node !== null; node = TextSourceRange.getNextNode(node, true)) {
             nodes.push(node);
             if (node === end) { break; }
         }
         return nodes;
     }
 
-    static getNextNode(node) {
-        let next = node.firstChild;
+    static getNextNode(node, visitChildren) {
+        let next = visitChildren ? node.firstChild : null;
         if (next === null) {
             while (true) {
                 next = node.nextSibling;
                 if (next !== null) { break; }
 
                 next = node.parentNode;
-                if (node === null) { break; }
+                if (next === null) { break; }
+
+                node = next;
+            }
+        }
+        return next;
+    }
+
+    static getPreviousNode(node, visitChildren) {
+        let next = visitChildren ? node.lastChild : null;
+        if (next === null) {
+            while (true) {
+                next = node.previousSibling;
+                if (next !== null) { break; }
+
+                next = node.parentNode;
+                if (next === null) { break; }
 
                 node = next;
             }
