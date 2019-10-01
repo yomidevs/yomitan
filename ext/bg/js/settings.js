@@ -425,7 +425,7 @@ async function onDictionaryPurge(e) {
         dictionarySpinnerShow(true);
 
         await utilDatabasePurge();
-        for (const options of await getOptionsArray()) {
+        for (const options of toIterable(await getOptionsArray())) {
             options.dictionaries = utilBackgroundIsolate({});
             options.general.mainDictionary = '';
         }
@@ -474,7 +474,7 @@ async function onDictionaryImport(e) {
 
         const exceptions = [];
         const summary = await utilDatabaseImport(e.target.files[0], updateProgress, exceptions);
-        for (const options of await getOptionsArray()) {
+        for (const options of toIterable(await getOptionsArray())) {
             options.dictionaries[summary.title] = utilBackgroundIsolate({
                 enabled: true,
                 priority: 0,

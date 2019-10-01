@@ -36,7 +36,7 @@ ConditionsUI.Container = class Container {
 
         this.container.empty();
 
-        for (const conditionGroup of conditionGroups) {
+        for (const conditionGroup of toIterable(conditionGroups)) {
             this.children.push(new ConditionsUI.ConditionGroup(this, conditionGroup));
         }
 
@@ -122,7 +122,7 @@ ConditionsUI.ConditionGroup = class ConditionGroup {
         this.separator = ConditionsUI.instantiateTemplate('#condition-group-separator-template').appendTo(parent.container);
         this.addButton = this.options.find('.condition-add');
 
-        for (const condition of conditionGroup.conditions) {
+        for (const condition of toIterable(conditionGroup.conditions)) {
             this.children.push(new ConditionsUI.Condition(this, condition));
         }
 

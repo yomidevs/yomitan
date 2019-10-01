@@ -17,13 +17,24 @@
  */
 
 
+// toIterable is required on Edge for cross-window origin objects.
 function toIterable(value) {
     if (typeof Symbol !== 'undefined' && typeof value[Symbol.iterator] !== 'undefined') {
         return value;
     }
 
-    const array = JSON.parse(JSON.stringify(value));
-    return Array.isArray(array) ? array : [];
+    if (value !== null && typeof value === 'object') {
+        const length = value.length;
+        if (typeof length === 'number' && Number.isFinite(length)) {
+            const array = [];
+            for (let i = 0; i < length; ++i) {
+                array.push(value[i]);
+            }
+            return array;
+        }
+    }
+
+    throw 'Could not convert to iterable';
 }
 
 function extensionHasChrome() {
