@@ -218,22 +218,55 @@ class Translator {
             return [];
         }
 
-        const definitions = await this.database.findTermsBulk(deinflections.map(e => e.term), titles);
+        const uniqueDeinflectionTerms = [];
+        const uniqueDeinflectionArrays = [];
+        const uniqueDeinflectionsMap = {};
+        for (const deinflection of deinflections) {
+            const term = deinflection.term;
+            let deinflectionArray;
+            if (uniqueDeinflectionsMap.hasOwnProperty(term)) {
+                deinflectionArray = uniqueDeinflectionsMap[term];
+            } else {
+                deinflectionArray = [];
+                uniqueDeinflectionTerms.push(term);
+                uniqueDeinflectionArrays.push(deinflectionArray);
+                uniqueDeinflectionsMap[term] = deinflectionArray;
+            }
+            deinflectionArray.push(deinflection);
+        }
 
-        for (const d of definitions) {
-            deinflections[d.index].definitions.push(d);
+        const definitions = await this.database.findTermsBulk(uniqueDeinflectionTerms, titles);
+
+        for (const definition of definitions) {
+            for (const deinflection of uniqueDeinflectionArrays[definition.index]) {
+                if (Translator.definitionContainsAnyRule(definition, deinflection.rules)) {
+                    deinflection.definitions.push(definition);
+                }
+            }
         }
 
         return deinflections.filter(e => e.definitions.length > 0);
     }
 
+    static definitionContainsAnyRule(definition, rules) {
+        if (rules.length === 0) {
+            return true;
+        }
+        const definitionRules = definition.rules;
+        for (const rule of rules) {
+            if (definitionRules.includes(rule)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     getDeinflections(text) {
         const deinflections = [];
-        const deinflectionsKeys = {};
 
         for (let i = text.length; i > 0; --i) {
             const textSlice = text.slice(0, i);
-            Translator.addUniqueDeinflections(this.deinflector.deinflect(textSlice), deinflections, deinflectionsKeys);
+            deinflections.push(...this.deinflector.deinflect(textSlice));
         }
 
         return deinflections;
@@ -241,28 +274,17 @@ class Translator {
 
     getDeinflections2(text, text2) {
         const deinflections = [];
-        const deinflectionsKeys = {};
 
         for (let i = text.length; i > 0; --i) {
             const textSlice = text.slice(0, i);
             const text2Slice = text2.slice(0, i);
-            Translator.addUniqueDeinflections(this.deinflector.deinflect(textSlice), deinflections, deinflectionsKeys);
+            deinflections.push(...this.deinflector.deinflect(textSlice));
             if (textSlice !== text2Slice) {
-                Translator.addUniqueDeinflections(this.deinflector.deinflect(text2Slice), deinflections, deinflectionsKeys);
+                deinflections.push(...this.deinflector.deinflect(text2Slice));
             }
         }
 
         return deinflections;
-    }
-
-    static addUniqueDeinflections(newValues, deinflections, deinflectionsKeys) {
-        for (const value of newValues) {
-            const key = value.term;
-            if (!deinflectionsKeys.hasOwnProperty(key)) {
-                deinflections.push(value);
-                deinflectionsKeys[key] = true;
-            }
-        }
     }
 
     async findKanji(text, dictionaries) {
