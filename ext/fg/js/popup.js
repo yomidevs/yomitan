@@ -105,7 +105,7 @@ class Popup {
         container.style.height = `${height}px`;
         container.style.visibility = 'visible';
 
-        this.hideChildren();
+        this.hideChildren(true);
     }
 
     static getPositionForHorizontalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral) {
@@ -206,16 +206,21 @@ class Popup {
         this.invokeApi('orphaned');
     }
 
-    hide() {
-        this.hideChildren();
+    hide(changeFocus) {
+        if (this.isContainerHidden()) {
+            changeFocus = false;
+        }
+        this.hideChildren(changeFocus);
         this.hideContainer();
-        this.focusParent();
+        if (changeFocus) {
+            this.focusParent();
+        }
     }
 
-    hideChildren() {
-        // recursively hides all children
-        if (this.child && !this.child.isContainerHidden()) {
-            this.child.hide();
+    hideChildren(changeFocus) {
+        // Recursively hides all children.
+        if (this.child !== null && !this.child.isContainerHidden()) {
+            this.child.hide(changeFocus);
         }
     }
 

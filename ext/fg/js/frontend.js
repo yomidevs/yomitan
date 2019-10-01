@@ -128,7 +128,7 @@ class Frontend {
         }
 
         this.popupTimerClear();
-        this.searchClear();
+        this.searchClear(true);
     }
 
     onMouseOut(e) {
@@ -138,7 +138,7 @@ class Frontend {
     onFrameMessage(e) {
         const handlers = {
             popupClose: () => {
-                this.searchClear();
+                this.searchClear(true);
             },
 
             selectionCopy: () => {
@@ -153,7 +153,7 @@ class Frontend {
     }
 
     onResize() {
-        this.searchClear();
+        this.searchClear(true);
     }
 
     onClick(e) {
@@ -265,7 +265,7 @@ class Frontend {
     async updateOptions() {
         this.options = await apiOptionsGet(this.getOptionsContext());
         if (!this.options.enable) {
-            this.searchClear();
+            this.searchClear(false);
         }
     }
 
@@ -320,7 +320,7 @@ class Frontend {
                 textSource.cleanup();
             }
             if (hideResults && this.options.scanning.autoHideResults) {
-                this.searchClear();
+                this.searchClear(true);
             }
 
             this.pendingLookup = false;
@@ -392,8 +392,8 @@ class Frontend {
         return true;
     }
 
-    searchClear() {
-        this.popup.hide();
+    searchClear(changeFocus) {
+        this.popup.hide(changeFocus);
         this.popup.clearAutoPlayTimer();
 
         if (this.options.scanning.selectText && this.textSourceLast) {
