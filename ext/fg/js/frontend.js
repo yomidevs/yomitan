@@ -333,7 +333,7 @@ class Frontend {
 
         const searchText = textSource.text();
         if (searchText.length === 0) {
-            return;
+            return false;
         }
 
         const {definitions, length} = await apiTermsFind(searchText, this.getOptionsContext());
@@ -366,7 +366,7 @@ class Frontend {
 
         const searchText = textSource.text();
         if (searchText.length === 0) {
-            return;
+            return false;
         }
 
         const definitions = await apiKanjiFind(searchText, this.getOptionsContext());
