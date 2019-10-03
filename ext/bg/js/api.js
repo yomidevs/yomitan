@@ -126,35 +126,35 @@ async function apiTemplateRender(template, data, dynamic) {
 }
 
 async function apiCommandExec(command) {
-    const handlers = {
-        search: () => {
-            chrome.tabs.create({url: chrome.extension.getURL('/bg/search.html')});
-        },
-
-        help: () => {
-            chrome.tabs.create({url: 'https://foosoft.net/projects/yomichan/'});
-        },
-
-        options: () => {
-            chrome.runtime.openOptionsPage();
-        },
-
-        toggle: async () => {
-            const optionsContext = {
-                depth: 0,
-                url: window.location.href
-            };
-            const options = await apiOptionsGet(optionsContext);
-            options.general.enable = !options.general.enable;
-            await apiOptionsSave('popup');
-        }
-    };
-
-    const handler = handlers[command];
-    if (handler) {
+    const handlers = apiCommandExec.handlers;
+    if (handlers.hasOwnProperty(command)) {
+        const handler = handlers[command];
         handler();
     }
 }
+apiCommandExec.handlers = {
+    search: () => {
+        chrome.tabs.create({url: chrome.extension.getURL('/bg/search.html')});
+    },
+
+    help: () => {
+        chrome.tabs.create({url: 'https://foosoft.net/projects/yomichan/'});
+    },
+
+    options: () => {
+        chrome.runtime.openOptionsPage();
+    },
+
+    toggle: async () => {
+        const optionsContext = {
+            depth: 0,
+            url: window.location.href
+        };
+        const options = await apiOptionsGet(optionsContext);
+        options.general.enable = !options.general.enable;
+        await apiOptionsSave('popup');
+    }
+};
 
 async function apiAudioGetUrl(definition, source) {
     return audioBuildUrl(definition, source);
