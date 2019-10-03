@@ -96,6 +96,18 @@ class DisplayFloat extends Display {
         }
     }
 
+    initialize(options, popupInfo, url) {
+        const css = options.general.customPopupCss;
+        if (css) {
+            this.setStyle(css);
+        }
+
+        const {id, depth, parentFrameId} = popupInfo;
+        this.optionsContext.depth = depth;
+        this.optionsContext.url = url;
+        popupNestedInitialize(id, depth, parentFrameId, url);
+    }
+
     setStyle(css) {
         const parent = document.head;
 
@@ -122,34 +134,11 @@ DisplayFloat.onKeyDownHandlers = {
 };
 
 DisplayFloat.messageHandlers = {
-    termsShow: (self, {definitions, options, context}) => {
-        self.termsShow(definitions, options, context);
-    },
-
-    kanjiShow: (self, {definitions, options, context}) => {
-        self.kanjiShow(definitions, options, context);
-    },
-
-    clearAutoPlayTimer: (self) => {
-        self.clearAutoPlayTimer();
-    },
-
-    orphaned: (self) => {
-        self.onOrphaned();
-    },
-
-    setOptions: (self, options) => {
-        const css = options.general.customPopupCss;
-        if (css) {
-            self.setStyle(css);
-        }
-    },
-
-    popupNestedInitialize: (self, {id, depth, parentFrameId, url}) => {
-        self.optionsContext.depth = depth;
-        self.optionsContext.url = url;
-        popupNestedInitialize(id, depth, parentFrameId, url);
-    }
+    termsShow: (self, {definitions, options, context}) => self.termsShow(definitions, options, context),
+    kanjiShow: (self, {definitions, options, context}) => self.kanjiShow(definitions, options, context),
+    clearAutoPlayTimer: (self) => self.clearAutoPlayTimer(),
+    orphaned: (self) => self.onOrphaned(),
+    initialize: (self, {options, popupInfo, url}) => self.initialize(options, popupInfo, url)
 };
 
 window.yomichan_display = new DisplayFloat();
