@@ -63,41 +63,11 @@ class DisplayFloat extends Display {
     }
 
     onMessage(e) {
-        const handlers = {
-            termsShow: ({definitions, options, context}) => {
-                this.termsShow(definitions, options, context);
-            },
-
-            kanjiShow: ({definitions, options, context}) => {
-                this.kanjiShow(definitions, options, context);
-            },
-
-            clearAutoPlayTimer: () => {
-                this.clearAutoPlayTimer();
-            },
-
-            orphaned: () => {
-                this.onOrphaned();
-            },
-
-            setOptions: (options) => {
-                const css = options.general.customPopupCss;
-                if (css) {
-                    this.setStyle(css);
-                }
-            },
-
-            popupNestedInitialize: ({id, depth, parentFrameId, url}) => {
-                this.optionsContext.depth = depth;
-                this.optionsContext.url = url;
-                popupNestedInitialize(id, depth, parentFrameId, url);
-            }
-        };
-
         const {action, params} = e.data;
-        const handler = handlers[action];
-        if (handler) {
-            handler(params);
+        const handlers = DisplayFloat.messageHandlers;
+        if (handlers.hasOwnProperty(action)) {
+            const handler = handlers[action];
+            handler(this, params);
         }
     }
 
@@ -148,6 +118,37 @@ DisplayFloat.onKeyDownHandlers = {
             return true;
         }
         return false;
+    }
+};
+
+DisplayFloat.messageHandlers = {
+    termsShow: (self, {definitions, options, context}) => {
+        self.termsShow(definitions, options, context);
+    },
+
+    kanjiShow: (self, {definitions, options, context}) => {
+        self.kanjiShow(definitions, options, context);
+    },
+
+    clearAutoPlayTimer: (self) => {
+        self.clearAutoPlayTimer();
+    },
+
+    orphaned: (self) => {
+        self.onOrphaned();
+    },
+
+    setOptions: (self, options) => {
+        const css = options.general.customPopupCss;
+        if (css) {
+            self.setStyle(css);
+        }
+    },
+
+    popupNestedInitialize: (self, {id, depth, parentFrameId, url}) => {
+        self.optionsContext.depth = depth;
+        self.optionsContext.url = url;
+        popupNestedInitialize(id, depth, parentFrameId, url);
     }
 };
 
