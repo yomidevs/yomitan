@@ -161,20 +161,12 @@ class Display {
     }
 
     onWheel(e) {
-        const handler = () => {
-            if (e.altKey) {
-                if (e.deltaY < 0) { // scroll up
-                    this.entryScrollIntoView(this.index - 1, null, true);
-                    return true;
-                } else if (e.deltaY > 0) { // scroll down
-                    this.entryScrollIntoView(this.index + 1, null, true);
-                    return true;
-                }
+        if (e.altKey) {
+            const delta = e.deltaY;
+            if (delta !== 0) {
+                this.entryScrollIntoView(this.index + (delta > 0 ? 1 : -1), null, true);
+                e.preventDefault();
             }
-        };
-
-        if (handler()) {
-            e.preventDefault();
         }
     }
 
