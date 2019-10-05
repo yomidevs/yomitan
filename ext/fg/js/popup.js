@@ -56,16 +56,18 @@ class Popup {
         return new Promise((resolve) => {
             const parentFrameId = (typeof this.frameId === 'number' ? this.frameId : null);
             this.container.addEventListener('load', () => {
-                this.invokeApi('popupNestedInitialize', {
-                    id: this.id,
-                    depth: this.depth,
-                    parentFrameId,
+                this.invokeApi('initialize', {
+                    options: {
+                        general: {
+                            customPopupCss: options.general.customPopupCss
+                        }
+                    },
+                    popupInfo: {
+                        id: this.id,
+                        depth: this.depth,
+                        parentFrameId
+                    },
                     url: this.url
-                });
-                this.invokeApi('setOptions', {
-                    general: {
-                        customPopupCss: options.general.customPopupCss
-                    }
                 });
                 resolve();
             });
@@ -105,7 +107,7 @@ class Popup {
         container.style.height = `${height}px`;
         container.style.visibility = 'visible';
 
-        this.hideChildren();
+        this.hideChildren(true);
     }
 
     static getPositionForHorizontalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral) {
@@ -206,16 +208,21 @@ class Popup {
         this.invokeApi('orphaned');
     }
 
-    hide() {
-        this.hideChildren();
+    hide(changeFocus) {
+        if (this.isContainerHidden()) {
+            changeFocus = false;
+        }
+        this.hideChildren(changeFocus);
         this.hideContainer();
-        this.focusParent();
+        if (changeFocus) {
+            this.focusParent();
+        }
     }
 
-    hideChildren() {
-        // recursively hides all children
-        if (this.child && !this.child.isContainerHidden()) {
-            this.child.hide();
+    hideChildren(changeFocus) {
+        // Recursively hides all children.
+        if (this.child !== null && !this.child.isContainerHidden()) {
+            this.child.hide(changeFocus);
         }
     }
 

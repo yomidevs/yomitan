@@ -50,6 +50,7 @@ async function formRead(options) {
     options.scanning.alphanumeric = $('#search-alphanumeric').prop('checked');
     options.scanning.autoHideResults = $('#auto-hide-results').prop('checked');
     options.scanning.deepDomScan = $('#deep-dom-scan').prop('checked');
+    options.scanning.enablePopupSearch = $('#enable-search-within-first-popup').prop('checked');
     options.scanning.enableOnPopupExpressions = $('#enable-scanning-of-popup-expressions').prop('checked');
     options.scanning.enableOnSearchPage = $('#enable-scanning-on-search-page').prop('checked');
     options.scanning.delay = parseInt($('#scan-delay').val(), 10);
@@ -115,6 +116,7 @@ async function formWrite(options) {
     $('#search-alphanumeric').prop('checked', options.scanning.alphanumeric);
     $('#auto-hide-results').prop('checked', options.scanning.autoHideResults);
     $('#deep-dom-scan').prop('checked', options.scanning.deepDomScan);
+    $('#enable-search-within-first-popup').prop('checked', options.scanning.enablePopupSearch);
     $('#enable-scanning-of-popup-expressions').prop('checked', options.scanning.enableOnPopupExpressions);
     $('#enable-scanning-on-search-page').prop('checked', options.scanning.enableOnSearchPage);
     $('#scan-delay').val(options.scanning.delay);
@@ -149,6 +151,7 @@ async function formWrite(options) {
 function formSetupEventListeners() {
     $('#dict-purge-link').click(utilAsync(onDictionaryPurge));
     $('#dict-file').change(utilAsync(onDictionaryImport));
+    $('#dict-file-button').click(onDictionaryImportButtonClick);
 
     $('#field-templates-reset').click(utilAsync(onAnkiFieldTemplatesReset));
     $('input, select, textarea').not('.anki-model').not('.profile-form *').change(utilAsync(onFormOptionsChanged));
@@ -238,6 +241,8 @@ async function onFormOptionsChanged(e) {
 }
 
 async function onReady() {
+    showExtensionInformation();
+
     formSetupEventListeners();
     await profileOptionsSetup();
 
@@ -420,7 +425,7 @@ async function onDictionaryPurge(e) {
         dictionarySpinnerShow(true);
 
         await utilDatabasePurge();
-        for (const options of await getOptionsArray()) {
+        for (const options of toIterable(await getOptionsArray())) {
             options.dictionaries = utilBackgroundIsolate({});
             options.general.mainDictionary = '';
         }
@@ -444,6 +449,11 @@ async function onDictionaryPurge(e) {
     }
 }
 
+function onDictionaryImportButtonClick() {
+    const dictFile = document.querySelector('#dict-file');
+    dictFile.click();
+}
+
 async function onDictionaryImport(e) {
     const dictFile = $('#dict-file');
     const dictControls = $('#dict-importer').hide();
@@ -464,7 +474,7 @@ async function onDictionaryImport(e) {
 
         const exceptions = [];
         const summary = await utilDatabaseImport(e.target.files[0], updateProgress, exceptions);
-        for (const options of await getOptionsArray()) {
+        for (const options of toIterable(await getOptionsArray())) {
             options.dictionaries[summary.title] = utilBackgroundIsolate({
                 enabled: true,
                 priority: 0,
@@ -738,4 +748,17 @@ function storageSpinnerShow(show) {
     } else {
         spinner.hide();
     }
+}
+
+
+/*
+ * Information
+ */
+
+function showExtensionInformation() {
+    const node = document.getElementById('extension-info');
+    if (node === null) { return; }
+
+    const manifest = chrome.runtime.getManifest();
+    node.textContent = `${manifest.name} v${manifest.version}`;
 }

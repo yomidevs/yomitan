@@ -6,116 +6,14 @@
         <title>Yomichan Options</title>
         <link rel="stylesheet" type="text/css" href="/mixed/lib/bootstrap/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="/mixed/lib/bootstrap/css/bootstrap-theme.min.css">
-        <style>
-            #anki-spinner, #anki-general, #anki-error,
-            #dict-spinner, #dict-error, #dict-warning, #dict-purge, #dict-import-progress,
-            #debug, .options-advanced, .storage-hidden, #storage-spinner {
-                display: none;
-            }
-
-            .tab-content {
-                border-bottom: 1px #ddd solid;
-                border-left: 1px #ddd solid;
-                border-right: 1px #ddd solid;
-                padding: 10px;
-            }
-
-            #field-templates {
-                font-family: monospace;
-                overflow-x: hidden;
-                white-space: pre;
-            }
-
-            .bottom-links {
-                padding-bottom: 1em;
-            }
-
-            .label-light {
-                font-weight: normal;
-            }
-
-            .form-control.is-invalid {
-                border-color: #f00000;
-            }
-
-            .condition>.condition-prefix:after {
-                content: "IF";
-            }
-            .condition:nth-child(n+2)>.condition-prefix:after {
-                content: "AND";
-            }
-
-            .input-group .condition-prefix,
-            .input-group .condition-group-separator-label {
-                width: 60px;
-                text-align: center;
-            }
-            .input-group .condition-group-separator-label {
-                padding: 6px 12px;
-                font-weight: bold;
-                display: inline-block;
-            }
-            .input-group .condition-type,
-            .input-group .condition-operator {
-                width: auto;
-                text-align: center;
-                text-align-last: center;
-            }
-
-            .condition-group>.condition>div:first-child {
-                border-bottom-left-radius: 0;
-            }
-            .condition-group>.condition:nth-child(n+2)>div:first-child {
-                border-top-left-radius: 0;
-            }
-            .condition-group>.condition:nth-child(n+2)>div:last-child>button {
-                border-top-right-radius: 0;
-            }
-            .condition-group>.condition:nth-last-child(n+2)>div:last-child>button {
-                border-bottom-right-radius: 0;
-            }
-            .condition-group-options>.condition-add {
-                border-top-left-radius: 0;
-                border-top-right-radius: 0;
-            }
-
-            .condition-groups>*:last-of-type {
-                display: none;
-            }
-
-            #custom-popup-css {
-                width: 100%;
-                min-height: 34px;
-                height: 96px;
-                resize: vertical;
-                font-family: 'Courier New', Courier, monospace;
-                white-space: pre;
-            }
-
-            [data-show-for-browser] {
-                display: none;
-            }
-
-            [data-browser=edge] [data-show-for-browser~=edge],
-            [data-browser=chrome] [data-show-for-browser~=chrome],
-            [data-browser=firefox] [data-show-for-browser~=firefox],
-            [data-browser=firefox-mobile] [data-show-for-browser~=firefox-mobile] {
-                display: initial;
-            }
-
-            @media screen and (max-width: 740px) {
-                .col-xs-6 {
-                    float: none;
-                    width: 100%;
-                }
-                .col-xs-6+.col-xs-6 {
-                    margin-top: 15px;
-                }
-            }
-        </style>
+        <link rel="stylesheet" type="text/css" href="/bg/css/settings.css">
     </head>
     <body>
-        <div class="container-fluid">
+        <div class="container">
+            <div class="page-header">
+                <h1>Yomichan Options</h1>
+            </div>
+
             <div class="profile-form">
                 <h3>Profiles</h3>
 
@@ -211,7 +109,8 @@
                     <div class="input-group-addon condition-prefix"></div>
                     <div class="input-group-btn"><select class="form-control btn btn-default condition-type"><optgroup label="Type"></optgroup></select></div>
                     <div class="input-group-btn"><select class="form-control btn btn-default condition-operator"><optgroup label="Operator"></optgroup></select></div>
-                    <input type="text" class="form-control" />
+                    <div class="condition-line-break"></div>
+                    <div class="condition-input"><input type="text" class="form-control" /></div>
                     <div class="input-group-btn"><button class="btn btn-danger condition-remove" title="Remove"><span class="glyphicon glyphicon-remove"></span></button></div>
                 </div></template>
                 <template id="condition-group-separator-template"><div class="input-group">
@@ -293,14 +192,14 @@
                 <div class="form-group">
                     <div class="row">
                         <div class="col-xs-6">
-                            <label for="popup-display-mode">Popup position for horizontal text</label>
+                            <label for="popup-horizontal-text-position">Popup position for horizontal text</label>
                             <select class="form-control" id="popup-horizontal-text-position">
                                 <option value="below">Below text</option>
                                 <option value="above">Above text</option>
                             </select>
                         </div>
                         <div class="col-xs-6">
-                            <label for="popup-display-mode">Popup position for vertical text</label>
+                            <label for="popup-vertical-text-position">Popup position for vertical text</label>
                             <select class="form-control" id="popup-vertical-text-position">
                                 <option value="default">Same as for horizontal text</option>
                                 <option value="before">Before text reading direction</option>
@@ -315,11 +214,11 @@
                 <div class="form-group options-advanced">
                     <div class="row">
                         <div class="col-xs-6">
-                            <label for="popup-display-mode">Popup width <span class="label-light">(in pixels)</span></label>
+                            <label for="popup-width">Popup width <span class="label-light">(in pixels)</span></label>
                             <input type="number" min="1" id="popup-width" class="form-control">
                         </div>
                         <div class="col-xs-6">
-                            <label for="popup-display-mode">Popup height <span class="label-light">(in pixels)</span></label>
+                            <label for="popup-height">Popup height <span class="label-light">(in pixels)</span></label>
                             <input type="number" min="1" id="popup-height" class="form-control">
                         </div>
                     </div>
@@ -328,11 +227,11 @@
                 <div class="form-group options-advanced">
                     <div class="row">
                         <div class="col-xs-6">
-                            <label for="popup-display-mode">Horizontal popup offset <span class="label-light">(in pixels)</span></label>
+                            <label for="popup-horizontal-offset">Horizontal popup offset <span class="label-light">(in pixels)</span></label>
                             <input type="number" min="0" id="popup-horizontal-offset" class="form-control">
                         </div>
                         <div class="col-xs-6">
-                            <label for="popup-display-mode">Vertical popup offset <span class="label-light">(in pixels)</span></label>
+                            <label for="popup-vertical-offset">Vertical popup offset <span class="label-light">(in pixels)</span></label>
                             <input type="number" min="0" id="popup-vertical-offset" class="form-control">
                         </div>
                     </div>
@@ -341,11 +240,11 @@
                 <div class="form-group options-advanced">
                     <div class="row">
                         <div class="col-xs-6">
-                            <label for="popup-display-mode">Horizontal popup offset for vertical text <span class="label-light">(in pixels)</span></label>
+                            <label for="popup-horizontal-offset2">Horizontal popup offset for vertical text <span class="label-light">(in pixels)</span></label>
                             <input type="number" min="0" id="popup-horizontal-offset2" class="form-control">
                         </div>
                         <div class="col-xs-6">
-                            <label for="popup-display-mode">Vertical popup offset for vertical text <span class="label-light">(in pixels)</span></label>
+                            <label for="popup-vertical-offset2">Vertical popup offset for vertical text <span class="label-light">(in pixels)</span></label>
                             <input type="number" min="0" id="popup-vertical-offset2" class="form-control">
                         </div>
                     </div>
@@ -414,6 +313,10 @@
                 </p>
 
                 <div class="checkbox">
+                    <label><input type="checkbox" id="enable-search-within-first-popup"> Enable search when clicking glossary entries</label>
+                </div>
+
+                <div class="checkbox">
                     <label><input type="checkbox" id="enable-scanning-on-search-page"> Enable scanning on search page</label>
                 </div>
 
@@ -465,7 +368,8 @@
                         <a href="https://foosoft.net/projects/yomichan" target="_blank" rel="noopener">download free dictionaries</a>
                         for use with this extension and to learn about importing proprietary EPWING dictionaries.
                     </p>
-                    <input type="file" id="dict-file">
+                    <button class="btn btn-primary" id="dict-file-button">Import Dictionary</button>
+                    <div hidden><input type="file" id="dict-file"></div>
                 </div>
             </div>
 
@@ -499,7 +403,7 @@
                 </div></div>
 
                 <div>
-                    <input type="button" value="Refresh" id="storage-refresh" />
+                    <button class="btn btn-default" id="storage-refresh">Refresh</button>
                 </div>
             </div>
 
@@ -617,6 +521,29 @@
             </div>
 
             <div>
+                <h3>Keyboard Shortcuts</h3>
+
+                <p class="help-block">
+                    Yomichan includes keyboard shortcuts for common actions which can be adjusted
+                    using the web browser's settings.
+                    Instructions on how to access this settings page are listed below for a few browsers.
+                </p>
+
+                <h4>Chrome</h4>
+                <ul class="help-block">
+                    <li>Open the settings page (<a href="chrome://settings/">chrome://settings/</a>)</li>
+                    <li>Click the "Extensions" link in the left sidebar (<a href="chrome://extensions/">chrome://extensions/</a>)</li>
+                    <li>Open the left side panel using the hamburger (<strong>&#8801;</strong>) menu button, then click "Keyboard shortcuts"</li>
+                </ul>
+
+                <h4>Firefox</h4>
+                <ul class="help-block">
+                    <li>Open the extensions page (<a href="about:addons">about:addons</a>)</li>
+                    <li>Click the button on the right with the gear icon, then click "Manage Extension Shortcuts"</li>
+                </ul>
+            </div>
+
+            <div>
                 <h3>Support Development</h3>
 
                 <p class="help-block">
@@ -635,7 +562,7 @@
             <pre id="debug"></pre>
 
             <div class="pull-right bottom-links">
-                <small><a href="search.html">Search</a> &bull; <a href="https://foosoft.net/projects/yomichan/" target="_blank" rel="noopener">Homepage</a> &bull; <a href="legal.html">Legal</a></small>
+                <small><span id="extension-info"></span> &bull; <a href="search.html">Search</a> &bull; <a href="https://foosoft.net/projects/yomichan/" target="_blank" rel="noopener">Homepage</a> &bull; <a href="legal.html">Legal</a></small>
             </div>
         </div>
 

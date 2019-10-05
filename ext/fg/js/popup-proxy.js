@@ -58,11 +58,11 @@ class PopupProxy {
         return await this.invokeHostApi('showOrphaned', {id, elementRect, options});
     }
 
-    async hide() {
+    async hide(changeFocus) {
         if (this.id === null) {
             return;
         }
-        return await this.invokeHostApi('hide', {id: this.id});
+        return await this.invokeHostApi('hide', {id: this.id, changeFocus});
     }
 
     async setVisible(visible) {
