@@ -17,103 +17,53 @@
  */
 
 
-class Deinflection {
-    constructor(term, {rules=[], definitions=[], reason=''} = {}) {
-        this.term = term;
-        this.rules = rules;
-        this.definitions = definitions;
-        this.reason = reason;
-        this.children = [];
-    }
-
-    async deinflect(definer, reasons) {
-        for (const reason in reasons) {
-            for (const variant of reasons[reason]) {
-                let accept = this.rules.length === 0;
-                if (!accept) {
-                    for (const rule of this.rules) {
-                        if (variant.rulesIn.includes(rule)) {
-                            accept = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (!accept || !this.term.endsWith(variant.kanaIn)) {
-                    continue;
-                }
-
-                const term = this.term.slice(0, -variant.kanaIn.length) + variant.kanaOut;
-                if (term.length === 0) {
-                    continue;
-                }
-
-                const child = new Deinflection(term, {reason, rules: variant.rulesOut});
-                if (await child.deinflect(definer, reasons)) {
-                    this.children.push(child);
-                }
-            }
-        }
-
-        const definitions = await definer(this.term);
-        if (this.rules.length === 0) {
-            this.definitions = definitions;
-        } else {
-            for (const rule of this.rules) {
-                for (const definition of definitions) {
-                    if (definition.rules.includes(rule)) {
-                        this.definitions.push(definition);
-                    }
-                }
-            }
-        }
-
-        if (this.definitions.length > 0 && this.children.length > 0) {
-            const child = new Deinflection(this.term, {rules: this.rules, definitions: this.definitions});
-            this.children.push(child);
-        }
-
-        return this.definitions.length > 0 || this.children.length > 0;
-    }
-
-    gather() {
-        if (this.children.length === 0) {
-            return [{
-                source: this.term,
-                rules: this.rules,
-                definitions: this.definitions,
-                reasons: this.reason.length > 0 ? [this.reason] : []
-            }];
-        }
-
-        const results = [];
-        for (const child of this.children) {
-            for (const result of child.gather()) {
-                if (this.reason.length > 0) {
-                    result.reasons.push(this.reason);
-                }
-
-                result.source = this.term;
-                results.push(result);
-            }
-        }
-
-        return results;
-    }
-}
-
-
 class Deinflector {
     constructor(reasons) {
         this.reasons = reasons;
     }
 
-    async deinflect(term, definer) {
-        const node = new Deinflection(term);
-        if (await node.deinflect(definer, this.reasons)) {
-            return node.gather();
-        } else {
-            return [];
+    deinflect(source) {
+        const results = [{
+            source,
+            term: source,
+            rules: [],
+            definitions: [],
+            reasons: []
+        }];
+        for (let i = 0; i < results.length; ++i) {
+            const entry = results[i];
+
+            for (const reason in this.reasons) {
+                for (const variant of this.reasons[reason]) {
+                    let accept = entry.rules.length === 0;
+                    if (!accept) {
+                        for (const rule of entry.rules) {
+                            if (variant.rulesIn.includes(rule)) {
+                                accept = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!accept || !entry.term.endsWith(variant.kanaIn)) {
+                        continue;
+                    }
+
+                    const term = entry.term.slice(0, -variant.kanaIn.length) + variant.kanaOut;
+                    if (term.length === 0) {
+                        continue;
+                    }
+
+                    results.push({
+                        source,
+                        term,
+                        rules: variant.rulesOut,
+                        definitions: [],
+                        reasons: [reason, ...entry.reasons]
+                    });
+                }
+            }
         }
+        return results;
     }
 }

@@ -41,9 +41,7 @@ class Translator {
         const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
 
         const definitionsGrouped = dictTermsGroup(definitions, dictionaries);
-        for (const definition of definitionsGrouped) {
-            await this.buildTermFrequencies(definition, titles);
-        }
+        await this.buildTermFrequencies(definitionsGrouped, titles);
 
         if (options.general.compactTags) {
             for (const definition of definitionsGrouped) {
@@ -147,9 +145,7 @@ class Translator {
             definitionsMerged.push(groupedDefinition);
         }
 
-        for (const definition of definitionsMerged) {
-            await this.buildTermFrequencies(definition, titles);
-        }
+        await this.buildTermFrequencies(definitionsMerged, titles);
 
         if (options.general.compactTags) {
             for (const definition of definitionsMerged) {
@@ -164,9 +160,7 @@ class Translator {
         const titles = Object.keys(dictionaries);
         const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
 
-        for (const definition of definitions) {
-            await this.buildTermFrequencies(definition, titles);
-        }
+        await this.buildTermFrequencies(definitions, titles);
 
         return {length, definitions};
     }
@@ -179,13 +173,9 @@ class Translator {
             }
         }
 
-        const cache = {};
-        const titles = Object.keys(dictionaries);
-        let deinflections = await this.findTermDeinflections(text, titles, cache);
         const textHiragana = jpKatakanaToHiragana(text);
-        if (text !== textHiragana) {
-            deinflections.push(...await this.findTermDeinflections(textHiragana, titles, cache));
-        }
+        const titles = Object.keys(dictionaries);
+        const deinflections = await this.findTermDeinflections(text, textHiragana, titles);
 
         let definitions = [];
         for (const deinflection of deinflections) {
@@ -221,19 +211,77 @@ class Translator {
         return {length, definitions};
     }
 
-    async findTermDeinflections(text, titles, cache) {
-        const definer = async term => {
-            if (cache.hasOwnProperty(term)) {
-                return cache[term];
-            } else {
-                return cache[term] = await this.database.findTerms(term, titles);
-            }
-        };
+    async findTermDeinflections(text, text2, titles) {
+        const deinflections = (text === text2 ? this.getDeinflections(text) : this.getDeinflections2(text, text2));
 
-        let deinflections = [];
+        if (deinflections.length === 0) {
+            return [];
+        }
+
+        const uniqueDeinflectionTerms = [];
+        const uniqueDeinflectionArrays = [];
+        const uniqueDeinflectionsMap = {};
+        for (const deinflection of deinflections) {
+            const term = deinflection.term;
+            let deinflectionArray;
+            if (uniqueDeinflectionsMap.hasOwnProperty(term)) {
+                deinflectionArray = uniqueDeinflectionsMap[term];
+            } else {
+                deinflectionArray = [];
+                uniqueDeinflectionTerms.push(term);
+                uniqueDeinflectionArrays.push(deinflectionArray);
+                uniqueDeinflectionsMap[term] = deinflectionArray;
+            }
+            deinflectionArray.push(deinflection);
+        }
+
+        const definitions = await this.database.findTermsBulk(uniqueDeinflectionTerms, titles);
+
+        for (const definition of definitions) {
+            for (const deinflection of uniqueDeinflectionArrays[definition.index]) {
+                if (Translator.definitionContainsAnyRule(definition, deinflection.rules)) {
+                    deinflection.definitions.push(definition);
+                }
+            }
+        }
+
+        return deinflections.filter(e => e.definitions.length > 0);
+    }
+
+    static definitionContainsAnyRule(definition, rules) {
+        if (rules.length === 0) {
+            return true;
+        }
+        const definitionRules = definition.rules;
+        for (const rule of rules) {
+            if (definitionRules.includes(rule)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    getDeinflections(text) {
+        const deinflections = [];
+
         for (let i = text.length; i > 0; --i) {
             const textSlice = text.slice(0, i);
-            deinflections.push(...await this.deinflector.deinflect(textSlice, definer));
+            deinflections.push(...this.deinflector.deinflect(textSlice));
+        }
+
+        return deinflections;
+    }
+
+    getDeinflections2(text, text2) {
+        const deinflections = [];
+
+        for (let i = text.length; i > 0; --i) {
+            const textSlice = text.slice(0, i);
+            const text2Slice = text2.slice(0, i);
+            deinflections.push(...this.deinflector.deinflect(textSlice));
+            if (textSlice !== text2Slice) {
+                deinflections.push(...this.deinflector.deinflect(text2Slice));
+            }
         }
 
         return deinflections;
@@ -272,24 +320,51 @@ class Translator {
         return definitions;
     }
 
-    async buildTermFrequencies(definition, titles) {
-        let terms = [];
-        if (definition.expressions) {
-            terms.push(...definition.expressions);
-        } else {
-            terms.push(definition);
+    async buildTermFrequencies(definitions, titles) {
+        const terms = [];
+        for (const definition of definitions) {
+            if (definition.expressions) {
+                terms.push(...definition.expressions);
+            } else {
+                terms.push(definition);
+            }
         }
 
-        for (const term of terms) {
+        if (terms.length === 0) {
+            return;
+        }
+
+        // Create mapping of unique terms
+        const expressionsUnique = [];
+        const termsUnique = [];
+        const termsUniqueMap = {};
+        for (let i = 0, ii = terms.length; i < ii; ++i) {
+            const term = terms[i];
+            const expression = term.expression;
             term.frequencies = [];
-            for (const meta of await this.database.findTermMeta(term.expression, titles)) {
-                if (meta.mode === 'freq') {
-                    term.frequencies.push({
-                        expression: meta.expression,
-                        frequency: meta.data,
-                        dictionary: meta.dictionary
-                    });
-                }
+
+            if (termsUniqueMap.hasOwnProperty(expression)) {
+                termsUniqueMap[expression].push(term);
+            } else {
+                const termList = [term];
+                expressionsUnique.push(expression);
+                termsUnique.push(termList);
+                termsUniqueMap[expression] = termList;
+            }
+        }
+
+        const metas = await this.database.findTermMetaBulk(expressionsUnique, titles);
+        for (const meta of metas) {
+            if (meta.mode !== 'freq') {
+                continue;
+            }
+
+            for (const term of termsUnique[meta.index]) {
+                term.frequencies.push({
+                    expression: meta.expression,
+                    frequency: meta.data,
+                    dictionary: meta.dictionary
+                });
             }
         }
     }
@@ -298,14 +373,12 @@ class Translator {
         const tags = [];
         for (const name of names) {
             const base = Translator.getNameBase(name);
-            const meta = await this.database.findTagForTitle(base, title);
-
-            const tag = {name};
-            for (const prop in meta || {}) {
-                if (prop !== 'name') {
-                    tag[prop] = meta[prop];
-                }
+            let meta = this.database.findTagForTitleCached(base, title);
+            if (typeof meta === 'undefined') {
+                meta = await this.database.findTagForTitle(base, title);
             }
+
+            const tag = Object.assign({}, meta !== null ? meta : {}, {name});
 
             tags.push(dictTagSanitize(tag));
         }
@@ -317,15 +390,17 @@ class Translator {
         const stats = {};
         for (const name in items) {
             const base = Translator.getNameBase(name);
-            const meta = await this.database.findTagForTitle(base, title);
-            const group = stats[meta.category] = stats[meta.category] || [];
-
-            const stat = {name, value: items[name]};
-            for (const prop in meta || {}) {
-                if (prop !== 'name') {
-                    stat[prop] = meta[prop];
+            let meta = this.database.findTagForTitleCached(base, title);
+            if (typeof meta === 'undefined') {
+                meta = await this.database.findTagForTitle(base, title);
+                if (meta === null) {
+                    continue;
                 }
             }
+
+            const group = stats[meta.category] = stats[meta.category] || [];
+
+            const stat = Object.assign({}, meta, {name, value: items[name]});
 
             group.push(dictTagSanitize(stat));
         }
