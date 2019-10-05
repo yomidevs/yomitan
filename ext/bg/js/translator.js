@@ -238,27 +238,16 @@ class Translator {
         const definitions = await this.database.findTermsBulk(uniqueDeinflectionTerms, titles);
 
         for (const definition of definitions) {
+            const definitionRules = Deinflector.rulesToRuleFlags(definition.rules);
             for (const deinflection of uniqueDeinflectionArrays[definition.index]) {
-                if (Translator.definitionContainsAnyRule(definition, deinflection.rules)) {
+                const deinflectionRules = deinflection.rules;
+                if (deinflectionRules === 0 || (definitionRules & deinflectionRules) !== 0) {
                     deinflection.definitions.push(definition);
                 }
             }
         }
 
         return deinflections.filter(e => e.definitions.length > 0);
-    }
-
-    static definitionContainsAnyRule(definition, rules) {
-        if (rules.length === 0) {
-            return true;
-        }
-        const definitionRules = definition.rules;
-        for (const rule of rules) {
-            if (definitionRules.includes(rule)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     getDeinflections(text) {
