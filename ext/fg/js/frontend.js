@@ -55,7 +55,7 @@ class Frontend {
         try {
             this.options = await apiOptionsGet(this.getOptionsContext());
 
-            window.addEventListener('message', this.onFrameMessage.bind(this));
+            window.addEventListener('message', this.onWindowMessage.bind(this));
             window.addEventListener('mousedown', this.onMouseDown.bind(this));
             window.addEventListener('mousemove', this.onMouseMove.bind(this));
             window.addEventListener('mouseover', this.onMouseOver.bind(this));
@@ -71,7 +71,7 @@ class Frontend {
                 window.addEventListener('contextmenu', this.onContextMenu.bind(this));
             }
 
-            chrome.runtime.onMessage.addListener(this.onBgMessage.bind(this));
+            chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
         } catch (e) {
             this.onError(e);
         }
@@ -135,20 +135,12 @@ class Frontend {
         this.popupTimerClear();
     }
 
-    onFrameMessage(e) {
-        const handlers = {
-            popupClose: () => {
-                this.searchClear(true);
-            },
-
-            selectionCopy: () => {
-                document.execCommand('copy');
-            }
-        };
-
-        const handler = handlers[e.data];
-        if (handler) {
-            handler();
+    onWindowMessage(e) {
+        const action = e.data;
+        const handlers = Frontend.windowMessageHandlers;
+        if (handlers.hasOwnProperty(action)) {
+            const handler = handlers[action];
+            handler(this);
         }
     }
 
@@ -240,20 +232,11 @@ class Frontend {
         this.contextMenuChecking = false;
     }
 
-    onBgMessage({action, params}, sender, callback) {
-        const handlers = {
-            optionsUpdate: () => {
-                this.updateOptions();
-            },
-
-            popupSetVisible: ({visible}) => {
-                this.popup.setVisible(visible);
-            }
-        };
-
-        const handler = handlers[action];
-        if (handler) {
-            handler(params);
+    onRuntimeMessage({action, params}, sender, callback) {
+        const handlers = Frontend.runtimeMessageHandlers;
+        if (handlers.hasOwnProperty(action)) {
+            const handler = handlers[action];
+            handler(this, params);
             callback();
         }
     }
@@ -528,5 +511,26 @@ class Frontend {
         }
     }
 }
+
+Frontend.windowMessageHandlers = {
+    popupClose: (self) => {
+        self.searchClear(true);
+    },
+
+    selectionCopy: () => {
+        document.execCommand('copy');
+    }
+};
+
+Frontend.runtimeMessageHandlers = {
+    optionsUpdate: (self) => {
+        self.updateOptions();
+    },
+
+    popupSetVisible: (self, {visible}) => {
+        self.popup.setVisible(visible);
+    }
+};
+
 
 window.yomichan_frontend = Frontend.create();

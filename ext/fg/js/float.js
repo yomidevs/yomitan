@@ -63,60 +63,25 @@ class DisplayFloat extends Display {
     }
 
     onMessage(e) {
-        const handlers = {
-            termsShow: ({definitions, options, context}) => {
-                this.termsShow(definitions, options, context);
-            },
-
-            kanjiShow: ({definitions, options, context}) => {
-                this.kanjiShow(definitions, options, context);
-            },
-
-            clearAutoPlayTimer: () => {
-                this.clearAutoPlayTimer();
-            },
-
-            orphaned: () => {
-                this.onOrphaned();
-            },
-
-            setOptions: (options) => {
-                const css = options.general.customPopupCss;
-                if (css) {
-                    this.setStyle(css);
-                }
-            },
-
-            popupNestedInitialize: ({id, depth, parentFrameId, url}) => {
-                this.optionsContext.depth = depth;
-                this.optionsContext.url = url;
-                popupNestedInitialize(id, depth, parentFrameId, url);
-            }
-        };
-
         const {action, params} = e.data;
-        const handler = handlers[action];
-        if (handler) {
-            handler(params);
+        const handlers = DisplayFloat.messageHandlers;
+        if (handlers.hasOwnProperty(action)) {
+            const handler = handlers[action];
+            handler(this, params);
         }
     }
 
     onKeyDown(e) {
-        const handlers = {
-            67: /* c */ () => {
-                if (e.ctrlKey && !window.getSelection().toString()) {
-                    this.onSelectionCopy();
-                    return true;
-                }
+        const key = Display.getKeyFromEvent(e);
+        const handlers = DisplayFloat.onKeyDownHandlers;
+        if (handlers.hasOwnProperty(key)) {
+            const handler = handlers[key];
+            if (handler(this, e)) {
+                e.preventDefault();
+                return;
             }
-        };
-
-        const handler = handlers[e.keyCode];
-        if (handler && handler()) {
-            e.preventDefault();
-        } else {
-            super.onKeyDown(e);
         }
+        super.onKeyDown(e);
     }
 
     autoPlayAudio() {
@@ -129,6 +94,18 @@ class DisplayFloat extends Display {
             window.clearTimeout(this.autoPlayAudioTimer);
             this.autoPlayAudioTimer = null;
         }
+    }
+
+    initialize(options, popupInfo, url) {
+        const css = options.general.customPopupCss;
+        if (css) {
+            this.setStyle(css);
+        }
+
+        const {id, depth, parentFrameId} = popupInfo;
+        this.optionsContext.depth = depth;
+        this.optionsContext.url = url;
+        popupNestedInitialize(id, depth, parentFrameId, url);
     }
 
     setStyle(css) {
@@ -145,5 +122,23 @@ class DisplayFloat extends Display {
         }
     }
 }
+
+DisplayFloat.onKeyDownHandlers = {
+    'C': (self, e) => {
+        if (e.ctrlKey && !window.getSelection().toString()) {
+            self.onSelectionCopy();
+            return true;
+        }
+        return false;
+    }
+};
+
+DisplayFloat.messageHandlers = {
+    termsShow: (self, {definitions, options, context}) => self.termsShow(definitions, options, context),
+    kanjiShow: (self, {definitions, options, context}) => self.kanjiShow(definitions, options, context),
+    clearAutoPlayTimer: (self) => self.clearAutoPlayTimer(),
+    orphaned: (self) => self.onOrphaned(),
+    initialize: (self, {options, popupInfo, url}) => self.initialize(options, popupInfo, url)
+};
 
 window.yomichan_display = new DisplayFloat();

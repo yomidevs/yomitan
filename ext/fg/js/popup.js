@@ -56,16 +56,18 @@ class Popup {
         return new Promise((resolve) => {
             const parentFrameId = (typeof this.frameId === 'number' ? this.frameId : null);
             this.container.addEventListener('load', () => {
-                this.invokeApi('popupNestedInitialize', {
-                    id: this.id,
-                    depth: this.depth,
-                    parentFrameId,
+                this.invokeApi('initialize', {
+                    options: {
+                        general: {
+                            customPopupCss: options.general.customPopupCss
+                        }
+                    },
+                    popupInfo: {
+                        id: this.id,
+                        depth: this.depth,
+                        parentFrameId
+                    },
                     url: this.url
-                });
-                this.invokeApi('setOptions', {
-                    general: {
-                        customPopupCss: options.general.customPopupCss
-                    }
                 });
                 resolve();
             });

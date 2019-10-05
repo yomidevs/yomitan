@@ -69,68 +69,13 @@ class Backend {
     }
 
     onMessage({action, params}, sender, callback) {
-        const forward = (promise, callback) => {
-            return promise.then(result => {
-                callback({result});
-            }).catch(error => {
-                callback({error: error.toString ? error.toString() : error});
-            });
-        };
-
-        const handlers = {
-            optionsGet: ({optionsContext, callback}) => {
-                forward(apiOptionsGet(optionsContext), callback);
-            },
-
-            kanjiFind: ({text, optionsContext, callback}) => {
-                forward(apiKanjiFind(text, optionsContext), callback);
-            },
-
-            termsFind: ({text, optionsContext, callback}) => {
-                forward(apiTermsFind(text, optionsContext), callback);
-            },
-
-            definitionAdd: ({definition, mode, context, optionsContext, callback}) => {
-                forward(apiDefinitionAdd(definition, mode, context, optionsContext), callback);
-            },
-
-            definitionsAddable: ({definitions, modes, optionsContext, callback}) => {
-                forward(apiDefinitionsAddable(definitions, modes, optionsContext), callback);
-            },
-
-            noteView: ({noteId}) => {
-                forward(apiNoteView(noteId), callback);
-            },
-
-            templateRender: ({template, data, dynamic, callback}) => {
-                forward(apiTemplateRender(template, data, dynamic), callback);
-            },
-
-            commandExec: ({command, callback}) => {
-                forward(apiCommandExec(command), callback);
-            },
-
-            audioGetUrl: ({definition, source, callback}) => {
-                forward(apiAudioGetUrl(definition, source), callback);
-            },
-
-            screenshotGet: ({options}) => {
-                forward(apiScreenshotGet(options, sender), callback);
-            },
-
-            forward: ({action, params}) => {
-                forward(apiForward(action, params, sender), callback);
-            },
-
-            frameInformationGet: () => {
-                forward(apiFrameInformationGet(sender), callback);
-            }
-        };
-
-        const handler = handlers[action];
-        if (handler) {
-            params.callback = callback;
-            handler(params);
+        const handlers = Backend.messageHandlers;
+        if (handlers.hasOwnProperty(action)) {
+            const handler = handlers[action];
+            const promise = handler(params, sender);
+            promise
+                .then(result => callback({result}))
+                .catch(error => callback({error: typeof error.toString === 'function' ? error.toString() : error}));
         }
 
         return true;
@@ -226,6 +171,21 @@ class Backend {
         // NOP
     }
 }
+
+Backend.messageHandlers = {
+    optionsGet: ({optionsContext}) => apiOptionsGet(optionsContext),
+    kanjiFind: ({text, optionsContext}) => apiKanjiFind(text, optionsContext),
+    termsFind: ({text, optionsContext}) => apiTermsFind(text, optionsContext),
+    definitionAdd: ({definition, mode, context, optionsContext}) => apiDefinitionAdd(definition, mode, context, optionsContext),
+    definitionsAddable: ({definitions, modes, optionsContext}) => apiDefinitionsAddable(definitions, modes, optionsContext),
+    noteView: ({noteId}) => apiNoteView(noteId),
+    templateRender: ({template, data, dynamic}) => apiTemplateRender(template, data, dynamic),
+    commandExec: ({command}) => apiCommandExec(command),
+    audioGetUrl: ({definition, source}) => apiAudioGetUrl(definition, source),
+    screenshotGet: ({options}, sender) => apiScreenshotGet(options, sender),
+    forward: ({action, params}, sender) => apiForward(action, params, sender),
+    frameInformationGet: (params, sender) => apiFrameInformationGet(sender),
+};
 
 window.yomichan_backend = new Backend();
 window.yomichan_backend.prepare();
