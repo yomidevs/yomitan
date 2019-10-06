@@ -445,7 +445,7 @@ class Display {
 
     async getScreenshot() {
         try {
-            await this.setPopupVisible(false);
+            await this.setPopupVisibleOverride(false);
             await Display.delay(1); // Wait for popup to be hidden.
 
             const {format, quality} = this.options.anki.screenshot;
@@ -454,7 +454,7 @@ class Display {
 
             return {dataUrl, format};
         } finally {
-            await this.setPopupVisible(true);
+            await this.setPopupVisibleOverride(null);
         }
     }
 
@@ -462,8 +462,8 @@ class Display {
         return this.options.general.resultOutputMode === 'merge' ? 0 : -1;
     }
 
-    setPopupVisible(visible) {
-        return apiForward('popupSetVisible', {visible});
+    setPopupVisibleOverride(visible) {
+        return apiForward('popupSetVisibleOverride', {visible});
     }
 
     setSpinnerVisible(visible) {

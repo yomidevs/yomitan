@@ -145,7 +145,7 @@ class Frontend {
     }
 
     onResize() {
-        this.searchClear(true);
+        this.searchClear(false);
     }
 
     onClick(e) {
@@ -527,8 +527,8 @@ Frontend.runtimeMessageHandlers = {
         self.updateOptions();
     },
 
-    popupSetVisible: (self, {visible}) => {
-        self.popup.setVisible(visible);
+    popupSetVisibleOverride: (self, {visible}) => {
+        self.popup.setVisibleOverride(visible);
     }
 };
 
