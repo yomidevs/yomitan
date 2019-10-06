@@ -145,7 +145,7 @@ class Frontend {
     }
 
     onResize() {
-        this.searchClear(true);
+        this.searchClear(false);
     }
 
     onClick(e) {
