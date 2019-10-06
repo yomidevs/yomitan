@@ -527,8 +527,8 @@ Frontend.runtimeMessageHandlers = {
         self.updateOptions();
     },
 
-    popupSetVisible: (self, {visible}) => {
-        self.popup.setVisible(visible);
+    popupSetVisibleOverride: (self, {visible}) => {
+        self.popup.setVisibleOverride(visible);
     }
 };
 

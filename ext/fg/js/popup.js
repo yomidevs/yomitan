@@ -238,7 +238,7 @@ class Popup {
         return this.isInjected && this.container.style.visibility !== 'hidden';
     }
 
-    setVisible(visible) {
+    setVisibleOverride(visible) {
         if (visible) {
             this.container.style.setProperty('display', '');
         } else {
