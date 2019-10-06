@@ -19,51 +19,74 @@
 
 class Deinflector {
     constructor(reasons) {
-        this.reasons = reasons;
+        this.reasons = Deinflector.normalizeReasons(reasons);
     }
 
     deinflect(source) {
         const results = [{
             source,
             term: source,
-            rules: [],
+            rules: 0,
             definitions: [],
             reasons: []
         }];
         for (let i = 0; i < results.length; ++i) {
-            const entry = results[i];
-
-            for (const reason in this.reasons) {
-                for (const variant of this.reasons[reason]) {
-                    let accept = entry.rules.length === 0;
-                    if (!accept) {
-                        for (const rule of entry.rules) {
-                            if (variant.rulesIn.includes(rule)) {
-                                accept = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!accept || !entry.term.endsWith(variant.kanaIn)) {
-                        continue;
-                    }
-
-                    const term = entry.term.slice(0, -variant.kanaIn.length) + variant.kanaOut;
-                    if (term.length === 0) {
+            const {rules, term, reasons} = results[i];
+            for (const [reason, variants] of this.reasons) {
+                for (const [kanaIn, kanaOut, rulesIn, rulesOut] of variants) {
+                    if (
+                        (rules !== 0 && (rules & rulesIn) === 0) ||
+                        !term.endsWith(kanaIn) ||
+                        (term.length - kanaIn.length + kanaOut.length) <= 0
+                    ) {
                         continue;
                     }
 
                     results.push({
                         source,
-                        term,
-                        rules: variant.rulesOut,
+                        term: term.slice(0, -kanaIn.length) + kanaOut,
+                        rules: rulesOut,
                         definitions: [],
-                        reasons: [reason, ...entry.reasons]
+                        reasons: [reason, ...reasons]
                     });
                 }
             }
         }
         return results;
     }
+
+    static normalizeReasons(reasons) {
+        const normalizedReasons = [];
+        for (const reason in reasons) {
+            const variants = [];
+            for (const {kanaIn, kanaOut, rulesIn, rulesOut} of reasons[reason]) {
+                variants.push([
+                    kanaIn,
+                    kanaOut,
+                    Deinflector.rulesToRuleFlags(rulesIn),
+                    Deinflector.rulesToRuleFlags(rulesOut)
+                ]);
+            }
+            normalizedReasons.push([reason, variants]);
+        }
+        return normalizedReasons;
+    }
+
+    static rulesToRuleFlags(rules) {
+        const ruleTypes = Deinflector.ruleTypes;
+        let value = 0;
+        for (const rule of rules) {
+            value |= ruleTypes[rule];
+        }
+        return value;
+    }
 }
+
+Deinflector.ruleTypes = {
+    'v1':    0b0000001, // Verb ichidan
+    'v5':    0b0000010, // Verb godan
+    'vs':    0b0000100, // Verb suru
+    'vk':    0b0001000, // Verb kuru
+    'adj-i': 0b0010000, // Adjective i
+    'iru':   0b0100000, // Intermediate -iru endings for progressive or perfect tense
+};
