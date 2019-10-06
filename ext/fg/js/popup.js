@@ -34,6 +34,9 @@ class Popup {
         this.container.style.height = '0px';
         this.injectPromise = null;
         this.isInjected = false;
+        this.visible = false;
+        this.visibleOverride = null;
+        this.updateVisibility();
     }
 
     inject(options) {
@@ -105,9 +108,11 @@ class Popup {
         container.style.top = `${y}px`;
         container.style.width = `${width}px`;
         container.style.height = `${height}px`;
-        container.style.visibility = 'visible';
 
-        this.hideChildren(true);
+        this.setVisible(true);
+        if (this.child !== null) {
+            this.child.hide(true);
+        }
     }
 
     static getPositionForHorizontalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral) {
@@ -209,41 +214,35 @@ class Popup {
     }
 
     hide(changeFocus) {
-        if (this.isContainerHidden()) {
-            changeFocus = false;
+        if (!this.isVisible()) {
+            return;
         }
-        this.hideChildren(changeFocus);
-        this.hideContainer();
+
+        this.setVisible(false);
+        if (this.child !== null) {
+            this.child.hide(false);
+        }
         if (changeFocus) {
             this.focusParent();
         }
     }
 
-    hideChildren(changeFocus) {
-        // Recursively hides all children.
-        if (this.child !== null && !this.child.isContainerHidden()) {
-            this.child.hide(changeFocus);
-        }
-    }
-
-    hideContainer() {
-        this.container.style.visibility = 'hidden';
-    }
-
-    isContainerHidden() {
-        return (this.container.style.visibility === 'hidden');
-    }
-
     isVisible() {
-        return this.isInjected && this.container.style.visibility !== 'hidden';
+        return this.isInjected && (this.visibleOverride !== null ? this.visibleOverride : this.visible);
+    }
+
+    setVisible(visible) {
+        this.visible = visible;
+        this.updateVisibility();
     }
 
     setVisibleOverride(visible) {
-        if (visible) {
-            this.container.style.setProperty('display', '');
-        } else {
-            this.container.style.setProperty('display', 'none', 'important');
-        }
+        this.visibleOverride = visible;
+        this.updateVisibility();
+    }
+
+    updateVisibility() {
+        this.container.style.setProperty('visibility', this.isVisible() ? 'visible' : 'hidden', 'important');
     }
 
     focusParent() {

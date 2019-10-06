@@ -454,7 +454,7 @@ class Display {
 
             return {dataUrl, format};
         } finally {
-            await this.setPopupVisibleOverride(true);
+            await this.setPopupVisibleOverride(null);
         }
     }
 
