@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" version="1.1" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <linearGradient id="linearGradient5010" x2="-3.9688" y1="3.7042" y2="1.0583" gradientTransform="matrix(3.7795 0 0 3.7795 15.5 -.5)" gradientUnits="userSpaceOnUse">
+   <stop stop-color="#012e5b" offset="0"/>
+   <stop stop-color="#6399c6" offset="1"/>
+  </linearGradient>
+  <linearGradient id="linearGradient5018-3" x1="3.8365" x2=".39687" y1="3.0427" y2=".59531" gradientTransform="scale(3.7795 3.7795)" gradientUnits="userSpaceOnUse">
+   <stop stop-color="#012e5b" offset="0"/>
+   <stop stop-color="#6399c6" offset="1"/>
+  </linearGradient>
+ </defs>
+ <g stroke-width="1px">
+  <path d="m9.75 13.5-1 1h-1.5l-1-1h-5.75v-10h6l1 1h1l1-1h6v10z" fill="#5d8bb3" stroke="url(#linearGradient5010)"/>
+  <path d="m14.5 11.5h-5l-1 1h-1l-1-1h-5v-9.25h5l1 1h1l1-1h5v9.25" fill="#f8f8f8" stroke="url(#linearGradient5018-3)"/>
+  <g fill="none">
+   <path d="m10 8.75h3m-3-2h3m-3-2h3m-10 4h3m-3-2h3m-3-2h3" stroke="#bdbdbd"/>
+   <path d="m7.5 10.25v-4.75" stroke="#a6a6a6"/>
+   <path d="m8.5 5.75v4.25" stroke="#d8d8d8"/>
+  </g>
+ </g>
+</svg>
