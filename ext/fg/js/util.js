@@ -30,19 +30,19 @@ function utilInvoke(action, params={}) {
             chrome.runtime.sendMessage(data, (response) => {
                 utilCheckLastError(chrome.runtime.lastError);
                 if (response !== null && typeof response === 'object') {
-                    if (response.error) {
-                        reject(response.error);
+                    if (typeof response.error !== 'undefined') {
+                        reject(jsonToError(response.error));
                     } else {
                         resolve(response.result);
                     }
                 } else {
                     const message = response === null ? 'Unexpected null response' : `Unexpected response of type ${typeof response}`;
-                    reject(`${message} (${JSON.stringify(data)})`);
+                    reject(new Error(`${message} (${JSON.stringify(data)})`));
                 }
             });
         } catch (e) {
             window.yomichan_orphaned = true;
-            reject(e.message);
+            reject(e);
         }
     });
 }

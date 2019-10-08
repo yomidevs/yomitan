@@ -98,7 +98,7 @@ class PopupProxy {
 
     invokeHostApi(action, params={}) {
         if (typeof this.parentFrameId !== 'number') {
-            return Promise.reject('Invalid frame');
+            return Promise.reject(new Error('Invalid frame'));
         }
         return this.apiSender.invoke(action, params, `popup-proxy-host#${this.parentFrameId}`);
     }

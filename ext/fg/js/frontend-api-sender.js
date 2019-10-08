@@ -31,7 +31,7 @@ class FrontendApiSender {
 
     invoke(action, params, target) {
         if (this.disconnected) {
-            return Promise.reject('Disconnected');
+            return Promise.reject(new Error('Disconnected'));
         }
 
         if (this.port === null) {
@@ -110,8 +110,8 @@ class FrontendApiSender {
         clearTimeout(info.timer);
         info.timer = null;
 
-        if (typeof data.error === 'string') {
-            info.reject(data.error);
+        if (typeof data.error !== 'undefined') {
+            info.reject(jsonToError(data.error));
         } else {
             info.resolve(data.result);
         }
@@ -122,7 +122,7 @@ class FrontendApiSender {
         const info = this.callbacks[id];
         delete this.callbacks[id];
         info.timer = null;
-        info.reject(reason);
+        info.reject(new Error(reason));
     }
 
     static generateId(length) {

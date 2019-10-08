@@ -53,6 +53,21 @@ function extensionHasBrowser() {
     }
 }
 
+function errorToJson(error) {
+    return {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+    };
+}
+
+function jsonToError(jsonError) {
+    const error = new Error(jsonError.message);
+    error.name = jsonError.name;
+    error.stack = jsonError.stack;
+    return error;
+}
+
 const EXTENSION_IS_BROWSER_EDGE = (
     extensionHasBrowser() &&
     (!extensionHasChrome() || (typeof chrome.runtime === 'undefined' && typeof browser.runtime !== 'undefined'))

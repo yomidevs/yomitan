@@ -402,7 +402,7 @@ function optionsLoad() {
         chrome.storage.local.get(['options'], store => {
             const error = chrome.runtime.lastError;
             if (error) {
-                reject(error);
+                reject(new Error(error));
             } else {
                 resolve(store.options);
             }
@@ -431,7 +431,7 @@ function optionsSave(options) {
         chrome.storage.local.set({options: JSON.stringify(options)}, () => {
             const error = chrome.runtime.lastError;
             if (error) {
-                reject(error);
+                reject(new Error(error));
             } else {
                 resolve();
             }
