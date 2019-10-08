@@ -26,10 +26,8 @@ async function searchFrontendSetup() {
     if (!options.scanning.enableOnSearchPage) { return; }
 
     const scriptSrcs = [
-        '/fg/js/api.js',
         '/fg/js/frontend-api-receiver.js',
         '/fg/js/popup.js',
-        '/fg/js/util.js',
         '/fg/js/popup-proxy-host.js',
         '/fg/js/frontend.js'
     ];
