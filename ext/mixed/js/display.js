@@ -39,11 +39,11 @@ class Display {
     }
 
     onError(error) {
-        throw 'Override me';
+        throw new Error('Override me');
     }
 
     onSearchClear() {
-        throw 'Override me';
+        throw new Error('Override me');
     }
 
     onSourceTermView(e) {
@@ -386,7 +386,7 @@ class Display {
                     viewerButton.dataset.noteId = noteId;
                 }
             } else {
-                throw 'Note could note be added';
+                throw new Error('Note could not be added');
             }
         } catch (e) {
             this.onError(e);

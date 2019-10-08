@@ -75,7 +75,7 @@ class Backend {
             const promise = handler(params, sender);
             promise
                 .then(result => callback({result}))
-                .catch(error => callback({error: typeof error.toString === 'function' ? error.toString() : error}));
+                .catch(error => callback(errorToJson(error)));
         }
 
         return true;

@@ -34,7 +34,7 @@ function toIterable(value) {
         }
     }
 
-    throw 'Could not convert to iterable';
+    throw new Error('Could not convert to iterable');
 }
 
 function extensionHasChrome() {

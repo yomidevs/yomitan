@@ -69,7 +69,7 @@ class PopupProxyHost {
 
     getPopup(id) {
         if (!this.popups.hasOwnProperty(id)) {
-            throw 'Invalid popup ID';
+            throw new Error('Invalid popup ID');
         }
 
         return this.popups[id];
