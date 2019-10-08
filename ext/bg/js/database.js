@@ -80,7 +80,12 @@ class Database {
         const visited = {};
         const results = [];
         const createResult = Database.createTerm;
-        const filter = (row) => titles.includes(row.dictionary);
+        const processRow = (row, index) => {
+            if (titles.includes(row.dictionary) && !visited.hasOwnProperty(row.id)) {
+                visited[row.id] = true;
+                results.push(createResult(row, index));
+            }
+        };
 
         const db = this.db.backendDB();
         const dbTransaction = db.transaction(['terms'], 'readonly');
@@ -91,8 +96,8 @@ class Database {
         for (let i = 0; i < terms.length; ++i) {
             const only = IDBKeyRange.only(terms[i]);
             promises.push(
-                Database.getAll(dbIndex1, only, i, visited, filter, createResult, results),
-                Database.getAll(dbIndex2, only, i, visited, filter, createResult, results)
+                Database.getAll(dbIndex1, only, i, processRow),
+                Database.getAll(dbIndex2, only, i, processRow)
             );
         }
 
@@ -152,10 +157,13 @@ class Database {
 
     async findTermMetaBulk(terms, titles) {
         const promises = [];
-        const visited = {};
         const results = [];
         const createResult = Database.createTermMeta;
-        const filter = (row) => titles.includes(row.dictionary);
+        const processRow = (row, index) => {
+            if (titles.includes(row.dictionary)) {
+                results.push(createResult(row, index));
+            }
+        };
 
         const db = this.db.backendDB();
         const dbTransaction = db.transaction(['termMeta'], 'readonly');
@@ -164,7 +172,7 @@ class Database {
 
         for (let i = 0; i < terms.length; ++i) {
             const only = IDBKeyRange.only(terms[i]);
-            promises.push(Database.getAll(dbIndex, only, i, visited, filter, createResult, results));
+            promises.push(Database.getAll(dbIndex, only, i, processRow));
         }
 
         await Promise.all(promises);
@@ -537,39 +545,32 @@ class Database {
         };
     }
 
-    static getAll(dbIndex, query, index, visited, filter, createResult, results) {
+    static getAll(dbIndex, query, context, processRow) {
         const fn = typeof dbIndex.getAll === 'function' ? Database.getAllFast : Database.getAllUsingCursor;
-        return fn(dbIndex, query, index, visited, filter, createResult, results);
+        return fn(dbIndex, query, context, processRow);
     }
 
-    static getAllFast(dbIndex, query, index, visited, filter, createResult, results) {
+    static getAllFast(dbIndex, query, context, processRow) {
         return new Promise((resolve, reject) => {
             const request = dbIndex.getAll(query);
             request.onerror = (e) => reject(e);
             request.onsuccess = (e) => {
                 for (const row of e.target.result) {
-                    if (filter(row, index) && !visited.hasOwnProperty(row.id)) {
-                        visited[row.id] = true;
-                        results.push(createResult(row, index));
-                    }
+                    processRow(row, context);
                 }
                 resolve();
             };
         });
     }
 
-    static getAllUsingCursor(dbIndex, query, index, visited, filter, createResult, results) {
+    static getAllUsingCursor(dbIndex, query, context, processRow) {
         return new Promise((resolve, reject) => {
             const request = dbIndex.openCursor(query, 'next');
             request.onerror = (e) => reject(e);
             request.onsuccess = (e) => {
                 const cursor = e.target.result;
                 if (cursor) {
-                    const row = cursor.value;
-                    if (filter(row, index) && !visited.hasOwnProperty(row.id)) {
-                        visited[row.id] = true;
-                        results.push(createResult(row, index));
-                    }
+                    processRow(cursor.value, context);
                     cursor.continue();
                 } else {
                     resolve();
