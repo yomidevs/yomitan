@@ -539,7 +539,7 @@ class Display {
 
     static getKeyFromEvent(event) {
         const key = event.key;
-        return key.length === 1 ? key.toUpperCase() : key;
+        return (typeof key === 'string' ? (key.length === 1 ? key.toUpperCase() : key) : '');
     }
 }
 
