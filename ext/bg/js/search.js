@@ -53,7 +53,7 @@ class DisplaySearch extends Display {
     }
 
     onError(error) {
-        window.alert(`Error: ${error.toString ? error.toString() : error}`);
+        logError(error, true);
     }
 
     onSearchClear() {

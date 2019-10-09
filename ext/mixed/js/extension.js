@@ -68,6 +68,24 @@ function jsonToError(jsonError) {
     return error;
 }
 
+function logError(error, alert) {
+    const manifest = chrome.runtime.getManifest();
+    let errorMessage = `${manifest.name} v${manifest.version} has encountered an error.\n`;
+    errorMessage += `Originating URL: ${window.location.href}\n`;
+
+    const errorString = `${error.toString ? error.toString() : error}`;
+    const stack = `${error.stack}`.trimRight();
+    errorMessage += (!stack.startsWith(errorString) ? `${errorString}\n${stack}` : `${stack}`);
+
+    errorMessage += '\n\nIssues can be reported at https://github.com/FooSoft/yomichan/issues';
+
+    console.error(errorMessage);
+
+    if (alert) {
+        window.alert(`${errorString}\n\nCheck the developer console for more details.`);
+    }
+}
+
 const EXTENSION_IS_BROWSER_EDGE = (
     extensionHasBrowser() &&
     (!extensionHasChrome() || (typeof chrome.runtime === 'undefined' && typeof browser.runtime !== 'undefined'))

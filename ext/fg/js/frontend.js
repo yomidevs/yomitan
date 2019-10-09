@@ -228,7 +228,7 @@ class Frontend {
     }
 
     onError(error) {
-        console.log(error);
+        logError(error, false);
     }
 
     setEnabled(enabled) {
