@@ -26,6 +26,8 @@ class Display {
         this.context = null;
         this.sequence = 0;
         this.index = 0;
+        this.audioPlaying = null;
+        this.audioFallback = null;
         this.audioCache = {};
         this.optionsContext = {};
         this.eventListeners = [];
@@ -404,33 +406,24 @@ class Display {
             this.setSpinnerVisible(true);
 
             const expression = expressionIndex === -1 ? definition : definition.expressions[expressionIndex];
-            let url = await apiAudioGetUrl(expression, this.options.audio.sources[0], this.optionsContext);
-            if (!url) {
-                url = '/mixed/mp3/button.mp3';
+
+            if (this.audioPlaying !== null) {
+                this.audioPlaying.pause();
+                this.audioPlaying = null;
             }
 
-            for (const key in this.audioCache) {
-                this.audioCache[key].pause();
+            let {audio} = await audioGetFromSources(expression, this.options.audio.sources, this.optionsContext, true, this.audioCache);
+            if (audio === null) {
+                if (this.audioFallback === null) {
+                    this.audioFallback = new Audio('/mixed/mp3/button.mp3');
+                }
+                audio = this.audioFallback;
             }
 
-            const volume = this.options.audio.volume / 100.0;
-            let audio = this.audioCache[url];
-            if (audio) {
-                audio.currentTime = 0;
-                audio.volume = volume;
-                audio.play();
-            } else {
-                audio = new Audio(url);
-                audio.onloadeddata = () => {
-                    if (audio.duration === 5.694694 || audio.duration === 5.720718) {
-                        audio = new Audio('/mixed/mp3/button.mp3');
-                    }
-
-                    this.audioCache[url] = audio;
-                    audio.volume = volume;
-                    audio.play();
-                };
-            }
+            this.audioPlaying = audio;
+            audio.currentTime = 0;
+            audio.volume = this.options.audio.volume / 100.0;
+            audio.play();
         } catch (e) {
             this.onError(e);
         } finally {

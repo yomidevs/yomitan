@@ -136,6 +136,7 @@ function audioBuildFilename(definition) {
 
         return filename += '.mp3';
     }
+    return null;
 }
 
 async function audioInject(definition, fields, sources, optionsContext) {
@@ -157,11 +158,12 @@ async function audioInject(definition, fields, sources, optionsContext) {
             audioSourceDefinition = definition.expressions[0];
         }
 
-        const url = await audioBuildUrl(audioSourceDefinition, sources[0], optionsContext);
-        const filename = audioBuildFilename(audioSourceDefinition);
-
-        if (url && filename) {
-            definition.audio = {url, filename};
+        const {url} = await audioGetFromSources(audioSourceDefinition, sources, optionsContext, false);
+        if (url !== null) {
+            const filename = audioBuildFilename(audioSourceDefinition);
+            if (filename !== null) {
+                definition.audio = {url, filename};
+            }
         }
 
         return true;
