@@ -286,14 +286,22 @@ class Display {
 
             for (let i = 0; i < states.length; ++i) {
                 const state = states[i];
+                let noteId = null;
                 for (const mode in state) {
                     const button = this.adderButtonFind(i, mode);
                     if (button === null) {
                         continue;
                     }
 
-                    button.classList.toggle('disabled', !state[mode]);
+                    const info = state[mode];
+                    if (!info.canAdd && noteId === null && info.noteId) {
+                        noteId = info.noteId;
+                    }
+                    button.classList.toggle('disabled', !info.canAdd);
                     button.classList.remove('pending');
+                }
+                if (noteId !== null) {
+                    this.viewerButtonShow(i, noteId);
                 }
             }
         } catch (e) {
@@ -380,11 +388,7 @@ class Display {
                 if (adderButton !== null) {
                     adderButton.classList.add('disabled');
                 }
-                const viewerButton = this.viewerButtonFind(index);
-                if (viewerButton !== null) {
-                    viewerButton.classList.remove('pending', 'disabled');
-                    viewerButton.dataset.noteId = noteId;
-                }
+                this.viewerButtonShow(index, noteId);
             } else {
                 throw new Error('Note could not be added');
             }
@@ -502,6 +506,15 @@ class Display {
     viewerButtonFind(index) {
         const entry = this.getEntry(index);
         return entry !== null ? entry.querySelector('.action-view-note') : null;
+    }
+
+    viewerButtonShow(index, noteId) {
+        const viewerButton = this.viewerButtonFind(index);
+        if (viewerButton === null) {
+            return;
+        }
+        viewerButton.classList.remove('pending', 'disabled');
+        viewerButton.dataset.noteId = noteId;
     }
 
     static delay(time) {
