@@ -68,7 +68,8 @@ async function apiDefinitionAdd(definition, mode, context, optionsContext) {
         await audioInject(
             definition,
             options.anki.terms.fields,
-            options.general.audioSource
+            options.general.audioSource,
+            optionsContext
         );
     }
 
@@ -174,8 +175,8 @@ apiCommandExec.handlers = {
     }
 };
 
-async function apiAudioGetUrl(definition, source) {
-    return audioBuildUrl(definition, source);
+async function apiAudioGetUrl(definition, source, optionsContext) {
+    return audioBuildUrl(definition, source, optionsContext);
 }
 
 async function apiInjectScreenshot(definition, fields, screenshot) {

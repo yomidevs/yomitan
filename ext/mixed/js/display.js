@@ -404,7 +404,7 @@ class Display {
             this.setSpinnerVisible(true);
 
             const expression = expressionIndex === -1 ? definition : definition.expressions[expressionIndex];
-            let url = await apiAudioGetUrl(expression, this.options.general.audioSource);
+            let url = await apiAudioGetUrl(expression, this.options.general.audioSource, this.optionsContext);
             if (!url) {
                 url = '/mixed/mp3/button.mp3';
             }

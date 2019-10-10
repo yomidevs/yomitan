@@ -88,7 +88,7 @@ const audioUrlBuilders = {
     }
 };
 
-async function audioBuildUrl(definition, mode, cache={}) {
+async function audioBuildUrl(definition, mode, optionsContext, cache={}) {
     const cacheKey = `${mode}:${definition.expression}`;
     if (cache.hasOwnProperty(cacheKey)) {
         return Promise.resolve(cache[cacheKey]);
@@ -96,7 +96,7 @@ async function audioBuildUrl(definition, mode, cache={}) {
 
     if (audioUrlBuilders.hasOwnProperty(mode)) {
         const handler = audioUrlBuilders[mode];
-        return handler(definition).then(
+        return handler(definition, optionsContext).then(
             (url) => {
                 cache[cacheKey] = url;
                 return url;
@@ -138,7 +138,7 @@ function audioBuildFilename(definition) {
     }
 }
 
-async function audioInject(definition, fields, mode) {
+async function audioInject(definition, fields, mode, optionsContext) {
     let usesAudio = false;
     for (const name in fields) {
         if (fields[name].includes('{audio}')) {
@@ -157,7 +157,7 @@ async function audioInject(definition, fields, mode) {
             audioSourceDefinition = definition.expressions[0];
         }
 
-        const url = await audioBuildUrl(audioSourceDefinition, mode);
+        const url = await audioBuildUrl(audioSourceDefinition, mode, optionsContext);
         const filename = audioBuildFilename(audioSourceDefinition);
 
         if (url && filename) {
