@@ -189,7 +189,7 @@ class Display {
                 addable: options.anki.enable,
                 grouped: options.general.resultOutputMode === 'group',
                 merged: options.general.resultOutputMode === 'merge',
-                playback: options.general.audioSource !== 'disabled',
+                playback: options.audio.enabled,
                 compactGlossaries: options.general.compactGlossaries,
                 debug: options.general.debugInfo
             };
@@ -209,7 +209,7 @@ class Display {
             const {index, scroll} = context || {};
             this.entryScrollIntoView(index || 0, scroll);
 
-            if (this.options.general.autoPlayAudio && this.options.general.audioSource !== 'disabled') {
+            if (this.options.audio.enabled && this.options.audio.autoPlay) {
                 this.autoPlayAudio();
             }
 
@@ -404,7 +404,7 @@ class Display {
             this.setSpinnerVisible(true);
 
             const expression = expressionIndex === -1 ? definition : definition.expressions[expressionIndex];
-            let url = await apiAudioGetUrl(expression, this.options.general.audioSource, this.optionsContext);
+            let url = await apiAudioGetUrl(expression, this.options.audio.sources[0], this.optionsContext);
             if (!url) {
                 url = '/mixed/mp3/button.mp3';
             }
@@ -413,10 +413,11 @@ class Display {
                 this.audioCache[key].pause();
             }
 
+            const volume = this.options.audio.volume / 100.0;
             let audio = this.audioCache[url];
             if (audio) {
                 audio.currentTime = 0;
-                audio.volume = this.options.general.audioVolume / 100.0;
+                audio.volume = volume;
                 audio.play();
             } else {
                 audio = new Audio(url);
@@ -426,7 +427,7 @@ class Display {
                     }
 
                     this.audioCache[url] = audio;
-                    audio.volume = this.options.general.audioVolume / 100.0;
+                    audio.volume = volume;
                     audio.play();
                 };
             }

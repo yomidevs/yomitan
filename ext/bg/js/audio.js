@@ -138,7 +138,7 @@ function audioBuildFilename(definition) {
     }
 }
 
-async function audioInject(definition, fields, mode, optionsContext) {
+async function audioInject(definition, fields, sources, optionsContext) {
     let usesAudio = false;
     for (const name in fields) {
         if (fields[name].includes('{audio}')) {
@@ -157,7 +157,7 @@ async function audioInject(definition, fields, mode, optionsContext) {
             audioSourceDefinition = definition.expressions[0];
         }
 
-        const url = await audioBuildUrl(audioSourceDefinition, mode, optionsContext);
+        const url = await audioBuildUrl(audioSourceDefinition, sources[0], optionsContext);
         const filename = audioBuildFilename(audioSourceDefinition);
 
         if (url && filename) {

@@ -68,7 +68,7 @@ async function apiDefinitionAdd(definition, mode, context, optionsContext) {
         await audioInject(
             definition,
             options.anki.terms.fields,
-            options.general.audioSource,
+            options.audio.sources,
             optionsContext
         );
     }
