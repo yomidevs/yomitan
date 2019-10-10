@@ -17,8 +17,8 @@
  */
 
 
-async function audioBuildUrl(definition, mode, cache={}) {
-    if (mode === 'jpod101') {
+const audioUrlBuilders = {
+    'jpod101': async (definition) => {
         let kana = definition.reading;
         let kanji = definition.expression;
 
@@ -35,84 +35,75 @@ async function audioBuildUrl(definition, mode, cache={}) {
             params.push(`kana=${encodeURIComponent(kana)}`);
         }
 
-        const url = `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?${params.join('&')}`;
-        return Promise.resolve(url);
-    } else if (mode === 'jpod101-alternate') {
-        return new Promise((resolve, reject) => {
-            const response = cache[definition.expression];
-            if (response) {
-                resolve(response);
-            } else {
-                const data = {
-                    post: 'dictionary_reference',
-                    match_type: 'exact',
-                    search_query: definition.expression
-                };
-
-                const params = [];
-                for (const key in data) {
-                    params.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`);
-                }
-
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post');
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhr.addEventListener('error', () => reject(new Error('Failed to scrape audio data')));
-                xhr.addEventListener('load', () => {
-                    cache[definition.expression] = xhr.responseText;
-                    resolve(xhr.responseText);
-                });
-
-                xhr.send(params.join('&'));
-            }
-        }).then(response => {
-            const dom = new DOMParser().parseFromString(response, 'text/html');
-            for (const row of dom.getElementsByClassName('dc-result-row')) {
-                try {
-                    const url = row.querySelector('audio>source[src]').getAttribute('src');
-                    const reading = row.getElementsByClassName('dc-vocab_kana').item(0).innerText;
-                    if (url && reading && (!definition.reading || definition.reading === reading)) {
-                        return audioUrlNormalize(url, 'https://www.japanesepod101.com', '/learningcenter/reference/');
-                    }
-                } catch (e) {
-                    // NOP
-                }
-            }
+        return `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?${params.join('&')}`;
+    },
+    'jpod101-alternate': async (definition) => {
+        const response = await new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post');
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.addEventListener('error', () => reject(new Error('Failed to scrape audio data')));
+            xhr.addEventListener('load', () => resolve(xhr.responseText));
+            xhr.send(`post=dictionary_reference&match_type=exact&search_query=${encodeURIComponent(definition.expression)}`);
         });
-    } else if (mode === 'jisho') {
-        return new Promise((resolve, reject) => {
-            const response = cache[definition.expression];
-            if (response) {
-                resolve(response);
-            } else {
-                const xhr = new XMLHttpRequest();
-                xhr.open('GET', `https://jisho.org/search/${definition.expression}`);
-                xhr.addEventListener('error', () => reject(new Error('Failed to scrape audio data')));
-                xhr.addEventListener('load', () => {
-                    cache[definition.expression] = xhr.responseText;
-                    resolve(xhr.responseText);
-                });
 
-                xhr.send();
-            }
-        }).then(response => {
+        const dom = new DOMParser().parseFromString(response, 'text/html');
+        for (const row of dom.getElementsByClassName('dc-result-row')) {
             try {
-                const dom = new DOMParser().parseFromString(response, 'text/html');
-                const audio = dom.getElementById(`audio_${definition.expression}:${definition.reading}`);
-                if (audio) {
-                    const url = audio.getElementsByTagName('source').item(0).getAttribute('src');
-                    if (url) {
-                        return audioUrlNormalize(url, 'https://jisho.org', '/search/');
-                    }
+                const url = row.querySelector('audio>source[src]').getAttribute('src');
+                const reading = row.getElementsByClassName('dc-vocab_kana').item(0).innerText;
+                if (url && reading && (!definition.reading || definition.reading === reading)) {
+                    return audioUrlNormalize(url, 'https://www.japanesepod101.com', '/learningcenter/reference/');
                 }
             } catch (e) {
                 // NOP
             }
+        }
+
+        throw new Error('Failed to find audio URL');
+    },
+    'jisho': async (definition) => {
+        const response = await new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', `https://jisho.org/search/${definition.expression}`);
+            xhr.addEventListener('error', () => reject(new Error('Failed to scrape audio data')));
+            xhr.addEventListener('load', () => resolve(xhr.responseText));
+            xhr.send();
         });
+
+        const dom = new DOMParser().parseFromString(response, 'text/html');
+        try {
+            const audio = dom.getElementById(`audio_${definition.expression}:${definition.reading}`);
+            if (audio !== null) {
+                const url = audio.getElementsByTagName('source').item(0).getAttribute('src');
+                if (url) {
+                    return audioUrlNormalize(url, 'https://jisho.org', '/search/');
+                }
+            }
+        } catch (e) {
+            // NOP
+        }
+
+        throw new Error('Failed to find audio URL');
     }
-    else {
-        return Promise.resolve();
+};
+
+async function audioBuildUrl(definition, mode, cache={}) {
+    const cacheKey = `${mode}:${definition.expression}`;
+    if (cache.hasOwnProperty(cacheKey)) {
+        return Promise.resolve(cache[cacheKey]);
     }
+
+    if (audioUrlBuilders.hasOwnProperty(mode)) {
+        const handler = audioUrlBuilders[mode];
+        return handler(definition).then(
+            (url) => {
+                cache[cacheKey] = url;
+                return url;
+            },
+            () => null);
+    }
+    return null;
 }
 
 function audioUrlNormalize(url, baseUrl, basePath) {
