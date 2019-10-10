@@ -72,8 +72,33 @@ class AnkiConnect {
         }
     }
 
+    async findNoteIds(notes) {
+        await this.checkVersion();
+        const actions = notes.map(note => ({
+            action: 'findNotes',
+            params: {
+                query: `deck:"${AnkiConnect.escapeQuery(note.deckName)}" ${AnkiConnect.fieldsToQuery(note.fields)}`
+            }
+        }));
+        return await this.ankiInvoke('multi', {actions});
+    }
+
     ankiInvoke(action, params) {
         return requestJson(this.server, 'POST', {action, params, version: this.localVersion});
+    }
+
+    static escapeQuery(text) {
+        return text.replace(/"/g, '');
+    }
+
+    static fieldsToQuery(fields) {
+        const fieldNames = Object.keys(fields);
+        if (fieldNames.length === 0) {
+            return '';
+        }
+
+        const key = fieldNames[0];
+        return `${key.toLowerCase()}:"${AnkiConnect.escapeQuery(fields[key])}"`;
     }
 }
 
@@ -104,6 +129,10 @@ class AnkiNull {
     }
 
     async guiBrowse(query) {
+        return [];
+    }
+
+    async findNoteIds(notes) {
         return [];
     }
 }
