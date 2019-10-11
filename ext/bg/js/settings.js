@@ -607,10 +607,10 @@ async function ankiFieldsPopulate(element, options) {
             'glossary',
             'glossary-brief',
             'reading',
+            'screenshot',
             'sentence',
             'tags',
-            'url',
-            'screenshot'
+            'url'
         ],
         'kanji': [
             'character',
@@ -618,6 +618,7 @@ async function ankiFieldsPopulate(element, options) {
             'glossary',
             'kunyomi',
             'onyomi',
+            'screenshot',
             'sentence',
             'tags',
             'url'
