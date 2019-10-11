@@ -44,6 +44,7 @@ async function formRead(options) {
     options.audio.enabled = $('#audio-playback-enabled').prop('checked');
     options.audio.autoPlay = $('#auto-play-audio').prop('checked');
     options.audio.volume = parseFloat($('#audio-playback-volume').val());
+    options.audio.customSourceUrl = $('#audio-custom-source').val();
 
     options.scanning.middleMouse = $('#middle-mouse-button-scan').prop('checked');
     options.scanning.touchInputEnabled = $('#touch-input-enabled').prop('checked');
@@ -111,6 +112,7 @@ async function formWrite(options) {
     $('#audio-playback-enabled').prop('checked', options.audio.enabled);
     $('#auto-play-audio').prop('checked', options.audio.autoPlay);
     $('#audio-playback-volume').val(options.audio.volume);
+    $('#audio-custom-source').val(options.audio.customSourceUrl);
 
     $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);
     $('#touch-input-enabled').prop('checked', options.scanning.touchInputEnabled);
