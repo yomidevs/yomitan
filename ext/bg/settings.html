@@ -395,10 +395,18 @@
                 </div>
             </div>
 
-            <div id="storage-info" class="storage-hidden">
+            <div id="storage-info">
                 <div>
                     <img src="/mixed/img/spinner.gif" class="pull-right" id="storage-spinner" />
                     <h3>Storage</h3>
+                </div>
+
+                <div id="storage-persist-info" class="storage-hidden">
+                    <p class="help-block">
+                        Web browsers may sometimes clear stored data if the device is running low on storage space.
+                        This can result in the stored dictionary data being deleted unexpectedly, causing Yomichan to stop working for no apparent reason.
+                        In order to prevent this, persistent storage must be enable by clicking the "Persistent Storage" button below.
+                    </p>
                 </div>
 
                 <div id="storage-use" class="storage-hidden">
@@ -425,7 +433,8 @@
                 </div></div>
 
                 <div>
-                    <button class="btn btn-default" id="storage-refresh">Refresh</button>
+                    <button class="btn btn-default" id="storage-refresh"><span class="btn-inner-middle">Refresh</span></button>
+                    <button class="btn btn-default storage-hidden ignore-form-changes" id="storage-persist-button"><span class="storage-persist-button-inner"><input type="checkbox" class="btn-inner-middle" id="storage-persist-button-checkbox" readonly /><span class="btn-inner-middle">Persistent Storage</span></span></button>
                 </div>
             </div>
 

@@ -137,6 +137,17 @@
     white-space: pre;
 }
 
+.btn-inner-middle {
+    vertical-align: middle;
+}
+.storage-persist-button-inner {
+    pointer-events: none;
+}
+input[type=checkbox]#storage-persist-button-checkbox {
+    margin: 0 0.375em 0 0;
+    padding: 0;
+}
+
 [data-show-for-browser] {
     display: none;
 }

@@ -724,13 +724,12 @@ async function storageEstimate() {
 storageEstimate.mostRecent = null;
 
 async function storageInfoInitialize() {
+    storagePersistInitialize();
     const browser = await getBrowser();
     const container = document.querySelector('#storage-info');
     container.setAttribute('data-browser', browser);
 
     await storageShowInfo();
-
-    container.classList.remove('storage-hidden');
 
     document.querySelector('#storage-refresh').addEventListener('click', () => storageShowInfo(), false);
 }
@@ -768,6 +767,35 @@ function storageSpinnerShow(show) {
     } else {
         spinner.hide();
     }
+}
+
+async function storagePersistInitialize() {
+    if (!(navigator.storage && navigator.storage.persist)) {
+        // Not supported
+        return;
+    }
+
+    const info = document.querySelector('#storage-persist-info');
+    const button = document.querySelector('#storage-persist-button');
+    const checkbox = document.querySelector('#storage-persist-button-checkbox');
+
+    info.classList.remove('storage-hidden');
+    button.classList.remove('storage-hidden');
+
+    let persisted = await navigator.storage.persisted();
+    if (persisted) {
+        checkbox.checked = true;
+    }
+
+    button.addEventListener('click', async () => {
+        if (persisted) {
+            return;
+        }
+        if (await navigator.storage.persist()) {
+            persisted = true;
+            checkbox.checked = true;
+        }
+    }, false);
 }
 
 
