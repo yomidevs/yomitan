@@ -158,7 +158,7 @@ function formSetupEventListeners() {
     $('#dict-file-button').click(onDictionaryImportButtonClick);
 
     $('#field-templates-reset').click(utilAsync(onAnkiFieldTemplatesReset));
-    $('input, select, textarea').not('.anki-model').not('.profile-form *').change(utilAsync(onFormOptionsChanged));
+    $('input, select, textarea').not('.anki-model').not('.ignore-form-changes *').change(utilAsync(onFormOptionsChanged));
     $('.anki-model').change(utilAsync(onAnkiModelChanged));
 }
 
@@ -248,6 +248,7 @@ async function onReady() {
     showExtensionInformation();
 
     formSetupEventListeners();
+    await audioSettingsInitialize();
     await profileOptionsSetup();
 
     storageInfoInitialize();
@@ -256,6 +257,20 @@ async function onReady() {
 }
 
 $(document).ready(utilAsync(onReady));
+
+
+/*
+ * Audio
+ */
+
+let audioSourceUI = null;
+
+async function audioSettingsInitialize() {
+    const optionsContext = getOptionsContext();
+    const options = await apiOptionsGet(optionsContext);
+    audioSourceUI = new AudioSourceUI.Container(options.audio.sources, $('.audio-source-list'), $('.audio-source-add'));
+    audioSourceUI.save = () => apiOptionsSave();
+}
 
 
 /*

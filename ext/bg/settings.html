@@ -14,7 +14,7 @@
                 <h1>Yomichan Options</h1>
             </div>
 
-            <div class="profile-form">
+            <div class="profile-form ignore-form-changes">
                 <h3>Profiles</h3>
 
                 <p class="help-block">
@@ -258,14 +258,23 @@
                     <input type="text" id="audio-custom-source" class="form-control" placeholder="Example: http://localhost/audio.mp3?expression={expression}&reading={reading}">
                 </div>
 
-                <div class="form-group">
-                    <label for="audio-playback-source">Audio playback source</label>
-                    <select class="form-control" id="audio-playback-source">
-                        <option value="disabled">Disabled</option>
-                        <option value="jpod101">JapanesePod101</option>
-                        <option value="jpod101-alternate">JapanesePod101 (alternate)</option>
-                        <option value="jisho">Jisho.org</option>
-                    </select>
+                <div class="form-group ignore-form-changes">
+                    <label>Audio playback sources</label>
+                    <div class="audio-source-list"></div>
+                    <div class="input-group audio-source-options">
+                        <button class="btn btn-default audio-source-add" title="Add audio playback source"><span class="glyphicon glyphicon-plus"></span></button>
+                    </div>
+
+                    <template id="audio-source-template"><div class="input-group audio-source">
+                        <div class="input-group-addon audio-source-prefix"></div>
+                        <select class="form-control audio-source-select">
+                            <option value="jpod101">JapanesePod101</option>
+                            <option value="jpod101-alternate">JapanesePod101 (alternate)</option>
+                            <option value="jisho">Jisho.org</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                        <div class="input-group-btn"><button class="btn btn-danger audio-source-remove" title="Remove"><span class="glyphicon glyphicon-remove"></span></button></div>
+                    </div></template>
                 </div>
             </div>
 
@@ -587,6 +596,7 @@
 
         <script src="/bg/js/anki.js"></script>
         <script src="/bg/js/api.js"></script>
+        <script src="/bg/js/audio-ui.js"></script>
         <script src="/bg/js/conditions.js"></script>
         <script src="/bg/js/conditions-ui.js"></script>
         <script src="/bg/js/dictionary.js"></script>
