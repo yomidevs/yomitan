@@ -85,6 +85,11 @@ const audioUrlBuilders = {
         }
 
         throw new Error('Failed to find audio URL');
+    },
+    'custom': async (definition, optionsContext) => {
+        const options = await apiOptionsGet(optionsContext);
+        const customSourceUrl = options.audio.customSourceUrl;
+        return customSourceUrl.replace(/\{([^\}]*)\}/g, (m0, m1) => (definition.hasOwnProperty(m1) ? `${definition[m1]}` : m0));
     }
 };
 
