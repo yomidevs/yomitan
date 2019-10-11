@@ -135,7 +135,7 @@ class Display {
         const entry = link.closest('.entry');
         const definitionIndex = this.entryIndexFind(entry);
         const expressionIndex = Display.indexOf(entry.querySelectorAll('.expression .action-play-audio'), link);
-        this.audioPlay(this.definitions[definitionIndex], expressionIndex);
+        this.audioPlay(this.definitions[definitionIndex], expressionIndex, definitionIndex);
     }
 
     onNoteAdd(e) {
@@ -276,7 +276,7 @@ class Display {
     }
 
     autoPlayAudio() {
-        this.audioPlay(this.definitions[0], this.firstExpressionIndex);
+        this.audioPlay(this.definitions[0], this.firstExpressionIndex, 0);
     }
 
     async adderButtonUpdate(modes, sequence) {
@@ -401,7 +401,7 @@ class Display {
         }
     }
 
-    async audioPlay(definition, expressionIndex) {
+    async audioPlay(definition, expressionIndex, entryIndex) {
         try {
             this.setSpinnerVisible(true);
 
@@ -412,12 +412,27 @@ class Display {
                 this.audioPlaying = null;
             }
 
-            let {audio} = await audioGetFromSources(expression, this.options.audio.sources, this.optionsContext, true, this.audioCache);
+            const sources = this.options.audio.sources;
+            let {audio, source} = await audioGetFromSources(expression, sources, this.optionsContext, true, this.audioCache);
+            let info;
             if (audio === null) {
                 if (this.audioFallback === null) {
                     this.audioFallback = new Audio('/mixed/mp3/button.mp3');
                 }
                 audio = this.audioFallback;
+                info = 'Could not find audio';
+            } else {
+                info = `From source ${1 + sources.indexOf(source)}: ${source}`;
+            }
+
+            const button = this.audioButtonFindImage(entryIndex);
+            if (button !== null) {
+                let titleDefault = button.dataset.titleDefault;
+                if (!titleDefault) {
+                    titleDefault = button.title || "";
+                    button.dataset.titleDefault = titleDefault;
+                }
+                button.title = `${titleDefault}\n${info}`;
             }
 
             this.audioPlaying = audio;
@@ -509,6 +524,11 @@ class Display {
         }
         viewerButton.classList.remove('pending', 'disabled');
         viewerButton.dataset.noteId = noteId;
+    }
+
+    audioButtonFindImage(index) {
+        const entry = this.getEntry(index);
+        return entry !== null ? entry.querySelector('.action-play-audio>img') : null;
     }
 
     static delay(time) {
@@ -640,7 +660,7 @@ Display.onKeyDownHandlers = {
         if (e.altKey) {
             const entry = self.getEntry(self.index);
             if (entry !== null && entry.dataset.type === 'term') {
-                self.audioPlay(self.definitions[self.index], self.firstExpressionIndex);
+                self.audioPlay(self.definitions[self.index], self.firstExpressionIndex, self.index);
             }
             return true;
         }
