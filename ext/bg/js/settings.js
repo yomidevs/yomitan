@@ -705,13 +705,13 @@ async function getBrowser() {
 
 function storageBytesToLabeledString(size) {
     const base = 1000;
-    const labels = ['bytes', 'KB', 'MB', 'GB'];
+    const labels = [' bytes', 'KB', 'MB', 'GB'];
     let labelIndex = 0;
     while (size >= base) {
         size /= base;
         ++labelIndex;
     }
-    const label = size.toFixed(1);
+    const label = labelIndex === 0 ? `${size}` : size.toFixed(1);
     return `${label}${labels[labelIndex]}`;
 }
 
@@ -722,6 +722,13 @@ async function storageEstimate() {
     return null;
 }
 storageEstimate.mostRecent = null;
+
+async function isStoragePeristent() {
+    try {
+        return await navigator.storage.persisted();
+    } catch (e) { }
+    return false;
+}
 
 async function storageInfoInitialize() {
     storagePersistInitialize();
@@ -741,8 +748,14 @@ async function storageUpdateStats() {
     const valid = (estimate !== null);
 
     if (valid) {
-        document.querySelector('#storage-usage').textContent = storageBytesToLabeledString(estimate.usage);
-        document.querySelector('#storage-quota').textContent = storageBytesToLabeledString(estimate.quota);
+        // Firefox reports usage as 0 when persistent storage is enabled.
+        const finite = (estimate.usage > 0 || !(await isStoragePeristent()));
+        if (finite) {
+            document.querySelector('#storage-usage').textContent = storageBytesToLabeledString(estimate.usage);
+            document.querySelector('#storage-quota').textContent = storageBytesToLabeledString(estimate.quota);
+        }
+        document.querySelector('#storage-use-finite').classList.toggle('storage-hidden', !finite);
+        document.querySelector('#storage-use-infinite').classList.toggle('storage-hidden', finite);
     }
 
     storageUpdateStats.isUpdating = false;
@@ -782,7 +795,7 @@ async function storagePersistInitialize() {
     info.classList.remove('storage-hidden');
     button.classList.remove('storage-hidden');
 
-    let persisted = await navigator.storage.persisted();
+    let persisted = await isStoragePeristent();
     if (persisted) {
         checkbox.checked = true;
     }
@@ -794,6 +807,7 @@ async function storagePersistInitialize() {
         if (await navigator.storage.persist()) {
             persisted = true;
             checkbox.checked = true;
+            storageShowInfo();
         }
     }, false);
 }
