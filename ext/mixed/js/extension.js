@@ -34,7 +34,7 @@ function toIterable(value) {
         }
     }
 
-    throw 'Could not convert to iterable';
+    throw new Error('Could not convert to iterable');
 }
 
 function extensionHasChrome() {
@@ -50,6 +50,39 @@ function extensionHasBrowser() {
         return typeof browser === 'object' && browser !== null;
     } catch (e) {
         return false;
+    }
+}
+
+function errorToJson(error) {
+    return {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+    };
+}
+
+function jsonToError(jsonError) {
+    const error = new Error(jsonError.message);
+    error.name = jsonError.name;
+    error.stack = jsonError.stack;
+    return error;
+}
+
+function logError(error, alert) {
+    const manifest = chrome.runtime.getManifest();
+    let errorMessage = `${manifest.name} v${manifest.version} has encountered an error.\n`;
+    errorMessage += `Originating URL: ${window.location.href}\n`;
+
+    const errorString = `${error.toString ? error.toString() : error}`;
+    const stack = `${error.stack}`.trimRight();
+    errorMessage += (!stack.startsWith(errorString) ? `${errorString}\n${stack}` : `${stack}`);
+
+    errorMessage += '\n\nIssues can be reported at https://github.com/FooSoft/yomichan/issues';
+
+    console.error(errorMessage);
+
+    if (alert) {
+        window.alert(`${errorString}\n\nCheck the developer console for more details.`);
     }
 }
 

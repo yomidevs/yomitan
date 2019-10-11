@@ -25,7 +25,7 @@ class Database {
 
     async prepare() {
         if (this.db) {
-            throw 'Database already initialized';
+            throw new Error('Database already initialized');
         }
 
         this.db = new Dexie('dict');
@@ -48,9 +48,7 @@ class Database {
     }
 
     async purge() {
-        if (!this.db) {
-            throw 'Database not initialized';
-        }
+        this.validate();
 
         this.db.close();
         await this.db.delete();
@@ -61,9 +59,7 @@ class Database {
     }
 
     async findTerms(term, titles) {
-        if (!this.db) {
-            throw 'Database not initialized';
-        }
+        this.validate();
 
         const results = [];
         await this.db.terms.where('expression').equals(term).or('reading').equals(term).each(row => {
@@ -80,7 +76,12 @@ class Database {
         const visited = {};
         const results = [];
         const createResult = Database.createTerm;
-        const filter = (row) => titles.includes(row.dictionary);
+        const processRow = (row, index) => {
+            if (titles.includes(row.dictionary) && !visited.hasOwnProperty(row.id)) {
+                visited[row.id] = true;
+                results.push(createResult(row, index));
+            }
+        };
 
         const db = this.db.backendDB();
         const dbTransaction = db.transaction(['terms'], 'readonly');
@@ -91,8 +92,8 @@ class Database {
         for (let i = 0; i < terms.length; ++i) {
             const only = IDBKeyRange.only(terms[i]);
             promises.push(
-                Database.getAll(dbIndex1, only, i, visited, filter, createResult, results),
-                Database.getAll(dbIndex2, only, i, visited, filter, createResult, results)
+                Database.getAll(dbIndex1, only, i, processRow),
+                Database.getAll(dbIndex2, only, i, processRow)
             );
         }
 
@@ -102,9 +103,7 @@ class Database {
     }
 
     async findTermsExact(term, reading, titles) {
-        if (!this.db) {
-            throw 'Database not initialized';
-        }
+        this.validate();
 
         const results = [];
         await this.db.terms.where('expression').equals(term).each(row => {
@@ -117,9 +116,7 @@ class Database {
     }
 
     async findTermsBySequence(sequence, mainDictionary) {
-        if (!this.db) {
-            throw 'Database not initialized';
-        }
+        this.validate();
 
         const results = [];
         await this.db.terms.where('sequence').equals(sequence).each(row => {
@@ -132,9 +129,7 @@ class Database {
     }
 
     async findTermMeta(term, titles) {
-        if (!this.db) {
-            throw 'Database not initialized';
-        }
+        this.validate();
 
         const results = [];
         await this.db.termMeta.where('expression').equals(term).each(row => {
@@ -152,10 +147,13 @@ class Database {
 
     async findTermMetaBulk(terms, titles) {
         const promises = [];
-        const visited = {};
         const results = [];
         const createResult = Database.createTermMeta;
-        const filter = (row) => titles.includes(row.dictionary);
+        const processRow = (row, index) => {
+            if (titles.includes(row.dictionary)) {
+                results.push(createResult(row, index));
+            }
+        };
 
         const db = this.db.backendDB();
         const dbTransaction = db.transaction(['termMeta'], 'readonly');
@@ -164,7 +162,7 @@ class Database {
 
         for (let i = 0; i < terms.length; ++i) {
             const only = IDBKeyRange.only(terms[i]);
-            promises.push(Database.getAll(dbIndex, only, i, visited, filter, createResult, results));
+            promises.push(Database.getAll(dbIndex, only, i, processRow));
         }
 
         await Promise.all(promises);
@@ -173,9 +171,7 @@ class Database {
     }
 
     async findKanji(kanji, titles) {
-        if (!this.db) {
-            throw 'Database not initialized';
-        }
+        this.validate();
 
         const results = [];
         await this.db.kanji.where('character').equals(kanji).each(row => {
@@ -196,9 +192,7 @@ class Database {
     }
 
     async findKanjiMeta(kanji, titles) {
-        if (!this.db) {
-            throw 'Database not initialized';
-        }
+        this.validate();
 
         const results = [];
         await this.db.kanjiMeta.where('character').equals(kanji).each(row => {
@@ -224,9 +218,7 @@ class Database {
     }
 
     async findTagForTitle(name, title) {
-        if (!this.db) {
-            throw 'Database not initialized';
-        }
+        this.validate();
 
         const cache = (this.tagCache.hasOwnProperty(title) ? this.tagCache[title] : (this.tagCache[title] = {}));
 
@@ -243,17 +235,13 @@ class Database {
     }
 
     async summarize() {
-        if (this.db) {
-            return this.db.dictionaries.toArray();
-        } else {
-            throw 'Database not initialized';
-        }
+        this.validate();
+
+        return this.db.dictionaries.toArray();
     }
 
     async importDictionary(archive, progressCallback, exceptions) {
-        if (!this.db) {
-            throw 'Database not initialized';
-        }
+        this.validate();
 
         const maxTransactionLength = 1000;
         const bulkAdd = async (table, items, total, current) => {
@@ -293,12 +281,12 @@ class Database {
 
         const indexDataLoaded = async summary => {
             if (summary.version > 3) {
-                throw 'Unsupported dictionary version';
+                throw new Error('Unsupported dictionary version');
             }
 
             const count = await this.db.dictionaries.where('title').equals(summary.title).count();
             if (count > 0) {
-                throw 'Dictionary is already imported';
+                throw new Error('Dictionary is already imported');
             }
 
             await this.db.dictionaries.add(summary);
@@ -424,6 +412,12 @@ class Database {
         );
     }
 
+    validate() {
+        if (this.db === null) {
+            throw new Error('Database not initialized');
+        }
+    }
+
     static async importDictionaryZip(
         archive,
         indexDataLoaded,
@@ -437,12 +431,12 @@ class Database {
 
         const indexFile = zip.files['index.json'];
         if (!indexFile) {
-            throw 'No dictionary index found in archive';
+            throw new Error('No dictionary index found in archive');
         }
 
         const index = JSON.parse(await indexFile.async('string'));
         if (!index.title || !index.revision) {
-            throw 'Unrecognized dictionary format';
+            throw new Error('Unrecognized dictionary format');
         }
 
         const summary = {
@@ -537,39 +531,32 @@ class Database {
         };
     }
 
-    static getAll(dbIndex, query, index, visited, filter, createResult, results) {
+    static getAll(dbIndex, query, context, processRow) {
         const fn = typeof dbIndex.getAll === 'function' ? Database.getAllFast : Database.getAllUsingCursor;
-        return fn(dbIndex, query, index, visited, filter, createResult, results);
+        return fn(dbIndex, query, context, processRow);
     }
 
-    static getAllFast(dbIndex, query, index, visited, filter, createResult, results) {
+    static getAllFast(dbIndex, query, context, processRow) {
         return new Promise((resolve, reject) => {
             const request = dbIndex.getAll(query);
             request.onerror = (e) => reject(e);
             request.onsuccess = (e) => {
                 for (const row of e.target.result) {
-                    if (filter(row, index) && !visited.hasOwnProperty(row.id)) {
-                        visited[row.id] = true;
-                        results.push(createResult(row, index));
-                    }
+                    processRow(row, context);
                 }
                 resolve();
             };
         });
     }
 
-    static getAllUsingCursor(dbIndex, query, index, visited, filter, createResult, results) {
+    static getAllUsingCursor(dbIndex, query, context, processRow) {
         return new Promise((resolve, reject) => {
             const request = dbIndex.openCursor(query, 'next');
             request.onerror = (e) => reject(e);
             request.onsuccess = (e) => {
                 const cursor = e.target.result;
                 if (cursor) {
-                    const row = cursor.value;
-                    if (filter(row, index) && !visited.hasOwnProperty(row.id)) {
-                        visited[row.id] = true;
-                        results.push(createResult(row, index));
-                    }
+                    processRow(cursor.value, context);
                     cursor.continue();
                 } else {
                     resolve();

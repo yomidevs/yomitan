@@ -75,7 +75,7 @@ class Backend {
             const promise = handler(params, sender);
             promise
                 .then(result => callback({result}))
-                .catch(error => callback({error: typeof error.toString === 'function' ? error.toString() : error}));
+                .catch(error => callback(errorToJson(error)));
         }
 
         return true;
@@ -181,7 +181,7 @@ Backend.messageHandlers = {
     noteView: ({noteId}) => apiNoteView(noteId),
     templateRender: ({template, data, dynamic}) => apiTemplateRender(template, data, dynamic),
     commandExec: ({command}) => apiCommandExec(command),
-    audioGetUrl: ({definition, source}) => apiAudioGetUrl(definition, source),
+    audioGetUrl: ({definition, source, optionsContext}) => apiAudioGetUrl(definition, source, optionsContext),
     screenshotGet: ({options}, sender) => apiScreenshotGet(options, sender),
     forward: ({action, params}, sender) => apiForward(action, params, sender),
     frameInformationGet: (params, sender) => apiFrameInformationGet(sender),

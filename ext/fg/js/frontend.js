@@ -38,6 +38,9 @@ class Frontend {
         this.mouseDownPrevent = false;
         this.clickPrevent = false;
         this.scrollPrevent = false;
+
+        this.enabled = false;
+        this.eventListeners = [];
     }
 
     static create() {
@@ -53,23 +56,7 @@ class Frontend {
 
     async prepare() {
         try {
-            this.options = await apiOptionsGet(this.getOptionsContext());
-
-            window.addEventListener('message', this.onWindowMessage.bind(this));
-            window.addEventListener('mousedown', this.onMouseDown.bind(this));
-            window.addEventListener('mousemove', this.onMouseMove.bind(this));
-            window.addEventListener('mouseover', this.onMouseOver.bind(this));
-            window.addEventListener('mouseout', this.onMouseOut.bind(this));
-            window.addEventListener('resize', this.onResize.bind(this));
-
-            if (this.options.scanning.touchInputEnabled) {
-                window.addEventListener('click', this.onClick.bind(this));
-                window.addEventListener('touchstart', this.onTouchStart.bind(this));
-                window.addEventListener('touchend', this.onTouchEnd.bind(this));
-                window.addEventListener('touchcancel', this.onTouchCancel.bind(this));
-                window.addEventListener('touchmove', this.onTouchMove.bind(this), {passive: false});
-                window.addEventListener('contextmenu', this.onContextMenu.bind(this));
-            }
+            await this.updateOptions();
 
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
         } catch (e) {
@@ -88,7 +75,6 @@ class Frontend {
 
         if (
             this.pendingLookup ||
-            !this.options.general.enable ||
             (e.buttons & 0x1) !== 0x0 // Left mouse button
         ) {
             return;
@@ -145,7 +131,7 @@ class Frontend {
     }
 
     onResize() {
-        this.searchClear(true);
+        this.searchClear(false);
     }
 
     onClick(e) {
@@ -242,14 +228,57 @@ class Frontend {
     }
 
     onError(error) {
-        console.log(error);
+        logError(error, false);
+    }
+
+    setEnabled(enabled) {
+        if (enabled) {
+            if (!this.enabled) {
+                this.hookEvents();
+                this.enabled = true;
+            }
+        } else {
+            if (this.enabled) {
+                this.clearEventListeners();
+                this.enabled = false;
+            }
+            this.searchClear(false);
+        }
+    }
+
+    hookEvents() {
+        this.addEventListener(window, 'message', this.onWindowMessage.bind(this));
+        this.addEventListener(window, 'mousedown', this.onMouseDown.bind(this));
+        this.addEventListener(window, 'mousemove', this.onMouseMove.bind(this));
+        this.addEventListener(window, 'mouseover', this.onMouseOver.bind(this));
+        this.addEventListener(window, 'mouseout', this.onMouseOut.bind(this));
+        this.addEventListener(window, 'resize', this.onResize.bind(this));
+
+        if (this.options.scanning.touchInputEnabled) {
+            this.addEventListener(window, 'click', this.onClick.bind(this));
+            this.addEventListener(window, 'touchstart', this.onTouchStart.bind(this));
+            this.addEventListener(window, 'touchend', this.onTouchEnd.bind(this));
+            this.addEventListener(window, 'touchcancel', this.onTouchCancel.bind(this));
+            this.addEventListener(window, 'touchmove', this.onTouchMove.bind(this), {passive: false});
+            this.addEventListener(window, 'contextmenu', this.onContextMenu.bind(this));
+        }
+    }
+
+    addEventListener(node, type, listener, options) {
+        node.addEventListener(type, listener, options);
+        this.eventListeners.push([node, type, listener, options]);
+    }
+
+    clearEventListeners() {
+        for (const [node, type, listener, options] of this.eventListeners) {
+            node.removeEventListener(type, listener, options);
+        }
+        this.eventListeners = [];
     }
 
     async updateOptions() {
         this.options = await apiOptionsGet(this.getOptionsContext());
-        if (!this.options.enable) {
-            this.searchClear(false);
-        }
+        this.setEnabled(this.options.general.enable);
     }
 
     popupTimerSet(callback) {
@@ -452,7 +481,7 @@ class Frontend {
     searchFromTouch(x, y, cause) {
         this.popupTimerClear();
 
-        if (!this.options.general.enable || this.pendingLookup) {
+        if (this.pendingLookup) {
             return;
         }
 
@@ -527,8 +556,8 @@ Frontend.runtimeMessageHandlers = {
         self.updateOptions();
     },
 
-    popupSetVisible: (self, {visible}) => {
-        self.popup.setVisible(visible);
+    popupSetVisibleOverride: (self, {visible}) => {
+        self.popup.setVisibleOverride(visible);
     }
 };
 

@@ -74,6 +74,18 @@ const profileOptionsVersionUpdates = [
         if (utilStringHashCode(options.anki.fieldTemplates) === -250091611) {
             options.anki.fieldTemplates = profileOptionsGetDefaultFieldTemplates();
         }
+    },
+    (options) => {
+        const oldAudioSource = options.general.audioSource;
+        const disabled = oldAudioSource === 'disabled';
+        options.audio.enabled = !disabled;
+        options.audio.volume = options.general.audioVolume;
+        options.audio.autoPlay = options.general.autoPlayAudio;
+        options.audio.sources = [disabled ? 'jpod101' : oldAudioSource];
+
+        delete options.general.audioSource;
+        delete options.general.audioVolume;
+        delete options.general.autoPlayAudio;
     }
 ];
 
@@ -247,9 +259,6 @@ function profileOptionsCreateDefaults() {
     return {
         general: {
             enable: true,
-            audioSource: 'jpod101',
-            audioVolume: 100,
-            autoPlayAudio: false,
             resultOutputMode: 'group',
             debugInfo: false,
             maxResults: 32,
@@ -268,6 +277,14 @@ function profileOptionsCreateDefaults() {
             compactGlossaries: false,
             mainDictionary: '',
             customPopupCss: ''
+        },
+
+        audio: {
+            enabled: true,
+            sources: ['jpod101', 'jpod101-alternate', 'jisho', 'custom'],
+            volume: 100,
+            autoPlay: false,
+            customSourceUrl: ''
         },
 
         scanning: {
@@ -402,7 +419,7 @@ function optionsLoad() {
         chrome.storage.local.get(['options'], store => {
             const error = chrome.runtime.lastError;
             if (error) {
-                reject(error);
+                reject(new Error(error));
             } else {
                 resolve(store.options);
             }
@@ -431,7 +448,7 @@ function optionsSave(options) {
         chrome.storage.local.set({options: JSON.stringify(options)}, () => {
             const error = chrome.runtime.lastError;
             if (error) {
-                reject(error);
+                reject(new Error(error));
             } else {
                 resolve();
             }

@@ -29,7 +29,8 @@ class DisplaySearch extends Display {
         this.search = document.querySelector('#search');
         this.query = document.querySelector('#query');
         this.intro = document.querySelector('#intro');
-        this.introHidden = false;
+        this.introVisible = true;
+        this.introAnimationTimer = null;
 
         this.dependencies = Object.assign({}, this.dependencies, {docRangeFromPoint, docSentenceExtract});
 
@@ -38,12 +39,21 @@ class DisplaySearch extends Display {
         }
         if (this.query !== null) {
             this.query.addEventListener('input', () => this.onSearchInput(), false);
+
+            const query = DisplaySearch.getSearchQueryFromLocation(window.location.href);
+            if (query !== null) {
+                this.query.value = window.wanakana.toKana(query);
+                this.onSearchQueryUpdated(query, false);
+            }
+
             window.wanakana.bind(this.query);
         }
+
+        this.updateSearchButton();
     }
 
     onError(error) {
-        window.alert(`Error: ${error.toString ? error.toString() : error}`);
+        logError(error, true);
     }
 
     onSearchClear() {
@@ -56,40 +66,101 @@ class DisplaySearch extends Display {
     }
 
     onSearchInput() {
-        this.search.disabled = (this.query === null || this.query.value.length === 0);
+        this.updateSearchButton();
     }
 
-    async onSearch(e) {
+    onSearch(e) {
         if (this.query === null) {
             return;
         }
 
+        e.preventDefault();
+
+        const query = this.query.value;
+        const queryString = query.length > 0 ? `?query=${encodeURIComponent(query)}` : '';
+        window.history.replaceState(null, '', `${window.location.pathname}${queryString}`);
+        this.onSearchQueryUpdated(query, true);
+    }
+
+    async onSearchQueryUpdated(query, animate) {
         try {
-            e.preventDefault();
-            this.hideIntro();
-            const {length, definitions} = await apiTermsFind(this.query.value, this.optionsContext);
-            super.termsShow(definitions, await apiOptionsGet(this.optionsContext));
+            const valid = (query.length > 0);
+            this.setIntroVisible(!valid, animate);
+            this.updateSearchButton();
+            if (valid) {
+                const {definitions} = await apiTermsFind(query, this.optionsContext);
+                this.termsShow(definitions, await apiOptionsGet(this.optionsContext));
+            } else {
+                this.container.textContent = '';
+            }
         } catch (e) {
             this.onError(e);
         }
     }
 
-    hideIntro() {
-        if (this.introHidden) {
+    setIntroVisible(visible, animate) {
+        if (this.introVisible === visible) {
             return;
         }
 
-        this.introHidden = true;
+        this.introVisible = visible;
 
         if (this.intro === null) {
             return;
         }
 
-        const size = this.intro.getBoundingClientRect();
-        this.intro.style.height = `${size.height}px`;
-        this.intro.style.transition = 'height 0.4s ease-in-out 0s';
-        window.getComputedStyle(this.intro).getPropertyValue('height'); // Commits height so next line can start animation
+        if (this.introAnimationTimer !== null) {
+            clearTimeout(this.introAnimationTimer);
+            this.introAnimationTimer = null;
+        }
+
+        if (visible) {
+            this.showIntro(animate);
+        } else {
+            this.hideIntro(animate);
+        }
+    }
+
+    showIntro(animate) {
+        if (animate) {
+            const duration = 0.4;
+            this.intro.style.transition = '';
+            this.intro.style.height = '';
+            const size = this.intro.getBoundingClientRect();
+            this.intro.style.height = `0px`;
+            this.intro.style.transition = `height ${duration}s ease-in-out 0s`;
+            window.getComputedStyle(this.intro).getPropertyValue('height'); // Commits height so next line can start animation
+            this.intro.style.height = `${size.height}px`;
+            this.introAnimationTimer = setTimeout(() => {
+                this.intro.style.height = '';
+                this.introAnimationTimer = null;
+            }, duration * 1000);
+        } else {
+            this.intro.style.transition = '';
+            this.intro.style.height = '';
+        }
+    }
+
+    hideIntro(animate) {
+        if (animate) {
+            const duration = 0.4;
+            const size = this.intro.getBoundingClientRect();
+            this.intro.style.height = `${size.height}px`;
+            this.intro.style.transition = `height ${duration}s ease-in-out 0s`;
+            window.getComputedStyle(this.intro).getPropertyValue('height'); // Commits height so next line can start animation
+        } else {
+            this.intro.style.transition = '';
+        }
         this.intro.style.height = '0';
+    }
+
+    updateSearchButton() {
+        this.search.disabled = this.introVisible && (this.query === null || this.query.value.length === 0);
+    }
+
+    static getSearchQueryFromLocation(url) {
+        let match = /^[^\?#]*\?(?:[^&#]*&)?query=([^&#]*)/.exec(url);
+        return match !== null ? decodeURIComponent(match[1]) : null;
     }
 }
 

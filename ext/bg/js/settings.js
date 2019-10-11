@@ -26,10 +26,7 @@ async function formRead(options) {
     options.general.showGuide = $('#show-usage-guide').prop('checked');
     options.general.compactTags = $('#compact-tags').prop('checked');
     options.general.compactGlossaries = $('#compact-glossaries').prop('checked');
-    options.general.autoPlayAudio = $('#auto-play-audio').prop('checked');
     options.general.resultOutputMode = $('#result-output-mode').val();
-    options.general.audioSource = $('#audio-playback-source').val();
-    options.general.audioVolume = parseFloat($('#audio-playback-volume').val());
     options.general.debugInfo = $('#show-debug-info').prop('checked');
     options.general.showAdvanced = $('#show-advanced-options').prop('checked');
     options.general.maxResults = parseInt($('#max-displayed-results').val(), 10);
@@ -43,6 +40,11 @@ async function formRead(options) {
     options.general.popupHorizontalOffset2 = parseInt($('#popup-horizontal-offset2').val(), 0);
     options.general.popupVerticalOffset2 = parseInt($('#popup-vertical-offset2').val(), 10);
     options.general.customPopupCss = $('#custom-popup-css').val();
+
+    options.audio.enabled = $('#audio-playback-enabled').prop('checked');
+    options.audio.autoPlay = $('#auto-play-audio').prop('checked');
+    options.audio.volume = parseFloat($('#audio-playback-volume').val());
+    options.audio.customSourceUrl = $('#audio-custom-source').val();
 
     options.scanning.middleMouse = $('#middle-mouse-button-scan').prop('checked');
     options.scanning.touchInputEnabled = $('#touch-input-enabled').prop('checked');
@@ -92,10 +94,7 @@ async function formWrite(options) {
     $('#show-usage-guide').prop('checked', options.general.showGuide);
     $('#compact-tags').prop('checked', options.general.compactTags);
     $('#compact-glossaries').prop('checked', options.general.compactGlossaries);
-    $('#auto-play-audio').prop('checked', options.general.autoPlayAudio);
     $('#result-output-mode').val(options.general.resultOutputMode);
-    $('#audio-playback-source').val(options.general.audioSource);
-    $('#audio-playback-volume').val(options.general.audioVolume);
     $('#show-debug-info').prop('checked', options.general.debugInfo);
     $('#show-advanced-options').prop('checked', options.general.showAdvanced);
     $('#max-displayed-results').val(options.general.maxResults);
@@ -109,6 +108,11 @@ async function formWrite(options) {
     $('#popup-horizontal-offset2').val(options.general.popupHorizontalOffset2);
     $('#popup-vertical-offset2').val(options.general.popupVerticalOffset2);
     $('#custom-popup-css').val(options.general.customPopupCss);
+
+    $('#audio-playback-enabled').prop('checked', options.audio.enabled);
+    $('#auto-play-audio').prop('checked', options.audio.autoPlay);
+    $('#audio-playback-volume').val(options.audio.volume);
+    $('#audio-custom-source').val(options.audio.customSourceUrl);
 
     $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);
     $('#touch-input-enabled').prop('checked', options.scanning.touchInputEnabled);
@@ -154,7 +158,7 @@ function formSetupEventListeners() {
     $('#dict-file-button').click(onDictionaryImportButtonClick);
 
     $('#field-templates-reset').click(utilAsync(onAnkiFieldTemplatesReset));
-    $('input, select, textarea').not('.anki-model').not('.profile-form *').change(utilAsync(onFormOptionsChanged));
+    $('input, select, textarea').not('.anki-model').not('.ignore-form-changes *').change(utilAsync(onFormOptionsChanged));
     $('.anki-model').change(utilAsync(onAnkiModelChanged));
 }
 
@@ -244,6 +248,7 @@ async function onReady() {
     showExtensionInformation();
 
     formSetupEventListeners();
+    await audioSettingsInitialize();
     await profileOptionsSetup();
 
     storageInfoInitialize();
@@ -252,6 +257,20 @@ async function onReady() {
 }
 
 $(document).ready(utilAsync(onReady));
+
+
+/*
+ * Audio
+ */
+
+let audioSourceUI = null;
+
+async function audioSettingsInitialize() {
+    const optionsContext = getOptionsContext();
+    const options = await apiOptionsGet(optionsContext);
+    audioSourceUI = new AudioSourceUI.Container(options.audio.sources, $('.audio-source-list'), $('.audio-source-add'));
+    audioSourceUI.save = () => apiOptionsSave();
+}
 
 
 /*

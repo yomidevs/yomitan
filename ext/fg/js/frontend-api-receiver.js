@@ -46,9 +46,8 @@ class FrontendApiReceiver {
             result => {
                 this.sendResult(port, id, senderId, {result});
             },
-            e => {
-                const error = typeof e.toString === 'function' ? e.toString() : e;
-                this.sendResult(port, id, senderId, {error});
+            error => {
+                this.sendResult(port, id, senderId, {error: errorToJson(error)});
             });
     }
 

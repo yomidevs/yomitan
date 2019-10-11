@@ -65,9 +65,9 @@ class PopupProxy {
         return await this.invokeHostApi('hide', {id: this.id, changeFocus});
     }
 
-    async setVisible(visible) {
+    async setVisibleOverride(visible) {
         const id = await this.getPopupId();
-        return await this.invokeHostApi('setVisible', {id, visible});
+        return await this.invokeHostApi('setVisibleOverride', {id, visible});
     }
 
     async containsPoint(x, y) {
@@ -98,7 +98,7 @@ class PopupProxy {
 
     invokeHostApi(action, params={}) {
         if (typeof this.parentFrameId !== 'number') {
-            return Promise.reject('Invalid frame');
+            return Promise.reject(new Error('Invalid frame'));
         }
         return this.apiSender.invoke(action, params, `popup-proxy-host#${this.parentFrameId}`);
     }

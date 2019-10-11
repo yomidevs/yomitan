@@ -26,6 +26,8 @@ class Display {
         this.context = null;
         this.sequence = 0;
         this.index = 0;
+        this.audioPlaying = null;
+        this.audioFallback = null;
         this.audioCache = {};
         this.optionsContext = {};
         this.eventListeners = [];
@@ -39,11 +41,11 @@ class Display {
     }
 
     onError(error) {
-        throw 'Override me';
+        throw new Error('Override me');
     }
 
     onSearchClear() {
-        throw 'Override me';
+        throw new Error('Override me');
     }
 
     onSourceTermView(e) {
@@ -133,7 +135,7 @@ class Display {
         const entry = link.closest('.entry');
         const definitionIndex = this.entryIndexFind(entry);
         const expressionIndex = Display.indexOf(entry.querySelectorAll('.expression .action-play-audio'), link);
-        this.audioPlay(this.definitions[definitionIndex], expressionIndex);
+        this.audioPlay(this.definitions[definitionIndex], expressionIndex, definitionIndex);
     }
 
     onNoteAdd(e) {
@@ -189,7 +191,7 @@ class Display {
                 addable: options.anki.enable,
                 grouped: options.general.resultOutputMode === 'group',
                 merged: options.general.resultOutputMode === 'merge',
-                playback: options.general.audioSource !== 'disabled',
+                playback: options.audio.enabled,
                 compactGlossaries: options.general.compactGlossaries,
                 debug: options.general.debugInfo
             };
@@ -209,7 +211,7 @@ class Display {
             const {index, scroll} = context || {};
             this.entryScrollIntoView(index || 0, scroll);
 
-            if (this.options.general.autoPlayAudio && this.options.general.audioSource !== 'disabled') {
+            if (this.options.audio.enabled && this.options.audio.autoPlay) {
                 this.autoPlayAudio();
             }
 
@@ -274,7 +276,7 @@ class Display {
     }
 
     autoPlayAudio() {
-        this.audioPlay(this.definitions[0], this.firstExpressionIndex);
+        this.audioPlay(this.definitions[0], this.firstExpressionIndex, 0);
     }
 
     async adderButtonUpdate(modes, sequence) {
@@ -286,14 +288,22 @@ class Display {
 
             for (let i = 0; i < states.length; ++i) {
                 const state = states[i];
+                let noteId = null;
                 for (const mode in state) {
                     const button = this.adderButtonFind(i, mode);
                     if (button === null) {
                         continue;
                     }
 
-                    button.classList.toggle('disabled', !state[mode]);
+                    const info = state[mode];
+                    if (!info.canAdd && noteId === null && info.noteId) {
+                        noteId = info.noteId;
+                    }
+                    button.classList.toggle('disabled', !info.canAdd);
                     button.classList.remove('pending');
+                }
+                if (noteId !== null) {
+                    this.viewerButtonShow(i, noteId);
                 }
             }
         } catch (e) {
@@ -380,13 +390,9 @@ class Display {
                 if (adderButton !== null) {
                     adderButton.classList.add('disabled');
                 }
-                const viewerButton = this.viewerButtonFind(index);
-                if (viewerButton !== null) {
-                    viewerButton.classList.remove('pending', 'disabled');
-                    viewerButton.dataset.noteId = noteId;
-                }
+                this.viewerButtonShow(index, noteId);
             } else {
-                throw 'Note could note be added';
+                throw new Error('Note could not be added');
             }
         } catch (e) {
             this.onError(e);
@@ -395,37 +401,44 @@ class Display {
         }
     }
 
-    async audioPlay(definition, expressionIndex) {
+    async audioPlay(definition, expressionIndex, entryIndex) {
         try {
             this.setSpinnerVisible(true);
 
             const expression = expressionIndex === -1 ? definition : definition.expressions[expressionIndex];
-            let url = await apiAudioGetUrl(expression, this.options.general.audioSource);
-            if (!url) {
-                url = '/mixed/mp3/button.mp3';
+
+            if (this.audioPlaying !== null) {
+                this.audioPlaying.pause();
+                this.audioPlaying = null;
             }
 
-            for (const key in this.audioCache) {
-                this.audioCache[key].pause();
-            }
-
-            let audio = this.audioCache[url];
-            if (audio) {
-                audio.currentTime = 0;
-                audio.volume = this.options.general.audioVolume / 100.0;
-                audio.play();
+            const sources = this.options.audio.sources;
+            let {audio, source} = await audioGetFromSources(expression, sources, this.optionsContext, true, this.audioCache);
+            let info;
+            if (audio === null) {
+                if (this.audioFallback === null) {
+                    this.audioFallback = new Audio('/mixed/mp3/button.mp3');
+                }
+                audio = this.audioFallback;
+                info = 'Could not find audio';
             } else {
-                audio = new Audio(url);
-                audio.onloadeddata = () => {
-                    if (audio.duration === 5.694694 || audio.duration === 5.720718) {
-                        audio = new Audio('/mixed/mp3/button.mp3');
-                    }
-
-                    this.audioCache[url] = audio;
-                    audio.volume = this.options.general.audioVolume / 100.0;
-                    audio.play();
-                };
+                info = `From source ${1 + sources.indexOf(source)}: ${source}`;
             }
+
+            const button = this.audioButtonFindImage(entryIndex);
+            if (button !== null) {
+                let titleDefault = button.dataset.titleDefault;
+                if (!titleDefault) {
+                    titleDefault = button.title || "";
+                    button.dataset.titleDefault = titleDefault;
+                }
+                button.title = `${titleDefault}\n${info}`;
+            }
+
+            this.audioPlaying = audio;
+            audio.currentTime = 0;
+            audio.volume = this.options.audio.volume / 100.0;
+            audio.play();
         } catch (e) {
             this.onError(e);
         } finally {
@@ -445,7 +458,7 @@ class Display {
 
     async getScreenshot() {
         try {
-            await this.setPopupVisible(false);
+            await this.setPopupVisibleOverride(false);
             await Display.delay(1); // Wait for popup to be hidden.
 
             const {format, quality} = this.options.anki.screenshot;
@@ -454,7 +467,7 @@ class Display {
 
             return {dataUrl, format};
         } finally {
-            await this.setPopupVisible(true);
+            await this.setPopupVisibleOverride(null);
         }
     }
 
@@ -462,8 +475,8 @@ class Display {
         return this.options.general.resultOutputMode === 'merge' ? 0 : -1;
     }
 
-    setPopupVisible(visible) {
-        return apiForward('popupSetVisible', {visible});
+    setPopupVisibleOverride(visible) {
+        return apiForward('popupSetVisibleOverride', {visible});
     }
 
     setSpinnerVisible(visible) {
@@ -504,6 +517,20 @@ class Display {
         return entry !== null ? entry.querySelector('.action-view-note') : null;
     }
 
+    viewerButtonShow(index, noteId) {
+        const viewerButton = this.viewerButtonFind(index);
+        if (viewerButton === null) {
+            return;
+        }
+        viewerButton.classList.remove('pending', 'disabled');
+        viewerButton.dataset.noteId = noteId;
+    }
+
+    audioButtonFindImage(index) {
+        const entry = this.getEntry(index);
+        return entry !== null ? entry.querySelector('.action-play-audio>img') : null;
+    }
+
     static delay(time) {
         return new Promise((resolve) => setTimeout(resolve, time));
     }
@@ -539,7 +566,7 @@ class Display {
 
     static getKeyFromEvent(event) {
         const key = event.key;
-        return key.length === 1 ? key.toUpperCase() : key;
+        return (typeof key === 'string' ? (key.length === 1 ? key.toUpperCase() : key) : '');
     }
 }
 
@@ -633,7 +660,7 @@ Display.onKeyDownHandlers = {
         if (e.altKey) {
             const entry = self.getEntry(self.index);
             if (entry !== null && entry.dataset.type === 'term') {
-                self.audioPlay(self.definitions[self.index], self.firstExpressionIndex);
+                self.audioPlay(self.definitions[self.index], self.firstExpressionIndex, self.index);
             }
             return true;
         }

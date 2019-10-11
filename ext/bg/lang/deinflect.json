@@ -1186,7 +1186,7 @@
             "kanaIn": "て",
             "kanaOut": "る",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v1",
@@ -1197,7 +1197,7 @@
             "kanaIn": "いて",
             "kanaOut": "く",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1207,7 +1207,7 @@
             "kanaIn": "いで",
             "kanaOut": "ぐ",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1217,7 +1217,7 @@
             "kanaIn": "きて",
             "kanaOut": "くる",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "vk"
@@ -1227,7 +1227,7 @@
             "kanaIn": "くて",
             "kanaOut": "い",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "adj-i"
@@ -1237,7 +1237,7 @@
             "kanaIn": "して",
             "kanaOut": "す",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1247,7 +1247,7 @@
             "kanaIn": "して",
             "kanaOut": "する",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "vs"
@@ -1257,7 +1257,7 @@
             "kanaIn": "って",
             "kanaOut": "う",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1267,7 +1267,7 @@
             "kanaIn": "って",
             "kanaOut": "つ",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1277,7 +1277,7 @@
             "kanaIn": "って",
             "kanaOut": "る",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1287,7 +1287,7 @@
             "kanaIn": "んで",
             "kanaOut": "ぬ",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1297,7 +1297,7 @@
             "kanaIn": "んで",
             "kanaOut": "ぶ",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1307,7 +1307,7 @@
             "kanaIn": "んで",
             "kanaOut": "む",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1317,7 +1317,7 @@
             "kanaIn": "のたもうて",
             "kanaOut": "のたまう",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1327,7 +1327,7 @@
             "kanaIn": "いって",
             "kanaOut": "いく",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1337,7 +1337,7 @@
             "kanaIn": "おうて",
             "kanaOut": "おう",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1347,7 +1347,7 @@
             "kanaIn": "こうて",
             "kanaOut": "こう",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1357,7 +1357,7 @@
             "kanaIn": "そうて",
             "kanaOut": "そう",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1367,7 +1367,7 @@
             "kanaIn": "とうて",
             "kanaOut": "とう",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1377,7 +1377,7 @@
             "kanaIn": "行って",
             "kanaOut": "行く",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1387,7 +1387,7 @@
             "kanaIn": "逝って",
             "kanaOut": "逝く",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1397,7 +1397,7 @@
             "kanaIn": "往って",
             "kanaOut": "往く",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1407,7 +1407,7 @@
             "kanaIn": "請うて",
             "kanaOut": "請う",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1417,7 +1417,7 @@
             "kanaIn": "乞うて",
             "kanaOut": "乞う",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1427,7 +1427,7 @@
             "kanaIn": "恋うて",
             "kanaOut": "恋う",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1437,7 +1437,7 @@
             "kanaIn": "問うて",
             "kanaOut": "問う",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1447,7 +1447,7 @@
             "kanaIn": "負うて",
             "kanaOut": "負う",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1457,7 +1457,7 @@
             "kanaIn": "沿うて",
             "kanaOut": "沿う",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1467,7 +1467,7 @@
             "kanaIn": "添うて",
             "kanaOut": "添う",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1477,7 +1477,7 @@
             "kanaIn": "副うて",
             "kanaOut": "副う",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
@@ -1487,20 +1487,10 @@
             "kanaIn": "厭うて",
             "kanaOut": "厭う",
             "rulesIn": [
-              "iru"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
-            ]
-        },
-        {
-            "kanaIn": "で",
-            "kanaOut": "",
-            "rulesIn": [
-              "iru"
-            ],
-            "rulesOut": [
-                "neg-de"
             ]
         }
     ],
@@ -2233,8 +2223,7 @@
             "kanaIn": "ない",
             "kanaOut": "る",
             "rulesIn": [
-                "adj-i",
-                "neg-de"
+                "adj-i"
             ],
             "rulesOut": [
                 "v1",
@@ -2245,8 +2234,7 @@
             "kanaIn": "かない",
             "kanaOut": "く",
             "rulesIn": [
-                "adj-i",
-                "neg-de"
+                "adj-i"
             ],
             "rulesOut": [
                 "v5"
@@ -2256,8 +2244,7 @@
             "kanaIn": "がない",
             "kanaOut": "ぐ",
             "rulesIn": [
-                "adj-i",
-                "neg-de"
+                "adj-i"
             ],
             "rulesOut": [
                 "v5"
@@ -2267,8 +2254,7 @@
             "kanaIn": "くない",
             "kanaOut": "い",
             "rulesIn": [
-                "adj-i",
-                "neg-de"
+                "adj-i"
             ],
             "rulesOut": [
                 "adj-i"
@@ -2278,8 +2264,7 @@
             "kanaIn": "こない",
             "kanaOut": "くる",
             "rulesIn": [
-                "adj-i",
-                "neg-de"
+                "adj-i"
             ],
             "rulesOut": [
                 "vk"
@@ -2289,8 +2274,7 @@
             "kanaIn": "さない",
             "kanaOut": "す",
             "rulesIn": [
-                "adj-i",
-                "neg-de"
+                "adj-i"
             ],
             "rulesOut": [
                 "v5"
@@ -2300,8 +2284,7 @@
             "kanaIn": "しない",
             "kanaOut": "する",
             "rulesIn": [
-                "adj-i",
-                "neg-de"
+                "adj-i"
             ],
             "rulesOut": [
                 "vs"
@@ -2311,8 +2294,7 @@
             "kanaIn": "たない",
             "kanaOut": "つ",
             "rulesIn": [
-                "adj-i",
-                "neg-de"
+                "adj-i"
             ],
             "rulesOut": [
                 "v5"
@@ -2322,8 +2304,7 @@
             "kanaIn": "なない",
             "kanaOut": "ぬ",
             "rulesIn": [
-                "adj-i",
-                "neg-de"
+                "adj-i"
             ],
             "rulesOut": [
                 "v5"
@@ -2333,8 +2314,7 @@
             "kanaIn": "ばない",
             "kanaOut": "ぶ",
             "rulesIn": [
-                "adj-i",
-                "neg-de"
+                "adj-i"
             ],
             "rulesOut": [
                 "v5"
@@ -2344,8 +2324,7 @@
             "kanaIn": "まない",
             "kanaOut": "む",
             "rulesIn": [
-                "adj-i",
-                "neg-de"
+                "adj-i"
             ],
             "rulesOut": [
                 "v5"
@@ -2355,8 +2334,7 @@
             "kanaIn": "らない",
             "kanaOut": "る",
             "rulesIn": [
-                "adj-i",
-                "neg-de"
+                "adj-i"
             ],
             "rulesOut": [
                 "v5"
@@ -2366,8 +2344,7 @@
             "kanaIn": "わない",
             "kanaOut": "う",
             "rulesIn": [
-                "adj-i",
-                "neg-de"
+                "adj-i"
             ],
             "rulesOut": [
                 "v5"
@@ -3681,8 +3658,8 @@
     ],
     "progressive or perfect": [
         {
-            "kanaIn": "いる",
-            "kanaOut": "",
+            "kanaIn": "ている",
+            "kanaOut": "て",
             "rulesIn": [
                 "v1"
             ],
@@ -3691,8 +3668,8 @@
             ]
         },
         {
-            "kanaIn": "る",
-            "kanaOut": "",
+            "kanaIn": "ておる",
+            "kanaOut": "て",
             "rulesIn": [
                 "v1"
             ],
@@ -3701,13 +3678,53 @@
             ]
         },
         {
-            "kanaIn": "おる",
-            "kanaOut": "",
+            "kanaIn": "てる",
+            "kanaOut": "て",
             "rulesIn": [
                 "v1"
             ],
             "rulesOut": [
                 "iru"
+            ]
+        },
+        {
+            "kanaIn": "でいる",
+            "kanaOut": "で",
+            "rulesIn": [
+                "v1"
+            ],
+            "rulesOut": [
+                "iru"
+            ]
+        },
+        {
+            "kanaIn": "でおる",
+            "kanaOut": "で",
+            "rulesIn": [
+                "v1"
+            ],
+            "rulesOut": [
+                "iru"
+            ]
+        },
+        {
+            "kanaIn": "とる",
+            "kanaOut": "て",
+            "rulesIn": [
+                "v1"
+            ],
+            "rulesOut": [
+                "iru"
+            ]
+        },
+        {
+            "kanaIn": "ないでいる",
+            "kanaOut": "ない",
+            "rulesIn": [
+                "v1"
+            ],
+            "rulesOut": [
+                "adj-i"
             ]
         }
     ]
