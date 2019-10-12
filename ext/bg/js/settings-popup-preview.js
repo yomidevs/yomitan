@@ -1,0 +1,147 @@
+/*
+ * Copyright (C) 2019  Alex Yatskov <alex@foosoft.net>
+ * Author: Alex Yatskov <alex@foosoft.net>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+class SettingsPopupPreview {
+    constructor() {
+        this.frontend = null;
+        this.apiOptionsGetOld = apiOptionsGet;
+        this.popupShown = false;
+    }
+
+    static create() {
+        const instance = new SettingsPopupPreview();
+        instance.prepare();
+        return instance;
+    }
+
+    async prepare() {
+        // Setup events
+        window.addEventListener('resize', (e) => this.onWindowResize(e), false);
+        window.addEventListener('message', (e) => this.onMessage(e), false);
+
+        const themeDarkCheckbox = document.querySelector('#theme-dark-checkbox');
+        if (themeDarkCheckbox !== null) {
+            themeDarkCheckbox.addEventListener('change', () => this.onThemeDarkCheckboxChanged(themeDarkCheckbox), false);
+        }
+
+        // Overwrite API functions
+        window.apiOptionsGet = (...args) => this.apiOptionsGet(...args);
+
+        // Overwrite frontend
+        this.frontend = Frontend.create();
+        window.yomichan_frontend = this.frontend;
+
+        this.frontend.setEnabled = function () {};
+        this.frontend.searchClear = function () {};
+
+        this.frontend.popup.childrenSupported = false;
+        this.frontend.popup.interactive = false;
+
+        await this.frontend.isPrepared();
+
+        // Update search
+        this.updateSearch();
+    }
+
+    async apiOptionsGet(...args) {
+        const options = await this.apiOptionsGetOld(...args);
+        options.general.enable = true;
+        options.general.debugInfo = false;
+        options.general.popupWidth = 400;
+        options.general.popupHeight = 250;
+        options.general.popupHorizontalOffset = 0;
+        options.general.popupVerticalOffset = 10;
+        options.general.popupHorizontalOffset2 = 10;
+        options.general.popupVerticalOffset2 = 0;
+        options.general.popupHorizontalTextPosition = 'below';
+        options.general.popupVerticalTextPosition = 'before';
+        options.scanning.selectText = false;
+        return options;
+    }
+
+    onWindowResize() {
+        if (this.frontend === null) { return; }
+        const textSource = this.frontend.textSourceLast;
+        if (textSource === null) { return; }
+
+        const elementRect = textSource.getRect();
+        const writingMode = textSource.getWritingMode();
+        const options = this.frontend.options;
+        this.frontend.popup.show(elementRect, writingMode, options);
+    }
+
+    onMessage(e) {
+        const {action, params} = e.data;
+        const handlers = SettingsPopupPreview.messageHandlers;
+        if (handlers.hasOwnProperty(action)) {
+            const handler = handlers[action];
+            handler(this, params);
+        }
+    }
+
+    onThemeDarkCheckboxChanged(node) {
+        document.documentElement.classList.toggle('dark', node.checked);
+    }
+
+    setText(text) {
+        const exampleText = document.querySelector('#example-text');
+        if (exampleText === null) { return; }
+
+        exampleText.textContent = text;
+        this.updateSearch();
+    }
+
+    async updateSearch() {
+        const exampleText = document.querySelector('#example-text');
+        if (exampleText === null) { return; }
+
+        const textNode = exampleText.firstChild;
+        if (textNode === null) { return; }
+
+        const range = document.createRange();
+        range.selectNode(textNode);
+        const source = new TextSourceRange(range, range.toString(), null);
+
+        this.frontend.textSourceLast = null;
+        await this.frontend.searchSource(source, 'script');
+        await this.frontend.lastShowPromise;
+
+        if (this.frontend.popup.isVisible()) {
+            this.popupShown = true;
+        }
+
+        this.setInfoVisible(!this.popupShown);
+    }
+
+    setInfoVisible(visible) {
+        const node = document.querySelector('.placeholder-info');
+        if (node === null) { return; }
+
+        node.classList.toggle('placeholder-info-visible', visible);
+    }
+}
+
+SettingsPopupPreview.messageHandlers = {
+    setText: (self, {text}) => self.setText(text)
+};
+
+SettingsPopupPreview.instance = SettingsPopupPreview.create();
+
+
+

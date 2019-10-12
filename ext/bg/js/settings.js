@@ -248,6 +248,7 @@ async function onReady() {
     showExtensionInformation();
 
     formSetupEventListeners();
+    appearanceInitialize();
     await audioSettingsInitialize();
     await profileOptionsSetup();
 
@@ -257,6 +258,43 @@ async function onReady() {
 }
 
 $(document).ready(utilAsync(onReady));
+
+
+/*
+ * Appearance
+ */
+
+function appearanceInitialize() {
+    let previewVisible = false;
+    $('#settings-popup-preview-button').on('click', () => {
+        if (previewVisible) { return; }
+        showAppearancePreview();
+        previewVisible = true;
+    });
+}
+
+function showAppearancePreview() {
+    const container = $('#settings-popup-preview-container');
+    const buttonContainer = $('#settings-popup-preview-button-container');
+    const settings = $('#settings-popup-preview-settings');
+    const text = $('#settings-popup-preview-text');
+
+    const frame = document.createElement('iframe');
+    frame.src = '/bg/settings-popup-preview.html';
+    frame.id = 'settings-popup-preview-frame';
+
+    window.wanakana.bind(text[0]);
+
+    text.on('input', () => {
+        const action = 'setText';
+        const params = {text: text.val()};
+        frame.contentWindow.postMessage({action, params}, '*');
+    });
+
+    container.append(frame);
+    buttonContainer.remove();
+    settings.css('display', '');
+}
 
 
 /*

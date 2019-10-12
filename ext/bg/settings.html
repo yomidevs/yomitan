@@ -235,6 +235,18 @@
                     <label for="custom-popup-css">Custom popup CSS</label>
                     <div><textarea autocomplete="off" spellcheck="false" wrap="soft" id="custom-popup-css" class="form-control"></textarea></div>
                 </div>
+
+                <div class="form-group ignore-form-changes" style="display: none;" id="settings-popup-preview-settings">
+                    <label for="settings-popup-preview-text">Popup preview text</label>
+                    <input type="text" id="settings-popup-preview-text" class="form-control" value="読め">
+                </div>
+
+                <div class="form-group ignore-form-changes">
+                    <div id="settings-popup-preview-button-container">
+                        <button class="btn btn-default" id="settings-popup-preview-button">Show popup preview</button>
+                    </div>
+                    <div id="settings-popup-preview-container"></div>
+                </div>
             </div>
 
             <div>
@@ -603,6 +615,7 @@
         <script src="/mixed/lib/jquery.min.js"></script>
         <script src="/mixed/lib/bootstrap/js/bootstrap.min.js"></script>
         <script src="/mixed/lib/handlebars.min.js"></script>
+        <script src="/mixed/lib/wanakana.min.js"></script>
 
         <script src="/mixed/js/extension.js"></script>
 
