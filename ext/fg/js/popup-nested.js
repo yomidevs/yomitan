@@ -41,7 +41,8 @@ async function popupNestedInitialize(id, depth, parentFrameId, url) {
         '/fg/js/frontend-api-sender.js',
         '/fg/js/popup.js',
         '/fg/js/popup-proxy.js',
-        '/fg/js/frontend.js'
+        '/fg/js/frontend.js',
+        '/fg/js/frontend-initialize.js'
     ];
     for (const src of scriptSrcs) {
         const script = document.createElement('script');

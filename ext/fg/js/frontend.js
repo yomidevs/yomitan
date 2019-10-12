@@ -41,6 +41,9 @@ class Frontend {
 
         this.enabled = false;
         this.eventListeners = [];
+
+        this.isPreparedPromiseResolve = null;
+        this.isPreparedPromise = new Promise((resolve) => { this.isPreparedPromiseResolve = resolve; });
     }
 
     static create() {
@@ -59,9 +62,14 @@ class Frontend {
             await this.updateOptions();
 
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
+            this.isPreparedPromiseResolve();
         } catch (e) {
             this.onError(e);
         }
+    }
+
+    isPrepared() {
+        return this.isPreparedPromise;
     }
 
     onMouseOver(e) {
@@ -303,6 +311,10 @@ class Frontend {
         }
 
         const textSource = docRangeFromPoint(x, y, this.options);
+        return await this.searchSource(textSource, cause);
+    }
+
+    async searchSource(textSource, cause) {
         let hideResults = textSource === null;
         let searched = false;
         let success = false;
@@ -560,6 +572,3 @@ Frontend.runtimeMessageHandlers = {
         self.popup.setVisibleOverride(visible);
     }
 };
-
-
-window.yomichan_frontend = Frontend.create();

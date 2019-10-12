@@ -25,6 +25,7 @@ class Popup {
         this.frameId = null;
         this.parent = null;
         this.child = null;
+        this.childrenSupported = true;
         this.container = document.createElement('iframe');
         this.container.id = 'yomichan-float';
         this.container.addEventListener('mousedown', e => e.stopPropagation());
@@ -70,7 +71,8 @@ class Popup {
                         depth: this.depth,
                         parentFrameId
                     },
-                    url: this.url
+                    url: this.url,
+                    childrenSupported: this.childrenSupported
                 });
                 resolve();
             });

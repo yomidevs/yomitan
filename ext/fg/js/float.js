@@ -96,7 +96,7 @@ class DisplayFloat extends Display {
         }
     }
 
-    initialize(options, popupInfo, url) {
+    initialize(options, popupInfo, url, childrenSupported) {
         const css = options.general.customPopupCss;
         if (css) {
             this.setStyle(css);
@@ -105,7 +105,10 @@ class DisplayFloat extends Display {
         const {id, depth, parentFrameId} = popupInfo;
         this.optionsContext.depth = depth;
         this.optionsContext.url = url;
-        popupNestedInitialize(id, depth, parentFrameId, url);
+
+        if (childrenSupported) {
+            popupNestedInitialize(id, depth, parentFrameId, url);
+        }
     }
 
     setStyle(css) {
@@ -138,7 +141,7 @@ DisplayFloat.messageHandlers = {
     kanjiShow: (self, {definitions, options, context}) => self.kanjiShow(definitions, options, context),
     clearAutoPlayTimer: (self) => self.clearAutoPlayTimer(),
     orphaned: (self) => self.onOrphaned(),
-    initialize: (self, {options, popupInfo, url}) => self.initialize(options, popupInfo, url)
+    initialize: (self, {options, popupInfo, url, childrenSupported}) => self.initialize(options, popupInfo, url, childrenSupported)
 };
 
 window.yomichan_display = new DisplayFloat();

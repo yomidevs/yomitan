@@ -26,7 +26,8 @@
             "fg/js/source.js",
             "fg/js/util.js",
             "fg/js/popup-proxy-host.js",
-            "fg/js/frontend.js"
+            "fg/js/frontend.js",
+            "fg/js/frontend-initialize.js"
         ],
         "css": ["fg/css/client.css"],
         "all_frames": true
