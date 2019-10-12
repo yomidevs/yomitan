@@ -30,9 +30,27 @@
  * General
  */
 
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #333;
+    background-color: #fff;
+    margin: 0;
+    border: 0;
+    padding: 0;
+}
+
 hr {
     padding: 0px;
     margin: 0px;
+    border: 0;
+    border-top: 1px solid #eee;
+}
+
+ol, ul {
+    margin-top: 0;
+    margin-bottom: 10px;
 }
 
 #spinner {
@@ -58,6 +76,12 @@ hr {
 .entry, .note {
     padding-top: 10px;
     padding-bottom: 10px;
+}
+
+html:root.yomichan-float .entry,
+html:root.yomichan-float .note {
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .tag-default {
@@ -103,6 +127,7 @@ hr {
 
 .actions .disabled img {
     -webkit-filter: grayscale(100%);
+    filter: grayscale(100%);
     opacity: 0.25;
 }
 
@@ -111,7 +136,7 @@ hr {
 }
 
 .actions {
-    display: inline-block;
+    display: block;
     float: right;
 }
 
@@ -233,4 +258,17 @@ div.glossary-item.compact-glossary {
 
 .entry:not(.entry-current) .current {
     display: none;
+}
+
+.label {
+    display: inline;
+    padding: 0.2em 0.6em 0.3em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25em;
 }
