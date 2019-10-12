@@ -21,7 +21,6 @@ class DisplayFloat extends Display {
     constructor() {
         super(document.querySelector('#spinner'), document.querySelector('#definitions'));
         this.autoPlayAudioTimer = null;
-        this.styleNode = null;
 
         this.optionsContext = {
             depth: 0,
@@ -101,31 +100,12 @@ class DisplayFloat extends Display {
     async initialize(options, popupInfo, url, childrenSupported) {
         await super.initialize(options);
 
-        const css = options.general.customPopupCss;
-        if (css) {
-            this.setStyle(css);
-        }
-
         const {id, depth, parentFrameId} = popupInfo;
         this.optionsContext.depth = depth;
         this.optionsContext.url = url;
 
         if (childrenSupported) {
             popupNestedInitialize(id, depth, parentFrameId, url);
-        }
-    }
-
-    setStyle(css) {
-        const parent = document.head;
-
-        if (this.styleNode === null) {
-            this.styleNode = document.createElement('style');
-        }
-
-        this.styleNode.textContent = css;
-
-        if (this.styleNode.parentNode !== parent) {
-            parent.appendChild(this.styleNode);
         }
     }
 }
@@ -145,6 +125,7 @@ DisplayFloat.messageHandlers = {
     kanjiShow: (self, {definitions, context}) => self.kanjiShow(definitions, context),
     clearAutoPlayTimer: (self) => self.clearAutoPlayTimer(),
     orphaned: (self) => self.onOrphaned(),
+    setCustomCss: (self, {css}) => self.setCustomCss(css),
     initialize: (self, {options, popupInfo, url, childrenSupported}) => self.initialize(options, popupInfo, url, childrenSupported)
 };
 

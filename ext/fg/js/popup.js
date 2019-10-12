@@ -292,6 +292,10 @@ class Popup {
         this.invokeApi('kanjiShow', {definitions, context});
     }
 
+    async setCustomCss(css) {
+        this.invokeApi('setCustomCss', {css});
+    }
+
     clearAutoPlayTimer() {
         if (this.isInjected) {
             this.invokeApi('clearAutoPlayTimer');
