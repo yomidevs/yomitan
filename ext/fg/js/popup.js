@@ -79,6 +79,10 @@ class Popup {
         });
     }
 
+    isInitialized() {
+        return this.options !== null;
+    }
+
     async setOptions(options) {
         this.options = options;
     }
@@ -212,6 +216,7 @@ class Popup {
     }
 
     async showOrphaned(elementRect, writingMode, options) {
+        if (!this.isInitialized()) { return; }
         await this.show(elementRect, writingMode, options);
         this.invokeApi('orphaned');
     }
@@ -275,11 +280,13 @@ class Popup {
     }
 
     async termsShow(elementRect, writingMode, definitions, options, context) {
+        if (!this.isInitialized()) { return; }
         await this.show(elementRect, writingMode, options);
         this.invokeApi('termsShow', {definitions, options, context});
     }
 
     async kanjiShow(elementRect, writingMode, definitions, options, context) {
+        if (!this.isInitialized()) { return; }
         await this.show(elementRect, writingMode, options);
         this.invokeApi('kanjiShow', {definitions, options, context});
     }

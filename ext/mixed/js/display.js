@@ -187,6 +187,10 @@ class Display {
         throw new Error('Override me');
     }
 
+    isInitialized() {
+        return this.options !== null;
+    }
+
     async initialize(options=null) {
         await this.updateOptions(options);
         chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
@@ -236,6 +240,8 @@ class Display {
     }
 
     async termsShow(definitions, options, context) {
+        if (!this.isInitialized()) { return; }
+
         try {
             this.setEventListenersActive(false);
 
@@ -287,6 +293,8 @@ class Display {
     }
 
     async kanjiShow(definitions, options, context) {
+        if (!this.isInitialized()) { return; }
+
         try {
             this.setEventListenersActive(false);
 
