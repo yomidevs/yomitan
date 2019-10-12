@@ -39,6 +39,7 @@ async function formRead(options) {
     options.general.popupVerticalOffset = parseInt($('#popup-vertical-offset').val(), 10);
     options.general.popupHorizontalOffset2 = parseInt($('#popup-horizontal-offset2').val(), 0);
     options.general.popupVerticalOffset2 = parseInt($('#popup-vertical-offset2').val(), 10);
+    options.general.popupTheme = $('#popup-theme').val();
     options.general.customPopupCss = $('#custom-popup-css').val();
 
     options.audio.enabled = $('#audio-playback-enabled').prop('checked');
@@ -107,6 +108,7 @@ async function formWrite(options) {
     $('#popup-vertical-offset').val(options.general.popupVerticalOffset);
     $('#popup-horizontal-offset2').val(options.general.popupHorizontalOffset2);
     $('#popup-vertical-offset2').val(options.general.popupVerticalOffset2);
+    $('#popup-theme').val(options.general.popupTheme);
     $('#custom-popup-css').val(options.general.customPopupCss);
 
     $('#audio-playback-enabled').prop('checked', options.audio.enabled);
