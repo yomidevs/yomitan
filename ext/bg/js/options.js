@@ -281,7 +281,7 @@ function profileOptionsCreateDefaults() {
 
         audio: {
             enabled: true,
-            sources: ['jpod101', 'jpod101-alternate', 'jisho', 'custom'],
+            sources: ['jpod101'],
             volume: 100,
             autoPlay: false,
             customSourceUrl: ''
