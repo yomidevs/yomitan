@@ -30,8 +30,8 @@
  * General
  */
 
-html.yomichan-float,
-html.yomichan-float body {
+html.yomichan-float:not([data-yomichan-theme]),
+html.yomichan-float:not([data-yomichan-theme]) body {
     background-color: transparent;
 }
 

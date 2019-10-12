@@ -17,8 +17,7 @@
  */
 
 
-body,
-html.yomichan-float body { background-color: #ffffff; color: #333333; }
+body { background-color: #ffffff; color: #333333; }
 
 hr { border-top-color: #eeeeee; }
 
