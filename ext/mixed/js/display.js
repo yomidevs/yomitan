@@ -29,7 +29,6 @@ class Display {
         this.audioPlaying = null;
         this.audioFallback = null;
         this.audioCache = {};
-        this.optionsContext = {};
 
         this.eventListeners = [];
         this.persistentEventListeners = [];
@@ -76,7 +75,7 @@ class Display {
                 context.source.source = this.context.source;
             }
 
-            const kanjiDefs = await apiKanjiFind(link.textContent, this.optionsContext);
+            const kanjiDefs = await apiKanjiFind(link.textContent, this.getOptionsContext());
             this.kanjiShow(kanjiDefs, this.options, context);
         } catch (e) {
             this.onError(e);
@@ -99,7 +98,7 @@ class Display {
             try {
                 textSource.setEndOffset(this.options.scanning.length);
 
-                ({definitions, length} = await apiTermsFind(textSource.text(), this.optionsContext));
+                ({definitions, length} = await apiTermsFind(textSource.text(), this.getOptionsContext()));
                 if (definitions.length === 0) {
                     return false;
                 }
@@ -173,6 +172,28 @@ class Display {
                 e.preventDefault();
             }
         }
+    }
+
+    onRuntimeMessage({action, params}, sender, callback) {
+        const handlers = Display.runtimeMessageHandlers;
+        if (handlers.hasOwnProperty(action)) {
+            const handler = handlers[action];
+            handler(this, params);
+            callback();
+        }
+    }
+
+    getOptionsContext() {
+        throw new Error('Override me');
+    }
+
+    async initialize(options=null) {
+        await this.updateOptions(options);
+        chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
+    }
+
+    async updateOptions(options) {
+        this.options = options ? options : await apiOptionsGet(this.getOptionsContext());
     }
 
     setInteractive(interactive) {
@@ -314,7 +335,7 @@ class Display {
 
     async adderButtonUpdate(modes, sequence) {
         try {
-            const states = await apiDefinitionsAddable(this.definitions, modes, this.optionsContext);
+            const states = await apiDefinitionsAddable(this.definitions, modes, this.getOptionsContext());
             if (!states || sequence !== this.sequence) {
                 return;
             }
@@ -416,7 +437,7 @@ class Display {
                 }
             }
 
-            const noteId = await apiDefinitionAdd(definition, mode, context, this.optionsContext);
+            const noteId = await apiDefinitionAdd(definition, mode, context, this.getOptionsContext());
             if (noteId) {
                 const index = this.definitions.indexOf(definition);
                 const adderButton = this.adderButtonFind(index, mode);
@@ -446,7 +467,7 @@ class Display {
             }
 
             const sources = this.options.audio.sources;
-            let {audio, source} = await audioGetFromSources(expression, sources, this.optionsContext, true, this.audioCache);
+            let {audio, source} = await audioGetFromSources(expression, sources, this.getOptionsContext(), true, this.audioCache);
             let info;
             if (audio === null) {
                 if (this.audioFallback === null) {
@@ -705,4 +726,8 @@ Display.onKeyDownHandlers = {
         }
         return false;
     }
+};
+
+Display.runtimeMessageHandlers = {
+    optionsUpdate: (self) => self.updateOptions(null)
 };

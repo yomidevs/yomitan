@@ -33,23 +33,37 @@ class DisplaySearch extends Display {
         this.introAnimationTimer = null;
 
         this.dependencies = Object.assign({}, this.dependencies, {docRangeFromPoint, docSentenceExtract});
+    }
 
-        if (this.search !== null) {
-            this.search.addEventListener('click', (e) => this.onSearch(e), false);
-        }
-        if (this.query !== null) {
-            this.query.addEventListener('input', () => this.onSearchInput(), false);
+    static create() {
+        const instance = new DisplaySearch();
+        instance.prepare();
+        return instance;
+    }
 
-            const query = DisplaySearch.getSearchQueryFromLocation(window.location.href);
-            if (query !== null) {
-                this.query.value = window.wanakana.toKana(query);
-                this.onSearchQueryUpdated(query, false);
+    async prepare() {
+        try {
+            await this.initialize();
+
+            if (this.search !== null) {
+                this.search.addEventListener('click', (e) => this.onSearch(e), false);
+            }
+            if (this.query !== null) {
+                this.query.addEventListener('input', () => this.onSearchInput(), false);
+
+                const query = DisplaySearch.getSearchQueryFromLocation(window.location.href);
+                if (query !== null) {
+                    this.query.value = window.wanakana.toKana(query);
+                    this.onSearchQueryUpdated(query, false);
+                }
+
+                window.wanakana.bind(this.query);
             }
 
-            window.wanakana.bind(this.query);
+            this.updateSearchButton();
+        } catch (e) {
+            this.onError(e);
         }
-
-        this.updateSearchButton();
     }
 
     onError(error) {
@@ -89,13 +103,17 @@ class DisplaySearch extends Display {
             this.updateSearchButton();
             if (valid) {
                 const {definitions} = await apiTermsFind(query, this.optionsContext);
-                this.termsShow(definitions, await apiOptionsGet(this.optionsContext));
+                this.termsShow(definitions, this.options);
             } else {
                 this.container.textContent = '';
             }
         } catch (e) {
             this.onError(e);
         }
+    }
+
+    getOptionsContext() {
+        return this.optionsContext;
     }
 
     setIntroVisible(visible, animate) {
@@ -164,4 +182,4 @@ class DisplaySearch extends Display {
     }
 }
 
-window.yomichan_search = new DisplaySearch();
+window.yomichan_search = DisplaySearch.create();

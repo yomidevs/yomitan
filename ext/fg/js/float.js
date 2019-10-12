@@ -84,6 +84,10 @@ class DisplayFloat extends Display {
         super.onKeyDown(e);
     }
 
+    getOptionsContext() {
+        return this.optionsContext;
+    }
+
     autoPlayAudio() {
         this.clearAutoPlayTimer();
         this.autoPlayAudioTimer = window.setTimeout(() => super.autoPlayAudio(), 400);
@@ -96,7 +100,9 @@ class DisplayFloat extends Display {
         }
     }
 
-    initialize(options, popupInfo, url, childrenSupported) {
+    async initialize(options, popupInfo, url, childrenSupported) {
+        await super.initialize(options);
+
         const css = options.general.customPopupCss;
         if (css) {
             this.setStyle(css);

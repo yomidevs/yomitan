@@ -61,11 +61,7 @@ class Popup {
             const parentFrameId = (typeof this.frameId === 'number' ? this.frameId : null);
             this.container.addEventListener('load', () => {
                 this.invokeApi('initialize', {
-                    options: {
-                        general: {
-                            customPopupCss: options.general.customPopupCss
-                        }
-                    },
+                    options: options,
                     popupInfo: {
                         id: this.id,
                         depth: this.depth,
