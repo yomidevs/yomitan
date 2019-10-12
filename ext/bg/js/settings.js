@@ -280,6 +280,7 @@ function showAppearancePreview() {
     const buttonContainer = $('#settings-popup-preview-button-container');
     const settings = $('#settings-popup-preview-settings');
     const text = $('#settings-popup-preview-text');
+    const customCss = $('#custom-popup-css');
 
     const frame = document.createElement('iframe');
     frame.src = '/bg/settings-popup-preview.html';
@@ -290,6 +291,11 @@ function showAppearancePreview() {
     text.on('input', () => {
         const action = 'setText';
         const params = {text: text.val()};
+        frame.contentWindow.postMessage({action, params}, '*');
+    });
+    customCss.on('input', () => {
+        const action = 'setCustomCss';
+        const params = {css: customCss.val()};
         frame.contentWindow.postMessage({action, params}, '*');
     });
 

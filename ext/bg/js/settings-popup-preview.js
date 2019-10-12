@@ -107,6 +107,18 @@ class SettingsPopupPreview {
         this.updateSearch();
     }
 
+    setInfoVisible(visible) {
+        const node = document.querySelector('.placeholder-info');
+        if (node === null) { return; }
+
+        node.classList.toggle('placeholder-info-visible', visible);
+    }
+
+    setCustomCss(css) {
+        if (this.frontend === null) { return; }
+        this.frontend.popup.setCustomCss(css);
+    }
+
     async updateSearch() {
         const exampleText = document.querySelector('#example-text');
         if (exampleText === null) { return; }
@@ -128,17 +140,11 @@ class SettingsPopupPreview {
 
         this.setInfoVisible(!this.popupShown);
     }
-
-    setInfoVisible(visible) {
-        const node = document.querySelector('.placeholder-info');
-        if (node === null) { return; }
-
-        node.classList.toggle('placeholder-info-visible', visible);
-    }
 }
 
 SettingsPopupPreview.messageHandlers = {
-    setText: (self, {text}) => self.setText(text)
+    setText: (self, {text}) => self.setText(text),
+    setCustomCss: (self, {css}) => self.setCustomCss(css)
 };
 
 SettingsPopupPreview.instance = SettingsPopupPreview.create();
