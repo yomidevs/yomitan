@@ -85,7 +85,7 @@ class Popup {
 
     async setOptions(options) {
         this.options = options;
-        this.container.dataset.yomichanTheme = options.general.popupTheme;
+        this.updateTheme();
     }
 
     async show(elementRect, writingMode) {
@@ -268,6 +268,47 @@ class Popup {
             // This is needed for Chrome.
             window.focus();
         }
+    }
+
+    updateTheme() {
+        this.container.dataset.yomichanTheme = this.getTheme(this.options.general.popupOuterTheme);
+    }
+
+    getTheme(themeName) {
+        if (themeName === 'auto') {
+            const color = [255, 255, 255];
+            Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.documentElement).backgroundColor));
+            Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.body).backgroundColor));
+            const dark = (color[0] < 128 && color[1] < 128 && color[2] < 128);
+            themeName = dark ? 'dark' : 'default';
+        }
+
+        return themeName;
+    }
+
+    static addColor(target, color) {
+        if (color === null) { return; }
+
+        const a = color[3];
+        if (a <= 0.0) { return; }
+
+        const aInv = 1.0 - a;
+        for (let i = 0; i < 3; ++i) {
+            target[i] = target[i] * aInv + color[i] * a;
+        }
+    }
+
+    static getColorInfo(cssColor) {
+        const m = /^\s*rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d\.]+)\s*)?\)\s*$/.exec(cssColor);
+        if (m === null) { return null; }
+
+        const m4 = m[4];
+        return [
+            Number.parseInt(m[1], 10),
+            Number.parseInt(m[2], 10),
+            Number.parseInt(m[3], 10),
+            m4 ? Math.max(0.0, Math.min(1.0, Number.parseFloat(m4))) : 1.0
+        ];
     }
 
     async containsPoint(x, y) {

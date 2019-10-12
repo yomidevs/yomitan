@@ -22,6 +22,7 @@ class SettingsPopupPreview {
         this.frontend = null;
         this.apiOptionsGetOld = apiOptionsGet;
         this.popupShown = false;
+        this.themeChangeTimeout = null;
     }
 
     static create() {
@@ -97,6 +98,13 @@ class SettingsPopupPreview {
 
     onThemeDarkCheckboxChanged(node) {
         document.documentElement.classList.toggle('dark', node.checked);
+        if (this.themeChangeTimeout !== null) {
+            clearTimeout(this.themeChangeTimeout);
+        }
+        this.themeChangeTimeout = setTimeout(() => {
+            this.themeChangeTimeout = null;
+            this.frontend.popup.updateTheme();
+        }, 300);
     }
 
     setText(text) {
