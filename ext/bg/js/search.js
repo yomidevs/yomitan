@@ -31,8 +31,6 @@ class DisplaySearch extends Display {
         this.intro = document.querySelector('#intro');
         this.introVisible = true;
         this.introAnimationTimer = null;
-
-        this.dependencies = Object.assign({}, this.dependencies, {docRangeFromPoint, docSentenceExtract});
     }
 
     static create() {

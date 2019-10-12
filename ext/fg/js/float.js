@@ -28,8 +28,6 @@ class DisplayFloat extends Display {
             url: window.location.href
         };
 
-        this.dependencies = Object.assign({}, this.dependencies, {docRangeFromPoint, docSentenceExtract});
-
         window.addEventListener('message', (e) => this.onMessage(e), false);
     }
 

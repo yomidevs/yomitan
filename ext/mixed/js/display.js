@@ -35,8 +35,6 @@ class Display {
         this.interactive = false;
         this.eventListenersActive = false;
 
-        this.dependencies = {};
-
         this.windowScroll = new WindowScroll();
 
         this.setInteractive(true);
@@ -85,8 +83,6 @@ class Display {
     async onTermLookup(e) {
         try {
             e.preventDefault();
-
-            const {docRangeFromPoint, docSentenceExtract} = this.dependencies;
 
             const clickedElement = e.target;
             const textSource = docRangeFromPoint(e.clientX, e.clientY, this.options);
