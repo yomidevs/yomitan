@@ -143,8 +143,8 @@ DisplayFloat.onKeyDownHandlers = {
 };
 
 DisplayFloat.messageHandlers = {
-    termsShow: (self, {definitions, options, context}) => self.termsShow(definitions, options, context),
-    kanjiShow: (self, {definitions, options, context}) => self.kanjiShow(definitions, options, context),
+    termsShow: (self, {definitions, context}) => self.termsShow(definitions, context),
+    kanjiShow: (self, {definitions, context}) => self.kanjiShow(definitions, context),
     clearAutoPlayTimer: (self) => self.clearAutoPlayTimer(),
     orphaned: (self) => self.onOrphaned(),
     initialize: (self, {options, popupInfo, url, childrenSupported}) => self.initialize(options, popupInfo, url, childrenSupported)

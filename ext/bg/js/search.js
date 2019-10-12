@@ -103,7 +103,11 @@ class DisplaySearch extends Display {
             this.updateSearchButton();
             if (valid) {
                 const {definitions} = await apiTermsFind(query, this.optionsContext);
-                this.termsShow(definitions, this.options);
+                this.termsShow(definitions, {
+                    focus: false,
+                    sentence: null,
+                    url: window.location.href
+                });
             } else {
                 this.container.textContent = '';
             }

@@ -333,8 +333,7 @@ class Frontend {
                 if (textSource && this.options.scanning.modifier !== 'none') {
                     this.popup.showOrphaned(
                         textSource.getRect(),
-                        textSource.getWritingMode(),
-                        this.options
+                        textSource.getWritingMode()
                     );
                 }
             } else {
@@ -374,7 +373,6 @@ class Frontend {
             textSource.getRect(),
             textSource.getWritingMode(),
             definitions,
-            this.options,
             {sentence, url, focus}
         );
 
@@ -405,7 +403,6 @@ class Frontend {
             textSource.getRect(),
             textSource.getWritingMode(),
             definitions,
-            this.options,
             {sentence, url, focus}
         );
 

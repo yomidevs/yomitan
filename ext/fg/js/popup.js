@@ -41,14 +41,14 @@ class Popup {
         this.updateVisibility();
     }
 
-    inject(options) {
+    inject() {
         if (this.injectPromise === null) {
-            this.injectPromise = this.createInjectPromise(options);
+            this.injectPromise = this.createInjectPromise();
         }
         return this.injectPromise;
     }
 
-    async createInjectPromise(options) {
+    async createInjectPromise() {
         try {
             const {frameId} = await this.frameIdPromise;
             if (typeof frameId === 'number') {
@@ -62,7 +62,7 @@ class Popup {
             const parentFrameId = (typeof this.frameId === 'number' ? this.frameId : null);
             this.container.addEventListener('load', () => {
                 this.invokeApi('initialize', {
-                    options: options,
+                    options: this.options,
                     popupInfo: {
                         id: this.id,
                         depth: this.depth,
@@ -87,10 +87,10 @@ class Popup {
         this.options = options;
     }
 
-    async show(elementRect, writingMode, options) {
-        await this.inject(options);
+    async show(elementRect, writingMode) {
+        await this.inject();
 
-        const optionsGeneral = options.general;
+        const optionsGeneral = this.options.general;
         const container = this.container;
         const containerRect = container.getBoundingClientRect();
         const getPosition = (
@@ -215,9 +215,9 @@ class Popup {
         return [position, size, after];
     }
 
-    async showOrphaned(elementRect, writingMode, options) {
+    async showOrphaned(elementRect, writingMode) {
         if (!this.isInitialized()) { return; }
-        await this.show(elementRect, writingMode, options);
+        await this.show(elementRect, writingMode);
         this.invokeApi('orphaned');
     }
 
@@ -279,16 +279,16 @@ class Popup {
         return false;
     }
 
-    async termsShow(elementRect, writingMode, definitions, options, context) {
+    async termsShow(elementRect, writingMode, definitions, context) {
         if (!this.isInitialized()) { return; }
-        await this.show(elementRect, writingMode, options);
-        this.invokeApi('termsShow', {definitions, options, context});
+        await this.show(elementRect, writingMode);
+        this.invokeApi('termsShow', {definitions, context});
     }
 
-    async kanjiShow(elementRect, writingMode, definitions, options, context) {
+    async kanjiShow(elementRect, writingMode, definitions, context) {
         if (!this.isInitialized()) { return; }
-        await this.show(elementRect, writingMode, options);
-        this.invokeApi('kanjiShow', {definitions, options, context});
+        await this.show(elementRect, writingMode);
+        this.invokeApi('kanjiShow', {definitions, context});
     }
 
     clearAutoPlayTimer() {

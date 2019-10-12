@@ -76,7 +76,7 @@ class Display {
             }
 
             const kanjiDefs = await apiKanjiFind(link.textContent, this.getOptionsContext());
-            this.kanjiShow(kanjiDefs, this.options, context);
+            this.kanjiShow(kanjiDefs, context);
         } catch (e) {
             this.onError(e);
         }
@@ -125,7 +125,7 @@ class Display {
                 context.source.source = this.context.source;
             }
 
-            this.termsShow(definitions, this.options, context);
+            this.termsShow(definitions, context);
         } catch (e) {
             this.onError(e);
         }
@@ -239,10 +239,12 @@ class Display {
         });
     }
 
-    async termsShow(definitions, options, context) {
+    async termsShow(definitions, context) {
         if (!this.isInitialized()) { return; }
 
         try {
+            const options = this.options;
+
             this.setEventListenersActive(false);
 
             if (!context || context.focus !== false) {
@@ -250,7 +252,6 @@ class Display {
             }
 
             this.definitions = definitions;
-            this.options = options;
             this.context = context;
 
             const sequence = ++this.sequence;
@@ -280,7 +281,7 @@ class Display {
             const {index, scroll} = context || {};
             this.entryScrollIntoView(index || 0, scroll);
 
-            if (this.options.audio.enabled && this.options.audio.autoPlay) {
+            if (options.audio.enabled && options.audio.autoPlay) {
                 this.autoPlayAudio();
             }
 
@@ -292,10 +293,12 @@ class Display {
         }
     }
 
-    async kanjiShow(definitions, options, context) {
+    async kanjiShow(definitions, context) {
         if (!this.isInitialized()) { return; }
 
         try {
+            const options = this.options;
+
             this.setEventListenersActive(false);
 
             if (!context || context.focus !== false) {
@@ -303,7 +306,6 @@ class Display {
             }
 
             this.definitions = definitions;
-            this.options = options;
             this.context = context;
 
             const sequence = ++this.sequence;
@@ -415,7 +417,7 @@ class Display {
                 source: this.context.source.source
             };
 
-            this.termsShow(this.context.source.definitions, this.options, context);
+            this.termsShow(this.context.source.definitions, context);
         }
     }
 
