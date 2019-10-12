@@ -287,6 +287,7 @@ class Frontend {
     async updateOptions() {
         this.options = await apiOptionsGet(this.getOptionsContext());
         this.setEnabled(this.options.general.enable);
+        await this.popup.setOptions(this.options);
     }
 
     popupTimerSet(callback) {

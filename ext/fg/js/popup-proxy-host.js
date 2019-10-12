@@ -38,6 +38,7 @@ class PopupProxyHost {
 
         this.apiReceiver = new FrontendApiReceiver(`popup-proxy-host#${frameId}`, {
             createNestedPopup: ({parentId}) => this.createNestedPopup(parentId),
+            setOptions: ({id, options}) => this.setOptions(id, options),
             show: ({id, elementRect, options}) => this.show(id, elementRect, options),
             showOrphaned: ({id, elementRect, options}) => this.show(id, elementRect, options),
             hide: ({id, changeFocus}) => this.hide(id, changeFocus),
@@ -84,6 +85,11 @@ class PopupProxyHost {
             y += popupRect.y;
         }
         return new DOMRect(x, y, jsonRect.width, jsonRect.height);
+    }
+
+    async setOptions(id, options) {
+        const popup = this.getPopup(id);
+        return await popup.setOptions(options);
     }
 
     async show(id, elementRect, options) {

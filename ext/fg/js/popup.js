@@ -37,6 +37,7 @@ class Popup {
         this.isInjected = false;
         this.visible = false;
         this.visibleOverride = null;
+        this.options = null;
         this.updateVisibility();
     }
 
@@ -76,6 +77,10 @@ class Popup {
             this.onFullscreenChanged();
             this.isInjected = true;
         });
+    }
+
+    async setOptions(options) {
+        this.options = options;
     }
 
     async show(elementRect, writingMode, options) {
