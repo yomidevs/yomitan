@@ -30,14 +30,17 @@ class Display {
         this.audioFallback = null;
         this.audioCache = {};
         this.optionsContext = {};
+
         this.eventListeners = [];
+        this.persistentEventListeners = [];
+        this.interactive = false;
+        this.eventListenersActive = false;
 
         this.dependencies = {};
 
         this.windowScroll = new WindowScroll();
 
-        document.addEventListener('keydown', this.onKeyDown.bind(this));
-        document.addEventListener('wheel', this.onWheel.bind(this), {passive: false});
+        this.setInteractive(true);
     }
 
     onError(error) {
@@ -172,9 +175,48 @@ class Display {
         }
     }
 
+    setInteractive(interactive) {
+        interactive = !!interactive;
+        if (this.interactive === interactive) { return; }
+        this.interactive = interactive;
+
+        if (interactive) {
+            Display.addEventListener(this.persistentEventListeners, document, 'keydown', this.onKeyDown.bind(this), false);
+            Display.addEventListener(this.persistentEventListeners, document, 'wheel', this.onWheel.bind(this), {passive: false});
+        } else {
+            Display.clearEventListeners(this.persistentEventListeners);
+        }
+        this.setEventListenersActive(this.eventListenersActive);
+    }
+
+    setEventListenersActive(active) {
+        active = !!active && this.interactive;
+        if (this.eventListenersActive === active) { return; }
+        this.eventListenersActive = active;
+
+        if (active) {
+            this.addEventListeners('.action-add-note', 'click', this.onNoteAdd.bind(this));
+            this.addEventListeners('.action-view-note', 'click', this.onNoteView.bind(this));
+            this.addEventListeners('.action-play-audio', 'click', this.onAudioPlay.bind(this));
+            this.addEventListeners('.kanji-link', 'click', this.onKanjiLookup.bind(this));
+            this.addEventListeners('.source-term', 'click', this.onSourceTermView.bind(this));
+            if (this.options.scanning.enablePopupSearch) {
+                this.addEventListeners('.glossary-item', 'click', this.onTermLookup.bind(this));
+            }
+        } else {
+            Display.clearEventListeners(this.eventListeners);
+        }
+    }
+
+    addEventListeners(selector, type, listener, options) {
+        this.container.querySelectorAll(selector).forEach((node) => {
+            Display.addEventListener(this.eventListeners, node, type, listener, options);
+        });
+    }
+
     async termsShow(definitions, options, context) {
         try {
-            this.clearEventListeners();
+            this.setEventListenersActive(false);
 
             if (!context || context.focus !== false) {
                 window.focus();
@@ -215,14 +257,7 @@ class Display {
                 this.autoPlayAudio();
             }
 
-            this.addEventListeners('.action-add-note', 'click', this.onNoteAdd.bind(this));
-            this.addEventListeners('.action-view-note', 'click', this.onNoteView.bind(this));
-            this.addEventListeners('.action-play-audio', 'click', this.onAudioPlay.bind(this));
-            this.addEventListeners('.kanji-link', 'click', this.onKanjiLookup.bind(this));
-            this.addEventListeners('.source-term', 'click', this.onSourceTermView.bind(this));
-            if (this.options.scanning.enablePopupSearch) {
-                this.addEventListeners('.glossary-item', 'click', this.onTermLookup.bind(this));
-            }
+            this.setEventListenersActive(true);
 
             await this.adderButtonUpdate(['term-kanji', 'term-kana'], sequence);
         } catch (e) {
@@ -232,7 +267,7 @@ class Display {
 
     async kanjiShow(definitions, options, context) {
         try {
-            this.clearEventListeners();
+            this.setEventListenersActive(false);
 
             if (!context || context.focus !== false) {
                 window.focus();
@@ -265,9 +300,7 @@ class Display {
             const {index, scroll} = context || {};
             this.entryScrollIntoView(index || 0, scroll);
 
-            this.addEventListeners('.action-add-note', 'click', this.onNoteAdd.bind(this));
-            this.addEventListeners('.action-view-note', 'click', this.onNoteView.bind(this));
-            this.addEventListeners('.source-term', 'click', this.onSourceTermView.bind(this));
+            this.setEventListenersActive(true);
 
             await this.adderButtonUpdate(['kanji'], sequence);
         } catch (e) {
@@ -544,18 +577,16 @@ class Display {
         return -1;
     }
 
-    addEventListeners(selector, type, listener, options) {
-        this.container.querySelectorAll(selector).forEach((node) => {
-            node.addEventListener(type, listener, options);
-            this.eventListeners.push([node, type, listener, options]);
-        });
+    static addEventListener(eventListeners, object, type, listener, options) {
+        object.addEventListener(type, listener, options);
+        eventListeners.push([object, type, listener, options]);
     }
 
-    clearEventListeners() {
-        for (const [node, type, listener, options] of this.eventListeners) {
-            node.removeEventListener(type, listener, options);
+    static clearEventListeners(eventListeners) {
+        for (const [object, type, listener, options] of eventListeners) {
+            object.removeEventListener(type, listener, options);
         }
-        this.eventListeners = [];
+        eventListeners.length = 0;
     }
 
     static getElementTop(element) {
