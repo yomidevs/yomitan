@@ -194,6 +194,17 @@ class Display {
 
     async updateOptions(options) {
         this.options = options ? options : await apiOptionsGet(this.getOptionsContext());
+        this.updateTheme(this.options.general.popupTheme);
+    }
+
+    updateTheme(themeName) {
+        document.documentElement.dataset.yomichanTheme = themeName;
+
+        const stylesheets = document.querySelectorAll('link[data-yomichan-theme-name]');
+        for (const stylesheet of stylesheets) {
+            const match = (stylesheet.dataset.yomichanThemeName === themeName);
+            stylesheet.rel = (match ? 'stylesheet' : 'stylesheet alternate');
+        }
     }
 
     setInteractive(interactive) {

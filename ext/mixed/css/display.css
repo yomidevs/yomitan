@@ -30,12 +30,15 @@
  * General
  */
 
+html.yomichan-float,
+html.yomichan-float body {
+    background-color: transparent;
+}
+
 body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 14px;
     line-height: 1.42857143;
-    color: #333;
-    background-color: #fff;
     margin: 0;
     border: 0;
     padding: 0;
@@ -45,7 +48,8 @@ hr {
     padding: 0px;
     margin: 0px;
     border: 0;
-    border-top: 1px solid #eee;
+    border-top-width: 1px;
+    border-top-style: solid;
 }
 
 ol, ul {
@@ -84,42 +88,6 @@ html:root.yomichan-float .note {
     padding-right: 10px;
 }
 
-.tag-default {
-    background-color: #8a8a91;
-}
-
-.tag-name {
-    background-color: #5cb85c;
-}
-
-.tag-expression {
-    background-color: #f0ad4e;
-}
-
-.tag-popular {
-    background-color: #0275d8;
-}
-
-.tag-frequent {
-    background-color: #5bc0de;
-}
-
-.tag-archaism {
-    background-color: #d9534f;
-}
-
-.tag-dictionary {
-    background-color: #aa66cc;
-}
-
-.tag-frequency {
-    background-color: #5cb85c;
-}
-
-.tag-partOfSpeech {
-    background-color: #565656;
-}
-
 .actions .disabled {
     pointer-events: none;
     cursor: default;
@@ -152,17 +120,9 @@ html:root.yomichan-float .note {
 }
 
 .expression .kanji-link {
-    border-bottom: 1px #777 dashed;
-    color: #333;
+    border-bottom-width: 1px;
+    border-bottom-style: dashed;
     text-decoration: none;
-}
-
-.expression-popular, .expression-popular .kanji-link {
-    color: #0275d8;
-}
-
-.expression-rare, .expression-rare .kanji-link {
-    color: #999;
 }
 
 .expression .peek-wrapper {
@@ -198,7 +158,6 @@ html:root.yomichan-float .note {
 }
 
 .reasons {
-    color: #777;
     display: inline-block;
 }
 
@@ -222,14 +181,6 @@ html:root.yomichan-float .note {
 
 .glossary .compact-glossary li:not(:first-child):before {
     content: " | ";
-}
-
-.glossary li {
-    color: #777;
-}
-
-.glossary-item {
-    color: #000;
 }
 
 div.glossary-item.compact-glossary {
@@ -266,7 +217,6 @@ div.glossary-item.compact-glossary {
     font-size: 75%;
     font-weight: 700;
     line-height: 1;
-    color: #fff;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;

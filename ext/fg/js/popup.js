@@ -85,6 +85,7 @@ class Popup {
 
     async setOptions(options) {
         this.options = options;
+        this.container.dataset.yomichanTheme = options.general.popupTheme;
     }
 
     async show(elementRect, writingMode) {
