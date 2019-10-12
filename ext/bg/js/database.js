@@ -58,19 +58,6 @@ class Database {
         await this.prepare();
     }
 
-    async findTerms(term, titles) {
-        this.validate();
-
-        const results = [];
-        await this.db.terms.where('expression').equals(term).or('reading').equals(term).each(row => {
-            if (titles.includes(row.dictionary)) {
-                results.push(Database.createTerm(row));
-            }
-        });
-
-        return results;
-    }
-
     async findTermsBulk(terms, titles) {
         const promises = [];
         const visited = {};
@@ -122,23 +109,6 @@ class Database {
         await this.db.terms.where('sequence').equals(sequence).each(row => {
             if (row.dictionary === mainDictionary) {
                 results.push(Database.createTerm(row));
-            }
-        });
-
-        return results;
-    }
-
-    async findTermMeta(term, titles) {
-        this.validate();
-
-        const results = [];
-        await this.db.termMeta.where('expression').equals(term).each(row => {
-            if (titles.includes(row.dictionary)) {
-                results.push({
-                    mode: row.mode,
-                    data: row.data,
-                    dictionary: row.dictionary
-                });
             }
         });
 
