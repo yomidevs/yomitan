@@ -51,12 +51,6 @@ class PopupProxy {
         return await this.invokeHostApi('setOptions', {id, options});
     }
 
-    async show(elementRect, options) {
-        const id = await this.getPopupId();
-        elementRect = PopupProxy.DOMRectToJson(elementRect);
-        return await this.invokeHostApi('show', {id, elementRect, options});
-    }
-
     async showOrphaned(elementRect, options) {
         const id = await this.getPopupId();
         elementRect = PopupProxy.DOMRectToJson(elementRect);
