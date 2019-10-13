@@ -58,3 +58,16 @@ async function audioGetFromSources(expression, sources, optionsContext, createAu
     }
     return {audio: null, source: null};
 }
+
+function audioGetTextToSpeechVoice(voiceURI) {
+    try {
+        for (const voice of speechSynthesis.getVoices()) {
+            if (voice.voiceURI === voiceURI) {
+                return voice;
+            }
+        }
+    } catch (e) {
+        // NOP
+    }
+    return null;
+}

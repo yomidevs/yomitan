@@ -48,6 +48,7 @@ async function formRead(options) {
     options.audio.autoPlay = $('#auto-play-audio').prop('checked');
     options.audio.volume = parseFloat($('#audio-playback-volume').val());
     options.audio.customSourceUrl = $('#audio-custom-source').val();
+    options.audio.textToSpeechVoice = $('#text-to-speech-voice').val();
 
     options.scanning.middleMouse = $('#middle-mouse-button-scan').prop('checked');
     options.scanning.touchInputEnabled = $('#touch-input-enabled').prop('checked');
@@ -119,6 +120,7 @@ async function formWrite(options) {
     $('#auto-play-audio').prop('checked', options.audio.autoPlay);
     $('#audio-playback-volume').val(options.audio.volume);
     $('#audio-custom-source').val(options.audio.customSourceUrl);
+    $('#text-to-speech-voice').val(options.audio.textToSpeechVoice).attr('data-value', options.audio.textToSpeechVoice);
 
     $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);
     $('#touch-input-enabled').prop('checked', options.scanning.touchInputEnabled);
@@ -326,6 +328,77 @@ async function audioSettingsInitialize() {
     const options = await apiOptionsGet(optionsContext);
     audioSourceUI = new AudioSourceUI.Container(options.audio.sources, $('.audio-source-list'), $('.audio-source-add'));
     audioSourceUI.save = () => apiOptionsSave();
+
+    textToSpeechInitialize();
+}
+
+function textToSpeechInitialize() {
+    if (typeof speechSynthesis === 'undefined') { return; }
+
+    speechSynthesis.addEventListener('voiceschanged', () => updateTextToSpeechVoices(), false);
+    updateTextToSpeechVoices();
+
+    $('#text-to-speech-voice-test').on('click', () => textToSpeechTest());
+}
+
+function updateTextToSpeechVoices() {
+    const voices = Array.prototype.map.call(speechSynthesis.getVoices(), (voice, index) => ({voice, index}));
+    voices.sort(textToSpeechVoiceCompare);
+    if (voices.length > 0) {
+        $('#text-to-speech-voice-container').css('display', '');
+    }
+
+    const select = $('#text-to-speech-voice');
+    select.empty();
+    select.append($('<option>').val('').text('None'));
+    for (const {voice} of voices) {
+        select.append($('<option>').val(voice.voiceURI).text(`${voice.name} (${voice.lang})`));
+    }
+
+    select.val(select.attr('data-value'));
+}
+
+function compareLanguageTags(a, b) {
+    if (a.substr(0, 3) === 'ja-') {
+        return (b.substr(0, 3) === 'ja-') ? 0 : -1;
+    } else {
+        return (b.substr(0, 3) === 'ja-') ? 1 : 0;
+    }
+}
+
+function textToSpeechVoiceCompare(a, b) {
+    const i = compareLanguageTags(a.voice.lang, b.voice.lang);
+    if (i !== 0) { return i; }
+
+    if (a.voice.default) {
+        if (!b.voice.default) {
+            return -1;
+        }
+    } else if (b.voice.default) {
+        return 1;
+    }
+
+    if (a.index < b.index) { return -1; }
+    if (a.index > b.index) { return 1; }
+    return 0;
+}
+
+function textToSpeechTest() {
+    try {
+        const text = $('#text-to-speech-voice-test').attr('data-speech-text') || '';
+        const voiceURI = $('#text-to-speech-voice').val();
+        const voice = audioGetTextToSpeechVoice(voiceURI);
+        if (voice === null) { return; }
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ja-JP';
+        utterance.voice = voice;
+        utterance.volume = 1.0;
+
+        speechSynthesis.speak(utterance);
+    } catch (e) {
+        // NOP
+    }
 }
 
 

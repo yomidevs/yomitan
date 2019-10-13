@@ -287,7 +287,8 @@ function profileOptionsCreateDefaults() {
             sources: ['jpod101'],
             volume: 100,
             autoPlay: false,
-            customSourceUrl: ''
+            customSourceUrl: '',
+            textToSpeechVoice: ''
         },
 
         scanning: {

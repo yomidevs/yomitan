@@ -293,6 +293,16 @@
                     <input type="number" min="0" max="100" id="audio-playback-volume" class="form-control">
                 </div>
 
+                <div class="form-group" style="display: none;" id="text-to-speech-voice-container">
+                    <label for="text-to-speech-voice">Text-to-speech voice</label>
+                    <div class="input-group">
+                        <select class="form-control" id="text-to-speech-voice"></select>
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="text-to-speech-voice-test" title="Test voice" data-speech-text="よみちゃん"><span class="glyphicon glyphicon-volume-up"></span></button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group options-advanced">
                     <label for="audio-custom-source">Custom audio source <span class="label-light">(URL)</span></label>
                     <input type="text" id="audio-custom-source" class="form-control" placeholder="Example: http://localhost/audio.mp3?expression={expression}&reading={reading}">
@@ -658,6 +668,7 @@
         <script src="/bg/js/profile-conditions.js"></script>
         <script src="/bg/js/templates.js"></script>
         <script src="/bg/js/util.js"></script>
+        <script src="/mixed/js/audio.js"></script>
 
         <script src="/bg/js/settings-profiles.js"></script>
         <script src="/bg/js/settings.js"></script>
