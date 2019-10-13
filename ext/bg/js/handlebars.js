@@ -75,6 +75,10 @@ function handlebarsMultiLine(options) {
     return options.fn(this).split('\n').join('<br>');
 }
 
+function handlebarsSanitizeCssClass(options) {
+    return options.fn(this).replace(/[^_a-z0-9\u00a0-\uffff]/ig, '_');
+}
+
 function handlebarsRegisterHelpers() {
     if (Handlebars.partials !== Handlebars.templates) {
         Handlebars.partials = Handlebars.templates;
@@ -83,6 +87,7 @@ function handlebarsRegisterHelpers() {
         Handlebars.registerHelper('furiganaPlain', handlebarsFuriganaPlain);
         Handlebars.registerHelper('kanjiLinks', handlebarsKanjiLinks);
         Handlebars.registerHelper('multiLine', handlebarsMultiLine);
+        Handlebars.registerHelper('sanitizeCssClass', handlebarsSanitizeCssClass);
     }
 }
 
