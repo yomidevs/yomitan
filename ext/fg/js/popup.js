@@ -27,7 +27,7 @@ class Popup {
         this.child = null;
         this.childrenSupported = true;
         this.container = document.createElement('iframe');
-        this.container.id = 'yomichan-float';
+        this.container.className = 'yomichan-float';
         this.container.addEventListener('mousedown', e => e.stopPropagation());
         this.container.addEventListener('scroll', e => e.stopPropagation());
         this.container.setAttribute('src', chrome.extension.getURL('/fg/float.html'));
