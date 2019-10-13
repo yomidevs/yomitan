@@ -93,20 +93,14 @@ const audioUrlBuilders = {
     }
 };
 
-async function audioBuildUrl(definition, mode, optionsContext, cache={}) {
-    const cacheKey = `${mode}:${definition.expression}`;
-    if (cache.hasOwnProperty(cacheKey)) {
-        return Promise.resolve(cache[cacheKey]);
-    }
-
+async function audioGetUrl(definition, mode, optionsContext, download) {
     if (audioUrlBuilders.hasOwnProperty(mode)) {
         const handler = audioUrlBuilders[mode];
-        return handler(definition, optionsContext).then(
-            (url) => {
-                cache[cacheKey] = url;
-                return url;
-            },
-            () => null);
+        try {
+            return await handler(definition, optionsContext, download);
+        } catch (e) {
+            // NOP
+        }
     }
     return null;
 }

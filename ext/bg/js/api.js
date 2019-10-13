@@ -176,7 +176,7 @@ apiCommandExec.handlers = {
 };
 
 async function apiAudioGetUrl(definition, source, optionsContext) {
-    return audioBuildUrl(definition, source, optionsContext);
+    return audioGetUrl(definition, source, optionsContext);
 }
 
 async function apiInjectScreenshot(definition, fields, screenshot) {
