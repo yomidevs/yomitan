@@ -229,13 +229,29 @@ class TextSourceRange {
     }
 
     static getElementWritingMode(element) {
-        if (element === null) {
-            return 'horizontal-tb';
+        if (element !== null) {
+            const style = window.getComputedStyle(element);
+            const writingMode = style.writingMode;
+            if (typeof writingMode === 'string') {
+                TextSourceRange.normalizeWritingMode(writingMode);
+            }
         }
+        return 'horizontal-tb';
+    }
 
-        const style = window.getComputedStyle(element);
-        const writingMode = style.writingMode;
-        return typeof writingMode === 'string' ? writingMode : 'horizontal-tb';
+    static normalizeWritingMode(writingMode) {
+        switch (writingMode) {
+            case 'lr':
+            case 'lr-tb':
+            case 'rl':
+                return 'horizontal-tb';
+            case 'tb':
+                return 'vertical-lr';
+            case 'tb-rl':
+                return 'vertical-rl';
+            default:
+                return writingMode;
+        }
     }
 
     static getNodesInRange(range) {
