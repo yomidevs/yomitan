@@ -64,3 +64,7 @@ function apiForward(action, params) {
 function apiFrameInformationGet() {
     return utilInvoke('frameInformationGet');
 }
+
+function apiInjectStylesheet(css) {
+    return utilInvoke('injectStylesheet', {css});
+}
