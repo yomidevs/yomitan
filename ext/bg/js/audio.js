@@ -86,6 +86,24 @@ const audioUrlBuilders = {
 
         throw new Error('Failed to find audio URL');
     },
+    'text-to-speech': async (definition, optionsContext) => {
+        const options = await apiOptionsGet(optionsContext);
+        const voiceURI = options.audio.textToSpeechVoice;
+        if (!voiceURI) {
+            throw new Error('No voice');
+        }
+
+        return `tts:?text=${encodeURIComponent(definition.expression)}&voice=${encodeURIComponent(voiceURI)}`;
+    },
+    'text-to-speech-reading': async (definition, optionsContext) => {
+        const options = await apiOptionsGet(optionsContext);
+        const voiceURI = options.audio.textToSpeechVoice;
+        if (!voiceURI) {
+            throw new Error('No voice');
+        }
+
+        return `tts:?text=${encodeURIComponent(definition.reading || definition.expression)}&voice=${encodeURIComponent(voiceURI)}`;
+    },
     'custom': async (definition, optionsContext) => {
         const options = await apiOptionsGet(optionsContext);
         const customSourceUrl = options.audio.customSourceUrl;

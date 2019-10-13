@@ -197,6 +197,7 @@ class Display {
         this.options = options ? options : await apiOptionsGet(this.getOptionsContext());
         this.updateTheme(this.options.general.popupTheme);
         this.setCustomCss(this.options.general.customPopupCss);
+        audioPrepareTextToSpeech(this.options);
     }
 
     updateTheme(themeName) {
