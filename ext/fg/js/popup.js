@@ -271,19 +271,16 @@ class Popup {
     }
 
     updateTheme() {
-        this.container.dataset.yomichanTheme = this.getTheme(this.options.general.popupOuterTheme);
+        this.container.dataset.yomichanTheme = this.options.general.popupOuterTheme;
+        this.container.dataset.yomichanSiteColor = this.getSiteColor();
     }
 
-    getTheme(themeName) {
-        if (themeName === 'auto') {
-            const color = [255, 255, 255];
-            Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.documentElement).backgroundColor));
-            Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.body).backgroundColor));
-            const dark = (color[0] < 128 && color[1] < 128 && color[2] < 128);
-            themeName = dark ? 'dark' : 'default';
-        }
-
-        return themeName;
+    getSiteColor() {
+        const color = [255, 255, 255];
+        Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.documentElement).backgroundColor));
+        Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.body).backgroundColor));
+        const dark = (color[0] < 128 && color[1] < 128 && color[2] < 128);
+        return dark ? 'dark' : 'light';
     }
 
     static addColor(target, color) {
