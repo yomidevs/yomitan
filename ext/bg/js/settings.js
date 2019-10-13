@@ -285,6 +285,7 @@ function showAppearancePreview() {
     const settings = $('#settings-popup-preview-settings');
     const text = $('#settings-popup-preview-text');
     const customCss = $('#custom-popup-css');
+    const customOuterCss = $('#custom-popup-outer-css');
 
     const frame = document.createElement('iframe');
     frame.src = '/bg/settings-popup-preview.html';
@@ -300,6 +301,11 @@ function showAppearancePreview() {
     customCss.on('input', () => {
         const action = 'setCustomCss';
         const params = {css: customCss.val()};
+        frame.contentWindow.postMessage({action, params}, '*');
+    });
+    customOuterCss.on('input', () => {
+        const action = 'setCustomOuterCss';
+        const params = {css: customOuterCss.val()};
         frame.contentWindow.postMessage({action, params}, '*');
     });
 

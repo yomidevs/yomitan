@@ -127,6 +127,11 @@ class SettingsPopupPreview {
         this.frontend.popup.setCustomCss(css);
     }
 
+    setCustomOuterCss(css) {
+        if (this.frontend === null) { return; }
+        this.frontend.popup.setCustomOuterCss(css, true);
+    }
+
     async updateSearch() {
         const exampleText = document.querySelector('#example-text');
         if (exampleText === null) { return; }
@@ -152,7 +157,8 @@ class SettingsPopupPreview {
 
 SettingsPopupPreview.messageHandlers = {
     setText: (self, {text}) => self.setText(text),
-    setCustomCss: (self, {css}) => self.setCustomCss(css)
+    setCustomCss: (self, {css}) => self.setCustomCss(css),
+    setCustomOuterCss: (self, {css}) => self.setCustomOuterCss(css)
 };
 
 SettingsPopupPreview.instance = SettingsPopupPreview.create();
