@@ -920,7 +920,14 @@ async function storagePersistInitialize() {
         if (persisted) {
             return;
         }
-        if (await navigator.storage.persist()) {
+        let result = false;
+        try {
+            result = await navigator.storage.persist();
+        } catch (e) {
+            // NOP
+        }
+
+        if (result) {
             persisted = true;
             checkbox.checked = true;
             storageShowInfo();
