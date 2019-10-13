@@ -21,6 +21,7 @@ class SettingsPopupPreview {
     constructor() {
         this.frontend = null;
         this.apiOptionsGetOld = apiOptionsGet;
+        this.popupInjectOuterStylesheetOld = Popup.injectOuterStylesheet;
         this.popupShown = false;
         this.themeChangeTimeout = null;
     }
@@ -56,6 +57,9 @@ class SettingsPopupPreview {
 
         await this.frontend.isPrepared();
 
+        // Overwrite popup
+        Popup.injectOuterStylesheet = (...args) => this.popupInjectOuterStylesheet(...args);
+
         // Update search
         this.updateSearch();
     }
@@ -74,6 +78,19 @@ class SettingsPopupPreview {
         options.general.popupVerticalTextPosition = 'before';
         options.scanning.selectText = false;
         return options;
+    }
+
+    popupInjectOuterStylesheet(...args) {
+        // This simulates the stylesheet priorities when injecting using the web extension API.
+        const result = this.popupInjectOuterStylesheetOld(...args);
+
+        const outerStylesheet = Popup.outerStylesheet;
+        const node = document.querySelector('#client-css');
+        if (node !== null && outerStylesheet !== null) {
+            node.parentNode.insertBefore(outerStylesheet, node);
+        }
+
+        return result;
     }
 
     onWindowResize() {
