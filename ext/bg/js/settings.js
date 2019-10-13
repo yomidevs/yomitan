@@ -358,24 +358,28 @@ function updateTextToSpeechVoices() {
     select.val(select.attr('data-value'));
 }
 
-function compareLanguageTags(a, b) {
-    if (a.substr(0, 3) === 'ja-') {
-        return (b.substr(0, 3) === 'ja-') ? 0 : -1;
-    } else {
-        return (b.substr(0, 3) === 'ja-') ? 1 : 0;
-    }
+function languageTagIsJapanese(languageTag) {
+    return (
+        languageTag.startsWith('ja-') ||
+        languageTag.startsWith('jpn-')
+    );
 }
 
 function textToSpeechVoiceCompare(a, b) {
-    const i = compareLanguageTags(a.voice.lang, b.voice.lang);
-    if (i !== 0) { return i; }
+    const aIsJapanese = languageTagIsJapanese(a.voice.lang);
+    const bIsJapanese = languageTagIsJapanese(b.voice.lang);
+    if (aIsJapanese) {
+        if (!bIsJapanese) { return -1; }
+    } else {
+        if (bIsJapanese) { return 1; }
+    }
 
-    if (a.voice.default) {
-        if (!b.voice.default) {
-            return -1;
-        }
-    } else if (b.voice.default) {
-        return 1;
+    const aIsDefault = a.voice.default;
+    const bIsDefault = b.voice.default;
+    if (aIsDefault) {
+        if (!bIsDefault) { return -1; }
+    } else {
+        if (bIsDefault) { return 1; }
     }
 
     if (a.index < b.index) { return -1; }
