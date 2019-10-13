@@ -278,7 +278,8 @@ function profileOptionsCreateDefaults() {
             mainDictionary: '',
             popupTheme: 'default',
             popupOuterTheme: 'default',
-            customPopupCss: ''
+            customPopupCss: '',
+            customPopupOuterCss: ''
         },
 
         audio: {

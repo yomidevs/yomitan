@@ -30,8 +30,8 @@
  * General
  */
 
-html.yomichan-float:not([data-yomichan-theme]),
-html.yomichan-float:not([data-yomichan-theme]) body {
+html:root[data-yomichan-page=float]:not([data-yomichan-theme]),
+html:root[data-yomichan-page=float]:not([data-yomichan-theme]) body {
     background-color: transparent;
 }
 
@@ -82,8 +82,8 @@ ol, ul {
     padding-bottom: 10px;
 }
 
-html:root.yomichan-float .entry,
-html:root.yomichan-float .note {
+html:root[data-yomichan-page=float] .entry,
+html:root[data-yomichan-page=float] .note {
     padding-left: 10px;
     padding-right: 10px;
 }

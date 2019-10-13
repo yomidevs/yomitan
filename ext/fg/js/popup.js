@@ -27,7 +27,7 @@ class Popup {
         this.child = null;
         this.childrenSupported = true;
         this.container = document.createElement('iframe');
-        this.container.id = 'yomichan-float';
+        this.container.className = 'yomichan-float';
         this.container.addEventListener('mousedown', e => e.stopPropagation());
         this.container.addEventListener('scroll', e => e.stopPropagation());
         this.container.setAttribute('src', chrome.extension.getURL('/fg/float.html'));
@@ -38,6 +38,7 @@ class Popup {
         this.visible = false;
         this.visibleOverride = null;
         this.options = null;
+        this.stylesheetInjectedViaApi = false;
         this.updateVisibility();
     }
 
@@ -75,6 +76,7 @@ class Popup {
             });
             this.observeFullscreen();
             this.onFullscreenChanged();
+            this.setCustomOuterCss(this.options.general.customPopupOuterCss, false);
             this.isInjected = true;
         });
     }
@@ -271,19 +273,16 @@ class Popup {
     }
 
     updateTheme() {
-        this.container.dataset.yomichanTheme = this.getTheme(this.options.general.popupOuterTheme);
+        this.container.dataset.yomichanTheme = this.options.general.popupOuterTheme;
+        this.container.dataset.yomichanSiteColor = this.getSiteColor();
     }
 
-    getTheme(themeName) {
-        if (themeName === 'auto') {
-            const color = [255, 255, 255];
-            Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.documentElement).backgroundColor));
-            Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.body).backgroundColor));
-            const dark = (color[0] < 128 && color[1] < 128 && color[2] < 128);
-            themeName = dark ? 'dark' : 'default';
-        }
-
-        return themeName;
+    getSiteColor() {
+        const color = [255, 255, 255];
+        Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.documentElement).backgroundColor));
+        Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.body).backgroundColor));
+        const dark = (color[0] < 128 && color[1] < 128 && color[2] < 128);
+        return dark ? 'dark' : 'light';
     }
 
     static addColor(target, color) {
@@ -337,6 +336,23 @@ class Popup {
         this.invokeApi('setCustomCss', {css});
     }
 
+    async setCustomOuterCss(css, injectDirectly) {
+        // Cannot repeatedly inject stylesheets using web extension APIs since there is no way to remove them.
+        if (this.stylesheetInjectedViaApi) { return; }
+
+        if (injectDirectly || Popup.isOnExtensionPage()) {
+            Popup.injectOuterStylesheet(css);
+        } else {
+            if (!css) { return; }
+            try {
+                await apiInjectStylesheet(css);
+                this.stylesheetInjectedViaApi = true;
+            } catch (e) {
+                // NOP
+            }
+        }
+    }
+
     clearAutoPlayTimer() {
         if (this.isInjected) {
             this.invokeApi('clearAutoPlayTimer');
@@ -378,4 +394,35 @@ class Popup {
     get url() {
         return window.location.href;
     }
+
+    static isOnExtensionPage() {
+        try {
+            const url = chrome.runtime.getURL('/');
+            return window.location.href.substr(0, url.length) === url;
+        } catch (e) {
+            // NOP
+        }
+    }
+
+    static injectOuterStylesheet(css) {
+        if (Popup.outerStylesheet === null) {
+            if (!css) { return; }
+            Popup.outerStylesheet = document.createElement('style');
+            Popup.outerStylesheet.id = "yomichan-popup-outer-stylesheet";
+        }
+
+        const outerStylesheet = Popup.outerStylesheet;
+        if (css) {
+            outerStylesheet.textContent = css;
+
+            const par = document.head;
+            if (par && outerStylesheet.parentNode !== par) {
+                par.appendChild(outerStylesheet);
+            }
+        } else {
+            outerStylesheet.textContent = '';
+        }
+    }
 }
+
+Popup.outerStylesheet = null;

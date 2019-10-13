@@ -42,6 +42,7 @@ async function formRead(options) {
     options.general.popupTheme = $('#popup-theme').val();
     options.general.popupOuterTheme = $('#popup-outer-theme').val();
     options.general.customPopupCss = $('#custom-popup-css').val();
+    options.general.customPopupOuterCss = $('#custom-popup-outer-css').val();
 
     options.audio.enabled = $('#audio-playback-enabled').prop('checked');
     options.audio.autoPlay = $('#auto-play-audio').prop('checked');
@@ -112,6 +113,7 @@ async function formWrite(options) {
     $('#popup-theme').val(options.general.popupTheme);
     $('#popup-outer-theme').val(options.general.popupOuterTheme);
     $('#custom-popup-css').val(options.general.customPopupCss);
+    $('#custom-popup-outer-css').val(options.general.customPopupOuterCss);
 
     $('#audio-playback-enabled').prop('checked', options.audio.enabled);
     $('#auto-play-audio').prop('checked', options.audio.autoPlay);
@@ -283,6 +285,7 @@ function showAppearancePreview() {
     const settings = $('#settings-popup-preview-settings');
     const text = $('#settings-popup-preview-text');
     const customCss = $('#custom-popup-css');
+    const customOuterCss = $('#custom-popup-outer-css');
 
     const frame = document.createElement('iframe');
     frame.src = '/bg/settings-popup-preview.html';
@@ -298,6 +301,11 @@ function showAppearancePreview() {
     customCss.on('input', () => {
         const action = 'setCustomCss';
         const params = {css: customCss.val()};
+        frame.contentWindow.postMessage({action, params}, '*');
+    });
+    customOuterCss.on('input', () => {
+        const action = 'setCustomOuterCss';
+        const params = {css: customOuterCss.val()};
         frame.contentWindow.postMessage({action, params}, '*');
     });
 

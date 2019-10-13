@@ -21,6 +21,7 @@ class SettingsPopupPreview {
     constructor() {
         this.frontend = null;
         this.apiOptionsGetOld = apiOptionsGet;
+        this.popupInjectOuterStylesheetOld = Popup.injectOuterStylesheet;
         this.popupShown = false;
         this.themeChangeTimeout = null;
     }
@@ -56,6 +57,9 @@ class SettingsPopupPreview {
 
         await this.frontend.isPrepared();
 
+        // Overwrite popup
+        Popup.injectOuterStylesheet = (...args) => this.popupInjectOuterStylesheet(...args);
+
         // Update search
         this.updateSearch();
     }
@@ -74,6 +78,19 @@ class SettingsPopupPreview {
         options.general.popupVerticalTextPosition = 'before';
         options.scanning.selectText = false;
         return options;
+    }
+
+    popupInjectOuterStylesheet(...args) {
+        // This simulates the stylesheet priorities when injecting using the web extension API.
+        const result = this.popupInjectOuterStylesheetOld(...args);
+
+        const outerStylesheet = Popup.outerStylesheet;
+        const node = document.querySelector('#client-css');
+        if (node !== null && outerStylesheet !== null) {
+            node.parentNode.insertBefore(outerStylesheet, node);
+        }
+
+        return result;
     }
 
     onWindowResize() {
@@ -127,6 +144,11 @@ class SettingsPopupPreview {
         this.frontend.popup.setCustomCss(css);
     }
 
+    setCustomOuterCss(css) {
+        if (this.frontend === null) { return; }
+        this.frontend.popup.setCustomOuterCss(css, true);
+    }
+
     async updateSearch() {
         const exampleText = document.querySelector('#example-text');
         if (exampleText === null) { return; }
@@ -152,7 +174,8 @@ class SettingsPopupPreview {
 
 SettingsPopupPreview.messageHandlers = {
     setText: (self, {text}) => self.setText(text),
-    setCustomCss: (self, {css}) => self.setCustomCss(css)
+    setCustomCss: (self, {css}) => self.setCustomCss(css),
+    setCustomOuterCss: (self, {css}) => self.setCustomOuterCss(css)
 };
 
 SettingsPopupPreview.instance = SettingsPopupPreview.create();
