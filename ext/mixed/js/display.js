@@ -500,7 +500,7 @@ class Display {
             }
 
             const sources = this.options.audio.sources;
-            let {audio, source} = await audioGetFromSources(expression, sources, this.getOptionsContext(), true, this.audioCache);
+            let {audio, source} = await audioGetFromSources(expression, sources, this.getOptionsContext(), false, this.audioCache);
             let info;
             if (audio === null) {
                 if (this.audioFallback === null) {

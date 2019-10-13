@@ -163,7 +163,7 @@ async function audioInject(definition, fields, sources, optionsContext) {
             audioSourceDefinition = definition.expressions[0];
         }
 
-        const {url} = await audioGetFromSources(audioSourceDefinition, sources, optionsContext, false);
+        const {url} = await audioGetFromSources(audioSourceDefinition, sources, optionsContext, true);
         if (url !== null) {
             const filename = audioBuildFilename(audioSourceDefinition);
             if (filename !== null) {

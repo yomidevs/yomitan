@@ -32,7 +32,7 @@ function audioGetFromUrl(url) {
     });
 }
 
-async function audioGetFromSources(expression, sources, optionsContext, createAudioObject, cache=null) {
+async function audioGetFromSources(expression, sources, optionsContext, download, cache=null) {
     const key = `${expression.expression}:${expression.reading}`;
     if (cache !== null && cache.hasOwnProperty(expression)) {
         return cache[key];
@@ -46,7 +46,7 @@ async function audioGetFromSources(expression, sources, optionsContext, createAu
         }
 
         try {
-            const audio = createAudioObject ? await audioGetFromUrl(url) : null;
+            const audio = download ? null : await audioGetFromUrl(url);
             const result = {audio, url, source};
             if (cache !== null) {
                 cache[key] = result;
