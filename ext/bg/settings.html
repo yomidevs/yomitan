@@ -505,21 +505,21 @@
                     <a href="https://foosoft.net/projects/anki-connect/" target="_blank" rel="noopener">AnkiConnect</a> plugin.
                 </p>
 
-                <div data-show-for-operating-system="win">
-                    <div class="alert alert-warning" id="anki-mac-warning">
-                        Notice for Mac OS X users:
-                        If Yomichan has issues connecting to AnkiConnect, you may have to tweak some system settings.
-                        See <a href="https://foosoft.net/projects/anki-connect/#notes-for-mac-os-x-users" target="_blank" rel="noopener">this link</a> for more details.
-                    </div>
-                </div>
-
-                <div class="alert alert-danger" id="anki-error"></div>
-
                 <div class="checkbox">
                     <label><input type="checkbox" id="anki-enable"> Enable Anki integration</label>
                 </div>
 
                 <div id="anki-general">
+                    <div data-show-for-operating-system="mac">
+                        <div class="alert alert-warning" id="anki-mac-warning">
+                            Notice for Mac OS X users:
+                            If Yomichan has issues connecting to AnkiConnect, you may have to tweak some system settings.
+                            See <a href="https://foosoft.net/projects/anki-connect/#notes-for-mac-os-x-users" target="_blank" rel="noopener">this link</a> for more details.
+                        </div>
+                    </div>
+
+                    <div class="alert alert-danger" id="anki-error"></div>
+
                     <div class="form-group">
                         <label for="card-tags">Card tags <span class="label-light">(comma or space separated)</span></label>
                         <input type="text" id="card-tags" class="form-control">
