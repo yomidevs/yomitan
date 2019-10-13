@@ -73,9 +73,10 @@ class Backend {
         if (handlers.hasOwnProperty(action)) {
             const handler = handlers[action];
             const promise = handler(params, sender);
-            promise
-                .then(result => callback({result}))
-                .catch(error => callback(errorToJson(error)));
+            promise.then(
+                result => callback({result}),
+                error => callback({error: errorToJson(error)})
+            );
         }
 
         return true;
