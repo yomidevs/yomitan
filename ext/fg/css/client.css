@@ -21,12 +21,18 @@ iframe#yomichan-float {
     all: initial;
     background-color: #fff;
     border: 1px solid #999;
-    box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     position: fixed;
     resize: both;
     visibility: hidden;
     z-index: 2147483647;
     box-sizing: border-box;
+}
+
+iframe#yomichan-float[data-yomichan-theme=dark] {
+    background-color: #1e1e1e;
+    border: 1px solid #666;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 iframe#yomichan-float.yomichan-float-full-width {

@@ -148,6 +148,15 @@ input[type=checkbox]#storage-persist-button-checkbox {
     padding: 0;
 }
 
+#settings-popup-preview-frame {
+    background-color: transparent;
+    border: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 320px;
+}
+
 [data-show-for-browser] {
     display: none;
 }

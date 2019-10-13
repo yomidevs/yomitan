@@ -276,6 +276,8 @@ function profileOptionsCreateDefaults() {
             compactTags: false,
             compactGlossaries: false,
             mainDictionary: '',
+            popupTheme: 'default',
+            popupOuterTheme: 'default',
             customPopupCss: ''
         },
 

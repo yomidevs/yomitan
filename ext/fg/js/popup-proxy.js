@@ -88,6 +88,11 @@ class PopupProxy {
         return await this.invokeHostApi('kanjiShow', {id, elementRect, writingMode, definitions, context});
     }
 
+    async setCustomCss(css) {
+        const id = await this.getPopupId();
+        return await this.invokeHostApi('setCustomCss', {id, css});
+    }
+
     async clearAutoPlayTimer() {
         if (this.id === null) {
             return;

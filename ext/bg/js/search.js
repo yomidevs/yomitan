@@ -118,6 +118,10 @@ class DisplaySearch extends Display {
         return this.optionsContext;
     }
 
+    setCustomCss() {
+        // No custom CSS
+    }
+
     setIntroVisible(visible, animate) {
         if (this.introVisible === visible) {
             return;

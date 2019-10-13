@@ -44,6 +44,8 @@ class Frontend {
 
         this.isPreparedPromiseResolve = null;
         this.isPreparedPromise = new Promise((resolve) => { this.isPreparedPromiseResolve = resolve; });
+
+        this.lastShowPromise = Promise.resolve();
     }
 
     static create() {
@@ -331,7 +333,7 @@ class Frontend {
         } catch (e) {
             if (window.yomichan_orphaned) {
                 if (textSource && this.options.scanning.modifier !== 'none') {
-                    this.popup.showOrphaned(
+                    this.lastShowPromise = this.popup.showOrphaned(
                         textSource.getRect(),
                         textSource.getWritingMode()
                     );
@@ -369,7 +371,7 @@ class Frontend {
 
         const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
         const url = window.location.href;
-        this.popup.termsShow(
+        this.lastShowPromise = this.popup.termsShow(
             textSource.getRect(),
             textSource.getWritingMode(),
             definitions,
@@ -399,7 +401,7 @@ class Frontend {
 
         const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
         const url = window.location.href;
-        this.popup.kanjiShow(
+        this.lastShowPromise = this.popup.kanjiShow(
             textSource.getRect(),
             textSource.getWritingMode(),
             definitions,

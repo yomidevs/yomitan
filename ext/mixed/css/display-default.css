@@ -1,0 +1,50 @@
+/*
+ * Copyright (C) 2019  Alex Yatskov <alex@foosoft.net>
+ * Author: Alex Yatskov <alex@foosoft.net>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the entrys of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+body { background-color: #ffffff; color: #333333; }
+
+hr { border-top-color: #eeeeee; }
+
+.tag-default      { background-color: #8a8a91; }
+.tag-name         { background-color: #5cb85c; }
+.tag-expression   { background-color: #f0ad4e; }
+.tag-popular      { background-color: #0275d8; }
+.tag-frequent     { background-color: #5bc0de; }
+.tag-archaism     { background-color: #d9534f; }
+.tag-dictionary   { background-color: #aa66cc; }
+.tag-frequency    { background-color: #5cb85c; }
+.tag-partOfSpeech { background-color: #565656; }
+
+.reasons       { color: #777777; }
+.glossary li   { color: #777777; }
+.glossary-item { color: #000000; }
+.label         { color: #ffffff; }
+
+.expression .kanji-link {
+    border-bottom-color: #777777;
+    color: #333333;
+}
+
+.expression-popular, .expression-popular .kanji-link {
+    color: #0275d8;
+}
+
+.expression-rare, .expression-rare .kanji-link {
+    color: #999999;
+}

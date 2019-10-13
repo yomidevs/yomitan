@@ -29,6 +29,7 @@ class Display {
         this.audioPlaying = null;
         this.audioFallback = null;
         this.audioCache = {};
+        this.styleNode = null;
 
         this.eventListeners = [];
         this.persistentEventListeners = [];
@@ -194,6 +195,32 @@ class Display {
 
     async updateOptions(options) {
         this.options = options ? options : await apiOptionsGet(this.getOptionsContext());
+        this.updateTheme(this.options.general.popupTheme);
+        this.setCustomCss(this.options.general.customPopupCss);
+    }
+
+    updateTheme(themeName) {
+        document.documentElement.dataset.yomichanTheme = themeName;
+
+        const stylesheets = document.querySelectorAll('link[data-yomichan-theme-name]');
+        for (const stylesheet of stylesheets) {
+            const match = (stylesheet.dataset.yomichanThemeName === themeName);
+            stylesheet.rel = (match ? 'stylesheet' : 'stylesheet alternate');
+        }
+    }
+
+    setCustomCss(css) {
+        if (this.styleNode === null) {
+            if (css.length === 0) { return; }
+            this.styleNode = document.createElement('style');
+        }
+
+        this.styleNode.textContent = css;
+
+        const parent = document.head;
+        if (this.styleNode.parentNode !== parent) {
+            parent.appendChild(this.styleNode);
+        }
     }
 
     setInteractive(interactive) {

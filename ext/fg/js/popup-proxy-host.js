@@ -45,6 +45,7 @@ class PopupProxyHost {
             containsPoint: ({id, x, y}) => this.containsPoint(id, x, y),
             termsShow: ({id, elementRect, writingMode, definitions, context}) => this.termsShow(id, elementRect, writingMode, definitions, context),
             kanjiShow: ({id, elementRect, writingMode, definitions, context}) => this.kanjiShow(id, elementRect, writingMode, definitions, context),
+            setCustomCss: ({id, css}) => this.setCustomCss(id, css),
             clearAutoPlayTimer: ({id}) => this.clearAutoPlayTimer(id)
         });
     }
@@ -124,6 +125,11 @@ class PopupProxyHost {
         elementRect = this.jsonRectToDOMRect(popup, elementRect);
         if (!PopupProxyHost.popupCanShow(popup)) { return false; }
         return await popup.kanjiShow(elementRect, writingMode, definitions, context);
+    }
+
+    async setCustomCss(id, css) {
+        const popup = this.getPopup(id);
+        return popup.setCustomCss(css);
     }
 
     async clearAutoPlayTimer(id) {

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Yomichan Popup Preview</title>
+        <link rel="stylesheet" type="text/css" href="/fg/css/client.css">
+        <style>
+            html {
+                transition: background-color 0.25s linear 0s, color 0.25s linear 0s;
+                color: #333333;
+            }
+            html.dark {
+                background-color: #1e1e1e;
+                color: #d4d4d4;
+            }
+            html, body {
+                margin: 0;
+                padding: 0;
+                border: 0;
+                overflow: hidden;
+                width: 100%;
+                height: 100%;
+                font-family: "Helvetica Neue", Helvetica, Arial ,sans-serif;
+                font-size: 14px;
+            }
+            iframe#yomichan-float {
+                resize: none;
+            }
+            .vertical-align-outer {
+                width: 100%;
+                height: 100%;
+                white-space: nowrap;
+            }
+            .vertical-align-outer::before {
+                content: "";
+                display: inline-block;
+                vertical-align: middle;
+                width: 0;
+                height: 100%;
+            }
+            .vertical-align-inner {
+                display: inline-block;
+                vertical-align: middle;
+                white-space: normal;
+                width: 100%;
+            }
+            .horizontal-size {
+                max-width: 400px;
+                padding: 15px;
+                margin: 0 auto;
+            }
+            .example-text-container {
+                font-size: 24px;
+                line-height: 1.25em;
+                height: 1.25em;
+            }
+            .popup-placeholder {
+                height: 250px;
+                padding-top: 10px;
+                border: 1px solid rgba(0, 0, 0, 0);
+            }
+            .placeholder-info {
+                visibility: hidden;
+                opacity: 0;
+                transition: opacity 0.5s linear 0s, visibility 0s linear 0.5s;
+            }
+            .placeholder-info.placeholder-info-visible {
+                visibility: visible;
+                opacity: 1;
+                transition: opacity 0.5s linear 0s, visibility 0s linear 0s;
+            }
+
+            .options {
+                float: right;
+                font-size: 14px;
+                line-height: 30px;
+            }
+            .theme-button {
+                display: inline-block;
+                margin-left: 0.5em;
+                text-decoration: none;
+                cursor: pointer;
+                white-space: nowrap;
+                line-height: 0;
+            }
+            .theme-button>input {
+                vertical-align: middle;
+                margin: 0 0.25em 0 0;
+                padding: 0;
+            }
+            .theme-button>span {
+                vertical-align: middle;
+            }
+            .theme-button:hover>span {
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="vertical-align-outer"><div class="vertical-align-inner"><div class="horizontal-size">
+            <div class="example-text-container">
+                <div class="options"><label class="theme-button"><input type="checkbox" id="theme-dark-checkbox" /><span>dark</span></label></div>
+                <span id="example-text">読め</span>
+            </div>
+            <div class="popup-placeholder">
+                <div class="vertical-align-outer"><div class="vertical-align-inner placeholder-info">
+                    This page uses the dictionaries you have installed in order to show a preview.
+                    If you see this message, make sure you have a dictionary installed.
+                </div></div>
+            </div>
+        </div></div></div>
+
+        <script src="/mixed/js/extension.js"></script>
+        <script src="/fg/js/api.js"></script>
+        <script src="/fg/js/document.js"></script>
+        <script src="/fg/js/frontend-api-receiver.js"></script>
+        <script src="/fg/js/popup.js"></script>
+        <script src="/fg/js/source.js"></script>
+        <script src="/fg/js/util.js"></script>
+        <script src="/fg/js/popup-proxy-host.js"></script>
+        <script src="/fg/js/frontend.js"></script>
+        <script src="/bg/js/settings-popup-preview.js"></script>
+    </body>
+</html>
