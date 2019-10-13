@@ -17,10 +17,25 @@
  */
 
 
+function showExtensionInfo() {
+    const node = document.getElementById('extension-info');
+    if (node === null) { return; }
+
+    const manifest = chrome.runtime.getManifest();
+    node.textContent = `${manifest.name} v${manifest.version}`;
+}
+
 $(document).ready(utilAsync(() => {
-    $('#open-search').click(() => apiCommandExec('search'));
-    $('#open-options').click(() => apiCommandExec('options'));
-    $('#open-help').click(() => apiCommandExec('help'));
+    showExtensionInfo();
+
+    apiGetEnvironmentInfo().then(({browser}) => {
+        // Firefox mobile opens this page as a full webpage.
+        document.documentElement.dataset.mode = (browser === 'firefox-mobile' ? 'full' : 'mini');
+    });
+
+    $('.action-open-search').click(() => apiCommandExec('search'));
+    $('.action-open-options').click(() => apiCommandExec('options'));
+    $('.action-open-help').click(() => apiCommandExec('help'));
 
     const optionsContext = {
         depth: 0,
@@ -31,5 +46,9 @@ $(document).ready(utilAsync(() => {
         toggle.prop('checked', options.general.enable).change();
         toggle.bootstrapToggle();
         toggle.change(() => apiCommandExec('toggle'));
+
+        const toggle2 = $('#enable-search2');
+        toggle2.prop('checked', options.general.enable).change();
+        toggle2.change(() => apiCommandExec('toggle'));
     });
 }));

@@ -9,25 +9,107 @@
         <style type="text/css">
             body {
                 padding: 10px;
-                text-align: center;
             }
 
+            h3 {
+                margin-top: 10px;
+            }
+            label {
+                font-weight: normal;
+            }
+
+            #mini {
+                text-align: center;
+            }
+            #full {
+                display: none;
+            }
             .btn-group {
                 display: flex;
                 justify-content: center;
                 margin-top: 10px;
                 white-space: nowrap;
             }
+
+            html:root[data-mode=full] #mini {
+                display: none;
+            }
+            html:root[data-mode=full] #full {
+                display: initial;
+            }
+
+            .link-group {
+                display: block;
+                line-height: 1.5em;
+                margin: 0 -10px;
+                padding: 0.5em 10px;
+                cursor: pointer;
+                color: #333;
+                text-decoration: none;
+                background-color: transparent;
+                transition: background-color 0.125s linear 0s;
+                max-width: none;
+            }
+            .link-group:hover,
+            .link-group:active {
+                color: #333;
+                text-decoration: none;
+            }
+            .link-group:hover>.link-group-label,
+            .link-group:active>.link-group-label {
+                text-decoration: underline;
+            }
+            .link-group:hover {
+                background-color: rgba(0, 0, 0, 0.05);
+            }
+            .link-group:active {
+                background-color: rgba(0, 0, 0, 0.1);
+            }
+            .link-group-icon {
+                width: 16px;
+                height: 16px;
+                text-align: center;
+                vertical-align: middle;
+                display: inline-block;
+                margin-right: 0.25em;
+            }
+            .link-group-icon>input {
+                margin: 0;
+                padding: 0;
+            }
+            .link-group-icon>.glyphicon {
+                top: 0;
+            }
+            .link-group-label {
+                vertical-align: middle;
+            }
         </style>
     </head>
     <body>
-        <div>
-            <input type="checkbox" id="enable-search">
+        <div id="mini">
+            <div>
+                <input type="checkbox" id="enable-search">
+            </div>
+            <div class="btn-group">
+                <button type="button" title="Search (Alt + Insert)" class="btn btn-default btn-xs action-open-search"><span class="glyphicon glyphicon-search"></span></button>
+                <button type="button" title="Options" class="btn btn-default btn-xs action-open-options"><span class="glyphicon glyphicon-wrench"></span></button>
+                <button type="button" title="Help" class="btn btn-default btn-xs action-open-help"><span class="glyphicon glyphicon-question-sign"></span></button>
+            </div>
         </div>
-        <div class="btn-group">
-            <button type="button" id="open-search" title="Search (Alt + Insert)" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-search"></span></button>
-            <button type="button" id="open-options" title="Options" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-wrench"></span></button>
-            <button type="button" id="open-help" title="Help" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-question-sign"></span></button>
+        <div id="full">
+            <h3 id="extension-info">Yomichan</h3>
+            <label class="link-group">
+                <span class="link-group-icon"><input type="checkbox" id="enable-search2" /></span><span class="link-group-label">Enable content scanning</span>
+            </label>
+            <a class="link-group action-open-search">
+                <span class="link-group-icon"><span class="glyphicon glyphicon-chevron-right"></span></span><span class="link-group-label">Search</span>
+            </a>
+            <a class="link-group action-open-options">
+                <span class="link-group-icon"><span class="glyphicon glyphicon-chevron-right"></span></span><span class="link-group-label">Options</span>
+            </a>
+            <a class="link-group action-open-help">
+                <span class="link-group-icon"><span class="glyphicon glyphicon-chevron-right"></span></span><span class="link-group-label">Help</span>
+            </a>
         </div>
 
         <script src="/mixed/lib/jquery.min.js"></script>
