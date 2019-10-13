@@ -68,3 +68,7 @@ function apiFrameInformationGet() {
 function apiInjectStylesheet(css) {
     return utilInvoke('injectStylesheet', {css});
 }
+
+function apiGetEnvironmentInfo() {
+    return utilInvoke('getEnvironmentInfo');
+}

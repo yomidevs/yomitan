@@ -270,3 +270,31 @@ function apiInjectStylesheet(css, sender) {
         });
     });
 }
+
+async function apiGetEnvironmentInfo() {
+    const browser = await apiGetBrowser();
+    const platform = await new Promise((resolve) => chrome.runtime.getPlatformInfo(resolve));
+    return {
+        browser,
+        platform: {
+            os: platform.os
+        }
+    };
+}
+
+async function apiGetBrowser() {
+    if (EXTENSION_IS_BROWSER_EDGE) {
+        return 'edge';
+    }
+    if (typeof browser !== 'undefined') {
+        try {
+            const info = await browser.runtime.getBrowserInfo();
+            if (info.name === 'Fennec') {
+                return 'firefox-mobile';
+            }
+        } catch (e) { }
+        return 'firefox';
+    } else {
+        return 'chrome';
+    }
+}

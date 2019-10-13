@@ -819,23 +819,6 @@ async function onAnkiFieldTemplatesReset(e) {
  * Storage
  */
 
-async function getBrowser() {
-    if (EXTENSION_IS_BROWSER_EDGE) {
-        return 'edge';
-    }
-    if (typeof browser !== 'undefined') {
-        try {
-            const info = await browser.runtime.getBrowserInfo();
-            if (info.name === 'Fennec') {
-                return 'firefox-mobile';
-            }
-        } catch (e) { }
-        return 'firefox';
-    } else {
-        return 'chrome';
-    }
-}
-
 function storageBytesToLabeledString(size) {
     const base = 1000;
     const labels = [' bytes', 'KB', 'MB', 'GB'];
@@ -865,7 +848,7 @@ async function isStoragePeristent() {
 
 async function storageInfoInitialize() {
     storagePersistInitialize();
-    const browser = await getBrowser();
+    const {browser} = await apiGetEnvironmentInfo();
     const container = document.querySelector('#storage-info');
     container.setAttribute('data-browser', browser);
 

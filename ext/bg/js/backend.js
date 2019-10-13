@@ -186,7 +186,8 @@ Backend.messageHandlers = {
     screenshotGet: ({options}, sender) => apiScreenshotGet(options, sender),
     forward: ({action, params}, sender) => apiForward(action, params, sender),
     frameInformationGet: (params, sender) => apiFrameInformationGet(sender),
-    injectStylesheet: ({css}, sender) => apiInjectStylesheet(css, sender)
+    injectStylesheet: ({css}, sender) => apiInjectStylesheet(css, sender),
+    getEnvironmentInfo: () => apiGetEnvironmentInfo()
 };
 
 window.yomichan_backend = new Backend();
