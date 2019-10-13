@@ -848,9 +848,9 @@ async function isStoragePeristent() {
 
 async function storageInfoInitialize() {
     storagePersistInitialize();
-    const {browser} = await apiGetEnvironmentInfo();
-    const container = document.querySelector('#storage-info');
-    container.setAttribute('data-browser', browser);
+    const {browser, platform} = await apiGetEnvironmentInfo();
+    document.documentElement.dataset.browser = browser;
+    document.documentElement.dataset.operatingSystem = platform.os;
 
     await storageShowInfo();
 
