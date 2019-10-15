@@ -489,8 +489,18 @@
 
                 <div>
                     <button class="btn btn-default" id="storage-refresh"><span class="btn-inner-middle">Refresh</span></button>
-                    <button class="btn btn-default storage-hidden ignore-form-changes" id="storage-persist-button"><span class="storage-persist-button-inner"><input type="checkbox" class="btn-inner-middle" id="storage-persist-button-checkbox" readonly /><span class="btn-inner-middle">Persistent Storage</span></span></button>
+                    <button class="btn btn-default storage-hidden ignore-form-changes" id="storage-persist-button"><span class="storage-button-inner"><input type="checkbox" class="btn-inner-middle storage-button-checkbox" id="storage-persist-button-checkbox" readonly /><span class="btn-inner-middle">Persistent Storage</span></span></button>
                 </div>
+
+                <p></p>
+
+                <div data-show-for-browser="firefox-mobile"><div class="alert alert-warning storage-persist-fail-warning storage-hidden">
+                    <p>It may not be possible to enable Persistent Storage on Firefox for Android.</p>
+                </div></div>
+
+                <div data-show-for-browser="chrome"><div class="alert alert-warning storage-persist-fail-warning storage-hidden">
+                    <p>It may not be possible to enable Persistent Storage on Chrome-based browsers.</p>
+                </div></div>
             </div>
 
             <div>

@@ -912,9 +912,7 @@ async function storagePersistInitialize() {
     button.classList.remove('storage-hidden');
 
     let persisted = await isStoragePeristent();
-    if (persisted) {
-        checkbox.checked = true;
-    }
+    checkbox.checked = persisted;
 
     button.addEventListener('click', async () => {
         if (persisted) {
@@ -931,6 +929,8 @@ async function storagePersistInitialize() {
             persisted = true;
             checkbox.checked = true;
             storageShowInfo();
+        } else {
+            $('.storage-persist-fail-warning').removeClass('storage-hidden');
         }
     }, false);
 }

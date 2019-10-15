@@ -141,10 +141,10 @@
 .btn-inner-middle {
     vertical-align: middle;
 }
-.storage-persist-button-inner {
+.storage-button-inner {
     pointer-events: none;
 }
-input[type=checkbox]#storage-persist-button-checkbox {
+input[type=checkbox].storage-button-checkbox {
     margin: 0 0.375em 0 0;
     padding: 0;
 }
