@@ -25,6 +25,8 @@ async function searchFrontendSetup() {
     const options = await apiOptionsGet(optionsContext);
     if (!options.scanning.enableOnSearchPage) { return; }
 
+    window.frontendInitializationData = {depth: 1, proxy: false};
+
     const scriptSrcs = [
         '/fg/js/frontend-api-receiver.js',
         '/fg/js/popup.js',

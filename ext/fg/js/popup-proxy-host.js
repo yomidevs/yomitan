@@ -50,10 +50,12 @@ class PopupProxyHost {
         });
     }
 
-    createPopup(parentId) {
+    createPopup(parentId, depth) {
         const parent = (typeof parentId === 'string' && this.popups.hasOwnProperty(parentId) ? this.popups[parentId] : null);
-        const depth = (parent !== null ? parent.depth + 1 : 0);
         const id = `${this.nextId}`;
+        if (parent !== null) {
+            depth = parent.depth + 1;
+        }
         ++this.nextId;
         const popup = new Popup(id, depth, this.frameIdPromise);
         if (parent !== null) {
@@ -65,7 +67,7 @@ class PopupProxyHost {
     }
 
     async createNestedPopup(parentId) {
-        return this.createPopup(parentId).id;
+        return this.createPopup(parentId, 0).id;
     }
 
     getPopup(id) {
