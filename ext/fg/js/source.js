@@ -233,7 +233,7 @@ class TextSourceRange {
             const style = window.getComputedStyle(element);
             const writingMode = style.writingMode;
             if (typeof writingMode === 'string') {
-                TextSourceRange.normalizeWritingMode(writingMode);
+                return TextSourceRange.normalizeWritingMode(writingMode);
             }
         }
         return 'horizontal-tb';
