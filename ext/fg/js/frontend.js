@@ -139,8 +139,14 @@ class Frontend {
         }
     }
 
-    onResize() {
-        this.searchClear(false);
+    async onResize() {
+        if (this.textSourceLast !== null && await this.popup.isVisibleAsync()) {
+            const textSource = this.textSourceLast;
+            this.lastShowPromise = this.popup.showContent(
+                textSource.getRect(),
+                textSource.getWritingMode()
+            );
+        }
     }
 
     onClick(e) {

@@ -239,6 +239,10 @@ class Popup {
         }
     }
 
+    async isVisibleAsync() {
+        return this.isVisible();
+    }
+
     isVisible() {
         return this.isInjected && (this.visibleOverride !== null ? this.visibleOverride : this.visible);
     }

@@ -58,6 +58,11 @@ class PopupProxy {
         return await this.invokeHostApi('hide', {id: this.id, changeFocus});
     }
 
+    async isVisibleAsync() {
+        const id = await this.getPopupId();
+        return await this.invokeHostApi('isVisibleAsync', {id});
+    }
+
     async setVisibleOverride(visible) {
         const id = await this.getPopupId();
         return await this.invokeHostApi('setVisibleOverride', {id, visible});
