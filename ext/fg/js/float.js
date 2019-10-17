@@ -32,22 +32,9 @@ class DisplayFloat extends Display {
 
     onError(error) {
         if (window.yomichan_orphaned) {
-            this.onOrphaned();
+            this.setContentOrphaned();
         } else {
             logError(error, true);
-        }
-    }
-
-    onOrphaned() {
-        const definitions = document.querySelector('#definitions');
-        const errorOrphaned = document.querySelector('#error-orphaned');
-
-        if (definitions !== null) {
-            definitions.style.setProperty('display', 'none', 'important');
-        }
-
-        if (errorOrphaned !== null) {
-            errorOrphaned.style.setProperty('display', 'block', 'important');
         }
     }
 
@@ -121,10 +108,8 @@ DisplayFloat.onKeyDownHandlers = {
 };
 
 DisplayFloat.messageHandlers = {
-    termsShow: (self, {definitions, context}) => self.termsShow(definitions, context),
-    kanjiShow: (self, {definitions, context}) => self.kanjiShow(definitions, context),
+    setContent: (self, {type, details}) => self.setContent(type, details),
     clearAutoPlayTimer: (self) => self.clearAutoPlayTimer(),
-    orphaned: (self) => self.onOrphaned(),
     setCustomCss: (self, {css}) => self.setCustomCss(css),
     initialize: (self, {options, popupInfo, url, childrenSupported}) => self.initialize(options, popupInfo, url, childrenSupported)
 };

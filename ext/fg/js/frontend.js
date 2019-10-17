@@ -332,9 +332,10 @@ class Frontend {
         } catch (e) {
             if (window.yomichan_orphaned) {
                 if (textSource && this.options.scanning.modifier !== 'none') {
-                    this.lastShowPromise = this.popup.showOrphaned(
+                    this.lastShowPromise = this.popup.showContent(
                         textSource.getRect(),
-                        textSource.getWritingMode()
+                        textSource.getWritingMode(),
+                        'orphaned'
                     );
                 }
             } else {
@@ -370,11 +371,11 @@ class Frontend {
 
         const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
         const url = window.location.href;
-        this.lastShowPromise = this.popup.termsShow(
+        this.lastShowPromise = this.popup.showContent(
             textSource.getRect(),
             textSource.getWritingMode(),
-            definitions,
-            {sentence, url, focus}
+            'terms',
+            {definitions, context: {sentence, url, focus}}
         );
 
         this.textSourceLast = textSource;
@@ -400,11 +401,11 @@ class Frontend {
 
         const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
         const url = window.location.href;
-        this.lastShowPromise = this.popup.kanjiShow(
+        this.lastShowPromise = this.popup.showContent(
             textSource.getRect(),
             textSource.getWritingMode(),
-            definitions,
-            {sentence, url, focus}
+            'kanji',
+            {definitions, context: {sentence, url, focus}}
         );
 
         this.textSourceLast = textSource;

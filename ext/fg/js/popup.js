@@ -90,6 +90,13 @@ class Popup {
         this.updateTheme();
     }
 
+    async showContent(elementRect, writingMode, type=null, details=null) {
+        if (!this.isInitialized()) { return; }
+        await this.show(elementRect, writingMode);
+        if (type === null) { return; }
+        this.invokeApi('setContent', {type, details});
+    }
+
     async show(elementRect, writingMode) {
         await this.inject();
 
@@ -218,12 +225,6 @@ class Popup {
         return [position, size, after];
     }
 
-    async showOrphaned(elementRect, writingMode) {
-        if (!this.isInitialized()) { return; }
-        await this.show(elementRect, writingMode);
-        this.invokeApi('orphaned');
-    }
-
     hide(changeFocus) {
         if (!this.isVisible()) {
             return;
@@ -318,18 +319,6 @@ class Popup {
             }
         }
         return false;
-    }
-
-    async termsShow(elementRect, writingMode, definitions, context) {
-        if (!this.isInitialized()) { return; }
-        await this.show(elementRect, writingMode);
-        this.invokeApi('termsShow', {definitions, context});
-    }
-
-    async kanjiShow(elementRect, writingMode, definitions, context) {
-        if (!this.isInitialized()) { return; }
-        await this.show(elementRect, writingMode);
-        this.invokeApi('kanjiShow', {definitions, context});
     }
 
     async setCustomCss(css) {

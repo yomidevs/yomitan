@@ -74,8 +74,8 @@ class Display {
                 context.source.source = this.context.source;
             }
 
-            const kanjiDefs = await apiKanjiFind(link.textContent, this.getOptionsContext());
-            this.kanjiShow(kanjiDefs, context);
+            const definitions = await apiKanjiFind(link.textContent, this.getOptionsContext());
+            this.setContentKanji(definitions, context);
         } catch (e) {
             this.onError(e);
         }
@@ -122,7 +122,7 @@ class Display {
                 context.source.source = this.context.source;
             }
 
-            this.termsShow(definitions, context);
+            this.setContentTerms(definitions, context);
         } catch (e) {
             this.onError(e);
         }
@@ -263,7 +263,20 @@ class Display {
         });
     }
 
-    async termsShow(definitions, context) {
+    setContent(type, details) {
+        switch (type) {
+            case 'terms':
+                return this.setContentTerms(details.definitions, details.context);
+            case 'kanji':
+                return this.setContentKanji(details.definitions, details.context);
+            case 'orphaned':
+                return this.setContentOrphaned();
+            default:
+                return Promise.resolve();
+        }
+    }
+
+    async setContentTerms(definitions, context) {
         if (!this.isInitialized()) { return; }
 
         try {
@@ -317,7 +330,7 @@ class Display {
         }
     }
 
-    async kanjiShow(definitions, context) {
+    async setContentKanji(definitions, context) {
         if (!this.isInitialized()) { return; }
 
         try {
@@ -360,6 +373,19 @@ class Display {
             await this.adderButtonUpdate(['kanji'], sequence);
         } catch (e) {
             this.onError(e);
+        }
+    }
+
+    async setContentOrphaned() {
+        const definitions = document.querySelector('#definitions');
+        const errorOrphaned = document.querySelector('#error-orphaned');
+
+        if (definitions !== null) {
+            definitions.style.setProperty('display', 'none', 'important');
+        }
+
+        if (errorOrphaned !== null) {
+            errorOrphaned.style.setProperty('display', 'block', 'important');
         }
     }
 
@@ -441,7 +467,7 @@ class Display {
                 source: this.context.source.source
             };
 
-            this.termsShow(this.context.source.definitions, context);
+            this.setContentTerms(this.context.source.definitions, context);
         }
     }
 

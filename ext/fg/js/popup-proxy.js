@@ -51,12 +51,6 @@ class PopupProxy {
         return await this.invokeHostApi('setOptions', {id, options});
     }
 
-    async showOrphaned(elementRect) {
-        const id = await this.getPopupId();
-        elementRect = PopupProxy.DOMRectToJson(elementRect);
-        return await this.invokeHostApi('showOrphaned', {id, elementRect});
-    }
-
     async hide(changeFocus) {
         if (this.id === null) {
             return;
@@ -76,16 +70,10 @@ class PopupProxy {
         return await this.invokeHostApi('containsPoint', {id: this.id, x, y});
     }
 
-    async termsShow(elementRect, writingMode, definitions, context) {
+    async showContent(elementRect, writingMode, type=null, details=null) {
         const id = await this.getPopupId();
         elementRect = PopupProxy.DOMRectToJson(elementRect);
-        return await this.invokeHostApi('termsShow', {id, elementRect, writingMode, definitions, context});
-    }
-
-    async kanjiShow(elementRect, writingMode, definitions, context) {
-        const id = await this.getPopupId();
-        elementRect = PopupProxy.DOMRectToJson(elementRect);
-        return await this.invokeHostApi('kanjiShow', {id, elementRect, writingMode, definitions, context});
+        return await this.invokeHostApi('showContent', {id, elementRect, writingMode, type, details});
     }
 
     async setCustomCss(css) {

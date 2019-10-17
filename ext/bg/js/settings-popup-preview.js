@@ -100,8 +100,7 @@ class SettingsPopupPreview {
 
         const elementRect = textSource.getRect();
         const writingMode = textSource.getWritingMode();
-        const options = this.frontend.options;
-        this.frontend.popup.show(elementRect, writingMode, options);
+        this.frontend.popup.showContent(elementRect, writingMode);
     }
 
     onMessage(e) {

@@ -39,12 +39,10 @@ class PopupProxyHost {
         this.apiReceiver = new FrontendApiReceiver(`popup-proxy-host#${frameId}`, {
             createNestedPopup: ({parentId}) => this.createNestedPopup(parentId),
             setOptions: ({id, options}) => this.setOptions(id, options),
-            showOrphaned: ({id, elementRect}) => this.showOrphaned(id, elementRect),
             hide: ({id, changeFocus}) => this.hide(id, changeFocus),
             setVisibleOverride: ({id, visible}) => this.setVisibleOverride(id, visible),
             containsPoint: ({id, x, y}) => this.containsPoint(id, x, y),
-            termsShow: ({id, elementRect, writingMode, definitions, context}) => this.termsShow(id, elementRect, writingMode, definitions, context),
-            kanjiShow: ({id, elementRect, writingMode, definitions, context}) => this.kanjiShow(id, elementRect, writingMode, definitions, context),
+            showContent: ({id, elementRect, writingMode, type, details}) => this.showContent(id, elementRect, writingMode, type, details),
             setCustomCss: ({id, css}) => this.setCustomCss(id, css),
             clearAutoPlayTimer: ({id}) => this.clearAutoPlayTimer(id)
         });
@@ -94,12 +92,6 @@ class PopupProxyHost {
         return await popup.setOptions(options);
     }
 
-    async showOrphaned(id, elementRect) {
-        const popup = this.getPopup(id);
-        elementRect = this.jsonRectToDOMRect(popup, elementRect);
-        return await popup.showOrphaned(elementRect);
-    }
-
     async hide(id, changeFocus) {
         const popup = this.getPopup(id);
         return popup.hide(changeFocus);
@@ -115,18 +107,11 @@ class PopupProxyHost {
         return await popup.containsPoint(x, y);
     }
 
-    async termsShow(id, elementRect, writingMode, definitions, context) {
+    async showContent(id, elementRect, writingMode, type, details) {
         const popup = this.getPopup(id);
         elementRect = this.jsonRectToDOMRect(popup, elementRect);
-        if (!PopupProxyHost.popupCanShow(popup)) { return false; }
-        return await popup.termsShow(elementRect, writingMode, definitions, context);
-    }
-
-    async kanjiShow(id, elementRect, writingMode, definitions, context) {
-        const popup = this.getPopup(id);
-        elementRect = this.jsonRectToDOMRect(popup, elementRect);
-        if (!PopupProxyHost.popupCanShow(popup)) { return false; }
-        return await popup.kanjiShow(elementRect, writingMode, definitions, context);
+        if (!PopupProxyHost.popupCanShow(popup)) { return Promise.resolve(false); }
+        return await popup.showContent(elementRect, writingMode, type, details);
     }
 
     async setCustomCss(id, css) {
