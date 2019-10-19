@@ -59,6 +59,8 @@ class Database {
     }
 
     async findTermsBulk(terms, titles) {
+        this.validate();
+
         const promises = [];
         const visited = {};
         const results = [];
@@ -116,6 +118,8 @@ class Database {
     }
 
     async findTermMetaBulk(terms, titles) {
+        this.validate();
+
         const promises = [];
         const results = [];
         const createResult = Database.createTermMeta;
