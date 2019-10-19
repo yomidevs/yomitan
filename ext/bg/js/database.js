@@ -64,11 +64,10 @@ class Database {
         const promises = [];
         const visited = {};
         const results = [];
-        const createResult = Database.createTerm;
         const processRow = (row, index) => {
             if (titles.includes(row.dictionary) && !visited.hasOwnProperty(row.id)) {
                 visited[row.id] = true;
-                results.push(createResult(row, index));
+                results.push(Database.createTerm(row, index));
             }
         };
 
@@ -122,10 +121,9 @@ class Database {
 
         const promises = [];
         const results = [];
-        const createResult = Database.createTermMeta;
         const processRow = (row, index) => {
             if (titles.includes(row.dictionary)) {
-                results.push(createResult(row, index));
+                results.push(Database.createTermMeta(row, index));
             }
         };
 
