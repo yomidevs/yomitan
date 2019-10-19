@@ -69,6 +69,78 @@ class Translator {
         return {sequencedDefinitions, defaultDefinitions};
     }
 
+    async getMergedDefinition(text, dictionaries, sequencedDefinition, defaultDefinitions, secondarySearchTitles, mergedByTermIndices) {
+        const result = sequencedDefinition.definitions;
+        const rawDefinitionsBySequence = sequencedDefinition.rawDefinitions;
+
+        for (const definition of rawDefinitionsBySequence) {
+            const definitionTags = await this.expandTags(definition.definitionTags, definition.dictionary);
+            definitionTags.push(dictTagBuildSource(definition.dictionary));
+            definition.definitionTags = definitionTags;
+            const termTags = await this.expandTags(definition.termTags, definition.dictionary);
+            definition.termTags = termTags;
+        }
+
+        const definitionsByGloss = dictTermsMergeByGloss(result, rawDefinitionsBySequence);
+
+        const secondarySearchResults = [];
+        if (secondarySearchTitles.length > 0) {
+            for (const expression of result.expressions.keys()) {
+                if (expression === text) {
+                    continue;
+                }
+
+                for (const reading of result.expressions.get(expression).keys()) {
+                    for (const definition of await this.database.findTermsExact(expression, reading, secondarySearchTitles)) {
+                        const definitionTags = await this.expandTags(definition.definitionTags, definition.dictionary);
+                        definitionTags.push(dictTagBuildSource(definition.dictionary));
+                        definition.definitionTags = definitionTags;
+                        const termTags = await this.expandTags(definition.termTags, definition.dictionary);
+                        definition.termTags = termTags;
+                        secondarySearchResults.push(definition);
+                    }
+                }
+            }
+        }
+
+        dictTermsMergeByGloss(result, defaultDefinitions.concat(secondarySearchResults), definitionsByGloss, mergedByTermIndices);
+
+        for (const gloss in definitionsByGloss) {
+            const definition = definitionsByGloss[gloss];
+            dictTagsSort(definition.definitionTags);
+            result.definitions.push(definition);
+        }
+
+        dictTermsSort(result.definitions, dictionaries);
+
+        const expressions = [];
+        for (const expression of result.expressions.keys()) {
+            for (const reading of result.expressions.get(expression).keys()) {
+                const termTags = result.expressions.get(expression).get(reading);
+                expressions.push({
+                    expression: expression,
+                    reading: reading,
+                    termTags: dictTagsSort(termTags),
+                    termFrequency: (score => {
+                        if (score > 0) {
+                            return 'popular';
+                        } else if (score < 0) {
+                            return 'rare';
+                        } else {
+                            return 'normal';
+                        }
+                    })(termTags.map(tag => tag.score).reduce((p, v) => p + v, 0))
+                });
+            }
+        }
+
+        result.expressions = expressions;
+        result.expression = Array.from(result.expression);
+        result.reading = Array.from(result.reading);
+
+        return result;
+    }
+
     async findTermsMerged(text, dictionaries, alphanumeric, options) {
         const secondarySearchTitles = Object.keys(options.dictionaries).filter(dict => options.dictionaries[dict].allowSecondarySearches);
         const titles = Object.keys(dictionaries);
@@ -78,75 +150,14 @@ class Translator {
         const mergedByTermIndices = new Set();
 
         for (const sequencedDefinition of sequencedDefinitions) {
-            const result = sequencedDefinition.definitions;
-            const rawDefinitionsBySequence = sequencedDefinition.rawDefinitions;
-
-            for (const definition of rawDefinitionsBySequence) {
-                const definitionTags = await this.expandTags(definition.definitionTags, definition.dictionary);
-                definitionTags.push(dictTagBuildSource(definition.dictionary));
-                definition.definitionTags = definitionTags;
-                const termTags = await this.expandTags(definition.termTags, definition.dictionary);
-                definition.termTags = termTags;
-            }
-
-            const definitionsByGloss = dictTermsMergeByGloss(result, rawDefinitionsBySequence);
-
-            const secondarySearchResults = [];
-            if (secondarySearchTitles.length > 0) {
-                for (const expression of result.expressions.keys()) {
-                    if (expression === text) {
-                        continue;
-                    }
-
-                    for (const reading of result.expressions.get(expression).keys()) {
-                        for (const definition of await this.database.findTermsExact(expression, reading, secondarySearchTitles)) {
-                            const definitionTags = await this.expandTags(definition.definitionTags, definition.dictionary);
-                            definitionTags.push(dictTagBuildSource(definition.dictionary));
-                            definition.definitionTags = definitionTags;
-                            const termTags = await this.expandTags(definition.termTags, definition.dictionary);
-                            definition.termTags = termTags;
-                            secondarySearchResults.push(definition);
-                        }
-                    }
-                }
-            }
-
-            dictTermsMergeByGloss(result, defaultDefinitions.concat(secondarySearchResults), definitionsByGloss, mergedByTermIndices);
-
-            for (const gloss in definitionsByGloss) {
-                const definition = definitionsByGloss[gloss];
-                dictTagsSort(definition.definitionTags);
-                result.definitions.push(definition);
-            }
-
-            dictTermsSort(result.definitions, dictionaries);
-
-            const expressions = [];
-            for (const expression of result.expressions.keys()) {
-                for (const reading of result.expressions.get(expression).keys()) {
-                    const termTags = result.expressions.get(expression).get(reading);
-                    expressions.push({
-                        expression: expression,
-                        reading: reading,
-                        termTags: dictTagsSort(termTags),
-                        termFrequency: (score => {
-                            if (score > 0) {
-                                return 'popular';
-                            } else if (score < 0) {
-                                return 'rare';
-                            } else {
-                                return 'normal';
-                            }
-                        })(termTags.map(tag => tag.score).reduce((p, v) => p + v, 0))
-                    });
-                }
-            }
-
-            result.expressions = expressions;
-
-            result.expression = Array.from(result.expression);
-            result.reading = Array.from(result.reading);
-
+            const result = await this.getMergedDefinition(
+                text,
+                dictionaries,
+                sequencedDefinition,
+                defaultDefinitions,
+                secondarySearchTitles,
+                mergedByTermIndices
+            );
             definitionsMerged.push(result);
         }
 
