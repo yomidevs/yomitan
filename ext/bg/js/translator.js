@@ -69,6 +69,32 @@ class Translator {
         return {sequencedDefinitions, defaultDefinitions};
     }
 
+    async getMergedSecondarySearchResults(text, expressionsMap, secondarySearchTitles) {
+        const secondarySearchResults = [];
+        if (secondarySearchTitles.length === 0) {
+            return secondarySearchResults;
+        }
+
+        for (const expression of expressionsMap.keys()) {
+            if (expression === text) {
+                continue;
+            }
+
+            for (const reading of expressionsMap.get(expression).keys()) {
+                for (const definition of await this.database.findTermsExact(expression, reading, secondarySearchTitles)) {
+                    const definitionTags = await this.expandTags(definition.definitionTags, definition.dictionary);
+                    definitionTags.push(dictTagBuildSource(definition.dictionary));
+                    definition.definitionTags = definitionTags;
+                    const termTags = await this.expandTags(definition.termTags, definition.dictionary);
+                    definition.termTags = termTags;
+                    secondarySearchResults.push(definition);
+                }
+            }
+        }
+
+        return secondarySearchResults;
+    }
+
     async getMergedDefinition(text, dictionaries, sequencedDefinition, defaultDefinitions, secondarySearchTitles, mergedByTermIndices) {
         const result = sequencedDefinition.definitions;
         const rawDefinitionsBySequence = sequencedDefinition.rawDefinitions;
@@ -82,26 +108,7 @@ class Translator {
         }
 
         const definitionsByGloss = dictTermsMergeByGloss(result, rawDefinitionsBySequence);
-
-        const secondarySearchResults = [];
-        if (secondarySearchTitles.length > 0) {
-            for (const expression of result.expressions.keys()) {
-                if (expression === text) {
-                    continue;
-                }
-
-                for (const reading of result.expressions.get(expression).keys()) {
-                    for (const definition of await this.database.findTermsExact(expression, reading, secondarySearchTitles)) {
-                        const definitionTags = await this.expandTags(definition.definitionTags, definition.dictionary);
-                        definitionTags.push(dictTagBuildSource(definition.dictionary));
-                        definition.definitionTags = definitionTags;
-                        const termTags = await this.expandTags(definition.termTags, definition.dictionary);
-                        definition.termTags = termTags;
-                        secondarySearchResults.push(definition);
-                    }
-                }
-            }
-        }
+        const secondarySearchResults = await this.getMergedSecondarySearchResults(text, result.expressions, secondarySearchTitles);
 
         dictTermsMergeByGloss(result, defaultDefinitions.concat(secondarySearchResults), definitionsByGloss, mergedByTermIndices);
 
