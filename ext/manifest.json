@@ -41,7 +41,8 @@
     "permissions": [
         "<all_urls>",
         "storage",
-        "clipboardWrite"
+        "clipboardWrite",
+        "unlimitedStorage"
     ],
     "commands": {
         "toggle": {
