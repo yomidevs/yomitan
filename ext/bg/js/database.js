@@ -123,7 +123,7 @@ class Database {
         const results = [];
         const processRow = (row, index) => {
             if (titles.includes(row.dictionary)) {
-                results.push(Database.createTermMeta(row, index));
+                results.push(Database.createMeta(row, index));
             }
         };
 
@@ -148,15 +148,7 @@ class Database {
         const results = [];
         await this.db.kanji.where('character').equals(kanji).each(row => {
             if (titles.includes(row.dictionary)) {
-                results.push({
-                    character: row.character,
-                    onyomi: dictFieldSplit(row.onyomi),
-                    kunyomi: dictFieldSplit(row.kunyomi),
-                    tags: dictFieldSplit(row.tags),
-                    glossary: row.meanings,
-                    stats: row.stats,
-                    dictionary: row.dictionary
-                });
+                results.push(Database.createKanji(row));
             }
         });
 
@@ -169,11 +161,7 @@ class Database {
         const results = [];
         await this.db.kanjiMeta.where('character').equals(kanji).each(row => {
             if (titles.includes(row.dictionary)) {
-                results.push({
-                    mode: row.mode,
-                    data: row.data,
-                    dictionary: row.dictionary
-                });
+                results.push(Database.createMeta(row));
             }
         });
 
@@ -494,7 +482,20 @@ class Database {
         };
     }
 
-    static createTermMeta(row, index) {
+    static createKanji(row, index) {
+        return {
+            index,
+            character: row.character,
+            onyomi: dictFieldSplit(row.onyomi),
+            kunyomi: dictFieldSplit(row.kunyomi),
+            tags: dictFieldSplit(row.tags),
+            glossary: row.meanings,
+            stats: row.stats,
+            dictionary: row.dictionary
+        };
+    }
+
+    static createMeta(row, index) {
         return {
             index,
             mode: row.mode,
