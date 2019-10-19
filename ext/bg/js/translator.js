@@ -277,33 +277,44 @@ class Translator {
     }
 
     async findKanji(text, dictionaries) {
-        let definitions = [];
-        const processed = {};
         const titles = Object.keys(dictionaries);
+        const kanjiUnique = {};
+        const kanjiList = [];
         for (const c of text) {
-            if (!processed[c]) {
-                definitions.push(...await this.database.findKanji(c, titles));
-                processed[c] = true;
+            if (!kanjiUnique.hasOwnProperty(c)) {
+                kanjiList.push(c);
+                kanjiUnique[c] = true;
             }
         }
 
+        const definitions = await this.database.findKanjiBulk(kanjiList, titles);
+        if (definitions.length === 0) {
+            return definitions;
+        }
+
+        if (definitions.length > 1) {
+            definitions.sort((a, b) => a.index - b.index);
+        }
+
+        const kanjiList2 = [];
         for (const definition of definitions) {
+            kanjiList2.push(definition.character);
+
             const tags = await this.expandTags(definition.tags, definition.dictionary);
             tags.push(dictTagBuildSource(definition.dictionary));
 
             definition.tags = dictTagsSort(tags);
             definition.stats = await this.expandStats(definition.stats, definition.dictionary);
-
             definition.frequencies = [];
-            for (const meta of await this.database.findKanjiMeta(definition.character, titles)) {
-                if (meta.mode === 'freq') {
-                    definition.frequencies.push({
-                        character: meta.character,
-                        frequency: meta.data,
-                        dictionary: meta.dictionary
-                    });
-                }
-            }
+        }
+
+        for (const meta of await this.database.findKanjiMetaBulk(kanjiList2, titles)) {
+            if (meta.mode !== 'freq') { continue; }
+            definitions[meta.index].frequencies.push({
+                character: meta.character,
+                frequency: meta.data,
+                dictionary: meta.dictionary
+            });
         }
 
         return definitions;
