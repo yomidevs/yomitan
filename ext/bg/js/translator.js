@@ -52,23 +52,34 @@ class Translator {
         return {length, definitions: definitionsGrouped};
     }
 
+    async getSequencedDefinitions(definitions, mainDictionary) {
+        const definitionsBySequence = dictTermsMergeBySequence(definitions, mainDictionary);
+        const defaultDefinitions = definitionsBySequence['-1'];
+
+        const sequenceList = Object.keys(definitionsBySequence).map(v => Number(v)).filter(v => v >= 0);
+        const sequencedDefinitions = sequenceList.map((key) => ({
+            definitions: definitionsBySequence[key],
+            rawDefinitions: []
+        }));
+
+        for (const definition of await this.database.findTermsBySequenceBulk(sequenceList, mainDictionary)) {
+            sequencedDefinitions[definition.index].rawDefinitions.push(definition);
+        }
+
+        return {sequencedDefinitions, defaultDefinitions};
+    }
+
     async findTermsMerged(text, dictionaries, alphanumeric, options) {
         const secondarySearchTitles = Object.keys(options.dictionaries).filter(dict => options.dictionaries[dict].allowSecondarySearches);
         const titles = Object.keys(dictionaries);
         const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
-
-        const definitionsBySequence = dictTermsMergeBySequence(definitions, options.general.mainDictionary);
-
+        const {sequencedDefinitions, defaultDefinitions} = await this.getSequencedDefinitions(definitions, options.general.mainDictionary);
         const definitionsMerged = [];
         const mergedByTermIndices = new Set();
-        for (const sequence in definitionsBySequence) {
-            if (sequence < 0) {
-                continue;
-            }
 
-            const result = definitionsBySequence[sequence];
-
-            const rawDefinitionsBySequence = await this.database.findTermsBySequence(Number(sequence), options.general.mainDictionary);
+        for (const sequencedDefinition of sequencedDefinitions) {
+            const result = sequencedDefinition.definitions;
+            const rawDefinitionsBySequence = sequencedDefinition.rawDefinitions;
 
             for (const definition of rawDefinitionsBySequence) {
                 const definitionTags = await this.expandTags(definition.definitionTags, definition.dictionary);
@@ -100,7 +111,7 @@ class Translator {
                 }
             }
 
-            dictTermsMergeByGloss(result, definitionsBySequence['-1'].concat(secondarySearchResults), definitionsByGloss, mergedByTermIndices);
+            dictTermsMergeByGloss(result, defaultDefinitions.concat(secondarySearchResults), definitionsByGloss, mergedByTermIndices);
 
             for (const gloss in definitionsByGloss) {
                 const definition = definitionsByGloss[gloss];
@@ -139,7 +150,7 @@ class Translator {
             definitionsMerged.push(result);
         }
 
-        const strayDefinitions = definitionsBySequence['-1'].filter((definition, index) => !mergedByTermIndices.has(index));
+        const strayDefinitions = defaultDefinitions.filter((definition, index) => !mergedByTermIndices.has(index));
         for (const groupedDefinition of dictTermsGroup(strayDefinitions, dictionaries)) {
             groupedDefinition.expressions = [{expression: groupedDefinition.expression, reading: groupedDefinition.reading}];
             definitionsMerged.push(groupedDefinition);
