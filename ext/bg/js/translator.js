@@ -135,19 +135,12 @@ class Translator {
         for (const expression of result.expressions.keys()) {
             for (const reading of result.expressions.get(expression).keys()) {
                 const termTags = result.expressions.get(expression).get(reading);
+                const score = termTags.map(tag => tag.score).reduce((p, v) => p + v, 0);
                 expressions.push({
                     expression: expression,
                     reading: reading,
                     termTags: dictTagsSort(termTags),
-                    termFrequency: (score => {
-                        if (score > 0) {
-                            return 'popular';
-                        } else if (score < 0) {
-                            return 'rare';
-                        } else {
-                            return 'normal';
-                        }
-                    })(termTags.map(tag => tag.score).reduce((p, v) => p + v, 0))
+                    termFrequency: Translator.scoreToTermFrequency(score)
                 });
             }
         }
@@ -468,6 +461,16 @@ class Translator {
         }
 
         return tagMetaList;
+    }
+
+    static scoreToTermFrequency(score) {
+        if (score > 0) {
+            return 'popular';
+        } else if (score < 0) {
+            return 'rare';
+        } else {
+            return 'normal';
+        }
     }
 
     static getNameBase(name) {
