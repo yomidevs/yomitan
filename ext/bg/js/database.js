@@ -182,7 +182,12 @@ class Database {
         this.validate();
 
         let result = null;
-        await this.db.tagMeta.where('name').equals(name).each(row => {
+        const db = this.db.backendDB();
+        const dbTransaction = db.transaction(['tagMeta'], 'readonly');
+        const dbTerms = dbTransaction.objectStore('tagMeta');
+        const dbIndex = dbTerms.index('name');
+        const only = IDBKeyRange.only(name);
+        await Database.getAll(dbIndex, only, null, row => {
             if (title === row.dictionary) {
                 result = row;
             }
