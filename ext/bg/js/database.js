@@ -90,19 +90,6 @@ class Database {
         return results;
     }
 
-    async findTermsExact(term, reading, titles) {
-        this.validate();
-
-        const results = [];
-        await this.db.terms.where('expression').equals(term).each(row => {
-            if (row.reading === reading && titles.includes(row.dictionary)) {
-                results.push(Database.createTerm(row));
-            }
-        });
-
-        return results;
-    }
-
     async findTermsExactBulk(termList, readingList, titles) {
         this.validate();
 
@@ -125,19 +112,6 @@ class Database {
         }
 
         await Promise.all(promises);
-
-        return results;
-    }
-
-    async findTermsBySequence(sequence, mainDictionary) {
-        this.validate();
-
-        const results = [];
-        await this.db.terms.where('sequence').equals(sequence).each(row => {
-            if (row.dictionary === mainDictionary) {
-                results.push(Database.createTerm(row));
-            }
-        });
 
         return results;
     }
@@ -172,34 +146,8 @@ class Database {
         return this.findGenericBulk('termMeta', 'expression', termList, titles, Database.createMeta);
     }
 
-    async findKanji(kanji, titles) {
-        this.validate();
-
-        const results = [];
-        await this.db.kanji.where('character').equals(kanji).each(row => {
-            if (titles.includes(row.dictionary)) {
-                results.push(Database.createKanji(row));
-            }
-        });
-
-        return results;
-    }
-
     async findKanjiBulk(kanjiList, titles) {
         return this.findGenericBulk('kanji', 'character', kanjiList, titles, Database.createKanji);
-    }
-
-    async findKanjiMeta(kanji, titles) {
-        this.validate();
-
-        const results = [];
-        await this.db.kanjiMeta.where('character').equals(kanji).each(row => {
-            if (titles.includes(row.dictionary)) {
-                results.push(Database.createMeta(row));
-            }
-        });
-
-        return results;
     }
 
     async findKanjiMetaBulk(kanjiList, titles) {
