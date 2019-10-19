@@ -20,7 +20,6 @@
 class Database {
     constructor() {
         this.db = null;
-        this.tagCache = {};
     }
 
     async prepare() {
@@ -53,7 +52,6 @@ class Database {
         this.db.close();
         await this.db.delete();
         this.db = null;
-        this.tagCache = {};
 
         await this.prepare();
     }
@@ -180,19 +178,8 @@ class Database {
         return results;
     }
 
-    findTagForTitleCached(name, title) {
-        if (this.tagCache.hasOwnProperty(title)) {
-            const cache = this.tagCache[title];
-            if (cache.hasOwnProperty(name)) {
-                return cache[name];
-            }
-        }
-    }
-
     async findTagForTitle(name, title) {
         this.validate();
-
-        const cache = (this.tagCache.hasOwnProperty(title) ? this.tagCache[title] : (this.tagCache[title] = {}));
 
         let result = null;
         await this.db.tagMeta.where('name').equals(name).each(row => {
@@ -200,8 +187,6 @@ class Database {
                 result = row;
             }
         });
-
-        cache[name] = result;
 
         return result;
     }

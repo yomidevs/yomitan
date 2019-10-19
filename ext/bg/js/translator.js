@@ -21,6 +21,7 @@ class Translator {
     constructor() {
         this.database = null;
         this.deinflector = null;
+        this.tagCache = {};
     }
 
     async prepare() {
@@ -34,6 +35,11 @@ class Translator {
             const reasons = await requestJson(url, 'GET');
             this.deinflector = new Deinflector(reasons);
         }
+    }
+
+    async purgeDatabase() {
+        this.tagCache = {};
+        await this.database.purge();
     }
 
     async findTermsGrouped(text, dictionaries, alphanumeric, options) {
@@ -404,54 +410,64 @@ class Translator {
     }
 
     async expandTags(names, title) {
-        const tags = [];
-        for (const name of names) {
-            const base = Translator.getNameBase(name);
-            let meta = this.database.findTagForTitleCached(base, title);
-            if (typeof meta === 'undefined') {
-                meta = await this.database.findTagForTitle(base, title);
-            }
-
-            const tag = Object.assign({}, meta !== null ? meta : {}, {name});
-
-            tags.push(dictTagSanitize(tag));
-        }
-
-        return tags;
+        const tagMetaList = await this.getTagMetaList(names, title);
+        return tagMetaList.map((meta, index) => {
+            const name = names[index];
+            const tag = dictTagSanitize(Object.assign({}, meta !== null ? meta : {}, {name}));
+            return dictTagSanitize(tag);
+        });
     }
 
     async expandStats(items, title) {
-        const stats = {};
-        for (const name in items) {
-            const base = Translator.getNameBase(name);
-            let meta = this.database.findTagForTitleCached(base, title);
-            if (typeof meta === 'undefined') {
-                meta = await this.database.findTagForTitle(base, title);
-                if (meta === null) {
-                    continue;
-                }
-            }
+        const names = Object.keys(items);
+        const tagMetaList = await this.getTagMetaList(names, title);
 
-            const group = stats[meta.category] = stats[meta.category] || [];
+        const stats = {};
+        for (let i = 0; i < names.length; ++i) {
+            const name = names[i];
+            const meta = tagMetaList[i];
+            if (meta === null) { continue; }
+
+            const category = meta.category;
+            const group = (
+                stats.hasOwnProperty(category) ?
+                stats[category] :
+                (stats[category] = [])
+            );
 
             const stat = Object.assign({}, meta, {name, value: items[name]});
-
             group.push(dictTagSanitize(stat));
         }
 
+        const sortCompare = (a, b) => a.notes - b.notes;
         for (const category in stats) {
-            stats[category].sort((a, b) => {
-                if (a.notes < b.notes) {
-                    return -1;
-                } else if (a.notes > b.notes) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            });
+            stats[category].sort(sortCompare);
         }
 
         return stats;
+    }
+
+    async getTagMetaList(names, title) {
+        const tagMetaList = [];
+        const cache = (
+            this.tagCache.hasOwnProperty(title) ?
+            this.tagCache[title] :
+            (this.tagCache[title] = {})
+        );
+
+        for (const name of names) {
+            const base = Translator.getNameBase(name);
+
+            if (cache.hasOwnProperty(base)) {
+                tagMetaList.push(cache[base]);
+            } else {
+                const tagMeta = await this.database.findTagForTitle(base, title);
+                cache[base] = tagMeta;
+                tagMetaList.push(tagMeta);
+            }
+        }
+
+        return tagMetaList;
     }
 
     static getNameBase(name) {
