@@ -144,28 +144,30 @@ async function apiTemplateRender(template, data, dynamic) {
     }
 }
 
-async function apiCommandExec(command) {
+async function apiCommandExec(command, params) {
     const handlers = apiCommandExec.handlers;
     if (handlers.hasOwnProperty(command)) {
         const handler = handlers[command];
-        handler();
+        handler(params);
     }
 }
 apiCommandExec.handlers = {
-    search: async () => {
+    search: async (params) => {
         const url = chrome.extension.getURL('/bg/search.html');
-        try {
-            const tab = await apiFindTab(1000, (url2) => (
-                url2 !== null &&
-                url2.startsWith(url) &&
-                (url2.length === url.length || url2[url.length] === '?' || url2[url.length] === '#')
-            ));
-            if (tab !== null) {
-                await apiFocusTab(tab);
-                return;
+        if (!(params && params.newTab)) {
+            try {
+                const tab = await apiFindTab(1000, (url2) => (
+                    url2 !== null &&
+                    url2.startsWith(url) &&
+                    (url2.length === url.length || url2[url.length] === '?' || url2[url.length] === '#')
+                ));
+                if (tab !== null) {
+                    await apiFocusTab(tab);
+                    return;
+                }
+            } catch (e) {
+                // NOP
             }
-        } catch (e) {
-            // NOP
         }
         chrome.tabs.create({url});
     },

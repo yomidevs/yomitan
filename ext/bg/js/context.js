@@ -25,6 +25,20 @@ function showExtensionInfo() {
     node.textContent = `${manifest.name} v${manifest.version}`;
 }
 
+function setupButtonEvents(selector, command) {
+    $(selector)
+    .on('click', (e) => {
+        if (e.button !== 0) { return; }
+        apiCommandExec(command, {newTab: e.ctrlKey});
+        e.preventDefault();
+    })
+    .on('auxclick', (e) => {
+        if (e.button !== 1) { return; }
+        apiCommandExec(command, {newTab: true});
+        e.preventDefault();
+    });
+}
+
 $(document).ready(utilAsync(() => {
     showExtensionInfo();
 
@@ -33,9 +47,9 @@ $(document).ready(utilAsync(() => {
         document.documentElement.dataset.mode = (browser === 'firefox-mobile' ? 'full' : 'mini');
     });
 
-    $('.action-open-search').click(() => apiCommandExec('search'));
-    $('.action-open-options').click(() => apiCommandExec('options'));
-    $('.action-open-help').click(() => apiCommandExec('help'));
+    setupButtonEvents('.action-open-search', 'search');
+    setupButtonEvents('.action-open-options', 'options');
+    setupButtonEvents('.action-open-help', 'help');
 
     const optionsContext = {
         depth: 0,
