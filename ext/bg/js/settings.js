@@ -430,9 +430,14 @@ async function onOptionsUpdate({source}) {
     await formWrite(options);
 }
 
-function onMessage({action, params}) {
-    if (action === 'optionsUpdate') {
-        onOptionsUpdate(params);
+function onMessage({action, params}, sender, callback) {
+    switch (action) {
+        case 'optionsUpdate':
+            onOptionsUpdate(params);
+            break;
+        case 'getUrl':
+            callback({url: window.location.href});
+            break;
     }
 }
 
