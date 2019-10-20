@@ -176,8 +176,14 @@ apiCommandExec.handlers = {
         chrome.tabs.create({url: 'https://foosoft.net/projects/yomichan/'});
     },
 
-    options: () => {
-        chrome.runtime.openOptionsPage();
+    options: (params) => {
+        if (!(params && params.newTab)) {
+            chrome.runtime.openOptionsPage();
+        } else {
+            const manifest = chrome.runtime.getManifest();
+            const url = chrome.extension.getURL(manifest.options_ui.page);
+            chrome.tabs.create({url});
+        }
     },
 
     toggle: async () => {
