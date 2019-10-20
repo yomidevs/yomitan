@@ -237,8 +237,8 @@ class Frontend {
         const handlers = Frontend.runtimeMessageHandlers;
         if (handlers.hasOwnProperty(action)) {
             const handler = handlers[action];
-            handler(this, params);
-            callback();
+            const result = handler(this, params);
+            callback(result);
         }
     }
 
@@ -576,5 +576,9 @@ Frontend.runtimeMessageHandlers = {
 
     popupSetVisibleOverride: (self, {visible}) => {
         self.popup.setVisibleOverride(visible);
+    },
+
+    getUrl: () => {
+        return {url: window.location.href};
     }
 };

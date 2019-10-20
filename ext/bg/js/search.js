@@ -114,6 +114,17 @@ class DisplaySearch extends Display {
         }
     }
 
+    onRuntimeMessage({action, params}, sender, callback) {
+        const handlers = DisplaySearch.runtimeMessageHandlers;
+        if (handlers.hasOwnProperty(action)) {
+            const handler = handlers[action];
+            const result = handler(this, params);
+            callback(result);
+        } else {
+            return super.onRuntimeMessage({action, params}, sender, callback);
+        }
+    }
+
     getOptionsContext() {
         return this.optionsContext;
     }
@@ -187,5 +198,11 @@ class DisplaySearch extends Display {
         return match !== null ? decodeURIComponent(match[1]) : null;
     }
 }
+
+DisplaySearch.runtimeMessageHandlers = {
+    getUrl: () => {
+        return {url: window.location.href};
+    }
+};
 
 window.yomichan_search = DisplaySearch.create();

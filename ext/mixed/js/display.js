@@ -175,8 +175,8 @@ class Display {
         const handlers = Display.runtimeMessageHandlers;
         if (handlers.hasOwnProperty(action)) {
             const handler = handlers[action];
-            handler(this, params);
-            callback();
+            const result = handler(this, params);
+            callback(result);
         }
     }
 

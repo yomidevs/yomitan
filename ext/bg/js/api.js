@@ -152,8 +152,22 @@ async function apiCommandExec(command) {
     }
 }
 apiCommandExec.handlers = {
-    search: () => {
-        chrome.tabs.create({url: chrome.extension.getURL('/bg/search.html')});
+    search: async () => {
+        const url = chrome.extension.getURL('/bg/search.html');
+        try {
+            const tab = await apiFindTab(1000, (url2) => (
+                url2 !== null &&
+                url2.startsWith(url) &&
+                (url2.length === url.length || url2[url.length] === '?' || url2[url.length] === '#')
+            ));
+            if (tab !== null) {
+                await apiFocusTab(tab);
+                return;
+            }
+        } catch (e) {
+            // NOP
+        }
+        chrome.tabs.create({url});
     },
 
     help: () => {
@@ -297,4 +311,75 @@ async function apiGetBrowser() {
     } else {
         return 'chrome';
     }
+}
+
+function apiGetTabUrl(tab) {
+    return new Promise((resolve) => {
+        chrome.tabs.sendMessage(tab.id, {action: 'getUrl'}, {frameId: 0}, (response) => {
+            let url = null;
+            if (!chrome.runtime.lastError) {
+                url = (response !== null && typeof response === 'object' && !Array.isArray(response) ? response.url : null);
+                if (url !== null && typeof url !== 'string') {
+                    url = null;
+                }
+            }
+            resolve({tab, url});
+        });
+    });
+}
+
+async function apiFindTab(timeout, checkUrl) {
+    // This function works around the need to have the "tabs" permission to access tab.url.
+    const tabs = await new Promise((resolve) => chrome.tabs.query({}, resolve));
+    let matchPromiseResolve = null;
+    const matchPromise = new Promise((resolve) => { matchPromiseResolve = resolve; });
+
+    const checkTabUrl = ({tab, url}) => {
+        if (checkUrl(url, tab)) {
+            matchPromiseResolve(tab);
+        }
+    };
+
+    const promises = [];
+    for (const tab of tabs) {
+        const promise = apiGetTabUrl(tab);
+        promise.then(checkTabUrl);
+        promises.push(promise);
+    }
+
+    const racePromises = [
+        matchPromise,
+        Promise.all(promises).then(() => null)
+    ];
+    if (typeof timeout === 'number') {
+        racePromises.push(new Promise((resolve) => setTimeout(() => resolve(null), timeout)));
+    }
+
+    return await Promise.race(racePromises);
+}
+
+async function apiFocusTab(tab) {
+    const tabWindow = await new Promise((resolve) => {
+        chrome.windows.get(tab.windowId, {}, (tabWindow) => {
+            const e = chrome.runtime.lastError;
+            if (e) { reject(e); }
+            else { resolve(tabWindow); }
+        });
+    });
+    if (!tabWindow.focused) {
+        await new Promise((resolve, reject) => {
+            chrome.windows.update(tab.windowId, {focused: true}, () => {
+                const e = chrome.runtime.lastError;
+                if (e) { reject(e); }
+                else { resolve(); }
+            });
+        });
+    }
+    await new Promise((resolve, reject) => {
+        chrome.tabs.update(tab.id, {active: true}, () => {
+            const e = chrome.runtime.lastError;
+            if (e) { reject(e); }
+            else { resolve(); }
+        });
+    });
 }
