@@ -21,36 +21,20 @@ class DisplayFloat extends Display {
     constructor() {
         super(document.querySelector('#spinner'), document.querySelector('#definitions'));
         this.autoPlayAudioTimer = null;
-        this.styleNode = null;
 
         this.optionsContext = {
             depth: 0,
             url: window.location.href
         };
 
-        this.dependencies = Object.assign({}, this.dependencies, {docRangeFromPoint, docSentenceExtract});
-
         window.addEventListener('message', (e) => this.onMessage(e), false);
     }
 
     onError(error) {
         if (window.yomichan_orphaned) {
-            this.onOrphaned();
+            this.setContentOrphaned();
         } else {
             logError(error, true);
-        }
-    }
-
-    onOrphaned() {
-        const definitions = document.querySelector('#definitions');
-        const errorOrphaned = document.querySelector('#error-orphaned');
-
-        if (definitions !== null) {
-            definitions.style.setProperty('display', 'none', 'important');
-        }
-
-        if (errorOrphaned !== null) {
-            errorOrphaned.style.setProperty('display', 'block', 'important');
         }
     }
 
@@ -84,6 +68,10 @@ class DisplayFloat extends Display {
         super.onKeyDown(e);
     }
 
+    getOptionsContext() {
+        return this.optionsContext;
+    }
+
     autoPlayAudio() {
         this.clearAutoPlayTimer();
         this.autoPlayAudioTimer = window.setTimeout(() => super.autoPlayAudio(), 400);
@@ -96,29 +84,15 @@ class DisplayFloat extends Display {
         }
     }
 
-    initialize(options, popupInfo, url) {
-        const css = options.general.customPopupCss;
-        if (css) {
-            this.setStyle(css);
-        }
+    async initialize(options, popupInfo, url, childrenSupported) {
+        await super.initialize(options);
 
         const {id, depth, parentFrameId} = popupInfo;
         this.optionsContext.depth = depth;
         this.optionsContext.url = url;
-        popupNestedInitialize(id, depth, parentFrameId, url);
-    }
 
-    setStyle(css) {
-        const parent = document.head;
-
-        if (this.styleNode === null) {
-            this.styleNode = document.createElement('style');
-        }
-
-        this.styleNode.textContent = css;
-
-        if (this.styleNode.parentNode !== parent) {
-            parent.appendChild(this.styleNode);
+        if (childrenSupported) {
+            popupNestedInitialize(id, depth, parentFrameId, url);
         }
     }
 }
@@ -134,11 +108,10 @@ DisplayFloat.onKeyDownHandlers = {
 };
 
 DisplayFloat.messageHandlers = {
-    termsShow: (self, {definitions, options, context}) => self.termsShow(definitions, options, context),
-    kanjiShow: (self, {definitions, options, context}) => self.kanjiShow(definitions, options, context),
+    setContent: (self, {type, details}) => self.setContent(type, details),
     clearAutoPlayTimer: (self) => self.clearAutoPlayTimer(),
-    orphaned: (self) => self.onOrphaned(),
-    initialize: (self, {options, popupInfo, url}) => self.initialize(options, popupInfo, url)
+    setCustomCss: (self, {css}) => self.setCustomCss(css),
+    initialize: (self, {options, popupInfo, url, childrenSupported}) => self.initialize(options, popupInfo, url, childrenSupported)
 };
 
 window.yomichan_display = new DisplayFloat();

@@ -25,8 +25,9 @@ class Popup {
         this.frameId = null;
         this.parent = null;
         this.child = null;
+        this.childrenSupported = true;
         this.container = document.createElement('iframe');
-        this.container.id = 'yomichan-float';
+        this.container.className = 'yomichan-float';
         this.container.addEventListener('mousedown', e => e.stopPropagation());
         this.container.addEventListener('scroll', e => e.stopPropagation());
         this.container.setAttribute('src', chrome.extension.getURL('/fg/float.html'));
@@ -36,17 +37,19 @@ class Popup {
         this.isInjected = false;
         this.visible = false;
         this.visibleOverride = null;
+        this.options = null;
+        this.stylesheetInjectedViaApi = false;
         this.updateVisibility();
     }
 
-    inject(options) {
+    inject() {
         if (this.injectPromise === null) {
-            this.injectPromise = this.createInjectPromise(options);
+            this.injectPromise = this.createInjectPromise();
         }
         return this.injectPromise;
     }
 
-    async createInjectPromise(options) {
+    async createInjectPromise() {
         try {
             const {frameId} = await this.frameIdPromise;
             if (typeof frameId === 'number') {
@@ -60,30 +63,44 @@ class Popup {
             const parentFrameId = (typeof this.frameId === 'number' ? this.frameId : null);
             this.container.addEventListener('load', () => {
                 this.invokeApi('initialize', {
-                    options: {
-                        general: {
-                            customPopupCss: options.general.customPopupCss
-                        }
-                    },
+                    options: this.options,
                     popupInfo: {
                         id: this.id,
                         depth: this.depth,
                         parentFrameId
                     },
-                    url: this.url
+                    url: this.url,
+                    childrenSupported: this.childrenSupported
                 });
                 resolve();
             });
             this.observeFullscreen();
             this.onFullscreenChanged();
+            this.setCustomOuterCss(this.options.general.customPopupOuterCss, false);
             this.isInjected = true;
         });
     }
 
-    async show(elementRect, writingMode, options) {
-        await this.inject(options);
+    isInitialized() {
+        return this.options !== null;
+    }
 
-        const optionsGeneral = options.general;
+    async setOptions(options) {
+        this.options = options;
+        this.updateTheme();
+    }
+
+    async showContent(elementRect, writingMode, type=null, details=null) {
+        if (!this.isInitialized()) { return; }
+        await this.show(elementRect, writingMode);
+        if (type === null) { return; }
+        this.invokeApi('setContent', {type, details});
+    }
+
+    async show(elementRect, writingMode) {
+        await this.inject();
+
+        const optionsGeneral = this.options.general;
         const container = this.container;
         const containerRect = container.getBoundingClientRect();
         const getPosition = (
@@ -208,11 +225,6 @@ class Popup {
         return [position, size, after];
     }
 
-    async showOrphaned(elementRect, writingMode, options) {
-        await this.show(elementRect, writingMode, options);
-        this.invokeApi('orphaned');
-    }
-
     hide(changeFocus) {
         if (!this.isVisible()) {
             return;
@@ -225,6 +237,10 @@ class Popup {
         if (changeFocus) {
             this.focusParent();
         }
+    }
+
+    async isVisibleAsync() {
+        return this.isVisible();
     }
 
     isVisible() {
@@ -261,6 +277,44 @@ class Popup {
         }
     }
 
+    updateTheme() {
+        this.container.dataset.yomichanTheme = this.options.general.popupOuterTheme;
+        this.container.dataset.yomichanSiteColor = this.getSiteColor();
+    }
+
+    getSiteColor() {
+        const color = [255, 255, 255];
+        Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.documentElement).backgroundColor));
+        Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.body).backgroundColor));
+        const dark = (color[0] < 128 && color[1] < 128 && color[2] < 128);
+        return dark ? 'dark' : 'light';
+    }
+
+    static addColor(target, color) {
+        if (color === null) { return; }
+
+        const a = color[3];
+        if (a <= 0.0) { return; }
+
+        const aInv = 1.0 - a;
+        for (let i = 0; i < 3; ++i) {
+            target[i] = target[i] * aInv + color[i] * a;
+        }
+    }
+
+    static getColorInfo(cssColor) {
+        const m = /^\s*rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d\.]+)\s*)?\)\s*$/.exec(cssColor);
+        if (m === null) { return null; }
+
+        const m4 = m[4];
+        return [
+            Number.parseInt(m[1], 10),
+            Number.parseInt(m[2], 10),
+            Number.parseInt(m[3], 10),
+            m4 ? Math.max(0.0, Math.min(1.0, Number.parseFloat(m4))) : 1.0
+        ];
+    }
+
     async containsPoint(x, y) {
         for (let popup = this; popup !== null && popup.isVisible(); popup = popup.child) {
             const rect = popup.container.getBoundingClientRect();
@@ -271,14 +325,25 @@ class Popup {
         return false;
     }
 
-    async termsShow(elementRect, writingMode, definitions, options, context) {
-        await this.show(elementRect, writingMode, options);
-        this.invokeApi('termsShow', {definitions, options, context});
+    async setCustomCss(css) {
+        this.invokeApi('setCustomCss', {css});
     }
 
-    async kanjiShow(elementRect, writingMode, definitions, options, context) {
-        await this.show(elementRect, writingMode, options);
-        this.invokeApi('kanjiShow', {definitions, options, context});
+    async setCustomOuterCss(css, injectDirectly) {
+        // Cannot repeatedly inject stylesheets using web extension APIs since there is no way to remove them.
+        if (this.stylesheetInjectedViaApi) { return; }
+
+        if (injectDirectly || Popup.isOnExtensionPage()) {
+            Popup.injectOuterStylesheet(css);
+        } else {
+            if (!css) { return; }
+            try {
+                await apiInjectStylesheet(css);
+                this.stylesheetInjectedViaApi = true;
+            } catch (e) {
+                // NOP
+            }
+        }
     }
 
     clearAutoPlayTimer() {
@@ -322,4 +387,35 @@ class Popup {
     get url() {
         return window.location.href;
     }
+
+    static isOnExtensionPage() {
+        try {
+            const url = chrome.runtime.getURL('/');
+            return window.location.href.substr(0, url.length) === url;
+        } catch (e) {
+            // NOP
+        }
+    }
+
+    static injectOuterStylesheet(css) {
+        if (Popup.outerStylesheet === null) {
+            if (!css) { return; }
+            Popup.outerStylesheet = document.createElement('style');
+            Popup.outerStylesheet.id = "yomichan-popup-outer-stylesheet";
+        }
+
+        const outerStylesheet = Popup.outerStylesheet;
+        if (css) {
+            outerStylesheet.textContent = css;
+
+            const par = document.head;
+            if (par && outerStylesheet.parentNode !== par) {
+                par.appendChild(outerStylesheet);
+            }
+        } else {
+            outerStylesheet.textContent = '';
+        }
+    }
 }
+
+Popup.outerStylesheet = null;

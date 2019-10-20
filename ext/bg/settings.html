@@ -231,9 +231,49 @@
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <label for="popup-theme">Popup theme</label>
+                            <select class="form-control" id="popup-theme">
+                                <option value="default">Light</option>
+                                <option value="dark">Dark</option>
+                            </select>
+                        </div>
+                        <div class="col-xs-6">
+                            <label for="popup-outer-theme">Popup shadow theme</label>
+                            <select class="form-control" id="popup-outer-theme">
+                                <option value="auto">Auto-detect</option>
+                                <option value="default">Light</option>
+                                <option value="dark">Dark</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group options-advanced">
-                    <label for="custom-popup-css">Custom popup CSS</label>
-                    <div><textarea autocomplete="off" spellcheck="false" wrap="soft" id="custom-popup-css" class="form-control"></textarea></div>
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <label for="custom-popup-css">Custom popup CSS</label>
+                            <div><textarea autocomplete="off" spellcheck="false" wrap="soft" id="custom-popup-css" class="form-control"></textarea></div>
+                        </div>
+                        <div class="col-xs-6">
+                            <label for="custom-popup-outer-css">Custom popup outer CSS</label>
+                            <div><textarea autocomplete="off" spellcheck="false" wrap="soft" id="custom-popup-outer-css" class="form-control" placeholder="iframe.yomichan-float { /*styles*/ }"></textarea></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group ignore-form-changes" style="display: none;" id="settings-popup-preview-settings">
+                    <label for="settings-popup-preview-text">Popup preview text</label>
+                    <input type="text" id="settings-popup-preview-text" class="form-control" value="読め">
+                </div>
+
+                <div class="form-group ignore-form-changes">
+                    <div id="settings-popup-preview-button-container">
+                        <button class="btn btn-default" id="settings-popup-preview-button">Show popup preview</button>
+                    </div>
+                    <div id="settings-popup-preview-container"></div>
                 </div>
             </div>
 
@@ -253,6 +293,16 @@
                     <input type="number" min="0" max="100" id="audio-playback-volume" class="form-control">
                 </div>
 
+                <div class="form-group" style="display: none;" id="text-to-speech-voice-container">
+                    <label for="text-to-speech-voice">Text-to-speech voice</label>
+                    <div class="input-group">
+                        <select class="form-control" id="text-to-speech-voice"></select>
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="text-to-speech-voice-test" title="Test voice" data-speech-text="よみちゃん"><span class="glyphicon glyphicon-volume-up"></span></button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group options-advanced">
                     <label for="audio-custom-source">Custom audio source <span class="label-light">(URL)</span></label>
                     <input type="text" id="audio-custom-source" class="form-control" placeholder="Example: http://localhost/audio.mp3?expression={expression}&reading={reading}">
@@ -269,8 +319,10 @@
                         <div class="input-group-addon audio-source-prefix"></div>
                         <select class="form-control audio-source-select">
                             <option value="jpod101">JapanesePod101</option>
-                            <option value="jpod101-alternate">JapanesePod101 (alternate)</option>
+                            <option value="jpod101-alternate">JapanesePod101 (Alternate)</option>
                             <option value="jisho">Jisho.org</option>
+                            <option value="text-to-speech">Text-to-speech</option>
+                            <option value="text-to-speech-reading">Text-to-speech (Kana reading)</option>
                             <option value="custom">Custom</option>
                         </select>
                         <div class="input-group-btn"><button class="btn btn-danger audio-source-remove" title="Remove"><span class="glyphicon glyphicon-remove"></span></button></div>
@@ -395,15 +447,26 @@
                 </div>
             </div>
 
-            <div id="storage-info" class="storage-hidden">
+            <div id="storage-info">
                 <div>
                     <img src="/mixed/img/spinner.gif" class="pull-right" id="storage-spinner" />
                     <h3>Storage</h3>
                 </div>
 
-                <div id="storage-use" class="storage-hidden">
+                <div id="storage-persist-info" class="storage-hidden">
                     <p class="help-block">
+                        Web browsers may sometimes clear stored data if the device is running low on storage space.
+                        This can result in the stored dictionary data being deleted unexpectedly, causing Yomichan to stop working for no apparent reason.
+                        In order to prevent this, persistent storage must be enable by clicking the "Persistent Storage" button below.
+                    </p>
+                </div>
+
+                <div id="storage-use" class="storage-hidden">
+                    <p class="help-block storage-hidden" id="storage-use-finite">
                         Yomichan is using approximately <strong id="storage-usage"></strong> of <strong id="storage-quota"></strong>.
+                    </p>
+                    <p class="help-block storage-hidden" id="storage-use-infinite">
+                        Yomichan is permitted <strong>unlimited storage</strong>.
                     </p>
                 </div>
 
@@ -425,8 +488,23 @@
                 </div></div>
 
                 <div>
-                    <button class="btn btn-default" id="storage-refresh">Refresh</button>
+                    <button class="btn btn-default" id="storage-refresh"><span class="btn-inner-middle">Refresh</span></button>
+                    <button class="btn btn-default storage-hidden ignore-form-changes" id="storage-persist-button"><span class="storage-button-inner"><input type="checkbox" class="btn-inner-middle storage-button-checkbox" id="storage-persist-button-checkbox" readonly /><span class="btn-inner-middle">Persistent Storage</span></span></button>
                 </div>
+
+                <p></p>
+
+                <div data-show-for-browser="firefox-mobile"><div class="alert alert-warning storage-persist-fail-warning storage-hidden">
+                    <p>It may not be possible to enable Persistent Storage on Firefox for Android.</p>
+                </div></div>
+
+                <div data-show-for-browser="chrome"><div class="alert alert-warning storage-persist-fail-warning storage-hidden">
+                    <p>
+                        It may not be possible to enable Persistent Storage on Chrome-based browsers.
+                        However, the Yomichan extension has permission for unlimited storage which should
+                        prevent Chrome from deleting data.<sup><a href="https://bugs.chromium.org/p/chromium/issues/detail?id=680392#c15" target="_blank" rel="noopener">[1]</a></sup>
+                    </p>
+                </div></div>
             </div>
 
             <div>
@@ -441,13 +519,21 @@
                     <a href="https://foosoft.net/projects/anki-connect/" target="_blank" rel="noopener">AnkiConnect</a> plugin.
                 </p>
 
-                <div class="alert alert-danger" id="anki-error"></div>
-
                 <div class="checkbox">
                     <label><input type="checkbox" id="anki-enable"> Enable Anki integration</label>
                 </div>
 
                 <div id="anki-general">
+                    <div data-show-for-operating-system="mac">
+                        <div class="alert alert-warning" id="anki-mac-warning">
+                            Notice for Mac OS X users:
+                            If Yomichan has issues connecting to AnkiConnect, you may have to tweak some system settings.
+                            See <a href="https://foosoft.net/projects/anki-connect/#notes-for-mac-os-x-users" target="_blank" rel="noopener">this link</a> for more details.
+                        </div>
+                    </div>
+
+                    <div class="alert alert-danger" id="anki-error"></div>
+
                     <div class="form-group">
                         <label for="card-tags">Card tags <span class="label-light">(comma or space separated)</span></label>
                         <input type="text" id="card-tags" class="form-control">
@@ -591,6 +677,7 @@
         <script src="/mixed/lib/jquery.min.js"></script>
         <script src="/mixed/lib/bootstrap/js/bootstrap.min.js"></script>
         <script src="/mixed/lib/handlebars.min.js"></script>
+        <script src="/mixed/lib/wanakana.min.js"></script>
 
         <script src="/mixed/js/extension.js"></script>
 
@@ -605,6 +692,7 @@
         <script src="/bg/js/profile-conditions.js"></script>
         <script src="/bg/js/templates.js"></script>
         <script src="/bg/js/util.js"></script>
+        <script src="/mixed/js/audio.js"></script>
 
         <script src="/bg/js/settings-profiles.js"></script>
         <script src="/bg/js/settings.js"></script>

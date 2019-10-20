@@ -17,10 +17,47 @@
  */
 
 
+function showExtensionInfo() {
+    const node = document.getElementById('extension-info');
+    if (node === null) { return; }
+
+    const manifest = chrome.runtime.getManifest();
+    node.textContent = `${manifest.name} v${manifest.version}`;
+}
+
+function setupButtonEvents(selector, command, url) {
+    const node = $(selector);
+    node.on('click', (e) => {
+        if (e.button !== 0) { return; }
+        apiCommandExec(command, {newTab: e.ctrlKey});
+        e.preventDefault();
+    })
+    .on('auxclick', (e) => {
+        if (e.button !== 1) { return; }
+        apiCommandExec(command, {newTab: true});
+        e.preventDefault();
+    });
+
+    if (typeof url === 'string') {
+        node.attr('href', url);
+        node.attr('target', '_blank');
+        node.attr('rel', 'noopener');
+    }
+}
+
 $(document).ready(utilAsync(() => {
-    $('#open-search').click(() => apiCommandExec('search'));
-    $('#open-options').click(() => apiCommandExec('options'));
-    $('#open-help').click(() => apiCommandExec('help'));
+    showExtensionInfo();
+
+    apiGetEnvironmentInfo().then(({browser}) => {
+        // Firefox mobile opens this page as a full webpage.
+        document.documentElement.dataset.mode = (browser === 'firefox-mobile' ? 'full' : 'mini');
+    });
+
+    const manifest = chrome.runtime.getManifest();
+
+    setupButtonEvents('.action-open-search', 'search', chrome.extension.getURL('/bg/search.html'));
+    setupButtonEvents('.action-open-options', 'options', chrome.extension.getURL(manifest.options_ui.page));
+    setupButtonEvents('.action-open-help', 'help');
 
     const optionsContext = {
         depth: 0,
@@ -31,5 +68,9 @@ $(document).ready(utilAsync(() => {
         toggle.prop('checked', options.general.enable).change();
         toggle.bootstrapToggle();
         toggle.change(() => apiCommandExec('toggle'));
+
+        const toggle2 = $('#enable-search2');
+        toggle2.prop('checked', options.general.enable).change();
+        toggle2.change(() => apiCommandExec('toggle'));
     });
 }));

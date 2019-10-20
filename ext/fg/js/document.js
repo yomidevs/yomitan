@@ -27,8 +27,8 @@ function docImposterCreate(element, isTextarea) {
     const elementStyle = window.getComputedStyle(element);
     const elementRect = element.getBoundingClientRect();
     const documentRect = document.documentElement.getBoundingClientRect();
-    const left = elementRect.left - documentRect.left;
-    const top = elementRect.top - documentRect.top;
+    let left = elementRect.left - documentRect.left;
+    let top = elementRect.top - documentRect.top;
 
     // Container
     const container = document.createElement('div');
@@ -81,6 +81,12 @@ function docImposterCreate(element, isTextarea) {
         const height = parseFloat(elementStyle.height) + (elementRect.height - imposterRect.height);
         docSetImposterStyle(imposterStyle, 'width', `${width}px`);
         docSetImposterStyle(imposterStyle, 'height', `${height}px`);
+    }
+    if (imposterRect.x !== elementRect.x || imposterRect.y !== elementRect.y) {
+        left += (elementRect.left - imposterRect.left);
+        top += (elementRect.top - imposterRect.top);
+        docSetImposterStyle(imposterStyle, 'left', `${left}px`);
+        docSetImposterStyle(imposterStyle, 'top', `${top}px`);
     }
 
     imposter.scrollTop = element.scrollTop;

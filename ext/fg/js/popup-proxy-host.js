@@ -38,21 +38,23 @@ class PopupProxyHost {
 
         this.apiReceiver = new FrontendApiReceiver(`popup-proxy-host#${frameId}`, {
             createNestedPopup: ({parentId}) => this.createNestedPopup(parentId),
-            show: ({id, elementRect, options}) => this.show(id, elementRect, options),
-            showOrphaned: ({id, elementRect, options}) => this.show(id, elementRect, options),
+            setOptions: ({id, options}) => this.setOptions(id, options),
             hide: ({id, changeFocus}) => this.hide(id, changeFocus),
+            isVisibleAsync: ({id}) => this.isVisibleAsync(id),
             setVisibleOverride: ({id, visible}) => this.setVisibleOverride(id, visible),
             containsPoint: ({id, x, y}) => this.containsPoint(id, x, y),
-            termsShow: ({id, elementRect, writingMode, definitions, options, context}) => this.termsShow(id, elementRect, writingMode, definitions, options, context),
-            kanjiShow: ({id, elementRect, writingMode, definitions, options, context}) => this.kanjiShow(id, elementRect, writingMode, definitions, options, context),
+            showContent: ({id, elementRect, writingMode, type, details}) => this.showContent(id, elementRect, writingMode, type, details),
+            setCustomCss: ({id, css}) => this.setCustomCss(id, css),
             clearAutoPlayTimer: ({id}) => this.clearAutoPlayTimer(id)
         });
     }
 
-    createPopup(parentId) {
+    createPopup(parentId, depth) {
         const parent = (typeof parentId === 'string' && this.popups.hasOwnProperty(parentId) ? this.popups[parentId] : null);
-        const depth = (parent !== null ? parent.depth + 1 : 0);
         const id = `${this.nextId}`;
+        if (parent !== null) {
+            depth = parent.depth + 1;
+        }
         ++this.nextId;
         const popup = new Popup(id, depth, this.frameIdPromise);
         if (parent !== null) {
@@ -64,7 +66,7 @@ class PopupProxyHost {
     }
 
     async createNestedPopup(parentId) {
-        return this.createPopup(parentId).id;
+        return this.createPopup(parentId, 0).id;
     }
 
     getPopup(id) {
@@ -86,16 +88,9 @@ class PopupProxyHost {
         return new DOMRect(x, y, jsonRect.width, jsonRect.height);
     }
 
-    async show(id, elementRect, options) {
+    async setOptions(id, options) {
         const popup = this.getPopup(id);
-        elementRect = this.jsonRectToDOMRect(popup, elementRect);
-        return await popup.show(elementRect, options);
-    }
-
-    async showOrphaned(id, elementRect, options) {
-        const popup = this.getPopup(id);
-        elementRect = this.jsonRectToDOMRect(popup, elementRect);
-        return await popup.showOrphaned(elementRect, options);
+        return await popup.setOptions(options);
     }
 
     async hide(id, changeFocus) {
@@ -103,9 +98,14 @@ class PopupProxyHost {
         return popup.hide(changeFocus);
     }
 
+    async isVisibleAsync(id) {
+        const popup = this.getPopup(id);
+        return await popup.isVisibleAsync();
+    }
+
     async setVisibleOverride(id, visible) {
         const popup = this.getPopup(id);
-        return popup.setVisibleOverride(visible);
+        return await popup.setVisibleOverride(visible);
     }
 
     async containsPoint(id, x, y) {
@@ -113,18 +113,16 @@ class PopupProxyHost {
         return await popup.containsPoint(x, y);
     }
 
-    async termsShow(id, elementRect, writingMode, definitions, options, context) {
+    async showContent(id, elementRect, writingMode, type, details) {
         const popup = this.getPopup(id);
         elementRect = this.jsonRectToDOMRect(popup, elementRect);
-        if (!PopupProxyHost.popupCanShow(popup)) { return false; }
-        return await popup.termsShow(elementRect, writingMode, definitions, options, context);
+        if (!PopupProxyHost.popupCanShow(popup)) { return Promise.resolve(false); }
+        return await popup.showContent(elementRect, writingMode, type, details);
     }
 
-    async kanjiShow(id, elementRect, writingMode, definitions, options, context) {
+    async setCustomCss(id, css) {
         const popup = this.getPopup(id);
-        elementRect = this.jsonRectToDOMRect(popup, elementRect);
-        if (!PopupProxyHost.popupCanShow(popup)) { return false; }
-        return await popup.kanjiShow(elementRect, writingMode, definitions, options, context);
+        return popup.setCustomCss(css);
     }
 
     async clearAutoPlayTimer(id) {

@@ -20,7 +20,6 @@
 class Database {
     constructor() {
         this.db = null;
-        this.tagCache = {};
     }
 
     async prepare() {
@@ -53,33 +52,20 @@ class Database {
         this.db.close();
         await this.db.delete();
         this.db = null;
-        this.tagCache = {};
 
         await this.prepare();
     }
 
-    async findTerms(term, titles) {
+    async findTermsBulk(termList, titles) {
         this.validate();
 
-        const results = [];
-        await this.db.terms.where('expression').equals(term).or('reading').equals(term).each(row => {
-            if (titles.includes(row.dictionary)) {
-                results.push(Database.createTerm(row));
-            }
-        });
-
-        return results;
-    }
-
-    async findTermsBulk(terms, titles) {
         const promises = [];
         const visited = {};
         const results = [];
-        const createResult = Database.createTerm;
         const processRow = (row, index) => {
             if (titles.includes(row.dictionary) && !visited.hasOwnProperty(row.id)) {
                 visited[row.id] = true;
-                results.push(createResult(row, index));
+                results.push(Database.createTerm(row, index));
             }
         };
 
@@ -89,8 +75,8 @@ class Database {
         const dbIndex1 = dbTerms.index('expression');
         const dbIndex2 = dbTerms.index('reading');
 
-        for (let i = 0; i < terms.length; ++i) {
-            const only = IDBKeyRange.only(terms[i]);
+        for (let i = 0; i < termList.length; ++i) {
+            const only = IDBKeyRange.only(termList[i]);
             promises.push(
                 Database.getAll(dbIndex1, only, i, processRow),
                 Database.getAll(dbIndex2, only, i, processRow)
@@ -102,66 +88,24 @@ class Database {
         return results;
     }
 
-    async findTermsExact(term, reading, titles) {
+    async findTermsExactBulk(termList, readingList, titles) {
         this.validate();
 
-        const results = [];
-        await this.db.terms.where('expression').equals(term).each(row => {
-            if (row.reading === reading && titles.includes(row.dictionary)) {
-                results.push(Database.createTerm(row));
-            }
-        });
-
-        return results;
-    }
-
-    async findTermsBySequence(sequence, mainDictionary) {
-        this.validate();
-
-        const results = [];
-        await this.db.terms.where('sequence').equals(sequence).each(row => {
-            if (row.dictionary === mainDictionary) {
-                results.push(Database.createTerm(row));
-            }
-        });
-
-        return results;
-    }
-
-    async findTermMeta(term, titles) {
-        this.validate();
-
-        const results = [];
-        await this.db.termMeta.where('expression').equals(term).each(row => {
-            if (titles.includes(row.dictionary)) {
-                results.push({
-                    mode: row.mode,
-                    data: row.data,
-                    dictionary: row.dictionary
-                });
-            }
-        });
-
-        return results;
-    }
-
-    async findTermMetaBulk(terms, titles) {
         const promises = [];
         const results = [];
-        const createResult = Database.createTermMeta;
         const processRow = (row, index) => {
-            if (titles.includes(row.dictionary)) {
-                results.push(createResult(row, index));
+            if (row.reading === readingList[index] && titles.includes(row.dictionary)) {
+                results.push(Database.createTerm(row, index));
             }
         };
 
         const db = this.db.backendDB();
-        const dbTransaction = db.transaction(['termMeta'], 'readonly');
-        const dbTerms = dbTransaction.objectStore('termMeta');
+        const dbTransaction = db.transaction(['terms'], 'readonly');
+        const dbTerms = dbTransaction.objectStore('terms');
         const dbIndex = dbTerms.index('expression');
 
-        for (let i = 0; i < terms.length; ++i) {
-            const only = IDBKeyRange.only(terms[i]);
+        for (let i = 0; i < termList.length; ++i) {
+            const only = IDBKeyRange.only(termList[i]);
             promises.push(Database.getAll(dbIndex, only, i, processRow));
         }
 
@@ -170,66 +114,84 @@ class Database {
         return results;
     }
 
-    async findKanji(kanji, titles) {
+    async findTermsBySequenceBulk(sequenceList, mainDictionary) {
         this.validate();
 
+        const promises = [];
         const results = [];
-        await this.db.kanji.where('character').equals(kanji).each(row => {
-            if (titles.includes(row.dictionary)) {
-                results.push({
-                    character: row.character,
-                    onyomi: dictFieldSplit(row.onyomi),
-                    kunyomi: dictFieldSplit(row.kunyomi),
-                    tags: dictFieldSplit(row.tags),
-                    glossary: row.meanings,
-                    stats: row.stats,
-                    dictionary: row.dictionary
-                });
+        const processRow = (row, index) => {
+            if (row.dictionary === mainDictionary) {
+                results.push(Database.createTerm(row, index));
             }
-        });
+        };
 
-        return results;
-    }
+        const db = this.db.backendDB();
+        const dbTransaction = db.transaction(['terms'], 'readonly');
+        const dbTerms = dbTransaction.objectStore('terms');
+        const dbIndex = dbTerms.index('sequence');
 
-    async findKanjiMeta(kanji, titles) {
-        this.validate();
-
-        const results = [];
-        await this.db.kanjiMeta.where('character').equals(kanji).each(row => {
-            if (titles.includes(row.dictionary)) {
-                results.push({
-                    mode: row.mode,
-                    data: row.data,
-                    dictionary: row.dictionary
-                });
-            }
-        });
-
-        return results;
-    }
-
-    findTagForTitleCached(name, title) {
-        if (this.tagCache.hasOwnProperty(title)) {
-            const cache = this.tagCache[title];
-            if (cache.hasOwnProperty(name)) {
-                return cache[name];
-            }
+        for (let i = 0; i < sequenceList.length; ++i) {
+            const only = IDBKeyRange.only(sequenceList[i]);
+            promises.push(Database.getAll(dbIndex, only, i, processRow));
         }
+
+        await Promise.all(promises);
+
+        return results;
+    }
+
+    async findTermMetaBulk(termList, titles) {
+        return this.findGenericBulk('termMeta', 'expression', termList, titles, Database.createMeta);
+    }
+
+    async findKanjiBulk(kanjiList, titles) {
+        return this.findGenericBulk('kanji', 'character', kanjiList, titles, Database.createKanji);
+    }
+
+    async findKanjiMetaBulk(kanjiList, titles) {
+        return this.findGenericBulk('kanjiMeta', 'character', kanjiList, titles, Database.createMeta);
+    }
+
+    async findGenericBulk(tableName, indexName, indexValueList, titles, createResult) {
+        this.validate();
+
+        const promises = [];
+        const results = [];
+        const processRow = (row, index) => {
+            if (titles.includes(row.dictionary)) {
+                results.push(createResult(row, index));
+            }
+        };
+
+        const db = this.db.backendDB();
+        const dbTransaction = db.transaction([tableName], 'readonly');
+        const dbTerms = dbTransaction.objectStore(tableName);
+        const dbIndex = dbTerms.index(indexName);
+
+        for (let i = 0; i < indexValueList.length; ++i) {
+            const only = IDBKeyRange.only(indexValueList[i]);
+            promises.push(Database.getAll(dbIndex, only, i, processRow));
+        }
+
+        await Promise.all(promises);
+
+        return results;
     }
 
     async findTagForTitle(name, title) {
         this.validate();
 
-        const cache = (this.tagCache.hasOwnProperty(title) ? this.tagCache[title] : (this.tagCache[title] = {}));
-
         let result = null;
-        await this.db.tagMeta.where('name').equals(name).each(row => {
+        const db = this.db.backendDB();
+        const dbTransaction = db.transaction(['tagMeta'], 'readonly');
+        const dbTerms = dbTransaction.objectStore('tagMeta');
+        const dbIndex = dbTerms.index('name');
+        const only = IDBKeyRange.only(name);
+        await Database.getAll(dbIndex, only, null, row => {
             if (title === row.dictionary) {
                 result = row;
             }
         });
-
-        cache[name] = result;
 
         return result;
     }
@@ -522,7 +484,20 @@ class Database {
         };
     }
 
-    static createTermMeta(row, index) {
+    static createKanji(row, index) {
+        return {
+            index,
+            character: row.character,
+            onyomi: dictFieldSplit(row.onyomi),
+            kunyomi: dictFieldSplit(row.kunyomi),
+            tags: dictFieldSplit(row.tags),
+            glossary: row.meanings,
+            stats: row.stats,
+            dictionary: row.dictionary
+        };
+    }
+
+    static createMeta(row, index) {
         return {
             index,
             mode: row.mode,

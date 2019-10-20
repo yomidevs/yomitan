@@ -29,15 +29,16 @@ class Display {
         this.audioPlaying = null;
         this.audioFallback = null;
         this.audioCache = {};
-        this.optionsContext = {};
-        this.eventListeners = [];
+        this.styleNode = null;
 
-        this.dependencies = {};
+        this.eventListeners = [];
+        this.persistentEventListeners = [];
+        this.interactive = false;
+        this.eventListenersActive = false;
 
         this.windowScroll = new WindowScroll();
 
-        document.addEventListener('keydown', this.onKeyDown.bind(this));
-        document.addEventListener('wheel', this.onWheel.bind(this), {passive: false});
+        this.setInteractive(true);
     }
 
     onError(error) {
@@ -73,8 +74,8 @@ class Display {
                 context.source.source = this.context.source;
             }
 
-            const kanjiDefs = await apiKanjiFind(link.textContent, this.optionsContext);
-            this.kanjiShow(kanjiDefs, this.options, context);
+            const definitions = await apiKanjiFind(link.textContent, this.getOptionsContext());
+            this.setContentKanji(definitions, context);
         } catch (e) {
             this.onError(e);
         }
@@ -83,8 +84,6 @@ class Display {
     async onTermLookup(e) {
         try {
             e.preventDefault();
-
-            const {docRangeFromPoint, docSentenceExtract} = this.dependencies;
 
             const clickedElement = e.target;
             const textSource = docRangeFromPoint(e.clientX, e.clientY, this.options);
@@ -96,7 +95,7 @@ class Display {
             try {
                 textSource.setEndOffset(this.options.scanning.length);
 
-                ({definitions, length} = await apiTermsFind(textSource.text(), this.optionsContext));
+                ({definitions, length} = await apiTermsFind(textSource.text(), this.getOptionsContext()));
                 if (definitions.length === 0) {
                     return false;
                 }
@@ -123,7 +122,7 @@ class Display {
                 context.source.source = this.context.source;
             }
 
-            this.termsShow(definitions, this.options, context);
+            this.setContentTerms(definitions, context);
         } catch (e) {
             this.onError(e);
         }
@@ -172,16 +171,124 @@ class Display {
         }
     }
 
-    async termsShow(definitions, options, context) {
+    onRuntimeMessage({action, params}, sender, callback) {
+        const handlers = Display.runtimeMessageHandlers;
+        if (handlers.hasOwnProperty(action)) {
+            const handler = handlers[action];
+            const result = handler(this, params);
+            callback(result);
+        }
+    }
+
+    getOptionsContext() {
+        throw new Error('Override me');
+    }
+
+    isInitialized() {
+        return this.options !== null;
+    }
+
+    async initialize(options=null) {
+        await this.updateOptions(options);
+        chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
+    }
+
+    async updateOptions(options) {
+        this.options = options ? options : await apiOptionsGet(this.getOptionsContext());
+        this.updateTheme(this.options.general.popupTheme);
+        this.setCustomCss(this.options.general.customPopupCss);
+        audioPrepareTextToSpeech(this.options);
+    }
+
+    updateTheme(themeName) {
+        document.documentElement.dataset.yomichanTheme = themeName;
+
+        const stylesheets = document.querySelectorAll('link[data-yomichan-theme-name]');
+        for (const stylesheet of stylesheets) {
+            const match = (stylesheet.dataset.yomichanThemeName === themeName);
+            stylesheet.rel = (match ? 'stylesheet' : 'stylesheet alternate');
+        }
+    }
+
+    setCustomCss(css) {
+        if (this.styleNode === null) {
+            if (css.length === 0) { return; }
+            this.styleNode = document.createElement('style');
+        }
+
+        this.styleNode.textContent = css;
+
+        const parent = document.head;
+        if (this.styleNode.parentNode !== parent) {
+            parent.appendChild(this.styleNode);
+        }
+    }
+
+    setInteractive(interactive) {
+        interactive = !!interactive;
+        if (this.interactive === interactive) { return; }
+        this.interactive = interactive;
+
+        if (interactive) {
+            Display.addEventListener(this.persistentEventListeners, document, 'keydown', this.onKeyDown.bind(this), false);
+            Display.addEventListener(this.persistentEventListeners, document, 'wheel', this.onWheel.bind(this), {passive: false});
+        } else {
+            Display.clearEventListeners(this.persistentEventListeners);
+        }
+        this.setEventListenersActive(this.eventListenersActive);
+    }
+
+    setEventListenersActive(active) {
+        active = !!active && this.interactive;
+        if (this.eventListenersActive === active) { return; }
+        this.eventListenersActive = active;
+
+        if (active) {
+            this.addEventListeners('.action-add-note', 'click', this.onNoteAdd.bind(this));
+            this.addEventListeners('.action-view-note', 'click', this.onNoteView.bind(this));
+            this.addEventListeners('.action-play-audio', 'click', this.onAudioPlay.bind(this));
+            this.addEventListeners('.kanji-link', 'click', this.onKanjiLookup.bind(this));
+            this.addEventListeners('.source-term', 'click', this.onSourceTermView.bind(this));
+            if (this.options.scanning.enablePopupSearch) {
+                this.addEventListeners('.glossary-item', 'click', this.onTermLookup.bind(this));
+            }
+        } else {
+            Display.clearEventListeners(this.eventListeners);
+        }
+    }
+
+    addEventListeners(selector, type, listener, options) {
+        this.container.querySelectorAll(selector).forEach((node) => {
+            Display.addEventListener(this.eventListeners, node, type, listener, options);
+        });
+    }
+
+    setContent(type, details) {
+        switch (type) {
+            case 'terms':
+                return this.setContentTerms(details.definitions, details.context);
+            case 'kanji':
+                return this.setContentKanji(details.definitions, details.context);
+            case 'orphaned':
+                return this.setContentOrphaned();
+            default:
+                return Promise.resolve();
+        }
+    }
+
+    async setContentTerms(definitions, context) {
+        if (!this.isInitialized()) { return; }
+
         try {
-            this.clearEventListeners();
+            const options = this.options;
+
+            this.setEventListenersActive(false);
 
             if (!context || context.focus !== false) {
                 window.focus();
             }
 
             this.definitions = definitions;
-            this.options = options;
             this.context = context;
 
             const sequence = ++this.sequence;
@@ -211,18 +318,11 @@ class Display {
             const {index, scroll} = context || {};
             this.entryScrollIntoView(index || 0, scroll);
 
-            if (this.options.audio.enabled && this.options.audio.autoPlay) {
+            if (options.audio.enabled && options.audio.autoPlay) {
                 this.autoPlayAudio();
             }
 
-            this.addEventListeners('.action-add-note', 'click', this.onNoteAdd.bind(this));
-            this.addEventListeners('.action-view-note', 'click', this.onNoteView.bind(this));
-            this.addEventListeners('.action-play-audio', 'click', this.onAudioPlay.bind(this));
-            this.addEventListeners('.kanji-link', 'click', this.onKanjiLookup.bind(this));
-            this.addEventListeners('.source-term', 'click', this.onSourceTermView.bind(this));
-            if (this.options.scanning.enablePopupSearch) {
-                this.addEventListeners('.glossary-item', 'click', this.onTermLookup.bind(this));
-            }
+            this.setEventListenersActive(true);
 
             await this.adderButtonUpdate(['term-kanji', 'term-kana'], sequence);
         } catch (e) {
@@ -230,16 +330,19 @@ class Display {
         }
     }
 
-    async kanjiShow(definitions, options, context) {
+    async setContentKanji(definitions, context) {
+        if (!this.isInitialized()) { return; }
+
         try {
-            this.clearEventListeners();
+            const options = this.options;
+
+            this.setEventListenersActive(false);
 
             if (!context || context.focus !== false) {
                 window.focus();
             }
 
             this.definitions = definitions;
-            this.options = options;
             this.context = context;
 
             const sequence = ++this.sequence;
@@ -265,13 +368,24 @@ class Display {
             const {index, scroll} = context || {};
             this.entryScrollIntoView(index || 0, scroll);
 
-            this.addEventListeners('.action-add-note', 'click', this.onNoteAdd.bind(this));
-            this.addEventListeners('.action-view-note', 'click', this.onNoteView.bind(this));
-            this.addEventListeners('.source-term', 'click', this.onSourceTermView.bind(this));
+            this.setEventListenersActive(true);
 
             await this.adderButtonUpdate(['kanji'], sequence);
         } catch (e) {
             this.onError(e);
+        }
+    }
+
+    async setContentOrphaned() {
+        const definitions = document.querySelector('#definitions');
+        const errorOrphaned = document.querySelector('#error-orphaned');
+
+        if (definitions !== null) {
+            definitions.style.setProperty('display', 'none', 'important');
+        }
+
+        if (errorOrphaned !== null) {
+            errorOrphaned.style.setProperty('display', 'block', 'important');
         }
     }
 
@@ -281,7 +395,7 @@ class Display {
 
     async adderButtonUpdate(modes, sequence) {
         try {
-            const states = await apiDefinitionsAddable(this.definitions, modes, this.optionsContext);
+            const states = await apiDefinitionsAddable(this.definitions, modes, this.getOptionsContext());
             if (!states || sequence !== this.sequence) {
                 return;
             }
@@ -353,7 +467,7 @@ class Display {
                 source: this.context.source.source
             };
 
-            this.termsShow(this.context.source.definitions, this.options, context);
+            this.setContentTerms(this.context.source.definitions, context);
         }
     }
 
@@ -383,7 +497,7 @@ class Display {
                 }
             }
 
-            const noteId = await apiDefinitionAdd(definition, mode, context, this.optionsContext);
+            const noteId = await apiDefinitionAdd(definition, mode, context, this.getOptionsContext());
             if (noteId) {
                 const index = this.definitions.indexOf(definition);
                 const adderButton = this.adderButtonFind(index, mode);
@@ -413,7 +527,7 @@ class Display {
             }
 
             const sources = this.options.audio.sources;
-            let {audio, source} = await audioGetFromSources(expression, sources, this.optionsContext, true, this.audioCache);
+            let {audio, source} = await audioGetFromSources(expression, sources, this.getOptionsContext(), false, this.audioCache);
             let info;
             if (audio === null) {
                 if (this.audioFallback === null) {
@@ -544,18 +658,16 @@ class Display {
         return -1;
     }
 
-    addEventListeners(selector, type, listener, options) {
-        this.container.querySelectorAll(selector).forEach((node) => {
-            node.addEventListener(type, listener, options);
-            this.eventListeners.push([node, type, listener, options]);
-        });
+    static addEventListener(eventListeners, object, type, listener, options) {
+        object.addEventListener(type, listener, options);
+        eventListeners.push([object, type, listener, options]);
     }
 
-    clearEventListeners() {
-        for (const [node, type, listener, options] of this.eventListeners) {
-            node.removeEventListener(type, listener, options);
+    static clearEventListeners(eventListeners) {
+        for (const [object, type, listener, options] of eventListeners) {
+            object.removeEventListener(type, listener, options);
         }
-        this.eventListeners = [];
+        eventListeners.length = 0;
     }
 
     static getElementTop(element) {
@@ -674,4 +786,8 @@ Display.onKeyDownHandlers = {
         }
         return false;
     }
+};
+
+Display.runtimeMessageHandlers = {
+    optionsUpdate: (self) => self.updateOptions(null)
 };

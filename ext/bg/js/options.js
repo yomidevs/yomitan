@@ -276,15 +276,19 @@ function profileOptionsCreateDefaults() {
             compactTags: false,
             compactGlossaries: false,
             mainDictionary: '',
-            customPopupCss: ''
+            popupTheme: 'default',
+            popupOuterTheme: 'default',
+            customPopupCss: '',
+            customPopupOuterCss: ''
         },
 
         audio: {
             enabled: true,
-            sources: ['jpod101', 'jpod101-alternate', 'jisho', 'custom'],
+            sources: ['jpod101'],
             volume: 100,
             autoPlay: false,
-            customSourceUrl: ''
+            customSourceUrl: '',
+            textToSpeechVoice: ''
         },
 
         scanning: {

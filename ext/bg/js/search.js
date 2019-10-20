@@ -31,25 +31,37 @@ class DisplaySearch extends Display {
         this.intro = document.querySelector('#intro');
         this.introVisible = true;
         this.introAnimationTimer = null;
+    }
 
-        this.dependencies = Object.assign({}, this.dependencies, {docRangeFromPoint, docSentenceExtract});
+    static create() {
+        const instance = new DisplaySearch();
+        instance.prepare();
+        return instance;
+    }
 
-        if (this.search !== null) {
-            this.search.addEventListener('click', (e) => this.onSearch(e), false);
-        }
-        if (this.query !== null) {
-            this.query.addEventListener('input', () => this.onSearchInput(), false);
+    async prepare() {
+        try {
+            await this.initialize();
 
-            const query = DisplaySearch.getSearchQueryFromLocation(window.location.href);
-            if (query !== null) {
-                this.query.value = window.wanakana.toKana(query);
-                this.onSearchQueryUpdated(query, false);
+            if (this.search !== null) {
+                this.search.addEventListener('click', (e) => this.onSearch(e), false);
+            }
+            if (this.query !== null) {
+                this.query.addEventListener('input', () => this.onSearchInput(), false);
+
+                const query = DisplaySearch.getSearchQueryFromLocation(window.location.href);
+                if (query !== null) {
+                    this.query.value = window.wanakana.toKana(query);
+                    this.onSearchQueryUpdated(query, false);
+                }
+
+                window.wanakana.bind(this.query);
             }
 
-            window.wanakana.bind(this.query);
+            this.updateSearchButton();
+        } catch (e) {
+            this.onError(e);
         }
-
-        this.updateSearchButton();
     }
 
     onError(error) {
@@ -89,13 +101,36 @@ class DisplaySearch extends Display {
             this.updateSearchButton();
             if (valid) {
                 const {definitions} = await apiTermsFind(query, this.optionsContext);
-                this.termsShow(definitions, await apiOptionsGet(this.optionsContext));
+                this.setContentTerms(definitions, {
+                    focus: false,
+                    sentence: null,
+                    url: window.location.href
+                });
             } else {
                 this.container.textContent = '';
             }
         } catch (e) {
             this.onError(e);
         }
+    }
+
+    onRuntimeMessage({action, params}, sender, callback) {
+        const handlers = DisplaySearch.runtimeMessageHandlers;
+        if (handlers.hasOwnProperty(action)) {
+            const handler = handlers[action];
+            const result = handler(this, params);
+            callback(result);
+        } else {
+            return super.onRuntimeMessage({action, params}, sender, callback);
+        }
+    }
+
+    getOptionsContext() {
+        return this.optionsContext;
+    }
+
+    setCustomCss() {
+        // No custom CSS
     }
 
     setIntroVisible(visible, animate) {
@@ -164,4 +199,10 @@ class DisplaySearch extends Display {
     }
 }
 
-window.yomichan_search = new DisplaySearch();
+DisplaySearch.runtimeMessageHandlers = {
+    getUrl: () => {
+        return {url: window.location.href};
+    }
+};
+
+window.yomichan_search = DisplaySearch.create();

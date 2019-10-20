@@ -21,6 +21,7 @@ class Translator {
     constructor() {
         this.database = null;
         this.deinflector = null;
+        this.tagCache = {};
     }
 
     async prepare() {
@@ -34,6 +35,11 @@ class Translator {
             const reasons = await requestJson(url, 'GET');
             this.deinflector = new Deinflector(reasons);
         }
+    }
+
+    async purgeDatabase() {
+        this.tagCache = {};
+        await this.database.purge();
     }
 
     async findTermsGrouped(text, dictionaries, alphanumeric, options) {
@@ -52,94 +58,121 @@ class Translator {
         return {length, definitions: definitionsGrouped};
     }
 
+    async getSequencedDefinitions(definitions, mainDictionary) {
+        const definitionsBySequence = dictTermsMergeBySequence(definitions, mainDictionary);
+        const defaultDefinitions = definitionsBySequence['-1'];
+
+        const sequenceList = Object.keys(definitionsBySequence).map(v => Number(v)).filter(v => v >= 0);
+        const sequencedDefinitions = sequenceList.map((key) => ({
+            definitions: definitionsBySequence[key],
+            rawDefinitions: []
+        }));
+
+        for (const definition of await this.database.findTermsBySequenceBulk(sequenceList, mainDictionary)) {
+            sequencedDefinitions[definition.index].rawDefinitions.push(definition);
+        }
+
+        return {sequencedDefinitions, defaultDefinitions};
+    }
+
+    async getMergedSecondarySearchResults(text, expressionsMap, secondarySearchTitles) {
+        if (secondarySearchTitles.length === 0) {
+            return [];
+        }
+
+        const expressionList = [];
+        const readingList = [];
+        for (const expression of expressionsMap.keys()) {
+            if (expression === text) { continue; }
+            for (const reading of expressionsMap.get(expression).keys()) {
+                expressionList.push(expression);
+                readingList.push(reading);
+            }
+        }
+
+        const definitions = await this.database.findTermsExactBulk(expressionList, readingList, secondarySearchTitles);
+        for (const definition of definitions) {
+            const definitionTags = await this.expandTags(definition.definitionTags, definition.dictionary);
+            definitionTags.push(dictTagBuildSource(definition.dictionary));
+            definition.definitionTags = definitionTags;
+            const termTags = await this.expandTags(definition.termTags, definition.dictionary);
+            definition.termTags = termTags;
+        }
+
+        if (definitions.length > 1) {
+            definitions.sort((a, b) => a.index - b.index);
+        }
+
+        return definitions;
+    }
+
+    async getMergedDefinition(text, dictionaries, sequencedDefinition, defaultDefinitions, secondarySearchTitles, mergedByTermIndices) {
+        const result = sequencedDefinition.definitions;
+        const rawDefinitionsBySequence = sequencedDefinition.rawDefinitions;
+
+        for (const definition of rawDefinitionsBySequence) {
+            const definitionTags = await this.expandTags(definition.definitionTags, definition.dictionary);
+            definitionTags.push(dictTagBuildSource(definition.dictionary));
+            definition.definitionTags = definitionTags;
+            const termTags = await this.expandTags(definition.termTags, definition.dictionary);
+            definition.termTags = termTags;
+        }
+
+        const definitionsByGloss = dictTermsMergeByGloss(result, rawDefinitionsBySequence);
+        const secondarySearchResults = await this.getMergedSecondarySearchResults(text, result.expressions, secondarySearchTitles);
+
+        dictTermsMergeByGloss(result, defaultDefinitions.concat(secondarySearchResults), definitionsByGloss, mergedByTermIndices);
+
+        for (const gloss in definitionsByGloss) {
+            const definition = definitionsByGloss[gloss];
+            dictTagsSort(definition.definitionTags);
+            result.definitions.push(definition);
+        }
+
+        dictTermsSort(result.definitions, dictionaries);
+
+        const expressions = [];
+        for (const expression of result.expressions.keys()) {
+            for (const reading of result.expressions.get(expression).keys()) {
+                const termTags = result.expressions.get(expression).get(reading);
+                const score = termTags.map(tag => tag.score).reduce((p, v) => p + v, 0);
+                expressions.push({
+                    expression: expression,
+                    reading: reading,
+                    termTags: dictTagsSort(termTags),
+                    termFrequency: Translator.scoreToTermFrequency(score)
+                });
+            }
+        }
+
+        result.expressions = expressions;
+        result.expression = Array.from(result.expression);
+        result.reading = Array.from(result.reading);
+
+        return result;
+    }
+
     async findTermsMerged(text, dictionaries, alphanumeric, options) {
         const secondarySearchTitles = Object.keys(options.dictionaries).filter(dict => options.dictionaries[dict].allowSecondarySearches);
         const titles = Object.keys(dictionaries);
         const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
-
-        const definitionsBySequence = dictTermsMergeBySequence(definitions, options.general.mainDictionary);
-
+        const {sequencedDefinitions, defaultDefinitions} = await this.getSequencedDefinitions(definitions, options.general.mainDictionary);
         const definitionsMerged = [];
         const mergedByTermIndices = new Set();
-        for (const sequence in definitionsBySequence) {
-            if (sequence < 0) {
-                continue;
-            }
 
-            const result = definitionsBySequence[sequence];
-
-            const rawDefinitionsBySequence = await this.database.findTermsBySequence(Number(sequence), options.general.mainDictionary);
-
-            for (const definition of rawDefinitionsBySequence) {
-                const definitionTags = await this.expandTags(definition.definitionTags, definition.dictionary);
-                definitionTags.push(dictTagBuildSource(definition.dictionary));
-                definition.definitionTags = definitionTags;
-                const termTags = await this.expandTags(definition.termTags, definition.dictionary);
-                definition.termTags = termTags;
-            }
-
-            const definitionsByGloss = dictTermsMergeByGloss(result, rawDefinitionsBySequence);
-
-            const secondarySearchResults = [];
-            if (secondarySearchTitles.length > 0) {
-                for (const expression of result.expressions.keys()) {
-                    if (expression === text) {
-                        continue;
-                    }
-
-                    for (const reading of result.expressions.get(expression).keys()) {
-                        for (const definition of await this.database.findTermsExact(expression, reading, secondarySearchTitles)) {
-                            const definitionTags = await this.expandTags(definition.definitionTags, definition.dictionary);
-                            definitionTags.push(dictTagBuildSource(definition.dictionary));
-                            definition.definitionTags = definitionTags;
-                            const termTags = await this.expandTags(definition.termTags, definition.dictionary);
-                            definition.termTags = termTags;
-                            secondarySearchResults.push(definition);
-                        }
-                    }
-                }
-            }
-
-            dictTermsMergeByGloss(result, definitionsBySequence['-1'].concat(secondarySearchResults), definitionsByGloss, mergedByTermIndices);
-
-            for (const gloss in definitionsByGloss) {
-                const definition = definitionsByGloss[gloss];
-                dictTagsSort(definition.definitionTags);
-                result.definitions.push(definition);
-            }
-
-            dictTermsSort(result.definitions, dictionaries);
-
-            const expressions = [];
-            for (const expression of result.expressions.keys()) {
-                for (const reading of result.expressions.get(expression).keys()) {
-                    const termTags = result.expressions.get(expression).get(reading);
-                    expressions.push({
-                        expression: expression,
-                        reading: reading,
-                        termTags: dictTagsSort(termTags),
-                        termFrequency: (score => {
-                            if (score > 0) {
-                                return 'popular';
-                            } else if (score < 0) {
-                                return 'rare';
-                            } else {
-                                return 'normal';
-                            }
-                        })(termTags.map(tag => tag.score).reduce((p, v) => p + v, 0))
-                    });
-                }
-            }
-
-            result.expressions = expressions;
-
-            result.expression = Array.from(result.expression);
-            result.reading = Array.from(result.reading);
-
+        for (const sequencedDefinition of sequencedDefinitions) {
+            const result = await this.getMergedDefinition(
+                text,
+                dictionaries,
+                sequencedDefinition,
+                defaultDefinitions,
+                secondarySearchTitles,
+                mergedByTermIndices
+            );
             definitionsMerged.push(result);
         }
 
-        const strayDefinitions = definitionsBySequence['-1'].filter((definition, index) => !mergedByTermIndices.has(index));
+        const strayDefinitions = defaultDefinitions.filter((definition, index) => !mergedByTermIndices.has(index));
         for (const groupedDefinition of dictTermsGroup(strayDefinitions, dictionaries)) {
             groupedDefinition.expressions = [{expression: groupedDefinition.expression, reading: groupedDefinition.reading}];
             definitionsMerged.push(groupedDefinition);
@@ -277,33 +310,44 @@ class Translator {
     }
 
     async findKanji(text, dictionaries) {
-        let definitions = [];
-        const processed = {};
         const titles = Object.keys(dictionaries);
+        const kanjiUnique = {};
+        const kanjiList = [];
         for (const c of text) {
-            if (!processed[c]) {
-                definitions.push(...await this.database.findKanji(c, titles));
-                processed[c] = true;
+            if (!kanjiUnique.hasOwnProperty(c)) {
+                kanjiList.push(c);
+                kanjiUnique[c] = true;
             }
         }
 
+        const definitions = await this.database.findKanjiBulk(kanjiList, titles);
+        if (definitions.length === 0) {
+            return definitions;
+        }
+
+        if (definitions.length > 1) {
+            definitions.sort((a, b) => a.index - b.index);
+        }
+
+        const kanjiList2 = [];
         for (const definition of definitions) {
+            kanjiList2.push(definition.character);
+
             const tags = await this.expandTags(definition.tags, definition.dictionary);
             tags.push(dictTagBuildSource(definition.dictionary));
 
             definition.tags = dictTagsSort(tags);
             definition.stats = await this.expandStats(definition.stats, definition.dictionary);
-
             definition.frequencies = [];
-            for (const meta of await this.database.findKanjiMeta(definition.character, titles)) {
-                if (meta.mode === 'freq') {
-                    definition.frequencies.push({
-                        character: meta.character,
-                        frequency: meta.data,
-                        dictionary: meta.dictionary
-                    });
-                }
-            }
+        }
+
+        for (const meta of await this.database.findKanjiMetaBulk(kanjiList2, titles)) {
+            if (meta.mode !== 'freq') { continue; }
+            definitions[meta.index].frequencies.push({
+                character: meta.character,
+                frequency: meta.data,
+                dictionary: meta.dictionary
+            });
         }
 
         return definitions;
@@ -359,54 +403,74 @@ class Translator {
     }
 
     async expandTags(names, title) {
-        const tags = [];
-        for (const name of names) {
-            const base = Translator.getNameBase(name);
-            let meta = this.database.findTagForTitleCached(base, title);
-            if (typeof meta === 'undefined') {
-                meta = await this.database.findTagForTitle(base, title);
-            }
-
-            const tag = Object.assign({}, meta !== null ? meta : {}, {name});
-
-            tags.push(dictTagSanitize(tag));
-        }
-
-        return tags;
+        const tagMetaList = await this.getTagMetaList(names, title);
+        return tagMetaList.map((meta, index) => {
+            const name = names[index];
+            const tag = dictTagSanitize(Object.assign({}, meta !== null ? meta : {}, {name}));
+            return dictTagSanitize(tag);
+        });
     }
 
     async expandStats(items, title) {
-        const stats = {};
-        for (const name in items) {
-            const base = Translator.getNameBase(name);
-            let meta = this.database.findTagForTitleCached(base, title);
-            if (typeof meta === 'undefined') {
-                meta = await this.database.findTagForTitle(base, title);
-                if (meta === null) {
-                    continue;
-                }
-            }
+        const names = Object.keys(items);
+        const tagMetaList = await this.getTagMetaList(names, title);
 
-            const group = stats[meta.category] = stats[meta.category] || [];
+        const stats = {};
+        for (let i = 0; i < names.length; ++i) {
+            const name = names[i];
+            const meta = tagMetaList[i];
+            if (meta === null) { continue; }
+
+            const category = meta.category;
+            const group = (
+                stats.hasOwnProperty(category) ?
+                stats[category] :
+                (stats[category] = [])
+            );
 
             const stat = Object.assign({}, meta, {name, value: items[name]});
-
             group.push(dictTagSanitize(stat));
         }
 
+        const sortCompare = (a, b) => a.notes - b.notes;
         for (const category in stats) {
-            stats[category].sort((a, b) => {
-                if (a.notes < b.notes) {
-                    return -1;
-                } else if (a.notes > b.notes) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            });
+            stats[category].sort(sortCompare);
         }
 
         return stats;
+    }
+
+    async getTagMetaList(names, title) {
+        const tagMetaList = [];
+        const cache = (
+            this.tagCache.hasOwnProperty(title) ?
+            this.tagCache[title] :
+            (this.tagCache[title] = {})
+        );
+
+        for (const name of names) {
+            const base = Translator.getNameBase(name);
+
+            if (cache.hasOwnProperty(base)) {
+                tagMetaList.push(cache[base]);
+            } else {
+                const tagMeta = await this.database.findTagForTitle(base, title);
+                cache[base] = tagMeta;
+                tagMetaList.push(tagMeta);
+            }
+        }
+
+        return tagMetaList;
+    }
+
+    static scoreToTermFrequency(score) {
+        if (score > 0) {
+            return 'popular';
+        } else if (score < 0) {
+            return 'rare';
+        } else {
+            return 'normal';
+        }
     }
 
     static getNameBase(name) {

@@ -25,11 +25,14 @@ async function searchFrontendSetup() {
     const options = await apiOptionsGet(optionsContext);
     if (!options.scanning.enableOnSearchPage) { return; }
 
+    window.frontendInitializationData = {depth: 1, proxy: false};
+
     const scriptSrcs = [
         '/fg/js/frontend-api-receiver.js',
         '/fg/js/popup.js',
         '/fg/js/popup-proxy-host.js',
-        '/fg/js/frontend.js'
+        '/fg/js/frontend.js',
+        '/fg/js/frontend-initialize.js'
     ];
     for (const src of scriptSrcs) {
         const script = document.createElement('script');

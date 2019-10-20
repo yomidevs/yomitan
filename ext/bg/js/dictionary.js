@@ -342,10 +342,10 @@ async function dictFieldFormat(field, definition, mode, options) {
         'kunyomi',
         'onyomi',
         'reading',
+        'screenshot',
         'sentence',
         'tags',
-        'url',
-        'screenshot'
+        'url'
     ];
 
     for (const marker of markers) {

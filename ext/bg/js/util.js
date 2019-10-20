@@ -89,7 +89,7 @@ function utilAnkiGetModelFieldNames(modelName) {
 }
 
 function utilDatabasePurge() {
-    return utilBackend().translator.database.purge();
+    return utilBackend().translator.purgeDatabase();
 }
 
 async function utilDatabaseImport(data, progress, exceptions) {

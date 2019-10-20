@@ -35,13 +35,14 @@ async function popupNestedInitialize(id, depth, parentFrameId, url) {
 
     const ignoreNodes = options.scanning.enableOnPopupExpressions ? [] : [ '.expression', '.expression *' ];
 
-    window.frontendInitializationData = {id, depth, parentFrameId, ignoreNodes, url};
+    window.frontendInitializationData = {id, depth, parentFrameId, ignoreNodes, url, proxy: true};
 
     const scriptSrcs = [
         '/fg/js/frontend-api-sender.js',
         '/fg/js/popup.js',
         '/fg/js/popup-proxy.js',
-        '/fg/js/frontend.js'
+        '/fg/js/frontend.js',
+        '/fg/js/frontend-initialize.js'
     ];
     for (const src of scriptSrcs) {
         const script = document.createElement('script');

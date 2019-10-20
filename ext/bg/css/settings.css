@@ -128,7 +128,8 @@
     content: counter(audio-source-id);
 }
 
-#custom-popup-css {
+#custom-popup-css,
+#custom-popup-outer-css {
     width: 100%;
     min-height: 34px;
     height: 96px;
@@ -137,14 +138,41 @@
     white-space: pre;
 }
 
-[data-show-for-browser] {
+.btn-inner-middle {
+    vertical-align: middle;
+}
+.storage-button-inner {
+    pointer-events: none;
+}
+input[type=checkbox].storage-button-checkbox {
+    margin: 0 0.375em 0 0;
+    padding: 0;
+}
+
+#settings-popup-preview-frame {
+    background-color: transparent;
+    border: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 320px;
+}
+
+[data-show-for-browser],
+[data-show-for-operating-system] {
     display: none;
 }
 
-[data-browser=edge] [data-show-for-browser~=edge],
-[data-browser=chrome] [data-show-for-browser~=chrome],
-[data-browser=firefox] [data-show-for-browser~=firefox],
-[data-browser=firefox-mobile] [data-show-for-browser~=firefox-mobile] {
+html:root[data-browser=edge] [data-show-for-browser~=edge],
+html:root[data-browser=chrome] [data-show-for-browser~=chrome],
+html:root[data-browser=firefox] [data-show-for-browser~=firefox],
+html:root[data-browser=firefox-mobile] [data-show-for-browser~=firefox-mobile],
+html:root[data-operating-system=mac] [data-show-for-operating-system~=mac],
+html:root[data-operating-system=win] [data-show-for-operating-system~=win],
+html:root[data-operating-system=android] [data-show-for-operating-system~=android],
+html:root[data-operating-system=cros] [data-show-for-operating-system~=cros],
+html:root[data-operating-system=linux] [data-show-for-operating-system~=linux],
+html:root[data-operating-system=openbsd] [data-show-for-operating-system~=openbsd] {
     display: initial;
 }
 

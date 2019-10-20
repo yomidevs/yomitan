@@ -41,14 +41,18 @@ class Frontend {
 
         this.enabled = false;
         this.eventListeners = [];
+
+        this.isPreparedPromiseResolve = null;
+        this.isPreparedPromise = new Promise((resolve) => { this.isPreparedPromiseResolve = resolve; });
+
+        this.lastShowPromise = Promise.resolve();
     }
 
     static create() {
-        const initializationData = window.frontendInitializationData;
-        const isNested = (initializationData !== null && typeof initializationData === 'object');
-        const {id, depth, parentFrameId, ignoreNodes, url} = isNested ? initializationData : {};
+        const data = window.frontendInitializationData || {};
+        const {id, depth=0, parentFrameId, ignoreNodes, url, proxy=false} = data;
 
-        const popup = isNested ? new PopupProxy(depth + 1, id, parentFrameId, url) : PopupProxyHost.instance.createPopup(null);
+        const popup = proxy ? new PopupProxy(depth + 1, id, parentFrameId, url) : PopupProxyHost.instance.createPopup(null, depth);
         const frontend = new Frontend(popup, ignoreNodes);
         frontend.prepare();
         return frontend;
@@ -59,9 +63,14 @@ class Frontend {
             await this.updateOptions();
 
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
+            this.isPreparedPromiseResolve();
         } catch (e) {
             this.onError(e);
         }
+    }
+
+    isPrepared() {
+        return this.isPreparedPromise;
     }
 
     onMouseOver(e) {
@@ -130,8 +139,14 @@ class Frontend {
         }
     }
 
-    onResize() {
-        this.searchClear(false);
+    async onResize() {
+        if (this.textSourceLast !== null && await this.popup.isVisibleAsync()) {
+            const textSource = this.textSourceLast;
+            this.lastShowPromise = this.popup.showContent(
+                textSource.getRect(),
+                textSource.getWritingMode()
+            );
+        }
     }
 
     onClick(e) {
@@ -222,8 +237,8 @@ class Frontend {
         const handlers = Frontend.runtimeMessageHandlers;
         if (handlers.hasOwnProperty(action)) {
             const handler = handlers[action];
-            handler(this, params);
-            callback();
+            const result = handler(this, params);
+            callback(result);
         }
     }
 
@@ -279,6 +294,7 @@ class Frontend {
     async updateOptions() {
         this.options = await apiOptionsGet(this.getOptionsContext());
         this.setEnabled(this.options.general.enable);
+        await this.popup.setOptions(this.options);
     }
 
     popupTimerSet(callback) {
@@ -303,6 +319,10 @@ class Frontend {
         }
 
         const textSource = docRangeFromPoint(x, y, this.options);
+        return await this.searchSource(textSource, cause);
+    }
+
+    async searchSource(textSource, cause) {
         let hideResults = textSource === null;
         let searched = false;
         let success = false;
@@ -318,10 +338,10 @@ class Frontend {
         } catch (e) {
             if (window.yomichan_orphaned) {
                 if (textSource && this.options.scanning.modifier !== 'none') {
-                    this.popup.showOrphaned(
+                    this.lastShowPromise = this.popup.showContent(
                         textSource.getRect(),
                         textSource.getWritingMode(),
-                        this.options
+                        'orphaned'
                     );
                 }
             } else {
@@ -357,12 +377,11 @@ class Frontend {
 
         const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
         const url = window.location.href;
-        this.popup.termsShow(
+        this.lastShowPromise = this.popup.showContent(
             textSource.getRect(),
             textSource.getWritingMode(),
-            definitions,
-            this.options,
-            {sentence, url, focus}
+            'terms',
+            {definitions, context: {sentence, url, focus}}
         );
 
         this.textSourceLast = textSource;
@@ -388,12 +407,11 @@ class Frontend {
 
         const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
         const url = window.location.href;
-        this.popup.kanjiShow(
+        this.lastShowPromise = this.popup.showContent(
             textSource.getRect(),
             textSource.getWritingMode(),
-            definitions,
-            this.options,
-            {sentence, url, focus}
+            'kanji',
+            {definitions, context: {sentence, url, focus}}
         );
 
         this.textSourceLast = textSource;
@@ -558,8 +576,9 @@ Frontend.runtimeMessageHandlers = {
 
     popupSetVisibleOverride: (self, {visible}) => {
         self.popup.setVisibleOverride(visible);
+    },
+
+    getUrl: () => {
+        return {url: window.location.href};
     }
 };
-
-
-window.yomichan_frontend = Frontend.create();

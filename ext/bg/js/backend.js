@@ -73,9 +73,10 @@ class Backend {
         if (handlers.hasOwnProperty(action)) {
             const handler = handlers[action];
             const promise = handler(params, sender);
-            promise
-                .then(result => callback({result}))
-                .catch(error => callback(errorToJson(error)));
+            promise.then(
+                result => callback({result}),
+                error => callback({error: errorToJson(error)})
+            );
         }
 
         return true;
@@ -180,11 +181,13 @@ Backend.messageHandlers = {
     definitionsAddable: ({definitions, modes, optionsContext}) => apiDefinitionsAddable(definitions, modes, optionsContext),
     noteView: ({noteId}) => apiNoteView(noteId),
     templateRender: ({template, data, dynamic}) => apiTemplateRender(template, data, dynamic),
-    commandExec: ({command}) => apiCommandExec(command),
+    commandExec: ({command, params}) => apiCommandExec(command, params),
     audioGetUrl: ({definition, source, optionsContext}) => apiAudioGetUrl(definition, source, optionsContext),
     screenshotGet: ({options}, sender) => apiScreenshotGet(options, sender),
     forward: ({action, params}, sender) => apiForward(action, params, sender),
     frameInformationGet: (params, sender) => apiFrameInformationGet(sender),
+    injectStylesheet: ({css}, sender) => apiInjectStylesheet(css, sender),
+    getEnvironmentInfo: () => apiGetEnvironmentInfo()
 };
 
 window.yomichan_backend = new Backend();

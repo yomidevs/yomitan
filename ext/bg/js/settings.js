@@ -39,12 +39,16 @@ async function formRead(options) {
     options.general.popupVerticalOffset = parseInt($('#popup-vertical-offset').val(), 10);
     options.general.popupHorizontalOffset2 = parseInt($('#popup-horizontal-offset2').val(), 0);
     options.general.popupVerticalOffset2 = parseInt($('#popup-vertical-offset2').val(), 10);
+    options.general.popupTheme = $('#popup-theme').val();
+    options.general.popupOuterTheme = $('#popup-outer-theme').val();
     options.general.customPopupCss = $('#custom-popup-css').val();
+    options.general.customPopupOuterCss = $('#custom-popup-outer-css').val();
 
     options.audio.enabled = $('#audio-playback-enabled').prop('checked');
     options.audio.autoPlay = $('#auto-play-audio').prop('checked');
     options.audio.volume = parseFloat($('#audio-playback-volume').val());
     options.audio.customSourceUrl = $('#audio-custom-source').val();
+    options.audio.textToSpeechVoice = $('#text-to-speech-voice').val();
 
     options.scanning.middleMouse = $('#middle-mouse-button-scan').prop('checked');
     options.scanning.touchInputEnabled = $('#touch-input-enabled').prop('checked');
@@ -107,12 +111,16 @@ async function formWrite(options) {
     $('#popup-vertical-offset').val(options.general.popupVerticalOffset);
     $('#popup-horizontal-offset2').val(options.general.popupHorizontalOffset2);
     $('#popup-vertical-offset2').val(options.general.popupVerticalOffset2);
+    $('#popup-theme').val(options.general.popupTheme);
+    $('#popup-outer-theme').val(options.general.popupOuterTheme);
     $('#custom-popup-css').val(options.general.customPopupCss);
+    $('#custom-popup-outer-css').val(options.general.customPopupOuterCss);
 
     $('#audio-playback-enabled').prop('checked', options.audio.enabled);
     $('#auto-play-audio').prop('checked', options.audio.autoPlay);
     $('#audio-playback-volume').val(options.audio.volume);
     $('#audio-custom-source').val(options.audio.customSourceUrl);
+    $('#text-to-speech-voice').val(options.audio.textToSpeechVoice).attr('data-value', options.audio.textToSpeechVoice);
 
     $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);
     $('#touch-input-enabled').prop('checked', options.scanning.touchInputEnabled);
@@ -248,6 +256,7 @@ async function onReady() {
     showExtensionInformation();
 
     formSetupEventListeners();
+    appearanceInitialize();
     await audioSettingsInitialize();
     await profileOptionsSetup();
 
@@ -257,6 +266,55 @@ async function onReady() {
 }
 
 $(document).ready(utilAsync(onReady));
+
+
+/*
+ * Appearance
+ */
+
+function appearanceInitialize() {
+    let previewVisible = false;
+    $('#settings-popup-preview-button').on('click', () => {
+        if (previewVisible) { return; }
+        showAppearancePreview();
+        previewVisible = true;
+    });
+}
+
+function showAppearancePreview() {
+    const container = $('#settings-popup-preview-container');
+    const buttonContainer = $('#settings-popup-preview-button-container');
+    const settings = $('#settings-popup-preview-settings');
+    const text = $('#settings-popup-preview-text');
+    const customCss = $('#custom-popup-css');
+    const customOuterCss = $('#custom-popup-outer-css');
+
+    const frame = document.createElement('iframe');
+    frame.src = '/bg/settings-popup-preview.html';
+    frame.id = 'settings-popup-preview-frame';
+
+    window.wanakana.bind(text[0]);
+
+    text.on('input', () => {
+        const action = 'setText';
+        const params = {text: text.val()};
+        frame.contentWindow.postMessage({action, params}, '*');
+    });
+    customCss.on('input', () => {
+        const action = 'setCustomCss';
+        const params = {css: customCss.val()};
+        frame.contentWindow.postMessage({action, params}, '*');
+    });
+    customOuterCss.on('input', () => {
+        const action = 'setCustomOuterCss';
+        const params = {css: customOuterCss.val()};
+        frame.contentWindow.postMessage({action, params}, '*');
+    });
+
+    container.append(frame);
+    buttonContainer.remove();
+    settings.css('display', '');
+}
 
 
 /*
@@ -270,6 +328,81 @@ async function audioSettingsInitialize() {
     const options = await apiOptionsGet(optionsContext);
     audioSourceUI = new AudioSourceUI.Container(options.audio.sources, $('.audio-source-list'), $('.audio-source-add'));
     audioSourceUI.save = () => apiOptionsSave();
+
+    textToSpeechInitialize();
+}
+
+function textToSpeechInitialize() {
+    if (typeof speechSynthesis === 'undefined') { return; }
+
+    speechSynthesis.addEventListener('voiceschanged', () => updateTextToSpeechVoices(), false);
+    updateTextToSpeechVoices();
+
+    $('#text-to-speech-voice-test').on('click', () => textToSpeechTest());
+}
+
+function updateTextToSpeechVoices() {
+    const voices = Array.prototype.map.call(speechSynthesis.getVoices(), (voice, index) => ({voice, index}));
+    voices.sort(textToSpeechVoiceCompare);
+    if (voices.length > 0) {
+        $('#text-to-speech-voice-container').css('display', '');
+    }
+
+    const select = $('#text-to-speech-voice');
+    select.empty();
+    select.append($('<option>').val('').text('None'));
+    for (const {voice} of voices) {
+        select.append($('<option>').val(voice.voiceURI).text(`${voice.name} (${voice.lang})`));
+    }
+
+    select.val(select.attr('data-value'));
+}
+
+function languageTagIsJapanese(languageTag) {
+    return (
+        languageTag.startsWith('ja-') ||
+        languageTag.startsWith('jpn-')
+    );
+}
+
+function textToSpeechVoiceCompare(a, b) {
+    const aIsJapanese = languageTagIsJapanese(a.voice.lang);
+    const bIsJapanese = languageTagIsJapanese(b.voice.lang);
+    if (aIsJapanese) {
+        if (!bIsJapanese) { return -1; }
+    } else {
+        if (bIsJapanese) { return 1; }
+    }
+
+    const aIsDefault = a.voice.default;
+    const bIsDefault = b.voice.default;
+    if (aIsDefault) {
+        if (!bIsDefault) { return -1; }
+    } else {
+        if (bIsDefault) { return 1; }
+    }
+
+    if (a.index < b.index) { return -1; }
+    if (a.index > b.index) { return 1; }
+    return 0;
+}
+
+function textToSpeechTest() {
+    try {
+        const text = $('#text-to-speech-voice-test').attr('data-speech-text') || '';
+        const voiceURI = $('#text-to-speech-voice').val();
+        const voice = audioGetTextToSpeechVoice(voiceURI);
+        if (voice === null) { return; }
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ja-JP';
+        utterance.voice = voice;
+        utterance.volume = 1.0;
+
+        speechSynthesis.speak(utterance);
+    } catch (e) {
+        // NOP
+    }
 }
 
 
@@ -297,9 +430,14 @@ async function onOptionsUpdate({source}) {
     await formWrite(options);
 }
 
-function onMessage({action, params}) {
-    if (action === 'optionsUpdate') {
-        onOptionsUpdate(params);
+function onMessage({action, params}, sender, callback) {
+    switch (action) {
+        case 'optionsUpdate':
+            onOptionsUpdate(params);
+            break;
+        case 'getUrl':
+            callback({url: window.location.href});
+            break;
     }
 }
 
@@ -607,10 +745,10 @@ async function ankiFieldsPopulate(element, options) {
             'glossary',
             'glossary-brief',
             'reading',
+            'screenshot',
             'sentence',
             'tags',
-            'url',
-            'screenshot'
+            'url'
         ],
         'kanji': [
             'character',
@@ -618,6 +756,7 @@ async function ankiFieldsPopulate(element, options) {
             'glossary',
             'kunyomi',
             'onyomi',
+            'screenshot',
             'sentence',
             'tags',
             'url'
@@ -685,32 +824,15 @@ async function onAnkiFieldTemplatesReset(e) {
  * Storage
  */
 
-async function getBrowser() {
-    if (EXTENSION_IS_BROWSER_EDGE) {
-        return 'edge';
-    }
-    if (typeof browser !== 'undefined') {
-        try {
-            const info = await browser.runtime.getBrowserInfo();
-            if (info.name === 'Fennec') {
-                return 'firefox-mobile';
-            }
-        } catch (e) { }
-        return 'firefox';
-    } else {
-        return 'chrome';
-    }
-}
-
 function storageBytesToLabeledString(size) {
     const base = 1000;
-    const labels = ['bytes', 'KB', 'MB', 'GB'];
+    const labels = [' bytes', 'KB', 'MB', 'GB'];
     let labelIndex = 0;
     while (size >= base) {
         size /= base;
         ++labelIndex;
     }
-    const label = size.toFixed(1);
+    const label = labelIndex === 0 ? `${size}` : size.toFixed(1);
     return `${label}${labels[labelIndex]}`;
 }
 
@@ -722,14 +844,20 @@ async function storageEstimate() {
 }
 storageEstimate.mostRecent = null;
 
+async function isStoragePeristent() {
+    try {
+        return await navigator.storage.persisted();
+    } catch (e) { }
+    return false;
+}
+
 async function storageInfoInitialize() {
-    const browser = await getBrowser();
-    const container = document.querySelector('#storage-info');
-    container.setAttribute('data-browser', browser);
+    storagePersistInitialize();
+    const {browser, platform} = await apiGetEnvironmentInfo();
+    document.documentElement.dataset.browser = browser;
+    document.documentElement.dataset.operatingSystem = platform.os;
 
     await storageShowInfo();
-
-    container.classList.remove('storage-hidden');
 
     document.querySelector('#storage-refresh').addEventListener('click', () => storageShowInfo(), false);
 }
@@ -741,8 +869,14 @@ async function storageUpdateStats() {
     const valid = (estimate !== null);
 
     if (valid) {
-        document.querySelector('#storage-usage').textContent = storageBytesToLabeledString(estimate.usage);
-        document.querySelector('#storage-quota').textContent = storageBytesToLabeledString(estimate.quota);
+        // Firefox reports usage as 0 when persistent storage is enabled.
+        const finite = (estimate.usage > 0 || !(await isStoragePeristent()));
+        if (finite) {
+            document.querySelector('#storage-usage').textContent = storageBytesToLabeledString(estimate.usage);
+            document.querySelector('#storage-quota').textContent = storageBytesToLabeledString(estimate.quota);
+        }
+        document.querySelector('#storage-use-finite').classList.toggle('storage-hidden', !finite);
+        document.querySelector('#storage-use-infinite').classList.toggle('storage-hidden', finite);
     }
 
     storageUpdateStats.isUpdating = false;
@@ -767,6 +901,43 @@ function storageSpinnerShow(show) {
     } else {
         spinner.hide();
     }
+}
+
+async function storagePersistInitialize() {
+    if (!(navigator.storage && navigator.storage.persist)) {
+        // Not supported
+        return;
+    }
+
+    const info = document.querySelector('#storage-persist-info');
+    const button = document.querySelector('#storage-persist-button');
+    const checkbox = document.querySelector('#storage-persist-button-checkbox');
+
+    info.classList.remove('storage-hidden');
+    button.classList.remove('storage-hidden');
+
+    let persisted = await isStoragePeristent();
+    checkbox.checked = persisted;
+
+    button.addEventListener('click', async () => {
+        if (persisted) {
+            return;
+        }
+        let result = false;
+        try {
+            result = await navigator.storage.persist();
+        } catch (e) {
+            // NOP
+        }
+
+        if (result) {
+            persisted = true;
+            checkbox.checked = true;
+            storageShowInfo();
+        } else {
+            $('.storage-persist-fail-warning').removeClass('storage-hidden');
+        }
+    }, false);
 }
 
 

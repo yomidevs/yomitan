@@ -3671,7 +3671,7 @@
             "kanaIn": "ておる",
             "kanaOut": "て",
             "rulesIn": [
-                "v1"
+                "v5"
             ],
             "rulesOut": [
                 "iru"
@@ -3701,7 +3701,7 @@
             "kanaIn": "でおる",
             "kanaOut": "で",
             "rulesIn": [
-                "v1"
+                "v5"
             ],
             "rulesOut": [
                 "iru"
@@ -3711,7 +3711,7 @@
             "kanaIn": "とる",
             "kanaOut": "て",
             "rulesIn": [
-                "v1"
+                "v5"
             ],
             "rulesOut": [
                 "iru"

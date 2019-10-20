@@ -46,16 +46,9 @@ class PopupProxy {
         return id;
     }
 
-    async show(elementRect, options) {
+    async setOptions(options) {
         const id = await this.getPopupId();
-        elementRect = PopupProxy.DOMRectToJson(elementRect);
-        return await this.invokeHostApi('show', {id, elementRect, options});
-    }
-
-    async showOrphaned(elementRect, options) {
-        const id = await this.getPopupId();
-        elementRect = PopupProxy.DOMRectToJson(elementRect);
-        return await this.invokeHostApi('showOrphaned', {id, elementRect, options});
+        return await this.invokeHostApi('setOptions', {id, options});
     }
 
     async hide(changeFocus) {
@@ -63,6 +56,11 @@ class PopupProxy {
             return;
         }
         return await this.invokeHostApi('hide', {id: this.id, changeFocus});
+    }
+
+    async isVisibleAsync() {
+        const id = await this.getPopupId();
+        return await this.invokeHostApi('isVisibleAsync', {id});
     }
 
     async setVisibleOverride(visible) {
@@ -77,16 +75,15 @@ class PopupProxy {
         return await this.invokeHostApi('containsPoint', {id: this.id, x, y});
     }
 
-    async termsShow(elementRect, writingMode, definitions, options, context) {
+    async showContent(elementRect, writingMode, type=null, details=null) {
         const id = await this.getPopupId();
         elementRect = PopupProxy.DOMRectToJson(elementRect);
-        return await this.invokeHostApi('termsShow', {id, elementRect, writingMode, definitions, options, context});
+        return await this.invokeHostApi('showContent', {id, elementRect, writingMode, type, details});
     }
 
-    async kanjiShow(elementRect, writingMode, definitions, options, context) {
+    async setCustomCss(css) {
         const id = await this.getPopupId();
-        elementRect = PopupProxy.DOMRectToJson(elementRect);
-        return await this.invokeHostApi('kanjiShow', {id, elementRect, writingMode, definitions, options, context});
+        return await this.invokeHostApi('setCustomCss', {id, css});
     }
 
     async clearAutoPlayTimer() {

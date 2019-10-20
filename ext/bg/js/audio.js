@@ -86,6 +86,24 @@ const audioUrlBuilders = {
 
         throw new Error('Failed to find audio URL');
     },
+    'text-to-speech': async (definition, optionsContext) => {
+        const options = await apiOptionsGet(optionsContext);
+        const voiceURI = options.audio.textToSpeechVoice;
+        if (!voiceURI) {
+            throw new Error('No voice');
+        }
+
+        return `tts:?text=${encodeURIComponent(definition.expression)}&voice=${encodeURIComponent(voiceURI)}`;
+    },
+    'text-to-speech-reading': async (definition, optionsContext) => {
+        const options = await apiOptionsGet(optionsContext);
+        const voiceURI = options.audio.textToSpeechVoice;
+        if (!voiceURI) {
+            throw new Error('No voice');
+        }
+
+        return `tts:?text=${encodeURIComponent(definition.reading || definition.expression)}&voice=${encodeURIComponent(voiceURI)}`;
+    },
     'custom': async (definition, optionsContext) => {
         const options = await apiOptionsGet(optionsContext);
         const customSourceUrl = options.audio.customSourceUrl;
@@ -93,20 +111,14 @@ const audioUrlBuilders = {
     }
 };
 
-async function audioBuildUrl(definition, mode, optionsContext, cache={}) {
-    const cacheKey = `${mode}:${definition.expression}`;
-    if (cache.hasOwnProperty(cacheKey)) {
-        return Promise.resolve(cache[cacheKey]);
-    }
-
+async function audioGetUrl(definition, mode, optionsContext, download) {
     if (audioUrlBuilders.hasOwnProperty(mode)) {
         const handler = audioUrlBuilders[mode];
-        return handler(definition, optionsContext).then(
-            (url) => {
-                cache[cacheKey] = url;
-                return url;
-            },
-            () => null);
+        try {
+            return await handler(definition, optionsContext, download);
+        } catch (e) {
+            // NOP
+        }
     }
     return null;
 }
@@ -163,7 +175,7 @@ async function audioInject(definition, fields, sources, optionsContext) {
             audioSourceDefinition = definition.expressions[0];
         }
 
-        const {url} = await audioGetFromSources(audioSourceDefinition, sources, optionsContext, false);
+        const {url} = await audioGetFromSources(audioSourceDefinition, sources, optionsContext, true);
         if (url !== null) {
             const filename = audioBuildFilename(audioSourceDefinition);
             if (filename !== null) {

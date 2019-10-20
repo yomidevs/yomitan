@@ -49,8 +49,8 @@ function apiAudioGetUrl(definition, source, optionsContext) {
     return utilInvoke('audioGetUrl', {definition, source, optionsContext});
 }
 
-function apiCommandExec(command) {
-    return utilInvoke('commandExec', {command});
+function apiCommandExec(command, params) {
+    return utilInvoke('commandExec', {command, params});
 }
 
 function apiScreenshotGet(options) {
@@ -63,4 +63,12 @@ function apiForward(action, params) {
 
 function apiFrameInformationGet() {
     return utilInvoke('frameInformationGet');
+}
+
+function apiInjectStylesheet(css) {
+    return utilInvoke('injectStylesheet', {css});
+}
+
+function apiGetEnvironmentInfo() {
+    return utilInvoke('getEnvironmentInfo');
 }
