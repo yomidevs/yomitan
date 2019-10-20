@@ -367,21 +367,23 @@ async function apiFindTab(timeout, checkUrl) {
 }
 
 async function apiFocusTab(tab) {
-    const tabWindow = await new Promise((resolve) => {
-        chrome.windows.get(tab.windowId, {}, (tabWindow) => {
-            const e = chrome.runtime.lastError;
-            if (e) { reject(e); }
-            else { resolve(tabWindow); }
-        });
-    });
-    if (!tabWindow.focused) {
-        await new Promise((resolve, reject) => {
-            chrome.windows.update(tab.windowId, {focused: true}, () => {
+    if (typeof chrome.windows === 'object' && chrome.windows !== null) {
+        const tabWindow = await new Promise((resolve) => {
+            chrome.windows.get(tab.windowId, {}, (tabWindow) => {
                 const e = chrome.runtime.lastError;
                 if (e) { reject(e); }
-                else { resolve(); }
+                else { resolve(tabWindow); }
             });
         });
+        if (!tabWindow.focused) {
+            await new Promise((resolve, reject) => {
+                chrome.windows.update(tab.windowId, {focused: true}, () => {
+                    const e = chrome.runtime.lastError;
+                    if (e) { reject(e); }
+                    else { resolve(); }
+                });
+            });
+        }
     }
     await new Promise((resolve, reject) => {
         chrome.tabs.update(tab.id, {active: true}, () => {
