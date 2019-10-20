@@ -25,9 +25,9 @@ function showExtensionInfo() {
     node.textContent = `${manifest.name} v${manifest.version}`;
 }
 
-function setupButtonEvents(selector, command) {
-    $(selector)
-    .on('click', (e) => {
+function setupButtonEvents(selector, command, url) {
+    const node = $(selector);
+    node.on('click', (e) => {
         if (e.button !== 0) { return; }
         apiCommandExec(command, {newTab: e.ctrlKey});
         e.preventDefault();
@@ -37,6 +37,12 @@ function setupButtonEvents(selector, command) {
         apiCommandExec(command, {newTab: true});
         e.preventDefault();
     });
+
+    if (typeof url === 'string') {
+        node.attr('href', url);
+        node.attr('target', '_blank');
+        node.attr('rel', 'noopener');
+    }
 }
 
 $(document).ready(utilAsync(() => {
@@ -47,8 +53,10 @@ $(document).ready(utilAsync(() => {
         document.documentElement.dataset.mode = (browser === 'firefox-mobile' ? 'full' : 'mini');
     });
 
-    setupButtonEvents('.action-open-search', 'search');
-    setupButtonEvents('.action-open-options', 'options');
+    const manifest = chrome.runtime.getManifest();
+
+    setupButtonEvents('.action-open-search', 'search', chrome.extension.getURL('/bg/search.html'));
+    setupButtonEvents('.action-open-options', 'options', chrome.extension.getURL(manifest.options_ui.page));
     setupButtonEvents('.action-open-help', 'help');
 
     const optionsContext = {
