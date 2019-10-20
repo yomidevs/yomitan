@@ -380,20 +380,24 @@ async function apiFocusTab(tab) {
         return;
     }
 
-    const tabWindow = await new Promise((resolve) => {
-        chrome.windows.get(tab.windowId, {}, (tabWindow) => {
-            const e = chrome.runtime.lastError;
-            if (e) { reject(e); }
-            else { resolve(tabWindow); }
-        });
-    });
-    if (!tabWindow.focused) {
-        await new Promise((resolve, reject) => {
-            chrome.windows.update(tab.windowId, {focused: true}, () => {
+    try {
+        const tabWindow = await new Promise((resolve) => {
+            chrome.windows.get(tab.windowId, {}, (tabWindow) => {
                 const e = chrome.runtime.lastError;
                 if (e) { reject(e); }
-                else { resolve(); }
+                else { resolve(tabWindow); }
             });
         });
+        if (!tabWindow.focused) {
+            await new Promise((resolve, reject) => {
+                chrome.windows.update(tab.windowId, {focused: true}, () => {
+                    const e = chrome.runtime.lastError;
+                    if (e) { reject(e); }
+                    else { resolve(); }
+                });
+            });
+        }
+    } catch (e) {
+        // Edge throws exception for no reason here.
     }
 }
