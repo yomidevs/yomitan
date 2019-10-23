@@ -153,7 +153,7 @@ async function apiCommandExec(command, params) {
 }
 apiCommandExec.handlers = {
     search: async (params) => {
-        const url = chrome.extension.getURL('/bg/search.html');
+        const url = chrome.runtime.getURL('/bg/search.html');
         if (!(params && params.newTab)) {
             try {
                 const tab = await apiFindTab(1000, (url2) => (
@@ -181,7 +181,7 @@ apiCommandExec.handlers = {
             chrome.runtime.openOptionsPage();
         } else {
             const manifest = chrome.runtime.getManifest();
-            const url = chrome.extension.getURL(manifest.options_ui.page);
+            const url = chrome.runtime.getURL(manifest.options_ui.page);
             chrome.tabs.create({url});
         }
     },

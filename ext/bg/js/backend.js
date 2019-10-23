@@ -45,7 +45,7 @@ class Backend {
 
         const options = this.getOptionsSync(this.optionsContext);
         if (options.general.showGuide) {
-            chrome.tabs.create({url: chrome.extension.getURL('/bg/guide.html')});
+            chrome.tabs.create({url: chrome.runtime.getURL('/bg/guide.html')});
         }
 
         this.isPreparedResolve();

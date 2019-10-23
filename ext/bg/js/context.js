@@ -55,8 +55,8 @@ $(document).ready(utilAsync(() => {
 
     const manifest = chrome.runtime.getManifest();
 
-    setupButtonEvents('.action-open-search', 'search', chrome.extension.getURL('/bg/search.html'));
-    setupButtonEvents('.action-open-options', 'options', chrome.extension.getURL(manifest.options_ui.page));
+    setupButtonEvents('.action-open-search', 'search', chrome.runtime.getURL('/bg/search.html'));
+    setupButtonEvents('.action-open-options', 'options', chrome.runtime.getURL(manifest.options_ui.page));
     setupButtonEvents('.action-open-help', 'help');
 
     const optionsContext = {
