@@ -20,7 +20,7 @@
 class Frontend {
     constructor(popup, ignoreNodes) {
         this.popup = popup;
-        this.popupTimer = null;
+        this.popupTimerPromise = null;
         this.textSourceLast = null;
         this.pendingLookup = false;
         this.options = null;
@@ -74,7 +74,7 @@ class Frontend {
     }
 
     onMouseOver(e) {
-        if (e.target === this.popup.container && this.popupTimer !== null) {
+        if (e.target === this.popup.container) {
             this.popupTimerClear();
         }
     }
@@ -99,14 +99,17 @@ class Frontend {
         }
 
         const search = async () => {
+            if (scanningModifier === 'none') {
+                if (!await this.popupTimerWait()) {
+                    // Aborted
+                    return;
+                }
+            }
+
             await this.searchAt(e.clientX, e.clientY, 'mouse');
         };
 
-        if (scanningModifier === 'none') {
-            this.popupTimerSet(search);
-        } else {
-            search();
-        }
+        search();
     }
 
     onMouseDown(e) {
@@ -293,19 +296,19 @@ class Frontend {
         await this.popup.setOptions(this.options);
     }
 
-    popupTimerSet(callback) {
+    async popupTimerWait() {
         const delay = this.options.scanning.delay;
-        if (delay > 0) {
-            this.popupTimer = window.setTimeout(callback, delay);
-        } else {
-            Promise.resolve().then(callback);
+        this.popupTimerPromise = promiseTimeout(delay, true);
+        try {
+            return await this.popupTimerPromise;
+        } finally {
+            this.popupTimerPromise = null;
         }
     }
 
     popupTimerClear() {
-        if (this.popupTimer !== null) {
-            window.clearTimeout(this.popupTimer);
-            this.popupTimer = null;
+        if (this.popupTimerPromise !== null) {
+            this.popupTimerPromise.resolve(false);
         }
     }
 
