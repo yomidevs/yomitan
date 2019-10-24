@@ -99,11 +99,7 @@ class Frontend {
         }
 
         const search = async () => {
-            try {
-                await this.searchAt(e.clientX, e.clientY, 'mouse');
-            } catch (e) {
-                this.onError(e);
-            }
+            await this.searchAt(e.clientX, e.clientY, 'mouse');
         };
 
         if (scanningModifier === 'none') {
@@ -314,12 +310,16 @@ class Frontend {
     }
 
     async searchAt(x, y, cause) {
-        if (this.pendingLookup || await this.popup.containsPoint(x, y)) {
-            return;
-        }
+        try {
+            if (this.pendingLookup || await this.popup.containsPoint(x, y)) {
+                return;
+            }
 
-        const textSource = docRangeFromPoint(x, y, this.options);
-        return await this.searchSource(textSource, cause);
+            const textSource = docRangeFromPoint(x, y, this.options);
+            return await this.searchSource(textSource, cause);
+        } catch (e) {
+            this.onError(e);
+        }
     }
 
     async searchSource(textSource, cause) {
@@ -503,15 +503,7 @@ class Frontend {
             return;
         }
 
-        const search = async () => {
-            try {
-                await this.searchAt(x, y, cause);
-            } catch (e) {
-                this.onError(e);
-            }
-        };
-
-        search();
+        this.searchAt(x, y, cause);
     }
 
     selectionContainsPoint(selection, x, y) {
