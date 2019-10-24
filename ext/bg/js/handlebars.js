@@ -49,13 +49,13 @@ function handlebarsFuriganaPlain(options) {
     let result = '';
     for (const seg of segs) {
         if (seg.furigana) {
-            result += `${seg.text}[${seg.furigana}]`;
+            result += ` ${seg.text}[${seg.furigana}]`;
         } else {
             result += seg.text;
         }
     }
 
-    return result;
+    return result.trimLeft();
 }
 
 function handlebarsKanjiLinks(options) {
