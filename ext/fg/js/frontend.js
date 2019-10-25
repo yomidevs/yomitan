@@ -319,19 +319,27 @@ class Frontend {
             }
 
             const textSource = docRangeFromPoint(x, y, this.options);
-            return await this.searchSource(textSource, cause);
+            if (textSource === null) {
+                return;
+            }
+
+            try {
+                return await this.searchSource(textSource, cause);
+            } finally {
+                textSource.cleanup();
+            }
         } catch (e) {
             this.onError(e);
         }
     }
 
     async searchSource(textSource, cause) {
-        let hideResults = textSource === null;
+        let hideResults = false;
         let searched = false;
         let success = false;
 
         try {
-            if (!hideResults && (!this.textSourceLast || !this.textSourceLast.equals(textSource))) {
+            if (!this.textSourceLast || !this.textSourceLast.equals(textSource)) {
                 searched = true;
                 this.pendingLookup = true;
                 const focus = (cause === 'mouse');
@@ -351,9 +359,6 @@ class Frontend {
                 this.onError(e);
             }
         } finally {
-            if (textSource !== null) {
-                textSource.cleanup();
-            }
             if (hideResults && this.options.scanning.autoHideResults) {
                 this.searchClear(true);
             }

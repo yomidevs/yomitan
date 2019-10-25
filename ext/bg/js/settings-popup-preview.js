@@ -158,9 +158,14 @@ class SettingsPopupPreview {
         const range = document.createRange();
         range.selectNode(textNode);
         const source = new TextSourceRange(range, range.toString(), null);
+        if (source === null) { return; }
 
         this.frontend.textSourceLast = null;
-        await this.frontend.searchSource(source, 'script');
+        try {
+            await this.frontend.searchSource(source, 'script');
+        } finally {
+            source.cleanup();
+        }
         await this.frontend.lastShowPromise;
 
         if (this.frontend.popup.isVisible()) {
