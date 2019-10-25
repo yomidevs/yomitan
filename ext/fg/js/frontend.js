@@ -156,28 +156,30 @@ class Frontend {
     }
 
     onTouchStart(e) {
-        if (this.primaryTouchIdentifier !== null && this.getIndexOfTouch(e.touches, this.primaryTouchIdentifier) >= 0) {
+        if (
+            this.primaryTouchIdentifier !== null ||
+            e.changedTouches.length === 0
+        ) {
             return;
         }
 
-        let touch = this.getPrimaryTouch(e.changedTouches);
-        if (Frontend.selectionContainsPoint(window.getSelection(), touch.clientX, touch.clientY)) {
-            touch = null;
+        const primaryTouch = e.changedTouches[0];
+        if (Frontend.selectionContainsPoint(window.getSelection(), primaryTouch.clientX, primaryTouch.clientY)) {
+            return;
         }
 
-        this.setPrimaryTouch(touch);
+        this.setPrimaryTouch(primaryTouch);
     }
 
     onTouchEnd(e) {
-        if (this.primaryTouchIdentifier === null) {
+        if (
+            this.primaryTouchIdentifier === null ||
+            this.getIndexOfTouch(e.changedTouches, this.primaryTouchIdentifier) < 0
+        ) {
             return;
         }
 
-        if (this.getIndexOfTouch(e.changedTouches, this.primaryTouchIdentifier) < 0) {
-            return;
-        }
-
-        this.setPrimaryTouch(this.getPrimaryTouch(this.excludeTouches(e.touches, e.changedTouches)));
+        this.setPrimaryTouch(null);
     }
 
     onTouchCancel(e) {
@@ -195,8 +197,8 @@ class Frontend {
             return;
         }
 
-        const touch = touches[index];
-        this.searchAt(touch.clientX, touch.clientY, 'touchMove');
+        const primaryTouch = touches[index];
+        this.searchAt(primaryTouch.clientX, primaryTouch.clientY, 'touchMove');
 
         e.preventDefault(); // Disable scroll
     }
@@ -407,10 +409,6 @@ class Frontend {
         }
     }
 
-    getPrimaryTouch(touchList) {
-        return touchList.length > 0 ? touchList[0] : null;
-    }
-
     getIndexOfTouch(touchList, identifier) {
         for (let i in touchList) {
             let t = touchList[i];
@@ -419,16 +417,6 @@ class Frontend {
             }
         }
         return -1;
-    }
-
-    excludeTouches(touchList, excludeTouchList) {
-        const result = [];
-        for (let r of touchList) {
-            if (this.getIndexOfTouch(excludeTouchList, r.identifier) < 0) {
-                result.push(r);
-            }
-        }
-        return result;
     }
 
     setPrimaryTouch(touch) {
