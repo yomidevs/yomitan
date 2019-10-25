@@ -32,10 +32,10 @@ class Frontend {
         };
 
         this.primaryTouchIdentifier = null;
-        this.contextMenuPrevent = false;
-        this.mouseDownPrevent = false;
-        this.clickPrevent = false;
-        this.scrollPrevent = false;
+        this.preventNextContextMenu = false;
+        this.preventNextMouseDown = false;
+        this.preventNextClick = false;
+        this.preventScroll = false;
 
         this.enabled = false;
         this.eventListeners = [];
@@ -111,9 +111,9 @@ class Frontend {
     }
 
     onMouseDown(e) {
-        if (this.mouseDownPrevent) {
-            this.mouseDownPrevent = false;
-            this.clickPrevent = true;
+        if (this.preventNextMouseDown) {
+            this.preventNextMouseDown = false;
+            this.preventNextClick = true;
             e.preventDefault();
             e.stopPropagation();
             return false;
@@ -147,8 +147,8 @@ class Frontend {
     }
 
     onClick(e) {
-        if (this.clickPrevent) {
-            this.clickPrevent = false;
+        if (this.preventNextClick) {
+            this.preventNextClick = false;
             e.preventDefault();
             e.stopPropagation();
             return false;
@@ -185,7 +185,7 @@ class Frontend {
     }
 
     onTouchMove(e) {
-        if (!this.scrollPrevent || !e.cancelable || this.primaryTouchIdentifier === null) {
+        if (!this.preventScroll || !e.cancelable || this.primaryTouchIdentifier === null) {
             return;
         }
 
@@ -202,8 +202,8 @@ class Frontend {
     }
 
     onContextMenu(e) {
-        if (this.contextMenuPrevent) {
-            this.contextMenuPrevent = false;
+        if (this.preventNextContextMenu) {
+            this.preventNextContextMenu = false;
             e.preventDefault();
             e.stopPropagation();
             return false;
@@ -434,19 +434,19 @@ class Frontend {
     setPrimaryTouch(touch) {
         if (touch === null) {
             this.primaryTouchIdentifier = null;
-            this.scrollPrevent = false;
-            this.clickPrevent = false;
+            this.preventScroll = false;
+            this.preventNextClick = false;
             // Don't revert context menu and mouse down prevention,
             // since these events can occur after the touch has ended.
-            // this.contextMenuPrevent = false;
-            // this.mouseDownPrevent = false;
+            // this.preventNextContextMenu = false;
+            // this.preventNextMouseDown = false;
         }
         else {
             this.primaryTouchIdentifier = touch.identifier;
-            this.scrollPrevent = false;
-            this.contextMenuPrevent = false;
-            this.mouseDownPrevent = false;
-            this.clickPrevent = false;
+            this.preventScroll = false;
+            this.preventNextContextMenu = false;
+            this.preventNextMouseDown = false;
+            this.preventNextClick = false;
 
             const textSourceCurrentPrevious = this.textSourceCurrent !== null ? this.textSourceCurrent.clone() : null;
 
@@ -460,9 +460,9 @@ class Frontend {
                     return;
                 }
 
-                this.scrollPrevent = true;
-                this.contextMenuPrevent = true;
-                this.mouseDownPrevent = true;
+                this.preventScroll = true;
+                this.preventNextContextMenu = true;
+                this.preventNextMouseDown = true;
             });
         }
     }
