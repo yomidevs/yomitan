@@ -212,7 +212,7 @@ class Frontend {
         }
     }
 
-    onAfterSearch(newRange, cause, searched, success) {
+    onAfterSearch(newRange, cause) {
         if (cause === 'mouse') {
             return;
         }
@@ -335,16 +335,12 @@ class Frontend {
 
     async searchSource(textSource, cause) {
         let hideResults = false;
-        let searched = false;
-        let success = false;
 
         try {
             if (!this.textSourceLast || !this.textSourceLast.equals(textSource)) {
-                searched = true;
                 this.pendingLookup = true;
                 const focus = (cause === 'mouse');
                 hideResults = !await this.searchTerms(textSource, focus) && !await this.searchKanji(textSource, focus);
-                success = true;
             }
         } catch (e) {
             if (window.yomichan_orphaned) {
@@ -364,7 +360,7 @@ class Frontend {
             }
 
             this.pendingLookup = false;
-            this.onAfterSearch(this.textSourceLast, cause, searched, success);
+            this.onAfterSearch(this.textSourceLast, cause);
         }
     }
 
