@@ -319,7 +319,10 @@ class Frontend {
             }
 
             const textSource = docRangeFromPoint(x, y, this.options);
-            if (textSource === null) {
+            if (
+                textSource === null ||
+                (this.textSourceLast !== null && this.textSourceLast.equals(textSource))
+            ) {
                 return;
             }
 
@@ -337,11 +340,9 @@ class Frontend {
         let hideResults = false;
 
         try {
-            if (!this.textSourceLast || !this.textSourceLast.equals(textSource)) {
-                this.pendingLookup = true;
-                const focus = (cause === 'mouse');
-                hideResults = !await this.searchTerms(textSource, focus) && !await this.searchKanji(textSource, focus);
-            }
+            this.pendingLookup = true;
+            const focus = (cause === 'mouse');
+            hideResults = !await this.searchTerms(textSource, focus) && !await this.searchKanji(textSource, focus);
         } catch (e) {
             if (window.yomichan_orphaned) {
                 if (textSource && this.options.scanning.modifier !== 'none') {
