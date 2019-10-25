@@ -174,12 +174,13 @@ class Frontend {
         this.preventNextMouseDown = false;
         this.preventNextClick = false;
 
+        if (this.pendingLookup) { return; }
+
         const textSourceCurrentPrevious = this.textSourceCurrent !== null ? this.textSourceCurrent.clone() : null;
 
         this.searchAt(primaryTouch.clientX, primaryTouch.clientY, 'touchStart')
         .then(() => {
             if (
-                this.pendingLookup ||
                 this.textSourceCurrent === null ||
                 this.textSourceCurrent.equals(textSourceCurrentPrevious)
             ) {
