@@ -197,7 +197,7 @@ class Frontend {
         }
 
         const touch = touches[index];
-        this.searchFromTouch(touch.clientX, touch.clientY, 'touchMove');
+        this.searchAt(touch.clientX, touch.clientY, 'touchMove');
 
         e.preventDefault(); // Disable scroll
     }
@@ -293,6 +293,8 @@ class Frontend {
 
     async searchAt(x, y, cause) {
         try {
+            this.popupTimerClear();
+
             if (this.pendingLookup || await this.popup.containsPoint(x, y)) {
                 return;
             }
@@ -449,7 +451,7 @@ class Frontend {
 
             const textSourceCurrentPrevious = this.textSourceCurrent !== null ? this.textSourceCurrent.clone() : null;
 
-            this.searchFromTouch(touch.clientX, touch.clientY, 'touchStart')
+            this.searchAt(touch.clientX, touch.clientY, 'touchStart')
             .then(() => {
                 if (
                     this.pendingLookup ||
@@ -480,16 +482,6 @@ class Frontend {
 
     setClickPrevent(value) {
         this.clickPrevent = value;
-    }
-
-    searchFromTouch(x, y, cause) {
-        this.popupTimerClear();
-
-        if (this.pendingLookup) {
-            return Promise.resolve();
-        }
-
-        return this.searchAt(x, y, cause);
     }
 
     selectionContainsPoint(selection, x, y) {
