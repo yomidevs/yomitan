@@ -32,7 +32,6 @@ class Frontend {
         };
 
         this.primaryTouchIdentifier = null;
-        this.contextMenuChecking = false;
         this.contextMenuPrevent = false;
         this.contextMenuPreviousRange = null;
         this.mouseDownPrevent = false;
@@ -212,26 +211,6 @@ class Frontend {
         }
     }
 
-    onAfterSearch(newRange, cause) {
-        if (cause === 'mouse') {
-            return;
-        }
-
-        if (
-            !this.contextMenuChecking ||
-            (this.contextMenuPreviousRange === null ? newRange === null : this.contextMenuPreviousRange.equals(newRange))) {
-            return;
-        }
-
-        if (cause === 'touchStart' && newRange !== null) {
-            this.scrollPrevent = true;
-        }
-
-        this.setContextMenuPrevent(true, false);
-        this.setMouseDownPrevent(true, false);
-        this.contextMenuChecking = false;
-    }
-
     onRuntimeMessage({action, params}, sender, callback) {
         const handlers = Frontend.runtimeMessageHandlers;
         if (handlers.hasOwnProperty(action)) {
@@ -367,7 +346,6 @@ class Frontend {
             }
 
             this.pendingLookup = false;
-            this.onAfterSearch(this.textSourceCurrent, cause);
         }
 
         return results !== null;
@@ -456,7 +434,6 @@ class Frontend {
         if (touch === null) {
             this.primaryTouchIdentifier = null;
             this.contextMenuPreviousRange = null;
-            this.contextMenuChecking = false;
             this.scrollPrevent = false;
             this.setContextMenuPrevent(false, true);
             this.setMouseDownPrevent(false, true);
@@ -465,13 +442,27 @@ class Frontend {
         else {
             this.primaryTouchIdentifier = touch.identifier;
             this.contextMenuPreviousRange = this.textSourceCurrent !== null ? this.textSourceCurrent.clone() : null;
-            this.contextMenuChecking = true;
             this.scrollPrevent = false;
             this.setContextMenuPrevent(false, false);
             this.setMouseDownPrevent(false, false);
             this.setClickPrevent(false);
 
-            this.searchFromTouch(touch.clientX, touch.clientY, 'touchStart');
+            const textSourceCurrentPrevious = this.textSourceCurrent !== null ? this.textSourceCurrent.clone() : null;
+
+            this.searchFromTouch(touch.clientX, touch.clientY, 'touchStart')
+            .then(() => {
+                if (
+                    this.pendingLookup ||
+                    this.textSourceCurrent === null ||
+                    this.textSourceCurrent.equals(textSourceCurrentPrevious)
+                ) {
+                    return;
+                }
+
+                this.scrollPrevent = true;
+                this.setContextMenuPrevent(true, false);
+                this.setMouseDownPrevent(true, false);
+            });
         }
     }
 
@@ -495,10 +486,10 @@ class Frontend {
         this.popupTimerClear();
 
         if (this.pendingLookup) {
-            return;
+            return Promise.resolve();
         }
 
-        this.searchAt(x, y, cause);
+        return this.searchAt(x, y, cause);
     }
 
     selectionContainsPoint(selection, x, y) {
