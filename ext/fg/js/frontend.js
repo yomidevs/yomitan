@@ -163,16 +163,17 @@ class Frontend {
             return;
         }
 
+        this.preventScroll = false;
+        this.preventNextContextMenu = false;
+        this.preventNextMouseDown = false;
+        this.preventNextClick = false;
+
         const primaryTouch = e.changedTouches[0];
         if (Frontend.selectionContainsPoint(window.getSelection(), primaryTouch.clientX, primaryTouch.clientY)) {
             return;
         }
 
         this.primaryTouchIdentifier = primaryTouch.identifier;
-        this.preventScroll = false;
-        this.preventNextContextMenu = false;
-        this.preventNextMouseDown = false;
-        this.preventNextClick = false;
 
         if (this.pendingLookup) { return; }
 
