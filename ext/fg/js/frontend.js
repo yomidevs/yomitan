@@ -337,12 +337,18 @@ class Frontend {
     }
 
     async searchSource(textSource, cause) {
-        let hideResults = false;
+        let results = null;
 
         try {
             this.pendingLookup = true;
-            const focus = (cause === 'mouse');
-            hideResults = !await this.searchTerms(textSource, focus) && !await this.searchKanji(textSource, focus);
+            results = (
+                await this.findTerms(textSource) ||
+                await this.findKanji(textSource)
+            );
+            if (results !== null) {
+                const focus = (cause === 'mouse');
+                this.showContent(textSource, focus, results.definitions, results.type);
+            }
         } catch (e) {
             if (window.yomichan_orphaned) {
                 if (textSource && this.options.scanning.modifier !== 'none') {
@@ -356,7 +362,7 @@ class Frontend {
                 this.onError(e);
             }
         } finally {
-            if (hideResults && this.options.scanning.autoHideResults) {
+            if (results === null && this.options.scanning.autoHideResults) {
                 this.searchClear(true);
             }
 
@@ -365,66 +371,46 @@ class Frontend {
         }
     }
 
-    async searchTerms(textSource, focus) {
+    showContent(textSource, focus, definitions, type) {
+        const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
+        const url = window.location.href;
+        this.lastShowPromise = this.popup.showContent(
+            textSource.getRect(),
+            textSource.getWritingMode(),
+            type,
+            {definitions, context: {sentence, url, focus}}
+        );
+
+        this.textSourceLast = textSource;
+        if (this.options.scanning.selectText) {
+            textSource.select();
+        }
+    }
+
+    async findTerms(textSource) {
         this.setTextSourceScanLength(textSource, this.options.scanning.length);
 
         const searchText = textSource.text();
-        if (searchText.length === 0) {
-            return false;
-        }
+        if (searchText.length === 0) { return null; }
 
         const {definitions, length} = await apiTermsFind(searchText, this.getOptionsContext());
-        if (definitions.length === 0) {
-            return false;
-        }
+        if (definitions.length === 0) { return null; }
 
         textSource.setEndOffset(length);
 
-        const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
-        const url = window.location.href;
-        this.lastShowPromise = this.popup.showContent(
-            textSource.getRect(),
-            textSource.getWritingMode(),
-            'terms',
-            {definitions, context: {sentence, url, focus}}
-        );
-
-        this.textSourceLast = textSource;
-        if (this.options.scanning.selectText) {
-            textSource.select();
-        }
-
-        return true;
+        return {definitions, type: 'terms'};
     }
 
-    async searchKanji(textSource, focus) {
+    async findKanji(textSource) {
         this.setTextSourceScanLength(textSource, 1);
 
         const searchText = textSource.text();
-        if (searchText.length === 0) {
-            return false;
-        }
+        if (searchText.length === 0) { return null; }
 
         const definitions = await apiKanjiFind(searchText, this.getOptionsContext());
-        if (definitions.length === 0) {
-            return false;
-        }
+        if (definitions.length === 0) { return null; }
 
-        const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
-        const url = window.location.href;
-        this.lastShowPromise = this.popup.showContent(
-            textSource.getRect(),
-            textSource.getWritingMode(),
-            'kanji',
-            {definitions, context: {sentence, url, focus}}
-        );
-
-        this.textSourceLast = textSource;
-        if (this.options.scanning.selectText) {
-            textSource.select();
-        }
-
-        return true;
+        return {definitions, type: 'kanji'};
     }
 
     searchClear(changeFocus) {
