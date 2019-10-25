@@ -156,10 +156,7 @@ class Frontend {
     }
 
     onTouchStart(e) {
-        if (
-            this.primaryTouchIdentifier !== null ||
-            e.changedTouches.length === 0
-        ) {
+        if (this.primaryTouchIdentifier !== null || e.changedTouches.length === 0) {
             return;
         }
 
@@ -175,7 +172,9 @@ class Frontend {
 
         this.primaryTouchIdentifier = primaryTouch.identifier;
 
-        if (this.pendingLookup) { return; }
+        if (this.pendingLookup) {
+            return;
+        }
 
         const textSourceCurrentPrevious = this.textSourceCurrent !== null ? this.textSourceCurrent.clone() : null;
 
