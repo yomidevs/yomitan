@@ -21,7 +21,7 @@ class Frontend {
     constructor(popup, ignoreNodes) {
         this.popup = popup;
         this.popupTimerPromise = null;
-        this.textSourceLast = null;
+        this.textSourceCurrent = null;
         this.pendingLookup = false;
         this.options = null;
         this.ignoreNodes = (Array.isArray(ignoreNodes) && ignoreNodes.length > 0 ? ignoreNodes.join(',') : null);
@@ -139,8 +139,8 @@ class Frontend {
     }
 
     async onResize() {
-        if (this.textSourceLast !== null && await this.popup.isVisibleAsync()) {
-            const textSource = this.textSourceLast;
+        if (this.textSourceCurrent !== null && await this.popup.isVisibleAsync()) {
+            const textSource = this.textSourceCurrent;
             this.lastShowPromise = this.popup.showContent(
                 textSource.getRect(),
                 textSource.getWritingMode()
@@ -321,7 +321,7 @@ class Frontend {
             const textSource = docRangeFromPoint(x, y, this.options);
             if (
                 textSource === null ||
-                (this.textSourceLast !== null && this.textSourceLast.equals(textSource))
+                (this.textSourceCurrent !== null && this.textSourceCurrent.equals(textSource))
             ) {
                 return;
             }
@@ -367,8 +367,10 @@ class Frontend {
             }
 
             this.pendingLookup = false;
-            this.onAfterSearch(this.textSourceLast, cause);
+            this.onAfterSearch(this.textSourceCurrent, cause);
         }
+
+        return results !== null;
     }
 
     showContent(textSource, focus, definitions, type) {
@@ -381,7 +383,7 @@ class Frontend {
             {definitions, context: {sentence, url, focus}}
         );
 
-        this.textSourceLast = textSource;
+        this.textSourceCurrent = textSource;
         if (this.options.scanning.selectText) {
             textSource.select();
         }
@@ -417,11 +419,13 @@ class Frontend {
         this.popup.hide(changeFocus);
         this.popup.clearAutoPlayTimer();
 
-        if (this.options.scanning.selectText && this.textSourceLast) {
-            this.textSourceLast.deselect();
-        }
+        if (this.textSourceCurrent !== null) {
+            if (this.options.scanning.selectText) {
+                this.textSourceCurrent.deselect();
+            }
 
-        this.textSourceLast = null;
+            this.textSourceCurrent = null;
+        }
     }
 
     getPrimaryTouch(touchList) {
@@ -460,7 +464,7 @@ class Frontend {
         }
         else {
             this.primaryTouchIdentifier = touch.identifier;
-            this.contextMenuPreviousRange = this.textSourceLast ? this.textSourceLast.clone() : null;
+            this.contextMenuPreviousRange = this.textSourceCurrent !== null ? this.textSourceCurrent.clone() : null;
             this.contextMenuChecking = true;
             this.scrollPrevent = false;
             this.setContextMenuPrevent(false, false);
