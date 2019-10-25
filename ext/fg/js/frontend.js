@@ -168,7 +168,28 @@ class Frontend {
             return;
         }
 
-        this.setPrimaryTouch(primaryTouch);
+        this.primaryTouchIdentifier = primaryTouch.identifier;
+        this.preventScroll = false;
+        this.preventNextContextMenu = false;
+        this.preventNextMouseDown = false;
+        this.preventNextClick = false;
+
+        const textSourceCurrentPrevious = this.textSourceCurrent !== null ? this.textSourceCurrent.clone() : null;
+
+        this.searchAt(primaryTouch.clientX, primaryTouch.clientY, 'touchStart')
+        .then(() => {
+            if (
+                this.pendingLookup ||
+                this.textSourceCurrent === null ||
+                this.textSourceCurrent.equals(textSourceCurrentPrevious)
+            ) {
+                return;
+            }
+
+            this.preventScroll = true;
+            this.preventNextContextMenu = true;
+            this.preventNextMouseDown = true;
+        });
     }
 
     onTouchEnd(e) {
@@ -179,7 +200,13 @@ class Frontend {
             return;
         }
 
-        this.setPrimaryTouch(null);
+        this.primaryTouchIdentifier = null;
+        this.preventScroll = false;
+        this.preventNextClick = false;
+        // Don't revert context menu and mouse down prevention,
+        // since these events can occur after the touch has ended.
+        // this.preventNextContextMenu = false;
+        // this.preventNextMouseDown = false;
     }
 
     onTouchCancel(e) {
@@ -417,42 +444,6 @@ class Frontend {
             }
         }
         return -1;
-    }
-
-    setPrimaryTouch(touch) {
-        if (touch === null) {
-            this.primaryTouchIdentifier = null;
-            this.preventScroll = false;
-            this.preventNextClick = false;
-            // Don't revert context menu and mouse down prevention,
-            // since these events can occur after the touch has ended.
-            // this.preventNextContextMenu = false;
-            // this.preventNextMouseDown = false;
-        }
-        else {
-            this.primaryTouchIdentifier = touch.identifier;
-            this.preventScroll = false;
-            this.preventNextContextMenu = false;
-            this.preventNextMouseDown = false;
-            this.preventNextClick = false;
-
-            const textSourceCurrentPrevious = this.textSourceCurrent !== null ? this.textSourceCurrent.clone() : null;
-
-            this.searchAt(touch.clientX, touch.clientY, 'touchStart')
-            .then(() => {
-                if (
-                    this.pendingLookup ||
-                    this.textSourceCurrent === null ||
-                    this.textSourceCurrent.equals(textSourceCurrentPrevious)
-                ) {
-                    return;
-                }
-
-                this.preventScroll = true;
-                this.preventNextContextMenu = true;
-                this.preventNextMouseDown = true;
-            });
-        }
     }
 
     static selectionContainsPoint(selection, x, y) {
