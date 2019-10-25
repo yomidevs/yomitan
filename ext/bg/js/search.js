@@ -79,6 +79,7 @@ class DisplaySearch extends Display {
 
     onSearchInput() {
         this.updateSearchButton();
+        this.query.scrollIntoView();
     }
 
     onSearch(e) {
@@ -92,6 +93,12 @@ class DisplaySearch extends Display {
         const queryString = query.length > 0 ? `?query=${encodeURIComponent(query)}` : '';
         window.history.replaceState(null, '', `${window.location.pathname}${queryString}`);
         this.onSearchQueryUpdated(query, true);
+    }
+
+    onKeyDown(e) {
+        if (!super.onKeyDown(e)) {
+            this.query.focus({preventScroll: true});
+        }
     }
 
     async onSearchQueryUpdated(query, animate) {

@@ -157,8 +157,10 @@ class Display {
             const handler = handlers[key];
             if (handler(this, e)) {
                 e.preventDefault();
+                return true;
             }
         }
+        return false;
     }
 
     onWheel(e) {
