@@ -33,7 +33,6 @@ class Frontend {
 
         this.primaryTouchIdentifier = null;
         this.contextMenuPrevent = false;
-        this.contextMenuPreviousRange = null;
         this.mouseDownPrevent = false;
         this.clickPrevent = false;
         this.scrollPrevent = false;
@@ -435,7 +434,6 @@ class Frontend {
     setPrimaryTouch(touch) {
         if (touch === null) {
             this.primaryTouchIdentifier = null;
-            this.contextMenuPreviousRange = null;
             this.scrollPrevent = false;
             this.setContextMenuPrevent(false, true);
             this.setMouseDownPrevent(false, true);
@@ -443,7 +441,6 @@ class Frontend {
         }
         else {
             this.primaryTouchIdentifier = touch.identifier;
-            this.contextMenuPreviousRange = this.textSourceCurrent !== null ? this.textSourceCurrent.clone() : null;
             this.scrollPrevent = false;
             this.setContextMenuPrevent(false, false);
             this.setMouseDownPrevent(false, false);
