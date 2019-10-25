@@ -161,7 +161,7 @@ class Frontend {
         }
 
         let touch = this.getPrimaryTouch(e.changedTouches);
-        if (this.selectionContainsPoint(window.getSelection(), touch.clientX, touch.clientY)) {
+        if (Frontend.selectionContainsPoint(window.getSelection(), touch.clientX, touch.clientY)) {
             touch = null;
         }
 
@@ -467,7 +467,7 @@ class Frontend {
         }
     }
 
-    selectionContainsPoint(selection, x, y) {
+    static selectionContainsPoint(selection, x, y) {
         for (let i = 0; i < selection.rangeCount; ++i) {
             const range = selection.getRangeAt(i);
             for (const rect of range.getClientRects()) {
