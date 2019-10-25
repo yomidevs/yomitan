@@ -112,8 +112,8 @@ class Frontend {
 
     onMouseDown(e) {
         if (this.mouseDownPrevent) {
-            this.setMouseDownPrevent(false, false);
-            this.setClickPrevent(true);
+            this.mouseDownPrevent = false;
+            this.clickPrevent = true;
             e.preventDefault();
             e.stopPropagation();
             return false;
@@ -148,7 +148,7 @@ class Frontend {
 
     onClick(e) {
         if (this.clickPrevent) {
-            this.setClickPrevent(false);
+            this.clickPrevent = false;
             e.preventDefault();
             e.stopPropagation();
             return false;
@@ -203,7 +203,7 @@ class Frontend {
 
     onContextMenu(e) {
         if (this.contextMenuPrevent) {
-            this.setContextMenuPrevent(false, false);
+            this.contextMenuPrevent = false;
             e.preventDefault();
             e.stopPropagation();
             return false;
@@ -435,16 +435,18 @@ class Frontend {
         if (touch === null) {
             this.primaryTouchIdentifier = null;
             this.scrollPrevent = false;
-            this.setContextMenuPrevent(false, true);
-            this.setMouseDownPrevent(false, true);
-            this.setClickPrevent(false);
+            this.clickPrevent = false;
+            // Don't revert context menu and mouse down prevention,
+            // since these events can occur after the touch has ended.
+            // this.contextMenuPrevent = false;
+            // this.mouseDownPrevent = false;
         }
         else {
             this.primaryTouchIdentifier = touch.identifier;
             this.scrollPrevent = false;
-            this.setContextMenuPrevent(false, false);
-            this.setMouseDownPrevent(false, false);
-            this.setClickPrevent(false);
+            this.contextMenuPrevent = false;
+            this.mouseDownPrevent = false;
+            this.clickPrevent = false;
 
             const textSourceCurrentPrevious = this.textSourceCurrent !== null ? this.textSourceCurrent.clone() : null;
 
@@ -459,26 +461,10 @@ class Frontend {
                 }
 
                 this.scrollPrevent = true;
-                this.setContextMenuPrevent(true, false);
-                this.setMouseDownPrevent(true, false);
+                this.contextMenuPrevent = true;
+                this.mouseDownPrevent = true;
             });
         }
-    }
-
-    setContextMenuPrevent(value, delay) {
-        if (!delay) {
-            this.contextMenuPrevent = value;
-        }
-    }
-
-    setMouseDownPrevent(value, delay) {
-        if (!delay) {
-            this.mouseDownPrevent = value;
-        }
-    }
-
-    setClickPrevent(value) {
-        this.clickPrevent = value;
     }
 
     selectionContainsPoint(selection, x, y) {
