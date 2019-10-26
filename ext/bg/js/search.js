@@ -29,8 +29,13 @@ class DisplaySearch extends Display {
         this.search = document.querySelector('#search');
         this.query = document.querySelector('#query');
         this.intro = document.querySelector('#intro');
+        this.clipboardMonitorCheck = document.querySelector('#clipboard-monitor');
+
         this.introVisible = true;
         this.introAnimationTimer = null;
+
+        this.clipboardMonitorIntervalId = null;
+        this.clipboardPrevText = null;
     }
 
     static create() {
@@ -57,10 +62,20 @@ class DisplaySearch extends Display {
 
                 window.wanakana.bind(this.query);
             }
+            if (this.clipboardMonitorCheck !== null) {
+                this.clipboardMonitorCheck.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        this.startClipboardMonitor();
+                    } else {
+                        this.stopClipboardMonitor();
+                    }
+                });
+            }
 
             window.addEventListener('popstate', (e) => this.onPopState(e));
 
             this.updateSearchButton();
+            this.initClipboardMonitor();
         } catch (e) {
             this.onError(e);
         }
@@ -93,7 +108,9 @@ class DisplaySearch extends Display {
             return;
         }
 
-        e.preventDefault();
+        if (e) {
+            e.preventDefault();
+        }
 
         const query = this.query.value;
         const queryString = query.length > 0 ? `?query=${encodeURIComponent(query)}` : '';
@@ -179,6 +196,31 @@ class DisplaySearch extends Display {
             callback(result);
         } else {
             return super.onRuntimeMessage({action, params}, sender, callback);
+        }
+    }
+
+    initClipboardMonitor() {
+        // ignore copy from search page
+        window.addEventListener('copy', (e) => {
+            this.clipboardPrevText = document.getSelection().toString().trim();
+        });
+    }
+
+    startClipboardMonitor() {
+        this.clipboardMonitorIntervalId = setInterval(async () => {
+            const curText = (await navigator.clipboard.readText()).trim();
+            if (curText && (curText !== this.clipboardPrevText)) {
+                this.query.value = curText;
+                this.onSearch();
+                this.clipboardPrevText = curText;
+            }
+        }, 100);
+    }
+
+    stopClipboardMonitor() {
+        if (this.clipboardMonitorIntervalId) {
+            clearInterval(this.clipboardMonitorIntervalId);
+            this.clipboardMonitorIntervalId = null;
         }
     }
 
