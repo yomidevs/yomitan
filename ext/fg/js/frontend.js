@@ -119,8 +119,10 @@ class Frontend {
             return false;
         }
 
-        this.popupTimerClear();
-        this.searchClear(true);
+        if (e.button === 0) {
+            this.popupTimerClear();
+            this.searchClear(true);
+        }
     }
 
     onMouseOut(e) {
@@ -231,6 +233,10 @@ class Frontend {
         e.preventDefault(); // Disable scroll
     }
 
+    onAuxClick(e) {
+        this.preventNextContextMenu = false;
+    }
+
     onContextMenu(e) {
         if (this.preventNextContextMenu) {
             this.preventNextContextMenu = false;
@@ -278,6 +284,7 @@ class Frontend {
 
         if (this.options.scanning.touchInputEnabled) {
             this.addEventListener(window, 'click', this.onClick.bind(this));
+            this.addEventListener(window, 'auxclick', this.onAuxClick.bind(this));
             this.addEventListener(window, 'touchstart', this.onTouchStart.bind(this));
             this.addEventListener(window, 'touchend', this.onTouchEnd.bind(this));
             this.addEventListener(window, 'touchcancel', this.onTouchCancel.bind(this));
