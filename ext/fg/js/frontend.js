@@ -129,28 +129,22 @@ class Frontend {
         this.popupTimerClear();
     }
 
-    onWindowMessage(e) {
-        const action = e.data;
-        const handlers = Frontend.windowMessageHandlers;
-        if (handlers.hasOwnProperty(action)) {
-            const handler = handlers[action];
-            handler(this);
-        }
-    }
-
-    async onResize() {
-        if (this.textSourceCurrent !== null && await this.popup.isVisibleAsync()) {
-            const textSource = this.textSourceCurrent;
-            this.lastShowPromise = this.popup.showContent(
-                textSource.getRect(),
-                textSource.getWritingMode()
-            );
-        }
-    }
-
     onClick(e) {
         if (this.preventNextClick) {
             this.preventNextClick = false;
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    }
+
+    onAuxClick(e) {
+        this.preventNextContextMenu = false;
+    }
+
+    onContextMenu(e) {
+        if (this.preventNextContextMenu) {
+            this.preventNextContextMenu = false;
             e.preventDefault();
             e.stopPropagation();
             return false;
@@ -233,16 +227,22 @@ class Frontend {
         e.preventDefault(); // Disable scroll
     }
 
-    onAuxClick(e) {
-        this.preventNextContextMenu = false;
+    async onResize() {
+        if (this.textSourceCurrent !== null && await this.popup.isVisibleAsync()) {
+            const textSource = this.textSourceCurrent;
+            this.lastShowPromise = this.popup.showContent(
+                textSource.getRect(),
+                textSource.getWritingMode()
+            );
+        }
     }
 
-    onContextMenu(e) {
-        if (this.preventNextContextMenu) {
-            this.preventNextContextMenu = false;
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
+    onWindowMessage(e) {
+        const action = e.data;
+        const handlers = Frontend.windowMessageHandlers;
+        if (handlers.hasOwnProperty(action)) {
+            const handler = handlers[action];
+            handler(this);
         }
     }
 
