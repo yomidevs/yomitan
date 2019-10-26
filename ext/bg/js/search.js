@@ -79,7 +79,11 @@ class DisplaySearch extends Display {
 
     onSearchInput() {
         this.updateSearchButton();
-        this.query.scrollIntoView();
+
+        const queryElementRect = this.query.getBoundingClientRect();
+        if (queryElementRect.top < 0 || queryElementRect.bottom > window.innerHeight) {
+            this.query.scrollIntoView();
+        }
     }
 
     onSearch(e) {
@@ -123,7 +127,7 @@ class DisplaySearch extends Display {
             }
         }
 
-        if (!super.onKeyDown(e) && !preventFocus) {
+        if (!super.onKeyDown(e) && !preventFocus && document.activeElement !== this.query) {
             this.query.focus({preventScroll: true});
         }
     }
