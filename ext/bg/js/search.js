@@ -104,17 +104,21 @@ class DisplaySearch extends Display {
 
         let activeModifierMap = {
             'Control': e.ctrlKey,
-            'Meta': e.metaKey
+            'Meta': e.metaKey,
+            'ANY_MOD': true
         };
-        // true if no known modifier is pressed
-        activeModifierMap[undefined] = !Object.values(activeModifierMap).includes(true);
 
         const ignoreKeys = {
-            undefined: ['Tab'],
-            'Control': ['C', 'A', 'Z', 'Y', 'X', 'F'],
-            'Meta': ['C', 'A', 'Z', 'Y', 'X', 'F'],
+            'ANY_MOD': ['Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageDown', 'PageUp', 'Home', 'End']
+                .concat(
+                    Array.from(Array(24).keys())
+                    .map(i => `F${i + 1}`)
+                ),
+            'Control': ['C', 'A', 'Z', 'Y', 'X', 'F', 'G'],
+            'Meta': ['C', 'A', 'Z', 'Y', 'X', 'F', 'G'],
             'OS': [],
             'Alt': [],
+            'AltGraph': [],
             'Shift': []
         }
 
