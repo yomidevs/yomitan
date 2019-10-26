@@ -58,6 +58,8 @@ class DisplaySearch extends Display {
                 window.wanakana.bind(this.query);
             }
 
+            window.addEventListener('popstate', (e) => this.onPopState(e));
+
             this.updateSearchButton();
         } catch (e) {
             this.onError(e);
@@ -95,8 +97,21 @@ class DisplaySearch extends Display {
 
         const query = this.query.value;
         const queryString = query.length > 0 ? `?query=${encodeURIComponent(query)}` : '';
-        window.history.replaceState(null, '', `${window.location.pathname}${queryString}`);
+        window.history.pushState({query}, '', `${window.location.pathname}${queryString}`);
         this.onSearchQueryUpdated(query, true);
+    }
+
+    onPopState(e) {
+        let query = '';
+        if (e.state && e.state.query) {
+            query = e.state.query
+        }
+
+        if (this.query !== null) {
+            this.query.value = query;
+        }
+
+        this.onSearchQueryUpdated(query, false);
     }
 
     onKeyDown(e) {
