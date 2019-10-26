@@ -85,7 +85,16 @@ class DisplaySearch extends Display {
             if (this.clipboardMonitorEnable !== null) {
                 this.clipboardMonitorEnable.addEventListener('change', (e) => {
                     if (e.target.checked) {
-                        this.startClipboardMonitor();
+                        chrome.permissions.request(
+                            {permissions: ['clipboardRead']},
+                            (granted) => {
+                                if (granted) {
+                                    this.startClipboardMonitor();
+                                } else {
+                                    e.target.checked = false;
+                                }
+                            }
+                        );
                     } else {
                         this.stopClipboardMonitor();
                     }
