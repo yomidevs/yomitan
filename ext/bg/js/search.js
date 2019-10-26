@@ -57,6 +57,7 @@ class DisplaySearch extends Display {
                 const query = DisplaySearch.getSearchQueryFromLocation(window.location.href);
                 if (query !== null) {
                     this.query.value = window.wanakana.toKana(query);
+                    window.history.replaceState({query}, '');
                     this.onSearchQueryUpdated(query, false);
                 }
 
