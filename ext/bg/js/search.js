@@ -74,7 +74,6 @@ class DisplaySearch extends Display {
                         query = window.wanakana.toKana(query);
                     }
                     this.query.value = query;
-                    window.history.replaceState({query}, '');
                     this.onSearchQueryUpdated(query, false);
                 }
             }
@@ -130,16 +129,12 @@ class DisplaySearch extends Display {
 
         const query = this.query.value;
         const queryString = query.length > 0 ? `?query=${encodeURIComponent(query)}` : '';
-        window.history.pushState({query}, '', `${window.location.pathname}${queryString}`);
+        window.history.pushState(null, '', `${window.location.pathname}${queryString}`);
         this.onSearchQueryUpdated(query, true);
     }
 
     onPopState(e) {
-        let query = '';
-        if (e.state && e.state.query) {
-            query = e.state.query
-        }
-
+        const query = DisplaySearch.getSearchQueryFromLocation(window.location.href) || '';
         if (this.query !== null) {
             this.query.value = query;
         }
