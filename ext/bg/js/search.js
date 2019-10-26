@@ -96,7 +96,34 @@ class DisplaySearch extends Display {
     }
 
     onKeyDown(e) {
-        if (!super.onKeyDown(e)) {
+        const key = Display.getKeyFromEvent(e);
+
+        let activeModifierMap = {
+            'Control': e.ctrlKey,
+            'Meta': e.metaKey
+        };
+        // true if no known modifier is pressed
+        activeModifierMap[undefined] = !Object.values(activeModifierMap).includes(true);
+
+        const ignoreKeys = {
+            undefined: ['Tab'],
+            'Control': ['C', 'A', 'V'],
+            'Meta': ['C', 'A', 'V'],
+            'OS': [],
+            'Alt': [],
+            'Shift': []
+        }
+
+        let preventFocus = false;
+        for (const [modifier, keys] of Object.entries(ignoreKeys)) {
+            const modifierActive = activeModifierMap[modifier];
+            if (key === modifier || (modifierActive && keys.includes(key))) {
+                preventFocus = true;
+                break;
+            }
+        }
+
+        if (!super.onKeyDown(e) && !preventFocus) {
             this.query.focus({preventScroll: true});
         }
     }
