@@ -60,21 +60,26 @@ class DisplaySearch extends Display {
                         window.wanakana.bind(this.query);
                     }
                     this.wanakanaEnable.addEventListener('change', (e) => {
+                        let query = DisplaySearch.getSearchQueryFromLocation(window.location.href);
                         if (e.target.checked) {
                             window.wanakana.bind(this.query);
+                            this.query.value = window.wanakana.toKana(query);
                         } else {
                             window.wanakana.unbind(this.query);
+                            this.query.value = query;
                         }
+                        this.onSearchQueryUpdated(this.query.value, false);
                     });
                 }
 
-                let query = DisplaySearch.getSearchQueryFromLocation(window.location.href);
+                const query = DisplaySearch.getSearchQueryFromLocation(window.location.href);
                 if (query !== null) {
-                    if (this.wanakanaEnable !== null && this.wanakanaEnable.checked) {
-                        query = window.wanakana.toKana(query);
+                    if (this.isWanakanaEnabled()) {
+                        this.query.value = window.wanakana.toKana(query);
+                    } else {
+                        this.query.value = query;
                     }
-                    this.query.value = query;
-                    this.onSearchQueryUpdated(query, false);
+                    this.onSearchQueryUpdated(this.query.value, false);
                 }
             }
             if (this.clipboardMonitorEnable !== null) {
@@ -123,9 +128,7 @@ class DisplaySearch extends Display {
             return;
         }
 
-        if (e) {
-            e.preventDefault();
-        }
+        e.preventDefault();
 
         const query = this.query.value;
         const queryString = query.length > 0 ? `?query=${encodeURIComponent(query)}` : '';
@@ -136,10 +139,14 @@ class DisplaySearch extends Display {
     onPopState(e) {
         const query = DisplaySearch.getSearchQueryFromLocation(window.location.href) || '';
         if (this.query !== null) {
-            this.query.value = query;
+            if (this.isWanakanaEnabled()) {
+                this.query.value = window.wanakana.toKana(query);
+            } else {
+                this.query.value = query;
+            }
         }
 
-        this.onSearchQueryUpdated(query, false);
+        this.onSearchQueryUpdated(this.query.value, false);
     }
 
     onKeyDown(e) {
@@ -213,23 +220,24 @@ class DisplaySearch extends Display {
     initClipboardMonitor() {
         // ignore copy from search page
         window.addEventListener('copy', (e) => {
-            let prevText = document.getSelection().toString().trim();
-            if (this.wanakanaEnable !== null && this.wanakanaEnable.checked) {
-                prevText = window.wanakana.toKana(prevText);
-            }
-            this.clipboardPrevText = prevText;
+            this.clipboardPrevText = document.getSelection().toString().trim();
         });
     }
 
     startClipboardMonitor() {
         this.clipboardMonitorIntervalId = setInterval(async () => {
-            let curText = (await navigator.clipboard.readText()).trim();
-            if (this.wanakanaEnable !== null && this.wanakanaEnable.checked) {
-                curText = window.wanakana.toKana(curText);
-            }
+            const curText = (await navigator.clipboard.readText()).trim();
             if (curText && (curText !== this.clipboardPrevText)) {
-                this.query.value = curText;
-                this.onSearch();
+                if (this.isWanakanaEnabled()) {
+                    this.query.value = window.wanakana.toKana(curText);
+                } else {
+                    this.query.value = curText;
+                }
+
+                const queryString = curText.length > 0 ? `?query=${encodeURIComponent(curText)}` : '';
+                window.history.pushState(null, '', `${window.location.pathname}${queryString}`);
+                this.onSearchQueryUpdated(this.query.value, true);
+
                 this.clipboardPrevText = curText;
             }
         }, 100);
@@ -240,6 +248,10 @@ class DisplaySearch extends Display {
             clearInterval(this.clipboardMonitorIntervalId);
             this.clipboardMonitorIntervalId = null;
         }
+    }
+
+    isWanakanaEnabled() {
+        return this.wanakanaEnable !== null && this.wanakanaEnable.checked;
     }
 
     getOptionsContext() {
