@@ -107,8 +107,8 @@ class DisplaySearch extends Display {
 
         const ignoreKeys = {
             undefined: ['Tab'],
-            'Control': ['C', 'A', 'V'],
-            'Meta': ['C', 'A', 'V'],
+            'Control': ['C', 'A', 'Z', 'Y', 'X', 'F'],
+            'Meta': ['C', 'A', 'Z', 'Y', 'X', 'F'],
             'OS': [],
             'Alt': [],
             'Shift': []
