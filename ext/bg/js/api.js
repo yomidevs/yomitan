@@ -22,9 +22,7 @@ function apiOptionsGet(optionsContext) {
 }
 
 async function apiOptionsSet(changedOptions, optionsContext, source) {
-    const backend = utilBackend();
-    const {depth} = optionsContext;
-    let options = await apiOptionsGetFull();
+    let options = await apiOptionsGet(optionsContext);
 
     function getValuePaths(obj) {
         let valuePaths = [];
@@ -63,11 +61,10 @@ async function apiOptionsSet(changedOptions, optionsContext, source) {
     }
 
     for (let [value, path] of getValuePaths(changedOptions)) {
-        modifyOption(path, value, options.profiles[depth].options);
+        modifyOption(path, value, options);
     }
 
-    await optionsSave(options);
-    backend.onOptionsUpdated(source);
+    await apiOptionsSave(source);
 }
 
 function apiOptionsGetFull() {
