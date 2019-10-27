@@ -21,6 +21,55 @@ function apiOptionsGet(optionsContext) {
     return utilBackend().getOptions(optionsContext);
 }
 
+async function apiOptionsSet(changedOptions, optionsContext, source) {
+    const backend = utilBackend();
+    const {depth} = optionsContext;
+    let options = await apiOptionsGetFull();
+
+    function getValuePaths(obj) {
+        let valuePaths = [];
+        let nodes = [{
+            obj: changedOptions,
+            path: []
+        }];
+        while (nodes.length > 0) {
+            let node = nodes.pop();
+            Object.keys(node.obj).forEach((key) => {
+                let path = node.path.concat(key);
+                let value = node.obj[key];
+                if (typeof value === 'object') {
+                    nodes.unshift({
+                        obj: value,
+                        path: path
+                    });
+                } else {
+                    valuePaths.push([value, path]);
+                }
+            });
+        }
+        return valuePaths;
+    }
+
+    function modifyOption(path, value, options) {
+        let pivot = options;
+        for (let pathKey of path.slice(0, -1)) {
+            if (!(pathKey in pivot)) {
+                return false;
+            }
+            pivot = pivot[pathKey];
+        }
+        pivot[path[path.length - 1]] = value;
+        return true;
+    }
+
+    for (let [value, path] of getValuePaths(changedOptions)) {
+        modifyOption(path, value, options.profiles[depth].options);
+    }
+
+    await optionsSave(options);
+    backend.onOptionsUpdated(source);
+}
+
 function apiOptionsGetFull() {
     return utilBackend().getFullOptions();
 }

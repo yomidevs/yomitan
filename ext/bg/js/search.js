@@ -62,17 +62,22 @@ class DisplaySearch extends Display {
                 this.query.addEventListener('input', () => this.onSearchInput(), false);
 
                 if (this.wanakanaEnable !== null) {
-                    if (this.wanakanaEnable.checked) {
+                    if (this.options.general.enableWanakana === true) {
+                        this.wanakanaEnable.checked = true;
                         window.wanakana.bind(this.query);
+                    } else {
+                        this.wanakanaEnable.checked = false;
                     }
                     this.wanakanaEnable.addEventListener('change', (e) => {
                         let query = DisplaySearch.getSearchQueryFromLocation(window.location.href);
                         if (e.target.checked) {
                             window.wanakana.bind(this.query);
                             this.query.value = window.wanakana.toKana(query);
+                            apiOptionsSet({general: {enableWanakana: true}}, this.getOptionsContext());
                         } else {
                             window.wanakana.unbind(this.query);
                             this.query.value = query;
+                            apiOptionsSet({general: {enableWanakana: false}}, this.getOptionsContext());
                         }
                         this.onSearchQueryUpdated(this.query.value, false);
                     });
@@ -89,6 +94,12 @@ class DisplaySearch extends Display {
                 }
             }
             if (this.clipboardMonitorEnable !== null) {
+                if (this.options.general.enableClipboardMonitor === true) {
+                    this.clipboardMonitorEnable.checked = true;
+                    this.startClipboardMonitor();
+                } else {
+                    this.clipboardMonitorEnable.checked = false;
+                }
                 this.clipboardMonitorEnable.addEventListener('change', (e) => {
                     if (e.target.checked) {
                         chrome.permissions.request(
@@ -96,6 +107,7 @@ class DisplaySearch extends Display {
                             (granted) => {
                                 if (granted) {
                                     this.startClipboardMonitor();
+                                    apiOptionsSet({general: {enableClipboardMonitor: true}}, this.getOptionsContext());
                                 } else {
                                     e.target.checked = false;
                                 }
@@ -103,6 +115,7 @@ class DisplaySearch extends Display {
                         );
                     } else {
                         this.stopClipboardMonitor();
+                        apiOptionsSet({general: {enableClipboardMonitor: false}}, this.getOptionsContext());
                     }
                 });
             }

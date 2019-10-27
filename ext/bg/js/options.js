@@ -279,7 +279,9 @@ function profileOptionsCreateDefaults() {
             popupTheme: 'default',
             popupOuterTheme: 'default',
             customPopupCss: '',
-            customPopupOuterCss: ''
+            customPopupOuterCss: '',
+            enableWanakana: true,
+            enableClipboardMonitor: false
         },
 
         audio: {

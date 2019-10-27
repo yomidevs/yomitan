@@ -177,6 +177,7 @@ class Backend {
 
 Backend.messageHandlers = {
     optionsGet: ({optionsContext}) => apiOptionsGet(optionsContext),
+    optionsSet: ({changedOptions, optionsContext, source}) => apiOptionsSet(changedOptions, optionsContext, source),
     kanjiFind: ({text, optionsContext}) => apiKanjiFind(text, optionsContext),
     termsFind: ({text, optionsContext}) => apiTermsFind(text, optionsContext),
     definitionAdd: ({definition, mode, context, optionsContext}) => apiDefinitionAdd(definition, mode, context, optionsContext),
