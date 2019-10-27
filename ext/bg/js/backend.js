@@ -122,15 +122,15 @@ class Backend {
         if (typeof optionsContext.index === 'number') {
             return profiles[optionsContext.index];
         }
-        const profile = this.getProfileFromContext(optionsContext);
+        const {profile} = this.getProfileFromContext(optionsContext);
         return profile !== null ? profile : this.options.profiles[this.options.profileCurrent];
     }
 
     getProfileFromContext(optionsContext) {
-        for (const profile of this.options.profiles) {
+        for (const [profileIndex, profile] of this.options.profiles.entries()) {
             const conditionGroups = profile.conditionGroups;
             if (conditionGroups.length > 0 && Backend.testConditionGroups(conditionGroups, optionsContext)) {
-                return profile;
+                return {profileIndex, profile};
             }
         }
         return null;
