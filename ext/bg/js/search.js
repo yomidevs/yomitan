@@ -69,7 +69,7 @@ class DisplaySearch extends Display {
                         this.wanakanaEnable.checked = false;
                     }
                     this.wanakanaEnable.addEventListener('change', (e) => {
-                        let query = DisplaySearch.getSearchQueryFromLocation(window.location.href);
+                        const query = DisplaySearch.getSearchQueryFromLocation(window.location.href) || '';
                         if (e.target.checked) {
                             window.wanakana.bind(this.query);
                             this.query.value = window.wanakana.toKana(query);
