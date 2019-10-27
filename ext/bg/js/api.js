@@ -22,12 +22,12 @@ function apiOptionsGet(optionsContext) {
 }
 
 async function apiOptionsSet(changedOptions, optionsContext, source) {
-    let options = await apiOptionsGet(optionsContext);
+    const options = await apiOptionsGet(optionsContext);
 
     function getValuePaths(obj) {
         let valuePaths = [];
         let nodes = [{
-            obj: changedOptions,
+            obj,
             path: []
         }];
         while (nodes.length > 0) {
