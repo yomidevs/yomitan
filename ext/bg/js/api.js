@@ -401,3 +401,11 @@ async function apiFocusTab(tab) {
         // Edge throws exception for no reason here.
     }
 }
+
+async function apiClipboardGet() {
+    const clipboardPasteTarget = utilBackend().clipboardPasteTarget;
+    clipboardPasteTarget.innerText = '';
+    clipboardPasteTarget.focus();
+    document.execCommand('paste');
+    return clipboardPasteTarget.innerText;
+}

@@ -17,6 +17,12 @@
  */
 
 
+let IS_FIREFOX = null;
+(async () => {
+    const {browser} = await apiGetEnvironmentInfo();
+    IS_FIREFOX = ['firefox', 'firefox-mobile'].includes(browser);
+})();
+
 class DisplaySearch extends Display {
     constructor() {
         super(document.querySelector('#spinner'), document.querySelector('#content'));
@@ -235,7 +241,13 @@ class DisplaySearch extends Display {
 
     startClipboardMonitor() {
         this.clipboardMonitorIntervalId = setInterval(async () => {
-            const curText = (await navigator.clipboard.readText()).trim();
+            let curText = null;
+            // TODO get rid of this and figure out why apiClipboardGet doesn't work on Firefox
+            if (IS_FIREFOX) {
+                curText = (await navigator.clipboard.readText()).trim();
+            } else if (IS_FIREFOX === false) {
+                curText = (await apiClipboardGet()).trim();
+            }
             if (curText && (curText !== this.clipboardPrevText)) {
                 if (this.isWanakanaEnabled()) {
                     this.query.value = window.wanakana.toKana(curText);

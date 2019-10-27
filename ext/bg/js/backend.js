@@ -30,6 +30,8 @@ class Backend {
         this.isPreparedResolve = null;
         this.isPreparedPromise = new Promise((resolve) => (this.isPreparedResolve = resolve));
 
+        this.clipboardPasteTarget = document.querySelector('#clipboard-paste-target');
+
         this.apiForwarder = new BackendApiForwarder();
     }
 
@@ -187,7 +189,8 @@ Backend.messageHandlers = {
     forward: ({action, params}, sender) => apiForward(action, params, sender),
     frameInformationGet: (params, sender) => apiFrameInformationGet(sender),
     injectStylesheet: ({css}, sender) => apiInjectStylesheet(css, sender),
-    getEnvironmentInfo: () => apiGetEnvironmentInfo()
+    getEnvironmentInfo: () => apiGetEnvironmentInfo(),
+    clipboardGet: () => apiClipboardGet()
 };
 
 window.yomichan_backend = new Backend();

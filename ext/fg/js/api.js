@@ -72,3 +72,7 @@ function apiInjectStylesheet(css) {
 function apiGetEnvironmentInfo() {
     return utilInvoke('getEnvironmentInfo');
 }
+
+function apiClipboardGet() {
+    return utilInvoke('clipboardGet');
+}
