@@ -171,36 +171,16 @@ function formSetupEventListeners() {
 }
 
 function formUpdateVisibility(options) {
-    const general = $('#anki-general');
-    if (options.anki.enable) {
-        general.show();
-    } else {
-        general.hide();
-    }
+    document.documentElement.dataset.optionsAnkiEnable = `${!!options.anki.enable}`;
+    document.documentElement.dataset.optionsGeneralDebugInfo = `${!!options.general.debugInfo}`;
+    document.documentElement.dataset.optionsGeneralShowAdvanced = `${!!options.general.showAdvanced}`;
+    document.documentElement.dataset.optionsGeneralResultOutputMode = `${options.general.resultOutputMode}`;
 
-    const advanced = $('.options-advanced');
-    if (options.general.showAdvanced) {
-        advanced.show();
-    } else {
-        advanced.hide();
-    }
-
-    const mainGroup = $('#dict-main-group');
-    if (options.general.resultOutputMode === 'merge') {
-        mainGroup.show();
-    } else {
-        mainGroup.hide();
-    }
-
-    const debug = $('#debug');
     if (options.general.debugInfo) {
         const temp = utilIsolate(options);
         temp.anki.fieldTemplates = '...';
         const text = JSON.stringify(temp, null, 4);
-        debug.html(handlebarsEscape(text));
-        debug.show();
-    } else {
-        debug.hide();
+        $('#debug').text(text);
     }
 }
 
