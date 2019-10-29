@@ -88,6 +88,15 @@ ol, ul {
     user-select: none;
 }
 
+#query-parser {
+    margin-top: 10px;
+    font-size: 24px;
+}
+
+.highlight {
+    background-color: lightblue;
+}
+
 
 /*
  * Entries

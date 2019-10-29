@@ -32,6 +32,8 @@ class DisplaySearch extends Display {
             url: window.location.href
         };
 
+        this.queryParser = new QueryParser(this);
+
         this.search = document.querySelector('#search');
         this.query = document.querySelector('#query');
         this.intro = document.querySelector('#intro');
@@ -72,11 +74,11 @@ class DisplaySearch extends Display {
                         const query = DisplaySearch.getSearchQueryFromLocation(window.location.href) || '';
                         if (e.target.checked) {
                             window.wanakana.bind(this.query);
-                            this.query.value = window.wanakana.toKana(query);
+                            this.setQuery(window.wanakana.toKana(query));
                             apiOptionsSet({general: {enableWanakana: true}}, this.getOptionsContext());
                         } else {
                             window.wanakana.unbind(this.query);
-                            this.query.value = query;
+                            this.setQuery(query);
                             apiOptionsSet({general: {enableWanakana: false}}, this.getOptionsContext());
                         }
                         this.onSearchQueryUpdated(this.query.value, false);
@@ -86,9 +88,9 @@ class DisplaySearch extends Display {
                 const query = DisplaySearch.getSearchQueryFromLocation(window.location.href);
                 if (query !== null) {
                     if (this.isWanakanaEnabled()) {
-                        this.query.value = window.wanakana.toKana(query);
+                        this.setQuery(window.wanakana.toKana(query));
                     } else {
-                        this.query.value = query;
+                        this.setQuery(query);
                     }
                     this.onSearchQueryUpdated(this.query.value, false);
                 }
@@ -159,6 +161,7 @@ class DisplaySearch extends Display {
         e.preventDefault();
 
         const query = this.query.value;
+        this.queryParser.setText(query);
         const queryString = query.length > 0 ? `?query=${encodeURIComponent(query)}` : '';
         window.history.pushState(null, '', `${window.location.pathname}${queryString}`);
         this.onSearchQueryUpdated(query, true);
@@ -168,9 +171,9 @@ class DisplaySearch extends Display {
         const query = DisplaySearch.getSearchQueryFromLocation(window.location.href) || '';
         if (this.query !== null) {
             if (this.isWanakanaEnabled()) {
-                this.query.value = window.wanakana.toKana(query);
+                this.setQuery(window.wanakana.toKana(query));
             } else {
-                this.query.value = query;
+                this.setQuery(query);
             }
         }
 
@@ -258,9 +261,9 @@ class DisplaySearch extends Display {
             }
             if (curText && (curText !== this.clipboardPrevText) && jpIsJapaneseText(curText)) {
                 if (this.isWanakanaEnabled()) {
-                    this.query.value = window.wanakana.toKana(curText);
+                    this.setQuery(window.wanakana.toKana(curText));
                 } else {
-                    this.query.value = curText;
+                    this.setQuery(curText);
                 }
 
                 const queryString = curText.length > 0 ? `?query=${encodeURIComponent(curText)}` : '';
@@ -285,6 +288,11 @@ class DisplaySearch extends Display {
 
     getOptionsContext() {
         return this.optionsContext;
+    }
+
+    setQuery(query) {
+        this.query.value = query;
+        this.queryParser.setText(query);
     }
 
     setIntroVisible(visible, animate) {

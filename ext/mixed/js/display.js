@@ -140,6 +140,8 @@ class Display {
             }
 
             this.setContentTerms(definitions, context);
+
+            return {textSource};
         } catch (error) {
             this.onError(error);
         }
