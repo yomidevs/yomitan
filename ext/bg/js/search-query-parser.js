@@ -59,25 +59,39 @@ class QueryParser {
     }
 
     async setText(text) {
+        this.queryParser.innerHTML = '';
         this.search.setSpinnerVisible(true);
+
+        let previewText = text;
+        while (previewText) {
+            const tempText = previewText.slice(0, 2);
+            previewText = previewText.slice(2);
+
+            const tempRuby = document.createElement('ruby');
+            const tempFurigana = document.createElement('rt');
+            tempRuby.appendChild(document.createTextNode(tempText));
+            tempRuby.appendChild(tempFurigana);
+            this.queryParser.appendChild(tempRuby);
+        }
 
         const results = await apiTextParse(text, this.search.getOptionsContext());
 
-        const tempContainer = document.createElement('div');
+        const textContainer = document.createElement('div');
         for (const {text, furigana} of results) {
+            const rubyElement = document.createElement('ruby');
+            const furiganaElement = document.createElement('rt');
             if (furigana) {
-                const rubyElement = document.createElement('ruby');
-                const furiganaElement = document.createElement('rt');
                 furiganaElement.innerText = furigana;
                 rubyElement.appendChild(document.createTextNode(text));
                 rubyElement.appendChild(furiganaElement);
-                tempContainer.appendChild(rubyElement);
             } else {
-                tempContainer.appendChild(document.createTextNode(text));
+                rubyElement.appendChild(document.createTextNode(text));
+                rubyElement.appendChild(furiganaElement);
             }
+            textContainer.appendChild(rubyElement);
         }
         this.queryParser.innerHTML = '';
-        this.queryParser.appendChild(tempContainer);
+        this.queryParser.appendChild(textContainer);
 
         this.search.setSpinnerVisible(false);
     }
