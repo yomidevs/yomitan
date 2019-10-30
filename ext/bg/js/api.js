@@ -90,9 +90,10 @@ async function apiTextParse(text, optionsContext) {
             definitions = dictTermsSort(definitions);
             const {expression, source, reading} = definitions[0];
 
-            let stemLength = source.length;
-            while (source[stemLength - 1] !== expression[stemLength - 1]) {
-                --stemLength;
+            let stemLength = 0;
+            const shortest = Math.min(source.length, expression.length);
+            while (stemLength < shortest && source[stemLength] === expression[stemLength]) {
+                ++stemLength;
             }
             const offset = source.length - stemLength;
 
