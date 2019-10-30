@@ -98,7 +98,7 @@ class Display {
         }
     }
 
-    async onTermLookup(e, {disableScroll, selectText, disableHistory}) {
+    async onTermLookup(e, {disableScroll, selectText, disableHistory}={}) {
         const termLookupResults = await this.termLookup(e);
         if (!termLookupResults) {
             return false;
