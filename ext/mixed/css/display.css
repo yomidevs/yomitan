@@ -73,10 +73,6 @@ ol, ul {
 }
 
 
-html:root[data-yomichan-page=search] body {
-    min-height: 101vh; /* always show scroll bar to avoid scanning problems */
-}
-
 /*
  * Search page
  */
@@ -97,8 +93,13 @@ html:root[data-yomichan-page=search] body {
     font-size: 24px;
 }
 
-.highlight {
-    background-color: lightblue;
+html:root[data-yomichan-page=search] body {
+    min-height: 101vh; /* always show scroll bar to avoid scanning problems */
+}
+
+#query-parser {
+    margin-top: 10px;
+    font-size: 24px;
 }
 
 
