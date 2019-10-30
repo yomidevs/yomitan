@@ -85,10 +85,11 @@ async function apiTextParse(text, optionsContext) {
 
     const results = [];
     while (text) {
-        let [definitions, length] = await translator.findTerms(text, {}, options);
+        let [definitions, sourceLength] = await translator.findTerms(text, {}, options);
         if (definitions.length > 0) {
             definitions = dictTermsSort(definitions);
-            const {expression, source, reading} = definitions[0];
+            const {expression, reading} = definitions[0];
+            const source = text.slice(0, sourceLength);
 
             let stemLength = 0;
             const shortest = Math.min(source.length, expression.length);
