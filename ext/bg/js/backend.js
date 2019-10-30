@@ -180,6 +180,7 @@ Backend.messageHandlers = {
     optionsSet: ({changedOptions, optionsContext, source}) => apiOptionsSet(changedOptions, optionsContext, source),
     kanjiFind: ({text, optionsContext}) => apiKanjiFind(text, optionsContext),
     termsFind: ({text, details, optionsContext}) => apiTermsFind(text, details, optionsContext),
+    textParse: ({text, optionsContext}) => apiTextParse(text, optionsContext),
     definitionAdd: ({definition, mode, context, optionsContext}) => apiDefinitionAdd(definition, mode, context, optionsContext),
     definitionsAddable: ({definitions, modes, optionsContext}) => apiDefinitionsAddable(definitions, modes, optionsContext),
     noteView: ({noteId}) => apiNoteView(noteId),

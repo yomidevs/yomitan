@@ -23,22 +23,103 @@ class QueryParser {
 
         this.queryParser = document.querySelector('#query-parser');
 
-        // TODO also enable for mouseover scanning
-        this.queryParser.addEventListener('click', (e) => this.onTermLookup(e));
+        this.queryParser.addEventListener('click', (e) => this.onClick(e));
+        this.queryParser.addEventListener('mousemove', (e) => this.onMouseMove(e));
     }
 
     onError(error) {
         logError(error, false);
     }
 
-    async onTermLookup(e) {
-        const {textSource} = await this.search.onTermLookup(e, {isQueryParser: true});
-        if (textSource) {
-            textSource.select();
+    onClick(e) {
+        this.onTermLookup(e, {disableScroll: true, selectText: true});
+    }
+
+    async onMouseMove(e) {
+        if (
+            (e.buttons & 0x1) !== 0x0 // Left mouse button
+        ) {
+            return;
+        }
+
+        const scanningOptions = this.search.options.scanning;
+        const scanningModifier = scanningOptions.modifier;
+        if (!(
+            QueryParser.isScanningModifierPressed(scanningModifier, e) ||
+            (scanningOptions.middleMouse && (e.buttons & 0x4) !== 0x0) // Middle mouse button
+        )) {
+            return;
+        }
+
+        await this.onTermLookup(e, {disableScroll: true, selectText: true, disableHistory: true})
+    }
+
+    onTermLookup(e, params) {
+        this.search.onTermLookup(e, params);
+    }
+
+    async setText(text) {
+        this.search.setSpinnerVisible(true);
+
+        const results = await apiTextParse(text, this.search.getOptionsContext());
+
+        const tempContainer = document.createElement('div');
+        for (const {text, furigana} of results) {
+            if (furigana) {
+                const rubyElement = document.createElement('ruby');
+                const furiganaElement = document.createElement('rt');
+                furiganaElement.innerText = furigana;
+                rubyElement.appendChild(document.createTextNode(text));
+                rubyElement.appendChild(furiganaElement);
+                tempContainer.appendChild(rubyElement);
+            } else {
+                tempContainer.appendChild(document.createTextNode(text));
+            }
+        }
+        this.queryParser.innerHTML = '';
+        this.queryParser.appendChild(tempContainer);
+
+        this.search.setSpinnerVisible(false);
+    }
+
+    async parseText(text) {
+        const results = [];
+        while (text) {
+            const {definitions, length} =  await apiTermsFind(text, {}, this.search.getOptionsContext());
+            if (length) {
+                results.push(definitions);
+                text = text.slice(length);
+            } else {
+                results.push(text[0]);
+                text = text.slice(1);
+            }
+        }
+        return results;
+    }
+
+    popupTimerSet(callback) {
+        const delay = this.options.scanning.delay;
+        if (delay > 0) {
+            this.popupTimer = window.setTimeout(callback, delay);
+        } else {
+            Promise.resolve().then(callback);
         }
     }
 
-    setText(text) {
-        this.queryParser.innerText = text;
+    popupTimerClear() {
+        if (this.popupTimer !== null) {
+            window.clearTimeout(this.popupTimer);
+            this.popupTimer = null;
+        }
+    }
+
+    static isScanningModifierPressed(scanningModifier, mouseEvent) {
+        switch (scanningModifier) {
+            case 'alt': return mouseEvent.altKey;
+            case 'ctrl': return mouseEvent.ctrlKey;
+            case 'shift': return mouseEvent.shiftKey;
+            case 'none': return true;
+            default: return false;
+        }
     }
 }

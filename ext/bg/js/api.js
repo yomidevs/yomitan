@@ -79,6 +79,43 @@ async function apiTermsFind(text, details, optionsContext) {
     return {length, definitions};
 }
 
+async function apiTextParse(text, optionsContext) {
+    const options = await apiOptionsGet(optionsContext);
+    const translator = utilBackend().translator;
+
+    const results = [];
+    while (text) {
+        let [definitions, length] = await translator.findTerms(text, {}, options);
+        if (definitions.length > 0) {
+            definitions = dictTermsSort(definitions);
+            const {expression, source, reading} = definitions[0];
+
+            let stemLength = source.length;
+            while (source[stemLength - 1] !== expression[stemLength - 1]) {
+                --stemLength;
+            }
+            const offset = source.length - stemLength;
+
+            for (const result of jpDistributeFurigana(
+                source.slice(0, offset === 0 ? source.length : source.length - offset),
+                reading.slice(0, offset === 0 ? reading.length : source.length + (reading.length - expression.length) - offset)
+            )) {
+                results.push(result);
+            }
+
+            if (stemLength !== source.length) {
+                results.push({text: source.slice(stemLength)});
+            }
+
+            text = text.slice(source.length);
+        } else {
+            results.push({text: text[0]});
+            text = text.slice(1);
+        }
+    }
+    return results;
+}
+
 async function apiKanjiFind(text, optionsContext) {
     const options = await apiOptionsGet(optionsContext);
     const definitions = await utilBackend().translator.findKanji(text, options);

@@ -73,6 +73,10 @@ ol, ul {
 }
 
 
+html:root[data-yomichan-page=search] body {
+    min-height: 101vh; /* always show scroll bar to avoid scanning problems */
+}
+
 /*
  * Search page
  */

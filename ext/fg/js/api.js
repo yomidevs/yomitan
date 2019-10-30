@@ -29,6 +29,10 @@ function apiTermsFind(text, details, optionsContext) {
     return utilInvoke('termsFind', {text, details, optionsContext});
 }
 
+function apiTextParse(text, optionsContext) {
+    return utilInvoke('textParse', {text, optionsContext});
+}
+
 function apiKanjiFind(text, optionsContext) {
     return utilInvoke('kanjiFind', {text, optionsContext});
 }
