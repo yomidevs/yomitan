@@ -93,13 +93,12 @@ ol, ul {
     font-size: 24px;
 }
 
-html:root[data-yomichan-page=search] body {
-    min-height: 101vh; /* always show scroll bar to avoid scanning problems */
+.query-parser-term {
+    margin-right: 5px;
 }
 
-#query-parser {
-    margin-top: 10px;
-    font-size: 24px;
+html:root[data-yomichan-page=search] body {
+    min-height: 101vh; /* always show scroll bar to avoid scanning problems */
 }
 
 

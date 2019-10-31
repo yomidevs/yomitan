@@ -59,39 +59,33 @@ class QueryParser {
     }
 
     async setText(text) {
-        this.queryParser.innerHTML = '';
         this.search.setSpinnerVisible(true);
 
+        const previewTerms = [];
         let previewText = text;
         while (previewText) {
             const tempText = previewText.slice(0, 2);
+            previewTerms.push([{text: tempText}]);
             previewText = previewText.slice(2);
-
-            const tempRuby = document.createElement('ruby');
-            const tempFurigana = document.createElement('rt');
-            tempRuby.appendChild(document.createTextNode(tempText));
-            tempRuby.appendChild(tempFurigana);
-            this.queryParser.appendChild(tempRuby);
         }
+
+        this.queryParser.innerHTML = await apiTemplateRender('query-parser.html', {
+            terms: previewTerms,
+            preview: true
+        });
 
         const results = await apiTextParse(text, this.search.getOptionsContext());
 
-        const textContainer = document.createElement('div');
-        for (const {text, furigana} of results) {
-            const rubyElement = document.createElement('ruby');
-            const furiganaElement = document.createElement('rt');
-            if (furigana) {
-                furiganaElement.innerText = furigana;
-                rubyElement.appendChild(document.createTextNode(text));
-                rubyElement.appendChild(furiganaElement);
-            } else {
-                rubyElement.appendChild(document.createTextNode(text));
-                rubyElement.appendChild(furiganaElement);
-            }
-            textContainer.appendChild(rubyElement);
-        }
-        this.queryParser.innerHTML = '';
-        this.queryParser.appendChild(textContainer);
+        const content = await apiTemplateRender('query-parser.html', {
+            terms: results.map((term) => {
+                return term.map((part) => {
+                    part.raw = !part.text.trim() && (!part.reading || !part.reading.trim());
+                    return part;
+                });
+            })
+        });
+
+        this.queryParser.innerHTML = content;
 
         this.search.setSpinnerVisible(false);
     }

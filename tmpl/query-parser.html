@@ -1,0 +1,23 @@
+{{~#*inline "term"~}}
+{{~#if preview~}}
+<span class="query-parser-term-preview">
+{{~else~}}
+<span class="query-parser-term">
+{{~/if~}}
+{{~#each this~}}
+{{> part }}
+{{~/each~}}
+</span>
+{{~/inline~}}
+
+{{~#*inline "part"~}}
+{{~#if raw~}}
+{{text}}
+{{~else~}}
+<ruby>{{text}}<rt>{{reading}}</rt></ruby>
+{{~/if~}}
+{{~/inline~}}
+
+{{~#each terms~}}
+{{> term preview=../preview }}
+{{~/each~}}
