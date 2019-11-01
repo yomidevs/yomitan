@@ -202,6 +202,60 @@ class Database {
         return this.db.dictionaries.toArray();
     }
 
+    async getDictionaryInfo() {
+        this.validate();
+
+        const results = [];
+        const db = this.db.backendDB();
+        const dbTransaction = db.transaction(['dictionaries'], 'readonly');
+        const dbDictionaries = dbTransaction.objectStore('dictionaries');
+
+        await Database.getAll(dbDictionaries, null, null, info => results.push(info));
+
+        return results;
+    }
+
+    async getDictionaryCounts(dictionaryNames, getTotal) {
+        this.validate();
+
+        const objectStoreNames = [
+            'kanji',
+            'kanjiMeta',
+            'terms',
+            'termMeta',
+            'tagMeta'
+        ];
+        const db = this.db.backendDB();
+        const dbCountTransaction = db.transaction(objectStoreNames, 'readonly');
+
+        const targets = [];
+        for (const objectStoreName of objectStoreNames) {
+            targets.push([
+                objectStoreName,
+                dbCountTransaction.objectStore(objectStoreName).index('dictionary')
+            ]);
+        }
+
+        const totalPromise = getTotal ? Database.getCounts(targets, null) : null;
+
+        const counts = [];
+        const countPromises = [];
+        for (let i = 0; i < dictionaryNames.length; ++i) {
+            counts.push(null);
+            const index = i;
+            const only = IDBKeyRange.only(dictionaryNames[i]);
+            const countPromise = Database.getCounts(targets, only).then(v => counts[index] = v);
+            countPromises.push(countPromise);
+        }
+        await Promise.all(countPromises);
+
+        const result = {counts};
+        if (totalPromise !== null) {
+            result.total = await totalPromise;
+        }
+        return result;
+    }
+
     async importDictionary(archive, progressCallback, exceptions) {
         this.validate();
 
@@ -537,6 +591,25 @@ class Database {
                     resolve();
                 }
             };
+        });
+    }
+
+    static getCounts(targets, query) {
+        const countPromises = [];
+        const counts = {};
+        for (const [objectStoreName, index] of targets) {
+            const n = objectStoreName;
+            const countPromise = Database.getCount(index, query).then(count => counts[n] = count);
+            countPromises.push(countPromise);
+        }
+        return Promise.all(countPromises).then(() => counts);
+    }
+
+    static getCount(dbIndex, query) {
+        return new Promise((resolve, reject) => {
+            const request = dbIndex.count(query);
+            request.onerror = (e) => reject(e);
+            request.onsuccess = (e) => resolve(e.target.result);
         });
     }
 }
