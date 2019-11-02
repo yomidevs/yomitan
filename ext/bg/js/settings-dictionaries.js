@@ -270,6 +270,8 @@ async function onDatabaseUpdated(options) {
         const dictionaries = await utilDatabaseGetDictionaryInfo();
         dictionaryUI.setDictionaries(dictionaries);
 
+        document.querySelector('#dict-warning').hidden = (dictionaries.length > 0);
+
         updateMainDictionarySelect(options, dictionaries);
 
         const {counts, total} = await utilDatabaseGetDictionaryCounts(dictionaries.map(v => v.title), true);
@@ -353,8 +355,8 @@ dictionaryErrorToString.overrides = [
 ];
 
 function dictionaryErrorsShow(errors) {
-    const dialog = $('#dict-error');
-    dialog.show().text('');
+    const dialog = document.querySelector('#dict-error');
+    dialog.textContent = '';
 
     if (errors !== null && errors.length > 0) {
         const uniqueErrors = {};
@@ -375,12 +377,12 @@ function dictionaryErrorsShow(errors) {
             } else {
                 div.textContent = `${e}`;
             }
-            dialog.append($(div));
+            dialog.appendChild(div);
         }
 
-        dialog.show();
+        dialog.hidden = false;
     } else {
-        dialog.hide();
+        dialog.hidden = true;
     }
 }
 
@@ -410,7 +412,8 @@ async function onDictionaryPurge(e) {
     $('#dict-purge-modal').modal('hide');
 
     const dictControls = $('#dict-importer, #dict-groups, #dict-groups-extra, #dict-main-group').hide();
-    const dictProgress = $('#dict-purge').show();
+    const dictProgress = document.querySelector('#dict-purge');
+    dictProgress.hidden = false;
 
     try {
         dictionaryErrorsShow(null);
@@ -432,7 +435,7 @@ async function onDictionaryPurge(e) {
         dictionarySpinnerShow(false);
 
         dictControls.show();
-        dictProgress.hide();
+        dictProgress.hidden = true;
 
         if (storageEstimate.mostRecent !== null) {
             storageUpdateStats();
