@@ -418,7 +418,6 @@
 
                 <p class="help-block">
                     Yomichan can import and use a variety of dictionary formats. Unneeded dictionaries can be disabled.
-                    Deleting individual dictionaries is not currently feasible due to limitations of browser database technology.
                 </p>
 
                 <div class="form-group" id="dict-main-group">
@@ -471,6 +470,25 @@
                     </div>
                 </div>
 
+                <div class="modal fade" tabindex="-1" role="dialog" id="dict-delete-modal">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Confirm dictionary deletion</h4>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to delete the dictionary <em id="dict-remove-modal-dict-name"></em>?
+                                This operation may take some time and the responsiveness of this browser tab may be reduced.
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger" id="dict-delete-confirm">Delete Dictionary</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <template id="dict-template"><div class="dict-group well well-sm">
                     <h4><span class="text-muted glyphicon glyphicon-book"></span> <span class="dict-title"></span> <small class="dict-revision"></small></h4>
                     <p class="text-warning" hidden>This dictionary is outdated and may not support new extension features; please import the latest version.</p>
@@ -484,6 +502,16 @@
                     <div class="form-group options-advanced">
                         <label class="dict-result-priority-label">Result priority</label>
                         <input type="number" class="form-control dict-priority">
+                    </div>
+                    <div class="dict-delete-table">
+                        <div>
+                            <button class="btn btn-default dict-delete-button">Delete Dictionary</button>
+                        </div>
+                        <div>
+                            <div class="progress" hidden>
+                                <div class="progress-bar progress-bar-striped" style="width: 0%"></div>
+                            </div>
+                        </div>
                     </div>
                     <pre class="debug dict-counts" hidden></pre>
                 </div></template>

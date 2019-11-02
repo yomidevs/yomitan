@@ -30,6 +30,8 @@ class SettingsDictionaryListUI {
 
         this.dictionaryEntries = [];
         this.extra = null;
+
+        document.querySelector('#dict-delete-confirm').addEventListener('click', (e) => this.onDictionaryConfirmDelete(e), false);
     }
 
     setDictionaries(dictionaries) {
@@ -126,6 +128,19 @@ class SettingsDictionaryListUI {
     save() {
         // Overwrite
     }
+
+    onDictionaryConfirmDelete(e) {
+        e.preventDefault();
+        const n = document.querySelector('#dict-delete-modal');
+        const title = n.dataset.dict;
+        delete n.dataset.dict;
+        $(n).modal('hide');
+
+        const index = this.dictionaryEntries.findIndex(e => e.dictionaryInfo.title === title);
+        if (index >= 0) {
+            this.dictionaryEntries[index].deleteDictionary();
+        }
+    }
 }
 
 class SettingsDictionaryEntryUI {
@@ -135,11 +150,13 @@ class SettingsDictionaryEntryUI {
         this.optionsDictionary = optionsDictionary;
         this.counts = null;
         this.eventListeners = [];
+        this.isDeleting = false;
 
         this.content = content;
         this.enabledCheckbox = this.content.querySelector('.dict-enabled');
         this.allowSecondarySearchesCheckbox = this.content.querySelector('.dict-allow-secondary-searches');
         this.priorityInput = this.content.querySelector('.dict-priority');
+        this.deleteButton = this.content.querySelector('.dict-delete-button');
 
         this.content.querySelector('.dict-title').textContent = this.dictionaryInfo.title;
         this.content.querySelector('.dict-revision').textContent = `rev.${this.dictionaryInfo.revision}`;
@@ -149,6 +166,7 @@ class SettingsDictionaryEntryUI {
         this.addEventListener(this.enabledCheckbox, 'change', (e) => this.onEnabledChanged(e), false);
         this.addEventListener(this.allowSecondarySearchesCheckbox, 'change', (e) => this.onAllowSecondarySearchesChanged(e), false);
         this.addEventListener(this.priorityInput, 'change', (e) => this.onPriorityChanged(e), false);
+        this.addEventListener(this.deleteButton, 'click', (e) => this.onDeleteButtonClicked(e), false);
     }
 
     cleanup() {
@@ -194,6 +212,38 @@ class SettingsDictionaryEntryUI {
         this.priorityInput.value = `${this.optionsDictionary.priority}`;
     }
 
+    async deleteDictionary() {
+        if (this.isDeleting) {
+            return;
+        }
+
+        const progress = this.content.querySelector('.progress');
+        progress.hidden = false;
+        const progressBar = this.content.querySelector('.progress-bar');
+        this.isDeleting = true;
+
+        try {
+            const onProgress = ({processed, count, storeCount, storesProcesed}) => {
+                let percent = 0.0;
+                if (count > 0 && storesProcesed > 0) {
+                    percent = (processed / count) * (storesProcesed / storeCount) * 100.0;
+                }
+                progressBar.style.width = `${percent}%`;
+            };
+
+            await utilDatabaseDeleteDictionary(this.dictionaryInfo.title, onProgress, {rate: 1000});
+        } catch (e) {
+            dictionaryErrorsShow([e]);
+        } finally {
+            this.isDeleting = false;
+            progress.hidden = true;
+
+            const optionsContext = getOptionsContext();
+            const options = await apiOptionsGet(optionsContext);
+            onDatabaseUpdated(options);
+        }
+    }
+
     onEnabledChanged(e) {
         this.optionsDictionary.enabled = !!e.target.checked;
         this.save();
@@ -214,6 +264,20 @@ class SettingsDictionaryEntryUI {
         }
 
         e.target.value = `${value}`;
+    }
+
+    onDeleteButtonClicked(e) {
+        e.preventDefault();
+
+        if (this.isDeleting) {
+            return;
+        }
+
+        const title = this.dictionaryInfo.title;
+        const n = document.querySelector('#dict-delete-modal');
+        n.dataset.dict = title;
+        document.querySelector('#dict-remove-modal-dict-name').textContent = title;
+        $(n).modal('show');
     }
 }
 

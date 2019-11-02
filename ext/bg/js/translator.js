@@ -42,6 +42,11 @@ class Translator {
         await this.database.purge();
     }
 
+    async deleteDictionary(dictionaryName) {
+        this.tagCache = {};
+        await this.database.deleteDictionary(dictionaryName);
+    }
+
     async findTermsGrouped(text, dictionaries, alphanumeric, options) {
         const titles = Object.keys(dictionaries);
         const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);

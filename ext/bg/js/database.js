@@ -56,6 +56,42 @@ class Database {
         await this.prepare();
     }
 
+    async deleteDictionary(dictionaryName, onProgress, progressSettings) {
+        this.validate();
+
+        const targets = [
+            ['dictionaries', 'title'],
+            ['kanji', 'dictionary'],
+            ['kanjiMeta', 'dictionary'],
+            ['terms', 'dictionary'],
+            ['termMeta', 'dictionary'],
+            ['tagMeta', 'dictionary']
+        ];
+        const promises = [];
+        const progressData = {
+            count: 0,
+            processed: 0,
+            storeCount: targets.length,
+            storesProcesed: 0
+        };
+        let progressRate = (typeof progressSettings === 'object' && progressSettings !== null ? progressSettings.rate : 0);
+        if (typeof progressRate !== 'number' || progressRate <= 0) {
+            progressRate = 1000;
+        }
+
+        const db = this.db.backendDB();
+
+        for (const [objectStoreName, index] of targets) {
+            const dbTransaction = db.transaction([objectStoreName], 'readwrite');
+            const dbObjectStore = dbTransaction.objectStore(objectStoreName);
+            const dbIndex = dbObjectStore.index(index);
+            const only = IDBKeyRange.only(dictionaryName);
+            promises.push(Database.deleteValues(dbObjectStore, dbIndex, only, onProgress, progressData, progressRate));
+        }
+
+        await Promise.all(promises);
+    }
+
     async findTermsBulk(termList, titles) {
         this.validate();
 
@@ -610,6 +646,74 @@ class Database {
             const request = dbIndex.count(query);
             request.onerror = (e) => reject(e);
             request.onsuccess = (e) => resolve(e.target.result);
+        });
+    }
+
+    static getAllKeys(dbIndex, query) {
+        const fn = typeof dbIndex.getAllKeys === 'function' ? Database.getAllKeysFast : Database.getAllKeysUsingCursor;
+        return fn(dbIndex, query);
+    }
+
+    static getAllKeysFast(dbIndex, query) {
+        return new Promise((resolve, reject) => {
+            const request = dbIndex.getAllKeys(query);
+            request.onerror = (e) => reject(e);
+            request.onsuccess = (e) => resolve(e.target.result);
+        });
+    }
+
+    static getAllKeysUsingCursor(dbIndex, query) {
+        return new Promise((resolve, reject) => {
+            const primaryKeys = [];
+            const request = dbIndex.openKeyCursor(query, 'next');
+            request.onerror = (e) => reject(e);
+            request.onsuccess = (e) => {
+                const cursor = e.target.result;
+                if (cursor) {
+                    primaryKeys.push(cursor.primaryKey);
+                    cursor.continue();
+                } else {
+                    resolve(primaryKeys);
+                }
+            };
+        });
+    }
+
+    static async deleteValues(dbObjectStore, dbIndex, query, onProgress, progressData, progressRate) {
+        const hasProgress = (typeof onProgress === 'function');
+        const count = await Database.getCount(dbIndex, query);
+        ++progressData.storesProcesed;
+        progressData.count += count;
+        if (hasProgress) {
+            onProgress(progressData);
+        }
+
+        const onValueDeleted = (
+            hasProgress ?
+            () => {
+                const p = ++progressData.processed;
+                if ((p % progressRate) === 0 || p === progressData.count) {
+                    onProgress(progressData);
+                }
+            } :
+            () => {}
+        );
+
+        const promises = [];
+        const primaryKeys = await Database.getAllKeys(dbIndex, query);
+        for (const key of primaryKeys) {
+            const promise = Database.deleteValue(dbObjectStore, key).then(onValueDeleted);
+            promises.push(promise);
+        }
+
+        await Promise.all(promises);
+    }
+
+    static deleteValue(dbObjectStore, key) {
+        return new Promise((resolve, reject) => {
+            const request = dbObjectStore.delete(key);
+            request.onerror = (e) => reject(e);
+            request.onsuccess = () => resolve();
         });
     }
 }
