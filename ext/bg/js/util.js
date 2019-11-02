@@ -84,6 +84,14 @@ function utilDatabaseSummarize() {
     return utilBackend().translator.database.summarize();
 }
 
+function utilDatabaseGetDictionaryInfo() {
+    return utilBackend().translator.database.getDictionaryInfo();
+}
+
+function utilDatabaseGetDictionaryCounts(dictionaryNames, getTotal) {
+    return utilBackend().translator.database.getDictionaryCounts(dictionaryNames, getTotal);
+}
+
 function utilAnkiGetModelFieldNames(modelName) {
     return utilBackend().anki.getModelFieldNames(modelName);
 }

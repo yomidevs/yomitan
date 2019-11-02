@@ -410,7 +410,7 @@
                 </div>
             </div>
 
-            <div>
+            <div class="ignore-form-changes">
                 <div>
                     <img src="/mixed/img/spinner.gif" class="pull-right" id="dict-spinner" alt>
                     <h3>Dictionaries</h3>
@@ -434,6 +434,7 @@
                 <div class="alert alert-danger" id="dict-error"></div>
 
                 <div id="dict-groups"></div>
+                <div id="dict-groups-extra"></div>
 
                 <div id="dict-import-progress">
                     Dictionary data is being imported, please be patient...
@@ -451,6 +452,32 @@
                     <button class="btn btn-primary" id="dict-file-button">Import Dictionary</button>
                     <div hidden><input type="file" id="dict-file"></div>
                 </div>
+
+                <template id="dict-template"><div class="dict-group well well-sm">
+                    <h4><span class="text-muted glyphicon glyphicon-book"></span> <span class="dict-title"></span> <small class="dict-revision"></small></h4>
+                    <p class="text-warning" hidden>This dictionary is outdated and may not support new extension features; please import the latest version.</p>
+
+                    <div class="checkbox">
+                        <label><input type="checkbox" class="dict-enabled"> Enable search</label>
+                    </div>
+                    <div class="checkbox options-advanced">
+                        <label><input type="checkbox" class="dict-allow-secondary-searches"> Allow secondary searches</label>
+                    </div>
+                    <div class="form-group options-advanced">
+                        <label class="dict-result-priority-label">Result priority</label>
+                        <input type="number" class="form-control dict-priority">
+                    </div>
+                    <pre class="debug dict-counts" hidden></pre>
+                </div></template>
+
+                <template id="dict-extra-template"><div class="well well-sm">
+                    <h4><span class="text-muted glyphicon glyphicon-alert"></span> <span class="dict-title">Unassociated Data</span> <small class="dict-total-count"></small></h4>
+                    <p class="text-warning">
+                        The database contains extra data which is not associated with any installed dictionary.
+                        Purging the database can fix this issue.
+                    </p>
+                    <pre class="debug dict-counts" hidden></pre>
+                </div></template>
             </div>
 
             <div id="storage-info">
@@ -700,6 +727,7 @@
         <script src="/bg/js/util.js"></script>
         <script src="/mixed/js/audio.js"></script>
 
+        <script src="/bg/js/settings-dictionaries.js"></script>
         <script src="/bg/js/settings-profiles.js"></script>
         <script src="/bg/js/settings.js"></script>
     </body>

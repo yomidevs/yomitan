@@ -81,16 +81,6 @@ async function formRead(options) {
         options.anki.kanji.model = $('#anki-kanji-model').val();
         options.anki.kanji.fields = utilBackgroundIsolate(ankiFieldsToDict($('#kanji .anki-field-value')));
     }
-
-    options.general.mainDictionary = $('#dict-main').val();
-    $('.dict-group').each((index, element) => {
-        const dictionary = $(element);
-        options.dictionaries[dictionary.data('title')] = utilBackgroundIsolate({
-            priority: parseInt(dictionary.find('.dict-priority').val(), 10),
-            enabled: dictionary.find('.dict-enabled').prop('checked'),
-            allowSecondarySearches: dictionary.find('.dict-allow-secondary-searches').prop('checked')
-        });
-    });
 }
 
 async function formWrite(options) {
@@ -145,13 +135,6 @@ async function formWrite(options) {
     $('#field-templates').val(options.anki.fieldTemplates);
 
     try {
-        await dictionaryGroupsPopulate(options);
-        await formMainDictionaryOptionsPopulate(options);
-    } catch (e) {
-        dictionaryErrorsShow([e]);
-    }
-
-    try {
         await ankiDeckAndModelPopulate(options);
     } catch (e) {
         ankiErrorShow(e);
@@ -161,10 +144,6 @@ async function formWrite(options) {
 }
 
 function formSetupEventListeners() {
-    $('#dict-purge-link').click(utilAsync(onDictionaryPurge));
-    $('#dict-file').change(utilAsync(onDictionaryImport));
-    $('#dict-file-button').click(onDictionaryImportButtonClick);
-
     $('#field-templates-reset').click(utilAsync(onAnkiFieldTemplatesReset));
     $('input, select, textarea').not('.anki-model').not('.ignore-form-changes *').change(utilAsync(onFormOptionsChanged));
     $('.anki-model').change(utilAsync(onAnkiModelChanged));
@@ -182,23 +161,6 @@ function formUpdateVisibility(options) {
         const text = JSON.stringify(temp, null, 4);
         $('#debug').text(text);
     }
-}
-
-async function formMainDictionaryOptionsPopulate(options) {
-    const select = $('#dict-main').empty();
-    select.append($('<option class="text-muted" value="">Not selected</option>'));
-
-    let mainDictionary = '';
-    for (const dictRow of toIterable(await utilDatabaseSummarize())) {
-        if (dictRow.sequenced) {
-            select.append($(`<option value="${dictRow.title}">${dictRow.title}</option>`));
-            if (dictRow.title === options.general.mainDictionary) {
-                mainDictionary = dictRow.title;
-            }
-        }
-    }
-
-    select.val(mainDictionary);
 }
 
 async function onFormOptionsChanged(e) {
@@ -239,6 +201,7 @@ async function onReady() {
     appearanceInitialize();
     await audioSettingsInitialize();
     await profileOptionsSetup();
+    await dictSettingsInitialize();
 
     storageInfoInitialize();
 
@@ -418,228 +381,6 @@ function onMessage({action, params}, sender, callback) {
         case 'getUrl':
             callback({url: window.location.href});
             break;
-    }
-}
-
-
-/*
- * Dictionary
- */
-
-function dictionaryErrorToString(error) {
-    if (error.toString) {
-        error = error.toString();
-    } else {
-        error = `${error}`;
-    }
-
-    for (const [match, subst] of dictionaryErrorToString.overrides) {
-        if (error.includes(match)) {
-            error = subst;
-            break;
-        }
-    }
-
-    return error;
-}
-dictionaryErrorToString.overrides = [
-    [
-        'A mutation operation was attempted on a database that did not allow mutations.',
-        'Access to IndexedDB appears to be restricted. Firefox seems to require that the history preference is set to "Remember history" before IndexedDB use of any kind is allowed.'
-    ],
-    [
-        'The operation failed for reasons unrelated to the database itself and not covered by any other error code.',
-        'Unable to access IndexedDB due to a possibly corrupt user profile. Try using the "Refresh Firefox" feature to reset your user profile.'
-    ],
-    [
-        'BulkError',
-        'Unable to finish importing dictionary data into IndexedDB. This may indicate that you do not have sufficient disk space available to complete this operation.'
-    ]
-];
-
-function dictionaryErrorsShow(errors) {
-    const dialog = $('#dict-error');
-    dialog.show().text('');
-
-    if (errors !== null && errors.length > 0) {
-        const uniqueErrors = {};
-        for (let e of errors) {
-            e = dictionaryErrorToString(e);
-            uniqueErrors[e] = uniqueErrors.hasOwnProperty(e) ? uniqueErrors[e] + 1 : 1;
-        }
-
-        for (const e in uniqueErrors) {
-            const count = uniqueErrors[e];
-            const div = document.createElement('p');
-            if (count > 1) {
-                div.textContent = `${e} `;
-                const em = document.createElement('em');
-                em.textContent = `(${count})`;
-                div.appendChild(em);
-            } else {
-                div.textContent = `${e}`;
-            }
-            dialog.append($(div));
-        }
-
-        dialog.show();
-    } else {
-        dialog.hide();
-    }
-}
-
-function dictionarySpinnerShow(show) {
-    const spinner = $('#dict-spinner');
-    if (show) {
-        spinner.show();
-    } else {
-        spinner.hide();
-    }
-}
-
-function dictionaryGroupsSort() {
-    const dictGroups = $('#dict-groups');
-    const dictGroupChildren = dictGroups.children('.dict-group').sort((ca, cb) => {
-        const pa = parseInt($(ca).find('.dict-priority').val(), 10);
-        const pb = parseInt($(cb).find('.dict-priority').val(), 10);
-        if (pa < pb) {
-            return 1;
-        } else if (pa > pb) {
-            return -1;
-        } else {
-            return 0;
-        }
-    });
-
-    dictGroups.append(dictGroupChildren);
-}
-
-async function dictionaryGroupsPopulate(options) {
-    const dictGroups = $('#dict-groups').empty();
-    const dictWarning = $('#dict-warning').hide();
-
-    const dictRows = toIterable(await utilDatabaseSummarize());
-    if (dictRows.length === 0) {
-        dictWarning.show();
-    }
-
-    for (const dictRow of toIterable(dictRowsSort(dictRows, options))) {
-        const dictOptions = options.dictionaries[dictRow.title] || {
-            enabled: false,
-            priority: 0,
-            allowSecondarySearches: false
-        };
-
-        const dictHtml = await apiTemplateRender('dictionary.html', {
-            enabled: dictOptions.enabled,
-            priority: dictOptions.priority,
-            allowSecondarySearches: dictOptions.allowSecondarySearches,
-            title: dictRow.title,
-            version: dictRow.version,
-            revision: dictRow.revision,
-            outdated: dictRow.version < 3
-        });
-
-        dictGroups.append($(dictHtml));
-    }
-
-    formUpdateVisibility(options);
-
-    $('.dict-enabled, .dict-priority, .dict-allow-secondary-searches').change(e => {
-        dictionaryGroupsSort();
-        onFormOptionsChanged(e);
-    });
-}
-
-async function onDictionaryPurge(e) {
-    e.preventDefault();
-
-    const dictControls = $('#dict-importer, #dict-groups, #dict-main-group').hide();
-    const dictProgress = $('#dict-purge').show();
-
-    try {
-        dictionaryErrorsShow(null);
-        dictionarySpinnerShow(true);
-
-        await utilDatabasePurge();
-        for (const options of toIterable(await getOptionsArray())) {
-            options.dictionaries = utilBackgroundIsolate({});
-            options.general.mainDictionary = '';
-        }
-        await settingsSaveOptions();
-
-        const optionsContext = getOptionsContext();
-        const options = await apiOptionsGet(optionsContext);
-        await dictionaryGroupsPopulate(options);
-        await formMainDictionaryOptionsPopulate(options);
-    } catch (e) {
-        dictionaryErrorsShow([e]);
-    } finally {
-        dictionarySpinnerShow(false);
-
-        dictControls.show();
-        dictProgress.hide();
-
-        if (storageEstimate.mostRecent !== null) {
-            storageUpdateStats();
-        }
-    }
-}
-
-function onDictionaryImportButtonClick() {
-    const dictFile = document.querySelector('#dict-file');
-    dictFile.click();
-}
-
-async function onDictionaryImport(e) {
-    const dictFile = $('#dict-file');
-    const dictControls = $('#dict-importer').hide();
-    const dictProgress = $('#dict-import-progress').show();
-
-    try {
-        dictionaryErrorsShow(null);
-        dictionarySpinnerShow(true);
-
-        const setProgress = percent => dictProgress.find('.progress-bar').css('width', `${percent}%`);
-        const updateProgress = (total, current) => {
-            setProgress(current / total * 100.0);
-            if (storageEstimate.mostRecent !== null && !storageUpdateStats.isUpdating) {
-                storageUpdateStats();
-            }
-        };
-        setProgress(0.0);
-
-        const exceptions = [];
-        const summary = await utilDatabaseImport(e.target.files[0], updateProgress, exceptions);
-        for (const options of toIterable(await getOptionsArray())) {
-            options.dictionaries[summary.title] = utilBackgroundIsolate({
-                enabled: true,
-                priority: 0,
-                allowSecondarySearches: false
-            });
-            if (summary.sequenced && options.general.mainDictionary === '') {
-                options.general.mainDictionary = summary.title;
-            }
-        }
-        await settingsSaveOptions();
-
-        if (exceptions.length > 0) {
-            exceptions.push(`Dictionary may not have been imported properly: ${exceptions.length} error${exceptions.length === 1 ? '' : 's'} reported.`);
-            dictionaryErrorsShow(exceptions);
-        }
-
-        const optionsContext = getOptionsContext();
-        const options = await apiOptionsGet(optionsContext);
-        await dictionaryGroupsPopulate(options);
-        await formMainDictionaryOptionsPopulate(options);
-    } catch (e) {
-        dictionaryErrorsShow([e]);
-    } finally {
-        dictionarySpinnerShow(false);
-
-        dictFile.val('');
-        dictControls.show();
-        dictProgress.hide();
     }
 }
 
