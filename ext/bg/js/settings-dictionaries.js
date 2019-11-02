@@ -256,7 +256,8 @@ async function dictSettingsInitialize() {
     );
     dictionaryUI.save = () => apiOptionsSave();
 
-    document.querySelector('#dict-purge-link').addEventListener('click', (e) => onDictionaryPurge(e), false);
+    document.querySelector('#dict-purge-button').addEventListener('click', (e) => onDictionaryPurgeButtonClick(e), false);
+    document.querySelector('#dict-purge-confirm').addEventListener('click', (e) => onDictionaryPurge(e), false);
     document.querySelector('#dict-file-button').addEventListener('click', (e) => onDictionaryImportButtonClick(e), false);
     document.querySelector('#dict-file').addEventListener('change', (e) => onDictionaryImport(e), false);
     document.querySelector('#dict-main').addEventListener('change', (e) => onDictionaryMainChanged(e), false);
@@ -398,8 +399,15 @@ function onDictionaryImportButtonClick() {
     dictFile.click();
 }
 
+function onDictionaryPurgeButtonClick(e) {
+    e.preventDefault();
+    $('#dict-purge-modal').modal('show');
+}
+
 async function onDictionaryPurge(e) {
     e.preventDefault();
+
+    $('#dict-purge-modal').modal('hide');
 
     const dictControls = $('#dict-importer, #dict-groups, #dict-groups-extra, #dict-main-group').hide();
     const dictProgress = $('#dict-purge').show();

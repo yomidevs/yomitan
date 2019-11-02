@@ -417,10 +417,7 @@
                 </div>
 
                 <p class="help-block">
-                    Yomichan can import and use a variety of dictionary formats. Unneeded dictionaries can be disabled,
-                    or you can simply <a href="#" id="dict-purge-link">purge the database</a> to delete everything.
-                </p>
-                <p class="help-block">
+                    Yomichan can import and use a variety of dictionary formats. Unneeded dictionaries can be disabled.
                     Deleting individual dictionaries is not currently feasible due to limitations of browser database technology.
                 </p>
 
@@ -449,8 +446,29 @@
                         <a href="https://foosoft.net/projects/yomichan" target="_blank" rel="noopener">download free dictionaries</a>
                         for use with this extension and to learn about importing proprietary EPWING dictionaries.
                     </p>
-                    <button class="btn btn-primary" id="dict-file-button">Import Dictionary</button>
+                    <div>
+                        <button class="btn btn-primary" id="dict-file-button">Import Dictionary</button>
+                        <button class="btn btn-danger" id="dict-purge-button">Purge Database</button>
+                    </div>
                     <div hidden><input type="file" id="dict-file"></div>
+                </div>
+
+                <div class="modal fade" tabindex="-1" role="dialog" id="dict-purge-modal">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Confirm database purge</h4>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to delete all data in the database?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger" id="dict-purge-confirm">Purge Database</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <template id="dict-template"><div class="dict-group well well-sm">
