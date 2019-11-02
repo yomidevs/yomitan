@@ -222,7 +222,10 @@ class SettingsDictionaryEntryUI {
         const progressBar = this.content.querySelector('.progress-bar');
         this.isDeleting = true;
 
+        const prevention = new PageExitPrevention();
         try {
+            prevention.start();
+
             const onProgress = ({processed, count, storeCount, storesProcesed}) => {
                 let percent = 0.0;
                 if (count > 0 && storesProcesed > 0) {
@@ -235,6 +238,7 @@ class SettingsDictionaryEntryUI {
         } catch (e) {
             dictionaryErrorsShow([e]);
         } finally {
+            prevention.end();
             this.isDeleting = false;
             progress.hidden = true;
 
@@ -479,7 +483,10 @@ async function onDictionaryPurge(e) {
     const dictProgress = document.querySelector('#dict-purge');
     dictProgress.hidden = false;
 
+    const prevention = new PageExitPrevention();
+
     try {
+        prevention.start();
         dictionaryErrorsShow(null);
         dictionarySpinnerShow(true);
 
@@ -496,6 +503,8 @@ async function onDictionaryPurge(e) {
     } catch (err) {
         dictionaryErrorsShow([err]);
     } finally {
+        prevention.end();
+
         dictionarySpinnerShow(false);
 
         dictControls.show();
@@ -513,7 +522,10 @@ async function onDictionaryImport(e) {
     const dictProgress = $('#dict-import-progress').show();
     const dictImportInfo = document.querySelector('#dict-import-info');
 
+    const prevention = new PageExitPrevention();
+
     try {
+        prevention.start();
         dictionaryErrorsShow(null);
         dictionarySpinnerShow(true);
 
@@ -559,6 +571,7 @@ async function onDictionaryImport(e) {
     } catch (err) {
         dictionaryErrorsShow([err]);
     } finally {
+        prevention.end();
         dictionarySpinnerShow(false);
 
         dictImportInfo.hidden = false;
