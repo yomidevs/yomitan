@@ -511,6 +511,7 @@ async function onDictionaryImport(e) {
     const dictFile = $('#dict-file');
     const dictControls = $('#dict-importer').hide();
     const dictProgress = $('#dict-import-progress').show();
+    const dictImportInfo = document.querySelector('#dict-import-info');
 
     try {
         dictionaryErrorsShow(null);
@@ -523,33 +524,45 @@ async function onDictionaryImport(e) {
                 storageUpdateStats();
             }
         };
-        setProgress(0.0);
 
         const exceptions = [];
-        const summary = await utilDatabaseImport(e.target.files[0], updateProgress, exceptions);
-        for (const options of toIterable(await getOptionsArray())) {
-            const dictionaryOptions = SettingsDictionaryListUI.createDictionaryOptions();
-            dictionaryOptions.enabled = true;
-            options.dictionaries[summary.title] = dictionaryOptions;
-            if (summary.sequenced && options.general.mainDictionary === '') {
-                options.general.mainDictionary = summary.title;
+        const files = [...e.target.files];
+
+        for (let i = 0, ii = files.length; i < ii; ++i) {
+            setProgress(0.0);
+            if (ii > 1) {
+                dictImportInfo.hidden = false;
+                dictImportInfo.textContent = `(${i + 1} of ${ii})`;
             }
-        }
-        await settingsSaveOptions();
 
-        if (exceptions.length > 0) {
-            exceptions.push(`Dictionary may not have been imported properly: ${exceptions.length} error${exceptions.length === 1 ? '' : 's'} reported.`);
-            dictionaryErrorsShow(exceptions);
-        }
+            const summary = await utilDatabaseImport(files[i], updateProgress, exceptions);
+            for (const options of toIterable(await getOptionsArray())) {
+                const dictionaryOptions = SettingsDictionaryListUI.createDictionaryOptions();
+                dictionaryOptions.enabled = true;
+                options.dictionaries[summary.title] = dictionaryOptions;
+                if (summary.sequenced && options.general.mainDictionary === '') {
+                    options.general.mainDictionary = summary.title;
+                }
+            }
 
-        const optionsContext = getOptionsContext();
-        const options = await apiOptionsGet(optionsContext);
-        onDatabaseUpdated(options);
+            await settingsSaveOptions();
+
+            if (exceptions.length > 0) {
+                exceptions.push(`Dictionary may not have been imported properly: ${exceptions.length} error${exceptions.length === 1 ? '' : 's'} reported.`);
+                dictionaryErrorsShow(exceptions);
+            }
+
+            const optionsContext = getOptionsContext();
+            const options = await apiOptionsGet(optionsContext);
+            onDatabaseUpdated(options);
+        }
     } catch (err) {
         dictionaryErrorsShow([err]);
     } finally {
         dictionarySpinnerShow(false);
 
+        dictImportInfo.hidden = false;
+        dictImportInfo.textContent = '';
         dictFile.val('');
         dictControls.show();
         dictProgress.hide();

@@ -434,6 +434,7 @@
 
                 <div id="dict-import-progress">
                     Dictionary data is being imported, please be patient...
+                    <span id="dict-import-info" hidden></span>
                     <div class="progress">
                         <div class="progress-bar progress-bar-striped" style="width: 0%"></div>
                     </div>
@@ -449,7 +450,7 @@
                         <button class="btn btn-primary" id="dict-file-button">Import Dictionary</button>
                         <button class="btn btn-danger" id="dict-purge-button">Purge Database</button>
                     </div>
-                    <div hidden><input type="file" id="dict-file"></div>
+                    <div hidden><input type="file" id="dict-file" multiple></div>
                 </div>
 
                 <div class="modal fade" tabindex="-1" role="dialog" id="dict-purge-modal">
