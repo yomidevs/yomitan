@@ -21,25 +21,39 @@ class QueryParser {
     constructor(search) {
         this.search = search;
         this.pendingLookup = false;
+        this.clickScanPrevent = false;
 
         this.queryParser = document.querySelector('#query-parser');
 
-        this.queryParser.addEventListener('click', (e) => this.onClick(e));
+        this.queryParser.addEventListener('mousedown', (e) => this.onMouseDown(e));
+        this.queryParser.addEventListener('mouseup', (e) => this.onMouseUp(e));
     }
 
     onError(error) {
         logError(error, false);
     }
 
-    onClick(e) {
-        const selectText = this.search.options.scanning.selectText;
-        this.onTermLookup(e, {disableScroll: true, selectText});
+    onMouseDown(e) {
+        if (QueryParser.isMouseButton('primary', e)) {
+            this.clickScanPrevent = false;
+        }
+    }
+
+    onMouseUp(e) {
+        if (
+            this.search.options.scanning.clickGlossary &&
+            !this.clickScanPrevent &&
+            QueryParser.isMouseButton('primary', e)
+        ) {
+            const selectText = this.search.options.scanning.selectText;
+            this.onTermLookup(e, {disableScroll: true, selectText});
+        }
     }
 
     onMouseMove(e) {
         if (
             this.pendingLookup ||
-            (e.buttons & 0x1) !== 0x0 // Left mouse button
+            QueryParser.isMouseButton('primary', e)
         ) {
             return;
         }
@@ -48,13 +62,19 @@ class QueryParser {
         const scanningModifier = scanningOptions.modifier;
         if (!(
             QueryParser.isScanningModifierPressed(scanningModifier, e) ||
-            (scanningOptions.middleMouse && (e.buttons & 0x4) !== 0x0) // Middle mouse button
+            (scanningOptions.middleMouse && QueryParser.isMouseButton('auxiliary', e))
         )) {
             return;
         }
 
         const selectText = this.search.options.scanning.selectText;
         this.onTermLookup(e, {disableScroll: true, disableHistory: true, selectText});
+    }
+
+    onMouseLeave(e) {
+        this.clickScanPrevent = true;
+        clearTimeout(e.target.dataset.timer);
+        delete e.target.dataset.timer;
     }
 
     onTermLookup(e, params) {
@@ -124,8 +144,7 @@ class QueryParser {
             }
         });
         element.addEventListener('mouseleave', (e) => {
-            clearTimeout(e.target.dataset.timer);
-            delete e.target.dataset.timer;
+            this.onMouseLeave(e);
         });
     }
 
@@ -150,6 +169,23 @@ class QueryParser {
             case 'ctrl': return mouseEvent.ctrlKey;
             case 'shift': return mouseEvent.shiftKey;
             case 'none': return true;
+            default: return false;
+        }
+    }
+
+    static isMouseButton(button, mouseEvent) {
+        if (['mouseup', 'mousedown'].includes(mouseEvent.type)) {
+            switch (button) {
+                case 'primary': return mouseEvent.button === 0;
+                case 'secondary': return mouseEvent.button === 2;
+                case 'auxiliary': return mouseEvent.button === 1;
+                default: return false;
+            }
+        }
+        switch (button) {
+            case 'primary': return (mouseEvent.buttons & 0x1) !== 0x0;
+            case 'secondary': return (mouseEvent.buttons & 0x2) !== 0x0;
+            case 'auxiliary': return (mouseEvent.buttons & 0x4) !== 0x0;
             default: return false;
         }
     }
