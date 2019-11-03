@@ -81,8 +81,9 @@ class Database {
 
         this.db = {
             backendDB: () => idb,
-            close: () => {}, // Not implemented
-            delete: () => {} // Not implemented
+            close: () => idb.close(),
+            get name() { return idb.name; },
+            set name(v) {}
         };
     }
 
@@ -90,7 +91,7 @@ class Database {
         this.validate();
 
         this.db.close();
-        await this.db.delete();
+        await Database.deleteDatabase(this.db.name);
         this.db = null;
 
         await this.prepare();
@@ -814,5 +815,13 @@ class Database {
                 }
             }
         }
+    }
+
+    static deleteDatabase(dbName) {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.deleteDatabase(dbName);
+            request.onerror = (e) => reject(e);
+            request.onsuccess = () => resolve();
+        });
     }
 }
