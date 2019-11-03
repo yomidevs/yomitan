@@ -27,23 +27,63 @@ class Database {
             throw new Error('Database already initialized');
         }
 
-        this.db = new Dexie('dict');
-        this.db.version(2).stores({
-            terms:        '++id,dictionary,expression,reading',
-            kanji:        '++,dictionary,character',
-            tagMeta:      '++,dictionary',
-            dictionaries: '++,title,version'
-        });
-        this.db.version(3).stores({
-            termMeta:  '++,dictionary,expression',
-            kanjiMeta: '++,dictionary,character',
-            tagMeta:   '++,dictionary,name'
-        });
-        this.db.version(4).stores({
-            terms: '++id,dictionary,expression,reading,sequence'
+        const idb = await Database.open('dict', 4, (db, transaction, oldVersion) => {
+            Database.upgrade(db, transaction, oldVersion, [
+                {
+                    version: 2,
+                    stores: {
+                        terms: {
+                            primaryKey: {keyPath: 'id', autoIncrement: true},
+                            indices: ['dictionary', 'expression', 'reading']
+                        },
+                        kanji: {
+                            primaryKey: {autoIncrement: true},
+                            indices: ['dictionary', 'character']
+                        },
+                        tagMeta: {
+                            primaryKey: {autoIncrement: true},
+                            indices: ['dictionary']
+                        },
+                        dictionaries: {
+                            primaryKey: {autoIncrement: true},
+                            indices: ['title', 'version']
+                        }
+                    }
+                },
+                {
+                    version: 3,
+                    stores: {
+                        termMeta: {
+                            primaryKey: {autoIncrement: true},
+                            indices: ['dictionary', 'expression']
+                        },
+                        kanjiMeta: {
+                            primaryKey: {autoIncrement: true},
+                            indices: ['dictionary', 'character']
+                        },
+                        tagMeta: {
+                            primaryKey: {autoIncrement: true},
+                            indices: ['dictionary', 'name']
+                        }
+                    }
+                },
+                {
+                    version: 4,
+                    stores: {
+                        terms: {
+                            primaryKey: {keyPath: 'id', autoIncrement: true},
+                            indices: ['dictionary', 'expression', 'reading', 'sequence']
+                        }
+                    }
+                }
+            ]);
         });
 
-        await this.db.open();
+        this.db = {
+            backendDB: () => idb,
+            close: () => {}, // Not implemented
+            delete: () => {} // Not implemented
+        };
     }
 
     async purge() {
@@ -733,5 +773,46 @@ class Database {
                 request.onsuccess = onSuccess;
             }
         });
+    }
+
+    static open(name, version, onUpgradeNeeded) {
+        return new Promise((resolve, reject) => {
+            const request = window.indexedDB.open(name, version * 10);
+
+            request.onupgradeneeded = (event) => {
+                try {
+                    request.transaction.onerror = (e) => reject(e);
+                    onUpgradeNeeded(request.result, request.transaction, event.oldVersion / 10, event.newVersion / 10);
+                } catch (e) {
+                    reject(e);
+                }
+            };
+
+            request.onerror = (e) => reject(e);
+            request.onsuccess = () => resolve(request.result);
+        });
+    }
+
+    static upgrade(db, transaction, oldVersion, upgrades) {
+        for (const {version, stores} of upgrades) {
+            if (oldVersion >= version) { continue; }
+
+            const objectStoreNames = Object.keys(stores);
+            for (const objectStoreName of objectStoreNames) {
+                const {primaryKey, indices} = stores[objectStoreName];
+
+                const objectStore = (
+                    transaction.objectStoreNames.contains(objectStoreName) ?
+                    transaction.objectStore(objectStoreName) :
+                    db.createObjectStore(objectStoreName, primaryKey)
+                );
+
+                for (const indexName of indices) {
+                    if (objectStore.indexNames.contains(indexName)) { continue; }
+
+                    objectStore.createIndex(indexName, indexName, {});
+                }
+            }
+        }
     }
 }
