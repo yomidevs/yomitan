@@ -20,11 +20,11 @@
 class QueryParser {
     constructor(search) {
         this.search = search;
+        this.pendingLookup = false;
 
         this.queryParser = document.querySelector('#query-parser');
 
         this.queryParser.addEventListener('click', (e) => this.onClick(e));
-        this.queryParser.addEventListener('mousemove', (e) => this.onMouseMove(e));
     }
 
     onError(error) {
@@ -35,8 +35,9 @@ class QueryParser {
         this.onTermLookup(e, {disableScroll: true, selectText: true});
     }
 
-    async onMouseMove(e) {
+    onMouseEnter(e) {
         if (
+            this.pendingLookup ||
             (e.buttons & 0x1) !== 0x0 // Left mouse button
         ) {
             return;
@@ -51,22 +52,51 @@ class QueryParser {
             return;
         }
 
-        await this.onTermLookup(e, {disableScroll: true, selectText: true, disableHistory: true})
+        this.onTermLookup(e, {disableScroll: true, selectText: true, disableHistory: true});
     }
 
     onTermLookup(e, params) {
-        this.search.onTermLookup(e, params);
+        this.pendingLookup = true;
+        (async () => {
+            await this.search.onTermLookup(e, params);
+            this.pendingLookup = false;
+        })();
     }
 
     async setText(text) {
         this.search.setSpinnerVisible(true);
+        await this.setPreview(text);
 
+        // const results = await apiTextParse(text, this.search.getOptionsContext());
+        const results = await apiTextParseMecab(text, this.search.getOptionsContext());
+
+        const content = await apiTemplateRender('query-parser.html', {
+            terms: results.map((term) => {
+                return term.filter(part => part.text.trim()).map((part) => {
+                    return {
+                        text: Array.from(part.text),
+                        reading: part.reading,
+                        raw: !part.reading || !part.reading.trim(),
+                    };
+                });
+            })
+        });
+
+        this.queryParser.innerHTML = content;
+
+        this.queryParser.querySelectorAll('.query-parser-char').forEach((charElement) => {
+            this.activateScanning(charElement);
+        });
+
+        this.search.setSpinnerVisible(false);
+    }
+
+    async setPreview(text) {
         const previewTerms = [];
-        let previewText = text;
-        while (previewText) {
-            const tempText = previewText.slice(0, 2);
-            previewTerms.push([{text: tempText}]);
-            previewText = previewText.slice(2);
+        while (text) {
+            const tempText = text.slice(0, 2);
+            previewTerms.push([{text: Array.from(tempText)}]);
+            text = text.slice(2);
         }
 
         this.queryParser.innerHTML = await apiTemplateRender('query-parser.html', {
@@ -74,21 +104,22 @@ class QueryParser {
             preview: true
         });
 
-        // const results = await apiTextParse(text, this.search.getOptionsContext());
-        const results = await apiTextParseMecab(text, this.search.getOptionsContext());
-
-        const content = await apiTemplateRender('query-parser.html', {
-            terms: results.map((term) => {
-                return term.map((part) => {
-                    part.raw = !part.text.trim() && (!part.reading || !part.reading.trim());
-                    return part;
-                });
-            })
+        this.queryParser.querySelectorAll('.query-parser-char').forEach((charElement) => {
+            this.activateScanning(charElement);
         });
+    }
 
-        this.queryParser.innerHTML = content;
-
-        this.search.setSpinnerVisible(false);
+    activateScanning(element) {
+        element.addEventListener('mouseenter', (e) => {
+            e.target.dataset.timer = setTimeout(() => {
+                this.onMouseEnter(e);
+                delete e.target.dataset.timer;
+            }, this.search.options.scanning.delay);
+        });
+        element.addEventListener('mouseleave', (e) => {
+            clearTimeout(e.target.dataset.timer);
+            delete e.target.dataset.timer;
+        });
     }
 
     async parseText(text) {
@@ -104,22 +135,6 @@ class QueryParser {
             }
         }
         return results;
-    }
-
-    popupTimerSet(callback) {
-        const delay = this.options.scanning.delay;
-        if (delay > 0) {
-            this.popupTimer = window.setTimeout(callback, delay);
-        } else {
-            Promise.resolve().then(callback);
-        }
-    }
-
-    popupTimerClear() {
-        if (this.popupTimer !== null) {
-            window.clearTimeout(this.popupTimer);
-            this.popupTimer = null;
-        }
     }
 
     static isScanningModifierPressed(scanningModifier, mouseEvent) {

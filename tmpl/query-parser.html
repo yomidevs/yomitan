@@ -12,9 +12,13 @@
 
 {{~#*inline "part"~}}
 {{~#if raw~}}
-{{text}}
+{{~#each text~}}
+<span class="query-parser-char">{{this}}</span>
+{{~/each~}}
 {{~else~}}
-<ruby>{{text}}<rt>{{reading}}</rt></ruby>
+<ruby>{{~#each text~}}
+<span class="query-parser-char">{{this}}</span>
+{{~/each~}}<rt>{{reading}}</rt></ruby>
 {{~/if~}}
 {{~/inline~}}
 
