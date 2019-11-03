@@ -257,7 +257,6 @@ versions packaged.
 
 *   Bootstrap: [homepage](https://getbootstrap.com/) - [snapshot](https://github.com/twbs/bootstrap/releases/download/v3.3.7/bootstrap-3.3.7-dist.zip) - [license](https://github.com/twbs/bootstrap/blob/v3.3.7/LICENSE)
 *   Bootstrap Toggle: [homepage](https://www.bootstraptoggle.com/) - [snapshot](https://github.com/minhur/bootstrap-toggle/archive/b76c094.zip) - [license](https://github.com/minhur/bootstrap-toggle/blob/2.2.0/LICENSE)
-*   Dexie: [homepage](https://dexie.org/) - [snapshot](https://github.com/dfahlander/Dexie.js/archive/v2.0.0-beta.10.zip) - [license](https://github.com/dfahlander/Dexie.js/blob/v2.0.0-beta.10/LICENSE)
 *   Handlebars: [homepage](https://handlebarsjs.com/) - [snapshot](http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars.min-714a4c4.js) - [license](https://github.com/wycats/handlebars.js/blob/v4.0.6/LICENSE)
 *   jQuery: [homepage](https://blog.jquery.com/) - [snapshot](https://code.jquery.com/jquery-3.2.1.min.js) - [license](https://github.com/jquery/jquery/blob/3.2.1/LICENSE.txt)
 *   JSZip: [homepage](https://stuk.github.io/jszip/) - [snapshot](https://raw.githubusercontent.com/Stuk/jszip/de7f52fbcba485737bef7923a83f0fad92d9f5bc/dist/jszip.min.js) - [license](https://github.com/Stuk/jszip/blob/v3.1.3/LICENSE.markdown)
