@@ -232,12 +232,6 @@ class Database {
         return result;
     }
 
-    async summarize() {
-        this.validate();
-
-        return this.db.dictionaries.toArray();
-    }
-
     async getDictionaryInfo() {
         this.validate();
 

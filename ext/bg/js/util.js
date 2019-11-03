@@ -80,10 +80,6 @@ function utilAnkiGetDeckNames() {
     return utilBackend().anki.getDeckNames();
 }
 
-function utilDatabaseSummarize() {
-    return utilBackend().translator.database.summarize();
-}
-
 function utilDatabaseGetDictionaryInfo() {
     return utilBackend().translator.database.getDictionaryInfo();
 }
