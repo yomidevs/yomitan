@@ -34,7 +34,7 @@ class QueryParser {
     }
 
     onMouseDown(e) {
-        if (QueryParser.isMouseButton('primary', e)) {
+        if (Frontend.isMouseButton('primary', e)) {
             this.clickScanPrevent = false;
         }
     }
@@ -43,7 +43,7 @@ class QueryParser {
         if (
             this.search.options.scanning.clickGlossary &&
             !this.clickScanPrevent &&
-            QueryParser.isMouseButton('primary', e)
+            Frontend.isMouseButton('primary', e)
         ) {
             const selectText = this.search.options.scanning.selectText;
             this.onTermLookup(e, {disableScroll: true, selectText});
@@ -51,18 +51,15 @@ class QueryParser {
     }
 
     onMouseMove(e) {
-        if (
-            this.pendingLookup ||
-            QueryParser.isMouseButton('primary', e)
-        ) {
+        if (this.pendingLookup || Frontend.isMouseButton('primary', e)) {
             return;
         }
 
         const scanningOptions = this.search.options.scanning;
         const scanningModifier = scanningOptions.modifier;
         if (!(
-            QueryParser.isScanningModifierPressed(scanningModifier, e) ||
-            (scanningOptions.middleMouse && QueryParser.isMouseButton('auxiliary', e))
+            Frontend.isScanningModifierPressed(scanningModifier, e) ||
+            (scanningOptions.middleMouse && Frontend.isMouseButton('auxiliary', e))
         )) {
             return;
         }
@@ -161,32 +158,5 @@ class QueryParser {
             }
         }
         return results;
-    }
-
-    static isScanningModifierPressed(scanningModifier, mouseEvent) {
-        switch (scanningModifier) {
-            case 'alt': return mouseEvent.altKey;
-            case 'ctrl': return mouseEvent.ctrlKey;
-            case 'shift': return mouseEvent.shiftKey;
-            case 'none': return true;
-            default: return false;
-        }
-    }
-
-    static isMouseButton(button, mouseEvent) {
-        if (['mouseup', 'mousedown'].includes(mouseEvent.type)) {
-            switch (button) {
-                case 'primary': return mouseEvent.button === 0;
-                case 'secondary': return mouseEvent.button === 2;
-                case 'auxiliary': return mouseEvent.button === 1;
-                default: return false;
-            }
-        }
-        switch (button) {
-            case 'primary': return (mouseEvent.buttons & 0x1) !== 0x0;
-            case 'secondary': return (mouseEvent.buttons & 0x2) !== 0x0;
-            case 'auxiliary': return (mouseEvent.buttons & 0x4) !== 0x0;
-            default: return false;
-        }
     }
 }
