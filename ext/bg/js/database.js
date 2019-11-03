@@ -23,11 +23,11 @@ class Database {
     }
 
     async prepare() {
-        if (this.db) {
+        if (this.db !== null) {
             throw new Error('Database already initialized');
         }
 
-        const idb = await Database.open('dict', 4, (db, transaction, oldVersion) => {
+        this.db = await Database.open('dict', 4, (db, transaction, oldVersion) => {
             Database.upgrade(db, transaction, oldVersion, [
                 {
                     version: 2,
@@ -78,13 +78,6 @@ class Database {
                 }
             ]);
         });
-
-        this.db = {
-            backendDB: () => idb,
-            close: () => idb.close(),
-            get name() { return idb.name; },
-            set name(v) {}
-        };
     }
 
     async purge() {
@@ -120,10 +113,8 @@ class Database {
             progressRate = 1000;
         }
 
-        const db = this.db.backendDB();
-
         for (const [objectStoreName, index] of targets) {
-            const dbTransaction = db.transaction([objectStoreName], 'readwrite');
+            const dbTransaction = this.db.transaction([objectStoreName], 'readwrite');
             const dbObjectStore = dbTransaction.objectStore(objectStoreName);
             const dbIndex = dbObjectStore.index(index);
             const only = IDBKeyRange.only(dictionaryName);
@@ -146,8 +137,7 @@ class Database {
             }
         };
 
-        const db = this.db.backendDB();
-        const dbTransaction = db.transaction(['terms'], 'readonly');
+        const dbTransaction = this.db.transaction(['terms'], 'readonly');
         const dbTerms = dbTransaction.objectStore('terms');
         const dbIndex1 = dbTerms.index('expression');
         const dbIndex2 = dbTerms.index('reading');
@@ -176,8 +166,7 @@ class Database {
             }
         };
 
-        const db = this.db.backendDB();
-        const dbTransaction = db.transaction(['terms'], 'readonly');
+        const dbTransaction = this.db.transaction(['terms'], 'readonly');
         const dbTerms = dbTransaction.objectStore('terms');
         const dbIndex = dbTerms.index('expression');
 
@@ -202,8 +191,7 @@ class Database {
             }
         };
 
-        const db = this.db.backendDB();
-        const dbTransaction = db.transaction(['terms'], 'readonly');
+        const dbTransaction = this.db.transaction(['terms'], 'readonly');
         const dbTerms = dbTransaction.objectStore('terms');
         const dbIndex = dbTerms.index('sequence');
 
@@ -240,8 +228,7 @@ class Database {
             }
         };
 
-        const db = this.db.backendDB();
-        const dbTransaction = db.transaction([tableName], 'readonly');
+        const dbTransaction = this.db.transaction([tableName], 'readonly');
         const dbTerms = dbTransaction.objectStore(tableName);
         const dbIndex = dbTerms.index(indexName);
 
@@ -259,8 +246,7 @@ class Database {
         this.validate();
 
         let result = null;
-        const db = this.db.backendDB();
-        const dbTransaction = db.transaction(['tagMeta'], 'readonly');
+        const dbTransaction = this.db.transaction(['tagMeta'], 'readonly');
         const dbTerms = dbTransaction.objectStore('tagMeta');
         const dbIndex = dbTerms.index('name');
         const only = IDBKeyRange.only(name);
@@ -277,8 +263,7 @@ class Database {
         this.validate();
 
         const results = [];
-        const db = this.db.backendDB();
-        const dbTransaction = db.transaction(['dictionaries'], 'readonly');
+        const dbTransaction = this.db.transaction(['dictionaries'], 'readonly');
         const dbDictionaries = dbTransaction.objectStore('dictionaries');
 
         await Database.getAll(dbDictionaries, null, null, info => results.push(info));
@@ -296,8 +281,7 @@ class Database {
             'termMeta',
             'tagMeta'
         ];
-        const db = this.db.backendDB();
-        const dbCountTransaction = db.transaction(objectStoreNames, 'readonly');
+        const dbCountTransaction = this.db.transaction(objectStoreNames, 'readonly');
 
         const targets = [];
         for (const objectStoreName of objectStoreNames) {
@@ -334,7 +318,7 @@ class Database {
 
         const maxTransactionLength = 1000;
         const bulkAdd = async (objectStoreName, items, total, current) => {
-            const db = this.db.backendDB();
+            const db = this.db;
             for (let i = 0; i < items.length; i += maxTransactionLength) {
                 if (progressCallback) {
                     progressCallback(total, current + i / items.length);
@@ -360,7 +344,7 @@ class Database {
                 throw new Error('Unsupported dictionary version');
             }
 
-            const db = this.db.backendDB();
+            const db = this.db;
             const dbCountTransaction = db.transaction(['dictionaries'], 'readonly');
             const dbIndex = dbCountTransaction.objectStore('dictionaries').index('title');
             const only = IDBKeyRange.only(summary.title);
