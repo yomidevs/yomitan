@@ -36,7 +36,7 @@ class QueryParser {
         this.onTermLookup(e, {disableScroll: true, selectText});
     }
 
-    onMouseEnter(e) {
+    onMouseMove(e) {
         if (
             this.pendingLookup ||
             (e.buttons & 0x1) !== 0x0 // Left mouse button
@@ -112,11 +112,16 @@ class QueryParser {
     }
 
     activateScanning(element) {
-        element.addEventListener('mouseenter', (e) => {
-            e.target.dataset.timer = setTimeout(() => {
-                this.onMouseEnter(e);
-                delete e.target.dataset.timer;
-            }, this.search.options.scanning.delay);
+        element.addEventListener('mousemove', (e) => {
+            clearTimeout(e.target.dataset.timer);
+            if (this.search.options.scanning.modifier === 'none') {
+                e.target.dataset.timer = setTimeout(() => {
+                    this.onMouseMove(e);
+                    delete e.target.dataset.timer;
+                }, this.search.options.scanning.delay);
+            } else {
+                this.onMouseMove(e);
+            }
         });
         element.addEventListener('mouseleave', (e) => {
             clearTimeout(e.target.dataset.timer);
