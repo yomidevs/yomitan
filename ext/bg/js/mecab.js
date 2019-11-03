@@ -29,7 +29,7 @@ class Mecab {
     }
 
     startListener() {
-        this.port = chrome.runtime.connectNative('mecab');
+        this.port = chrome.runtime.connectNative('yomichan_mecab');
         this.port.onMessage.addListener((message) => {
             const {sequence, data} = message;
             const {callback, timer} = this.listeners[sequence] || {};
