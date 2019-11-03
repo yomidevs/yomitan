@@ -91,31 +91,43 @@ async function apiTextParse(text, optionsContext) {
             definitions = dictTermsSort(definitions);
             const {expression, reading} = definitions[0];
             const source = text.slice(0, sourceLength);
-
-            let stemLength = 0;
-            const shortest = Math.min(source.length, expression.length);
-            while (stemLength < shortest && source[stemLength] === expression[stemLength]) {
-                ++stemLength;
+            for (const {text, furigana} of jpDistributeFuriganaInflected(expression, reading, source)) {
+                // can't use 'furigana' in templates
+                term.push({text, reading: furigana});
             }
-            const offset = source.length - stemLength;
-
-            for (const {text, furigana} of jpDistributeFurigana(
-                source.slice(0, offset === 0 ? source.length : source.length - offset),
-                reading.slice(0, offset === 0 ? reading.length : reading.length - expression.length + stemLength)
-            )) {
-                term.push({text, reading: furigana || ''});
-            }
-
-            if (stemLength !== source.length) {
-                term.push({text: source.slice(stemLength)});
-            }
-
             text = text.slice(source.length);
         } else {
             term.push({text: text[0]});
             text = text.slice(1);
         }
         results.push(term);
+    }
+    return results;
+}
+
+async function apiTextParseMecab(text, optionsContext) {
+    const options = await apiOptionsGet(optionsContext);
+    const mecab = utilBackend().mecab;
+
+    const results = [];
+    for (const parsedLine of await mecab.parseText(text)) {
+        for (const {expression, reading, source} of parsedLine) {
+            const term = [];
+            if (expression && reading) {
+                for (const {text, furigana} of jpDistributeFuriganaInflected(
+                    expression,
+                    jpKatakanaToHiragana(reading),
+                    source
+                )) {
+                    // can't use 'furigana' in templates
+                    term.push({text, reading: furigana});
+                }
+            } else {
+                term.push({text: source});
+            }
+            results.push(term);
+        }
+        results.push([{text: '\n'}]);
     }
     return results;
 }

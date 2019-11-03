@@ -61,12 +61,11 @@ function jpDistributeFurigana(expression, reading) {
 
         const group = groups[0];
         if (group.mode === 'kana') {
-            if (reading.startsWith(group.text)) {
-                const readingUsed = reading.substring(0, group.text.length);
+            if (jpKatakanaToHiragana(reading).startsWith(jpKatakanaToHiragana(group.text))) {
                 const readingLeft = reading.substring(group.text.length);
                 const segs = segmentize(readingLeft, groups.splice(1));
                 if (segs) {
-                    return [{text: readingUsed}].concat(segs);
+                    return [{text: group.text}].concat(segs);
                 }
             }
         } else {
@@ -94,4 +93,34 @@ function jpDistributeFurigana(expression, reading) {
     }
 
     return segmentize(reading, groups) || fallback;
+}
+
+function jpDistributeFuriganaInflected(expression, reading, source) {
+    const output = [];
+
+    let stemLength = 0;
+    const shortest = Math.min(source.length, expression.length);
+    const sourceHiragana = jpKatakanaToHiragana(source);
+    const expressionHiragana = jpKatakanaToHiragana(expression);
+    while (
+        stemLength < shortest &&
+        // sometimes an expression can use a kanji that's different from the source
+        (!jpIsKana(source[stemLength]) || (sourceHiragana[stemLength] === expressionHiragana[stemLength]))
+    ) {
+        ++stemLength;
+    }
+    const offset = source.length - stemLength;
+
+    for (const segment of jpDistributeFurigana(
+        source.slice(0, offset === 0 ? source.length : source.length - offset),
+        reading.slice(0, offset === 0 ? reading.length : reading.length - expression.length + stemLength)
+    )) {
+        output.push(segment);
+    }
+
+    if (stemLength !== source.length) {
+        output.push({text: source.slice(stemLength)});
+    }
+
+    return output;
 }

@@ -74,7 +74,8 @@ class QueryParser {
             preview: true
         });
 
-        const results = await apiTextParse(text, this.search.getOptionsContext());
+        // const results = await apiTextParse(text, this.search.getOptionsContext());
+        const results = await apiTextParseMecab(text, this.search.getOptionsContext());
 
         const content = await apiTemplateRender('query-parser.html', {
             terms: results.map((term) => {
