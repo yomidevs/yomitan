@@ -336,17 +336,16 @@ class Frontend {
             }
 
             const textSource = docRangeFromPoint(x, y, this.options);
-            if (
-                textSource === null ||
-                (this.textSourceCurrent !== null && this.textSourceCurrent.equals(textSource))
-            ) {
+            if (this.textSourceCurrent !== null && this.textSourceCurrent.equals(textSource)) {
                 return;
             }
 
             try {
-                return await this.searchSource(textSource, cause);
+                await this.searchSource(textSource, cause);
             } finally {
-                textSource.cleanup();
+                if (textSource !== null) {
+                    textSource.cleanup();
+                }
             }
         } catch (e) {
             this.onError(e);
@@ -358,17 +357,19 @@ class Frontend {
 
         try {
             this.pendingLookup = true;
-            results = (
-                await this.findTerms(textSource) ||
-                await this.findKanji(textSource)
-            );
-            if (results !== null) {
-                const focus = (cause === 'mouse');
-                this.showContent(textSource, focus, results.definitions, results.type);
+            if (textSource !== null) {
+                results = (
+                    await this.findTerms(textSource) ||
+                    await this.findKanji(textSource)
+                );
+                if (results !== null) {
+                    const focus = (cause === 'mouse');
+                    this.showContent(textSource, focus, results.definitions, results.type);
+                }
             }
         } catch (e) {
             if (window.yomichan_orphaned) {
-                if (textSource && this.options.scanning.modifier !== 'none') {
+                if (textSource !== null && this.options.scanning.modifier !== 'none') {
                     this.lastShowPromise = this.popup.showContent(
                         textSource.getRect(),
                         textSource.getWritingMode(),
@@ -386,7 +387,7 @@ class Frontend {
             this.pendingLookup = false;
         }
 
-        return results !== null;
+        return results;
     }
 
     showContent(textSource, focus, definitions, type) {
