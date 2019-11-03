@@ -48,6 +48,8 @@ class SettingsDictionaryListUI {
             }
         }
 
+        this.updateDictionaryOrder();
+
         const titles = this.dictionaryEntries.map(e => e.dictionaryInfo.title);
         const removeKeys = Object.keys(this.optionsDictionaries).filter(key => titles.indexOf(key) < 0);
         if (removeKeys.length >= 0) {
@@ -76,7 +78,6 @@ class SettingsDictionaryListUI {
         }
 
         const content = document.importNode(this.template.content, true).firstChild;
-        this.container.appendChild(content);
 
         this.dictionaryEntries.push(new SettingsDictionaryEntryUI(this, dictionaryInfo, content, optionsDictionary));
 
@@ -122,6 +123,18 @@ class SettingsDictionaryListUI {
 
         if (totalRemainder > 0) {
             this.extra = this.createExtra(totalCounts, remainders, totalRemainder);
+        }
+    }
+
+    updateDictionaryOrder() {
+        const sortInfo = this.dictionaryEntries.map((e, i) => [e, i]);
+        sortInfo.sort((a, b) => {
+            const i = b[0].optionsDictionary.priority - a[0].optionsDictionary.priority;
+            return (i !== 0 ? i : a[1] - b[1]);
+        });
+
+        for (const [e] of sortInfo) {
+            this.container.appendChild(e.content);
         }
     }
 
@@ -268,6 +281,8 @@ class SettingsDictionaryEntryUI {
         }
 
         e.target.value = `${value}`;
+
+        this.parent.updateDictionaryOrder();
     }
 
     onDeleteButtonClicked(e) {
