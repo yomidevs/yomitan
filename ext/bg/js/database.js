@@ -292,36 +292,23 @@ class Database {
         this.validate();
 
         const maxTransactionLength = 1000;
-        const bulkAdd = async (table, items, total, current) => {
-            if (items.length < maxTransactionLength) {
+        const bulkAdd = async (objectStoreName, items, total, current) => {
+            const db = this.db.backendDB();
+            for (let i = 0; i < items.length; i += maxTransactionLength) {
                 if (progressCallback) {
-                    progressCallback(total, current);
+                    progressCallback(total, current + i / items.length);
                 }
 
                 try {
-                    await table.bulkAdd(items);
+                    const count = Math.min(maxTransactionLength, items.length - i);
+                    const transaction = db.transaction([objectStoreName], 'readwrite');
+                    const objectStore = transaction.objectStore(objectStoreName);
+                    await Database.bulkAdd(objectStore, items, i, count);
                 } catch (e) {
                     if (exceptions) {
                         exceptions.push(e);
                     } else {
                         throw e;
-                    }
-                }
-            } else {
-                for (let i = 0; i < items.length; i += maxTransactionLength) {
-                    if (progressCallback) {
-                        progressCallback(total, current + i / items.length);
-                    }
-
-                    let count = Math.min(maxTransactionLength, items.length - i);
-                    try {
-                        await table.bulkAdd(items.slice(i, i + count));
-                    } catch (e) {
-                        if (exceptions) {
-                            exceptions.push(e);
-                        } else {
-                            throw e;
-                        }
                     }
                 }
             }
@@ -377,7 +364,7 @@ class Database {
                 }
             }
 
-            await bulkAdd(this.db.terms, rows, total, current);
+            await bulkAdd('terms', rows, total, current);
         };
 
         const termMetaDataLoaded = async (summary, entries, total, current) => {
@@ -391,7 +378,7 @@ class Database {
                 });
             }
 
-            await bulkAdd(this.db.termMeta, rows, total, current);
+            await bulkAdd('termMeta', rows, total, current);
         };
 
         const kanjiDataLoaded = async (summary, entries, total, current)  => {
@@ -421,7 +408,7 @@ class Database {
                 }
             }
 
-            await bulkAdd(this.db.kanji, rows, total, current);
+            await bulkAdd('kanji', rows, total, current);
         };
 
         const kanjiMetaDataLoaded = async (summary, entries, total, current) => {
@@ -435,7 +422,7 @@ class Database {
                 });
             }
 
-            await bulkAdd(this.db.kanjiMeta, rows, total, current);
+            await bulkAdd('kanjiMeta', rows, total, current);
         };
 
         const tagDataLoaded = async (summary, entries, total, current) => {
@@ -453,7 +440,7 @@ class Database {
                 rows.push(row);
             }
 
-            await bulkAdd(this.db.tagMeta, rows, total, current);
+            await bulkAdd('tagMeta', rows, total, current);
         };
 
         return await Database.importDictionaryZip(
