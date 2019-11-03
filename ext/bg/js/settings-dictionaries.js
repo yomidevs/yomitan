@@ -171,6 +171,10 @@ class SettingsDictionaryEntryUI {
         this.priorityInput = this.content.querySelector('.dict-priority');
         this.deleteButton = this.content.querySelector('.dict-delete-button');
 
+        if (this.dictionaryInfo.version < 3) {
+            this.content.querySelector('.dict-outdated').hidden = false;
+        }
+
         this.content.querySelector('.dict-title').textContent = this.dictionaryInfo.title;
         this.content.querySelector('.dict-revision').textContent = `rev.${this.dictionaryInfo.revision}`;
 
