@@ -32,7 +32,8 @@ class QueryParser {
     }
 
     onClick(e) {
-        this.onTermLookup(e, {disableScroll: true, selectText: true});
+        const selectText = this.search.options.scanning.selectText;
+        this.onTermLookup(e, {disableScroll: true, selectText});
     }
 
     onMouseEnter(e) {
@@ -52,7 +53,8 @@ class QueryParser {
             return;
         }
 
-        this.onTermLookup(e, {disableScroll: true, selectText: true, disableHistory: true});
+        const selectText = this.search.options.scanning.selectText;
+        this.onTermLookup(e, {disableScroll: true, disableHistory: true, selectText});
     }
 
     onTermLookup(e, params) {
