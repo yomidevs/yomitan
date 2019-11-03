@@ -80,10 +80,7 @@ class Frontend {
     onMouseMove(e) {
         this.popupTimerClear();
 
-        if (
-            this.pendingLookup ||
-            (e.buttons & 0x1) !== 0x0 // Left mouse button
-        ) {
+        if (this.pendingLookup || Frontend.isMouseButton('primary', e)) {
             return;
         }
 
@@ -91,7 +88,7 @@ class Frontend {
         const scanningModifier = scanningOptions.modifier;
         if (!(
             Frontend.isScanningModifierPressed(scanningModifier, e) ||
-            (scanningOptions.middleMouse && (e.buttons & 0x4) !== 0x0) // Middle mouse button
+            (scanningOptions.middleMouse && Frontend.isMouseButton('auxiliary', e))
         )) {
             return;
         }
@@ -495,6 +492,23 @@ class Frontend {
             case 'ctrl': return mouseEvent.ctrlKey;
             case 'shift': return mouseEvent.shiftKey;
             case 'none': return true;
+            default: return false;
+        }
+    }
+
+    static isMouseButton(button, mouseEvent) {
+        if (['mouseup', 'mousedown', 'click'].includes(mouseEvent.type)) {
+            switch (button) {
+                case 'primary': return mouseEvent.button === 0;
+                case 'secondary': return mouseEvent.button === 2;
+                case 'auxiliary': return mouseEvent.button === 1;
+                default: return false;
+            }
+        }
+        switch (button) {
+            case 'primary': return (mouseEvent.buttons & 0x1) !== 0x0;
+            case 'secondary': return (mouseEvent.buttons & 0x2) !== 0x0;
+            case 'auxiliary': return (mouseEvent.buttons & 0x4) !== 0x0;
             default: return false;
         }
     }
