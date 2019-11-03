@@ -332,12 +332,19 @@ class Database {
                 throw new Error('Unsupported dictionary version');
             }
 
-            const count = await this.db.dictionaries.where('title').equals(summary.title).count();
+            const db = this.db.backendDB();
+            const dbCountTransaction = db.transaction(['dictionaries'], 'readonly');
+            const dbIndex = dbCountTransaction.objectStore('dictionaries').index('title');
+            const only = IDBKeyRange.only(summary.title);
+            const count = await Database.getCount(dbIndex, only);
+
             if (count > 0) {
                 throw new Error('Dictionary is already imported');
             }
 
-            await this.db.dictionaries.add(summary);
+            const transaction = db.transaction(['dictionaries'], 'readwrite');
+            const objectStore = transaction.objectStore('dictionaries');
+            await Database.bulkAdd(objectStore, [summary], 0, 1);
         };
 
         const termDataLoaded = async (summary, entries, total, current) => {
@@ -710,6 +717,34 @@ class Database {
             const request = dbObjectStore.delete(key);
             request.onerror = (e) => reject(e);
             request.onsuccess = () => resolve();
+        });
+    }
+
+    static bulkAdd(objectStore, items, start, count) {
+        return new Promise((resolve, reject) => {
+            if (start + count > items.length) {
+                count = items.length - start;
+            }
+
+            if (count <= 0) {
+                resolve();
+                return;
+            }
+
+            const end = start + count;
+            let completedCount = 0;
+            const onError = (e) => reject(e);
+            const onSuccess = () => {
+                if (++completedCount >= count) {
+                    resolve();
+                }
+            };
+
+            for (let i = start; i < end; ++i) {
+                const request = objectStore.add(items[i]);
+                request.onerror = onError;
+                request.onsuccess = onSuccess;
+            }
         });
     }
 }
