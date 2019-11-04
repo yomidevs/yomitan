@@ -497,19 +497,21 @@ class Frontend {
     }
 
     static isMouseButton(button, mouseEvent) {
-        if (['mouseup', 'mousedown', 'click'].includes(mouseEvent.type)) {
-            switch (button) {
+        switch (mouseEvent.type) {
+            case 'mouseup':
+            case 'mousedown':
+            case 'click': switch (button) {
                 case 'primary': return mouseEvent.button === 0;
                 case 'secondary': return mouseEvent.button === 2;
                 case 'auxiliary': return mouseEvent.button === 1;
                 default: return false;
             }
-        }
-        switch (button) {
-            case 'primary': return (mouseEvent.buttons & 0x1) !== 0x0;
-            case 'secondary': return (mouseEvent.buttons & 0x2) !== 0x0;
-            case 'auxiliary': return (mouseEvent.buttons & 0x4) !== 0x0;
-            default: return false;
+            default: switch (button) {
+                case 'primary': return (mouseEvent.buttons & 0x1) !== 0x0;
+                case 'secondary': return (mouseEvent.buttons & 0x2) !== 0x0;
+                case 'auxiliary': return (mouseEvent.buttons & 0x4) !== 0x0;
+                default: return false;
+            }
         }
     }
 }

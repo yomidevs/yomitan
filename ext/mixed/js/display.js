@@ -82,7 +82,7 @@ class Display {
         }
     }
 
-    onGlossaryMousedown(e) {
+    onGlossaryMouseDown(e) {
         if (Frontend.isMouseButton('primary', e)) {
             this.clickScanPrevent = false;
         }
@@ -92,7 +92,7 @@ class Display {
         this.clickScanPrevent = true;
     }
 
-    onGlossaryMouseup(e) {
+    onGlossaryMouseUp(e) {
         if (!this.clickScanPrevent && Frontend.isMouseButton('primary', e)) {
             this.onTermLookup(e);
         }
@@ -269,8 +269,8 @@ class Display {
             this.addEventListeners('.kanji-link', 'click', this.onKanjiLookup.bind(this));
             this.addEventListeners('.source-term', 'click', this.onSourceTermView.bind(this));
             if (this.options.scanning.enablePopupSearch) {
-                this.addEventListeners('.glossary-item', 'mouseup', this.onGlossaryMouseup.bind(this));
-                this.addEventListeners('.glossary-item', 'mousedown', this.onGlossaryMousedown.bind(this));
+                this.addEventListeners('.glossary-item', 'mouseup', this.onGlossaryMouseUp.bind(this));
+                this.addEventListeners('.glossary-item', 'mousedown', this.onGlossaryMouseDown.bind(this));
                 this.addEventListeners('.glossary-item', 'mousemove', this.onGlossaryMouseMove.bind(this));
             }
         } else {
