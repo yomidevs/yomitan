@@ -109,25 +109,30 @@ async function apiTextParseMecab(text, optionsContext) {
     const options = await apiOptionsGet(optionsContext);
     const mecab = utilBackend().mecab;
 
-    const results = [];
-    for (const parsedLine of await mecab.parseText(text)) {
-        for (const {expression, reading, source} of parsedLine) {
-            const term = [];
-            if (expression && reading) {
-                for (const {text, furigana} of jpDistributeFuriganaInflected(
-                    expression,
-                    jpKatakanaToHiragana(reading),
-                    source
-                )) {
-                    // can't use 'furigana' in templates
-                    term.push({text, reading: furigana});
+    const results = {};
+    const rawResults = await mecab.parseText(text);
+    for (const mecabName in rawResults) {
+        const result = [];
+        for (const parsedLine of rawResults[mecabName]) {
+            for (const {expression, reading, source} of parsedLine) {
+                const term = [];
+                if (expression && reading) {
+                    for (const {text, furigana} of jpDistributeFuriganaInflected(
+                        expression,
+                        jpKatakanaToHiragana(reading),
+                        source
+                    )) {
+                        // can't use 'furigana' in templates
+                        term.push({text, reading: furigana});
+                    }
+                } else {
+                    term.push({text: source});
                 }
-            } else {
-                term.push({text: source});
+                result.push(term);
             }
-            results.push(term);
+            result.push([{text: '\n'}]);
         }
-        results.push([{text: '\n'}]);
+        results[mecabName] = result;
     }
     return results;
 }

@@ -311,6 +311,11 @@ function profileOptionsCreateDefaults() {
 
         dictionaries: {},
 
+        parsing: {
+            enableScanningParser: true,
+            enableMecabParser: false
+        },
+
         anki: {
             enable: false,
             server: 'http://127.0.0.1:8765',

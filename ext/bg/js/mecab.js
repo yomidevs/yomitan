@@ -60,4 +60,4 @@ class Mecab {
     }
 }
 
-Mecab.timeout = 1000;
+Mecab.timeout = 5000;

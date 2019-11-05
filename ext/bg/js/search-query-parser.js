@@ -86,22 +86,32 @@ class QueryParser {
         this.search.setSpinnerVisible(true);
         await this.setPreview(text);
 
-        // const results = await apiTextParse(text, this.search.getOptionsContext());
-        const results = await apiTextParseMecab(text, this.search.getOptionsContext());
+        const results = {};
+        if (this.search.options.parsing.enableScanningParser) {
+            results['scan'] = await apiTextParse(text, this.search.getOptionsContext());
+        }
+        if (this.search.options.parsing.enableMecabParser) {
+            let mecabResults = await apiTextParseMecab(text, this.search.getOptionsContext());
+            for (const mecabDictName in mecabResults) {
+                results[`mecab-${mecabDictName}`] = mecabResults[mecabDictName];
+            }
+        }
 
-        const content = await apiTemplateRender('query-parser.html', {
-            terms: results.map((term) => {
-                return term.filter(part => part.text.trim()).map((part) => {
-                    return {
-                        text: Array.from(part.text),
-                        reading: part.reading,
-                        raw: !part.reading || !part.reading.trim(),
-                    };
-                });
-            })
-        });
+        const contents = await Promise.all(Object.values(results).map(async result => {
+            return await apiTemplateRender('query-parser.html', {
+                terms: result.map((term) => {
+                    return term.filter(part => part.text.trim()).map((part) => {
+                        return {
+                            text: Array.from(part.text),
+                            reading: part.reading,
+                            raw: !part.reading || !part.reading.trim(),
+                        };
+                    });
+                })
+            });
+        }));
 
-        this.queryParser.innerHTML = content;
+        this.queryParser.innerHTML = contents.join('<hr>');
 
         this.queryParser.querySelectorAll('.query-parser-char').forEach((charElement) => {
             this.activateScanning(charElement);

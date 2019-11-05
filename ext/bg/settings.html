@@ -587,6 +587,35 @@
                 </div></div>
             </div>
 
+            <div id="text-parsing">
+                <h3>Text Parsing Options</h3>
+
+                <p class="help-block">
+                    Yomichan can attempt to parse entire sentences or longer text blocks on the search page,
+                    adding furigana above words and a small space between words.
+                </p>
+
+                <p class="help-block">
+                    Two types of parsers are supported. The first one, enabled by default, works using the built-in
+                    scanning functionality by automatically advancing in the sentence after a matching word.
+                </p>
+
+                <p class="help-block">
+                    The second type is an external program called <a href="https://en.wikipedia.org/wiki/MeCab" target="_blank" rel="noopener">MeCab</a>
+                    that uses its own dictionaries and a special parsing algorithm. To get it working, you must first
+                    install it and <a href="https://github.com/siikamiika/yomichan-mecab-installer" target="_blank" rel="noopener">a native messaging component</a>
+                    that acts as a bridge between the program and Yomichan.
+                </p>
+
+                <div class="checkbox">
+                    <label><input type="checkbox" id="parsing-scan-enable"> Enable text parsing using installed dictionaries</label>
+                </div>
+
+                <div class="checkbox">
+                    <label><input type="checkbox" id="parsing-mecab-enable"> Enable text parsing using MeCab</label>
+                </div>
+            </div>
+
             <div>
                 <div>
                     <img src="/mixed/img/spinner.gif" class="pull-right" id="anki-spinner" alt>
