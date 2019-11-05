@@ -102,11 +102,7 @@ function jpDistributeFuriganaInflected(expression, reading, source) {
     const shortest = Math.min(source.length, expression.length);
     const sourceHiragana = jpKatakanaToHiragana(source);
     const expressionHiragana = jpKatakanaToHiragana(expression);
-    while (
-        stemLength < shortest &&
-        // sometimes an expression can use a kanji that's different from the source
-        (!jpIsKana(source[stemLength]) || (sourceHiragana[stemLength] === expressionHiragana[stemLength]))
-    ) {
+    while (stemLength < shortest && sourceHiragana[stemLength] === expressionHiragana[stemLength]) {
         ++stemLength;
     }
     const offset = source.length - stemLength;
