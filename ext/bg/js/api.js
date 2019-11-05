@@ -72,9 +72,9 @@ async function apiOptionsSave(source) {
     backend.onOptionsUpdated(source);
 }
 
-async function apiTermsFind(text, optionsContext) {
+async function apiTermsFind(text, details, optionsContext) {
     const options = await apiOptionsGet(optionsContext);
-    const [definitions, length] = await utilBackend().translator.findTerms(text, options);
+    const [definitions, length] = await utilBackend().translator.findTerms(text, details, options);
     definitions.splice(options.general.maxResults);
     return {length, definitions};
 }

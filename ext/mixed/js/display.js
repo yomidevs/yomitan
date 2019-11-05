@@ -112,7 +112,7 @@ class Display {
             try {
                 textSource.setEndOffset(this.options.scanning.length);
 
-                ({definitions, length} = await apiTermsFind(textSource.text(), this.getOptionsContext()));
+                ({definitions, length} = await apiTermsFind(textSource.text(), {}, this.getOptionsContext()));
                 if (definitions.length === 0) {
                     return false;
                 }

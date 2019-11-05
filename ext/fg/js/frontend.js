@@ -413,7 +413,7 @@ class Frontend {
         const searchText = textSource.text();
         if (searchText.length === 0) { return null; }
 
-        const {definitions, length} = await apiTermsFind(searchText, this.getOptionsContext());
+        const {definitions, length} = await apiTermsFind(searchText, {}, this.getOptionsContext());
         if (definitions.length === 0) { return null; }
 
         textSource.setEndOffset(length);
