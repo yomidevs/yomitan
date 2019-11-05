@@ -227,9 +227,12 @@ class Translator {
             }
         }
 
-        const textHiragana = jpKatakanaToHiragana(text);
         const titles = Object.keys(dictionaries);
-        const deinflections = await this.findTermDeinflections(text, textHiragana, titles);
+        const deinflections = (
+            details.wildcard ?
+            await this.findTermWildcard(text, titles) :
+            await this.findTermDeinflections(text, titles)
+        );
 
         let definitions = [];
         for (const deinflection of deinflections) {
@@ -265,7 +268,23 @@ class Translator {
         return [definitions, length];
     }
 
-    async findTermDeinflections(text, text2, titles) {
+    async findTermWildcard(text, titles) {
+        const definitions = await this.database.findTermsBulk([text], titles, true);
+        if (definitions.length === 0) {
+            return [];
+        }
+
+        return [{
+            source: text,
+            term: text,
+            rules: 0,
+            definitions,
+            reasons: []
+        }];
+    }
+
+    async findTermDeinflections(text, titles) {
+        const text2 = jpKatakanaToHiragana(text);
         const deinflections = (text === text2 ? this.getDeinflections(text) : this.getDeinflections2(text, text2));
 
         if (deinflections.length === 0) {
@@ -289,7 +308,7 @@ class Translator {
             deinflectionArray.push(deinflection);
         }
 
-        const definitions = await this.database.findTermsBulk(uniqueDeinflectionTerms, titles);
+        const definitions = await this.database.findTermsBulk(uniqueDeinflectionTerms, titles, false);
 
         for (const definition of definitions) {
             const definitionRules = Deinflector.rulesToRuleFlags(definition.rules);

@@ -130,7 +130,7 @@ class Database {
         await Promise.all(promises);
     }
 
-    async findTermsBulk(termList, titles) {
+    async findTermsBulk(termList, titles, wildcard) {
         this.validate();
 
         const promises = [];
@@ -149,10 +149,11 @@ class Database {
         const dbIndex2 = dbTerms.index('reading');
 
         for (let i = 0; i < termList.length; ++i) {
-            const only = IDBKeyRange.only(termList[i]);
+            const term = termList[i];
+            const query = wildcard ? IDBKeyRange.bound(term, `${term}\uffff`, false, false) : IDBKeyRange.only(term);
             promises.push(
-                Database.getAll(dbIndex1, only, i, processRow),
-                Database.getAll(dbIndex2, only, i, processRow)
+                Database.getAll(dbIndex1, query, i, processRow),
+                Database.getAll(dbIndex2, query, i, processRow)
             );
         }
 
