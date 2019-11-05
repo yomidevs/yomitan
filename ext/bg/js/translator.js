@@ -143,7 +143,7 @@ class Translator {
 
     async findTermsGrouped(text, dictionaries, alphanumeric, options) {
         const titles = Object.keys(dictionaries);
-        const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
+        const {length, definitions} = await this.findTermsInternal(text, dictionaries, alphanumeric);
 
         const definitionsGrouped = dictTermsGroup(definitions, dictionaries);
         await this.buildTermFrequencies(definitionsGrouped, titles);
@@ -160,7 +160,7 @@ class Translator {
     async findTermsMerged(text, dictionaries, alphanumeric, options) {
         const secondarySearchTitles = Object.keys(options.dictionaries).filter(dict => options.dictionaries[dict].allowSecondarySearches);
         const titles = Object.keys(dictionaries);
-        const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
+        const {length, definitions} = await this.findTermsInternal(text, dictionaries, alphanumeric);
         const {sequencedDefinitions, defaultDefinitions} = await this.getSequencedDefinitions(definitions, options.general.mainDictionary);
         const definitionsMerged = [];
         const mergedByTermIndices = new Set();
@@ -196,14 +196,14 @@ class Translator {
 
     async findTermsSplit(text, dictionaries, alphanumeric) {
         const titles = Object.keys(dictionaries);
-        const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
+        const {length, definitions} = await this.findTermsInternal(text, dictionaries, alphanumeric);
 
         await this.buildTermFrequencies(definitions, titles);
 
         return {length, definitions};
     }
 
-    async findTerms(text, dictionaries, alphanumeric) {
+    async findTermsInternal(text, dictionaries, alphanumeric) {
         if (!alphanumeric && text.length > 0) {
             const c = text[0];
             if (!jpIsKana(c) && !jpIsKanji(c)) {
