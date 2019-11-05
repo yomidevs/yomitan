@@ -75,16 +75,15 @@ async function apiOptionsSave(source) {
 async function apiTermsFind(text, optionsContext) {
     const options = await apiOptionsGet(optionsContext);
     const [definitions, length] = await utilBackend().translator.findTerms(text, options);
-    return {
-        length,
-        definitions: definitions.slice(0, options.general.maxResults)
-    };
+    definitions.splice(options.general.maxResults);
+    return {length, definitions};
 }
 
 async function apiKanjiFind(text, optionsContext) {
     const options = await apiOptionsGet(optionsContext);
     const definitions = await utilBackend().translator.findKanji(text, options);
-    return definitions.slice(0, options.general.maxResults);
+    definitions.splice(options.general.maxResults);
+    return definitions;
 }
 
 async function apiDefinitionAdd(definition, mode, context, optionsContext) {
