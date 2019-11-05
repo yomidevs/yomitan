@@ -47,22 +47,6 @@ class Translator {
         await this.database.deleteDictionary(dictionaryName);
     }
 
-    async findTermsGrouped(text, dictionaries, alphanumeric, options) {
-        const titles = Object.keys(dictionaries);
-        const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
-
-        const definitionsGrouped = dictTermsGroup(definitions, dictionaries);
-        await this.buildTermFrequencies(definitionsGrouped, titles);
-
-        if (options.general.compactTags) {
-            for (const definition of definitionsGrouped) {
-                dictTermsCompressTags(definition.definitions);
-            }
-        }
-
-        return {length, definitions: definitionsGrouped};
-    }
-
     async getSequencedDefinitions(definitions, mainDictionary) {
         const definitionsBySequence = dictTermsMergeBySequence(definitions, mainDictionary);
         const defaultDefinitions = definitionsBySequence['-1'];
@@ -155,6 +139,22 @@ class Translator {
         result.reading = Array.from(result.reading);
 
         return result;
+    }
+
+    async findTermsGrouped(text, dictionaries, alphanumeric, options) {
+        const titles = Object.keys(dictionaries);
+        const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
+
+        const definitionsGrouped = dictTermsGroup(definitions, dictionaries);
+        await this.buildTermFrequencies(definitionsGrouped, titles);
+
+        if (options.general.compactTags) {
+            for (const definition of definitionsGrouped) {
+                dictTermsCompressTags(definition.definitions);
+            }
+        }
+
+        return {length, definitions: definitionsGrouped};
     }
 
     async findTermsMerged(text, dictionaries, alphanumeric, options) {
