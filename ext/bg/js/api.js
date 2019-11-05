@@ -83,7 +83,7 @@ async function apiTermsFind(text, optionsContext) {
 
 async function apiKanjiFind(text, optionsContext) {
     const options = await apiOptionsGet(optionsContext);
-    const definitions = await utilBackend().translator.findKanji(text, dictEnabledSet(options));
+    const definitions = await utilBackend().translator.findKanji(text, options);
     return definitions.slice(0, options.general.maxResults);
 }
 

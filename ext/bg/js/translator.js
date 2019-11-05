@@ -330,7 +330,8 @@ class Translator {
         return deinflections;
     }
 
-    async findKanji(text, dictionaries) {
+    async findKanji(text, options) {
+        const dictionaries = dictEnabledSet(options);
         const titles = Object.keys(dictionaries);
         const kanjiUnique = {};
         const kanjiList = [];
