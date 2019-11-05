@@ -74,21 +74,7 @@ async function apiOptionsSave(source) {
 
 async function apiTermsFind(text, optionsContext) {
     const options = await apiOptionsGet(optionsContext);
-    const translator = utilBackend().translator;
-
-    const searcher = {
-        'merge': translator.findTermsMerged,
-        'split': translator.findTermsSplit,
-        'group': translator.findTermsGrouped
-    }[options.general.resultOutputMode].bind(translator);
-
-    const {definitions, length} = await searcher(
-        text,
-        dictEnabledSet(options),
-        options.scanning.alphanumeric,
-        options
-    );
-
+    const [definitions, length] = await utilBackend().translator.findTerms(text, options);
     return {
         length,
         definitions: definitions.slice(0, options.general.maxResults)
