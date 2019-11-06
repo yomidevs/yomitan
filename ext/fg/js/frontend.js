@@ -310,17 +310,21 @@ class Frontend {
 
     async popupTimerWait() {
         const delay = this.options.scanning.delay;
-        this.popupTimerPromise = promiseTimeout(delay, true);
+        const promise = promiseTimeout(delay, true);
+        this.popupTimerPromise = promise;
         try {
-            return await this.popupTimerPromise;
+            return await promise;
         } finally {
-            this.popupTimerPromise = null;
+            if (this.popupTimerPromise === promise) {
+                this.popupTimerPromise = null;
+            }
         }
     }
 
     popupTimerClear() {
         if (this.popupTimerPromise !== null) {
             this.popupTimerPromise.resolve(false);
+            this.popupTimerPromise = null;
         }
     }
 
