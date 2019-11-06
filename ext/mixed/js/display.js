@@ -35,6 +35,7 @@ class Display {
         this.persistentEventListeners = [];
         this.interactive = false;
         this.eventListenersActive = false;
+        this.clickScanPrevent = false;
 
         this.windowScroll = new WindowScroll();
 
@@ -78,6 +79,22 @@ class Display {
             this.setContentKanji(definitions, context);
         } catch (e) {
             this.onError(e);
+        }
+    }
+
+    onGlossaryMouseDown(e) {
+        if (Frontend.isMouseButton('primary', e)) {
+            this.clickScanPrevent = false;
+        }
+    }
+
+    onGlossaryMouseMove(e) {
+        this.clickScanPrevent = true;
+    }
+
+    onGlossaryMouseUp(e) {
+        if (!this.clickScanPrevent && Frontend.isMouseButton('primary', e)) {
+            this.onTermLookup(e);
         }
     }
 
@@ -157,8 +174,10 @@ class Display {
             const handler = handlers[key];
             if (handler(this, e)) {
                 e.preventDefault();
+                return true;
             }
         }
+        return false;
     }
 
     onWheel(e) {
@@ -250,7 +269,9 @@ class Display {
             this.addEventListeners('.kanji-link', 'click', this.onKanjiLookup.bind(this));
             this.addEventListeners('.source-term', 'click', this.onSourceTermView.bind(this));
             if (this.options.scanning.enablePopupSearch) {
-                this.addEventListeners('.glossary-item', 'click', this.onTermLookup.bind(this));
+                this.addEventListeners('.glossary-item', 'mouseup', this.onGlossaryMouseUp.bind(this));
+                this.addEventListeners('.glossary-item', 'mousedown', this.onGlossaryMouseDown.bind(this));
+                this.addEventListeners('.glossary-item', 'mousemove', this.onGlossaryMouseMove.bind(this));
             }
         } else {
             Display.clearEventListeners(this.eventListeners);

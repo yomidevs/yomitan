@@ -95,3 +95,41 @@ if (EXTENSION_IS_BROWSER_EDGE) {
     // Edge does not have chrome defined.
     chrome = browser;
 }
+
+function promiseTimeout(delay, resolveValue) {
+    if (delay <= 0) {
+        return Promise.resolve(resolveValue);
+    }
+
+    let timer = null;
+    let promiseResolve = null;
+    let promiseReject = null;
+
+    const complete = (callback, value) => {
+        if (callback === null) { return; }
+        if (timer !== null) {
+            window.clearTimeout(timer);
+            timer = null;
+        }
+        promiseResolve = null;
+        promiseReject = null;
+        callback(value);
+    };
+
+    const resolve = (value) => complete(promiseResolve, value);
+    const reject = (value) => complete(promiseReject, value);
+
+    const promise = new Promise((resolve, reject) => {
+        promiseResolve = resolve;
+        promiseReject = reject;
+    });
+    timer = window.setTimeout(() => {
+        timer = null;
+        resolve(resolveValue);
+    }, delay);
+
+    promise.resolve = resolve;
+    promise.reject = reject;
+
+    return promise;
+}

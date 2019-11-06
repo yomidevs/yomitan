@@ -30,7 +30,7 @@ class Popup {
         this.container.className = 'yomichan-float';
         this.container.addEventListener('mousedown', e => e.stopPropagation());
         this.container.addEventListener('scroll', e => e.stopPropagation());
-        this.container.setAttribute('src', chrome.extension.getURL('/fg/float.html'));
+        this.container.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
         this.container.style.width = '0px';
         this.container.style.height = '0px';
         this.injectPromise = null;

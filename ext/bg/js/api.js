@@ -21,6 +21,52 @@ function apiOptionsGet(optionsContext) {
     return utilBackend().getOptions(optionsContext);
 }
 
+async function apiOptionsSet(changedOptions, optionsContext, source) {
+    const options = await apiOptionsGet(optionsContext);
+
+    function getValuePaths(obj) {
+        let valuePaths = [];
+        let nodes = [{
+            obj,
+            path: []
+        }];
+        while (nodes.length > 0) {
+            let node = nodes.pop();
+            Object.keys(node.obj).forEach((key) => {
+                let path = node.path.concat(key);
+                let value = node.obj[key];
+                if (typeof value === 'object') {
+                    nodes.unshift({
+                        obj: value,
+                        path: path
+                    });
+                } else {
+                    valuePaths.push([value, path]);
+                }
+            });
+        }
+        return valuePaths;
+    }
+
+    function modifyOption(path, value, options) {
+        let pivot = options;
+        for (let pathKey of path.slice(0, -1)) {
+            if (!(pathKey in pivot)) {
+                return false;
+            }
+            pivot = pivot[pathKey];
+        }
+        pivot[path[path.length - 1]] = value;
+        return true;
+    }
+
+    for (let [value, path] of getValuePaths(changedOptions)) {
+        modifyOption(path, value, options);
+    }
+
+    await apiOptionsSave(source);
+}
+
 function apiOptionsGetFull() {
     return utilBackend().getFullOptions();
 }
@@ -153,7 +199,7 @@ async function apiCommandExec(command, params) {
 }
 apiCommandExec.handlers = {
     search: async (params) => {
-        const url = chrome.extension.getURL('/bg/search.html');
+        const url = chrome.runtime.getURL('/bg/search.html');
         if (!(params && params.newTab)) {
             try {
                 const tab = await apiFindTab(1000, (url2) => (
@@ -181,7 +227,7 @@ apiCommandExec.handlers = {
             chrome.runtime.openOptionsPage();
         } else {
             const manifest = chrome.runtime.getManifest();
-            const url = chrome.extension.getURL(manifest.options_ui.page);
+            const url = chrome.runtime.getURL(manifest.options_ui.page);
             chrome.tabs.create({url});
         }
     },
@@ -400,4 +446,12 @@ async function apiFocusTab(tab) {
     } catch (e) {
         // Edge throws exception for no reason here.
     }
+}
+
+async function apiClipboardGet() {
+    const clipboardPasteTarget = utilBackend().clipboardPasteTarget;
+    clipboardPasteTarget.innerText = '';
+    clipboardPasteTarget.focus();
+    document.execCommand('paste');
+    return clipboardPasteTarget.innerText;
 }

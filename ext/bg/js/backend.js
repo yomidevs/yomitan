@@ -30,6 +30,8 @@ class Backend {
         this.isPreparedResolve = null;
         this.isPreparedPromise = new Promise((resolve) => (this.isPreparedResolve = resolve));
 
+        this.clipboardPasteTarget = document.querySelector('#clipboard-paste-target');
+
         this.apiForwarder = new BackendApiForwarder();
     }
 
@@ -45,7 +47,7 @@ class Backend {
 
         const options = this.getOptionsSync(this.optionsContext);
         if (options.general.showGuide) {
-            chrome.tabs.create({url: chrome.extension.getURL('/bg/guide.html')});
+            chrome.tabs.create({url: chrome.runtime.getURL('/bg/guide.html')});
         }
 
         this.isPreparedResolve();
@@ -175,6 +177,7 @@ class Backend {
 
 Backend.messageHandlers = {
     optionsGet: ({optionsContext}) => apiOptionsGet(optionsContext),
+    optionsSet: ({changedOptions, optionsContext, source}) => apiOptionsSet(changedOptions, optionsContext, source),
     kanjiFind: ({text, optionsContext}) => apiKanjiFind(text, optionsContext),
     termsFind: ({text, optionsContext}) => apiTermsFind(text, optionsContext),
     definitionAdd: ({definition, mode, context, optionsContext}) => apiDefinitionAdd(definition, mode, context, optionsContext),
@@ -187,7 +190,8 @@ Backend.messageHandlers = {
     forward: ({action, params}, sender) => apiForward(action, params, sender),
     frameInformationGet: (params, sender) => apiFrameInformationGet(sender),
     injectStylesheet: ({css}, sender) => apiInjectStylesheet(css, sender),
-    getEnvironmentInfo: () => apiGetEnvironmentInfo()
+    getEnvironmentInfo: () => apiGetEnvironmentInfo(),
+    clipboardGet: () => apiClipboardGet()
 };
 
 window.yomichan_backend = new Backend();

@@ -31,7 +31,7 @@ class Translator {
         }
 
         if (!this.deinflector) {
-            const url = chrome.extension.getURL('/bg/lang/deinflect.json');
+            const url = chrome.runtime.getURL('/bg/lang/deinflect.json');
             const reasons = await requestJson(url, 'GET');
             this.deinflector = new Deinflector(reasons);
         }
