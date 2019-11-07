@@ -98,6 +98,10 @@ class Backend {
         }
 
         this.anki = options.anki.enable ? new AnkiConnect(options.anki.server) : new AnkiNull();
+
+        if (options.parsing.enableMecabParser) {
+            this.mecab.startListener();
+        }
     }
 
     async getFullOptions() {

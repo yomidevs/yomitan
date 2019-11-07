@@ -19,16 +19,20 @@
 
 class Mecab {
     constructor() {
+        this.port = null;
         this.listeners = {};
         this.sequence = 0;
-        this.startListener();
     }
 
     async parseText(text) {
+        if (this.port === null) {
+            return {};
+        }
         return await this.invoke('parse_text', {text});
     }
 
     startListener() {
+        if (this.port !== null) { return; }
         this.port = chrome.runtime.connectNative('yomichan_mecab');
         this.port.onMessage.addListener((message) => {
             const {sequence, data} = message;
@@ -39,6 +43,14 @@ class Mecab {
                 callback(data);
             }
         });
+    }
+
+    stopListener() {
+        if (this.port === null) { return; }
+        this.port.disconnect();
+        this.port = null;
+        this.listeners = {};
+        this.sequence = 0;
     }
 
     invoke(action, params) {
