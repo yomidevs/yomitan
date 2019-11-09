@@ -49,7 +49,7 @@
 
     {{#if merged}}
     {{~#each expressions~}}
-    <div class="expression"><span class="expression-{{termFrequency}}">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</span><div class="peek-wrapper">
+    <div class="expression expression-scan-toggle"><span class="expression-{{termFrequency}}">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</span><div class="peek-wrapper">
             {{~#if ../playback~}}
             <a href="#" class="action-play-audio"><img src="/mixed/img/play-audio.svg" title="Play audio" alt></a>
             {{~/if~}}
@@ -70,7 +70,7 @@
     </div><span class="{{#if @last}}invisible{{/if}}">、</span></div>
     {{~/each~}}
     {{else}}
-    <div class="expression">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</div>
+    <div class="expression expression-scan-toggle">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</div>
     {{#if termTags}}
     <div style="display: inline-block;">
         {{#each termTags}}
