@@ -704,6 +704,23 @@
                             </p>
                             <textarea autocomplete="off" spellcheck="false" wrap="soft" class="form-control" rows="10" id="field-templates"></textarea>
                         </div>
+
+                        <template id="anki-field-template"><tr>
+                            <td class="col-sm-2 anki-field-name"></td>
+                            <td class="col-sm-10">
+                                <div class="input-group">
+                                    <input type="text" class="anki-field-value form-control" data-field="" value="">
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right anki-field-marker-list"></ul>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr></template>
+
+                        <template id="anki-field-marker-template"><li><a class="marker-link" href="#"></a></li></template>
                     </div>
                 </div>
             </div>

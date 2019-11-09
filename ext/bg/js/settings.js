@@ -489,6 +489,71 @@ async function ankiDeckAndModelPopulate(options) {
     ankiFormat.show();
 }
 
+function ankiCreateFieldTemplate(name, value, markers) {
+    const template = document.querySelector('#anki-field-template').content;
+    const content = document.importNode(template, true).firstChild;
+
+    content.querySelector('.anki-field-name').textContent = name;
+
+    const field = content.querySelector('.anki-field-value');
+    field.dataset.field = name;
+    field.value = value;
+
+    content.querySelector('.anki-field-marker-list').appendChild(ankiGetFieldMarkersHtml(markers));
+
+    return content;
+}
+
+function ankiGetFieldMarkersHtml(markers, fragment) {
+    const template = document.querySelector('#anki-field-marker-template').content;
+    if (!fragment) {
+        fragment = new DocumentFragment();
+    }
+    for (const marker of markers) {
+        const markerNode = document.importNode(template, true).firstChild;
+        markerNode.querySelector('.marker-link').textContent = marker;
+        fragment.appendChild(markerNode);
+    }
+    return fragment;
+}
+
+function ankiGetFieldMarkers(type) {
+    switch (type) {
+        case 'terms':
+            return [
+                'audio',
+                'cloze-body',
+                'cloze-prefix',
+                'cloze-suffix',
+                'dictionary',
+                'expression',
+                'furigana',
+                'furigana-plain',
+                'glossary',
+                'glossary-brief',
+                'reading',
+                'screenshot',
+                'sentence',
+                'tags',
+                'url'
+            ];
+        case 'kanji':
+            return [
+                'character',
+                'dictionary',
+                'glossary',
+                'kunyomi',
+                'onyomi',
+                'screenshot',
+                'sentence',
+                'tags',
+                'url'
+            ];
+        default:
+            return [];
+    }
+}
+
 async function ankiFieldsPopulate(element, options) {
     const modelName = element.val();
     if (!modelName) {
@@ -498,41 +563,11 @@ async function ankiFieldsPopulate(element, options) {
     const tab = element.closest('.tab-pane');
     const tabId = tab.attr('id');
     const container = tab.find('tbody').empty();
-
-    const markers = {
-        'terms': [
-            'audio',
-            'cloze-body',
-            'cloze-prefix',
-            'cloze-suffix',
-            'dictionary',
-            'expression',
-            'furigana',
-            'furigana-plain',
-            'glossary',
-            'glossary-brief',
-            'reading',
-            'screenshot',
-            'sentence',
-            'tags',
-            'url'
-        ],
-        'kanji': [
-            'character',
-            'dictionary',
-            'glossary',
-            'kunyomi',
-            'onyomi',
-            'screenshot',
-            'sentence',
-            'tags',
-            'url'
-        ]
-    }[tabId] || {};
+    const markers = ankiGetFieldMarkers(tabId);
 
     for (const name of await utilAnkiGetModelFieldNames(modelName)) {
         const value = options.anki[tabId].fields[name] || '';
-        const html = Handlebars.templates['model.html']({name, markers, value});
+        const html = ankiCreateFieldTemplate(name, value, markers);
         container.append($(html));
     }
 
