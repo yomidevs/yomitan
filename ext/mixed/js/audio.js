@@ -88,17 +88,13 @@ class TextToSpeechAudio {
 
 }
 
-function audioGetFromUrl(url, download) {
+function audioGetFromUrl(url, willDownload) {
     const tts = TextToSpeechAudio.createFromUri(url);
     if (tts !== null) {
-        if (download) {
-            throw new Error('Download not supported for text-to-speech');
+        if (willDownload) {
+            throw new Error('AnkiConnect does not support downloading text-to-speech audio.');
         }
         return Promise.resolve(tts);
-    }
-
-    if (download) {
-        return Promise.resolve(null);
     }
 
     return new Promise((resolve, reject) => {
@@ -115,7 +111,7 @@ function audioGetFromUrl(url, download) {
     });
 }
 
-async function audioGetFromSources(expression, sources, optionsContext, download, cache=null) {
+async function audioGetFromSources(expression, sources, optionsContext, willDownload, cache=null) {
     const key = `${expression.expression}:${expression.reading}`;
     if (cache !== null && cache.hasOwnProperty(expression)) {
         return cache[key];
@@ -129,7 +125,11 @@ async function audioGetFromSources(expression, sources, optionsContext, download
         }
 
         try {
-            const audio = await audioGetFromUrl(url, download);
+            const audio = await audioGetFromUrl(url, willDownload);
+            if (willDownload) {
+                // AnkiConnect handles downloading URLs into cards
+                audio = null
+            }
             const result = {audio, url, source};
             if (cache !== null) {
                 cache[key] = result;
