@@ -134,6 +134,8 @@ async function formWrite(options) {
     $('#screenshot-quality').val(options.anki.screenshot.quality);
     $('#field-templates').val(options.anki.fieldTemplates);
 
+    onAnkiTemplatesValidateCompile();
+
     try {
         await ankiDeckAndModelPopulate(options);
     } catch (e) {
@@ -144,7 +146,6 @@ async function formWrite(options) {
 }
 
 function formSetupEventListeners() {
-    $('#field-templates-reset').click(utilAsync(onAnkiFieldTemplatesReset));
     $('input, select, textarea').not('.anki-model').not('.ignore-form-changes *').change(utilAsync(onFormOptionsChanged));
     $('.anki-model').change(utilAsync(onAnkiModelChanged));
 }
@@ -202,6 +203,7 @@ async function onReady() {
     await audioSettingsInitialize();
     await profileOptionsSetup();
     await dictSettingsInitialize();
+    ankiTemplatesInitialize();
 
     storageInfoInitialize();
 
@@ -607,18 +609,103 @@ async function onAnkiModelChanged(e) {
     }
 }
 
-async function onAnkiFieldTemplatesReset(e) {
+function onAnkiFieldTemplatesReset(e) {
+    e.preventDefault();
+    $('#field-template-reset-modal').modal('show');
+}
+
+async function onAnkiFieldTemplatesResetConfirm(e) {
     try {
         e.preventDefault();
+
+        $('#field-template-reset-modal').modal('hide');
+
         const optionsContext = getOptionsContext();
         const options = await apiOptionsGet(optionsContext);
         const fieldTemplates = profileOptionsGetDefaultFieldTemplates();
         options.anki.fieldTemplates = fieldTemplates;
         $('#field-templates').val(fieldTemplates);
+        onAnkiTemplatesValidateCompile();
         await settingsSaveOptions();
     } catch (e) {
         ankiErrorShow(e);
     }
+}
+
+function ankiTemplatesInitialize() {
+    const markers = new Set(ankiGetFieldMarkers('terms').concat(ankiGetFieldMarkers('kanji')));
+    const fragment = ankiGetFieldMarkersHtml(markers);
+
+    const list = document.querySelector('#field-templates-list');
+    list.appendChild(fragment);
+    for (const node of list.querySelectorAll('.marker-link')) {
+        node.addEventListener('click', onAnkiTemplateMarkerClicked, false);
+    }
+
+    $('#field-templates').on('change', onAnkiTemplatesValidateCompile);
+    $('#field-template-render').on('click', onAnkiTemplateRender);
+    $('#field-templates-reset').on('click', onAnkiFieldTemplatesReset);
+    $('#field-templates-reset-confirm').on('click', onAnkiFieldTemplatesResetConfirm);
+}
+
+const ankiTemplatesValidateGetDefinition = (() => {
+    let cachedValue = null;
+    let cachedText = null;
+
+    return async (text, optionsContext) => {
+        if (cachedText !== text) {
+            const {definitions} = await apiTermsFind(text, optionsContext);
+            if (definitions.length === 0) { return null; }
+
+            cachedValue = definitions[0];
+            cachedText = text;
+        }
+        return cachedValue;
+    };
+})();
+
+async function ankiTemplatesValidate(infoNode, field, mode, showSuccessResult, invalidateInput) {
+    const text = document.querySelector('#field-templates-preview-text').value || '';
+    const exceptions = [];
+    let result = `No definition found for ${text}`;
+    try {
+        const optionsContext = getOptionsContext();
+        const definition = await ankiTemplatesValidateGetDefinition(text, optionsContext);
+        if (definition !== null) {
+            const options = await apiOptionsGet(optionsContext);
+            result = await dictFieldFormat(field, definition, mode, options, exceptions);
+        }
+    } catch (e) {
+        exceptions.push(e);
+    }
+
+    const hasException = exceptions.length > 0;
+    infoNode.hidden = !(showSuccessResult || hasException);
+    infoNode.textContent = hasException ? exceptions.map(e => `${e}`).join('\n') : (showSuccessResult ? result : '');
+    infoNode.classList.toggle('text-danger', hasException);
+    if (invalidateInput) {
+        const input = document.querySelector('#field-templates');
+        input.classList.toggle('is-invalid', hasException);
+    }
+}
+
+function onAnkiTemplatesValidateCompile() {
+    const infoNode = document.querySelector('#field-template-compile-result');
+    ankiTemplatesValidate(infoNode, '{expression}', 'term-kanji', false, true);
+}
+
+function onAnkiTemplateMarkerClicked(e) {
+    e.preventDefault();
+    document.querySelector('#field-template-render-text').value = `{${e.target.textContent}}`;
+}
+
+function onAnkiTemplateRender(e) {
+    e.preventDefault();
+
+    const field = document.querySelector('#field-template-render-text').value;
+    const infoNode = document.querySelector('#field-template-render-result');
+    infoNode.hidden = true;
+    ankiTemplatesValidate(infoNode, field, 'term-kanji', true, false);
 }
 
 

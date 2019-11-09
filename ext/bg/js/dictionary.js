@@ -326,7 +326,7 @@ function dictFieldSplit(field) {
     return field.length === 0 ? [] : field.split(' ');
 }
 
-async function dictFieldFormat(field, definition, mode, options) {
+async function dictFieldFormat(field, definition, mode, options, exceptions) {
     const data = {
         marker: null,
         definition,
@@ -347,6 +347,7 @@ async function dictFieldFormat(field, definition, mode, options) {
         try {
             return await apiTemplateRender(options.anki.fieldTemplates, data, true);
         } catch (e) {
+            if (exceptions) { exceptions.push(e); }
             return `{${marker}-render-error}`;
         }
     });

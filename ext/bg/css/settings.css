@@ -37,12 +37,6 @@ html:root:not([data-options-general-result-output-mode=merge]) #dict-main-group 
     padding: 10px;
 }
 
-#field-templates {
-    font-family: monospace;
-    overflow-x: hidden;
-    white-space: pre;
-}
-
 .bottom-links {
     padding-bottom: 1em;
 }
@@ -136,13 +130,23 @@ html:root:not([data-options-general-result-output-mode=merge]) #dict-main-group 
 }
 
 #custom-popup-css,
-#custom-popup-outer-css {
+#custom-popup-outer-css,
+#field-templates {
     width: 100%;
     min-height: 34px;
+    line-height: 18px;
     height: 96px;
     resize: vertical;
     font-family: 'Courier New', Courier, monospace;
     white-space: pre;
+}
+#field-templates {
+    height: 240px;
+    border-bottom-left-radius: 0;
+}
+#field-templates-reset {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
 
 .btn-inner-middle {
