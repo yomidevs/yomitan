@@ -108,6 +108,10 @@ class TextSourceRange {
 
     static seekForward(node, offset, length) {
         const state = {node, offset, remainder: length, content: ''};
+        if (length <= 0) {
+            return state;
+        }
+
         const TEXT_NODE = Node.TEXT_NODE;
         const ELEMENT_NODE = Node.ELEMENT_NODE;
         let resetOffset = false;
@@ -166,6 +170,10 @@ class TextSourceRange {
 
     static seekBackward(node, offset, length) {
         const state = {node, offset, remainder: length, content: ''};
+        if (length <= 0) {
+            return state;
+        }
+
         const TEXT_NODE = Node.TEXT_NODE;
         const ELEMENT_NODE = Node.ELEMENT_NODE;
         let resetOffset = false;
