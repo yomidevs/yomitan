@@ -327,45 +327,50 @@ function dictFieldSplit(field) {
 }
 
 async function dictFieldFormat(field, definition, mode, options) {
-    const markers = [
-        'audio',
-        'character',
-        'cloze-body',
-        'cloze-prefix',
-        'cloze-suffix',
-        'dictionary',
-        'expression',
-        'furigana',
-        'furigana-plain',
-        'glossary',
-        'glossary-brief',
-        'kunyomi',
-        'onyomi',
-        'reading',
-        'screenshot',
-        'sentence',
-        'tags',
-        'url'
-    ];
-
-    for (const marker of markers) {
-        const data = {
-            marker,
-            definition,
-            group: options.general.resultOutputMode === 'group',
-            merge: options.general.resultOutputMode === 'merge',
-            modeTermKanji: mode === 'term-kanji',
-            modeTermKana: mode === 'term-kana',
-            modeKanji: mode === 'kanji',
-            compactGlossaries: options.general.compactGlossaries
-        };
-
-        const html = await apiTemplateRender(options.anki.fieldTemplates, data, true);
-        field = field.replace(`{${marker}}`, html);
-    }
-
-    return field;
+    const data = {
+        marker: null,
+        definition,
+        group: options.general.resultOutputMode === 'group',
+        merge: options.general.resultOutputMode === 'merge',
+        modeTermKanji: mode === 'term-kanji',
+        modeTermKana: mode === 'term-kana',
+        modeKanji: mode === 'kanji',
+        compactGlossaries: options.general.compactGlossaries
+    };
+    const markers = dictFieldFormat.markers;
+    const pattern = /\{([\w\-]+)\}/g;
+    return await stringReplaceAsync(field, pattern, async (g0, marker) => {
+        if (!markers.has(marker)) {
+            return g0;
+        }
+        data.marker = marker;
+        try {
+            return await apiTemplateRender(options.anki.fieldTemplates, data, true);
+        } catch (e) {
+            return `{${marker}-render-error}`;
+        }
+    });
 }
+dictFieldFormat.markers = new Set([
+    'audio',
+    'character',
+    'cloze-body',
+    'cloze-prefix',
+    'cloze-suffix',
+    'dictionary',
+    'expression',
+    'furigana',
+    'furigana-plain',
+    'glossary',
+    'glossary-brief',
+    'kunyomi',
+    'onyomi',
+    'reading',
+    'screenshot',
+    'sentence',
+    'tags',
+    'url'
+]);
 
 async function dictNoteFormat(definition, mode, options) {
     const note = {fields: {}, tags: options.anki.tags};
