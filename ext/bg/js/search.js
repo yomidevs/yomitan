@@ -179,26 +179,13 @@ class DisplaySearch extends Display {
 
     onKeyDown(e) {
         const key = Display.getKeyFromEvent(e);
+        const ignoreKeys = DisplaySearch.onKeyDownIgnoreKeys;
 
-        let activeModifierMap = {
+        const activeModifierMap = {
             'Control': e.ctrlKey,
             'Meta': e.metaKey,
             'ANY_MOD': true
         };
-
-        const ignoreKeys = {
-            'ANY_MOD': ['Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageDown', 'PageUp', 'Home', 'End']
-                .concat(
-                    Array.from(Array(24).keys())
-                    .map(i => `F${i + 1}`)
-                ),
-            'Control': ['C', 'A', 'Z', 'Y', 'X', 'F', 'G'],
-            'Meta': ['C', 'A', 'Z', 'Y', 'X', 'F', 'G'],
-            'OS': [],
-            'Alt': [],
-            'AltGraph': [],
-            'Shift': []
-        }
 
         let preventFocus = false;
         for (const [modifier, keys] of Object.entries(ignoreKeys)) {
@@ -362,6 +349,21 @@ DisplaySearch.runtimeMessageHandlers = {
     getUrl: () => {
         return {url: window.location.href};
     }
+};
+
+DisplaySearch.onKeyDownIgnoreKeys = {
+    'ANY_MOD': [
+        'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageDown', 'PageUp', 'Home', 'End',
+        'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10',
+        'F11', 'F12', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19', 'F20',
+        'F21', 'F22', 'F23', 'F24'
+    ],
+    'Control': ['C', 'A', 'Z', 'Y', 'X', 'F', 'G'],
+    'Meta': ['C', 'A', 'Z', 'Y', 'X', 'F', 'G'],
+    'OS': [],
+    'Alt': [],
+    'AltGraph': [],
+    'Shift': []
 };
 
 window.yomichan_search = DisplaySearch.create();
