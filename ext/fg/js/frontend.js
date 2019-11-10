@@ -80,7 +80,7 @@ class Frontend {
     onMouseMove(e) {
         this.popupTimerClear();
 
-        if (this.pendingLookup || Frontend.isMouseButton('primary', e)) {
+        if (this.pendingLookup || Frontend.isMouseButtonDown('primary', e)) {
             return;
         }
 
@@ -88,7 +88,7 @@ class Frontend {
         const scanningModifier = scanningOptions.modifier;
         if (!(
             Frontend.isScanningModifierPressed(scanningModifier, e) ||
-            (scanningOptions.middleMouse && Frontend.isMouseButton('auxiliary', e))
+            (scanningOptions.middleMouse && Frontend.isMouseButtonDown('auxiliary', e))
         )) {
             return;
         }
@@ -504,18 +504,30 @@ class Frontend {
         switch (mouseEvent.type) {
             case 'mouseup':
             case 'mousedown':
-            case 'click': switch (button) {
-                case 'primary': return mouseEvent.button === 0;
-                case 'secondary': return mouseEvent.button === 2;
-                case 'auxiliary': return mouseEvent.button === 1;
-                default: return false;
-            }
-            default: switch (button) {
-                case 'primary': return (mouseEvent.buttons & 0x1) !== 0x0;
-                case 'secondary': return (mouseEvent.buttons & 0x2) !== 0x0;
-                case 'auxiliary': return (mouseEvent.buttons & 0x4) !== 0x0;
-                default: return false;
-            }
+            case 'click':
+                return Frontend.isMouseButtonPressed(button, mouseEvent);
+            default:
+                return Frontend.isMouseButtonDown(button, mouseEvent);
+        }
+    }
+
+    static isMouseButtonPressed(button, mouseEvent) {
+        const mouseEventButton = mouseEvent.button;
+        switch (button) {
+            case 'primary': return mouseEventButton === 0;
+            case 'secondary': return mouseEventButton === 2;
+            case 'auxiliary': return mouseEventButton === 1;
+            default: return false;
+        }
+    }
+
+    static isMouseButtonDown(button, mouseEvent) {
+        const mouseEventButtons = mouseEvent.buttons;
+        switch (button) {
+            case 'primary': return (mouseEventButtons & 0x1) !== 0x0;
+            case 'secondary': return (mouseEventButtons & 0x2) !== 0x0;
+            case 'auxiliary': return (mouseEventButtons & 0x4) !== 0x0;
+            default: return false;
         }
     }
 }
