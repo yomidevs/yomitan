@@ -266,15 +266,17 @@ class Database {
             ]);
         }
 
-        const totalPromise = getTotal ? Database.getCounts(targets, null) : null;
+        // Query is required for Edge, otherwise index.count throws an exception.
+        const query1 = IDBKeyRange.lowerBound('', false);
+        const totalPromise = getTotal ? Database.getCounts(targets, query1) : null;
 
         const counts = [];
         const countPromises = [];
         for (let i = 0; i < dictionaryNames.length; ++i) {
             counts.push(null);
             const index = i;
-            const only = IDBKeyRange.only(dictionaryNames[i]);
-            const countPromise = Database.getCounts(targets, only).then(v => counts[index] = v);
+            const query2 = IDBKeyRange.only(dictionaryNames[i]);
+            const countPromise = Database.getCounts(targets, query2).then(v => counts[index] = v);
             countPromises.push(countPromise);
         }
         await Promise.all(countPromises);

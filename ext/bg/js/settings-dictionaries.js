@@ -53,7 +53,7 @@ class SettingsDictionaryListUI {
         const titles = this.dictionaryEntries.map(e => e.dictionaryInfo.title);
         const removeKeys = Object.keys(this.optionsDictionaries).filter(key => titles.indexOf(key) < 0);
         if (removeKeys.length >= 0) {
-            for (const key of removeKeys) {
+            for (const key of toIterable(removeKeys)) {
                 delete this.optionsDictionaries[key];
             }
             changed = true;
