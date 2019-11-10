@@ -27,57 +27,63 @@ class Database {
             throw new Error('Database already initialized');
         }
 
-        this.db = await Database.open('dict', 4, (db, transaction, oldVersion) => {
-            Database.upgrade(db, transaction, oldVersion, [
-                {
-                    version: 2,
-                    stores: {
-                        terms: {
-                            primaryKey: {keyPath: 'id', autoIncrement: true},
-                            indices: ['dictionary', 'expression', 'reading']
-                        },
-                        kanji: {
-                            primaryKey: {autoIncrement: true},
-                            indices: ['dictionary', 'character']
-                        },
-                        tagMeta: {
-                            primaryKey: {autoIncrement: true},
-                            indices: ['dictionary']
-                        },
-                        dictionaries: {
-                            primaryKey: {autoIncrement: true},
-                            indices: ['title', 'version']
+        try {
+            this.db = await Database.open('dict', 4, (db, transaction, oldVersion) => {
+                Database.upgrade(db, transaction, oldVersion, [
+                    {
+                        version: 2,
+                        stores: {
+                            terms: {
+                                primaryKey: {keyPath: 'id', autoIncrement: true},
+                                indices: ['dictionary', 'expression', 'reading']
+                            },
+                            kanji: {
+                                primaryKey: {autoIncrement: true},
+                                indices: ['dictionary', 'character']
+                            },
+                            tagMeta: {
+                                primaryKey: {autoIncrement: true},
+                                indices: ['dictionary']
+                            },
+                            dictionaries: {
+                                primaryKey: {autoIncrement: true},
+                                indices: ['title', 'version']
+                            }
+                        }
+                    },
+                    {
+                        version: 3,
+                        stores: {
+                            termMeta: {
+                                primaryKey: {autoIncrement: true},
+                                indices: ['dictionary', 'expression']
+                            },
+                            kanjiMeta: {
+                                primaryKey: {autoIncrement: true},
+                                indices: ['dictionary', 'character']
+                            },
+                            tagMeta: {
+                                primaryKey: {autoIncrement: true},
+                                indices: ['dictionary', 'name']
+                            }
+                        }
+                    },
+                    {
+                        version: 4,
+                        stores: {
+                            terms: {
+                                primaryKey: {keyPath: 'id', autoIncrement: true},
+                                indices: ['dictionary', 'expression', 'reading', 'sequence']
+                            }
                         }
                     }
-                },
-                {
-                    version: 3,
-                    stores: {
-                        termMeta: {
-                            primaryKey: {autoIncrement: true},
-                            indices: ['dictionary', 'expression']
-                        },
-                        kanjiMeta: {
-                            primaryKey: {autoIncrement: true},
-                            indices: ['dictionary', 'character']
-                        },
-                        tagMeta: {
-                            primaryKey: {autoIncrement: true},
-                            indices: ['dictionary', 'name']
-                        }
-                    }
-                },
-                {
-                    version: 4,
-                    stores: {
-                        terms: {
-                            primaryKey: {keyPath: 'id', autoIncrement: true},
-                            indices: ['dictionary', 'expression', 'reading', 'sequence']
-                        }
-                    }
-                }
-            ]);
-        });
+                ]);
+            });
+            return true;
+        } catch (e) {
+            console.error(e);
+            return false;
+        }
     }
 
     async purge() {
@@ -786,14 +792,15 @@ class Database {
             for (const objectStoreName of objectStoreNames) {
                 const {primaryKey, indices} = stores[objectStoreName];
 
+                const objectStoreNames = transaction.objectStoreNames || db.objectStoreNames;
                 const objectStore = (
-                    transaction.objectStoreNames.contains(objectStoreName) ?
+                    Database.listContains(objectStoreNames, objectStoreName) ?
                     transaction.objectStore(objectStoreName) :
                     db.createObjectStore(objectStoreName, primaryKey)
                 );
 
                 for (const indexName of indices) {
-                    if (objectStore.indexNames.contains(indexName)) { continue; }
+                    if (Database.listContains(objectStore.indexNames, indexName)) { continue; }
 
                     objectStore.createIndex(indexName, indexName, {});
                 }
@@ -807,5 +814,12 @@ class Database {
             request.onerror = (e) => reject(e);
             request.onsuccess = () => resolve();
         });
+    }
+
+    static listContains(list, value) {
+        for (let i = 0, ii = list.length; i < ii; ++i) {
+            if (list[i] === value) { return true; }
+        }
+        return false;
     }
 }
