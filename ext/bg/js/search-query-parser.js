@@ -154,19 +154,4 @@ class QueryParser {
             this.onMouseLeave(e);
         });
     }
-
-    async parseText(text) {
-        const results = [];
-        while (text) {
-            const {definitions, length} =  await apiTermsFind(text, {}, this.search.getOptionsContext());
-            if (length) {
-                results.push(definitions);
-                text = text.slice(length);
-            } else {
-                results.push(text[0]);
-                text = text.slice(1);
-            }
-        }
-        return results;
-    }
 }
