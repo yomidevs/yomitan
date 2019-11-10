@@ -113,9 +113,9 @@ class QueryParser {
 
         this.queryParser.innerHTML = contents.join('<hr>');
 
-        this.queryParser.querySelectorAll('.query-parser-char').forEach((charElement) => {
+        for (const charElement of this.queryParser.querySelectorAll('.query-parser-char')) {
             this.activateScanning(charElement);
-        });
+        }
 
         this.search.setSpinnerVisible(false);
     }
@@ -133,9 +133,9 @@ class QueryParser {
             preview: true
         });
 
-        this.queryParser.querySelectorAll('.query-parser-char').forEach((charElement) => {
+        for (const charElement of this.queryParser.querySelectorAll('.query-parser-char')) {
             this.activateScanning(charElement);
-        });
+        }
     }
 
     activateScanning(element) {
