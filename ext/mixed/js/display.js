@@ -279,9 +279,9 @@ class Display {
     }
 
     addEventListeners(selector, type, listener, options) {
-        this.container.querySelectorAll(selector).forEach((node) => {
+        for (const node of this.container.querySelectorAll(selector)) {
             Display.addEventListener(this.eventListeners, node, type, listener, options);
-        });
+        }
     }
 
     setContent(type, details) {
