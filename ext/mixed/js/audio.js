@@ -125,10 +125,10 @@ async function audioGetFromSources(expression, sources, optionsContext, willDown
         }
 
         try {
-            const audio = await audioGetFromUrl(url, willDownload);
+            let audio = await audioGetFromUrl(url, willDownload);
             if (willDownload) {
                 // AnkiConnect handles downloading URLs into cards
-                audio = null
+                audio = null;
             }
             const result = {audio, url, source};
             if (cache !== null) {
