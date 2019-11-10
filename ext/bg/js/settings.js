@@ -188,8 +188,8 @@ async function onFormOptionsChanged(e) {
             await ankiDeckAndModelPopulate(options);
             ankiErrorShow();
         }
-    } catch (e) {
-        ankiErrorShow(e);
+    } catch (error) {
+        ankiErrorShow(error);
     } finally {
         ankiSpinnerShow(false);
     }
@@ -602,8 +602,8 @@ async function onAnkiModelChanged(e) {
         ankiSpinnerShow(true);
         await ankiFieldsPopulate(element, options);
         ankiErrorShow();
-    } catch (e) {
-        ankiErrorShow(e);
+    } catch (error) {
+        ankiErrorShow(error);
     } finally {
         ankiSpinnerShow(false);
     }
@@ -627,8 +627,8 @@ async function onAnkiFieldTemplatesResetConfirm(e) {
         $('#field-templates').val(fieldTemplates);
         onAnkiTemplatesValidateCompile();
         await settingsSaveOptions();
-    } catch (e) {
-        ankiErrorShow(e);
+    } catch (error) {
+        ankiErrorShow(error);
     }
 }
 

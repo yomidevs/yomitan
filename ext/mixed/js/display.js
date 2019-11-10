@@ -77,8 +77,8 @@ class Display {
 
             const definitions = await apiKanjiFind(link.textContent, this.getOptionsContext());
             this.setContentKanji(definitions, context);
-        } catch (e) {
-            this.onError(e);
+        } catch (error) {
+            this.onError(error);
         }
     }
 
@@ -140,8 +140,8 @@ class Display {
             }
 
             this.setContentTerms(definitions, context);
-        } catch (e) {
-            this.onError(e);
+        } catch (error) {
+            this.onError(error);
         }
     }
 
