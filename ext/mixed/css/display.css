@@ -74,6 +74,22 @@ ol, ul {
 
 
 /*
+ * Search page
+ */
+
+.icon-checkbox {
+    display: none;
+}
+
+.icon-checkbox + label {
+    cursor: pointer;
+    font-size: 22px;
+    padding: 2px;
+    user-select: none;
+}
+
+
+/*
  * Entries
  */
 

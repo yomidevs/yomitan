@@ -48,3 +48,9 @@ hr { border-top-color: #eeeeee; }
 .expression-rare, .expression-rare .kanji-link {
     color: #999999;
 }
+
+.icon-checkbox:checked + label {
+    /* invert colors */
+    background-color: #333333;
+    color: #ffffff;
+}
