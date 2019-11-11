@@ -97,8 +97,8 @@ class QueryParser {
             }
         }
 
-        const contents = await Promise.all(Object.values(results).map(async result => {
-            return await apiTemplateRender('query-parser.html', {
+        const contents = await Promise.all(Object.values(results).map(result => {
+            return apiTemplateRender('query-parser.html', {
                 terms: result.map((term) => {
                     return term.filter(part => part.text.trim()).map((part) => {
                         return {

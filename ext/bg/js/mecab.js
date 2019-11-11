@@ -58,12 +58,10 @@ class Mecab {
             const sequence = this.sequence++;
 
             this.listeners[sequence] = {
-                callback: (data) => {
-                    resolve(data);
-                },
+                callback: resolve,
                 timer: setTimeout(() => {
                     delete this.listeners[sequence];
-                    reject(`Mecab invoke timed out in ${Mecab.timeout} ms`);
+                    reject(new Error(`Mecab invoke timed out in ${Mecab.timeout} ms`));
                 }, Mecab.timeout)
             }
 
