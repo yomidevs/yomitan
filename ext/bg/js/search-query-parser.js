@@ -122,7 +122,7 @@ class QueryParser {
 
     async setPreview(text) {
         const previewTerms = [];
-        while (text) {
+        while (text.length > 0) {
             const tempText = text.slice(0, 2);
             previewTerms.push([{text: Array.from(tempText)}]);
             text = text.slice(2);

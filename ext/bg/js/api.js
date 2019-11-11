@@ -84,7 +84,7 @@ async function apiTextParse(text, optionsContext) {
     const translator = utilBackend().translator;
 
     const results = [];
-    while (text) {
+    while (text.length > 0) {
         const term = [];
         const [definitions, sourceLength] = await translator.findTerms(text, {}, options);
         if (definitions.length > 0) {
@@ -116,7 +116,7 @@ async function apiTextParseMecab(text, optionsContext) {
         for (const parsedLine of rawResults[mecabName]) {
             for (const {expression, reading, source} of parsedLine) {
                 const term = [];
-                if (expression && reading) {
+                if (expression !== null && reading !== null) {
                     for (const {text, furigana} of jpDistributeFuriganaInflected(
                         expression,
                         jpKatakanaToHiragana(reading),
