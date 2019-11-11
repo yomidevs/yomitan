@@ -154,7 +154,6 @@ async function formWrite(options) {
 
 function formSetupEventListeners() {
     $('input, select, textarea').not('.anki-model').not('.ignore-form-changes *').change(utilAsync(onFormOptionsChanged));
-    $('#parsing-mecab-enable').change(onParseMecabChanged);
     $('.anki-model').change(utilAsync(onAnkiModelChanged));
 }
 
@@ -437,20 +436,6 @@ function onMessage({action, params}, sender, callback) {
         case 'getUrl':
             callback({url: window.location.href});
             break;
-    }
-}
-
-
-/*
- * Text parsing
- */
-
-function onParseMecabChanged(e) {
-    const mecab = utilBackend().mecab;
-    if (e.target.checked) {
-        mecab.startListener();
-    } else {
-        mecab.stopListener();
     }
 }
 

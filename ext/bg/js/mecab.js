@@ -34,15 +34,7 @@ class Mecab {
     startListener() {
         if (this.port !== null) { return; }
         this.port = chrome.runtime.connectNative('yomichan_mecab');
-        this.port.onMessage.addListener((message) => {
-            const {sequence, data} = message;
-            const {callback, timer} = this.listeners[sequence] || {};
-            if (timer) {
-                clearTimeout(timer);
-                delete this.listeners[sequence];
-                callback(data);
-            }
-        });
+        this.port.onMessage.addListener(this.onNativeMessage.bind(this));
     }
 
     stopListener() {
@@ -51,6 +43,15 @@ class Mecab {
         this.port = null;
         this.listeners = {};
         this.sequence = 0;
+    }
+
+    onNativeMessage({sequence, data}) {
+        if (this.listeners.hasOwnProperty(sequence)) {
+            const {callback, timer} = this.listeners[sequence];
+            clearTimeout(timer);
+            callback(data);
+            delete this.listeners[sequence];
+        }
     }
 
     invoke(action, params) {

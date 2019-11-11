@@ -101,6 +101,8 @@ class Backend {
 
         if (options.parsing.enableMecabParser) {
             this.mecab.startListener();
+        } else {
+            this.mecab.stopListener();
         }
     }
 
