@@ -314,7 +314,7 @@ function profileOptionsCreateDefaults() {
         parsing: {
             enableScanningParser: true,
             enableMecabParser: false,
-            selectedParser = null
+            selectedParser: null
         },
 
         anki: {
