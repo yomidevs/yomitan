@@ -313,7 +313,8 @@ function profileOptionsCreateDefaults() {
 
         parsing: {
             enableScanningParser: true,
-            enableMecabParser: false
+            enableMecabParser: false,
+            selectedParser = null
         },
 
         anki: {

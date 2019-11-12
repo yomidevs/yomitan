@@ -23,7 +23,10 @@ class QueryParser {
         this.pendingLookup = false;
         this.clickScanPrevent = false;
 
+        this.parseResults = [];
+
         this.queryParser = document.querySelector('#query-parser');
+        this.queryParserSelect = document.querySelector('#query-parser-select');
 
         this.queryParser.addEventListener('mousedown', (e) => this.onMouseDown(e));
         this.queryParser.addEventListener('mouseup', (e) => this.onMouseUp(e));
@@ -82,42 +85,55 @@ class QueryParser {
         })();
     }
 
+    onParserChange(e) {
+        const selectedParser = e.target.value;
+        apiOptionsSet({parsing: {selectedParser}}, this.search.getOptionsContext());
+        this.renderParseResult(this.getParseResult());
+    }
+
+    getParseResult() {
+        return this.parseResults.find(r => r.id === this.search.options.parsing.selectedParser);
+    }
+
     async setText(text) {
         this.search.setSpinnerVisible(true);
+
         await this.setPreview(text);
 
-        const results = {};
+        this.parseResults = await this.parseText(text);
+        if (this.parseResults.length > 0) {
+            if (this.search.options.parsing.selectedParser === null || !this.getParseResult()) {
+                const selectedParser = this.parseResults[0].id;
+                apiOptionsSet({parsing: {selectedParser}}, this.search.getOptionsContext());
+            }
+        }
+
+        this.renderParserSelect();
+        await this.renderParseResult();
+
+        this.search.setSpinnerVisible(false);
+    }
+
+    async parseText(text) {
+        const results = [];
         if (this.search.options.parsing.enableScanningParser) {
-            results['scan'] = await apiTextParse(text, this.search.getOptionsContext());
+            results.push({
+                name: 'Scanning parser',
+                id: 'scan',
+                parsedText: await apiTextParse(text, this.search.getOptionsContext())
+            });
         }
         if (this.search.options.parsing.enableMecabParser) {
             let mecabResults = await apiTextParseMecab(text, this.search.getOptionsContext());
             for (const mecabDictName in mecabResults) {
-                results[`mecab-${mecabDictName}`] = mecabResults[mecabDictName];
+                results.push({
+                    name: `MeCab: ${mecabDictName}`,
+                    id: `mecab-${mecabDictName}`,
+                    parsedText: mecabResults[mecabDictName]
+                });
             }
         }
-
-        const contents = await Promise.all(Object.values(results).map(result => {
-            return apiTemplateRender('query-parser.html', {
-                terms: result.map((term) => {
-                    return term.filter(part => part.text.trim()).map((part) => {
-                        return {
-                            text: Array.from(part.text),
-                            reading: part.reading,
-                            raw: !part.reading || !part.reading.trim(),
-                        };
-                    });
-                })
-            });
-        }));
-
-        this.queryParser.innerHTML = contents.join('<hr>');
-
-        for (const charElement of this.queryParser.querySelectorAll('.query-parser-char')) {
-            this.activateScanning(charElement);
-        }
-
-        this.search.setSpinnerVisible(false);
+        return results;
     }
 
     async setPreview(text) {
@@ -127,11 +143,44 @@ class QueryParser {
             previewTerms.push([{text: Array.from(tempText)}]);
             text = text.slice(2);
         }
-
         this.queryParser.innerHTML = await apiTemplateRender('query-parser.html', {
             terms: previewTerms,
             preview: true
         });
+
+        for (const charElement of this.queryParser.querySelectorAll('.query-parser-char')) {
+            this.activateScanning(charElement);
+        }
+    }
+
+    renderParserSelect() {
+        this.queryParserSelect.innerHTML = '';
+        if (this.parseResults.length > 1) {
+            const select = document.createElement('select');
+            select.classList.add('form-control');
+            for (const parseResult of this.parseResults) {
+                const option = document.createElement('option');
+                option.value = parseResult.id;
+                option.innerText = parseResult.name;
+                option.defaultSelected = this.search.options.parsing.selectedParser === parseResult.id;
+                select.appendChild(option);
+            }
+            select.addEventListener('change', this.onParserChange.bind(this));
+            this.queryParserSelect.appendChild(select);
+        }
+    }
+
+    async renderParseResult() {
+        const parseResult = this.getParseResult();
+        if (!parseResult) {
+            this.queryParser.innerHTML = '';
+            return;
+        }
+
+        this.queryParser.innerHTML = await apiTemplateRender(
+            'query-parser.html',
+            {terms: QueryParser.processParseResultForDisplay(parseResult.parsedText)}
+        );
 
         for (const charElement of this.queryParser.querySelectorAll('.query-parser-char')) {
             this.activateScanning(charElement);
@@ -152,6 +201,18 @@ class QueryParser {
         });
         element.addEventListener('mouseleave', (e) => {
             this.onMouseLeave(e);
+        });
+    }
+
+    static processParseResultForDisplay(result) {
+        return result.map((term) => {
+            return term.filter(part => part.text.trim()).map((part) => {
+                return {
+                    text: Array.from(part.text),
+                    reading: part.reading,
+                    raw: !part.reading || !part.reading.trim(),
+                };
+            });
         });
     }
 }
