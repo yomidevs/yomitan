@@ -93,16 +93,7 @@ class QueryParser {
         this.renderParseResult(this.getParseResult());
     }
 
-    getParseResult() {
-        return this.parseResults.find(r => r.id === this.selectedParser);
-    }
-
-    async setText(text) {
-        this.search.setSpinnerVisible(true);
-
-        await this.setPreview(text);
-
-        this.parseResults = await this.parseText(text);
+    refreshSelectedParser() {
         if (this.parseResults.length > 0) {
             if (this.selectedParser === null) {
                 this.selectedParser = this.search.options.parsing.selectedParser;
@@ -113,6 +104,19 @@ class QueryParser {
                 apiOptionsSet({parsing: {selectedParser}}, this.search.getOptionsContext());
             }
         }
+    }
+
+    getParseResult() {
+        return this.parseResults.find(r => r.id === this.selectedParser);
+    }
+
+    async setText(text) {
+        this.search.setSpinnerVisible(true);
+
+        await this.setPreview(text);
+
+        this.parseResults = await this.parseText(text);
+        this.refreshSelectedParser();
 
         this.renderParserSelect();
         await this.renderParseResult();
