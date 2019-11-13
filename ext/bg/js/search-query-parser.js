@@ -24,6 +24,7 @@ class QueryParser {
         this.clickScanPrevent = false;
 
         this.parseResults = [];
+        this.selectedParser = null;
 
         this.queryParser = document.querySelector('#query-parser');
         this.queryParserSelect = document.querySelector('#query-parser-select');
@@ -85,14 +86,15 @@ class QueryParser {
         })();
     }
 
-    onParserChange(e) {
+    async onParserChange(e) {
         const selectedParser = e.target.value;
+        this.selectedParser = selectedParser;
         apiOptionsSet({parsing: {selectedParser}}, this.search.getOptionsContext());
         this.renderParseResult(this.getParseResult());
     }
 
     getParseResult() {
-        return this.parseResults.find(r => r.id === this.search.options.parsing.selectedParser);
+        return this.parseResults.find(r => r.id === this.selectedParser);
     }
 
     async setText(text) {
@@ -102,8 +104,12 @@ class QueryParser {
 
         this.parseResults = await this.parseText(text);
         if (this.parseResults.length > 0) {
-            if (this.search.options.parsing.selectedParser === null || !this.getParseResult()) {
+            if (this.selectedParser === null) {
+                this.selectedParser = this.search.options.parsing.selectedParser;
+            }
+            if (this.selectedParser === null || !this.getParseResult()) {
                 const selectedParser = this.parseResults[0].id;
+                this.selectedParser = selectedParser;
                 apiOptionsSet({parsing: {selectedParser}}, this.search.getOptionsContext());
             }
         }
@@ -162,7 +168,7 @@ class QueryParser {
                 const option = document.createElement('option');
                 option.value = parseResult.id;
                 option.innerText = parseResult.name;
-                option.defaultSelected = this.search.options.parsing.selectedParser === parseResult.id;
+                option.defaultSelected = this.selectedParser === parseResult.id;
                 select.appendChild(option);
             }
             select.addEventListener('change', this.onParserChange.bind(this));
