@@ -86,7 +86,7 @@ class QueryParser {
         })();
     }
 
-    async onParserChange(e) {
+    onParserChange(e) {
         const selectedParser = e.target.value;
         this.selectedParser = selectedParser;
         apiOptionsSet({parsing: {selectedParser}}, this.search.getOptionsContext());
