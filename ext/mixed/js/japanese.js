@@ -26,6 +26,15 @@ function jpIsKana(c) {
     return wanakana.isKana(c);
 }
 
+function jpIsJapaneseText(text) {
+    for (const c of text) {
+        if (jpIsKanji(c) || jpIsKana(c)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function jpKatakanaToHiragana(text) {
     let result = '';
     for (const c of text) {

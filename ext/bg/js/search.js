@@ -248,7 +248,7 @@ class DisplaySearch extends Display {
             } else if (IS_FIREFOX === false) {
                 curText = (await apiClipboardGet()).trim();
             }
-            if (curText && (curText !== this.clipboardPrevText)) {
+            if (curText && (curText !== this.clipboardPrevText) && jpIsJapaneseText(curText)) {
                 if (this.isWanakanaEnabled()) {
                     this.query.value = window.wanakana.toKana(curText);
                 } else {
