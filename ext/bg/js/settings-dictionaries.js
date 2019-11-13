@@ -341,7 +341,7 @@ async function dictSettingsInitialize() {
         document.querySelector('#dict-extra-template'),
         options.dictionaries
     );
-    dictionaryUI.save = () => apiOptionsSave();
+    dictionaryUI.save = () => settingsSaveOptions();
 
     document.querySelector('#dict-purge-button').addEventListener('click', (e) => onDictionaryPurgeButtonClick(e), false);
     document.querySelector('#dict-purge-confirm').addEventListener('click', (e) => onDictionaryPurge(e), false);
@@ -397,7 +397,7 @@ async function updateMainDictionarySelect(options, dictionaries) {
 
     if (options.general.mainDictionary !== value) {
         options.general.mainDictionary = value;
-        apiOptionsSave();
+        settingsSaveOptions();
     }
 }
 
@@ -406,7 +406,7 @@ async function onDictionaryMainChanged(e) {
     const optionsContext = getOptionsContext();
     const options = await apiOptionsGet(optionsContext);
     options.general.mainDictionary = value;
-    apiOptionsSave();
+    settingsSaveOptions();
 }
 
 

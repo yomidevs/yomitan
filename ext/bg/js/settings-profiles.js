@@ -95,7 +95,7 @@ async function profileFormWrite(optionsFull) {
         $('#profile-add-condition-group')
     );
     profileConditionsContainer.save = () => {
-        apiOptionsSave();
+        settingsSaveOptions();
         conditionsClearCaches(profileConditionsDescriptor);
     };
     profileConditionsContainer.isolate = utilBackgroundIsolate;
@@ -166,7 +166,7 @@ async function onProfileOptionsChanged(e) {
 
     const optionsFull = await apiOptionsGetFull();
     await profileFormRead(optionsFull);
-    await apiOptionsSave();
+    await settingsSaveOptions();
 }
 
 async function onTargetProfileChanged() {
@@ -188,7 +188,7 @@ async function onProfileAdd() {
     optionsFull.profiles.push(profile);
     currentProfileIndex = optionsFull.profiles.length - 1;
     await profileOptionsUpdateTarget(optionsFull);
-    await apiOptionsSave();
+    await settingsSaveOptions();
 }
 
 async function onProfileRemove(e) {
@@ -226,7 +226,7 @@ async function onProfileRemoveConfirm() {
     }
 
     await profileOptionsUpdateTarget(optionsFull);
-    await apiOptionsSave();
+    await settingsSaveOptions();
 }
 
 function onProfileNameChanged() {

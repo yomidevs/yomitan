@@ -318,7 +318,7 @@ async function audioSettingsInitialize() {
     const optionsContext = getOptionsContext();
     const options = await apiOptionsGet(optionsContext);
     audioSourceUI = new AudioSourceUI.Container(options.audio.sources, $('.audio-source-list'), $('.audio-source-add'));
-    audioSourceUI.save = () => apiOptionsSave();
+    audioSourceUI.save = () => settingsSaveOptions();
 
     textToSpeechInitialize();
 }
