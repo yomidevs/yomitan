@@ -216,6 +216,7 @@ class DisplaySearch extends Display {
             } else {
                 this.container.textContent = '';
             }
+            window.parent.postMessage('popupClose', '*');
         } catch (e) {
             this.onError(e);
         }
