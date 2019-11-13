@@ -66,6 +66,7 @@ async function formRead(options) {
 
     options.parsing.enableScanningParser = $('#parsing-scan-enable').prop('checked');
     options.parsing.enableMecabParser = $('#parsing-mecab-enable').prop('checked');
+    options.parsing.readingMode = $('#parsing-reading-mode').val();
 
     const optionsAnkiEnableOld = options.anki.enable;
     options.anki.enable = $('#anki-enable').prop('checked');
@@ -131,6 +132,7 @@ async function formWrite(options) {
 
     $('#parsing-scan-enable').prop('checked', options.parsing.enableScanningParser);
     $('#parsing-mecab-enable').prop('checked', options.parsing.enableMecabParser);
+    $('#parsing-reading-mode').val(options.parsing.readingMode);
 
     $('#anki-enable').prop('checked', options.anki.enable);
     $('#card-tags').val(options.anki.tags.join(' '));

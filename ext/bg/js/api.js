@@ -92,12 +92,13 @@ async function apiTextParse(text, optionsContext) {
             const {expression, reading} = definitions[0];
             const source = text.slice(0, sourceLength);
             for (const {text, furigana} of jpDistributeFuriganaInflected(expression, reading, source)) {
-                // can't use 'furigana' in templates
-                term.push({text, reading: furigana});
+                const reading = jpConvertReading(text, furigana, options.parsing.readingMode);
+                term.push({text, reading});
             }
             text = text.slice(source.length);
         } else {
-            term.push({text: text[0]});
+            const reading = jpConvertReading(text[0], null, options.parsing.readingMode);
+            term.push({text: text[0], reading});
             text = text.slice(1);
         }
         results.push(term);
@@ -122,11 +123,12 @@ async function apiTextParseMecab(text, optionsContext) {
                         jpKatakanaToHiragana(reading),
                         source
                     )) {
-                        // can't use 'furigana' in templates
-                        term.push({text, reading: furigana});
+                        const reading = jpConvertReading(text, furigana, options.parsing.readingMode);
+                        term.push({text, reading});
                     }
                 } else {
-                    term.push({text: source});
+                    const reading = jpConvertReading(source, null, options.parsing.readingMode);
+                    term.push({text: source, reading});
                 }
                 result.push(term);
             }

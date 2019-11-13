@@ -48,6 +48,43 @@ function jpKatakanaToHiragana(text) {
     return result;
 }
 
+function jpHiraganaToKatakana(text) {
+    let result = '';
+    for (const c of text) {
+        if (wanakana.isHiragana(c)) {
+            result += wanakana.toKatakana(c);
+        } else {
+            result += c;
+        }
+    }
+
+    return result;
+}
+
+function jpToRomaji(text) {
+    return wanakana.toRomaji(text);
+}
+
+function jpConvertReading(expressionFragment, readingFragment, readingMode) {
+    switch (readingMode) {
+        case 'hiragana':
+            return jpKatakanaToHiragana(readingFragment || '');
+        case 'katakana':
+            return jpHiraganaToKatakana(readingFragment || '');
+        case 'romaji':
+            if (readingFragment) {
+                return jpToRomaji(readingFragment);
+            } else {
+                if (jpIsKana(expressionFragment)) {
+                    return jpToRomaji(expressionFragment);
+                }
+            }
+            return readingFragment;
+        default:
+            return readingFragment;
+    }
+}
+
 function jpDistributeFurigana(expression, reading) {
     const fallback = [{furigana: reading, text: expression}];
     if (!reading) {
