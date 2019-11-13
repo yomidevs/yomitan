@@ -135,6 +135,7 @@ async function formWrite(options) {
     $('#field-templates').val(options.anki.fieldTemplates);
 
     onAnkiTemplatesValidateCompile();
+    await onDictionaryOptionsChanged(options);
 
     try {
         await ankiDeckAndModelPopulate(options);

@@ -21,17 +21,24 @@ let dictionaryUI = null;
 
 
 class SettingsDictionaryListUI {
-    constructor(container, template, extraContainer, extraTemplate, optionsDictionaries) {
+    constructor(container, template, extraContainer, extraTemplate) {
         this.container = container;
         this.template = template;
         this.extraContainer = extraContainer;
         this.extraTemplate = extraTemplate;
-        this.optionsDictionaries = optionsDictionaries;
-
+        this.optionsDictionaries = null;
+        this.dictionaries = null;
         this.dictionaryEntries = [];
         this.extra = null;
 
         document.querySelector('#dict-delete-confirm').addEventListener('click', (e) => this.onDictionaryConfirmDelete(e), false);
+    }
+
+    setOptionsDictionaries(optionsDictionaries) {
+        this.optionsDictionaries = optionsDictionaries;
+        if (this.dictionaries !== null) {
+            this.setDictionaries(this.dictionaries);
+        }
     }
 
     setDictionaries(dictionaries) {
@@ -40,9 +47,14 @@ class SettingsDictionaryListUI {
         }
 
         this.dictionaryEntries = [];
+        this.dictionaries = toIterable(dictionaries);
+
+        if (this.optionsDictionaries === null) {
+            return;
+        }
 
         let changed = false;
-        for (const dictionaryInfo of toIterable(dictionaries)) {
+        for (const dictionaryInfo of this.dictionaries) {
             if (this.createEntry(dictionaryInfo)) {
                 changed = true;
             }
@@ -52,7 +64,7 @@ class SettingsDictionaryListUI {
 
         const titles = this.dictionaryEntries.map(e => e.dictionaryInfo.title);
         const removeKeys = Object.keys(this.optionsDictionaries).filter(key => titles.indexOf(key) < 0);
-        if (removeKeys.length >= 0) {
+        if (removeKeys.length > 0) {
             for (const key of toIterable(removeKeys)) {
                 delete this.optionsDictionaries[key];
             }
@@ -331,15 +343,11 @@ class SettingsDictionaryExtraUI {
 
 
 async function dictSettingsInitialize() {
-    const optionsContext = getOptionsContext();
-    const options = await apiOptionsGet(optionsContext);
-
     dictionaryUI = new SettingsDictionaryListUI(
         document.querySelector('#dict-groups'),
         document.querySelector('#dict-template'),
         document.querySelector('#dict-groups-extra'),
-        document.querySelector('#dict-extra-template'),
-        options.dictionaries
+        document.querySelector('#dict-extra-template')
     );
     dictionaryUI.save = () => settingsSaveOptions();
 
@@ -349,7 +357,15 @@ async function dictSettingsInitialize() {
     document.querySelector('#dict-file').addEventListener('change', (e) => onDictionaryImport(e), false);
     document.querySelector('#dict-main').addEventListener('change', (e) => onDictionaryMainChanged(e), false);
 
+    const optionsContext = getOptionsContext();
+    const options = await apiOptionsGet(optionsContext);
+    onDictionaryOptionsChanged(options);
     onDatabaseUpdated(options);
+}
+
+async function onDictionaryOptionsChanged(options) {
+    if (dictionaryUI === null) { return; }
+    dictionaryUI.setOptionsDictionaries(options.dictionaries);
 }
 
 async function onDatabaseUpdated(options) {
