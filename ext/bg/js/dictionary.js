@@ -55,39 +55,23 @@ function dictRowsSort(rows, options) {
 
 function dictTermsSort(definitions, dictionaries=null) {
     return definitions.sort((v1, v2) => {
+        let i;
         if (dictionaries !== null) {
-            const p1 = (dictionaries[v1.dictionary] || {}).priority || 0;
-            const p2 = (dictionaries[v2.dictionary] || {}).priority || 0;
-            if (p1 > p2) {
-                return -1;
-            } else if (p1 < p2) {
-                return 1;
-            }
+            i = (
+                ((dictionaries[v2.dictionary] || {}).priority || 0) -
+                ((dictionaries[v1.dictionary] || {}).priority || 0)
+            );
+            if (i !== 0) { return i; }
         }
 
-        const sl1 = v1.source.length;
-        const sl2 = v2.source.length;
-        if (sl1 > sl2) {
-            return -1;
-        } else if (sl1 < sl2) {
-            return 1;
-        }
+        i = v2.source.length - v1.source.length;
+        if (i !== 0) { return i; }
 
-        const rl1 = v1.reasons.length;
-        const rl2 = v2.reasons.length;
-        if (rl1 < rl2) {
-            return -1;
-        } else if (rl1 > rl2) {
-            return 1;
-        }
+        i = v2.reasons.length - v1.reasons.length;
+        if (i !== 0) { return i; }
 
-        const s1 = v1.score;
-        const s2 = v2.score;
-        if (s1 > s2) {
-            return -1;
-        } else if (s1 < s2) {
-            return 1;
-        }
+        i = v2.score - v1.score;
+        if (i !== 0) { return i; }
 
         return v2.expression.toString().localeCompare(v1.expression.toString());
     });

@@ -47,22 +47,6 @@ class Translator {
         await this.database.deleteDictionary(dictionaryName);
     }
 
-    async findTermsGrouped(text, dictionaries, alphanumeric, options) {
-        const titles = Object.keys(dictionaries);
-        const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
-
-        const definitionsGrouped = dictTermsGroup(definitions, dictionaries);
-        await this.buildTermFrequencies(definitionsGrouped, titles);
-
-        if (options.general.compactTags) {
-            for (const definition of definitionsGrouped) {
-                dictTermsCompressTags(definition.definitions);
-            }
-        }
-
-        return {length, definitions: definitionsGrouped};
-    }
-
     async getSequencedDefinitions(definitions, mainDictionary) {
         const definitionsBySequence = dictTermsMergeBySequence(definitions, mainDictionary);
         const defaultDefinitions = definitionsBySequence['-1'];
@@ -157,10 +141,41 @@ class Translator {
         return result;
     }
 
-    async findTermsMerged(text, dictionaries, alphanumeric, options) {
+    async findTerms(text, details, options) {
+        switch (options.general.resultOutputMode) {
+            case 'group':
+                return await this.findTermsGrouped(text, details, options);
+            case 'merge':
+                return await this.findTermsMerged(text, details, options);
+            case 'split':
+                return await this.findTermsSplit(text, details, options);
+            default:
+                return [[], 0];
+        }
+    }
+
+    async findTermsGrouped(text, details, options) {
+        const dictionaries = dictEnabledSet(options);
+        const titles = Object.keys(dictionaries);
+        const [definitions, length] = await this.findTermsInternal(text, dictionaries, options.scanning.alphanumeric, details);
+
+        const definitionsGrouped = dictTermsGroup(definitions, dictionaries);
+        await this.buildTermFrequencies(definitionsGrouped, titles);
+
+        if (options.general.compactTags) {
+            for (const definition of definitionsGrouped) {
+                dictTermsCompressTags(definition.definitions);
+            }
+        }
+
+        return [definitionsGrouped, length];
+    }
+
+    async findTermsMerged(text, details, options) {
+        const dictionaries = dictEnabledSet(options);
         const secondarySearchTitles = Object.keys(options.dictionaries).filter(dict => options.dictionaries[dict].allowSecondarySearches);
         const titles = Object.keys(dictionaries);
-        const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
+        const [definitions, length] = await this.findTermsInternal(text, dictionaries, options.scanning.alphanumeric, details);
         const {sequencedDefinitions, defaultDefinitions} = await this.getSequencedDefinitions(definitions, options.general.mainDictionary);
         const definitionsMerged = [];
         const mergedByTermIndices = new Set();
@@ -191,29 +206,33 @@ class Translator {
             }
         }
 
-        return {length, definitions: dictTermsSort(definitionsMerged)};
+        return [dictTermsSort(definitionsMerged), length];
     }
 
-    async findTermsSplit(text, dictionaries, alphanumeric) {
+    async findTermsSplit(text, details, options) {
+        const dictionaries = dictEnabledSet(options);
         const titles = Object.keys(dictionaries);
-        const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
+        const [definitions, length] = await this.findTermsInternal(text, dictionaries, options.scanning.alphanumeric, details);
 
         await this.buildTermFrequencies(definitions, titles);
 
-        return {length, definitions};
+        return [definitions, length];
     }
 
-    async findTerms(text, dictionaries, alphanumeric) {
+    async findTermsInternal(text, dictionaries, alphanumeric, details) {
         if (!alphanumeric && text.length > 0) {
             const c = text[0];
             if (!jpIsKana(c) && !jpIsKanji(c)) {
-                return {length: 0, definitions: []};
+                return [[], 0];
             }
         }
 
-        const textHiragana = jpKatakanaToHiragana(text);
         const titles = Object.keys(dictionaries);
-        const deinflections = await this.findTermDeinflections(text, textHiragana, titles);
+        const deinflections = (
+            details.wildcard ?
+            await this.findTermWildcard(text, titles) :
+            await this.findTermDeinflections(text, titles)
+        );
 
         let definitions = [];
         for (const deinflection of deinflections) {
@@ -246,10 +265,26 @@ class Translator {
             length = Math.max(length, definition.source.length);
         }
 
-        return {length, definitions};
+        return [definitions, length];
     }
 
-    async findTermDeinflections(text, text2, titles) {
+    async findTermWildcard(text, titles) {
+        const definitions = await this.database.findTermsBulk([text], titles, true);
+        if (definitions.length === 0) {
+            return [];
+        }
+
+        return [{
+            source: text,
+            term: text,
+            rules: 0,
+            definitions,
+            reasons: []
+        }];
+    }
+
+    async findTermDeinflections(text, titles) {
+        const text2 = jpKatakanaToHiragana(text);
         const deinflections = (text === text2 ? this.getDeinflections(text) : this.getDeinflections2(text, text2));
 
         if (deinflections.length === 0) {
@@ -273,7 +308,7 @@ class Translator {
             deinflectionArray.push(deinflection);
         }
 
-        const definitions = await this.database.findTermsBulk(uniqueDeinflectionTerms, titles);
+        const definitions = await this.database.findTermsBulk(uniqueDeinflectionTerms, titles, false);
 
         for (const definition of definitions) {
             const definitionRules = Deinflector.rulesToRuleFlags(definition.rules);
@@ -314,7 +349,8 @@ class Translator {
         return deinflections;
     }
 
-    async findKanji(text, dictionaries) {
+    async findKanji(text, options) {
+        const dictionaries = dictEnabledSet(options);
         const titles = Object.keys(dictionaries);
         const kanjiUnique = {};
         const kanjiList = [];

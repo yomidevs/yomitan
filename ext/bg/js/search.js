@@ -203,11 +203,18 @@ class DisplaySearch extends Display {
 
     async onSearchQueryUpdated(query, animate) {
         try {
+            const details = {};
+            const match = /[\*\uff0a]+$/.exec(query);
+            if (match !== null) {
+                details.wildcard = true;
+                query = query.substr(0, query.length - match[0].length);
+            }
+
             const valid = (query.length > 0);
             this.setIntroVisible(!valid, animate);
             this.updateSearchButton();
             if (valid) {
-                const {definitions} = await apiTermsFind(query, this.optionsContext);
+                const {definitions} = await apiTermsFind(query, details, this.optionsContext);
                 this.setContentTerms(definitions, {
                     focus: false,
                     sentence: null,

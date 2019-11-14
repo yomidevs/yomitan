@@ -72,33 +72,18 @@ async function apiOptionsSave(source) {
     backend.onOptionsUpdated(source);
 }
 
-async function apiTermsFind(text, optionsContext) {
+async function apiTermsFind(text, details, optionsContext) {
     const options = await apiOptionsGet(optionsContext);
-    const translator = utilBackend().translator;
-
-    const searcher = {
-        'merge': translator.findTermsMerged,
-        'split': translator.findTermsSplit,
-        'group': translator.findTermsGrouped
-    }[options.general.resultOutputMode].bind(translator);
-
-    const {definitions, length} = await searcher(
-        text,
-        dictEnabledSet(options),
-        options.scanning.alphanumeric,
-        options
-    );
-
-    return {
-        length,
-        definitions: definitions.slice(0, options.general.maxResults)
-    };
+    const [definitions, length] = await utilBackend().translator.findTerms(text, details, options);
+    definitions.splice(options.general.maxResults);
+    return {length, definitions};
 }
 
 async function apiKanjiFind(text, optionsContext) {
     const options = await apiOptionsGet(optionsContext);
-    const definitions = await utilBackend().translator.findKanji(text, dictEnabledSet(options));
-    return definitions.slice(0, options.general.maxResults);
+    const definitions = await utilBackend().translator.findKanji(text, options);
+    definitions.splice(options.general.maxResults);
+    return definitions;
 }
 
 async function apiDefinitionAdd(definition, mode, context, optionsContext) {
