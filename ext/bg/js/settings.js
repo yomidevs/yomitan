@@ -655,7 +655,7 @@ const ankiTemplatesValidateGetDefinition = (() => {
 
     return async (text, optionsContext) => {
         if (cachedText !== text) {
-            const {definitions} = await apiTermsFind(text, optionsContext);
+            const {definitions} = await apiTermsFind(text, {}, optionsContext);
             if (definitions.length === 0) { return null; }
 
             cachedValue = definitions[0];
