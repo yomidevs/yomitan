@@ -86,7 +86,12 @@ async function apiTextParse(text, optionsContext) {
     const results = [];
     while (text.length > 0) {
         const term = [];
-        const [definitions, sourceLength] = await translator.findTerms(text, {}, options);
+        const [definitions, sourceLength] = await translator.findTermsInternal(
+            text.slice(0, options.scanning.length),
+            dictEnabledSet(options),
+            options.scanning.alphanumeric,
+            {}
+        );
         if (definitions.length > 0) {
             dictTermsSort(definitions);
             const {expression, reading} = definitions[0];
