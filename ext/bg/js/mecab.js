@@ -25,7 +25,7 @@ class Mecab {
     }
 
     onError(error) {
-        logError(error, true);
+        logError(error, false);
     }
 
     async checkVersion() {
