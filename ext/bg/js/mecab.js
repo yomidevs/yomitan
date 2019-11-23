@@ -24,10 +24,23 @@ class Mecab {
         this.sequence = 0;
     }
 
-    async parseText(text) {
-        if (this.port === null) {
-            return {};
+    onError(error) {
+        logError(error, true);
+    }
+
+    async checkVersion() {
+        try {
+            const {version} = await this.invoke('get_version', {});
+            if (version !== Mecab.version) {
+                this.stopListener();
+                throw new Error(`Unsupported MeCab native messenger version ${version}. Yomichan supports version ${Mecab.version}.`);
+            }
+        } catch (error) {
+            this.onError(error);
         }
+    }
+
+    async parseText(text) {
         return await this.invoke('parse_text', {text});
     }
 
@@ -35,6 +48,7 @@ class Mecab {
         if (this.port !== null) { return; }
         this.port = chrome.runtime.connectNative('yomichan_mecab');
         this.port.onMessage.addListener(this.onNativeMessage.bind(this));
+        this.checkVersion();
     }
 
     stopListener() {
@@ -55,6 +69,9 @@ class Mecab {
     }
 
     invoke(action, params) {
+        if (this.port === null) {
+            return {};
+        }
         return new Promise((resolve, reject) => {
             const sequence = this.sequence++;
 
@@ -72,3 +89,4 @@ class Mecab {
 }
 
 Mecab.timeout = 5000;
+Mecab.version = 1;
