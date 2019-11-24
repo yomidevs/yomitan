@@ -503,7 +503,8 @@ class Database {
             termMetaDataLoaded,
             kanjiDataLoaded,
             kanjiMetaDataLoaded,
-            tagDataLoaded
+            tagDataLoaded,
+            details
         );
     }
 
@@ -520,7 +521,8 @@ class Database {
         termMetaDataLoaded,
         kanjiDataLoaded,
         kanjiMetaDataLoaded,
-        tagDataLoaded
+        tagDataLoaded,
+        details
     ) {
         const zip = await JSZip.loadAsync(archive);
 
@@ -538,7 +540,8 @@ class Database {
             title: index.title,
             revision: index.revision,
             sequenced: index.sequenced,
-            version: index.format || index.version
+            version: index.format || index.version,
+            prefixWildcardsSupported: !!details.prefixWildcardsSupported
         };
 
         await indexDataLoaded(summary);

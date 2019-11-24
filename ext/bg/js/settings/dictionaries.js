@@ -189,6 +189,7 @@ class SettingsDictionaryEntryUI {
 
         this.content.querySelector('.dict-title').textContent = this.dictionaryInfo.title;
         this.content.querySelector('.dict-revision').textContent = `rev.${this.dictionaryInfo.revision}`;
+        this.content.querySelector('.dict-prefix-wildcard-searches-supported').checked = !!this.dictionaryInfo.prefixWildcardsSupported;
 
         this.applyValues();
 
