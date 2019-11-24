@@ -26,26 +26,26 @@ function showExtensionInfo() {
 }
 
 function setupButtonEvents(selector, command, url) {
-    const node = $(selector);
-    node.on('click', (e) => {
+    const node = document.querySelector(selector);
+    node.addEventListener('click', (e) => {
         if (e.button !== 0) { return; }
         apiCommandExec(command, {newTab: e.ctrlKey});
         e.preventDefault();
-    })
-    .on('auxclick', (e) => {
+    }, false);
+    node.addEventListener('auxclick', (e) => {
         if (e.button !== 1) { return; }
         apiCommandExec(command, {newTab: true});
         e.preventDefault();
-    });
+    }, false);
 
     if (typeof url === 'string') {
-        node.attr('href', url);
-        node.attr('target', '_blank');
-        node.attr('rel', 'noopener');
+        node.href = url;
+        node.target = '_blank';
+        node.rel = 'noopener';
     }
 }
 
-$(document).ready(utilAsync(() => {
+window.addEventListener('DOMContentLoaded', () => {
     showExtensionInfo();
 
     apiGetEnvironmentInfo().then(({browser}) => {
@@ -78,4 +78,4 @@ $(document).ready(utilAsync(() => {
             }
         }, 10);
     });
-}));
+});
