@@ -356,6 +356,7 @@ async function dictSettingsInitialize() {
     document.querySelector('#dict-file-button').addEventListener('click', (e) => onDictionaryImportButtonClick(e), false);
     document.querySelector('#dict-file').addEventListener('change', (e) => onDictionaryImport(e), false);
     document.querySelector('#dict-main').addEventListener('change', (e) => onDictionaryMainChanged(e), false);
+    document.querySelector('#database-enable-prefix-wildcard-searches').addEventListener('change', (e) => onDatabaseEnablePrefixWildcardSearchesChanged(e), false);
 
     const optionsContext = getOptionsContext();
     const options = await apiOptionsGet(optionsContext);
@@ -366,6 +367,9 @@ async function dictSettingsInitialize() {
 async function onDictionaryOptionsChanged(options) {
     if (dictionaryUI === null) { return; }
     dictionaryUI.setOptionsDictionaries(options.dictionaries);
+
+    const optionsFull = await apiOptionsGetFull();
+    document.querySelector('#database-enable-prefix-wildcard-searches').checked = optionsFull.global.database.prefixWildcardsSupported;
 }
 
 async function onDatabaseUpdated(options) {
@@ -575,6 +579,12 @@ async function onDictionaryImport(e) {
         const exceptions = [];
         const files = [...e.target.files];
 
+        const optionsFull = await apiOptionsGetFull();
+
+        const importDetails = {
+            prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported
+        };
+
         for (let i = 0, ii = files.length; i < ii; ++i) {
             setProgress(0.0);
             if (ii > 1) {
@@ -582,7 +592,7 @@ async function onDictionaryImport(e) {
                 dictImportInfo.textContent = `(${i + 1} of ${ii})`;
             }
 
-            const summary = await utilDatabaseImport(files[i], updateProgress, exceptions);
+            const summary = await utilDatabaseImport(files[i], updateProgress, exceptions, importDetails);
             for (const options of toIterable(await getOptionsArray())) {
                 const dictionaryOptions = SettingsDictionaryListUI.createDictionaryOptions();
                 dictionaryOptions.enabled = true;
@@ -615,4 +625,13 @@ async function onDictionaryImport(e) {
         dictControls.show();
         dictProgress.hide();
     }
+}
+
+
+async function onDatabaseEnablePrefixWildcardSearchesChanged(e) {
+    const optionsFull = await apiOptionsGetFull();
+    const v = !!e.target.checked;
+    if (optionsFull.global.database.prefixWildcardsSupported === v) { return; }
+    optionsFull.global.database.prefixWildcardsSupported = !!e.target.checked;
+    await settingsSaveOptions();
 }

@@ -332,8 +332,10 @@ class Database {
         return result;
     }
 
-    async importDictionary(archive, progressCallback, exceptions) {
+    async importDictionary(archive, progressCallback, exceptions, details) {
         this.validate();
+
+        const prefixWildcardsSupported = details.prefixWildcardsSupported;
 
         const maxTransactionLength = 1000;
         const bulkAdd = async (objectStoreName, items, total, current) => {
@@ -389,9 +391,7 @@ class Database {
                         rules,
                         score,
                         glossary,
-                        dictionary: summary.title,
-                        expressionReverse: stringReverse(expression),
-                        readingReverse: stringReverse(reading)
+                        dictionary: summary.title
                     });
                 }
             } else {
@@ -405,10 +405,15 @@ class Database {
                         glossary,
                         sequence,
                         termTags,
-                        dictionary: summary.title,
-                        expressionReverse: stringReverse(expression),
-                        readingReverse: stringReverse(reading)
+                        dictionary: summary.title
                     });
+                }
+            }
+
+            if (prefixWildcardsSupported) {
+                for (const row of rows) {
+                    row.expressionReverse = stringReverse(row.expression);
+                    row.readingReverse = stringReverse(row.reading);
                 }
             }
 

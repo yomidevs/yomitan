@@ -378,7 +378,15 @@ function profileOptionsUpdateVersion(options) {
  * ]
  */
 
-const optionsVersionUpdates = [];
+const optionsVersionUpdates = [
+    (options) => {
+        options.global = {
+            database: {
+                prefixWildcardsSupported: false
+            }
+        };
+    }
+];
 
 function optionsUpdateVersion(options, defaultProfileOptions) {
     // Ensure profiles is an array
@@ -421,6 +429,11 @@ function optionsUpdateVersion(options, defaultProfileOptions) {
             profile.conditionGroups = [];
         }
         profile.options = profileOptionsUpdateVersion(profile.options);
+    }
+
+    // Version
+    if (typeof options.version !== 'number') {
+        options.version = 0;
     }
 
     // Generic updates
