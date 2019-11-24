@@ -70,7 +70,7 @@ class Mecab {
 
     invoke(action, params) {
         if (this.port === null) {
-            return {};
+            return Promise.resolve({});
         }
         return new Promise((resolve, reject) => {
             const sequence = this.sequence++;
