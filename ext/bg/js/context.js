@@ -64,13 +64,18 @@ $(document).ready(utilAsync(() => {
         url: window.location.href
     };
     apiOptionsGet(optionsContext).then(options => {
-        const toggle = $('#enable-search');
-        toggle.prop('checked', options.general.enable).change();
-        toggle.bootstrapToggle();
-        toggle.change(() => apiCommandExec('toggle'));
+        const toggle = document.querySelector('#enable-search');
+        toggle.checked = options.general.enable;
+        toggle.addEventListener('change', () => apiCommandExec('toggle'), false);
 
-        const toggle2 = $('#enable-search2');
-        toggle2.prop('checked', options.general.enable).change();
-        toggle2.change(() => apiCommandExec('toggle'));
+        const toggle2 = document.querySelector('#enable-search2');
+        toggle2.checked = options.general.enable;
+        toggle2.addEventListener('change', () => apiCommandExec('toggle'), false);
+
+        setTimeout(() => {
+            for (const n of document.querySelectorAll('.toggle-group')) {
+                n.classList.add('toggle-group-animated');
+            }
+        }, 10);
     });
 }));

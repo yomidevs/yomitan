@@ -11,7 +11,6 @@
         <link rel="icon" type="image/png" href="/mixed/img/icon128.png" sizes="128x128">
         <link rel="stylesheet" type="text/css" href="/mixed/lib/bootstrap/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="/mixed/lib/bootstrap/css/bootstrap-theme.min.css">
-        <link rel="stylesheet" type="text/css" href="/mixed/lib/bootstrap-toggle/bootstrap-toggle.min.css">
         <style type="text/css">
             body {
                 padding: 10px;
@@ -89,12 +88,73 @@
             .link-group-label {
                 vertical-align: middle;
             }
+
+
+            .toggle {
+                width: 60px;
+                height: 34px;
+                position: relative;
+                overflow: hidden;
+            }
+            .toggle-group {
+                position: absolute;
+                width: 200%;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                user-select: none;
+            }
+            .toggle-group.toggle-group-animated {
+                transition: transform 0.35s;
+            }
+            .toggle-on,
+            .toggle-off {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                margin: 0;
+                border: 0;
+                border-radius: 0;
+            }
+            .toggle-on {
+                padding-right: 24px;
+                left: 0;
+                right: 50%;
+            }
+            .toggle-off {
+                padding-left: 24px;
+                left: 50%;
+                right: 0;
+            }
+            .toggle-handle {
+                position: relative;
+                margin: 0 auto;
+                padding-top: 0;
+                padding-bottom: 0;
+                height: 100%;
+                width: 0;
+                border-width: 0 1px;
+            }
+
+            .toggle>input[type=checkbox] {
+                display: none;
+            }
+            .toggle>input[type=checkbox]:not(:checked)~.toggle-group {
+                transform: translateX(-50%);
+            }
         </style>
     </head>
     <body>
         <div id="mini">
             <div>
-                <input type="checkbox" id="enable-search">
+                <label class="btn btn-primary toggle">
+                    <input type="checkbox" id="enable-search" />
+                    <div class="toggle-group">
+                        <span class="btn btn-primary toggle-on">On</span>
+                        <span class="btn btn-default active toggle-off">Off</span>
+                        <span class="btn btn-default toggle-handle"></span>
+                    </div>
+                </label>
             </div>
             <div class="btn-group">
                 <a title="Search (Alt + Insert)&#10;(Middle click to open in new tab)" class="btn btn-default btn-xs action-open-search"><span class="glyphicon glyphicon-search"></span></a>
@@ -119,7 +179,6 @@
         </div>
 
         <script src="/mixed/lib/jquery.min.js"></script>
-        <script src="/mixed/lib/bootstrap-toggle/bootstrap-toggle.min.js"></script>
 
         <script src="/mixed/js/extension.js"></script>
 
