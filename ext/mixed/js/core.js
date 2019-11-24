@@ -118,6 +118,10 @@ function toIterable(value) {
     throw new Error('Could not convert to iterable');
 }
 
+function stringReverse(string) {
+    return string.split('').reverse().join('').replace(/([\uDC00-\uDFFF])([\uD800-\uDBFF])/g, '$2$1');
+}
+
 
 /*
  * Async utilities

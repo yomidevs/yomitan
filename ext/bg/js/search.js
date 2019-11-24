@@ -207,10 +207,14 @@ class DisplaySearch extends Display {
     async onSearchQueryUpdated(query, animate) {
         try {
             const details = {};
-            const match = /[*\uff0a]+$/.exec(query);
+            const match = /^([*\uff0a]*)([\w\W]*?)([*\uff0a]*)$/.exec(query);
             if (match !== null) {
-                details.wildcard = true;
-                query = query.substring(0, query.length - match[0].length);
+                if (match[1]) {
+                    details.wildcard = 'prefix';
+                } else if (match[3]) {
+                    details.wildcard = 'suffix';
+                }
+                query = match[2];
             }
 
             const valid = (query.length > 0);

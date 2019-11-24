@@ -28,7 +28,7 @@ class Database {
         }
 
         try {
-            this.db = await Database.open('dict', 4, (db, transaction, oldVersion) => {
+            this.db = await Database.open('dict', 5, (db, transaction, oldVersion) => {
                 Database.upgrade(db, transaction, oldVersion, [
                     {
                         version: 2,
@@ -74,6 +74,15 @@ class Database {
                             terms: {
                                 primaryKey: {keyPath: 'id', autoIncrement: true},
                                 indices: ['dictionary', 'expression', 'reading', 'sequence']
+                            }
+                        }
+                    },
+                    {
+                        version: 5,
+                        stores: {
+                            terms: {
+                                primaryKey: {keyPath: 'id', autoIncrement: true},
+                                indices: ['dictionary', 'expression', 'reading', 'sequence', 'expressionReverse', 'readingReverse']
                             }
                         }
                     }
@@ -143,14 +152,17 @@ class Database {
             }
         };
 
+        const useWildcard = !!wildcard;
+        const prefixWildcard = wildcard === 'prefix';
+
         const dbTransaction = this.db.transaction(['terms'], 'readonly');
         const dbTerms = dbTransaction.objectStore('terms');
-        const dbIndex1 = dbTerms.index('expression');
-        const dbIndex2 = dbTerms.index('reading');
+        const dbIndex1 = dbTerms.index(prefixWildcard ? 'expressionReverse' : 'expression');
+        const dbIndex2 = dbTerms.index(prefixWildcard ? 'readingReverse' : 'reading');
 
         for (let i = 0; i < termList.length; ++i) {
-            const term = termList[i];
-            const query = wildcard ? IDBKeyRange.bound(term, `${term}\uffff`, false, false) : IDBKeyRange.only(term);
+            const term = prefixWildcard ? stringReverse(termList[i]) : termList[i];
+            const query = useWildcard ? IDBKeyRange.bound(term, `${term}\uffff`, false, false) : IDBKeyRange.only(term);
             promises.push(
                 Database.getAll(dbIndex1, query, i, processRow),
                 Database.getAll(dbIndex2, query, i, processRow)
@@ -377,7 +389,9 @@ class Database {
                         rules,
                         score,
                         glossary,
-                        dictionary: summary.title
+                        dictionary: summary.title,
+                        expressionReverse: stringReverse(expression),
+                        readingReverse: stringReverse(reading)
                     });
                 }
             } else {
@@ -391,7 +405,9 @@ class Database {
                         glossary,
                         sequence,
                         termTags,
-                        dictionary: summary.title
+                        dictionary: summary.title,
+                        expressionReverse: stringReverse(expression),
+                        readingReverse: stringReverse(reading)
                     });
                 }
             }

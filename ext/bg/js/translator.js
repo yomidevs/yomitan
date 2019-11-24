@@ -230,7 +230,7 @@ class Translator {
         const titles = Object.keys(dictionaries);
         const deinflections = (
             details.wildcard ?
-            await this.findTermWildcard(text, titles) :
+            await this.findTermWildcard(text, titles, details.wildcard) :
             await this.findTermDeinflections(text, titles)
         );
 
@@ -268,8 +268,8 @@ class Translator {
         return [definitions, length];
     }
 
-    async findTermWildcard(text, titles) {
-        const definitions = await this.database.findTermsBulk([text], titles, true);
+    async findTermWildcard(text, titles, wildcard) {
+        const definitions = await this.database.findTermsBulk([text], titles, wildcard);
         if (definitions.length === 0) {
             return [];
         }
@@ -308,7 +308,7 @@ class Translator {
             deinflectionArray.push(deinflection);
         }
 
-        const definitions = await this.database.findTermsBulk(uniqueDeinflectionTerms, titles, false);
+        const definitions = await this.database.findTermsBulk(uniqueDeinflectionTerms, titles, null);
 
         for (const definition of definitions) {
             const definitionRules = Deinflector.rulesToRuleFlags(definition.rules);
