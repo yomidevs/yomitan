@@ -128,7 +128,7 @@ function audioUrlNormalize(url, baseUrl, basePath) {
         if (url[0] === '/') {
             if (url.length >= 2 && url[1] === '/') {
                 // Begins with "//"
-                url = baseUrl.substr(0, baseUrl.indexOf(':') + 1) + url;
+                url = baseUrl.substring(0, baseUrl.indexOf(':') + 1) + url;
             } else {
                 // Begins with "/"
                 url = baseUrl + url;

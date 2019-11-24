@@ -391,7 +391,7 @@ class Popup {
     static isOnExtensionPage() {
         try {
             const url = chrome.runtime.getURL('/');
-            return window.location.href.substr(0, url.length) === url;
+            return window.location.href.substring(0, url.length) === url;
         } catch (e) {
             // NOP
         }

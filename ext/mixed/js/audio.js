@@ -75,7 +75,7 @@ class TextToSpeechAudio {
         for (const group of m[1].split('&')) {
             const sep = group.indexOf('=');
             if (sep < 0) { continue; }
-            searchParameters[decodeURIComponent(group.substr(0, sep))] = decodeURIComponent(group.substr(sep + 1));
+            searchParameters[decodeURIComponent(group.substring(0, sep))] = decodeURIComponent(group.substring(sep + 1));
         }
 
         if (!searchParameters.text) { return null; }

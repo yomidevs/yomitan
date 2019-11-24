@@ -207,7 +207,7 @@ class DisplaySearch extends Display {
             const match = /[\*\uff0a]+$/.exec(query);
             if (match !== null) {
                 details.wildcard = true;
-                query = query.substr(0, query.length - match[0].length);
+                query = query.substring(0, query.length - match[0].length);
             }
 
             const valid = (query.length > 0);

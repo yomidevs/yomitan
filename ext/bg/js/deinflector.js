@@ -44,7 +44,7 @@ class Deinflector {
 
                     results.push({
                         source,
-                        term: term.slice(0, -kanaIn.length) + kanaOut,
+                        term: term.substring(0, term.length - kanaIn.length) + kanaOut,
                         rules: rulesOut,
                         definitions: [],
                         reasons: [reason, ...reasons]

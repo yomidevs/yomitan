@@ -327,22 +327,22 @@ class Translator {
         const deinflections = [];
 
         for (let i = text.length; i > 0; --i) {
-            const textSlice = text.slice(0, i);
-            deinflections.push(...this.deinflector.deinflect(textSlice));
+            const textSubstring = text.substring(0, i);
+            deinflections.push(...this.deinflector.deinflect(textSubstring));
         }
 
         return deinflections;
     }
 
-    getDeinflections2(text, text2) {
+    getDeinflections2(text1, text2) {
         const deinflections = [];
 
-        for (let i = text.length; i > 0; --i) {
-            const textSlice = text.slice(0, i);
-            const text2Slice = text2.slice(0, i);
-            deinflections.push(...this.deinflector.deinflect(textSlice));
-            if (textSlice !== text2Slice) {
-                deinflections.push(...this.deinflector.deinflect(text2Slice));
+        for (let i = text1.length; i > 0; --i) {
+            const text1Substring = text1.substring(0, i);
+            const text2Substring = text2.substring(0, i);
+            deinflections.push(...this.deinflector.deinflect(text1Substring));
+            if (text1Substring !== text2Substring) {
+                deinflections.push(...this.deinflector.deinflect(text2Substring));
             }
         }
 
@@ -516,6 +516,6 @@ class Translator {
 
     static getNameBase(name) {
         const pos = name.indexOf(':');
-        return (pos >= 0 ? name.substr(0, pos) : name);
+        return (pos >= 0 ? name.substring(0, pos) : name);
     }
 }
