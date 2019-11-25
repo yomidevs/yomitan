@@ -167,7 +167,7 @@ class DisplaySearch extends Display {
         this.onSearchQueryUpdated(query, true);
     }
 
-    onPopState(e) {
+    onPopState() {
         const query = DisplaySearch.getSearchQueryFromLocation(window.location.href) || '';
         if (this.query !== null) {
             if (this.isWanakanaEnabled()) {
@@ -245,7 +245,7 @@ class DisplaySearch extends Display {
 
     initClipboardMonitor() {
         // ignore copy from search page
-        window.addEventListener('copy', (e) => {
+        window.addEventListener('copy', () => {
             this.clipboardPrevText = document.getSelection().toString().trim();
         });
     }

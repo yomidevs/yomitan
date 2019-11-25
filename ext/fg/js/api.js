@@ -113,6 +113,6 @@ function _apiInvoke(action, params={}) {
     });
 }
 
-function _apiCheckLastError(e) {
+function _apiCheckLastError() {
     // NOP
 }

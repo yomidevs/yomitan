@@ -122,7 +122,7 @@ class Frontend {
         }
     }
 
-    onMouseOut(e) {
+    onMouseOut() {
         this.popupTimerClear();
     }
 
@@ -135,7 +135,7 @@ class Frontend {
         }
     }
 
-    onAuxClick(e) {
+    onAuxClick() {
         this.preventNextContextMenu = false;
     }
 

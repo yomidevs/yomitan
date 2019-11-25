@@ -108,11 +108,11 @@ class AnkiConnect {
  */
 
 class AnkiNull {
-    async addNote(note) {
+    async addNote() {
         return null;
     }
 
-    async canAddNotes(notes) {
+    async canAddNotes() {
         return [];
     }
 
@@ -124,15 +124,15 @@ class AnkiNull {
         return [];
     }
 
-    async getModelFieldNames(modelName) {
+    async getModelFieldNames() {
         return [];
     }
 
-    async guiBrowse(query) {
+    async guiBrowse() {
         return [];
     }
 
-    async findNoteIds(notes) {
+    async findNoteIds() {
         return [];
     }
 }

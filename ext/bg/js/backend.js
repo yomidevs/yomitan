@@ -177,7 +177,7 @@ class Backend {
         }
     }
 
-    checkLastError(e) {
+    checkLastError() {
         // NOP
     }
 }

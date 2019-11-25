@@ -375,7 +375,7 @@ class TextSourceElement {
         return this.content.length;
     }
 
-    setStartOffset(length) {
+    setStartOffset() {
         return 0;
     }
 

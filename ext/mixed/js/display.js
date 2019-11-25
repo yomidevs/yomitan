@@ -42,7 +42,7 @@ class Display {
         this.setInteractive(true);
     }
 
-    onError(error) {
+    onError(_error) {
         throw new Error('Override me');
     }
 
@@ -90,7 +90,7 @@ class Display {
         }
     }
 
-    onGlossaryMouseMove(e) {
+    onGlossaryMouseMove() {
         this.clickScanPrevent = true;
     }
 
