@@ -81,7 +81,7 @@ function dictTermsUndupe(definitions) {
     const definitionGroups = {};
     for (const definition of definitions) {
         const definitionExisting = definitionGroups[definition.id];
-        if (!definitionGroups.hasOwnProperty(definition.id) || definition.expression.length > definitionExisting.expression.length) {
+        if (!hasOwn(definitionGroups, definition.id) || definition.expression.length > definitionExisting.expression.length) {
             definitionGroups[definition.id] = definition;
         }
     }
@@ -131,7 +131,7 @@ function dictTermsGroup(definitions, dictionaries) {
         }
 
         const keyString = key.toString();
-        if (groups.hasOwnProperty(keyString)) {
+        if (hasOwn(groups, keyString)) {
             groups[keyString].push(definition);
         } else {
             groups[keyString] = [definition];

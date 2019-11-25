@@ -237,7 +237,7 @@ class Frontend {
     onWindowMessage(e) {
         const action = e.data;
         const handlers = Frontend.windowMessageHandlers;
-        if (handlers.hasOwnProperty(action)) {
+        if (hasOwn(handlers, action)) {
             const handler = handlers[action];
             handler(this);
         }
@@ -245,7 +245,7 @@ class Frontend {
 
     onRuntimeMessage({action, params}, sender, callback) {
         const handlers = Frontend.runtimeMessageHandlers;
-        if (handlers.hasOwnProperty(action)) {
+        if (hasOwn(handlers, action)) {
             const handler = handlers[action];
             const result = handler(this, params);
             callback(result);

@@ -113,7 +113,7 @@ function audioGetFromUrl(url, willDownload) {
 
 async function audioGetFromSources(expression, sources, optionsContext, willDownload, cache=null) {
     const key = `${expression.expression}:${expression.reading}`;
-    if (cache !== null && cache.hasOwnProperty(expression)) {
+    if (cache !== null && hasOwn(cache, expression)) {
         return cache[key];
     }
 

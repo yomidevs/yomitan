@@ -94,6 +94,10 @@ function isObject(value) {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+function hasOwn(object, property) {
+    return Object.prototype.hasOwnProperty.call(object, property);
+}
+
 // toIterable is required on Edge for cross-window origin objects.
 function toIterable(value) {
     if (typeof Symbol !== 'undefined' && typeof value[Symbol.iterator] !== 'undefined') {

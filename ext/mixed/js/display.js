@@ -194,7 +194,7 @@ class Display {
     onKeyDown(e) {
         const key = Display.getKeyFromEvent(e);
         const handlers = Display.onKeyDownHandlers;
-        if (handlers.hasOwnProperty(key)) {
+        if (hasOwn(handlers, key)) {
             const handler = handlers[key];
             if (handler(this, e)) {
                 e.preventDefault();
@@ -216,7 +216,7 @@ class Display {
 
     onRuntimeMessage({action, params}, sender, callback) {
         const handlers = Display.runtimeMessageHandlers;
-        if (handlers.hasOwnProperty(action)) {
+        if (hasOwn(handlers, action)) {
             const handler = handlers[action];
             const result = handler(this, params);
             callback(result);

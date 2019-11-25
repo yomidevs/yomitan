@@ -60,7 +60,7 @@ class Mecab {
     }
 
     onNativeMessage({sequence, data}) {
-        if (this.listeners.hasOwnProperty(sequence)) {
+        if (hasOwn(this.listeners, sequence)) {
             const {callback, timer} = this.listeners[sequence];
             clearTimeout(timer);
             callback(data);

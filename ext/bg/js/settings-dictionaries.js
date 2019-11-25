@@ -81,7 +81,7 @@ class SettingsDictionaryListUI {
         let changed = false;
         let optionsDictionary;
         const optionsDictionaries = this.optionsDictionaries;
-        if (optionsDictionaries.hasOwnProperty(title)) {
+        if (hasOwn(optionsDictionaries, title)) {
             optionsDictionary = optionsDictionaries[title];
         } else {
             optionsDictionary = SettingsDictionaryListUI.createDictionaryOptions();
@@ -466,7 +466,7 @@ function dictionaryErrorsShow(errors) {
         for (let e of errors) {
             console.error(e);
             e = dictionaryErrorToString(e);
-            uniqueErrors[e] = uniqueErrors.hasOwnProperty(e) ? uniqueErrors[e] + 1 : 1;
+            uniqueErrors[e] = hasOwn(uniqueErrors, e) ? uniqueErrors[e] + 1 : 1;
         }
 
         for (const e in uniqueErrors) {

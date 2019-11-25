@@ -336,7 +336,7 @@ function profileOptionsSetDefaults(options) {
 
     const combine = (target, source) => {
         for (const key in source) {
-            if (!target.hasOwnProperty(key)) {
+            if (!hasOwn(target, key)) {
                 target[key] = source[key];
             }
         }

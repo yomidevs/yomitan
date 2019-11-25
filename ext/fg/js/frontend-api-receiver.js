@@ -34,7 +34,7 @@ class FrontendApiReceiver {
     onMessage(port, {id, action, params, target, senderId}) {
         if (
             target !== this.source ||
-            !this.handlers.hasOwnProperty(action)
+            !hasOwn(this.handlers, action)
         ) {
             return;
         }

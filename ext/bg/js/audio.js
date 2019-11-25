@@ -107,12 +107,12 @@ const audioUrlBuilders = {
     'custom': async (definition, optionsContext) => {
         const options = await apiOptionsGet(optionsContext);
         const customSourceUrl = options.audio.customSourceUrl;
-        return customSourceUrl.replace(/\{([^\}]*)\}/g, (m0, m1) => (definition.hasOwnProperty(m1) ? `${definition[m1]}` : m0));
+        return customSourceUrl.replace(/\{([^\}]*)\}/g, (m0, m1) => (hasOwn(definition, m1) ? `${definition[m1]}` : m0));
     }
 };
 
 async function audioGetUrl(definition, mode, optionsContext, download) {
-    if (audioUrlBuilders.hasOwnProperty(mode)) {
+    if (hasOwn(audioUrlBuilders, mode)) {
         const handler = audioUrlBuilders[mode];
         try {
             return await handler(definition, optionsContext, download);
@@ -171,7 +171,7 @@ async function audioInject(definition, fields, sources, optionsContext) {
 
     try {
         let audioSourceDefinition = definition;
-        if (definition.hasOwnProperty('expressions')) {
+        if (hasOwn(definition, 'expressions')) {
             audioSourceDefinition = definition.expressions[0];
         }
 

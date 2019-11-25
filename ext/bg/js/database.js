@@ -137,7 +137,7 @@ class Database {
         const visited = {};
         const results = [];
         const processRow = (row, index) => {
-            if (titles.includes(row.dictionary) && !visited.hasOwnProperty(row.id)) {
+            if (titles.includes(row.dictionary) && !hasOwn(visited, row.id)) {
                 visited[row.id] = true;
                 results.push(Database.createTerm(row, index));
             }

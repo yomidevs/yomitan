@@ -297,7 +297,7 @@ class Translator {
         for (const deinflection of deinflections) {
             const term = deinflection.term;
             let deinflectionArray;
-            if (uniqueDeinflectionsMap.hasOwnProperty(term)) {
+            if (hasOwn(uniqueDeinflectionsMap, term)) {
                 deinflectionArray = uniqueDeinflectionsMap[term];
             } else {
                 deinflectionArray = [];
@@ -355,7 +355,7 @@ class Translator {
         const kanjiUnique = {};
         const kanjiList = [];
         for (const c of text) {
-            if (!kanjiUnique.hasOwnProperty(c)) {
+            if (!hasOwn(kanjiUnique, c)) {
                 kanjiList.push(c);
                 kanjiUnique[c] = true;
             }
@@ -417,7 +417,7 @@ class Translator {
             const expression = term.expression;
             term.frequencies = [];
 
-            if (termsUniqueMap.hasOwnProperty(expression)) {
+            if (hasOwn(termsUniqueMap, expression)) {
                 termsUniqueMap[expression].push(term);
             } else {
                 const termList = [term];
@@ -464,7 +464,7 @@ class Translator {
 
             const category = meta.category;
             const group = (
-                stats.hasOwnProperty(category) ?
+                hasOwn(stats, category) ?
                 stats[category] :
                 (stats[category] = [])
             );
@@ -484,7 +484,7 @@ class Translator {
     async getTagMetaList(names, title) {
         const tagMetaList = [];
         const cache = (
-            this.tagCache.hasOwnProperty(title) ?
+            hasOwn(this.tagCache, title) ?
             this.tagCache[title] :
             (this.tagCache[title] = {})
         );
@@ -492,7 +492,7 @@ class Translator {
         for (const name of names) {
             const base = Translator.getNameBase(name);
 
-            if (cache.hasOwnProperty(base)) {
+            if (hasOwn(cache, base)) {
                 tagMetaList.push(cache[base]);
             } else {
                 const tagMeta = await this.database.findTagForTitle(base, title);

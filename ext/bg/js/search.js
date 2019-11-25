@@ -234,7 +234,7 @@ class DisplaySearch extends Display {
 
     onRuntimeMessage({action, params}, sender, callback) {
         const handlers = DisplaySearch.runtimeMessageHandlers;
-        if (handlers.hasOwnProperty(action)) {
+        if (hasOwn(handlers, action)) {
             const handler = handlers[action];
             const result = handler(this, params);
             callback(result);

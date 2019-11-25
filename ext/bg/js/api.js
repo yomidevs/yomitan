@@ -45,7 +45,7 @@ async function apiOptionsSet(changedOptions, optionsContext, source) {
     function modifyOption(path, value, options) {
         let pivot = options;
         for (const key of path.slice(0, -1)) {
-            if (!pivot.hasOwnProperty(key)) {
+            if (!hasOwn(pivot, key)) {
                 return false;
             }
             pivot = pivot[key];
@@ -236,7 +236,7 @@ async function apiTemplateRender(template, data, dynamic) {
 
 async function apiCommandExec(command, params) {
     const handlers = apiCommandExec.handlers;
-    if (handlers.hasOwnProperty(command)) {
+    if (hasOwn(handlers, command)) {
         const handler = handlers[command];
         handler(params);
     }

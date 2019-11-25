@@ -84,7 +84,7 @@ ConditionsUI.Container = class Container {
     createDefaultCondition(type) {
         let operator = '';
         let value = '';
-        if (this.conditionDescriptors.hasOwnProperty(type)) {
+        if (hasOwn(this.conditionDescriptors, type)) {
             const conditionDescriptor = this.conditionDescriptors[type];
             operator = conditionDescriptor.defaultOperator;
             ({value} = this.getOperatorDefaultValue(type, operator));
@@ -96,15 +96,15 @@ ConditionsUI.Container = class Container {
     }
 
     getOperatorDefaultValue(type, operator) {
-        if (this.conditionDescriptors.hasOwnProperty(type)) {
+        if (hasOwn(this.conditionDescriptors, type)) {
             const conditionDescriptor = this.conditionDescriptors[type];
-            if (conditionDescriptor.operators.hasOwnProperty(operator)) {
+            if (hasOwn(conditionDescriptor.operators, operator)) {
                 const operatorDescriptor = conditionDescriptor.operators[operator];
-                if (operatorDescriptor.hasOwnProperty('defaultValue')) {
+                if (hasOwn(operatorDescriptor, 'defaultValue')) {
                     return {value: operatorDescriptor.defaultValue, fromOperator: true};
                 }
             }
-            if (conditionDescriptor.hasOwnProperty('defaultValue')) {
+            if (hasOwn(conditionDescriptor, 'defaultValue')) {
                 return {value: conditionDescriptor.defaultValue, fromOperator: false};
             }
         }
@@ -219,7 +219,7 @@ ConditionsUI.Condition = class Condition {
         optionGroup.empty();
 
         const type = this.condition.type;
-        if (conditionDescriptors.hasOwnProperty(type)) {
+        if (hasOwn(conditionDescriptors, type)) {
             const conditionDescriptor = conditionDescriptors[type];
             const operators = conditionDescriptor.operators;
             for (const operatorName of Object.keys(operators)) {
@@ -240,23 +240,23 @@ ConditionsUI.Condition = class Condition {
         };
 
         const objects = [];
-        if (conditionDescriptors.hasOwnProperty(type)) {
+        if (hasOwn(conditionDescriptors, type)) {
             const conditionDescriptor = conditionDescriptors[type];
             objects.push(conditionDescriptor);
-            if (conditionDescriptor.operators.hasOwnProperty(operator)) {
+            if (hasOwn(conditionDescriptor.operators, operator)) {
                 const operatorDescriptor = conditionDescriptor.operators[operator];
                 objects.push(operatorDescriptor);
             }
         }
 
         for (const object of objects) {
-            if (object.hasOwnProperty('placeholder')) {
+            if (hasOwn(object, 'placeholder')) {
                 props.placeholder = object.placeholder;
             }
             if (object.type === 'number') {
                 props.type = 'number';
                 for (const prop of ['step', 'min', 'max']) {
-                    if (object.hasOwnProperty(prop)) {
+                    if (hasOwn(object, prop)) {
                         props[prop] = object[prop];
                     }
                 }

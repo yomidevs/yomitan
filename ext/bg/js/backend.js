@@ -73,7 +73,7 @@ class Backend {
 
     onMessage({action, params}, sender, callback) {
         const handlers = Backend.messageHandlers;
-        if (handlers.hasOwnProperty(action)) {
+        if (hasOwn(handlers, action)) {
             const handler = handlers[action];
             const promise = handler(params, sender);
             promise.then(
