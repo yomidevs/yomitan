@@ -207,7 +207,7 @@ class DisplaySearch extends Display {
     async onSearchQueryUpdated(query, animate) {
         try {
             const details = {};
-            const match = /[\*\uff0a]+$/.exec(query);
+            const match = /[*\uff0a]+$/.exec(query);
             if (match !== null) {
                 details.wildcard = true;
                 query = query.substring(0, query.length - match[0].length);
@@ -356,7 +356,7 @@ class DisplaySearch extends Display {
     }
 
     static getSearchQueryFromLocation(url) {
-        let match = /^[^\?#]*\?(?:[^&#]*&)?query=([^&#]*)/.exec(url);
+        let match = /^[^?#]*\?(?:[^&#]*&)?query=([^&#]*)/.exec(url);
         return match !== null ? decodeURIComponent(match[1]) : null;
     }
 }

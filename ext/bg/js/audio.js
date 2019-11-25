@@ -107,7 +107,7 @@ const audioUrlBuilders = {
     'custom': async (definition, optionsContext) => {
         const options = await apiOptionsGet(optionsContext);
         const customSourceUrl = options.audio.customSourceUrl;
-        return customSourceUrl.replace(/\{([^\}]*)\}/g, (m0, m1) => (hasOwn(definition, m1) ? `${definition[m1]}` : m0));
+        return customSourceUrl.replace(/\{([^}]*)\}/g, (m0, m1) => (hasOwn(definition, m1) ? `${definition[m1]}` : m0));
     }
 };
 
@@ -133,7 +133,7 @@ function audioUrlNormalize(url, baseUrl, basePath) {
                 // Begins with "/"
                 url = baseUrl + url;
             }
-        } else if (!/^[a-z][a-z0-9\+\-\.]*:/i.test(url)) {
+        } else if (!/^[a-z][a-z0-9\-+.]*:/i.test(url)) {
             // No URI scheme => relative path
             url = baseUrl + basePath + url;
         }

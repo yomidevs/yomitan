@@ -322,7 +322,7 @@ async function dictFieldFormat(field, definition, mode, options, exceptions) {
         compactGlossaries: options.general.compactGlossaries
     };
     const markers = dictFieldFormat.markers;
-    const pattern = /\{([\w\-]+)\}/g;
+    const pattern = /\{([\w-]+)\}/g;
     return await stringReplaceAsync(field, pattern, async (g0, marker) => {
         if (!markers.has(marker)) {
             return g0;

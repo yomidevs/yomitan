@@ -303,7 +303,7 @@ class Popup {
     }
 
     static getColorInfo(cssColor) {
-        const m = /^\s*rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d\.]+)\s*)?\)\s*$/.exec(cssColor);
+        const m = /^\s*rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)\s*$/.exec(cssColor);
         if (m === null) { return null; }
 
         const m4 = m[4];

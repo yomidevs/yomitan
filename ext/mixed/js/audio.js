@@ -68,7 +68,7 @@ class TextToSpeechAudio {
     }
 
     static createFromUri(ttsUri) {
-        const m = /^tts:[^#\?]*\?([^#]*)/.exec(ttsUri);
+        const m = /^tts:[^#?]*\?([^#]*)/.exec(ttsUri);
         if (m === null) { return null; }
 
         const searchParameters = {};

@@ -17,7 +17,7 @@
  */
 
 
-const REGEX_TRANSPARENT_COLOR = /rgba\s*\([^\)]*,\s*0(?:\.0+)?\s*\)/;
+const REGEX_TRANSPARENT_COLOR = /rgba\s*\([^)]*,\s*0(?:\.0+)?\s*\)/;
 
 function docSetImposterStyle(style, propertyName, value) {
     style.setProperty(propertyName, value, 'important');
