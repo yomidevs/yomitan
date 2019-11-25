@@ -737,7 +737,9 @@ function storageBytesToLabeledString(size) {
 async function storageEstimate() {
     try {
         return (storageEstimate.mostRecent = await navigator.storage.estimate());
-    } catch (e) { }
+    } catch (e) {
+        // NOP
+    }
     return null;
 }
 storageEstimate.mostRecent = null;
@@ -745,7 +747,9 @@ storageEstimate.mostRecent = null;
 async function isStoragePeristent() {
     try {
         return await navigator.storage.persisted();
-    } catch (e) { }
+    } catch (e) {
+        // NOP
+    }
     return false;
 }
 

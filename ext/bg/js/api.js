@@ -404,7 +404,9 @@ async function apiGetBrowser() {
             if (info.name === 'Fennec') {
                 return 'firefox-mobile';
             }
-        } catch (e) { }
+        } catch (e) {
+            // NOP
+        }
         return 'firefox';
     } else {
         return 'chrome';
