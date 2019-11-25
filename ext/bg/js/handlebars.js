@@ -89,7 +89,7 @@ function handlebarsRegexReplace(...args) {
     let value = args[args.length - 1].fn(this);
     if (args.length >= 3) {
         try {
-            let flags = args.length > 3 ? args[2] : 'g';
+            const flags = args.length > 3 ? args[2] : 'g';
             const regex = new RegExp(args[0], flags);
             value = value.replace(regex, args[1]);
         } catch (e) {

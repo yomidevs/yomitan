@@ -134,7 +134,7 @@ class QueryParser {
             });
         }
         if (this.search.options.parsing.enableMecabParser) {
-            let mecabResults = await apiTextParseMecab(text, this.search.getOptionsContext());
+            const mecabResults = await apiTextParseMecab(text, this.search.getOptionsContext());
             for (const mecabDictName in mecabResults) {
                 results.push({
                     name: `MeCab: ${mecabDictName}`,

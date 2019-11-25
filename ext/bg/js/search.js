@@ -356,7 +356,7 @@ class DisplaySearch extends Display {
     }
 
     static getSearchQueryFromLocation(url) {
-        let match = /^[^?#]*\?(?:[^&#]*&)?query=([^&#]*)/.exec(url);
+        const match = /^[^?#]*\?(?:[^&#]*&)?query=([^&#]*)/.exec(url);
         return match !== null ? decodeURIComponent(match[1]) : null;
     }
 }

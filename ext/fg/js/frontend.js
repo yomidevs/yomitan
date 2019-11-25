@@ -447,8 +447,8 @@ class Frontend {
     }
 
     getIndexOfTouch(touchList, identifier) {
-        for (let i in touchList) {
-            let t = touchList[i];
+        for (const i in touchList) {
+            const t = touchList[i];
             if (t.identifier === identifier) {
                 return i;
             }

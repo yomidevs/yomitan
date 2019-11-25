@@ -361,7 +361,7 @@ class TextSourceElement {
 
         let consumed = 0;
         let content = '';
-        for (let currentChar of this.content || '') {
+        for (const currentChar of this.content || '') {
             if (consumed >= length) {
                 break;
             } else if (!currentChar.match(IGNORE_TEXT_PATTERN)) {
