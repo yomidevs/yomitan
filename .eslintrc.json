@@ -3,19 +3,26 @@
     "parserOptions": {
         "ecmaVersion": 8
     },
+    "ignorePatterns": [
+        "/ext/mixed/lib/",
+        "/ext/bg/js/templates.js"
+    ],
     "rules": {
         "arrow-parens": ["error", "as-needed"],
         "comma-dangle": ["error", "never"],
+        "curly": ["error", "all"],
         "dot-notation": "error",
-        "eqeqeq": 2,
+        "eqeqeq": "error",
         "no-case-declarations": "error",
-        "no-const-assign": 2,
-        "no-undef": 0,
-        "no-unused-vars": 0,
-        "no-var": 2,
-        "prefer-const": 2,
+        "no-const-assign": "error",
+        "no-constant-condition": "off",
+        "no-undef": "off",
+        "no-unused-vars": ["error", {"vars": "local", "args": "after-used", "argsIgnorePattern": "^_", "caughtErrors": "none"}],
+        "no-var": "error",
+        "prefer-const": ["error", {"destructuring": "all"}],
         "quote-props": ["error", "consistent"],
-        "quotes": [2, "single", "avoid-escape"],
-        "semi": 2
+        "quotes": ["error", "single", "avoid-escape"],
+        "require-atomic-updates": "off",
+        "semi": "error"
     }
 }
