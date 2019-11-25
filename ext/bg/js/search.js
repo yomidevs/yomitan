@@ -324,7 +324,7 @@ class DisplaySearch extends Display {
             this.intro.style.transition = '';
             this.intro.style.height = '';
             const size = this.intro.getBoundingClientRect();
-            this.intro.style.height = `0px`;
+            this.intro.style.height = '0px';
             this.intro.style.transition = `height ${duration}s ease-in-out 0s`;
             window.getComputedStyle(this.intro).getPropertyValue('height'); // Commits height so next line can start animation
             this.intro.style.height = `${size.height}px`;

@@ -574,7 +574,7 @@ class Display {
             if (button !== null) {
                 let titleDefault = button.dataset.titleDefault;
                 if (!titleDefault) {
-                    titleDefault = button.title || "";
+                    titleDefault = button.title || '';
                     button.dataset.titleDefault = titleDefault;
                 }
                 button.title = `${titleDefault}\n${info}`;

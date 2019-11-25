@@ -401,7 +401,7 @@ class Popup {
         if (Popup.outerStylesheet === null) {
             if (!css) { return; }
             Popup.outerStylesheet = document.createElement('style');
-            Popup.outerStylesheet.id = "yomichan-popup-outer-stylesheet";
+            Popup.outerStylesheet.id = 'yomichan-popup-outer-stylesheet';
         }
 
         const outerStylesheet = Popup.outerStylesheet;

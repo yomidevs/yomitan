@@ -99,9 +99,9 @@ class TextSourceRange {
 
     static getRubyElement(node) {
         node = TextSourceRange.getParentElement(node);
-        if (node !== null && node.nodeName.toUpperCase() === "RT") {
+        if (node !== null && node.nodeName.toUpperCase() === 'RT') {
             node = node.parentNode;
-            return (node !== null && node.nodeName.toUpperCase() === "RUBY") ? node : null;
+            return (node !== null && node.nodeName.toUpperCase() === 'RUBY') ? node : null;
         }
         return null;
     }
