@@ -220,7 +220,7 @@ class QueryParser {
                 return {
                     text: Array.from(part.text),
                     reading: part.reading,
-                    raw: !part.reading || !part.reading.trim(),
+                    raw: !part.reading || !part.reading.trim()
                 };
             });
         });

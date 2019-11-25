@@ -88,5 +88,5 @@ Deinflector.ruleTypes = {
     'vs':    0b0000100, // Verb suru
     'vk':    0b0001000, // Verb kuru
     'adj-i': 0b0010000, // Adjective i
-    'iru':   0b0100000, // Intermediate -iru endings for progressive or perfect tense
+    'iru':   0b0100000  // Intermediate -iru endings for progressive or perfect tense
 };
