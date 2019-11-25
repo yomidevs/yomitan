@@ -236,7 +236,7 @@ other developers who want to help out. I take pride in the high quality of the c
 following basic guidelines when creating pull requests:
 
 *   Please discuss large features before writing code.
-*   Follow the [conventions and style](https://raw.githubusercontent.com/FooSoft/dotfiles/master/.eslintrc.json) of the existing code.
+*   Follow the [conventions and style](.eslintrc.json) of the existing code.
 *   Write clean, modern ES6 code (`const`/`let`, `await`, arrow functions, etc.)
 *   Large pull requests without a clear scope will not be merged.
 *   Incomplete or non-standalone features will not be merged.

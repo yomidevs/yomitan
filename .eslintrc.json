@@ -1,0 +1,21 @@
+{
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "ecmaVersion": 8
+    },
+    "rules": {
+        "arrow-parens": ["error", "as-needed"],
+        "comma-dangle": ["error", "never"],
+        "dot-notation": "error",
+        "eqeqeq": 2,
+        "no-case-declarations": "error",
+        "no-const-assign": 2,
+        "no-undef": 0,
+        "no-unused-vars": 0,
+        "no-var": 2,
+        "prefer-const": 2,
+        "quote-props": ["error", "consistent"],
+        "quotes": [2, "single", "avoid-escape"],
+        "semi": 2
+    }
+}
