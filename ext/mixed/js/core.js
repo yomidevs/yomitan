@@ -17,27 +17,11 @@
  */
 
 
-// toIterable is required on Edge for cross-window origin objects.
-function toIterable(value) {
-    if (typeof Symbol !== 'undefined' && typeof value[Symbol.iterator] !== 'undefined') {
-        return value;
-    }
+/*
+ * Extension information
+ */
 
-    if (value !== null && typeof value === 'object') {
-        const length = value.length;
-        if (typeof length === 'number' && Number.isFinite(length)) {
-            const array = [];
-            for (let i = 0; i < length; ++i) {
-                array.push(value[i]);
-            }
-            return array;
-        }
-    }
-
-    throw new Error('Could not convert to iterable');
-}
-
-function extensionHasChrome() {
+function _extensionHasChrome() {
     try {
         return typeof chrome === 'object' && chrome !== null;
     } catch (e) {
@@ -45,13 +29,28 @@ function extensionHasChrome() {
     }
 }
 
-function extensionHasBrowser() {
+function _extensionHasBrowser() {
     try {
         return typeof browser === 'object' && browser !== null;
     } catch (e) {
         return false;
     }
 }
+
+const EXTENSION_IS_BROWSER_EDGE = (
+    _extensionHasBrowser() &&
+    (!_extensionHasChrome() || (typeof chrome.runtime === 'undefined' && typeof browser.runtime !== 'undefined'))
+);
+
+if (EXTENSION_IS_BROWSER_EDGE) {
+    // Edge does not have chrome defined.
+    chrome = browser;
+}
+
+
+/*
+ * Error handling
+ */
 
 function errorToJson(error) {
     return {
@@ -86,15 +85,39 @@ function logError(error, alert) {
     }
 }
 
-const EXTENSION_IS_BROWSER_EDGE = (
-    extensionHasBrowser() &&
-    (!extensionHasChrome() || (typeof chrome.runtime === 'undefined' && typeof browser.runtime !== 'undefined'))
-);
 
-if (EXTENSION_IS_BROWSER_EDGE) {
-    // Edge does not have chrome defined.
-    chrome = browser;
+/*
+ * Common helpers
+ */
+
+function isObject(value) {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
+
+// toIterable is required on Edge for cross-window origin objects.
+function toIterable(value) {
+    if (typeof Symbol !== 'undefined' && typeof value[Symbol.iterator] !== 'undefined') {
+        return value;
+    }
+
+    if (value !== null && typeof value === 'object') {
+        const length = value.length;
+        if (typeof length === 'number' && Number.isFinite(length)) {
+            const array = [];
+            for (let i = 0; i < length; ++i) {
+                array.push(value[i]);
+            }
+            return array;
+        }
+    }
+
+    throw new Error('Could not convert to iterable');
+}
+
+
+/*
+ * Async utilities
+ */
 
 function promiseTimeout(delay, resolveValue) {
     if (delay <= 0) {
@@ -147,8 +170,4 @@ function stringReplaceAsync(str, regex, replacer) {
     }
     parts.push(str.substring(index));
     return Promise.all(parts).then(v => v.join(''));
-}
-
-function isObject(value) {
-    return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
