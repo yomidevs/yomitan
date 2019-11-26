@@ -583,7 +583,7 @@ async function ankiFieldsPopulate(element, options) {
     }
 
     tab.find('.anki-field-value').change((e) => onFormOptionsChanged(e));
-    tab.find('.marker-link').click(onAnkiMarkerClicked);
+    tab.find('.marker-link').click((e) => onAnkiMarkerClicked(e));
 }
 
 function onAnkiMarkerClicked(e) {
@@ -651,10 +651,10 @@ function ankiTemplatesInitialize() {
         node.addEventListener('click', onAnkiTemplateMarkerClicked, false);
     }
 
-    $('#field-templates').on('change', onAnkiTemplatesValidateCompile);
-    $('#field-template-render').on('click', onAnkiTemplateRender);
-    $('#field-templates-reset').on('click', onAnkiFieldTemplatesReset);
-    $('#field-templates-reset-confirm').on('click', onAnkiFieldTemplatesResetConfirm);
+    $('#field-templates').on('change', (e) => onAnkiTemplatesValidateCompile(e));
+    $('#field-template-render').on('click', (e) => onAnkiTemplateRender(e));
+    $('#field-templates-reset').on('click', (e) => onAnkiFieldTemplatesReset(e));
+    $('#field-templates-reset-confirm').on('click', (e) => onAnkiFieldTemplatesResetConfirm(e));
 }
 
 const ankiTemplatesValidateGetDefinition = (() => {

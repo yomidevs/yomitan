@@ -36,7 +36,7 @@ async function profileOptionsSetup() {
 
 function profileOptionsSetupEventListeners() {
     $('#profile-target').change((e) => onTargetProfileChanged(e));
-    $('#profile-name').change(onProfileNameChanged);
+    $('#profile-name').change((e) => onProfileNameChanged(e));
     $('#profile-add').click((e) => onProfileAdd(e));
     $('#profile-remove').click((e) => onProfileRemove(e));
     $('#profile-remove-confirm').click((e) => onProfileRemoveConfirm(e));
