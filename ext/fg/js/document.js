@@ -359,7 +359,7 @@ function isElementTransparent(element) {
     }
     const style = window.getComputedStyle(element);
     return (
-        parseFloat(style.opacity) < 0 ||
+        parseFloat(style.opacity) <= 0 ||
         style.visibility === 'hidden' ||
         (style.backgroundImage === 'none' && isColorTransparent(style.backgroundColor))
     );
