@@ -18,7 +18,7 @@
     "content_scripts": [{
         "matches": ["http://*/*", "https://*/*", "file://*/*"],
         "js": [
-            "mixed/js/extension.js",
+            "mixed/js/core.js",
             "fg/js/api.js",
             "fg/js/document.js",
             "fg/js/frontend-api-receiver.js",
