@@ -159,7 +159,7 @@ class Frontend {
         this.preventNextClick = false;
 
         const primaryTouch = e.changedTouches[0];
-        if (Frontend.selectionContainsPoint(window.getSelection(), primaryTouch.clientX, primaryTouch.clientY)) {
+        if (DOM.isPointInSelection(primaryTouch.clientX, primaryTouch.clientY, window.getSelection())) {
             return;
         }
 
@@ -454,18 +454,6 @@ class Frontend {
             }
         }
         return -1;
-    }
-
-    static selectionContainsPoint(selection, x, y) {
-        for (let i = 0; i < selection.rangeCount; ++i) {
-            const range = selection.getRangeAt(i);
-            for (const rect of range.getClientRects()) {
-                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     setTextSourceScanLength(textSource, length) {
