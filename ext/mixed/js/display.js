@@ -398,7 +398,7 @@ class Display {
             };
 
             for (const definition of definitions) {
-                definition.cloze = Display.clozeBuild(context.sentence);
+                definition.cloze = Display.clozeBuild(context.sentence, definition.character);
                 definition.url = context.url;
             }
 
