@@ -81,7 +81,7 @@ class Mecab {
                     delete this.listeners[sequence];
                     reject(new Error(`Mecab invoke timed out in ${Mecab.timeout} ms`));
                 }, Mecab.timeout)
-            }
+            };
 
             this.port.postMessage({action, params, sequence});
         });
