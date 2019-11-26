@@ -640,7 +640,7 @@ class Display {
 
         if (source) {
             result.prefix = sentence.text.substring(0, sentence.offset).trim();
-            result.body = source.trim();
+            result.body = sentence.text.substring(sentence.offset, sentence.offset + source.length);
             result.suffix = sentence.text.substring(sentence.offset + source.length).trim();
         }
 
