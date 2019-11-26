@@ -389,7 +389,7 @@ function optionsUpdateVersion(options, defaultProfileOptions) {
     // Remove invalid
     const profiles = options.profiles;
     for (let i = profiles.length - 1; i >= 0; --i) {
-        if (!utilIsObject(profiles[i])) {
+        if (!isObject(profiles[i])) {
             profiles.splice(i, 1);
         }
     }
@@ -440,7 +440,7 @@ function optionsLoad() {
     }).then(optionsStr => {
         if (typeof optionsStr === 'string') {
             const options = JSON.parse(optionsStr);
-            if (utilIsObject(options)) {
+            if (isObject(options)) {
                 return options;
             }
         }

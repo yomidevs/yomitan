@@ -148,3 +148,7 @@ function stringReplaceAsync(str, regex, replacer) {
     parts.push(str.substring(index));
     return Promise.all(parts).then(v => v.join(''));
 }
+
+function isObject(value) {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+}

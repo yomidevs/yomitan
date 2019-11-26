@@ -111,7 +111,3 @@ function utilReadFile(file) {
         reader.readAsBinaryString(file);
     });
 }
-
-function utilIsObject(value) {
-    return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
