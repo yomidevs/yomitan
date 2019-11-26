@@ -91,8 +91,9 @@ function jpDistributeFurigana(expression, reading) {
         return fallback;
     }
 
+    let isAmbiguous = false;
     const segmentize = (reading, groups) => {
-        if (groups.length === 0) {
+        if (groups.length === 0 || isAmbiguous) {
             return [];
         }
 
@@ -106,14 +107,25 @@ function jpDistributeFurigana(expression, reading) {
                 }
             }
         } else {
+            let foundSegments = null;
             for (let i = reading.length; i >= group.text.length; --i) {
                 const readingUsed = reading.substring(0, i);
                 const readingLeft = reading.substring(i);
                 const segs = segmentize(readingLeft, groups.slice(1));
                 if (segs) {
-                    return [{text: group.text, furigana: readingUsed}].concat(segs);
+                    if (foundSegments !== null) {
+                        // more than one way to segmentize the tail, mark as ambiguous
+                        isAmbiguous = true;
+                        return null;
+                    }
+                    foundSegments = [{text: group.text, furigana: readingUsed}].concat(segs);
+                }
+                // there is only one way to segmentize the last non-kana group
+                if (groups.length === 1) {
+                    break;
                 }
             }
+            return foundSegments;
         }
     };
 
@@ -129,7 +141,11 @@ function jpDistributeFurigana(expression, reading) {
         }
     }
 
-    return segmentize(reading, groups) || fallback;
+    const segments = segmentize(reading, groups);
+    if (segments && !isAmbiguous) {
+        return segments;
+    }
+    return fallback;
 }
 
 function jpDistributeFuriganaInflected(expression, reading, source) {
