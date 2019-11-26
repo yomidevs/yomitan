@@ -220,7 +220,7 @@ class DisplaySearch extends Display {
                 const {definitions} = await apiTermsFind(query, details, this.optionsContext);
                 this.setContentTerms(definitions, {
                     focus: false,
-                    sentence: null,
+                    sentence: {text: query, offset: 0},
                     url: window.location.href
                 });
             } else {
