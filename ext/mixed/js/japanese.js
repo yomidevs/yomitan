@@ -48,6 +48,43 @@ function jpKatakanaToHiragana(text) {
     return result;
 }
 
+function jpHiraganaToKatakana(text) {
+    let result = '';
+    for (const c of text) {
+        if (wanakana.isHiragana(c)) {
+            result += wanakana.toKatakana(c);
+        } else {
+            result += c;
+        }
+    }
+
+    return result;
+}
+
+function jpToRomaji(text) {
+    return wanakana.toRomaji(text);
+}
+
+function jpConvertReading(expressionFragment, readingFragment, readingMode) {
+    switch (readingMode) {
+        case 'hiragana':
+            return jpKatakanaToHiragana(readingFragment || '');
+        case 'katakana':
+            return jpHiraganaToKatakana(readingFragment || '');
+        case 'romaji':
+            if (readingFragment) {
+                return jpToRomaji(readingFragment);
+            } else {
+                if (jpIsKana(expressionFragment)) {
+                    return jpToRomaji(expressionFragment);
+                }
+            }
+            return readingFragment;
+        default:
+            return readingFragment;
+    }
+}
+
 function jpDistributeFurigana(expression, reading) {
     const fallback = [{furigana: reading, text: expression}];
     if (!reading) {
@@ -61,12 +98,11 @@ function jpDistributeFurigana(expression, reading) {
 
         const group = groups[0];
         if (group.mode === 'kana') {
-            if (reading.startsWith(group.text)) {
-                const readingUsed = reading.substring(0, group.text.length);
+            if (jpKatakanaToHiragana(reading).startsWith(jpKatakanaToHiragana(group.text))) {
                 const readingLeft = reading.substring(group.text.length);
                 const segs = segmentize(readingLeft, groups.splice(1));
                 if (segs) {
-                    return [{text: readingUsed}].concat(segs);
+                    return [{text: group.text}].concat(segs);
                 }
             }
         } else {
@@ -94,4 +130,31 @@ function jpDistributeFurigana(expression, reading) {
     }
 
     return segmentize(reading, groups) || fallback;
+}
+
+function jpDistributeFuriganaInflected(expression, reading, source) {
+    const output = [];
+
+    let stemLength = 0;
+    const shortest = Math.min(source.length, expression.length);
+    const sourceHiragana = jpKatakanaToHiragana(source);
+    const expressionHiragana = jpKatakanaToHiragana(expression);
+    while (stemLength < shortest && sourceHiragana[stemLength] === expressionHiragana[stemLength]) {
+        ++stemLength;
+    }
+    const offset = source.length - stemLength;
+
+    const stemExpression = source.slice(0, source.length - offset);
+    const stemReading = reading.slice(
+        0, offset === 0 ? reading.length : reading.length - expression.length + stemLength
+    );
+    for (const segment of jpDistributeFurigana(stemExpression, stemReading)) {
+        output.push(segment);
+    }
+
+    if (stemLength !== source.length) {
+        output.push({text: source.slice(stemLength)});
+    }
+
+    return output;
 }

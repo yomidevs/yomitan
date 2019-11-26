@@ -64,6 +64,10 @@ async function formRead(options) {
     options.scanning.modifier = $('#scan-modifier-key').val();
     options.scanning.popupNestingMaxDepth = parseInt($('#popup-nesting-max-depth').val(), 10);
 
+    options.parsing.enableScanningParser = $('#parsing-scan-enable').prop('checked');
+    options.parsing.enableMecabParser = $('#parsing-mecab-enable').prop('checked');
+    options.parsing.readingMode = $('#parsing-reading-mode').val();
+
     const optionsAnkiEnableOld = options.anki.enable;
     options.anki.enable = $('#anki-enable').prop('checked');
     options.anki.tags = utilBackgroundIsolate($('#card-tags').val().split(/[,; ]+/));
@@ -125,6 +129,10 @@ async function formWrite(options) {
     $('#scan-length').val(options.scanning.length);
     $('#scan-modifier-key').val(options.scanning.modifier);
     $('#popup-nesting-max-depth').val(options.scanning.popupNestingMaxDepth);
+
+    $('#parsing-scan-enable').prop('checked', options.parsing.enableScanningParser);
+    $('#parsing-mecab-enable').prop('checked', options.parsing.enableMecabParser);
+    $('#parsing-reading-mode').val(options.parsing.readingMode);
 
     $('#anki-enable').prop('checked', options.anki.enable);
     $('#card-tags').val(options.anki.tags.join(' '));

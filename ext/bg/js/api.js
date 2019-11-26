@@ -79,6 +79,71 @@ async function apiTermsFind(text, details, optionsContext) {
     return {length, definitions};
 }
 
+async function apiTextParse(text, optionsContext) {
+    const options = await apiOptionsGet(optionsContext);
+    const translator = utilBackend().translator;
+
+    const results = [];
+    while (text.length > 0) {
+        const term = [];
+        const [definitions, sourceLength] = await translator.findTermsInternal(
+            text.slice(0, options.scanning.length),
+            dictEnabledSet(options),
+            options.scanning.alphanumeric,
+            {}
+        );
+        if (definitions.length > 0) {
+            dictTermsSort(definitions);
+            const {expression, reading} = definitions[0];
+            const source = text.slice(0, sourceLength);
+            for (const {text, furigana} of jpDistributeFuriganaInflected(expression, reading, source)) {
+                const reading = jpConvertReading(text, furigana, options.parsing.readingMode);
+                term.push({text, reading});
+            }
+            text = text.slice(source.length);
+        } else {
+            const reading = jpConvertReading(text[0], null, options.parsing.readingMode);
+            term.push({text: text[0], reading});
+            text = text.slice(1);
+        }
+        results.push(term);
+    }
+    return results;
+}
+
+async function apiTextParseMecab(text, optionsContext) {
+    const options = await apiOptionsGet(optionsContext);
+    const mecab = utilBackend().mecab;
+
+    const results = {};
+    const rawResults = await mecab.parseText(text);
+    for (const mecabName in rawResults) {
+        const result = [];
+        for (const parsedLine of rawResults[mecabName]) {
+            for (const {expression, reading, source} of parsedLine) {
+                const term = [];
+                if (expression !== null && reading !== null) {
+                    for (const {text, furigana} of jpDistributeFuriganaInflected(
+                        expression,
+                        jpKatakanaToHiragana(reading),
+                        source
+                    )) {
+                        const reading = jpConvertReading(text, furigana, options.parsing.readingMode);
+                        term.push({text, reading});
+                    }
+                } else {
+                    const reading = jpConvertReading(source, null, options.parsing.readingMode);
+                    term.push({text: source, reading});
+                }
+                result.push(term);
+            }
+            result.push([{text: '\n'}]);
+        }
+        results[mecabName] = result;
+    }
+    return results;
+}
+
 async function apiKanjiFind(text, optionsContext) {
     const options = await apiOptionsGet(optionsContext);
     const definitions = await utilBackend().translator.findKanji(text, options);

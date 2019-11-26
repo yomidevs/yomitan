@@ -98,17 +98,62 @@ class Display {
         }
     }
 
-    async onTermLookup(e) {
+    async onTermLookup(e, {disableScroll, selectText, disableHistory}={}) {
+        const termLookupResults = await this.termLookup(e);
+        if (!termLookupResults) {
+            return false;
+        }
+
+        try {
+            const {textSource, definitions} = termLookupResults;
+
+            const scannedElement = e.target;
+            const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
+
+            if (!disableScroll) {
+                this.windowScroll.toY(0);
+            }
+            let context;
+            if (disableHistory) {
+                const {url, source} = this.context || {};
+                context = {sentence, url, source, disableScroll};
+            } else {
+                context = {
+                    disableScroll,
+                    source: {
+                        definitions: this.definitions,
+                        index: this.entryIndexFind(scannedElement),
+                        scroll: this.windowScroll.y
+                    }
+                };
+
+                if (this.context) {
+                    context.sentence = sentence;
+                    context.url = this.context.url;
+                    context.source.source = this.context.source;
+                }
+            }
+
+            this.setContentTerms(definitions, context);
+
+            if (selectText) {
+                textSource.select();
+            }
+        } catch (error) {
+            this.onError(error);
+        }
+    }
+
+    async termLookup(e) {
         try {
             e.preventDefault();
 
-            const clickedElement = e.target;
             const textSource = docRangeFromPoint(e.clientX, e.clientY, this.options);
             if (textSource === null) {
                 return false;
             }
 
-            let definitions, length, sentence;
+            let definitions, length;
             try {
                 textSource.setEndOffset(this.options.scanning.length);
 
@@ -118,28 +163,11 @@ class Display {
                 }
 
                 textSource.setEndOffset(length);
-
-                sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
             } finally {
                 textSource.cleanup();
             }
 
-            this.windowScroll.toY(0);
-            const context = {
-                source: {
-                    definitions: this.definitions,
-                    index: this.entryIndexFind(clickedElement),
-                    scroll: this.windowScroll.y
-                }
-            };
-
-            if (this.context) {
-                context.sentence = sentence;
-                context.url = this.context.url;
-                context.source.source = this.context.source;
-            }
-
-            this.setContentTerms(definitions, context);
+            return {textSource, definitions};
         } catch (error) {
             this.onError(error);
         }
@@ -336,8 +364,10 @@ class Display {
 
             const content = await apiTemplateRender('terms.html', params);
             this.container.innerHTML = content;
-            const {index, scroll} = context || {};
-            this.entryScrollIntoView(index || 0, scroll);
+            const {index, scroll, disableScroll} = context || {};
+            if (!disableScroll) {
+                this.entryScrollIntoView(index || 0, scroll);
+            }
 
             if (options.audio.enabled && options.audio.autoPlay) {
                 this.autoPlayAudio();

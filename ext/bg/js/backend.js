@@ -21,6 +21,7 @@ class Backend {
     constructor() {
         this.translator = new Translator();
         this.anki = new AnkiNull();
+        this.mecab = new Mecab();
         this.options = null;
         this.optionsContext = {
             depth: 0,
@@ -97,6 +98,12 @@ class Backend {
         }
 
         this.anki = options.anki.enable ? new AnkiConnect(options.anki.server) : new AnkiNull();
+
+        if (options.parsing.enableMecabParser) {
+            this.mecab.startListener();
+        } else {
+            this.mecab.stopListener();
+        }
     }
 
     async getFullOptions() {
@@ -180,6 +187,8 @@ Backend.messageHandlers = {
     optionsSet: ({changedOptions, optionsContext, source}) => apiOptionsSet(changedOptions, optionsContext, source),
     kanjiFind: ({text, optionsContext}) => apiKanjiFind(text, optionsContext),
     termsFind: ({text, details, optionsContext}) => apiTermsFind(text, details, optionsContext),
+    textParse: ({text, optionsContext}) => apiTextParse(text, optionsContext),
+    textParseMecab: ({text, optionsContext}) => apiTextParseMecab(text, optionsContext),
     definitionAdd: ({definition, mode, context, optionsContext}) => apiDefinitionAdd(definition, mode, context, optionsContext),
     definitionsAddable: ({definitions, modes, optionsContext}) => apiDefinitionsAddable(definitions, modes, optionsContext),
     noteView: ({noteId}) => apiNoteView(noteId),

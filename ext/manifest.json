@@ -42,7 +42,8 @@
         "<all_urls>",
         "storage",
         "clipboardWrite",
-        "unlimitedStorage"
+        "unlimitedStorage",
+        "nativeMessaging"
     ],
     "optional_permissions": [
         "clipboardRead"
