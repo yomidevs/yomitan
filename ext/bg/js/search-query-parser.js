@@ -38,7 +38,7 @@ class QueryParser {
     }
 
     onMouseDown(e) {
-        if (Frontend.isMouseButton('primary', e)) {
+        if (DOM.isMouseButtonPressed(e, 'primary')) {
             this.clickScanPrevent = false;
         }
     }
@@ -47,7 +47,7 @@ class QueryParser {
         if (
             this.search.options.scanning.clickGlossary &&
             !this.clickScanPrevent &&
-            Frontend.isMouseButton('primary', e)
+            DOM.isMouseButtonPressed(e, 'primary')
         ) {
             const selectText = this.search.options.scanning.selectText;
             this.onTermLookup(e, {disableScroll: true, selectText});
@@ -55,7 +55,7 @@ class QueryParser {
     }
 
     onMouseMove(e) {
-        if (this.pendingLookup || Frontend.isMouseButton('primary', e)) {
+        if (this.pendingLookup || DOM.isMouseButtonDown(e, 'primary')) {
             return;
         }
 
@@ -63,7 +63,7 @@ class QueryParser {
         const scanningModifier = scanningOptions.modifier;
         if (!(
             Frontend.isScanningModifierPressed(scanningModifier, e) ||
-            (scanningOptions.middleMouse && Frontend.isMouseButton('auxiliary', e))
+            (scanningOptions.middleMouse && DOM.isMouseButtonDown(e, 'auxiliary'))
         )) {
             return;
         }

@@ -80,7 +80,7 @@ class Frontend {
     onMouseMove(e) {
         this.popupTimerClear();
 
-        if (this.pendingLookup || Frontend.isMouseButtonDown('primary', e)) {
+        if (this.pendingLookup || DOM.isMouseButtonDown(e, 'primary')) {
             return;
         }
 
@@ -88,7 +88,7 @@ class Frontend {
         const scanningModifier = scanningOptions.modifier;
         if (!(
             Frontend.isScanningModifierPressed(scanningModifier, e) ||
-            (scanningOptions.middleMouse && Frontend.isMouseButtonDown('auxiliary', e))
+            (scanningOptions.middleMouse && DOM.isMouseButtonDown(e, 'auxiliary'))
         )) {
             return;
         }
@@ -484,37 +484,6 @@ class Frontend {
             case 'ctrl': return mouseEvent.ctrlKey;
             case 'shift': return mouseEvent.shiftKey;
             case 'none': return true;
-            default: return false;
-        }
-    }
-
-    static isMouseButton(button, mouseEvent) {
-        switch (mouseEvent.type) {
-            case 'mouseup':
-            case 'mousedown':
-            case 'click':
-                return Frontend.isMouseButtonPressed(button, mouseEvent);
-            default:
-                return Frontend.isMouseButtonDown(button, mouseEvent);
-        }
-    }
-
-    static isMouseButtonPressed(button, mouseEvent) {
-        const mouseEventButton = mouseEvent.button;
-        switch (button) {
-            case 'primary': return mouseEventButton === 0;
-            case 'secondary': return mouseEventButton === 2;
-            case 'auxiliary': return mouseEventButton === 1;
-            default: return false;
-        }
-    }
-
-    static isMouseButtonDown(button, mouseEvent) {
-        const mouseEventButtons = mouseEvent.buttons;
-        switch (button) {
-            case 'primary': return (mouseEventButtons & 0x1) !== 0x0;
-            case 'secondary': return (mouseEventButtons & 0x2) !== 0x0;
-            case 'auxiliary': return (mouseEventButtons & 0x4) !== 0x0;
             default: return false;
         }
     }

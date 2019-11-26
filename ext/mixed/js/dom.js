@@ -43,4 +43,24 @@ class DOM {
         }
         return false;
     }
+
+    static isMouseButtonPressed(mouseEvent, button) {
+        const mouseEventButton = mouseEvent.button;
+        switch (button) {
+            case 'primary': return mouseEventButton === 0;
+            case 'secondary': return mouseEventButton === 2;
+            case 'auxiliary': return mouseEventButton === 1;
+            default: return false;
+        }
+    }
+
+    static isMouseButtonDown(mouseEvent, button) {
+        const mouseEventButtons = mouseEvent.buttons;
+        switch (button) {
+            case 'primary': return (mouseEventButtons & 0x1) !== 0x0;
+            case 'secondary': return (mouseEventButtons & 0x2) !== 0x0;
+            case 'auxiliary': return (mouseEventButtons & 0x4) !== 0x0;
+            default: return false;
+        }
+    }
 }

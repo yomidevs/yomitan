@@ -85,7 +85,7 @@ class Display {
     }
 
     onGlossaryMouseDown(e) {
-        if (Frontend.isMouseButtonPressed('primary', e)) {
+        if (DOM.isMouseButtonPressed(e, 'primary')) {
             this.clickScanPrevent = false;
         }
     }
@@ -95,7 +95,7 @@ class Display {
     }
 
     onGlossaryMouseUp(e) {
-        if (!this.clickScanPrevent && Frontend.isMouseButtonPressed('primary', e)) {
+        if (!this.clickScanPrevent && DOM.isMouseButtonPressed(e, 'primary')) {
             this.onTermLookup(e);
         }
     }
