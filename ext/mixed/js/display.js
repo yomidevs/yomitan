@@ -58,22 +58,24 @@ class Display {
     async onKanjiLookup(e) {
         try {
             e.preventDefault();
+            if (!this.context) { return; }
 
             const link = e.target;
             this.windowScroll.toY(0);
             const context = {
                 source: {
-                    definitions: this.definitions,
-                    index: this.entryIndexFind(link),
-                    scroll: this.windowScroll.y
-                }
+                    type: 'terms',
+                    details: {
+                        definitions: this.definitions,
+                        context: Object.assign({}, this.context, {
+                            index: this.entryIndexFind(link),
+                            scroll: this.windowScroll.y
+                        })
+                    }
+                },
+                sentence: this.context.sentence,
+                url: this.context.url
             };
-
-            if (this.context) {
-                context.sentence = this.context.sentence;
-                context.url = this.context.url;
-                context.source.source = this.context.source;
-            }
 
             const definitions = await apiKanjiFind(link.textContent, this.getOptionsContext());
             this.setContentKanji(definitions, context);
@@ -99,12 +101,10 @@ class Display {
     }
 
     async onTermLookup(e, {disableScroll, selectText, disableHistory}={}) {
-        const termLookupResults = await this.termLookup(e);
-        if (!termLookupResults) {
-            return false;
-        }
-
         try {
+            if (!this.context) { return; }
+            const termLookupResults = await this.termLookup(e);
+            if (!termLookupResults) { return; }
             const {textSource, definitions} = termLookupResults;
 
             const scannedElement = e.target;
@@ -113,26 +113,22 @@ class Display {
             if (!disableScroll) {
                 this.windowScroll.toY(0);
             }
-            let context;
-            if (disableHistory) {
-                const {url, source} = this.context || {};
-                context = {sentence, url, source, disableScroll};
-            } else {
-                context = {
-                    disableScroll,
-                    source: {
-                        definitions: this.definitions,
-                        index: this.entryIndexFind(scannedElement),
-                        scroll: this.windowScroll.y
-                    }
-                };
 
-                if (this.context) {
-                    context.sentence = sentence;
-                    context.url = this.context.url;
-                    context.source.source = this.context.source;
-                }
-            }
+            const context = {
+                source: disableHistory ? this.context.source : {
+                    type: 'terms',
+                    details: {
+                        definitions: this.definitions,
+                        context: Object.assign({}, this.context, {
+                            index: this.entryIndexFind(scannedElement),
+                            scroll: this.windowScroll.y
+                        })
+                    }
+                },
+                disableScroll,
+                sentence,
+                url: this.context.url
+            };
 
             this.setContentTerms(definitions, context);
 
@@ -501,17 +497,9 @@ class Display {
     }
 
     sourceTermView() {
-        if (this.context && this.context.source) {
-            const context = {
-                url: this.context.source.url,
-                sentence: this.context.source.sentence,
-                index: this.context.source.index,
-                scroll: this.context.source.scroll,
-                source: this.context.source.source
-            };
-
-            this.setContentTerms(this.context.source.definitions, context);
-        }
+        if (!this.context || !this.context.source) { return; }
+        const {type, details} = this.context.source;
+        this.setContent(type, details);
     }
 
     noteTryAdd(mode) {
