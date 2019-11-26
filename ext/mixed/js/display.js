@@ -326,6 +326,7 @@ class Display {
     }
 
     async setContentTerms(definitions, context) {
+        if (!context) { throw new Error('Context expected'); }
         if (!this.isInitialized()) { return; }
 
         try {
@@ -333,7 +334,7 @@ class Display {
 
             this.setEventListenersActive(false);
 
-            if (!context || context.focus !== false) {
+            if (context.focus !== false) {
                 window.focus();
             }
 
@@ -343,7 +344,7 @@ class Display {
             const sequence = ++this.sequence;
             const params = {
                 definitions,
-                source: context && context.source,
+                source: context.source,
                 addable: options.anki.enable,
                 grouped: options.general.resultOutputMode === 'group',
                 merged: options.general.resultOutputMode === 'merge',
@@ -352,19 +353,14 @@ class Display {
                 debug: options.general.debugInfo
             };
 
-            if (context) {
-                for (const definition of definitions) {
-                    if (context.sentence) {
-                        definition.cloze = Display.clozeBuild(context.sentence, definition.source);
-                    }
-
-                    definition.url = context.url;
-                }
+            for (const definition of definitions) {
+                definition.cloze = Display.clozeBuild(context.sentence, definition.source);
+                definition.url = context.url;
             }
 
             const content = await apiTemplateRender('terms.html', params);
             this.container.innerHTML = content;
-            const {index, scroll, disableScroll} = context || {};
+            const {index, scroll, disableScroll} = context;
             if (!disableScroll) {
                 this.entryScrollIntoView(index || 0, scroll);
             }
@@ -382,6 +378,7 @@ class Display {
     }
 
     async setContentKanji(definitions, context) {
+        if (!context) { throw new Error('Context expected'); }
         if (!this.isInitialized()) { return; }
 
         try {
@@ -389,7 +386,7 @@ class Display {
 
             this.setEventListenersActive(false);
 
-            if (!context || context.focus !== false) {
+            if (context.focus !== false) {
                 window.focus();
             }
 
@@ -399,24 +396,19 @@ class Display {
             const sequence = ++this.sequence;
             const params = {
                 definitions,
-                source: context && context.source,
+                source: context.source,
                 addable: options.anki.enable,
                 debug: options.general.debugInfo
             };
 
-            if (context) {
-                for (const definition of definitions) {
-                    if (context.sentence) {
-                        definition.cloze = Display.clozeBuild(context.sentence);
-                    }
-
-                    definition.url = context.url;
-                }
+            for (const definition of definitions) {
+                definition.cloze = Display.clozeBuild(context.sentence);
+                definition.url = context.url;
             }
 
             const content = await apiTemplateRender('kanji.html', params);
             this.container.innerHTML = content;
-            const {index, scroll} = context || {};
+            const {index, scroll} = context;
             this.entryScrollIntoView(index || 0, scroll);
 
             this.setEventListenersActive(true);
