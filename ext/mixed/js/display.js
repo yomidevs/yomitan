@@ -633,18 +633,13 @@ class Display {
         return index >= 0 && index < entries.length ? entries[index] : null;
     }
 
-    static clozeBuild(sentence, source) {
-        const result = {
-            sentence: sentence.text.trim()
+    static clozeBuild({text, offset}, source) {
+        return {
+            sentence: text.trim(),
+            prefix: text.substring(0, offset).trim(),
+            body: text.substring(offset, offset + source.length),
+            suffix: text.substring(offset + source.length).trim()
         };
-
-        if (source) {
-            result.prefix = sentence.text.substring(0, sentence.offset).trim();
-            result.body = sentence.text.substring(sentence.offset, sentence.offset + source.length);
-            result.suffix = sentence.text.substring(sentence.offset + source.length).trim();
-        }
-
-        return result;
     }
 
     entryIndexFind(element) {
