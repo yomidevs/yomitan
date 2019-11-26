@@ -155,8 +155,8 @@ async function formWrite(options) {
 }
 
 function formSetupEventListeners() {
-    $('input, select, textarea').not('.anki-model').not('.ignore-form-changes *').change(utilAsync(onFormOptionsChanged));
-    $('.anki-model').change(utilAsync(onAnkiModelChanged));
+    $('input, select, textarea').not('.anki-model').not('.ignore-form-changes *').change((e) => onFormOptionsChanged(e));
+    $('.anki-model').change((e) => onAnkiModelChanged(e));
 }
 
 function formUpdateVisibility(options) {
@@ -219,7 +219,7 @@ async function onReady() {
     chrome.runtime.onMessage.addListener(onMessage);
 }
 
-$(document).ready(utilAsync(onReady));
+$(document).ready(() => onReady());
 
 
 /*
@@ -582,7 +582,7 @@ async function ankiFieldsPopulate(element, options) {
         container.append($(html));
     }
 
-    tab.find('.anki-field-value').change(utilAsync(onFormOptionsChanged));
+    tab.find('.anki-field-value').change((e) => onFormOptionsChanged(e));
     tab.find('.marker-link').click(onAnkiMarkerClicked);
 }
 

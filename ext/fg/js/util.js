@@ -17,12 +17,6 @@
  */
 
 
-function utilAsync(func) {
-    return function(...args) {
-        func.apply(this, args);
-    };
-}
-
 function utilInvoke(action, params={}) {
     const data = {action, params};
     return new Promise((resolve, reject) => {

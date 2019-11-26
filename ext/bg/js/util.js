@@ -16,12 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function utilAsync(func) {
-    return function(...args) {
-        func.apply(this, args);
-    };
-}
-
 function utilIsolate(data) {
     return JSON.parse(JSON.stringify(data));
 }
