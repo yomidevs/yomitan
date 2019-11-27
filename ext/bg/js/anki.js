@@ -74,7 +74,7 @@ class AnkiConnect {
 
     async findNoteIds(notes) {
         await this.checkVersion();
-        const actions = notes.map(note => ({
+        const actions = notes.map((note) => ({
             action: 'findNotes',
             params: {
                 query: `deck:"${AnkiConnect.escapeQuery(note.deckName)}" ${AnkiConnect.fieldsToQuery(note.fields)}`

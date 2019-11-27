@@ -86,7 +86,7 @@ const profileConditionsDescriptor = {
                 placeholder: 'Comma separated list of domains',
                 defaultValue: 'example.com',
                 transformCache: {},
-                transform: (optionValue) => optionValue.split(/[,;\s]+/).map(v => v.trim().toLowerCase()).filter(v => v.length > 0),
+                transform: (optionValue) => optionValue.split(/[,;\s]+/).map((v) => v.trim().toLowerCase()).filter((v) => v.length > 0),
                 transformReverse: (transformedOptionValue) => transformedOptionValue.join(', '),
                 validateTransformed: (transformedOptionValue) => (transformedOptionValue.length > 0),
                 test: ({url}, transformedOptionValue) => _profileConditionTestDomainList(url, transformedOptionValue)

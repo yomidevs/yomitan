@@ -207,7 +207,7 @@ async function apiDefinitionsAddable(definitions, modes, optionsContext) {
         }
 
         if (cannotAdd.length > 0) {
-            const noteIdsArray = await anki.findNoteIds(cannotAdd.map(e => e[0]));
+            const noteIdsArray = await anki.findNoteIds(cannotAdd.map((e) => e[0]));
             for (let i = 0, ii = Math.min(cannotAdd.length, noteIdsArray.length); i < ii; ++i) {
                 const noteIds = noteIdsArray[i];
                 if (noteIds.length > 0) {

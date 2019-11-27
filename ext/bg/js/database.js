@@ -257,7 +257,7 @@ class Database {
         const dbTerms = dbTransaction.objectStore('tagMeta');
         const dbIndex = dbTerms.index('name');
         const only = IDBKeyRange.only(name);
-        await Database.getAll(dbIndex, only, null, row => {
+        await Database.getAll(dbIndex, only, null, (row) => {
             if (title === row.dictionary) {
                 result = row;
             }
@@ -273,7 +273,7 @@ class Database {
         const dbTransaction = this.db.transaction(['dictionaries'], 'readonly');
         const dbDictionaries = dbTransaction.objectStore('dictionaries');
 
-        await Database.getAll(dbDictionaries, null, null, info => results.push(info));
+        await Database.getAll(dbDictionaries, null, null, (info) => results.push(info));
 
         return results;
     }
@@ -308,7 +308,7 @@ class Database {
             counts.push(null);
             const index = i;
             const query2 = IDBKeyRange.only(dictionaryNames[i]);
-            const countPromise = Database.getCounts(targets, query2).then(v => counts[index] = v);
+            const countPromise = Database.getCounts(targets, query2).then((v) => counts[index] = v);
             countPromises.push(countPromise);
         }
         await Promise.all(countPromises);
@@ -346,7 +346,7 @@ class Database {
             }
         };
 
-        const indexDataLoaded = async summary => {
+        const indexDataLoaded = async (summary) => {
             if (summary.version > 3) {
                 throw new Error('Unsupported dictionary version');
             }
@@ -522,13 +522,13 @@ class Database {
 
         await indexDataLoaded(summary);
 
-        const buildTermBankName      = index => `term_bank_${index + 1}.json`;
-        const buildTermMetaBankName  = index => `term_meta_bank_${index + 1}.json`;
-        const buildKanjiBankName     = index => `kanji_bank_${index + 1}.json`;
-        const buildKanjiMetaBankName = index => `kanji_meta_bank_${index + 1}.json`;
-        const buildTagBankName       = index => `tag_bank_${index + 1}.json`;
+        const buildTermBankName      = (index) => `term_bank_${index + 1}.json`;
+        const buildTermMetaBankName  = (index) => `term_meta_bank_${index + 1}.json`;
+        const buildKanjiBankName     = (index) => `kanji_bank_${index + 1}.json`;
+        const buildKanjiMetaBankName = (index) => `kanji_meta_bank_${index + 1}.json`;
+        const buildTagBankName       = (index) => `tag_bank_${index + 1}.json`;
 
-        const countBanks = namer => {
+        const countBanks = (namer) => {
             let count = 0;
             while (zip.files[namer(count)]) {
                 ++count;
@@ -657,7 +657,7 @@ class Database {
         const counts = {};
         for (const [objectStoreName, index] of targets) {
             const n = objectStoreName;
-            const countPromise = Database.getCount(index, query).then(count => counts[n] = count);
+            const countPromise = Database.getCount(index, query).then((count) => counts[n] = count);
             countPromises.push(countPromise);
         }
         return Promise.all(countPromises).then(() => counts);

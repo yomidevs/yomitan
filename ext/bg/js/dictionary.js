@@ -99,8 +99,8 @@ function dictTermsCompressTags(definitions) {
     let lastPartOfSpeech = '';
 
     for (const definition of definitions) {
-        const dictionary = JSON.stringify(definition.definitionTags.filter(tag => tag.category === 'dictionary').map(tag => tag.name).sort());
-        const partOfSpeech = JSON.stringify(definition.definitionTags.filter(tag => tag.category === 'partOfSpeech').map(tag => tag.name).sort());
+        const dictionary = JSON.stringify(definition.definitionTags.filter((tag) => tag.category === 'dictionary').map((tag) => tag.name).sort());
+        const partOfSpeech = JSON.stringify(definition.definitionTags.filter((tag) => tag.category === 'partOfSpeech').map((tag) => tag.name).sort());
 
         const filterOutCategories = [];
 
@@ -117,7 +117,7 @@ function dictTermsCompressTags(definitions) {
             lastPartOfSpeech = partOfSpeech;
         }
 
-        definition.definitionTags = definition.definitionTags.filter(tag => !filterOutCategories.includes(tag.category));
+        definition.definitionTags = definition.definitionTags.filter((tag) => !filterOutCategories.includes(tag.category));
     }
 }
 
@@ -231,7 +231,7 @@ function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
         result.reading.add(definition.reading);
 
         for (const tag of definition.definitionTags) {
-            if (!definitionsByGloss[gloss].definitionTags.find(existingTag => existingTag.name === tag.name)) {
+            if (!definitionsByGloss[gloss].definitionTags.find((existingTag) => existingTag.name === tag.name)) {
                 definitionsByGloss[gloss].definitionTags.push(tag);
             }
         }
@@ -246,7 +246,7 @@ function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
             }
 
             for (const tag of definition.termTags) {
-                if (!result.expressions.get(definition.expression).get(definition.reading).find(existingTag => existingTag.name === tag.name)) {
+                if (!result.expressions.get(definition.expression).get(definition.reading).find((existingTag) => existingTag.name === tag.name)) {
                     result.expressions.get(definition.expression).get(definition.reading).push(tag);
                 }
             }

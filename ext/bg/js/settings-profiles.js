@@ -147,7 +147,7 @@ function profileOptionsCreateCopyName(name, profiles, maxUniqueAttempts) {
     let i = 0;
     while (true) {
         const newName = `${prefix}${space}${index}${suffix}`;
-        if (i++ >= maxUniqueAttempts || profiles.findIndex(profile => profile.name === newName) < 0) {
+        if (i++ >= maxUniqueAttempts || profiles.findIndex((profile) => profile.name === newName) < 0) {
             return newName;
         }
         if (typeof index !== 'number') {

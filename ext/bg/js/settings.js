@@ -18,7 +18,7 @@
 
 async function getOptionsArray() {
     const optionsFull = await apiOptionsGetFull();
-    return optionsFull.profiles.map(profile => profile.options);
+    return optionsFull.profiles.map((profile) => profile.options);
 }
 
 async function formRead(options) {
@@ -484,12 +484,12 @@ async function ankiDeckAndModelPopulate(options) {
     const deckNames = await utilAnkiGetDeckNames();
     const ankiDeck = $('.anki-deck');
     ankiDeck.find('option').remove();
-    deckNames.sort().forEach(name => ankiDeck.append($('<option/>', {value: name, text: name})));
+    deckNames.sort().forEach((name) => ankiDeck.append($('<option/>', {value: name, text: name})));
 
     const modelNames = await utilAnkiGetModelNames();
     const ankiModel = $('.anki-model');
     ankiModel.find('option').remove();
-    modelNames.sort().forEach(name => ankiModel.append($('<option/>', {value: name, text: name})));
+    modelNames.sort().forEach((name) => ankiModel.append($('<option/>', {value: name, text: name})));
 
     $('#anki-terms-deck').val(options.anki.terms.deck);
     await ankiFieldsPopulate($('#anki-terms-model').val(options.anki.terms.model), options);
@@ -690,7 +690,7 @@ async function ankiTemplatesValidate(infoNode, field, mode, showSuccessResult, i
 
     const hasException = exceptions.length > 0;
     infoNode.hidden = !(showSuccessResult || hasException);
-    infoNode.textContent = hasException ? exceptions.map(e => `${e}`).join('\n') : (showSuccessResult ? result : '');
+    infoNode.textContent = hasException ? exceptions.map((e) => `${e}`).join('\n') : (showSuccessResult ? result : '');
     infoNode.classList.toggle('text-danger', hasException);
     if (invalidateInput) {
         const input = document.querySelector('#field-templates');

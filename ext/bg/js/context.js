@@ -63,7 +63,7 @@ window.addEventListener('DOMContentLoaded', () => {
         depth: 0,
         url: window.location.href
     };
-    apiOptionsGet(optionsContext).then(options => {
+    apiOptionsGet(optionsContext).then((options) => {
         const toggle = document.querySelector('#enable-search');
         toggle.checked = options.general.enable;
         toggle.addEventListener('change', () => apiCommandExec('toggle'), false);

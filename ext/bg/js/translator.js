@@ -51,7 +51,7 @@ class Translator {
         const definitionsBySequence = dictTermsMergeBySequence(definitions, mainDictionary);
         const defaultDefinitions = definitionsBySequence['-1'];
 
-        const sequenceList = Object.keys(definitionsBySequence).map(v => Number(v)).filter(v => v >= 0);
+        const sequenceList = Object.keys(definitionsBySequence).map((v) => Number(v)).filter((v) => v >= 0);
         const sequencedDefinitions = sequenceList.map((key) => ({
             definitions: definitionsBySequence[key],
             rawDefinitions: []
@@ -124,7 +124,7 @@ class Translator {
         for (const expression of result.expressions.keys()) {
             for (const reading of result.expressions.get(expression).keys()) {
                 const termTags = result.expressions.get(expression).get(reading);
-                const score = termTags.map(tag => tag.score).reduce((p, v) => p + v, 0);
+                const score = termTags.map((tag) => tag.score).reduce((p, v) => p + v, 0);
                 expressions.push({
                     expression: expression,
                     reading: reading,
@@ -173,7 +173,7 @@ class Translator {
 
     async findTermsMerged(text, details, options) {
         const dictionaries = dictEnabledSet(options);
-        const secondarySearchTitles = Object.keys(options.dictionaries).filter(dict => options.dictionaries[dict].allowSecondarySearches);
+        const secondarySearchTitles = Object.keys(options.dictionaries).filter((dict) => options.dictionaries[dict].allowSecondarySearches);
         const titles = Object.keys(dictionaries);
         const [definitions, length] = await this.findTermsInternal(text, dictionaries, options.scanning.alphanumeric, details);
         const {sequencedDefinitions, defaultDefinitions} = await this.getSequencedDefinitions(definitions, options.general.mainDictionary);
@@ -320,7 +320,7 @@ class Translator {
             }
         }
 
-        return deinflections.filter(e => e.definitions.length > 0);
+        return deinflections.filter((e) => e.definitions.length > 0);
     }
 
     getDeinflections(text) {

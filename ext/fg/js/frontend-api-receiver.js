@@ -43,10 +43,10 @@ class FrontendApiReceiver {
 
         const handler = this.handlers[action];
         handler(params).then(
-            result => {
+            (result) => {
                 this.sendResult(port, id, senderId, {result});
             },
-            error => {
+            (error) => {
                 this.sendResult(port, id, senderId, {error: errorToJson(error)});
             });
     }

@@ -62,8 +62,8 @@ class SettingsDictionaryListUI {
 
         this.updateDictionaryOrder();
 
-        const titles = this.dictionaryEntries.map(e => e.dictionaryInfo.title);
-        const removeKeys = Object.keys(this.optionsDictionaries).filter(key => titles.indexOf(key) < 0);
+        const titles = this.dictionaryEntries.map((e) => e.dictionaryInfo.title);
+        const removeKeys = Object.keys(this.optionsDictionaries).filter((key) => titles.indexOf(key) < 0);
         if (removeKeys.length > 0) {
             for (const key of toIterable(removeKeys)) {
                 delete this.optionsDictionaries[key];
@@ -161,7 +161,7 @@ class SettingsDictionaryListUI {
         delete n.dataset.dict;
         $(n).modal('hide');
 
-        const index = this.dictionaryEntries.findIndex(e => e.dictionaryInfo.title === title);
+        const index = this.dictionaryEntries.findIndex((e) => e.dictionaryInfo.title === title);
         if (index >= 0) {
             this.dictionaryEntries[index].deleteDictionary();
         }
@@ -377,7 +377,7 @@ async function onDatabaseUpdated(options) {
 
         updateMainDictionarySelect(options, dictionaries);
 
-        const {counts, total} = await utilDatabaseGetDictionaryCounts(dictionaries.map(v => v.title), true);
+        const {counts, total} = await utilDatabaseGetDictionaryCounts(dictionaries.map((v) => v.title), true);
         dictionaryUI.setCounts(counts, total);
     } catch (e) {
         dictionaryErrorsShow([e]);
@@ -564,7 +564,7 @@ async function onDictionaryImport(e) {
         dictionaryErrorsShow(null);
         dictionarySpinnerShow(true);
 
-        const setProgress = percent => dictProgress.find('.progress-bar').css('width', `${percent}%`);
+        const setProgress = (percent) => dictProgress.find('.progress-bar').css('width', `${percent}%`);
         const updateProgress = (total, current) => {
             setProgress(current / total * 100.0);
             if (storageEstimate.mostRecent !== null && !storageUpdateStats.isUpdating) {

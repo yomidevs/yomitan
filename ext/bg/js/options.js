@@ -429,7 +429,7 @@ function optionsUpdateVersion(options, defaultProfileOptions) {
 
 function optionsLoad() {
     return new Promise((resolve, reject) => {
-        chrome.storage.local.get(['options'], store => {
+        chrome.storage.local.get(['options'], (store) => {
             const error = chrome.runtime.lastError;
             if (error) {
                 reject(new Error(error));
@@ -437,7 +437,7 @@ function optionsLoad() {
                 resolve(store.options);
             }
         });
-    }).then(optionsStr => {
+    }).then((optionsStr) => {
         if (typeof optionsStr === 'string') {
             const options = JSON.parse(optionsStr);
             if (isObject(options)) {
@@ -447,7 +447,7 @@ function optionsLoad() {
         return {};
     }).catch(() => {
         return {};
-    }).then(options => {
+    }).then((options) => {
         return (
             Array.isArray(options.profiles) ?
             optionsUpdateVersion(options, {}) :

@@ -173,5 +173,5 @@ function stringReplaceAsync(str, regex, replacer) {
         return Promise.resolve(str);
     }
     parts.push(str.substring(index));
-    return Promise.all(parts).then(v => v.join(''));
+    return Promise.all(parts).then((v) => v.join(''));
 }

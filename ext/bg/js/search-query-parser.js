@@ -107,7 +107,7 @@ class QueryParser {
     }
 
     getParseResult() {
-        return this.parseResults.find(r => r.id === this.selectedParser);
+        return this.parseResults.find((r) => r.id === this.selectedParser);
     }
 
     async setText(text) {
@@ -216,7 +216,7 @@ class QueryParser {
 
     static processParseResultForDisplay(result) {
         return result.map((term) => {
-            return term.filter(part => part.text.trim()).map((part) => {
+            return term.filter((part) => part.text.trim()).map((part) => {
                 return {
                     text: Array.from(part.text),
                     reading: part.reading,

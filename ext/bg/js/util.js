@@ -41,13 +41,13 @@ function utilSetEqual(setA, setB) {
 
 function utilSetIntersection(setA, setB) {
     return new Set(
-        [...setA].filter(value => setB.has(value))
+        [...setA].filter((value) => setB.has(value))
     );
 }
 
 function utilSetDifference(setA, setB) {
     return new Set(
-        [...setA].filter(value => !setB.has(value))
+        [...setA].filter((value) => !setB.has(value))
     );
 }
 

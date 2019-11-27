@@ -37,8 +37,8 @@ class BackendApiForwarder {
 
         const forwardPort = chrome.tabs.connect(tabId, {name: 'frontend-api-receiver'});
 
-        port.onMessage.addListener(message => forwardPort.postMessage(message));
-        forwardPort.onMessage.addListener(message => port.postMessage(message));
+        port.onMessage.addListener((message) => forwardPort.postMessage(message));
+        forwardPort.onMessage.addListener((message) => port.postMessage(message));
         port.onDisconnect.addListener(() => forwardPort.disconnect());
         forwardPort.onDisconnect.addListener(() => port.disconnect());
     }

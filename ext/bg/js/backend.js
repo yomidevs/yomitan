@@ -60,7 +60,7 @@ class Backend {
         this.applyOptions();
 
         const callback = () => this.checkLastError(chrome.runtime.lastError);
-        chrome.tabs.query({}, tabs => {
+        chrome.tabs.query({}, (tabs) => {
             for (const tab of tabs) {
                 chrome.tabs.sendMessage(tab.id, {action: 'optionsUpdate', params: {source}}, callback);
             }
@@ -77,8 +77,8 @@ class Backend {
             const handler = handlers[action];
             const promise = handler(params, sender);
             promise.then(
-                result => callback({result}),
-                error => callback({error: errorToJson(error)})
+                (result) => callback({result}),
+                (error) => callback({error: errorToJson(error)})
             );
         }
 
