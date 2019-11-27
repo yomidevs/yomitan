@@ -175,3 +175,49 @@ function stringReplaceAsync(str, regex, replacer) {
     parts.push(str.substring(index));
     return Promise.all(parts).then((v) => v.join(''));
 }
+
+
+/*
+ * Common events
+ */
+
+class EventDispatcher {
+    constructor() {
+        this._eventMap = new Map();
+    }
+
+    trigger(eventName, details) {
+        const callbacks = this._eventMap.get(eventName);
+        if (typeof callbacks === 'undefined') { return false; }
+
+        for (const callback of callbacks) {
+            callback(details);
+        }
+    }
+
+    on(eventName, callback) {
+        let callbacks = this._eventMap.get(eventName);
+        if (typeof callbacks === 'undefined') {
+            callbacks = [];
+            this._eventMap.set(eventName, callbacks);
+        }
+        callbacks.push(callback);
+    }
+
+    off(eventName, callback) {
+        const callbacks = this._eventMap.get(eventName);
+        if (typeof callbacks === 'undefined') { return true; }
+
+        const ii = callbacks.length;
+        for (let i = 0; i < ii; ++i) {
+            if (callbacks[i] === callback) {
+                callbacks.splice(i, 1);
+                if (callbacks.length === 0) {
+                    this._eventMap.delete(eventName);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+}
