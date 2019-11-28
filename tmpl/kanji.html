@@ -20,12 +20,6 @@ No data found
         <a href="#" class="action-view-note pending disabled"><img src="/mixed/img/view-note.svg" title="View added note (Alt + V)" alt></a>
         <a href="#" class="action-add-note pending disabled" data-mode="kanji"><img src="/mixed/img/add-term-kanji.svg" title="Add Kanji (Alt + K)" alt></a>
         {{/if}}
-        {{#if source}}
-        <a href="#" class="source-term"><img src="/mixed/img/source-term.svg" title="Source term (Alt + B)" alt></a>
-        {{/if}}
-        {{#if history}}
-        <a href="#" class="history-term"><img src="/mixed/img/source-term.svg" style="transform: scaleX(-1);" title="History term (Alt + F)" alt></a>
-        {{/if}}
         <img src="/mixed/img/entry-current.svg" class="current" title="Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)" alt>
     </div>
 
@@ -94,9 +88,13 @@ No data found
 {{/inline}}
 
 {{#if definitions}}
+<div class="term-navigation">
+    <a href="#" {{#if source}}class="source-term"{{else}}class="source-term term-button-fade"{{/if}}><img src="/mixed/img/source-term.svg" title="Source term (Alt + B)" alt></a>
+    <a href="#" {{#if history}}class="history-term"{{else}}class="history-term term-button-fade"{{/if}}><img src="/mixed/img/source-term.svg" style="transform: scaleX(-1);" title="History term (Alt + F)" alt></a>
+</div>
 {{#each definitions}}
 {{#unless @first}}<hr>{{/unless}}
-{{> kanji debug=../debug addable=../addable source=../source history=../history root=../root}}
+{{> kanji debug=../debug addable=../addable root=../root}}
 {{/each}}
 {{else}}
 <p class="note">No results found</p>

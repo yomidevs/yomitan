@@ -72,6 +72,19 @@ ol, ul {
     visibility: hidden;
 }
 
+/*
+ * Navigation
+ */
+
+.term-navigation {
+    position: fixed;
+    top: 0px;
+}
+
+.term-button-fade {
+    opacity: 0.4;
+}
+
 
 /*
  * Search page
@@ -107,7 +120,7 @@ html:root[data-yomichan-page=search] body {
  */
 
 .entry, .note {
-    padding-top: 10px;
+    padding-top: 20px;
     padding-bottom: 10px;
 }
 
