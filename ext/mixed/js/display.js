@@ -37,6 +37,8 @@ class Display {
         this.eventListenersActive = false;
         this.clickScanPrevent = false;
 
+        this.poppedContextHistory = [];
+
         this.windowScroll = new WindowScroll();
 
         this.setInteractive(true);
@@ -55,10 +57,16 @@ class Display {
         this.sourceTermView();
     }
 
+    onHistoryTermView(e) {
+        e.preventDefault();
+        this.poppedTermView();
+    }
+
     async onKanjiLookup(e) {
         try {
             e.preventDefault();
             if (!this.context) { return; }
+            this.poppedContextHistory = [];
 
             const link = e.target;
             const context = {
@@ -72,6 +80,7 @@ class Display {
                         })
                     }
                 },
+                type: 'kanji',
                 sentence: this.context.sentence,
                 url: this.context.url
             };
@@ -104,6 +113,7 @@ class Display {
     async onTermLookup(e, {disableScroll, selectText, disableHistory}={}) {
         try {
             if (!this.context) { return; }
+            this.poppedContextHistory = [];
             const termLookupResults = await this.termLookup(e);
             if (!termLookupResults) { return; }
             const {textSource, definitions} = termLookupResults;
@@ -122,6 +132,7 @@ class Display {
                         })
                     }
                 },
+                type: 'terms',
                 disableScroll,
                 sentence,
                 url: this.context.url
@@ -207,10 +218,18 @@ class Display {
 
     onWheel(e) {
         if (e.altKey) {
-            const delta = e.deltaY;
-            if (delta !== 0) {
-                this.entryScrollIntoView(this.index + (delta > 0 ? 1 : -1), null, true);
+            if (e.deltaY !== 0) {
+                this.entryScrollIntoView(this.index + (e.deltaY > 0 ? 1 : -1), null, true);
                 e.preventDefault();
+            }
+        }
+        if (e.shiftKey) {
+            const delta = e.deltaX || e.deltaY;
+            if (delta > 0) {
+                this.sourceTermView();
+                e.preventDefault();
+            } else if (delta < 0) {
+                this.poppedTermView();
             }
         }
     }
@@ -293,6 +312,7 @@ class Display {
             this.addEventListeners('.action-play-audio', 'click', this.onAudioPlay.bind(this));
             this.addEventListeners('.kanji-link', 'click', this.onKanjiLookup.bind(this));
             this.addEventListeners('.source-term', 'click', this.onSourceTermView.bind(this));
+            this.addEventListeners('.history-term', 'click', this.onHistoryTermView.bind(this));
             if (this.options.scanning.enablePopupSearch) {
                 this.addEventListeners('.glossary-item', 'mouseup', this.onGlossaryMouseUp.bind(this));
                 this.addEventListeners('.glossary-item', 'mousedown', this.onGlossaryMouseDown.bind(this));
@@ -342,6 +362,7 @@ class Display {
             const params = {
                 definitions,
                 source: context.source,
+                history: this.poppedContextHistory.length > 0,
                 addable: options.anki.enable,
                 grouped: options.general.resultOutputMode === 'group',
                 merged: options.general.resultOutputMode === 'merge',
@@ -396,6 +417,7 @@ class Display {
             const params = {
                 definitions,
                 source: context.source,
+                history: this.poppedContextHistory.length > 0,
                 addable: options.anki.enable,
                 debug: options.general.debugInfo
             };
@@ -506,7 +528,25 @@ class Display {
 
     sourceTermView() {
         if (!this.context || !this.context.source) { return; }
+        this.poppedContextHistory.push({
+            type: this.context.type,
+            details: {
+                definitions: this.definitions,
+                context: Object.assign({}, this.context, {
+                    index: this.index,
+                    scroll: this.windowScroll.y
+                })
+            }
+        });
         const {type, details} = this.context.source;
+        this.setContent(type, details);
+    }
+
+    poppedTermView() {
+        if (this.poppedContextHistory.length === 0) { return; }
+        this.context.index = this.index;
+        this.context.scroll = this.windowScroll.y;
+        const {type, details} = this.poppedContextHistory.pop();
         this.setContent(type, details);
     }
 
@@ -778,6 +818,14 @@ Display.onKeyDownHandlers = {
     'B': (self, e) => {
         if (e.altKey) {
             self.sourceTermView();
+            return true;
+        }
+        return false;
+    },
+
+    'F': (self, e) => {
+        if (e.altKey) {
+            self.poppedTermView();
             return true;
         }
         return false;
