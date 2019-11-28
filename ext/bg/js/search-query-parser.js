@@ -45,7 +45,7 @@ class QueryParser {
 
     onMouseUp(e) {
         if (
-            this.search.options.scanning.clickGlossary &&
+            this.search.options.scanning.enablePopupSearch &&
             !this.clickScanPrevent &&
             DOM.isMouseButtonPressed(e, 'primary')
         ) {
