@@ -360,6 +360,8 @@ class Display {
             const {index, scroll, disableScroll} = context;
             if (!disableScroll) {
                 this.entryScrollIntoView(index || 0, scroll);
+            } else {
+                this.entrySetCurrent(index || 0);
             }
 
             if (options.audio.enabled && options.audio.autoPlay) {
@@ -465,7 +467,7 @@ class Display {
         }
     }
 
-    entryScrollIntoView(index, scroll, smooth) {
+    entrySetCurrent(index) {
         index = Math.min(index, this.definitions.length - 1);
         index = Math.max(index, 0);
 
@@ -479,9 +481,16 @@ class Display {
             entry.classList.add('entry-current');
         }
 
-        this.windowScroll.stop();
-        let target;
+        this.index = index;
 
+        return entry;
+    }
+
+    entryScrollIntoView(index, scroll, smooth) {
+        this.windowScroll.stop();
+
+        const entry = this.entrySetCurrent(index);
+        let target;
         if (scroll !== null) {
             target = scroll;
         } else {
@@ -493,8 +502,6 @@ class Display {
         } else {
             this.windowScroll.toY(target);
         }
-
-        this.index = index;
     }
 
     sourceTermView() {
