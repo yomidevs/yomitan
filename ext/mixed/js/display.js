@@ -223,7 +223,7 @@ class Display {
                 e.preventDefault();
             }
         } else if (e.shiftKey) {
-            const delta = e.deltaX || e.deltaY;
+            const delta = -e.deltaX || e.deltaY;
             if (delta > 0) {
                 this.sourceTermView();
                 e.preventDefault();
