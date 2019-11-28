@@ -351,6 +351,11 @@ class Display {
 
             this.setEventListenersActive(false);
 
+            if (context.clearHistoryOnce) {
+                delete context.clearHistoryOnce;
+                this.poppedContextHistory = [];
+            }
+
             if (context.focus !== false) {
                 window.focus();
             }
@@ -405,6 +410,11 @@ class Display {
             const options = this.options;
 
             this.setEventListenersActive(false);
+
+            if (context.clearHistoryOnce) {
+                delete context.clearHistoryOnce;
+                this.poppedContextHistory = [];
+            }
 
             if (context.focus !== false) {
                 window.focus();

@@ -398,7 +398,7 @@ class Frontend {
             textSource.getRect(),
             textSource.getWritingMode(),
             type,
-            {definitions, context: {sentence, url, focus}}
+            {definitions, context: {sentence, url, focus, clearHistoryOnce: true}}
         );
 
         this.textSourceCurrent = textSource;
