@@ -61,7 +61,6 @@ class Display {
             if (!this.context) { return; }
 
             const link = e.target;
-            this.windowScroll.toY(0);
             const context = {
                 source: {
                     type: 'terms',
@@ -76,6 +75,8 @@ class Display {
                 sentence: this.context.sentence,
                 url: this.context.url
             };
+
+            this.windowScroll.toY(0);
 
             const definitions = await apiKanjiFind(link.textContent, this.getOptionsContext());
             this.setContentKanji(definitions, context);
@@ -110,10 +111,6 @@ class Display {
             const scannedElement = e.target;
             const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
 
-            if (!disableScroll) {
-                this.windowScroll.toY(0);
-            }
-
             const context = {
                 source: disableHistory ? this.context.source : {
                     type: 'terms',
@@ -131,6 +128,10 @@ class Display {
             };
 
             this.setContentTerms(definitions, context);
+
+            if (!disableScroll) {
+                this.windowScroll.toY(0);
+            }
 
             if (selectText) {
                 textSource.select();
@@ -481,7 +482,7 @@ class Display {
         this.windowScroll.stop();
         let target;
 
-        if (scroll) {
+        if (scroll !== null) {
             target = scroll;
         } else {
             target = index === 0 || entry === null ? 0 : Display.getElementTop(entry);
