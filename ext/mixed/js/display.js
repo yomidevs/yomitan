@@ -80,7 +80,6 @@ class Display {
                         })
                     }
                 },
-                type: 'kanji',
                 sentence: this.context.sentence,
                 url: this.context.url
             };
@@ -132,7 +131,6 @@ class Display {
                         })
                     }
                 },
-                type: 'terms',
                 disableScroll,
                 sentence,
                 url: this.context.url
@@ -361,6 +359,7 @@ class Display {
             }
 
             this.definitions = definitions;
+            context.type = 'terms';
             this.context = context;
 
             const sequence = ++this.sequence;
@@ -421,6 +420,7 @@ class Display {
             }
 
             this.definitions = definitions;
+            context.type = 'kanji';
             this.context = context;
 
             const sequence = ++this.sequence;
@@ -548,16 +548,16 @@ class Display {
                 })
             }
         });
-        const {type, details} = this.context.source;
-        this.setContent(type, details);
+        const {details} = this.context.source;
+        this.setContent(details.context.type, details);
     }
 
     poppedTermView() {
         if (this.poppedContextHistory.length === 0) { return; }
         this.context.index = this.index;
         this.context.scroll = this.windowScroll.y;
-        const {type, details} = this.poppedContextHistory.pop();
-        this.setContent(type, details);
+        const {details} = this.poppedContextHistory.pop();
+        this.setContent(details.context.type, details);
     }
 
     noteTryAdd(mode) {
