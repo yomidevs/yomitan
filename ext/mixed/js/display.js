@@ -222,14 +222,14 @@ class Display {
                 this.entryScrollIntoView(this.index + (e.deltaY > 0 ? 1 : -1), null, true);
                 e.preventDefault();
             }
-        }
-        if (e.shiftKey) {
+        } else if (e.shiftKey) {
             const delta = e.deltaX || e.deltaY;
             if (delta > 0) {
                 this.sourceTermView();
                 e.preventDefault();
             } else if (delta < 0) {
                 this.poppedTermView();
+                e.preventDefault();
             }
         }
     }
