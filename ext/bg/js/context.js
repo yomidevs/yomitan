@@ -26,22 +26,24 @@ function showExtensionInfo() {
 }
 
 function setupButtonEvents(selector, command, url) {
-    const node = document.querySelector(selector);
-    node.addEventListener('click', (e) => {
-        if (e.button !== 0) { return; }
-        apiCommandExec(command, {newTab: e.ctrlKey});
-        e.preventDefault();
-    }, false);
-    node.addEventListener('auxclick', (e) => {
-        if (e.button !== 1) { return; }
-        apiCommandExec(command, {newTab: true});
-        e.preventDefault();
-    }, false);
+    const nodes = document.querySelectorAll(selector);
+    for (const node of nodes) {
+        node.addEventListener('click', (e) => {
+            if (e.button !== 0) { return; }
+            apiCommandExec(command, {newTab: e.ctrlKey});
+            e.preventDefault();
+        }, false);
+        node.addEventListener('auxclick', (e) => {
+            if (e.button !== 1) { return; }
+            apiCommandExec(command, {newTab: true});
+            e.preventDefault();
+        }, false);
 
-    if (typeof url === 'string') {
-        node.href = url;
-        node.target = '_blank';
-        node.rel = 'noopener';
+        if (typeof url === 'string') {
+            node.href = url;
+            node.target = '_blank';
+            node.rel = 'noopener';
+        }
     }
 }
 
