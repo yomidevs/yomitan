@@ -221,8 +221,7 @@ class DisplaySearch extends Display {
                 this.setContentTerms(definitions, {
                     focus: false,
                     sentence: {text: query, offset: 0},
-                    url: window.location.href,
-                    clearHistoryOnce: true
+                    url: window.location.href
                 });
             } else {
                 this.container.textContent = '';

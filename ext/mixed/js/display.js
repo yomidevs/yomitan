@@ -349,13 +349,6 @@ class Display {
 
             this.setEventListenersActive(false);
 
-            if (context.clearHistoryOnce) {
-                delete context.clearHistoryOnce;
-                if (this.context !== null) {
-                    this.context.details.context.next = null;
-                }
-            }
-
             if (context.focus !== false) {
                 window.focus();
             }
@@ -413,13 +406,6 @@ class Display {
             const options = this.options;
 
             this.setEventListenersActive(false);
-
-            if (context.clearHistoryOnce) {
-                delete context.clearHistoryOnce;
-                if (this.context !== null) {
-                    this.context.details.context.next = null;
-                }
-            }
 
             if (context.focus !== false) {
                 window.focus();
