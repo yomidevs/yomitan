@@ -37,8 +37,6 @@ class Display {
         this.eventListenersActive = false;
         this.clickScanPrevent = false;
 
-        this.poppedContextHistory = [];
-
         this.windowScroll = new WindowScroll();
 
         this.setInteractive(true);
@@ -57,31 +55,32 @@ class Display {
         this.sourceTermView();
     }
 
-    onHistoryTermView(e) {
+    onNextTermView(e) {
         e.preventDefault();
-        this.poppedTermView();
+        this.nextTermView();
     }
 
     async onKanjiLookup(e) {
         try {
             e.preventDefault();
             if (!this.context) { return; }
-            this.poppedContextHistory = [];
+            this.context.details.context.next = null;
 
             const link = e.target;
+            const {type, details} = this.context;
             const context = {
                 source: {
-                    type: 'terms',
+                    type,
                     details: {
                         definitions: this.definitions,
-                        context: Object.assign({}, this.context, {
+                        context: Object.assign({}, details.context, {
                             index: this.entryIndexFind(link),
                             scroll: this.windowScroll.y
                         })
                     }
                 },
-                sentence: this.context.sentence,
-                url: this.context.url
+                sentence: details.context.sentence,
+                url: details.context.url
             };
 
             this.windowScroll.toY(0);
@@ -112,7 +111,7 @@ class Display {
     async onTermLookup(e, {disableScroll, selectText, disableHistory}={}) {
         try {
             if (!this.context) { return; }
-            this.poppedContextHistory = [];
+            this.context.details.context.next = null;
             const termLookupResults = await this.termLookup(e);
             if (!termLookupResults) { return; }
             const {textSource, definitions} = termLookupResults;
@@ -120,12 +119,13 @@ class Display {
             const scannedElement = e.target;
             const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
 
+            const {type, details} = this.context;
             const context = {
-                source: disableHistory ? this.context.source : {
-                    type: 'terms',
+                source: disableHistory ? details.context.source : {
+                    type,
                     details: {
                         definitions: this.definitions,
-                        context: Object.assign({}, this.context, {
+                        context: Object.assign({}, details.context, {
                             index: this.entryIndexFind(scannedElement),
                             scroll: this.windowScroll.y
                         })
@@ -133,7 +133,7 @@ class Display {
                 },
                 disableScroll,
                 sentence,
-                url: this.context.url
+                url: details.context.url
             };
 
             this.setContentTerms(definitions, context);
@@ -226,7 +226,7 @@ class Display {
                 this.sourceTermView();
                 e.preventDefault();
             } else if (delta < 0) {
-                this.poppedTermView();
+                this.nextTermView();
                 e.preventDefault();
             }
         }
@@ -310,7 +310,7 @@ class Display {
             this.addEventListeners('.action-play-audio', 'click', this.onAudioPlay.bind(this));
             this.addEventListeners('.kanji-link', 'click', this.onKanjiLookup.bind(this));
             this.addEventListeners('.source-term', 'click', this.onSourceTermView.bind(this));
-            this.addEventListeners('.history-term', 'click', this.onHistoryTermView.bind(this));
+            this.addEventListeners('.next-term', 'click', this.onNextTermView.bind(this));
             if (this.options.scanning.enablePopupSearch) {
                 this.addEventListeners('.glossary-item', 'mouseup', this.onGlossaryMouseUp.bind(this));
                 this.addEventListeners('.glossary-item', 'mousedown', this.onGlossaryMouseDown.bind(this));
@@ -351,7 +351,9 @@ class Display {
 
             if (context.clearHistoryOnce) {
                 delete context.clearHistoryOnce;
-                this.poppedContextHistory = [];
+                if (this.context !== null) {
+                    this.context.details.context.next = null;
+                }
             }
 
             if (context.focus !== false) {
@@ -359,14 +361,16 @@ class Display {
             }
 
             this.definitions = definitions;
-            context.type = 'terms';
-            this.context = context;
+            this.context = {
+                type: 'terms',
+                details: {definitions, context}
+            };
 
             const sequence = ++this.sequence;
             const params = {
                 definitions,
                 source: context.source,
-                history: this.poppedContextHistory.length > 0,
+                next: context.next,
                 addable: options.anki.enable,
                 grouped: options.general.resultOutputMode === 'group',
                 merged: options.general.resultOutputMode === 'merge',
@@ -412,7 +416,9 @@ class Display {
 
             if (context.clearHistoryOnce) {
                 delete context.clearHistoryOnce;
-                this.poppedContextHistory = [];
+                if (this.context !== null) {
+                    this.context.details.context.next = null;
+                }
             }
 
             if (context.focus !== false) {
@@ -420,14 +426,16 @@ class Display {
             }
 
             this.definitions = definitions;
-            context.type = 'kanji';
-            this.context = context;
+            this.context = {
+                type: 'kanji',
+                details: {definitions, context}
+            };
 
             const sequence = ++this.sequence;
             const params = {
                 definitions,
                 source: context.source,
-                history: this.poppedContextHistory.length > 0,
+                next: context.next,
                 addable: options.anki.enable,
                 debug: options.general.debugInfo
             };
@@ -537,27 +545,28 @@ class Display {
     }
 
     sourceTermView() {
-        if (!this.context || !this.context.source) { return; }
-        this.poppedContextHistory.push({
-            type: this.context.type,
+        if (!this.context || !this.context.details.context.source) { return; }
+        const {type, details} = this.context;
+        const sourceContext = details.context.source;
+        sourceContext.details.context.next = {
+            type,
             details: {
                 definitions: this.definitions,
-                context: Object.assign({}, this.context, {
+                context: Object.assign({}, details.context, {
                     index: this.index,
                     scroll: this.windowScroll.y
                 })
             }
-        });
-        const {details} = this.context.source;
-        this.setContent(details.context.type, details);
+        };
+        this.setContent(sourceContext.type, sourceContext.details);
     }
 
-    poppedTermView() {
-        if (this.poppedContextHistory.length === 0) { return; }
-        this.context.index = this.index;
-        this.context.scroll = this.windowScroll.y;
-        const {details} = this.poppedContextHistory.pop();
-        this.setContent(details.context.type, details);
+    nextTermView() {
+        if (!this.context.details.context.next) { return; }
+        this.context.details.context.index = this.index;
+        this.context.details.context.scroll = this.windowScroll.y;
+        const {type, details} = this.context.details.context.next;
+        this.setContent(type, details);
     }
 
     noteTryAdd(mode) {
@@ -835,7 +844,7 @@ Display.onKeyDownHandlers = {
 
     'F': (self, e) => {
         if (e.altKey) {
-            self.poppedTermView();
+            self.nextTermView();
             return true;
         }
         return false;

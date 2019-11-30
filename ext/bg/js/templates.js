@@ -137,17 +137,17 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
   return "<div class=\"term-navigation\">\n    <a href=\"#\" "
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.source : depth0),{"name":"if","hash":{},"fn":container.program(33, data, 0, blockParams, depths),"inverse":container.program(35, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
     + "><img src=\"/mixed/img/source-term.svg\" title=\"Source term (Alt + B)\" alt></a>\n    <a href=\"#\" "
-    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.history : depth0),{"name":"if","hash":{},"fn":container.program(37, data, 0, blockParams, depths),"inverse":container.program(39, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
-    + "><img src=\"/mixed/img/source-term.svg\" style=\"transform: scaleX(-1);\" title=\"History term (Alt + F)\" alt></a>\n</div>\n"
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.next : depth0),{"name":"if","hash":{},"fn":container.program(37, data, 0, blockParams, depths),"inverse":container.program(39, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
+    + "><img src=\"/mixed/img/source-term.svg\" style=\"transform: scaleX(-1);\" title=\"Next term (Alt + F)\" alt></a>\n</div>\n"
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.definitions : depth0),{"name":"each","hash":{},"fn":container.program(41, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "");
 },"33":function(container,depth0,helpers,partials,data) {
     return "class=\"source-term\"";
 },"35":function(container,depth0,helpers,partials,data) {
     return "class=\"source-term term-button-fade\"";
 },"37":function(container,depth0,helpers,partials,data) {
-    return "class=\"history-term\"";
+    return "class=\"next-term\"";
 },"39":function(container,depth0,helpers,partials,data) {
-    return "class=\"history-term term-button-fade\"";
+    return "class=\"next-term term-button-fade\"";
 },"41":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
@@ -485,17 +485,17 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
   return "<div class=\"term-navigation\">\n    <a href=\"#\" "
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.source : depth0),{"name":"if","hash":{},"fn":container.program(67, data, 0, blockParams, depths),"inverse":container.program(69, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
     + "><img src=\"/mixed/img/source-term.svg\" title=\"Source term (Alt + B)\" alt></a>\n    <a href=\"#\" "
-    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.history : depth0),{"name":"if","hash":{},"fn":container.program(71, data, 0, blockParams, depths),"inverse":container.program(73, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
-    + "><img src=\"/mixed/img/source-term.svg\" style=\"transform: scaleX(-1);\" title=\"History term (Alt + F)\" alt></a>\n</div>\n"
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.next : depth0),{"name":"if","hash":{},"fn":container.program(71, data, 0, blockParams, depths),"inverse":container.program(73, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
+    + "><img src=\"/mixed/img/source-term.svg\" style=\"transform: scaleX(-1);\" title=\"Next term (Alt + F)\" alt></a>\n</div>\n"
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.definitions : depth0),{"name":"each","hash":{},"fn":container.program(75, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "");
 },"67":function(container,depth0,helpers,partials,data) {
     return "class=\"source-term\"";
 },"69":function(container,depth0,helpers,partials,data) {
     return "class=\"source-term term-button-fade\"";
 },"71":function(container,depth0,helpers,partials,data) {
-    return "class=\"history-term\"";
+    return "class=\"next-term\"";
 },"73":function(container,depth0,helpers,partials,data) {
-    return "class=\"history-term term-button-fade\"";
+    return "class=\"next-term term-button-fade\"";
 },"75":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
