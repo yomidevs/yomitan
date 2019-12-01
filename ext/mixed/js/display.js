@@ -515,7 +515,7 @@ class Display {
         if (scroll !== null) {
             target = scroll;
         } else {
-            target = index === 0 || entry === null ? 0 : Display.getElementTop(entry);
+            target = this.index === 0 || entry === null ? 0 : Display.getElementTop(entry);
         }
 
         if (smooth) {
