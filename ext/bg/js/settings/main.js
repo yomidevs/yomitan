@@ -204,27 +204,6 @@ async function onFormOptionsChanged(e) {
     }
 }
 
-async function onReady() {
-    showExtensionInformation();
-
-    formSetupEventListeners();
-    appearanceInitialize();
-    await audioSettingsInitialize();
-    await profileOptionsSetup();
-    await dictSettingsInitialize();
-    ankiTemplatesInitialize();
-
-    storageInfoInitialize();
-
-    chrome.runtime.onMessage.addListener(onMessage);
-}
-
-$(document).ready(() => onReady());
-
-
-/*
- * Remote options updates
- */
 
 function settingsGetSource() {
     return new Promise((resolve) => {
@@ -258,10 +237,6 @@ function onMessage({action, params}, sender, callback) {
 }
 
 
-/*
- * Information
- */
-
 function showExtensionInformation() {
     const node = document.getElementById('extension-info');
     if (node === null) { return; }
@@ -269,3 +244,21 @@ function showExtensionInformation() {
     const manifest = chrome.runtime.getManifest();
     node.textContent = `${manifest.name} v${manifest.version}`;
 }
+
+
+async function onReady() {
+    showExtensionInformation();
+
+    formSetupEventListeners();
+    appearanceInitialize();
+    await audioSettingsInitialize();
+    await profileOptionsSetup();
+    await dictSettingsInitialize();
+    ankiTemplatesInitialize();
+
+    storageInfoInitialize();
+
+    chrome.runtime.onMessage.addListener(onMessage);
+}
+
+$(document).ready(() => onReady());
