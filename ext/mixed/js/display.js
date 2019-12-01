@@ -64,26 +64,16 @@ class Display {
         try {
             e.preventDefault();
             if (!this.context) { return; }
-            this.context.details.context.next = null;
 
             const link = e.target;
-            const {type, details} = this.context;
+            this.context.update({
+                index: this.entryIndexFind(link),
+                scroll: this.windowScroll.y
+            });
             const context = {
-                source: {
-                    type,
-                    details: {
-                        definitions: this.definitions,
-                        context: Object.assign({}, details.context, {
-                            index: this.entryIndexFind(link),
-                            scroll: this.windowScroll.y
-                        })
-                    }
-                },
-                sentence: details.context.sentence,
-                url: details.context.url
+                sentence: this.context.get('sentence'),
+                url: this.context.get('url')
             };
-
-            this.windowScroll.toY(0);
 
             const definitions = await apiKanjiFind(link.textContent, this.getOptionsContext());
             this.setContentKanji(definitions, context);
@@ -111,7 +101,7 @@ class Display {
     async onTermLookup(e, {disableScroll, selectText, disableHistory}={}) {
         try {
             if (!this.context) { return; }
-            this.context.details.context.next = null;
+
             const termLookupResults = await this.termLookup(e);
             if (!termLookupResults) { return; }
             const {textSource, definitions} = termLookupResults;
@@ -119,28 +109,28 @@ class Display {
             const scannedElement = e.target;
             const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
 
-            const {type, details} = this.context;
             const context = {
-                source: disableHistory ? details.context.source : {
-                    type,
-                    details: {
-                        definitions: this.definitions,
-                        context: Object.assign({}, details.context, {
-                            index: this.entryIndexFind(scannedElement),
-                            scroll: this.windowScroll.y
-                        })
-                    }
-                },
                 disableScroll,
+                disableHistory,
                 sentence,
-                url: details.context.url
+                url: this.context.get('url')
             };
+            if (disableHistory) {
+                Object.assign(context, {
+                    previous: this.context.previous,
+                    next: this.context.next
+                });
+            } else {
+                this.context.update({
+                    index: this.entryIndexFind(scannedElement),
+                    scroll: this.windowScroll.y
+                });
+                Object.assign(context, {
+                    previous: this.context
+                });
+            }
 
             this.setContentTerms(definitions, context);
-
-            if (!disableScroll) {
-                this.windowScroll.toY(0);
-            }
 
             if (selectText) {
                 textSource.select();
@@ -354,16 +344,18 @@ class Display {
             }
 
             this.definitions = definitions;
-            this.context = {
-                type: 'terms',
-                details: {definitions, context}
-            };
+            if (context.disableHistory) {
+                delete context.disableHistory;
+                this.context = new DisplayContext('terms', definitions, context);
+            } else {
+                this.context = DisplayContext.push(this.context, 'terms', definitions, context);
+            }
 
             const sequence = ++this.sequence;
             const params = {
                 definitions,
-                source: context.source,
-                next: context.next,
+                source: this.context.previous,
+                next: this.context.next,
                 addable: options.anki.enable,
                 grouped: options.general.resultOutputMode === 'group',
                 merged: options.general.resultOutputMode === 'merge',
@@ -383,6 +375,7 @@ class Display {
             if (!disableScroll) {
                 this.entryScrollIntoView(index || 0, scroll);
             } else {
+                delete context.disableScroll;
                 this.entrySetCurrent(index || 0);
             }
 
@@ -412,16 +405,18 @@ class Display {
             }
 
             this.definitions = definitions;
-            this.context = {
-                type: 'kanji',
-                details: {definitions, context}
-            };
+            if (context.disableHistory) {
+                delete context.disableHistory;
+                this.context = new DisplayContext('kanji', definitions, context);
+            } else {
+                this.context = DisplayContext.push(this.context, 'kanji', definitions, context);
+            }
 
             const sequence = ++this.sequence;
             const params = {
                 definitions,
-                source: context.source,
-                next: context.next,
+                source: this.context.previous,
+                next: this.context.next,
                 addable: options.anki.enable,
                 debug: options.general.debugInfo
             };
@@ -531,28 +526,33 @@ class Display {
     }
 
     sourceTermView() {
-        if (!this.context || !this.context.details.context.source) { return; }
-        const {type, details} = this.context;
-        const sourceContext = details.context.source;
-        sourceContext.details.context.next = {
-            type,
-            details: {
-                definitions: this.definitions,
-                context: Object.assign({}, details.context, {
-                    index: this.index,
-                    scroll: this.windowScroll.y
-                })
-            }
+        if (!this.context || !this.context.previous) { return; }
+        this.context.update({
+            index: this.index,
+            scroll: this.windowScroll.y
+        });
+        const previousContext = this.context.previous;
+        previousContext.set('disableHistory', true);
+        const details = {
+            definitions: previousContext.definitions,
+            context: previousContext.context
         };
-        this.setContent(sourceContext.type, sourceContext.details);
+        this.setContent(previousContext.type, details);
     }
 
     nextTermView() {
-        if (!this.context.details.context.next) { return; }
-        this.context.details.context.index = this.index;
-        this.context.details.context.scroll = this.windowScroll.y;
-        const {type, details} = this.context.details.context.next;
-        this.setContent(type, details);
+        if (!this.context || !this.context.next) { return; }
+        this.context.update({
+            index: this.index,
+            scroll: this.windowScroll.y
+        });
+        const nextContext = this.context.next;
+        nextContext.set('disableHistory', true);
+        const details = {
+            definitions: nextContext.definitions,
+            context: nextContext.context
+        };
+        this.setContent(nextContext.type, details);
     }
 
     noteTryAdd(mode) {
