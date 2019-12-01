@@ -109,6 +109,10 @@ class Display {
             const scannedElement = e.target;
             const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
 
+            this.context.update({
+                index: this.entryIndexFind(scannedElement),
+                scroll: this.windowScroll.y
+            });
             const context = {
                 disableScroll,
                 disableHistory,
@@ -121,10 +125,6 @@ class Display {
                     next: this.context.next
                 });
             } else {
-                this.context.update({
-                    index: this.entryIndexFind(scannedElement),
-                    scroll: this.windowScroll.y
-                });
                 Object.assign(context, {
                     previous: this.context
                 });
