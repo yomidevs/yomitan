@@ -17,6 +17,8 @@
  */
 
 
+// Private
+
 let _ankiDataPopulated = false;
 
 
@@ -37,19 +39,6 @@ function _ankiErrorShow(error) {
     else {
         dialog.hide();
     }
-}
-
-function ankiErrorShown() {
-    return $('#anki-error').is(':visible');
-}
-
-function ankiFieldsToDict(selection) {
-    const result = {};
-    selection.each((index, element) => {
-        result[$(element).data('field')] = $(element).val();
-    });
-
-    return result;
 }
 
 async function _ankiDeckAndModelPopulate(options) {
@@ -87,56 +76,6 @@ function _ankiCreateFieldTemplate(name, value, markers) {
     content.querySelector('.anki-field-marker-list').appendChild(ankiGetFieldMarkersHtml(markers));
 
     return content;
-}
-
-function ankiGetFieldMarkersHtml(markers, fragment) {
-    const template = document.querySelector('#anki-field-marker-template').content;
-    if (!fragment) {
-        fragment = new DocumentFragment();
-    }
-    for (const marker of markers) {
-        const markerNode = document.importNode(template, true).firstChild;
-        markerNode.querySelector('.marker-link').textContent = marker;
-        fragment.appendChild(markerNode);
-    }
-    return fragment;
-}
-
-function ankiGetFieldMarkers(type) {
-    switch (type) {
-        case 'terms':
-            return [
-                'audio',
-                'cloze-body',
-                'cloze-prefix',
-                'cloze-suffix',
-                'dictionary',
-                'expression',
-                'furigana',
-                'furigana-plain',
-                'glossary',
-                'glossary-brief',
-                'reading',
-                'screenshot',
-                'sentence',
-                'tags',
-                'url'
-            ];
-        case 'kanji':
-            return [
-                'character',
-                'dictionary',
-                'glossary',
-                'kunyomi',
-                'onyomi',
-                'screenshot',
-                'sentence',
-                'tags',
-                'url'
-            ];
-        default:
-            return [];
-    }
 }
 
 async function _ankiFieldsPopulate(element, options) {
@@ -185,6 +124,73 @@ async function _onAnkiModelChanged(e) {
         _ankiErrorShow(error);
     } finally {
         _ankiSpinnerShow(false);
+    }
+}
+
+
+// Public
+
+function ankiErrorShown() {
+    return $('#anki-error').is(':visible');
+}
+
+function ankiFieldsToDict(selection) {
+    const result = {};
+    selection.each((index, element) => {
+        result[$(element).data('field')] = $(element).val();
+    });
+
+    return result;
+}
+
+
+function ankiGetFieldMarkersHtml(markers, fragment) {
+    const template = document.querySelector('#anki-field-marker-template').content;
+    if (!fragment) {
+        fragment = new DocumentFragment();
+    }
+    for (const marker of markers) {
+        const markerNode = document.importNode(template, true).firstChild;
+        markerNode.querySelector('.marker-link').textContent = marker;
+        fragment.appendChild(markerNode);
+    }
+    return fragment;
+}
+
+function ankiGetFieldMarkers(type) {
+    switch (type) {
+        case 'terms':
+            return [
+                'audio',
+                'cloze-body',
+                'cloze-prefix',
+                'cloze-suffix',
+                'dictionary',
+                'expression',
+                'furigana',
+                'furigana-plain',
+                'glossary',
+                'glossary-brief',
+                'reading',
+                'screenshot',
+                'sentence',
+                'tags',
+                'url'
+            ];
+        case 'kanji':
+            return [
+                'character',
+                'dictionary',
+                'glossary',
+                'kunyomi',
+                'onyomi',
+                'screenshot',
+                'sentence',
+                'tags',
+                'url'
+            ];
+        default:
+            return [];
     }
 }
 
