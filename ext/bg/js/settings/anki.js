@@ -20,7 +20,7 @@
 let _ankiDataPopulated = false;
 
 
-function ankiSpinnerShow(show) {
+function _ankiSpinnerShow(show) {
     const spinner = $('#anki-spinner');
     if (show) {
         spinner.show();
@@ -29,7 +29,7 @@ function ankiSpinnerShow(show) {
     }
 }
 
-function ankiErrorShow(error) {
+function _ankiErrorShow(error) {
     const dialog = $('#anki-error');
     if (error) {
         dialog.show().text(error);
@@ -52,7 +52,7 @@ function ankiFieldsToDict(selection) {
     return result;
 }
 
-async function ankiDeckAndModelPopulate(options) {
+async function _ankiDeckAndModelPopulate(options) {
     const ankiFormat = $('#anki-format').hide();
 
     const deckNames = await utilAnkiGetDeckNames();
@@ -66,15 +66,15 @@ async function ankiDeckAndModelPopulate(options) {
     modelNames.sort().forEach((name) => ankiModel.append($('<option/>', {value: name, text: name})));
 
     $('#anki-terms-deck').val(options.anki.terms.deck);
-    await ankiFieldsPopulate($('#anki-terms-model').val(options.anki.terms.model), options);
+    await _ankiFieldsPopulate($('#anki-terms-model').val(options.anki.terms.model), options);
 
     $('#anki-kanji-deck').val(options.anki.kanji.deck);
-    await ankiFieldsPopulate($('#anki-kanji-model').val(options.anki.kanji.model), options);
+    await _ankiFieldsPopulate($('#anki-kanji-model').val(options.anki.kanji.model), options);
 
     ankiFormat.show();
 }
 
-function ankiCreateFieldTemplate(name, value, markers) {
+function _ankiCreateFieldTemplate(name, value, markers) {
     const template = document.querySelector('#anki-field-template').content;
     const content = document.importNode(template, true).firstChild;
 
@@ -139,7 +139,7 @@ function ankiGetFieldMarkers(type) {
     }
 }
 
-async function ankiFieldsPopulate(element, options) {
+async function _ankiFieldsPopulate(element, options) {
     const modelName = element.val();
     if (!modelName) {
         return;
@@ -152,21 +152,21 @@ async function ankiFieldsPopulate(element, options) {
 
     for (const name of await utilAnkiGetModelFieldNames(modelName)) {
         const value = options.anki[tabId].fields[name] || '';
-        const html = ankiCreateFieldTemplate(name, value, markers);
+        const html = _ankiCreateFieldTemplate(name, value, markers);
         container.append($(html));
     }
 
     tab.find('.anki-field-value').change((e) => onFormOptionsChanged(e));
-    tab.find('.marker-link').click((e) => onAnkiMarkerClicked(e));
+    tab.find('.marker-link').click((e) => _onAnkiMarkerClicked(e));
 }
 
-function onAnkiMarkerClicked(e) {
+function _onAnkiMarkerClicked(e) {
     e.preventDefault();
     const link = e.target;
     $(link).closest('.input-group').find('.anki-field-value').val(`{${link.text}}`).trigger('change');
 }
 
-async function onAnkiModelChanged(e) {
+async function _onAnkiModelChanged(e) {
     try {
         const element = $(e.currentTarget);
         const tab = element.closest('.tab-pane');
@@ -178,20 +178,20 @@ async function onAnkiModelChanged(e) {
         options.anki[tabId].fields = utilBackgroundIsolate({});
         await settingsSaveOptions();
 
-        ankiSpinnerShow(true);
-        await ankiFieldsPopulate(element, options);
-        ankiErrorShow();
+        _ankiSpinnerShow(true);
+        await _ankiFieldsPopulate(element, options);
+        _ankiErrorShow();
     } catch (error) {
-        ankiErrorShow(error);
+        _ankiErrorShow(error);
     } finally {
-        ankiSpinnerShow(false);
+        _ankiSpinnerShow(false);
     }
 }
 
 
 function ankiInitialize() {
     for (const node of document.querySelectorAll('#anki-terms-model,#anki-kanji-model')) {
-        node.addEventListener('change', (e) => onAnkiModelChanged(e), false);
+        node.addEventListener('change', (e) => _onAnkiModelChanged(e), false);
     }
 }
 
@@ -204,13 +204,13 @@ async function onAnkiOptionsChanged(options) {
     if (_ankiDataPopulated) { return; }
 
     try {
-        ankiSpinnerShow(true);
-        await ankiDeckAndModelPopulate(options);
-        ankiErrorShow();
+        _ankiSpinnerShow(true);
+        await _ankiDeckAndModelPopulate(options);
+        _ankiErrorShow();
         _ankiDataPopulated = true;
     } catch (e) {
-        ankiErrorShow(e);
+        _ankiErrorShow(e);
     } finally {
-        ankiSpinnerShow(false);
+        _ankiSpinnerShow(false);
     }
 }
