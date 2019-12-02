@@ -22,22 +22,14 @@ function onAnkiFieldTemplatesReset(e) {
     $('#field-template-reset-modal').modal('show');
 }
 
-async function onAnkiFieldTemplatesResetConfirm(e) {
-    try {
-        e.preventDefault();
+function onAnkiFieldTemplatesResetConfirm(e) {
+    e.preventDefault();
 
-        $('#field-template-reset-modal').modal('hide');
+    $('#field-template-reset-modal').modal('hide');
 
-        const optionsContext = getOptionsContext();
-        const options = await apiOptionsGet(optionsContext);
-        const fieldTemplates = profileOptionsGetDefaultFieldTemplates();
-        options.anki.fieldTemplates = fieldTemplates;
-        $('#field-templates').val(fieldTemplates);
-        onAnkiTemplatesValidateCompile();
-        await settingsSaveOptions();
-    } catch (error) {
-        ankiErrorShow(error);
-    }
+    const element = document.querySelector('#field-templates');
+    element.value = profileOptionsGetDefaultFieldTemplates();
+    element.dispatchEvent(new Event('change'));
 }
 
 function ankiTemplatesInitialize() {
