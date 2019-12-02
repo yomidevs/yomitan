@@ -143,20 +143,14 @@ async function formWrite(options) {
     $('#field-templates').val(options.anki.fieldTemplates);
 
     onAnkiTemplatesValidateCompile();
+    await onAnkiOptionsChanged(options);
     await onDictionaryOptionsChanged(options);
-
-    try {
-        await ankiDeckAndModelPopulate(options);
-    } catch (e) {
-        ankiErrorShow(e);
-    }
 
     formUpdateVisibility(options);
 }
 
 function formSetupEventListeners() {
     $('input, select, textarea').not('.anki-model').not('.ignore-form-changes *').change((e) => onFormOptionsChanged(e));
-    $('.anki-model').change((e) => onAnkiModelChanged(e));
 }
 
 function formUpdateVisibility(options) {
@@ -180,28 +174,12 @@ async function onFormOptionsChanged(e) {
 
     const optionsContext = getOptionsContext();
     const options = await apiOptionsGet(optionsContext);
-    const optionsAnkiEnableOld = options.anki.enable;
-    const optionsAnkiServerOld = options.anki.server;
 
     await formRead(options);
     await settingsSaveOptions();
     formUpdateVisibility(options);
 
-    try {
-        const ankiUpdated =
-            options.anki.enable !== optionsAnkiEnableOld ||
-            options.anki.server !== optionsAnkiServerOld;
-
-        if (ankiUpdated) {
-            ankiSpinnerShow(true);
-            await ankiDeckAndModelPopulate(options);
-            ankiErrorShow();
-        }
-    } catch (error) {
-        ankiErrorShow(error);
-    } finally {
-        ankiSpinnerShow(false);
-    }
+    await onAnkiOptionsChanged(options);
 }
 
 
@@ -254,6 +232,7 @@ async function onReady() {
     await audioSettingsInitialize();
     await profileOptionsSetup();
     await dictSettingsInitialize();
+    ankiInitialize();
     ankiTemplatesInitialize();
 
     storageInfoInitialize();

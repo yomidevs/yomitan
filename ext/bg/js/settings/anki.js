@@ -17,6 +17,9 @@
  */
 
 
+let _ankiDataPopulated = false;
+
+
 function ankiSpinnerShow(show) {
     const spinner = $('#anki-spinner');
     if (show) {
@@ -165,11 +168,7 @@ function onAnkiMarkerClicked(e) {
 
 async function onAnkiModelChanged(e) {
     try {
-        if (!e.originalEvent) {
-            return;
-        }
-
-        const element = $(this);
+        const element = $(e.currentTarget);
         const tab = element.closest('.tab-pane');
         const tabId = tab.attr('id');
 
@@ -184,6 +183,33 @@ async function onAnkiModelChanged(e) {
         ankiErrorShow();
     } catch (error) {
         ankiErrorShow(error);
+    } finally {
+        ankiSpinnerShow(false);
+    }
+}
+
+
+function ankiInitialize() {
+    for (const node of document.querySelectorAll('#anki-terms-model,#anki-kanji-model')) {
+        node.addEventListener('change', (e) => onAnkiModelChanged(e), false);
+    }
+}
+
+async function onAnkiOptionsChanged(options) {
+    if (!options.anki.enable) {
+        _ankiDataPopulated = false;
+        return;
+    }
+
+    if (_ankiDataPopulated) { return; }
+
+    try {
+        ankiSpinnerShow(true);
+        await ankiDeckAndModelPopulate(options);
+        ankiErrorShow();
+        _ankiDataPopulated = true;
+    } catch (e) {
+        ankiErrorShow(e);
     } finally {
         ankiSpinnerShow(false);
     }
