@@ -17,7 +17,7 @@
  */
 
 
-#anki-spinner, #anki-error,
+#anki-spinner,
 #dict-spinner, #dict-import-progress,
 .storage-hidden, #storage-spinner {
     display: none;

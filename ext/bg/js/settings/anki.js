@@ -31,13 +31,16 @@ function _ankiSpinnerShow(show) {
     }
 }
 
-function _ankiErrorShow(error) {
-    const dialog = $('#anki-error');
+function _ankiSetError(error) {
+    const node = document.querySelector('#anki-error');
+    if (!node) { return; }
     if (error) {
-        dialog.show().text(error);
+        node.hidden = false;
+        node.textContent = `${error}`;
     }
     else {
-        dialog.hide();
+        node.hidden = true;
+        node.textContent = '';
     }
 }
 
@@ -119,9 +122,9 @@ async function _onAnkiModelChanged(e) {
 
         _ankiSpinnerShow(true);
         await _ankiFieldsPopulate(element, options);
-        _ankiErrorShow();
+        _ankiSetError(null);
     } catch (error) {
-        _ankiErrorShow(error);
+        _ankiSetError(error);
     } finally {
         _ankiSpinnerShow(false);
     }
@@ -131,7 +134,8 @@ async function _onAnkiModelChanged(e) {
 // Public
 
 function ankiErrorShown() {
-    return $('#anki-error').is(':visible');
+    const node = document.querySelector('#anki-error');
+    return node && !node.hidden;
 }
 
 function ankiFieldsToDict(selection) {
@@ -212,10 +216,10 @@ async function onAnkiOptionsChanged(options) {
     try {
         _ankiSpinnerShow(true);
         await _ankiDeckAndModelPopulate(options);
-        _ankiErrorShow();
+        _ankiSetError(null);
         _ankiDataPopulated = true;
-    } catch (e) {
-        _ankiErrorShow(e);
+    } catch (error) {
+        _ankiSetError(error);
     } finally {
         _ankiSpinnerShow(false);
     }
