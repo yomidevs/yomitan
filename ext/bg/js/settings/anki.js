@@ -178,11 +178,9 @@ function ankiFieldsToDict(elements) {
 }
 
 
-function ankiGetFieldMarkersHtml(markers, fragment) {
+function ankiGetFieldMarkersHtml(markers) {
     const template = document.querySelector('#anki-field-marker-template').content;
-    if (!fragment) {
-        fragment = new DocumentFragment();
-    }
+    const fragment = document.createDocumentFragment();
     for (const marker of markers) {
         const markerNode = document.importNode(template, true).firstChild;
         markerNode.querySelector('.marker-link').textContent = marker;
