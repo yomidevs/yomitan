@@ -44,26 +44,44 @@ function _ankiSetError(error) {
     }
 }
 
+function _ankiSetDropdownOptions(dropdown, optionValues) {
+    const fragment = document.createDocumentFragment();
+    for (const optionValue of optionValues) {
+        const option = document.createElement('option');
+        option.value = optionValue;
+        option.textContent = optionValue;
+        fragment.appendChild(option);
+    }
+    dropdown.textContent = '';
+    dropdown.appendChild(fragment);
+}
+
 async function _ankiDeckAndModelPopulate(options) {
-    const ankiFormat = $('#anki-format').hide();
+    const termsDeck = {value: options.anki.terms.deck, selector: '#anki-terms-deck'};
+    const kanjiDeck = {value: options.anki.kanji.deck, selector: '#anki-kanji-deck'};
+    const termsModel = {value: options.anki.terms.model, selector: '#anki-terms-model'};
+    const kanjiModel = {value: options.anki.kanji.model, selector: '#anki-kanji-model'};
+    try {
+        _ankiSpinnerShow(true);
+        const [deckNames, modelNames] = await Promise.all([utilAnkiGetDeckNames(), utilAnkiGetModelNames()]);
+        deckNames.sort();
+        modelNames.sort();
+        termsDeck.values = deckNames;
+        kanjiDeck.values = deckNames;
+        termsModel.values = modelNames;
+        kanjiModel.values = modelNames;
+        _ankiSetError(null);
+    } catch (error) {
+        _ankiSetError(error);
+    } finally {
+        _ankiSpinnerShow(false);
+    }
 
-    const deckNames = await utilAnkiGetDeckNames();
-    const ankiDeck = $('.anki-deck');
-    ankiDeck.find('option').remove();
-    deckNames.sort().forEach((name) => ankiDeck.append($('<option/>', {value: name, text: name})));
-
-    const modelNames = await utilAnkiGetModelNames();
-    const ankiModel = $('.anki-model');
-    ankiModel.find('option').remove();
-    modelNames.sort().forEach((name) => ankiModel.append($('<option/>', {value: name, text: name})));
-
-    $('#anki-terms-deck').val(options.anki.terms.deck);
-    await _ankiFieldsPopulate($('#anki-terms-model').val(options.anki.terms.model), options);
-
-    $('#anki-kanji-deck').val(options.anki.kanji.deck);
-    await _ankiFieldsPopulate($('#anki-kanji-model').val(options.anki.kanji.model), options);
-
-    ankiFormat.show();
+    for (const {value, values, selector} of [termsDeck, kanjiDeck, termsModel, kanjiModel]) {
+        const node = document.querySelector(selector);
+        _ankiSetDropdownOptions(node, Array.isArray(values) ? values : [value]);
+        node.value = value;
+    }
 }
 
 function _ankiCreateFieldTemplate(name, value, markers) {
@@ -81,53 +99,66 @@ function _ankiCreateFieldTemplate(name, value, markers) {
     return content;
 }
 
-async function _ankiFieldsPopulate(element, options) {
-    const modelName = element.val();
-    if (!modelName) {
-        return;
-    }
-
-    const tab = element.closest('.tab-pane');
-    const tabId = tab.attr('id');
-    const container = tab.find('tbody').empty();
+async function _ankiFieldsPopulate(tabId, options) {
+    const tab = document.querySelector(`.tab-pane[data-anki-card-type=${tabId}]`);
+    const container = tab.querySelector('tbody');
     const markers = ankiGetFieldMarkers(tabId);
 
-    for (const name of await utilAnkiGetModelFieldNames(modelName)) {
-        const value = options.anki[tabId].fields[name] || '';
+    const fragment = document.createDocumentFragment();
+    const fields = options.anki[tabId].fields;
+    for (const name of Object.keys(fields)) {
+        const value = fields[name];
         const html = _ankiCreateFieldTemplate(name, value, markers);
-        container.append($(html));
+        fragment.appendChild(html);
     }
 
-    tab.find('.anki-field-value').change((e) => onFormOptionsChanged(e));
-    tab.find('.marker-link').click((e) => _onAnkiMarkerClicked(e));
+    container.textContent = '';
+    container.appendChild(fragment);
+
+    for (const node of container.querySelectorAll('.anki-field-value')) {
+        node.addEventListener('change', (e) => onFormOptionsChanged(e), false);
+    }
+    for (const node of container.querySelectorAll('.marker-link')) {
+        node.addEventListener('click', (e) => _onAnkiMarkerClicked(e), false);
+    }
 }
 
 function _onAnkiMarkerClicked(e) {
     e.preventDefault();
-    const link = e.target;
-    $(link).closest('.input-group').find('.anki-field-value').val(`{${link.text}}`).trigger('change');
+    const link = e.currentTarget;
+    const input = $(link).closest('.input-group').find('.anki-field-value')[0];
+    input.value = `{${link.textContent}}`;
+    input.dispatchEvent(new Event('change'));
 }
 
 async function _onAnkiModelChanged(e) {
+    const node = e.currentTarget;
+    let fieldNames;
     try {
-        const element = $(e.currentTarget);
-        const tab = element.closest('.tab-pane');
-        const tabId = tab.attr('id');
-
-        const optionsContext = getOptionsContext();
-        const options = await apiOptionsGet(optionsContext);
-        await formRead(options);
-        options.anki[tabId].fields = utilBackgroundIsolate({});
-        await settingsSaveOptions();
-
-        _ankiSpinnerShow(true);
-        await _ankiFieldsPopulate(element, options);
+        const modelName = node.value;
+        fieldNames = await utilAnkiGetModelFieldNames(modelName);
         _ankiSetError(null);
     } catch (error) {
         _ankiSetError(error);
+        return;
     } finally {
         _ankiSpinnerShow(false);
     }
+
+    const tabId = node.dataset.ankiCardType;
+    if (tabId !== 'terms' && tabId !== 'kanji') { return; }
+
+    const fields = {};
+    for (const name of fieldNames) {
+        fields[name] = '';
+    }
+
+    const optionsContext = getOptionsContext();
+    const options = await apiOptionsGet(optionsContext);
+    options.anki[tabId].fields = utilBackgroundIsolate(fields);
+    await settingsSaveOptions();
+
+    await _ankiFieldsPopulate(tabId, options);
 }
 
 
@@ -138,12 +169,11 @@ function ankiErrorShown() {
     return node && !node.hidden;
 }
 
-function ankiFieldsToDict(selection) {
+function ankiFieldsToDict(elements) {
     const result = {};
-    selection.each((index, element) => {
-        result[$(element).data('field')] = $(element).val();
-    });
-
+    for (const element of elements) {
+        result[element.dataset.field] = element.value;
+    }
     return result;
 }
 
@@ -213,14 +243,7 @@ async function onAnkiOptionsChanged(options) {
 
     if (_ankiDataPopulated) { return; }
 
-    try {
-        _ankiSpinnerShow(true);
-        await _ankiDeckAndModelPopulate(options);
-        _ankiSetError(null);
-        _ankiDataPopulated = true;
-    } catch (error) {
-        _ankiSetError(error);
-    } finally {
-        _ankiSpinnerShow(false);
-    }
+    await _ankiDeckAndModelPopulate(options);
+    _ankiDataPopulated = true;
+    await Promise.all([_ankiFieldsPopulate('terms', options), _ankiFieldsPopulate('kanji', options)]);
 }

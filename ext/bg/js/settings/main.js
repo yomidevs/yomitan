@@ -80,10 +80,10 @@ async function formRead(options) {
     if (optionsAnkiEnableOld && !ankiErrorShown()) {
         options.anki.terms.deck = $('#anki-terms-deck').val();
         options.anki.terms.model = $('#anki-terms-model').val();
-        options.anki.terms.fields = utilBackgroundIsolate(ankiFieldsToDict($('#terms .anki-field-value')));
+        options.anki.terms.fields = utilBackgroundIsolate(ankiFieldsToDict(document.querySelectorAll('#terms .anki-field-value')));
         options.anki.kanji.deck = $('#anki-kanji-deck').val();
         options.anki.kanji.model = $('#anki-kanji-model').val();
-        options.anki.kanji.fields = utilBackgroundIsolate(ankiFieldsToDict($('#kanji .anki-field-value')));
+        options.anki.kanji.fields = utilBackgroundIsolate(ankiFieldsToDict(document.querySelectorAll('#kanji .anki-field-value')));
     }
 }
 
@@ -167,11 +167,7 @@ function formUpdateVisibility(options) {
     }
 }
 
-async function onFormOptionsChanged(e) {
-    if (!e.originalEvent && !e.isTrigger) {
-        return;
-    }
-
+async function onFormOptionsChanged() {
     const optionsContext = getOptionsContext();
     const options = await apiOptionsGet(optionsContext);
 
