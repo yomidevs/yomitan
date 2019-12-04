@@ -272,7 +272,7 @@
 
                 <div class="form-group ignore-form-changes" style="display: none;" id="settings-popup-preview-settings">
                     <label for="settings-popup-preview-text">Popup preview text</label>
-                    <input type="text" id="settings-popup-preview-text" class="form-control" value="読め">
+                    <input type="text" id="settings-popup-preview-text" class="form-control" value="読め" placeholder="Preview text">
                 </div>
 
                 <div class="form-group ignore-form-changes">
@@ -401,7 +401,7 @@
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="enable-scanning-of-popup-expressions"> Enable scanning of popup expressions</label>
+                    <label><input type="checkbox" id="enable-scanning-of-popup-expressions"> Enable scanning of expressions in search results</label>
                 </div>
 
                 <div class="form-group">
@@ -410,18 +410,52 @@
                 </div>
             </div>
 
-            <div>
+            <div id="text-parsing">
+                <h3>Text Parsing Options</h3>
+
+                <p class="help-block">
+                    Yomichan can attempt to parse entire sentences or longer text blocks on the search page,
+                    adding furigana above words and a small space between words.
+                </p>
+
+                <p class="help-block">
+                    Two types of parsers are supported. The first one, enabled by default, works using the built-in
+                    scanning functionality by automatically advancing in the sentence after a matching word.
+                </p>
+
+                <p class="help-block">
+                    The second type is an external program called <a href="https://en.wikipedia.org/wiki/MeCab" target="_blank" rel="noopener">MeCab</a>
+                    that uses its own dictionaries and a special parsing algorithm. To get it working, you must first
+                    install it and <a href="https://github.com/siikamiika/yomichan-mecab-installer" target="_blank" rel="noopener">a native messaging component</a>
+                    that acts as a bridge between the program and Yomichan.
+                </p>
+
+                <div class="checkbox">
+                    <label><input type="checkbox" id="parsing-scan-enable"> Enable text parsing using installed dictionaries</label>
+                </div>
+
+                <div class="checkbox">
+                    <label><input type="checkbox" id="parsing-mecab-enable"> Enable text parsing using MeCab</label>
+                </div>
+
+                <div class="form-group">
+                    <label for="parsing-reading-mode">Reading mode</label>
+                    <select class="form-control" id="parsing-reading-mode">
+                        <option value="hiragana">ひらがな</option>
+                        <option value="katakana">カタカナ</option>
+                        <option value="romaji">Romaji</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="ignore-form-changes">
                 <div>
                     <img src="/mixed/img/spinner.gif" class="pull-right" id="dict-spinner" alt>
                     <h3>Dictionaries</h3>
                 </div>
 
                 <p class="help-block">
-                    Yomichan can import and use a variety of dictionary formats. Unneeded dictionaries can be disabled,
-                    or you can simply <a href="#" id="dict-purge-link">purge the database</a> to delete everything.
-                </p>
-                <p class="help-block">
-                    Deleting individual dictionaries is not currently feasible due to limitations of browser database technology.
+                    Yomichan can import and use a variety of dictionary formats. Unneeded dictionaries can be disabled.
                 </p>
 
                 <div class="form-group" id="dict-main-group">
@@ -429,14 +463,16 @@
                     <select class="form-control" id="dict-main"></select>
                 </div>
 
-                <div class="text-danger" id="dict-purge">Dictionary data is being purged, please be patient...</div>
-                <div class="alert alert-warning" id="dict-warning">No dictionaries have been installed</div>
-                <div class="alert alert-danger" id="dict-error"></div>
+                <div class="text-danger" id="dict-purge" hidden>Dictionary data is being purged, please be patient...</div>
+                <div class="alert alert-warning" id="dict-warning" hidden>No dictionaries have been installed</div>
+                <div class="alert alert-danger" id="dict-error" hidden></div>
 
                 <div id="dict-groups"></div>
+                <div id="dict-groups-extra"></div>
 
                 <div id="dict-import-progress">
                     Dictionary data is being imported, please be patient...
+                    <span id="dict-import-info" hidden></span>
                     <div class="progress">
                         <div class="progress-bar progress-bar-striped" style="width: 0%"></div>
                     </div>
@@ -448,9 +484,85 @@
                         <a href="https://foosoft.net/projects/yomichan" target="_blank" rel="noopener">download free dictionaries</a>
                         for use with this extension and to learn about importing proprietary EPWING dictionaries.
                     </p>
-                    <button class="btn btn-primary" id="dict-file-button">Import Dictionary</button>
-                    <div hidden><input type="file" id="dict-file"></div>
+                    <div>
+                        <button class="btn btn-primary" id="dict-file-button">Import Dictionary</button>
+                        <button class="btn btn-danger" id="dict-purge-button">Purge Database</button>
+                    </div>
+                    <div hidden><input type="file" id="dict-file" accept=".zip,application/zip" multiple></div>
                 </div>
+
+                <div class="modal fade" tabindex="-1" role="dialog" id="dict-purge-modal">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Confirm database purge</h4>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to delete all data in the database?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger" id="dict-purge-confirm">Purge Database</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" tabindex="-1" role="dialog" id="dict-delete-modal">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Confirm dictionary deletion</h4>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to delete the dictionary <em id="dict-remove-modal-dict-name"></em>?
+                                This operation may take some time and the responsiveness of this browser tab may be reduced.
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger" id="dict-delete-confirm">Delete Dictionary</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <template id="dict-template"><div class="dict-group well well-sm">
+                    <h4><span class="text-muted glyphicon glyphicon-book"></span> <span class="dict-title"></span> <small class="dict-revision"></small></h4>
+                    <p class="text-warning dict-outdated" hidden>This dictionary is outdated and may not support new extension features; please import the latest version.</p>
+
+                    <div class="checkbox">
+                        <label><input type="checkbox" class="dict-enabled"> Enable search</label>
+                    </div>
+                    <div class="checkbox options-advanced">
+                        <label><input type="checkbox" class="dict-allow-secondary-searches"> Allow secondary searches</label>
+                    </div>
+                    <div class="form-group options-advanced">
+                        <label class="dict-result-priority-label">Result priority</label>
+                        <input type="number" class="form-control dict-priority">
+                    </div>
+                    <div class="dict-delete-table">
+                        <div>
+                            <button class="btn btn-default dict-delete-button">Delete Dictionary</button>
+                        </div>
+                        <div>
+                            <div class="progress" hidden>
+                                <div class="progress-bar progress-bar-striped" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <pre class="debug dict-counts" hidden></pre>
+                </div></template>
+
+                <template id="dict-extra-template"><div class="well well-sm">
+                    <h4><span class="text-muted glyphicon glyphicon-alert"></span> <span class="dict-title">Unassociated Data</span> <small class="dict-total-count"></small></h4>
+                    <p class="text-warning">
+                        The database contains extra data which is not associated with any installed dictionary.
+                        Purging the database can fix this issue.
+                    </p>
+                    <pre class="debug dict-counts" hidden></pre>
+                </div></template>
             </div>
 
             <div id="storage-info">
@@ -538,7 +650,7 @@
                         </div>
                     </div>
 
-                    <div class="alert alert-danger" id="anki-error"></div>
+                    <div class="alert alert-danger" id="anki-error" hidden></div>
 
                     <div class="form-group">
                         <label for="card-tags">Card tags <span class="label-light">(comma or space separated)</span></label>
@@ -582,16 +694,16 @@
                         </ul>
 
                         <div class="tab-content">
-                            <div id="terms" class="tab-pane fade in active">
+                            <div id="terms" class="tab-pane fade in active" data-anki-card-type="terms">
                                 <div class="row">
                                     <div class="form-group col-xs-6">
                                         <label for="anki-terms-deck">Deck</label>
-                                        <select class="form-control anki-deck" id="anki-terms-deck"></select>
+                                        <select class="form-control anki-deck" id="anki-terms-deck" data-anki-card-type="terms"></select>
                                     </div>
 
                                     <div class="form-group col-xs-6">
                                         <label for="anki-terms-model">Model</label>
-                                        <select class="form-control anki-model" id="anki-terms-model"></select>
+                                        <select class="form-control anki-model" id="anki-terms-model" data-anki-card-type="terms"></select>
                                     </div>
                                 </div>
 
@@ -601,16 +713,16 @@
                                 </table>
                             </div>
 
-                            <div id="kanji" class="tab-pane fade">
+                            <div id="kanji" class="tab-pane fade" data-anki-card-type="kanji">
                                 <div class="row">
                                     <div class="form-group col-xs-6">
                                         <label for="anki-kanji-deck">Deck</label>
-                                        <select class="form-control anki-deck" id="anki-kanji-deck"></select>
+                                        <select class="form-control anki-deck" id="anki-kanji-deck" data-anki-card-type="kanji"></select>
                                     </div>
 
                                     <div class="form-group col-xs-6">
                                         <label for="anki-kanji-model">Model</label>
-                                        <select class="form-control anki-model" id="anki-kanji-model"></select>
+                                        <select class="form-control anki-model" id="anki-kanji-model" data-anki-card-type="kanji"></select>
                                     </div>
                                 </div>
 
@@ -625,11 +737,78 @@
                             <p class="help-block">
                                 Fields are formatted using the <a href="https://handlebarsjs.com/" target="_blank" rel="noopener">Handlebars.js</a> template rendering
                                 engine. Advanced users can modify these templates for ultimate control of what information gets included in
-                                their Anki cards. If you encounter problems with your changes you can always <a href="#" id="field-templates-reset">reset to default</a>
-                                template settings.
+                                their Anki cards. If you encounter problems with your changes, you can always reset to the default template settings.
                             </p>
                             <textarea autocomplete="off" spellcheck="false" wrap="soft" class="form-control" rows="10" id="field-templates"></textarea>
+                            <div>
+                                <button class="btn btn-danger" id="field-templates-reset">Reset Templates</button>
+                            </div>
+                            <p></p>
+                            <pre id="field-template-compile-result" hidden></pre>
+
+                            <p>Templates can be tested using the inputs below.</p>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <label for="field-templates-preview-text">Preview text</label>
+                                        <input type="text" id="field-templates-preview-text" class="form-control" value="読め" placeholder="Preview text">
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label for="field-template-render-text">Test field</label>
+                                        <div class="input-group">
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-default" id="field-template-render" title="Test"><span class="glyphicon glyphicon-play"></span></button>
+                                            </div>
+                                            <input type="text" class="form-control" id="field-template-render-text" value="{expression}" placeholder="{marker}">
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-default dropdown-toggle" id="field-templates-dropdown" data-toggle="dropdown"><span class="caret"></span></button>
+                                                <ul class="dropdown-menu dropdown-menu-right" id="field-templates-list"></ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p></p>
+                            <pre id="field-template-render-result" hidden></pre>
                         </div>
+
+                        <div class="modal fade" tabindex="-1" role="dialog" id="field-template-reset-modal">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title">Confirm template reset</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to reset the field templates to the default value?
+                                        Any changes you made will be lost.
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-danger" id="field-templates-reset-confirm">Reset Templates</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <template id="anki-field-template"><tr>
+                            <td class="col-sm-2 anki-field-name"></td>
+                            <td class="col-sm-10">
+                                <div class="input-group">
+                                    <input type="text" class="anki-field-value form-control" data-field="" value="">
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right anki-field-marker-list"></ul>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr></template>
+
+                        <template id="anki-field-marker-template"><li><a class="marker-link" href="#"></a></li></template>
                     </div>
                 </div>
             </div>
@@ -673,7 +852,7 @@
                 </p>
             </div>
 
-            <pre id="debug"></pre>
+            <pre id="debug" class="debug"></pre>
 
             <div class="pull-right bottom-links">
                 <small><span id="extension-info"></span> &bull; <a href="search.html">Search</a> &bull; <a href="https://foosoft.net/projects/yomichan/" target="_blank" rel="noopener">Homepage</a> &bull; <a href="legal.html">Legal</a></small>
@@ -685,7 +864,9 @@
         <script src="/mixed/lib/handlebars.min.js"></script>
         <script src="/mixed/lib/wanakana.min.js"></script>
 
-        <script src="/mixed/js/extension.js"></script>
+        <script src="/mixed/js/core.js"></script>
+        <script src="/mixed/js/dom.js"></script>
+        <script src="/mixed/js/japanese.js"></script>
 
         <script src="/bg/js/anki.js"></script>
         <script src="/bg/js/api.js"></script>
@@ -695,12 +876,20 @@
         <script src="/bg/js/dictionary.js"></script>
         <script src="/bg/js/handlebars.js"></script>
         <script src="/bg/js/options.js"></script>
+        <script src="/bg/js/page-exit-prevention.js"></script>
         <script src="/bg/js/profile-conditions.js"></script>
         <script src="/bg/js/templates.js"></script>
         <script src="/bg/js/util.js"></script>
         <script src="/mixed/js/audio.js"></script>
 
-        <script src="/bg/js/settings-profiles.js"></script>
-        <script src="/bg/js/settings.js"></script>
+        <script src="/bg/js/settings/anki.js"></script>
+        <script src="/bg/js/settings/anki-templates.js"></script>
+        <script src="/bg/js/settings/audio.js"></script>
+        <script src="/bg/js/settings/dictionaries.js"></script>
+        <script src="/bg/js/settings/popup-preview.js"></script>
+        <script src="/bg/js/settings/profiles.js"></script>
+        <script src="/bg/js/settings/storage.js"></script>
+
+        <script src="/bg/js/settings/main.js"></script>
     </body>
 </html>

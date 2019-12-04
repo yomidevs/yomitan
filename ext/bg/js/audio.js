@@ -107,12 +107,12 @@ const audioUrlBuilders = {
     'custom': async (definition, optionsContext) => {
         const options = await apiOptionsGet(optionsContext);
         const customSourceUrl = options.audio.customSourceUrl;
-        return customSourceUrl.replace(/\{([^\}]*)\}/g, (m0, m1) => (definition.hasOwnProperty(m1) ? `${definition[m1]}` : m0));
+        return customSourceUrl.replace(/\{([^}]*)\}/g, (m0, m1) => (hasOwn(definition, m1) ? `${definition[m1]}` : m0));
     }
 };
 
 async function audioGetUrl(definition, mode, optionsContext, download) {
-    if (audioUrlBuilders.hasOwnProperty(mode)) {
+    if (hasOwn(audioUrlBuilders, mode)) {
         const handler = audioUrlBuilders[mode];
         try {
             return await handler(definition, optionsContext, download);
@@ -128,12 +128,12 @@ function audioUrlNormalize(url, baseUrl, basePath) {
         if (url[0] === '/') {
             if (url.length >= 2 && url[1] === '/') {
                 // Begins with "//"
-                url = baseUrl.substr(0, baseUrl.indexOf(':') + 1) + url;
+                url = baseUrl.substring(0, baseUrl.indexOf(':') + 1) + url;
             } else {
                 // Begins with "/"
                 url = baseUrl + url;
             }
-        } else if (!/^[a-z][a-z0-9\+\-\.]*:/i.test(url)) {
+        } else if (!/^[a-z][a-z0-9\-+.]*:/i.test(url)) {
             // No URI scheme => relative path
             url = baseUrl + basePath + url;
         }
@@ -171,7 +171,7 @@ async function audioInject(definition, fields, sources, optionsContext) {
 
     try {
         let audioSourceDefinition = definition;
-        if (definition.hasOwnProperty('expressions')) {
+        if (hasOwn(definition, 'expressions')) {
             audioSourceDefinition = definition.expressions[0];
         }
 

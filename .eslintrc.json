@@ -1,0 +1,28 @@
+{
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "ecmaVersion": 8
+    },
+    "ignorePatterns": [
+        "/ext/mixed/lib/",
+        "/ext/bg/js/templates.js"
+    ],
+    "rules": {
+        "arrow-parens": ["error", "always"],
+        "comma-dangle": ["error", "never"],
+        "curly": ["error", "all"],
+        "dot-notation": "error",
+        "eqeqeq": "error",
+        "no-case-declarations": "error",
+        "no-const-assign": "error",
+        "no-constant-condition": "off",
+        "no-undef": "off",
+        "no-unused-vars": ["error", {"vars": "local", "args": "after-used", "argsIgnorePattern": "^_", "caughtErrors": "none"}],
+        "no-var": "error",
+        "prefer-const": ["error", {"destructuring": "all"}],
+        "quote-props": ["error", "consistent"],
+        "quotes": ["error", "single", "avoid-escape"],
+        "require-atomic-updates": "off",
+        "semi": "error"
+    }
+}

@@ -74,7 +74,7 @@ class AnkiConnect {
 
     async findNoteIds(notes) {
         await this.checkVersion();
-        const actions = notes.map(note => ({
+        const actions = notes.map((note) => ({
             action: 'findNotes',
             params: {
                 query: `deck:"${AnkiConnect.escapeQuery(note.deckName)}" ${AnkiConnect.fieldsToQuery(note.fields)}`
@@ -108,11 +108,11 @@ class AnkiConnect {
  */
 
 class AnkiNull {
-    async addNote(note) {
+    async addNote() {
         return null;
     }
 
-    async canAddNotes(notes) {
+    async canAddNotes() {
         return [];
     }
 
@@ -124,15 +124,15 @@ class AnkiNull {
         return [];
     }
 
-    async getModelFieldNames(modelName) {
+    async getModelFieldNames() {
         return [];
     }
 
-    async guiBrowse(query) {
+    async guiBrowse() {
         return [];
     }
 
-    async findNoteIds(notes) {
+    async findNoteIds() {
         return [];
     }
 }

@@ -32,6 +32,8 @@ class DisplaySearch extends Display {
             url: window.location.href
         };
 
+        this.queryParser = new QueryParser(this);
+
         this.search = document.querySelector('#search');
         this.query = document.querySelector('#query');
         this.intro = document.querySelector('#intro');
@@ -72,11 +74,11 @@ class DisplaySearch extends Display {
                         const query = DisplaySearch.getSearchQueryFromLocation(window.location.href) || '';
                         if (e.target.checked) {
                             window.wanakana.bind(this.query);
-                            this.query.value = window.wanakana.toKana(query);
+                            this.setQuery(window.wanakana.toKana(query));
                             apiOptionsSet({general: {enableWanakana: true}}, this.getOptionsContext());
                         } else {
                             window.wanakana.unbind(this.query);
-                            this.query.value = query;
+                            this.setQuery(query);
                             apiOptionsSet({general: {enableWanakana: false}}, this.getOptionsContext());
                         }
                         this.onSearchQueryUpdated(this.query.value, false);
@@ -86,9 +88,9 @@ class DisplaySearch extends Display {
                 const query = DisplaySearch.getSearchQueryFromLocation(window.location.href);
                 if (query !== null) {
                     if (this.isWanakanaEnabled()) {
-                        this.query.value = window.wanakana.toKana(query);
+                        this.setQuery(window.wanakana.toKana(query));
                     } else {
-                        this.query.value = query;
+                        this.setQuery(query);
                     }
                     this.onSearchQueryUpdated(this.query.value, false);
                 }
@@ -159,18 +161,19 @@ class DisplaySearch extends Display {
         e.preventDefault();
 
         const query = this.query.value;
+        this.queryParser.setText(query);
         const queryString = query.length > 0 ? `?query=${encodeURIComponent(query)}` : '';
         window.history.pushState(null, '', `${window.location.pathname}${queryString}`);
         this.onSearchQueryUpdated(query, true);
     }
 
-    onPopState(e) {
+    onPopState() {
         const query = DisplaySearch.getSearchQueryFromLocation(window.location.href) || '';
         if (this.query !== null) {
             if (this.isWanakanaEnabled()) {
-                this.query.value = window.wanakana.toKana(query);
+                this.setQuery(window.wanakana.toKana(query));
             } else {
-                this.query.value = query;
+                this.setQuery(query);
             }
         }
 
@@ -179,26 +182,13 @@ class DisplaySearch extends Display {
 
     onKeyDown(e) {
         const key = Display.getKeyFromEvent(e);
+        const ignoreKeys = DisplaySearch.onKeyDownIgnoreKeys;
 
-        let activeModifierMap = {
+        const activeModifierMap = {
             'Control': e.ctrlKey,
             'Meta': e.metaKey,
             'ANY_MOD': true
         };
-
-        const ignoreKeys = {
-            'ANY_MOD': ['Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageDown', 'PageUp', 'Home', 'End']
-                .concat(
-                    Array.from(Array(24).keys())
-                    .map(i => `F${i + 1}`)
-                ),
-            'Control': ['C', 'A', 'Z', 'Y', 'X', 'F', 'G'],
-            'Meta': ['C', 'A', 'Z', 'Y', 'X', 'F', 'G'],
-            'OS': [],
-            'Alt': [],
-            'AltGraph': [],
-            'Shift': []
-        }
 
         let preventFocus = false;
         for (const [modifier, keys] of Object.entries(ignoreKeys)) {
@@ -216,19 +206,28 @@ class DisplaySearch extends Display {
 
     async onSearchQueryUpdated(query, animate) {
         try {
+            const details = {};
+            const match = /[*\uff0a]+$/.exec(query);
+            if (match !== null) {
+                details.wildcard = true;
+                query = query.substring(0, query.length - match[0].length);
+            }
+
             const valid = (query.length > 0);
             this.setIntroVisible(!valid, animate);
             this.updateSearchButton();
             if (valid) {
-                const {definitions} = await apiTermsFind(query, this.optionsContext);
+                const {definitions} = await apiTermsFind(query, details, this.optionsContext);
                 this.setContentTerms(definitions, {
                     focus: false,
-                    sentence: null,
+                    disableHistory: true,
+                    sentence: {text: query, offset: 0},
                     url: window.location.href
                 });
             } else {
                 this.container.textContent = '';
             }
+            window.parent.postMessage('popupClose', '*');
         } catch (e) {
             this.onError(e);
         }
@@ -236,7 +235,7 @@ class DisplaySearch extends Display {
 
     onRuntimeMessage({action, params}, sender, callback) {
         const handlers = DisplaySearch.runtimeMessageHandlers;
-        if (handlers.hasOwnProperty(action)) {
+        if (hasOwn(handlers, action)) {
             const handler = handlers[action];
             const result = handler(this, params);
             callback(result);
@@ -247,7 +246,7 @@ class DisplaySearch extends Display {
 
     initClipboardMonitor() {
         // ignore copy from search page
-        window.addEventListener('copy', (e) => {
+        window.addEventListener('copy', () => {
             this.clipboardPrevText = document.getSelection().toString().trim();
         });
     }
@@ -261,11 +260,11 @@ class DisplaySearch extends Display {
             } else if (IS_FIREFOX === false) {
                 curText = (await apiClipboardGet()).trim();
             }
-            if (curText && (curText !== this.clipboardPrevText)) {
+            if (curText && (curText !== this.clipboardPrevText) && jpIsJapaneseText(curText)) {
                 if (this.isWanakanaEnabled()) {
-                    this.query.value = window.wanakana.toKana(curText);
+                    this.setQuery(window.wanakana.toKana(curText));
                 } else {
-                    this.query.value = curText;
+                    this.setQuery(curText);
                 }
 
                 const queryString = curText.length > 0 ? `?query=${encodeURIComponent(curText)}` : '';
@@ -292,8 +291,9 @@ class DisplaySearch extends Display {
         return this.optionsContext;
     }
 
-    setCustomCss() {
-        // No custom CSS
+    setQuery(query) {
+        this.query.value = query;
+        this.queryParser.setText(query);
     }
 
     setIntroVisible(visible, animate) {
@@ -325,7 +325,7 @@ class DisplaySearch extends Display {
             this.intro.style.transition = '';
             this.intro.style.height = '';
             const size = this.intro.getBoundingClientRect();
-            this.intro.style.height = `0px`;
+            this.intro.style.height = '0px';
             this.intro.style.transition = `height ${duration}s ease-in-out 0s`;
             window.getComputedStyle(this.intro).getPropertyValue('height'); // Commits height so next line can start animation
             this.intro.style.height = `${size.height}px`;
@@ -357,7 +357,7 @@ class DisplaySearch extends Display {
     }
 
     static getSearchQueryFromLocation(url) {
-        let match = /^[^\?#]*\?(?:[^&#]*&)?query=([^&#]*)/.exec(url);
+        const match = /^[^?#]*\?(?:[^&#]*&)?query=([^&#]*)/.exec(url);
         return match !== null ? decodeURIComponent(match[1]) : null;
     }
 }
@@ -366,6 +366,21 @@ DisplaySearch.runtimeMessageHandlers = {
     getUrl: () => {
         return {url: window.location.href};
     }
+};
+
+DisplaySearch.onKeyDownIgnoreKeys = {
+    'ANY_MOD': [
+        'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageDown', 'PageUp', 'Home', 'End',
+        'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10',
+        'F11', 'F12', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19', 'F20',
+        'F21', 'F22', 'F23', 'F24'
+    ],
+    'Control': ['C', 'A', 'Z', 'Y', 'X', 'F', 'G'],
+    'Meta': ['C', 'A', 'Z', 'Y', 'X', 'F', 'G'],
+    'OS': [],
+    'Alt': [],
+    'AltGraph': [],
+    'Shift': []
 };
 
 window.yomichan_search = DisplaySearch.create();

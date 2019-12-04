@@ -29,7 +29,7 @@ function requestJson(url, action, params) {
         } else {
             xhr.send();
         }
-    }).then(responseText => {
+    }).then((responseText) => {
         try {
             return JSON.parse(responseText);
         }

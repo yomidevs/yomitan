@@ -28,8 +28,8 @@ class Popup {
         this.childrenSupported = true;
         this.container = document.createElement('iframe');
         this.container.className = 'yomichan-float';
-        this.container.addEventListener('mousedown', e => e.stopPropagation());
-        this.container.addEventListener('scroll', e => e.stopPropagation());
+        this.container.addEventListener('mousedown', (e) => e.stopPropagation());
+        this.container.addEventListener('scroll', (e) => e.stopPropagation());
         this.container.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
         this.container.style.width = '0px';
         this.container.style.height = '0px';
@@ -303,7 +303,7 @@ class Popup {
     }
 
     static getColorInfo(cssColor) {
-        const m = /^\s*rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d\.]+)\s*)?\)\s*$/.exec(cssColor);
+        const m = /^\s*rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)\s*$/.exec(cssColor);
         if (m === null) { return null; }
 
         const m4 = m[4];
@@ -391,7 +391,7 @@ class Popup {
     static isOnExtensionPage() {
         try {
             const url = chrome.runtime.getURL('/');
-            return window.location.href.substr(0, url.length) === url;
+            return window.location.href.substring(0, url.length) === url;
         } catch (e) {
             // NOP
         }
@@ -401,7 +401,7 @@ class Popup {
         if (Popup.outerStylesheet === null) {
             if (!css) { return; }
             Popup.outerStylesheet = document.createElement('style');
-            Popup.outerStylesheet.id = "yomichan-popup-outer-stylesheet";
+            Popup.outerStylesheet.id = 'yomichan-popup-outer-stylesheet';
         }
 
         const outerStylesheet = Popup.outerStylesheet;

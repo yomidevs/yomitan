@@ -42,27 +42,16 @@ class Translator {
         await this.database.purge();
     }
 
-    async findTermsGrouped(text, dictionaries, alphanumeric, options) {
-        const titles = Object.keys(dictionaries);
-        const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
-
-        const definitionsGrouped = dictTermsGroup(definitions, dictionaries);
-        await this.buildTermFrequencies(definitionsGrouped, titles);
-
-        if (options.general.compactTags) {
-            for (const definition of definitionsGrouped) {
-                dictTermsCompressTags(definition.definitions);
-            }
-        }
-
-        return {length, definitions: definitionsGrouped};
+    async deleteDictionary(dictionaryName) {
+        this.tagCache = {};
+        await this.database.deleteDictionary(dictionaryName);
     }
 
     async getSequencedDefinitions(definitions, mainDictionary) {
         const definitionsBySequence = dictTermsMergeBySequence(definitions, mainDictionary);
         const defaultDefinitions = definitionsBySequence['-1'];
 
-        const sequenceList = Object.keys(definitionsBySequence).map(v => Number(v)).filter(v => v >= 0);
+        const sequenceList = Object.keys(definitionsBySequence).map((v) => Number(v)).filter((v) => v >= 0);
         const sequencedDefinitions = sequenceList.map((key) => ({
             definitions: definitionsBySequence[key],
             rawDefinitions: []
@@ -135,7 +124,7 @@ class Translator {
         for (const expression of result.expressions.keys()) {
             for (const reading of result.expressions.get(expression).keys()) {
                 const termTags = result.expressions.get(expression).get(reading);
-                const score = termTags.map(tag => tag.score).reduce((p, v) => p + v, 0);
+                const score = termTags.map((tag) => tag.score).reduce((p, v) => p + v, 0);
                 expressions.push({
                     expression: expression,
                     reading: reading,
@@ -152,10 +141,41 @@ class Translator {
         return result;
     }
 
-    async findTermsMerged(text, dictionaries, alphanumeric, options) {
-        const secondarySearchTitles = Object.keys(options.dictionaries).filter(dict => options.dictionaries[dict].allowSecondarySearches);
+    async findTerms(text, details, options) {
+        switch (options.general.resultOutputMode) {
+            case 'group':
+                return await this.findTermsGrouped(text, details, options);
+            case 'merge':
+                return await this.findTermsMerged(text, details, options);
+            case 'split':
+                return await this.findTermsSplit(text, details, options);
+            default:
+                return [[], 0];
+        }
+    }
+
+    async findTermsGrouped(text, details, options) {
+        const dictionaries = dictEnabledSet(options);
         const titles = Object.keys(dictionaries);
-        const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
+        const [definitions, length] = await this.findTermsInternal(text, dictionaries, options.scanning.alphanumeric, details);
+
+        const definitionsGrouped = dictTermsGroup(definitions, dictionaries);
+        await this.buildTermFrequencies(definitionsGrouped, titles);
+
+        if (options.general.compactTags) {
+            for (const definition of definitionsGrouped) {
+                dictTermsCompressTags(definition.definitions);
+            }
+        }
+
+        return [definitionsGrouped, length];
+    }
+
+    async findTermsMerged(text, details, options) {
+        const dictionaries = dictEnabledSet(options);
+        const secondarySearchTitles = Object.keys(options.dictionaries).filter((dict) => options.dictionaries[dict].allowSecondarySearches);
+        const titles = Object.keys(dictionaries);
+        const [definitions, length] = await this.findTermsInternal(text, dictionaries, options.scanning.alphanumeric, details);
         const {sequencedDefinitions, defaultDefinitions} = await this.getSequencedDefinitions(definitions, options.general.mainDictionary);
         const definitionsMerged = [];
         const mergedByTermIndices = new Set();
@@ -186,29 +206,33 @@ class Translator {
             }
         }
 
-        return {length, definitions: dictTermsSort(definitionsMerged)};
+        return [dictTermsSort(definitionsMerged), length];
     }
 
-    async findTermsSplit(text, dictionaries, alphanumeric) {
+    async findTermsSplit(text, details, options) {
+        const dictionaries = dictEnabledSet(options);
         const titles = Object.keys(dictionaries);
-        const {length, definitions} = await this.findTerms(text, dictionaries, alphanumeric);
+        const [definitions, length] = await this.findTermsInternal(text, dictionaries, options.scanning.alphanumeric, details);
 
         await this.buildTermFrequencies(definitions, titles);
 
-        return {length, definitions};
+        return [definitions, length];
     }
 
-    async findTerms(text, dictionaries, alphanumeric) {
+    async findTermsInternal(text, dictionaries, alphanumeric, details) {
         if (!alphanumeric && text.length > 0) {
             const c = text[0];
             if (!jpIsKana(c) && !jpIsKanji(c)) {
-                return {length: 0, definitions: []};
+                return [[], 0];
             }
         }
 
-        const textHiragana = jpKatakanaToHiragana(text);
         const titles = Object.keys(dictionaries);
-        const deinflections = await this.findTermDeinflections(text, textHiragana, titles);
+        const deinflections = (
+            details.wildcard ?
+            await this.findTermWildcard(text, titles) :
+            await this.findTermDeinflections(text, titles)
+        );
 
         let definitions = [];
         for (const deinflection of deinflections) {
@@ -241,10 +265,26 @@ class Translator {
             length = Math.max(length, definition.source.length);
         }
 
-        return {length, definitions};
+        return [definitions, length];
     }
 
-    async findTermDeinflections(text, text2, titles) {
+    async findTermWildcard(text, titles) {
+        const definitions = await this.database.findTermsBulk([text], titles, true);
+        if (definitions.length === 0) {
+            return [];
+        }
+
+        return [{
+            source: text,
+            term: text,
+            rules: 0,
+            definitions,
+            reasons: []
+        }];
+    }
+
+    async findTermDeinflections(text, titles) {
+        const text2 = jpKatakanaToHiragana(text);
         const deinflections = (text === text2 ? this.getDeinflections(text) : this.getDeinflections2(text, text2));
 
         if (deinflections.length === 0) {
@@ -257,7 +297,7 @@ class Translator {
         for (const deinflection of deinflections) {
             const term = deinflection.term;
             let deinflectionArray;
-            if (uniqueDeinflectionsMap.hasOwnProperty(term)) {
+            if (hasOwn(uniqueDeinflectionsMap, term)) {
                 deinflectionArray = uniqueDeinflectionsMap[term];
             } else {
                 deinflectionArray = [];
@@ -268,7 +308,7 @@ class Translator {
             deinflectionArray.push(deinflection);
         }
 
-        const definitions = await this.database.findTermsBulk(uniqueDeinflectionTerms, titles);
+        const definitions = await this.database.findTermsBulk(uniqueDeinflectionTerms, titles, false);
 
         for (const definition of definitions) {
             const definitionRules = Deinflector.rulesToRuleFlags(definition.rules);
@@ -280,41 +320,42 @@ class Translator {
             }
         }
 
-        return deinflections.filter(e => e.definitions.length > 0);
+        return deinflections.filter((e) => e.definitions.length > 0);
     }
 
     getDeinflections(text) {
         const deinflections = [];
 
         for (let i = text.length; i > 0; --i) {
-            const textSlice = text.slice(0, i);
-            deinflections.push(...this.deinflector.deinflect(textSlice));
+            const textSubstring = text.substring(0, i);
+            deinflections.push(...this.deinflector.deinflect(textSubstring));
         }
 
         return deinflections;
     }
 
-    getDeinflections2(text, text2) {
+    getDeinflections2(text1, text2) {
         const deinflections = [];
 
-        for (let i = text.length; i > 0; --i) {
-            const textSlice = text.slice(0, i);
-            const text2Slice = text2.slice(0, i);
-            deinflections.push(...this.deinflector.deinflect(textSlice));
-            if (textSlice !== text2Slice) {
-                deinflections.push(...this.deinflector.deinflect(text2Slice));
+        for (let i = text1.length; i > 0; --i) {
+            const text1Substring = text1.substring(0, i);
+            const text2Substring = text2.substring(0, i);
+            deinflections.push(...this.deinflector.deinflect(text1Substring));
+            if (text1Substring !== text2Substring) {
+                deinflections.push(...this.deinflector.deinflect(text2Substring));
             }
         }
 
         return deinflections;
     }
 
-    async findKanji(text, dictionaries) {
+    async findKanji(text, options) {
+        const dictionaries = dictEnabledSet(options);
         const titles = Object.keys(dictionaries);
         const kanjiUnique = {};
         const kanjiList = [];
         for (const c of text) {
-            if (!kanjiUnique.hasOwnProperty(c)) {
+            if (!hasOwn(kanjiUnique, c)) {
                 kanjiList.push(c);
                 kanjiUnique[c] = true;
             }
@@ -376,7 +417,7 @@ class Translator {
             const expression = term.expression;
             term.frequencies = [];
 
-            if (termsUniqueMap.hasOwnProperty(expression)) {
+            if (hasOwn(termsUniqueMap, expression)) {
                 termsUniqueMap[expression].push(term);
             } else {
                 const termList = [term];
@@ -423,7 +464,7 @@ class Translator {
 
             const category = meta.category;
             const group = (
-                stats.hasOwnProperty(category) ?
+                hasOwn(stats, category) ?
                 stats[category] :
                 (stats[category] = [])
             );
@@ -443,7 +484,7 @@ class Translator {
     async getTagMetaList(names, title) {
         const tagMetaList = [];
         const cache = (
-            this.tagCache.hasOwnProperty(title) ?
+            hasOwn(this.tagCache, title) ?
             this.tagCache[title] :
             (this.tagCache[title] = {})
         );
@@ -451,7 +492,7 @@ class Translator {
         for (const name of names) {
             const base = Translator.getNameBase(name);
 
-            if (cache.hasOwnProperty(base)) {
+            if (hasOwn(cache, base)) {
                 tagMetaList.push(cache[base]);
             } else {
                 const tagMeta = await this.database.findTagForTitle(base, title);
@@ -475,6 +516,6 @@ class Translator {
 
     static getNameBase(name) {
         const pos = name.indexOf(':');
-        return (pos >= 0 ? name.substr(0, pos) : name);
+        return (pos >= 0 ? name.substring(0, pos) : name);
     }
 }

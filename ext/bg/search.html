@@ -25,18 +25,14 @@
                 <p style="margin-bottom: 0;">Search your installed dictionaries by entering a Japanese expression into the field below.</p>
             </div>
 
-            <div class="input-group" style="padding-top: 10px; font-size: 20px; user-select: none;">
+            <div class="input-group" style="padding-top: 20px;">
                 <span title="Enable kana input method" class="input-group-text">
-                    <label>
-                        あ
-                        <input type="checkbox" id="wanakana-enable" />
-                    </label>
+                    <input type="checkbox" id="wanakana-enable" class="icon-checkbox" />
+                    <label for="wanakana-enable" class="scan-disable">あ</label>
                 </span>
                 <span title="Enable clipboard monitor" class="input-group-text">
-                    <label>
-                        <span class="glyphicon glyphicon-paste"></span>
-                        <input type="checkbox" id="clipboard-monitor-enable" />
-                    </label>
+                    <input type="checkbox" id="clipboard-monitor-enable" class="icon-checkbox" />
+                    <label for="clipboard-monitor-enable"><span class="glyphicon glyphicon-paste"></span></label>
                 </span>
             </div>
 
@@ -51,13 +47,21 @@
                 <img src="/mixed/img/spinner.gif">
             </div>
 
+            <div class="scan-disable">
+                <div id="query-parser-select" class="input-group"></div>
+                <div id="query-parser"></div>
+            </div>
+
+            <hr>
+
             <div id="content"></div>
         </div>
 
         <script src="/mixed/lib/handlebars.min.js"></script>
         <script src="/mixed/lib/wanakana.min.js"></script>
 
-        <script src="/mixed/js/extension.js"></script>
+        <script src="/mixed/js/core.js"></script>
+        <script src="/mixed/js/dom.js"></script>
 
         <script src="/bg/js/dictionary.js"></script>
         <script src="/bg/js/handlebars.js"></script>
@@ -67,10 +71,12 @@
         <script src="/fg/js/source.js"></script>
         <script src="/fg/js/util.js"></script>
         <script src="/mixed/js/audio.js"></script>
+        <script src="/mixed/js/display-context.js"></script>
         <script src="/mixed/js/display.js"></script>
         <script src="/mixed/js/japanese.js"></script>
         <script src="/mixed/js/scroll.js"></script>
 
+        <script src="/bg/js/search-query-parser.js"></script>
         <script src="/bg/js/search.js"></script>
         <script src="/bg/js/search-frontend.js"></script>
     </body>

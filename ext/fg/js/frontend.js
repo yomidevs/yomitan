@@ -80,7 +80,7 @@ class Frontend {
     onMouseMove(e) {
         this.popupTimerClear();
 
-        if (this.pendingLookup || Frontend.isMouseButton('primary', e)) {
+        if (this.pendingLookup || DOM.isMouseButtonDown(e, 'primary')) {
             return;
         }
 
@@ -88,7 +88,7 @@ class Frontend {
         const scanningModifier = scanningOptions.modifier;
         if (!(
             Frontend.isScanningModifierPressed(scanningModifier, e) ||
-            (scanningOptions.middleMouse && Frontend.isMouseButton('auxiliary', e))
+            (scanningOptions.middleMouse && DOM.isMouseButtonDown(e, 'auxiliary'))
         )) {
             return;
         }
@@ -122,7 +122,7 @@ class Frontend {
         }
     }
 
-    onMouseOut(e) {
+    onMouseOut() {
         this.popupTimerClear();
     }
 
@@ -135,7 +135,7 @@ class Frontend {
         }
     }
 
-    onAuxClick(e) {
+    onAuxClick() {
         this.preventNextContextMenu = false;
     }
 
@@ -159,7 +159,7 @@ class Frontend {
         this.preventNextClick = false;
 
         const primaryTouch = e.changedTouches[0];
-        if (Frontend.selectionContainsPoint(window.getSelection(), primaryTouch.clientX, primaryTouch.clientY)) {
+        if (DOM.isPointInSelection(primaryTouch.clientX, primaryTouch.clientY, window.getSelection())) {
             return;
         }
 
@@ -237,7 +237,7 @@ class Frontend {
     onWindowMessage(e) {
         const action = e.data;
         const handlers = Frontend.windowMessageHandlers;
-        if (handlers.hasOwnProperty(action)) {
+        if (hasOwn(handlers, action)) {
             const handler = handlers[action];
             handler(this);
         }
@@ -245,7 +245,7 @@ class Frontend {
 
     onRuntimeMessage({action, params}, sender, callback) {
         const handlers = Frontend.runtimeMessageHandlers;
-        if (handlers.hasOwnProperty(action)) {
+        if (hasOwn(handlers, action)) {
             const handler = handlers[action];
             const result = handler(this, params);
             callback(result);
@@ -398,7 +398,7 @@ class Frontend {
             textSource.getRect(),
             textSource.getWritingMode(),
             type,
-            {definitions, context: {sentence, url, focus}}
+            {definitions, context: {sentence, url, focus, disableHistory: true}}
         );
 
         this.textSourceCurrent = textSource;
@@ -413,7 +413,7 @@ class Frontend {
         const searchText = textSource.text();
         if (searchText.length === 0) { return null; }
 
-        const {definitions, length} = await apiTermsFind(searchText, this.getOptionsContext());
+        const {definitions, length} = await apiTermsFind(searchText, {}, this.getOptionsContext());
         if (definitions.length === 0) { return null; }
 
         textSource.setEndOffset(length);
@@ -447,25 +447,13 @@ class Frontend {
     }
 
     getIndexOfTouch(touchList, identifier) {
-        for (let i in touchList) {
-            let t = touchList[i];
+        for (const i in touchList) {
+            const t = touchList[i];
             if (t.identifier === identifier) {
                 return i;
             }
         }
         return -1;
-    }
-
-    static selectionContainsPoint(selection, x, y) {
-        for (let i = 0; i < selection.rangeCount; ++i) {
-            const range = selection.getRangeAt(i);
-            for (const rect of range.getClientRects()) {
-                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     setTextSourceScanLength(textSource, length) {
@@ -497,25 +485,6 @@ class Frontend {
             case 'shift': return mouseEvent.shiftKey;
             case 'none': return true;
             default: return false;
-        }
-    }
-
-    static isMouseButton(button, mouseEvent) {
-        switch (mouseEvent.type) {
-            case 'mouseup':
-            case 'mousedown':
-            case 'click': switch (button) {
-                case 'primary': return mouseEvent.button === 0;
-                case 'secondary': return mouseEvent.button === 2;
-                case 'auxiliary': return mouseEvent.button === 1;
-                default: return false;
-            }
-            default: switch (button) {
-                case 'primary': return (mouseEvent.buttons & 0x1) !== 0x0;
-                case 'secondary': return (mouseEvent.buttons & 0x2) !== 0x0;
-                case 'auxiliary': return (mouseEvent.buttons & 0x4) !== 0x0;
-                default: return false;
-            }
         }
     }
 }

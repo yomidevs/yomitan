@@ -78,7 +78,7 @@ class FrontendApiSender {
     }
 
     onAck(id) {
-        if (!this.callbacks.hasOwnProperty(id)) {
+        if (!hasOwn(this.callbacks, id)) {
             console.warn(`ID ${id} not found for ack`);
             return;
         }
@@ -95,7 +95,7 @@ class FrontendApiSender {
     }
 
     onResult(id, data) {
-        if (!this.callbacks.hasOwnProperty(id)) {
+        if (!hasOwn(this.callbacks, id)) {
             console.warn(`ID ${id} not found`);
             return;
         }
@@ -118,7 +118,7 @@ class FrontendApiSender {
     }
 
     onError(id, reason) {
-        if (!this.callbacks.hasOwnProperty(id)) { return; }
+        if (!hasOwn(this.callbacks, id)) { return; }
         const info = this.callbacks[id];
         delete this.callbacks[id];
         info.timer = null;

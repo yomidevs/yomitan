@@ -18,65 +18,101 @@
 
 
 function apiOptionsGet(optionsContext) {
-    return utilInvoke('optionsGet', {optionsContext});
+    return _apiInvoke('optionsGet', {optionsContext});
 }
 
 function apiOptionsSet(changedOptions, optionsContext, source) {
-    return utilInvoke('optionsSet', {changedOptions, optionsContext, source});
+    return _apiInvoke('optionsSet', {changedOptions, optionsContext, source});
 }
 
-function apiTermsFind(text, optionsContext) {
-    return utilInvoke('termsFind', {text, optionsContext});
+function apiTermsFind(text, details, optionsContext) {
+    return _apiInvoke('termsFind', {text, details, optionsContext});
+}
+
+function apiTextParse(text, optionsContext) {
+    return _apiInvoke('textParse', {text, optionsContext});
+}
+
+function apiTextParseMecab(text, optionsContext) {
+    return _apiInvoke('textParseMecab', {text, optionsContext});
 }
 
 function apiKanjiFind(text, optionsContext) {
-    return utilInvoke('kanjiFind', {text, optionsContext});
+    return _apiInvoke('kanjiFind', {text, optionsContext});
 }
 
 function apiDefinitionAdd(definition, mode, context, optionsContext) {
-    return utilInvoke('definitionAdd', {definition, mode, context, optionsContext});
+    return _apiInvoke('definitionAdd', {definition, mode, context, optionsContext});
 }
 
 function apiDefinitionsAddable(definitions, modes, optionsContext) {
-    return utilInvoke('definitionsAddable', {definitions, modes, optionsContext}).catch(() => null);
+    return _apiInvoke('definitionsAddable', {definitions, modes, optionsContext}).catch(() => null);
 }
 
 function apiNoteView(noteId) {
-    return utilInvoke('noteView', {noteId});
+    return _apiInvoke('noteView', {noteId});
 }
 
 function apiTemplateRender(template, data, dynamic) {
-    return utilInvoke('templateRender', {data, template, dynamic});
+    return _apiInvoke('templateRender', {data, template, dynamic});
 }
 
 function apiAudioGetUrl(definition, source, optionsContext) {
-    return utilInvoke('audioGetUrl', {definition, source, optionsContext});
+    return _apiInvoke('audioGetUrl', {definition, source, optionsContext});
 }
 
 function apiCommandExec(command, params) {
-    return utilInvoke('commandExec', {command, params});
+    return _apiInvoke('commandExec', {command, params});
 }
 
 function apiScreenshotGet(options) {
-    return utilInvoke('screenshotGet', {options});
+    return _apiInvoke('screenshotGet', {options});
 }
 
 function apiForward(action, params) {
-    return utilInvoke('forward', {action, params});
+    return _apiInvoke('forward', {action, params});
 }
 
 function apiFrameInformationGet() {
-    return utilInvoke('frameInformationGet');
+    return _apiInvoke('frameInformationGet');
 }
 
 function apiInjectStylesheet(css) {
-    return utilInvoke('injectStylesheet', {css});
+    return _apiInvoke('injectStylesheet', {css});
 }
 
 function apiGetEnvironmentInfo() {
-    return utilInvoke('getEnvironmentInfo');
+    return _apiInvoke('getEnvironmentInfo');
 }
 
 function apiClipboardGet() {
-    return utilInvoke('clipboardGet');
+    return _apiInvoke('clipboardGet');
+}
+
+function _apiInvoke(action, params={}) {
+    const data = {action, params};
+    return new Promise((resolve, reject) => {
+        try {
+            chrome.runtime.sendMessage(data, (response) => {
+                _apiCheckLastError(chrome.runtime.lastError);
+                if (response !== null && typeof response === 'object') {
+                    if (typeof response.error !== 'undefined') {
+                        reject(jsonToError(response.error));
+                    } else {
+                        resolve(response.result);
+                    }
+                } else {
+                    const message = response === null ? 'Unexpected null response' : `Unexpected response of type ${typeof response}`;
+                    reject(new Error(`${message} (${JSON.stringify(data)})`));
+                }
+            });
+        } catch (e) {
+            window.yomichan_orphaned = true;
+            reject(e);
+        }
+    });
+}
+
+function _apiCheckLastError() {
+    // NOP
 }

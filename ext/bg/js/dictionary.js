@@ -55,39 +55,23 @@ function dictRowsSort(rows, options) {
 
 function dictTermsSort(definitions, dictionaries=null) {
     return definitions.sort((v1, v2) => {
+        let i;
         if (dictionaries !== null) {
-            const p1 = (dictionaries[v1.dictionary] || {}).priority || 0;
-            const p2 = (dictionaries[v2.dictionary] || {}).priority || 0;
-            if (p1 > p2) {
-                return -1;
-            } else if (p1 < p2) {
-                return 1;
-            }
+            i = (
+                ((dictionaries[v2.dictionary] || {}).priority || 0) -
+                ((dictionaries[v1.dictionary] || {}).priority || 0)
+            );
+            if (i !== 0) { return i; }
         }
 
-        const sl1 = v1.source.length;
-        const sl2 = v2.source.length;
-        if (sl1 > sl2) {
-            return -1;
-        } else if (sl1 < sl2) {
-            return 1;
-        }
+        i = v2.source.length - v1.source.length;
+        if (i !== 0) { return i; }
 
-        const rl1 = v1.reasons.length;
-        const rl2 = v2.reasons.length;
-        if (rl1 < rl2) {
-            return -1;
-        } else if (rl1 > rl2) {
-            return 1;
-        }
+        i = v2.reasons.length - v1.reasons.length;
+        if (i !== 0) { return i; }
 
-        const s1 = v1.score;
-        const s2 = v2.score;
-        if (s1 > s2) {
-            return -1;
-        } else if (s1 < s2) {
-            return 1;
-        }
+        i = v2.score - v1.score;
+        if (i !== 0) { return i; }
 
         return v2.expression.toString().localeCompare(v1.expression.toString());
     });
@@ -97,7 +81,7 @@ function dictTermsUndupe(definitions) {
     const definitionGroups = {};
     for (const definition of definitions) {
         const definitionExisting = definitionGroups[definition.id];
-        if (!definitionGroups.hasOwnProperty(definition.id) || definition.expression.length > definitionExisting.expression.length) {
+        if (!hasOwn(definitionGroups, definition.id) || definition.expression.length > definitionExisting.expression.length) {
             definitionGroups[definition.id] = definition;
         }
     }
@@ -115,8 +99,8 @@ function dictTermsCompressTags(definitions) {
     let lastPartOfSpeech = '';
 
     for (const definition of definitions) {
-        const dictionary = JSON.stringify(definition.definitionTags.filter(tag => tag.category === 'dictionary').map(tag => tag.name).sort());
-        const partOfSpeech = JSON.stringify(definition.definitionTags.filter(tag => tag.category === 'partOfSpeech').map(tag => tag.name).sort());
+        const dictionary = JSON.stringify(definition.definitionTags.filter((tag) => tag.category === 'dictionary').map((tag) => tag.name).sort());
+        const partOfSpeech = JSON.stringify(definition.definitionTags.filter((tag) => tag.category === 'partOfSpeech').map((tag) => tag.name).sort());
 
         const filterOutCategories = [];
 
@@ -133,7 +117,7 @@ function dictTermsCompressTags(definitions) {
             lastPartOfSpeech = partOfSpeech;
         }
 
-        definition.definitionTags = definition.definitionTags.filter(tag => !filterOutCategories.includes(tag.category));
+        definition.definitionTags = definition.definitionTags.filter((tag) => !filterOutCategories.includes(tag.category));
     }
 }
 
@@ -147,7 +131,7 @@ function dictTermsGroup(definitions, dictionaries) {
         }
 
         const keyString = key.toString();
-        if (groups.hasOwnProperty(keyString)) {
+        if (hasOwn(groups, keyString)) {
             groups[keyString].push(definition);
         } else {
             groups[keyString] = [definition];
@@ -247,7 +231,7 @@ function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
         result.reading.add(definition.reading);
 
         for (const tag of definition.definitionTags) {
-            if (!definitionsByGloss[gloss].definitionTags.find(existingTag => existingTag.name === tag.name)) {
+            if (!definitionsByGloss[gloss].definitionTags.find((existingTag) => existingTag.name === tag.name)) {
                 definitionsByGloss[gloss].definitionTags.push(tag);
             }
         }
@@ -262,7 +246,7 @@ function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
             }
 
             for (const tag of definition.termTags) {
-                if (!result.expressions.get(definition.expression).get(definition.reading).find(existingTag => existingTag.name === tag.name)) {
+                if (!result.expressions.get(definition.expression).get(definition.reading).find((existingTag) => existingTag.name === tag.name)) {
                     result.expressions.get(definition.expression).get(definition.reading).push(tag);
                 }
             }
@@ -326,46 +310,52 @@ function dictFieldSplit(field) {
     return field.length === 0 ? [] : field.split(' ');
 }
 
-async function dictFieldFormat(field, definition, mode, options) {
-    const markers = [
-        'audio',
-        'character',
-        'cloze-body',
-        'cloze-prefix',
-        'cloze-suffix',
-        'dictionary',
-        'expression',
-        'furigana',
-        'furigana-plain',
-        'glossary',
-        'glossary-brief',
-        'kunyomi',
-        'onyomi',
-        'reading',
-        'screenshot',
-        'sentence',
-        'tags',
-        'url'
-    ];
-
-    for (const marker of markers) {
-        const data = {
-            marker,
-            definition,
-            group: options.general.resultOutputMode === 'group',
-            merge: options.general.resultOutputMode === 'merge',
-            modeTermKanji: mode === 'term-kanji',
-            modeTermKana: mode === 'term-kana',
-            modeKanji: mode === 'kanji',
-            compactGlossaries: options.general.compactGlossaries
-        };
-
-        const html = await apiTemplateRender(options.anki.fieldTemplates, data, true);
-        field = field.replace(`{${marker}}`, html);
-    }
-
-    return field;
+async function dictFieldFormat(field, definition, mode, options, exceptions) {
+    const data = {
+        marker: null,
+        definition,
+        group: options.general.resultOutputMode === 'group',
+        merge: options.general.resultOutputMode === 'merge',
+        modeTermKanji: mode === 'term-kanji',
+        modeTermKana: mode === 'term-kana',
+        modeKanji: mode === 'kanji',
+        compactGlossaries: options.general.compactGlossaries
+    };
+    const markers = dictFieldFormat.markers;
+    const pattern = /\{([\w-]+)\}/g;
+    return await stringReplaceAsync(field, pattern, async (g0, marker) => {
+        if (!markers.has(marker)) {
+            return g0;
+        }
+        data.marker = marker;
+        try {
+            return await apiTemplateRender(options.anki.fieldTemplates, data, true);
+        } catch (e) {
+            if (exceptions) { exceptions.push(e); }
+            return `{${marker}-render-error}`;
+        }
+    });
 }
+dictFieldFormat.markers = new Set([
+    'audio',
+    'character',
+    'cloze-body',
+    'cloze-prefix',
+    'cloze-suffix',
+    'dictionary',
+    'expression',
+    'furigana',
+    'furigana-plain',
+    'glossary',
+    'glossary-brief',
+    'kunyomi',
+    'onyomi',
+    'reading',
+    'screenshot',
+    'sentence',
+    'tags',
+    'url'
+]);
 
 async function dictNoteFormat(definition, mode, options) {
     const note = {fields: {}, tags: options.anki.tags};

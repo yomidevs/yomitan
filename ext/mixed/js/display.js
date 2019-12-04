@@ -42,7 +42,7 @@ class Display {
         this.setInteractive(true);
     }
 
-    onError(error) {
+    onError(_error) {
         throw new Error('Override me');
     }
 
@@ -55,93 +55,117 @@ class Display {
         this.sourceTermView();
     }
 
+    onNextTermView(e) {
+        e.preventDefault();
+        this.nextTermView();
+    }
+
     async onKanjiLookup(e) {
         try {
             e.preventDefault();
+            if (!this.context) { return; }
 
             const link = e.target;
-            this.windowScroll.toY(0);
+            this.context.update({
+                index: this.entryIndexFind(link),
+                scroll: this.windowScroll.y
+            });
             const context = {
-                source: {
-                    definitions: this.definitions,
-                    index: this.entryIndexFind(link),
-                    scroll: this.windowScroll.y
-                }
+                sentence: this.context.get('sentence'),
+                url: this.context.get('url')
             };
-
-            if (this.context) {
-                context.sentence = this.context.sentence;
-                context.url = this.context.url;
-                context.source.source = this.context.source;
-            }
 
             const definitions = await apiKanjiFind(link.textContent, this.getOptionsContext());
             this.setContentKanji(definitions, context);
-        } catch (e) {
-            this.onError(e);
+        } catch (error) {
+            this.onError(error);
         }
     }
 
     onGlossaryMouseDown(e) {
-        if (Frontend.isMouseButton('primary', e)) {
+        if (DOM.isMouseButtonPressed(e, 'primary')) {
             this.clickScanPrevent = false;
         }
     }
 
-    onGlossaryMouseMove(e) {
+    onGlossaryMouseMove() {
         this.clickScanPrevent = true;
     }
 
     onGlossaryMouseUp(e) {
-        if (!this.clickScanPrevent && Frontend.isMouseButton('primary', e)) {
+        if (!this.clickScanPrevent && DOM.isMouseButtonPressed(e, 'primary')) {
             this.onTermLookup(e);
         }
     }
 
-    async onTermLookup(e) {
+    async onTermLookup(e, {disableScroll, selectText, disableHistory}={}) {
+        try {
+            if (!this.context) { return; }
+
+            const termLookupResults = await this.termLookup(e);
+            if (!termLookupResults) { return; }
+            const {textSource, definitions} = termLookupResults;
+
+            const scannedElement = e.target;
+            const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
+
+            this.context.update({
+                index: this.entryIndexFind(scannedElement),
+                scroll: this.windowScroll.y
+            });
+            const context = {
+                disableScroll,
+                disableHistory,
+                sentence,
+                url: this.context.get('url')
+            };
+            if (disableHistory) {
+                Object.assign(context, {
+                    previous: this.context.previous,
+                    next: this.context.next
+                });
+            } else {
+                Object.assign(context, {
+                    previous: this.context
+                });
+            }
+
+            this.setContentTerms(definitions, context);
+
+            if (selectText) {
+                textSource.select();
+            }
+        } catch (error) {
+            this.onError(error);
+        }
+    }
+
+    async termLookup(e) {
         try {
             e.preventDefault();
 
-            const clickedElement = e.target;
             const textSource = docRangeFromPoint(e.clientX, e.clientY, this.options);
             if (textSource === null) {
                 return false;
             }
 
-            let definitions, length, sentence;
+            let definitions, length;
             try {
                 textSource.setEndOffset(this.options.scanning.length);
 
-                ({definitions, length} = await apiTermsFind(textSource.text(), this.getOptionsContext()));
+                ({definitions, length} = await apiTermsFind(textSource.text(), {}, this.getOptionsContext()));
                 if (definitions.length === 0) {
                     return false;
                 }
 
                 textSource.setEndOffset(length);
-
-                sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
             } finally {
                 textSource.cleanup();
             }
 
-            this.windowScroll.toY(0);
-            const context = {
-                source: {
-                    definitions: this.definitions,
-                    index: this.entryIndexFind(clickedElement),
-                    scroll: this.windowScroll.y
-                }
-            };
-
-            if (this.context) {
-                context.sentence = sentence;
-                context.url = this.context.url;
-                context.source.source = this.context.source;
-            }
-
-            this.setContentTerms(definitions, context);
-        } catch (e) {
-            this.onError(e);
+            return {textSource, definitions};
+        } catch (error) {
+            this.onError(error);
         }
     }
 
@@ -170,7 +194,7 @@ class Display {
     onKeyDown(e) {
         const key = Display.getKeyFromEvent(e);
         const handlers = Display.onKeyDownHandlers;
-        if (handlers.hasOwnProperty(key)) {
+        if (hasOwn(handlers, key)) {
             const handler = handlers[key];
             if (handler(this, e)) {
                 e.preventDefault();
@@ -182,9 +206,17 @@ class Display {
 
     onWheel(e) {
         if (e.altKey) {
-            const delta = e.deltaY;
-            if (delta !== 0) {
-                this.entryScrollIntoView(this.index + (delta > 0 ? 1 : -1), null, true);
+            if (e.deltaY !== 0) {
+                this.entryScrollIntoView(this.index + (e.deltaY > 0 ? 1 : -1), null, true);
+                e.preventDefault();
+            }
+        } else if (e.shiftKey) {
+            const delta = -e.deltaX || e.deltaY;
+            if (delta > 0) {
+                this.sourceTermView();
+                e.preventDefault();
+            } else if (delta < 0) {
+                this.nextTermView();
                 e.preventDefault();
             }
         }
@@ -192,7 +224,7 @@ class Display {
 
     onRuntimeMessage({action, params}, sender, callback) {
         const handlers = Display.runtimeMessageHandlers;
-        if (handlers.hasOwnProperty(action)) {
+        if (hasOwn(handlers, action)) {
             const handler = handlers[action];
             const result = handler(this, params);
             callback(result);
@@ -268,6 +300,7 @@ class Display {
             this.addEventListeners('.action-play-audio', 'click', this.onAudioPlay.bind(this));
             this.addEventListeners('.kanji-link', 'click', this.onKanjiLookup.bind(this));
             this.addEventListeners('.source-term', 'click', this.onSourceTermView.bind(this));
+            this.addEventListeners('.next-term', 'click', this.onNextTermView.bind(this));
             if (this.options.scanning.enablePopupSearch) {
                 this.addEventListeners('.glossary-item', 'mouseup', this.onGlossaryMouseUp.bind(this));
                 this.addEventListeners('.glossary-item', 'mousedown', this.onGlossaryMouseDown.bind(this));
@@ -279,9 +312,9 @@ class Display {
     }
 
     addEventListeners(selector, type, listener, options) {
-        this.container.querySelectorAll(selector).forEach((node) => {
+        for (const node of this.container.querySelectorAll(selector)) {
             Display.addEventListener(this.eventListeners, node, type, listener, options);
-        });
+        }
     }
 
     setContent(type, details) {
@@ -298,6 +331,7 @@ class Display {
     }
 
     async setContentTerms(definitions, context) {
+        if (!context) { throw new Error('Context expected'); }
         if (!this.isInitialized()) { return; }
 
         try {
@@ -305,17 +339,23 @@ class Display {
 
             this.setEventListenersActive(false);
 
-            if (!context || context.focus !== false) {
+            if (context.focus !== false) {
                 window.focus();
             }
 
             this.definitions = definitions;
-            this.context = context;
+            if (context.disableHistory) {
+                delete context.disableHistory;
+                this.context = new DisplayContext('terms', definitions, context);
+            } else {
+                this.context = DisplayContext.push(this.context, 'terms', definitions, context);
+            }
 
             const sequence = ++this.sequence;
             const params = {
                 definitions,
-                source: context && context.source,
+                source: this.context.previous,
+                next: this.context.next,
                 addable: options.anki.enable,
                 grouped: options.general.resultOutputMode === 'group',
                 merged: options.general.resultOutputMode === 'merge',
@@ -324,20 +364,20 @@ class Display {
                 debug: options.general.debugInfo
             };
 
-            if (context) {
-                for (const definition of definitions) {
-                    if (context.sentence) {
-                        definition.cloze = Display.clozeBuild(context.sentence, definition.source);
-                    }
-
-                    definition.url = context.url;
-                }
+            for (const definition of definitions) {
+                definition.cloze = Display.clozeBuild(context.sentence, definition.source);
+                definition.url = context.url;
             }
 
             const content = await apiTemplateRender('terms.html', params);
             this.container.innerHTML = content;
-            const {index, scroll} = context || {};
-            this.entryScrollIntoView(index || 0, scroll);
+            const {index, scroll, disableScroll} = context;
+            if (!disableScroll) {
+                this.entryScrollIntoView(index || 0, scroll);
+            } else {
+                delete context.disableScroll;
+                this.entrySetCurrent(index || 0);
+            }
 
             if (options.audio.enabled && options.audio.autoPlay) {
                 this.autoPlayAudio();
@@ -352,6 +392,7 @@ class Display {
     }
 
     async setContentKanji(definitions, context) {
+        if (!context) { throw new Error('Context expected'); }
         if (!this.isInitialized()) { return; }
 
         try {
@@ -359,34 +400,35 @@ class Display {
 
             this.setEventListenersActive(false);
 
-            if (!context || context.focus !== false) {
+            if (context.focus !== false) {
                 window.focus();
             }
 
             this.definitions = definitions;
-            this.context = context;
+            if (context.disableHistory) {
+                delete context.disableHistory;
+                this.context = new DisplayContext('kanji', definitions, context);
+            } else {
+                this.context = DisplayContext.push(this.context, 'kanji', definitions, context);
+            }
 
             const sequence = ++this.sequence;
             const params = {
                 definitions,
-                source: context && context.source,
+                source: this.context.previous,
+                next: this.context.next,
                 addable: options.anki.enable,
                 debug: options.general.debugInfo
             };
 
-            if (context) {
-                for (const definition of definitions) {
-                    if (context.sentence) {
-                        definition.cloze = Display.clozeBuild(context.sentence);
-                    }
-
-                    definition.url = context.url;
-                }
+            for (const definition of definitions) {
+                definition.cloze = Display.clozeBuild(context.sentence, definition.character);
+                definition.url = context.url;
             }
 
             const content = await apiTemplateRender('kanji.html', params);
             this.container.innerHTML = content;
-            const {index, scroll} = context || {};
+            const {index, scroll} = context;
             this.entryScrollIntoView(index || 0, scroll);
 
             this.setEventListenersActive(true);
@@ -446,7 +488,7 @@ class Display {
         }
     }
 
-    entryScrollIntoView(index, scroll, smooth) {
+    entrySetCurrent(index) {
         index = Math.min(index, this.definitions.length - 1);
         index = Math.max(index, 0);
 
@@ -460,13 +502,20 @@ class Display {
             entry.classList.add('entry-current');
         }
 
-        this.windowScroll.stop();
-        let target;
+        this.index = index;
 
-        if (scroll) {
+        return entry;
+    }
+
+    entryScrollIntoView(index, scroll, smooth) {
+        this.windowScroll.stop();
+
+        const entry = this.entrySetCurrent(index);
+        let target;
+        if (scroll !== null) {
             target = scroll;
         } else {
-            target = index === 0 || entry === null ? 0 : Display.getElementTop(entry);
+            target = this.index === 0 || entry === null ? 0 : Display.getElementTop(entry);
         }
 
         if (smooth) {
@@ -474,22 +523,36 @@ class Display {
         } else {
             this.windowScroll.toY(target);
         }
-
-        this.index = index;
     }
 
     sourceTermView() {
-        if (this.context && this.context.source) {
-            const context = {
-                url: this.context.source.url,
-                sentence: this.context.source.sentence,
-                index: this.context.source.index,
-                scroll: this.context.source.scroll,
-                source: this.context.source.source
-            };
+        if (!this.context || !this.context.previous) { return; }
+        this.context.update({
+            index: this.index,
+            scroll: this.windowScroll.y
+        });
+        const previousContext = this.context.previous;
+        previousContext.set('disableHistory', true);
+        const details = {
+            definitions: previousContext.definitions,
+            context: previousContext.context
+        };
+        this.setContent(previousContext.type, details);
+    }
 
-            this.setContentTerms(this.context.source.definitions, context);
-        }
+    nextTermView() {
+        if (!this.context || !this.context.next) { return; }
+        this.context.update({
+            index: this.index,
+            scroll: this.windowScroll.y
+        });
+        const nextContext = this.context.next;
+        nextContext.set('disableHistory', true);
+        const details = {
+            definitions: nextContext.definitions,
+            context: nextContext.context
+        };
+        this.setContent(nextContext.type, details);
     }
 
     noteTryAdd(mode) {
@@ -564,7 +627,7 @@ class Display {
             if (button !== null) {
                 let titleDefault = button.dataset.titleDefault;
                 if (!titleDefault) {
-                    titleDefault = button.title || "";
+                    titleDefault = button.title || '';
                     button.dataset.titleDefault = titleDefault;
                 }
                 button.title = `${titleDefault}\n${info}`;
@@ -623,18 +686,13 @@ class Display {
         return index >= 0 && index < entries.length ? entries[index] : null;
     }
 
-    static clozeBuild(sentence, source) {
-        const result = {
-            sentence: sentence.text.trim()
+    static clozeBuild({text, offset}, source) {
+        return {
+            sentence: text.trim(),
+            prefix: text.substring(0, offset).trim(),
+            body: text.substring(offset, offset + source.length),
+            suffix: text.substring(offset + source.length).trim()
         };
-
-        if (source) {
-            result.prefix = sentence.text.substring(0, sentence.offset).trim();
-            result.body = source.trim();
-            result.suffix = sentence.text.substring(sentence.offset + source.length).trim();
-        }
-
-        return result;
     }
 
     entryIndexFind(element) {
@@ -760,6 +818,14 @@ Display.onKeyDownHandlers = {
     'B': (self, e) => {
         if (e.altKey) {
             self.sourceTermView();
+            return true;
+        }
+        return false;
+    },
+
+    'F': (self, e) => {
+        if (e.altKey) {
+            self.nextTermView();
             return true;
         }
         return false;

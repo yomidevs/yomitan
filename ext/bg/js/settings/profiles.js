@@ -35,16 +35,16 @@ async function profileOptionsSetup() {
 }
 
 function profileOptionsSetupEventListeners() {
-    $('#profile-target').change(utilAsync(onTargetProfileChanged));
-    $('#profile-name').change(onProfileNameChanged);
-    $('#profile-add').click(utilAsync(onProfileAdd));
-    $('#profile-remove').click(utilAsync(onProfileRemove));
-    $('#profile-remove-confirm').click(utilAsync(onProfileRemoveConfirm));
-    $('#profile-copy').click(utilAsync(onProfileCopy));
-    $('#profile-copy-confirm').click(utilAsync(onProfileCopyConfirm));
+    $('#profile-target').change((e) => onTargetProfileChanged(e));
+    $('#profile-name').change((e) => onProfileNameChanged(e));
+    $('#profile-add').click((e) => onProfileAdd(e));
+    $('#profile-remove').click((e) => onProfileRemove(e));
+    $('#profile-remove-confirm').click((e) => onProfileRemoveConfirm(e));
+    $('#profile-copy').click((e) => onProfileCopy(e));
+    $('#profile-copy-confirm').click((e) => onProfileCopyConfirm(e));
     $('#profile-move-up').click(() => onProfileMove(-1));
     $('#profile-move-down').click(() => onProfileMove(1));
-    $('.profile-form').find('input, select, textarea').not('.profile-form-manual').change(utilAsync(onProfileOptionsChanged));
+    $('.profile-form').find('input, select, textarea').not('.profile-form-manual').change((e) => onProfileOptionsChanged(e));
 }
 
 function tryGetIntegerValue(selector, min, max) {
@@ -95,7 +95,7 @@ async function profileFormWrite(optionsFull) {
         $('#profile-add-condition-group')
     );
     profileConditionsContainer.save = () => {
-        apiOptionsSave();
+        settingsSaveOptions();
         conditionsClearCaches(profileConditionsDescriptor);
     };
     profileConditionsContainer.isolate = utilBackgroundIsolate;
@@ -147,7 +147,7 @@ function profileOptionsCreateCopyName(name, profiles, maxUniqueAttempts) {
     let i = 0;
     while (true) {
         const newName = `${prefix}${space}${index}${suffix}`;
-        if (i++ >= maxUniqueAttempts || profiles.findIndex(profile => profile.name === newName) < 0) {
+        if (i++ >= maxUniqueAttempts || profiles.findIndex((profile) => profile.name === newName) < 0) {
             return newName;
         }
         if (typeof index !== 'number') {
@@ -166,7 +166,7 @@ async function onProfileOptionsChanged(e) {
 
     const optionsFull = await apiOptionsGetFull();
     await profileFormRead(optionsFull);
-    await apiOptionsSave();
+    await settingsSaveOptions();
 }
 
 async function onTargetProfileChanged() {
@@ -188,7 +188,7 @@ async function onProfileAdd() {
     optionsFull.profiles.push(profile);
     currentProfileIndex = optionsFull.profiles.length - 1;
     await profileOptionsUpdateTarget(optionsFull);
-    await apiOptionsSave();
+    await settingsSaveOptions();
 }
 
 async function onProfileRemove(e) {
@@ -226,7 +226,7 @@ async function onProfileRemoveConfirm() {
     }
 
     await profileOptionsUpdateTarget(optionsFull);
-    await apiOptionsSave();
+    await settingsSaveOptions();
 }
 
 function onProfileNameChanged() {

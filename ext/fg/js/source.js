@@ -99,15 +99,19 @@ class TextSourceRange {
 
     static getRubyElement(node) {
         node = TextSourceRange.getParentElement(node);
-        if (node !== null && node.nodeName.toUpperCase() === "RT") {
+        if (node !== null && node.nodeName.toUpperCase() === 'RT') {
             node = node.parentNode;
-            return (node !== null && node.nodeName.toUpperCase() === "RUBY") ? node : null;
+            return (node !== null && node.nodeName.toUpperCase() === 'RUBY') ? node : null;
         }
         return null;
     }
 
     static seekForward(node, offset, length) {
         const state = {node, offset, remainder: length, content: ''};
+        if (length <= 0) {
+            return state;
+        }
+
         const TEXT_NODE = Node.TEXT_NODE;
         const ELEMENT_NODE = Node.ELEMENT_NODE;
         let resetOffset = false;
@@ -166,6 +170,10 @@ class TextSourceRange {
 
     static seekBackward(node, offset, length) {
         const state = {node, offset, remainder: length, content: ''};
+        if (length <= 0) {
+            return state;
+        }
+
         const TEXT_NODE = Node.TEXT_NODE;
         const ELEMENT_NODE = Node.ELEMENT_NODE;
         let resetOffset = false;
@@ -353,7 +361,7 @@ class TextSourceElement {
 
         let consumed = 0;
         let content = '';
-        for (let currentChar of this.content || '') {
+        for (const currentChar of this.content || '') {
             if (consumed >= length) {
                 break;
             } else if (!currentChar.match(IGNORE_TEXT_PATTERN)) {
@@ -367,7 +375,7 @@ class TextSourceElement {
         return this.content.length;
     }
 
-    setStartOffset(length) {
+    setStartOffset() {
         return 0;
     }
 

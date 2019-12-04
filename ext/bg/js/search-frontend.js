@@ -25,7 +25,12 @@ async function searchFrontendSetup() {
     const options = await apiOptionsGet(optionsContext);
     if (!options.scanning.enableOnSearchPage) { return; }
 
-    window.frontendInitializationData = {depth: 1, proxy: false};
+    const ignoreNodes = ['.scan-disable', '.scan-disable *'];
+    if (!options.scanning.enableOnPopupExpressions) {
+        ignoreNodes.push('.expression-scan-toggle', '.expression-scan-toggle *');
+    }
+
+    window.frontendInitializationData = {depth: 1, ignoreNodes, proxy: false};
 
     const scriptSrcs = [
         '/fg/js/frontend-api-receiver.js',

@@ -17,9 +17,16 @@
  */
 
 
-#anki-spinner, #anki-general, #anki-error,
-#dict-spinner, #dict-error, #dict-warning, #dict-purge, #dict-import-progress,
-#debug, .options-advanced, .storage-hidden, #storage-spinner {
+#anki-spinner,
+#dict-spinner, #dict-import-progress,
+.storage-hidden, #storage-spinner {
+    display: none;
+}
+
+html:root:not([data-options-anki-enable=true]) #anki-general,
+html:root:not([data-options-general-debug-info=true]) .debug,
+html:root:not([data-options-general-show-advanced=true]) .options-advanced,
+html:root:not([data-options-general-result-output-mode=merge]) #dict-main-group {
     display: none;
 }
 
@@ -28,12 +35,6 @@
     border-left: 1px #ddd solid;
     border-right: 1px #ddd solid;
     padding: 10px;
-}
-
-#field-templates {
-    font-family: monospace;
-    overflow-x: hidden;
-    white-space: pre;
 }
 
 .bottom-links {
@@ -129,13 +130,23 @@
 }
 
 #custom-popup-css,
-#custom-popup-outer-css {
+#custom-popup-outer-css,
+#field-templates {
     width: 100%;
     min-height: 34px;
+    line-height: 18px;
     height: 96px;
     resize: vertical;
     font-family: 'Courier New', Courier, monospace;
     white-space: pre;
+}
+#field-templates {
+    height: 240px;
+    border-bottom-left-radius: 0;
+}
+#field-templates-reset {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
 
 .btn-inner-middle {
@@ -156,6 +167,24 @@ input[type=checkbox].storage-button-checkbox {
     padding: 0;
     width: 100%;
     height: 320px;
+}
+
+.dict-delete-table {
+    display: table;
+    width: 100%;
+}
+.dict-delete-table>*:first-child {
+    display: table-cell;
+    vertical-align: middle;
+    padding-right: 1em;
+}
+.dict-delete-table>*:nth-child(n+2) {
+    display: table-cell;
+    width: 100%;
+    vertical-align: middle;
+}
+.dict-delete-table .progress {
+    margin: 0;
 }
 
 [data-show-for-browser],

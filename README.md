@@ -236,7 +236,7 @@ other developers who want to help out. I take pride in the high quality of the c
 following basic guidelines when creating pull requests:
 
 *   Please discuss large features before writing code.
-*   Follow the [conventions and style](https://raw.githubusercontent.com/FooSoft/dotfiles/master/.eslintrc.json) of the existing code.
+*   Follow the [conventions and style](.eslintrc.json) of the existing code.
 *   Write clean, modern ES6 code (`const`/`let`, `await`, arrow functions, etc.)
 *   Large pull requests without a clear scope will not be merged.
 *   Incomplete or non-standalone features will not be merged.
@@ -256,12 +256,10 @@ Yomichan uses several third-party libraries to function. Below are links to home
 versions packaged.
 
 *   Bootstrap: [homepage](https://getbootstrap.com/) - [snapshot](https://github.com/twbs/bootstrap/releases/download/v3.3.7/bootstrap-3.3.7-dist.zip) - [license](https://github.com/twbs/bootstrap/blob/v3.3.7/LICENSE)
-*   Bootstrap Toggle: [homepage](https://www.bootstraptoggle.com/) - [snapshot](https://github.com/minhur/bootstrap-toggle/archive/b76c094.zip) - [license](https://github.com/minhur/bootstrap-toggle/blob/2.2.0/LICENSE)
-*   Dexie: [homepage](https://dexie.org/) - [snapshot](https://github.com/dfahlander/Dexie.js/archive/v2.0.0-beta.10.zip) - [license](https://github.com/dfahlander/Dexie.js/blob/v2.0.0-beta.10/LICENSE)
 *   Handlebars: [homepage](https://handlebarsjs.com/) - [snapshot](http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars.min-714a4c4.js) - [license](https://github.com/wycats/handlebars.js/blob/v4.0.6/LICENSE)
 *   jQuery: [homepage](https://blog.jquery.com/) - [snapshot](https://code.jquery.com/jquery-3.2.1.min.js) - [license](https://github.com/jquery/jquery/blob/3.2.1/LICENSE.txt)
 *   JSZip: [homepage](https://stuk.github.io/jszip/) - [snapshot](https://raw.githubusercontent.com/Stuk/jszip/de7f52fbcba485737bef7923a83f0fad92d9f5bc/dist/jszip.min.js) - [license](https://github.com/Stuk/jszip/blob/v3.1.3/LICENSE.markdown)
-*   WanaKana: [homepage](https://wanakana.com/) - [snapshot](https://raw.githubusercontent.com/WaniKani/WanaKana/7c4a052/gh-pages/assets/js/wanakana.min.js) - [license](https://github.com/WaniKani/WanaKana/blob/2.2.3/LICENSE)
+*   WanaKana: [homepage](https://wanakana.com/) - [snapshot](https://unpkg.com/wanakana@4.0.2/umd/wanakana.min.js) - [license](https://github.com/WaniKani/WanaKana/blob/4.0.2/LICENSE)
 
 ## Frequently Asked Questions ##
 

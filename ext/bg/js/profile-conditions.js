@@ -17,6 +17,26 @@
  */
 
 
+function _profileConditionTestDomain(urlDomain, domain) {
+    return (
+        urlDomain.endsWith(domain) &&
+        (
+            domain.length === urlDomain.length ||
+            urlDomain[urlDomain.length - domain.length - 1] === '.'
+        )
+    );
+}
+
+function _profileConditionTestDomainList(url, domainList) {
+    const urlDomain = new URL(url).hostname.toLowerCase();
+    for (const domain of domainList) {
+        if (_profileConditionTestDomain(urlDomain, domain)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 const profileConditionsDescriptor = {
     popupLevel: {
         name: 'Popup Level',
@@ -66,10 +86,10 @@ const profileConditionsDescriptor = {
                 placeholder: 'Comma separated list of domains',
                 defaultValue: 'example.com',
                 transformCache: {},
-                transform: (optionValue) => optionValue.split(/[,;\s]+/).map(v => v.trim().toLowerCase()).filter(v => v.length > 0),
+                transform: (optionValue) => optionValue.split(/[,;\s]+/).map((v) => v.trim().toLowerCase()).filter((v) => v.length > 0),
                 transformReverse: (transformedOptionValue) => transformedOptionValue.join(', '),
                 validateTransformed: (transformedOptionValue) => (transformedOptionValue.length > 0),
-                test: ({url}, transformedOptionValue) => (transformedOptionValue.indexOf(new URL(url).hostname.toLowerCase()) >= 0)
+                test: ({url}, transformedOptionValue) => _profileConditionTestDomainList(url, transformedOptionValue)
             },
             matchRegExp: {
                 name: 'Matches RegExp',

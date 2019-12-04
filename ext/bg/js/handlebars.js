@@ -79,6 +79,47 @@ function handlebarsSanitizeCssClass(options) {
     return options.fn(this).replace(/[^_a-z0-9\u00a0-\uffff]/ig, '_');
 }
 
+function handlebarsRegexReplace(...args) {
+    // Usage:
+    // {{#regexReplace regex string [flags]}}content{{/regexReplace}}
+    // regex: regular expression string
+    // string: string to replace
+    // flags: optional flags for regular expression
+    //   e.g. "i" for case-insensitive, "g" for replace all
+    let value = args[args.length - 1].fn(this);
+    if (args.length >= 3) {
+        try {
+            const flags = args.length > 3 ? args[2] : 'g';
+            const regex = new RegExp(args[0], flags);
+            value = value.replace(regex, args[1]);
+        } catch (e) {
+            return `${e}`;
+        }
+    }
+    return value;
+}
+
+function handlebarsRegexMatch(...args) {
+    // Usage:
+    // {{#regexMatch regex [flags]}}content{{/regexMatch}}
+    // regex: regular expression string
+    // flags: optional flags for regular expression
+    //   e.g. "i" for case-insensitive, "g" for match all
+    let value = args[args.length - 1].fn(this);
+    if (args.length >= 2) {
+        try {
+            const flags = args.length > 2 ? args[1] : '';
+            const regex = new RegExp(args[0], flags);
+            const parts = [];
+            value.replace(regex, (g0) => parts.push(g0));
+            value = parts.join('');
+        } catch (e) {
+            return `${e}`;
+        }
+    }
+    return value;
+}
+
 function handlebarsRegisterHelpers() {
     if (Handlebars.partials !== Handlebars.templates) {
         Handlebars.partials = Handlebars.templates;
@@ -88,6 +129,8 @@ function handlebarsRegisterHelpers() {
         Handlebars.registerHelper('kanjiLinks', handlebarsKanjiLinks);
         Handlebars.registerHelper('multiLine', handlebarsMultiLine);
         Handlebars.registerHelper('sanitizeCssClass', handlebarsSanitizeCssClass);
+        Handlebars.registerHelper('regexReplace', handlebarsRegexReplace);
+        Handlebars.registerHelper('regexMatch', handlebarsRegexMatch);
     }
 }
 

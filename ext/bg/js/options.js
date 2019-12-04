@@ -311,6 +311,13 @@ function profileOptionsCreateDefaults() {
 
         dictionaries: {},
 
+        parsing: {
+            enableScanningParser: true,
+            enableMecabParser: false,
+            selectedParser: null,
+            readingMode: 'hiragana'
+        },
+
         anki: {
             enable: false,
             server: 'http://127.0.0.1:8765',
@@ -329,7 +336,7 @@ function profileOptionsSetDefaults(options) {
 
     const combine = (target, source) => {
         for (const key in source) {
-            if (!target.hasOwnProperty(key)) {
+            if (!hasOwn(target, key)) {
                 target[key] = source[key];
             }
         }
@@ -382,7 +389,7 @@ function optionsUpdateVersion(options, defaultProfileOptions) {
     // Remove invalid
     const profiles = options.profiles;
     for (let i = profiles.length - 1; i >= 0; --i) {
-        if (!utilIsObject(profiles[i])) {
+        if (!isObject(profiles[i])) {
             profiles.splice(i, 1);
         }
     }
@@ -422,7 +429,7 @@ function optionsUpdateVersion(options, defaultProfileOptions) {
 
 function optionsLoad() {
     return new Promise((resolve, reject) => {
-        chrome.storage.local.get(['options'], store => {
+        chrome.storage.local.get(['options'], (store) => {
             const error = chrome.runtime.lastError;
             if (error) {
                 reject(new Error(error));
@@ -430,17 +437,17 @@ function optionsLoad() {
                 resolve(store.options);
             }
         });
-    }).then(optionsStr => {
+    }).then((optionsStr) => {
         if (typeof optionsStr === 'string') {
             const options = JSON.parse(optionsStr);
-            if (utilIsObject(options)) {
+            if (isObject(options)) {
                 return options;
             }
         }
         return {};
     }).catch(() => {
         return {};
-    }).then(options => {
+    }).then((options) => {
         return (
             Array.isArray(options.profiles) ?
             optionsUpdateVersion(options, {}) :

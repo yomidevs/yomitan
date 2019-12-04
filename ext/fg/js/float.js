@@ -49,7 +49,7 @@ class DisplayFloat extends Display {
     onMessage(e) {
         const {action, params} = e.data;
         const handlers = DisplayFloat.messageHandlers;
-        if (handlers.hasOwnProperty(action)) {
+        if (hasOwn(handlers, action)) {
             const handler = handlers[action];
             handler(this, params);
         }
@@ -58,7 +58,7 @@ class DisplayFloat extends Display {
     onKeyDown(e) {
         const key = Display.getKeyFromEvent(e);
         const handlers = DisplayFloat.onKeyDownHandlers;
-        if (handlers.hasOwnProperty(key)) {
+        if (hasOwn(handlers, key)) {
             const handler = handlers[key];
             if (handler(this, e)) {
                 e.preventDefault();

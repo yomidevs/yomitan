@@ -25,42 +25,36 @@ async function apiOptionsSet(changedOptions, optionsContext, source) {
     const options = await apiOptionsGet(optionsContext);
 
     function getValuePaths(obj) {
-        let valuePaths = [];
-        let nodes = [{
-            obj,
-            path: []
-        }];
+        const valuePaths = [];
+        const nodes = [{obj, path: []}];
         while (nodes.length > 0) {
-            let node = nodes.pop();
-            Object.keys(node.obj).forEach((key) => {
-                let path = node.path.concat(key);
-                let value = node.obj[key];
-                if (typeof value === 'object') {
-                    nodes.unshift({
-                        obj: value,
-                        path: path
-                    });
+            const node = nodes.pop();
+            for (const key of Object.keys(node.obj)) {
+                const path = node.path.concat(key);
+                const obj = node.obj[key];
+                if (obj !== null && typeof obj === 'object') {
+                    nodes.unshift({obj, path});
                 } else {
-                    valuePaths.push([value, path]);
+                    valuePaths.push([obj, path]);
                 }
-            });
+            }
         }
         return valuePaths;
     }
 
     function modifyOption(path, value, options) {
         let pivot = options;
-        for (let pathKey of path.slice(0, -1)) {
-            if (!(pathKey in pivot)) {
+        for (const key of path.slice(0, -1)) {
+            if (!hasOwn(pivot, key)) {
                 return false;
             }
-            pivot = pivot[pathKey];
+            pivot = pivot[key];
         }
         pivot[path[path.length - 1]] = value;
         return true;
     }
 
-    for (let [value, path] of getValuePaths(changedOptions)) {
+    for (const [value, path] of getValuePaths(changedOptions)) {
         modifyOption(path, value, options);
     }
 
@@ -78,33 +72,83 @@ async function apiOptionsSave(source) {
     backend.onOptionsUpdated(source);
 }
 
-async function apiTermsFind(text, optionsContext) {
+async function apiTermsFind(text, details, optionsContext) {
+    const options = await apiOptionsGet(optionsContext);
+    const [definitions, length] = await utilBackend().translator.findTerms(text, details, options);
+    definitions.splice(options.general.maxResults);
+    return {length, definitions};
+}
+
+async function apiTextParse(text, optionsContext) {
     const options = await apiOptionsGet(optionsContext);
     const translator = utilBackend().translator;
 
-    const searcher = {
-        'merge': translator.findTermsMerged,
-        'split': translator.findTermsSplit,
-        'group': translator.findTermsGrouped
-    }[options.general.resultOutputMode].bind(translator);
+    const results = [];
+    while (text.length > 0) {
+        const term = [];
+        const [definitions, sourceLength] = await translator.findTermsInternal(
+            text.slice(0, options.scanning.length),
+            dictEnabledSet(options),
+            options.scanning.alphanumeric,
+            {}
+        );
+        if (definitions.length > 0) {
+            dictTermsSort(definitions);
+            const {expression, reading} = definitions[0];
+            const source = text.slice(0, sourceLength);
+            for (const {text, furigana} of jpDistributeFuriganaInflected(expression, reading, source)) {
+                const reading = jpConvertReading(text, furigana, options.parsing.readingMode);
+                term.push({text, reading});
+            }
+            text = text.slice(source.length);
+        } else {
+            const reading = jpConvertReading(text[0], null, options.parsing.readingMode);
+            term.push({text: text[0], reading});
+            text = text.slice(1);
+        }
+        results.push(term);
+    }
+    return results;
+}
 
-    const {definitions, length} = await searcher(
-        text,
-        dictEnabledSet(options),
-        options.scanning.alphanumeric,
-        options
-    );
+async function apiTextParseMecab(text, optionsContext) {
+    const options = await apiOptionsGet(optionsContext);
+    const mecab = utilBackend().mecab;
 
-    return {
-        length,
-        definitions: definitions.slice(0, options.general.maxResults)
-    };
+    const results = {};
+    const rawResults = await mecab.parseText(text);
+    for (const mecabName in rawResults) {
+        const result = [];
+        for (const parsedLine of rawResults[mecabName]) {
+            for (const {expression, reading, source} of parsedLine) {
+                const term = [];
+                if (expression !== null && reading !== null) {
+                    for (const {text, furigana} of jpDistributeFuriganaInflected(
+                        expression,
+                        jpKatakanaToHiragana(reading),
+                        source
+                    )) {
+                        const reading = jpConvertReading(text, furigana, options.parsing.readingMode);
+                        term.push({text, reading});
+                    }
+                } else {
+                    const reading = jpConvertReading(source, null, options.parsing.readingMode);
+                    term.push({text: source, reading});
+                }
+                result.push(term);
+            }
+            result.push([{text: '\n'}]);
+        }
+        results[mecabName] = result;
+    }
+    return results;
 }
 
 async function apiKanjiFind(text, optionsContext) {
     const options = await apiOptionsGet(optionsContext);
-    const definitions = await utilBackend().translator.findKanji(text, dictEnabledSet(options));
-    return definitions.slice(0, options.general.maxResults);
+    const definitions = await utilBackend().translator.findKanji(text, options);
+    definitions.splice(options.general.maxResults);
+    return definitions;
 }
 
 async function apiDefinitionAdd(definition, mode, context, optionsContext) {
@@ -163,7 +207,7 @@ async function apiDefinitionsAddable(definitions, modes, optionsContext) {
         }
 
         if (cannotAdd.length > 0) {
-            const noteIdsArray = await anki.findNoteIds(cannotAdd.map(e => e[0]));
+            const noteIdsArray = await anki.findNoteIds(cannotAdd.map((e) => e[0]));
             for (let i = 0, ii = Math.min(cannotAdd.length, noteIdsArray.length); i < ii; ++i) {
                 const noteIds = noteIdsArray[i];
                 if (noteIds.length > 0) {
@@ -192,7 +236,7 @@ async function apiTemplateRender(template, data, dynamic) {
 
 async function apiCommandExec(command, params) {
     const handlers = apiCommandExec.handlers;
-    if (handlers.hasOwnProperty(command)) {
+    if (hasOwn(handlers, command)) {
         const handler = handlers[command];
         handler(params);
     }
@@ -360,7 +404,9 @@ async function apiGetBrowser() {
             if (info.name === 'Fennec') {
                 return 'firefox-mobile';
             }
-        } catch (e) { }
+        } catch (e) {
+            // NOP
+        }
         return 'firefox';
     } else {
         return 'chrome';

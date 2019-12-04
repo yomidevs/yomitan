@@ -41,15 +41,12 @@
         <a href="#" class="action-play-audio"><img src="/mixed/img/play-audio.svg" title="Play audio (Alt + P)" alt></a>
         {{/if}}
         {{/unless}}
-        {{#if source}}
-        <a href="#" class="source-term"><img src="/mixed/img/source-term.svg" title="Source term (Alt + B)" alt></a>
-        {{/if}}
         <img src="/mixed/img/entry-current.svg" class="current" title="Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)" alt>
     </div>
 
     {{#if merged}}
     {{~#each expressions~}}
-    <div class="expression"><span class="expression-{{termFrequency}}">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</span><div class="peek-wrapper">
+    <div class="expression expression-scan-toggle"><span class="expression-{{termFrequency}}">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</span><div class="peek-wrapper">
             {{~#if ../playback~}}
             <a href="#" class="action-play-audio"><img src="/mixed/img/play-audio.svg" title="Play audio" alt></a>
             {{~/if~}}
@@ -70,7 +67,7 @@
     </div><span class="{{#if @last}}invisible{{/if}}">、</span></div>
     {{~/each~}}
     {{else}}
-    <div class="expression">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</div>
+    <div class="expression expression-scan-toggle">{{#kanjiLinks}}{{#furigana}}{{{.}}}{{/furigana}}{{/kanjiLinks}}</div>
     {{#if termTags}}
     <div style="display: inline-block;">
         {{#each termTags}}
@@ -129,9 +126,13 @@
 {{/inline}}
 
 {{#if definitions}}
+<div class="term-navigation">
+    <a href="#" {{#if source}}class="source-term"{{else}}class="source-term term-button-fade"{{/if}}><img src="/mixed/img/source-term.svg" title="Source term (Alt + B)" alt></a>
+    <a href="#" {{#if next}}class="next-term"{{else}}class="next-term term-button-fade"{{/if}}><img src="/mixed/img/source-term.svg" style="transform: scaleX(-1);" title="Next term (Alt + F)" alt></a>
+</div>
 {{#each definitions}}
 {{#unless @first}}<hr>{{/unless}}
-{{> term debug=../debug grouped=../grouped merged=../merged addable=../addable playback=../playback compactGlossaries=../compactGlossaries source=../source}}
+{{> term debug=../debug grouped=../grouped merged=../merged addable=../addable playback=../playback compactGlossaries=../compactGlossaries}}
 {{/each}}
 {{else}}
 <p class="note">No results found.</p>

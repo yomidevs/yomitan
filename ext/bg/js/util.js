@@ -16,12 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function utilAsync(func) {
-    return function(...args) {
-        func.apply(this, args);
-    };
-}
-
 function utilIsolate(data) {
     return JSON.parse(JSON.stringify(data));
 }
@@ -47,13 +41,13 @@ function utilSetEqual(setA, setB) {
 
 function utilSetIntersection(setA, setB) {
     return new Set(
-        [...setA].filter(value => setB.has(value))
+        [...setA].filter((value) => setB.has(value))
     );
 }
 
 function utilSetDifference(setA, setB) {
     return new Set(
-        [...setA].filter(value => !setB.has(value))
+        [...setA].filter((value) => !setB.has(value))
     );
 }
 
@@ -80,8 +74,12 @@ function utilAnkiGetDeckNames() {
     return utilBackend().anki.getDeckNames();
 }
 
-function utilDatabaseSummarize() {
-    return utilBackend().translator.database.summarize();
+function utilDatabaseGetDictionaryInfo() {
+    return utilBackend().translator.database.getDictionaryInfo();
+}
+
+function utilDatabaseGetDictionaryCounts(dictionaryNames, getTotal) {
+    return utilBackend().translator.database.getDictionaryCounts(dictionaryNames, getTotal);
 }
 
 function utilAnkiGetModelFieldNames(modelName) {
@@ -90,6 +88,10 @@ function utilAnkiGetModelFieldNames(modelName) {
 
 function utilDatabasePurge() {
     return utilBackend().translator.purgeDatabase();
+}
+
+function utilDatabaseDeleteDictionary(dictionaryName, onProgress) {
+    return utilBackend().translator.database.deleteDictionary(dictionaryName, onProgress);
 }
 
 async function utilDatabaseImport(data, progress, exceptions) {
@@ -108,8 +110,4 @@ function utilReadFile(file) {
         reader.onerror = () => reject(reader.error);
         reader.readAsBinaryString(file);
     });
-}
-
-function utilIsObject(value) {
-    return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

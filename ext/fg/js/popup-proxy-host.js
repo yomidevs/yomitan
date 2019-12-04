@@ -50,7 +50,7 @@ class PopupProxyHost {
     }
 
     createPopup(parentId, depth) {
-        const parent = (typeof parentId === 'string' && this.popups.hasOwnProperty(parentId) ? this.popups[parentId] : null);
+        const parent = (typeof parentId === 'string' && hasOwn(this.popups, parentId) ? this.popups[parentId] : null);
         const id = `${this.nextId}`;
         if (parent !== null) {
             depth = parent.depth + 1;
@@ -70,7 +70,7 @@ class PopupProxyHost {
     }
 
     getPopup(id) {
-        if (!this.popups.hasOwnProperty(id)) {
+        if (!hasOwn(this.popups, id)) {
             throw new Error('Invalid popup ID');
         }
 

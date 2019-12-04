@@ -18,14 +18,14 @@
 
 
 function conditionsValidateOptionValue(object, value) {
-    if (object.hasOwnProperty('validate') && !object.validate(value)) {
+    if (hasOwn(object, 'validate') && !object.validate(value)) {
         throw new Error('Invalid value for condition');
     }
 
-    if (object.hasOwnProperty('transform')) {
+    if (hasOwn(object, 'transform')) {
         value = object.transform(value);
 
-        if (object.hasOwnProperty('validateTransformed') && !object.validateTransformed(value)) {
+        if (hasOwn(object, 'validateTransformed') && !object.validateTransformed(value)) {
             throw new Error('Invalid value for condition');
         }
     }
@@ -34,12 +34,12 @@ function conditionsValidateOptionValue(object, value) {
 }
 
 function conditionsNormalizeOptionValue(descriptors, type, operator, optionValue) {
-    if (!descriptors.hasOwnProperty(type)) {
+    if (!hasOwn(descriptors, type)) {
         throw new Error('Invalid type');
     }
 
     const conditionDescriptor = descriptors[type];
-    if (!conditionDescriptor.operators.hasOwnProperty(operator)) {
+    if (!hasOwn(conditionDescriptor.operators, operator)) {
         throw new Error('Invalid operator');
     }
 
@@ -48,28 +48,28 @@ function conditionsNormalizeOptionValue(descriptors, type, operator, optionValue
     let transformedValue = conditionsValidateOptionValue(conditionDescriptor, optionValue);
     transformedValue = conditionsValidateOptionValue(operatorDescriptor, transformedValue);
 
-    if (operatorDescriptor.hasOwnProperty('transformReverse')) {
+    if (hasOwn(operatorDescriptor, 'transformReverse')) {
         transformedValue = operatorDescriptor.transformReverse(transformedValue);
     }
     return transformedValue;
 }
 
 function conditionsTestValueThrowing(descriptors, type, operator, optionValue, value) {
-    if (!descriptors.hasOwnProperty(type)) {
+    if (!hasOwn(descriptors, type)) {
         throw new Error('Invalid type');
     }
 
     const conditionDescriptor = descriptors[type];
-    if (!conditionDescriptor.operators.hasOwnProperty(operator)) {
+    if (!hasOwn(conditionDescriptor.operators, operator)) {
         throw new Error('Invalid operator');
     }
 
     const operatorDescriptor = conditionDescriptor.operators[operator];
-    if (operatorDescriptor.hasOwnProperty('transform')) {
-        if (operatorDescriptor.hasOwnProperty('transformCache')) {
+    if (hasOwn(operatorDescriptor, 'transform')) {
+        if (hasOwn(operatorDescriptor, 'transformCache')) {
             const key = `${optionValue}`;
             const transformCache = operatorDescriptor.transformCache;
-            if (transformCache.hasOwnProperty(key)) {
+            if (hasOwn(transformCache, key)) {
                 optionValue = transformCache[key];
             } else {
                 optionValue = operatorDescriptor.transform(optionValue);
@@ -93,23 +93,23 @@ function conditionsTestValue(descriptors, type, operator, optionValue, value) {
 
 function conditionsClearCaches(descriptors) {
     for (const type in descriptors) {
-        if (!descriptors.hasOwnProperty(type)) {
+        if (!hasOwn(descriptors, type)) {
             continue;
         }
 
         const conditionDescriptor = descriptors[type];
-        if (conditionDescriptor.hasOwnProperty('transformCache')) {
+        if (hasOwn(conditionDescriptor, 'transformCache')) {
             conditionDescriptor.transformCache = {};
         }
 
         const operatorDescriptors = conditionDescriptor.operators;
         for (const operator in operatorDescriptors) {
-            if (!operatorDescriptors.hasOwnProperty(operator)) {
+            if (!hasOwn(operatorDescriptors, operator)) {
                 continue;
             }
 
             const operatorDescriptor = operatorDescriptors[operator];
-            if (operatorDescriptor.hasOwnProperty('transformCache')) {
+            if (hasOwn(operatorDescriptor, 'transformCache')) {
                 operatorDescriptor.transformCache = {};
             }
         }

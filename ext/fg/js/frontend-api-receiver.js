@@ -34,7 +34,7 @@ class FrontendApiReceiver {
     onMessage(port, {id, action, params, target, senderId}) {
         if (
             target !== this.source ||
-            !this.handlers.hasOwnProperty(action)
+            !hasOwn(this.handlers, action)
         ) {
             return;
         }
@@ -43,10 +43,10 @@ class FrontendApiReceiver {
 
         const handler = this.handlers[action];
         handler(params).then(
-            result => {
+            (result) => {
                 this.sendResult(port, id, senderId, {result});
             },
-            error => {
+            (error) => {
                 this.sendResult(port, id, senderId, {error: errorToJson(error)});
             });
     }

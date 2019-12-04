@@ -106,7 +106,7 @@ class SettingsPopupPreview {
     onMessage(e) {
         const {action, params} = e.data;
         const handlers = SettingsPopupPreview.messageHandlers;
-        if (handlers.hasOwnProperty(action)) {
+        if (hasOwn(handlers, action)) {
             const handler = handlers[action];
             handler(this, params);
         }

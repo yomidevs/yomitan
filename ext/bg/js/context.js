@@ -26,26 +26,28 @@ function showExtensionInfo() {
 }
 
 function setupButtonEvents(selector, command, url) {
-    const node = $(selector);
-    node.on('click', (e) => {
-        if (e.button !== 0) { return; }
-        apiCommandExec(command, {newTab: e.ctrlKey});
-        e.preventDefault();
-    })
-    .on('auxclick', (e) => {
-        if (e.button !== 1) { return; }
-        apiCommandExec(command, {newTab: true});
-        e.preventDefault();
-    });
+    const nodes = document.querySelectorAll(selector);
+    for (const node of nodes) {
+        node.addEventListener('click', (e) => {
+            if (e.button !== 0) { return; }
+            apiCommandExec(command, {newTab: e.ctrlKey});
+            e.preventDefault();
+        }, false);
+        node.addEventListener('auxclick', (e) => {
+            if (e.button !== 1) { return; }
+            apiCommandExec(command, {newTab: true});
+            e.preventDefault();
+        }, false);
 
-    if (typeof url === 'string') {
-        node.attr('href', url);
-        node.attr('target', '_blank');
-        node.attr('rel', 'noopener');
+        if (typeof url === 'string') {
+            node.href = url;
+            node.target = '_blank';
+            node.rel = 'noopener';
+        }
     }
 }
 
-$(document).ready(utilAsync(() => {
+window.addEventListener('DOMContentLoaded', () => {
     showExtensionInfo();
 
     apiGetEnvironmentInfo().then(({browser}) => {
@@ -63,14 +65,19 @@ $(document).ready(utilAsync(() => {
         depth: 0,
         url: window.location.href
     };
-    apiOptionsGet(optionsContext).then(options => {
-        const toggle = $('#enable-search');
-        toggle.prop('checked', options.general.enable).change();
-        toggle.bootstrapToggle();
-        toggle.change(() => apiCommandExec('toggle'));
+    apiOptionsGet(optionsContext).then((options) => {
+        const toggle = document.querySelector('#enable-search');
+        toggle.checked = options.general.enable;
+        toggle.addEventListener('change', () => apiCommandExec('toggle'), false);
 
-        const toggle2 = $('#enable-search2');
-        toggle2.prop('checked', options.general.enable).change();
-        toggle2.change(() => apiCommandExec('toggle'));
+        const toggle2 = document.querySelector('#enable-search2');
+        toggle2.checked = options.general.enable;
+        toggle2.addEventListener('change', () => apiCommandExec('toggle'), false);
+
+        setTimeout(() => {
+            for (const n of document.querySelectorAll('.toggle-group')) {
+                n.classList.add('toggle-group-animated');
+            }
+        }, 10);
     });
-}));
+});
