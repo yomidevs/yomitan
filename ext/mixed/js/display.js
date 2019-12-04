@@ -354,8 +354,8 @@ class Display {
             const sequence = ++this.sequence;
             const params = {
                 definitions,
-                source: this.context.previous,
-                next: this.context.next,
+                source: !!this.context.previous,
+                next: !!this.context.next,
                 addable: options.anki.enable,
                 grouped: options.general.resultOutputMode === 'group',
                 merged: options.general.resultOutputMode === 'merge',
@@ -415,8 +415,8 @@ class Display {
             const sequence = ++this.sequence;
             const params = {
                 definitions,
-                source: this.context.previous,
-                next: this.context.next,
+                source: !!this.context.previous,
+                next: !!this.context.next,
                 addable: options.anki.enable,
                 debug: options.general.debugInfo
             };
