@@ -62,7 +62,7 @@ class QueryParser {
         const scanningOptions = this.search.options.scanning;
         const scanningModifier = scanningOptions.modifier;
         if (!(
-            Frontend.isScanningModifierPressed(scanningModifier, e) ||
+            TextScanner.isScanningModifierPressed(scanningModifier, e) ||
             (scanningOptions.middleMouse && DOM.isMouseButtonDown(e, 'auxiliary'))
         )) {
             return;
