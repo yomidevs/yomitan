@@ -18,19 +18,23 @@
 
 
 class TextScanner {
-    constructor(node, ignoreNodes, popup, onTextSearch) {
+    constructor(node, ignoreNodes, ignoreElements, ignorePoints) {
         this.node = node;
         this.ignoreNodes = (Array.isArray(ignoreNodes) && ignoreNodes.length > 0 ? ignoreNodes.join(',') : null);
-        this.popup = popup;
-        this.onTextSearch = onTextSearch;
+        this.ignoreElements = ignoreElements;
+        this.ignorePoints = ignorePoints;
 
-        this.popupTimerPromise = null;
+        this.scanTimerPromise = null;
         this.textSourceCurrent = null;
         this.pendingLookup = false;
         this.options = null;
 
         this.enabled = false;
         this.eventListeners = [];
+        this.subscribers = {
+            searchClear: [],
+            textSearch: []
+        };
 
         this.primaryTouchIdentifier = null;
         this.preventNextContextMenu = false;
@@ -40,13 +44,13 @@ class TextScanner {
     }
 
     onMouseOver(e) {
-        if (this.popup && e.target === this.popup.container) {
-            this.popupTimerClear();
+        if (this.ignoreElements.includes(e.target)) {
+            this.scanTimerClear();
         }
     }
 
     onMouseMove(e) {
-        this.popupTimerClear();
+        this.scanTimerClear();
 
         if (this.pendingLookup || DOM.isMouseButtonDown(e, 'primary')) {
             return;
@@ -63,7 +67,7 @@ class TextScanner {
 
         const search = async () => {
             if (scanningModifier === 'none') {
-                if (!await this.popupTimerWait()) {
+                if (!await this.scanTimerWait()) {
                     // Aborted
                     return;
                 }
@@ -84,14 +88,14 @@ class TextScanner {
             return false;
         }
 
-        if (DOM.isMouseButtonPressed(e, 'primary')) {
-            this.popupTimerClear();
-            this.searchClear();
+        if (DOM.isMouseButtonDown(e, 'primary')) {
+            this.scanTimerClear();
+            this.onSearchClear();
         }
     }
 
     onMouseOut() {
-        this.popupTimerClear();
+        this.scanTimerClear();
     }
 
     onClick(e) {
@@ -192,23 +196,55 @@ class TextScanner {
         e.preventDefault(); // Disable scroll
     }
 
-    async popupTimerWait() {
+    async onSearchClear() {
+        this.searchClear();
+        await this.publish('searchClear', {});
+    }
+
+    async onTextSearch(textSource, cause) {
+        this.pendingLookup = true;
+        const results = await this.publish('textSearch', {textSource, cause});
+        if (results.some((r) => r)) {
+            this.textSourceCurrent = textSource;
+        }
+        this.pendingLookup = false;
+    }
+
+    onError(error) {
+        logError(error, false);
+    }
+
+    subscribe(eventName, subscriber) {
+        if (this.subscribers[eventName].includes(subscriber)) { return; }
+        this.subscribers[eventName].push(subscriber);
+    }
+
+    async publish(eventName, data) {
+        const results = [];
+        for (const subscriber of this.subscribers[eventName]) {
+            const result = await subscriber(data);
+            results.push(result);
+        }
+        return results;
+    }
+
+    async scanTimerWait() {
         const delay = this.options.scanning.delay;
         const promise = promiseTimeout(delay, true);
-        this.popupTimerPromise = promise;
+        this.scanTimerPromise = promise;
         try {
             return await promise;
         } finally {
-            if (this.popupTimerPromise === promise) {
-                this.popupTimerPromise = null;
+            if (this.scanTimerPromise === promise) {
+                this.scanTimerPromise = null;
             }
         }
     }
 
-    popupTimerClear() {
-        if (this.popupTimerPromise !== null) {
-            this.popupTimerPromise.resolve(false);
-            this.popupTimerPromise = null;
+    scanTimerClear() {
+        if (this.scanTimerPromise !== null) {
+            this.scanTimerPromise.resolve(false);
+            this.scanTimerPromise = null;
         }
     }
 
@@ -223,7 +259,7 @@ class TextScanner {
                 this.clearEventListeners();
                 this.enabled = false;
             }
-            this.searchClear();
+            this.onSearchClear();
         }
     }
 
@@ -262,10 +298,16 @@ class TextScanner {
 
     async searchAt(x, y, cause) {
         try {
-            this.popupTimerClear();
+            this.scanTimerClear();
 
-            if (this.pendingLookup || (this.popup && await this.popup.containsPoint(x, y))) {
+            if (this.pendingLookup) {
                 return;
+            }
+
+            for (const ignorePointFn of this.ignorePoints) {
+                if (await ignorePointFn(x, y)) {
+                    return;
+                }
             }
 
             const textSource = docRangeFromPoint(x, y, this.options);

@@ -20,7 +20,14 @@
 class Frontend {
     constructor(popup, ignoreNodes) {
         this.popup = popup;
-        this.textScanner = new TextScanner(window, ignoreNodes, this.popup, this.searchSource.bind(this));
+        this.textScanner = new TextScanner(
+            window,
+            ignoreNodes,
+            [this.popup.container],
+            [(x, y) => this.popup.containsPoint(x, y)]
+        );
+        this.textScanner.subscribe('textSearch', ({textSource, cause}) => this.searchSource(textSource, cause));
+        this.textScanner.subscribe('searchClear', () => this.searchClear(true));
         this.options = null;
 
         this.optionsContext = {
@@ -138,7 +145,6 @@ class Frontend {
         let results = null;
 
         try {
-            this.textScanner.pendingLookup = true;
             if (textSource !== null) {
                 results = (
                     await this.findTerms(textSource) ||
@@ -165,8 +171,6 @@ class Frontend {
             if (results === null && this.options.scanning.autoHideResults) {
                 this.searchClear(true);
             }
-
-            this.textScanner.pendingLookup = false;
         }
 
         return results;
@@ -182,7 +186,6 @@ class Frontend {
             {definitions, context: {sentence, url, focus, disableHistory: true}}
         );
 
-        this.textScanner.setCurrentTextSource(textSource);
         if (this.options.scanning.selectText) {
             textSource.select();
         }
