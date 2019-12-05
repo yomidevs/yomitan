@@ -206,6 +206,9 @@ class TextScanner {
         const results = await this.publish('textSearch', {textSource, cause});
         if (results.some((r) => r)) {
             this.textSourceCurrent = textSource;
+            if (this.options.scanning.selectText) {
+                textSource.select();
+            }
         }
         this.pendingLookup = false;
     }

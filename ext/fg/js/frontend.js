@@ -185,10 +185,6 @@ class Frontend {
             type,
             {definitions, context: {sentence, url, focus, disableHistory: true}}
         );
-
-        if (this.options.scanning.selectText) {
-            textSource.select();
-        }
     }
 
     async findTerms(textSource) {
