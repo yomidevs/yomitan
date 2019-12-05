@@ -41,6 +41,7 @@ async function popupNestedInitialize(id, depth, parentFrameId, url) {
     window.frontendInitializationData = {id, depth, parentFrameId, ignoreNodes, url, proxy: true};
 
     const scriptSrcs = [
+        '/mixed/js/text-scanner.js',
         '/fg/js/frontend-api-sender.js',
         '/fg/js/popup.js',
         '/fg/js/popup-proxy.js',
