@@ -224,6 +224,7 @@ class DisplaySearch extends Display {
                     sentence: {text: query, offset: 0},
                     url: window.location.href
                 });
+                this.setTitleText(query);
             } else {
                 this.container.textContent = '';
             }
@@ -354,6 +355,14 @@ class DisplaySearch extends Display {
 
     updateSearchButton() {
         this.search.disabled = this.introVisible && (this.query === null || this.query.value.length === 0);
+    }
+
+    setTitleText(text) {
+        // Chrome limits title to 1024 characters
+        if (text.length > 1000) {
+            text = text.slice(0, 1000) + '...';
+        }
+        document.title = `${text} - Yomichan Search`;
     }
 
     static getSearchQueryFromLocation(url) {
