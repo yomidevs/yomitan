@@ -360,7 +360,7 @@ class DisplaySearch extends Display {
     setTitleText(text) {
         // Chrome limits title to 1024 characters
         if (text.length > 1000) {
-            text = text.slice(0, 1000) + '...';
+            text = text.substring(0, 1000) + '...';
         }
 
         if (text.length === 0) {
