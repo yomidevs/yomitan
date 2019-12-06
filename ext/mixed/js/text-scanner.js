@@ -31,10 +31,6 @@ class TextScanner {
 
         this.enabled = false;
         this.eventListeners = [];
-        this.subscribers = {
-            searchClear: [],
-            textSearch: []
-        };
 
         this.primaryTouchIdentifier = null;
         this.preventNextContextMenu = false;
@@ -90,7 +86,7 @@ class TextScanner {
 
         if (DOM.isMouseButtonDown(e, 'primary')) {
             this.scanTimerClear();
-            this.onSearchClear();
+            this.onSearchClear(true);
         }
     }
 
@@ -196,39 +192,12 @@ class TextScanner {
         e.preventDefault(); // Disable scroll
     }
 
-    async onSearchClear() {
-        this.searchClear();
-        await this.publish('searchClear', {});
-    }
-
-    async onTextSearch(textSource, cause) {
-        this.pendingLookup = true;
-        const results = await this.publish('textSearch', {textSource, cause});
-        if (results.some((r) => r)) {
-            this.textSourceCurrent = textSource;
-            if (this.options.scanning.selectText) {
-                textSource.select();
-            }
-        }
-        this.pendingLookup = false;
+    async onSearchSource(_textSource, _cause) {
+        throw new Error('Override me');
     }
 
     onError(error) {
         logError(error, false);
-    }
-
-    subscribe(eventName, subscriber) {
-        if (this.subscribers[eventName].includes(subscriber)) { return; }
-        this.subscribers[eventName].push(subscriber);
-    }
-
-    async publish(eventName, data) {
-        const results = [];
-        for (const subscriber of this.subscribers[eventName]) {
-            const result = await subscriber(data);
-            results.push(result);
-        }
-        return results;
     }
 
     async scanTimerWait() {
@@ -262,35 +231,50 @@ class TextScanner {
                 this.clearEventListeners();
                 this.enabled = false;
             }
-            this.onSearchClear();
+            this.onSearchClear(false);
         }
     }
 
     hookEvents() {
-        this.addEventListener('mousedown', this.onMouseDown.bind(this));
-        this.addEventListener('mousemove', this.onMouseMove.bind(this));
-        this.addEventListener('mouseover', this.onMouseOver.bind(this));
-        this.addEventListener('mouseout', this.onMouseOut.bind(this));
-
+        let eventListeners = this.getMouseEventListeners();
         if (this.options.scanning.touchInputEnabled) {
-            this.addEventListener('click', this.onClick.bind(this));
-            this.addEventListener('auxclick', this.onAuxClick.bind(this));
-            this.addEventListener('touchstart', this.onTouchStart.bind(this));
-            this.addEventListener('touchend', this.onTouchEnd.bind(this));
-            this.addEventListener('touchcancel', this.onTouchCancel.bind(this));
-            this.addEventListener('touchmove', this.onTouchMove.bind(this), {passive: false});
-            this.addEventListener('contextmenu', this.onContextMenu.bind(this));
+            eventListeners = eventListeners.concat(this.getTouchEventListeners());
+        }
+
+        for (const [node, type, listener, options] of eventListeners) {
+            this.addEventListener(node, type, listener, options);
         }
     }
 
-    addEventListener(type, listener, options) {
-        this.node.addEventListener(type, listener, options);
-        this.eventListeners.push([type, listener, options]);
+    getMouseEventListeners() {
+        return [
+            [this.node, 'mousedown', this.onMouseDown.bind(this)],
+            [this.node, 'mousemove', this.onMouseMove.bind(this)],
+            [this.node, 'mouseover', this.onMouseOver.bind(this)],
+            [this.node, 'mouseout', this.onMouseOut.bind(this)]
+        ];
+    }
+
+    getTouchEventListeners() {
+        return [
+            [this.node, 'click', this.onClick.bind(this)],
+            [this.node, 'auxclick', this.onAuxClick.bind(this)],
+            [this.node, 'touchstart', this.onTouchStart.bind(this)],
+            [this.node, 'touchend', this.onTouchEnd.bind(this)],
+            [this.node, 'touchcancel', this.onTouchCancel.bind(this)],
+            [this.node, 'touchmove', this.onTouchMove.bind(this), {passive: false}],
+            [this.node, 'contextmenu', this.onContextMenu.bind(this)]
+        ];
+    }
+
+    addEventListener(node, type, listener, options) {
+        node.addEventListener(type, listener, options);
+        this.eventListeners.push([node, type, listener, options]);
     }
 
     clearEventListeners() {
-        for (const [type, listener, options] of this.eventListeners) {
-            this.node.removeEventListener(type, listener, options);
+        for (const [node, type, listener, options] of this.eventListeners) {
+            node.removeEventListener(type, listener, options);
         }
         this.eventListeners = [];
     }
@@ -319,7 +303,15 @@ class TextScanner {
             }
 
             try {
-                await this.onTextSearch(textSource, cause);
+                this.pendingLookup = true;
+                const result = await this.onSearchSource(textSource, cause);
+                if (result !== null) {
+                    this.textSourceCurrent = textSource;
+                    if (this.options.scanning.selectText) {
+                        textSource.select();
+                    }
+                }
+                this.pendingLookup = false;
             } finally {
                 if (textSource !== null) {
                     textSource.cleanup();
@@ -347,7 +339,7 @@ class TextScanner {
         }
     }
 
-    searchClear() {
+    onSearchClear(_) {
         if (this.textSourceCurrent !== null) {
             if (this.options.scanning.selectText) {
                 this.textSourceCurrent.deselect();

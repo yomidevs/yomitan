@@ -17,26 +17,22 @@
  */
 
 
-class Frontend {
+class Frontend extends TextScanner {
     constructor(popup, ignoreNodes) {
-        this.popup = popup;
-        this.textScanner = new TextScanner(
+        super(
             window,
             ignoreNodes,
-            [this.popup.container],
+            [popup.container],
             [(x, y) => this.popup.containsPoint(x, y)]
         );
-        this.textScanner.subscribe('textSearch', ({textSource, cause}) => this.searchSource(textSource, cause));
-        this.textScanner.subscribe('searchClear', () => this.searchClear(true));
+
+        this.popup = popup;
         this.options = null;
 
         this.optionsContext = {
             depth: popup.depth,
             url: popup.url
         };
-
-        this.enabled = false;
-        this.eventListeners = [];
 
         this.isPreparedPromiseResolve = null;
         this.isPreparedPromise = new Promise((resolve) => { this.isPreparedPromiseResolve = resolve; });
@@ -70,7 +66,7 @@ class Frontend {
     }
 
     async onResize() {
-        const textSource = this.textScanner.getCurrentTextSource();
+        const textSource = this.textSourceCurrent;
         if (textSource !== null && await this.popup.isVisibleAsync()) {
             this.lastShowPromise = this.popup.showContent(
                 textSource.getRect(),
@@ -97,51 +93,21 @@ class Frontend {
         }
     }
 
-    onError(error) {
-        logError(error, false);
-    }
-
-    setEnabled(enabled) {
-        this.textScanner.setEnabled(enabled);
-        if (enabled) {
-            if (!this.enabled) {
-                this.hookEvents();
-                this.enabled = true;
-            }
-        } else {
-            if (this.enabled) {
-                this.clearEventListeners();
-                this.enabled = false;
-            }
-            this.searchClear(false);
-        }
-    }
-
-    hookEvents() {
-        this.addEventListener(window, 'message', this.onWindowMessage.bind(this));
-        this.addEventListener(window, 'resize', this.onResize.bind(this));
-    }
-
-    addEventListener(node, type, listener, options) {
-        node.addEventListener(type, listener, options);
-        this.eventListeners.push([node, type, listener, options]);
-    }
-
-    clearEventListeners() {
-        for (const [node, type, listener, options] of this.eventListeners) {
-            node.removeEventListener(type, listener, options);
-        }
-        this.eventListeners = [];
+    getMouseEventListeners() {
+        return [
+            ...super.getMouseEventListeners(),
+            [window, 'message', this.onWindowMessage.bind(this)],
+            [window, 'resize', this.onResize.bind(this)]
+        ];
     }
 
     async updateOptions() {
         this.options = await apiOptionsGet(this.getOptionsContext());
-        this.textScanner.setOptions(this.options);
         await this.popup.setOptions(this.options);
         this.setEnabled(this.options.general.enable);
     }
 
-    async searchSource(textSource, cause) {
+    async onSearchSource(textSource, cause) {
         let results = null;
 
         try {
@@ -169,7 +135,7 @@ class Frontend {
             }
         } finally {
             if (results === null && this.options.scanning.autoHideResults) {
-                this.searchClear(true);
+                this.onSearchClear(true);
             }
         }
 
@@ -188,7 +154,7 @@ class Frontend {
     }
 
     async findTerms(textSource) {
-        this.textScanner.setTextSourceScanLength(textSource, this.options.scanning.length);
+        this.setTextSourceScanLength(textSource, this.options.scanning.length);
 
         const searchText = textSource.text();
         if (searchText.length === 0) { return null; }
@@ -202,7 +168,7 @@ class Frontend {
     }
 
     async findKanji(textSource) {
-        this.textScanner.setTextSourceScanLength(textSource, 1);
+        this.setTextSourceScanLength(textSource, 1);
 
         const searchText = textSource.text();
         if (searchText.length === 0) { return null; }
@@ -213,10 +179,10 @@ class Frontend {
         return {definitions, type: 'kanji'};
     }
 
-    searchClear(changeFocus) {
+    onSearchClear(changeFocus) {
         this.popup.hide(changeFocus);
         this.popup.clearAutoPlayTimer();
-        this.textScanner.searchClear();
+        super.onSearchClear(changeFocus);
     }
 
     getOptionsContext() {
@@ -227,7 +193,7 @@ class Frontend {
 
 Frontend.windowMessageHandlers = {
     popupClose: (self) => {
-        self.searchClear(true);
+        self.onSearchClear(true);
     },
 
     selectionCopy: () => {
