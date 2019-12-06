@@ -224,10 +224,10 @@ class DisplaySearch extends Display {
                     sentence: {text: query, offset: 0},
                     url: window.location.href
                 });
-                this.setTitleText(query);
             } else {
                 this.container.textContent = '';
             }
+            this.setTitleText(query);
             window.parent.postMessage('popupClose', '*');
         } catch (e) {
             this.onError(e);
@@ -362,7 +362,12 @@ class DisplaySearch extends Display {
         if (text.length > 1000) {
             text = text.slice(0, 1000) + '...';
         }
-        document.title = `${text} - Yomichan Search`;
+
+        if (text.length === 0) {
+            document.title = 'Yomichan Search';
+        } else {
+            document.title = `${text} - Yomichan Search`;
+        }
     }
 
     static getSearchQueryFromLocation(url) {
