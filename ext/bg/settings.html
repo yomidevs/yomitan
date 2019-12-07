@@ -365,12 +365,12 @@
 
                 <div class="form-group options-advanced">
                     <label for="scan-delay">Scan delay <span class="label-light">(in milliseconds)</span></label>
-                    <input type="number" min="1" id="scan-delay" class="form-control">
+                    <input type="number" min="0" id="scan-delay" class="form-control">
                 </div>
 
                 <div class="form-group options-advanced">
                     <label for="scan-length">Scan length <span class="label-light">(in characters)</span></label>
-                    <input type="number" min="1" id="scan-length" class="form-control">
+                    <input type="number" min="1" step="1" id="scan-length" class="form-control">
                 </div>
 
                 <div class="form-group">
@@ -406,7 +406,7 @@
 
                 <div class="form-group">
                     <label for="popup-nesting-max-depth">Maximum number of additional popups</label>
-                    <input type="number" min="0" id="popup-nesting-max-depth" class="form-control">
+                    <input type="number" min="0" step="1" id="popup-nesting-max-depth" class="form-control">
                 </div>
             </div>
 
@@ -659,7 +659,7 @@
 
                     <div class="form-group options-advanced">
                         <label for="sentence-detection-extent">Sentence detection extent <span class="label-light">(in characters)</span></label>
-                        <input type="number" min="1" id="sentence-detection-extent" class="form-control">
+                        <input type="number" min="1" step="1" id="sentence-detection-extent" class="form-control">
                     </div>
 
                     <div class="form-group options-advanced">
