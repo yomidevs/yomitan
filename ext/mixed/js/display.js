@@ -211,14 +211,18 @@ class Display {
                 e.preventDefault();
             }
         } else if (e.shiftKey) {
-            const delta = -e.deltaX || e.deltaY;
-            if (delta > 0) {
-                this.sourceTermView();
-                e.preventDefault();
-            } else if (delta < 0) {
-                this.nextTermView();
-                e.preventDefault();
-            }
+            this.onHistoryWheel(e);
+        }
+    }
+
+    onHistoryWheel(e) {
+        const delta = -e.deltaX || e.deltaY;
+        if (delta > 0) {
+            this.sourceTermView();
+            e.preventDefault();
+        } else if (delta < 0) {
+            this.nextTermView();
+            e.preventDefault();
         }
     }
 
@@ -301,6 +305,7 @@ class Display {
             this.addEventListeners('.kanji-link', 'click', this.onKanjiLookup.bind(this));
             this.addEventListeners('.source-term', 'click', this.onSourceTermView.bind(this));
             this.addEventListeners('.next-term', 'click', this.onNextTermView.bind(this));
+            this.addEventListeners('.term-navigation', 'wheel', this.onHistoryWheel.bind(this), {passive: false});
             if (this.options.scanning.enablePopupSearch) {
                 this.addEventListeners('.glossary-item', 'mouseup', this.onGlossaryMouseUp.bind(this));
                 this.addEventListeners('.glossary-item', 'mousedown', this.onGlossaryMouseDown.bind(this));
