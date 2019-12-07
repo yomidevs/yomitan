@@ -17,28 +17,22 @@
  */
 
 
-class Frontend {
+class Frontend extends TextScanner {
     constructor(popup, ignoreNodes) {
+        super(
+            window,
+            ignoreNodes,
+            [popup.container],
+            [(x, y) => this.popup.containsPoint(x, y)]
+        );
+
         this.popup = popup;
-        this.popupTimerPromise = null;
-        this.textSourceCurrent = null;
-        this.pendingLookup = false;
         this.options = null;
-        this.ignoreNodes = (Array.isArray(ignoreNodes) && ignoreNodes.length > 0 ? ignoreNodes.join(',') : null);
 
         this.optionsContext = {
             depth: popup.depth,
             url: popup.url
         };
-
-        this.primaryTouchIdentifier = null;
-        this.preventNextContextMenu = false;
-        this.preventNextMouseDown = false;
-        this.preventNextClick = false;
-        this.preventScroll = false;
-
-        this.enabled = false;
-        this.eventListeners = [];
 
         this.isPreparedPromiseResolve = null;
         this.isPreparedPromise = new Promise((resolve) => { this.isPreparedPromiseResolve = resolve; });
@@ -71,162 +65,9 @@ class Frontend {
         return this.isPreparedPromise;
     }
 
-    onMouseOver(e) {
-        if (e.target === this.popup.container) {
-            this.popupTimerClear();
-        }
-    }
-
-    onMouseMove(e) {
-        this.popupTimerClear();
-
-        if (this.pendingLookup || DOM.isMouseButtonDown(e, 'primary')) {
-            return;
-        }
-
-        const scanningOptions = this.options.scanning;
-        const scanningModifier = scanningOptions.modifier;
-        if (!(
-            Frontend.isScanningModifierPressed(scanningModifier, e) ||
-            (scanningOptions.middleMouse && DOM.isMouseButtonDown(e, 'auxiliary'))
-        )) {
-            return;
-        }
-
-        const search = async () => {
-            if (scanningModifier === 'none') {
-                if (!await this.popupTimerWait()) {
-                    // Aborted
-                    return;
-                }
-            }
-
-            await this.searchAt(e.clientX, e.clientY, 'mouse');
-        };
-
-        search();
-    }
-
-    onMouseDown(e) {
-        if (this.preventNextMouseDown) {
-            this.preventNextMouseDown = false;
-            this.preventNextClick = true;
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-
-        if (e.button === 0) {
-            this.popupTimerClear();
-            this.searchClear(true);
-        }
-    }
-
-    onMouseOut() {
-        this.popupTimerClear();
-    }
-
-    onClick(e) {
-        if (this.preventNextClick) {
-            this.preventNextClick = false;
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-    }
-
-    onAuxClick() {
-        this.preventNextContextMenu = false;
-    }
-
-    onContextMenu(e) {
-        if (this.preventNextContextMenu) {
-            this.preventNextContextMenu = false;
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-    }
-
-    onTouchStart(e) {
-        if (this.primaryTouchIdentifier !== null || e.changedTouches.length === 0) {
-            return;
-        }
-
-        this.preventScroll = false;
-        this.preventNextContextMenu = false;
-        this.preventNextMouseDown = false;
-        this.preventNextClick = false;
-
-        const primaryTouch = e.changedTouches[0];
-        if (DOM.isPointInSelection(primaryTouch.clientX, primaryTouch.clientY, window.getSelection())) {
-            return;
-        }
-
-        this.primaryTouchIdentifier = primaryTouch.identifier;
-
-        if (this.pendingLookup) {
-            return;
-        }
-
-        const textSourceCurrentPrevious = this.textSourceCurrent !== null ? this.textSourceCurrent.clone() : null;
-
-        this.searchAt(primaryTouch.clientX, primaryTouch.clientY, 'touchStart')
-        .then(() => {
-            if (
-                this.textSourceCurrent === null ||
-                this.textSourceCurrent.equals(textSourceCurrentPrevious)
-            ) {
-                return;
-            }
-
-            this.preventScroll = true;
-            this.preventNextContextMenu = true;
-            this.preventNextMouseDown = true;
-        });
-    }
-
-    onTouchEnd(e) {
-        if (
-            this.primaryTouchIdentifier === null ||
-            this.getIndexOfTouch(e.changedTouches, this.primaryTouchIdentifier) < 0
-        ) {
-            return;
-        }
-
-        this.primaryTouchIdentifier = null;
-        this.preventScroll = false;
-        this.preventNextClick = false;
-        // Don't revert context menu and mouse down prevention,
-        // since these events can occur after the touch has ended.
-        // this.preventNextContextMenu = false;
-        // this.preventNextMouseDown = false;
-    }
-
-    onTouchCancel(e) {
-        this.onTouchEnd(e);
-    }
-
-    onTouchMove(e) {
-        if (!this.preventScroll || !e.cancelable || this.primaryTouchIdentifier === null) {
-            return;
-        }
-
-        const touches = e.changedTouches;
-        const index = this.getIndexOfTouch(touches, this.primaryTouchIdentifier);
-        if (index < 0) {
-            return;
-        }
-
-        const primaryTouch = touches[index];
-        this.searchAt(primaryTouch.clientX, primaryTouch.clientY, 'touchMove');
-
-        e.preventDefault(); // Disable scroll
-    }
-
     async onResize() {
-        if (this.textSourceCurrent !== null && await this.popup.isVisibleAsync()) {
-            const textSource = this.textSourceCurrent;
+        const textSource = this.textSourceCurrent;
+        if (textSource !== null && await this.popup.isVisibleAsync()) {
             this.lastShowPromise = this.popup.showContent(
                 textSource.getRect(),
                 textSource.getWritingMode()
@@ -252,112 +93,24 @@ class Frontend {
         }
     }
 
-    onError(error) {
-        logError(error, false);
-    }
-
-    setEnabled(enabled) {
-        if (enabled) {
-            if (!this.enabled) {
-                this.hookEvents();
-                this.enabled = true;
-            }
-        } else {
-            if (this.enabled) {
-                this.clearEventListeners();
-                this.enabled = false;
-            }
-            this.searchClear(false);
-        }
-    }
-
-    hookEvents() {
-        this.addEventListener(window, 'message', this.onWindowMessage.bind(this));
-        this.addEventListener(window, 'mousedown', this.onMouseDown.bind(this));
-        this.addEventListener(window, 'mousemove', this.onMouseMove.bind(this));
-        this.addEventListener(window, 'mouseover', this.onMouseOver.bind(this));
-        this.addEventListener(window, 'mouseout', this.onMouseOut.bind(this));
-        this.addEventListener(window, 'resize', this.onResize.bind(this));
-
-        if (this.options.scanning.touchInputEnabled) {
-            this.addEventListener(window, 'click', this.onClick.bind(this));
-            this.addEventListener(window, 'auxclick', this.onAuxClick.bind(this));
-            this.addEventListener(window, 'touchstart', this.onTouchStart.bind(this));
-            this.addEventListener(window, 'touchend', this.onTouchEnd.bind(this));
-            this.addEventListener(window, 'touchcancel', this.onTouchCancel.bind(this));
-            this.addEventListener(window, 'touchmove', this.onTouchMove.bind(this), {passive: false});
-            this.addEventListener(window, 'contextmenu', this.onContextMenu.bind(this));
-        }
-    }
-
-    addEventListener(node, type, listener, options) {
-        node.addEventListener(type, listener, options);
-        this.eventListeners.push([node, type, listener, options]);
-    }
-
-    clearEventListeners() {
-        for (const [node, type, listener, options] of this.eventListeners) {
-            node.removeEventListener(type, listener, options);
-        }
-        this.eventListeners = [];
+    getMouseEventListeners() {
+        return [
+            ...super.getMouseEventListeners(),
+            [window, 'message', this.onWindowMessage.bind(this)],
+            [window, 'resize', this.onResize.bind(this)]
+        ];
     }
 
     async updateOptions() {
         this.options = await apiOptionsGet(this.getOptionsContext());
-        this.setEnabled(this.options.general.enable);
         await this.popup.setOptions(this.options);
+        this.setEnabled(this.options.general.enable);
     }
 
-    async popupTimerWait() {
-        const delay = this.options.scanning.delay;
-        const promise = promiseTimeout(delay, true);
-        this.popupTimerPromise = promise;
-        try {
-            return await promise;
-        } finally {
-            if (this.popupTimerPromise === promise) {
-                this.popupTimerPromise = null;
-            }
-        }
-    }
-
-    popupTimerClear() {
-        if (this.popupTimerPromise !== null) {
-            this.popupTimerPromise.resolve(false);
-            this.popupTimerPromise = null;
-        }
-    }
-
-    async searchAt(x, y, cause) {
-        try {
-            this.popupTimerClear();
-
-            if (this.pendingLookup || await this.popup.containsPoint(x, y)) {
-                return;
-            }
-
-            const textSource = docRangeFromPoint(x, y, this.options);
-            if (this.textSourceCurrent !== null && this.textSourceCurrent.equals(textSource)) {
-                return;
-            }
-
-            try {
-                await this.searchSource(textSource, cause);
-            } finally {
-                if (textSource !== null) {
-                    textSource.cleanup();
-                }
-            }
-        } catch (e) {
-            this.onError(e);
-        }
-    }
-
-    async searchSource(textSource, cause) {
+    async onSearchSource(textSource, cause) {
         let results = null;
 
         try {
-            this.pendingLookup = true;
             if (textSource !== null) {
                 results = (
                     await this.findTerms(textSource) ||
@@ -382,10 +135,8 @@ class Frontend {
             }
         } finally {
             if (results === null && this.options.scanning.autoHideResults) {
-                this.searchClear(true);
+                this.onSearchClear(true);
             }
-
-            this.pendingLookup = false;
         }
 
         return results;
@@ -400,11 +151,6 @@ class Frontend {
             type,
             {definitions, context: {sentence, url, focus, disableHistory: true}}
         );
-
-        this.textSourceCurrent = textSource;
-        if (this.options.scanning.selectText) {
-            textSource.select();
-        }
     }
 
     async findTerms(textSource) {
@@ -433,65 +179,21 @@ class Frontend {
         return {definitions, type: 'kanji'};
     }
 
-    searchClear(changeFocus) {
+    onSearchClear(changeFocus) {
         this.popup.hide(changeFocus);
         this.popup.clearAutoPlayTimer();
-
-        if (this.textSourceCurrent !== null) {
-            if (this.options.scanning.selectText) {
-                this.textSourceCurrent.deselect();
-            }
-
-            this.textSourceCurrent = null;
-        }
-    }
-
-    getIndexOfTouch(touchList, identifier) {
-        for (const i in touchList) {
-            const t = touchList[i];
-            if (t.identifier === identifier) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    setTextSourceScanLength(textSource, length) {
-        textSource.setEndOffset(length);
-        if (this.ignoreNodes === null || !textSource.range) {
-            return;
-        }
-
-        length = textSource.text().length;
-        while (textSource.range && length > 0) {
-            const nodes = TextSourceRange.getNodesInRange(textSource.range);
-            if (!TextSourceRange.anyNodeMatchesSelector(nodes, this.ignoreNodes)) {
-                break;
-            }
-            --length;
-            textSource.setEndOffset(length);
-        }
+        super.onSearchClear(changeFocus);
     }
 
     getOptionsContext() {
         this.optionsContext.url = this.popup.url;
         return this.optionsContext;
     }
-
-    static isScanningModifierPressed(scanningModifier, mouseEvent) {
-        switch (scanningModifier) {
-            case 'alt': return mouseEvent.altKey;
-            case 'ctrl': return mouseEvent.ctrlKey;
-            case 'shift': return mouseEvent.shiftKey;
-            case 'none': return true;
-            default: return false;
-        }
-    }
 }
 
 Frontend.windowMessageHandlers = {
     popupClose: (self) => {
-        self.searchClear(true);
+        self.onSearchClear(true);
     },
 
     selectionCopy: () => {

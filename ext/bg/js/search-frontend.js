@@ -33,6 +33,7 @@ async function searchFrontendSetup() {
     window.frontendInitializationData = {depth: 1, ignoreNodes, proxy: false};
 
     const scriptSrcs = [
+        '/mixed/js/text-scanner.js',
         '/fg/js/frontend-api-receiver.js',
         '/fg/js/popup.js',
         '/fg/js/popup-proxy-host.js',
