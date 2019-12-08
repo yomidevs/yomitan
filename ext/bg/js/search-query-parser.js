@@ -148,10 +148,9 @@ class QueryParser {
 
     async setPreview(text) {
         const previewTerms = [];
-        while (text.length > 0) {
-            const tempText = text.slice(0, 2);
-            previewTerms.push([{text: Array.from(tempText)}]);
-            text = text.slice(2);
+        for (let i = 0, ii = text.length; i < ii; i += 2) {
+            const tempText = text.substring(i, i + 2);
+            previewTerms.push([{text: tempText.split('')}]);
         }
         this.queryParser.innerHTML = await apiTemplateRender('query-parser.html', {
             terms: previewTerms,

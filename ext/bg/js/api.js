@@ -87,7 +87,7 @@ async function apiTextParse(text, optionsContext) {
     while (text.length > 0) {
         const term = [];
         const [definitions, sourceLength] = await translator.findTermsInternal(
-            text.slice(0, options.scanning.length),
+            text.substring(0, options.scanning.length),
             dictEnabledSet(options),
             options.scanning.alphanumeric,
             {}
@@ -95,16 +95,16 @@ async function apiTextParse(text, optionsContext) {
         if (definitions.length > 0) {
             dictTermsSort(definitions);
             const {expression, reading} = definitions[0];
-            const source = text.slice(0, sourceLength);
+            const source = text.substring(0, sourceLength);
             for (const {text, furigana} of jpDistributeFuriganaInflected(expression, reading, source)) {
                 const reading = jpConvertReading(text, furigana, options.parsing.readingMode);
                 term.push({text, reading});
             }
-            text = text.slice(source.length);
+            text = text.substring(source.length);
         } else {
             const reading = jpConvertReading(text[0], null, options.parsing.readingMode);
             term.push({text: text[0], reading});
-            text = text.slice(1);
+            text = text.substring(1);
         }
         results.push(term);
     }

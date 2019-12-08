@@ -160,16 +160,17 @@ function jpDistributeFuriganaInflected(expression, reading, source) {
     }
     const offset = source.length - stemLength;
 
-    const stemExpression = source.slice(0, source.length - offset);
-    const stemReading = reading.slice(
-        0, offset === 0 ? reading.length : reading.length - expression.length + stemLength
+    const stemExpression = source.substring(0, source.length - offset);
+    const stemReading = reading.substring(
+        0,
+        offset === 0 ? reading.length : reading.length - expression.length + stemLength
     );
     for (const segment of jpDistributeFurigana(stemExpression, stemReading)) {
         output.push(segment);
     }
 
     if (stemLength !== source.length) {
-        output.push({text: source.slice(stemLength)});
+        output.push({text: source.substring(stemLength)});
     }
 
     return output;
