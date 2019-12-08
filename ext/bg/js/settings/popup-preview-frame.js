@@ -160,7 +160,7 @@ class SettingsPopupPreview {
         const source = new TextSourceRange(range, range.toString(), null);
 
         try {
-            await this.frontend.searchSource(source, 'script');
+            await this.frontend.onSearchSource(source, 'script');
         } finally {
             source.cleanup();
         }
