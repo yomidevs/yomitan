@@ -217,7 +217,7 @@ class QueryParser {
         return result.map((term) => {
             return term.filter((part) => part.text.trim()).map((part) => {
                 return {
-                    text: Array.from(part.text),
+                    text: part.text.split(''),
                     reading: part.reading,
                     raw: !part.reading || !part.reading.trim()
                 };
