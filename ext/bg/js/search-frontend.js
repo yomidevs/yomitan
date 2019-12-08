@@ -41,6 +41,9 @@ async function searchFrontendSetup() {
         '/fg/js/frontend-initialize.js'
     ];
     for (const src of scriptSrcs) {
+        const node = document.querySelector(`script[src='${src}']`);
+        if (node !== null) { continue; }
+
         const script = document.createElement('script');
         script.async = false;
         script.src = src;
