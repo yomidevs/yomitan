@@ -16,8 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function utilIsolate(data) {
-    return JSON.parse(JSON.stringify(data));
+function utilIsolate(value) {
+    if (value === null) { return null; }
+
+    switch (typeof value) {
+        case 'boolean':
+        case 'number':
+        case 'string':
+        case 'bigint':
+        case 'symbol':
+            return value;
+    }
+
+    const stringValue = JSON.stringify(value);
+    return typeof stringValue === 'string' ? JSON.parse(stringValue) : null;
 }
 
 function utilBackgroundIsolate(data) {
