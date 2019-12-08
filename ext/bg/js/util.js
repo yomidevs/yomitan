@@ -106,13 +106,13 @@ function utilDatabaseDeleteDictionary(dictionaryName, onProgress) {
     return utilBackend().translator.database.deleteDictionary(dictionaryName, onProgress);
 }
 
-async function utilDatabaseImport(data, progress, exceptions, details) {
+async function utilDatabaseImport(data, progress, details) {
     // Edge cannot read data on the background page due to the File object
     // being created from a different window. Read on the same page instead.
     if (EXTENSION_IS_BROWSER_EDGE) {
         data = await utilReadFile(data);
     }
-    return utilBackend().translator.database.importDictionary(data, progress, exceptions, details);
+    return utilBackend().translator.database.importDictionary(data, progress, details);
 }
 
 function utilReadFile(file) {

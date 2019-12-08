@@ -577,7 +577,6 @@ async function onDictionaryImport(e) {
             }
         };
 
-        const exceptions = [];
         const files = [...e.target.files];
 
         const optionsFull = await apiOptionsGetFull();
@@ -593,21 +592,22 @@ async function onDictionaryImport(e) {
                 dictImportInfo.textContent = `(${i + 1} of ${ii})`;
             }
 
-            const summary = await utilDatabaseImport(files[i], updateProgress, exceptions, importDetails);
+            const {result, errors} = await utilDatabaseImport(files[i], updateProgress, importDetails);
             for (const options of toIterable(await getOptionsArray())) {
                 const dictionaryOptions = SettingsDictionaryListUI.createDictionaryOptions();
                 dictionaryOptions.enabled = true;
-                options.dictionaries[summary.title] = dictionaryOptions;
-                if (summary.sequenced && options.general.mainDictionary === '') {
-                    options.general.mainDictionary = summary.title;
+                options.dictionaries[result.title] = dictionaryOptions;
+                if (result.sequenced && options.general.mainDictionary === '') {
+                    options.general.mainDictionary = result.title;
                 }
             }
 
             await settingsSaveOptions();
 
-            if (exceptions.length > 0) {
-                exceptions.push(`Dictionary may not have been imported properly: ${exceptions.length} error${exceptions.length === 1 ? '' : 's'} reported.`);
-                dictionaryErrorsShow(exceptions);
+            if (errors.length > 0) {
+                errors.push(...errors);
+                errors.push(`Dictionary may not have been imported properly: ${errors.length} error${errors.length === 1 ? '' : 's'} reported.`);
+                dictionaryErrorsShow(errors);
             }
 
             const optionsContext = getOptionsContext();

@@ -332,9 +332,10 @@ class Database {
         return result;
     }
 
-    async importDictionary(archive, progressCallback, exceptions, details) {
+    async importDictionary(archive, progressCallback, details) {
         this.validate();
 
+        const errors = [];
         const prefixWildcardsSupported = details.prefixWildcardsSupported;
 
         const maxTransactionLength = 1000;
@@ -351,11 +352,7 @@ class Database {
                     const objectStore = transaction.objectStore(objectStoreName);
                     await Database.bulkAdd(objectStore, items, i, count);
                 } catch (e) {
-                    if (exceptions) {
-                        exceptions.push(e);
-                    } else {
-                        throw e;
-                    }
+                    errors.push(e);
                 }
             }
         };
@@ -496,7 +493,7 @@ class Database {
             await bulkAdd('tagMeta', rows, total, current);
         };
 
-        return await Database.importDictionaryZip(
+        const result = await Database.importDictionaryZip(
             archive,
             indexDataLoaded,
             termDataLoaded,
@@ -506,6 +503,8 @@ class Database {
             tagDataLoaded,
             details
         );
+
+        return {result, errors};
     }
 
     validate() {
