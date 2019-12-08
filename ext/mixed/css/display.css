@@ -79,6 +79,7 @@ ol, ul {
 .term-navigation {
     position: fixed;
     top: 0px;
+    right: 0px;
 }
 
 .term-button-fade {
