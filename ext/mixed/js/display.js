@@ -227,12 +227,12 @@ class Display {
     }
 
     onRuntimeMessage({action, params}, sender, callback) {
-        const handlers = Display.runtimeMessageHandlers;
-        if (hasOwn(handlers, action)) {
-            const handler = handlers[action];
-            const result = handler(this, params);
-            callback(result);
-        }
+        const handler = Display._runtimeMessageHandlers.get(action);
+        if (typeof handler !== 'function') { return false; }
+
+        const result = handler(this, params, sender);
+        callback(result);
+        return false;
     }
 
     getOptionsContext() {
@@ -880,6 +880,6 @@ Display.onKeyDownHandlers = {
     }
 };
 
-Display.runtimeMessageHandlers = {
-    optionsUpdate: (self) => self.updateOptions(null)
-};
+Display._runtimeMessageHandlers = new Map([
+    ['optionsUpdate', (self) => self.updateOptions(null)]
+]);
