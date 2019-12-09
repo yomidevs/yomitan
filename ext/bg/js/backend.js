@@ -72,17 +72,20 @@ class Backend {
     }
 
     onMessage({action, params}, sender, callback) {
-        const handlers = Backend.messageHandlers;
-        if (hasOwn(handlers, action)) {
-            const handler = handlers[action];
-            const promise = handler(params, sender);
+        const handler = Backend._messageHandlers.get(action);
+        if (typeof handler !== 'function') { return false; }
+
+        try {
+            const promise = handler(this, params, sender);
             promise.then(
                 (result) => callback({result}),
                 (error) => callback({error: errorToJson(error)})
             );
+            return true;
+        } catch (error) {
+            callback({error: errorToJson(error)});
+            return false;
         }
-
-        return true;
     }
 
     applyOptions() {
@@ -180,28 +183,102 @@ class Backend {
     checkLastError() {
         // NOP
     }
+
+    // Message handlers
+
+    _onApiOptionsGet({optionsContext}) {
+        return apiOptionsGet(optionsContext);
+    }
+
+    _onApiOptionsSet({changedOptions, optionsContext, source}) {
+        return apiOptionsSet(changedOptions, optionsContext, source);
+    }
+
+    _onApiKanjiFind({text, optionsContext}) {
+        return apiKanjiFind(text, optionsContext);
+    }
+
+    _onApiTermsFind({text, details, optionsContext}) {
+        return apiTermsFind(text, details, optionsContext);
+    }
+
+    _onApiTextParse({text, optionsContext}) {
+        return apiTextParse(text, optionsContext);
+    }
+
+    _onApiTextParseMecab({text, optionsContext}) {
+        return apiTextParseMecab(text, optionsContext);
+    }
+
+    _onApiDefinitionAdd({definition, mode, context, optionsContext}) {
+        return apiDefinitionAdd(definition, mode, context, optionsContext);
+    }
+
+    _onApiDefinitionsAddable({definitions, modes, optionsContext}) {
+        return apiDefinitionsAddable(definitions, modes, optionsContext);
+    }
+
+    _onApiNoteView({noteId}) {
+        return apiNoteView(noteId);
+    }
+
+    _onApiTemplateRender({template, data, dynamic}) {
+        return apiTemplateRender(template, data, dynamic);
+    }
+
+    _onApiCommandExec({command, params}) {
+        return apiCommandExec(command, params);
+    }
+
+    _onApiAudioGetUrl({definition, source, optionsContext}) {
+        return apiAudioGetUrl(definition, source, optionsContext);
+    }
+
+    _onApiScreenshotGet({options}, sender) {
+        return apiScreenshotGet(options, sender);
+    }
+
+    _onApiForward({action, params}, sender) {
+        return apiForward(action, params, sender);
+    }
+
+    _onApiFrameInformationGet(params, sender) {
+        return apiFrameInformationGet(sender);
+    }
+
+    _onApiInjectStylesheet({css}, sender) {
+        return apiInjectStylesheet(css, sender);
+    }
+
+    _onApiGetEnvironmentInfo() {
+        return apiGetEnvironmentInfo();
+    }
+
+    _onApiClipboardGet() {
+        return apiClipboardGet();
+    }
 }
 
-Backend.messageHandlers = {
-    optionsGet: ({optionsContext}) => apiOptionsGet(optionsContext),
-    optionsSet: ({changedOptions, optionsContext, source}) => apiOptionsSet(changedOptions, optionsContext, source),
-    kanjiFind: ({text, optionsContext}) => apiKanjiFind(text, optionsContext),
-    termsFind: ({text, details, optionsContext}) => apiTermsFind(text, details, optionsContext),
-    textParse: ({text, optionsContext}) => apiTextParse(text, optionsContext),
-    textParseMecab: ({text, optionsContext}) => apiTextParseMecab(text, optionsContext),
-    definitionAdd: ({definition, mode, context, optionsContext}) => apiDefinitionAdd(definition, mode, context, optionsContext),
-    definitionsAddable: ({definitions, modes, optionsContext}) => apiDefinitionsAddable(definitions, modes, optionsContext),
-    noteView: ({noteId}) => apiNoteView(noteId),
-    templateRender: ({template, data, dynamic}) => apiTemplateRender(template, data, dynamic),
-    commandExec: ({command, params}) => apiCommandExec(command, params),
-    audioGetUrl: ({definition, source, optionsContext}) => apiAudioGetUrl(definition, source, optionsContext),
-    screenshotGet: ({options}, sender) => apiScreenshotGet(options, sender),
-    forward: ({action, params}, sender) => apiForward(action, params, sender),
-    frameInformationGet: (params, sender) => apiFrameInformationGet(sender),
-    injectStylesheet: ({css}, sender) => apiInjectStylesheet(css, sender),
-    getEnvironmentInfo: () => apiGetEnvironmentInfo(),
-    clipboardGet: () => apiClipboardGet()
-};
+Backend._messageHandlers = new Map([
+    ['optionsGet', (self, ...args) => self._onApiOptionsGet(...args)],
+    ['optionsSet', (self, ...args) => self._onApiOptionsSet(...args)],
+    ['kanjiFind', (self, ...args) => self._onApiKanjiFind(...args)],
+    ['termsFind', (self, ...args) => self._onApiTermsFind(...args)],
+    ['textParse', (self, ...args) => self._onApiTextParse(...args)],
+    ['textParseMecab', (self, ...args) => self._onApiTextParseMecab(...args)],
+    ['definitionAdd', (self, ...args) => self._onApiDefinitionAdd(...args)],
+    ['definitionsAddable', (self, ...args) => self._onApiDefinitionsAddable(...args)],
+    ['noteView', (self, ...args) => self._onApiNoteView(...args)],
+    ['templateRender', (self, ...args) => self._onApiTemplateRender(...args)],
+    ['commandExec', (self, ...args) => self._onApiCommandExec(...args)],
+    ['audioGetUrl', (self, ...args) => self._onApiAudioGetUrl(...args)],
+    ['screenshotGet', (self, ...args) => self._onApiScreenshotGet(...args)],
+    ['forward', (self, ...args) => self._onApiForward(...args)],
+    ['frameInformationGet', (self, ...args) => self._onApiFrameInformationGet(...args)],
+    ['injectStylesheet', (self, ...args) => self._onApiInjectStylesheet(...args)],
+    ['getEnvironmentInfo', (self, ...args) => self._onApiGetEnvironmentInfo(...args)],
+    ['clipboardGet', (self, ...args) => self._onApiClipboardGet(...args)]
+]);
 
 window.yomichan_backend = new Backend();
 window.yomichan_backend.prepare();
