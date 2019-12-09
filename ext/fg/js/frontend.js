@@ -77,20 +77,19 @@ class Frontend extends TextScanner {
 
     onWindowMessage(e) {
         const action = e.data;
-        const handlers = Frontend.windowMessageHandlers;
-        if (hasOwn(handlers, action)) {
-            const handler = handlers[action];
-            handler(this);
-        }
+        const handler = Frontend._windowMessageHandlers.get(action);
+        if (typeof handler !== 'function') { return false; }
+
+        handler(this);
     }
 
     onRuntimeMessage({action, params}, sender, callback) {
-        const handlers = Frontend.runtimeMessageHandlers;
-        if (hasOwn(handlers, action)) {
-            const handler = handlers[action];
-            const result = handler(this, params);
-            callback(result);
-        }
+        const handler = Frontend._runtimeMessageHandlers.get(action);
+        if (typeof handler !== 'function') { return false; }
+
+        const result = handler(this, params, sender);
+        callback(result);
+        return false;
     }
 
     getMouseEventListeners() {
@@ -195,26 +194,13 @@ class Frontend extends TextScanner {
     }
 }
 
-Frontend.windowMessageHandlers = {
-    popupClose: (self) => {
-        self.onSearchClear(true);
-    },
+Frontend._windowMessageHandlers = new Map([
+    ['popupClose', (self) => self.onSearchClear(true)],
+    ['selectionCopy', () => document.execCommand('copy')]
+]);
 
-    selectionCopy: () => {
-        document.execCommand('copy');
-    }
-};
-
-Frontend.runtimeMessageHandlers = {
-    optionsUpdate: (self) => {
-        self.updateOptions();
-    },
-
-    popupSetVisibleOverride: (self, {visible}) => {
-        self.popup.setVisibleOverride(visible);
-    },
-
-    getUrl: () => {
-        return {url: window.location.href};
-    }
-};
+Frontend._runtimeMessageHandlers = new Map([
+    ['optionsUpdate', (self) => self.updateOptions()],
+    ['popupSetVisibleOverride', (self, {visible}) => self.popup.setVisibleOverride(visible)],
+    ['getUrl', () => ({url: window.location.href})]
+]);
