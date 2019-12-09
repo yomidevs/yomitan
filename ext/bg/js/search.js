@@ -238,17 +238,6 @@ class DisplaySearch extends Display {
         }
     }
 
-    onRuntimeMessage({action, params}, sender, callback) {
-        const handlers = DisplaySearch.runtimeMessageHandlers;
-        if (hasOwn(handlers, action)) {
-            const handler = handlers[action];
-            const result = handler(this, params);
-            callback(result);
-        } else {
-            return super.onRuntimeMessage({action, params}, sender, callback);
-        }
-    }
-
     initClipboardMonitor() {
         // ignore copy from search page
         window.addEventListener('copy', () => {
@@ -379,12 +368,6 @@ class DisplaySearch extends Display {
         return match !== null ? decodeURIComponent(match[1]) : null;
     }
 }
-
-DisplaySearch.runtimeMessageHandlers = {
-    getUrl: () => {
-        return {url: window.location.href};
-    }
-};
 
 DisplaySearch.onKeyDownIgnoreKeys = {
     'ANY_MOD': [

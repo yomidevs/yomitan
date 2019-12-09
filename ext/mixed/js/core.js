@@ -225,3 +225,21 @@ class EventDispatcher {
         return false;
     }
 }
+
+
+/*
+ * Default message handlers
+ */
+
+(() => {
+    function onMessage({action}, sender, callback) {
+        switch (action) {
+            case 'getUrl':
+                callback({url: window.location.href});
+                break;
+        }
+        return false;
+    }
+
+    chrome.runtime.onMessage.addListener(onMessage);
+})();
