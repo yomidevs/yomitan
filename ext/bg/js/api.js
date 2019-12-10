@@ -105,11 +105,8 @@ async function apiTextParseMecab(text, optionsContext) {
     return results;
 }
 
-async function apiKanjiFind(text, optionsContext) {
-    const options = await apiOptionsGet(optionsContext);
-    const definitions = await utilBackend().translator.findKanji(text, options);
-    definitions.splice(options.general.maxResults);
-    return definitions;
+function apiKanjiFind(text, optionsContext) {
+    return utilBackend()._onApiKanjiFind({text, optionsContext});
 }
 
 async function apiDefinitionAdd(definition, mode, context, optionsContext) {

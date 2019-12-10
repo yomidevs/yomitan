@@ -240,8 +240,11 @@ class Backend {
         this.onOptionsUpdated(source);
     }
 
-    _onApiKanjiFind({text, optionsContext}) {
-        return apiKanjiFind(text, optionsContext);
+    async _onApiKanjiFind({text, optionsContext}) {
+        const options = await this.getOptions(optionsContext);
+        const definitions = await this.translator.findKanji(text, options);
+        definitions.splice(options.general.maxResults);
+        return definitions;
     }
 
     _onApiTermsFind({text, details, optionsContext}) {
