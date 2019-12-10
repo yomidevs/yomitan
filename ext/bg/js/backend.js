@@ -191,7 +191,7 @@ class Backend {
     }
 
     _onApiOptionsGetFull() {
-        return apiOptionsGetFull();
+        return this.getFullOptions();
     }
 
     _onApiOptionsSet({changedOptions, optionsContext, source}) {

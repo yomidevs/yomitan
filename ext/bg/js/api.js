@@ -62,7 +62,7 @@ async function apiOptionsSet(changedOptions, optionsContext, source) {
 }
 
 function apiOptionsGetFull() {
-    return utilBackend().getFullOptions();
+    return utilBackend()._onApiOptionsGetFull();
 }
 
 async function apiOptionsSave(source) {
