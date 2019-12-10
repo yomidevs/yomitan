@@ -86,32 +86,7 @@ function apiFrameInformationGet(sender) {
 }
 
 function apiInjectStylesheet(css, sender) {
-    if (!sender.tab) {
-        return Promise.reject(new Error('Invalid tab'));
-    }
-
-    const tabId = sender.tab.id;
-    const frameId = sender.frameId;
-    const details = {
-        code: css,
-        runAt: 'document_start',
-        cssOrigin: 'user',
-        allFrames: false
-    };
-    if (typeof frameId === 'number') {
-        details.frameId = frameId;
-    }
-
-    return new Promise((resolve, reject) => {
-        chrome.tabs.insertCSS(tabId, details, () => {
-            const e = chrome.runtime.lastError;
-            if (e) {
-                reject(new Error(e.message));
-            } else {
-                resolve();
-            }
-        });
-    });
+    return utilBackend()._onApiInjectStylesheet({css}, sender);
 }
 
 async function apiGetEnvironmentInfo() {
