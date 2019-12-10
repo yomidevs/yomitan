@@ -69,8 +69,8 @@ function apiCommandExec(command, params) {
     return utilBackend()._onApiCommandExec({command, params});
 }
 
-async function apiAudioGetUrl(definition, source, optionsContext) {
-    return audioGetUrl(definition, source, optionsContext);
+function apiAudioGetUrl(definition, source, optionsContext) {
+    return utilBackend()._onApiAudioGetUrl({definition, source, optionsContext});
 }
 
 function apiScreenshotGet(options, sender) {

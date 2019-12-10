@@ -404,8 +404,8 @@ class Backend {
         handler(this, params);
     }
 
-    _onApiAudioGetUrl({definition, source, optionsContext}) {
-        return apiAudioGetUrl(definition, source, optionsContext);
+    async _onApiAudioGetUrl({definition, source, optionsContext}) {
+        return audioGetUrl(definition, source, optionsContext);
     }
 
     _onApiScreenshotGet({options}, sender) {
