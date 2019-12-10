@@ -29,11 +29,8 @@ function apiOptionsGetFull() {
     return utilBackend()._onApiOptionsGetFull();
 }
 
-async function apiOptionsSave(source) {
-    const backend = utilBackend();
-    const options = await apiOptionsGetFull();
-    await optionsSave(options);
-    backend.onOptionsUpdated(source);
+function apiOptionsSave(source) {
+    return utilBackend()._onApiOptionsSave({source});
 }
 
 async function apiTermsFind(text, details, optionsContext) {

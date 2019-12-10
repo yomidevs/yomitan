@@ -234,8 +234,10 @@ class Backend {
         await this._optionsSave({source});
     }
 
-    _onApiOptionsSave({source}) {
-        return apiOptionsSave(source);
+    async _onApiOptionsSave({source}) {
+        const options = await this.getFullOptions();
+        await optionsSave(options);
+        this.onOptionsUpdated(source);
     }
 
     _onApiKanjiFind({text, optionsContext}) {
