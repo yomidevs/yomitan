@@ -74,14 +74,7 @@ function apiAudioGetUrl(definition, source, optionsContext) {
 }
 
 function apiScreenshotGet(options, sender) {
-    if (!(sender && sender.tab)) {
-        return Promise.resolve();
-    }
-
-    const windowId = sender.tab.windowId;
-    return new Promise((resolve) => {
-        chrome.tabs.captureVisibleTab(windowId, options, (dataUrl) => resolve(dataUrl));
-    });
+    return utilBackend()._onApiScreenshotGet({options}, sender);
 }
 
 function apiForward(action, params, sender) {

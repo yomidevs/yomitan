@@ -409,7 +409,14 @@ class Backend {
     }
 
     _onApiScreenshotGet({options}, sender) {
-        return apiScreenshotGet(options, sender);
+        if (!(sender && sender.tab)) {
+            return Promise.resolve();
+        }
+
+        const windowId = sender.tab.windowId;
+        return new Promise((resolve) => {
+            chrome.tabs.captureVisibleTab(windowId, options, (dataUrl) => resolve(dataUrl));
+        });
     }
 
     _onApiForward({action, params}, sender) {
