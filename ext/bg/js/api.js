@@ -49,28 +49,8 @@ function apiKanjiFind(text, optionsContext) {
     return utilBackend()._onApiKanjiFind({text, optionsContext});
 }
 
-async function apiDefinitionAdd(definition, mode, context, optionsContext) {
-    const options = await apiOptionsGet(optionsContext);
-
-    if (mode !== 'kanji') {
-        await audioInject(
-            definition,
-            options.anki.terms.fields,
-            options.audio.sources,
-            optionsContext
-        );
-    }
-
-    if (context && context.screenshot) {
-        await _apiInjectScreenshot(
-            definition,
-            options.anki.terms.fields,
-            context.screenshot
-        );
-    }
-
-    const note = await dictNoteFormat(definition, mode, options);
-    return utilBackend().anki.addNote(note);
+function apiDefinitionAdd(definition, mode, context, optionsContext) {
+    return utilBackend()._onApiDefinitionAdd({definition, mode, context, optionsContext});
 }
 
 async function apiDefinitionsAddable(definitions, modes, optionsContext) {
@@ -187,42 +167,6 @@ apiCommandExec.handlers = {
 
 async function apiAudioGetUrl(definition, source, optionsContext) {
     return audioGetUrl(definition, source, optionsContext);
-}
-
-async function _apiInjectScreenshot(definition, fields, screenshot) {
-    let usesScreenshot = false;
-    for (const name in fields) {
-        if (fields[name].includes('{screenshot}')) {
-            usesScreenshot = true;
-            break;
-        }
-    }
-
-    if (!usesScreenshot) {
-        return;
-    }
-
-    const dateToString = (date) => {
-        const year = date.getUTCFullYear();
-        const month = date.getUTCMonth().toString().padStart(2, '0');
-        const day = date.getUTCDate().toString().padStart(2, '0');
-        const hours = date.getUTCHours().toString().padStart(2, '0');
-        const minutes = date.getUTCMinutes().toString().padStart(2, '0');
-        const seconds = date.getUTCSeconds().toString().padStart(2, '0');
-        return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
-    };
-
-    const now = new Date(Date.now());
-    const filename = `yomichan_browser_screenshot_${definition.reading}_${dateToString(now)}.${screenshot.format}`;
-    const data = screenshot.dataUrl.replace(/^data:[\w\W]*?,/, '');
-
-    try {
-        await utilBackend().anki.storeMediaFile(filename, data);
-    } catch (e) {
-        return;
-    }
-
-    definition.screenshotFileName = filename;
 }
 
 function apiScreenshotGet(options, sender) {
