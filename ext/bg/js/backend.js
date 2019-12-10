@@ -190,8 +190,16 @@ class Backend {
         return apiOptionsGet(optionsContext);
     }
 
+    _onApiOptionsGetFull() {
+        return apiOptionsGetFull();
+    }
+
     _onApiOptionsSet({changedOptions, optionsContext, source}) {
         return apiOptionsSet(changedOptions, optionsContext, source);
+    }
+
+    _onApiOptionsSave({source}) {
+        return apiOptionsSave(source);
     }
 
     _onApiKanjiFind({text, optionsContext}) {
@@ -261,7 +269,9 @@ class Backend {
 
 Backend._messageHandlers = new Map([
     ['optionsGet', (self, ...args) => self._onApiOptionsGet(...args)],
+    ['optionsGetFull', (self, ...args) => self._onApiOptionsGetFull(...args)],
     ['optionsSet', (self, ...args) => self._onApiOptionsSet(...args)],
+    ['optionsSave', (self, ...args) => self._onApiOptionsSave(...args)],
     ['kanjiFind', (self, ...args) => self._onApiKanjiFind(...args)],
     ['termsFind', (self, ...args) => self._onApiTermsFind(...args)],
     ['textParse', (self, ...args) => self._onApiTextParse(...args)],
