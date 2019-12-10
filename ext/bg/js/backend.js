@@ -397,8 +397,11 @@ class Backend {
         );
     }
 
-    _onApiCommandExec({command, params}) {
-        return apiCommandExec(command, params);
+    async _onApiCommandExec({command, params}) {
+        const handler = Backend._commandHandlers.get(command);
+        if (typeof handler !== 'function') { return false; }
+
+        handler(this, params);
     }
 
     _onApiAudioGetUrl({definition, source, optionsContext}) {
@@ -427,6 +430,54 @@ class Backend {
 
     _onApiClipboardGet() {
         return apiClipboardGet();
+    }
+
+    // Command handlers
+
+    async _onCommandSearch(params) {
+        const url = chrome.runtime.getURL('/bg/search.html');
+        if (!(params && params.newTab)) {
+            try {
+                const tab = await Backend._findTab(1000, (url2) => (
+                    url2 !== null &&
+                    url2.startsWith(url) &&
+                    (url2.length === url.length || url2[url.length] === '?' || url2[url.length] === '#')
+                ));
+                if (tab !== null) {
+                    await Backend._focusTab(tab);
+                    return;
+                }
+            } catch (e) {
+                // NOP
+            }
+        }
+        chrome.tabs.create({url});
+    }
+
+    _onCommandHelp() {
+        chrome.tabs.create({url: 'https://foosoft.net/projects/yomichan/'});
+    }
+
+    _onCommandOptions(params) {
+        if (!(params && params.newTab)) {
+            chrome.runtime.openOptionsPage();
+        } else {
+            const manifest = chrome.runtime.getManifest();
+            const url = chrome.runtime.getURL(manifest.options_ui.page);
+            chrome.tabs.create({url});
+        }
+    }
+
+    async _onCommandToggle() {
+        const optionsContext = {
+            depth: 0,
+            url: window.location.href
+        };
+        const source = 'popup';
+
+        const options = await this.getOptions(optionsContext);
+        options.general.enable = !options.general.enable;
+        await this._optionsSave({source});
     }
 
     // Utilities
@@ -466,6 +517,87 @@ class Backend {
 
         definition.screenshotFileName = filename;
     }
+
+    static _getTabUrl(tab) {
+        return new Promise((resolve) => {
+            chrome.tabs.sendMessage(tab.id, {action: 'getUrl'}, {frameId: 0}, (response) => {
+                let url = null;
+                if (!chrome.runtime.lastError) {
+                    url = (response !== null && typeof response === 'object' && !Array.isArray(response) ? response.url : null);
+                    if (url !== null && typeof url !== 'string') {
+                        url = null;
+                    }
+                }
+                resolve({tab, url});
+            });
+        });
+    }
+
+    static async _findTab(timeout, checkUrl) {
+        // This function works around the need to have the "tabs" permission to access tab.url.
+        const tabs = await new Promise((resolve) => chrome.tabs.query({}, resolve));
+        let matchPromiseResolve = null;
+        const matchPromise = new Promise((resolve) => { matchPromiseResolve = resolve; });
+
+        const checkTabUrl = ({tab, url}) => {
+            if (checkUrl(url, tab)) {
+                matchPromiseResolve(tab);
+            }
+        };
+
+        const promises = [];
+        for (const tab of tabs) {
+            const promise = Backend._getTabUrl(tab);
+            promise.then(checkTabUrl);
+            promises.push(promise);
+        }
+
+        const racePromises = [
+            matchPromise,
+            Promise.all(promises).then(() => null)
+        ];
+        if (typeof timeout === 'number') {
+            racePromises.push(new Promise((resolve) => setTimeout(() => resolve(null), timeout)));
+        }
+
+        return await Promise.race(racePromises);
+    }
+
+    static async _focusTab(tab) {
+        await new Promise((resolve, reject) => {
+            chrome.tabs.update(tab.id, {active: true}, () => {
+                const e = chrome.runtime.lastError;
+                if (e) { reject(e); }
+                else { resolve(); }
+            });
+        });
+
+        if (!(typeof chrome.windows === 'object' && chrome.windows !== null)) {
+            // Windows not supported (e.g. on Firefox mobile)
+            return;
+        }
+
+        try {
+            const tabWindow = await new Promise((resolve) => {
+                chrome.windows.get(tab.windowId, {}, (tabWindow) => {
+                    const e = chrome.runtime.lastError;
+                    if (e) { reject(e); }
+                    else { resolve(tabWindow); }
+                });
+            });
+            if (!tabWindow.focused) {
+                await new Promise((resolve, reject) => {
+                    chrome.windows.update(tab.windowId, {focused: true}, () => {
+                        const e = chrome.runtime.lastError;
+                        if (e) { reject(e); }
+                        else { resolve(); }
+                    });
+                });
+            }
+        } catch (e) {
+            // Edge throws exception for no reason here.
+        }
+    }
 }
 
 Backend._messageHandlers = new Map([
@@ -489,6 +621,13 @@ Backend._messageHandlers = new Map([
     ['injectStylesheet', (self, ...args) => self._onApiInjectStylesheet(...args)],
     ['getEnvironmentInfo', (self, ...args) => self._onApiGetEnvironmentInfo(...args)],
     ['clipboardGet', (self, ...args) => self._onApiClipboardGet(...args)]
+]);
+
+Backend._commandHandlers = new Map([
+    ['search', (self, ...args) => self._onCommandSearch(...args)],
+    ['help', (self, ...args) => self._onCommandHelp(...args)],
+    ['options', (self, ...args) => self._onCommandOptions(...args)],
+    ['toggle', (self, ...args) => self._onCommandToggle(...args)]
 ]);
 
 window.yomichan_backend = new Backend();

@@ -65,58 +65,9 @@ function apiTemplateRender(template, data, dynamic) {
     return utilBackend()._onApiTemplateRender({template, data, dynamic});
 }
 
-async function apiCommandExec(command, params) {
-    const handlers = apiCommandExec.handlers;
-    if (hasOwn(handlers, command)) {
-        const handler = handlers[command];
-        handler(params);
-    }
+function apiCommandExec(command, params) {
+    return utilBackend()._onApiCommandExec({command, params});
 }
-apiCommandExec.handlers = {
-    search: async (params) => {
-        const url = chrome.runtime.getURL('/bg/search.html');
-        if (!(params && params.newTab)) {
-            try {
-                const tab = await _apiFindTab(1000, (url2) => (
-                    url2 !== null &&
-                    url2.startsWith(url) &&
-                    (url2.length === url.length || url2[url.length] === '?' || url2[url.length] === '#')
-                ));
-                if (tab !== null) {
-                    await _apiFocusTab(tab);
-                    return;
-                }
-            } catch (e) {
-                // NOP
-            }
-        }
-        chrome.tabs.create({url});
-    },
-
-    help: () => {
-        chrome.tabs.create({url: 'https://foosoft.net/projects/yomichan/'});
-    },
-
-    options: (params) => {
-        if (!(params && params.newTab)) {
-            chrome.runtime.openOptionsPage();
-        } else {
-            const manifest = chrome.runtime.getManifest();
-            const url = chrome.runtime.getURL(manifest.options_ui.page);
-            chrome.tabs.create({url});
-        }
-    },
-
-    toggle: async () => {
-        const optionsContext = {
-            depth: 0,
-            url: window.location.href
-        };
-        const options = await apiOptionsGet(optionsContext);
-        options.general.enable = !options.general.enable;
-        await apiOptionsSave('popup');
-    }
-};
 
 async function apiAudioGetUrl(definition, source, optionsContext) {
     return audioGetUrl(definition, source, optionsContext);
@@ -205,87 +156,6 @@ async function _apiGetBrowser() {
         return 'firefox';
     } else {
         return 'chrome';
-    }
-}
-
-function _apiGetTabUrl(tab) {
-    return new Promise((resolve) => {
-        chrome.tabs.sendMessage(tab.id, {action: 'getUrl'}, {frameId: 0}, (response) => {
-            let url = null;
-            if (!chrome.runtime.lastError) {
-                url = (response !== null && typeof response === 'object' && !Array.isArray(response) ? response.url : null);
-                if (url !== null && typeof url !== 'string') {
-                    url = null;
-                }
-            }
-            resolve({tab, url});
-        });
-    });
-}
-
-async function _apiFindTab(timeout, checkUrl) {
-    // This function works around the need to have the "tabs" permission to access tab.url.
-    const tabs = await new Promise((resolve) => chrome.tabs.query({}, resolve));
-    let matchPromiseResolve = null;
-    const matchPromise = new Promise((resolve) => { matchPromiseResolve = resolve; });
-
-    const checkTabUrl = ({tab, url}) => {
-        if (checkUrl(url, tab)) {
-            matchPromiseResolve(tab);
-        }
-    };
-
-    const promises = [];
-    for (const tab of tabs) {
-        const promise = _apiGetTabUrl(tab);
-        promise.then(checkTabUrl);
-        promises.push(promise);
-    }
-
-    const racePromises = [
-        matchPromise,
-        Promise.all(promises).then(() => null)
-    ];
-    if (typeof timeout === 'number') {
-        racePromises.push(new Promise((resolve) => setTimeout(() => resolve(null), timeout)));
-    }
-
-    return await Promise.race(racePromises);
-}
-
-async function _apiFocusTab(tab) {
-    await new Promise((resolve, reject) => {
-        chrome.tabs.update(tab.id, {active: true}, () => {
-            const e = chrome.runtime.lastError;
-            if (e) { reject(e); }
-            else { resolve(); }
-        });
-    });
-
-    if (!(typeof chrome.windows === 'object' && chrome.windows !== null)) {
-        // Windows not supported (e.g. on Firefox mobile)
-        return;
-    }
-
-    try {
-        const tabWindow = await new Promise((resolve) => {
-            chrome.windows.get(tab.windowId, {}, (tabWindow) => {
-                const e = chrome.runtime.lastError;
-                if (e) { reject(e); }
-                else { resolve(tabWindow); }
-            });
-        });
-        if (!tabWindow.focused) {
-            await new Promise((resolve, reject) => {
-                chrome.windows.update(tab.windowId, {focused: true}, () => {
-                    const e = chrome.runtime.lastError;
-                    if (e) { reject(e); }
-                    else { resolve(); }
-                });
-            });
-        }
-    } catch (e) {
-        // Edge throws exception for no reason here.
     }
 }
 
