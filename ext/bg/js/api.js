@@ -33,11 +33,8 @@ function apiOptionsSave(source) {
     return utilBackend()._onApiOptionsSave({source});
 }
 
-async function apiTermsFind(text, details, optionsContext) {
-    const options = await apiOptionsGet(optionsContext);
-    const [definitions, length] = await utilBackend().translator.findTerms(text, details, options);
-    definitions.splice(options.general.maxResults);
-    return {length, definitions};
+function apiTermsFind(text, details, optionsContext) {
+    return utilBackend()._onApiTermsFind({text, details, optionsContext});
 }
 
 async function apiTextParse(text, optionsContext) {

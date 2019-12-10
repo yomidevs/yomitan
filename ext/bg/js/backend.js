@@ -247,8 +247,11 @@ class Backend {
         return definitions;
     }
 
-    _onApiTermsFind({text, details, optionsContext}) {
-        return apiTermsFind(text, details, optionsContext);
+    async _onApiTermsFind({text, details, optionsContext}) {
+        const options = await this.getOptions(optionsContext);
+        const [definitions, length] = await this.translator.findTerms(text, details, options);
+        definitions.splice(options.general.maxResults);
+        return {length, definitions};
     }
 
     _onApiTextParse({text, optionsContext}) {
