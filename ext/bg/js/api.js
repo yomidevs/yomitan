@@ -18,7 +18,7 @@
 
 
 function apiOptionsGet(optionsContext) {
-    return utilBackend().getOptions(optionsContext);
+    return utilBackend()._onApiOptionsGet({optionsContext});
 }
 
 async function apiOptionsSet(changedOptions, optionsContext, source) {

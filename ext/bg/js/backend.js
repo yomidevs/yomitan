@@ -187,7 +187,7 @@ class Backend {
     // Message handlers
 
     _onApiOptionsGet({optionsContext}) {
-        return apiOptionsGet(optionsContext);
+        return this.getOptions(optionsContext);
     }
 
     _onApiOptionsGetFull() {
