@@ -385,8 +385,8 @@ class Backend {
         return states;
     }
 
-    _onApiNoteView({noteId}) {
-        return apiNoteView(noteId);
+    async _onApiNoteView({noteId}) {
+        return this.anki.guiBrowse(`nid:${noteId}`);
     }
 
     _onApiTemplateRender({template, data, dynamic}) {

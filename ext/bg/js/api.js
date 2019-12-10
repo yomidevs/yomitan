@@ -57,8 +57,8 @@ function apiDefinitionsAddable(definitions, modes, optionsContext) {
     return utilBackend()._onApiDefinitionsAddable({definitions, modes, optionsContext});
 }
 
-async function apiNoteView(noteId) {
-    return utilBackend().anki.guiBrowse(`nid:${noteId}`);
+function apiNoteView(noteId) {
+    return utilBackend()._onApiNoteView({noteId});
 }
 
 async function apiTemplateRender(template, data, dynamic) {
