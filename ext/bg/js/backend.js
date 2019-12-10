@@ -254,8 +254,34 @@ class Backend {
         return {length, definitions};
     }
 
-    _onApiTextParse({text, optionsContext}) {
-        return apiTextParse(text, optionsContext);
+    async _onApiTextParse({text, optionsContext}) {
+        const options = await this.getOptions(optionsContext);
+        const results = [];
+        while (text.length > 0) {
+            const term = [];
+            const [definitions, sourceLength] = await this.translator.findTermsInternal(
+                text.substring(0, options.scanning.length),
+                dictEnabledSet(options),
+                options.scanning.alphanumeric,
+                {}
+            );
+            if (definitions.length > 0) {
+                dictTermsSort(definitions);
+                const {expression, reading} = definitions[0];
+                const source = text.substring(0, sourceLength);
+                for (const {text, furigana} of jpDistributeFuriganaInflected(expression, reading, source)) {
+                    const reading = jpConvertReading(text, furigana, options.parsing.readingMode);
+                    term.push({text, reading});
+                }
+                text = text.substring(source.length);
+            } else {
+                const reading = jpConvertReading(text[0], null, options.parsing.readingMode);
+                term.push({text: text[0], reading});
+                text = text.substring(1);
+            }
+            results.push(term);
+        }
+        return results;
     }
 
     _onApiTextParseMecab({text, optionsContext}) {
