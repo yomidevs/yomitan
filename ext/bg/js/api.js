@@ -61,12 +61,8 @@ function apiNoteView(noteId) {
     return utilBackend()._onApiNoteView({noteId});
 }
 
-async function apiTemplateRender(template, data, dynamic) {
-    if (dynamic) {
-        return handlebarsRenderDynamic(template, data);
-    } else {
-        return handlebarsRenderStatic(template, data);
-    }
+function apiTemplateRender(template, data, dynamic) {
+    return utilBackend()._onApiTemplateRender({template, data, dynamic});
 }
 
 async function apiCommandExec(command, params) {

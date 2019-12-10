@@ -389,8 +389,12 @@ class Backend {
         return this.anki.guiBrowse(`nid:${noteId}`);
     }
 
-    _onApiTemplateRender({template, data, dynamic}) {
-        return apiTemplateRender(template, data, dynamic);
+    async _onApiTemplateRender({template, data, dynamic}) {
+        return (
+            dynamic ?
+            handlebarsRenderDynamic(template, data) :
+            handlebarsRenderStatic(template, data)
+        );
     }
 
     _onApiCommandExec({command, params}) {
