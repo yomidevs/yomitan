@@ -464,8 +464,15 @@ class Backend {
         });
     }
 
-    _onApiGetEnvironmentInfo() {
-        return apiGetEnvironmentInfo();
+    async _onApiGetEnvironmentInfo() {
+        const browser = await Backend._getBrowser();
+        const platform = await new Promise((resolve) => chrome.runtime.getPlatformInfo(resolve));
+        return {
+            browser,
+            platform: {
+                os: platform.os
+            }
+        };
     }
 
     _onApiClipboardGet() {
@@ -636,6 +643,25 @@ class Backend {
             }
         } catch (e) {
             // Edge throws exception for no reason here.
+        }
+    }
+
+    static async _getBrowser() {
+        if (EXTENSION_IS_BROWSER_EDGE) {
+            return 'edge';
+        }
+        if (typeof browser !== 'undefined') {
+            try {
+                const info = await browser.runtime.getBrowserInfo();
+                if (info.name === 'Fennec') {
+                    return 'firefox-mobile';
+                }
+            } catch (e) {
+                // NOP
+            }
+            return 'firefox';
+        } else {
+            return 'chrome';
         }
     }
 }
