@@ -78,14 +78,7 @@ function apiScreenshotGet(options, sender) {
 }
 
 function apiForward(action, params, sender) {
-    if (!(sender && sender.tab)) {
-        return Promise.resolve();
-    }
-
-    const tabId = sender.tab.id;
-    return new Promise((resolve) => {
-        chrome.tabs.sendMessage(tabId, {action, params}, (response) => resolve(response));
-    });
+    return utilBackend()._onApiForward({action, params}, sender);
 }
 
 function apiFrameInformationGet(sender) {
