@@ -339,8 +339,50 @@ class Backend {
         return this.anki.addNote(note);
     }
 
-    _onApiDefinitionsAddable({definitions, modes, optionsContext}) {
-        return apiDefinitionsAddable(definitions, modes, optionsContext);
+    async _onApiDefinitionsAddable({definitions, modes, optionsContext}) {
+        const options = await this.getOptions(optionsContext);
+        const states = [];
+
+        try {
+            const notes = [];
+            for (const definition of definitions) {
+                for (const mode of modes) {
+                    const note = await dictNoteFormat(definition, mode, options);
+                    notes.push(note);
+                }
+            }
+
+            const cannotAdd = [];
+            const results = await this.anki.canAddNotes(notes);
+            for (let resultBase = 0; resultBase < results.length; resultBase += modes.length) {
+                const state = {};
+                for (let modeOffset = 0; modeOffset < modes.length; ++modeOffset) {
+                    const index = resultBase + modeOffset;
+                    const result = results[index];
+                    const info = {canAdd: result};
+                    state[modes[modeOffset]] = info;
+                    if (!result) {
+                        cannotAdd.push([notes[index], info]);
+                    }
+                }
+
+                states.push(state);
+            }
+
+            if (cannotAdd.length > 0) {
+                const noteIdsArray = await this.anki.findNoteIds(cannotAdd.map((e) => e[0]));
+                for (let i = 0, ii = Math.min(cannotAdd.length, noteIdsArray.length); i < ii; ++i) {
+                    const noteIds = noteIdsArray[i];
+                    if (noteIds.length > 0) {
+                        cannotAdd[i][1].noteId = noteIds[0];
+                    }
+                }
+            }
+        } catch (e) {
+            // NOP
+        }
+
+        return states;
     }
 
     _onApiNoteView({noteId}) {
