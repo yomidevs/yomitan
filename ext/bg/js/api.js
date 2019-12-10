@@ -164,7 +164,7 @@ async function apiDefinitionAdd(definition, mode, context, optionsContext) {
     }
 
     if (context && context.screenshot) {
-        await apiInjectScreenshot(
+        await _apiInjectScreenshot(
             definition,
             options.anki.terms.fields,
             context.screenshot
@@ -246,13 +246,13 @@ apiCommandExec.handlers = {
         const url = chrome.runtime.getURL('/bg/search.html');
         if (!(params && params.newTab)) {
             try {
-                const tab = await apiFindTab(1000, (url2) => (
+                const tab = await _apiFindTab(1000, (url2) => (
                     url2 !== null &&
                     url2.startsWith(url) &&
                     (url2.length === url.length || url2[url.length] === '?' || url2[url.length] === '#')
                 ));
                 if (tab !== null) {
-                    await apiFocusTab(tab);
+                    await _apiFocusTab(tab);
                     return;
                 }
             } catch (e) {
@@ -291,7 +291,7 @@ async function apiAudioGetUrl(definition, source, optionsContext) {
     return audioGetUrl(definition, source, optionsContext);
 }
 
-async function apiInjectScreenshot(definition, fields, screenshot) {
+async function _apiInjectScreenshot(definition, fields, screenshot) {
     let usesScreenshot = false;
     for (const name in fields) {
         if (fields[name].includes('{screenshot}')) {
@@ -384,7 +384,7 @@ function apiInjectStylesheet(css, sender) {
 }
 
 async function apiGetEnvironmentInfo() {
-    const browser = await apiGetBrowser();
+    const browser = await _apiGetBrowser();
     const platform = await new Promise((resolve) => chrome.runtime.getPlatformInfo(resolve));
     return {
         browser,
@@ -394,7 +394,7 @@ async function apiGetEnvironmentInfo() {
     };
 }
 
-async function apiGetBrowser() {
+async function _apiGetBrowser() {
     if (EXTENSION_IS_BROWSER_EDGE) {
         return 'edge';
     }
@@ -413,7 +413,7 @@ async function apiGetBrowser() {
     }
 }
 
-function apiGetTabUrl(tab) {
+function _apiGetTabUrl(tab) {
     return new Promise((resolve) => {
         chrome.tabs.sendMessage(tab.id, {action: 'getUrl'}, {frameId: 0}, (response) => {
             let url = null;
@@ -428,7 +428,7 @@ function apiGetTabUrl(tab) {
     });
 }
 
-async function apiFindTab(timeout, checkUrl) {
+async function _apiFindTab(timeout, checkUrl) {
     // This function works around the need to have the "tabs" permission to access tab.url.
     const tabs = await new Promise((resolve) => chrome.tabs.query({}, resolve));
     let matchPromiseResolve = null;
@@ -442,7 +442,7 @@ async function apiFindTab(timeout, checkUrl) {
 
     const promises = [];
     for (const tab of tabs) {
-        const promise = apiGetTabUrl(tab);
+        const promise = _apiGetTabUrl(tab);
         promise.then(checkTabUrl);
         promises.push(promise);
     }
@@ -458,7 +458,7 @@ async function apiFindTab(timeout, checkUrl) {
     return await Promise.race(racePromises);
 }
 
-async function apiFocusTab(tab) {
+async function _apiFocusTab(tab) {
     await new Promise((resolve, reject) => {
         chrome.tabs.update(tab.id, {active: true}, () => {
             const e = chrome.runtime.lastError;
