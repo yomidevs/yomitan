@@ -20,8 +20,8 @@
         "js": [
             "mixed/js/core.js",
             "mixed/js/dom.js",
+            "mixed/js/api.js",
             "mixed/js/text-scanner.js",
-            "fg/js/api.js",
             "fg/js/document.js",
             "fg/js/frontend-api-receiver.js",
             "fg/js/popup.js",
