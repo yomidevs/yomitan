@@ -21,44 +21,8 @@ function apiOptionsGet(optionsContext) {
     return utilBackend()._onApiOptionsGet({optionsContext});
 }
 
-async function apiOptionsSet(changedOptions, optionsContext, source) {
-    const options = await apiOptionsGet(optionsContext);
-
-    function getValuePaths(obj) {
-        const valuePaths = [];
-        const nodes = [{obj, path: []}];
-        while (nodes.length > 0) {
-            const node = nodes.pop();
-            for (const key of Object.keys(node.obj)) {
-                const path = node.path.concat(key);
-                const obj = node.obj[key];
-                if (obj !== null && typeof obj === 'object') {
-                    nodes.unshift({obj, path});
-                } else {
-                    valuePaths.push([obj, path]);
-                }
-            }
-        }
-        return valuePaths;
-    }
-
-    function modifyOption(path, value, options) {
-        let pivot = options;
-        for (const key of path.slice(0, -1)) {
-            if (!hasOwn(pivot, key)) {
-                return false;
-            }
-            pivot = pivot[key];
-        }
-        pivot[path[path.length - 1]] = value;
-        return true;
-    }
-
-    for (const [value, path] of getValuePaths(changedOptions)) {
-        modifyOption(path, value, options);
-    }
-
-    await apiOptionsSave(source);
+function apiOptionsSet(changedOptions, optionsContext, source) {
+    return utilBackend()._onApiOptionsSet({changedOptions, optionsContext, source});
 }
 
 function apiOptionsGetFull() {
