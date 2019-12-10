@@ -475,8 +475,12 @@ class Backend {
         };
     }
 
-    _onApiClipboardGet() {
-        return apiClipboardGet();
+    async _onApiClipboardGet() {
+        const clipboardPasteTarget = this.clipboardPasteTarget;
+        clipboardPasteTarget.innerText = '';
+        clipboardPasteTarget.focus();
+        document.execCommand('paste');
+        return clipboardPasteTarget.innerText;
     }
 
     // Command handlers

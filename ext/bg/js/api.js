@@ -93,10 +93,6 @@ function apiGetEnvironmentInfo() {
     return utilBackend()._onApiGetEnvironmentInfo();
 }
 
-async function apiClipboardGet() {
-    const clipboardPasteTarget = utilBackend().clipboardPasteTarget;
-    clipboardPasteTarget.innerText = '';
-    clipboardPasteTarget.focus();
-    document.execCommand('paste');
-    return clipboardPasteTarget.innerText;
+function apiClipboardGet() {
+    return utilBackend()._onApiClipboardGet();
 }
