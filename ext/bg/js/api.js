@@ -82,8 +82,7 @@ function apiForward(action, params, sender) {
 }
 
 function apiFrameInformationGet(sender) {
-    const frameId = sender.frameId;
-    return Promise.resolve({frameId});
+    return utilBackend()._onApiFrameInformationGet(null, sender);
 }
 
 function apiInjectStylesheet(css, sender) {

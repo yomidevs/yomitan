@@ -431,7 +431,8 @@ class Backend {
     }
 
     _onApiFrameInformationGet(params, sender) {
-        return apiFrameInformationGet(sender);
+        const frameId = sender.frameId;
+        return Promise.resolve({frameId});
     }
 
     _onApiInjectStylesheet({css}, sender) {
