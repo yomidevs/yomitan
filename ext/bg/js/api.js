@@ -41,37 +41,8 @@ function apiTextParse(text, optionsContext) {
     return utilBackend()._onApiTextParse({text, optionsContext});
 }
 
-async function apiTextParseMecab(text, optionsContext) {
-    const options = await apiOptionsGet(optionsContext);
-    const mecab = utilBackend().mecab;
-
-    const results = {};
-    const rawResults = await mecab.parseText(text);
-    for (const mecabName in rawResults) {
-        const result = [];
-        for (const parsedLine of rawResults[mecabName]) {
-            for (const {expression, reading, source} of parsedLine) {
-                const term = [];
-                if (expression !== null && reading !== null) {
-                    for (const {text, furigana} of jpDistributeFuriganaInflected(
-                        expression,
-                        jpKatakanaToHiragana(reading),
-                        source
-                    )) {
-                        const reading = jpConvertReading(text, furigana, options.parsing.readingMode);
-                        term.push({text, reading});
-                    }
-                } else {
-                    const reading = jpConvertReading(source, null, options.parsing.readingMode);
-                    term.push({text: source, reading});
-                }
-                result.push(term);
-            }
-            result.push([{text: '\n'}]);
-        }
-        results[mecabName] = result;
-    }
-    return results;
+function apiTextParseMecab(text, optionsContext) {
+    return utilBackend()._onApiTextParseMecab({text, optionsContext});
 }
 
 function apiKanjiFind(text, optionsContext) {
