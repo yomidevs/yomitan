@@ -18,9 +18,9 @@
 
 
 class FrontendApiReceiver {
-    constructor(source='', handlers={}) {
-        this.source = source;
-        this.handlers = handlers;
+    constructor(source='', handlers=new Map()) {
+        this._source = source;
+        this._handlers = handlers;
 
         chrome.runtime.onConnect.addListener(this.onConnect.bind(this));
     }
@@ -32,16 +32,13 @@ class FrontendApiReceiver {
     }
 
     onMessage(port, {id, action, params, target, senderId}) {
-        if (
-            target !== this.source ||
-            !hasOwn(this.handlers, action)
-        ) {
-            return;
-        }
+        if (target !== this._source) { return; }
+
+        const handler = this._handlers.get(action);
+        if (typeof handler !== 'function') { return; }
 
         this.sendAck(port, id, senderId);
 
-        const handler = this.handlers[action];
         handler(params).then(
             (result) => {
                 this.sendResult(port, id, senderId, {result});

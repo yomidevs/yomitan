@@ -36,17 +36,17 @@ class PopupProxyHost {
         const {frameId} = await this.frameIdPromise;
         if (typeof frameId !== 'number') { return; }
 
-        this.apiReceiver = new FrontendApiReceiver(`popup-proxy-host#${frameId}`, {
-            createNestedPopup: ({parentId}) => this.createNestedPopup(parentId),
-            setOptions: ({id, options}) => this.setOptions(id, options),
-            hide: ({id, changeFocus}) => this.hide(id, changeFocus),
-            isVisibleAsync: ({id}) => this.isVisibleAsync(id),
-            setVisibleOverride: ({id, visible}) => this.setVisibleOverride(id, visible),
-            containsPoint: ({id, x, y}) => this.containsPoint(id, x, y),
-            showContent: ({id, elementRect, writingMode, type, details}) => this.showContent(id, elementRect, writingMode, type, details),
-            setCustomCss: ({id, css}) => this.setCustomCss(id, css),
-            clearAutoPlayTimer: ({id}) => this.clearAutoPlayTimer(id)
-        });
+        this.apiReceiver = new FrontendApiReceiver(`popup-proxy-host#${frameId}`, new Map([
+            ['createNestedPopup', ({parentId}) => this.createNestedPopup(parentId)],
+            ['setOptions', ({id, options}) => this.setOptions(id, options)],
+            ['hide', ({id, changeFocus}) => this.hide(id, changeFocus)],
+            ['isVisibleAsync', ({id}) => this.isVisibleAsync(id)],
+            ['setVisibleOverride', ({id, visible}) => this.setVisibleOverride(id, visible)],
+            ['containsPoint', ({id, x, y}) => this.containsPoint(id, x, y)],
+            ['showContent', ({id, elementRect, writingMode, type, details}) => this.showContent(id, elementRect, writingMode, type, details)],
+            ['setCustomCss', ({id, css}) => this.setCustomCss(id, css)],
+            ['clearAutoPlayTimer', ({id}) => this.clearAutoPlayTimer(id)]
+        ]));
     }
 
     createPopup(parentId, depth) {
