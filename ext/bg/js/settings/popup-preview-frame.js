@@ -24,6 +24,7 @@ class SettingsPopupPreview {
         this.popupInjectOuterStylesheetOld = Popup.injectOuterStylesheet;
         this.popupShown = false;
         this.themeChangeTimeout = null;
+        this.textSource = null;
     }
 
     static create() {
@@ -95,7 +96,7 @@ class SettingsPopupPreview {
 
     onWindowResize() {
         if (this.frontend === null) { return; }
-        const textSource = this.frontend.textSourceLast;
+        const textSource = this.textSource;
         if (textSource === null) { return; }
 
         const elementRect = textSource.getRect();
@@ -164,6 +165,7 @@ class SettingsPopupPreview {
         } finally {
             source.cleanup();
         }
+        this.textSource = source;
         await this.frontend.lastShowPromise;
 
         if (this.frontend.popup.isVisible()) {
