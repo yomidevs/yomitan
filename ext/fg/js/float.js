@@ -56,15 +56,14 @@ class DisplayFloat extends Display {
 
     onKeyDown(e) {
         const key = Display.getKeyFromEvent(e);
-        const handlers = DisplayFloat.onKeyDownHandlers;
-        if (hasOwn(handlers, key)) {
-            const handler = handlers[key];
+        const handler = DisplayFloat._onKeyDownHandlers.get(key);
+        if (typeof handler === 'function') {
             if (handler(this, e)) {
                 e.preventDefault();
-                return;
+                return true;
             }
         }
-        super.onKeyDown(e);
+        return super.onKeyDown(e);
     }
 
     getOptionsContext() {
@@ -96,15 +95,15 @@ class DisplayFloat extends Display {
     }
 }
 
-DisplayFloat.onKeyDownHandlers = {
-    'C': (self, e) => {
+DisplayFloat._onKeyDownHandlers = new Map([
+    ['C', (self, e) => {
         if (e.ctrlKey && !window.getSelection().toString()) {
             self.onSelectionCopy();
             return true;
         }
         return false;
-    }
-};
+    }]
+]);
 
 DisplayFloat._messageHandlers = new Map([
     ['setContent', (self, {type, details}) => self.setContent(type, details)],
