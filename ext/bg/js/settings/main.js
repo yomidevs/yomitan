@@ -16,11 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-async function getOptionsArray() {
-    const optionsFull = await apiOptionsGetFull();
-    return optionsFull.profiles.map((profile) => profile.options);
-}
-
 async function formRead(options) {
     options.general.enable = $('#enable').prop('checked');
     options.general.showGuide = $('#show-usage-guide').prop('checked');

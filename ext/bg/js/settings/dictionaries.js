@@ -531,7 +531,7 @@ async function onDictionaryPurge(e) {
         dictionarySpinnerShow(true);
 
         await utilDatabasePurge();
-        for (const options of toIterable(await getOptionsArray())) {
+        for (const {options} of toIterable((await apiOptionsGetFull()).profiles)) {
             options.dictionaries = utilBackgroundIsolate({});
             options.general.mainDictionary = '';
         }
@@ -593,7 +593,7 @@ async function onDictionaryImport(e) {
             }
 
             const {result, errors} = await utilDatabaseImport(files[i], updateProgress, importDetails);
-            for (const options of toIterable(await getOptionsArray())) {
+            for (const {options} of toIterable((await apiOptionsGetFull()).profiles)) {
                 const dictionaryOptions = SettingsDictionaryListUI.createDictionaryOptions();
                 dictionaryOptions.enabled = true;
                 options.dictionaries[result.title] = dictionaryOptions;
