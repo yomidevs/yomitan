@@ -37,7 +37,7 @@ class Frontend extends TextScanner {
         this.isPreparedPromiseResolve = null;
         this.isPreparedPromise = new Promise((resolve) => { this.isPreparedPromiseResolve = resolve; });
 
-        this.lastShowPromise = Promise.resolve();
+        this._lastShowPromise = Promise.resolve();
     }
 
     static create() {
@@ -68,7 +68,7 @@ class Frontend extends TextScanner {
     async onResize() {
         const textSource = this.textSourceCurrent;
         if (textSource !== null && await this.popup.isVisibleAsync()) {
-            this.lastShowPromise = this.popup.showContent(
+            this._lastShowPromise = this.popup.showContent(
                 textSource.getRect(),
                 textSource.getWritingMode()
             );
@@ -124,7 +124,7 @@ class Frontend extends TextScanner {
         } catch (e) {
             if (window.yomichan_orphaned) {
                 if (textSource !== null && this.options.scanning.modifier !== 'none') {
-                    this.lastShowPromise = this.popup.showContent(
+                    this._lastShowPromise = this.popup.showContent(
                         textSource.getRect(),
                         textSource.getWritingMode(),
                         'orphaned'
@@ -145,12 +145,16 @@ class Frontend extends TextScanner {
     showContent(textSource, focus, definitions, type) {
         const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
         const url = window.location.href;
-        this.lastShowPromise = this.popup.showContent(
+        this._lastShowPromise = this.popup.showContent(
             textSource.getRect(),
             textSource.getWritingMode(),
             type,
             {definitions, context: {sentence, url, focus, disableHistory: true}}
         );
+    }
+
+    showContentCompleted() {
+        return this._lastShowPromise;
     }
 
     async findTerms(textSource) {

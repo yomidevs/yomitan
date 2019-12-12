@@ -166,7 +166,7 @@ class SettingsPopupPreview {
             source.cleanup();
         }
         this.textSource = source;
-        await this.frontend.lastShowPromise;
+        await this.frontend.showContentCompleted();
 
         if (this.frontend.popup.isVisible()) {
             this.popupShown = true;
