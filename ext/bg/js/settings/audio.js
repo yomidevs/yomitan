@@ -21,7 +21,7 @@ let audioSourceUI = null;
 
 async function audioSettingsInitialize() {
     const optionsContext = getOptionsContext();
-    const options = await apiOptionsGet(optionsContext);
+    const options = await getOptionsMutable(optionsContext);
     audioSourceUI = new AudioSourceUI.Container(
         options.audio.sources,
         document.querySelector('.audio-source-list'),

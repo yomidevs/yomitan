@@ -16,6 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+function getOptionsMutable(optionsContext) {
+    return utilBackend().getOptions(optionsContext);
+}
+
+function getOptionsFullMutable() {
+    return utilBackend().getFullOptions();
+}
+
 async function formRead(options) {
     options.general.enable = $('#enable').prop('checked');
     options.general.showGuide = $('#show-usage-guide').prop('checked');
@@ -164,7 +172,7 @@ function formUpdateVisibility(options) {
 
 async function onFormOptionsChanged() {
     const optionsContext = getOptionsContext();
-    const options = await apiOptionsGet(optionsContext);
+    const options = await getOptionsMutable(optionsContext);
 
     await formRead(options);
     await settingsSaveOptions();
@@ -190,7 +198,7 @@ async function onOptionsUpdate({source}) {
     if (source === thisSource) { return; }
 
     const optionsContext = getOptionsContext();
-    const options = await apiOptionsGet(optionsContext);
+    const options = await getOptionsMutable(optionsContext);
     await formWrite(options);
 }
 

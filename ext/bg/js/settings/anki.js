@@ -154,7 +154,7 @@ async function _onAnkiModelChanged(e) {
     }
 
     const optionsContext = getOptionsContext();
-    const options = await apiOptionsGet(optionsContext);
+    const options = await getOptionsMutable(optionsContext);
     options.anki[tabId].fields = utilBackgroundIsolate(fields);
     await settingsSaveOptions();
 

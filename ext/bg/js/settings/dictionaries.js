@@ -273,7 +273,7 @@ class SettingsDictionaryEntryUI {
             progress.hidden = true;
 
             const optionsContext = getOptionsContext();
-            const options = await apiOptionsGet(optionsContext);
+            const options = await getOptionsMutable(optionsContext);
             onDatabaseUpdated(options);
         }
     }
@@ -360,7 +360,7 @@ async function dictSettingsInitialize() {
     document.querySelector('#database-enable-prefix-wildcard-searches').addEventListener('change', (e) => onDatabaseEnablePrefixWildcardSearchesChanged(e), false);
 
     const optionsContext = getOptionsContext();
-    const options = await apiOptionsGet(optionsContext);
+    const options = await getOptionsMutable(optionsContext);
     onDictionaryOptionsChanged(options);
     onDatabaseUpdated(options);
 }
@@ -425,7 +425,7 @@ async function updateMainDictionarySelect(options, dictionaries) {
 async function onDictionaryMainChanged(e) {
     const value = e.target.value;
     const optionsContext = getOptionsContext();
-    const options = await apiOptionsGet(optionsContext);
+    const options = await getOptionsMutable(optionsContext);
     options.general.mainDictionary = value;
     settingsSaveOptions();
 }
@@ -531,14 +531,14 @@ async function onDictionaryPurge(e) {
         dictionarySpinnerShow(true);
 
         await utilDatabasePurge();
-        for (const {options} of toIterable((await apiOptionsGetFull()).profiles)) {
+        for (const {options} of toIterable((await getOptionsFullMutable()).profiles)) {
             options.dictionaries = utilBackgroundIsolate({});
             options.general.mainDictionary = '';
         }
         await settingsSaveOptions();
 
         const optionsContext = getOptionsContext();
-        const options = await apiOptionsGet(optionsContext);
+        const options = await getOptionsMutable(optionsContext);
         onDatabaseUpdated(options);
     } catch (err) {
         dictionaryErrorsShow([err]);
@@ -593,7 +593,7 @@ async function onDictionaryImport(e) {
             }
 
             const {result, errors} = await utilDatabaseImport(files[i], updateProgress, importDetails);
-            for (const {options} of toIterable((await apiOptionsGetFull()).profiles)) {
+            for (const {options} of toIterable((await getOptionsFullMutable()).profiles)) {
                 const dictionaryOptions = SettingsDictionaryListUI.createDictionaryOptions();
                 dictionaryOptions.enabled = true;
                 options.dictionaries[result.title] = dictionaryOptions;
@@ -611,7 +611,7 @@ async function onDictionaryImport(e) {
             }
 
             const optionsContext = getOptionsContext();
-            const options = await apiOptionsGet(optionsContext);
+            const options = await getOptionsMutable(optionsContext);
             onDatabaseUpdated(options);
         }
     } catch (err) {
@@ -630,7 +630,7 @@ async function onDictionaryImport(e) {
 
 
 async function onDatabaseEnablePrefixWildcardSearchesChanged(e) {
-    const optionsFull = await apiOptionsGetFull();
+    const optionsFull = await getOptionsFullMutable();
     const v = !!e.target.checked;
     if (optionsFull.global.database.prefixWildcardsSupported === v) { return; }
     optionsFull.global.database.prefixWildcardsSupported = !!e.target.checked;

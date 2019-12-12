@@ -27,7 +27,7 @@ function getOptionsContext() {
 
 
 async function profileOptionsSetup() {
-    const optionsFull = await apiOptionsGetFull();
+    const optionsFull = await getOptionsFullMutable();
     currentProfileIndex = optionsFull.profileCurrent;
 
     profileOptionsSetupEventListeners();
@@ -120,7 +120,7 @@ async function profileOptionsUpdateTarget(optionsFull) {
     profileFormWrite(optionsFull);
 
     const optionsContext = getOptionsContext();
-    const options = await apiOptionsGet(optionsContext);
+    const options = await getOptionsMutable(optionsContext);
     await formWrite(options);
 }
 
@@ -164,13 +164,13 @@ async function onProfileOptionsChanged(e) {
         return;
     }
 
-    const optionsFull = await apiOptionsGetFull();
+    const optionsFull = await getOptionsFullMutable();
     await profileFormRead(optionsFull);
     await settingsSaveOptions();
 }
 
 async function onTargetProfileChanged() {
-    const optionsFull = await apiOptionsGetFull();
+    const optionsFull = await getOptionsFullMutable();
     const index = tryGetIntegerValue('#profile-target', 0, optionsFull.profiles.length);
     if (index === null || currentProfileIndex === index) {
         return;
@@ -182,7 +182,7 @@ async function onTargetProfileChanged() {
 }
 
 async function onProfileAdd() {
-    const optionsFull = await apiOptionsGetFull();
+    const optionsFull = await getOptionsFullMutable();
     const profile = utilBackgroundIsolate(optionsFull.profiles[currentProfileIndex]);
     profile.name = profileOptionsCreateCopyName(profile.name, optionsFull.profiles, 100);
     optionsFull.profiles.push(profile);
@@ -210,7 +210,7 @@ async function onProfileRemove(e) {
 async function onProfileRemoveConfirm() {
     $('#profile-remove-modal').modal('hide');
 
-    const optionsFull = await apiOptionsGetFull();
+    const optionsFull = await getOptionsFullMutable();
     if (optionsFull.profiles.length <= 1) {
         return;
     }
@@ -234,7 +234,7 @@ function onProfileNameChanged() {
 }
 
 async function onProfileMove(offset) {
-    const optionsFull = await apiOptionsGetFull();
+    const optionsFull = await getOptionsFullMutable();
     const index = currentProfileIndex + offset;
     if (index < 0 || index >= optionsFull.profiles.length) {
         return;
@@ -267,7 +267,7 @@ async function onProfileCopy() {
 async function onProfileCopyConfirm() {
     $('#profile-copy-modal').modal('hide');
 
-    const optionsFull = await apiOptionsGetFull();
+    const optionsFull = await getOptionsFullMutable();
     const index = tryGetIntegerValue('#profile-copy-source', 0, optionsFull.profiles.length);
     if (index === null || index === currentProfileIndex) {
         return;
