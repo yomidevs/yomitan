@@ -106,11 +106,10 @@ class SettingsPopupPreview {
 
     onMessage(e) {
         const {action, params} = e.data;
-        const handlers = SettingsPopupPreview.messageHandlers;
-        if (hasOwn(handlers, action)) {
-            const handler = handlers[action];
-            handler(this, params);
-        }
+        const handler = SettingsPopupPreview._messageHandlers.get(action);
+        if (typeof handler !== 'function') { return; }
+
+        handler(this, params);
     }
 
     onThemeDarkCheckboxChanged(node) {
@@ -176,11 +175,11 @@ class SettingsPopupPreview {
     }
 }
 
-SettingsPopupPreview.messageHandlers = {
-    setText: (self, {text}) => self.setText(text),
-    setCustomCss: (self, {css}) => self.setCustomCss(css),
-    setCustomOuterCss: (self, {css}) => self.setCustomOuterCss(css)
-};
+SettingsPopupPreview._messageHandlers = new Map([
+    ['setText', (self, {text}) => self.setText(text)],
+    ['setCustomCss', (self, {css}) => self.setCustomCss(css)],
+    ['setCustomOuterCss', (self, {css}) => self.setCustomOuterCss(css)]
+]);
 
 SettingsPopupPreview.instance = SettingsPopupPreview.create();
 
