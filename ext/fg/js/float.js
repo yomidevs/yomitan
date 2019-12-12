@@ -48,11 +48,10 @@ class DisplayFloat extends Display {
 
     onMessage(e) {
         const {action, params} = e.data;
-        const handlers = DisplayFloat.messageHandlers;
-        if (hasOwn(handlers, action)) {
-            const handler = handlers[action];
-            handler(this, params);
-        }
+        const handler = DisplayFloat._messageHandlers.get(action);
+        if (typeof handler !== 'function') { return; }
+
+        handler(this, params);
     }
 
     onKeyDown(e) {
@@ -107,11 +106,11 @@ DisplayFloat.onKeyDownHandlers = {
     }
 };
 
-DisplayFloat.messageHandlers = {
-    setContent: (self, {type, details}) => self.setContent(type, details),
-    clearAutoPlayTimer: (self) => self.clearAutoPlayTimer(),
-    setCustomCss: (self, {css}) => self.setCustomCss(css),
-    initialize: (self, {options, popupInfo, url, childrenSupported}) => self.initialize(options, popupInfo, url, childrenSupported)
-};
+DisplayFloat._messageHandlers = new Map([
+    ['setContent', (self, {type, details}) => self.setContent(type, details)],
+    ['clearAutoPlayTimer', (self) => self.clearAutoPlayTimer()],
+    ['setCustomCss', (self, {css}) => self.setCustomCss(css)],
+    ['initialize', (self, {options, popupInfo, url, childrenSupported}) => self.initialize(options, popupInfo, url, childrenSupported)]
+]);
 
 window.yomichan_display = new DisplayFloat();
