@@ -38,6 +38,7 @@ function textToSpeechInitialize() {
     speechSynthesis.addEventListener('voiceschanged', () => updateTextToSpeechVoices(), false);
     updateTextToSpeechVoices();
 
+    document.querySelector('#text-to-speech-voice').addEventListener('change', (e) => onTextToSpeechVoiceChange(e), false);
     document.querySelector('#text-to-speech-voice-test').addEventListener('click', () => textToSpeechTest(), false);
 }
 
@@ -110,4 +111,8 @@ function textToSpeechTest() {
     } catch (e) {
         // NOP
     }
+}
+
+function onTextToSpeechVoiceChange(e) {
+    e.currentTarget.dataset.value = e.currentTarget.value;
 }
