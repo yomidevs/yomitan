@@ -235,7 +235,7 @@ class Backend {
             modifyOption(path, value, options);
         }
 
-        await this._optionsSave({source});
+        await this._onApiOptionsSave({source});
     }
 
     async _onApiOptionsSave({source}) {
@@ -529,7 +529,7 @@ class Backend {
 
         const options = await this.getOptions(optionsContext);
         options.general.enable = !options.general.enable;
-        await this._optionsSave({source});
+        await this._onApiOptionsSave({source});
     }
 
     // Utilities
