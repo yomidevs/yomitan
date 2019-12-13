@@ -42,7 +42,7 @@ class Backend {
         this.onOptionsUpdated('background');
 
         if (chrome.commands !== null && typeof chrome.commands === 'object') {
-            chrome.commands.onCommand.addListener(this.onCommand.bind(this));
+            chrome.commands.onCommand.addListener((command) => this._runCommand(command));
         }
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
 
@@ -65,10 +65,6 @@ class Backend {
                 chrome.tabs.sendMessage(tab.id, {action: 'optionsUpdate', params: {source}}, callback);
             }
         });
-    }
-
-    onCommand(command) {
-        apiCommandExec(command);
     }
 
     onMessage({action, params}, sender, callback) {
@@ -182,6 +178,14 @@ class Backend {
 
     checkLastError() {
         // NOP
+    }
+
+    _runCommand(command, params) {
+        const handler = Backend._commandHandlers.get(command);
+        if (typeof handler !== 'function') { return false; }
+
+        handler(this, params);
+        return true;
     }
 
     // Message handlers
@@ -398,10 +402,7 @@ class Backend {
     }
 
     async _onApiCommandExec({command, params}) {
-        const handler = Backend._commandHandlers.get(command);
-        if (typeof handler !== 'function') { return false; }
-
-        handler(this, params);
+        return this._runCommand(command, params);
     }
 
     async _onApiAudioGetUrl({definition, source, optionsContext}) {
