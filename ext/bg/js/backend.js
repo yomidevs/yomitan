@@ -479,10 +479,12 @@ class Backend {
 
     async _onApiClipboardGet() {
         const clipboardPasteTarget = this.clipboardPasteTarget;
-        clipboardPasteTarget.innerText = '';
+        clipboardPasteTarget.value = '';
         clipboardPasteTarget.focus();
         document.execCommand('paste');
-        return clipboardPasteTarget.innerText;
+        const result = clipboardPasteTarget.value;
+        clipboardPasteTarget.value = '';
+        return result;
     }
 
     // Command handlers
