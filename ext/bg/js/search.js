@@ -16,13 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-let IS_FIREFOX = null;
-(async () => {
-    const {browser} = await apiGetEnvironmentInfo();
-    IS_FIREFOX = ['firefox', 'firefox-mobile'].includes(browser);
-})();
-
 class DisplaySearch extends Display {
     constructor() {
         super(document.querySelector('#spinner'), document.querySelector('#content'));
@@ -43,8 +36,12 @@ class DisplaySearch extends Display {
         this.introVisible = true;
         this.introAnimationTimer = null;
 
-        this.clipboardMonitorIntervalId = null;
-        this.clipboardPrevText = null;
+        this.isFirefox = false;
+
+        this.clipboardMonitorTimerId = null;
+        this.clipboardMonitorTimerToken = null;
+        this.clipboardInterval = 250;
+        this.clipboardPreviousText = null;
     }
 
     static create() {
@@ -56,6 +53,7 @@ class DisplaySearch extends Display {
     async prepare() {
         try {
             await this.initialize();
+            this.isFirefox = await DisplaySearch._isFirefox();
 
             if (this.search !== null) {
                 this.search.addEventListener('click', (e) => this.onSearch(e), false);
@@ -241,39 +239,63 @@ class DisplaySearch extends Display {
     initClipboardMonitor() {
         // ignore copy from search page
         window.addEventListener('copy', () => {
-            this.clipboardPrevText = document.getSelection().toString().trim();
+            this.clipboardPreviousText = document.getSelection().toString().trim();
         });
     }
 
     startClipboardMonitor() {
-        this.clipboardMonitorIntervalId = setInterval(async () => {
-            let curText = null;
-            // TODO get rid of this and figure out why apiClipboardGet doesn't work on Firefox
-            if (IS_FIREFOX) {
-                curText = (await navigator.clipboard.readText()).trim();
-            } else if (IS_FIREFOX === false) {
-                curText = (await apiClipboardGet()).trim();
-            }
-            if (curText && (curText !== this.clipboardPrevText) && jpIsJapaneseText(curText)) {
-                if (this.isWanakanaEnabled()) {
-                    this.setQuery(window.wanakana.toKana(curText));
-                } else {
-                    this.setQuery(curText);
+        const token = {};
+        const intervalCallback = async () => {
+            this.clipboardMonitorTimerId = null;
+
+            let text = await this.getClipboardText();
+            if (this.clipboardMonitorTimerToken !== token) { return; }
+
+            if (
+                typeof text === 'string' &&
+                (text = text.trim()).length > 0 &&
+                text !== this.clipboardPreviousText
+            ) {
+                this.clipboardPreviousText = text;
+                if (jpIsJapaneseText(text)) {
+                    this.setQuery(this.isWanakanaEnabled() ? window.wanakana.toKana(text) : text);
+                    window.history.pushState(null, '', `${window.location.pathname}?query=${encodeURIComponent(text)}`);
+                    this.onSearchQueryUpdated(this.query.value, true);
                 }
-
-                const queryString = curText.length > 0 ? `?query=${encodeURIComponent(curText)}` : '';
-                window.history.pushState(null, '', `${window.location.pathname}${queryString}`);
-                this.onSearchQueryUpdated(this.query.value, true);
-
-                this.clipboardPrevText = curText;
             }
-        }, 100);
+
+            this.clipboardMonitorTimerId = setTimeout(intervalCallback, this.clipboardInterval);
+        };
+
+        this.clipboardMonitorTimerToken = token;
+
+        intervalCallback();
     }
 
     stopClipboardMonitor() {
-        if (this.clipboardMonitorIntervalId) {
-            clearInterval(this.clipboardMonitorIntervalId);
-            this.clipboardMonitorIntervalId = null;
+        this.clipboardMonitorTimerToken = null;
+        if (this.clipboardMonitorTimerId !== null) {
+            clearTimeout(this.clipboardMonitorTimerId);
+            this.clipboardMonitorTimerId = null;
+        }
+    }
+
+    async getClipboardText() {
+        /*
+        Notes:
+            apiClipboardGet doesn't work on firefox because document.execCommand('paste') requires
+            user interaction. Therefore, navigator.clipboard.readText() is used.
+
+            navigator.clipboard.readText() can't be used in Chrome for two reasons:
+            * Requires page to be focused, else it rejects with an exception.
+            * When the page is focused, Chrome will request clipboard permission, despite already
+              being an extension with clipboard permissions. It effectively asks for the
+              non-extension permission for clipboard access.
+        */
+        try {
+            return this.isFirefox ? await navigator.clipboard.readText() : await apiClipboardGet();
+        } catch (e) {
+            return null;
         }
     }
 
@@ -366,6 +388,17 @@ class DisplaySearch extends Display {
     static getSearchQueryFromLocation(url) {
         const match = /^[^?#]*\?(?:[^&#]*&)?query=([^&#]*)/.exec(url);
         return match !== null ? decodeURIComponent(match[1]) : null;
+    }
+
+    static async _isFirefox() {
+        const {browser} = await apiGetEnvironmentInfo();
+        switch (browser) {
+            case 'firefox':
+            case 'firefox-mobile':
+                return true;
+            default:
+                return false;
+        }
     }
 }
 
