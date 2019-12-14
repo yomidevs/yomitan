@@ -17,6 +17,10 @@
  */
 
 
+function apiOptionsSchemaGet() {
+    return _apiInvoke('optionsSchemaGet');
+}
+
 function apiOptionsGet(optionsContext) {
     return _apiInvoke('optionsGet', {optionsContext});
 }

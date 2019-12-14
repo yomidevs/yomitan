@@ -115,6 +115,13 @@ class Backend {
         }
     }
 
+    async getOptionsSchema() {
+        if (this.isPreparedPromise !== null) {
+            await this.isPreparedPromise;
+        }
+        return this.optionsSchema;
+    }
+
     async getFullOptions() {
         if (this.isPreparedPromise !== null) {
             await this.isPreparedPromise;
@@ -199,6 +206,10 @@ class Backend {
     }
 
     // Message handlers
+
+    _onApiOptionsSchemaGet() {
+        return this.getOptionsSchema();
+    }
 
     _onApiOptionsGet({optionsContext}) {
         return this.getOptions(optionsContext);
@@ -692,6 +703,7 @@ class Backend {
 }
 
 Backend._messageHandlers = new Map([
+    ['optionsSchemaGet', (self, ...args) => self._onApiOptionsSchemaGet(...args)],
     ['optionsGet', (self, ...args) => self._onApiOptionsGet(...args)],
     ['optionsGetFull', (self, ...args) => self._onApiOptionsGetFull(...args)],
     ['optionsSet', (self, ...args) => self._onApiOptionsSet(...args)],
