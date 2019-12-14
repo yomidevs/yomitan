@@ -32,9 +32,30 @@ function utilIsolate(value) {
     return typeof stringValue === 'string' ? JSON.parse(stringValue) : null;
 }
 
+function utilFunctionIsolate(func) {
+    return function (...args) {
+        try {
+            return func.call(this, ...args);
+        } catch (e) {
+            try {
+                String(func);
+            } catch (e2) {
+                // Dead object
+                return;
+            }
+            throw e;
+        }
+    };
+}
+
 function utilBackgroundIsolate(data) {
     const backgroundPage = chrome.extension.getBackgroundPage();
     return backgroundPage.utilIsolate(data);
+}
+
+function utilBackgroundFunctionIsolate(func) {
+    const backgroundPage = chrome.extension.getBackgroundPage();
+    return backgroundPage.utilFunctionIsolate(func);
 }
 
 function utilSetEqual(setA, setB) {
@@ -110,15 +131,15 @@ function utilDatabasePurge() {
 function utilDatabaseDeleteDictionary(dictionaryName, onProgress) {
     return utilBackend().translator.database.deleteDictionary(
         utilBackgroundIsolate(dictionaryName),
-        onProgress
+        utilBackgroundFunctionIsolate(onProgress)
     );
 }
 
-async function utilDatabaseImport(data, progress, details) {
+async function utilDatabaseImport(data, onProgress, details) {
     data = await utilReadFile(data);
     return utilBackend().translator.database.importDictionary(
         utilBackgroundIsolate(data),
-        progress,
+        utilBackgroundFunctionIsolate(onProgress),
         utilBackgroundIsolate(details)
     );
 }
