@@ -129,6 +129,18 @@ class Backend {
         return this.options;
     }
 
+    async setFullOptions(options) {
+        if (this.isPreparedPromise !== null) {
+            await this.isPreparedPromise;
+        }
+        try {
+            this.options = JsonSchema.getValidValueOrDefault(this.optionsSchema, utilIsolate(options));
+        } catch (e) {
+            // This shouldn't happen, but catch errors just in case of bugs
+            logError(e);
+        }
+    }
+
     async getOptions(optionsContext) {
         if (this.isPreparedPromise !== null) {
             await this.isPreparedPromise;

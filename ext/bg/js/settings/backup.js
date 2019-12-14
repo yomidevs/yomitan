@@ -115,8 +115,234 @@ async function _onSettingsExportClick() {
 }
 
 
+// Importing
+
+async function _settingsImportSetOptionsFull(optionsFull) {
+    return utilIsolate(await utilBackend().setFullOptions(
+        utilBackgroundIsolate(optionsFull)
+    ));
+}
+
+function _showSettingsImportError(error) {
+    logError(error);
+    document.querySelector('#settings-import-error-modal-message').textContent = `${error}`;
+    $('#settings-import-error-modal').modal('show');
+}
+
+async function _showSettingsImportWarnings(warnings) {
+    const modalNode = $('#settings-import-warning-modal');
+    const buttons = document.querySelectorAll('.settings-import-warning-modal-import-button');
+    const messageContainer = document.querySelector('#settings-import-warning-modal-message');
+    if (modalNode.length === 0 || buttons.length === 0 || messageContainer === null) {
+        return {result: false};
+    }
+
+    // Set message
+    const fragment = document.createDocumentFragment();
+    for (const warning of warnings) {
+        const node = document.createElement('li');
+        node.textContent = `${warning}`;
+        fragment.appendChild(node);
+    }
+    messageContainer.textContent = '';
+    messageContainer.appendChild(fragment);
+
+    // Show modal
+    modalNode.modal('show');
+
+    // Wait for modal to close
+    return new Promise((resolve) => {
+        const onButtonClick = (e) => {
+            e.preventDefault();
+            complete({
+                result: true,
+                sanitize: e.currentTarget.dataset.importSanitize === 'true'
+            });
+            modalNode.modal('hide');
+
+        };
+        const onModalHide = () => {
+            complete({result: false});
+        };
+
+        let completed = false;
+        const complete = (result) => {
+            if (completed) { return; }
+            completed = true;
+
+            modalNode.off('hide.bs.modal', onModalHide);
+            for (const button of buttons) {
+                button.removeEventListener('click', onButtonClick, false);
+            }
+
+            resolve(result);
+        };
+
+        // Hook events
+        modalNode.on('hide.bs.modal', onModalHide);
+        for (const button of buttons) {
+            button.addEventListener('click', onButtonClick, false);
+        }
+    });
+}
+
+function _isLocalhostUrl(urlString) {
+    try {
+        const url = new URL(urlString);
+        switch (url.hostname.toLowerCase()) {
+            case 'localhost':
+            case '127.0.0.1':
+            case '[::1]':
+                switch (url.protocol.toLowerCase()) {
+                    case 'http:':
+                    case 'https:':
+                        return true;
+                }
+                break;
+        }
+    } catch (e) {
+        // NOP
+    }
+    return false;
+}
+
+function _settingsImportSanitizeProfileOptions(options, dryRun) {
+    const warnings = [];
+
+    const anki = options.anki;
+    if (isObject(anki)) {
+        const fieldTemplates = anki.fieldTemplates;
+        if (typeof fieldTemplates === 'string') {
+            warnings.push('anki.fieldTemplates contains a non-default value');
+            if (!dryRun) {
+                delete anki.fieldTemplates;
+            }
+        }
+        const server = anki.server;
+        if (typeof server === 'string' && server.length > 0 && !_isLocalhostUrl(server)) {
+            warnings.push('anki.server uses a non-localhost URL');
+            if (!dryRun) {
+                delete anki.server;
+            }
+        }
+    }
+
+    const audio = options.audio;
+    if (isObject(audio)) {
+        const customSourceUrl = audio.customSourceUrl;
+        if (typeof customSourceUrl === 'string' && customSourceUrl.length > 0 && !_isLocalhostUrl(customSourceUrl)) {
+            warnings.push('audio.customSourceUrl uses a non-localhost URL');
+            if (!dryRun) {
+                delete audio.customSourceUrl;
+            }
+        }
+    }
+
+    return warnings;
+}
+
+function _settingsImportSanitizeOptions(optionsFull, dryRun) {
+    const warnings = new Set();
+
+    const profiles = optionsFull.profiles;
+    if (Array.isArray(profiles)) {
+        for (const profile of profiles) {
+            if (!isObject(profile)) { continue; }
+            const options = profile.options;
+            if (!isObject(options)) { continue; }
+
+            const warnings2 = _settingsImportSanitizeProfileOptions(options, dryRun);
+            for (const warning of warnings2) {
+                warnings.add(warning);
+            }
+        }
+    }
+
+    return warnings;
+}
+
+function _utf8Decode(arrayBuffer) {
+    try {
+        return new TextDecoder('utf-8').decode(arrayBuffer);
+    } catch (e) {
+        const binaryString = String.fromCharCode.apply(null, new Uint8Array(arrayBuffer));
+        return decodeURIComponent(escape(binaryString));
+    }
+}
+
+async function _importSettingsFile(file) {
+    const dataString = _utf8Decode(await utilReadFileArrayBuffer(file));
+    const data = JSON.parse(dataString);
+
+    // Type check
+    if (!isObject(data)) {
+        throw new Error(`Invalid data type: ${typeof data}`);
+    }
+
+    // Version check
+    const version = data.version;
+    if (!(
+        typeof version === 'number' &&
+        Number.isFinite(version) &&
+        version === Math.floor(version)
+    )) {
+        throw new Error(`Invalid version: ${version}`);
+    }
+
+    if (!(
+        version >= 0 &&
+        version <= SETTINGS_EXPORT_CURRENT_VERSION
+    )) {
+        throw new Error(`Unsupported version: ${version}`);
+    }
+
+    // Verify options exists
+    let optionsFull = data.options;
+    if (!isObject(optionsFull)) {
+        throw new Error(`Invalid options type: ${typeof optionsFull}`);
+    }
+
+    // Upgrade options
+    optionsFull = optionsUpdateVersion(optionsFull, {});
+
+    // Check for warnings
+    const sanitizationWarnings = _settingsImportSanitizeOptions(optionsFull, true);
+
+    // Show sanitization warnings
+    if (sanitizationWarnings.size > 0) {
+        const {result, sanitize} = await _showSettingsImportWarnings(sanitizationWarnings);
+        if (!result) { return; }
+
+        if (sanitize !== false) {
+            _settingsImportSanitizeOptions(optionsFull, false);
+        }
+    }
+
+    // Assign options
+    await _settingsImportSetOptionsFull(optionsFull);
+
+    // Reload settings page
+    window.location.reload();
+}
+
+function _onSettingsImportClick() {
+    document.querySelector('#settings-import-file').click();
+}
+
+function _onSettingsImportFileChange(e) {
+    const files = e.target.files;
+    if (files.length === 0) { return; }
+
+    const file = files[0];
+    e.target.value = null;
+    _importSettingsFile(file).catch(_showSettingsImportError);
+}
+
+
 // Setup
 
 window.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#settings-export').addEventListener('click', _onSettingsExportClick, false);
+    document.querySelector('#settings-import').addEventListener('click', _onSettingsImportClick, false);
+    document.querySelector('#settings-import-file').addEventListener('change', _onSettingsImportFileChange, false);
 }, false);

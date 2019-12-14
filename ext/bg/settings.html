@@ -866,6 +866,55 @@
 
                 <div>
                     <button class="btn btn-default" id="settings-export">Export Settings</button>
+                    <button class="btn btn-default" id="settings-import">Import Settings</button>
+                </div>
+
+                <div hidden><input type="file" id="settings-import-file" accept=".json,application/json"></div>
+
+                <div class="modal fade" tabindex="-1" role="dialog" id="settings-import-error-modal">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Import Error</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p>
+                                    An error occurred while trying to import the settings file:
+                                </p>
+                                <p class="text-danger" id="settings-import-error-modal-message"></p>
+                                <p>
+                                    Additional info can be found in the developer console.
+                                </p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" tabindex="-1" role="dialog" id="settings-import-warning-modal">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Import Security Warning</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p>
+                                    Settings file contains settings which may pose a security risk.
+                                    Only import settings from sources you trust.
+                                </p>
+                                <ul class="text-danger" id="settings-import-warning-modal-message"></ul>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger settings-import-warning-modal-import-button">Import</button>
+                                <button type="button" class="btn btn-primary settings-import-warning-modal-import-button" data-import-sanitize="true">Sanitize and Import</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
