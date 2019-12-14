@@ -326,7 +326,7 @@ function profileOptionsCreateDefaults() {
             screenshot: {format: 'png', quality: 92},
             terms: {deck: '', model: '', fields: {}},
             kanji: {deck: '', model: '', fields: {}},
-            fieldTemplates: profileOptionsGetDefaultFieldTemplates()
+            fieldTemplates: null
         }
     };
 }

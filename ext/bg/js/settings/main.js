@@ -145,7 +145,11 @@ async function formWrite(options) {
     $('#interface-server').val(options.anki.server);
     $('#screenshot-format').val(options.anki.screenshot.format);
     $('#screenshot-quality').val(options.anki.screenshot.quality);
-    $('#field-templates').val(options.anki.fieldTemplates);
+
+    let templates = options.anki.fieldTemplates;
+    if (typeof templates !== 'string') { templates = profileOptionsGetDefaultFieldTemplates(); }
+
+    $('#field-templates').val(templates);
 
     onAnkiTemplatesValidateCompile();
     await onAnkiOptionsChanged(options);
@@ -166,7 +170,9 @@ function formUpdateVisibility(options) {
 
     if (options.general.debugInfo) {
         const temp = utilIsolate(options);
-        temp.anki.fieldTemplates = '...';
+        if (typeof temp.anki.fieldTemplates === 'string') {
+            temp.anki.fieldTemplates = '...';
+        }
         const text = JSON.stringify(temp, null, 4);
         $('#debug').text(text);
     }

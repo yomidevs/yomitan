@@ -73,7 +73,9 @@ async function ankiTemplatesValidate(infoNode, field, mode, showSuccessResult, i
         const definition = await ankiTemplatesValidateGetDefinition(text, optionsContext);
         if (definition !== null) {
             const options = await apiOptionsGet(optionsContext);
-            result = await dictFieldFormat(field, definition, mode, options, exceptions);
+            let templates = options.anki.fieldTemplates;
+            if (typeof templates !== 'string') { templates = profileOptionsGetDefaultFieldTemplates(); }
+            result = await dictFieldFormat(field, definition, mode, options, templates, exceptions);
         }
     } catch (e) {
         exceptions.push(e);

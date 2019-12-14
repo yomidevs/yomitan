@@ -310,7 +310,7 @@ function dictFieldSplit(field) {
     return field.length === 0 ? [] : field.split(' ');
 }
 
-async function dictFieldFormat(field, definition, mode, options, exceptions) {
+async function dictFieldFormat(field, definition, mode, options, templates, exceptions) {
     const data = {
         marker: null,
         definition,
@@ -329,7 +329,7 @@ async function dictFieldFormat(field, definition, mode, options, exceptions) {
         }
         data.marker = marker;
         try {
-            return await apiTemplateRender(options.anki.fieldTemplates, data, true);
+            return await apiTemplateRender(templates, data, true);
         } catch (e) {
             if (exceptions) { exceptions.push(e); }
             return `{${marker}-render-error}`;
@@ -357,7 +357,7 @@ dictFieldFormat.markers = new Set([
     'url'
 ]);
 
-async function dictNoteFormat(definition, mode, options) {
+async function dictNoteFormat(definition, mode, options, templates) {
     const note = {fields: {}, tags: options.anki.tags};
     let fields = [];
 
@@ -391,7 +391,7 @@ async function dictNoteFormat(definition, mode, options) {
     }
 
     for (const name in fields) {
-        note.fields[name] = await dictFieldFormat(fields[name], definition, mode, options);
+        note.fields[name] = await dictFieldFormat(fields[name], definition, mode, options, templates);
     }
 
     return note;

@@ -321,6 +321,7 @@ class Backend {
 
     async _onApiDefinitionAdd({definition, mode, context, optionsContext}) {
         const options = await this.getOptions(optionsContext);
+        const templates = Backend._getTemplates(options);
 
         if (mode !== 'kanji') {
             await audioInject(
@@ -339,19 +340,20 @@ class Backend {
             );
         }
 
-        const note = await dictNoteFormat(definition, mode, options);
+        const note = await dictNoteFormat(definition, mode, options, templates);
         return this.anki.addNote(note);
     }
 
     async _onApiDefinitionsAddable({definitions, modes, optionsContext}) {
         const options = await this.getOptions(optionsContext);
+        const templates = Backend._getTemplates(options);
         const states = [];
 
         try {
             const notes = [];
             for (const definition of definitions) {
                 for (const mode of modes) {
-                    const note = await dictNoteFormat(definition, mode, options);
+                    const note = await dictNoteFormat(definition, mode, options, templates);
                     notes.push(note);
                 }
             }
@@ -671,6 +673,11 @@ class Backend {
         } else {
             return 'chrome';
         }
+    }
+
+    static _getTemplates(options) {
+        const templates = options.anki.fieldTemplates;
+        return typeof templates === 'string' ? templates : profileOptionsGetDefaultFieldTemplates();
     }
 }
 
