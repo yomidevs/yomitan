@@ -35,6 +35,7 @@ function utilIsolate(value) {
 function utilFunctionIsolate(func) {
     return function (...args) {
         try {
+            args = args.map((v) => utilIsolate(v));
             return func.call(this, ...args);
         } catch (e) {
             try {
@@ -99,49 +100,49 @@ function utilBackend() {
     return chrome.extension.getBackgroundPage().yomichan_backend;
 }
 
-function utilAnkiGetModelNames() {
-    return utilBackend().anki.getModelNames();
+async function utilAnkiGetModelNames() {
+    return utilIsolate(await utilBackend().anki.getModelNames());
 }
 
-function utilAnkiGetDeckNames() {
-    return utilBackend().anki.getDeckNames();
+async function utilAnkiGetDeckNames() {
+    return utilIsolate(await utilBackend().anki.getDeckNames());
 }
 
-function utilDatabaseGetDictionaryInfo() {
-    return utilBackend().translator.database.getDictionaryInfo();
+async function utilDatabaseGetDictionaryInfo() {
+    return utilIsolate(await utilBackend().translator.database.getDictionaryInfo());
 }
 
-function utilDatabaseGetDictionaryCounts(dictionaryNames, getTotal) {
-    return utilBackend().translator.database.getDictionaryCounts(
+async function utilDatabaseGetDictionaryCounts(dictionaryNames, getTotal) {
+    return utilIsolate(await utilBackend().translator.database.getDictionaryCounts(
         utilBackgroundIsolate(dictionaryNames),
         utilBackgroundIsolate(getTotal)
-    );
+    ));
 }
 
-function utilAnkiGetModelFieldNames(modelName) {
-    return utilBackend().anki.getModelFieldNames(
+async function utilAnkiGetModelFieldNames(modelName) {
+    return utilIsolate(await utilBackend().anki.getModelFieldNames(
         utilBackgroundIsolate(modelName)
-    );
+    ));
 }
 
-function utilDatabasePurge() {
-    return utilBackend().translator.purgeDatabase();
+async function utilDatabasePurge() {
+    return utilIsolate(await utilBackend().translator.purgeDatabase());
 }
 
-function utilDatabaseDeleteDictionary(dictionaryName, onProgress) {
-    return utilBackend().translator.database.deleteDictionary(
+async function utilDatabaseDeleteDictionary(dictionaryName, onProgress) {
+    return utilIsolate(await utilBackend().translator.database.deleteDictionary(
         utilBackgroundIsolate(dictionaryName),
         utilBackgroundFunctionIsolate(onProgress)
-    );
+    ));
 }
 
 async function utilDatabaseImport(data, onProgress, details) {
     data = await utilReadFile(data);
-    return utilBackend().translator.database.importDictionary(
+    return utilIsolate(await utilBackend().translator.database.importDictionary(
         utilBackgroundIsolate(data),
         utilBackgroundFunctionIsolate(onProgress),
         utilBackgroundIsolate(details)
-    );
+    ));
 }
 
 function utilReadFile(file) {
