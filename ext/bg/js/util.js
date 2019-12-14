@@ -91,11 +91,16 @@ function utilDatabaseGetDictionaryInfo() {
 }
 
 function utilDatabaseGetDictionaryCounts(dictionaryNames, getTotal) {
-    return utilBackend().translator.database.getDictionaryCounts(dictionaryNames, getTotal);
+    return utilBackend().translator.database.getDictionaryCounts(
+        utilBackgroundIsolate(dictionaryNames),
+        utilBackgroundIsolate(getTotal)
+    );
 }
 
 function utilAnkiGetModelFieldNames(modelName) {
-    return utilBackend().anki.getModelFieldNames(modelName);
+    return utilBackend().anki.getModelFieldNames(
+        utilBackgroundIsolate(modelName)
+    );
 }
 
 function utilDatabasePurge() {
@@ -103,12 +108,19 @@ function utilDatabasePurge() {
 }
 
 function utilDatabaseDeleteDictionary(dictionaryName, onProgress) {
-    return utilBackend().translator.database.deleteDictionary(dictionaryName, onProgress);
+    return utilBackend().translator.database.deleteDictionary(
+        utilBackgroundIsolate(dictionaryName),
+        onProgress
+    );
 }
 
 async function utilDatabaseImport(data, progress, details) {
     data = await utilReadFile(data);
-    return utilBackend().translator.database.importDictionary(data, progress, details);
+    return utilBackend().translator.database.importDictionary(
+        utilBackgroundIsolate(data),
+        progress,
+        utilBackgroundIsolate(details)
+    );
 }
 
 function utilReadFile(file) {

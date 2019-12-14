@@ -17,7 +17,9 @@
  */
 
 function getOptionsMutable(optionsContext) {
-    return utilBackend().getOptions(optionsContext);
+    return utilBackend().getOptions(
+        utilBackgroundIsolate(optionsContext)
+    );
 }
 
 function getOptionsFullMutable() {
