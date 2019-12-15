@@ -42,6 +42,12 @@ class Popup {
         this.updateVisibility();
     }
 
+    // Public properties
+
+    get url() {
+        return window.location.href;
+    }
+
     inject() {
         if (this.injectPromise === null) {
             this.injectPromise = this.createInjectPromise();
@@ -382,10 +388,6 @@ class Popup {
         if (parent !== null && this.container.parentNode !== parent) {
             parent.appendChild(this.container);
         }
-    }
-
-    get url() {
-        return window.location.href;
     }
 
     static isOnExtensionPage() {
