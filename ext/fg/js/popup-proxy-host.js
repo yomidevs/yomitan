@@ -65,10 +65,6 @@ class PopupProxyHost {
         return popup;
     }
 
-    async createNestedPopup(parentId) {
-        return this.createPopup(parentId, 0).id;
-    }
-
     getPopup(id) {
         const popup = this.popups.get(id);
         if (typeof popup === 'undefined') {
@@ -86,6 +82,12 @@ class PopupProxyHost {
             y += popupRect.y;
         }
         return new DOMRect(x, y, jsonRect.width, jsonRect.height);
+    }
+
+    // Message handlers
+
+    async createNestedPopup(parentId) {
+        return this.createPopup(parentId, 0).id;
     }
 
     async setOptions(id, options) {
