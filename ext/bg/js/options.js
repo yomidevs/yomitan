@@ -86,6 +86,13 @@ const profileOptionsVersionUpdates = [
         delete options.general.audioSource;
         delete options.general.audioVolume;
         delete options.general.autoPlayAudio;
+    },
+    (options) => {
+        // Version 12 changes:
+        //  The preferred default value of options.anki.fieldTemplates has been changed to null.
+        if (utilStringHashCode(options.anki.fieldTemplates) === 1444379824) {
+            options.anki.fieldTemplates = null;
+        }
     }
 ];
 
