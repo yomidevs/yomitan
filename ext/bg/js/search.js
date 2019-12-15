@@ -244,6 +244,9 @@ class DisplaySearch extends Display {
     }
 
     startClipboardMonitor() {
+        // The token below is used as a unique identifier to ensure that a new clipboard monitor
+        // hasn't been started during the await call. The check below the await this.getClipboardText()
+        // call will exit early if the reference has changed.
         const token = {};
         const intervalCallback = async () => {
             this.clipboardMonitorTimerId = null;
