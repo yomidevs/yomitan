@@ -138,6 +138,140 @@ class Popup {
         }
     }
 
+    hide(changeFocus) {
+        if (!this.isVisible()) {
+            return;
+        }
+
+        this.setVisible(false);
+        if (this.child !== null) {
+            this.child.hide(false);
+        }
+        if (changeFocus) {
+            this.focusParent();
+        }
+    }
+
+    async isVisibleAsync() {
+        return this.isVisible();
+    }
+
+    isVisible() {
+        return this.isInjected && (this.visibleOverride !== null ? this.visibleOverride : this.visible);
+    }
+
+    setVisible(visible) {
+        this.visible = visible;
+        this.updateVisibility();
+    }
+
+    setVisibleOverride(visible) {
+        this.visibleOverride = visible;
+        this.updateVisibility();
+    }
+
+    updateVisibility() {
+        this.container.style.setProperty('visibility', this.isVisible() ? 'visible' : 'hidden', 'important');
+    }
+
+    focusParent() {
+        if (this.parent !== null) {
+            // Chrome doesn't like focusing iframe without contentWindow.
+            const contentWindow = this.parent.container.contentWindow;
+            if (contentWindow !== null) {
+                contentWindow.focus();
+            }
+        } else {
+            // Firefox doesn't like focusing window without first blurring the iframe.
+            // this.container.contentWindow.blur() doesn't work on Firefox for some reason.
+            this.container.blur();
+            // This is needed for Chrome.
+            window.focus();
+        }
+    }
+
+    updateTheme() {
+        this.container.dataset.yomichanTheme = this.options.general.popupOuterTheme;
+        this.container.dataset.yomichanSiteColor = this.getSiteColor();
+    }
+
+    getSiteColor() {
+        const color = [255, 255, 255];
+        Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.documentElement).backgroundColor));
+        Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.body).backgroundColor));
+        const dark = (color[0] < 128 && color[1] < 128 && color[2] < 128);
+        return dark ? 'dark' : 'light';
+    }
+
+    async containsPoint(x, y) {
+        for (let popup = this; popup !== null && popup.isVisible(); popup = popup.child) {
+            const rect = popup.container.getBoundingClientRect();
+            if (x >= rect.left && y >= rect.top && x < rect.right && y < rect.bottom) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    async setCustomCss(css) {
+        this.invokeApi('setCustomCss', {css});
+    }
+
+    async setCustomOuterCss(css, injectDirectly) {
+        // Cannot repeatedly inject stylesheets using web extension APIs since there is no way to remove them.
+        if (this.stylesheetInjectedViaApi) { return; }
+
+        if (injectDirectly || Popup.isOnExtensionPage()) {
+            Popup.injectOuterStylesheet(css);
+        } else {
+            if (!css) { return; }
+            try {
+                await apiInjectStylesheet(css);
+                this.stylesheetInjectedViaApi = true;
+            } catch (e) {
+                // NOP
+            }
+        }
+    }
+
+    clearAutoPlayTimer() {
+        if (this.isInjected) {
+            this.invokeApi('clearAutoPlayTimer');
+        }
+    }
+
+    invokeApi(action, params={}) {
+        this.container.contentWindow.postMessage({action, params}, '*');
+    }
+
+    observeFullscreen() {
+        const fullscreenEvents = [
+            'fullscreenchange',
+            'MSFullscreenChange',
+            'mozfullscreenchange',
+            'webkitfullscreenchange'
+        ];
+        for (const eventName of fullscreenEvents) {
+            document.addEventListener(eventName, () => this.onFullscreenChanged(), false);
+        }
+    }
+
+    getFullscreenElement() {
+        return (
+            document.fullscreenElement ||
+            document.msFullscreenElement ||
+            document.mozFullScreenElement ||
+            document.webkitFullscreenElement
+        );
+    }
+
+    onFullscreenChanged() {
+        const parent = (this.getFullscreenElement() || document.body || null);
+        if (parent !== null && this.container.parentNode !== parent) {
+            parent.appendChild(this.container);
+        }
+    }
+
     static getPositionForHorizontalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral) {
         let x = elementRect.left + optionsGeneral.popupHorizontalOffset;
         const overflowX = Math.max(x + width - maxWidth, 0);
@@ -231,71 +365,6 @@ class Popup {
         return [position, size, after];
     }
 
-    hide(changeFocus) {
-        if (!this.isVisible()) {
-            return;
-        }
-
-        this.setVisible(false);
-        if (this.child !== null) {
-            this.child.hide(false);
-        }
-        if (changeFocus) {
-            this.focusParent();
-        }
-    }
-
-    async isVisibleAsync() {
-        return this.isVisible();
-    }
-
-    isVisible() {
-        return this.isInjected && (this.visibleOverride !== null ? this.visibleOverride : this.visible);
-    }
-
-    setVisible(visible) {
-        this.visible = visible;
-        this.updateVisibility();
-    }
-
-    setVisibleOverride(visible) {
-        this.visibleOverride = visible;
-        this.updateVisibility();
-    }
-
-    updateVisibility() {
-        this.container.style.setProperty('visibility', this.isVisible() ? 'visible' : 'hidden', 'important');
-    }
-
-    focusParent() {
-        if (this.parent !== null) {
-            // Chrome doesn't like focusing iframe without contentWindow.
-            const contentWindow = this.parent.container.contentWindow;
-            if (contentWindow !== null) {
-                contentWindow.focus();
-            }
-        } else {
-            // Firefox doesn't like focusing window without first blurring the iframe.
-            // this.container.contentWindow.blur() doesn't work on Firefox for some reason.
-            this.container.blur();
-            // This is needed for Chrome.
-            window.focus();
-        }
-    }
-
-    updateTheme() {
-        this.container.dataset.yomichanTheme = this.options.general.popupOuterTheme;
-        this.container.dataset.yomichanSiteColor = this.getSiteColor();
-    }
-
-    getSiteColor() {
-        const color = [255, 255, 255];
-        Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.documentElement).backgroundColor));
-        Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.body).backgroundColor));
-        const dark = (color[0] < 128 && color[1] < 128 && color[2] < 128);
-        return dark ? 'dark' : 'light';
-    }
-
     static addColor(target, color) {
         if (color === null) { return; }
 
@@ -319,75 +388,6 @@ class Popup {
             Number.parseInt(m[3], 10),
             m4 ? Math.max(0.0, Math.min(1.0, Number.parseFloat(m4))) : 1.0
         ];
-    }
-
-    async containsPoint(x, y) {
-        for (let popup = this; popup !== null && popup.isVisible(); popup = popup.child) {
-            const rect = popup.container.getBoundingClientRect();
-            if (x >= rect.left && y >= rect.top && x < rect.right && y < rect.bottom) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    async setCustomCss(css) {
-        this.invokeApi('setCustomCss', {css});
-    }
-
-    async setCustomOuterCss(css, injectDirectly) {
-        // Cannot repeatedly inject stylesheets using web extension APIs since there is no way to remove them.
-        if (this.stylesheetInjectedViaApi) { return; }
-
-        if (injectDirectly || Popup.isOnExtensionPage()) {
-            Popup.injectOuterStylesheet(css);
-        } else {
-            if (!css) { return; }
-            try {
-                await apiInjectStylesheet(css);
-                this.stylesheetInjectedViaApi = true;
-            } catch (e) {
-                // NOP
-            }
-        }
-    }
-
-    clearAutoPlayTimer() {
-        if (this.isInjected) {
-            this.invokeApi('clearAutoPlayTimer');
-        }
-    }
-
-    invokeApi(action, params={}) {
-        this.container.contentWindow.postMessage({action, params}, '*');
-    }
-
-    observeFullscreen() {
-        const fullscreenEvents = [
-            'fullscreenchange',
-            'MSFullscreenChange',
-            'mozfullscreenchange',
-            'webkitfullscreenchange'
-        ];
-        for (const eventName of fullscreenEvents) {
-            document.addEventListener(eventName, () => this.onFullscreenChanged(), false);
-        }
-    }
-
-    getFullscreenElement() {
-        return (
-            document.fullscreenElement ||
-            document.msFullscreenElement ||
-            document.mozFullScreenElement ||
-            document.webkitFullscreenElement
-        );
-    }
-
-    onFullscreenChanged() {
-        const parent = (this.getFullscreenElement() || document.body || null);
-        if (parent !== null && this.container.parentNode !== parent) {
-            parent.appendChild(this.container);
-        }
     }
 
     static isOnExtensionPage() {
