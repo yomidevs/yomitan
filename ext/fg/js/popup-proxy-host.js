@@ -73,17 +73,6 @@ class PopupProxyHost {
         return popup;
     }
 
-    jsonRectToDOMRect(popup, jsonRect) {
-        let x = jsonRect.x;
-        let y = jsonRect.y;
-        if (popup.parent !== null) {
-            const popupRect = popup.parent.container.getBoundingClientRect();
-            x += popupRect.x;
-            y += popupRect.y;
-        }
-        return new DOMRect(x, y, jsonRect.width, jsonRect.height);
-    }
-
     // Message handlers
 
     async createNestedPopup(parentId) {
@@ -117,7 +106,7 @@ class PopupProxyHost {
 
     async showContent(id, elementRect, writingMode, type, details) {
         const popup = this.getPopup(id);
-        elementRect = this.jsonRectToDOMRect(popup, elementRect);
+        elementRect = PopupProxyHost.convertJsonRectToDOMRect(popup, elementRect);
         if (!PopupProxyHost.popupCanShow(popup)) { return Promise.resolve(false); }
         return await popup.showContent(elementRect, writingMode, type, details);
     }
@@ -130,6 +119,17 @@ class PopupProxyHost {
     async clearAutoPlayTimer(id) {
         const popup = this.getPopup(id);
         return popup.clearAutoPlayTimer();
+    }
+
+    static convertJsonRectToDOMRect(popup, jsonRect) {
+        let x = jsonRect.x;
+        let y = jsonRect.y;
+        if (popup.parent !== null) {
+            const popupRect = popup.parent.container.getBoundingClientRect();
+            x += popupRect.x;
+            y += popupRect.y;
+        }
+        return new DOMRect(x, y, jsonRect.width, jsonRect.height);
     }
 
     static popupCanShow(popup) {
