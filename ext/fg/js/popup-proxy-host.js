@@ -25,6 +25,8 @@ class PopupProxyHost {
         this.frameIdPromise = null;
     }
 
+    // Public functions
+
     static create() {
         const popupProxyHost = new PopupProxyHost();
         popupProxyHost.prepare();
@@ -65,14 +67,6 @@ class PopupProxyHost {
         return popup;
     }
 
-    getPopup(id) {
-        const popup = this.popups.get(id);
-        if (typeof popup === 'undefined') {
-            throw new Error('Invalid popup ID');
-        }
-        return popup;
-    }
-
     // Message handlers
 
     async createNestedPopup(parentId) {
@@ -80,48 +74,58 @@ class PopupProxyHost {
     }
 
     async setOptions(id, options) {
-        const popup = this.getPopup(id);
+        const popup = this._getPopup(id);
         return await popup.setOptions(options);
     }
 
     async hide(id, changeFocus) {
-        const popup = this.getPopup(id);
+        const popup = this._getPopup(id);
         return popup.hide(changeFocus);
     }
 
     async isVisibleAsync(id) {
-        const popup = this.getPopup(id);
+        const popup = this._getPopup(id);
         return await popup.isVisibleAsync();
     }
 
     async setVisibleOverride(id, visible) {
-        const popup = this.getPopup(id);
+        const popup = this._getPopup(id);
         return await popup.setVisibleOverride(visible);
     }
 
     async containsPoint(id, x, y) {
-        const popup = this.getPopup(id);
+        const popup = this._getPopup(id);
         return await popup.containsPoint(x, y);
     }
 
     async showContent(id, elementRect, writingMode, type, details) {
-        const popup = this.getPopup(id);
-        elementRect = PopupProxyHost.convertJsonRectToDOMRect(popup, elementRect);
-        if (!PopupProxyHost.popupCanShow(popup)) { return Promise.resolve(false); }
+        const popup = this._getPopup(id);
+        elementRect = PopupProxyHost._convertJsonRectToDOMRect(popup, elementRect);
+        if (!PopupProxyHost._popupCanShow(popup)) { return Promise.resolve(false); }
         return await popup.showContent(elementRect, writingMode, type, details);
     }
 
     async setCustomCss(id, css) {
-        const popup = this.getPopup(id);
+        const popup = this._getPopup(id);
         return popup.setCustomCss(css);
     }
 
     async clearAutoPlayTimer(id) {
-        const popup = this.getPopup(id);
+        const popup = this._getPopup(id);
         return popup.clearAutoPlayTimer();
     }
 
-    static convertJsonRectToDOMRect(popup, jsonRect) {
+    // Private functions
+
+    _getPopup(id) {
+        const popup = this.popups.get(id);
+        if (typeof popup === 'undefined') {
+            throw new Error('Invalid popup ID');
+        }
+        return popup;
+    }
+
+    static _convertJsonRectToDOMRect(popup, jsonRect) {
         let x = jsonRect.x;
         let y = jsonRect.y;
         if (popup.parent !== null) {
@@ -132,7 +136,7 @@ class PopupProxyHost {
         return new DOMRect(x, y, jsonRect.width, jsonRect.height);
     }
 
-    static popupCanShow(popup) {
+    static _popupCanShow(popup) {
         return popup.parent === null || popup.parent.isVisible();
     }
 }
