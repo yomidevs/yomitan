@@ -286,8 +286,10 @@ class DisplaySearch extends Display {
     async getClipboardText() {
         /*
         Notes:
-            apiClipboardGet doesn't work on firefox because document.execCommand('paste') requires
-            user interaction. Therefore, navigator.clipboard.readText() is used.
+            apiClipboardGet doesn't work on Firefox because document.execCommand('paste')
+            results in an empty string on the web extension background page.
+            This may be a bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1603985
+            Therefore, navigator.clipboard.readText() is used on Firefox.
 
             navigator.clipboard.readText() can't be used in Chrome for two reasons:
             * Requires page to be focused, else it rejects with an exception.
