@@ -339,10 +339,32 @@ function _onSettingsImportFileChange(e) {
 }
 
 
+// Resetting
+
+function _onSettingsResetClick() {
+    $('#settings-reset-modal').modal('show');
+}
+
+async function _onSettingsResetConfirmClick() {
+    $('#settings-reset-modal').modal('hide');
+
+    // Get default options
+    const optionsFull = optionsGetDefault();
+
+    // Assign options
+    await _settingsImportSetOptionsFull(optionsFull);
+
+    // Reload settings page
+    window.location.reload();
+}
+
+
 // Setup
 
 window.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#settings-export').addEventListener('click', _onSettingsExportClick, false);
     document.querySelector('#settings-import').addEventListener('click', _onSettingsImportClick, false);
     document.querySelector('#settings-import-file').addEventListener('change', _onSettingsImportFileChange, false);
+    document.querySelector('#settings-reset').addEventListener('click', _onSettingsResetClick, false);
+    document.querySelector('#settings-reset-modal-confirm').addEventListener('click', _onSettingsResetConfirmClick, false);
 }, false);

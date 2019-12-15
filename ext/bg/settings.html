@@ -867,6 +867,7 @@
                 <div>
                     <button class="btn btn-default" id="settings-export">Export Settings</button>
                     <button class="btn btn-default" id="settings-import">Import Settings</button>
+                    <button class="btn btn-danger" id="settings-reset">Reset Default Settings</button>
                 </div>
 
                 <div hidden><input type="file" id="settings-import-file" accept=".json,application/json"></div>
@@ -912,6 +913,36 @@
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                                 <button type="button" class="btn btn-danger settings-import-warning-modal-import-button">Import</button>
                                 <button type="button" class="btn btn-primary settings-import-warning-modal-import-button" data-import-sanitize="true">Sanitize and Import</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" tabindex="-1" role="dialog" id="settings-reset-modal">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Settings Reset</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p class="text-danger">
+                                    You are about to reset all Yomichan settings back to their default values.
+                                    This will delete all custom profiles you may have created.
+                                    <strong>This action cannot be undone.</strong>
+                                </p>
+                                <p>
+                                    Consider making a backup using the "Export Settings" button before resetting
+                                    if you want to be able to revert.
+                                </p>
+                                <p>
+                                    Dictionary data will not be deleted, but any installed dictionaries
+                                    will need to be re-enabled.
+                                </p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger" id="settings-reset-modal-confirm">Reset All Settings</button>
                             </div>
                         </div>
                     </div>

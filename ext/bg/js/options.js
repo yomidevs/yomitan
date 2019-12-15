@@ -488,3 +488,7 @@ function optionsSave(options) {
         });
     });
 }
+
+function optionsGetDefault() {
+    return optionsUpdateVersion({}, {});
+}
