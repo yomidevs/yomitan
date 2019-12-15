@@ -557,6 +557,9 @@ async function onDictionaryPurge(e) {
 }
 
 async function onDictionaryImport(e) {
+    const files = [...e.target.files];
+    e.target.value = null;
+
     const dictFile = $('#dict-file');
     const dictControls = $('#dict-importer').hide();
     const dictProgress = $('#dict-import-progress').show();
@@ -576,8 +579,6 @@ async function onDictionaryImport(e) {
                 storageUpdateStats();
             }
         };
-
-        const files = [...e.target.files];
 
         const optionsFull = await apiOptionsGetFull();
 
