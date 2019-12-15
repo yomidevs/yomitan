@@ -19,10 +19,10 @@
 
 class PopupProxyHost {
     constructor() {
-        this.popups = new Map();
-        this.nextId = 0;
-        this.apiReceiver = null;
-        this.frameIdPromise = null;
+        this._popups = new Map();
+        this._nextId = 0;
+        this._apiReceiver = null;
+        this._frameIdPromise = null;
     }
 
     // Public functions
@@ -34,11 +34,11 @@ class PopupProxyHost {
     }
 
     async prepare() {
-        this.frameIdPromise = apiFrameInformationGet();
-        const {frameId} = await this.frameIdPromise;
+        this._frameIdPromise = apiFrameInformationGet();
+        const {frameId} = await this._frameIdPromise;
         if (typeof frameId !== 'number') { return; }
 
-        this.apiReceiver = new FrontendApiReceiver(`popup-proxy-host#${frameId}`, new Map([
+        this._apiReceiver = new FrontendApiReceiver(`popup-proxy-host#${frameId}`, new Map([
             ['createNestedPopup', ({parentId}) => this._onApiCreateNestedPopup(parentId)],
             ['setOptions', ({id, options}) => this._onApiSetOptions(id, options)],
             ['hide', ({id, changeFocus}) => this._onApiHide(id, changeFocus)],
@@ -52,18 +52,18 @@ class PopupProxyHost {
     }
 
     createPopup(parentId, depth) {
-        const parent = (typeof parentId === 'string' && this.popups.has(parentId) ? this.popups.get(parentId) : null);
-        const id = `${this.nextId}`;
+        const parent = (typeof parentId === 'string' && this._popups.has(parentId) ? this._popups.get(parentId) : null);
+        const id = `${this._nextId}`;
         if (parent !== null) {
             depth = parent.depth + 1;
         }
-        ++this.nextId;
-        const popup = new Popup(id, depth, this.frameIdPromise);
+        ++this._nextId;
+        const popup = new Popup(id, depth, this._frameIdPromise);
         if (parent !== null) {
             popup.parent = parent;
             parent.child = popup;
         }
-        this.popups.set(id, popup);
+        this._popups.set(id, popup);
         return popup;
     }
 
@@ -118,7 +118,7 @@ class PopupProxyHost {
     // Private functions
 
     _getPopup(id) {
-        const popup = this.popups.get(id);
+        const popup = this._popups.get(id);
         if (typeof popup === 'undefined') {
             throw new Error('Invalid popup ID');
         }
