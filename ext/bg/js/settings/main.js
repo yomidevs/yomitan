@@ -80,7 +80,6 @@ async function formRead(options) {
     options.anki.server = $('#interface-server').val();
     options.anki.screenshot.format = $('#screenshot-format').val();
     options.anki.screenshot.quality = parseInt($('#screenshot-quality').val(), 10);
-    options.anki.fieldTemplates = $('#field-templates').val();
 
     if (optionsAnkiEnableOld && !ankiErrorShown()) {
         options.anki.terms.deck = $('#anki-terms-deck').val();
@@ -146,12 +145,7 @@ async function formWrite(options) {
     $('#screenshot-format').val(options.anki.screenshot.format);
     $('#screenshot-quality').val(options.anki.screenshot.quality);
 
-    let templates = options.anki.fieldTemplates;
-    if (typeof templates !== 'string') { templates = profileOptionsGetDefaultFieldTemplates(); }
-
-    $('#field-templates').val(templates);
-
-    onAnkiTemplatesValidateCompile();
+    await ankiTemplatesUpdateValue();
     await onAnkiOptionsChanged(options);
     await onDictionaryOptionsChanged(options);
 
