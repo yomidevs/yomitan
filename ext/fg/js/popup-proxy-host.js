@@ -19,7 +19,7 @@
 
 class PopupProxyHost {
     constructor() {
-        this.popups = {};
+        this.popups = new Map();
         this.nextId = 0;
         this.apiReceiver = null;
         this.frameIdPromise = null;
@@ -50,7 +50,7 @@ class PopupProxyHost {
     }
 
     createPopup(parentId, depth) {
-        const parent = (typeof parentId === 'string' && hasOwn(this.popups, parentId) ? this.popups[parentId] : null);
+        const parent = (typeof parentId === 'string' && this.popups.has(parentId) ? this.popups.get(parentId) : null);
         const id = `${this.nextId}`;
         if (parent !== null) {
             depth = parent.depth + 1;
@@ -61,7 +61,7 @@ class PopupProxyHost {
             popup.parent = parent;
             parent.child = popup;
         }
-        this.popups[id] = popup;
+        this.popups.set(id, popup);
         return popup;
     }
 
@@ -70,11 +70,11 @@ class PopupProxyHost {
     }
 
     getPopup(id) {
-        if (!hasOwn(this.popups, id)) {
+        const popup = this.popups.get(id);
+        if (typeof popup === 'undefined') {
             throw new Error('Invalid popup ID');
         }
-
-        return this.popups[id];
+        return popup;
     }
 
     jsonRectToDOMRect(popup, jsonRect) {
