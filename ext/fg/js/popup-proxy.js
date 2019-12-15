@@ -19,19 +19,34 @@
 
 class PopupProxy {
     constructor(depth, parentId, parentFrameId, url) {
-        this.parentId = parentId;
-        this.parentFrameId = parentFrameId;
-        this.id = null;
-        this.idPromise = null;
-        this.parent = null;
-        this.child = null;
-        this.depth = depth;
-        this.url = url;
-
-        this.container = null;
-
-        this.apiSender = new FrontendApiSender();
+        this._parentId = parentId;
+        this._parentFrameId = parentFrameId;
+        this._id = null;
+        this._idPromise = null;
+        this._depth = depth;
+        this._url = url;
+        this._apiSender = new FrontendApiSender();
     }
+
+    // Public properties
+
+    get parent() {
+        return null;
+    }
+
+    get child() {
+        return null;
+    }
+
+    get depth() {
+        return this._depth;
+    }
+
+    get url() {
+        return this._url;
+    }
+
+    // Public functions
 
     async setOptions(options) {
         const id = await this._getPopupId();
@@ -39,10 +54,10 @@ class PopupProxy {
     }
 
     async hide(changeFocus) {
-        if (this.id === null) {
+        if (this._id === null) {
             return;
         }
-        return await this._invokeHostApi('hide', {id: this.id, changeFocus});
+        return await this._invokeHostApi('hide', {id: this._id, changeFocus});
     }
 
     async isVisibleAsync() {
@@ -56,10 +71,10 @@ class PopupProxy {
     }
 
     async containsPoint(x, y) {
-        if (this.id === null) {
+        if (this._id === null) {
             return false;
         }
-        return await this._invokeHostApi('containsPoint', {id: this.id, x, y});
+        return await this._invokeHostApi('containsPoint', {id: this._id, x, y});
     }
 
     async showContent(elementRect, writingMode, type=null, details=null) {
@@ -74,32 +89,32 @@ class PopupProxy {
     }
 
     async clearAutoPlayTimer() {
-        if (this.id === null) {
+        if (this._id === null) {
             return;
         }
-        return await this._invokeHostApi('clearAutoPlayTimer', {id: this.id});
+        return await this._invokeHostApi('clearAutoPlayTimer', {id: this._id});
     }
 
     // Private
 
     _getPopupId() {
-        if (this.idPromise === null) {
-            this.idPromise = this._getPopupIdAsync();
+        if (this._idPromise === null) {
+            this._idPromise = this._getPopupIdAsync();
         }
-        return this.idPromise;
+        return this._idPromise;
     }
 
     async _getPopupIdAsync() {
-        const id = await this._invokeHostApi('createNestedPopup', {parentId: this.parentId});
-        this.id = id;
+        const id = await this._invokeHostApi('createNestedPopup', {parentId: this._parentId});
+        this._id = id;
         return id;
     }
 
     _invokeHostApi(action, params={}) {
-        if (typeof this.parentFrameId !== 'number') {
+        if (typeof this._parentFrameId !== 'number') {
             return Promise.reject(new Error('Invalid frame'));
         }
-        return this.apiSender.invoke(action, params, `popup-proxy-host#${this.parentFrameId}`);
+        return this._apiSender.invoke(action, params, `popup-proxy-host#${this._parentFrameId}`);
     }
 
     static _convertDOMRectToJson(domRect) {
