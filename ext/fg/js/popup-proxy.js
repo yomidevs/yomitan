@@ -33,74 +33,76 @@ class PopupProxy {
         this.apiSender = new FrontendApiSender();
     }
 
-    getPopupId() {
-        if (this.idPromise === null) {
-            this.idPromise = this.getPopupIdAsync();
-        }
-        return this.idPromise;
-    }
-
-    async getPopupIdAsync() {
-        const id = await this.invokeHostApi('createNestedPopup', {parentId: this.parentId});
-        this.id = id;
-        return id;
-    }
-
     async setOptions(options) {
-        const id = await this.getPopupId();
-        return await this.invokeHostApi('setOptions', {id, options});
+        const id = await this._getPopupId();
+        return await this._invokeHostApi('setOptions', {id, options});
     }
 
     async hide(changeFocus) {
         if (this.id === null) {
             return;
         }
-        return await this.invokeHostApi('hide', {id: this.id, changeFocus});
+        return await this._invokeHostApi('hide', {id: this.id, changeFocus});
     }
 
     async isVisibleAsync() {
-        const id = await this.getPopupId();
-        return await this.invokeHostApi('isVisibleAsync', {id});
+        const id = await this._getPopupId();
+        return await this._invokeHostApi('isVisibleAsync', {id});
     }
 
     async setVisibleOverride(visible) {
-        const id = await this.getPopupId();
-        return await this.invokeHostApi('setVisibleOverride', {id, visible});
+        const id = await this._getPopupId();
+        return await this._invokeHostApi('setVisibleOverride', {id, visible});
     }
 
     async containsPoint(x, y) {
         if (this.id === null) {
             return false;
         }
-        return await this.invokeHostApi('containsPoint', {id: this.id, x, y});
+        return await this._invokeHostApi('containsPoint', {id: this.id, x, y});
     }
 
     async showContent(elementRect, writingMode, type=null, details=null) {
-        const id = await this.getPopupId();
-        elementRect = PopupProxy.DOMRectToJson(elementRect);
-        return await this.invokeHostApi('showContent', {id, elementRect, writingMode, type, details});
+        const id = await this._getPopupId();
+        elementRect = PopupProxy._convertDOMRectToJson(elementRect);
+        return await this._invokeHostApi('showContent', {id, elementRect, writingMode, type, details});
     }
 
     async setCustomCss(css) {
-        const id = await this.getPopupId();
-        return await this.invokeHostApi('setCustomCss', {id, css});
+        const id = await this._getPopupId();
+        return await this._invokeHostApi('setCustomCss', {id, css});
     }
 
     async clearAutoPlayTimer() {
         if (this.id === null) {
             return;
         }
-        return await this.invokeHostApi('clearAutoPlayTimer', {id: this.id});
+        return await this._invokeHostApi('clearAutoPlayTimer', {id: this.id});
     }
 
-    invokeHostApi(action, params={}) {
+    // Private
+
+    _getPopupId() {
+        if (this.idPromise === null) {
+            this.idPromise = this._getPopupIdAsync();
+        }
+        return this.idPromise;
+    }
+
+    async _getPopupIdAsync() {
+        const id = await this._invokeHostApi('createNestedPopup', {parentId: this.parentId});
+        this.id = id;
+        return id;
+    }
+
+    _invokeHostApi(action, params={}) {
         if (typeof this.parentFrameId !== 'number') {
             return Promise.reject(new Error('Invalid frame'));
         }
         return this.apiSender.invoke(action, params, `popup-proxy-host#${this.parentFrameId}`);
     }
 
-    static DOMRectToJson(domRect) {
+    static _convertDOMRectToJson(domRect) {
         return {
             x: domRect.x,
             y: domRect.y,
