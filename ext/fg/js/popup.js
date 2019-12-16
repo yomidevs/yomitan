@@ -48,6 +48,63 @@ class Popup {
         return window.location.href;
     }
 
+    // Public functions
+
+    async setOptions(options) {
+        this.options = options;
+        this.updateTheme();
+    }
+
+    hide(changeFocus) {
+        if (!this.isVisible()) {
+            return;
+        }
+
+        this.setVisible(false);
+        if (this.child !== null) {
+            this.child.hide(false);
+        }
+        if (changeFocus) {
+            this.focusParent();
+        }
+    }
+
+    async isVisibleAsync() {
+        return this.isVisible();
+    }
+
+    setVisibleOverride(visible) {
+        this.visibleOverride = visible;
+        this.updateVisibility();
+    }
+
+    async containsPoint(x, y) {
+        for (let popup = this; popup !== null && popup.isVisible(); popup = popup.child) {
+            const rect = popup.container.getBoundingClientRect();
+            if (x >= rect.left && y >= rect.top && x < rect.right && y < rect.bottom) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    async showContent(elementRect, writingMode, type=null, details=null) {
+        if (!this.isInitialized()) { return; }
+        await this.show(elementRect, writingMode);
+        if (type === null) { return; }
+        this.invokeApi('setContent', {type, details});
+    }
+
+    async setCustomCss(css) {
+        this.invokeApi('setCustomCss', {css});
+    }
+
+    clearAutoPlayTimer() {
+        if (this.isInjected) {
+            this.invokeApi('clearAutoPlayTimer');
+        }
+    }
+
     inject() {
         if (this.injectPromise === null) {
             this.injectPromise = this.createInjectPromise();
@@ -91,18 +148,6 @@ class Popup {
         return this.options !== null;
     }
 
-    async setOptions(options) {
-        this.options = options;
-        this.updateTheme();
-    }
-
-    async showContent(elementRect, writingMode, type=null, details=null) {
-        if (!this.isInitialized()) { return; }
-        await this.show(elementRect, writingMode);
-        if (type === null) { return; }
-        this.invokeApi('setContent', {type, details});
-    }
-
     async show(elementRect, writingMode) {
         await this.inject();
 
@@ -138,35 +183,12 @@ class Popup {
         }
     }
 
-    hide(changeFocus) {
-        if (!this.isVisible()) {
-            return;
-        }
-
-        this.setVisible(false);
-        if (this.child !== null) {
-            this.child.hide(false);
-        }
-        if (changeFocus) {
-            this.focusParent();
-        }
-    }
-
-    async isVisibleAsync() {
-        return this.isVisible();
-    }
-
     isVisible() {
         return this.isInjected && (this.visibleOverride !== null ? this.visibleOverride : this.visible);
     }
 
     setVisible(visible) {
         this.visible = visible;
-        this.updateVisibility();
-    }
-
-    setVisibleOverride(visible) {
-        this.visibleOverride = visible;
         this.updateVisibility();
     }
 
@@ -203,20 +225,6 @@ class Popup {
         return dark ? 'dark' : 'light';
     }
 
-    async containsPoint(x, y) {
-        for (let popup = this; popup !== null && popup.isVisible(); popup = popup.child) {
-            const rect = popup.container.getBoundingClientRect();
-            if (x >= rect.left && y >= rect.top && x < rect.right && y < rect.bottom) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    async setCustomCss(css) {
-        this.invokeApi('setCustomCss', {css});
-    }
-
     async setCustomOuterCss(css, injectDirectly) {
         // Cannot repeatedly inject stylesheets using web extension APIs since there is no way to remove them.
         if (this.stylesheetInjectedViaApi) { return; }
@@ -231,12 +239,6 @@ class Popup {
             } catch (e) {
                 // NOP
             }
-        }
-    }
-
-    clearAutoPlayTimer() {
-        if (this.isInjected) {
-            this.invokeApi('clearAutoPlayTimer');
         }
     }
 
