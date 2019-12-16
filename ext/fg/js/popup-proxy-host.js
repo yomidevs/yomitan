@@ -140,7 +140,7 @@ class PopupProxyHost {
     }
 
     static _popupCanShow(popup) {
-        return popup.parent === null || popup.parent.isVisible();
+        return popup.parent === null || popup.parent.isVisibleSync();
     }
 }
 

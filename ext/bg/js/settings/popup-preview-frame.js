@@ -166,7 +166,7 @@ class SettingsPopupPreview {
         this.textSource = source;
         await this.frontend.showContentCompleted();
 
-        if (this.frontend.popup.isVisible()) {
+        if (this.frontend.popup.isVisibleSync()) {
             this.popupShown = true;
         }
 

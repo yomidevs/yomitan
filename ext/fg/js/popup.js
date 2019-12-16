@@ -70,7 +70,7 @@ class Popup {
     }
 
     hide(changeFocus) {
-        if (!this.isVisible()) {
+        if (!this.isVisibleSync()) {
             return;
         }
 
@@ -84,7 +84,7 @@ class Popup {
     }
 
     async isVisibleAsync() {
-        return this.isVisible();
+        return this.isVisibleSync();
     }
 
     setVisibleOverride(visible) {
@@ -93,7 +93,7 @@ class Popup {
     }
 
     async containsPoint(x, y) {
-        for (let popup = this; popup !== null && popup.isVisible(); popup = popup._child) {
+        for (let popup = this; popup !== null && popup.isVisibleSync(); popup = popup._child) {
             const rect = popup._container.getBoundingClientRect();
             if (x >= rect.left && y >= rect.top && x < rect.right && y < rect.bottom) {
                 return true;
@@ -135,7 +135,7 @@ class Popup {
         parent._child = this;
     }
 
-    isVisible() {
+    isVisibleSync() {
         return this._isInjected && (this._visibleOverride !== null ? this._visibleOverride : this._visible);
     }
 
@@ -279,7 +279,7 @@ class Popup {
     }
 
     _updateVisibility() {
-        this._container.style.setProperty('visibility', this.isVisible() ? 'visible' : 'hidden', 'important');
+        this._container.style.setProperty('visibility', this.isVisibleSync() ? 'visible' : 'hidden', 'important');
     }
 
     _focusParent() {
