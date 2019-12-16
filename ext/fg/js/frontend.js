@@ -67,7 +67,7 @@ class Frontend extends TextScanner {
 
     async onResize() {
         const textSource = this.textSourceCurrent;
-        if (textSource !== null && await this.popup.isVisibleAsync()) {
+        if (textSource !== null && await this.popup.isVisible()) {
             this._lastShowPromise = this.popup.showContent(
                 textSource.getRect(),
                 textSource.getWritingMode()

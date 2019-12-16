@@ -83,7 +83,7 @@ class Popup {
         }
     }
 
-    async isVisibleAsync() {
+    async isVisible() {
         return this.isVisibleSync();
     }
 

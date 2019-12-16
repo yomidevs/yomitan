@@ -42,7 +42,7 @@ class PopupProxyHost {
             ['createNestedPopup', ({parentId}) => this._onApiCreateNestedPopup(parentId)],
             ['setOptions', ({id, options}) => this._onApiSetOptions(id, options)],
             ['hide', ({id, changeFocus}) => this._onApiHide(id, changeFocus)],
-            ['isVisibleAsync', ({id}) => this._onApiIsVisibleAsync(id)],
+            ['isVisible', ({id}) => this._onApiIsVisibleAsync(id)],
             ['setVisibleOverride', ({id, visible}) => this._onApiSetVisibleOverride(id, visible)],
             ['containsPoint', ({id, x, y}) => this._onApiContainsPoint(id, x, y)],
             ['showContent', ({id, elementRect, writingMode, type, details}) => this._onApiShowContent(id, elementRect, writingMode, type, details)],
@@ -73,7 +73,7 @@ class PopupProxyHost {
 
     async _onApiIsVisibleAsync(id) {
         const popup = this._getPopup(id);
-        return await popup.isVisibleAsync();
+        return await popup.isVisible();
     }
 
     async _onApiSetVisibleOverride(id, visible) {
