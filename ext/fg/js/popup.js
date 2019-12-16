@@ -285,7 +285,7 @@ class Popup {
     _focusParent() {
         if (this._parent !== null) {
             // Chrome doesn't like focusing iframe without contentWindow.
-            const contentWindow = this._parent.container.contentWindow;
+            const contentWindow = this._parent._container.contentWindow;
             if (contentWindow !== null) {
                 contentWindow.focus();
             }
