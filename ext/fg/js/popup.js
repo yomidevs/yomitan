@@ -19,32 +19,44 @@
 
 class Popup {
     constructor(id, depth, frameIdPromise) {
-        this.id = id;
-        this.depth = depth;
-        this.frameIdPromise = frameIdPromise;
-        this.frameId = null;
-        this.parent = null;
-        this.child = null;
-        this.childrenSupported = true;
-        this.injectPromise = null;
-        this.isInjected = false;
-        this.visible = false;
-        this.visibleOverride = null;
-        this.options = null;
-        this.stylesheetInjectedViaApi = false;
+        this._id = id;
+        this._depth = depth;
+        this._frameIdPromise = frameIdPromise;
+        this._frameId = null;
+        this._parent = null;
+        this._child = null;
+        this._childrenSupported = true;
+        this._injectPromise = null;
+        this._isInjected = false;
+        this._visible = false;
+        this._visibleOverride = null;
+        this._options = null;
+        this._stylesheetInjectedViaApi = false;
 
-        this.container = document.createElement('iframe');
-        this.container.className = 'yomichan-float';
-        this.container.addEventListener('mousedown', (e) => e.stopPropagation());
-        this.container.addEventListener('scroll', (e) => e.stopPropagation());
-        this.container.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
-        this.container.style.width = '0px';
-        this.container.style.height = '0px';
+        this._container = document.createElement('iframe');
+        this._container.className = 'yomichan-float';
+        this._container.addEventListener('mousedown', (e) => e.stopPropagation());
+        this._container.addEventListener('scroll', (e) => e.stopPropagation());
+        this._container.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
+        this._container.style.width = '0px';
+        this._container.style.height = '0px';
 
         this._updateVisibility();
     }
 
     // Public properties
+
+    get parent() {
+        return this._parent;
+    }
+
+    get child() {
+        return this._child;
+    }
+
+    get depth() {
+        return this._depth;
+    }
 
     get url() {
         return window.location.href;
@@ -57,7 +69,7 @@ class Popup {
     }
 
     async setOptions(options) {
-        this.options = options;
+        this._options = options;
         this.updateTheme();
     }
 
@@ -67,8 +79,8 @@ class Popup {
         }
 
         this._setVisible(false);
-        if (this.child !== null) {
-            this.child.hide(false);
+        if (this._child !== null) {
+            this._child.hide(false);
         }
         if (changeFocus) {
             this._focusParent();
@@ -80,13 +92,13 @@ class Popup {
     }
 
     setVisibleOverride(visible) {
-        this.visibleOverride = visible;
+        this._visibleOverride = visible;
         this._updateVisibility();
     }
 
     async containsPoint(x, y) {
-        for (let popup = this; popup !== null && popup.isVisible(); popup = popup.child) {
-            const rect = popup.container.getBoundingClientRect();
+        for (let popup = this; popup !== null && popup.isVisible(); popup = popup._child) {
+            const rect = popup._container.getBoundingClientRect();
             if (x >= rect.left && y >= rect.top && x < rect.right && y < rect.bottom) {
                 return true;
             }
@@ -106,7 +118,7 @@ class Popup {
     }
 
     clearAutoPlayTimer() {
-        if (this.isInjected) {
+        if (this._isInjected) {
             this._invokeApi('clearAutoPlayTimer');
         }
     }
@@ -117,28 +129,28 @@ class Popup {
         if (parent === null) {
             throw new Error('Cannot set popup parent to null');
         }
-        if (this.parent !== null) {
+        if (this._parent !== null) {
             throw new Error('Popup already has a parent');
         }
-        if (parent.child !== null) {
+        if (parent._child !== null) {
             throw new Error('Cannot parent popup to another popup which already has a child');
         }
-        this.parent = parent;
-        parent.child = this;
+        this._parent = parent;
+        parent._child = this;
     }
 
     isVisible() {
-        return this.isInjected && (this.visibleOverride !== null ? this.visibleOverride : this.visible);
+        return this._isInjected && (this._visibleOverride !== null ? this._visibleOverride : this._visible);
     }
 
     updateTheme() {
-        this.container.dataset.yomichanTheme = this.options.general.popupOuterTheme;
-        this.container.dataset.yomichanSiteColor = this._getSiteColor();
+        this._container.dataset.yomichanTheme = this._options.general.popupOuterTheme;
+        this._container.dataset.yomichanSiteColor = this._getSiteColor();
     }
 
     async setCustomOuterCss(css, injectDirectly) {
         // Cannot repeatedly inject stylesheets using web extension APIs since there is no way to remove them.
-        if (this.stylesheetInjectedViaApi) { return; }
+        if (this._stylesheetInjectedViaApi) { return; }
 
         if (injectDirectly || Popup._isOnExtensionPage()) {
             Popup.injectOuterStylesheet(css);
@@ -146,7 +158,7 @@ class Popup {
             if (!css) { return; }
             try {
                 await apiInjectStylesheet(css);
-                this.stylesheetInjectedViaApi = true;
+                this._stylesheetInjectedViaApi = true;
             } catch (e) {
                 // NOP
             }
@@ -154,15 +166,15 @@ class Popup {
     }
 
     setChildrenSupported(value) {
-        this.childrenSupported = value;
+        this._childrenSupported = value;
     }
 
     getContainer() {
-        return this.container;
+        return this._container;
     }
 
     getContainerRect() {
-        return this.container.getBoundingClientRect();
+        return this._container.getBoundingClientRect();
     }
 
     static injectOuterStylesheet(css) {
@@ -188,53 +200,53 @@ class Popup {
     // Private functions
 
     _inject() {
-        if (this.injectPromise === null) {
-            this.injectPromise = this._createInjectPromise();
+        if (this._injectPromise === null) {
+            this._injectPromise = this._createInjectPromise();
         }
-        return this.injectPromise;
+        return this._injectPromise;
     }
 
     async _createInjectPromise() {
         try {
-            const {frameId} = await this.frameIdPromise;
+            const {frameId} = await this._frameIdPromise;
             if (typeof frameId === 'number') {
-                this.frameId = frameId;
+                this._frameId = frameId;
             }
         } catch (e) {
             // NOP
         }
 
         return new Promise((resolve) => {
-            const parentFrameId = (typeof this.frameId === 'number' ? this.frameId : null);
-            this.container.addEventListener('load', () => {
+            const parentFrameId = (typeof this._frameId === 'number' ? this._frameId : null);
+            this._container.addEventListener('load', () => {
                 this._invokeApi('initialize', {
-                    options: this.options,
+                    options: this._options,
                     popupInfo: {
-                        id: this.id,
-                        depth: this.depth,
+                        id: this._id,
+                        depth: this._depth,
                         parentFrameId
                     },
                     url: this.url,
-                    childrenSupported: this.childrenSupported
+                    childrenSupported: this._childrenSupported
                 });
                 resolve();
             });
             this._observeFullscreen();
             this._onFullscreenChanged();
-            this.setCustomOuterCss(this.options.general.customPopupOuterCss, false);
-            this.isInjected = true;
+            this.setCustomOuterCss(this._options.general.customPopupOuterCss, false);
+            this._isInjected = true;
         });
     }
 
     _isInitialized() {
-        return this.options !== null;
+        return this._options !== null;
     }
 
     async _show(elementRect, writingMode) {
         await this._inject();
 
-        const optionsGeneral = this.options.general;
-        const container = this.container;
+        const optionsGeneral = this._options.general;
+        const container = this._container;
         const containerRect = container.getBoundingClientRect();
         const getPosition = (
             writingMode === 'horizontal-tb' || optionsGeneral.popupVerticalTextPosition === 'default' ?
@@ -260,31 +272,31 @@ class Popup {
         container.style.height = `${height}px`;
 
         this._setVisible(true);
-        if (this.child !== null) {
-            this.child.hide(true);
+        if (this._child !== null) {
+            this._child.hide(true);
         }
     }
 
     _setVisible(visible) {
-        this.visible = visible;
+        this._visible = visible;
         this._updateVisibility();
     }
 
     _updateVisibility() {
-        this.container.style.setProperty('visibility', this.isVisible() ? 'visible' : 'hidden', 'important');
+        this._container.style.setProperty('visibility', this.isVisible() ? 'visible' : 'hidden', 'important');
     }
 
     _focusParent() {
-        if (this.parent !== null) {
+        if (this._parent !== null) {
             // Chrome doesn't like focusing iframe without contentWindow.
-            const contentWindow = this.parent.container.contentWindow;
+            const contentWindow = this._parent.container.contentWindow;
             if (contentWindow !== null) {
                 contentWindow.focus();
             }
         } else {
             // Firefox doesn't like focusing window without first blurring the iframe.
             // this.container.contentWindow.blur() doesn't work on Firefox for some reason.
-            this.container.blur();
+            this._container.blur();
             // This is needed for Chrome.
             window.focus();
         }
@@ -299,7 +311,7 @@ class Popup {
     }
 
     _invokeApi(action, params={}) {
-        this.container.contentWindow.postMessage({action, params}, '*');
+        this._container.contentWindow.postMessage({action, params}, '*');
     }
 
     _observeFullscreen() {
@@ -325,8 +337,8 @@ class Popup {
 
     _onFullscreenChanged() {
         const parent = (this._getFullscreenElement() || document.body || null);
-        if (parent !== null && this.container.parentNode !== parent) {
-            parent.appendChild(this.container);
+        if (parent !== null && this._container.parentNode !== parent) {
+            parent.appendChild(this._container);
         }
     }
 
