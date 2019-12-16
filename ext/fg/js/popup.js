@@ -113,6 +113,20 @@ class Popup {
 
     // Popup-only public functions
 
+    setParent(parent) {
+        if (parent === null) {
+            throw new Error('Cannot set popup parent to null');
+        }
+        if (this.parent !== null) {
+            throw new Error('Popup already has a parent');
+        }
+        if (parent.child !== null) {
+            throw new Error('Cannot parent popup to another popup which already has a child');
+        }
+        this.parent = parent;
+        parent.child = this;
+    }
+
     isVisible() {
         return this.isInjected && (this.visibleOverride !== null ? this.visibleOverride : this.visible);
     }

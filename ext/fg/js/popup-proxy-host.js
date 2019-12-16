@@ -114,8 +114,7 @@ class PopupProxyHost {
         ++this._nextId;
         const popup = new Popup(id, depth, this._frameIdPromise);
         if (parent !== null) {
-            popup.parent = parent;
-            parent.child = popup;
+            popup.setParent(parent);
         }
         this._popups.set(id, popup);
         return {popup, id};
