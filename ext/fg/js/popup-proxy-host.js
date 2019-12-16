@@ -52,25 +52,13 @@ class PopupProxyHost {
     }
 
     createPopup(parentId, depth) {
-        const parent = (typeof parentId === 'string' && this._popups.has(parentId) ? this._popups.get(parentId) : null);
-        const id = `${this._nextId}`;
-        if (parent !== null) {
-            depth = parent.depth + 1;
-        }
-        ++this._nextId;
-        const popup = new Popup(id, depth, this._frameIdPromise);
-        if (parent !== null) {
-            popup.parent = parent;
-            parent.child = popup;
-        }
-        this._popups.set(id, popup);
-        return popup;
+        return this._createPopupInternal(parentId, depth).popup;
     }
 
     // Message handlers
 
     async _onApiCreateNestedPopup(parentId) {
-        return this.createPopup(parentId, 0).id;
+        return this._createPopupInternal(parentId, 0).id;
     }
 
     async _onApiSetOptions(id, options) {
@@ -116,6 +104,22 @@ class PopupProxyHost {
     }
 
     // Private functions
+
+    _createPopupInternal(parentId, depth) {
+        const parent = (typeof parentId === 'string' && this._popups.has(parentId) ? this._popups.get(parentId) : null);
+        const id = `${this._nextId}`;
+        if (parent !== null) {
+            depth = parent.depth + 1;
+        }
+        ++this._nextId;
+        const popup = new Popup(id, depth, this._frameIdPromise);
+        if (parent !== null) {
+            popup.parent = parent;
+            parent.child = popup;
+        }
+        this._popups.set(id, popup);
+        return {popup, id};
+    }
 
     _getPopup(id) {
         const popup = this._popups.get(id);
