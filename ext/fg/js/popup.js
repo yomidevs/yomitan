@@ -39,7 +39,7 @@ class Popup {
         this.visibleOverride = null;
         this.options = null;
         this.stylesheetInjectedViaApi = false;
-        this.updateVisibility();
+        this._updateVisibility();
     }
 
     // Public properties
@@ -60,12 +60,12 @@ class Popup {
             return;
         }
 
-        this.setVisible(false);
+        this._setVisible(false);
         if (this.child !== null) {
             this.child.hide(false);
         }
         if (changeFocus) {
-            this.focusParent();
+            this._focusParent();
         }
     }
 
@@ -75,7 +75,7 @@ class Popup {
 
     setVisibleOverride(visible) {
         this.visibleOverride = visible;
-        this.updateVisibility();
+        this._updateVisibility();
     }
 
     async containsPoint(x, y) {
@@ -89,19 +89,19 @@ class Popup {
     }
 
     async showContent(elementRect, writingMode, type=null, details=null) {
-        if (!this.isInitialized()) { return; }
-        await this.show(elementRect, writingMode);
+        if (!this._isInitialized()) { return; }
+        await this._show(elementRect, writingMode);
         if (type === null) { return; }
-        this.invokeApi('setContent', {type, details});
+        this._invokeApi('setContent', {type, details});
     }
 
     async setCustomCss(css) {
-        this.invokeApi('setCustomCss', {css});
+        this._invokeApi('setCustomCss', {css});
     }
 
     clearAutoPlayTimer() {
         if (this.isInjected) {
-            this.invokeApi('clearAutoPlayTimer');
+            this._invokeApi('clearAutoPlayTimer');
         }
     }
 
@@ -113,14 +113,14 @@ class Popup {
 
     updateTheme() {
         this.container.dataset.yomichanTheme = this.options.general.popupOuterTheme;
-        this.container.dataset.yomichanSiteColor = this.getSiteColor();
+        this.container.dataset.yomichanSiteColor = this._getSiteColor();
     }
 
     async setCustomOuterCss(css, injectDirectly) {
         // Cannot repeatedly inject stylesheets using web extension APIs since there is no way to remove them.
         if (this.stylesheetInjectedViaApi) { return; }
 
-        if (injectDirectly || Popup.isOnExtensionPage()) {
+        if (injectDirectly || Popup._isOnExtensionPage()) {
             Popup.injectOuterStylesheet(css);
         } else {
             if (!css) { return; }
@@ -153,14 +153,16 @@ class Popup {
         }
     }
 
-    inject() {
+    // Private functions
+
+    _inject() {
         if (this.injectPromise === null) {
-            this.injectPromise = this.createInjectPromise();
+            this.injectPromise = this._createInjectPromise();
         }
         return this.injectPromise;
     }
 
-    async createInjectPromise() {
+    async _createInjectPromise() {
         try {
             const {frameId} = await this.frameIdPromise;
             if (typeof frameId === 'number') {
@@ -173,7 +175,7 @@ class Popup {
         return new Promise((resolve) => {
             const parentFrameId = (typeof this.frameId === 'number' ? this.frameId : null);
             this.container.addEventListener('load', () => {
-                this.invokeApi('initialize', {
+                this._invokeApi('initialize', {
                     options: this.options,
                     popupInfo: {
                         id: this.id,
@@ -185,27 +187,27 @@ class Popup {
                 });
                 resolve();
             });
-            this.observeFullscreen();
-            this.onFullscreenChanged();
+            this._observeFullscreen();
+            this._onFullscreenChanged();
             this.setCustomOuterCss(this.options.general.customPopupOuterCss, false);
             this.isInjected = true;
         });
     }
 
-    isInitialized() {
+    _isInitialized() {
         return this.options !== null;
     }
 
-    async show(elementRect, writingMode) {
-        await this.inject();
+    async _show(elementRect, writingMode) {
+        await this._inject();
 
         const optionsGeneral = this.options.general;
         const container = this.container;
         const containerRect = container.getBoundingClientRect();
         const getPosition = (
             writingMode === 'horizontal-tb' || optionsGeneral.popupVerticalTextPosition === 'default' ?
-            Popup.getPositionForHorizontalText :
-            Popup.getPositionForVerticalText
+            Popup._getPositionForHorizontalText :
+            Popup._getPositionForVerticalText
         );
 
         const [x, y, width, height, below] = getPosition(
@@ -225,22 +227,22 @@ class Popup {
         container.style.width = `${width}px`;
         container.style.height = `${height}px`;
 
-        this.setVisible(true);
+        this._setVisible(true);
         if (this.child !== null) {
             this.child.hide(true);
         }
     }
 
-    setVisible(visible) {
+    _setVisible(visible) {
         this.visible = visible;
-        this.updateVisibility();
+        this._updateVisibility();
     }
 
-    updateVisibility() {
+    _updateVisibility() {
         this.container.style.setProperty('visibility', this.isVisible() ? 'visible' : 'hidden', 'important');
     }
 
-    focusParent() {
+    _focusParent() {
         if (this.parent !== null) {
             // Chrome doesn't like focusing iframe without contentWindow.
             const contentWindow = this.parent.container.contentWindow;
@@ -256,19 +258,19 @@ class Popup {
         }
     }
 
-    getSiteColor() {
+    _getSiteColor() {
         const color = [255, 255, 255];
-        Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.documentElement).backgroundColor));
-        Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.body).backgroundColor));
+        Popup._addColor(color, Popup._getColorInfo(window.getComputedStyle(document.documentElement).backgroundColor));
+        Popup._addColor(color, Popup._getColorInfo(window.getComputedStyle(document.body).backgroundColor));
         const dark = (color[0] < 128 && color[1] < 128 && color[2] < 128);
         return dark ? 'dark' : 'light';
     }
 
-    invokeApi(action, params={}) {
+    _invokeApi(action, params={}) {
         this.container.contentWindow.postMessage({action, params}, '*');
     }
 
-    observeFullscreen() {
+    _observeFullscreen() {
         const fullscreenEvents = [
             'fullscreenchange',
             'MSFullscreenChange',
@@ -276,11 +278,11 @@ class Popup {
             'webkitfullscreenchange'
         ];
         for (const eventName of fullscreenEvents) {
-            document.addEventListener(eventName, () => this.onFullscreenChanged(), false);
+            document.addEventListener(eventName, () => this._onFullscreenChanged(), false);
         }
     }
 
-    getFullscreenElement() {
+    _getFullscreenElement() {
         return (
             document.fullscreenElement ||
             document.msFullscreenElement ||
@@ -289,14 +291,14 @@ class Popup {
         );
     }
 
-    onFullscreenChanged() {
-        const parent = (this.getFullscreenElement() || document.body || null);
+    _onFullscreenChanged() {
+        const parent = (this._getFullscreenElement() || document.body || null);
         if (parent !== null && this.container.parentNode !== parent) {
             parent.appendChild(this.container);
         }
     }
 
-    static getPositionForHorizontalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral) {
+    static _getPositionForHorizontalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral) {
         let x = elementRect.left + optionsGeneral.popupHorizontalOffset;
         const overflowX = Math.max(x + width - maxWidth, 0);
         if (overflowX > 0) {
@@ -311,7 +313,7 @@ class Popup {
         const preferBelow = (optionsGeneral.popupHorizontalTextPosition === 'below');
 
         const verticalOffset = optionsGeneral.popupVerticalOffset;
-        const [y, h, below] = Popup.limitGeometry(
+        const [y, h, below] = Popup._limitGeometry(
             elementRect.top - verticalOffset,
             elementRect.bottom + verticalOffset,
             height,
@@ -322,19 +324,19 @@ class Popup {
         return [x, y, width, h, below];
     }
 
-    static getPositionForVerticalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral, writingMode) {
-        const preferRight = Popup.isVerticalTextPopupOnRight(optionsGeneral.popupVerticalTextPosition, writingMode);
+    static _getPositionForVerticalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral, writingMode) {
+        const preferRight = Popup._isVerticalTextPopupOnRight(optionsGeneral.popupVerticalTextPosition, writingMode);
         const horizontalOffset = optionsGeneral.popupHorizontalOffset2;
         const verticalOffset = optionsGeneral.popupVerticalOffset2;
 
-        const [x, w] = Popup.limitGeometry(
+        const [x, w] = Popup._limitGeometry(
             elementRect.left - horizontalOffset,
             elementRect.right + horizontalOffset,
             width,
             maxWidth,
             preferRight
         );
-        const [y, h, below] = Popup.limitGeometry(
+        const [y, h, below] = Popup._limitGeometry(
             elementRect.bottom - verticalOffset,
             elementRect.top + verticalOffset,
             height,
@@ -344,12 +346,12 @@ class Popup {
         return [x, y, w, h, below];
     }
 
-    static isVerticalTextPopupOnRight(positionPreference, writingMode) {
+    static _isVerticalTextPopupOnRight(positionPreference, writingMode) {
         switch (positionPreference) {
             case 'before':
-                return !Popup.isWritingModeLeftToRight(writingMode);
+                return !Popup._isWritingModeLeftToRight(writingMode);
             case 'after':
-                return Popup.isWritingModeLeftToRight(writingMode);
+                return Popup._isWritingModeLeftToRight(writingMode);
             case 'left':
                 return false;
             case 'right':
@@ -357,7 +359,7 @@ class Popup {
         }
     }
 
-    static isWritingModeLeftToRight(writingMode) {
+    static _isWritingModeLeftToRight(writingMode) {
         switch (writingMode) {
             case 'vertical-lr':
             case 'sideways-lr':
@@ -367,7 +369,7 @@ class Popup {
         }
     }
 
-    static limitGeometry(positionBefore, positionAfter, size, limit, preferAfter) {
+    static _limitGeometry(positionBefore, positionAfter, size, limit, preferAfter) {
         let after = preferAfter;
         let position = 0;
         const overflowBefore = Math.max(0, size - positionBefore);
@@ -389,7 +391,7 @@ class Popup {
         return [position, size, after];
     }
 
-    static addColor(target, color) {
+    static _addColor(target, color) {
         if (color === null) { return; }
 
         const a = color[3];
@@ -401,7 +403,7 @@ class Popup {
         }
     }
 
-    static getColorInfo(cssColor) {
+    static _getColorInfo(cssColor) {
         const m = /^\s*rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)\s*$/.exec(cssColor);
         if (m === null) { return null; }
 
@@ -414,7 +416,7 @@ class Popup {
         ];
     }
 
-    static isOnExtensionPage() {
+    static _isOnExtensionPage() {
         try {
             const url = chrome.runtime.getURL('/');
             return window.location.href.substring(0, url.length) === url;
