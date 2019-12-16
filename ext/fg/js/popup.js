@@ -52,6 +52,10 @@ class Popup {
 
     // Public functions
 
+    isProxy() {
+        return false;
+    }
+
     async setOptions(options) {
         this.options = options;
         this.updateTheme();

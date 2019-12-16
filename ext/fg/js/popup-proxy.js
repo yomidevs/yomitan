@@ -48,6 +48,10 @@ class PopupProxy {
 
     // Public functions
 
+    isProxy() {
+        return true;
+    }
+
     async setOptions(options) {
         const id = await this._getPopupId();
         return await this._invokeHostApi('setOptions', {id, options});
