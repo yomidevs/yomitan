@@ -54,7 +54,6 @@ class SettingsPopupPreview {
         this.frontend.searchClear = function () {};
 
         this.frontend.popup.childrenSupported = false;
-        this.frontend.popup.interactive = false;
 
         await this.frontend.isPrepared();
 
