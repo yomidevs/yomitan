@@ -53,7 +53,7 @@ class SettingsPopupPreview {
         this.frontend.setEnabled = function () {};
         this.frontend.searchClear = function () {};
 
-        this.frontend.popup.childrenSupported = false;
+        this.frontend.popup.setChildrenSupported(false);
 
         await this.frontend.isPrepared();
 

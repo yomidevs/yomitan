@@ -135,6 +135,10 @@ class Popup {
         }
     }
 
+    setChildrenSupported(value) {
+        this.childrenSupported = value;
+    }
+
     getContainer() {
         return this.container;
     }
