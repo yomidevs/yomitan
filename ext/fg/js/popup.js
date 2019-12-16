@@ -26,6 +26,13 @@ class Popup {
         this.parent = null;
         this.child = null;
         this.childrenSupported = true;
+        this.injectPromise = null;
+        this.isInjected = false;
+        this.visible = false;
+        this.visibleOverride = null;
+        this.options = null;
+        this.stylesheetInjectedViaApi = false;
+
         this.container = document.createElement('iframe');
         this.container.className = 'yomichan-float';
         this.container.addEventListener('mousedown', (e) => e.stopPropagation());
@@ -33,12 +40,7 @@ class Popup {
         this.container.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
         this.container.style.width = '0px';
         this.container.style.height = '0px';
-        this.injectPromise = null;
-        this.isInjected = false;
-        this.visible = false;
-        this.visibleOverride = null;
-        this.options = null;
-        this.stylesheetInjectedViaApi = false;
+
         this._updateVisibility();
     }
 
