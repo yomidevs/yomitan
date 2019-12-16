@@ -101,7 +101,7 @@ class PopupProxyHost {
     async _onApiShowContent(id, elementRect, writingMode, type, details) {
         const popup = this._getPopup(id);
         elementRect = PopupProxyHost._convertJsonRectToDOMRect(popup, elementRect);
-        if (!PopupProxyHost._popupCanShow(popup)) { return Promise.resolve(false); }
+        if (!PopupProxyHost._popupCanShow(popup)) { return; }
         return await popup.showContent(elementRect, writingMode, type, details);
     }
 

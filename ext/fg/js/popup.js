@@ -105,6 +105,54 @@ class Popup {
         }
     }
 
+    // Popup-only public functions
+
+    isVisible() {
+        return this.isInjected && (this.visibleOverride !== null ? this.visibleOverride : this.visible);
+    }
+
+    updateTheme() {
+        this.container.dataset.yomichanTheme = this.options.general.popupOuterTheme;
+        this.container.dataset.yomichanSiteColor = this.getSiteColor();
+    }
+
+    async setCustomOuterCss(css, injectDirectly) {
+        // Cannot repeatedly inject stylesheets using web extension APIs since there is no way to remove them.
+        if (this.stylesheetInjectedViaApi) { return; }
+
+        if (injectDirectly || Popup.isOnExtensionPage()) {
+            Popup.injectOuterStylesheet(css);
+        } else {
+            if (!css) { return; }
+            try {
+                await apiInjectStylesheet(css);
+                this.stylesheetInjectedViaApi = true;
+            } catch (e) {
+                // NOP
+            }
+        }
+    }
+
+    static injectOuterStylesheet(css) {
+        if (Popup.outerStylesheet === null) {
+            if (!css) { return; }
+            Popup.outerStylesheet = document.createElement('style');
+            Popup.outerStylesheet.id = 'yomichan-popup-outer-stylesheet';
+        }
+
+        const outerStylesheet = Popup.outerStylesheet;
+        if (css) {
+            outerStylesheet.textContent = css;
+
+            const par = document.head;
+            if (par && outerStylesheet.parentNode !== par) {
+                par.appendChild(outerStylesheet);
+            }
+        } else {
+            outerStylesheet.textContent = '';
+        }
+    }
+
     inject() {
         if (this.injectPromise === null) {
             this.injectPromise = this.createInjectPromise();
@@ -183,10 +231,6 @@ class Popup {
         }
     }
 
-    isVisible() {
-        return this.isInjected && (this.visibleOverride !== null ? this.visibleOverride : this.visible);
-    }
-
     setVisible(visible) {
         this.visible = visible;
         this.updateVisibility();
@@ -212,34 +256,12 @@ class Popup {
         }
     }
 
-    updateTheme() {
-        this.container.dataset.yomichanTheme = this.options.general.popupOuterTheme;
-        this.container.dataset.yomichanSiteColor = this.getSiteColor();
-    }
-
     getSiteColor() {
         const color = [255, 255, 255];
         Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.documentElement).backgroundColor));
         Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.body).backgroundColor));
         const dark = (color[0] < 128 && color[1] < 128 && color[2] < 128);
         return dark ? 'dark' : 'light';
-    }
-
-    async setCustomOuterCss(css, injectDirectly) {
-        // Cannot repeatedly inject stylesheets using web extension APIs since there is no way to remove them.
-        if (this.stylesheetInjectedViaApi) { return; }
-
-        if (injectDirectly || Popup.isOnExtensionPage()) {
-            Popup.injectOuterStylesheet(css);
-        } else {
-            if (!css) { return; }
-            try {
-                await apiInjectStylesheet(css);
-                this.stylesheetInjectedViaApi = true;
-            } catch (e) {
-                // NOP
-            }
-        }
     }
 
     invokeApi(action, params={}) {
@@ -398,26 +420,6 @@ class Popup {
             return window.location.href.substring(0, url.length) === url;
         } catch (e) {
             // NOP
-        }
-    }
-
-    static injectOuterStylesheet(css) {
-        if (Popup.outerStylesheet === null) {
-            if (!css) { return; }
-            Popup.outerStylesheet = document.createElement('style');
-            Popup.outerStylesheet.id = 'yomichan-popup-outer-stylesheet';
-        }
-
-        const outerStylesheet = Popup.outerStylesheet;
-        if (css) {
-            outerStylesheet.textContent = css;
-
-            const par = document.head;
-            if (par && outerStylesheet.parentNode !== par) {
-                par.appendChild(outerStylesheet);
-            }
-        } else {
-            outerStylesheet.textContent = '';
         }
     }
 }
