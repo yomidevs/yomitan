@@ -53,11 +53,11 @@ class PopupProxy {
         return await this._invokeHostApi('setOptions', {id, options});
     }
 
-    async hide(changeFocus) {
+    hide(changeFocus) {
         if (this._id === null) {
             return;
         }
-        return await this._invokeHostApi('hide', {id: this._id, changeFocus});
+        this._invokeHostApi('hide', {id: this._id, changeFocus});
     }
 
     async isVisible() {
@@ -65,9 +65,11 @@ class PopupProxy {
         return await this._invokeHostApi('isVisible', {id});
     }
 
-    async setVisibleOverride(visible) {
-        const id = await this._getPopupId();
-        return await this._invokeHostApi('setVisibleOverride', {id, visible});
+    setVisibleOverride(visible) {
+        if (this._id === null) {
+            return;
+        }
+        this._invokeHostApi('setVisibleOverride', {id, visible});
     }
 
     async containsPoint(x, y) {
@@ -88,11 +90,11 @@ class PopupProxy {
         return await this._invokeHostApi('setCustomCss', {id, css});
     }
 
-    async clearAutoPlayTimer() {
+    clearAutoPlayTimer() {
         if (this._id === null) {
             return;
         }
-        return await this._invokeHostApi('clearAutoPlayTimer', {id: this._id});
+        this._invokeHostApi('clearAutoPlayTimer', {id: this._id});
     }
 
     // Private
