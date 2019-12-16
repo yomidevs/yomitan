@@ -200,6 +200,6 @@ Frontend._windowMessageHandlers = new Map([
 ]);
 
 Frontend._runtimeMessageHandlers = new Map([
-    ['optionsUpdate', (self) => self.updateOptions()],
-    ['popupSetVisibleOverride', (self, {visible}) => self.popup.setVisibleOverride(visible)]
+    ['optionsUpdate', (self) => { self.updateOptions(); }],
+    ['popupSetVisibleOverride', (self, {visible}) => { self.popup.setVisibleOverride(visible); }]
 ]);
