@@ -135,6 +135,10 @@ class Popup {
         }
     }
 
+    getContainerRect() {
+        return this.container.getBoundingClientRect();
+    }
+
     static injectOuterStylesheet(css) {
         if (Popup.outerStylesheet === null) {
             if (!css) { return; }

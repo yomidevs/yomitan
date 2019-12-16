@@ -129,7 +129,7 @@ class PopupProxyHost {
         let x = jsonRect.x;
         let y = jsonRect.y;
         if (popup.parent !== null) {
-            const popupRect = popup.parent.container.getBoundingClientRect();
+            const popupRect = popup.parent.getContainerRect();
             x += popupRect.x;
             y += popupRect.y;
         }
