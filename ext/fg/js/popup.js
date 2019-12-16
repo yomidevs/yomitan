@@ -135,6 +135,10 @@ class Popup {
         }
     }
 
+    getContainer() {
+        return this.container;
+    }
+
     getContainerRect() {
         return this.container.getBoundingClientRect();
     }

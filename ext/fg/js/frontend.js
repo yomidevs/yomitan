@@ -22,7 +22,7 @@ class Frontend extends TextScanner {
         super(
             window,
             ignoreNodes,
-            [popup.container],
+            [popup.getContainer()],
             [(x, y) => this.popup.containsPoint(x, y)]
         );
 
