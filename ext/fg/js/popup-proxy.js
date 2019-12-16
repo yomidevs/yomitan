@@ -34,10 +34,6 @@ class PopupProxy {
         return null;
     }
 
-    get child() {
-        return null;
-    }
-
     get depth() {
         return this._depth;
     }

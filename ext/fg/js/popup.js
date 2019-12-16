@@ -50,10 +50,6 @@ class Popup {
         return this._parent;
     }
 
-    get child() {
-        return this._child;
-    }
-
     get depth() {
         return this._depth;
     }
