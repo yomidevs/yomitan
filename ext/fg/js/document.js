@@ -321,7 +321,7 @@ function disableTransparentElement(elements, i, modifications) {
         if (isElementTransparent(element)) {
             const style = element.hasAttribute('style') ? element.getAttribute('style') : null;
             modifications.push({element, style});
-            element.style.pointerEvents = 'none';
+            element.style.setProperty('pointer-events', 'none', 'important');
             return i;
         }
     }
