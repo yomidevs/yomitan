@@ -106,8 +106,7 @@ function docElementsFromPoint(x, y, all) {
     return e !== null ? [e] : [];
 }
 
-function docRangeFromPoint(x, y, options) {
-    const deepDomScan = options.scanning.deepDomScan;
+function docRangeFromPoint(x, y, deepDomScan) {
     const elements = docElementsFromPoint(x, y, deepDomScan);
     let imposter = null;
     let imposterContainer = null;

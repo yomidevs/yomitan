@@ -144,7 +144,7 @@ class Display {
         try {
             e.preventDefault();
 
-            const textSource = docRangeFromPoint(e.clientX, e.clientY, this.options);
+            const textSource = docRangeFromPoint(e.clientX, e.clientY, this.options.scanning.deepDomScan);
             if (textSource === null) {
                 return false;
             }

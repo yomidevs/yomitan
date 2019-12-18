@@ -297,7 +297,7 @@ class TextScanner {
                 }
             }
 
-            const textSource = docRangeFromPoint(x, y, this.options);
+            const textSource = docRangeFromPoint(x, y, this.options.scanning.deepDomScan);
             if (this.textSourceCurrent !== null && this.textSourceCurrent.equals(textSource)) {
                 return;
             }
