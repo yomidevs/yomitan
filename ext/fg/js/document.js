@@ -97,7 +97,9 @@ function docImposterCreate(element, isTextarea) {
 
 function docElementsFromPoint(x, y, all) {
     if (all) {
-        return document.elementsFromPoint(x, y);
+        // document.elementsFromPoint can return duplicates which must be removed.
+        const elements = document.elementsFromPoint(x, y);
+        return elements.filter((e, i) => elements.indexOf(e) === i);
     }
 
     const e = document.elementFromPoint(x, y);
