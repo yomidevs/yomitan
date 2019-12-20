@@ -54,6 +54,7 @@ class Frontend extends TextScanner {
         try {
             await this.updateOptions();
 
+            yomichan.on('optionsUpdate', () => this.updateOptions());
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
             this.isPreparedPromiseResolve();
         } catch (e) {
@@ -200,6 +201,5 @@ Frontend._windowMessageHandlers = new Map([
 ]);
 
 Frontend._runtimeMessageHandlers = new Map([
-    ['optionsUpdate', (self) => { self.updateOptions(); }],
     ['popupSetVisibleOverride', (self, {visible}) => { self.popup.setVisibleOverride(visible); }]
 ]);

@@ -225,15 +225,6 @@ class Display {
         }
     }
 
-    onRuntimeMessage({action, params}, sender, callback) {
-        const handler = Display._runtimeMessageHandlers.get(action);
-        if (typeof handler !== 'function') { return false; }
-
-        const result = handler(this, params, sender);
-        callback(result);
-        return false;
-    }
-
     getOptionsContext() {
         throw new Error('Override me');
     }
@@ -244,7 +235,7 @@ class Display {
 
     async initialize(options=null) {
         await this.updateOptions(options);
-        chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
+        yomichan.on('optionsUpdate', () => this.updateOptions(null));
     }
 
     async updateOptions(options) {
@@ -877,8 +868,4 @@ Display._onKeyDownHandlers = new Map([
         }
         return false;
     }]
-]);
-
-Display._runtimeMessageHandlers = new Map([
-    ['optionsUpdate', (self) => self.updateOptions(null)]
 ]);

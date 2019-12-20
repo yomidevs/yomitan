@@ -204,14 +204,6 @@ async function onOptionsUpdate({source}) {
     await formWrite(options);
 }
 
-function onMessage({action, params}) {
-    switch (action) {
-        case 'optionsUpdate':
-            onOptionsUpdate(params);
-            break;
-    }
-}
-
 
 function showExtensionInformation() {
     const node = document.getElementById('extension-info');
@@ -235,7 +227,7 @@ async function onReady() {
 
     storageInfoInitialize();
 
-    chrome.runtime.onMessage.addListener(onMessage);
+    yomichan.on('optionsUpdate', onOptionsUpdate);
 }
 
 $(document).ready(() => onReady());

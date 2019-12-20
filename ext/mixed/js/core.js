@@ -232,10 +232,13 @@ class EventDispatcher {
  */
 
 const yomichan = (() => {
-    class Yomichan {
+    class Yomichan extends EventDispatcher {
         constructor() {
+            super();
+
             this._messageHandlers = new Map([
-                ['getUrl', this._onMessageGetUrl.bind(this)]
+                ['getUrl', this._onMessageGetUrl.bind(this)],
+                ['optionsUpdate', this._onMessageOptionsUpdate.bind(this)]
             ]);
 
             chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
@@ -252,6 +255,10 @@ const yomichan = (() => {
 
         _onMessageGetUrl() {
             return {url: window.location.href};
+        }
+
+        _onMessageOptionsUpdate({source}) {
+            this.trigger('optionsUpdate', {source});
         }
     }
 
