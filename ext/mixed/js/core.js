@@ -231,15 +231,29 @@ class EventDispatcher {
  * Default message handlers
  */
 
-(() => {
-    function onMessage({action}, sender, callback) {
-        switch (action) {
-            case 'getUrl':
-                callback({url: window.location.href});
-                break;
+const yomichan = (() => {
+    class Yomichan {
+        constructor() {
+            this._messageHandlers = new Map([
+                ['getUrl', this._onMessageGetUrl.bind(this)]
+            ]);
+
+            chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
         }
-        return false;
+
+        _onMessage({action, params}, sender, callback) {
+            const handler = this._messageHandlers.get(action);
+            if (typeof handler !== 'function') { return false; }
+
+            const result = handler(params, sender);
+            callback(result);
+            return false;
+        }
+
+        _onMessageGetUrl() {
+            return {url: window.location.href};
+        }
     }
 
-    chrome.runtime.onMessage.addListener(onMessage);
+    return new Yomichan();
 })();
