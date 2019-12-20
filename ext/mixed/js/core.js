@@ -244,6 +244,14 @@ const yomichan = (() => {
             chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
         }
 
+        // Public
+
+        triggerOrphaned(error) {
+            this.trigger('orphaned', {error});
+        }
+
+        // Private
+
         _onMessage({action, params}, sender, callback) {
             const handler = this._messageHandlers.get(action);
             if (typeof handler !== 'function') { return false; }

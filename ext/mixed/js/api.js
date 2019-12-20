@@ -115,8 +115,8 @@ function _apiInvoke(action, params={}) {
                 }
             });
         } catch (e) {
-            window.yomichan_orphaned = true;
             reject(e);
+            yomichan.triggerOrphaned(e);
         }
     });
 }

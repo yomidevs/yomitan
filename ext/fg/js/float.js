@@ -27,15 +27,22 @@ class DisplayFloat extends Display {
             url: window.location.href
         };
 
+        this._orphaned = false;
+
+        yomichan.on('orphaned', () => this.onOrphaned());
         window.addEventListener('message', (e) => this.onMessage(e), false);
     }
 
     onError(error) {
-        if (window.yomichan_orphaned) {
+        if (this._orphaned) {
             this.setContentOrphaned();
         } else {
             logError(error, true);
         }
+    }
+
+    onOrphaned() {
+        this._orphaned = true;
     }
 
     onSearchClear() {

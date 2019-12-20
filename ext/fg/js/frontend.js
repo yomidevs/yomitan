@@ -37,6 +37,7 @@ class Frontend extends TextScanner {
         this.isPreparedPromiseResolve = null;
         this.isPreparedPromise = new Promise((resolve) => { this.isPreparedPromiseResolve = resolve; });
 
+        this._orphaned = true;
         this._lastShowPromise = Promise.resolve();
     }
 
@@ -54,6 +55,7 @@ class Frontend extends TextScanner {
         try {
             await this.updateOptions();
 
+            yomichan.on('orphaned', () => this.onOrphaned());
             yomichan.on('optionsUpdate', () => this.updateOptions());
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
             this.isPreparedPromiseResolve();
@@ -93,6 +95,10 @@ class Frontend extends TextScanner {
         return false;
     }
 
+    onOrphaned() {
+        this._orphaned = true;
+    }
+
     getMouseEventListeners() {
         return [
             ...super.getMouseEventListeners(),
@@ -122,7 +128,7 @@ class Frontend extends TextScanner {
                 }
             }
         } catch (e) {
-            if (window.yomichan_orphaned) {
+            if (this._orphaned) {
                 if (textSource !== null && this.options.scanning.modifier !== 'none') {
                     this._lastShowPromise = this.popup.showContent(
                         textSource.getRect(),
