@@ -47,14 +47,15 @@ class SettingsPopupPreview {
         window.apiOptionsGet = (...args) => this.apiOptionsGet(...args);
 
         // Overwrite frontend
-        this.frontend = Frontend.create();
+        const popup = PopupProxyHost.instance.createPopup(null, 0);
+        popup.setChildrenSupported(false);
+
+        this.frontend = new Frontend(popup);
 
         this.frontend.setEnabled = function () {};
         this.frontend.searchClear = function () {};
 
-        this.frontend.popup.setChildrenSupported(false);
-
-        await this.frontend.isPrepared();
+        await this.frontend.prepare();
 
         // Overwrite popup
         Popup.injectOuterStylesheet = (...args) => this.popupInjectOuterStylesheet(...args);

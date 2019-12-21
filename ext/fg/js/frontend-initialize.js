@@ -17,4 +17,13 @@
  */
 
 
-Frontend.create();
+async function main() {
+    const data = window.frontendInitializationData || {};
+    const {id, depth=0, parentFrameId, ignoreNodes, url, proxy=false} = data;
+
+    const popup = proxy ? new PopupProxy(depth + 1, id, parentFrameId, url) : PopupProxyHost.instance.createPopup(null, depth);
+    const frontend = new Frontend(popup, ignoreNodes);
+    await frontend.prepare();
+}
+
+main();

@@ -34,21 +34,8 @@ class Frontend extends TextScanner {
             url: popup.url
         };
 
-        this.isPreparedPromiseResolve = null;
-        this.isPreparedPromise = new Promise((resolve) => { this.isPreparedPromiseResolve = resolve; });
-
         this._orphaned = true;
         this._lastShowPromise = Promise.resolve();
-    }
-
-    static create() {
-        const data = window.frontendInitializationData || {};
-        const {id, depth=0, parentFrameId, ignoreNodes, url, proxy=false} = data;
-
-        const popup = proxy ? new PopupProxy(depth + 1, id, parentFrameId, url) : PopupProxyHost.instance.createPopup(null, depth);
-        const frontend = new Frontend(popup, ignoreNodes);
-        frontend.prepare();
-        return frontend;
     }
 
     async prepare() {
@@ -58,14 +45,9 @@ class Frontend extends TextScanner {
             yomichan.on('orphaned', () => this.onOrphaned());
             yomichan.on('optionsUpdate', () => this.updateOptions());
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
-            this.isPreparedPromiseResolve();
         } catch (e) {
             this.onError(e);
         }
-    }
-
-    isPrepared() {
-        return this.isPreparedPromise;
     }
 
     async onResize() {
