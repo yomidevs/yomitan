@@ -48,7 +48,6 @@ class SettingsPopupPreview {
 
         // Overwrite frontend
         this.frontend = Frontend.create();
-        window.yomichan_frontend = this.frontend;
 
         this.frontend.setEnabled = function () {};
         this.frontend.searchClear = function () {};

@@ -17,4 +17,4 @@
  */
 
 
-window.yomichan_frontend = Frontend.create();
+Frontend.create();
