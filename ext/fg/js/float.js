@@ -119,4 +119,4 @@ DisplayFloat._messageHandlers = new Map([
     ['initialize', (self, {options, popupInfo, url, childrenSupported}) => self.initialize(options, popupInfo, url, childrenSupported)]
 ]);
 
-window.yomichan_display = new DisplayFloat();
+DisplayFloat.instance = new DisplayFloat();
