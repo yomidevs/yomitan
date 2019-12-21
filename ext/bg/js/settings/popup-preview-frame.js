@@ -47,7 +47,10 @@ class SettingsPopupPreview {
         window.apiOptionsGet = (...args) => this.apiOptionsGet(...args);
 
         // Overwrite frontend
-        const popup = PopupProxyHost.instance.createPopup(null, 0);
+        const popupHost = new PopupProxyHost();
+        await popupHost.prepare();
+
+        const popup = popupHost.createPopup(null, 0);
         popup.setChildrenSupported(false);
 
         this.frontend = new Frontend(popup);

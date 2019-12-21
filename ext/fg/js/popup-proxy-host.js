@@ -27,12 +27,6 @@ class PopupProxyHost {
 
     // Public functions
 
-    static create() {
-        const popupProxyHost = new PopupProxyHost();
-        popupProxyHost.prepare();
-        return popupProxyHost;
-    }
-
     async prepare() {
         this._frameIdPromise = apiFrameInformationGet();
         const {frameId} = await this._frameIdPromise;
@@ -143,5 +137,3 @@ class PopupProxyHost {
         return popup.parent === null || popup.parent.isVisibleSync();
     }
 }
-
-PopupProxyHost.instance = PopupProxyHost.create();
