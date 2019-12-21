@@ -406,7 +406,8 @@ class Backend {
     }
 
     async _onApiAudioGetUrl({definition, source, optionsContext}) {
-        return audioGetUrl(definition, source, optionsContext);
+        const options = await this.getOptions(optionsContext);
+        return await audioGetUrl(definition, source, options);
     }
 
     _onApiScreenshotGet({options}, sender) {

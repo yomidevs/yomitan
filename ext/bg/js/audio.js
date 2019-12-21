@@ -17,8 +17,8 @@
  */
 
 
-const audioUrlBuilders = {
-    'jpod101': async (definition) => {
+const audioUrlBuilders = new Map([
+    ['jpod101', async (definition) => {
         let kana = definition.reading;
         let kanji = definition.expression;
 
@@ -36,8 +36,8 @@ const audioUrlBuilders = {
         }
 
         return `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?${params.join('&')}`;
-    },
-    'jpod101-alternate': async (definition) => {
+    }],
+    ['jpod101-alternate', async (definition) => {
         const response = await new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.open('POST', 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post');
@@ -61,8 +61,8 @@ const audioUrlBuilders = {
         }
 
         throw new Error('Failed to find audio URL');
-    },
-    'jisho': async (definition) => {
+    }],
+    ['jisho', async (definition) => {
         const response = await new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.open('GET', `https://jisho.org/search/${definition.expression}`);
@@ -85,37 +85,34 @@ const audioUrlBuilders = {
         }
 
         throw new Error('Failed to find audio URL');
-    },
-    'text-to-speech': async (definition, optionsContext) => {
-        const options = await apiOptionsGet(optionsContext);
+    }],
+    ['text-to-speech', async (definition, options) => {
         const voiceURI = options.audio.textToSpeechVoice;
         if (!voiceURI) {
             throw new Error('No voice');
         }
 
         return `tts:?text=${encodeURIComponent(definition.expression)}&voice=${encodeURIComponent(voiceURI)}`;
-    },
-    'text-to-speech-reading': async (definition, optionsContext) => {
-        const options = await apiOptionsGet(optionsContext);
+    }],
+    ['text-to-speech-reading', async (definition, options) => {
         const voiceURI = options.audio.textToSpeechVoice;
         if (!voiceURI) {
             throw new Error('No voice');
         }
 
         return `tts:?text=${encodeURIComponent(definition.reading || definition.expression)}&voice=${encodeURIComponent(voiceURI)}`;
-    },
-    'custom': async (definition, optionsContext) => {
-        const options = await apiOptionsGet(optionsContext);
+    }],
+    ['custom', async (definition, options) => {
         const customSourceUrl = options.audio.customSourceUrl;
         return customSourceUrl.replace(/\{([^}]*)\}/g, (m0, m1) => (hasOwn(definition, m1) ? `${definition[m1]}` : m0));
-    }
-};
+    }]
+]);
 
-async function audioGetUrl(definition, mode, optionsContext, download) {
-    if (hasOwn(audioUrlBuilders, mode)) {
-        const handler = audioUrlBuilders[mode];
+async function audioGetUrl(definition, mode, options, download) {
+    const handler = audioUrlBuilders.get(mode);
+    if (typeof handler === 'function') {
         try {
-            return await handler(definition, optionsContext, download);
+            return await handler(definition, options, download);
         } catch (e) {
             // NOP
         }
