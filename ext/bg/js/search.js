@@ -384,4 +384,4 @@ DisplaySearch.onKeyDownIgnoreKeys = {
     'Shift': []
 };
 
-window.yomichan_search = DisplaySearch.create();
+DisplaySearch.instance = DisplaySearch.create();
