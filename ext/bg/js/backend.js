@@ -702,5 +702,5 @@ Backend._commandHandlers = new Map([
     ['toggle', (self, ...args) => self._onCommandToggle(...args)]
 ]);
 
-window.yomichan_backend = new Backend();
-window.yomichan_backend.prepare();
+window.yomichanBackend = new Backend();
+window.yomichanBackend.prepare();

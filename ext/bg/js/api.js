@@ -41,7 +41,7 @@ function _apiInvoke(action, params={}) {
                     reject(new Error(`${message} (${JSON.stringify(data)})`));
                 }
             };
-            const backend = window.yomichan_backend;
+            const backend = window.yomichanBackend;
             backend.onMessage({action, params}, null, callback);
         } catch (e) {
             reject(e);

@@ -97,7 +97,7 @@ function utilStringHashCode(string) {
 }
 
 function utilBackend() {
-    return chrome.extension.getBackgroundPage().yomichan_backend;
+    return chrome.extension.getBackgroundPage().yomichanBackend;
 }
 
 async function utilAnkiGetModelNames() {
