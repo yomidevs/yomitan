@@ -141,12 +141,13 @@ function handlebarsRenderStatic(name, data) {
 
 function handlebarsRenderDynamic(template, data) {
     handlebarsRegisterHelpers();
-
-    Handlebars.yomichan_cache = Handlebars.yomichan_cache || {};
-    let instance = Handlebars.yomichan_cache[template];
-    if (!instance) {
-        instance = Handlebars.yomichan_cache[template] = Handlebars.compile(template);
+    const cache = handlebarsRenderDynamic._cache;
+    let instance = cache.get(template);
+    if (typeof instance === 'undefined') {
+        instance = Handlebars.compile(template);
+        cache.set(template, instance);
     }
 
     return instance(data).trim();
 }
+handlebarsRenderDynamic._cache = new Map();
