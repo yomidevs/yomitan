@@ -151,7 +151,7 @@ class Translator {
     async findTermsGrouped(text, details, options) {
         const dictionaries = dictEnabledSet(options);
         const titles = Object.keys(dictionaries);
-        const [definitions, length] = await this.findTermsInternal(text, dictionaries, options.scanning.alphanumeric, details);
+        const [definitions, length] = await this.findTermsInternal(text, dictionaries, options.scanning.alphanumeric, details, options);
 
         const definitionsGrouped = dictTermsGroup(definitions, dictionaries);
         await this.buildTermFrequencies(definitionsGrouped, titles);
@@ -169,7 +169,7 @@ class Translator {
         const dictionaries = dictEnabledSet(options);
         const secondarySearchTitles = Object.keys(options.dictionaries).filter((dict) => options.dictionaries[dict].allowSecondarySearches);
         const titles = Object.keys(dictionaries);
-        const [definitions, length] = await this.findTermsInternal(text, dictionaries, options.scanning.alphanumeric, details);
+        const [definitions, length] = await this.findTermsInternal(text, dictionaries, options.scanning.alphanumeric, details, options);
         const {sequencedDefinitions, defaultDefinitions} = await this.getSequencedDefinitions(definitions, options.general.mainDictionary);
         const definitionsMerged = [];
         const mergedByTermIndices = new Set();
@@ -206,14 +206,14 @@ class Translator {
     async findTermsSplit(text, details, options) {
         const dictionaries = dictEnabledSet(options);
         const titles = Object.keys(dictionaries);
-        const [definitions, length] = await this.findTermsInternal(text, dictionaries, options.scanning.alphanumeric, details);
+        const [definitions, length] = await this.findTermsInternal(text, dictionaries, options.scanning.alphanumeric, details, options);
 
         await this.buildTermFrequencies(definitions, titles);
 
         return [definitions, length];
     }
 
-    async findTermsInternal(text, dictionaries, alphanumeric, details) {
+    async findTermsInternal(text, dictionaries, alphanumeric, details, options) {
         if (!alphanumeric && text.length > 0) {
             const c = text[0];
             if (!jpIsKana(c) && !jpIsKanji(c)) {
@@ -225,7 +225,7 @@ class Translator {
         const deinflections = (
             details.wildcard ?
             await this.findTermWildcard(text, titles, details.wildcard) :
-            await this.findTermDeinflections(text, titles)
+            await this.findTermDeinflections(text, titles, options)
         );
 
         let definitions = [];
@@ -281,9 +281,8 @@ class Translator {
         }];
     }
 
-    async findTermDeinflections(text, titles) {
-        const text2 = jpKatakanaToHiragana(text);
-        const deinflections = (text === text2 ? this.getDeinflections(text) : this.getDeinflections2(text, text2));
+    async findTermDeinflections(text, titles, options) {
+        const deinflections = this.getAllDeinflections(text, options);
 
         if (deinflections.length === 0) {
             return [];
@@ -321,29 +320,24 @@ class Translator {
         return deinflections.filter((e) => e.definitions.length > 0);
     }
 
-    getDeinflections(text) {
+    getAllDeinflections(text, _options) {
+        const textOptionVariantArray = [
+            [false, true] // convert katakana to hiragana
+        ];
+
         const deinflections = [];
+        const used = new Set();
+        for (const [hiragana] of Translator.getArrayVariants(textOptionVariantArray)) {
+            let text2 = text;
+            if (hiragana) { text2 = jpKatakanaToHiragana(text2); }
 
-        for (let i = text.length; i > 0; --i) {
-            const textSubstring = text.substring(0, i);
-            deinflections.push(...this.deinflector.deinflect(textSubstring));
-        }
-
-        return deinflections;
-    }
-
-    getDeinflections2(text1, text2) {
-        const deinflections = [];
-
-        for (let i = text1.length; i > 0; --i) {
-            const text1Substring = text1.substring(0, i);
-            const text2Substring = text2.substring(0, i);
-            deinflections.push(...this.deinflector.deinflect(text1Substring));
-            if (text1Substring !== text2Substring) {
+            for (let i = text2.length; i > 0; --i) {
+                const text2Substring = text2.substring(0, i);
+                if (used.has(text2Substring)) { break; }
+                used.add(text2Substring);
                 deinflections.push(...this.deinflector.deinflect(text2Substring));
             }
         }
-
         return deinflections;
     }
 
@@ -526,5 +520,25 @@ class Translator {
     static getNameBase(name) {
         const pos = name.indexOf(':');
         return (pos >= 0 ? name.substring(0, pos) : name);
+    }
+
+    static *getArrayVariants(arrayVariants) {
+        const ii = arrayVariants.length;
+
+        let total = 1;
+        for (let i = 0; i < ii; ++i) {
+            total *= arrayVariants[i].length;
+        }
+
+        for (let a = 0; a < total; ++a) {
+            const variant = [];
+            let index = a;
+            for (let i = 0; i < ii; ++i) {
+                const entryVariants = arrayVariants[i];
+                variant.push(entryVariants[index % entryVariants.length]);
+                index = Math.floor(index / entryVariants.length);
+            }
+            yield variant;
+        }
     }
 }
