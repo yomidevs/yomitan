@@ -92,8 +92,22 @@ function jpIsKana(c) {
     );
 }
 
+function jpIsCharFullWidth(c) {
+    const code = c.charCodeAt(0);
+    return (
+        (code >= 0xff21 && code <= 0xff3a) || // full width upper case roman letters
+        (code >= 0xff41 && code <= 0xff3a) || // full width upper case roman letters
+        (code >= 0xff10 && code <= 0xff19) // full width numbers
+    );
+}
+
+function jpIsKanaHalfWidth(c) {
+    const code = c.charCodeAt(0);
+    return (code >= 0xff66 && code <= 0xff9f); // half width katakana
+}
+
 function jpIsCharacterJapanese(c) {
-    return jpIsKanji(c) || jpIsKana(c);
+    return jpIsKanji(c) || jpIsKana(c) || jpIsCharFullWidth(c) || jpIsKanaHalfWidth(c);
 }
 
 function jpIsAnyCharacterJapanese(text) {
