@@ -214,11 +214,9 @@ class Translator {
     }
 
     async findTermsInternal(text, dictionaries, details, options) {
-        if (!options.scanning.alphanumeric && text.length > 0) {
-            const c = text[0];
-            if (!jpIsKana(c) && !jpIsKanji(c)) {
-                return [[], 0];
-            }
+        text = Translator.getSearchableText(text, options);
+        if (text.length === 0) {
+            return [[], 0];
         }
 
         const titles = Object.keys(dictionaries);
@@ -586,5 +584,20 @@ class Translator {
             }
             yield variant;
         }
+    }
+
+    static getSearchableText(text, options) {
+        if (!options.scanning.alphanumeric) {
+            const ii = text.length;
+            for (let i = 0; i < ii; ++i) {
+                const c = text[i];
+                if (!jpIsCharacterJapanese(c)) {
+                    text = text.substring(0, i);
+                    break;
+                }
+            }
+        }
+
+        return text;
     }
 }

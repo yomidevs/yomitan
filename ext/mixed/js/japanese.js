@@ -92,9 +92,13 @@ function jpIsKana(c) {
     );
 }
 
-function jpIsJapaneseText(text) {
+function jpIsCharacterJapanese(c) {
+    return jpIsKanji(c) || jpIsKana(c);
+}
+
+function jpIsAnyCharacterJapanese(text) {
     for (const c of text) {
-        if (jpIsKanji(c) || jpIsKana(c)) {
+        if (jpIsCharacterJapanese(c)) {
             return true;
         }
     }
