@@ -240,6 +240,7 @@ class Translator {
 
                 definitions.push({
                     source: deinflection.source,
+                    rawSource: deinflection.rawSource,
                     reasons: deinflection.reasons,
                     score: definition.score,
                     id: definition.id,
@@ -260,7 +261,7 @@ class Translator {
 
         let length = 0;
         for (const definition of definitions) {
-            length = Math.max(length, definition.source.length);
+            length = Math.max(length, definition.rawSource.length);
         }
 
         return [definitions, length];
@@ -274,6 +275,7 @@ class Translator {
 
         return [{
             source: text,
+            rawSource: text,
             term: text,
             rules: 0,
             definitions,
@@ -320,25 +322,69 @@ class Translator {
         return deinflections.filter((e) => e.definitions.length > 0);
     }
 
-    getAllDeinflections(text, _options) {
+    getAllDeinflections(text, options) {
+        const translationOptions = options.translation;
         const textOptionVariantArray = [
-            [false, true] // convert katakana to hiragana
+            Translator.getTextOptionEntryVariants(translationOptions.convertKatakanaToHiragana),
+            Translator.getTextOptionEntryVariants(translationOptions.convertHalfWidthCharacters),
+            Translator.getTextOptionEntryVariants(translationOptions.convertNumericCharacters),
+            Translator.getTextOptionEntryVariants(translationOptions.convertAlphabeticCharacters)
         ];
 
         const deinflections = [];
         const used = new Set();
-        for (const [hiragana] of Translator.getArrayVariants(textOptionVariantArray)) {
+        for (const [hiragana, halfWidth, numeric, alphabetic] of Translator.getArrayVariants(textOptionVariantArray)) {
             let text2 = text;
+            let sourceMapping = null;
+            if (halfWidth) {
+                if (sourceMapping === null) { sourceMapping = Translator.createTextSourceMapping(text2); }
+                text2 = jpConvertHalfWidthKanaToFullWidth(text2, sourceMapping);
+            }
+            if (numeric) { text2 = jpConvertNumericTofullWidth(text2); }
+            if (alphabetic) {
+                if (sourceMapping === null) { sourceMapping = Translator.createTextSourceMapping(text2); }
+                text2 = jpConvertAlphabeticToKana(text2, sourceMapping);
+            }
             if (hiragana) { text2 = jpKatakanaToHiragana(text2); }
 
             for (let i = text2.length; i > 0; --i) {
                 const text2Substring = text2.substring(0, i);
                 if (used.has(text2Substring)) { break; }
                 used.add(text2Substring);
-                deinflections.push(...this.deinflector.deinflect(text2Substring));
+                for (const deinflection of this.deinflector.deinflect(text2Substring)) {
+                    deinflection.rawSource = Translator.getDeinflectionRawSource(text, i, sourceMapping);
+                    deinflections.push(deinflection);
+                }
             }
         }
         return deinflections;
+    }
+
+    static getTextOptionEntryVariants(value) {
+        switch (value) {
+            case 'true': return [true];
+            case 'variant': return [false, true];
+            default: return [false];
+        }
+    }
+
+    static getDeinflectionRawSource(source, length, sourceMapping) {
+        if (sourceMapping === null) {
+            return source.substring(0, length);
+        }
+
+        let result = '';
+        let index = 0;
+        for (let i = 0; i < length; ++i) {
+            const c = sourceMapping[i];
+            result += source.substring(index, index + c);
+            index += c;
+        }
+        return result;
+    }
+
+    static createTextSourceMapping(text) {
+        return new Array(text.length).fill(1);
     }
 
     async findKanji(text, options) {
