@@ -151,7 +151,7 @@ class Translator {
     async findTermsGrouped(text, details, options) {
         const dictionaries = dictEnabledSet(options);
         const titles = Object.keys(dictionaries);
-        const [definitions, length] = await this.findTermsInternal(text, dictionaries, options.scanning.alphanumeric, details, options);
+        const [definitions, length] = await this.findTermsInternal(text, dictionaries, details, options);
 
         const definitionsGrouped = dictTermsGroup(definitions, dictionaries);
         await this.buildTermFrequencies(definitionsGrouped, titles);
@@ -169,7 +169,7 @@ class Translator {
         const dictionaries = dictEnabledSet(options);
         const secondarySearchTitles = Object.keys(options.dictionaries).filter((dict) => options.dictionaries[dict].allowSecondarySearches);
         const titles = Object.keys(dictionaries);
-        const [definitions, length] = await this.findTermsInternal(text, dictionaries, options.scanning.alphanumeric, details, options);
+        const [definitions, length] = await this.findTermsInternal(text, dictionaries, details, options);
         const {sequencedDefinitions, defaultDefinitions} = await this.getSequencedDefinitions(definitions, options.general.mainDictionary);
         const definitionsMerged = [];
         const mergedByTermIndices = new Set();
@@ -206,15 +206,15 @@ class Translator {
     async findTermsSplit(text, details, options) {
         const dictionaries = dictEnabledSet(options);
         const titles = Object.keys(dictionaries);
-        const [definitions, length] = await this.findTermsInternal(text, dictionaries, options.scanning.alphanumeric, details, options);
+        const [definitions, length] = await this.findTermsInternal(text, dictionaries, details, options);
 
         await this.buildTermFrequencies(definitions, titles);
 
         return [definitions, length];
     }
 
-    async findTermsInternal(text, dictionaries, alphanumeric, details, options) {
-        if (!alphanumeric && text.length > 0) {
+    async findTermsInternal(text, dictionaries, details, options) {
+        if (!options.scanning.alphanumeric && text.length > 0) {
             const c = text[0];
             if (!jpIsKana(c) && !jpIsKanji(c)) {
                 return [[], 0];
