@@ -78,11 +78,18 @@ const jpHalfWidthCharacterMapping = new Map([
 
 function jpIsKanji(c) {
     const code = c.charCodeAt(0);
-    return code >= 0x4e00 && code < 0x9fb0 || code >= 0x3400 && code < 0x4dc0;
+    return (
+        (code >= 0x4e00 && code < 0x9fb0) ||
+        (code >= 0x3400 && code < 0x4dc0)
+    );
 }
 
 function jpIsKana(c) {
-    return wanakana.isKana(c);
+    const code = c.charCodeAt(0);
+    return (
+        (code >= 0x3041 && code <= 0x3096) || // hiragana
+        (code >= 0x30a1 && code <= 0x30fc) // katakana
+    );
 }
 
 function jpIsJapaneseText(text) {
