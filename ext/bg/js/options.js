@@ -319,6 +319,13 @@ function profileOptionsCreateDefaults() {
             enableOnSearchPage: true
         },
 
+        translation: {
+            convertKatakanaToHiragana: 'variant',
+            convertHalfWidthCharacters: 'false',
+            convertNumericCharacters: 'false',
+            convertAlphabeticCharacters: 'false'
+        },
+
         dictionaries: {},
 
         parsing: {

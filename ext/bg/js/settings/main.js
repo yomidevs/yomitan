@@ -72,6 +72,11 @@ async function formRead(options) {
     options.scanning.modifier = $('#scan-modifier-key').val();
     options.scanning.popupNestingMaxDepth = parseInt($('#popup-nesting-max-depth').val(), 10);
 
+    options.translation.convertKatakanaToHiragana = $('#translation-convert-katakana-to-hiragana').val();
+    options.translation.convertHalfWidthCharacters = $('#translation-convert-half-width-characters').val();
+    options.translation.convertNumericCharacters = $('#translation-convert-numeric-characters').val();
+    options.translation.convertAlphabeticCharacters = $('#translation-convert-alphabetic-characters').val();
+
     options.parsing.enableScanningParser = $('#parsing-scan-enable').prop('checked');
     options.parsing.enableMecabParser = $('#parsing-mecab-enable').prop('checked');
     options.parsing.readingMode = $('#parsing-reading-mode').val();
@@ -139,6 +144,11 @@ async function formWrite(options) {
     $('#scan-length').val(options.scanning.length);
     $('#scan-modifier-key').val(options.scanning.modifier);
     $('#popup-nesting-max-depth').val(options.scanning.popupNestingMaxDepth);
+
+    $('#translation-convert-katakana-to-hiragana').val(options.translation.convertKatakanaToHiragana);
+    $('#translation-convert-half-width-characters').val(options.translation.convertHalfWidthCharacters);
+    $('#translation-convert-numeric-characters').val(options.translation.convertNumericCharacters);
+    $('#translation-convert-alphabetic-characters').val(options.translation.convertAlphabeticCharacters);
 
     $('#parsing-scan-enable').prop('checked', options.parsing.enableScanningParser);
     $('#parsing-mecab-enable').prop('checked', options.parsing.enableMecabParser);
