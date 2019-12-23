@@ -35,10 +35,13 @@ html:root[data-yomichan-page=float]:not([data-yomichan-theme]) body {
     background-color: transparent;
 }
 
-body {
+:root {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 14px;
     line-height: 1.42857143; /* 14px => 20px */
+}
+
+body {
     margin: 0;
     border: 0;
     padding: 0;
