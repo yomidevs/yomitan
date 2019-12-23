@@ -28,6 +28,7 @@ class Popup {
         this._childrenSupported = true;
         this._injectPromise = null;
         this._isInjected = false;
+        this._isInjectedAndLoaded = false;
         this._visible = false;
         this._visibleOverride = null;
         this._options = null;
@@ -114,7 +115,7 @@ class Popup {
     }
 
     clearAutoPlayTimer() {
-        if (this._isInjected) {
+        if (this._isInjectedAndLoaded) {
             this._invokeApi('clearAutoPlayTimer');
         }
     }
@@ -215,6 +216,7 @@ class Popup {
         return new Promise((resolve) => {
             const parentFrameId = (typeof this._frameId === 'number' ? this._frameId : null);
             this._container.addEventListener('load', () => {
+                this._isInjectedAndLoaded = true;
                 this._invokeApi('initialize', {
                     options: this._options,
                     popupInfo: {
@@ -307,6 +309,9 @@ class Popup {
     }
 
     _invokeApi(action, params={}) {
+        if (!this._isInjectedAndLoaded) {
+            throw new Error('Frame not loaded');
+        }
         this._container.contentWindow.postMessage({action, params}, '*');
     }
 
