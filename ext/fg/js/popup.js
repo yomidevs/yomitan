@@ -104,7 +104,7 @@ class Popup {
     }
 
     async showContent(elementRect, writingMode, type=null, details=null) {
-        if (!this._isInitialized()) { return; }
+        if (this._options === null) { throw new Error('Options not assigned'); }
         await this._show(elementRect, writingMode);
         if (type === null) { return; }
         this._invokeApi('setContent', {type, details});
@@ -234,10 +234,6 @@ class Popup {
             this.setCustomOuterCss(this._options.general.customPopupOuterCss, false);
             this._isInjected = true;
         });
-    }
-
-    _isInitialized() {
-        return this._options !== null;
     }
 
     async _show(elementRect, writingMode) {
