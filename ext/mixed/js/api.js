@@ -105,6 +105,10 @@ function apiGetDisplayTemplatesHtml() {
     return _apiInvoke('getDisplayTemplatesHtml');
 }
 
+function apiGetZoom() {
+    return _apiInvoke('getZoom');
+}
+
 function _apiInvoke(action, params={}) {
     const data = {action, params};
     return new Promise((resolve, reject) => {

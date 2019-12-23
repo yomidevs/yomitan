@@ -244,7 +244,8 @@ const yomichan = (() => {
 
             this._messageHandlers = new Map([
                 ['getUrl', this._onMessageGetUrl.bind(this)],
-                ['optionsUpdate', this._onMessageOptionsUpdate.bind(this)]
+                ['optionsUpdate', this._onMessageOptionsUpdate.bind(this)],
+                ['zoomChanged', this._onMessageZoomChanged.bind(this)]
             ]);
 
             chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
@@ -273,6 +274,10 @@ const yomichan = (() => {
 
         _onMessageOptionsUpdate({source}) {
             this.trigger('optionsUpdate', {source});
+        }
+
+        _onMessageZoomChanged({oldZoomFactor, newZoomFactor}) {
+            this.trigger('zoomChanged', {oldZoomFactor, newZoomFactor});
         }
     }
 
