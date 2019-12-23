@@ -89,7 +89,11 @@ class DisplayFloat extends Display {
         }
     }
 
-    async initialize(options, popupInfo, url, childrenSupported) {
+    setContentScale(scale) {
+        document.body.style.fontSize = `${scale}em`;
+    }
+
+    async initialize(options, popupInfo, url, childrenSupported, scale) {
         await super.initialize(options);
 
         const {id, depth, parentFrameId} = popupInfo;
@@ -99,6 +103,8 @@ class DisplayFloat extends Display {
         if (childrenSupported) {
             popupNestedInitialize(id, depth, parentFrameId, url);
         }
+
+        this.setContentScale(scale);
     }
 }
 
@@ -116,7 +122,8 @@ DisplayFloat._messageHandlers = new Map([
     ['setContent', (self, {type, details}) => self.setContent(type, details)],
     ['clearAutoPlayTimer', (self) => self.clearAutoPlayTimer()],
     ['setCustomCss', (self, {css}) => self.setCustomCss(css)],
-    ['initialize', (self, {options, popupInfo, url, childrenSupported}) => self.initialize(options, popupInfo, url, childrenSupported)]
+    ['initialize', (self, {options, popupInfo, url, childrenSupported, scale}) => self.initialize(options, popupInfo, url, childrenSupported, scale)],
+    ['setContentScale', (self, {scale}) => self.setContentScale(scale)]
 ]);
 
 DisplayFloat.instance = new DisplayFloat();

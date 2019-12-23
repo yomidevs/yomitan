@@ -34,6 +34,8 @@ class Frontend extends TextScanner {
             url: popup.url
         };
 
+        this._pageZoomFactor = 1.0;
+        this._contentScale = 1.0;
         this._orphaned = true;
         this._lastShowPromise = Promise.resolve();
     }
@@ -41,11 +43,14 @@ class Frontend extends TextScanner {
     async prepare() {
         try {
             await this.updateOptions();
+            const {zoomFactor} = await apiGetZoom();
+            this.onZoomChanged({newZoomFactor: zoomFactor});
 
             window.addEventListener('resize', this.onResize.bind(this), false);
 
             yomichan.on('orphaned', () => this.onOrphaned());
             yomichan.on('optionsUpdate', () => this.updateOptions());
+            yomichan.on('zoomChanged', (e) => this.onZoomChanged(e));
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
         } catch (e) {
             this.onError(e);
@@ -80,6 +85,11 @@ class Frontend extends TextScanner {
         this._orphaned = true;
     }
 
+    onZoomChanged({newZoomFactor}) {
+        this._pageZoomFactor = newZoomFactor;
+        this._updateContentScale();
+    }
+
     getMouseEventListeners() {
         return [
             ...super.getMouseEventListeners(),
@@ -90,6 +100,7 @@ class Frontend extends TextScanner {
     async updateOptions() {
         this.setOptions(await apiOptionsGet(this.getOptionsContext()));
         await this.popup.setOptions(this.options);
+        this._updateContentScale();
     }
 
     async onSearchSource(textSource, cause) {
@@ -182,6 +193,15 @@ class Frontend extends TextScanner {
             details
         );
         return this._lastShowPromise;
+    }
+
+    _updateContentScale() {
+        const contentScale = 1.0 / this._pageZoomFactor; // TODO : Use options
+        if (contentScale === this._contentScale) { return; }
+
+        this._contentScale = contentScale;
+        this.popup.setContentScale(this._contentScale);
+        this.onResize();
     }
 }
 

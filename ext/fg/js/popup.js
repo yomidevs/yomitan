@@ -33,6 +33,7 @@ class Popup {
         this._visibleOverride = null;
         this._options = null;
         this._stylesheetInjectedViaApi = false;
+        this._contentScale = 1.0;
 
         this._container = document.createElement('iframe');
         this._container.className = 'yomichan-float';
@@ -117,6 +118,13 @@ class Popup {
     clearAutoPlayTimer() {
         if (this._isInjectedAndLoaded) {
             this._invokeApi('clearAutoPlayTimer');
+        }
+    }
+
+    setContentScale(scale) {
+        this._contentScale = scale;
+        if (this._isInjectedAndLoaded) {
+            this._invokeApi('setContentScale', {scale});
         }
     }
 
@@ -225,7 +233,8 @@ class Popup {
                         parentFrameId
                     },
                     url: this.url,
-                    childrenSupported: this._childrenSupported
+                    childrenSupported: this._childrenSupported,
+                    scale: this._contentScale
                 });
                 resolve();
             });
@@ -248,12 +257,14 @@ class Popup {
             Popup._getPositionForVerticalText
         );
 
+        const scale = this._contentScale;
         const [x, y, width, height, below] = getPosition(
             elementRect,
-            Math.max(containerRect.width, optionsGeneral.popupWidth),
-            Math.max(containerRect.height, optionsGeneral.popupHeight),
+            Math.max(containerRect.width, optionsGeneral.popupWidth * scale),
+            Math.max(containerRect.height, optionsGeneral.popupHeight * scale),
             document.body.clientWidth,
             window.innerHeight,
+            scale,
             optionsGeneral,
             writingMode
         );
@@ -339,8 +350,8 @@ class Popup {
         }
     }
 
-    static _getPositionForHorizontalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral) {
-        let x = elementRect.left + optionsGeneral.popupHorizontalOffset;
+    static _getPositionForHorizontalText(elementRect, width, height, maxWidth, maxHeight, offsetScale, optionsGeneral) {
+        let x = elementRect.left + optionsGeneral.popupHorizontalOffset * offsetScale;
         const overflowX = Math.max(x + width - maxWidth, 0);
         if (overflowX > 0) {
             if (x >= overflowX) {
@@ -353,7 +364,7 @@ class Popup {
 
         const preferBelow = (optionsGeneral.popupHorizontalTextPosition === 'below');
 
-        const verticalOffset = optionsGeneral.popupVerticalOffset;
+        const verticalOffset = optionsGeneral.popupVerticalOffset * offsetScale;
         const [y, h, below] = Popup._limitGeometry(
             elementRect.top - verticalOffset,
             elementRect.bottom + verticalOffset,
@@ -365,10 +376,10 @@ class Popup {
         return [x, y, width, h, below];
     }
 
-    static _getPositionForVerticalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral, writingMode) {
+    static _getPositionForVerticalText(elementRect, width, height, maxWidth, maxHeight, offsetScale, optionsGeneral, writingMode) {
         const preferRight = Popup._isVerticalTextPopupOnRight(optionsGeneral.popupVerticalTextPosition, writingMode);
-        const horizontalOffset = optionsGeneral.popupHorizontalOffset2;
-        const verticalOffset = optionsGeneral.popupVerticalOffset2;
+        const horizontalOffset = optionsGeneral.popupHorizontalOffset2 * offsetScale;
+        const verticalOffset = optionsGeneral.popupVerticalOffset2 * offsetScale;
 
         const [x, w] = Popup._limitGeometry(
             elementRect.left - horizontalOffset,

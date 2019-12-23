@@ -41,7 +41,8 @@ class PopupProxyHost {
             ['containsPoint', ({id, x, y}) => this._onApiContainsPoint(id, x, y)],
             ['showContent', ({id, elementRect, writingMode, type, details}) => this._onApiShowContent(id, elementRect, writingMode, type, details)],
             ['setCustomCss', ({id, css}) => this._onApiSetCustomCss(id, css)],
-            ['clearAutoPlayTimer', ({id}) => this._onApiClearAutoPlayTimer(id)]
+            ['clearAutoPlayTimer', ({id}) => this._onApiClearAutoPlayTimer(id)],
+            ['setContentScale', ({id, scale}) => this._onApiSetContentScale(id, scale)]
         ]));
     }
 
@@ -95,6 +96,11 @@ class PopupProxyHost {
     async _onApiClearAutoPlayTimer(id) {
         const popup = this._getPopup(id);
         return popup.clearAutoPlayTimer();
+    }
+
+    async _onApiSetContentScale(id, scale) {
+        const popup = this._getPopup(id);
+        return popup.setContentScale(scale);
     }
 
     // Private functions
