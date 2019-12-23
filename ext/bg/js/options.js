@@ -279,6 +279,8 @@ function profileOptionsCreateDefaults() {
             popupVerticalOffset2: 0,
             popupHorizontalTextPosition: 'below',
             popupVerticalTextPosition: 'before',
+            popupScalingFactor: 1,
+            popupScaleRelativeToPageZoom: false,
             showGuide: true,
             compactTags: false,
             compactGlossaries: false,

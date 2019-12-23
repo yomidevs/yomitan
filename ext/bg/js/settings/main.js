@@ -44,6 +44,8 @@ async function formRead(options) {
     options.general.popupVerticalOffset = parseInt($('#popup-vertical-offset').val(), 10);
     options.general.popupHorizontalOffset2 = parseInt($('#popup-horizontal-offset2').val(), 0);
     options.general.popupVerticalOffset2 = parseInt($('#popup-vertical-offset2').val(), 10);
+    options.general.popupScalingFactor = parseInt($('#popup-scaling-factor').val(), 10);
+    options.general.popupScaleRelativeToPageZoom = $('#popup-scale-relative-to-page-zoom').val() === 'true';
     options.general.popupTheme = $('#popup-theme').val();
     options.general.popupOuterTheme = $('#popup-outer-theme').val();
     options.general.customPopupCss = $('#custom-popup-css').val();
@@ -109,6 +111,8 @@ async function formWrite(options) {
     $('#popup-vertical-offset').val(options.general.popupVerticalOffset);
     $('#popup-horizontal-offset2').val(options.general.popupHorizontalOffset2);
     $('#popup-vertical-offset2').val(options.general.popupVerticalOffset2);
+    $('#popup-scaling-factor').val(options.general.popupScalingFactor);
+    $('#popup-scale-relative-to-page-zoom').val(options.general.popupScaleRelativeToPageZoom ? 'true' : 'false');
     $('#popup-theme').val(options.general.popupTheme);
     $('#popup-outer-theme').val(options.general.popupOuterTheme);
     $('#custom-popup-css').val(options.general.customPopupCss);

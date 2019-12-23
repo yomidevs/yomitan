@@ -196,7 +196,9 @@ class Frontend extends TextScanner {
     }
 
     _updateContentScale() {
-        const contentScale = 1.0 / this._pageZoomFactor; // TODO : Use options
+        const {popupScalingFactor, popupScaleRelativeToPageZoom} = this.options.general;
+        let contentScale = popupScalingFactor;
+        if (popupScaleRelativeToPageZoom) { contentScale /= this._pageZoomFactor; }
         if (contentScale === this._contentScale) { return; }
 
         this._contentScale = contentScale;
