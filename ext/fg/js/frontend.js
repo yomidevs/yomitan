@@ -53,10 +53,7 @@ class Frontend extends TextScanner {
     async onResize() {
         const textSource = this.textSourceCurrent;
         if (textSource !== null && await this.popup.isVisible()) {
-            this._lastShowPromise = this.popup.showContent(
-                textSource.getRect(),
-                textSource.getWritingMode()
-            );
+            this._showPopupContent(textSource);
         }
     }
 
@@ -111,11 +108,7 @@ class Frontend extends TextScanner {
         } catch (e) {
             if (this._orphaned) {
                 if (textSource !== null && this.options.scanning.modifier !== 'none') {
-                    this._lastShowPromise = this.popup.showContent(
-                        textSource.getRect(),
-                        textSource.getWritingMode(),
-                        'orphaned'
-                    );
+                    this._showPopupContent(textSource, 'orphaned');
                 }
             } else {
                 this.onError(e);
@@ -132,9 +125,8 @@ class Frontend extends TextScanner {
     showContent(textSource, focus, definitions, type) {
         const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
         const url = window.location.href;
-        this._lastShowPromise = this.popup.showContent(
-            textSource.getRect(),
-            textSource.getWritingMode(),
+        this._showPopupContent(
+            textSource,
             type,
             {definitions, context: {sentence, url, focus, disableHistory: true}}
         );
@@ -179,6 +171,16 @@ class Frontend extends TextScanner {
     getOptionsContext() {
         this.optionsContext.url = this.popup.url;
         return this.optionsContext;
+    }
+
+    _showPopupContent(textSource, type=null, details=null) {
+        this._lastShowPromise = this.popup.showContent(
+            textSource.getRect(),
+            textSource.getWritingMode(),
+            type,
+            details
+        );
+        return this._lastShowPromise;
     }
 }
 
