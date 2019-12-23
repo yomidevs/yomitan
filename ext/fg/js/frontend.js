@@ -42,6 +42,8 @@ class Frontend extends TextScanner {
         try {
             await this.updateOptions();
 
+            window.addEventListener('resize', this.onResize.bind(this), false);
+
             yomichan.on('orphaned', () => this.onOrphaned());
             yomichan.on('optionsUpdate', () => this.updateOptions());
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
@@ -51,7 +53,7 @@ class Frontend extends TextScanner {
     }
 
     async onResize() {
-        const textSource = this.textSourceCurrent;
+        const textSource = this.getCurrentTextSource();
         if (textSource !== null && await this.popup.isVisible()) {
             this._showPopupContent(textSource);
         }
@@ -81,8 +83,7 @@ class Frontend extends TextScanner {
     getMouseEventListeners() {
         return [
             ...super.getMouseEventListeners(),
-            [window, 'message', this.onWindowMessage.bind(this)],
-            [window, 'resize', this.onResize.bind(this)]
+            [window, 'message', this.onWindowMessage.bind(this)]
         ];
     }
 
