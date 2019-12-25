@@ -37,6 +37,7 @@ class Display {
         this.eventListenersActive = false;
         this.clickScanPrevent = false;
 
+        this.displayGenerator = new DisplayGenerator();
         this.windowScroll = new WindowScroll();
 
         this.setInteractive(true);
@@ -240,9 +241,18 @@ class Display {
 
     async updateOptions(options) {
         this.options = options ? options : await apiOptionsGet(this.getOptionsContext());
+        this.updateDocumentOptions(this.options);
         this.updateTheme(this.options.general.popupTheme);
         this.setCustomCss(this.options.general.customPopupCss);
         audioPrepareTextToSpeech(this.options);
+    }
+
+    updateDocumentOptions(options) {
+        const data = document.documentElement.dataset;
+        data.ankiEnabled = `${options.anki.enable}`;
+        data.audioEnabled = `${options.audio.enable}`;
+        data.compactGlossaries = `${options.general.compactGlossaries}`;
+        data.debug = `${options.general.debugInfo}`;
     }
 
     updateTheme(themeName) {
@@ -277,6 +287,9 @@ class Display {
         if (interactive) {
             Display.addEventListener(this.persistentEventListeners, document, 'keydown', this.onKeyDown.bind(this), false);
             Display.addEventListener(this.persistentEventListeners, document, 'wheel', this.onWheel.bind(this), {passive: false});
+            Display.addEventListener(this.persistentEventListeners, document.querySelector('.action-previous'), 'click', this.onSourceTermView.bind(this));
+            Display.addEventListener(this.persistentEventListeners, document.querySelector('.action-next'), 'click', this.onNextTermView.bind(this));
+            Display.addEventListener(this.persistentEventListeners, document.querySelector('.navigation-header'), 'wheel', this.onHistoryWheel.bind(this), {passive: false});
         } else {
             Display.clearEventListeners(this.persistentEventListeners);
         }
@@ -293,9 +306,6 @@ class Display {
             this.addEventListeners('.action-view-note', 'click', this.onNoteView.bind(this));
             this.addEventListeners('.action-play-audio', 'click', this.onAudioPlay.bind(this));
             this.addEventListeners('.kanji-link', 'click', this.onKanjiLookup.bind(this));
-            this.addEventListeners('.source-term', 'click', this.onSourceTermView.bind(this));
-            this.addEventListeners('.next-term', 'click', this.onNextTermView.bind(this));
-            this.addEventListeners('.term-navigation', 'wheel', this.onHistoryWheel.bind(this), {passive: false});
             if (this.options.scanning.enablePopupSearch) {
                 this.addEventListeners('.glossary-item', 'mouseup', this.onGlossaryMouseUp.bind(this));
                 this.addEventListeners('.glossary-item', 'mousedown', this.onGlossaryMouseDown.bind(this));
@@ -347,25 +357,25 @@ class Display {
             }
 
             const sequence = ++this.sequence;
-            const params = {
-                definitions,
-                source: !!this.context.previous,
-                next: !!this.context.next,
-                addable: options.anki.enable,
-                grouped: options.general.resultOutputMode === 'group',
-                merged: options.general.resultOutputMode === 'merge',
-                playback: options.audio.enabled,
-                compactGlossaries: options.general.compactGlossaries,
-                debug: options.general.debugInfo
-            };
 
             for (const definition of definitions) {
                 definition.cloze = Display.clozeBuild(context.sentence, definition.source);
                 definition.url = context.url;
             }
 
-            const content = await apiTemplateRender('terms.html', params);
-            this.container.innerHTML = content;
+            this.updateNavigation(this.context.previous, this.context.next);
+            this.setNoContentVisible(definitions.length === 0);
+
+            const fragment = document.createDocumentFragment();
+            for (const definition of definitions) {
+                fragment.appendChild(this.displayGenerator.createTermEntry(definition));
+            }
+
+            await Promise.resolve(); // Delay to help avoid forced reflow warnings in Chrome
+
+            this.container.textContent = '';
+            this.container.appendChild(fragment);
+
             const {index, scroll, disableScroll} = context;
             if (!disableScroll) {
                 this.entryScrollIntoView(index || 0, scroll);
@@ -391,8 +401,6 @@ class Display {
         if (!this.isInitialized()) { return; }
 
         try {
-            const options = this.options;
-
             this.setEventListenersActive(false);
 
             if (context.focus !== false) {
@@ -408,21 +416,25 @@ class Display {
             }
 
             const sequence = ++this.sequence;
-            const params = {
-                definitions,
-                source: !!this.context.previous,
-                next: !!this.context.next,
-                addable: options.anki.enable,
-                debug: options.general.debugInfo
-            };
 
             for (const definition of definitions) {
                 definition.cloze = Display.clozeBuild(context.sentence, definition.character);
                 definition.url = context.url;
             }
 
-            const content = await apiTemplateRender('kanji.html', params);
-            this.container.innerHTML = content;
+            this.updateNavigation(this.context.previous, this.context.next);
+            this.setNoContentVisible(definitions.length === 0);
+
+            const fragment = document.createDocumentFragment();
+            for (const definition of definitions) {
+                fragment.appendChild(this.displayGenerator.createKanjiEntry(definition));
+            }
+
+            await Promise.resolve(); // Delay to help avoid forced reflow warnings in Chrome
+
+            this.container.textContent = '';
+            this.container.appendChild(fragment);
+
             const {index, scroll} = context;
             this.entryScrollIntoView(index || 0, scroll);
 
@@ -444,6 +456,26 @@ class Display {
 
         if (errorOrphaned !== null) {
             errorOrphaned.style.setProperty('display', 'block', 'important');
+        }
+
+        this.updateNavigation(null, null);
+        this.setNoContentVisible(false);
+    }
+
+    setNoContentVisible(visible) {
+        const noResults = document.querySelector('#no-results');
+
+        if (noResults !== null) {
+            noResults.hidden = !visible;
+        }
+    }
+
+    updateNavigation(previous, next) {
+        const navigation = document.querySelector('#navigation-header');
+        if (navigation !== null) {
+            navigation.hidden = !(previous || next);
+            navigation.dataset.hasPrevious = `${!!previous}`;
+            navigation.dataset.hasNext = `${!!next}`;
         }
     }
 
@@ -733,6 +765,7 @@ class Display {
     }
 
     static addEventListener(eventListeners, object, type, listener, options) {
+        if (object === null) { return; }
         object.addEventListener(type, listener, options);
         eventListeners.push([object, type, listener, options]);
     }

@@ -19,10 +19,21 @@
             <img src="/mixed/img/spinner.gif">
         </div>
 
+        <div id="navigation-header" class="navigation-header" hidden><div class="navigation-header-actions">
+            <button class="action-button action-previous"><img src="/mixed/img/source-term.svg" class="icon-image" title="Source term (Alt + B)" alt></button>
+            <button class="action-button action-next"><img src="/mixed/img/source-term.svg" class="icon-image" title="Next term (Alt + F)" alt></button>
+        </div></div><div class="navigation-header-spacer"></div>
+
         <div id="definitions"></div>
 
+        <div id="no-results" hidden>
+            <div class="entry">
+                <p>No results found.</p>
+            </div>
+        </div>
+
         <div id="error-orphaned">
-            <div class="container-fluid">
+            <div class="entry">
                 <h1>Yomichan Updated!</h1>
                 <p>
                     The Yomichan extension has been updated to a new version! In order to continue
@@ -30,6 +41,84 @@
                 </p>
             </div>
         </div>
+
+        <template id="term-entry-template"><div class="entry" data-type="term">
+            <div class="entry-header1">
+                <div class="entry-header2">
+                    <div class="entry-header3">
+                        <div class="actions">
+                            <button class="action-button action-view-note pending disabled"><img src="/mixed/img/view-note.svg" class="icon-image" title="View added note (Alt + V)" alt></button>
+                            <button class="action-button action-add-note pending disabled" data-mode="term-kanji"><img src="/mixed/img/add-term-kanji.svg" class="icon-image" title="Add expression (Alt + E)" alt></button>
+                            <button class="action-button action-add-note pending disabled" data-mode="term-kana"><img src="/mixed/img/add-term-kana.svg" class="icon-image" title="Add reading (Alt + R)" alt></button>
+                            <button class="action-button action-play-audio"><img src="/mixed/img/play-audio.svg" class="icon-image" title="Play audio (Alt + P)" alt></button>
+                            <span class="action-button action-current-indicator"><img src="/mixed/img/entry-current.svg" class="icon-image current" title="Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)" alt></span>
+                        </div>
+                        <div class="term-expression-list"></div>
+                    </div>
+                    <div class="term-reasons"></div>
+                </div>
+                <div class="frequencies"></div>
+            </div>
+            <div class="term-definition-container"><ol class="term-definition-list"></ol></div>
+            <pre class="debug-info"></pre>
+        </div></template>
+        <template id="term-expression-template"><div class="term-expression"><span class="term-expression-text"></span><div class="term-expression-details">
+            <button class="action-button action-play-audio"><img src="/mixed/img/play-audio.svg" class="icon-image" title="Play audio" alt></button>
+            <div class="tags tag-list"></div>
+            <div class="frequencies tag-list"></div>
+        </div></div></template>
+        <template id="term-definition-item-template"><li class="term-definition-item">
+            <div class="term-definition-tag-list tag-list"></div>
+            <div class="term-definition-only-list"></div>
+            <ul class="term-glossary-list"></ul>
+        </li></template>
+        <template id="term-definition-only-template"><span class="term-definition-only"></span></template>
+        <template id="term-glossary-item-template"><li class="term-glossary-item"><span class="term-glossary"></span></li></template>
+        <template id="term-reason-template"><span class="term-reason"></span></template>
+
+        <template id="kanji-entry-template"><div class="entry" data-type="kanji">
+            <div class="entry-header1">
+                <div class="entry-header2">
+                    <div class="entry-header3">
+                        <div class="actions">
+                            <button class="action-button action-view-note pending disabled"><img src="/mixed/img/view-note.svg" class="icon-image" title="View added note (Alt + V)" alt></button>
+                            <button class="action-button action-add-note pending disabled" data-mode="kanji"><img src="/mixed/img/add-term-kanji.svg" class="icon-image" title="Add Kanji (Alt + K)" alt></button>
+                            <span class="action-button action-current-indicator"><img src="/mixed/img/entry-current.svg" class="icon-image current" title="Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)" alt></span>
+                        </div>
+                        <div class="kanji-glyph"></div>
+                    </div>
+                </div>
+                <div class="frequencies"></div>
+            </div>
+            <div class="tags tag-list"></div>
+            <table class="kanji-glyph-data"><tbody>
+                <tr>
+                    <th>Glossary</th>
+                    <th>Readings</th>
+                    <th>Statistics</th>
+                </tr>
+                <tr>
+                    <td class="kanji-glossary-container"><ol class="kanji-glossary-list"></ol></td>
+                    <td class="kanji-readings"><dl class="kanji-readings-chinese"></dl><dl class="kanji-readings-japanese"></dl></td>
+                    <td class="kanji-statistics"></td>
+                </tr>
+                <tr><th colspan="3">Classifications</th></tr>
+                <tr><td colspan="3" class="kanji-classifications"></td></tr>
+                <tr><th colspan="3">Codepoints</th></tr>
+                <tr><td colspan="3" class="kanji-codepoints"></td></tr>
+                <tr><th colspan="3">Dictionary Indices</th></tr>
+                <tr><td colspan="3" class="kanji-dictionary-indices"></td></tr>
+            </tbody></table>
+            <pre class="debug-info"></pre>
+        </div></template>
+        <template id="kanji-info-table-template"><table class="kanji-info-table"><tbody class="kanji-info-table-body"></tbody></table></template>
+        <template id="kanji-info-table-item-template"><tr class="kanji-info-table-item"><th class="kanji-info-table-item-header"></th><td class="kanji-info-table-item-value"></td></tr></template>
+        <template id="kanji-info-table-empty-template"><tr class="kanji-info-table-item kanji-info-table-item-empty"><td class="kanji-info-table-item-value-empty">No data found</td></tr class="kanji-info-table-item"></template>
+        <template id="kanji-glossary-item-template"><li class="kanji-glossary-item"><span class="kanji-glossary"></span></li></template>
+        <template id="kanji-reading-template"><dd class="kanji-reading"></dd></template>
+
+        <template id="tag-template"><span class="tag"></span></template>
+        <template id="tag-frequency-template"><span class="tag" data-category="frequency"><span class="term-frequency-dictionary-name"></span><span class="term-frequency-separator"></span><span class="term-frequency-value"></span></template>
 
         <script src="/mixed/js/core.js"></script>
         <script src="/mixed/js/dom.js"></script>
@@ -40,6 +129,7 @@
         <script src="/mixed/js/audio.js"></script>
         <script src="/mixed/js/display-context.js"></script>
         <script src="/mixed/js/display.js"></script>
+        <script src="/mixed/js/display-generator.js"></script>
         <script src="/mixed/js/scroll.js"></script>
 
         <script src="/fg/js/float.js"></script>
