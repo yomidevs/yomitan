@@ -121,16 +121,10 @@ class Translator {
         dictTermsSort(result.definitions, dictionaries);
 
         const expressions = [];
-        for (const expression of result.expressions.keys()) {
-            for (const reading of result.expressions.get(expression).keys()) {
-                const termTags = result.expressions.get(expression).get(reading);
+        for (const [expression, readingMap] of result.expressions.entries()) {
+            for (const [reading, termTags] of readingMap.entries()) {
                 const score = termTags.map((tag) => tag.score).reduce((p, v) => p + v, 0);
-                expressions.push({
-                    expression: expression,
-                    reading: reading,
-                    termTags: dictTagsSort(termTags),
-                    termFrequency: Translator.scoreToTermFrequency(score)
-                });
+                expressions.push(Translator.createExpression(expression, reading, dictTagsSort(termTags), Translator.scoreToTermFrequency(score)));
             }
         }
 
@@ -194,7 +188,7 @@ class Translator {
 
         const strayDefinitions = defaultDefinitions.filter((definition, index) => !mergedByTermIndices.has(index));
         for (const groupedDefinition of dictTermsGroup(strayDefinitions, dictionaries)) {
-            groupedDefinition.expressions = [{expression: groupedDefinition.expression, reading: groupedDefinition.reading}];
+            groupedDefinition.expressions = [Translator.createExpression(expression, reading)];
             definitionsMerged.push(groupedDefinition);
         }
 
@@ -241,14 +235,18 @@ class Translator {
                 definitionTags.push(dictTagBuildSource(definition.dictionary));
                 const termTags = await this.expandTags(definition.termTags, definition.dictionary);
 
+                const {expression, reading} = definition;
+                const furiganaSegments = jpDistributeFurigana(expression, reading);
+
                 definitions.push({
                     source: deinflection.source,
                     reasons: deinflection.reasons,
                     score: definition.score,
                     id: definition.id,
                     dictionary: definition.dictionary,
-                    expression: definition.expression,
-                    reading: definition.reading,
+                    expression,
+                    reading,
+                    furiganaSegments,
                     glossary: definition.glossary,
                     definitionTags: dictTagsSort(definitionTags),
                     termTags: dictTagsSort(termTags),
@@ -502,6 +500,17 @@ class Translator {
         }
 
         return tagMetaList;
+    }
+
+    static createExpression(expression, reading, termTags=null, termFrequency=null) {
+        const furiganaSegments = jpDistributeFurigana(expression, reading);
+        return {
+            expression,
+            reading,
+            furiganaSegments,
+            termTags,
+            termFrequency
+        };
     }
 
     static scoreToTermFrequency(score) {

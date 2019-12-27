@@ -76,8 +76,12 @@ class DisplayGenerator {
         }
 
         if (expressionContainer !== null) {
-            const segments = [{text: details.expression, furigana: details.reading}]; // TODO : Use proper furigana segmentation
-            DisplayGenerator._appendFurigana(expressionContainer, segments, this._appendKanjiLinks.bind(this));
+            let furiganaSegments = details.furiganaSegments;
+            if (!Array.isArray(furiganaSegments)) {
+                // This case should not occur
+                furiganaSegments = [{text: details.expression, furigana: details.reading}];
+            }
+            DisplayGenerator._appendFurigana(expressionContainer, furiganaSegments, this._appendKanjiLinks.bind(this));
         }
 
         DisplayGenerator._appendMultiple(tagContainer, this.createTag.bind(this), details.termTags);
