@@ -25,6 +25,10 @@ function apiAudioGetUrl(definition, source, optionsContext) {
     return _apiInvoke('audioGetUrl', {definition, source, optionsContext});
 }
 
+function apiGetDisplayTemplatesHtml() {
+    return _apiInvoke('getDisplayTemplatesHtml');
+}
+
 function _apiInvoke(action, params={}) {
     const data = {action, params};
     return new Promise((resolve, reject) => {

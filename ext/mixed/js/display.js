@@ -356,6 +356,11 @@ class Display {
             window.focus();
         }
 
+        if (!this.displayGenerator.isInitialized()) {
+            await this.displayGenerator.initialize();
+            if (this.setContentToken !== token) { return; }
+        }
+
         this.definitions = definitions;
         if (context.disableHistory) {
             delete context.disableHistory;
@@ -413,6 +418,11 @@ class Display {
 
         if (context.focus !== false) {
             window.focus();
+        }
+
+        if (!this.displayGenerator.isInitialized()) {
+            await this.displayGenerator.initialize();
+            if (this.setContentToken !== token) { return; }
         }
 
         this.definitions = definitions;

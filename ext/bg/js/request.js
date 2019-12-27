@@ -17,10 +17,10 @@
  */
 
 
-function requestJson(url, action, params) {
+function requestText(url, action, params) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        xhr.overrideMimeType('application/json');
+        xhr.overrideMimeType('text/plain');
         xhr.addEventListener('load', () => resolve(xhr.responseText));
         xhr.addEventListener('error', () => reject(new Error('Failed to connect')));
         xhr.open(action, url);
@@ -29,12 +29,15 @@ function requestJson(url, action, params) {
         } else {
             xhr.send();
         }
-    }).then((responseText) => {
-        try {
-            return JSON.parse(responseText);
-        }
-        catch (e) {
-            return Promise.reject(new Error('Invalid response'));
-        }
     });
+}
+
+async function requestJson(url, action, params) {
+    const responseText = await requestText(url, action, params);
+    try {
+        return JSON.parse(responseText);
+    }
+    catch (e) {
+        throw new Error('Invalid response');
+    }
 }

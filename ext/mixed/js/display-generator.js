@@ -19,22 +19,39 @@
 
 class DisplayGenerator {
     constructor() {
-        this._termEntryTemplate = document.querySelector('#term-entry-template');
-        this._termExpressionTemplate = document.querySelector('#term-expression-template');
-        this._termDefinitionItemTemplate = document.querySelector('#term-definition-item-template');
-        this._termDefinitionOnlyTemplate = document.querySelector('#term-definition-only-template');
-        this._termGlossaryItemTemplate = document.querySelector('#term-glossary-item-template');
-        this._termReasonTemplate = document.querySelector('#term-reason-template');
+        this._isInitialized = false;
+        this._initializationPromise = null;
 
-        this._kanjiEntryTemplate = document.querySelector('#kanji-entry-template');
-        this._kanjiInfoTableTemplate = document.querySelector('#kanji-info-table-template');
-        this._kanjiInfoTableItemTemplate = document.querySelector('#kanji-info-table-item-template');
-        this._kanjiInfoTableEmptyTemplate = document.querySelector('#kanji-info-table-empty-template');
-        this._kanjiGlossaryItemTemplate = document.querySelector('#kanji-glossary-item-template');
-        this._kanjiReadingTemplate = document.querySelector('#kanji-reading-template');
+        this._termEntryTemplate = null;
+        this._termExpressionTemplate = null;
+        this._termDefinitionItemTemplate = null;
+        this._termDefinitionOnlyTemplate = null;
+        this._termGlossaryItemTemplate = null;
+        this._termReasonTemplate = null;
 
-        this._tagTemplate = document.querySelector('#tag-template');
-        this._tagFrequencyTemplate = document.querySelector('#tag-frequency-template');
+        this._kanjiEntryTemplate = null;
+        this._kanjiInfoTableTemplate = null;
+        this._kanjiInfoTableItemTemplate = null;
+        this._kanjiInfoTableEmptyTemplate = null;
+        this._kanjiGlossaryItemTemplate = null;
+        this._kanjiReadingTemplate = null;
+
+        this._tagTemplate = null;
+        this._tagFrequencyTemplate = null;
+    }
+
+    isInitialized() {
+        return this._isInitialized;
+    }
+
+    initialize() {
+        if (this._isInitialized) {
+            return Promise.resolve();
+        }
+        if (this._initializationPromise === null) {
+            this._initializationPromise = this._initializeInternal();
+        }
+        return this._initializationPromise;
     }
 
     createTermEntry(details) {
@@ -257,6 +274,31 @@ class DisplayGenerator {
         node.dataset.frequency = details.frequency;
 
         return node;
+    }
+
+    async _initializeInternal() {
+        const html = await apiGetDisplayTemplatesHtml();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        this._setTemplates(doc);
+    }
+
+    _setTemplates(doc) {
+        this._termEntryTemplate = doc.querySelector('#term-entry-template');
+        this._termExpressionTemplate = doc.querySelector('#term-expression-template');
+        this._termDefinitionItemTemplate = doc.querySelector('#term-definition-item-template');
+        this._termDefinitionOnlyTemplate = doc.querySelector('#term-definition-only-template');
+        this._termGlossaryItemTemplate = doc.querySelector('#term-glossary-item-template');
+        this._termReasonTemplate = doc.querySelector('#term-reason-template');
+
+        this._kanjiEntryTemplate = doc.querySelector('#kanji-entry-template');
+        this._kanjiInfoTableTemplate = doc.querySelector('#kanji-info-table-template');
+        this._kanjiInfoTableItemTemplate = doc.querySelector('#kanji-info-table-item-template');
+        this._kanjiInfoTableEmptyTemplate = doc.querySelector('#kanji-info-table-empty-template');
+        this._kanjiGlossaryItemTemplate = doc.querySelector('#kanji-glossary-item-template');
+        this._kanjiReadingTemplate = doc.querySelector('#kanji-reading-template');
+
+        this._tagTemplate = doc.querySelector('#tag-template');
+        this._tagFrequencyTemplate = doc.querySelector('#tag-frequency-template');
     }
 
     _appendKanjiLinks(container, text) {

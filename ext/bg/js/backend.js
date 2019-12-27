@@ -522,6 +522,11 @@ class Backend {
         return result;
     }
 
+    async _onApiGetDisplayTemplatesHtml() {
+        const url = chrome.runtime.getURL('/mixed/display-templates.html');
+        return await requestText(url, 'GET');
+    }
+
     // Command handlers
 
     async _onCommandSearch(params) {
@@ -735,7 +740,8 @@ Backend._messageHandlers = new Map([
     ['frameInformationGet', (self, ...args) => self._onApiFrameInformationGet(...args)],
     ['injectStylesheet', (self, ...args) => self._onApiInjectStylesheet(...args)],
     ['getEnvironmentInfo', (self, ...args) => self._onApiGetEnvironmentInfo(...args)],
-    ['clipboardGet', (self, ...args) => self._onApiClipboardGet(...args)]
+    ['clipboardGet', (self, ...args) => self._onApiClipboardGet(...args)],
+    ['getDisplayTemplatesHtml', (self, ...args) => self._onApiGetDisplayTemplatesHtml(...args)]
 ]);
 
 Backend._commandHandlers = new Map([
