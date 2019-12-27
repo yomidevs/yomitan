@@ -35,7 +35,7 @@ class DisplayFloat extends Display {
 
     onError(error) {
         if (this._orphaned) {
-            this.setContentOrphaned();
+            this.setContent('orphaned');
         } else {
             logError(error, true);
         }

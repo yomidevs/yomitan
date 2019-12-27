@@ -77,7 +77,7 @@ class Display {
             };
 
             const definitions = await apiKanjiFind(link.textContent, this.getOptionsContext());
-            this.setContentKanji(definitions, context);
+            this.setContent('kanji', {definitions, context});
         } catch (error) {
             this.onError(error);
         }
@@ -131,7 +131,7 @@ class Display {
                 });
             }
 
-            this.setContentTerms(definitions, context);
+            this.setContent('terms', {definitions, context});
 
             if (selectText) {
                 textSource.select();

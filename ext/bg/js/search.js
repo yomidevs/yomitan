@@ -220,12 +220,12 @@ class DisplaySearch extends Display {
             this.updateSearchButton();
             if (valid) {
                 const {definitions} = await apiTermsFind(query, details, this.optionsContext);
-                this.setContentTerms(definitions, {
+                this.setContent('terms', {definitions, context: {
                     focus: false,
                     disableHistory: true,
                     sentence: {text: query, offset: 0},
                     url: window.location.href
-                });
+                }});
             } else {
                 this.container.textContent = '';
             }
