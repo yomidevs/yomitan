@@ -705,7 +705,9 @@ class Display {
     }
 
     setSpinnerVisible(visible) {
-        this.spinner.style.display = visible ? 'block' : '';
+        if (this.spinner !== null) {
+            this.spinner.hidden = !visible;
+        }
     }
 
     getEntry(index) {
