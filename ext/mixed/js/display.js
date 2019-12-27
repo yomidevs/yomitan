@@ -372,16 +372,18 @@ class Display {
         this.updateNavigation(this.context.previous, this.context.next);
         this.setNoContentVisible(definitions.length === 0);
 
-        const fragment = document.createDocumentFragment();
-        for (const definition of definitions) {
-            fragment.appendChild(this.displayGenerator.createTermEntry(definition));
+        const container = this.container;
+        container.textContent = '';
+
+        for (let i = 0, ii = definitions.length; i < ii; ++i) {
+            if (i > 0) {
+                await promiseTimeout(1);
+                if (this.setContentToken !== token) { return; }
+            }
+
+            const entry = this.displayGenerator.createTermEntry(definitions[i]);
+            container.appendChild(entry);
         }
-
-        await Promise.resolve(); // Delay to help avoid forced reflow warnings in Chrome
-        if (this.setContentToken !== token) { return; }
-
-        this.container.textContent = '';
-        this.container.appendChild(fragment);
 
         const {index, scroll, disableScroll} = context;
         if (!disableScroll) {
@@ -429,16 +431,18 @@ class Display {
         this.updateNavigation(this.context.previous, this.context.next);
         this.setNoContentVisible(definitions.length === 0);
 
-        const fragment = document.createDocumentFragment();
-        for (const definition of definitions) {
-            fragment.appendChild(this.displayGenerator.createKanjiEntry(definition));
+        const container = this.container;
+        container.textContent = '';
+
+        for (let i = 0, ii = definitions.length; i < ii; ++i) {
+            if (i > 0) {
+                await promiseTimeout(0);
+                if (this.setContentToken !== token) { return; }
+            }
+
+            const entry = this.displayGenerator.createKanjiEntry(definitions[i]);
+            container.appendChild(entry);
         }
-
-        await Promise.resolve(); // Delay to help avoid forced reflow warnings in Chrome
-        if (this.setContentToken !== token) { return; }
-
-        this.container.textContent = '';
-        this.container.appendChild(fragment);
 
         const {index, scroll} = context;
         this.entryScrollIntoView(index || 0, scroll);

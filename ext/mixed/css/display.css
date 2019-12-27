@@ -42,6 +42,7 @@ body {
     margin: 0;
     border: 0;
     padding: 0;
+    overflow-y: scroll; /* always show scroll bar */
 }
 
 ol, ul {
@@ -130,10 +131,6 @@ html:root[data-yomichan-page=float] .navigation-header {
 
 .query-parser-term {
     margin-right: 0.2em;
-}
-
-html:root[data-yomichan-page=search] body {
-    overflow-y: scroll; /* always show scroll bar to avoid scanning problems */
 }
 
 
