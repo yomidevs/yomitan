@@ -330,7 +330,6 @@ class DisplayGenerator {
     }
 
     static _instantiateTemplate(template) {
-        const content = document.importNode(template.content, true);
-        return content.firstChild;
+        return document.importNode(template.content.firstChild, true);
     }
 }
