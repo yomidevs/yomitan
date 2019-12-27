@@ -456,15 +456,14 @@ class Display {
     }
 
     setContentOrphaned() {
-        const definitions = document.querySelector('#definitions');
         const errorOrphaned = document.querySelector('#error-orphaned');
 
-        if (definitions !== null) {
-            definitions.style.setProperty('display', 'none', 'important');
+        if (this.container !== null) {
+            this.container.hidden = true;
         }
 
         if (errorOrphaned !== null) {
-            errorOrphaned.style.setProperty('display', 'block', 'important');
+            errorOrphaned.hidden = false;
         }
 
         this.updateNavigation(null, null);

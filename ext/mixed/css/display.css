@@ -62,10 +62,6 @@ ol, ul {
     height: 2.28571428em; /* 14px => 32px */
 }
 
-#error-orphaned {
-    display: none;
-}
-
 .invisible {
     visibility: hidden;
 }
