@@ -81,11 +81,15 @@ ol, ul {
     border-bottom-style: solid;
 }
 
+html:root[data-yomichan-page=search] .navigation-header {
+    position: sticky;
+}
+
 html:root[data-yomichan-page=float] .navigation-header {
     position: fixed;
 }
 
-.navigation-header:not([hidden])~.navigation-header-spacer {
+html:root[data-yomichan-page=float] .navigation-header:not([hidden])~.navigation-header-spacer {
     height: 2.1em;
 }
 
