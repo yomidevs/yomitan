@@ -188,7 +188,7 @@ class Translator {
 
         const strayDefinitions = defaultDefinitions.filter((definition, index) => !mergedByTermIndices.has(index));
         for (const groupedDefinition of dictTermsGroup(strayDefinitions, dictionaries)) {
-            groupedDefinition.expressions = [Translator.createExpression(expression, reading)];
+            groupedDefinition.expressions = [Translator.createExpression(groupedDefinition.expression, groupedDefinition.reading)];
             definitionsMerged.push(groupedDefinition);
         }
 
