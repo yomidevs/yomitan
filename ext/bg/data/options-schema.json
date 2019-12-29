@@ -91,6 +91,8 @@
                                     "popupVerticalOffset2",
                                     "popupHorizontalTextPosition",
                                     "popupVerticalTextPosition",
+                                    "popupScalingFactor",
+                                    "popupScaleRelativeToPageZoom",
                                     "showGuide",
                                     "compactTags",
                                     "compactGlossaries",
@@ -165,6 +167,14 @@
                                         "type": "string",
                                         "enum": ["default", "before", "after", "left", "right"],
                                         "default": "before"
+                                    },
+                                    "popupScalingFactor": {
+                                        "type": "number",
+                                        "default": 1
+                                    },
+                                    "popupScaleRelativeToPageZoom": {
+                                        "type": "boolean",
+                                        "default": true
                                     },
                                     "showGuide": {
                                         "type": "boolean",
