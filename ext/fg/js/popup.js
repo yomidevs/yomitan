@@ -34,6 +34,7 @@ class Popup {
         this._options = null;
         this._stylesheetInjectedViaApi = false;
         this._contentScale = 1.0;
+        this._containerSizeContentScale = null;
 
         this._container = document.createElement('iframe');
         this._container.className = 'yomichan-float';
@@ -258,10 +259,12 @@ class Popup {
         );
 
         const scale = this._contentScale;
+        const scaleRatio = this._containerSizeContentScale === null ? 1.0 : scale / this._containerSizeContentScale;
+        this._containerSizeContentScale = scale;
         const [x, y, width, height, below] = getPosition(
             elementRect,
-            Math.max(containerRect.width, optionsGeneral.popupWidth * scale),
-            Math.max(containerRect.height, optionsGeneral.popupHeight * scale),
+            Math.max(containerRect.width * scaleRatio, optionsGeneral.popupWidth * scale),
+            Math.max(containerRect.height * scaleRatio, optionsGeneral.popupHeight * scale),
             document.body.clientWidth,
             window.innerHeight,
             scale,
