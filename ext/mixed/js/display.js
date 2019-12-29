@@ -552,6 +552,11 @@ class Display {
             target = scroll;
         } else {
             target = this.index === 0 || entry === null ? 0 : Display.getElementTop(entry);
+
+            const header = document.querySelector('#navigation-header');
+            if (header !== null) {
+                target -= header.getBoundingClientRect().height;
+            }
         }
 
         if (smooth) {
