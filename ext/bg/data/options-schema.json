@@ -65,6 +65,7 @@
                             "general",
                             "audio",
                             "scanning",
+                            "translation",
                             "dictionaries",
                             "parsing",
                             "anki"
@@ -347,6 +348,37 @@
                                     "enableOnSearchPage": {
                                         "type": "boolean",
                                         "default": true
+                                    }
+                                }
+                            },
+                            "translation": {
+                                "type": "object",
+                                "required": [
+                                    "convertKatakanaToHiragana",
+                                    "convertHalfWidthCharacters",
+                                    "convertNumericCharacters",
+                                    "convertAlphabeticCharacters"
+                                ],
+                                "properties": {
+                                    "convertKatakanaToHiragana": {
+                                        "type": "string",
+                                        "enum": ["false", "true", "variant"],
+                                        "default": "variant"
+                                    },
+                                    "convertHalfWidthCharacters": {
+                                        "type": "string",
+                                        "enum": ["false", "true", "variant"],
+                                        "default": "false"
+                                    },
+                                    "convertNumericCharacters": {
+                                        "type": "string",
+                                        "enum": ["false", "true", "variant"],
+                                        "default": "false"
+                                    },
+                                    "convertAlphabeticCharacters": {
+                                        "type": "string",
+                                        "enum": ["false", "true", "variant"],
+                                        "default": "false"
                                     }
                                 }
                             },
