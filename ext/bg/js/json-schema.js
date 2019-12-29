@@ -352,8 +352,13 @@ class JsonSchemaProxyHandler {
             }
         }
 
-        if (type === 'object') {
-            value = JsonSchemaProxyHandler.populateObjectDefaults(value, schema);
+        switch (type) {
+            case 'object':
+                value = JsonSchemaProxyHandler.populateObjectDefaults(value, schema);
+                break;
+            case 'array':
+                value = JsonSchemaProxyHandler.populateArrayDefaults(value, schema);
+                break;
         }
 
         return value;
@@ -380,6 +385,16 @@ class JsonSchemaProxyHandler {
             } else {
                 value[property] = JsonSchemaProxyHandler.getValidValueOrDefault(propertySchema, value[property]);
             }
+        }
+
+        return value;
+    }
+
+    static populateArrayDefaults(value, schema) {
+        for (let i = 0, ii = value.length; i < ii; ++i) {
+            const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, i);
+            if (propertySchema === null) { continue; }
+            value[i] = JsonSchemaProxyHandler.getValidValueOrDefault(propertySchema, value[i]);
         }
 
         return value;
