@@ -44,14 +44,22 @@ class Frontend extends TextScanner {
         try {
             await this.updateOptions();
             const {zoomFactor} = await apiGetZoom();
-            this.onZoomChanged({newZoomFactor: zoomFactor});
+            this._pageZoomFactor = zoomFactor;
 
             window.addEventListener('resize', this.onResize.bind(this), false);
+
+            const visualViewport = window.visualViewport;
+            if (visualViewport !== null && typeof visualViewport === 'object') {
+                window.visualViewport.addEventListener('scroll', this.onVisualViewportScroll.bind(this));
+                window.visualViewport.addEventListener('resize', this.onVisualViewportResize.bind(this));
+            }
 
             yomichan.on('orphaned', () => this.onOrphaned());
             yomichan.on('optionsUpdate', () => this.updateOptions());
             yomichan.on('zoomChanged', (e) => this.onZoomChanged(e));
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
+
+            this._updateContentScale();
         } catch (e) {
             this.onError(e);
         }
@@ -87,6 +95,14 @@ class Frontend extends TextScanner {
 
     onZoomChanged({newZoomFactor}) {
         this._pageZoomFactor = newZoomFactor;
+        this._updateContentScale();
+    }
+
+    onVisualViewportScroll() {
+        // TODO
+    }
+
+    onVisualViewportResize() {
         this._updateContentScale();
     }
 
@@ -196,14 +212,24 @@ class Frontend extends TextScanner {
     }
 
     _updateContentScale() {
-        const {popupScalingFactor, popupScaleRelativeToPageZoom} = this.options.general;
+        const {popupScalingFactor, popupScaleRelativeToPageZoom, popupScaleRelativeToVisualViewport} = this.options.general;
         let contentScale = popupScalingFactor;
-        if (popupScaleRelativeToPageZoom) { contentScale /= this._pageZoomFactor; }
+        if (popupScaleRelativeToPageZoom) {
+            contentScale /= this._pageZoomFactor;
+        }
+        if (popupScaleRelativeToVisualViewport) {
+            contentScale /= Frontend._getVisualViewportScale();
+        }
         if (contentScale === this._contentScale) { return; }
 
         this._contentScale = contentScale;
         this.popup.setContentScale(this._contentScale);
         this.onResize();
+    }
+
+    static _getVisualViewportScale() {
+        const visualViewport = window.visualViewport;
+        return visualViewport !== null && typeof visualViewport === 'object' ? visualViewport.scale : 1.0;
     }
 }
 
