@@ -174,7 +174,7 @@
                                     },
                                     "popupScaleRelativeToPageZoom": {
                                         "type": "boolean",
-                                        "default": true
+                                        "default": false
                                     },
                                     "showGuide": {
                                         "type": "boolean",
