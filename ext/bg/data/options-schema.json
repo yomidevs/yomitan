@@ -93,6 +93,7 @@
                                     "popupVerticalTextPosition",
                                     "popupScalingFactor",
                                     "popupScaleRelativeToPageZoom",
+                                    "popupScaleRelativeToVisualViewport",
                                     "showGuide",
                                     "compactTags",
                                     "compactGlossaries",
@@ -175,6 +176,10 @@
                                     "popupScaleRelativeToPageZoom": {
                                         "type": "boolean",
                                         "default": false
+                                    },
+                                    "popupScaleRelativeToVisualViewport": {
+                                        "type": "boolean",
+                                        "default": true
                                     },
                                     "showGuide": {
                                         "type": "boolean",

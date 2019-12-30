@@ -151,6 +151,14 @@
                 </div>
 
                 <div class="checkbox options-advanced">
+                    <label><input type="checkbox" id="popup-scale-relative-to-page-zoom"> Change popup size relative to page zoom level</label>
+                </div>
+
+                <div class="checkbox options-advanced">
+                    <label><input type="checkbox" id="popup-scale-relative-to-visual-viewport"> Change popup size relative to page viewport</label>
+                </div>
+
+                <div class="checkbox options-advanced">
                     <label><input type="checkbox" id="show-debug-info"> Show debug information</label>
                 </div>
 
@@ -169,6 +177,11 @@
                         <option value="default">Default</option>
                         <option value="full-width">Full width</option>
                     </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="popup-scaling-factor">Popup size multiplier</label>
+                    <input type="number" min="0" id="popup-scaling-factor" class="form-control">
                 </div>
 
                 <div class="form-group options-advanced">
@@ -233,22 +246,6 @@
                         <div class="col-xs-6">
                             <label for="popup-vertical-offset2">Vertical popup offset for vertical text <span class="label-light">(in pixels)</span></label>
                             <input type="number" min="0" id="popup-vertical-offset2" class="form-control">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group options-advanced">
-                    <div class="row">
-                        <div class="col-xs-6">
-                            <label for="popup-scaling-factor">Popup size multiplier</label>
-                            <input type="number" min="0" id="popup-scaling-factor" class="form-control">
-                        </div>
-                        <div class="col-xs-6">
-                            <label for="popup-scale-relative-to-page-zoom">Popup size mode</label>
-                            <select class="form-control" id="popup-scale-relative-to-page-zoom">
-                                <option value="false">Absolute</option>
-                                <option value="true">Relative to zoom level</option>
-                            </select>
                         </div>
                     </div>
                 </div>

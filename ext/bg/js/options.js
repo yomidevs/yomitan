@@ -281,6 +281,7 @@ function profileOptionsCreateDefaults() {
             popupVerticalTextPosition: 'before',
             popupScalingFactor: 1,
             popupScaleRelativeToPageZoom: false,
+            popupScaleRelativeToVisualViewport: true,
             showGuide: true,
             compactTags: false,
             compactGlossaries: false,
