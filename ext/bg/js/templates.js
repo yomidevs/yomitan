@@ -143,11 +143,11 @@ templates['kanji.html'] = template({"1":function(container,depth0,helpers,partia
 },"33":function(container,depth0,helpers,partials,data) {
     return "class=\"source-term\"";
 },"35":function(container,depth0,helpers,partials,data) {
-    return "class=\"source-term term-button-fade\"";
+    return "class=\"source-term invisible\"";
 },"37":function(container,depth0,helpers,partials,data) {
     return "class=\"next-term\"";
 },"39":function(container,depth0,helpers,partials,data) {
-    return "class=\"next-term term-button-fade\"";
+    return "class=\"next-term invisible\"";
 },"41":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
@@ -491,11 +491,11 @@ templates['terms.html'] = template({"1":function(container,depth0,helpers,partia
 },"67":function(container,depth0,helpers,partials,data) {
     return "class=\"source-term\"";
 },"69":function(container,depth0,helpers,partials,data) {
-    return "class=\"source-term term-button-fade\"";
+    return "class=\"source-term invisible\"";
 },"71":function(container,depth0,helpers,partials,data) {
     return "class=\"next-term\"";
 },"73":function(container,depth0,helpers,partials,data) {
-    return "class=\"next-term term-button-fade\"";
+    return "class=\"next-term invisible\"";
 },"75":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 

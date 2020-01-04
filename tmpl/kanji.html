@@ -89,8 +89,8 @@ No data found
 
 {{#if definitions}}
 <div class="term-navigation">
-    <a href="#" {{#if source}}class="source-term"{{else}}class="source-term term-button-fade"{{/if}}><img src="/mixed/img/source-term.svg" title="Source term (Alt + B)" alt></a>
-    <a href="#" {{#if next}}class="next-term"{{else}}class="next-term term-button-fade"{{/if}}><img src="/mixed/img/source-term.svg" style="transform: scaleX(-1);" title="Next term (Alt + F)" alt></a>
+    <a href="#" {{#if source}}class="source-term"{{else}}class="source-term invisible"{{/if}}><img src="/mixed/img/source-term.svg" title="Source term (Alt + B)" alt></a>
+    <a href="#" {{#if next}}class="next-term"{{else}}class="next-term invisible"{{/if}}><img src="/mixed/img/source-term.svg" style="transform: scaleX(-1);" title="Next term (Alt + F)" alt></a>
 </div>
 {{#each definitions}}
 {{#unless @first}}<hr>{{/unless}}

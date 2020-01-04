@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2019-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
@@ -24,6 +24,7 @@ class SettingsPopupPreview {
         this.popupInjectOuterStylesheetOld = Popup.injectOuterStylesheet;
         this.popupShown = false;
         this.themeChangeTimeout = null;
+        this.textSource = null;
     }
 
     static create() {
@@ -46,16 +47,18 @@ class SettingsPopupPreview {
         window.apiOptionsGet = (...args) => this.apiOptionsGet(...args);
 
         // Overwrite frontend
-        this.frontend = Frontend.create();
-        window.yomichan_frontend = this.frontend;
+        const popupHost = new PopupProxyHost();
+        await popupHost.prepare();
+
+        const popup = popupHost.createPopup(null, 0);
+        popup.setChildrenSupported(false);
+
+        this.frontend = new Frontend(popup);
 
         this.frontend.setEnabled = function () {};
         this.frontend.searchClear = function () {};
 
-        this.frontend.popup.childrenSupported = false;
-        this.frontend.popup.interactive = false;
-
-        await this.frontend.isPrepared();
+        await this.frontend.prepare();
 
         // Overwrite popup
         Popup.injectOuterStylesheet = (...args) => this.popupInjectOuterStylesheet(...args);
@@ -95,7 +98,7 @@ class SettingsPopupPreview {
 
     onWindowResize() {
         if (this.frontend === null) { return; }
-        const textSource = this.frontend.textSourceLast;
+        const textSource = this.textSource;
         if (textSource === null) { return; }
 
         const elementRect = textSource.getRect();
@@ -105,11 +108,10 @@ class SettingsPopupPreview {
 
     onMessage(e) {
         const {action, params} = e.data;
-        const handlers = SettingsPopupPreview.messageHandlers;
-        if (hasOwn(handlers, action)) {
-            const handler = handlers[action];
-            handler(this, params);
-        }
+        const handler = SettingsPopupPreview._messageHandlers.get(action);
+        if (typeof handler !== 'function') { return; }
+
+        handler(this, params);
     }
 
     onThemeDarkCheckboxChanged(node) {
@@ -160,13 +162,14 @@ class SettingsPopupPreview {
         const source = new TextSourceRange(range, range.toString(), null);
 
         try {
-            await this.frontend.searchSource(source, 'script');
+            await this.frontend.onSearchSource(source, 'script');
         } finally {
             source.cleanup();
         }
-        await this.frontend.lastShowPromise;
+        this.textSource = source;
+        await this.frontend.showContentCompleted();
 
-        if (this.frontend.popup.isVisible()) {
+        if (this.frontend.popup.isVisibleSync()) {
             this.popupShown = true;
         }
 
@@ -174,11 +177,11 @@ class SettingsPopupPreview {
     }
 }
 
-SettingsPopupPreview.messageHandlers = {
-    setText: (self, {text}) => self.setText(text),
-    setCustomCss: (self, {css}) => self.setCustomCss(css),
-    setCustomOuterCss: (self, {css}) => self.setCustomOuterCss(css)
-};
+SettingsPopupPreview._messageHandlers = new Map([
+    ['setText', (self, {text}) => self.setText(text)],
+    ['setCustomCss', (self, {css}) => self.setCustomCss(css)],
+    ['setCustomOuterCss', (self, {css}) => self.setCustomOuterCss(css)]
+]);
 
 SettingsPopupPreview.instance = SettingsPopupPreview.create();
 

@@ -299,7 +299,7 @@
                     <input type="number" min="0" max="100" id="audio-playback-volume" class="form-control">
                 </div>
 
-                <div class="form-group" style="display: none;" id="text-to-speech-voice-container">
+                <div class="form-group" id="text-to-speech-voice-container" hidden>
                     <label for="text-to-speech-voice">Text-to-speech voice</label>
                     <div class="input-group">
                         <select class="form-control" id="text-to-speech-voice"></select>
@@ -365,12 +365,12 @@
 
                 <div class="form-group options-advanced">
                     <label for="scan-delay">Scan delay <span class="label-light">(in milliseconds)</span></label>
-                    <input type="number" min="1" id="scan-delay" class="form-control">
+                    <input type="number" min="0" id="scan-delay" class="form-control">
                 </div>
 
                 <div class="form-group options-advanced">
                     <label for="scan-length">Scan length <span class="label-light">(in characters)</span></label>
-                    <input type="number" min="1" id="scan-length" class="form-control">
+                    <input type="number" min="1" step="1" id="scan-length" class="form-control">
                 </div>
 
                 <div class="form-group">
@@ -406,7 +406,7 @@
 
                 <div class="form-group">
                     <label for="popup-nesting-max-depth">Maximum number of additional popups</label>
-                    <input type="number" min="0" id="popup-nesting-max-depth" class="form-control">
+                    <input type="number" min="0" step="1" id="popup-nesting-max-depth" class="form-control">
                 </div>
             </div>
 
@@ -491,6 +491,18 @@
                     <div hidden><input type="file" id="dict-file" accept=".zip,application/zip" multiple></div>
                 </div>
 
+                <div>
+                    <h3>Dictionary Options</h3>
+                </div>
+
+                <div class="checkbox">
+                    <label><input type="checkbox" id="database-enable-prefix-wildcard-searches"> Enable prefix wildcard searches</label>
+                    <p class="help-block">
+                        This option only applies to newly imported dictionaries.
+                        Enabling this option will also cause dictionary data to take up slightly more storage space.
+                    </p>
+                </div>
+
                 <div class="modal fade" tabindex="-1" role="dialog" id="dict-purge-modal">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
@@ -537,6 +549,9 @@
                     </div>
                     <div class="checkbox options-advanced">
                         <label><input type="checkbox" class="dict-allow-secondary-searches"> Allow secondary searches</label>
+                    </div>
+                    <div class="checkbox dict-prefix-wildcard-searches-supported-container">
+                        <label><input type="checkbox" class="dict-prefix-wildcard-searches-supported" disabled> Prefix wildcard searches supported</label>
                     </div>
                     <div class="form-group options-advanced">
                         <label class="dict-result-priority-label">Result priority</label>
@@ -659,7 +674,7 @@
 
                     <div class="form-group options-advanced">
                         <label for="sentence-detection-extent">Sentence detection extent <span class="label-light">(in characters)</span></label>
-                        <input type="number" min="1" id="sentence-detection-extent" class="form-control">
+                        <input type="number" min="1" step="1" id="sentence-detection-extent" class="form-control">
                     </div>
 
                     <div class="form-group options-advanced">
@@ -739,7 +754,9 @@
                                 engine. Advanced users can modify these templates for ultimate control of what information gets included in
                                 their Anki cards. If you encounter problems with your changes, you can always reset to the default template settings.
                             </p>
-                            <textarea autocomplete="off" spellcheck="false" wrap="soft" class="form-control" rows="10" id="field-templates"></textarea>
+                            <div class="ignore-form-changes">
+                                <textarea autocomplete="off" spellcheck="false" wrap="soft" class="form-control" rows="10" id="field-templates"></textarea>
+                            </div>
                             <div>
                                 <button class="btn btn-danger" id="field-templates-reset">Reset Templates</button>
                             </div>
@@ -836,6 +853,102 @@
                 </ul>
             </div>
 
+
+            <div>
+                <h3>Backup</h3>
+
+                <p class="help-block">
+                    Yomichan can import and export settings files which can be used to restore settings,
+                    share settings across devices, or help to debug problems.
+                    These files will only contain settings and will not contain dictionaries.
+                    Dictionaries must be imported separately.
+                </p>
+
+                <div>
+                    <button class="btn btn-default" id="settings-export">Export Settings</button>
+                    <button class="btn btn-default" id="settings-import">Import Settings</button>
+                    <button class="btn btn-danger" id="settings-reset">Reset Default Settings</button>
+                </div>
+
+                <div hidden><input type="file" id="settings-import-file" accept=".json,application/json"></div>
+
+                <div class="modal fade" tabindex="-1" role="dialog" id="settings-import-error-modal">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Import Error</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p>
+                                    An error occurred while trying to import the settings file:
+                                </p>
+                                <p class="text-danger" id="settings-import-error-modal-message"></p>
+                                <p>
+                                    Additional info can be found in the developer console.
+                                </p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" tabindex="-1" role="dialog" id="settings-import-warning-modal">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Import Security Warning</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p>
+                                    Settings file contains settings which may pose a security risk.
+                                    Only import settings from sources you trust.
+                                </p>
+                                <ul class="text-danger" id="settings-import-warning-modal-message"></ul>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger settings-import-warning-modal-import-button">Import</button>
+                                <button type="button" class="btn btn-primary settings-import-warning-modal-import-button" data-import-sanitize="true">Sanitize and Import</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" tabindex="-1" role="dialog" id="settings-reset-modal">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Settings Reset</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p class="text-danger">
+                                    You are about to reset all Yomichan settings back to their default values.
+                                    This will delete all custom profiles you may have created.
+                                    <strong>This action cannot be undone.</strong>
+                                </p>
+                                <p>
+                                    Consider making a backup using the "Export Settings" button before resetting
+                                    if you want to be able to revert.
+                                </p>
+                                <p>
+                                    Dictionary data will not be deleted, but any installed dictionaries
+                                    will need to be re-enabled.
+                                </p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger" id="settings-reset-modal-confirm">Reset All Settings</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div>
                 <h3>Support Development</h3>
 
@@ -866,13 +979,11 @@
 
         <script src="/mixed/js/core.js"></script>
         <script src="/mixed/js/dom.js"></script>
+        <script src="/mixed/js/api.js"></script>
         <script src="/mixed/js/japanese.js"></script>
 
         <script src="/bg/js/anki.js"></script>
-        <script src="/bg/js/api.js"></script>
-        <script src="/bg/js/audio-ui.js"></script>
         <script src="/bg/js/conditions.js"></script>
-        <script src="/bg/js/conditions-ui.js"></script>
         <script src="/bg/js/dictionary.js"></script>
         <script src="/bg/js/handlebars.js"></script>
         <script src="/bg/js/options.js"></script>
@@ -885,6 +996,9 @@
         <script src="/bg/js/settings/anki.js"></script>
         <script src="/bg/js/settings/anki-templates.js"></script>
         <script src="/bg/js/settings/audio.js"></script>
+        <script src="/bg/js/settings/audio-ui.js"></script>
+        <script src="/bg/js/settings/backup.js"></script>
+        <script src="/bg/js/settings/conditions-ui.js"></script>
         <script src="/bg/js/settings/dictionaries.js"></script>
         <script src="/bg/js/settings/popup-preview.js"></script>
         <script src="/bg/js/settings/profiles.js"></script>

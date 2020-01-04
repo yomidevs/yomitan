@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
@@ -160,16 +160,17 @@ function jpDistributeFuriganaInflected(expression, reading, source) {
     }
     const offset = source.length - stemLength;
 
-    const stemExpression = source.slice(0, source.length - offset);
-    const stemReading = reading.slice(
-        0, offset === 0 ? reading.length : reading.length - expression.length + stemLength
+    const stemExpression = source.substring(0, source.length - offset);
+    const stemReading = reading.substring(
+        0,
+        offset === 0 ? reading.length : reading.length - expression.length + stemLength
     );
     for (const segment of jpDistributeFurigana(stemExpression, stemReading)) {
         output.push(segment);
     }
 
     if (stemLength !== source.length) {
-        output.push({text: source.slice(stemLength)});
+        output.push({text: source.substring(stemLength)});
     }
 
     return output;

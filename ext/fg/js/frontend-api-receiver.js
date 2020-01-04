@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2019-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,14 +13,14 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
 class FrontendApiReceiver {
-    constructor(source='', handlers={}) {
-        this.source = source;
-        this.handlers = handlers;
+    constructor(source='', handlers=new Map()) {
+        this._source = source;
+        this._handlers = handlers;
 
         chrome.runtime.onConnect.addListener(this.onConnect.bind(this));
     }
@@ -32,16 +32,13 @@ class FrontendApiReceiver {
     }
 
     onMessage(port, {id, action, params, target, senderId}) {
-        if (
-            target !== this.source ||
-            !hasOwn(this.handlers, action)
-        ) {
-            return;
-        }
+        if (target !== this._source) { return; }
+
+        const handler = this._handlers.get(action);
+        if (typeof handler !== 'function') { return; }
 
         this.sendAck(port, id, senderId);
 
-        const handler = this.handlers[action];
         handler(params).then(
             (result) => {
                 this.sendResult(port, id, senderId, {result});

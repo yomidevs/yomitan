@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,12 +13,17 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-async function getOptionsArray() {
-    const optionsFull = await apiOptionsGetFull();
-    return optionsFull.profiles.map((profile) => profile.options);
+function getOptionsMutable(optionsContext) {
+    return utilBackend().getOptions(
+        utilBackgroundIsolate(optionsContext)
+    );
+}
+
+function getOptionsFullMutable() {
+    return utilBackend().getFullOptions();
 }
 
 async function formRead(options) {
@@ -75,7 +80,6 @@ async function formRead(options) {
     options.anki.server = $('#interface-server').val();
     options.anki.screenshot.format = $('#screenshot-format').val();
     options.anki.screenshot.quality = parseInt($('#screenshot-quality').val(), 10);
-    options.anki.fieldTemplates = $('#field-templates').val();
 
     if (optionsAnkiEnableOld && !ankiErrorShown()) {
         options.anki.terms.deck = $('#anki-terms-deck').val();
@@ -140,9 +144,8 @@ async function formWrite(options) {
     $('#interface-server').val(options.anki.server);
     $('#screenshot-format').val(options.anki.screenshot.format);
     $('#screenshot-quality').val(options.anki.screenshot.quality);
-    $('#field-templates').val(options.anki.fieldTemplates);
 
-    onAnkiTemplatesValidateCompile();
+    await ankiTemplatesUpdateValue();
     await onAnkiOptionsChanged(options);
     await onDictionaryOptionsChanged(options);
 
@@ -161,7 +164,9 @@ function formUpdateVisibility(options) {
 
     if (options.general.debugInfo) {
         const temp = utilIsolate(options);
-        temp.anki.fieldTemplates = '...';
+        if (typeof temp.anki.fieldTemplates === 'string') {
+            temp.anki.fieldTemplates = '...';
+        }
         const text = JSON.stringify(temp, null, 4);
         $('#debug').text(text);
     }
@@ -169,7 +174,7 @@ function formUpdateVisibility(options) {
 
 async function onFormOptionsChanged() {
     const optionsContext = getOptionsContext();
-    const options = await apiOptionsGet(optionsContext);
+    const options = await getOptionsMutable(optionsContext);
 
     await formRead(options);
     await settingsSaveOptions();
@@ -195,19 +200,8 @@ async function onOptionsUpdate({source}) {
     if (source === thisSource) { return; }
 
     const optionsContext = getOptionsContext();
-    const options = await apiOptionsGet(optionsContext);
+    const options = await getOptionsMutable(optionsContext);
     await formWrite(options);
-}
-
-function onMessage({action, params}, sender, callback) {
-    switch (action) {
-        case 'optionsUpdate':
-            onOptionsUpdate(params);
-            break;
-        case 'getUrl':
-            callback({url: window.location.href});
-            break;
-    }
 }
 
 
@@ -233,7 +227,7 @@ async function onReady() {
 
     storageInfoInitialize();
 
-    chrome.runtime.onMessage.addListener(onMessage);
+    yomichan.on('optionsUpdate', onOptionsUpdate);
 }
 
 $(document).ready(() => onReady());

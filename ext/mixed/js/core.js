@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2019-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
@@ -118,6 +118,10 @@ function toIterable(value) {
     throw new Error('Could not convert to iterable');
 }
 
+function stringReverse(string) {
+    return string.split('').reverse().join('').replace(/([\uDC00-\uDFFF])([\uD800-\uDBFF])/g, '$2$1');
+}
+
 
 /*
  * Async utilities
@@ -175,3 +179,96 @@ function stringReplaceAsync(str, regex, replacer) {
     parts.push(str.substring(index));
     return Promise.all(parts).then((v) => v.join(''));
 }
+
+
+/*
+ * Common events
+ */
+
+class EventDispatcher {
+    constructor() {
+        this._eventMap = new Map();
+    }
+
+    trigger(eventName, details) {
+        const callbacks = this._eventMap.get(eventName);
+        if (typeof callbacks === 'undefined') { return false; }
+
+        for (const callback of callbacks) {
+            callback(details);
+        }
+    }
+
+    on(eventName, callback) {
+        let callbacks = this._eventMap.get(eventName);
+        if (typeof callbacks === 'undefined') {
+            callbacks = [];
+            this._eventMap.set(eventName, callbacks);
+        }
+        callbacks.push(callback);
+    }
+
+    off(eventName, callback) {
+        const callbacks = this._eventMap.get(eventName);
+        if (typeof callbacks === 'undefined') { return true; }
+
+        const ii = callbacks.length;
+        for (let i = 0; i < ii; ++i) {
+            if (callbacks[i] === callback) {
+                callbacks.splice(i, 1);
+                if (callbacks.length === 0) {
+                    this._eventMap.delete(eventName);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+
+/*
+ * Default message handlers
+ */
+
+const yomichan = (() => {
+    class Yomichan extends EventDispatcher {
+        constructor() {
+            super();
+
+            this._messageHandlers = new Map([
+                ['getUrl', this._onMessageGetUrl.bind(this)],
+                ['optionsUpdate', this._onMessageOptionsUpdate.bind(this)]
+            ]);
+
+            chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
+        }
+
+        // Public
+
+        triggerOrphaned(error) {
+            this.trigger('orphaned', {error});
+        }
+
+        // Private
+
+        _onMessage({action, params}, sender, callback) {
+            const handler = this._messageHandlers.get(action);
+            if (typeof handler !== 'function') { return false; }
+
+            const result = handler(params, sender);
+            callback(result);
+            return false;
+        }
+
+        _onMessageGetUrl() {
+            return {url: window.location.href};
+        }
+
+        _onMessageOptionsUpdate({source}) {
+            this.trigger('optionsUpdate', {source});
+        }
+    }
+
+    return new Yomichan();
+})();

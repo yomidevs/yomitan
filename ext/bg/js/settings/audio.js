@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2019-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
@@ -21,8 +21,12 @@ let audioSourceUI = null;
 
 async function audioSettingsInitialize() {
     const optionsContext = getOptionsContext();
-    const options = await apiOptionsGet(optionsContext);
-    audioSourceUI = new AudioSourceUI.Container(options.audio.sources, $('.audio-source-list'), $('.audio-source-add'));
+    const options = await getOptionsMutable(optionsContext);
+    audioSourceUI = new AudioSourceUI.Container(
+        options.audio.sources,
+        document.querySelector('.audio-source-list'),
+        document.querySelector('.audio-source-add')
+    );
     audioSourceUI.save = () => settingsSaveOptions();
 
     textToSpeechInitialize();
@@ -34,24 +38,34 @@ function textToSpeechInitialize() {
     speechSynthesis.addEventListener('voiceschanged', () => updateTextToSpeechVoices(), false);
     updateTextToSpeechVoices();
 
-    $('#text-to-speech-voice-test').on('click', () => textToSpeechTest());
+    document.querySelector('#text-to-speech-voice').addEventListener('change', (e) => onTextToSpeechVoiceChange(e), false);
+    document.querySelector('#text-to-speech-voice-test').addEventListener('click', () => textToSpeechTest(), false);
 }
 
 function updateTextToSpeechVoices() {
     const voices = Array.prototype.map.call(speechSynthesis.getVoices(), (voice, index) => ({voice, index}));
     voices.sort(textToSpeechVoiceCompare);
-    if (voices.length > 0) {
-        $('#text-to-speech-voice-container').css('display', '');
-    }
 
-    const select = $('#text-to-speech-voice');
-    select.empty();
-    select.append($('<option>').val('').text('None'));
+    document.querySelector('#text-to-speech-voice-container').hidden = (voices.length === 0);
+
+    const fragment = document.createDocumentFragment();
+
+    let option = document.createElement('option');
+    option.value = '';
+    option.textContent = 'None';
+    fragment.appendChild(option);
+
     for (const {voice} of voices) {
-        select.append($('<option>').val(voice.voiceURI).text(`${voice.name} (${voice.lang})`));
+        option = document.createElement('option');
+        option.value = voice.voiceURI;
+        option.textContent = `${voice.name} (${voice.lang})`;
+        fragment.appendChild(option);
     }
 
-    select.val(select.attr('data-value'));
+    const select = document.querySelector('#text-to-speech-voice');
+    select.textContent = '';
+    select.appendChild(fragment);
+    select.value = select.dataset.value;
 }
 
 function languageTagIsJapanese(languageTag) {
@@ -78,15 +92,13 @@ function textToSpeechVoiceCompare(a, b) {
         if (bIsDefault) { return 1; }
     }
 
-    if (a.index < b.index) { return -1; }
-    if (a.index > b.index) { return 1; }
-    return 0;
+    return a.index - b.index;
 }
 
 function textToSpeechTest() {
     try {
-        const text = $('#text-to-speech-voice-test').attr('data-speech-text') || '';
-        const voiceURI = $('#text-to-speech-voice').val();
+        const text = document.querySelector('#text-to-speech-voice-test').dataset.speechText || '';
+        const voiceURI = document.querySelector('#text-to-speech-voice').value;
         const voice = audioGetTextToSpeechVoice(voiceURI);
         if (voice === null) { return; }
 
@@ -99,4 +111,8 @@ function textToSpeechTest() {
     } catch (e) {
         // NOP
     }
+}
+
+function onTextToSpeechVoiceChange(e) {
+    e.currentTarget.dataset.value = e.currentTarget.value;
 }

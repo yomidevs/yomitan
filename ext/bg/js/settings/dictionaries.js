@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2019-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
@@ -189,6 +189,7 @@ class SettingsDictionaryEntryUI {
 
         this.content.querySelector('.dict-title').textContent = this.dictionaryInfo.title;
         this.content.querySelector('.dict-revision').textContent = `rev.${this.dictionaryInfo.revision}`;
+        this.content.querySelector('.dict-prefix-wildcard-searches-supported').checked = !!this.dictionaryInfo.prefixWildcardsSupported;
 
         this.applyValues();
 
@@ -272,7 +273,7 @@ class SettingsDictionaryEntryUI {
             progress.hidden = true;
 
             const optionsContext = getOptionsContext();
-            const options = await apiOptionsGet(optionsContext);
+            const options = await getOptionsMutable(optionsContext);
             onDatabaseUpdated(options);
         }
     }
@@ -356,9 +357,10 @@ async function dictSettingsInitialize() {
     document.querySelector('#dict-file-button').addEventListener('click', (e) => onDictionaryImportButtonClick(e), false);
     document.querySelector('#dict-file').addEventListener('change', (e) => onDictionaryImport(e), false);
     document.querySelector('#dict-main').addEventListener('change', (e) => onDictionaryMainChanged(e), false);
+    document.querySelector('#database-enable-prefix-wildcard-searches').addEventListener('change', (e) => onDatabaseEnablePrefixWildcardSearchesChanged(e), false);
 
     const optionsContext = getOptionsContext();
-    const options = await apiOptionsGet(optionsContext);
+    const options = await getOptionsMutable(optionsContext);
     onDictionaryOptionsChanged(options);
     onDatabaseUpdated(options);
 }
@@ -366,6 +368,9 @@ async function dictSettingsInitialize() {
 async function onDictionaryOptionsChanged(options) {
     if (dictionaryUI === null) { return; }
     dictionaryUI.setOptionsDictionaries(options.dictionaries);
+
+    const optionsFull = await apiOptionsGetFull();
+    document.querySelector('#database-enable-prefix-wildcard-searches').checked = optionsFull.global.database.prefixWildcardsSupported;
 }
 
 async function onDatabaseUpdated(options) {
@@ -420,7 +425,7 @@ async function updateMainDictionarySelect(options, dictionaries) {
 async function onDictionaryMainChanged(e) {
     const value = e.target.value;
     const optionsContext = getOptionsContext();
-    const options = await apiOptionsGet(optionsContext);
+    const options = await getOptionsMutable(optionsContext);
     options.general.mainDictionary = value;
     settingsSaveOptions();
 }
@@ -526,14 +531,14 @@ async function onDictionaryPurge(e) {
         dictionarySpinnerShow(true);
 
         await utilDatabasePurge();
-        for (const options of toIterable(await getOptionsArray())) {
+        for (const {options} of toIterable((await getOptionsFullMutable()).profiles)) {
             options.dictionaries = utilBackgroundIsolate({});
             options.general.mainDictionary = '';
         }
         await settingsSaveOptions();
 
         const optionsContext = getOptionsContext();
-        const options = await apiOptionsGet(optionsContext);
+        const options = await getOptionsMutable(optionsContext);
         onDatabaseUpdated(options);
     } catch (err) {
         dictionaryErrorsShow([err]);
@@ -552,6 +557,9 @@ async function onDictionaryPurge(e) {
 }
 
 async function onDictionaryImport(e) {
+    const files = [...e.target.files];
+    e.target.value = null;
+
     const dictFile = $('#dict-file');
     const dictControls = $('#dict-importer').hide();
     const dictProgress = $('#dict-import-progress').show();
@@ -572,8 +580,11 @@ async function onDictionaryImport(e) {
             }
         };
 
-        const exceptions = [];
-        const files = [...e.target.files];
+        const optionsFull = await apiOptionsGetFull();
+
+        const importDetails = {
+            prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported
+        };
 
         for (let i = 0, ii = files.length; i < ii; ++i) {
             setProgress(0.0);
@@ -582,25 +593,26 @@ async function onDictionaryImport(e) {
                 dictImportInfo.textContent = `(${i + 1} of ${ii})`;
             }
 
-            const summary = await utilDatabaseImport(files[i], updateProgress, exceptions);
-            for (const options of toIterable(await getOptionsArray())) {
+            const {result, errors} = await utilDatabaseImport(files[i], updateProgress, importDetails);
+            for (const {options} of toIterable((await getOptionsFullMutable()).profiles)) {
                 const dictionaryOptions = SettingsDictionaryListUI.createDictionaryOptions();
                 dictionaryOptions.enabled = true;
-                options.dictionaries[summary.title] = dictionaryOptions;
-                if (summary.sequenced && options.general.mainDictionary === '') {
-                    options.general.mainDictionary = summary.title;
+                options.dictionaries[result.title] = dictionaryOptions;
+                if (result.sequenced && options.general.mainDictionary === '') {
+                    options.general.mainDictionary = result.title;
                 }
             }
 
             await settingsSaveOptions();
 
-            if (exceptions.length > 0) {
-                exceptions.push(`Dictionary may not have been imported properly: ${exceptions.length} error${exceptions.length === 1 ? '' : 's'} reported.`);
-                dictionaryErrorsShow(exceptions);
+            if (errors.length > 0) {
+                errors.push(...errors);
+                errors.push(`Dictionary may not have been imported properly: ${errors.length} error${errors.length === 1 ? '' : 's'} reported.`);
+                dictionaryErrorsShow(errors);
             }
 
             const optionsContext = getOptionsContext();
-            const options = await apiOptionsGet(optionsContext);
+            const options = await getOptionsMutable(optionsContext);
             onDatabaseUpdated(options);
         }
     } catch (err) {
@@ -615,4 +627,13 @@ async function onDictionaryImport(e) {
         dictControls.show();
         dictProgress.hide();
     }
+}
+
+
+async function onDatabaseEnablePrefixWildcardSearchesChanged(e) {
+    const optionsFull = await getOptionsFullMutable();
+    const v = !!e.target.checked;
+    if (optionsFull.global.database.prefixWildcardsSupported === v) { return; }
+    optionsFull.global.database.prefixWildcardsSupported = !!e.target.checked;
+    await settingsSaveOptions();
 }

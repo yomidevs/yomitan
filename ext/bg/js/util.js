@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,16 +13,50 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-function utilIsolate(data) {
-    return JSON.parse(JSON.stringify(data));
+function utilIsolate(value) {
+    if (value === null) { return null; }
+
+    switch (typeof value) {
+        case 'boolean':
+        case 'number':
+        case 'string':
+        case 'bigint':
+        case 'symbol':
+            return value;
+    }
+
+    const stringValue = JSON.stringify(value);
+    return typeof stringValue === 'string' ? JSON.parse(stringValue) : null;
+}
+
+function utilFunctionIsolate(func) {
+    return function (...args) {
+        try {
+            args = args.map((v) => utilIsolate(v));
+            return func.call(this, ...args);
+        } catch (e) {
+            try {
+                String(func);
+            } catch (e2) {
+                // Dead object
+                return;
+            }
+            throw e;
+        }
+    };
 }
 
 function utilBackgroundIsolate(data) {
     const backgroundPage = chrome.extension.getBackgroundPage();
     return backgroundPage.utilIsolate(data);
+}
+
+function utilBackgroundFunctionIsolate(func) {
+    const backgroundPage = chrome.extension.getBackgroundPage();
+    return backgroundPage.utilFunctionIsolate(func);
 }
 
 function utilSetEqual(setA, setB) {
@@ -54,6 +88,8 @@ function utilSetDifference(setA, setB) {
 function utilStringHashCode(string) {
     let hashCode = 0;
 
+    if (typeof string !== 'string') { return hashCode; }
+
     for (let i = 0, charCode = string.charCodeAt(i); i < string.length; charCode = string.charCodeAt(++i)) {
         hashCode = ((hashCode << 5) - hashCode) + charCode;
         hashCode |= 0;
@@ -63,44 +99,52 @@ function utilStringHashCode(string) {
 }
 
 function utilBackend() {
-    return chrome.extension.getBackgroundPage().yomichan_backend;
+    return chrome.extension.getBackgroundPage().yomichanBackend;
 }
 
-function utilAnkiGetModelNames() {
-    return utilBackend().anki.getModelNames();
+async function utilAnkiGetModelNames() {
+    return utilIsolate(await utilBackend().anki.getModelNames());
 }
 
-function utilAnkiGetDeckNames() {
-    return utilBackend().anki.getDeckNames();
+async function utilAnkiGetDeckNames() {
+    return utilIsolate(await utilBackend().anki.getDeckNames());
 }
 
-function utilDatabaseGetDictionaryInfo() {
-    return utilBackend().translator.database.getDictionaryInfo();
+async function utilDatabaseGetDictionaryInfo() {
+    return utilIsolate(await utilBackend().translator.database.getDictionaryInfo());
 }
 
-function utilDatabaseGetDictionaryCounts(dictionaryNames, getTotal) {
-    return utilBackend().translator.database.getDictionaryCounts(dictionaryNames, getTotal);
+async function utilDatabaseGetDictionaryCounts(dictionaryNames, getTotal) {
+    return utilIsolate(await utilBackend().translator.database.getDictionaryCounts(
+        utilBackgroundIsolate(dictionaryNames),
+        utilBackgroundIsolate(getTotal)
+    ));
 }
 
-function utilAnkiGetModelFieldNames(modelName) {
-    return utilBackend().anki.getModelFieldNames(modelName);
+async function utilAnkiGetModelFieldNames(modelName) {
+    return utilIsolate(await utilBackend().anki.getModelFieldNames(
+        utilBackgroundIsolate(modelName)
+    ));
 }
 
-function utilDatabasePurge() {
-    return utilBackend().translator.purgeDatabase();
+async function utilDatabasePurge() {
+    return utilIsolate(await utilBackend().translator.purgeDatabase());
 }
 
-function utilDatabaseDeleteDictionary(dictionaryName, onProgress) {
-    return utilBackend().translator.database.deleteDictionary(dictionaryName, onProgress);
+async function utilDatabaseDeleteDictionary(dictionaryName, onProgress) {
+    return utilIsolate(await utilBackend().translator.database.deleteDictionary(
+        utilBackgroundIsolate(dictionaryName),
+        utilBackgroundFunctionIsolate(onProgress)
+    ));
 }
 
-async function utilDatabaseImport(data, progress, exceptions) {
-    // Edge cannot read data on the background page due to the File object
-    // being created from a different window. Read on the same page instead.
-    if (EXTENSION_IS_BROWSER_EDGE) {
-        data = await utilReadFile(data);
-    }
-    return utilBackend().translator.database.importDictionary(data, progress, exceptions);
+async function utilDatabaseImport(data, onProgress, details) {
+    data = await utilReadFile(data);
+    return utilIsolate(await utilBackend().translator.database.importDictionary(
+        utilBackgroundIsolate(data),
+        utilBackgroundFunctionIsolate(onProgress),
+        utilBackgroundIsolate(details)
+    ));
 }
 
 function utilReadFile(file) {
@@ -109,5 +153,14 @@ function utilReadFile(file) {
         reader.onload = () => resolve(reader.result);
         reader.onerror = () => reject(reader.error);
         reader.readAsBinaryString(file);
+    });
+}
+
+function utilReadFileArrayBuffer(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsArrayBuffer(file);
     });
 }

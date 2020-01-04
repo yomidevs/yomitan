@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
@@ -28,7 +28,7 @@ class Database {
         }
 
         try {
-            this.db = await Database.open('dict', 4, (db, transaction, oldVersion) => {
+            this.db = await Database.open('dict', 5, (db, transaction, oldVersion) => {
                 Database.upgrade(db, transaction, oldVersion, [
                     {
                         version: 2,
@@ -74,6 +74,15 @@ class Database {
                             terms: {
                                 primaryKey: {keyPath: 'id', autoIncrement: true},
                                 indices: ['dictionary', 'expression', 'reading', 'sequence']
+                            }
+                        }
+                    },
+                    {
+                        version: 5,
+                        stores: {
+                            terms: {
+                                primaryKey: {keyPath: 'id', autoIncrement: true},
+                                indices: ['dictionary', 'expression', 'reading', 'sequence', 'expressionReverse', 'readingReverse']
                             }
                         }
                     }
@@ -143,14 +152,17 @@ class Database {
             }
         };
 
+        const useWildcard = !!wildcard;
+        const prefixWildcard = wildcard === 'prefix';
+
         const dbTransaction = this.db.transaction(['terms'], 'readonly');
         const dbTerms = dbTransaction.objectStore('terms');
-        const dbIndex1 = dbTerms.index('expression');
-        const dbIndex2 = dbTerms.index('reading');
+        const dbIndex1 = dbTerms.index(prefixWildcard ? 'expressionReverse' : 'expression');
+        const dbIndex2 = dbTerms.index(prefixWildcard ? 'readingReverse' : 'reading');
 
         for (let i = 0; i < termList.length; ++i) {
-            const term = termList[i];
-            const query = wildcard ? IDBKeyRange.bound(term, `${term}\uffff`, false, false) : IDBKeyRange.only(term);
+            const term = prefixWildcard ? stringReverse(termList[i]) : termList[i];
+            const query = useWildcard ? IDBKeyRange.bound(term, `${term}\uffff`, false, false) : IDBKeyRange.only(term);
             promises.push(
                 Database.getAll(dbIndex1, query, i, processRow),
                 Database.getAll(dbIndex2, query, i, processRow)
@@ -320,8 +332,11 @@ class Database {
         return result;
     }
 
-    async importDictionary(archive, progressCallback, exceptions) {
+    async importDictionary(archive, progressCallback, details) {
         this.validate();
+
+        const errors = [];
+        const prefixWildcardsSupported = details.prefixWildcardsSupported;
 
         const maxTransactionLength = 1000;
         const bulkAdd = async (objectStoreName, items, total, current) => {
@@ -337,11 +352,7 @@ class Database {
                     const objectStore = transaction.objectStore(objectStoreName);
                     await Database.bulkAdd(objectStore, items, i, count);
                 } catch (e) {
-                    if (exceptions) {
-                        exceptions.push(e);
-                    } else {
-                        throw e;
-                    }
+                    errors.push(e);
                 }
             }
         };
@@ -393,6 +404,13 @@ class Database {
                         termTags,
                         dictionary: summary.title
                     });
+                }
+            }
+
+            if (prefixWildcardsSupported) {
+                for (const row of rows) {
+                    row.expressionReverse = stringReverse(row.expression);
+                    row.readingReverse = stringReverse(row.reading);
                 }
             }
 
@@ -475,15 +493,18 @@ class Database {
             await bulkAdd('tagMeta', rows, total, current);
         };
 
-        return await Database.importDictionaryZip(
+        const result = await Database.importDictionaryZip(
             archive,
             indexDataLoaded,
             termDataLoaded,
             termMetaDataLoaded,
             kanjiDataLoaded,
             kanjiMetaDataLoaded,
-            tagDataLoaded
+            tagDataLoaded,
+            details
         );
+
+        return {result, errors};
     }
 
     validate() {
@@ -499,7 +520,8 @@ class Database {
         termMetaDataLoaded,
         kanjiDataLoaded,
         kanjiMetaDataLoaded,
-        tagDataLoaded
+        tagDataLoaded,
+        details
     ) {
         const zip = await JSZip.loadAsync(archive);
 
@@ -517,7 +539,8 @@ class Database {
             title: index.title,
             revision: index.revision,
             sequenced: index.sequenced,
-            version: index.format || index.version
+            version: index.format || index.version,
+            prefixWildcardsSupported: !!details.prefixWildcardsSupported
         };
 
         await indexDataLoaded(summary);

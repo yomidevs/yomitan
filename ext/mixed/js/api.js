@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,16 +13,28 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
+function apiOptionsSchemaGet() {
+    return _apiInvoke('optionsSchemaGet');
+}
 
 function apiOptionsGet(optionsContext) {
     return _apiInvoke('optionsGet', {optionsContext});
 }
 
+function apiOptionsGetFull() {
+    return _apiInvoke('optionsGetFull');
+}
+
 function apiOptionsSet(changedOptions, optionsContext, source) {
     return _apiInvoke('optionsSet', {changedOptions, optionsContext, source});
+}
+
+function apiOptionsSave(source) {
+    return _apiInvoke('optionsSave', {source});
 }
 
 function apiTermsFind(text, details, optionsContext) {
@@ -107,8 +119,8 @@ function _apiInvoke(action, params={}) {
                 }
             });
         } catch (e) {
-            window.yomichan_orphaned = true;
             reject(e);
+            yomichan.triggerOrphaned(e);
         }
     });
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
@@ -86,6 +86,13 @@ const profileOptionsVersionUpdates = [
         delete options.general.audioSource;
         delete options.general.audioVolume;
         delete options.general.autoPlayAudio;
+    },
+    (options) => {
+        // Version 12 changes:
+        //  The preferred default value of options.anki.fieldTemplates has been changed to null.
+        if (utilStringHashCode(options.anki.fieldTemplates) === 1444379824) {
+            options.anki.fieldTemplates = null;
+        }
     }
 ];
 
@@ -326,7 +333,7 @@ function profileOptionsCreateDefaults() {
             screenshot: {format: 'png', quality: 92},
             terms: {deck: '', model: '', fields: {}},
             kanji: {deck: '', model: '', fields: {}},
-            fieldTemplates: profileOptionsGetDefaultFieldTemplates()
+            fieldTemplates: null
         }
     };
 }
@@ -378,7 +385,15 @@ function profileOptionsUpdateVersion(options) {
  * ]
  */
 
-const optionsVersionUpdates = [];
+const optionsVersionUpdates = [
+    (options) => {
+        options.global = {
+            database: {
+                prefixWildcardsSupported: false
+            }
+        };
+    }
+];
 
 function optionsUpdateVersion(options, defaultProfileOptions) {
     // Ensure profiles is an array
@@ -421,6 +436,11 @@ function optionsUpdateVersion(options, defaultProfileOptions) {
             profile.conditionGroups = [];
         }
         profile.options = profileOptionsUpdateVersion(profile.options);
+    }
+
+    // Version
+    if (typeof options.version !== 'number') {
+        options.version = 0;
     }
 
     // Generic updates
@@ -467,4 +487,8 @@ function optionsSave(options) {
             }
         });
     });
+}
+
+function optionsGetDefault() {
+    return optionsUpdateVersion({}, {});
 }

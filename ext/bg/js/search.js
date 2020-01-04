@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,15 +13,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-
-let IS_FIREFOX = null;
-(async () => {
-    const {browser} = await apiGetEnvironmentInfo();
-    IS_FIREFOX = ['firefox', 'firefox-mobile'].includes(browser);
-})();
 
 class DisplaySearch extends Display {
     constructor() {
@@ -43,8 +36,12 @@ class DisplaySearch extends Display {
         this.introVisible = true;
         this.introAnimationTimer = null;
 
-        this.clipboardMonitorIntervalId = null;
-        this.clipboardPrevText = null;
+        this.isFirefox = false;
+
+        this.clipboardMonitorTimerId = null;
+        this.clipboardMonitorTimerToken = null;
+        this.clipboardInterval = 250;
+        this.clipboardPreviousText = null;
     }
 
     static create() {
@@ -56,6 +53,7 @@ class DisplaySearch extends Display {
     async prepare() {
         try {
             await this.initialize();
+            this.isFirefox = await DisplaySearch._isFirefox();
 
             if (this.search !== null) {
                 this.search.addEventListener('click', (e) => this.onSearch(e), false);
@@ -207,10 +205,14 @@ class DisplaySearch extends Display {
     async onSearchQueryUpdated(query, animate) {
         try {
             const details = {};
-            const match = /[*\uff0a]+$/.exec(query);
+            const match = /^([*\uff0a]*)([\w\W]*?)([*\uff0a]*)$/.exec(query);
             if (match !== null) {
-                details.wildcard = true;
-                query = query.substring(0, query.length - match[0].length);
+                if (match[1]) {
+                    details.wildcard = 'prefix';
+                } else if (match[3]) {
+                    details.wildcard = 'suffix';
+                }
+                query = match[2];
             }
 
             const valid = (query.length > 0);
@@ -224,63 +226,81 @@ class DisplaySearch extends Display {
                     sentence: {text: query, offset: 0},
                     url: window.location.href
                 });
-                this.setTitleText(query);
             } else {
                 this.container.textContent = '';
             }
+            this.setTitleText(query);
             window.parent.postMessage('popupClose', '*');
         } catch (e) {
             this.onError(e);
         }
     }
 
-    onRuntimeMessage({action, params}, sender, callback) {
-        const handlers = DisplaySearch.runtimeMessageHandlers;
-        if (hasOwn(handlers, action)) {
-            const handler = handlers[action];
-            const result = handler(this, params);
-            callback(result);
-        } else {
-            return super.onRuntimeMessage({action, params}, sender, callback);
-        }
-    }
-
     initClipboardMonitor() {
         // ignore copy from search page
         window.addEventListener('copy', () => {
-            this.clipboardPrevText = document.getSelection().toString().trim();
+            this.clipboardPreviousText = document.getSelection().toString().trim();
         });
     }
 
     startClipboardMonitor() {
-        this.clipboardMonitorIntervalId = setInterval(async () => {
-            let curText = null;
-            // TODO get rid of this and figure out why apiClipboardGet doesn't work on Firefox
-            if (IS_FIREFOX) {
-                curText = (await navigator.clipboard.readText()).trim();
-            } else if (IS_FIREFOX === false) {
-                curText = (await apiClipboardGet()).trim();
-            }
-            if (curText && (curText !== this.clipboardPrevText) && jpIsJapaneseText(curText)) {
-                if (this.isWanakanaEnabled()) {
-                    this.setQuery(window.wanakana.toKana(curText));
-                } else {
-                    this.setQuery(curText);
+        // The token below is used as a unique identifier to ensure that a new clipboard monitor
+        // hasn't been started during the await call. The check below the await this.getClipboardText()
+        // call will exit early if the reference has changed.
+        const token = {};
+        const intervalCallback = async () => {
+            this.clipboardMonitorTimerId = null;
+
+            let text = await this.getClipboardText();
+            if (this.clipboardMonitorTimerToken !== token) { return; }
+
+            if (
+                typeof text === 'string' &&
+                (text = text.trim()).length > 0 &&
+                text !== this.clipboardPreviousText
+            ) {
+                this.clipboardPreviousText = text;
+                if (jpIsJapaneseText(text)) {
+                    this.setQuery(this.isWanakanaEnabled() ? window.wanakana.toKana(text) : text);
+                    window.history.pushState(null, '', `${window.location.pathname}?query=${encodeURIComponent(text)}`);
+                    this.onSearchQueryUpdated(this.query.value, true);
                 }
-
-                const queryString = curText.length > 0 ? `?query=${encodeURIComponent(curText)}` : '';
-                window.history.pushState(null, '', `${window.location.pathname}${queryString}`);
-                this.onSearchQueryUpdated(this.query.value, true);
-
-                this.clipboardPrevText = curText;
             }
-        }, 100);
+
+            this.clipboardMonitorTimerId = setTimeout(intervalCallback, this.clipboardInterval);
+        };
+
+        this.clipboardMonitorTimerToken = token;
+
+        intervalCallback();
     }
 
     stopClipboardMonitor() {
-        if (this.clipboardMonitorIntervalId) {
-            clearInterval(this.clipboardMonitorIntervalId);
-            this.clipboardMonitorIntervalId = null;
+        this.clipboardMonitorTimerToken = null;
+        if (this.clipboardMonitorTimerId !== null) {
+            clearTimeout(this.clipboardMonitorTimerId);
+            this.clipboardMonitorTimerId = null;
+        }
+    }
+
+    async getClipboardText() {
+        /*
+        Notes:
+            apiClipboardGet doesn't work on Firefox because document.execCommand('paste')
+            results in an empty string on the web extension background page.
+            This may be a bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1603985
+            Therefore, navigator.clipboard.readText() is used on Firefox.
+
+            navigator.clipboard.readText() can't be used in Chrome for two reasons:
+            * Requires page to be focused, else it rejects with an exception.
+            * When the page is focused, Chrome will request clipboard permission, despite already
+              being an extension with clipboard permissions. It effectively asks for the
+              non-extension permission for clipboard access.
+        */
+        try {
+            return this.isFirefox ? await navigator.clipboard.readText() : await apiClipboardGet();
+        } catch (e) {
+            return null;
         }
     }
 
@@ -360,22 +380,32 @@ class DisplaySearch extends Display {
     setTitleText(text) {
         // Chrome limits title to 1024 characters
         if (text.length > 1000) {
-            text = text.slice(0, 1000) + '...';
+            text = text.substring(0, 1000) + '...';
         }
-        document.title = `${text} - Yomichan Search`;
+
+        if (text.length === 0) {
+            document.title = 'Yomichan Search';
+        } else {
+            document.title = `${text} - Yomichan Search`;
+        }
     }
 
     static getSearchQueryFromLocation(url) {
         const match = /^[^?#]*\?(?:[^&#]*&)?query=([^&#]*)/.exec(url);
         return match !== null ? decodeURIComponent(match[1]) : null;
     }
-}
 
-DisplaySearch.runtimeMessageHandlers = {
-    getUrl: () => {
-        return {url: window.location.href};
+    static async _isFirefox() {
+        const {browser} = await apiGetEnvironmentInfo();
+        switch (browser) {
+            case 'firefox':
+            case 'firefox-mobile':
+                return true;
+            default:
+                return false;
+        }
     }
-};
+}
 
 DisplaySearch.onKeyDownIgnoreKeys = {
     'ANY_MOD': [
@@ -392,4 +422,4 @@ DisplaySearch.onKeyDownIgnoreKeys = {
     'Shift': []
 };
 
-window.yomichan_search = DisplaySearch.create();
+DisplaySearch.instance = DisplaySearch.create();

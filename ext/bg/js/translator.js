@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
@@ -230,7 +230,7 @@ class Translator {
         const titles = Object.keys(dictionaries);
         const deinflections = (
             details.wildcard ?
-            await this.findTermWildcard(text, titles) :
+            await this.findTermWildcard(text, titles, details.wildcard) :
             await this.findTermDeinflections(text, titles)
         );
 
@@ -268,8 +268,8 @@ class Translator {
         return [definitions, length];
     }
 
-    async findTermWildcard(text, titles) {
-        const definitions = await this.database.findTermsBulk([text], titles, true);
+    async findTermWildcard(text, titles, wildcard) {
+        const definitions = await this.database.findTermsBulk([text], titles, wildcard);
         if (definitions.length === 0) {
             return [];
         }
@@ -308,7 +308,7 @@ class Translator {
             deinflectionArray.push(deinflection);
         }
 
-        const definitions = await this.database.findTermsBulk(uniqueDeinflectionTerms, titles, false);
+        const definitions = await this.database.findTermsBulk(uniqueDeinflectionTerms, titles, null);
 
         for (const definition of definitions) {
             const definitionRules = Deinflector.rulesToRuleFlags(definition.rules);

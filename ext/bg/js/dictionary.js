@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
@@ -310,7 +310,7 @@ function dictFieldSplit(field) {
     return field.length === 0 ? [] : field.split(' ');
 }
 
-async function dictFieldFormat(field, definition, mode, options, exceptions) {
+async function dictFieldFormat(field, definition, mode, options, templates, exceptions) {
     const data = {
         marker: null,
         definition,
@@ -329,7 +329,7 @@ async function dictFieldFormat(field, definition, mode, options, exceptions) {
         }
         data.marker = marker;
         try {
-            return await apiTemplateRender(options.anki.fieldTemplates, data, true);
+            return await apiTemplateRender(templates, data, true);
         } catch (e) {
             if (exceptions) { exceptions.push(e); }
             return `{${marker}-render-error}`;
@@ -357,7 +357,7 @@ dictFieldFormat.markers = new Set([
     'url'
 ]);
 
-async function dictNoteFormat(definition, mode, options) {
+async function dictNoteFormat(definition, mode, options, templates) {
     const note = {fields: {}, tags: options.anki.tags};
     let fields = [];
 
@@ -391,7 +391,7 @@ async function dictNoteFormat(definition, mode, options) {
     }
 
     for (const name in fields) {
-        note.fields[name] = await dictFieldFormat(fields[name], definition, mode, options);
+        note.fields[name] = await dictFieldFormat(fields[name], definition, mode, options, templates);
     }
 
     return note;

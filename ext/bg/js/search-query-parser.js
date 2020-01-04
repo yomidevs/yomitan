@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2019-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
@@ -62,7 +62,7 @@ class QueryParser {
         const scanningOptions = this.search.options.scanning;
         const scanningModifier = scanningOptions.modifier;
         if (!(
-            Frontend.isScanningModifierPressed(scanningModifier, e) ||
+            TextScanner.isScanningModifierPressed(scanningModifier, e) ||
             (scanningOptions.middleMouse && DOM.isMouseButtonDown(e, 'auxiliary'))
         )) {
             return;
@@ -148,10 +148,9 @@ class QueryParser {
 
     async setPreview(text) {
         const previewTerms = [];
-        while (text.length > 0) {
-            const tempText = text.slice(0, 2);
-            previewTerms.push([{text: Array.from(tempText)}]);
-            text = text.slice(2);
+        for (let i = 0, ii = text.length; i < ii; i += 2) {
+            const tempText = text.substring(i, i + 2);
+            previewTerms.push([{text: tempText.split('')}]);
         }
         this.queryParser.innerHTML = await apiTemplateRender('query-parser.html', {
             terms: previewTerms,
@@ -218,7 +217,7 @@ class QueryParser {
         return result.map((term) => {
             return term.filter((part) => part.text.trim()).map((part) => {
                 return {
-                    text: Array.from(part.text),
+                    text: part.text.split(''),
                     reading: part.reading,
                     raw: !part.reading || !part.reading.trim()
                 };

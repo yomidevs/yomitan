@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2019-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
@@ -21,7 +21,7 @@ class AudioSourceUI {
     static instantiateTemplate(templateSelector) {
         const template = document.querySelector(templateSelector);
         const content = document.importNode(template.content, true);
-        return $(content.firstChild);
+        return content.firstChild;
     }
 }
 
@@ -32,13 +32,14 @@ AudioSourceUI.Container = class Container {
         this.addButton = addButton;
         this.children = [];
 
-        this.container.empty();
+        this.container.textContent = '';
 
         for (const audioSource of toIterable(audioSources)) {
             this.children.push(new AudioSourceUI.AudioSource(this, audioSource, this.children.length));
         }
 
-        this.addButton.on('click', () => this.onAddAudioSource());
+        this._clickListener = () => this.onAddAudioSource();
+        this.addButton.addEventListener('click', this._clickListener, false);
     }
 
     cleanup() {
@@ -46,8 +47,9 @@ AudioSourceUI.Container = class Container {
             child.cleanup();
         }
 
-        this.addButton.off('click');
-        this.container.empty();
+        this.addButton.removeEventListener('click', this._clickListener, false);
+        this.container.textContent = '';
+        this._clickListener = null;
     }
 
     save() {
@@ -98,20 +100,28 @@ AudioSourceUI.AudioSource = class AudioSource {
         this.audioSource = audioSource;
         this.index = index;
 
-        this.container = AudioSourceUI.instantiateTemplate('#audio-source-template').appendTo(parent.container);
-        this.select = this.container.find('.audio-source-select');
-        this.removeButton = this.container.find('.audio-source-remove');
+        this.container = AudioSourceUI.instantiateTemplate('#audio-source-template');
+        this.select = this.container.querySelector('.audio-source-select');
+        this.removeButton = this.container.querySelector('.audio-source-remove');
 
-        this.select.val(audioSource);
+        this.select.value = audioSource;
 
-        this.select.on('change', () => this.onSelectChanged());
-        this.removeButton.on('click', () => this.onRemoveClicked());
+        this._selectChangeListener = () => this.onSelectChanged();
+        this._removeClickListener = () => this.onRemoveClicked();
+
+        this.select.addEventListener('change', this._selectChangeListener, false);
+        this.removeButton.addEventListener('click', this._removeClickListener, false);
+
+        parent.container.appendChild(this.container);
     }
 
     cleanup() {
-        this.select.off('change');
-        this.removeButton.off('click');
-        this.container.remove();
+        this.select.removeEventListener('change', this._selectChangeListener, false);
+        this.removeButton.removeEventListener('click', this._removeClickListener, false);
+
+        if (this.container.parentNode !== null) {
+            this.container.parentNode.removeChild(this.container);
+        }
     }
 
     save() {
@@ -119,7 +129,7 @@ AudioSourceUI.AudioSource = class AudioSource {
     }
 
     onSelectChanged() {
-        this.audioSource = this.select.val();
+        this.audioSource = this.select.value;
         this.parent.audioSources[this.index] = this.audioSource;
         this.save();
     }

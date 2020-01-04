@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2017-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
@@ -144,7 +144,7 @@ class Display {
         try {
             e.preventDefault();
 
-            const textSource = docRangeFromPoint(e.clientX, e.clientY, this.options);
+            const textSource = docRangeFromPoint(e.clientX, e.clientY, this.options.scanning.deepDomScan);
             if (textSource === null) {
                 return false;
             }
@@ -193,9 +193,8 @@ class Display {
 
     onKeyDown(e) {
         const key = Display.getKeyFromEvent(e);
-        const handlers = Display.onKeyDownHandlers;
-        if (hasOwn(handlers, key)) {
-            const handler = handlers[key];
+        const handler = Display._onKeyDownHandlers.get(key);
+        if (typeof handler === 'function') {
             if (handler(this, e)) {
                 e.preventDefault();
                 return true;
@@ -211,23 +210,18 @@ class Display {
                 e.preventDefault();
             }
         } else if (e.shiftKey) {
-            const delta = -e.deltaX || e.deltaY;
-            if (delta > 0) {
-                this.sourceTermView();
-                e.preventDefault();
-            } else if (delta < 0) {
-                this.nextTermView();
-                e.preventDefault();
-            }
+            this.onHistoryWheel(e);
         }
     }
 
-    onRuntimeMessage({action, params}, sender, callback) {
-        const handlers = Display.runtimeMessageHandlers;
-        if (hasOwn(handlers, action)) {
-            const handler = handlers[action];
-            const result = handler(this, params);
-            callback(result);
+    onHistoryWheel(e) {
+        const delta = -e.deltaX || e.deltaY;
+        if (delta > 0) {
+            this.sourceTermView();
+            e.preventDefault();
+        } else if (delta < 0) {
+            this.nextTermView();
+            e.preventDefault();
         }
     }
 
@@ -241,7 +235,7 @@ class Display {
 
     async initialize(options=null) {
         await this.updateOptions(options);
-        chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
+        yomichan.on('optionsUpdate', () => this.updateOptions(null));
     }
 
     async updateOptions(options) {
@@ -301,6 +295,7 @@ class Display {
             this.addEventListeners('.kanji-link', 'click', this.onKanjiLookup.bind(this));
             this.addEventListeners('.source-term', 'click', this.onSourceTermView.bind(this));
             this.addEventListeners('.next-term', 'click', this.onNextTermView.bind(this));
+            this.addEventListeners('.term-navigation', 'wheel', this.onHistoryWheel.bind(this), {passive: false});
             if (this.options.scanning.enablePopupSearch) {
                 this.addEventListeners('.glossary-item', 'mouseup', this.onGlossaryMouseUp.bind(this));
                 this.addEventListeners('.glossary-item', 'mousedown', this.onGlossaryMouseDown.bind(this));
@@ -761,101 +756,101 @@ class Display {
     }
 }
 
-Display.onKeyDownHandlers = {
-    'Escape': (self) => {
+Display._onKeyDownHandlers = new Map([
+    ['Escape', (self) => {
         self.onSearchClear();
         return true;
-    },
+    }],
 
-    'PageUp': (self, e) => {
+    ['PageUp', (self, e) => {
         if (e.altKey) {
             self.entryScrollIntoView(self.index - 3, null, true);
             return true;
         }
         return false;
-    },
+    }],
 
-    'PageDown': (self, e) => {
+    ['PageDown', (self, e) => {
         if (e.altKey) {
             self.entryScrollIntoView(self.index + 3, null, true);
             return true;
         }
         return false;
-    },
+    }],
 
-    'End': (self, e) => {
+    ['End', (self, e) => {
         if (e.altKey) {
             self.entryScrollIntoView(self.definitions.length - 1, null, true);
             return true;
         }
         return false;
-    },
+    }],
 
-    'Home': (self, e) => {
+    ['Home', (self, e) => {
         if (e.altKey) {
             self.entryScrollIntoView(0, null, true);
             return true;
         }
         return false;
-    },
+    }],
 
-    'ArrowUp': (self, e) => {
+    ['ArrowUp', (self, e) => {
         if (e.altKey) {
             self.entryScrollIntoView(self.index - 1, null, true);
             return true;
         }
         return false;
-    },
+    }],
 
-    'ArrowDown': (self, e) => {
+    ['ArrowDown', (self, e) => {
         if (e.altKey) {
             self.entryScrollIntoView(self.index + 1, null, true);
             return true;
         }
         return false;
-    },
+    }],
 
-    'B': (self, e) => {
+    ['B', (self, e) => {
         if (e.altKey) {
             self.sourceTermView();
             return true;
         }
         return false;
-    },
+    }],
 
-    'F': (self, e) => {
+    ['F', (self, e) => {
         if (e.altKey) {
             self.nextTermView();
             return true;
         }
         return false;
-    },
+    }],
 
-    'E': (self, e) => {
+    ['E', (self, e) => {
         if (e.altKey) {
             self.noteTryAdd('term-kanji');
             return true;
         }
         return false;
-    },
+    }],
 
-    'K': (self, e) => {
+    ['K', (self, e) => {
         if (e.altKey) {
             self.noteTryAdd('kanji');
             return true;
         }
         return false;
-    },
+    }],
 
-    'R': (self, e) => {
+    ['R', (self, e) => {
         if (e.altKey) {
             self.noteTryAdd('term-kana');
             return true;
         }
         return false;
-    },
+    }],
 
-    'P': (self, e) => {
+    ['P', (self, e) => {
         if (e.altKey) {
             const entry = self.getEntry(self.index);
             if (entry !== null && entry.dataset.type === 'term') {
@@ -864,17 +859,13 @@ Display.onKeyDownHandlers = {
             return true;
         }
         return false;
-    },
+    }],
 
-    'V': (self, e) => {
+    ['V', (self, e) => {
         if (e.altKey) {
             self.noteTryView();
             return true;
         }
         return false;
-    }
-};
-
-Display.runtimeMessageHandlers = {
-    optionsUpdate: (self) => self.updateOptions(null)
-};
+    }]
+]);

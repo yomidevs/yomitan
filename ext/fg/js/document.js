@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
@@ -97,15 +97,16 @@ function docImposterCreate(element, isTextarea) {
 
 function docElementsFromPoint(x, y, all) {
     if (all) {
-        return document.elementsFromPoint(x, y);
+        // document.elementsFromPoint can return duplicates which must be removed.
+        const elements = document.elementsFromPoint(x, y);
+        return elements.filter((e, i) => elements.indexOf(e) === i);
     }
 
     const e = document.elementFromPoint(x, y);
     return e !== null ? [e] : [];
 }
 
-function docRangeFromPoint(x, y, options) {
-    const deepDomScan = options.scanning.deepDomScan;
+function docRangeFromPoint(x, y, deepDomScan) {
     const elements = docElementsFromPoint(x, y, deepDomScan);
     let imposter = null;
     let imposterContainer = null;
@@ -319,7 +320,7 @@ function disableTransparentElement(elements, i, modifications) {
         if (isElementTransparent(element)) {
             const style = element.hasAttribute('style') ? element.getAttribute('style') : null;
             modifications.push({element, style});
-            element.style.pointerEvents = 'none';
+            element.style.setProperty('pointer-events', 'none', 'important');
             return i;
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
@@ -141,12 +141,13 @@ function handlebarsRenderStatic(name, data) {
 
 function handlebarsRenderDynamic(template, data) {
     handlebarsRegisterHelpers();
-
-    Handlebars.yomichan_cache = Handlebars.yomichan_cache || {};
-    let instance = Handlebars.yomichan_cache[template];
-    if (!instance) {
-        instance = Handlebars.yomichan_cache[template] = Handlebars.compile(template);
+    const cache = handlebarsRenderDynamic._cache;
+    let instance = cache.get(template);
+    if (typeof instance === 'undefined') {
+        instance = Handlebars.compile(template);
+        cache.set(template, instance);
     }
 
     return instance(data).trim();
 }
+handlebarsRenderDynamic._cache = new Map();

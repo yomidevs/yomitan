@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2019-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,94 +13,113 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
 class PopupProxy {
     constructor(depth, parentId, parentFrameId, url) {
-        this.parentId = parentId;
-        this.parentFrameId = parentFrameId;
-        this.id = null;
-        this.idPromise = null;
-        this.parent = null;
-        this.child = null;
-        this.depth = depth;
-        this.url = url;
-
-        this.container = null;
-
-        this.apiSender = new FrontendApiSender();
+        this._parentId = parentId;
+        this._parentFrameId = parentFrameId;
+        this._id = null;
+        this._idPromise = null;
+        this._depth = depth;
+        this._url = url;
+        this._apiSender = new FrontendApiSender();
     }
 
-    getPopupId() {
-        if (this.idPromise === null) {
-            this.idPromise = this.getPopupIdAsync();
-        }
-        return this.idPromise;
+    // Public properties
+
+    get parent() {
+        return null;
     }
 
-    async getPopupIdAsync() {
-        const id = await this.invokeHostApi('createNestedPopup', {parentId: this.parentId});
-        this.id = id;
-        return id;
+    get depth() {
+        return this._depth;
+    }
+
+    get url() {
+        return this._url;
+    }
+
+    // Public functions
+
+    isProxy() {
+        return true;
     }
 
     async setOptions(options) {
-        const id = await this.getPopupId();
-        return await this.invokeHostApi('setOptions', {id, options});
+        const id = await this._getPopupId();
+        return await this._invokeHostApi('setOptions', {id, options});
     }
 
-    async hide(changeFocus) {
-        if (this.id === null) {
+    hide(changeFocus) {
+        if (this._id === null) {
             return;
         }
-        return await this.invokeHostApi('hide', {id: this.id, changeFocus});
+        this._invokeHostApi('hide', {id: this._id, changeFocus});
     }
 
-    async isVisibleAsync() {
-        const id = await this.getPopupId();
-        return await this.invokeHostApi('isVisibleAsync', {id});
+    async isVisible() {
+        const id = await this._getPopupId();
+        return await this._invokeHostApi('isVisible', {id});
     }
 
-    async setVisibleOverride(visible) {
-        const id = await this.getPopupId();
-        return await this.invokeHostApi('setVisibleOverride', {id, visible});
+    setVisibleOverride(visible) {
+        if (this._id === null) {
+            return;
+        }
+        this._invokeHostApi('setVisibleOverride', {id, visible});
     }
 
     async containsPoint(x, y) {
-        if (this.id === null) {
+        if (this._id === null) {
             return false;
         }
-        return await this.invokeHostApi('containsPoint', {id: this.id, x, y});
+        return await this._invokeHostApi('containsPoint', {id: this._id, x, y});
     }
 
     async showContent(elementRect, writingMode, type=null, details=null) {
-        const id = await this.getPopupId();
-        elementRect = PopupProxy.DOMRectToJson(elementRect);
-        return await this.invokeHostApi('showContent', {id, elementRect, writingMode, type, details});
+        const id = await this._getPopupId();
+        elementRect = PopupProxy._convertDOMRectToJson(elementRect);
+        return await this._invokeHostApi('showContent', {id, elementRect, writingMode, type, details});
     }
 
     async setCustomCss(css) {
-        const id = await this.getPopupId();
-        return await this.invokeHostApi('setCustomCss', {id, css});
+        const id = await this._getPopupId();
+        return await this._invokeHostApi('setCustomCss', {id, css});
     }
 
-    async clearAutoPlayTimer() {
-        if (this.id === null) {
+    clearAutoPlayTimer() {
+        if (this._id === null) {
             return;
         }
-        return await this.invokeHostApi('clearAutoPlayTimer', {id: this.id});
+        this._invokeHostApi('clearAutoPlayTimer', {id: this._id});
     }
 
-    invokeHostApi(action, params={}) {
-        if (typeof this.parentFrameId !== 'number') {
+    // Private
+
+    _getPopupId() {
+        if (this._idPromise === null) {
+            this._idPromise = this._getPopupIdAsync();
+        }
+        return this._idPromise;
+    }
+
+    async _getPopupIdAsync() {
+        const id = await this._invokeHostApi('createNestedPopup', {parentId: this._parentId});
+        this._id = id;
+        return id;
+    }
+
+    _invokeHostApi(action, params={}) {
+        if (typeof this._parentFrameId !== 'number') {
             return Promise.reject(new Error('Invalid frame'));
         }
-        return this.apiSender.invoke(action, params, `popup-proxy-host#${this.parentFrameId}`);
+        return this._apiSender.invoke(action, params, `popup-proxy-host#${this._parentFrameId}`);
     }
 
-    static DOMRectToJson(domRect) {
+    static _convertDOMRectToJson(domRect) {
         return {
             x: domRect.x,
             y: domRect.y,

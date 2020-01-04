@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,100 +13,241 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
 class Popup {
     constructor(id, depth, frameIdPromise) {
-        this.id = id;
-        this.depth = depth;
-        this.frameIdPromise = frameIdPromise;
-        this.frameId = null;
-        this.parent = null;
-        this.child = null;
-        this.childrenSupported = true;
-        this.container = document.createElement('iframe');
-        this.container.className = 'yomichan-float';
-        this.container.addEventListener('mousedown', (e) => e.stopPropagation());
-        this.container.addEventListener('scroll', (e) => e.stopPropagation());
-        this.container.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
-        this.container.style.width = '0px';
-        this.container.style.height = '0px';
-        this.injectPromise = null;
-        this.isInjected = false;
-        this.visible = false;
-        this.visibleOverride = null;
-        this.options = null;
-        this.stylesheetInjectedViaApi = false;
-        this.updateVisibility();
+        this._id = id;
+        this._depth = depth;
+        this._frameIdPromise = frameIdPromise;
+        this._frameId = null;
+        this._parent = null;
+        this._child = null;
+        this._childrenSupported = true;
+        this._injectPromise = null;
+        this._isInjected = false;
+        this._visible = false;
+        this._visibleOverride = null;
+        this._options = null;
+        this._stylesheetInjectedViaApi = false;
+
+        this._container = document.createElement('iframe');
+        this._container.className = 'yomichan-float';
+        this._container.addEventListener('mousedown', (e) => e.stopPropagation());
+        this._container.addEventListener('scroll', (e) => e.stopPropagation());
+        this._container.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
+        this._container.style.width = '0px';
+        this._container.style.height = '0px';
+
+        this._updateVisibility();
     }
 
-    inject() {
-        if (this.injectPromise === null) {
-            this.injectPromise = this.createInjectPromise();
+    // Public properties
+
+    get parent() {
+        return this._parent;
+    }
+
+    get depth() {
+        return this._depth;
+    }
+
+    get url() {
+        return window.location.href;
+    }
+
+    // Public functions
+
+    isProxy() {
+        return false;
+    }
+
+    async setOptions(options) {
+        this._options = options;
+        this.updateTheme();
+    }
+
+    hide(changeFocus) {
+        if (!this.isVisibleSync()) {
+            return;
         }
-        return this.injectPromise;
+
+        this._setVisible(false);
+        if (this._child !== null) {
+            this._child.hide(false);
+        }
+        if (changeFocus) {
+            this._focusParent();
+        }
     }
 
-    async createInjectPromise() {
+    async isVisible() {
+        return this.isVisibleSync();
+    }
+
+    setVisibleOverride(visible) {
+        this._visibleOverride = visible;
+        this._updateVisibility();
+    }
+
+    async containsPoint(x, y) {
+        for (let popup = this; popup !== null && popup.isVisibleSync(); popup = popup._child) {
+            const rect = popup._container.getBoundingClientRect();
+            if (x >= rect.left && y >= rect.top && x < rect.right && y < rect.bottom) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    async showContent(elementRect, writingMode, type=null, details=null) {
+        if (!this._isInitialized()) { return; }
+        await this._show(elementRect, writingMode);
+        if (type === null) { return; }
+        this._invokeApi('setContent', {type, details});
+    }
+
+    async setCustomCss(css) {
+        this._invokeApi('setCustomCss', {css});
+    }
+
+    clearAutoPlayTimer() {
+        if (this._isInjected) {
+            this._invokeApi('clearAutoPlayTimer');
+        }
+    }
+
+    // Popup-only public functions
+
+    setParent(parent) {
+        if (parent === null) {
+            throw new Error('Cannot set popup parent to null');
+        }
+        if (this._parent !== null) {
+            throw new Error('Popup already has a parent');
+        }
+        if (parent._child !== null) {
+            throw new Error('Cannot parent popup to another popup which already has a child');
+        }
+        this._parent = parent;
+        parent._child = this;
+    }
+
+    isVisibleSync() {
+        return this._isInjected && (this._visibleOverride !== null ? this._visibleOverride : this._visible);
+    }
+
+    updateTheme() {
+        this._container.dataset.yomichanTheme = this._options.general.popupOuterTheme;
+        this._container.dataset.yomichanSiteColor = this._getSiteColor();
+    }
+
+    async setCustomOuterCss(css, injectDirectly) {
+        // Cannot repeatedly inject stylesheets using web extension APIs since there is no way to remove them.
+        if (this._stylesheetInjectedViaApi) { return; }
+
+        if (injectDirectly || Popup._isOnExtensionPage()) {
+            Popup.injectOuterStylesheet(css);
+        } else {
+            if (!css) { return; }
+            try {
+                await apiInjectStylesheet(css);
+                this._stylesheetInjectedViaApi = true;
+            } catch (e) {
+                // NOP
+            }
+        }
+    }
+
+    setChildrenSupported(value) {
+        this._childrenSupported = value;
+    }
+
+    getContainer() {
+        return this._container;
+    }
+
+    getContainerRect() {
+        return this._container.getBoundingClientRect();
+    }
+
+    static injectOuterStylesheet(css) {
+        if (Popup.outerStylesheet === null) {
+            if (!css) { return; }
+            Popup.outerStylesheet = document.createElement('style');
+            Popup.outerStylesheet.id = 'yomichan-popup-outer-stylesheet';
+        }
+
+        const outerStylesheet = Popup.outerStylesheet;
+        if (css) {
+            outerStylesheet.textContent = css;
+
+            const par = document.head;
+            if (par && outerStylesheet.parentNode !== par) {
+                par.appendChild(outerStylesheet);
+            }
+        } else {
+            outerStylesheet.textContent = '';
+        }
+    }
+
+    // Private functions
+
+    _inject() {
+        if (this._injectPromise === null) {
+            this._injectPromise = this._createInjectPromise();
+        }
+        return this._injectPromise;
+    }
+
+    async _createInjectPromise() {
         try {
-            const {frameId} = await this.frameIdPromise;
+            const {frameId} = await this._frameIdPromise;
             if (typeof frameId === 'number') {
-                this.frameId = frameId;
+                this._frameId = frameId;
             }
         } catch (e) {
             // NOP
         }
 
         return new Promise((resolve) => {
-            const parentFrameId = (typeof this.frameId === 'number' ? this.frameId : null);
-            this.container.addEventListener('load', () => {
-                this.invokeApi('initialize', {
-                    options: this.options,
+            const parentFrameId = (typeof this._frameId === 'number' ? this._frameId : null);
+            this._container.addEventListener('load', () => {
+                this._invokeApi('initialize', {
+                    options: this._options,
                     popupInfo: {
-                        id: this.id,
-                        depth: this.depth,
+                        id: this._id,
+                        depth: this._depth,
                         parentFrameId
                     },
                     url: this.url,
-                    childrenSupported: this.childrenSupported
+                    childrenSupported: this._childrenSupported
                 });
                 resolve();
             });
-            this.observeFullscreen();
-            this.onFullscreenChanged();
-            this.setCustomOuterCss(this.options.general.customPopupOuterCss, false);
-            this.isInjected = true;
+            this._observeFullscreen();
+            this._onFullscreenChanged();
+            this.setCustomOuterCss(this._options.general.customPopupOuterCss, false);
+            this._isInjected = true;
         });
     }
 
-    isInitialized() {
-        return this.options !== null;
+    _isInitialized() {
+        return this._options !== null;
     }
 
-    async setOptions(options) {
-        this.options = options;
-        this.updateTheme();
-    }
+    async _show(elementRect, writingMode) {
+        await this._inject();
 
-    async showContent(elementRect, writingMode, type=null, details=null) {
-        if (!this.isInitialized()) { return; }
-        await this.show(elementRect, writingMode);
-        if (type === null) { return; }
-        this.invokeApi('setContent', {type, details});
-    }
-
-    async show(elementRect, writingMode) {
-        await this.inject();
-
-        const optionsGeneral = this.options.general;
-        const container = this.container;
+        const optionsGeneral = this._options.general;
+        const container = this._container;
         const containerRect = container.getBoundingClientRect();
         const getPosition = (
             writingMode === 'horizontal-tb' || optionsGeneral.popupVerticalTextPosition === 'default' ?
-            Popup.getPositionForHorizontalText :
-            Popup.getPositionForVerticalText
+            Popup._getPositionForHorizontalText :
+            Popup._getPositionForVerticalText
         );
 
         const [x, y, width, height, below] = getPosition(
@@ -126,13 +267,78 @@ class Popup {
         container.style.width = `${width}px`;
         container.style.height = `${height}px`;
 
-        this.setVisible(true);
-        if (this.child !== null) {
-            this.child.hide(true);
+        this._setVisible(true);
+        if (this._child !== null) {
+            this._child.hide(true);
         }
     }
 
-    static getPositionForHorizontalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral) {
+    _setVisible(visible) {
+        this._visible = visible;
+        this._updateVisibility();
+    }
+
+    _updateVisibility() {
+        this._container.style.setProperty('visibility', this.isVisibleSync() ? 'visible' : 'hidden', 'important');
+    }
+
+    _focusParent() {
+        if (this._parent !== null) {
+            // Chrome doesn't like focusing iframe without contentWindow.
+            const contentWindow = this._parent._container.contentWindow;
+            if (contentWindow !== null) {
+                contentWindow.focus();
+            }
+        } else {
+            // Firefox doesn't like focusing window without first blurring the iframe.
+            // this.container.contentWindow.blur() doesn't work on Firefox for some reason.
+            this._container.blur();
+            // This is needed for Chrome.
+            window.focus();
+        }
+    }
+
+    _getSiteColor() {
+        const color = [255, 255, 255];
+        Popup._addColor(color, Popup._getColorInfo(window.getComputedStyle(document.documentElement).backgroundColor));
+        Popup._addColor(color, Popup._getColorInfo(window.getComputedStyle(document.body).backgroundColor));
+        const dark = (color[0] < 128 && color[1] < 128 && color[2] < 128);
+        return dark ? 'dark' : 'light';
+    }
+
+    _invokeApi(action, params={}) {
+        this._container.contentWindow.postMessage({action, params}, '*');
+    }
+
+    _observeFullscreen() {
+        const fullscreenEvents = [
+            'fullscreenchange',
+            'MSFullscreenChange',
+            'mozfullscreenchange',
+            'webkitfullscreenchange'
+        ];
+        for (const eventName of fullscreenEvents) {
+            document.addEventListener(eventName, () => this._onFullscreenChanged(), false);
+        }
+    }
+
+    _getFullscreenElement() {
+        return (
+            document.fullscreenElement ||
+            document.msFullscreenElement ||
+            document.mozFullScreenElement ||
+            document.webkitFullscreenElement
+        );
+    }
+
+    _onFullscreenChanged() {
+        const parent = (this._getFullscreenElement() || document.body || null);
+        if (parent !== null && this._container.parentNode !== parent) {
+            parent.appendChild(this._container);
+        }
+    }
+
+    static _getPositionForHorizontalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral) {
         let x = elementRect.left + optionsGeneral.popupHorizontalOffset;
         const overflowX = Math.max(x + width - maxWidth, 0);
         if (overflowX > 0) {
@@ -147,7 +353,7 @@ class Popup {
         const preferBelow = (optionsGeneral.popupHorizontalTextPosition === 'below');
 
         const verticalOffset = optionsGeneral.popupVerticalOffset;
-        const [y, h, below] = Popup.limitGeometry(
+        const [y, h, below] = Popup._limitGeometry(
             elementRect.top - verticalOffset,
             elementRect.bottom + verticalOffset,
             height,
@@ -158,19 +364,19 @@ class Popup {
         return [x, y, width, h, below];
     }
 
-    static getPositionForVerticalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral, writingMode) {
-        const preferRight = Popup.isVerticalTextPopupOnRight(optionsGeneral.popupVerticalTextPosition, writingMode);
+    static _getPositionForVerticalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral, writingMode) {
+        const preferRight = Popup._isVerticalTextPopupOnRight(optionsGeneral.popupVerticalTextPosition, writingMode);
         const horizontalOffset = optionsGeneral.popupHorizontalOffset2;
         const verticalOffset = optionsGeneral.popupVerticalOffset2;
 
-        const [x, w] = Popup.limitGeometry(
+        const [x, w] = Popup._limitGeometry(
             elementRect.left - horizontalOffset,
             elementRect.right + horizontalOffset,
             width,
             maxWidth,
             preferRight
         );
-        const [y, h, below] = Popup.limitGeometry(
+        const [y, h, below] = Popup._limitGeometry(
             elementRect.bottom - verticalOffset,
             elementRect.top + verticalOffset,
             height,
@@ -180,12 +386,12 @@ class Popup {
         return [x, y, w, h, below];
     }
 
-    static isVerticalTextPopupOnRight(positionPreference, writingMode) {
+    static _isVerticalTextPopupOnRight(positionPreference, writingMode) {
         switch (positionPreference) {
             case 'before':
-                return !Popup.isWritingModeLeftToRight(writingMode);
+                return !Popup._isWritingModeLeftToRight(writingMode);
             case 'after':
-                return Popup.isWritingModeLeftToRight(writingMode);
+                return Popup._isWritingModeLeftToRight(writingMode);
             case 'left':
                 return false;
             case 'right':
@@ -193,7 +399,7 @@ class Popup {
         }
     }
 
-    static isWritingModeLeftToRight(writingMode) {
+    static _isWritingModeLeftToRight(writingMode) {
         switch (writingMode) {
             case 'vertical-lr':
             case 'sideways-lr':
@@ -203,7 +409,7 @@ class Popup {
         }
     }
 
-    static limitGeometry(positionBefore, positionAfter, size, limit, preferAfter) {
+    static _limitGeometry(positionBefore, positionAfter, size, limit, preferAfter) {
         let after = preferAfter;
         let position = 0;
         const overflowBefore = Math.max(0, size - positionBefore);
@@ -225,72 +431,7 @@ class Popup {
         return [position, size, after];
     }
 
-    hide(changeFocus) {
-        if (!this.isVisible()) {
-            return;
-        }
-
-        this.setVisible(false);
-        if (this.child !== null) {
-            this.child.hide(false);
-        }
-        if (changeFocus) {
-            this.focusParent();
-        }
-    }
-
-    async isVisibleAsync() {
-        return this.isVisible();
-    }
-
-    isVisible() {
-        return this.isInjected && (this.visibleOverride !== null ? this.visibleOverride : this.visible);
-    }
-
-    setVisible(visible) {
-        this.visible = visible;
-        this.updateVisibility();
-    }
-
-    setVisibleOverride(visible) {
-        this.visibleOverride = visible;
-        this.updateVisibility();
-    }
-
-    updateVisibility() {
-        this.container.style.setProperty('visibility', this.isVisible() ? 'visible' : 'hidden', 'important');
-    }
-
-    focusParent() {
-        if (this.parent !== null) {
-            // Chrome doesn't like focusing iframe without contentWindow.
-            const contentWindow = this.parent.container.contentWindow;
-            if (contentWindow !== null) {
-                contentWindow.focus();
-            }
-        } else {
-            // Firefox doesn't like focusing window without first blurring the iframe.
-            // this.container.contentWindow.blur() doesn't work on Firefox for some reason.
-            this.container.blur();
-            // This is needed for Chrome.
-            window.focus();
-        }
-    }
-
-    updateTheme() {
-        this.container.dataset.yomichanTheme = this.options.general.popupOuterTheme;
-        this.container.dataset.yomichanSiteColor = this.getSiteColor();
-    }
-
-    getSiteColor() {
-        const color = [255, 255, 255];
-        Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.documentElement).backgroundColor));
-        Popup.addColor(color, Popup.getColorInfo(window.getComputedStyle(document.body).backgroundColor));
-        const dark = (color[0] < 128 && color[1] < 128 && color[2] < 128);
-        return dark ? 'dark' : 'light';
-    }
-
-    static addColor(target, color) {
+    static _addColor(target, color) {
         if (color === null) { return; }
 
         const a = color[3];
@@ -302,7 +443,7 @@ class Popup {
         }
     }
 
-    static getColorInfo(cssColor) {
+    static _getColorInfo(cssColor) {
         const m = /^\s*rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)\s*$/.exec(cssColor);
         if (m === null) { return null; }
 
@@ -315,105 +456,12 @@ class Popup {
         ];
     }
 
-    async containsPoint(x, y) {
-        for (let popup = this; popup !== null && popup.isVisible(); popup = popup.child) {
-            const rect = popup.container.getBoundingClientRect();
-            if (x >= rect.left && y >= rect.top && x < rect.right && y < rect.bottom) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    async setCustomCss(css) {
-        this.invokeApi('setCustomCss', {css});
-    }
-
-    async setCustomOuterCss(css, injectDirectly) {
-        // Cannot repeatedly inject stylesheets using web extension APIs since there is no way to remove them.
-        if (this.stylesheetInjectedViaApi) { return; }
-
-        if (injectDirectly || Popup.isOnExtensionPage()) {
-            Popup.injectOuterStylesheet(css);
-        } else {
-            if (!css) { return; }
-            try {
-                await apiInjectStylesheet(css);
-                this.stylesheetInjectedViaApi = true;
-            } catch (e) {
-                // NOP
-            }
-        }
-    }
-
-    clearAutoPlayTimer() {
-        if (this.isInjected) {
-            this.invokeApi('clearAutoPlayTimer');
-        }
-    }
-
-    invokeApi(action, params={}) {
-        this.container.contentWindow.postMessage({action, params}, '*');
-    }
-
-    observeFullscreen() {
-        const fullscreenEvents = [
-            'fullscreenchange',
-            'MSFullscreenChange',
-            'mozfullscreenchange',
-            'webkitfullscreenchange'
-        ];
-        for (const eventName of fullscreenEvents) {
-            document.addEventListener(eventName, () => this.onFullscreenChanged(), false);
-        }
-    }
-
-    getFullscreenElement() {
-        return (
-            document.fullscreenElement ||
-            document.msFullscreenElement ||
-            document.mozFullScreenElement ||
-            document.webkitFullscreenElement
-        );
-    }
-
-    onFullscreenChanged() {
-        const parent = (this.getFullscreenElement() || document.body || null);
-        if (parent !== null && this.container.parentNode !== parent) {
-            parent.appendChild(this.container);
-        }
-    }
-
-    get url() {
-        return window.location.href;
-    }
-
-    static isOnExtensionPage() {
+    static _isOnExtensionPage() {
         try {
             const url = chrome.runtime.getURL('/');
             return window.location.href.substring(0, url.length) === url;
         } catch (e) {
             // NOP
-        }
-    }
-
-    static injectOuterStylesheet(css) {
-        if (Popup.outerStylesheet === null) {
-            if (!css) { return; }
-            Popup.outerStylesheet = document.createElement('style');
-            Popup.outerStylesheet.id = 'yomichan-popup-outer-stylesheet';
-        }
-
-        const outerStylesheet = Popup.outerStylesheet;
-        if (css) {
-            outerStylesheet.textContent = css;
-
-            const par = document.head;
-            if (par && outerStylesheet.parentNode !== par) {
-                par.appendChild(outerStylesheet);
-            }
-        } else {
-            outerStylesheet.textContent = '';
         }
     }
 }

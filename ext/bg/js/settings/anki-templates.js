@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2019-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
@@ -42,10 +42,22 @@ function ankiTemplatesInitialize() {
         node.addEventListener('click', onAnkiTemplateMarkerClicked, false);
     }
 
-    $('#field-templates').on('change', (e) => onAnkiTemplatesValidateCompile(e));
+    $('#field-templates').on('change', (e) => onAnkiFieldTemplatesChanged(e));
     $('#field-template-render').on('click', (e) => onAnkiTemplateRender(e));
     $('#field-templates-reset').on('click', (e) => onAnkiFieldTemplatesReset(e));
     $('#field-templates-reset-confirm').on('click', (e) => onAnkiFieldTemplatesResetConfirm(e));
+
+    ankiTemplatesUpdateValue();
+}
+
+async function ankiTemplatesUpdateValue() {
+    const optionsContext = getOptionsContext();
+    const options = await apiOptionsGet(optionsContext);
+    let templates = options.anki.fieldTemplates;
+    if (typeof templates !== 'string') { templates = profileOptionsGetDefaultFieldTemplates(); }
+    $('#field-templates').val(templates);
+
+    onAnkiTemplatesValidateCompile();
 }
 
 const ankiTemplatesValidateGetDefinition = (() => {
@@ -73,7 +85,9 @@ async function ankiTemplatesValidate(infoNode, field, mode, showSuccessResult, i
         const definition = await ankiTemplatesValidateGetDefinition(text, optionsContext);
         if (definition !== null) {
             const options = await apiOptionsGet(optionsContext);
-            result = await dictFieldFormat(field, definition, mode, options, exceptions);
+            let templates = options.anki.fieldTemplates;
+            if (typeof templates !== 'string') { templates = profileOptionsGetDefaultFieldTemplates(); }
+            result = await dictFieldFormat(field, definition, mode, options, templates, exceptions);
         }
     } catch (e) {
         exceptions.push(e);
@@ -87,6 +101,24 @@ async function ankiTemplatesValidate(infoNode, field, mode, showSuccessResult, i
         const input = document.querySelector('#field-templates');
         input.classList.toggle('is-invalid', hasException);
     }
+}
+
+async function onAnkiFieldTemplatesChanged(e) {
+    // Get value
+    let templates = e.currentTarget.value;
+    if (templates === profileOptionsGetDefaultFieldTemplates()) {
+        // Default
+        templates = null;
+    }
+
+    // Overwrite
+    const optionsContext = getOptionsContext();
+    const options = await getOptionsMutable(optionsContext);
+    options.anki.fieldTemplates = templates;
+    await settingsSaveOptions();
+
+    // Compile
+    onAnkiTemplatesValidateCompile();
 }
 
 function onAnkiTemplatesValidateCompile() {

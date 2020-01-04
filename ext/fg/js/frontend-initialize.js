@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2019-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,8 +13,23 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
-window.yomichan_frontend = Frontend.create();
+async function main() {
+    const data = window.frontendInitializationData || {};
+    const {id, depth=0, parentFrameId, ignoreNodes, url, proxy=false} = data;
+
+    let popupHost = null;
+    if (!proxy) {
+        popupHost = new PopupProxyHost();
+        await popupHost.prepare();
+    }
+
+    const popup = proxy ? new PopupProxy(depth + 1, id, parentFrameId, url) : popupHost.createPopup(null, depth);
+    const frontend = new Frontend(popup, ignoreNodes);
+    await frontend.prepare();
+}
+
+main();

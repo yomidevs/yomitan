@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017  Alex Yatskov <alex@foosoft.net>
+ * Copyright (C) 2016-2020  Alex Yatskov <alex@foosoft.net>
  * Author: Alex Yatskov <alex@foosoft.net>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 
@@ -27,15 +27,22 @@ class DisplayFloat extends Display {
             url: window.location.href
         };
 
+        this._orphaned = false;
+
+        yomichan.on('orphaned', () => this.onOrphaned());
         window.addEventListener('message', (e) => this.onMessage(e), false);
     }
 
     onError(error) {
-        if (window.yomichan_orphaned) {
+        if (this._orphaned) {
             this.setContentOrphaned();
         } else {
             logError(error, true);
         }
+    }
+
+    onOrphaned() {
+        this._orphaned = true;
     }
 
     onSearchClear() {
@@ -48,24 +55,22 @@ class DisplayFloat extends Display {
 
     onMessage(e) {
         const {action, params} = e.data;
-        const handlers = DisplayFloat.messageHandlers;
-        if (hasOwn(handlers, action)) {
-            const handler = handlers[action];
-            handler(this, params);
-        }
+        const handler = DisplayFloat._messageHandlers.get(action);
+        if (typeof handler !== 'function') { return; }
+
+        handler(this, params);
     }
 
     onKeyDown(e) {
         const key = Display.getKeyFromEvent(e);
-        const handlers = DisplayFloat.onKeyDownHandlers;
-        if (hasOwn(handlers, key)) {
-            const handler = handlers[key];
+        const handler = DisplayFloat._onKeyDownHandlers.get(key);
+        if (typeof handler === 'function') {
             if (handler(this, e)) {
                 e.preventDefault();
-                return;
+                return true;
             }
         }
-        super.onKeyDown(e);
+        return super.onKeyDown(e);
     }
 
     getOptionsContext() {
@@ -97,21 +102,21 @@ class DisplayFloat extends Display {
     }
 }
 
-DisplayFloat.onKeyDownHandlers = {
-    'C': (self, e) => {
+DisplayFloat._onKeyDownHandlers = new Map([
+    ['C', (self, e) => {
         if (e.ctrlKey && !window.getSelection().toString()) {
             self.onSelectionCopy();
             return true;
         }
         return false;
-    }
-};
+    }]
+]);
 
-DisplayFloat.messageHandlers = {
-    setContent: (self, {type, details}) => self.setContent(type, details),
-    clearAutoPlayTimer: (self) => self.clearAutoPlayTimer(),
-    setCustomCss: (self, {css}) => self.setCustomCss(css),
-    initialize: (self, {options, popupInfo, url, childrenSupported}) => self.initialize(options, popupInfo, url, childrenSupported)
-};
+DisplayFloat._messageHandlers = new Map([
+    ['setContent', (self, {type, details}) => self.setContent(type, details)],
+    ['clearAutoPlayTimer', (self) => self.clearAutoPlayTimer()],
+    ['setCustomCss', (self, {css}) => self.setCustomCss(css)],
+    ['initialize', (self, {options, popupInfo, url, childrenSupported}) => self.initialize(options, popupInfo, url, childrenSupported)]
+]);
 
-window.yomichan_display = new DisplayFloat();
+DisplayFloat.instance = new DisplayFloat();
