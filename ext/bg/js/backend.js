@@ -542,6 +542,15 @@ class Backend {
 
         return new Promise((resolve, reject) => {
             const tabId = sender.tab.id;
+            if (!(
+                chrome.tabs !== null &&
+                typeof chrome.tabs === 'object' &&
+                typeof chrome.tabs.getZoom === 'function'
+            )) {
+                // Not supported
+                resolve({zoomFactor: 1.0});
+                return;
+            }
             chrome.tabs.getZoom(tabId, (zoomFactor) => {
                 const e = chrome.runtime.lastError;
                 if (e) {
