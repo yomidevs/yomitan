@@ -46,6 +46,7 @@ class Frontend extends TextScanner {
             const {zoomFactor} = await apiGetZoom();
             this._pageZoomFactor = zoomFactor;
 
+            window.addEventListener('scroll', this.onScroll.bind(this), false);
             window.addEventListener('resize', this.onResize.bind(this), false);
 
             const visualViewport = window.visualViewport;
@@ -65,11 +66,12 @@ class Frontend extends TextScanner {
         }
     }
 
-    async onResize() {
-        const textSource = this.getCurrentTextSource();
-        if (textSource !== null && await this.popup.isVisible()) {
-            this._showPopupContent(textSource);
-        }
+    onResize() {
+        this._updatePopupPosition();
+    }
+
+    onScroll() {
+        this._updatePopupPosition();
     }
 
     onWindowMessage(e) {
@@ -99,7 +101,7 @@ class Frontend extends TextScanner {
     }
 
     onVisualViewportScroll() {
-        // TODO
+        this._updatePopupPosition();
     }
 
     onVisualViewportResize() {
@@ -224,7 +226,14 @@ class Frontend extends TextScanner {
 
         this._contentScale = contentScale;
         this.popup.setContentScale(this._contentScale);
-        this.onResize();
+        this._updatePopupPosition();
+    }
+
+    async _updatePopupPosition() {
+        const textSource = this.getCurrentTextSource();
+        if (textSource !== null && await this.popup.isVisible()) {
+            this._showPopupContent(textSource);
+        }
     }
 
     static _getVisualViewportScale() {
