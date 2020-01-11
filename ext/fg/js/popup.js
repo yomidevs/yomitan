@@ -258,6 +258,7 @@ class Popup {
             Popup._getPositionForVerticalText
         );
 
+        const viewport = Popup._getViewport(optionsGeneral.popupScaleRelativeToVisualViewport);
         const scale = this._contentScale;
         const scaleRatio = this._containerSizeContentScale === null ? 1.0 : scale / this._containerSizeContentScale;
         this._containerSizeContentScale = scale;
@@ -265,8 +266,7 @@ class Popup {
             elementRect,
             Math.max(containerRect.width * scaleRatio, optionsGeneral.popupWidth * scale),
             Math.max(containerRect.height * scaleRatio, optionsGeneral.popupHeight * scale),
-            document.body.clientWidth,
-            window.innerHeight,
+            viewport,
             scale,
             optionsGeneral,
             writingMode
@@ -353,49 +353,49 @@ class Popup {
         }
     }
 
-    static _getPositionForHorizontalText(elementRect, width, height, maxWidth, maxHeight, offsetScale, optionsGeneral) {
-        let x = elementRect.left + optionsGeneral.popupHorizontalOffset * offsetScale;
-        const overflowX = Math.max(x + width - maxWidth, 0);
-        if (overflowX > 0) {
-            if (x >= overflowX) {
-                x -= overflowX;
-            } else {
-                width = maxWidth;
-                x = 0;
-            }
-        }
-
+    static _getPositionForHorizontalText(elementRect, width, height, viewport, offsetScale, optionsGeneral) {
         const preferBelow = (optionsGeneral.popupHorizontalTextPosition === 'below');
-
+        const horizontalOffset = optionsGeneral.popupHorizontalOffset * offsetScale;
         const verticalOffset = optionsGeneral.popupVerticalOffset * offsetScale;
-        const [y, h, below] = Popup._limitGeometry(
+
+        const [x, w] = Popup._getConstrainedPosition(
+            elementRect.right - horizontalOffset,
+            elementRect.left + horizontalOffset,
+            width,
+            viewport.left,
+            viewport.right,
+            true
+        );
+        const [y, h, below] = Popup._getConstrainedPositionBinary(
             elementRect.top - verticalOffset,
             elementRect.bottom + verticalOffset,
             height,
-            maxHeight,
+            viewport.top,
+            viewport.bottom,
             preferBelow
         );
-
-        return [x, y, width, h, below];
+        return [x, y, w, h, below];
     }
 
-    static _getPositionForVerticalText(elementRect, width, height, maxWidth, maxHeight, offsetScale, optionsGeneral, writingMode) {
+    static _getPositionForVerticalText(elementRect, width, height, viewport, offsetScale, optionsGeneral, writingMode) {
         const preferRight = Popup._isVerticalTextPopupOnRight(optionsGeneral.popupVerticalTextPosition, writingMode);
         const horizontalOffset = optionsGeneral.popupHorizontalOffset2 * offsetScale;
         const verticalOffset = optionsGeneral.popupVerticalOffset2 * offsetScale;
 
-        const [x, w] = Popup._limitGeometry(
+        const [x, w] = Popup._getConstrainedPositionBinary(
             elementRect.left - horizontalOffset,
             elementRect.right + horizontalOffset,
             width,
-            maxWidth,
+            viewport.left,
+            viewport.right,
             preferRight
         );
-        const [y, h, below] = Popup._limitGeometry(
+        const [y, h, below] = Popup._getConstrainedPosition(
             elementRect.bottom - verticalOffset,
             elementRect.top + verticalOffset,
             height,
-            maxHeight,
+            viewport.top,
+            viewport.bottom,
             true
         );
         return [x, y, w, h, below];
@@ -424,23 +424,36 @@ class Popup {
         }
     }
 
-    static _limitGeometry(positionBefore, positionAfter, size, limit, preferAfter) {
-        let after = preferAfter;
-        let position = 0;
-        const overflowBefore = Math.max(0, size - positionBefore);
-        const overflowAfter = Math.max(0, positionAfter + size - limit);
-        if (overflowAfter > 0 || overflowBefore > 0) {
-            if (overflowAfter < overflowBefore) {
-                size = Math.max(0, size - overflowAfter);
-                position = positionAfter;
-                after = true;
-            } else {
-                size = Math.max(0, size - overflowBefore);
-                position = Math.max(0, positionBefore - size);
-                after = false;
-            }
+    static _getConstrainedPosition(positionBefore, positionAfter, size, minLimit, maxLimit, after) {
+        size = Math.min(size, maxLimit - minLimit);
+
+        let position;
+        if (after) {
+            position = Math.max(minLimit, positionAfter);
+            position = position - Math.max(0, (position + size) - maxLimit);
         } else {
-            position = preferAfter ? positionAfter : positionBefore - size;
+            position = Math.min(maxLimit, positionBefore) - size;
+            position = position + Math.max(0, minLimit - position);
+        }
+
+        return [position, size, after];
+    }
+
+    static _getConstrainedPositionBinary(positionBefore, positionAfter, size, minLimit, maxLimit, after) {
+        const overflowBefore = minLimit - (positionBefore - size);
+        const overflowAfter = (positionAfter + size) - maxLimit;
+
+        if (overflowAfter > 0 || overflowBefore > 0) {
+            after = (overflowAfter < overflowBefore);
+        }
+
+        let position;
+        if (after) {
+            size -= Math.max(0, overflowAfter);
+            position = Math.max(minLimit, positionAfter);
+        } else {
+            size -= Math.max(0, overflowBefore);
+            position = Math.min(maxLimit, positionBefore) - size;
         }
 
         return [position, size, after];
@@ -478,6 +491,29 @@ class Popup {
         } catch (e) {
             // NOP
         }
+    }
+
+    static _getViewport(useVisualViewport) {
+        if (useVisualViewport) {
+            const visualViewport = window.visualViewport;
+            if (visualViewport !== null && typeof visualViewport === 'object') {
+                const left = visualViewport.offsetLeft;
+                const top = visualViewport.offsetTop;
+                return {
+                    left,
+                    top,
+                    right: left + visualViewport.width,
+                    bottom: top + visualViewport.height
+                };
+            }
+        }
+
+        return {
+            left: 0,
+            top: 0,
+            right: document.body.clientWidth,
+            bottom: window.innerHeight
+        };
     }
 }
 
