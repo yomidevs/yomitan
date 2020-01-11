@@ -46,7 +46,6 @@ class Frontend extends TextScanner {
             const {zoomFactor} = await apiGetZoom();
             this._pageZoomFactor = zoomFactor;
 
-            window.addEventListener('scroll', this.onScroll.bind(this), false);
             window.addEventListener('resize', this.onResize.bind(this), false);
 
             const visualViewport = window.visualViewport;
@@ -67,10 +66,6 @@ class Frontend extends TextScanner {
     }
 
     onResize() {
-        this._updatePopupPosition();
-    }
-
-    onScroll() {
         this._updatePopupPosition();
     }
 
