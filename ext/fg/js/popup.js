@@ -262,7 +262,7 @@ class Popup {
         const scale = this._contentScale;
         const scaleRatio = this._containerSizeContentScale === null ? 1.0 : scale / this._containerSizeContentScale;
         this._containerSizeContentScale = scale;
-        const [x, y, width, height, below] = getPosition(
+        let [x, y, width, height, below] = getPosition(
             elementRect,
             Math.max(containerRect.width * scaleRatio, optionsGeneral.popupWidth * scale),
             Math.max(containerRect.height * scaleRatio, optionsGeneral.popupHeight * scale),
@@ -272,8 +272,16 @@ class Popup {
             writingMode
         );
 
-        container.classList.toggle('yomichan-float-full-width', optionsGeneral.popupDisplayMode === 'full-width');
+        const fullWidth = (optionsGeneral.popupDisplayMode === 'full-width');
+        container.classList.toggle('yomichan-float-full-width', fullWidth);
         container.classList.toggle('yomichan-float-above', !below);
+
+        if (optionsGeneral.popupDisplayMode === 'full-width') {
+            x = viewport.left;
+            y = below ? viewport.bottom - height : viewport.top;
+            width = viewport.right - viewport.left;
+        }
+
         container.style.left = `${x}px`;
         container.style.top = `${y}px`;
         container.style.width = `${width}px`;
