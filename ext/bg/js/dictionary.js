@@ -67,7 +67,7 @@ function dictTermsSort(definitions, dictionaries=null) {
         i = v2.source.length - v1.source.length;
         if (i !== 0) { return i; }
 
-        i = v2.reasons.length - v1.reasons.length;
+        i = v1.reasons.length - v2.reasons.length;
         if (i !== 0) { return i; }
 
         i = v2.score - v1.score;
