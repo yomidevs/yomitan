@@ -281,6 +281,7 @@ class TextScanner {
 
     setOptions(options) {
         this.options = options;
+        this.setEnabled(this.options.general.enable);
     }
 
     async searchAt(x, y, cause) {
