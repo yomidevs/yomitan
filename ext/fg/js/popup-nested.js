@@ -35,7 +35,7 @@ async function popupNestedInitialize(id, depth, parentFrameId, url) {
 
     const ignoreNodes = ['.scan-disable', '.scan-disable *'];
     if (!options.scanning.enableOnPopupExpressions) {
-        ignoreNodes.push('.expression-scan-toggle', '.expression-scan-toggle *');
+        ignoreNodes.push('.term-expression-text', '.term-expression-text *');
     }
 
     window.frontendInitializationData = {id, depth, parentFrameId, ignoreNodes, url, proxy: true};
