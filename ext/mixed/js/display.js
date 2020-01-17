@@ -175,7 +175,7 @@ class Display {
         const link = e.currentTarget;
         const entry = link.closest('.entry');
         const definitionIndex = this.entryIndexFind(entry);
-        const expressionIndex = Display.indexOf(entry.querySelectorAll('.expression .action-play-audio'), link);
+        const expressionIndex = Display.indexOf(entry.querySelectorAll('.term-expression .action-play-audio'), link);
         this.audioPlay(this.definitions[definitionIndex], expressionIndex, definitionIndex);
     }
 
