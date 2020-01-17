@@ -281,10 +281,6 @@ button.action-button {
 }
 
 .term-expression-list[data-multi=true]:not([data-count="1"]) .term-expression-details {
-    visibility: hidden;
-}
-
-.term-expression-list[data-multi=true]:not([data-count="1"]) .term-expression-details {
     display: inline-block;
     position: relative;
     width: 0;
