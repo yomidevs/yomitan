@@ -280,6 +280,12 @@ button.action-button {
     content: "\3001";
 }
 
+.term-expression-list>.term-expression:last-of-type:not(:first-of-type):after {
+    font-size: 2em;
+    content: "\3000";
+    visibility: hidden;
+}
+
 .term-expression-list[data-multi=true]:not([data-count="1"]) .term-expression-details {
     display: inline-block;
     position: relative;
