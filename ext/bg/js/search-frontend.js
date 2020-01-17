@@ -27,7 +27,7 @@ async function searchFrontendSetup() {
 
     const ignoreNodes = ['.scan-disable', '.scan-disable *'];
     if (!options.scanning.enableOnPopupExpressions) {
-        ignoreNodes.push('.term-expression-text', '.term-expression-text *');
+        ignoreNodes.push('.source-text', '.source-text *');
     }
 
     window.frontendInitializationData = {depth: 1, ignoreNodes, proxy: false};
