@@ -63,11 +63,13 @@ class DisplayGenerator {
         const definitionsContainer = node.querySelector('.term-definition-list');
         const debugInfoContainer = node.querySelector('.debug-info');
 
-        const multiExpression = Array.isArray(details.expressions);
-        const multiDefinition = Array.isArray(details.definitions);
+        const expressionMulti = Array.isArray(details.expressions);
+        const definitionMulti = Array.isArray(details.definitions);
 
-        node.dataset.multiExpression = `${multiExpression}`;
-        node.dataset.multiDefinition = `${multiDefinition}`;
+        node.dataset.expressionMulti = `${expressionMulti}`;
+        node.dataset.definitionMulti = `${definitionMulti}`;
+        node.dataset.expressionCount = `${expressionMulti ? details.expressions.length : 1}`;
+        node.dataset.definitionCount = `${definitionMulti ? details.definitions.length : 1}`;
 
         DisplayGenerator._appendMultiple(expressionsContainer, this.createTermExpression.bind(this), details.expressions, [details]);
         DisplayGenerator._appendMultiple(reasonsContainer, this.createTermReason.bind(this), details.reasons);
