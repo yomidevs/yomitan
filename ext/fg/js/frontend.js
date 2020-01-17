@@ -90,9 +90,8 @@ class Frontend extends TextScanner {
     }
 
     async updateOptions() {
-        this.options = await apiOptionsGet(this.getOptionsContext());
+        this.setOptions(await apiOptionsGet(this.getOptionsContext()));
         await this.popup.setOptions(this.options);
-        this.setEnabled(this.options.general.enable);
     }
 
     async onSearchSource(textSource, cause) {

@@ -236,6 +236,11 @@ class DisplaySearch extends Display {
         }
     }
 
+    async updateOptions(options) {
+        await super.updateOptions(options);
+        this.queryParser.setOptions(this.options);
+    }
+
     initClipboardMonitor() {
         // ignore copy from search page
         window.addEventListener('copy', () => {
