@@ -269,8 +269,14 @@ const caretRangeFromPoint = (() => {
 
             const range = document.createRange();
             const offset = (node.nodeType === Node.TEXT_NODE ? position.offset : 0);
-            range.setStart(node, offset);
-            range.setEnd(node, offset);
+            try {
+                range.setStart(node, offset);
+                range.setEnd(node, offset);
+            } catch (e) {
+                // Firefox throws new DOMException("The operation is insecure.")
+                // when trying to select a node from within a ShadowRoot.
+                return null;
+            }
             return range;
         };
     }
