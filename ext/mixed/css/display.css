@@ -182,8 +182,9 @@ html:root[data-yomichan-page=float] .entry {
     display: inline-block;
     border: 0;
     margin: 0;
-    padding: 0.25em;
+    padding: 0.3em;
     background: transparent;
+    font-size: inherit;
 }
 
 button.action-button {
