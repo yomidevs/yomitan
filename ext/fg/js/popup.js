@@ -502,16 +502,26 @@ class Popup {
     }
 
     static _getViewport(useVisualViewport) {
-        if (useVisualViewport) {
-            const visualViewport = window.visualViewport;
-            if (visualViewport !== null && typeof visualViewport === 'object') {
-                const left = visualViewport.offsetLeft;
-                const top = visualViewport.offsetTop;
+        const visualViewport = window.visualViewport;
+        if (visualViewport !== null && typeof visualViewport === 'object') {
+            const left = visualViewport.offsetLeft;
+            const top = visualViewport.offsetTop;
+            const width = visualViewport.width;
+            const height = visualViewport.height;
+            if (useVisualViewport) {
                 return {
                     left,
                     top,
-                    right: left + visualViewport.width,
-                    bottom: top + visualViewport.height
+                    right: left + width,
+                    bottom: top + height
+                };
+            } else {
+                const scale = visualViewport.scale;
+                return {
+                    left: 0,
+                    top: 0,
+                    right: Math.max(left + width, width * scale),
+                    bottom: Math.max(top + height, height * scale)
                 };
             }
         }
