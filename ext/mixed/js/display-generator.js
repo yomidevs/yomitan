@@ -58,7 +58,7 @@ class DisplayGenerator {
         const node = DisplayGenerator._instantiateTemplate(this._termEntryTemplate);
 
         const expressionsContainer = node.querySelector('.term-expression-list');
-        const reasonsContainer = node.querySelector('.reasons');
+        const reasonsContainer = node.querySelector('.term-reasons');
         const frequenciesContainer = node.querySelector('.frequencies');
         const definitionsContainer = node.querySelector('.term-definition-list');
         const debugInfoContainer = node.querySelector('.debug-info');
