@@ -37,11 +37,33 @@ function _ankiSetError(error) {
     if (error) {
         node.hidden = false;
         node.textContent = `${error}`;
-    }
-    else {
+        _ankiSetErrorData(node, error);
+    } else {
         node.hidden = true;
         node.textContent = '';
     }
+}
+
+function _ankiSetErrorData(node, error) {
+    const data = error.data;
+    let message = '';
+    if (typeof data !== 'undefined') {
+        message += `${JSON.stringify(data, null, 4)}\n\n`;
+    }
+    message += `${error.stack}`.trimRight();
+
+    const button = document.createElement('a');
+    button.className = 'error-data-show-button';
+
+    const content = document.createElement('div');
+    content.className = 'error-data-container';
+    content.textContent = message;
+    content.hidden = true;
+
+    button.addEventListener('click', () => content.hidden = !content.hidden, false);
+
+    node.appendChild(button);
+    node.appendChild(content);
 }
 
 function _ankiSetDropdownOptions(dropdown, optionValues) {

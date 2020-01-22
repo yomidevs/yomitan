@@ -36,8 +36,9 @@ async function requestJson(url, action, params) {
     const responseText = await requestText(url, action, params);
     try {
         return JSON.parse(responseText);
-    }
-    catch (e) {
-        throw new Error('Invalid response');
+    } catch (e) {
+        const error = new Error(`Invalid response (${e.message || e})`);
+        error.data = {url, action, params, responseText};
+        throw error;
     }
 }
