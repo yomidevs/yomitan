@@ -76,6 +76,41 @@ const JP_HALFWIDTH_KATAKANA_MAPPING = new Map([
     ['ﾝ', 'ン--']
 ]);
 
+const JP_HIRAGANA_RANGE = [0x3040, 0x309f];
+const JP_KATAKANA_RANGE = [0x30a0, 0x30ff];
+const JP_KANA_RANGES = [JP_HIRAGANA_RANGE, JP_KATAKANA_RANGE];
+
+const JP_CJK_COMMON_RANGE = [0x4e00, 0x9fff];
+const JP_CJK_RARE_RANGE = [0x3400, 0x4dbf];
+const JP_CJK_RANGES = [JP_CJK_COMMON_RANGE, JP_CJK_RARE_RANGE];
+
+const JP_ITERATION_MARK_CHAR_CODE = 0x3005;
+
+// Japanese character ranges, roughly ordered in order of expected frequency
+const JP_JAPANESE_RANGES = [
+    JP_HIRAGANA_RANGE,
+    JP_KATAKANA_RANGE,
+
+    JP_CJK_COMMON_RANGE,
+    JP_CJK_RARE_RANGE,
+
+    [0xff66, 0xff9f], // Halfwidth katakana
+
+    [0x30fb, 0x30fc], // Katakana punctuation
+    [0xff61, 0xff65], // Kana punctuation
+    [0x3000, 0x303f], // CJK punctuation
+
+    [0xff10, 0xff19], // Fullwidth numbers
+    [0xff21, 0xff3a], // Fullwidth upper case Latin letters
+    [0xff41, 0xff5a], // Fullwidth lower case Latin letters
+
+    [0xff01, 0xff0f], // Fullwidth punctuation 1
+    [0xff1a, 0xff1f], // Fullwidth punctuation 2
+    [0xff3b, 0xff3f], // Fullwidth punctuation 3
+    [0xff5b, 0xff60], // Fullwidth punctuation 4
+    [0xffe0, 0xffee], // Currency markers
+];
+
 
 function jpIsKanji(c) {
     const code = c.charCodeAt(0);
