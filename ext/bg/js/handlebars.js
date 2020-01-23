@@ -61,7 +61,7 @@ function handlebarsFuriganaPlain(options) {
 function handlebarsKanjiLinks(options) {
     let result = '';
     for (const c of options.fn(this)) {
-        if (jpIsKanji(c)) {
+        if (jpIsCharCodeKanji(c.charCodeAt(0))) {
             result += `<a href="#" class="kanji-link">${c}</a>`;
         } else {
             result += c;

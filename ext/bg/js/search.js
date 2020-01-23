@@ -265,7 +265,7 @@ class DisplaySearch extends Display {
                 text !== this.clipboardPreviousText
             ) {
                 this.clipboardPreviousText = text;
-                if (jpIsAnyCharacterJapanese(text)) {
+                if (jpIsStringPartiallyJapanese(text)) {
                     this.setQuery(this.isWanakanaEnabled() ? window.wanakana.toKana(text) : text);
                     window.history.pushState(null, '', `${window.location.pathname}?query=${encodeURIComponent(text)}`);
                     this.onSearchQueryUpdated(this.query.value, true);

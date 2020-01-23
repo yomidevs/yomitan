@@ -590,8 +590,7 @@ class Translator {
         if (!options.scanning.alphanumeric) {
             const ii = text.length;
             for (let i = 0; i < ii; ++i) {
-                const c = text[i];
-                if (!jpIsCharacterJapanese(c)) {
+                if (!jpIsCharCodeJapanese(text.charCodeAt(i))) {
                     text = text.substring(0, i);
                     break;
                 }

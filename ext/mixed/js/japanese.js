@@ -162,52 +162,6 @@ function jpIsStringPartiallyJapanese(str) {
 }
 
 
-// Old character/string testing functions
-
-function jpIsKanji(c) {
-    const code = c.charCodeAt(0);
-    return (
-        (code >= 0x4e00 && code < 0x9fb0) ||
-        (code >= 0x3400 && code < 0x4dc0)
-    );
-}
-
-function jpIsKana(c) {
-    const code = c.charCodeAt(0);
-    return (
-        (code >= 0x3041 && code <= 0x3096) || // hiragana
-        (code >= 0x30a1 && code <= 0x30fc) // katakana
-    );
-}
-
-function jpIsCharFullWidth(c) {
-    const code = c.charCodeAt(0);
-    return (
-        (code >= 0xff21 && code <= 0xff3a) || // full width upper case roman letters
-        (code >= 0xff41 && code <= 0xff3a) || // full width upper case roman letters
-        (code >= 0xff10 && code <= 0xff19) // full width numbers
-    );
-}
-
-function jpIsKanaHalfWidth(c) {
-    const code = c.charCodeAt(0);
-    return (code >= 0xff66 && code <= 0xff9f); // half width katakana
-}
-
-function jpIsCharacterJapanese(c) {
-    return jpIsKanji(c) || jpIsKana(c) || jpIsCharFullWidth(c) || jpIsKanaHalfWidth(c);
-}
-
-function jpIsAnyCharacterJapanese(text) {
-    for (const c of text) {
-        if (jpIsCharacterJapanese(c)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-
 // Conversion functions
 
 function jpKatakanaToHiragana(text) {
@@ -250,7 +204,7 @@ function jpConvertReading(expressionFragment, readingFragment, readingMode) {
             if (readingFragment) {
                 return jpToRomaji(readingFragment);
             } else {
-                if (jpIsKana(expressionFragment)) {
+                if (jpIsStringEntirelyKana(expressionFragment)) {
                     return jpToRomaji(expressionFragment);
                 }
             }
@@ -307,7 +261,8 @@ function jpDistributeFurigana(expression, reading) {
     const groups = [];
     let modePrev = null;
     for (const c of expression) {
-        const modeCurr = jpIsKanji(c) || c.charCodeAt(0) === 0x3005 /* noma */ ? 'kanji' : 'kana';
+        const charCode = c.charCodeAt(0);
+        const modeCurr = jpIsCharCodeKanji(charCode) || charCode === JP_ITERATION_MARK_CHAR_CODE ? 'kanji' : 'kana';
         if (modeCurr === modePrev) {
             groups[groups.length - 1].text += c;
         } else {
