@@ -112,6 +112,58 @@ const JP_JAPANESE_RANGES = [
 ];
 
 
+// Helper functions
+
+function _jpIsCharCodeInRanges(charCode, ranges) {
+    for (const [min, max] of ranges) {
+        if (charCode >= min && charCode <= max) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+// Character code testing functions
+
+function jpIsCharCodeKanji(charCode) {
+    return _jpIsCharCodeInRanges(charCode, JP_CJK_RANGES);
+}
+
+function jpIsCharCodeKana(charCode) {
+    return _jpIsCharCodeInRanges(charCode, JP_KANA_RANGES);
+}
+
+function jpIsCharCodeJapanese(charCode) {
+    return _jpIsCharCodeInRanges(charCode, JP_JAPANESE_RANGES);
+}
+
+
+// String testing functions
+
+function jpIsStringEntirelyKana(str) {
+    if (str.length === 0) { return false; }
+    for (let i = 0, ii = str.length; i < ii; ++i) {
+        if (!jpIsCharCodeKana(str.charCodeAt(i))) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function jpIsStringPartiallyJapanese(str) {
+    if (str.length === 0) { return false; }
+    for (let i = 0, ii = str.length; i < ii; ++i) {
+        if (jpIsCharCodeJapanese(str.charCodeAt(i))) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+// Old character/string testing functions
+
 function jpIsKanji(c) {
     const code = c.charCodeAt(0);
     return (
@@ -154,6 +206,9 @@ function jpIsAnyCharacterJapanese(text) {
     }
     return false;
 }
+
+
+// Conversion functions
 
 function jpKatakanaToHiragana(text) {
     let result = '';
