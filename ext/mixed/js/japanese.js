@@ -17,7 +17,7 @@
  */
 
 
-const jpHalfWidthCharacterMapping = new Map([
+const JP_HALFWIDTH_KATAKANA_MAPPING = new Map([
     ['ｦ', 'ヲヺ-'],
     ['ｧ', 'ァ--'],
     ['ｨ', 'ィ--'],
@@ -75,6 +75,7 @@ const jpHalfWidthCharacterMapping = new Map([
     ['ﾜ', 'ワ--'],
     ['ﾝ', 'ン--']
 ]);
+
 
 function jpIsKanji(c) {
     const code = c.charCodeAt(0);
@@ -267,7 +268,7 @@ function jpConvertHalfWidthKanaToFullWidth(text, sourceMapping) {
 
     for (let i = 0; i < ii; ++i) {
         const c = text[i];
-        const mapping = jpHalfWidthCharacterMapping.get(c);
+        const mapping = JP_HALFWIDTH_KATAKANA_MAPPING.get(c);
         if (typeof mapping !== 'string') {
             result += c;
             continue;
