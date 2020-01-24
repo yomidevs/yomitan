@@ -323,6 +323,7 @@ function profileOptionsCreateDefaults() {
             convertHalfWidthCharacters: 'false',
             convertNumericCharacters: 'false',
             convertAlphabeticCharacters: 'false',
+            convertHiraganaToKatakana: 'false',
             convertKatakanaToHiragana: 'variant'
         },
 

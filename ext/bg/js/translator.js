@@ -326,12 +326,13 @@ class Translator {
             Translator.getTextOptionEntryVariants(translationOptions.convertHalfWidthCharacters),
             Translator.getTextOptionEntryVariants(translationOptions.convertNumericCharacters),
             Translator.getTextOptionEntryVariants(translationOptions.convertAlphabeticCharacters),
+            Translator.getTextOptionEntryVariants(translationOptions.convertHiraganaToKatakana),
             Translator.getTextOptionEntryVariants(translationOptions.convertKatakanaToHiragana)
         ];
 
         const deinflections = [];
         const used = new Set();
-        for (const [halfWidth, numeric, alphabetic, hiragana] of Translator.getArrayVariants(textOptionVariantArray)) {
+        for (const [halfWidth, numeric, alphabetic, katakana, hiragana] of Translator.getArrayVariants(textOptionVariantArray)) {
             let text2 = text;
             let sourceMapping = null;
             if (halfWidth) {
@@ -344,6 +345,9 @@ class Translator {
             if (alphabetic) {
                 if (sourceMapping === null) { sourceMapping = Translator.createTextSourceMapping(text2); }
                 text2 = jpConvertAlphabeticToKana(text2, sourceMapping);
+            }
+            if (katakana) {
+                text2 = jpHiraganaToKatakana(text2);
             }
             if (hiragana) {
                 text2 = jpKatakanaToHiragana(text2);

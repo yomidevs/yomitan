@@ -357,6 +357,7 @@
                                     "convertHalfWidthCharacters",
                                     "convertNumericCharacters",
                                     "convertAlphabeticCharacters",
+                                    "convertHiraganaToKatakana",
                                     "convertKatakanaToHiragana"
                                 ],
                                 "properties": {
@@ -371,6 +372,11 @@
                                         "default": "false"
                                     },
                                     "convertAlphabeticCharacters": {
+                                        "type": "string",
+                                        "enum": ["false", "true", "variant"],
+                                        "default": "false"
+                                    },
+                                    "convertHiraganaToKatakana": {
                                         "type": "string",
                                         "enum": ["false", "true", "variant"],
                                         "default": "false"
