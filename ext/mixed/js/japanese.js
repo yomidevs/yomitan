@@ -375,15 +375,16 @@ function jpConvertAlphabeticToKana(text, sourceMapping) {
     }
 
     for (let i = 0; i < ii; ++i) {
+        // Note: 0x61 is the character code for 'a'
         let c = text.charCodeAt(i);
         if (c >= 0x41 && c <= 0x5a) { // ['A', 'Z']
-            c -= 0x41;
+            c += (0x61 - 0x41);
         } else if (c >= 0x61 && c <= 0x7a) { // ['a', 'z']
-            c -= 0x61;
-        } else if (c >= 0xff21 && c <= 0xff3a) { // ['A', 'Z'] full width
-            c -= 0xff21;
-        } else if (c >= 0xff41 && c <= 0xff5a) { // ['a', 'z'] full width
-            c -= 0xff41;
+            // NOP; c += (0x61 - 0x61);
+        } else if (c >= 0xff21 && c <= 0xff3a) { // ['A', 'Z'] fullwidth
+            c += (0x61 - 0xff21);
+        } else if (c >= 0xff41 && c <= 0xff5a) { // ['a', 'z'] fullwidth
+            c += (0x61 - 0xff41);
         } else {
             if (part.length > 0) {
                 result += jpToHiragana(part, sourceMapping, result.length);
@@ -392,7 +393,7 @@ function jpConvertAlphabeticToKana(text, sourceMapping) {
             result += text[i];
             continue;
         }
-        part += String.fromCharCode(c + 0x61); // + 'a'
+        part += String.fromCharCode(c);
     }
 
     if (part.length > 0) {
