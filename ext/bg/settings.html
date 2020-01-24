@@ -400,6 +400,32 @@
             <div>
                 <h3>Translation Options</h3>
 
+                <p class="help-block">
+                    The following options can be used during the translation process to provide alternate versions of the input text to search for.
+                    This can be helpful when the input text doesn't exactly match the term or expression found in the database.
+                </p>
+
+                <p class="help-block">
+                    The conversion options below are listed in the order that the conversions are applied to the input text.
+                    Each conversion has three possible values:
+                </p>
+
+                <ul class="help-block">
+                    <li>
+                        <strong>Disabled</strong><br>
+                        This conversion will never be applied to the input text.
+                    </li>
+                    <li>
+                        <strong>Enabled</strong><br>
+                        This conversion will always be applied to the input text.
+                    </li>
+                    <li>
+                        <strong>Use both variants</strong><br>
+                        The translator will check the database for two variations: the raw input text and the converted input text.
+                        When multiple options use variants, the translator will search for combinations of the converted text.
+                    </li>
+                </ul>
+
                 <div class="form-group">
                     <label for="translation-convert-half-width-characters">Convert half width characters to full width <span class="label-light">(ﾖﾐﾁｬﾝ &rarr; ヨミチャン)</span></label>
                     <select class="form-control" id="translation-convert-half-width-characters">
