@@ -385,6 +385,8 @@ function jpConvertAlphabeticToKana(text, sourceMapping) {
             c += (0x61 - 0xff21);
         } else if (c >= 0xff41 && c <= 0xff5a) { // ['a', 'z'] fullwidth
             c += (0x61 - 0xff41);
+        } else if (c === 0x2d || c === 0xff0d) { // '-' or fullwidth dash
+            c = 0x2d; // '-'
         } else {
             if (part.length > 0) {
                 result += jpToHiragana(part, sourceMapping, result.length);
