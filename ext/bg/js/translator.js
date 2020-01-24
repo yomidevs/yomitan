@@ -323,27 +323,31 @@ class Translator {
     getAllDeinflections(text, options) {
         const translationOptions = options.translation;
         const textOptionVariantArray = [
-            Translator.getTextOptionEntryVariants(translationOptions.convertKatakanaToHiragana),
             Translator.getTextOptionEntryVariants(translationOptions.convertHalfWidthCharacters),
             Translator.getTextOptionEntryVariants(translationOptions.convertNumericCharacters),
-            Translator.getTextOptionEntryVariants(translationOptions.convertAlphabeticCharacters)
+            Translator.getTextOptionEntryVariants(translationOptions.convertAlphabeticCharacters),
+            Translator.getTextOptionEntryVariants(translationOptions.convertKatakanaToHiragana)
         ];
 
         const deinflections = [];
         const used = new Set();
-        for (const [hiragana, halfWidth, numeric, alphabetic] of Translator.getArrayVariants(textOptionVariantArray)) {
+        for (const [halfWidth, numeric, alphabetic, hiragana] of Translator.getArrayVariants(textOptionVariantArray)) {
             let text2 = text;
             let sourceMapping = null;
             if (halfWidth) {
                 if (sourceMapping === null) { sourceMapping = Translator.createTextSourceMapping(text2); }
                 text2 = jpConvertHalfWidthKanaToFullWidth(text2, sourceMapping);
             }
-            if (numeric) { text2 = jpConvertNumericTofullWidth(text2); }
+            if (numeric) {
+                text2 = jpConvertNumericTofullWidth(text2);
+            }
             if (alphabetic) {
                 if (sourceMapping === null) { sourceMapping = Translator.createTextSourceMapping(text2); }
                 text2 = jpConvertAlphabeticToKana(text2, sourceMapping);
             }
-            if (hiragana) { text2 = jpKatakanaToHiragana(text2); }
+            if (hiragana) {
+                text2 = jpKatakanaToHiragana(text2);
+            }
 
             for (let i = text2.length; i > 0; --i) {
                 const text2Substring = text2.substring(0, i);

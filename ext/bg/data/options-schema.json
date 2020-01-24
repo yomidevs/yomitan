@@ -354,17 +354,12 @@
                             "translation": {
                                 "type": "object",
                                 "required": [
-                                    "convertKatakanaToHiragana",
                                     "convertHalfWidthCharacters",
                                     "convertNumericCharacters",
-                                    "convertAlphabeticCharacters"
+                                    "convertAlphabeticCharacters",
+                                    "convertKatakanaToHiragana"
                                 ],
                                 "properties": {
-                                    "convertKatakanaToHiragana": {
-                                        "type": "string",
-                                        "enum": ["false", "true", "variant"],
-                                        "default": "variant"
-                                    },
                                     "convertHalfWidthCharacters": {
                                         "type": "string",
                                         "enum": ["false", "true", "variant"],
@@ -379,6 +374,11 @@
                                         "type": "string",
                                         "enum": ["false", "true", "variant"],
                                         "default": "false"
+                                    },
+                                    "convertKatakanaToHiragana": {
+                                        "type": "string",
+                                        "enum": ["false", "true", "variant"],
+                                        "default": "variant"
                                     }
                                 }
                             },

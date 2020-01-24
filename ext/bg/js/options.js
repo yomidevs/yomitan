@@ -320,10 +320,10 @@ function profileOptionsCreateDefaults() {
         },
 
         translation: {
-            convertKatakanaToHiragana: 'variant',
             convertHalfWidthCharacters: 'false',
             convertNumericCharacters: 'false',
-            convertAlphabeticCharacters: 'false'
+            convertAlphabeticCharacters: 'false',
+            convertKatakanaToHiragana: 'variant'
         },
 
         dictionaries: {},
