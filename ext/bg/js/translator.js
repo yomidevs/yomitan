@@ -290,17 +290,15 @@ class Translator {
 
         const uniqueDeinflectionTerms = [];
         const uniqueDeinflectionArrays = [];
-        const uniqueDeinflectionsMap = {};
+        const uniqueDeinflectionsMap = new Map();
         for (const deinflection of deinflections) {
             const term = deinflection.term;
-            let deinflectionArray;
-            if (hasOwn(uniqueDeinflectionsMap, term)) {
-                deinflectionArray = uniqueDeinflectionsMap[term];
-            } else {
+            let deinflectionArray = uniqueDeinflectionsMap.get(term);
+            if (typeof deinflectionArray === 'undefined') {
                 deinflectionArray = [];
                 uniqueDeinflectionTerms.push(term);
                 uniqueDeinflectionArrays.push(deinflectionArray);
-                uniqueDeinflectionsMap[term] = deinflectionArray;
+                uniqueDeinflectionsMap.set(term, deinflectionArray);
             }
             deinflectionArray.push(deinflection);
         }
