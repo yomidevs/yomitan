@@ -155,6 +155,7 @@ async function formWrite(options) {
 
     $('#parsing-scan-enable').prop('checked', options.parsing.enableScanningParser);
     $('#parsing-mecab-enable').prop('checked', options.parsing.enableMecabParser);
+    $('#parsing-term-spacing').prop('checked', options.parsing.termSpacing);
     $('#parsing-reading-mode').val(options.parsing.readingMode);
 
     $('#anki-enable').prop('checked', options.anki.enable);
