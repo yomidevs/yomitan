@@ -225,7 +225,7 @@ class Database {
     }
 
     async findTermMetaBulk(termList, titles) {
-        return this.findGenericBulk('termMeta', 'expression', termList, titles, Database.createMeta);
+        return this.findGenericBulk('termMeta', 'expression', termList, titles, Database.createTermMeta);
     }
 
     async findKanjiBulk(kanjiList, titles) {
@@ -233,7 +233,7 @@ class Database {
     }
 
     async findKanjiMetaBulk(kanjiList, titles) {
-        return this.findGenericBulk('kanjiMeta', 'character', kanjiList, titles, Database.createMeta);
+        return this.findGenericBulk('kanjiMeta', 'character', kanjiList, titles, Database.createKanjiMeta);
     }
 
     async findGenericBulk(tableName, indexName, indexValueList, titles, createResult) {
@@ -632,13 +632,12 @@ class Database {
         };
     }
 
-    static createMeta(row, index) {
-        return {
-            index,
-            mode: row.mode,
-            data: row.data,
-            dictionary: row.dictionary
-        };
+    static createTermMeta({expression, mode, data, dictionary}, index) {
+        return {expression, mode, data, dictionary, index};
+    }
+
+    static createKanjiMeta({character, mode, data, dictionary}, index) {
+        return {character, mode, data, dictionary, index};
     }
 
     static getAll(dbIndex, query, context, processRow) {
