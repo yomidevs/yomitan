@@ -132,7 +132,7 @@ html:root[data-yomichan-page=float] .navigation-header:not([hidden])~.navigation
     font-size: 2em;
 }
 
-.query-parser-term {
+#query-parser[data-term-spacing=true] .query-parser-term {
     margin-right: 0.2em;
 }
 

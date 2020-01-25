@@ -74,6 +74,7 @@ async function formRead(options) {
 
     options.parsing.enableScanningParser = $('#parsing-scan-enable').prop('checked');
     options.parsing.enableMecabParser = $('#parsing-mecab-enable').prop('checked');
+    options.parsing.termSpacing = $('#parsing-term-spacing').prop('checked');
     options.parsing.readingMode = $('#parsing-reading-mode').val();
 
     const optionsAnkiEnableOld = options.anki.enable;

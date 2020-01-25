@@ -381,6 +381,7 @@
                                     "enableScanningParser",
                                     "enableMecabParser",
                                     "selectedParser",
+                                    "termSpacing",
                                     "readingMode"
                                 ],
                                 "properties": {
@@ -395,6 +396,10 @@
                                     "selectedParser": {
                                         "type": ["string", "null"],
                                         "default": null
+                                    },
+                                    "termSpacing": {
+                                        "type": "boolean",
+                                        "default": true
                                     },
                                     "readingMode": {
                                         "type": "string",
