@@ -301,22 +301,28 @@ class DisplayGenerator {
         }
     }
 
-    static _appendMultiple(container, createItem, detailsArray, fallback=[]) {
+    static _appendMultiple(container, createItem, detailsIterable, fallback=[]) {
         if (container === null) { return 0; }
 
-        const isArray = Array.isArray(detailsArray);
-        if (!isArray) { detailsArray = fallback; }
+        const multi = (
+            detailsIterable !== null &&
+            typeof detailsIterable === 'object' &&
+            typeof detailsIterable[Symbol.iterator] !== 'undefined'
+        );
+        if (!multi) { detailsIterable = fallback; }
 
-        container.dataset.multi = `${isArray}`;
-        container.dataset.count = `${detailsArray.length}`;
-
-        for (const details of detailsArray) {
+        let count = 0;
+        for (const details of detailsIterable) {
             const item = createItem(details);
             if (item === null) { continue; }
             container.appendChild(item);
+            ++count;
         }
 
-        return detailsArray.length;
+        container.dataset.multi = `${multi}`;
+        container.dataset.count = `${count}`;
+
+        return count;
     }
 
     static _appendFurigana(container, segments, addText) {
