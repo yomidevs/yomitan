@@ -453,20 +453,21 @@ class Translator {
         // Create mapping of unique terms
         const expressionsUnique = [];
         const termsUnique = [];
-        const termsUniqueMap = {};
+        const termsUniqueMap = new Map();
         for (let i = 0, ii = terms.length; i < ii; ++i) {
             const term = terms[i];
             const expression = term.expression;
-            term.frequencies = [];
-
-            if (hasOwn(termsUniqueMap, expression)) {
-                termsUniqueMap[expression].push(term);
-            } else {
-                const termList = [term];
+            let termList = termsUniqueMap.get(expression);
+            if (typeof termList === 'undefined') {
+                termList = [];
                 expressionsUnique.push(expression);
                 termsUnique.push(termList);
                 termsUniqueMap[expression] = termList;
             }
+            termList.push(term);
+
+            // New data
+            term.frequencies = [];
         }
 
         const metas = await this.database.findTermMetaBulk(expressionsUnique, titles);
