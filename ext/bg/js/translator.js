@@ -412,26 +412,18 @@ class Translator {
             definitions.sort((a, b) => a.index - b.index);
         }
 
-        const kanjiList2 = [];
         for (const definition of definitions) {
-            kanjiList2.push(definition.character);
-
             const tags = await this.expandTags(definition.tags, definition.dictionary);
             tags.push(dictTagBuildSource(definition.dictionary));
+            dictTagsSort(tags);
 
-            definition.tags = dictTagsSort(tags);
-            definition.stats = await this.expandStats(definition.stats, definition.dictionary);
-            definition.frequencies = [];
+            const stats = await this.expandStats(definition.stats, definition.dictionary);
+
+            definition.tags = tags;
+            definition.stats = stats;
         }
 
-        const metas = await this.database.findKanjiMetaBulk(kanjiList2, titles);
-        for (const {character, mode, data, dictionary, index} of metas) {
-            switch (mode) {
-                case 'freq':
-                    definitions[index].frequencies.push({character, frequency: data, dictionary});
-                    break;
-            }
-        }
+        await this.buildKanjiMeta(definitions, titles);
 
         return definitions;
     }
@@ -477,6 +469,23 @@ class Translator {
                     for (const term of termsUnique[index]) {
                         term.frequencies.push({expression, frequency: data, dictionary});
                     }
+                    break;
+            }
+        }
+    }
+
+    async buildKanjiMeta(definitions, titles) {
+        const kanjiList = [];
+        for (const definition of definitions) {
+            kanjiList.push(definition.character);
+            definition.frequencies = [];
+        }
+
+        const metas = await this.database.findKanjiMetaBulk(kanjiList, titles);
+        for (const {character, mode, data, dictionary, index} of metas) {
+            switch (mode) {
+                case 'freq':
+                    definitions[index].frequencies.push({character, frequency: data, dictionary});
                     break;
             }
         }
