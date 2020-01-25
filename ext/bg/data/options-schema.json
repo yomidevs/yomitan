@@ -419,6 +419,7 @@
                                     "enableScanningParser",
                                     "enableMecabParser",
                                     "selectedParser",
+                                    "termSpacing",
                                     "readingMode"
                                 ],
                                 "properties": {
@@ -434,9 +435,13 @@
                                         "type": ["string", "null"],
                                         "default": null
                                     },
+                                    "termSpacing": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
                                     "readingMode": {
                                         "type": "string",
-                                        "enum": ["hiragana", "katakana", "romaji"],
+                                        "enum": ["hiragana", "katakana", "romaji", "none"],
                                         "default": "hiragana"
                                     }
                                 }

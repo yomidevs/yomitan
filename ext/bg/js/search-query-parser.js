@@ -88,6 +88,11 @@ class QueryParser extends TextScanner {
         ];
     }
 
+    setOptions(options) {
+        super.setOptions(options);
+        this.queryParser.dataset.termSpacing = `${options.parsing.termSpacing}`;
+    }
+
     refreshSelectedParser() {
         if (this.parseResults.length > 0) {
             if (this.selectedParser === null) {

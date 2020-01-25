@@ -209,6 +209,8 @@ function jpConvertReading(expressionFragment, readingFragment, readingMode) {
                 }
             }
             return readingFragment;
+        case 'none':
+            return null;
         default:
             return readingFragment;
     }
