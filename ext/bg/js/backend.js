@@ -585,8 +585,7 @@ class Backend {
     async _onCommandSearch(params) {
         const {mode, query} = params || {};
 
-        const optionsContext = {depth: 0};
-        const options = await this.getOptions(optionsContext);
+        const options = await this.getOptions(this.optionsContext);
         const {popupWidth, popupHeight} = options.general;
 
         const baseUrl = chrome.runtime.getURL('/bg/search.html');
