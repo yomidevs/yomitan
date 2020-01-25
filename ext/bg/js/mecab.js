@@ -20,7 +20,7 @@
 class Mecab {
     constructor() {
         this.port = null;
-        this.listeners = {};
+        this.listeners = new Map();
         this.sequence = 0;
     }
 
@@ -55,17 +55,18 @@ class Mecab {
         if (this.port === null) { return; }
         this.port.disconnect();
         this.port = null;
-        this.listeners = {};
+        this.listeners.clear();
         this.sequence = 0;
     }
 
     onNativeMessage({sequence, data}) {
-        if (hasOwn(this.listeners, sequence)) {
-            const {callback, timer} = this.listeners[sequence];
-            clearTimeout(timer);
-            callback(data);
-            delete this.listeners[sequence];
-        }
+        const listener = this.listeners.get(sequence);
+        if (typeof listener === 'undefined') { return; }
+
+        const {callback, timer} = listener;
+        clearTimeout(timer);
+        callback(data);
+        this.listeners.delete(sequence);
     }
 
     invoke(action, params) {
@@ -75,13 +76,13 @@ class Mecab {
         return new Promise((resolve, reject) => {
             const sequence = this.sequence++;
 
-            this.listeners[sequence] = {
+            this.listeners.set(sequence, {
                 callback: resolve,
                 timer: setTimeout(() => {
-                    delete this.listeners[sequence];
+                    this.listeners.delete(sequence);
                     reject(new Error(`Mecab invoke timed out in ${Mecab.timeout} ms`));
                 }, Mecab.timeout)
-            };
+            });
 
             this.port.postMessage({action, params, sequence});
         });
