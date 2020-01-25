@@ -30,12 +30,12 @@ function setupButtonEvents(selector, command, url) {
     for (const node of nodes) {
         node.addEventListener('click', (e) => {
             if (e.button !== 0) { return; }
-            apiCommandExec(command, {newTab: e.ctrlKey});
+            apiCommandExec(command, {mode: e.ctrlKey ? 'newTab' : 'sameTab'});
             e.preventDefault();
         }, false);
         node.addEventListener('auxclick', (e) => {
             if (e.button !== 1) { return; }
-            apiCommandExec(command, {newTab: true});
+            apiCommandExec(command, {mode: 'newTab'});
             e.preventDefault();
         }, false);
 

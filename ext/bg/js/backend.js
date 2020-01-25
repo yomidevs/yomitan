@@ -33,6 +33,7 @@ class Backend {
         this.isPreparedPromise = new Promise((resolve) => (this.isPreparedResolve = resolve));
 
         this.clipboardPasteTarget = document.querySelector('#clipboard-paste-target');
+        this.popupWindow = null;
 
         this.apiForwarder = new BackendApiForwarder();
     }
@@ -565,23 +566,46 @@ class Backend {
     // Command handlers
 
     async _onCommandSearch(params) {
-        const url = chrome.runtime.getURL('/bg/search.html');
-        if (!(params && params.newTab)) {
-            try {
-                const tab = await Backend._findTab(1000, (url2) => (
-                    url2 !== null &&
-                    url2.startsWith(url) &&
-                    (url2.length === url.length || url2[url.length] === '?' || url2[url.length] === '#')
-                ));
-                if (tab !== null) {
-                    await Backend._focusTab(tab);
-                    return;
+        const {mode, query} = params || {};
+
+        const optionsContext = {depth: 0};
+        const options = await this.getOptions(optionsContext);
+        const {popupWidth, popupHeight} = options.general;
+
+        const baseUrl = chrome.runtime.getURL('/bg/search.html');
+        const queryString = (query && query.length > 0) ? `?query=${encodeURIComponent(query)}` : '';
+        const url = baseUrl + queryString;
+
+        switch (mode) {
+            case 'sameTab':
+                try {
+                    const tab = await Backend._findTab(1000, (url2) => (
+                        url2 !== null &&
+                        url2.startsWith(url) &&
+                        (url2.length === url.length || url2[url.length] === '?' || url2[url.length] === '#')
+                    ));
+                    if (tab !== null) {
+                        await Backend._focusTab(tab);
+                        return;
+                    }
+                } catch (e) {
+                    // NOP
                 }
-            } catch (e) {
-                // NOP
-            }
+                chrome.tabs.create({url});
+                return;
+            case 'newTab':
+                chrome.tabs.create({url});
+                return;
+            case 'popup':
+                if (this.popupWindow !== null) {
+                    chrome.windows.remove(this.popupWindow.id);
+                }
+                chrome.windows.create(
+                    {url, width: popupWidth, height: popupHeight, type: 'popup'},
+                    (popupWindow) => { this.popupWindow = popupWindow; }
+                );
+                return;
         }
-        chrome.tabs.create({url});
     }
 
     _onCommandHelp() {
