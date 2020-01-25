@@ -333,6 +333,7 @@ function profileOptionsCreateDefaults() {
             enableScanningParser: true,
             enableMecabParser: false,
             selectedParser: null,
+            termSpacing: true,
             readingMode: 'hiragana'
         },
 
