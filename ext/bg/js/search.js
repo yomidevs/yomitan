@@ -36,8 +36,6 @@ class DisplaySearch extends Display {
         this.introVisible = true;
         this.introAnimationTimer = null;
 
-        this.isFirefox = false;
-
         this.clipboardMonitorTimerId = null;
         this.clipboardMonitorTimerToken = null;
         this.clipboardInterval = 250;
@@ -53,7 +51,6 @@ class DisplaySearch extends Display {
     async prepare() {
         try {
             await this.initialize();
-            this.isFirefox = await DisplaySearch._isFirefox();
 
             if (this.search !== null) {
                 this.search.addEventListener('click', (e) => this.onSearch(e), false);
@@ -250,13 +247,18 @@ class DisplaySearch extends Display {
 
     startClipboardMonitor() {
         // The token below is used as a unique identifier to ensure that a new clipboard monitor
-        // hasn't been started during the await call. The check below the await this.getClipboardText()
+        // hasn't been started during the await call. The check below the await apiClipboardGet()
         // call will exit early if the reference has changed.
         const token = {};
         const intervalCallback = async () => {
             this.clipboardMonitorTimerId = null;
 
-            let text = await this.getClipboardText();
+            let text = null;
+            try {
+                text = await apiClipboardGet();
+            } catch (e) {
+                // NOP
+            }
             if (this.clipboardMonitorTimerToken !== token) { return; }
 
             if (
@@ -285,27 +287,6 @@ class DisplaySearch extends Display {
         if (this.clipboardMonitorTimerId !== null) {
             clearTimeout(this.clipboardMonitorTimerId);
             this.clipboardMonitorTimerId = null;
-        }
-    }
-
-    async getClipboardText() {
-        /*
-        Notes:
-            apiClipboardGet doesn't work on Firefox because document.execCommand('paste')
-            results in an empty string on the web extension background page.
-            This may be a bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1603985
-            Therefore, navigator.clipboard.readText() is used on Firefox.
-
-            navigator.clipboard.readText() can't be used in Chrome for two reasons:
-            * Requires page to be focused, else it rejects with an exception.
-            * When the page is focused, Chrome will request clipboard permission, despite already
-              being an extension with clipboard permissions. It effectively asks for the
-              non-extension permission for clipboard access.
-        */
-        try {
-            return this.isFirefox ? await navigator.clipboard.readText() : await apiClipboardGet();
-        } catch (e) {
-            return null;
         }
     }
 
@@ -398,17 +379,6 @@ class DisplaySearch extends Display {
     static getSearchQueryFromLocation(url) {
         const match = /^[^?#]*\?(?:[^&#]*&)?query=([^&#]*)/.exec(url);
         return match !== null ? decodeURIComponent(match[1]) : null;
-    }
-
-    static async _isFirefox() {
-        const {browser} = await apiGetEnvironmentInfo();
-        switch (browser) {
-            case 'firefox':
-            case 'firefox-mobile':
-                return true;
-            default:
-                return false;
-        }
     }
 }
 

@@ -522,13 +522,30 @@ class Backend {
     }
 
     async _onApiClipboardGet() {
-        const clipboardPasteTarget = this.clipboardPasteTarget;
-        clipboardPasteTarget.value = '';
-        clipboardPasteTarget.focus();
-        document.execCommand('paste');
-        const result = clipboardPasteTarget.value;
-        clipboardPasteTarget.value = '';
-        return result;
+        /*
+        Notes:
+            document.execCommand('paste') doesn't work on Firefox.
+            This may be a bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1603985
+            Therefore, navigator.clipboard.readText() is used on Firefox.
+
+            navigator.clipboard.readText() can't be used in Chrome for two reasons:
+            * Requires page to be focused, else it rejects with an exception.
+            * When the page is focused, Chrome will request clipboard permission, despite already
+              being an extension with clipboard permissions. It effectively asks for the
+              non-extension permission for clipboard access.
+        */
+        const browser = await Backend._getBrowser();
+        if (browser === 'firefox' || browser === 'firefox-mobile') {
+            return await navigator.clipboard.readText();
+        } else {
+            const clipboardPasteTarget = this.clipboardPasteTarget;
+            clipboardPasteTarget.value = '';
+            clipboardPasteTarget.focus();
+            document.execCommand('paste');
+            const result = clipboardPasteTarget.value;
+            clipboardPasteTarget.value = '';
+            return result;
+        }
     }
 
     async _onApiGetDisplayTemplatesHtml() {
