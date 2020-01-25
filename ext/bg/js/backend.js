@@ -34,6 +34,9 @@ class Backend {
 
         this.clipboardPasteTarget = document.querySelector('#clipboard-paste-target');
         this.popupWindow = null;
+        this.clipboardPopupTimerId = null;
+        this.clipboardInterval = 250;
+        this.clipboardPreviousText = null;
 
         this.apiForwarder = new BackendApiForwarder();
     }
@@ -121,6 +124,20 @@ class Backend {
             this.mecab.startListener();
         } else {
             this.mecab.stopListener();
+        }
+
+        window.clearInterval(this.clipboardPopupTimerId);
+        if (options.general.enableClipboardPopups) {
+            this.clipboardPopupTimerId = setInterval(() => {
+                this._onApiClipboardGet()
+                .then((result) => {
+                    if (this.clipboardPreviousText === result) {
+                        return;
+                    }
+                    this._onCommandSearch({mode: 'popup', query: result});
+                    this.clipboardPreviousText = result;
+                });
+            }, this.clipboardInterval);
         }
     }
 

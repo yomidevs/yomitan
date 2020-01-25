@@ -28,6 +28,7 @@ function getOptionsFullMutable() {
 
 async function formRead(options) {
     options.general.enable = $('#enable').prop('checked');
+    options.general.enableClipboardPopups = $('#enable-clipboard-popups').prop('checked');
     options.general.showGuide = $('#show-usage-guide').prop('checked');
     options.general.compactTags = $('#compact-tags').prop('checked');
     options.general.compactGlossaries = $('#compact-glossaries').prop('checked');
