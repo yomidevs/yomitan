@@ -424,13 +424,13 @@ class Translator {
             definition.frequencies = [];
         }
 
-        for (const meta of await this.database.findKanjiMetaBulk(kanjiList2, titles)) {
-            if (meta.mode !== 'freq') { continue; }
-            definitions[meta.index].frequencies.push({
-                character: meta.character,
-                frequency: meta.data,
-                dictionary: meta.dictionary
-            });
+        const metas = await this.database.findKanjiMetaBulk(kanjiList2, titles);
+        for (const {character, mode, data, dictionary, index} of metas) {
+            switch (mode) {
+                case 'freq':
+                    definitions[index].frequencies.push({character, frequency: data, dictionary});
+                    break;
+            }
         }
 
         return definitions;
@@ -471,17 +471,13 @@ class Translator {
         }
 
         const metas = await this.database.findTermMetaBulk(expressionsUnique, titles);
-        for (const meta of metas) {
-            if (meta.mode !== 'freq') {
-                continue;
-            }
-
-            for (const term of termsUnique[meta.index]) {
-                term.frequencies.push({
-                    expression: meta.expression,
-                    frequency: meta.data,
-                    dictionary: meta.dictionary
-                });
+        for (const {expression, mode, data, dictionary, index} of metas) {
+            switch (mode) {
+                case 'freq':
+                    for (const term of termsUnique[index]) {
+                        term.frequencies.push({expression, frequency: data, dictionary});
+                    }
+                    break;
             }
         }
     }
