@@ -148,7 +148,7 @@ class SettingsPopupPreview {
 
         const range = document.createRange();
         range.selectNode(textNode);
-        const source = new TextSourceRange(range, range.toString(), null);
+        const source = new TextSourceRange(range, range.toString(), null, null);
 
         try {
             await this.frontend.onSearchSource(source, 'script');
