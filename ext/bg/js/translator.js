@@ -154,7 +154,7 @@ class Translator {
         const [definitions, length] = await this.findTermsInternal(text, dictionaries, details, options);
 
         const definitionsGrouped = dictTermsGroup(definitions, dictionaries);
-        await this.buildTermFrequencies(definitionsGrouped, titles);
+        await this.buildTermMeta(definitionsGrouped, titles);
 
         if (options.general.compactTags) {
             for (const definition of definitionsGrouped) {
@@ -192,7 +192,7 @@ class Translator {
             definitionsMerged.push(groupedDefinition);
         }
 
-        await this.buildTermFrequencies(definitionsMerged, titles);
+        await this.buildTermMeta(definitionsMerged, titles);
 
         if (options.general.compactTags) {
             for (const definition of definitionsMerged) {
@@ -208,7 +208,7 @@ class Translator {
         const titles = Object.keys(dictionaries);
         const [definitions, length] = await this.findTermsInternal(text, dictionaries, details, options);
 
-        await this.buildTermFrequencies(definitions, titles);
+        await this.buildTermMeta(definitions, titles);
 
         return [definitions, length];
     }
@@ -436,7 +436,7 @@ class Translator {
         return definitions;
     }
 
-    async buildTermFrequencies(definitions, titles) {
+    async buildTermMeta(definitions, titles) {
         const terms = [];
         for (const definition of definitions) {
             if (definition.expressions) {
