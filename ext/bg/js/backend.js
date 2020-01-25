@@ -307,8 +307,8 @@ class Backend {
             const [definitions, sourceLength] = await this.translator.findTermsInternal(
                 text.substring(0, options.scanning.length),
                 dictEnabledSet(options),
-                options.scanning.alphanumeric,
-                {}
+                {},
+                options
             );
             if (definitions.length > 0) {
                 dictTermsSort(definitions);
