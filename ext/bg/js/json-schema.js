@@ -532,6 +532,10 @@ class JsonSchema {
         return new Proxy(target, new JsonSchemaProxyHandler(schema));
     }
 
+    static validate(value, schema) {
+        return JsonSchemaProxyHandler.validate(value, schema);
+    }
+
     static getValidValueOrDefault(schema, value) {
         return JsonSchemaProxyHandler.getValidValueOrDefault(schema, value);
     }
