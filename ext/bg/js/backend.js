@@ -22,6 +22,7 @@ class Backend {
         this.translator = new Translator();
         this.anki = new AnkiNull();
         this.mecab = new Mecab();
+        this.clipboardMonitor = new ClipboardMonitor();
         this.options = null;
         this.optionsSchema = null;
         this.optionsContext = {
@@ -33,10 +34,8 @@ class Backend {
         this.isPreparedPromise = new Promise((resolve) => (this.isPreparedResolve = resolve));
 
         this.clipboardPasteTarget = document.querySelector('#clipboard-paste-target');
+
         this.popupWindow = null;
-        this.clipboardPopupTimerId = null;
-        this.clipboardInterval = 250;
-        this.clipboardPreviousText = null;
 
         this.apiForwarder = new BackendApiForwarder();
     }
@@ -71,6 +70,8 @@ class Backend {
         this.isPreparedResolve();
         this.isPreparedResolve = null;
         this.isPreparedPromise = null;
+
+        this.clipboardMonitor.onClipboardText = (text) => this._onClipboardText(text);
     }
 
     onOptionsUpdated(source) {
@@ -101,6 +102,10 @@ class Backend {
         }
     }
 
+    _onClipboardText(text) {
+        this._onCommandSearch({mode: 'popup', query: text});
+    }
+
     _onZoomChange({tabId, oldZoomFactor, newZoomFactor}) {
         const callback = () => this.checkLastError(chrome.runtime.lastError);
         chrome.tabs.sendMessage(tabId, {action: 'zoomChanged', params: {oldZoomFactor, newZoomFactor}}, callback);
@@ -126,18 +131,10 @@ class Backend {
             this.mecab.stopListener();
         }
 
-        window.clearInterval(this.clipboardPopupTimerId);
         if (options.general.enableClipboardPopups) {
-            this.clipboardPopupTimerId = setInterval(() => {
-                this._onApiClipboardGet()
-                .then((result) => {
-                    if (this.clipboardPreviousText === result) {
-                        return;
-                    }
-                    this._onCommandSearch({mode: 'popup', query: result});
-                    this.clipboardPreviousText = result;
-                });
-            }, this.clipboardInterval);
+            this.clipboardMonitor.start();
+        } else {
+            this.clipboardMonitor.stop();
         }
     }
 
