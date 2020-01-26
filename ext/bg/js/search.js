@@ -36,10 +36,7 @@ class DisplaySearch extends Display {
         this.introVisible = true;
         this.introAnimationTimer = null;
 
-        this.clipboardMonitorTimerId = null;
-        this.clipboardMonitorTimerToken = null;
-        this.clipboardInterval = 250;
-        this.clipboardPreviousText = null;
+        this.clipboardMonitor = new ClipboardMonitor();
     }
 
     static create() {
@@ -93,7 +90,7 @@ class DisplaySearch extends Display {
             if (this.clipboardMonitorEnable !== null) {
                 if (this.options.general.enableClipboardMonitor === true) {
                     this.clipboardMonitorEnable.checked = true;
-                    this.startClipboardMonitor();
+                    this.clipboardMonitor.start();
                 } else {
                     this.clipboardMonitorEnable.checked = false;
                 }
@@ -103,7 +100,7 @@ class DisplaySearch extends Display {
                             {permissions: ['clipboardRead']},
                             (granted) => {
                                 if (granted) {
-                                    this.startClipboardMonitor();
+                                    this.clipboardMonitor.start();
                                     apiOptionsSet({general: {enableClipboardMonitor: true}}, this.getOptionsContext());
                                 } else {
                                     e.target.checked = false;
@@ -111,16 +108,18 @@ class DisplaySearch extends Display {
                             }
                         );
                     } else {
-                        this.stopClipboardMonitor();
+                        this.clipboardMonitor.stop();
                         apiOptionsSet({general: {enableClipboardMonitor: false}}, this.getOptionsContext());
                     }
                 });
             }
 
             window.addEventListener('popstate', (e) => this.onPopState(e));
+            window.addEventListener('copy', (e) => this.onCopy(e));
+
+            this.clipboardMonitor.onClipboardText = (text) => this.onClipboardText(text);
 
             this.updateSearchButton();
-            this.initClipboardMonitor();
         } catch (e) {
             this.onError(e);
         }
@@ -199,6 +198,17 @@ class DisplaySearch extends Display {
         }
     }
 
+    onCopy() {
+        // ignore copy from search page
+        this.clipboardMonitor.setPreviousText(document.getSelection().toString().trim());
+    }
+
+    onClipboardText(text) {
+        this.setQuery(this.isWanakanaEnabled() ? window.wanakana.toKana(text) : text);
+        window.history.pushState(null, '', `${window.location.pathname}?query=${encodeURIComponent(text)}`);
+        this.onSearchQueryUpdated(this.query.value, true);
+    }
+
     async onSearchQueryUpdated(query, animate) {
         try {
             const details = {};
@@ -236,58 +246,6 @@ class DisplaySearch extends Display {
     async updateOptions(options) {
         await super.updateOptions(options);
         this.queryParser.setOptions(this.options);
-    }
-
-    initClipboardMonitor() {
-        // ignore copy from search page
-        window.addEventListener('copy', () => {
-            this.clipboardPreviousText = document.getSelection().toString().trim();
-        });
-    }
-
-    startClipboardMonitor() {
-        // The token below is used as a unique identifier to ensure that a new clipboard monitor
-        // hasn't been started during the await call. The check below the await apiClipboardGet()
-        // call will exit early if the reference has changed.
-        const token = {};
-        const intervalCallback = async () => {
-            this.clipboardMonitorTimerId = null;
-
-            let text = null;
-            try {
-                text = await apiClipboardGet();
-            } catch (e) {
-                // NOP
-            }
-            if (this.clipboardMonitorTimerToken !== token) { return; }
-
-            if (
-                typeof text === 'string' &&
-                (text = text.trim()).length > 0 &&
-                text !== this.clipboardPreviousText
-            ) {
-                this.clipboardPreviousText = text;
-                if (jpIsStringPartiallyJapanese(text)) {
-                    this.setQuery(this.isWanakanaEnabled() ? window.wanakana.toKana(text) : text);
-                    window.history.pushState(null, '', `${window.location.pathname}?query=${encodeURIComponent(text)}`);
-                    this.onSearchQueryUpdated(this.query.value, true);
-                }
-            }
-
-            this.clipboardMonitorTimerId = setTimeout(intervalCallback, this.clipboardInterval);
-        };
-
-        this.clipboardMonitorTimerToken = token;
-
-        intervalCallback();
-    }
-
-    stopClipboardMonitor() {
-        this.clipboardMonitorTimerToken = null;
-        if (this.clipboardMonitorTimerId !== null) {
-            clearTimeout(this.clipboardMonitorTimerId);
-            this.clipboardMonitorTimerId = null;
-        }
     }
 
     isWanakanaEnabled() {
