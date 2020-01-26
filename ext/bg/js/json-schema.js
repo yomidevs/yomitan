@@ -64,7 +64,7 @@ class JsonSchemaProxyHandler {
             }
         }
 
-        const propertySchema = JsonSchemaProxyHandler.getPropertySchema(this._schema, property);
+        const propertySchema = JsonSchemaProxyHandler.getPropertySchema(this._schema, property, target);
         if (propertySchema === null) {
             return;
         }
@@ -86,7 +86,7 @@ class JsonSchemaProxyHandler {
             }
         }
 
-        const propertySchema = JsonSchemaProxyHandler.getPropertySchema(this._schema, property);
+        const propertySchema = JsonSchemaProxyHandler.getPropertySchema(this._schema, property, target);
         if (propertySchema === null) {
             throw new Error(`Property ${property} not supported`);
         }
@@ -122,11 +122,8 @@ class JsonSchemaProxyHandler {
         throw new Error('construct not supported');
     }
 
-    static getPropertySchema(schema, property) {
-        const type = schema.type;
-        if (Array.isArray(type)) {
-            throw new Error(`Ambiguous property type for ${property}`);
-        }
+    static getPropertySchema(schema, property, value) {
+        const type = JsonSchemaProxyHandler.getSchemaOrValueType(schema, value);
         switch (type) {
             case 'object':
             {
@@ -170,6 +167,29 @@ class JsonSchemaProxyHandler {
             default:
                 return null;
         }
+    }
+
+    static getSchemaOrValueType(schema, value) {
+        const type = schema.type;
+
+        if (Array.isArray(type)) {
+            if (typeof value !== 'undefined') {
+                const valueType = JsonSchemaProxyHandler.getValueType(value);
+                if (type.indexOf(valueType) >= 0) {
+                    return valueType;
+                }
+            }
+            throw new Error(`Ambiguous property type for ${property}`);
+        }
+
+        if (typeof type === 'undefined') {
+            if (typeof value !== 'undefined') {
+                return JsonSchemaProxyHandler.getValueType(value);
+            }
+            throw new Error(`No property type for ${property}`);
+        }
+
+        return type;
     }
 
     static validate(value, schema) {
@@ -376,7 +396,7 @@ class JsonSchemaProxyHandler {
         }
 
         for (const property of properties) {
-            const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, property);
+            const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, property, value);
             if (propertySchema === null) {
                 return `No schema found for ${property}`;
             }
@@ -492,14 +512,14 @@ class JsonSchemaProxyHandler {
             for (const property of required) {
                 properties.delete(property);
 
-                const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, property);
+                const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, property, value);
                 if (propertySchema === null) { continue; }
                 value[property] = JsonSchemaProxyHandler.getValidValueOrDefault(propertySchema, value[property]);
             }
         }
 
         for (const property of properties) {
-            const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, property);
+            const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, property, value);
             if (propertySchema === null) {
                 Reflect.deleteProperty(value, property);
             } else {
@@ -512,7 +532,7 @@ class JsonSchemaProxyHandler {
 
     static populateArrayDefaults(value, schema) {
         for (let i = 0, ii = value.length; i < ii; ++i) {
-            const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, i);
+            const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, i, value);
             if (propertySchema === null) { continue; }
             value[i] = JsonSchemaProxyHandler.getValidValueOrDefault(propertySchema, value[i]);
         }
