@@ -138,7 +138,13 @@ class JsonSchemaProxyHandler {
                 }
 
                 const additionalProperties = schema.additionalProperties;
-                return JsonSchemaProxyHandler.isObject(additionalProperties) ? additionalProperties : null;
+                if (additionalProperties === false) {
+                    return null;
+                } if (JsonSchemaProxyHandler.isObject(additionalProperties)) {
+                    return additionalProperties;
+                } else {
+                    return JsonSchemaProxyHandler._unconstrainedSchema;
+                }
             }
             case 'array':
             {
@@ -490,6 +496,8 @@ class JsonSchemaProxyHandler {
         return typeof value === 'object' && value !== null && !Array.isArray(value);
     }
 }
+
+JsonSchemaProxyHandler._unconstrainedSchema = {};
 
 class JsonSchema {
     static createProxy(target, schema) {
