@@ -600,7 +600,7 @@ class Backend {
     // Command handlers
 
     async _onCommandSearch(params) {
-        const {mode, query} = params || {};
+        const {mode, query} = params || {mode: 'sameTab'};
 
         const options = await this.getOptions(this.optionsContext);
         const {popupWidth, popupHeight} = options.general;
