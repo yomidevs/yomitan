@@ -151,6 +151,70 @@ class JsonSchemaProxyHandler {
     }
 
     static validate(value, schema) {
+        let result = JsonSchemaProxyHandler.validateSingleSchema(value, schema);
+        if (result !== null) { return result; }
+
+        result = JsonSchemaProxyHandler.validateAllOf(value, schema);
+        if (result !== null) { return result; }
+
+        result = JsonSchemaProxyHandler.validateAnyOf(value, schema);
+        if (result !== null) { return result; }
+
+        result = JsonSchemaProxyHandler.validateOneOf(value, schema);
+        if (result !== null) { return result; }
+
+        result = JsonSchemaProxyHandler.validateNoneOf(value, schema);
+        if (result !== null) { return result; }
+
+        return null;
+    }
+
+    static validateAllOf(value, schema) {
+        const subSchemas = schema.allOf;
+        if (!Array.isArray(subSchemas)) { return null; }
+
+        for (let i = 0; i < subSchemas.length; ++i) {
+            const result = JsonSchemaProxyHandler.validate(value, subSchemas[i]);
+            if (result !== null) { return `allOf[${i}] schema didn't match: ${result}`; }
+        }
+        return null;
+    }
+
+    static validateAnyOf(value, schema) {
+        const subSchemas = schema.anyOf;
+        if (!Array.isArray(subSchemas)) { return null; }
+
+        for (let i = 0; i < subSchemas.length; ++i) {
+            const result = JsonSchemaProxyHandler.validate(value, subSchemas[i]);
+            if (result === null) { return null; }
+        }
+        return '0 anyOf schemas matched';
+    }
+
+    static validateOneOf(value, schema) {
+        const subSchemas = schema.oneOf;
+        if (!Array.isArray(subSchemas)) { return null; }
+
+        let count = 0;
+        for (let i = 0; i < subSchemas.length; ++i) {
+            const result = JsonSchemaProxyHandler.validate(value, subSchemas[i]);
+            if (result === null) { ++count; }
+        }
+        return count === 1 ? null : `${count} oneOf schemas matched`;
+    }
+
+    static validateNoneOf(value, schema) {
+        const subSchemas = schema.not;
+        if (!Array.isArray(subSchemas)) { return null; }
+
+        for (let i = 0; i < subSchemas.length; ++i) {
+            const result = JsonSchemaProxyHandler.validate(value, subSchemas[i]);
+            if (result === null) { return `not[${i}] schema matched`; }
+        }
+        return null;
+    }
+
+    static validateSingleSchema(value, schema) {
         const type = JsonSchemaProxyHandler.getValueType(value);
         const schemaType = schema.type;
         if (!JsonSchemaProxyHandler.isValueTypeAny(value, type, schemaType)) {
