@@ -43,9 +43,7 @@
                 </span>
             </form>
 
-            <div id="spinner">
-                <img src="/mixed/img/spinner.gif">
-            </div>
+            <div id="spinner" hidden><img src="/mixed/img/spinner.gif"></div>
 
             <div class="scan-disable">
                 <div id="query-parser-select" class="input-group"></div>
@@ -54,7 +52,18 @@
 
             <hr>
 
+            <div id="navigation-header" class="navigation-header" hidden><div class="navigation-header-actions">
+                <button class="action-button action-previous"><img src="/mixed/img/source-term.svg" class="icon-image" title="Source term (Alt + B)" alt></button>
+                <button class="action-button action-next"><img src="/mixed/img/source-term.svg" class="icon-image" title="Next term (Alt + F)" alt></button>
+            </div></div><div class="navigation-header-spacer"></div>
+
             <div id="content"></div>
+
+            <div id="no-results" hidden>
+                <div class="entry">
+                    <p>No results found.</p>
+                </div>
+            </div>
         </div>
 
         <script src="/mixed/lib/handlebars.min.js"></script>
@@ -72,6 +81,7 @@
         <script src="/mixed/js/audio.js"></script>
         <script src="/mixed/js/display-context.js"></script>
         <script src="/mixed/js/display.js"></script>
+        <script src="/mixed/js/display-generator.js"></script>
         <script src="/mixed/js/japanese.js"></script>
         <script src="/mixed/js/scroll.js"></script>
         <script src="/mixed/js/text-scanner.js"></script>

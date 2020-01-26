@@ -110,6 +110,7 @@ function docRangeFromPoint(x, y, deepDomScan) {
     const elements = docElementsFromPoint(x, y, deepDomScan);
     let imposter = null;
     let imposterContainer = null;
+    let imposterSourceElement = null;
     if (elements.length > 0) {
         const element = elements[0];
         switch (element.nodeName.toUpperCase()) {
@@ -117,9 +118,11 @@ function docRangeFromPoint(x, y, deepDomScan) {
             case 'BUTTON':
                 return new TextSourceElement(element);
             case 'INPUT':
+                imposterSourceElement = element;
                 [imposter, imposterContainer] = docImposterCreate(element, false);
                 break;
             case 'TEXTAREA':
+                imposterSourceElement = element;
                 [imposter, imposterContainer] = docImposterCreate(element, true);
                 break;
         }
@@ -131,7 +134,7 @@ function docRangeFromPoint(x, y, deepDomScan) {
             docSetImposterStyle(imposterContainer.style, 'z-index', '-2147483646');
             docSetImposterStyle(imposter.style, 'pointer-events', 'none');
         }
-        return new TextSourceRange(range, '', imposterContainer);
+        return new TextSourceRange(range, '', imposterContainer, imposterSourceElement);
     } else {
         if (imposterContainer !== null) {
             imposterContainer.parentNode.removeChild(imposterContainer);
@@ -269,8 +272,14 @@ const caretRangeFromPoint = (() => {
 
             const range = document.createRange();
             const offset = (node.nodeType === Node.TEXT_NODE ? position.offset : 0);
-            range.setStart(node, offset);
-            range.setEnd(node, offset);
+            try {
+                range.setStart(node, offset);
+                range.setEnd(node, offset);
+            } catch (e) {
+                // Firefox throws new DOMException("The operation is insecure.")
+                // when trying to select a node from within a ShadowRoot.
+                return null;
+            }
             return range;
         };
     }

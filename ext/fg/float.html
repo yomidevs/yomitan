@@ -15,14 +15,23 @@
         <link rel="stylesheet alternate" type="text/css" href="/mixed/css/display-dark.css" data-yomichan-theme-name="dark">
     </head>
     <body>
-        <div id="spinner">
-            <img src="/mixed/img/spinner.gif">
-        </div>
+        <div id="spinner" hidden><img src="/mixed/img/spinner.gif"></div>
+
+        <div id="navigation-header" class="navigation-header" hidden><div class="navigation-header-actions">
+            <button class="action-button action-previous"><img src="/mixed/img/source-term.svg" class="icon-image" title="Source term (Alt + B)" alt></button>
+            <button class="action-button action-next"><img src="/mixed/img/source-term.svg" class="icon-image" title="Next term (Alt + F)" alt></button>
+        </div></div><div class="navigation-header-spacer"></div>
 
         <div id="definitions"></div>
 
-        <div id="error-orphaned">
-            <div class="container-fluid">
+        <div id="no-results" hidden>
+            <div class="entry">
+                <p>No results found.</p>
+            </div>
+        </div>
+
+        <div id="error-orphaned" hidden>
+            <div class="entry">
                 <h1>Yomichan Updated!</h1>
                 <p>
                     The Yomichan extension has been updated to a new version! In order to continue
@@ -40,6 +49,7 @@
         <script src="/mixed/js/audio.js"></script>
         <script src="/mixed/js/display-context.js"></script>
         <script src="/mixed/js/display.js"></script>
+        <script src="/mixed/js/display-generator.js"></script>
         <script src="/mixed/js/scroll.js"></script>
 
         <script src="/fg/js/float.js"></script>

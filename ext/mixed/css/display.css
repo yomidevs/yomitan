@@ -35,37 +35,34 @@ html:root[data-yomichan-page=float]:not([data-yomichan-theme]) body {
     background-color: transparent;
 }
 
-body {
+:root {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 14px;
-    line-height: 1.42857143;
+    line-height: 1.42857143; /* 14px => 20px */
+}
+
+body {
     margin: 0;
     border: 0;
     padding: 0;
-}
-
-hr {
-    padding: 0px;
-    margin: 0px;
-    border: 0;
-    border-top-width: 1px;
-    border-top-style: solid;
+    overflow-y: scroll; /* always show scroll bar */
 }
 
 ol, ul {
     margin-top: 0;
-    margin-bottom: 10px;
+    margin-bottom: 0.72em;
 }
 
 #spinner {
-    bottom: 5px;
-    display: none;
     position: fixed;
-    right: 5px;
+    z-index: 1;
+    right: 0.36em;
+    bottom: 0.36em;
 }
 
-#error-orphaned {
-    display: none;
+#spinner>img {
+    width: 2.28571428em; /* 14px => 32px */
+    height: 2.28571428em; /* 14px => 32px */
 }
 
 .invisible {
@@ -76,10 +73,42 @@ ol, ul {
  * Navigation
  */
 
-.term-navigation {
+.navigation-header {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2.1em;
+    box-sizing: border-box;
+    padding: 0.25em 0.5em;
+    border-bottom-width: 0.07142857em; /* 14px => 1px */
+    border-bottom-style: solid;
+}
+
+html:root[data-yomichan-page=search] .navigation-header {
+    position: sticky;
+}
+
+html:root[data-yomichan-page=float] .navigation-header {
     position: fixed;
-    top: 0px;
-    right: 0px;
+}
+
+html:root[data-yomichan-page=float] .navigation-header:not([hidden])~.navigation-header-spacer {
+    height: 2.1em;
+}
+
+.navigation-header-actions {
+    display: flex;
+}
+
+.navigation-header:not([data-has-previous=true]) .navigation-header-actions .action-previous>img,
+.navigation-header:not([data-has-next=true]) .navigation-header-actions .action-next>img {
+    opacity: 0.25;
+    -webkit-filter: grayscale(100%);
+    filter: grayscale(100%);
+}
+
+.action-next>img {
+    transform: scaleX(-1);
 }
 
 
@@ -91,24 +120,20 @@ ol, ul {
     display: none;
 }
 
-.icon-checkbox + label {
+.icon-checkbox+label {
     cursor: pointer;
-    font-size: 22px;
-    padding: 2px;
+    font-size: 1.6em;
+    padding: 0.1em;
     user-select: none;
 }
 
 #query-parser {
-    margin-top: 10px;
-    font-size: 24px;
+    margin-top: 0.5em;
+    font-size: 2em;
 }
 
-.query-parser-term {
-    margin-right: 5px;
-}
-
-html:root[data-yomichan-page=search] body {
-    overflow-y: scroll; /* always show scroll bar to avoid scanning problems */
+#query-parser[data-term-spacing=true] .query-parser-term {
+    margin-right: 0.2em;
 }
 
 
@@ -116,15 +141,14 @@ html:root[data-yomichan-page=search] body {
  * Entries
  */
 
-.entry, .note {
-    padding-top: 20px;
-    padding-bottom: 10px;
+.entry {
+    padding-top: 0.72em;
+    padding-bottom: 0.72em;
 }
 
-html:root[data-yomichan-page=float] .entry,
-html:root[data-yomichan-page=float] .note {
-    padding-left: 10px;
-    padding-right: 10px;
+html:root[data-yomichan-page=float] .entry {
+    padding-left: 0.72em;
+    padding-right: 0.72em;
 }
 
 .actions .disabled {
@@ -143,8 +167,9 @@ html:root[data-yomichan-page=float] .note {
 }
 
 .actions {
-    display: block;
+    display: flex;
     float: right;
+    margin: -0.25em;
 }
 
 .actions:after {
@@ -153,104 +178,36 @@ html:root[data-yomichan-page=float] .note {
     display: block;
 }
 
-.expression {
+.action-button {
     display: inline-block;
-    font-size: 24px;
+    border: 0;
+    margin: 0;
+    padding: 0.3em;
+    background: transparent;
+    font-size: inherit;
 }
 
-.expression .kanji-link {
-    border-bottom-width: 1px;
+button.action-button {
+    cursor: pointer;
+}
+
+.icon-image {
+    width: 1.14285714em; /* 14px => 16px */
+    height: 1.14285714em; /* 14px => 16px */
+    display: block;
+}
+
+.term-expression .kanji-link {
+    border-bottom-width: 0.03571428em; /* 28px => 1px */
     border-bottom-style: dashed;
     text-decoration: none;
-}
-
-.expression .peek-wrapper {
-    font-size: 14px;
-    white-space: nowrap;
-    display: inline-block;
-    position: relative;
-    width: 0px;
-    height: 0px;
-    visibility: hidden;
-}
-
-.expression .peek-wrapper .action-play-audio {
-    position: absolute;
-    left: 0px;
-    bottom: 10px;
-}
-
-.expression .peek-wrapper .tags {
-    position: absolute;
-    left: 0px;
-    bottom: -10px;
-}
-
-.expression .peek-wrapper .frequencies {
-    position: absolute;
-    left: 0px;
-    bottom: -30px;
-}
-
-.expression:hover .peek-wrapper {
-    visibility: visible;
-}
-
-.reasons {
-    display: inline-block;
-}
-
-.compact-info {
-    display: inline-block;
-}
-
-.glossary ol, .glossary ul {
-    padding-left: 1.4em;
-}
-
-.glossary ul.compact-glossary {
-    display: inline;
-    list-style: none;
-    padding-left: 0px;
-}
-
-.glossary .compact-glossary li {
-    display: inline;
-}
-
-.glossary .compact-glossary li:not(:first-child):before {
-    content: " | ";
-}
-
-div.glossary-item.compact-glossary {
-    display: inline;
-}
-
-.glyph {
-    font-family: kanji-stroke-orders;
-    font-size: 120px;
-    line-height: 120px;
-    padding: 0.01em;
-    vertical-align: top;
-}
-
-.glyph-data {
-    margin-top: 10px;
-}
-
-.info-output {
-    width: 100%;
-}
-
-.info-output td {
-    text-align: right;
 }
 
 .entry:not(.entry-current) .current {
     display: none;
 }
 
-.label {
+.tag {
     display: inline;
     padding: 0.2em 0.6em 0.3em;
     font-size: 75%;
@@ -260,4 +217,250 @@ div.glossary-item.compact-glossary {
     white-space: nowrap;
     vertical-align: baseline;
     border-radius: 0.25em;
+}
+
+.tag-list>.tag+.tag {
+    margin-left: 0.375em;
+}
+
+.entry-header2,
+.entry-header3 {
+    display: inline;
+}
+
+.term-frequency-separator::before {
+    content: ":";
+}
+
+.entry+.entry {
+    border-top-width: 0.07142857em; /* 14px => 1px */
+    border-top-style: solid;
+}
+
+.entry[data-type=term][data-expression-multi=true]:not([data-expression-count="1"]) .actions>.action-play-audio {
+    display: none;
+}
+
+.term-reasons {
+    display: inline-block;
+}
+
+.term-reasons>.term-reason+.term-reason:before {
+    content: " \00AB  "; /* The two spaces is not a typo */
+    display: inline;
+}
+
+.term-expression-list {
+    display: inline-block;
+}
+
+.term-expression {
+    display: inline-block;
+}
+
+.term-expression-text {
+    display: inline-block;
+    font-size: 2em;
+}
+
+.term-expression-details {
+    display: inline;
+}
+
+.term-expression-details>.action-play-audio {
+    display: none;
+}
+
+.term-expression-details>.tags {
+    display: inline;
+}
+
+.term-expression-details>.frequencies {
+    display: none;
+}
+
+.term-expression-list>.term-expression:not(:last-of-type):after {
+    font-size: 2em;
+    content: "\3001";
+}
+
+.term-expression-list>.term-expression:last-of-type:not(:first-of-type):after {
+    font-size: 2em;
+    content: "\3000";
+    visibility: hidden;
+}
+
+.term-expression-list[data-multi=true]:not([data-count="1"]) .term-expression-details {
+    display: inline-block;
+    position: relative;
+    width: 0;
+    height: 0;
+    visibility: hidden;
+}
+
+.term-expression-list[data-multi=true]:not([data-count="1"]) .term-expression:hover .term-expression-details {
+    visibility: visible;
+}
+
+.term-expression-list[data-multi=true]:not([data-count="1"]) .term-expression-details>.action-play-audio {
+    position: absolute;
+    left: 0;
+    bottom: 0.5em;
+}
+
+.term-expression-list[data-multi=true]:not([data-count="1"]) .term-expression-details>.action-play-audio {
+    display: block;
+}
+
+.term-expression-list[data-multi=true]:not([data-count="1"]) .term-expression-details>.tags {
+    display: block;
+    position: absolute;
+    left: 0;
+    bottom: -0.5em;
+    white-space: nowrap;
+}
+
+.term-expression-list[data-multi=true]:not([data-count="1"]) .term-expression-details>.frequencies {
+    display: block;
+    position: absolute;
+    left: 0;
+    bottom: -1.9em;
+    white-space: nowrap;
+}
+
+.term-definition-list {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.term-definition-list:not([data-count="0"]):not([data-count="1"]) {
+    padding-left: 1.4em;
+    list-style-type: decimal;
+}
+
+.term-glossary-list {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.term-glossary-list:not([data-count="0"]):not([data-count="1"]) {
+    padding-left: 1.4em;
+    list-style-type: circle;
+}
+
+.term-definition-only-list[data-count="0"] {
+    display: none;
+}
+
+.term-definition-only-list:before {
+    content: "(";
+}
+
+.term-definition-only-list:after {
+    content: " only)";
+}
+
+.term-definition-only+.term-definition-only:before {
+    content: ", ";
+}
+
+.debug-info {
+    display: none;
+}
+
+:root[data-debug=true] .debug-info {
+    display: block;
+}
+
+:root[data-anki-enabled=false] .action-view-note,
+:root[data-anki-enabled=false] .action-add-note {
+    display: none;
+}
+
+:root[data-audio-enabled=false] .action-play-audio {
+    display: none;
+}
+
+:root[data-compact-glossaries=true] .term-definition-tag-list,
+:root[data-compact-glossaries=true] .term-definition-only-list:not([data-count="0"]) {
+    display: inline-block;
+}
+
+:root[data-compact-glossaries=true] .term-glossary-list {
+    display: inline;
+    list-style: none;
+    padding-left: 0;
+}
+
+:root[data-compact-glossaries=true] .term-glossary-list>li {
+    display: inline;
+}
+
+:root[data-compact-glossaries=true] .term-glossary-list>li:not(:first-child):before {
+    content: " | ";
+}
+
+/*
+ * Kanji
+ */
+
+.kanji-glyph {
+    font-family: kanji-stroke-orders;
+    font-size: 8.5em;
+    line-height: 1;
+    padding: 0.01em;
+    vertical-align: top;
+}
+
+.kanji-glyph-data {
+    margin-top: 0.75em;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+.kanji-glyph-data>tbody>tr>* {
+    border-top-width: 0.07142857em; /* 14px => 1px */
+    border-top-style: solid;
+    text-align: left;
+    vertical-align: top;
+    padding: 0.36em;
+    margin: 0;
+}
+
+.kanji-info-table {
+    width: 100%;
+}
+
+.kanji-info-table>tbody>tr>th,
+.kanji-info-table>tbody>tr>td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0;
+    margin: 0;
+}
+
+.kanji-info-table>tbody>tr>td {
+    text-align: right;
+}
+
+.kanji-glyph-data dl {
+    margin-top: 0;
+    margin-bottom: 1.4em;
+}
+
+.kanji-glyph-data dd {
+    margin-left: 0;
+}
+
+.kanji-glossary-list {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.kanji-glossary-list:not([data-count="0"]):not([data-count="1"]) {
+    padding-left: 1.4em;
+    list-style-type: decimal;
 }

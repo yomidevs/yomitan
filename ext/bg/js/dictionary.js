@@ -67,7 +67,7 @@ function dictTermsSort(definitions, dictionaries=null) {
         i = v2.source.length - v1.source.length;
         if (i !== 0) { return i; }
 
-        i = v2.reasons.length - v1.reasons.length;
+        i = v1.reasons.length - v2.reasons.length;
         if (i !== 0) { return i; }
 
         i = v2.score - v1.score;
@@ -147,8 +147,9 @@ function dictTermsGroup(definitions, dictionaries) {
             definitions: groupDefs,
             expression: firstDef.expression,
             reading: firstDef.reading,
+            furiganaSegments: firstDef.furiganaSegments,
             reasons: firstDef.reasons,
-            termTags: groupDefs[0].termTags,
+            termTags: firstDef.termTags,
             score: groupDefs.reduce((p, v) => v.score > p ? v.score : p, Number.MIN_SAFE_INTEGER),
             source: firstDef.source
         });

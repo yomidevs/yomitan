@@ -187,6 +187,23 @@ input[type=checkbox].storage-button-checkbox {
     margin: 0;
 }
 
+.error-data-show-button {
+    display: inline-block;
+    margin-left: 0.5em;
+    cursor: pointer;
+}
+.error-data-show-button:after {
+    content: "\2026";
+    font-weight: bold;
+}
+
+.error-data-container {
+    margin-top: 0.25em;
+    font-family: 'Courier New', Courier, monospace;
+    white-space: pre;
+    overflow-x: auto;
+}
+
 [data-show-for-browser],
 [data-show-for-operating-system] {
     display: none;

@@ -25,14 +25,16 @@ const IGNORE_TEXT_PATTERN = /\u200c/;
  */
 
 class TextSourceRange {
-    constructor(range, content, imposterContainer) {
+    constructor(range, content, imposterContainer, imposterSourceElement) {
         this.range = range;
+        this.rangeStartOffset = range.startOffset;
         this.content = content;
         this.imposterContainer = imposterContainer;
+        this.imposterSourceElement = imposterSourceElement;
     }
 
     clone() {
-        return new TextSourceRange(this.range.cloneRange(), this.content, this.imposterContainer);
+        return new TextSourceRange(this.range.cloneRange(), this.content, this.imposterContainer, this.imposterSourceElement);
     }
 
     cleanup() {
@@ -55,6 +57,7 @@ class TextSourceRange {
     setStartOffset(length) {
         const state = TextSourceRange.seekBackward(this.range.startContainer, this.range.startOffset, length);
         this.range.setStart(state.node, state.offset);
+        this.rangeStartOffset = this.range.startOffset;
         this.content = state.content;
         return length - state.remainder;
     }
@@ -79,7 +82,17 @@ class TextSourceRange {
     }
 
     equals(other) {
-        return other && other.range && other.range.compareBoundaryPoints(Range.START_TO_START, this.range) === 0;
+        if (other === null) {
+            return false;
+        }
+        if (this.imposterSourceElement !== null) {
+            return (
+                this.imposterSourceElement === other.imposterSourceElement &&
+                this.rangeStartOffset === other.rangeStartOffset
+            );
+        } else {
+            return this.range.compareBoundaryPoints(Range.START_TO_START, other.range) === 0;
+        }
     }
 
     static shouldEnter(node) {

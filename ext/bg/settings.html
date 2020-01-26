@@ -151,6 +151,14 @@
                 </div>
 
                 <div class="checkbox options-advanced">
+                    <label><input type="checkbox" id="popup-scale-relative-to-page-zoom"> Change popup size relative to page zoom level</label>
+                </div>
+
+                <div class="checkbox options-advanced">
+                    <label><input type="checkbox" id="popup-scale-relative-to-visual-viewport"> Change popup size relative to page viewport</label>
+                </div>
+
+                <div class="checkbox options-advanced">
                     <label><input type="checkbox" id="show-debug-info"> Show debug information</label>
                 </div>
 
@@ -169,6 +177,11 @@
                         <option value="default">Default</option>
                         <option value="full-width">Full width</option>
                     </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="popup-scaling-factor">Popup size multiplier</label>
+                    <input type="number" min="0" id="popup-scaling-factor" class="form-control">
                 </div>
 
                 <div class="form-group options-advanced">
@@ -384,6 +397,81 @@
                 </div>
             </div>
 
+            <div>
+                <h3>Translation Options</h3>
+
+                <p class="help-block">
+                    The following options can be used during the translation process to provide alternate versions of the input text to search for.
+                    This can be helpful when the input text doesn't exactly match the term or expression found in the database.
+                </p>
+
+                <p class="help-block">
+                    The conversion options below are listed in the order that the conversions are applied to the input text.
+                    Each conversion has three possible values:
+                </p>
+
+                <ul class="help-block">
+                    <li>
+                        <strong>Disabled</strong><br>
+                        This conversion will never be applied to the input text.
+                    </li>
+                    <li>
+                        <strong>Enabled</strong><br>
+                        This conversion will always be applied to the input text.
+                    </li>
+                    <li>
+                        <strong>Use both variants</strong><br>
+                        The translator will check the database for two variations: the raw input text and the converted input text.
+                        When multiple options use variants, the translator will search for combinations of the converted text.
+                    </li>
+                </ul>
+
+                <div class="form-group">
+                    <label for="translation-convert-half-width-characters">Convert half width characters to full width <span class="label-light">(ﾖﾐﾁｬﾝ &rarr; ヨミチャン)</span></label>
+                    <select class="form-control" id="translation-convert-half-width-characters">
+                        <option value="false">Disabled</option>
+                        <option value="true">Enabled</option>
+                        <option value="variant">Use both variants</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="translation-convert-numeric-characters">Convert numeric characters to full width <span class="label-light">(1234 &rarr; １２３４)</span></label>
+                    <select class="form-control" id="translation-convert-numeric-characters">
+                        <option value="false">Disabled</option>
+                        <option value="true">Enabled</option>
+                        <option value="variant">Use both variants</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="translation-convert-alphabetic-characters">Convert alphabetic characters to hiragana <span class="label-light">(yomichan &rarr; よみちゃん)</span></label>
+                    <select class="form-control" id="translation-convert-alphabetic-characters">
+                        <option value="false">Disabled</option>
+                        <option value="true">Enabled</option>
+                        <option value="variant">Use both variants</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="translation-convert-hiragana-to-katakana">Convert hiragana to katakana <span class="label-light">(よみちゃん &rarr; ヨミチャン)</span></label>
+                    <select class="form-control" id="translation-convert-hiragana-to-katakana">
+                        <option value="false">Disabled</option>
+                        <option value="true">Enabled</option>
+                        <option value="variant">Use both variants</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="translation-convert-katakana-to-hiragana">Convert katakana to hiragana <span class="label-light">(ヨミチャン &rarr; よみちゃん)</span></label>
+                    <select class="form-control" id="translation-convert-katakana-to-hiragana">
+                        <option value="false">Disabled</option>
+                        <option value="true">Enabled</option>
+                        <option value="variant">Use both variants</option>
+                    </select>
+                </div>
+            </div>
+
             <div id="popup-content-scanning">
                 <h3>Popup Content Scanning Options</h3>
 
@@ -438,12 +526,17 @@
                     <label><input type="checkbox" id="parsing-mecab-enable"> Enable text parsing using MeCab</label>
                 </div>
 
+                <div class="checkbox">
+                    <label><input type="checkbox" id="parsing-term-spacing"> Enable small spaces between parsed words</label>
+                </div>
+
                 <div class="form-group">
                     <label for="parsing-reading-mode">Reading mode</label>
                     <select class="form-control" id="parsing-reading-mode">
                         <option value="hiragana">ひらがな</option>
                         <option value="katakana">カタカナ</option>
                         <option value="romaji">Romaji</option>
+                        <option value="none">Disabled</option>
                     </select>
                 </div>
             </div>

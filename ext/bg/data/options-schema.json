@@ -65,6 +65,7 @@
                             "general",
                             "audio",
                             "scanning",
+                            "translation",
                             "dictionaries",
                             "parsing",
                             "anki"
@@ -91,6 +92,9 @@
                                     "popupVerticalOffset2",
                                     "popupHorizontalTextPosition",
                                     "popupVerticalTextPosition",
+                                    "popupScalingFactor",
+                                    "popupScaleRelativeToPageZoom",
+                                    "popupScaleRelativeToVisualViewport",
                                     "showGuide",
                                     "compactTags",
                                     "compactGlossaries",
@@ -165,6 +169,18 @@
                                         "type": "string",
                                         "enum": ["default", "before", "after", "left", "right"],
                                         "default": "before"
+                                    },
+                                    "popupScalingFactor": {
+                                        "type": "number",
+                                        "default": 1
+                                    },
+                                    "popupScaleRelativeToPageZoom": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "popupScaleRelativeToVisualViewport": {
+                                        "type": "boolean",
+                                        "default": true
                                     },
                                     "showGuide": {
                                         "type": "boolean",
@@ -335,6 +351,43 @@
                                     }
                                 }
                             },
+                            "translation": {
+                                "type": "object",
+                                "required": [
+                                    "convertHalfWidthCharacters",
+                                    "convertNumericCharacters",
+                                    "convertAlphabeticCharacters",
+                                    "convertHiraganaToKatakana",
+                                    "convertKatakanaToHiragana"
+                                ],
+                                "properties": {
+                                    "convertHalfWidthCharacters": {
+                                        "type": "string",
+                                        "enum": ["false", "true", "variant"],
+                                        "default": "false"
+                                    },
+                                    "convertNumericCharacters": {
+                                        "type": "string",
+                                        "enum": ["false", "true", "variant"],
+                                        "default": "false"
+                                    },
+                                    "convertAlphabeticCharacters": {
+                                        "type": "string",
+                                        "enum": ["false", "true", "variant"],
+                                        "default": "false"
+                                    },
+                                    "convertHiraganaToKatakana": {
+                                        "type": "string",
+                                        "enum": ["false", "true", "variant"],
+                                        "default": "false"
+                                    },
+                                    "convertKatakanaToHiragana": {
+                                        "type": "string",
+                                        "enum": ["false", "true", "variant"],
+                                        "default": "variant"
+                                    }
+                                }
+                            },
                             "dictionaries": {
                                 "type": "object",
                                 "additionalProperties": {
@@ -366,6 +419,7 @@
                                     "enableScanningParser",
                                     "enableMecabParser",
                                     "selectedParser",
+                                    "termSpacing",
                                     "readingMode"
                                 ],
                                 "properties": {
@@ -381,9 +435,13 @@
                                         "type": ["string", "null"],
                                         "default": null
                                     },
+                                    "termSpacing": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
                                     "readingMode": {
                                         "type": "string",
-                                        "enum": ["hiragana", "katakana", "romaji"],
+                                        "enum": ["hiragana", "katakana", "romaji", "none"],
                                         "default": "hiragana"
                                     }
                                 }

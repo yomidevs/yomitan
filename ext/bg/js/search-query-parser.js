@@ -17,73 +17,47 @@
  */
 
 
-class QueryParser {
+class QueryParser extends TextScanner {
     constructor(search) {
+        super(document.querySelector('#query-parser'), [], [], []);
         this.search = search;
-        this.pendingLookup = false;
-        this.clickScanPrevent = false;
 
         this.parseResults = [];
         this.selectedParser = null;
 
         this.queryParser = document.querySelector('#query-parser');
         this.queryParserSelect = document.querySelector('#query-parser-select');
-
-        this.queryParser.addEventListener('mousedown', (e) => this.onMouseDown(e));
-        this.queryParser.addEventListener('mouseup', (e) => this.onMouseUp(e));
     }
 
     onError(error) {
         logError(error, false);
     }
 
-    onMouseDown(e) {
-        if (DOM.isMouseButtonPressed(e, 'primary')) {
-            this.clickScanPrevent = false;
-        }
+    onClick(e) {
+        super.onClick(e);
+        this.searchAt(e.clientX, e.clientY, 'click');
     }
 
-    onMouseUp(e) {
-        if (
-            this.search.options.scanning.enablePopupSearch &&
-            !this.clickScanPrevent &&
-            DOM.isMouseButtonPressed(e, 'primary')
-        ) {
-            const selectText = this.search.options.scanning.selectText;
-            this.onTermLookup(e, {disableScroll: true, selectText});
-        }
-    }
+    async onSearchSource(textSource, cause) {
+        if (textSource === null) { return null; }
 
-    onMouseMove(e) {
-        if (this.pendingLookup || DOM.isMouseButtonDown(e, 'primary')) {
-            return;
-        }
+        this.setTextSourceScanLength(textSource, this.search.options.scanning.length);
+        const searchText = textSource.text();
+        if (searchText.length === 0) { return; }
 
-        const scanningOptions = this.search.options.scanning;
-        const scanningModifier = scanningOptions.modifier;
-        if (!(
-            TextScanner.isScanningModifierPressed(scanningModifier, e) ||
-            (scanningOptions.middleMouse && DOM.isMouseButtonDown(e, 'auxiliary'))
-        )) {
-            return;
-        }
+        const {definitions, length} = await apiTermsFind(searchText, {}, this.search.getOptionsContext());
+        if (definitions.length === 0) { return null; }
 
-        const selectText = this.search.options.scanning.selectText;
-        this.onTermLookup(e, {disableScroll: true, disableHistory: true, selectText});
-    }
+        textSource.setEndOffset(length);
 
-    onMouseLeave(e) {
-        this.clickScanPrevent = true;
-        clearTimeout(e.target.dataset.timer);
-        delete e.target.dataset.timer;
-    }
+        this.search.setContent('terms', {definitions, context: {
+            focus: false,
+            disableHistory: cause === 'mouse' ? true : false,
+            sentence: {text: searchText, offset: 0},
+            url: window.location.href
+        }});
 
-    onTermLookup(e, params) {
-        this.pendingLookup = true;
-        (async () => {
-            await this.search.onTermLookup(e, params);
-            this.pendingLookup = false;
-        })();
+        return {definitions, type: 'terms'};
     }
 
     onParserChange(e) {
@@ -91,6 +65,32 @@ class QueryParser {
         this.selectedParser = selectedParser;
         apiOptionsSet({parsing: {selectedParser}}, this.search.getOptionsContext());
         this.renderParseResult(this.getParseResult());
+    }
+
+    getMouseEventListeners() {
+        return [
+            [this.node, 'click', this.onClick.bind(this)],
+            [this.node, 'mousedown', this.onMouseDown.bind(this)],
+            [this.node, 'mousemove', this.onMouseMove.bind(this)],
+            [this.node, 'mouseover', this.onMouseOver.bind(this)],
+            [this.node, 'mouseout', this.onMouseOut.bind(this)]
+        ];
+    }
+
+    getTouchEventListeners() {
+        return [
+            [this.node, 'auxclick', this.onAuxClick.bind(this)],
+            [this.node, 'touchstart', this.onTouchStart.bind(this)],
+            [this.node, 'touchend', this.onTouchEnd.bind(this)],
+            [this.node, 'touchcancel', this.onTouchCancel.bind(this)],
+            [this.node, 'touchmove', this.onTouchMove.bind(this), {passive: false}],
+            [this.node, 'contextmenu', this.onContextMenu.bind(this)]
+        ];
+    }
+
+    setOptions(options) {
+        super.setOptions(options);
+        this.queryParser.dataset.termSpacing = `${options.parsing.termSpacing}`;
     }
 
     refreshSelectedParser() {
@@ -156,10 +156,6 @@ class QueryParser {
             terms: previewTerms,
             preview: true
         });
-
-        for (const charElement of this.queryParser.querySelectorAll('.query-parser-char')) {
-            this.activateScanning(charElement);
-        }
     }
 
     renderParserSelect() {
@@ -190,27 +186,6 @@ class QueryParser {
             'query-parser.html',
             {terms: QueryParser.processParseResultForDisplay(parseResult.parsedText)}
         );
-
-        for (const charElement of this.queryParser.querySelectorAll('.query-parser-char')) {
-            this.activateScanning(charElement);
-        }
-    }
-
-    activateScanning(element) {
-        element.addEventListener('mousemove', (e) => {
-            clearTimeout(e.target.dataset.timer);
-            if (this.search.options.scanning.modifier === 'none') {
-                e.target.dataset.timer = setTimeout(() => {
-                    this.onMouseMove(e);
-                    delete e.target.dataset.timer;
-                }, this.search.options.scanning.delay);
-            } else {
-                this.onMouseMove(e);
-            }
-        });
-        element.addEventListener('mouseleave', (e) => {
-            this.onMouseLeave(e);
-        });
     }
 
     static processParseResultForDisplay(result) {

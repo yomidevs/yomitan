@@ -28,10 +28,13 @@ class Popup {
         this._childrenSupported = true;
         this._injectPromise = null;
         this._isInjected = false;
+        this._isInjectedAndLoaded = false;
         this._visible = false;
         this._visibleOverride = null;
         this._options = null;
         this._stylesheetInjectedViaApi = false;
+        this._contentScale = 1.0;
+        this._containerSizeContentScale = null;
 
         this._container = document.createElement('iframe');
         this._container.className = 'yomichan-float';
@@ -103,7 +106,7 @@ class Popup {
     }
 
     async showContent(elementRect, writingMode, type=null, details=null) {
-        if (!this._isInitialized()) { return; }
+        if (this._options === null) { throw new Error('Options not assigned'); }
         await this._show(elementRect, writingMode);
         if (type === null) { return; }
         this._invokeApi('setContent', {type, details});
@@ -114,8 +117,15 @@ class Popup {
     }
 
     clearAutoPlayTimer() {
-        if (this._isInjected) {
+        if (this._isInjectedAndLoaded) {
             this._invokeApi('clearAutoPlayTimer');
+        }
+    }
+
+    setContentScale(scale) {
+        this._contentScale = scale;
+        if (this._isInjectedAndLoaded) {
+            this._invokeApi('setContentScale', {scale});
         }
     }
 
@@ -215,6 +225,7 @@ class Popup {
         return new Promise((resolve) => {
             const parentFrameId = (typeof this._frameId === 'number' ? this._frameId : null);
             this._container.addEventListener('load', () => {
+                this._isInjectedAndLoaded = true;
                 this._invokeApi('initialize', {
                     options: this._options,
                     popupInfo: {
@@ -223,7 +234,8 @@ class Popup {
                         parentFrameId
                     },
                     url: this.url,
-                    childrenSupported: this._childrenSupported
+                    childrenSupported: this._childrenSupported,
+                    scale: this._contentScale
                 });
                 resolve();
             });
@@ -232,10 +244,6 @@ class Popup {
             this.setCustomOuterCss(this._options.general.customPopupOuterCss, false);
             this._isInjected = true;
         });
-    }
-
-    _isInitialized() {
-        return this._options !== null;
     }
 
     async _show(elementRect, writingMode) {
@@ -250,18 +258,30 @@ class Popup {
             Popup._getPositionForVerticalText
         );
 
-        const [x, y, width, height, below] = getPosition(
+        const viewport = Popup._getViewport(optionsGeneral.popupScaleRelativeToVisualViewport);
+        const scale = this._contentScale;
+        const scaleRatio = this._containerSizeContentScale === null ? 1.0 : scale / this._containerSizeContentScale;
+        this._containerSizeContentScale = scale;
+        let [x, y, width, height, below] = getPosition(
             elementRect,
-            Math.max(containerRect.width, optionsGeneral.popupWidth),
-            Math.max(containerRect.height, optionsGeneral.popupHeight),
-            document.body.clientWidth,
-            window.innerHeight,
+            Math.max(containerRect.width * scaleRatio, optionsGeneral.popupWidth * scale),
+            Math.max(containerRect.height * scaleRatio, optionsGeneral.popupHeight * scale),
+            viewport,
+            scale,
             optionsGeneral,
             writingMode
         );
 
-        container.classList.toggle('yomichan-float-full-width', optionsGeneral.popupDisplayMode === 'full-width');
+        const fullWidth = (optionsGeneral.popupDisplayMode === 'full-width');
+        container.classList.toggle('yomichan-float-full-width', fullWidth);
         container.classList.toggle('yomichan-float-above', !below);
+
+        if (optionsGeneral.popupDisplayMode === 'full-width') {
+            x = viewport.left;
+            y = below ? viewport.bottom - height : viewport.top;
+            width = viewport.right - viewport.left;
+        }
+
         container.style.left = `${x}px`;
         container.style.top = `${y}px`;
         container.style.width = `${width}px`;
@@ -307,6 +327,9 @@ class Popup {
     }
 
     _invokeApi(action, params={}) {
+        if (!this._isInjectedAndLoaded) {
+            throw new Error('Frame not loaded');
+        }
         this._container.contentWindow.postMessage({action, params}, '*');
     }
 
@@ -338,49 +361,49 @@ class Popup {
         }
     }
 
-    static _getPositionForHorizontalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral) {
-        let x = elementRect.left + optionsGeneral.popupHorizontalOffset;
-        const overflowX = Math.max(x + width - maxWidth, 0);
-        if (overflowX > 0) {
-            if (x >= overflowX) {
-                x -= overflowX;
-            } else {
-                width = maxWidth;
-                x = 0;
-            }
-        }
-
+    static _getPositionForHorizontalText(elementRect, width, height, viewport, offsetScale, optionsGeneral) {
         const preferBelow = (optionsGeneral.popupHorizontalTextPosition === 'below');
+        const horizontalOffset = optionsGeneral.popupHorizontalOffset * offsetScale;
+        const verticalOffset = optionsGeneral.popupVerticalOffset * offsetScale;
 
-        const verticalOffset = optionsGeneral.popupVerticalOffset;
-        const [y, h, below] = Popup._limitGeometry(
+        const [x, w] = Popup._getConstrainedPosition(
+            elementRect.right - horizontalOffset,
+            elementRect.left + horizontalOffset,
+            width,
+            viewport.left,
+            viewport.right,
+            true
+        );
+        const [y, h, below] = Popup._getConstrainedPositionBinary(
             elementRect.top - verticalOffset,
             elementRect.bottom + verticalOffset,
             height,
-            maxHeight,
+            viewport.top,
+            viewport.bottom,
             preferBelow
         );
-
-        return [x, y, width, h, below];
+        return [x, y, w, h, below];
     }
 
-    static _getPositionForVerticalText(elementRect, width, height, maxWidth, maxHeight, optionsGeneral, writingMode) {
+    static _getPositionForVerticalText(elementRect, width, height, viewport, offsetScale, optionsGeneral, writingMode) {
         const preferRight = Popup._isVerticalTextPopupOnRight(optionsGeneral.popupVerticalTextPosition, writingMode);
-        const horizontalOffset = optionsGeneral.popupHorizontalOffset2;
-        const verticalOffset = optionsGeneral.popupVerticalOffset2;
+        const horizontalOffset = optionsGeneral.popupHorizontalOffset2 * offsetScale;
+        const verticalOffset = optionsGeneral.popupVerticalOffset2 * offsetScale;
 
-        const [x, w] = Popup._limitGeometry(
+        const [x, w] = Popup._getConstrainedPositionBinary(
             elementRect.left - horizontalOffset,
             elementRect.right + horizontalOffset,
             width,
-            maxWidth,
+            viewport.left,
+            viewport.right,
             preferRight
         );
-        const [y, h, below] = Popup._limitGeometry(
+        const [y, h, below] = Popup._getConstrainedPosition(
             elementRect.bottom - verticalOffset,
             elementRect.top + verticalOffset,
             height,
-            maxHeight,
+            viewport.top,
+            viewport.bottom,
             true
         );
         return [x, y, w, h, below];
@@ -409,23 +432,36 @@ class Popup {
         }
     }
 
-    static _limitGeometry(positionBefore, positionAfter, size, limit, preferAfter) {
-        let after = preferAfter;
-        let position = 0;
-        const overflowBefore = Math.max(0, size - positionBefore);
-        const overflowAfter = Math.max(0, positionAfter + size - limit);
-        if (overflowAfter > 0 || overflowBefore > 0) {
-            if (overflowAfter < overflowBefore) {
-                size = Math.max(0, size - overflowAfter);
-                position = positionAfter;
-                after = true;
-            } else {
-                size = Math.max(0, size - overflowBefore);
-                position = Math.max(0, positionBefore - size);
-                after = false;
-            }
+    static _getConstrainedPosition(positionBefore, positionAfter, size, minLimit, maxLimit, after) {
+        size = Math.min(size, maxLimit - minLimit);
+
+        let position;
+        if (after) {
+            position = Math.max(minLimit, positionAfter);
+            position = position - Math.max(0, (position + size) - maxLimit);
         } else {
-            position = preferAfter ? positionAfter : positionBefore - size;
+            position = Math.min(maxLimit, positionBefore) - size;
+            position = position + Math.max(0, minLimit - position);
+        }
+
+        return [position, size, after];
+    }
+
+    static _getConstrainedPositionBinary(positionBefore, positionAfter, size, minLimit, maxLimit, after) {
+        const overflowBefore = minLimit - (positionBefore - size);
+        const overflowAfter = (positionAfter + size) - maxLimit;
+
+        if (overflowAfter > 0 || overflowBefore > 0) {
+            after = (overflowAfter < overflowBefore);
+        }
+
+        let position;
+        if (after) {
+            size -= Math.max(0, overflowAfter);
+            position = Math.max(minLimit, positionAfter);
+        } else {
+            size -= Math.max(0, overflowBefore);
+            position = Math.min(maxLimit, positionBefore) - size;
         }
 
         return [position, size, after];
@@ -463,6 +499,39 @@ class Popup {
         } catch (e) {
             // NOP
         }
+    }
+
+    static _getViewport(useVisualViewport) {
+        const visualViewport = window.visualViewport;
+        if (visualViewport !== null && typeof visualViewport === 'object') {
+            const left = visualViewport.offsetLeft;
+            const top = visualViewport.offsetTop;
+            const width = visualViewport.width;
+            const height = visualViewport.height;
+            if (useVisualViewport) {
+                return {
+                    left,
+                    top,
+                    right: left + width,
+                    bottom: top + height
+                };
+            } else {
+                const scale = visualViewport.scale;
+                return {
+                    left: 0,
+                    top: 0,
+                    right: Math.max(left + width, width * scale),
+                    bottom: Math.max(top + height, height * scale)
+                };
+            }
+        }
+
+        return {
+            left: 0,
+            top: 0,
+            right: document.body.clientWidth,
+            bottom: window.innerHeight
+        };
     }
 }
 

@@ -35,7 +35,6 @@ class SettingsPopupPreview {
 
     async prepare() {
         // Setup events
-        window.addEventListener('resize', (e) => this.onWindowResize(e), false);
         window.addEventListener('message', (e) => this.onMessage(e), false);
 
         const themeDarkCheckbox = document.querySelector('#theme-dark-checkbox');
@@ -96,16 +95,6 @@ class SettingsPopupPreview {
         return result;
     }
 
-    onWindowResize() {
-        if (this.frontend === null) { return; }
-        const textSource = this.textSource;
-        if (textSource === null) { return; }
-
-        const elementRect = textSource.getRect();
-        const writingMode = textSource.getWritingMode();
-        this.frontend.popup.showContent(elementRect, writingMode);
-    }
-
     onMessage(e) {
         const {action, params} = e.data;
         const handler = SettingsPopupPreview._messageHandlers.get(action);
@@ -159,10 +148,11 @@ class SettingsPopupPreview {
 
         const range = document.createRange();
         range.selectNode(textNode);
-        const source = new TextSourceRange(range, range.toString(), null);
+        const source = new TextSourceRange(range, range.toString(), null, null);
 
         try {
             await this.frontend.onSearchSource(source, 'script');
+            this.frontend.setCurrentTextSource(source);
         } finally {
             source.cleanup();
         }

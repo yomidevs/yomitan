@@ -281,6 +281,7 @@ class TextScanner {
 
     setOptions(options) {
         this.options = options;
+        this.setEnabled(this.options.general.enable);
     }
 
     async searchAt(x, y, cause) {
@@ -298,11 +299,11 @@ class TextScanner {
             }
 
             const textSource = docRangeFromPoint(x, y, this.options.scanning.deepDomScan);
-            if (this.textSourceCurrent !== null && this.textSourceCurrent.equals(textSource)) {
-                return;
-            }
-
             try {
+                if (this.textSourceCurrent !== null && this.textSourceCurrent.equals(textSource)) {
+                    return;
+                }
+
                 this.pendingLookup = true;
                 const result = await this.onSearchSource(textSource, cause);
                 if (result !== null) {

@@ -56,7 +56,8 @@ function errorToJson(error) {
     return {
         name: error.name,
         message: error.message,
-        stack: error.stack
+        stack: error.stack,
+        data: error.data
     };
 }
 
@@ -64,6 +65,7 @@ function jsonToError(jsonError) {
     const error = new Error(jsonError.message);
     error.name = jsonError.name;
     error.stack = jsonError.stack;
+    error.data = jsonError.data;
     return error;
 }
 
@@ -74,7 +76,11 @@ function logError(error, alert) {
 
     const errorString = `${error.toString ? error.toString() : error}`;
     const stack = `${error.stack}`.trimRight();
-    errorMessage += (!stack.startsWith(errorString) ? `${errorString}\n${stack}` : `${stack}`);
+    if (!stack.startsWith(errorString)) { errorMessage += `${errorString}\n`; }
+    errorMessage += stack;
+
+    const data = error.data;
+    if (typeof data !== 'undefined') { errorMessage += `\nData: ${JSON.stringify(data, null, 4)}`; }
 
     errorMessage += '\n\nIssues can be reported at https://github.com/FooSoft/yomichan/issues';
 
@@ -238,7 +244,8 @@ const yomichan = (() => {
 
             this._messageHandlers = new Map([
                 ['getUrl', this._onMessageGetUrl.bind(this)],
-                ['optionsUpdate', this._onMessageOptionsUpdate.bind(this)]
+                ['optionsUpdate', this._onMessageOptionsUpdate.bind(this)],
+                ['zoomChanged', this._onMessageZoomChanged.bind(this)]
             ]);
 
             chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
@@ -267,6 +274,10 @@ const yomichan = (() => {
 
         _onMessageOptionsUpdate({source}) {
             this.trigger('optionsUpdate', {source});
+        }
+
+        _onMessageZoomChanged({oldZoomFactor, newZoomFactor}) {
+            this.trigger('zoomChanged', {oldZoomFactor, newZoomFactor});
         }
     }
 

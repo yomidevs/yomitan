@@ -51,8 +51,11 @@ class Backend {
 
         this.onOptionsUpdated('background');
 
-        if (chrome.commands !== null && typeof chrome.commands === 'object') {
+        if (isObject(chrome.commands) && isObject(chrome.commands.onCommand)) {
             chrome.commands.onCommand.addListener((command) => this._runCommand(command));
+        }
+        if (isObject(chrome.tabs) && isObject(chrome.tabs.onZoomChange)) {
+            chrome.tabs.onZoomChange.addListener((info) => this._onZoomChange(info));
         }
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
 
@@ -92,6 +95,11 @@ class Backend {
             callback({error: errorToJson(error)});
             return false;
         }
+    }
+
+    _onZoomChange({tabId, oldZoomFactor, newZoomFactor}) {
+        const callback = () => this.checkLastError(chrome.runtime.lastError);
+        chrome.tabs.sendMessage(tabId, {action: 'zoomChanged', params: {oldZoomFactor, newZoomFactor}}, callback);
     }
 
     applyOptions() {
@@ -299,8 +307,8 @@ class Backend {
             const [definitions, sourceLength] = await this.translator.findTermsInternal(
                 text.substring(0, options.scanning.length),
                 dictEnabledSet(options),
-                options.scanning.alphanumeric,
-                {}
+                {},
+                options
             );
             if (definitions.length > 0) {
                 dictTermsSort(definitions);
@@ -522,6 +530,38 @@ class Backend {
         return result;
     }
 
+    async _onApiGetDisplayTemplatesHtml() {
+        const url = chrome.runtime.getURL('/mixed/display-templates.html');
+        return await requestText(url, 'GET');
+    }
+
+    _onApiGetZoom(params, sender) {
+        if (!sender || !sender.tab) {
+            return Promise.reject(new Error('Invalid tab'));
+        }
+
+        return new Promise((resolve, reject) => {
+            const tabId = sender.tab.id;
+            if (!(
+                chrome.tabs !== null &&
+                typeof chrome.tabs === 'object' &&
+                typeof chrome.tabs.getZoom === 'function'
+            )) {
+                // Not supported
+                resolve({zoomFactor: 1.0});
+                return;
+            }
+            chrome.tabs.getZoom(tabId, (zoomFactor) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve({zoomFactor});
+                }
+            });
+        });
+    }
+
     // Command handlers
 
     async _onCommandSearch(params) {
@@ -735,7 +775,9 @@ Backend._messageHandlers = new Map([
     ['frameInformationGet', (self, ...args) => self._onApiFrameInformationGet(...args)],
     ['injectStylesheet', (self, ...args) => self._onApiInjectStylesheet(...args)],
     ['getEnvironmentInfo', (self, ...args) => self._onApiGetEnvironmentInfo(...args)],
-    ['clipboardGet', (self, ...args) => self._onApiClipboardGet(...args)]
+    ['clipboardGet', (self, ...args) => self._onApiClipboardGet(...args)],
+    ['getDisplayTemplatesHtml', (self, ...args) => self._onApiGetDisplayTemplatesHtml(...args)],
+    ['getZoom', (self, ...args) => self._onApiGetZoom(...args)]
 ]);
 
 Backend._commandHandlers = new Map([

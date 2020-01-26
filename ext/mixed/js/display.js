@@ -24,7 +24,6 @@ class Display {
         this.definitions = [];
         this.options = null;
         this.context = null;
-        this.sequence = 0;
         this.index = 0;
         this.audioPlaying = null;
         this.audioFallback = null;
@@ -36,7 +35,9 @@ class Display {
         this.interactive = false;
         this.eventListenersActive = false;
         this.clickScanPrevent = false;
+        this.setContentToken = null;
 
+        this.displayGenerator = new DisplayGenerator();
         this.windowScroll = new WindowScroll();
 
         this.setInteractive(true);
@@ -76,7 +77,7 @@ class Display {
             };
 
             const definitions = await apiKanjiFind(link.textContent, this.getOptionsContext());
-            this.setContentKanji(definitions, context);
+            this.setContent('kanji', {definitions, context});
         } catch (error) {
             this.onError(error);
         }
@@ -130,7 +131,7 @@ class Display {
                 });
             }
 
-            this.setContentTerms(definitions, context);
+            this.setContent('terms', {definitions, context});
 
             if (selectText) {
                 textSource.select();
@@ -174,7 +175,7 @@ class Display {
         const link = e.currentTarget;
         const entry = link.closest('.entry');
         const definitionIndex = this.entryIndexFind(entry);
-        const expressionIndex = Display.indexOf(entry.querySelectorAll('.expression .action-play-audio'), link);
+        const expressionIndex = Display.indexOf(entry.querySelectorAll('.term-expression .action-play-audio'), link);
         this.audioPlay(this.definitions[definitionIndex], expressionIndex, definitionIndex);
     }
 
@@ -240,9 +241,18 @@ class Display {
 
     async updateOptions(options) {
         this.options = options ? options : await apiOptionsGet(this.getOptionsContext());
+        this.updateDocumentOptions(this.options);
         this.updateTheme(this.options.general.popupTheme);
         this.setCustomCss(this.options.general.customPopupCss);
         audioPrepareTextToSpeech(this.options);
+    }
+
+    updateDocumentOptions(options) {
+        const data = document.documentElement.dataset;
+        data.ankiEnabled = `${options.anki.enable}`;
+        data.audioEnabled = `${options.audio.enable}`;
+        data.compactGlossaries = `${options.general.compactGlossaries}`;
+        data.debug = `${options.general.debugInfo}`;
     }
 
     updateTheme(themeName) {
@@ -277,6 +287,9 @@ class Display {
         if (interactive) {
             Display.addEventListener(this.persistentEventListeners, document, 'keydown', this.onKeyDown.bind(this), false);
             Display.addEventListener(this.persistentEventListeners, document, 'wheel', this.onWheel.bind(this), {passive: false});
+            Display.addEventListener(this.persistentEventListeners, document.querySelector('.action-previous'), 'click', this.onSourceTermView.bind(this));
+            Display.addEventListener(this.persistentEventListeners, document.querySelector('.action-next'), 'click', this.onNextTermView.bind(this));
+            Display.addEventListener(this.persistentEventListeners, document.querySelector('.navigation-header'), 'wheel', this.onHistoryWheel.bind(this), {passive: false});
         } else {
             Display.clearEventListeners(this.persistentEventListeners);
         }
@@ -293,9 +306,6 @@ class Display {
             this.addEventListeners('.action-view-note', 'click', this.onNoteView.bind(this));
             this.addEventListeners('.action-play-audio', 'click', this.onAudioPlay.bind(this));
             this.addEventListeners('.kanji-link', 'click', this.onKanjiLookup.bind(this));
-            this.addEventListeners('.source-term', 'click', this.onSourceTermView.bind(this));
-            this.addEventListeners('.next-term', 'click', this.onNextTermView.bind(this));
-            this.addEventListeners('.term-navigation', 'wheel', this.onHistoryWheel.bind(this), {passive: false});
             if (this.options.scanning.enablePopupSearch) {
                 this.addEventListeners('.glossary-item', 'mouseup', this.onGlossaryMouseUp.bind(this));
                 this.addEventListeners('.glossary-item', 'mousedown', this.onGlossaryMouseDown.bind(this));
@@ -312,138 +322,178 @@ class Display {
         }
     }
 
-    setContent(type, details) {
-        switch (type) {
-            case 'terms':
-                return this.setContentTerms(details.definitions, details.context);
-            case 'kanji':
-                return this.setContentKanji(details.definitions, details.context);
-            case 'orphaned':
-                return this.setContentOrphaned();
-            default:
-                return Promise.resolve();
-        }
-    }
-
-    async setContentTerms(definitions, context) {
-        if (!context) { throw new Error('Context expected'); }
-        if (!this.isInitialized()) { return; }
-
+    async setContent(type, details) {
+        const token = {}; // Unique identifier token
+        this.setContentToken = token;
         try {
-            const options = this.options;
-
-            this.setEventListenersActive(false);
-
-            if (context.focus !== false) {
-                window.focus();
+            switch (type) {
+                case 'terms':
+                    await this.setContentTerms(details.definitions, details.context, token);
+                    break;
+                case 'kanji':
+                    await this.setContentKanji(details.definitions, details.context, token);
+                    break;
+                case 'orphaned':
+                    this.setContentOrphaned();
+                    break;
             }
-
-            this.definitions = definitions;
-            if (context.disableHistory) {
-                delete context.disableHistory;
-                this.context = new DisplayContext('terms', definitions, context);
-            } else {
-                this.context = DisplayContext.push(this.context, 'terms', definitions, context);
-            }
-
-            const sequence = ++this.sequence;
-            const params = {
-                definitions,
-                source: !!this.context.previous,
-                next: !!this.context.next,
-                addable: options.anki.enable,
-                grouped: options.general.resultOutputMode === 'group',
-                merged: options.general.resultOutputMode === 'merge',
-                playback: options.audio.enabled,
-                compactGlossaries: options.general.compactGlossaries,
-                debug: options.general.debugInfo
-            };
-
-            for (const definition of definitions) {
-                definition.cloze = Display.clozeBuild(context.sentence, definition.source);
-                definition.url = context.url;
-            }
-
-            const content = await apiTemplateRender('terms.html', params);
-            this.container.innerHTML = content;
-            const {index, scroll, disableScroll} = context;
-            if (!disableScroll) {
-                this.entryScrollIntoView(index || 0, scroll);
-            } else {
-                delete context.disableScroll;
-                this.entrySetCurrent(index || 0);
-            }
-
-            if (options.audio.enabled && options.audio.autoPlay) {
-                this.autoPlayAudio();
-            }
-
-            this.setEventListenersActive(true);
-
-            await this.adderButtonUpdate(['term-kanji', 'term-kana'], sequence);
         } catch (e) {
             this.onError(e);
+        } finally {
+            if (this.setContentToken === token) {
+                this.setContentToken = null;
+            }
         }
     }
 
-    async setContentKanji(definitions, context) {
+    async setContentTerms(definitions, context, token) {
         if (!context) { throw new Error('Context expected'); }
         if (!this.isInitialized()) { return; }
 
-        try {
-            const options = this.options;
+        this.setEventListenersActive(false);
 
-            this.setEventListenersActive(false);
+        if (context.focus !== false) {
+            window.focus();
+        }
 
-            if (context.focus !== false) {
-                window.focus();
+        if (!this.displayGenerator.isInitialized()) {
+            await this.displayGenerator.initialize();
+            if (this.setContentToken !== token) { return; }
+        }
+
+        this.definitions = definitions;
+        if (context.disableHistory) {
+            delete context.disableHistory;
+            this.context = new DisplayContext('terms', definitions, context);
+        } else {
+            this.context = DisplayContext.push(this.context, 'terms', definitions, context);
+        }
+
+        for (const definition of definitions) {
+            definition.cloze = Display.clozeBuild(context.sentence, definition.source);
+            definition.url = context.url;
+        }
+
+        this.updateNavigation(this.context.previous, this.context.next);
+        this.setNoContentVisible(definitions.length === 0);
+
+        const container = this.container;
+        container.textContent = '';
+
+        for (let i = 0, ii = definitions.length; i < ii; ++i) {
+            if (i > 0) {
+                await promiseTimeout(1);
+                if (this.setContentToken !== token) { return; }
             }
 
-            this.definitions = definitions;
-            if (context.disableHistory) {
-                delete context.disableHistory;
-                this.context = new DisplayContext('kanji', definitions, context);
-            } else {
-                this.context = DisplayContext.push(this.context, 'kanji', definitions, context);
-            }
+            const entry = this.displayGenerator.createTermEntry(definitions[i]);
+            container.appendChild(entry);
+        }
 
-            const sequence = ++this.sequence;
-            const params = {
-                definitions,
-                source: !!this.context.previous,
-                next: !!this.context.next,
-                addable: options.anki.enable,
-                debug: options.general.debugInfo
-            };
-
-            for (const definition of definitions) {
-                definition.cloze = Display.clozeBuild(context.sentence, definition.character);
-                definition.url = context.url;
-            }
-
-            const content = await apiTemplateRender('kanji.html', params);
-            this.container.innerHTML = content;
-            const {index, scroll} = context;
+        const {index, scroll, disableScroll} = context;
+        if (!disableScroll) {
             this.entryScrollIntoView(index || 0, scroll);
-
-            this.setEventListenersActive(true);
-
-            await this.adderButtonUpdate(['kanji'], sequence);
-        } catch (e) {
-            this.onError(e);
+        } else {
+            delete context.disableScroll;
+            this.entrySetCurrent(index || 0);
         }
+
+        if (this.options.audio.enabled && this.options.audio.autoPlay) {
+            this.autoPlayAudio();
+        }
+
+        this.setEventListenersActive(true);
+
+        const states = await apiDefinitionsAddable(definitions, ['term-kanji', 'term-kana'], this.getOptionsContext());
+        if (this.setContentToken !== token) { return; }
+
+        this.updateAdderButtons(states);
     }
 
-    async setContentOrphaned() {
-        const definitions = document.querySelector('#definitions');
+    async setContentKanji(definitions, context, token) {
+        if (!context) { throw new Error('Context expected'); }
+        if (!this.isInitialized()) { return; }
+
+        this.setEventListenersActive(false);
+
+        if (context.focus !== false) {
+            window.focus();
+        }
+
+        if (!this.displayGenerator.isInitialized()) {
+            await this.displayGenerator.initialize();
+            if (this.setContentToken !== token) { return; }
+        }
+
+        this.definitions = definitions;
+        if (context.disableHistory) {
+            delete context.disableHistory;
+            this.context = new DisplayContext('kanji', definitions, context);
+        } else {
+            this.context = DisplayContext.push(this.context, 'kanji', definitions, context);
+        }
+
+        for (const definition of definitions) {
+            definition.cloze = Display.clozeBuild(context.sentence, definition.character);
+            definition.url = context.url;
+        }
+
+        this.updateNavigation(this.context.previous, this.context.next);
+        this.setNoContentVisible(definitions.length === 0);
+
+        const container = this.container;
+        container.textContent = '';
+
+        for (let i = 0, ii = definitions.length; i < ii; ++i) {
+            if (i > 0) {
+                await promiseTimeout(0);
+                if (this.setContentToken !== token) { return; }
+            }
+
+            const entry = this.displayGenerator.createKanjiEntry(definitions[i]);
+            container.appendChild(entry);
+        }
+
+        const {index, scroll} = context;
+        this.entryScrollIntoView(index || 0, scroll);
+
+        this.setEventListenersActive(true);
+
+        const states = await apiDefinitionsAddable(definitions, ['kanji'], this.getOptionsContext());
+        if (this.setContentToken !== token) { return; }
+
+        this.updateAdderButtons(states);
+    }
+
+    setContentOrphaned() {
         const errorOrphaned = document.querySelector('#error-orphaned');
 
-        if (definitions !== null) {
-            definitions.style.setProperty('display', 'none', 'important');
+        if (this.container !== null) {
+            this.container.hidden = true;
         }
 
         if (errorOrphaned !== null) {
-            errorOrphaned.style.setProperty('display', 'block', 'important');
+            errorOrphaned.hidden = false;
+        }
+
+        this.updateNavigation(null, null);
+        this.setNoContentVisible(false);
+    }
+
+    setNoContentVisible(visible) {
+        const noResults = document.querySelector('#no-results');
+
+        if (noResults !== null) {
+            noResults.hidden = !visible;
+        }
+    }
+
+    updateNavigation(previous, next) {
+        const navigation = document.querySelector('#navigation-header');
+        if (navigation !== null) {
+            navigation.hidden = !(previous || next);
+            navigation.dataset.hasPrevious = `${!!previous}`;
+            navigation.dataset.hasNext = `${!!next}`;
         }
     }
 
@@ -451,35 +501,26 @@ class Display {
         this.audioPlay(this.definitions[0], this.firstExpressionIndex, 0);
     }
 
-    async adderButtonUpdate(modes, sequence) {
-        try {
-            const states = await apiDefinitionsAddable(this.definitions, modes, this.getOptionsContext());
-            if (!states || sequence !== this.sequence) {
-                return;
-            }
-
-            for (let i = 0; i < states.length; ++i) {
-                const state = states[i];
-                let noteId = null;
-                for (const mode in state) {
-                    const button = this.adderButtonFind(i, mode);
-                    if (button === null) {
-                        continue;
-                    }
-
-                    const info = state[mode];
-                    if (!info.canAdd && noteId === null && info.noteId) {
-                        noteId = info.noteId;
-                    }
-                    button.classList.toggle('disabled', !info.canAdd);
-                    button.classList.remove('pending');
+    updateAdderButtons(states) {
+        for (let i = 0; i < states.length; ++i) {
+            const state = states[i];
+            let noteId = null;
+            for (const mode in state) {
+                const button = this.adderButtonFind(i, mode);
+                if (button === null) {
+                    continue;
                 }
-                if (noteId !== null) {
-                    this.viewerButtonShow(i, noteId);
+
+                const info = state[mode];
+                if (!info.canAdd && noteId === null && info.noteId) {
+                    noteId = info.noteId;
                 }
+                button.classList.toggle('disabled', !info.canAdd);
+                button.classList.remove('pending');
             }
-        } catch (e) {
-            this.onError(e);
+            if (noteId !== null) {
+                this.viewerButtonShow(i, noteId);
+            }
         }
     }
 
@@ -511,6 +552,11 @@ class Display {
             target = scroll;
         } else {
             target = this.index === 0 || entry === null ? 0 : Display.getElementTop(entry);
+
+            const header = document.querySelector('#navigation-header');
+            if (header !== null) {
+                target -= header.getBoundingClientRect().height;
+            }
         }
 
         if (smooth) {
@@ -673,7 +719,9 @@ class Display {
     }
 
     setSpinnerVisible(visible) {
-        this.spinner.style.display = visible ? 'block' : '';
+        if (this.spinner !== null) {
+            this.spinner.hidden = !visible;
+        }
     }
 
     getEntry(index) {
@@ -733,6 +781,7 @@ class Display {
     }
 
     static addEventListener(eventListeners, object, type, listener, options) {
+        if (object === null) { return; }
         object.addEventListener(type, listener, options);
         eventListeners.push([object, type, listener, options]);
     }

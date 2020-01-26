@@ -220,12 +220,12 @@ class DisplaySearch extends Display {
             this.updateSearchButton();
             if (valid) {
                 const {definitions} = await apiTermsFind(query, details, this.optionsContext);
-                this.setContentTerms(definitions, {
+                this.setContent('terms', {definitions, context: {
                     focus: false,
                     disableHistory: true,
                     sentence: {text: query, offset: 0},
                     url: window.location.href
-                });
+                }});
             } else {
                 this.container.textContent = '';
             }
@@ -234,6 +234,11 @@ class DisplaySearch extends Display {
         } catch (e) {
             this.onError(e);
         }
+    }
+
+    async updateOptions(options) {
+        await super.updateOptions(options);
+        this.queryParser.setOptions(this.options);
     }
 
     initClipboardMonitor() {
@@ -260,7 +265,7 @@ class DisplaySearch extends Display {
                 text !== this.clipboardPreviousText
             ) {
                 this.clipboardPreviousText = text;
-                if (jpIsJapaneseText(text)) {
+                if (jpIsStringPartiallyJapanese(text)) {
                     this.setQuery(this.isWanakanaEnabled() ? window.wanakana.toKana(text) : text);
                     window.history.pushState(null, '', `${window.location.pathname}?query=${encodeURIComponent(text)}`);
                     this.onSearchQueryUpdated(this.query.value, true);

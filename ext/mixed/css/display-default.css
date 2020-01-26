@@ -19,34 +19,51 @@
 
 body { background-color: #ffffff; color: #333333; }
 
-hr { border-top-color: #eeeeee; }
+.navigation-header {
+    background-color: #ffffff;
+    border-bottom-color: #eeeeee;
+}
 
-.tag-default      { background-color: #8a8a91; }
-.tag-name         { background-color: #5cb85c; }
-.tag-expression   { background-color: #f0ad4e; }
-.tag-popular      { background-color: #0275d8; }
-.tag-frequent     { background-color: #5bc0de; }
-.tag-archaism     { background-color: #d9534f; }
-.tag-dictionary   { background-color: #aa66cc; }
-.tag-frequency    { background-color: #5cb85c; }
-.tag-partOfSpeech { background-color: #565656; }
+.entry+.entry { border-top-color: #eeeeee; }
 
-.reasons       { color: #777777; }
-.glossary li   { color: #777777; }
-.glossary-item { color: #000000; }
-.label         { color: #ffffff; }
+.kanji-glyph-data>tbody>tr>* { border-top-color: #dddddd; }
 
-.expression .kanji-link {
+.tag { color: #ffffff; }
+.tag[data-category=default]      { background-color: #8a8a91; }
+.tag[data-category=name]         { background-color: #5cb85c; }
+.tag[data-category=expression]   { background-color: #f0ad4e; }
+.tag[data-category=popular]      { background-color: #0275d8; }
+.tag[data-category=frequent]     { background-color: #5bc0de; }
+.tag[data-category=archaism]     { background-color: #d9534f; }
+.tag[data-category=dictionary]   { background-color: #aa66cc; }
+.tag[data-category=frequency]    { background-color: #5cb85c; }
+.tag[data-category=partOfSpeech] { background-color: #565656; }
+
+.term-reasons { color: #777777; }
+
+.term-expression>.term-expression-text .kanji-link {
     border-bottom-color: #777777;
     color: #333333;
 }
 
-.expression-popular, .expression-popular .kanji-link {
+.term-expression[data-frequency=popular]>.term-expression-text,
+.term-expression[data-frequency=popular]>.term-expression-text .kanji-link {
     color: #0275d8;
 }
 
-.expression-rare, .expression-rare .kanji-link {
+.term-expression[data-frequency=rare]>.term-expression-text,
+.term-expression[data-frequency=rare]>.term-expression-text .kanji-link {
     color: #999999;
+}
+
+.term-definition-container,
+.kanji-glossary-container {
+    color: #777777;
+}
+
+.term-glossary,
+.kanji-glossary {
+    color: #000000;
 }
 
 .icon-checkbox:checked + label {

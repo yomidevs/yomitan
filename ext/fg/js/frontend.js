@@ -34,6 +34,8 @@ class Frontend extends TextScanner {
             url: popup.url
         };
 
+        this._pageZoomFactor = 1.0;
+        this._contentScale = 1.0;
         this._orphaned = true;
         this._lastShowPromise = Promise.resolve();
     }
@@ -41,23 +43,30 @@ class Frontend extends TextScanner {
     async prepare() {
         try {
             await this.updateOptions();
+            const {zoomFactor} = await apiGetZoom();
+            this._pageZoomFactor = zoomFactor;
+
+            window.addEventListener('resize', this.onResize.bind(this), false);
+
+            const visualViewport = window.visualViewport;
+            if (visualViewport !== null && typeof visualViewport === 'object') {
+                window.visualViewport.addEventListener('scroll', this.onVisualViewportScroll.bind(this));
+                window.visualViewport.addEventListener('resize', this.onVisualViewportResize.bind(this));
+            }
 
             yomichan.on('orphaned', () => this.onOrphaned());
             yomichan.on('optionsUpdate', () => this.updateOptions());
+            yomichan.on('zoomChanged', (e) => this.onZoomChanged(e));
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
+
+            this._updateContentScale();
         } catch (e) {
             this.onError(e);
         }
     }
 
-    async onResize() {
-        const textSource = this.textSourceCurrent;
-        if (textSource !== null && await this.popup.isVisible()) {
-            this._lastShowPromise = this.popup.showContent(
-                textSource.getRect(),
-                textSource.getWritingMode()
-            );
-        }
+    onResize() {
+        this._updatePopupPosition();
     }
 
     onWindowMessage(e) {
@@ -81,18 +90,30 @@ class Frontend extends TextScanner {
         this._orphaned = true;
     }
 
+    onZoomChanged({newZoomFactor}) {
+        this._pageZoomFactor = newZoomFactor;
+        this._updateContentScale();
+    }
+
+    onVisualViewportScroll() {
+        this._updatePopupPosition();
+    }
+
+    onVisualViewportResize() {
+        this._updateContentScale();
+    }
+
     getMouseEventListeners() {
         return [
             ...super.getMouseEventListeners(),
-            [window, 'message', this.onWindowMessage.bind(this)],
-            [window, 'resize', this.onResize.bind(this)]
+            [window, 'message', this.onWindowMessage.bind(this)]
         ];
     }
 
     async updateOptions() {
-        this.options = await apiOptionsGet(this.getOptionsContext());
+        this.setOptions(await apiOptionsGet(this.getOptionsContext()));
         await this.popup.setOptions(this.options);
-        this.setEnabled(this.options.general.enable);
+        this._updateContentScale();
     }
 
     async onSearchSource(textSource, cause) {
@@ -112,11 +133,7 @@ class Frontend extends TextScanner {
         } catch (e) {
             if (this._orphaned) {
                 if (textSource !== null && this.options.scanning.modifier !== 'none') {
-                    this._lastShowPromise = this.popup.showContent(
-                        textSource.getRect(),
-                        textSource.getWritingMode(),
-                        'orphaned'
-                    );
+                    this._showPopupContent(textSource, 'orphaned');
                 }
             } else {
                 this.onError(e);
@@ -133,9 +150,8 @@ class Frontend extends TextScanner {
     showContent(textSource, focus, definitions, type) {
         const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
         const url = window.location.href;
-        this._lastShowPromise = this.popup.showContent(
-            textSource.getRect(),
-            textSource.getWritingMode(),
+        this._showPopupContent(
+            textSource,
             type,
             {definitions, context: {sentence, url, focus, disableHistory: true}}
         );
@@ -180,6 +196,44 @@ class Frontend extends TextScanner {
     getOptionsContext() {
         this.optionsContext.url = this.popup.url;
         return this.optionsContext;
+    }
+
+    _showPopupContent(textSource, type=null, details=null) {
+        this._lastShowPromise = this.popup.showContent(
+            textSource.getRect(),
+            textSource.getWritingMode(),
+            type,
+            details
+        );
+        return this._lastShowPromise;
+    }
+
+    _updateContentScale() {
+        const {popupScalingFactor, popupScaleRelativeToPageZoom, popupScaleRelativeToVisualViewport} = this.options.general;
+        let contentScale = popupScalingFactor;
+        if (popupScaleRelativeToPageZoom) {
+            contentScale /= this._pageZoomFactor;
+        }
+        if (popupScaleRelativeToVisualViewport) {
+            contentScale /= Frontend._getVisualViewportScale();
+        }
+        if (contentScale === this._contentScale) { return; }
+
+        this._contentScale = contentScale;
+        this.popup.setContentScale(this._contentScale);
+        this._updatePopupPosition();
+    }
+
+    async _updatePopupPosition() {
+        const textSource = this.getCurrentTextSource();
+        if (textSource !== null && await this.popup.isVisible()) {
+            this._showPopupContent(textSource);
+        }
+    }
+
+    static _getVisualViewportScale() {
+        const visualViewport = window.visualViewport;
+        return visualViewport !== null && typeof visualViewport === 'object' ? visualViewport.scale : 1.0;
     }
 }
 

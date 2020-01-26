@@ -279,6 +279,9 @@ function profileOptionsCreateDefaults() {
             popupVerticalOffset2: 0,
             popupHorizontalTextPosition: 'below',
             popupVerticalTextPosition: 'before',
+            popupScalingFactor: 1,
+            popupScaleRelativeToPageZoom: false,
+            popupScaleRelativeToVisualViewport: true,
             showGuide: true,
             compactTags: false,
             compactGlossaries: false,
@@ -316,12 +319,21 @@ function profileOptionsCreateDefaults() {
             enableOnSearchPage: true
         },
 
+        translation: {
+            convertHalfWidthCharacters: 'false',
+            convertNumericCharacters: 'false',
+            convertAlphabeticCharacters: 'false',
+            convertHiraganaToKatakana: 'false',
+            convertKatakanaToHiragana: 'variant'
+        },
+
         dictionaries: {},
 
         parsing: {
             enableScanningParser: true,
             enableMecabParser: false,
             selectedParser: null,
+            termSpacing: true,
             readingMode: 'hiragana'
         },
 
