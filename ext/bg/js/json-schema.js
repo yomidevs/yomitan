@@ -131,19 +131,19 @@ class JsonSchemaProxyHandler {
             case 'object':
             {
                 const properties = schema.properties;
-                if (properties !== null && typeof properties === 'object' && !Array.isArray(properties)) {
+                if (JsonSchemaProxyHandler.isObject(properties)) {
                     if (Object.prototype.hasOwnProperty.call(properties, property)) {
                         return properties[property];
                     }
                 }
 
                 const additionalProperties = schema.additionalProperties;
-                return (additionalProperties !== null && typeof additionalProperties === 'object' && !Array.isArray(additionalProperties)) ? additionalProperties : null;
+                return JsonSchemaProxyHandler.isObject(additionalProperties) ? additionalProperties : null;
             }
             case 'array':
             {
                 const items = schema.items;
-                return (items !== null && typeof items === 'object' && !Array.isArray(items)) ? items : null;
+                return JsonSchemaProxyHandler.isObject(items) ? items : null;
             }
             default:
                 return null;
@@ -398,6 +398,10 @@ class JsonSchemaProxyHandler {
         }
 
         return value;
+    }
+
+    static isObject(value) {
+        return typeof value === 'object' && value !== null && !Array.isArray(value);
     }
 }
 
