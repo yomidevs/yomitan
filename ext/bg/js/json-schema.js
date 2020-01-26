@@ -149,7 +149,23 @@ class JsonSchemaProxyHandler {
             case 'array':
             {
                 const items = schema.items;
-                return JsonSchemaProxyHandler.isObject(items) ? items : null;
+                if (JsonSchemaProxyHandler.isObject(items)) {
+                    return items;
+                }
+                if (Array.isArray(items)) {
+                    if (property >= 0 && property < items.length) {
+                        return items[property];
+                    }
+                }
+
+                const additionalItems = schema.additionalItems;
+                if (additionalItems === false) {
+                    return null;
+                } else if (JsonSchemaProxyHandler.isObject(additionalItems)) {
+                    return additionalItems;
+                } else {
+                    return JsonSchemaProxyHandler._unconstrainedSchema;
+                }
             }
             default:
                 return null;
@@ -320,6 +336,18 @@ class JsonSchemaProxyHandler {
         const maxItems = schema.maxItems;
         if (typeof maxItems === 'number' && value.length > maxItems) {
             return 'Array length too long';
+        }
+
+        for (let i = 0, ii = value.length; i < ii; ++i) {
+            const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, i, value);
+            if (propertySchema === null) {
+                return `No schema found for array[${i}]`;
+            }
+
+            const error = JsonSchemaProxyHandler.validate(value[i], propertySchema);
+            if (error !== null) {
+                return error;
+            }
         }
 
         return null;
