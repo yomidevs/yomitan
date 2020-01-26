@@ -227,6 +227,10 @@ button.action-button {
     margin-left: 0.375em;
 }
 
+html:root:not([data-enable-search-tags=true]) .tag[data-category=search] {
+    display: none;
+}
+
 .entry-header2,
 .entry-header3 {
     display: inline;

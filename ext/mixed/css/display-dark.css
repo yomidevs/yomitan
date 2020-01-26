@@ -38,6 +38,7 @@ body { background-color: #1e1e1e; color: #d4d4d4; }
 .tag[data-category=dictionary]   { background-color: #9057ad; }
 .tag[data-category=frequency]    { background-color: #489148; }
 .tag[data-category=partOfSpeech] { background-color: #565656; }
+.tag[data-category=search]       { background-color: #69696e; }
 
 .term-reasons { color: #888888; }
 

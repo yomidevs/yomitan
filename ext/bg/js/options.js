@@ -316,7 +316,8 @@ function profileOptionsCreateDefaults() {
             popupNestingMaxDepth: 0,
             enablePopupSearch: false,
             enableOnPopupExpressions: false,
-            enableOnSearchPage: true
+            enableOnSearchPage: true,
+            enableSearchTags: false
         },
 
         translation: {

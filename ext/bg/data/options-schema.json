@@ -290,7 +290,8 @@
                                     "popupNestingMaxDepth",
                                     "enablePopupSearch",
                                     "enableOnPopupExpressions",
-                                    "enableOnSearchPage"
+                                    "enableOnSearchPage",
+                                    "enableSearchTags"
                                 ],
                                 "properties": {
                                     "middleMouse": {
@@ -348,6 +349,10 @@
                                     "enableOnSearchPage": {
                                         "type": "boolean",
                                         "default": true
+                                    },
+                                    "enableSearchTags": {
+                                        "type": "boolean",
+                                        "default": false
                                     }
                                 }
                             },

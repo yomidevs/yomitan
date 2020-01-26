@@ -67,6 +67,7 @@ async function formRead(options) {
     options.scanning.enablePopupSearch = $('#enable-search-within-first-popup').prop('checked');
     options.scanning.enableOnPopupExpressions = $('#enable-scanning-of-popup-expressions').prop('checked');
     options.scanning.enableOnSearchPage = $('#enable-scanning-on-search-page').prop('checked');
+    options.scanning.enableSearchTags = $('#enable-search-tags').prop('checked');
     options.scanning.delay = parseInt($('#scan-delay').val(), 10);
     options.scanning.length = parseInt($('#scan-length').val(), 10);
     options.scanning.modifier = $('#scan-modifier-key').val();
@@ -142,6 +143,7 @@ async function formWrite(options) {
     $('#enable-search-within-first-popup').prop('checked', options.scanning.enablePopupSearch);
     $('#enable-scanning-of-popup-expressions').prop('checked', options.scanning.enableOnPopupExpressions);
     $('#enable-scanning-on-search-page').prop('checked', options.scanning.enableOnSearchPage);
+    $('#enable-search-tags').prop('checked', options.scanning.enableSearchTags);
     $('#scan-delay').val(options.scanning.delay);
     $('#scan-length').val(options.scanning.length);
     $('#scan-modifier-key').val(options.scanning.modifier);
