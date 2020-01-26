@@ -105,6 +105,7 @@ async function formRead(options) {
 
 async function formWrite(options) {
     $('#enable').prop('checked', options.general.enable);
+    $('#enable-clipboard-popups').prop('checked', options.general.enableClipboardPopups);
     $('#show-usage-guide').prop('checked', options.general.showGuide);
     $('#compact-tags').prop('checked', options.general.compactTags);
     $('#compact-glossaries').prop('checked', options.general.compactGlossaries);
