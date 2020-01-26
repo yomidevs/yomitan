@@ -1,0 +1,40 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "description": "Index file containing information about the data contained in the dictionary.",
+    "required": [
+        "title",
+        "revision"
+    ],
+    "properties": {
+        "title": {
+            "type": "string",
+            "description": "Title of the dictionary."
+        },
+        "revision": {
+            "type": "string",
+            "description": "Revision of the dictionary. This value is only used for displaying information."
+        },
+        "sequenced": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether or not this dictionary can be used as the primary dictionary. Primary dictionaries typically contain term/expression definitions."
+        },
+        "format": {
+            "type": "integer",
+            "description": "Format of data found in the JSON data files."
+        },
+        "version": {
+            "type": "integer",
+            "description": "Alias for format."
+        }
+    },
+    "anyOf": [
+        {
+            "required": ["format"]
+        },
+        {
+            "required": ["version"]
+        }
+    ]
+}
