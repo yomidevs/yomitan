@@ -154,6 +154,9 @@ class JsonSchemaProxyHandler {
         let result = JsonSchemaProxyHandler.validateSingleSchema(value, schema);
         if (result !== null) { return result; }
 
+        result = JsonSchemaProxyHandler.validateConditional(value, schema);
+        if (result !== null) { return result; }
+
         result = JsonSchemaProxyHandler.validateAllOf(value, schema);
         if (result !== null) { return result; }
 
@@ -165,6 +168,25 @@ class JsonSchemaProxyHandler {
 
         result = JsonSchemaProxyHandler.validateNoneOf(value, schema);
         if (result !== null) { return result; }
+
+        return null;
+    }
+
+    static validateConditional(value, schema) {
+        const ifCondition = schema.if;
+        if (!JsonSchemaProxyHandler.isObject(ifCondition)) { return null; }
+
+        const thenSchema = schema.then;
+        if (JsonSchemaProxyHandler.isObject(thenSchema)) {
+            const result = JsonSchemaProxyHandler.validate(value, thenSchema);
+            if (result !== null) { return `then conditional didn't match: ${result}`; }
+        }
+
+        const elseSchema = schema.else;
+        if (JsonSchemaProxyHandler.isObject(elseSchema)) {
+            const result = JsonSchemaProxyHandler.validate(value, thenSchema);
+            if (result !== null) { return `else conditional didn't match: ${result}`; }
+        }
 
         return null;
     }
