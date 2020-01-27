@@ -22,7 +22,7 @@ const audioUrlBuilders = new Map([
         let kana = definition.reading;
         let kanji = definition.expression;
 
-        if (!kana && wanakana.isHiragana(kanji)) {
+        if (!kana && jpIsStringEntirelyKana(kanji)) {
             kana = kanji;
             kanji = null;
         }
