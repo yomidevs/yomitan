@@ -176,7 +176,12 @@ class Display {
         const entry = link.closest('.entry');
         const definitionIndex = this.entryIndexFind(entry);
         const expressionIndex = Display.indexOf(entry.querySelectorAll('.term-expression .action-play-audio'), link);
-        this.audioPlay(this.definitions[definitionIndex], expressionIndex, definitionIndex);
+        this.audioPlay(
+            this.definitions[definitionIndex],
+            // expressionIndex is used in audioPlay to detect result output mode
+            Math.max(expressionIndex, this.options.general.resultOutputMode === 'merge' ? 0 : -1),
+            definitionIndex
+        );
     }
 
     onNoteAdd(e) {
