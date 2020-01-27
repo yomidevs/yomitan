@@ -760,6 +760,13 @@
 
                     <div class="alert alert-danger" id="anki-error" hidden></div>
 
+                    <div class="alert alert-danger" id="anki-invalid-response-error" hidden>
+                        Attempting to connect to Anki can sometimes return an error message which includes "Invalid response",
+                        which may indicate that the value of the <strong>Interface server</strong> option is incorrect.
+                        The <strong>Show advanced options</strong> checkbox under General Options must be ticked ticked to show this option.
+                        Resetting it to the default value may fix issues that are occurring.
+                    </div>
+
                     <div class="form-group">
                         <label for="card-tags">Card tags <span class="label-light">(comma or space separated)</span></label>
                         <input type="text" id="card-tags" class="form-control">
@@ -771,7 +778,7 @@
                     </div>
 
                     <div class="form-group options-advanced">
-                        <label for="interface-server">Interface server</label>
+                        <label for="interface-server">Interface server <span class="label-light">(Default: http://127.0.0.1:8765)</span></label>
                         <input type="text" id="interface-server" class="form-control">
                     </div>
 

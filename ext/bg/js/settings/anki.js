@@ -35,9 +35,15 @@ function _ankiSetError(error) {
     const node = document.querySelector('#anki-error');
     if (!node) { return; }
     if (error) {
+        const errorString = `${error}`;
         node.hidden = false;
-        node.textContent = `${error}`;
+        node.textContent = errorString;
         _ankiSetErrorData(node, error);
+
+        const node2 = document.querySelector('#anki-invalid-response-error');
+        if (node2 !== null) {
+            node2.hidden = (errorString.indexOf('Invalid response') < 0);
+        }
     } else {
         node.hidden = true;
         node.textContent = '';
