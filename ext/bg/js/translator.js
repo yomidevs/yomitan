@@ -48,14 +48,14 @@ class Translator {
     }
 
     async getSequencedDefinitions(definitions, mainDictionary) {
-        const definitionsBySequence = dictTermsMergeBySequence(definitions, mainDictionary);
-        const defaultDefinitions = definitionsBySequence['-1'];
+        const [definitionsBySequence, defaultDefinitions] = dictTermsMergeBySequence(definitions, mainDictionary);
 
-        const sequenceList = Object.keys(definitionsBySequence).map((v) => Number(v)).filter((v) => v >= 0);
-        const sequencedDefinitions = sequenceList.map((key) => ({
-            definitions: definitionsBySequence[key],
-            rawDefinitions: []
-        }));
+        const sequenceList = [];
+        const sequencedDefinitions = [];
+        for (const [key, value] of definitionsBySequence.entries()) {
+            sequenceList.push(key);
+            sequencedDefinitions.push({definitions: value, rawDefinitions: []});
+        }
 
         for (const definition of await this.database.findTermsBySequenceBulk(sequenceList, mainDictionary)) {
             sequencedDefinitions[definition.index].rawDefinitions.push(definition);

@@ -159,11 +159,14 @@ function dictTermsGroup(definitions, dictionaries) {
 }
 
 function dictTermsMergeBySequence(definitions, mainDictionary) {
-    const definitionsBySequence = {'-1': []};
+    const sequencedDefinitions = new Map();
+    const nonSequencedDefinitions = [];
     for (const definition of definitions) {
-        if (mainDictionary === definition.dictionary && definition.sequence >= 0) {
-            if (!definitionsBySequence[definition.sequence]) {
-                definitionsBySequence[definition.sequence] = {
+        const sequence = definition.sequence;
+        if (mainDictionary === definition.dictionary && sequence >= 0) {
+            sequencedDefinition = sequencedDefinitions.get(sequence);
+            if (typeof sequencedDefinition === 'undefined') {
+                sequencedDefinition = {
                     reasons: definition.reasons,
                     score: Number.MIN_SAFE_INTEGER,
                     expression: new Set(),
@@ -173,15 +176,16 @@ function dictTermsMergeBySequence(definitions, mainDictionary) {
                     dictionary: definition.dictionary,
                     definitions: []
                 };
+                sequencedDefinitions.set(sequence, sequencedDefinition);
+            } else {
+                sequencedDefinition.score = Math.max(sequencedDefinition.score, definition.score);
             }
-            const score = Math.max(definitionsBySequence[definition.sequence].score, definition.score);
-            definitionsBySequence[definition.sequence].score = score;
         } else {
-            definitionsBySequence['-1'].push(definition);
+            nonSequencedDefinitions.push(definition);
         }
     }
 
-    return definitionsBySequence;
+    return [sequencedDefinitions, nonSequencedDefinitions];
 }
 
 function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
