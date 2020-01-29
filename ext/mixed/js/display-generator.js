@@ -71,7 +71,11 @@ class DisplayGenerator {
         node.dataset.expressionCount = `${expressionMulti ? details.expressions.length : 1}`;
         node.dataset.definitionCount = `${definitionMulti ? details.definitions.length : 1}`;
 
-        DisplayGenerator._appendMultiple(expressionsContainer, this.createTermExpression.bind(this), details.expressions, [details]);
+        const termTags = details.termTags;
+        let expressions = details.expressions;
+        expressions = Array.isArray(expressions) ? expressions.map((e) => [e, termTags]) : null;
+
+        DisplayGenerator._appendMultiple(expressionsContainer, this.createTermExpression.bind(this), expressions, [[details, termTags]]);
         DisplayGenerator._appendMultiple(reasonsContainer, this.createTermReason.bind(this), details.reasons);
         DisplayGenerator._appendMultiple(frequenciesContainer, this.createFrequencyTag.bind(this), details.frequencies);
         DisplayGenerator._appendMultiple(definitionsContainer, this.createTermDefinitionItem.bind(this), details.definitions, [details]);
@@ -83,7 +87,7 @@ class DisplayGenerator {
         return node;
     }
 
-    createTermExpression(details) {
+    createTermExpression([details, termTags]) {
         const node = DisplayGenerator._instantiateTemplate(this._termExpressionTemplate);
 
         const expressionContainer = node.querySelector('.term-expression-text');
@@ -103,7 +107,11 @@ class DisplayGenerator {
             DisplayGenerator._appendFurigana(expressionContainer, furiganaSegments, this._appendKanjiLinks.bind(this));
         }
 
-        DisplayGenerator._appendMultiple(tagContainer, this.createTag.bind(this), details.termTags);
+        if (!Array.isArray(termTags)) {
+            // Fallback
+            termTags = details.termTags;
+        }
+        DisplayGenerator._appendMultiple(tagContainer, this.createTag.bind(this), termTags);
         DisplayGenerator._appendMultiple(frequencyContainer, this.createFrequencyTag.bind(this), details.frequencies);
 
         return node;
