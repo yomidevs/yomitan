@@ -208,15 +208,19 @@ button.action-button {
 }
 
 .tag {
-    display: inline;
+    display: inline-block;
     padding: 0.2em 0.6em 0.3em;
     font-size: 75%;
     font-weight: 700;
-    line-height: 1;
+    line-height: 1.25;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
     border-radius: 0.25em;
+}
+
+.tag-inner {
+    display: block;
 }
 
 .tag-list>.tag+.tag {

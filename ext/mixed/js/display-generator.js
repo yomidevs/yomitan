@@ -252,8 +252,10 @@ class DisplayGenerator {
     createTag(details) {
         const node = DisplayGenerator._instantiateTemplate(this._tagTemplate);
 
+        const inner = node.querySelector('.tag-inner');
+
         node.title = details.notes;
-        node.textContent = details.name;
+        inner.textContent = details.name;
         node.dataset.category = details.category;
 
         return node;
