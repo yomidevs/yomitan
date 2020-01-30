@@ -110,10 +110,11 @@ class DisplayGenerator {
     }
 
     createTermReason(reason) {
-        const node = DisplayGenerator._instantiateTemplate(this._termReasonTemplate);
+        const fragment = DisplayGenerator._instantiateTemplateFragment(this._termReasonTemplate);
+        const node = fragment.querySelector('.term-reason');
         node.textContent = reason;
         node.dataset.reason = reason;
-        return node;
+        return fragment;
     }
 
     createTermDefinitionItem(details) {
@@ -377,5 +378,9 @@ class DisplayGenerator {
 
     static _instantiateTemplate(template) {
         return document.importNode(template.content.firstChild, true);
+    }
+
+    static _instantiateTemplateFragment(template) {
+        return document.importNode(template.content, true);
     }
 }

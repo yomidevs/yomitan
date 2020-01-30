@@ -249,7 +249,7 @@ button.action-button {
     display: inline-block;
 }
 
-.term-reasons>.term-reason+.term-reason:before {
+.term-reasons>.term-reason+.term-reason-separator+.term-reason:before {
     content: " \00AB  "; /* The two spaces is not a typo */
     display: inline;
 }
@@ -467,4 +467,14 @@ button.action-button {
 .kanji-glossary-list:not([data-count="0"]):not([data-count="1"]) {
     padding-left: 1.4em;
     list-style-type: decimal;
+}
+
+.term-glossary-separator,
+.term-reason-separator {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    font-size: 0;
+    opacity: 0;
+    white-space: pre;
 }
