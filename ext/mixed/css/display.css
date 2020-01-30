@@ -251,6 +251,7 @@ button.action-button {
 
 .term-reasons>.term-reason+.term-reason-separator+.term-reason:before {
     content: " \00AB  "; /* The two spaces is not a typo */
+    white-space: pre-wrap;
     display: inline;
 }
 
@@ -403,7 +404,16 @@ button.action-button {
 }
 
 :root[data-compact-glossaries=true] .term-glossary-list>li:not(:first-child):before {
+    white-space: pre-wrap;
     content: " | ";
+    display: inline;
+}
+
+.term-glossary-separator,
+.term-reason-separator {
+    display: inline;
+    font-size: 0;
+    opacity: 0;
 }
 
 /*
@@ -467,14 +477,4 @@ button.action-button {
 .kanji-glossary-list:not([data-count="0"]):not([data-count="1"]) {
     padding-left: 1.4em;
     list-style-type: decimal;
-}
-
-.term-glossary-separator,
-.term-reason-separator {
-    display: inline-block;
-    width: 0;
-    height: 0;
-    font-size: 0;
-    opacity: 0;
-    white-space: pre;
 }
