@@ -272,9 +272,7 @@ class SettingsDictionaryEntryUI {
             this.isDeleting = false;
             progress.hidden = true;
 
-            const optionsContext = getOptionsContext();
-            const options = await getOptionsMutable(optionsContext);
-            onDatabaseUpdated(options);
+            onDatabaseUpdated();
         }
     }
 
@@ -359,10 +357,8 @@ async function dictSettingsInitialize() {
     document.querySelector('#dict-main').addEventListener('change', (e) => onDictionaryMainChanged(e), false);
     document.querySelector('#database-enable-prefix-wildcard-searches').addEventListener('change', (e) => onDatabaseEnablePrefixWildcardSearchesChanged(e), false);
 
-    const optionsContext = getOptionsContext();
-    const options = await getOptionsMutable(optionsContext);
     onDictionaryOptionsChanged();
-    onDatabaseUpdated(options);
+    onDatabaseUpdated();
 }
 
 async function onDictionaryOptionsChanged() {
@@ -377,14 +373,15 @@ async function onDictionaryOptionsChanged() {
     document.querySelector('#database-enable-prefix-wildcard-searches').checked = optionsFull.global.database.prefixWildcardsSupported;
 }
 
-async function onDatabaseUpdated(options) {
+async function onDatabaseUpdated() {
     try {
         const dictionaries = await utilDatabaseGetDictionaryInfo();
         dictionaryUI.setDictionaries(dictionaries);
 
         document.querySelector('#dict-warning').hidden = (dictionaries.length > 0);
 
-        updateMainDictionarySelect(options, dictionaries);
+        updateMainDictionarySelectOptions(dictionaries);
+        await updateMainDictionarySelectValue();
 
         const {counts, total} = await utilDatabaseGetDictionaryCounts(dictionaries.map((v) => v.title), true);
         dictionaryUI.setCounts(counts, total);
@@ -393,7 +390,7 @@ async function onDatabaseUpdated(options) {
     }
 }
 
-async function updateMainDictionarySelect(options, dictionaries) {
+function updateMainDictionarySelectOptions(dictionaries) {
     const select = document.querySelector('#dict-main');
     select.textContent = ''; // Empty
 
@@ -403,8 +400,6 @@ async function updateMainDictionarySelect(options, dictionaries) {
     option.textContent = 'Not selected';
     select.appendChild(option);
 
-    let value = '';
-    const currentValue = options.general.mainDictionary;
     for (const {title, sequenced} of toIterable(dictionaries)) {
         if (!sequenced) { continue; }
 
@@ -412,18 +407,41 @@ async function updateMainDictionarySelect(options, dictionaries) {
         option.value = title;
         option.textContent = title;
         select.appendChild(option);
+    }
+}
 
-        if (title === currentValue) {
-            value = title;
+async function updateMainDictionarySelectValue() {
+    const optionsContext = getOptionsContext();
+    const options = await apiOptionsGet(optionsContext);
+
+    const value = options.general.mainDictionary;
+
+    const select = document.querySelector('#dict-main');
+    let selectValue = null;
+    for (const child of select.children) {
+        if (child.nodeName.toUpperCase() === 'OPTION' && child.value === value) {
+            selectValue = value;
+            break;
+        }
+    }
+
+    let missingNodeOption = select.querySelector('option[data-not-installed=true]');
+    if (selectValue === null) {
+        if (missingNodeOption === null) {
+            missingNodeOption = document.createElement('option');
+            missingNodeOption.className = 'text-muted';
+            missingNodeOption.value = value;
+            missingNodeOption.textContent = `${value} (Not installed)`;
+            missingNodeOption.dataset.notInstalled = 'true';
+            select.appendChild(missingNodeOption);
+        }
+    } else {
+        if (missingNodeOption !== null) {
+            missingNodeOption.parentNode.removeChild(missingNodeOption);
         }
     }
 
     select.value = value;
-
-    if (options.general.mainDictionary !== value) {
-        options.general.mainDictionary = value;
-        settingsSaveOptions();
-    }
 }
 
 async function onDictionaryMainChanged(e) {
@@ -541,9 +559,7 @@ async function onDictionaryPurge(e) {
         }
         await settingsSaveOptions();
 
-        const optionsContext = getOptionsContext();
-        const options = await getOptionsMutable(optionsContext);
-        onDatabaseUpdated(options);
+        onDatabaseUpdated();
     } catch (err) {
         dictionaryErrorsShow([err]);
     } finally {
@@ -615,9 +631,7 @@ async function onDictionaryImport(e) {
                 dictionaryErrorsShow(errors);
             }
 
-            const optionsContext = getOptionsContext();
-            const options = await getOptionsMutable(optionsContext);
-            onDatabaseUpdated(options);
+            onDatabaseUpdated();
         }
     } catch (err) {
         dictionaryErrorsShow([err]);
