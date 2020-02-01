@@ -445,7 +445,14 @@ async function updateMainDictionarySelectValue() {
 }
 
 async function onDictionaryMainChanged(e) {
-    const value = e.target.value;
+    const select = e.target;
+    const value = select.value;
+
+    const missingNodeOption = select.querySelector('option[data-not-installed=true]');
+    if (missingNodeOption !== null && missingNodeOption.value !== value) {
+        missingNodeOption.parentNode.removeChild(missingNodeOption);
+    }
+
     const optionsContext = getOptionsContext();
     const options = await getOptionsMutable(optionsContext);
     options.general.mainDictionary = value;
