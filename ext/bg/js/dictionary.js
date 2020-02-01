@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global utilSetEqual, utilSetIntersection, apiTemplateRender*/
 
 function dictEnabledSet(options) {
     const dictionaries = {};

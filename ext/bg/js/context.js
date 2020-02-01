@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global apiCommandExec, apiGetEnvironmentInfo, apiOptionsGet*/
 
 function showExtensionInfo() {
     const node = document.getElementById('extension-info');

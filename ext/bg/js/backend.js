@@ -16,6 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global optionsSave, utilIsolate
+conditionsTestValue, profileConditionsDescriptor, profileOptionsGetDefaultFieldTemplates
+handlebarsRenderDynamic, handlebarsRenderStatic
+requestText, requestJson, optionsLoad
+dictConfigured, dictTermsSort, dictEnabledSet, dictNoteFormat
+audioGetUrl, audioInject
+jpConvertReading, jpDistributeFuriganaInflected, jpKatakanaToHiragana
+Translator, AnkiConnect, AnkiNull, Mecab, BackendApiForwarder, JsonSchema*/
 
 class Backend {
     constructor() {

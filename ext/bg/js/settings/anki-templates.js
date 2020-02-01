@@ -16,6 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global getOptionsContext, getOptionsMutable, settingsSaveOptions
+profileOptionsGetDefaultFieldTemplates, ankiGetFieldMarkers, ankiGetFieldMarkersHtml, dictFieldFormat
+apiOptionsGet, apiTermsFind*/
 
 function onAnkiFieldTemplatesReset(e) {
     e.preventDefault();

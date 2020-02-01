@@ -16,6 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global docRangeFromPoint, docSentenceExtract
+apiKanjiFind, apiTermsFind, apiNoteView, apiOptionsGet, apiDefinitionsAddable, apiDefinitionAdd
+apiScreenshotGet, apiForward
+audioPrepareTextToSpeech, audioGetFromSources
+DisplayGenerator, WindowScroll, DisplayContext, DOM*/
 
 class Display {
     constructor(spinner, container) {

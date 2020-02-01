@@ -16,6 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global apiOptionsGetFull, apiGetEnvironmentInfo
+utilBackend, utilIsolate, utilBackgroundIsolate, utilReadFileArrayBuffer
+optionsGetDefault, optionsUpdateVersion
+profileOptionsGetDefaultFieldTemplates*/
 
 // Exporting
 

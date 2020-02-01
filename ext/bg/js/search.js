@@ -16,6 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global jpIsStringPartiallyJapanese, apiOptionsSet, apiTermsFind, apiClipboardGet, apiGetEnvironmentInfo
+Display, QueryParser*/
+
 class DisplaySearch extends Display {
     constructor() {
         super(document.querySelector('#spinner'), document.querySelector('#content'));

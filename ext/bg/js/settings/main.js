@@ -16,6 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global getOptionsContext, apiOptionsSave
+utilBackend, utilIsolate, utilBackgroundIsolate
+ankiErrorShown, ankiFieldsToDict
+ankiTemplatesUpdateValue, onAnkiOptionsChanged, onDictionaryOptionsChanged
+appearanceInitialize, audioSettingsInitialize, profileOptionsSetup, dictSettingsInitialize
+ankiInitialize, ankiTemplatesInitialize, storageInfoInitialize
+*/
+
 function getOptionsMutable(optionsContext) {
     return utilBackend().getOptions(
         utilBackgroundIsolate(optionsContext)
