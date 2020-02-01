@@ -1,7 +1,14 @@
 {
+    "root": true,
     "extends": "eslint:recommended",
     "parserOptions": {
-        "ecmaVersion": 8
+        "ecmaVersion": 8,
+        "sourceType": "script"
+    },
+    "env": {
+        "browser": true,
+        "es2017": true,
+        "webextensions": true
     },
     "ignorePatterns": [
         "/ext/mixed/lib/",
@@ -18,6 +25,7 @@
         "no-constant-condition": "off",
         "no-undef": "off",
         "no-unused-vars": ["error", {"vars": "local", "args": "after-used", "argsIgnorePattern": "^_", "caughtErrors": "none"}],
+        "no-unused-expressions": "error",
         "no-var": "error",
         "prefer-const": ["error", {"destructuring": "all"}],
         "quote-props": ["error", "consistent"],
