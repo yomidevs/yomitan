@@ -427,7 +427,7 @@ async function onDictionaryMainChanged(e) {
     const optionsContext = getOptionsContext();
     const options = await getOptionsMutable(optionsContext);
     options.general.mainDictionary = value;
-    settingsSaveOptions();
+    await settingsSaveOptions();
 }
 
 
