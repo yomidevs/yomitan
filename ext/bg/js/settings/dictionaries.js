@@ -357,8 +357,8 @@ async function dictSettingsInitialize() {
     document.querySelector('#dict-main').addEventListener('change', (e) => onDictionaryMainChanged(e), false);
     document.querySelector('#database-enable-prefix-wildcard-searches').addEventListener('change', (e) => onDatabaseEnablePrefixWildcardSearchesChanged(e), false);
 
-    onDictionaryOptionsChanged();
-    onDatabaseUpdated();
+    await onDictionaryOptionsChanged();
+    await onDatabaseUpdated();
 }
 
 async function onDictionaryOptionsChanged() {
@@ -371,6 +371,8 @@ async function onDictionaryOptionsChanged() {
 
     const optionsFull = await apiOptionsGetFull();
     document.querySelector('#database-enable-prefix-wildcard-searches').checked = optionsFull.global.database.prefixWildcardsSupported;
+
+    await updateMainDictionarySelectValue();
 }
 
 async function onDatabaseUpdated() {
