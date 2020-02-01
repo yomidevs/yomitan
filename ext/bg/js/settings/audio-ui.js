@@ -16,8 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global toIterable*/
-
 class AudioSourceUI {
     static instantiateTemplate(templateSelector) {
         const template = document.querySelector(templateSelector);
