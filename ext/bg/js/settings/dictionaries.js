@@ -361,12 +361,16 @@ async function dictSettingsInitialize() {
 
     const optionsContext = getOptionsContext();
     const options = await getOptionsMutable(optionsContext);
-    onDictionaryOptionsChanged(options);
+    onDictionaryOptionsChanged();
     onDatabaseUpdated(options);
 }
 
-async function onDictionaryOptionsChanged(options) {
+async function onDictionaryOptionsChanged() {
     if (dictionaryUI === null) { return; }
+
+    const optionsContext = getOptionsContext();
+    const options = await getOptionsMutable(optionsContext);
+
     dictionaryUI.setOptionsDictionaries(options.dictionaries);
 
     const optionsFull = await apiOptionsGetFull();

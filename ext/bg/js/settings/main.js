@@ -167,7 +167,7 @@ async function formWrite(options) {
 
     await ankiTemplatesUpdateValue();
     await onAnkiOptionsChanged(options);
-    await onDictionaryOptionsChanged(options);
+    await onDictionaryOptionsChanged();
 
     formUpdateVisibility(options);
 }
