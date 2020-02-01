@@ -708,7 +708,7 @@ class Backend {
         }
 
         try {
-            const tabWindow = await new Promise((resolve) => {
+            const tabWindow = await new Promise((resolve, reject) => {
                 chrome.windows.get(tab.windowId, {}, (tabWindow) => {
                     const e = chrome.runtime.lastError;
                     if (e) { reject(e); }
