@@ -164,7 +164,7 @@ function dictTermsMergeBySequence(definitions, mainDictionary) {
     for (const definition of definitions) {
         const sequence = definition.sequence;
         if (mainDictionary === definition.dictionary && sequence >= 0) {
-            sequencedDefinition = sequencedDefinitions.get(sequence);
+            let sequencedDefinition = sequencedDefinitions.get(sequence);
             if (typeof sequencedDefinition === 'undefined') {
                 sequencedDefinition = {
                     reasons: definition.reasons,
