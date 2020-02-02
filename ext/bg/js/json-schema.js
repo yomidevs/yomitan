@@ -179,14 +179,14 @@ class JsonSchemaProxyHandler {
                     return valueType;
                 }
             }
-            throw new Error(`Ambiguous property type for ${property}`);
+            return null;
         }
 
         if (typeof type === 'undefined') {
             if (typeof value !== 'undefined') {
                 return JsonSchemaProxyHandler.getValueType(value);
             }
-            throw new Error(`No property type for ${property}`);
+            return null;
         }
 
         return type;
