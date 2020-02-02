@@ -257,6 +257,7 @@ class Display {
         data.ankiEnabled = `${options.anki.enable}`;
         data.audioEnabled = `${options.audio.enable}`;
         data.compactGlossaries = `${options.general.compactGlossaries}`;
+        data.enableSearchTags = `${options.scanning.enableSearchTags}`;
         data.debug = `${options.general.debugInfo}`;
     }
 
@@ -312,9 +313,9 @@ class Display {
             this.addEventListeners('.action-play-audio', 'click', this.onAudioPlay.bind(this));
             this.addEventListeners('.kanji-link', 'click', this.onKanjiLookup.bind(this));
             if (this.options.scanning.enablePopupSearch) {
-                this.addEventListeners('.term-glossary-item', 'mouseup', this.onGlossaryMouseUp.bind(this));
-                this.addEventListeners('.term-glossary-item', 'mousedown', this.onGlossaryMouseDown.bind(this));
-                this.addEventListeners('.term-glossary-item', 'mousemove', this.onGlossaryMouseMove.bind(this));
+                this.addEventListeners('.term-glossary-item, .tag', 'mouseup', this.onGlossaryMouseUp.bind(this));
+                this.addEventListeners('.term-glossary-item, .tag', 'mousedown', this.onGlossaryMouseDown.bind(this));
+                this.addEventListeners('.term-glossary-item, .tag', 'mousemove', this.onGlossaryMouseMove.bind(this));
             }
         } else {
             Display.clearEventListeners(this.eventListeners);

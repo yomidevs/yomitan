@@ -111,7 +111,11 @@ class DisplayGenerator {
             // Fallback
             termTags = details.termTags;
         }
+        const searchQueries = [details.expression, details.reading]
+            .filter((x) => !!x)
+            .map((x) => ({query: x}));
         DisplayGenerator._appendMultiple(tagContainer, this.createTag.bind(this), termTags);
+        DisplayGenerator._appendMultiple(tagContainer, this.createSearchTag.bind(this), searchQueries);
         DisplayGenerator._appendMultiple(frequencyContainer, this.createFrequencyTag.bind(this), details.frequencies);
 
         return node;
@@ -270,6 +274,16 @@ class DisplayGenerator {
         return node;
     }
 
+    createSearchTag(details) {
+        const node = DisplayGenerator._instantiateTemplate(this._tagSearchTemplate);
+
+        node.textContent = details.query;
+
+        node.dataset.query = details.query;
+
+        return node;
+    }
+
     createFrequencyTag(details) {
         const node = DisplayGenerator._instantiateTemplate(this._tagFrequencyTemplate);
 
@@ -311,6 +325,7 @@ class DisplayGenerator {
         this._kanjiReadingTemplate = doc.querySelector('#kanji-reading-template');
 
         this._tagTemplate = doc.querySelector('#tag-template');
+        this._tagSearchTemplate = doc.querySelector('#tag-search-template');
         this._tagFrequencyTemplate = doc.querySelector('#tag-frequency-template');
     }
 
