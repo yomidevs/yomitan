@@ -630,10 +630,10 @@ class Backend {
                 if (this.popupWindow !== null) {
                     chrome.windows.remove(this.popupWindow.id);
                 }
-                chrome.windows.create(
+                this.popupWindow = await new Promise((resolve) => chrome.windows.create(
                     {url, width: popupWidth, height: popupHeight, type: 'popup'},
-                    (popupWindow) => { this.popupWindow = popupWindow; }
-                );
+                    resolve
+                ));
                 return;
         }
     }
