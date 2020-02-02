@@ -586,8 +586,8 @@ class JsonSchemaTraversalInfo {
     constructor(value, schema) {
         this.valuePath = [];
         this.schemaPath = [];
-        this.valuePush([null, value]);
-        this.schemaPush([null, schema]);
+        this.valuePush(null, value);
+        this.schemaPush(null, schema);
     }
 
     valuePush(path, value) {
