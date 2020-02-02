@@ -339,7 +339,7 @@ class JsonSchemaProxyHandler {
             return 'String length too short';
         }
 
-        const maxLength = schema.minLength;
+        const maxLength = schema.maxLength;
         if (typeof maxLength === 'number' && value.length > maxLength) {
             return 'String length too long';
         }
