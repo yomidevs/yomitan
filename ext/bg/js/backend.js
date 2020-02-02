@@ -603,8 +603,10 @@ class Backend {
         const {popupWidth, popupHeight} = options.general;
 
         const baseUrl = chrome.runtime.getURL('/bg/search.html');
-        const queryString = (query && query.length > 0) ? `?query=${encodeURIComponent(query)}` : '';
-        const url = baseUrl + queryString;
+        const queryParams = {mode};
+        if (query && query.length > 0) { queryParams.query = query; }
+        const queryString = new URLSearchParams(queryParams).toString();
+        const url = `${baseUrl}?${queryString}`;
 
         switch (mode) {
             case 'sameTab':

@@ -136,6 +136,10 @@ html:root[data-yomichan-page=float] .navigation-header:not([hidden])~.navigation
     margin-right: 0.2em;
 }
 
+html:root[data-yomichan-page=search][data-search-mode=popup] .search-input {
+    display: none;
+}
+
 
 /*
  * Entries

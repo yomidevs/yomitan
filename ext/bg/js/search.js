@@ -53,6 +53,8 @@ class DisplaySearch extends Display {
                 this.search.addEventListener('click', (e) => this.onSearch(e), false);
             }
             if (this.query !== null) {
+                const {query='', mode=''} = DisplaySearch.parseQueryStringFromLocation(window.location.href);
+                document.documentElement.dataset.searchMode = mode;
                 this.query.addEventListener('input', () => this.onSearchInput(), false);
 
                 if (this.wanakanaEnable !== null) {
@@ -63,7 +65,6 @@ class DisplaySearch extends Display {
                         this.wanakanaEnable.checked = false;
                     }
                     this.wanakanaEnable.addEventListener('change', (e) => {
-                        const query = DisplaySearch.getSearchQueryFromLocation(window.location.href) || '';
                         if (e.target.checked) {
                             window.wanakana.bind(this.query);
                             this.setQuery(window.wanakana.toKana(query));
@@ -77,15 +78,12 @@ class DisplaySearch extends Display {
                     });
                 }
 
-                const query = DisplaySearch.getSearchQueryFromLocation(window.location.href);
-                if (query !== null) {
-                    if (this.isWanakanaEnabled()) {
-                        this.setQuery(window.wanakana.toKana(query));
-                    } else {
-                        this.setQuery(query);
-                    }
-                    this.onSearchQueryUpdated(this.query.value, false);
+                if (this.isWanakanaEnabled()) {
+                    this.setQuery(window.wanakana.toKana(query));
+                } else {
+                    this.setQuery(query);
                 }
+                this.onSearchQueryUpdated(this.query.value, false);
             }
             if (this.clipboardMonitorEnable !== null) {
                 if (this.options.general.enableClipboardMonitor === true) {
@@ -162,13 +160,12 @@ class DisplaySearch extends Display {
     }
 
     onPopState() {
-        const query = DisplaySearch.getSearchQueryFromLocation(window.location.href) || '';
-        if (this.query !== null) {
-            if (this.isWanakanaEnabled()) {
-                this.setQuery(window.wanakana.toKana(query));
-            } else {
-                this.setQuery(query);
-            }
+        const {query='', mode=''} = DisplaySearch.parseQueryStringFromLocation(window.location.href);
+        document.documentElement.dataset.searchMode = mode;
+        if (this.isWanakanaEnabled()) {
+            this.setQuery(window.wanakana.toKana(query));
+        } else {
+            this.setQuery(query);
         }
 
         this.onSearchQueryUpdated(this.query.value, false);
@@ -334,9 +331,11 @@ class DisplaySearch extends Display {
         }
     }
 
-    static getSearchQueryFromLocation(url) {
-        const match = /^[^?#]*\?(?:[^&#]*&)?query=([^&#]*)/.exec(url);
-        return match !== null ? decodeURIComponent(match[1]) : null;
+    static parseQueryStringFromLocation(url) {
+        const parsedUrl = new URL(url);
+        const parsedSearch = new URLSearchParams(parsedUrl.search);
+        return Array.from(parsedSearch.entries())
+            .reduce((a, [k, v]) => Object.assign({}, a, {[k]: v}), {});
     }
 }
 
