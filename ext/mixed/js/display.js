@@ -312,9 +312,9 @@ class Display {
             this.addEventListeners('.action-play-audio', 'click', this.onAudioPlay.bind(this));
             this.addEventListeners('.kanji-link', 'click', this.onKanjiLookup.bind(this));
             if (this.options.scanning.enablePopupSearch) {
-                this.addEventListeners('.glossary-item', 'mouseup', this.onGlossaryMouseUp.bind(this));
-                this.addEventListeners('.glossary-item', 'mousedown', this.onGlossaryMouseDown.bind(this));
-                this.addEventListeners('.glossary-item', 'mousemove', this.onGlossaryMouseMove.bind(this));
+                this.addEventListeners('.term-glossary-item', 'mouseup', this.onGlossaryMouseUp.bind(this));
+                this.addEventListeners('.term-glossary-item', 'mousedown', this.onGlossaryMouseDown.bind(this));
+                this.addEventListeners('.term-glossary-item', 'mousemove', this.onGlossaryMouseMove.bind(this));
             }
         } else {
             Display.clearEventListeners(this.eventListeners);
