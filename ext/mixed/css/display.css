@@ -414,6 +414,7 @@ button.action-button {
     display: inline;
     font-size: 0;
     opacity: 0;
+    white-space: pre-wrap;
 }
 
 /*
