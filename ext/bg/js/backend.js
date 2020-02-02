@@ -628,7 +628,8 @@ class Backend {
                 return;
             case 'popup':
                 if (this.popupWindow !== null) {
-                    chrome.windows.remove(this.popupWindow.id);
+                    const callback = () => this.checkLastError(chrome.runtime.lastError);
+                    chrome.windows.remove(this.popupWindow.id, callback);
                 }
                 this.popupWindow = await new Promise((resolve) => chrome.windows.create(
                     {url, width: popupWidth, height: popupHeight, type: 'popup'},
