@@ -119,7 +119,7 @@ class JsonSchemaProxyHandler {
         throw new Error('construct not supported');
     }
 
-    static getPropertySchema(schema, property, value) {
+    static getPropertySchema(schema, property, value, path=null) {
         const type = JsonSchemaProxyHandler.getSchemaOrValueType(schema, value);
         switch (type) {
             case 'object':
@@ -128,6 +128,7 @@ class JsonSchemaProxyHandler {
                 if (JsonSchemaProxyHandler.isObject(properties)) {
                     const propertySchema = properties[property];
                     if (JsonSchemaProxyHandler.isObject(propertySchema)) {
+                        if (path !== null) { path.push(['properties', properties], [property, propertySchema]); }
                         return propertySchema;
                     }
                 }
@@ -136,9 +137,12 @@ class JsonSchemaProxyHandler {
                 if (additionalProperties === false) {
                     return null;
                 } else if (JsonSchemaProxyHandler.isObject(additionalProperties)) {
+                    if (path !== null) { path.push(['additionalProperties', additionalProperties]); }
                     return additionalProperties;
                 } else {
-                    return JsonSchemaProxyHandler._unconstrainedSchema;
+                    const result = JsonSchemaProxyHandler._unconstrainedSchema;
+                    if (path !== null) { path.push([null, result]); }
+                    return result;
                 }
             }
             case 'array':
@@ -151,6 +155,7 @@ class JsonSchemaProxyHandler {
                     if (property >= 0 && property < items.length) {
                         const propertySchema = items[property];
                         if (JsonSchemaProxyHandler.isObject(propertySchema)) {
+                            if (path !== null) { path.push(['items', items], [property, propertySchema]); }
                             return propertySchema;
                         }
                     }
@@ -160,9 +165,12 @@ class JsonSchemaProxyHandler {
                 if (additionalItems === false) {
                     return null;
                 } else if (JsonSchemaProxyHandler.isObject(additionalItems)) {
+                    if (path !== null) { path.push(['additionalItems', additionalItems]); }
                     return additionalItems;
                 } else {
-                    return JsonSchemaProxyHandler._unconstrainedSchema;
+                    const result = JsonSchemaProxyHandler._unconstrainedSchema;
+                    if (path !== null) { path.push([null, result]); }
+                    return result;
                 }
             }
             default:
@@ -381,18 +389,19 @@ class JsonSchemaProxyHandler {
         }
 
         for (let i = 0, ii = value.length; i < ii; ++i) {
-            const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, i, value);
+            const schemaPath = [];
+            const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, i, value, schemaPath);
             if (propertySchema === null) {
                 throw new JsonSchemaValidationError(`No schema found for array[${i}]`, value, schema, info);
             }
 
             const propertyValue = value[i];
 
+            for (const [p, s] of schemaPath) { info.schemaPush(p, s); }
             info.valuePush(i, propertyValue);
-            info.schemaPush(i, propertySchema);
             JsonSchemaProxyHandler.validate(propertyValue, propertySchema, info);
-            info.schemaPop();
             info.valuePop();
+            for (let i = 0; i < schemaPath.length; ++i) { info.schemaPop(); }
         }
     }
 
@@ -419,18 +428,19 @@ class JsonSchemaProxyHandler {
         }
 
         for (const property of properties) {
-            const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, property, value);
+            const schemaPath = [];
+            const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, property, value, schemaPath);
             if (propertySchema === null) {
                 throw new JsonSchemaValidationError(`No schema found for ${property}`, value, schema, info);
             }
 
             const propertyValue = value[property];
 
+            for (const [p, s] of schemaPath) { info.schemaPush(p, s); }
             info.valuePush(property, propertyValue);
-            info.schemaPush(property, propertySchema);
             JsonSchemaProxyHandler.validate(propertyValue, propertySchema, info);
-            info.schemaPop();
             info.valuePop();
+            for (let i = 0; i < schemaPath.length; ++i) { info.schemaPop(); }
         }
     }
 
