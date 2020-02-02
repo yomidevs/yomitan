@@ -199,17 +199,19 @@ class JsonSchemaProxyHandler {
     }
 
     static validateConditional(value, schema) {
-        const ifCondition = schema.if;
-        if (!JsonSchemaProxyHandler.isObject(ifCondition)) { return; }
+        const ifSchema = schema.if;
+        if (!JsonSchemaProxyHandler.isObject(ifSchema)) { return; }
 
-        const thenSchema = schema.then;
-        if (JsonSchemaProxyHandler.isObject(thenSchema)) {
+        let okay = true;
+        try {
             JsonSchemaProxyHandler.validate(value, thenSchema);
+        } catch (e) {
+            okay = false;
         }
 
-        const elseSchema = schema.else;
-        if (JsonSchemaProxyHandler.isObject(elseSchema)) {
-            JsonSchemaProxyHandler.validate(value, thenSchema);
+        const nextSchema = okay ? schema.then : schema.else;
+        if (JsonSchemaProxyHandler.isObject(nextSchema)) {
+            JsonSchemaProxyHandler.validate(value, nextSchema);
         }
     }
 
