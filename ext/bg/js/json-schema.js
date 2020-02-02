@@ -134,7 +134,7 @@ class JsonSchemaProxyHandler {
                 const additionalProperties = schema.additionalProperties;
                 if (additionalProperties === false) {
                     return null;
-                } if (JsonSchemaProxyHandler.isObject(additionalProperties)) {
+                } else if (JsonSchemaProxyHandler.isObject(additionalProperties)) {
                     return additionalProperties;
                 } else {
                     return JsonSchemaProxyHandler._unconstrainedSchema;
