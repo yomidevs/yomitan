@@ -126,8 +126,9 @@ class JsonSchemaProxyHandler {
             {
                 const properties = schema.properties;
                 if (JsonSchemaProxyHandler.isObject(properties)) {
-                    if (Object.prototype.hasOwnProperty.call(properties, property)) {
-                        return properties[property];
+                    const propertySchema = properties[property];
+                    if (JsonSchemaProxyHandler.isObject(propertySchema)) {
+                        return propertySchema;
                     }
                 }
 
@@ -148,7 +149,10 @@ class JsonSchemaProxyHandler {
                 }
                 if (Array.isArray(items)) {
                     if (property >= 0 && property < items.length) {
-                        return items[property];
+                        const propertySchema = items[property];
+                        if (JsonSchemaProxyHandler.isObject(propertySchema)) {
+                            return propertySchema;
+                        }
                     }
                 }
 
