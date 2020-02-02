@@ -33,20 +33,27 @@ function _ankiSpinnerShow(show) {
 
 function _ankiSetError(error) {
     const node = document.querySelector('#anki-error');
-    if (!node) { return; }
+    const node2 = document.querySelector('#anki-invalid-response-error');
     if (error) {
         const errorString = `${error}`;
-        node.hidden = false;
-        node.textContent = errorString;
-        _ankiSetErrorData(node, error);
+        if (node !== null) {
+            node.hidden = false;
+            node.textContent = errorString;
+            _ankiSetErrorData(node, error);
+        }
 
-        const node2 = document.querySelector('#anki-invalid-response-error');
         if (node2 !== null) {
             node2.hidden = (errorString.indexOf('Invalid response') < 0);
         }
     } else {
-        node.hidden = true;
-        node.textContent = '';
+        if (node !== null) {
+            node.hidden = true;
+            node.textContent = '';
+        }
+
+        if (node2 !== null) {
+            node2.hidden = true;
+        }
     }
 }
 
