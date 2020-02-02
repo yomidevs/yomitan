@@ -93,7 +93,7 @@ class JsonSchemaProxyHandler {
 
         value = JsonSchema.isolate(value);
 
-        JsonSchemaProxyHandler.validate(value, propertySchema);
+        JsonSchemaProxyHandler.validate(value, propertySchema, new JsonSchemaTraversalInfo(value, propertySchema));
 
         target[property] = value;
         return true;
@@ -189,206 +189,244 @@ class JsonSchemaProxyHandler {
         return type;
     }
 
-    static validate(value, schema) {
-        JsonSchemaProxyHandler.validateSingleSchema(value, schema);
-        JsonSchemaProxyHandler.validateConditional(value, schema);
-        JsonSchemaProxyHandler.validateAllOf(value, schema);
-        JsonSchemaProxyHandler.validateAnyOf(value, schema);
-        JsonSchemaProxyHandler.validateOneOf(value, schema);
-        JsonSchemaProxyHandler.validateNoneOf(value, schema);
+    static validate(value, schema, info) {
+        JsonSchemaProxyHandler.validateSingleSchema(value, schema, info);
+        JsonSchemaProxyHandler.validateConditional(value, schema, info);
+        JsonSchemaProxyHandler.validateAllOf(value, schema, info);
+        JsonSchemaProxyHandler.validateAnyOf(value, schema, info);
+        JsonSchemaProxyHandler.validateOneOf(value, schema, info);
+        JsonSchemaProxyHandler.validateNoneOf(value, schema, info);
     }
 
-    static validateConditional(value, schema) {
+    static validateConditional(value, schema, info) {
         const ifSchema = schema.if;
         if (!JsonSchemaProxyHandler.isObject(ifSchema)) { return; }
 
         let okay = true;
+        info.schemaPush('if', ifSchema);
         try {
             JsonSchemaProxyHandler.validate(value, ifSchema, info);
         } catch (e) {
             okay = false;
         }
+        info.schemaPop();
 
         const nextSchema = okay ? schema.then : schema.else;
         if (JsonSchemaProxyHandler.isObject(nextSchema)) {
-            JsonSchemaProxyHandler.validate(value, nextSchema);
+            info.schemaPush(okay ? 'then' : 'else', nextSchema);
+            JsonSchemaProxyHandler.validate(value, nextSchema, info);
+            info.schemaPop();
         }
     }
 
-    static validateAllOf(value, schema) {
+    static validateAllOf(value, schema, info) {
         const subSchemas = schema.allOf;
         if (!Array.isArray(subSchemas)) { return; }
 
+        info.schemaPush('allOf', subSchemas);
         for (let i = 0; i < subSchemas.length; ++i) {
-            JsonSchemaProxyHandler.validate(value, subSchemas[i]);
+            const subSchema = subSchemas[i];
+            info.schemaPush(i, subSchema);
+            JsonSchemaProxyHandler.validate(value, subSchema, info);
+            info.schemaPop();
         }
+        info.schemaPop();
     }
 
-    static validateAnyOf(value, schema) {
+    static validateAnyOf(value, schema, info) {
         const subSchemas = schema.anyOf;
         if (!Array.isArray(subSchemas)) { return; }
 
+        info.schemaPush('anyOf', subSchemas);
         for (let i = 0; i < subSchemas.length; ++i) {
+            const subSchema = subSchemas[i];
+            info.schemaPush(i, subSchema);
             try {
-                JsonSchemaProxyHandler.validate(value, subSchemas[i]);
+                JsonSchemaProxyHandler.validate(value, subSchema, info);
                 return;
             } catch (e) {
                 // NOP
             }
+            info.schemaPop();
         }
 
-        throw new JsonSchemaValidationError('0 anyOf schemas matched', value, schema);
+        throw new JsonSchemaValidationError('0 anyOf schemas matched', value, schema, info);
+        // info.schemaPop(); // Unreachable
     }
 
-    static validateOneOf(value, schema) {
+    static validateOneOf(value, schema, info) {
         const subSchemas = schema.oneOf;
         if (!Array.isArray(subSchemas)) { return; }
 
+        info.schemaPush('oneOf', subSchemas);
         let count = 0;
         for (let i = 0; i < subSchemas.length; ++i) {
+            const subSchema = subSchemas[i];
+            info.schemaPush(i, subSchema);
             try {
-                JsonSchemaProxyHandler.validate(value, subSchemas[i]);
+                JsonSchemaProxyHandler.validate(value, subSchema, info);
                 ++count;
             } catch (e) {
                 // NOP
             }
+            info.schemaPop();
         }
 
         if (count !== 1) {
-            throw new JsonSchemaValidationError(`${count} oneOf schemas matched`, value, schema);
+            throw new JsonSchemaValidationError(`${count} oneOf schemas matched`, value, schema, info);
         }
+
+        info.schemaPop();
     }
 
-    static validateNoneOf(value, schema) {
+    static validateNoneOf(value, schema, info) {
         const subSchemas = schema.not;
         if (!Array.isArray(subSchemas)) { return; }
 
+        info.schemaPush('not', subSchemas);
         for (let i = 0; i < subSchemas.length; ++i) {
+            const subSchema = subSchemas[i];
+            info.schemaPush(i, subSchema);
             try {
-                JsonSchemaProxyHandler.validate(value, subSchemas[i]);
+                JsonSchemaProxyHandler.validate(value, subSchema, info);
             } catch (e) {
+                info.schemaPop();
                 continue;
             }
-            throw new JsonSchemaValidationError(`not[${i}] schema matched`, value, schema);
+            throw new JsonSchemaValidationError(`not[${i}] schema matched`, value, schema, info);
         }
+        info.schemaPop();
     }
 
-    static validateSingleSchema(value, schema) {
+    static validateSingleSchema(value, schema, info) {
         const type = JsonSchemaProxyHandler.getValueType(value);
         const schemaType = schema.type;
         if (!JsonSchemaProxyHandler.isValueTypeAny(value, type, schemaType)) {
-            throw new JsonSchemaValidationError(`Value type ${type} does not match schema type ${schemaType}`, value, schema);
+            throw new JsonSchemaValidationError(`Value type ${type} does not match schema type ${schemaType}`, value, schema, info);
         }
 
         const schemaEnum = schema.enum;
         if (Array.isArray(schemaEnum) && !JsonSchemaProxyHandler.valuesAreEqualAny(value, schemaEnum)) {
-            throw new JsonSchemaValidationError('Invalid enum value', value, schema);
+            throw new JsonSchemaValidationError('Invalid enum value', value, schema, info);
         }
 
         switch (type) {
             case 'number':
-                JsonSchemaProxyHandler.validateNumber(value, schema);
+                JsonSchemaProxyHandler.validateNumber(value, schema, info);
                 break;
             case 'string':
-                JsonSchemaProxyHandler.validateString(value, schema);
+                JsonSchemaProxyHandler.validateString(value, schema, info);
                 break;
             case 'array':
-                JsonSchemaProxyHandler.validateArray(value, schema);
+                JsonSchemaProxyHandler.validateArray(value, schema, info);
                 break;
             case 'object':
-                JsonSchemaProxyHandler.validateObject(value, schema);
+                JsonSchemaProxyHandler.validateObject(value, schema, info);
                 break;
         }
     }
 
-    static validateNumber(value, schema) {
+    static validateNumber(value, schema, info) {
         const multipleOf = schema.multipleOf;
         if (typeof multipleOf === 'number' && Math.floor(value / multipleOf) * multipleOf !== value) {
-            throw new JsonSchemaValidationError(`Number is not a multiple of ${multipleOf}`, value, schema);
+            throw new JsonSchemaValidationError(`Number is not a multiple of ${multipleOf}`, value, schema, info);
         }
 
         const minimum = schema.minimum;
         if (typeof minimum === 'number' && value < minimum) {
-            throw new JsonSchemaValidationError(`Number is less than ${minimum}`, value, schema);
+            throw new JsonSchemaValidationError(`Number is less than ${minimum}`, value, schema, info);
         }
 
         const exclusiveMinimum = schema.exclusiveMinimum;
         if (typeof exclusiveMinimum === 'number' && value <= exclusiveMinimum) {
-            throw new JsonSchemaValidationError(`Number is less than or equal to ${exclusiveMinimum}`, value, schema);
+            throw new JsonSchemaValidationError(`Number is less than or equal to ${exclusiveMinimum}`, value, schema, info);
         }
 
         const maximum = schema.maximum;
         if (typeof maximum === 'number' && value > maximum) {
-            throw new JsonSchemaValidationError(`Number is greater than ${maximum}`, value, schema);
+            throw new JsonSchemaValidationError(`Number is greater than ${maximum}`, value, schema, info);
         }
 
         const exclusiveMaximum = schema.exclusiveMaximum;
         if (typeof exclusiveMaximum === 'number' && value >= exclusiveMaximum) {
-            throw new JsonSchemaValidationError(`Number is greater than or equal to ${exclusiveMaximum}`, value, schema);
+            throw new JsonSchemaValidationError(`Number is greater than or equal to ${exclusiveMaximum}`, value, schema, info);
         }
     }
 
-    static validateString(value, schema) {
+    static validateString(value, schema, info) {
         const minLength = schema.minLength;
         if (typeof minLength === 'number' && value.length < minLength) {
-            throw new JsonSchemaValidationError('String length too short', value, schema);
+            throw new JsonSchemaValidationError('String length too short', value, schema, info);
         }
 
         const maxLength = schema.maxLength;
         if (typeof maxLength === 'number' && value.length > maxLength) {
-            throw new JsonSchemaValidationError('String length too long', value, schema);
+            throw new JsonSchemaValidationError('String length too long', value, schema, info);
         }
     }
 
-    static validateArray(value, schema) {
+    static validateArray(value, schema, info) {
         const minItems = schema.minItems;
         if (typeof minItems === 'number' && value.length < minItems) {
-            throw new JsonSchemaValidationError('Array length too short', value, schema);
+            throw new JsonSchemaValidationError('Array length too short', value, schema, info);
         }
 
         const maxItems = schema.maxItems;
         if (typeof maxItems === 'number' && value.length > maxItems) {
-            throw new JsonSchemaValidationError('Array length too long', value, schema);
+            throw new JsonSchemaValidationError('Array length too long', value, schema, info);
         }
 
         for (let i = 0, ii = value.length; i < ii; ++i) {
             const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, i, value);
             if (propertySchema === null) {
-                throw new JsonSchemaValidationError(`No schema found for array[${i}]`, value, schema);
+                throw new JsonSchemaValidationError(`No schema found for array[${i}]`, value, schema, info);
             }
 
-            JsonSchemaProxyHandler.validate(value[i], propertySchema);
+            const propertyValue = value[i];
+
+            info.valuePush(i, propertyValue);
+            info.schemaPush(i, propertySchema);
+            JsonSchemaProxyHandler.validate(propertyValue, propertySchema, info);
+            info.schemaPop();
+            info.valuePop();
         }
     }
 
-    static validateObject(value, schema) {
+    static validateObject(value, schema, info) {
         const properties = new Set(Object.getOwnPropertyNames(value));
 
         const required = schema.required;
         if (Array.isArray(required)) {
             for (const property of required) {
                 if (!properties.has(property)) {
-                    throw new JsonSchemaValidationError(`Missing property ${property}`, value, schema);
+                    throw new JsonSchemaValidationError(`Missing property ${property}`, value, schema, info);
                 }
             }
         }
 
         const minProperties = schema.minProperties;
         if (typeof minProperties === 'number' && properties.length < minProperties) {
-            throw new JsonSchemaValidationError('Not enough object properties', value, schema);
+            throw new JsonSchemaValidationError('Not enough object properties', value, schema, info);
         }
 
         const maxProperties = schema.maxProperties;
         if (typeof maxProperties === 'number' && properties.length > maxProperties) {
-            throw new JsonSchemaValidationError('Too many object properties', value, schema);
+            throw new JsonSchemaValidationError('Too many object properties', value, schema, info);
         }
 
         for (const property of properties) {
             const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, property, value);
             if (propertySchema === null) {
-                throw new JsonSchemaValidationError(`No schema found for ${property}`, value, schema);
+                throw new JsonSchemaValidationError(`No schema found for ${property}`, value, schema, info);
             }
-            JsonSchemaProxyHandler.validate(value[property], propertySchema);
+
+            const propertyValue = value[property];
+
+            info.valuePush(property, propertyValue);
+            info.schemaPush(property, propertySchema);
+            JsonSchemaProxyHandler.validate(propertyValue, propertySchema, info);
+            info.schemaPop();
+            info.valuePop();
         }
     }
 
@@ -530,12 +568,37 @@ class JsonSchemaProxyHandler {
 
 JsonSchemaProxyHandler._unconstrainedSchema = {};
 
+class JsonSchemaTraversalInfo {
+    constructor(value, schema) {
+        this.valuePath = [];
+        this.schemaPath = [];
+        this.valuePush([null, value]);
+        this.schemaPush([null, schema]);
+    }
+
+    valuePush(path, value) {
+        this.valuePath.push([path, value]);
+    }
+
+    valuePop() {
+        this.valuePath.pop();
+    }
+
+    schemaPush(path, schema) {
+        this.schemaPath.push([path, schema]);
+    }
+
+    schemaPop() {
+        this.schemaPath.pop();
+    }
+}
+
 class JsonSchemaValidationError extends Error {
-    constructor(message, value, schema, path) {
+    constructor(message, value, schema, info) {
         super(message);
         this.value = value;
         this.schema = schema;
-        this.path = path;
+        this.info = info;
     }
 }
 
@@ -545,7 +608,7 @@ class JsonSchema {
     }
 
     static validate(value, schema) {
-        return JsonSchemaProxyHandler.validate(value, schema);
+        return JsonSchemaProxyHandler.validate(value, schema, new JsonSchemaTraversalInfo(value, schema));
     }
 
     static getValidValueOrDefault(schema, value) {
