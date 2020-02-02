@@ -204,7 +204,7 @@ class JsonSchemaProxyHandler {
 
         let okay = true;
         try {
-            JsonSchemaProxyHandler.validate(value, thenSchema);
+            JsonSchemaProxyHandler.validate(value, ifSchema, info);
         } catch (e) {
             okay = false;
         }
