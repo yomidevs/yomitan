@@ -168,7 +168,7 @@ function dictTermsMergeBySequence(definitions, mainDictionary) {
             if (typeof sequencedDefinition === 'undefined') {
                 sequencedDefinition = {
                     reasons: definition.reasons,
-                    score: Number.MIN_SAFE_INTEGER,
+                    score: definition.score,
                     expression: new Set(),
                     reading: new Set(),
                     expressions: new Map(),
