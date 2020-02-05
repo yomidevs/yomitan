@@ -221,13 +221,16 @@ class Display {
     }
 
     onHistoryWheel(e) {
+        if (e.altKey) { return; }
         const delta = -e.deltaX || e.deltaY;
         if (delta > 0) {
             this.sourceTermView();
             e.preventDefault();
+            e.stopPropagation();
         } else if (delta < 0) {
             this.nextTermView();
             e.preventDefault();
+            e.stopPropagation();
         }
     }
 
