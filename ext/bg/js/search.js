@@ -49,11 +49,12 @@ class DisplaySearch extends Display {
         try {
             await this.initialize();
 
+            const {query='', mode=''} = DisplaySearch.parseQueryStringFromLocation(window.location.href);
+
             if (this.search !== null) {
                 this.search.addEventListener('click', (e) => this.onSearch(e), false);
             }
             if (this.query !== null) {
-                const {query='', mode=''} = DisplaySearch.parseQueryStringFromLocation(window.location.href);
                 document.documentElement.dataset.searchMode = mode;
                 this.query.addEventListener('input', () => this.onSearchInput(), false);
 
@@ -86,7 +87,7 @@ class DisplaySearch extends Display {
                 }
                 this.onSearchQueryUpdated(this.query.value, false);
             }
-            if (this.clipboardMonitorEnable !== null) {
+            if (this.clipboardMonitorEnable !== null && mode !== 'popup') {
                 if (this.options.general.enableClipboardMonitor === true) {
                     this.clipboardMonitorEnable.checked = true;
                     this.clipboardMonitor.start();
