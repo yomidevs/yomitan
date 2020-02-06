@@ -33,6 +33,10 @@ function apiClipboardGet() {
     return _apiInvoke('clipboardGet');
 }
 
+function apiGetQueryParserTemplatesHtml() {
+    return _apiInvoke('getQueryParserTemplatesHtml');
+}
+
 function _apiInvoke(action, params={}) {
     const data = {action, params};
     return new Promise((resolve, reject) => {

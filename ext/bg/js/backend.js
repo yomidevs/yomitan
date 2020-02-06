@@ -567,6 +567,11 @@ class Backend {
         return await requestText(url, 'GET');
     }
 
+    async _onApiGetQueryParserTemplatesHtml() {
+        const url = chrome.runtime.getURL('/bg/query-parser-templates.html');
+        return await requestText(url, 'GET');
+    }
+
     _onApiGetZoom(params, sender) {
         if (!sender || !sender.tab) {
             return Promise.reject(new Error('Invalid tab'));
@@ -854,6 +859,7 @@ Backend._messageHandlers = new Map([
     ['getEnvironmentInfo', (self, ...args) => self._onApiGetEnvironmentInfo(...args)],
     ['clipboardGet', (self, ...args) => self._onApiClipboardGet(...args)],
     ['getDisplayTemplatesHtml', (self, ...args) => self._onApiGetDisplayTemplatesHtml(...args)],
+    ['getQueryParserTemplatesHtml', (self, ...args) => self._onApiGetQueryParserTemplatesHtml(...args)],
     ['getZoom', (self, ...args) => self._onApiGetZoom(...args)]
 ]);
 
