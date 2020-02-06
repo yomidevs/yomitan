@@ -27,7 +27,6 @@ Yomichan provides advanced features not available in other browser-based diction
     *   [Flashcard Creation](https://foosoft.net/projects/yomichan/#flashcard-creation)
 *   [Keyboard Shortcuts](https://foosoft.net/projects/yomichan/#keyboard-shortcuts)
 *   [Development](https://foosoft.net/projects/yomichan/#development)
-    *   [Templates](https://foosoft.net/projects/yomichan/#templates)
     *   [Dependencies](https://foosoft.net/projects/yomichan/#dependencies)
 *   [Frequently Asked Questions](https://foosoft.net/projects/yomichan/#frequently-asked-questions)
 *   [Screenshots](https://foosoft.net/projects/yomichan/#screenshots)
@@ -240,15 +239,6 @@ following basic guidelines when creating pull requests:
 *   Write clean, modern ES6 code (`const`/`let`, `await`, arrow functions, etc.)
 *   Large pull requests without a clear scope will not be merged.
 *   Incomplete or non-standalone features will not be merged.
-
-### Templates ###
-
-Yomichan uses [Handlebars](https://handlebarsjs.com/) templates for user interface generation. The source templates are
-found in the `tmpl` directory and the compiled version is stored in the `ext/bg/js/templates.js` file. If you modify the
-source templates, you will need to also recompile them. If you are developing on Linux or Mac OS X, you can use the
-included `build_tmpl.sh` and `build_tmpl_auto.sh` shell scripts to do this for you
-([inotify-tools](https://github.com/rvoicilas/inotify-tools/wiki) required). Otherwise, simply execute `handlebars
-tmpl/*.html -f ext/bg/js/templates.js` from the project's base directory to compile all the templates.
 
 ### Dependencies ###
 
