@@ -629,6 +629,10 @@ class Backend {
                 chrome.tabs.create({url});
                 return;
             case 'popup':
+                if (!isObject(chrome.windows)) {
+                    // chrome.windows not supported (e.g. on Firefox mobile)
+                    return;
+                }
                 if (this.popupWindow !== null) {
                     const callback = () => this.checkLastError(chrome.runtime.lastError);
                     chrome.windows.remove(this.popupWindow.id, callback);
