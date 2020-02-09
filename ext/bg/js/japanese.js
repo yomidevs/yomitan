@@ -108,7 +108,7 @@ const JP_JAPANESE_RANGES = [
     [0xff1a, 0xff1f], // Fullwidth punctuation 2
     [0xff3b, 0xff3f], // Fullwidth punctuation 3
     [0xff5b, 0xff60], // Fullwidth punctuation 4
-    [0xffe0, 0xffee], // Currency markers
+    [0xffe0, 0xffee]  // Currency markers
 ];
 
 
