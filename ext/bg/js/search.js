@@ -152,9 +152,13 @@ class DisplaySearch extends Display {
         e.preventDefault();
 
         const query = this.query.value;
+
         this.queryParser.setText(query);
-        const queryString = query.length > 0 ? `?query=${encodeURIComponent(query)}` : '';
-        window.history.pushState(null, '', `${window.location.pathname}${queryString}`);
+
+        const url = new URL(window.location.href);
+        url.searchParams.set('query', query);
+        window.history.pushState(null, '', url.toString());
+
         this.onSearchQueryUpdated(query, true);
     }
 
