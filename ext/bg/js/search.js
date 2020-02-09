@@ -69,22 +69,17 @@ class DisplaySearch extends Display {
                         const {query=''} = DisplaySearch.parseQueryStringFromLocation(window.location.href);
                         if (e.target.checked) {
                             window.wanakana.bind(this.query);
-                            this.setQuery(window.wanakana.toKana(query));
                             apiOptionsSet({general: {enableWanakana: true}}, this.getOptionsContext());
                         } else {
                             window.wanakana.unbind(this.query);
-                            this.setQuery(query);
                             apiOptionsSet({general: {enableWanakana: false}}, this.getOptionsContext());
                         }
+                        this.setQuery(query);
                         this.onSearchQueryUpdated(this.query.value, false);
                     });
                 }
 
-                if (this.isWanakanaEnabled()) {
-                    this.setQuery(window.wanakana.toKana(query));
-                } else {
-                    this.setQuery(query);
-                }
+                this.setQuery(query);
                 this.onSearchQueryUpdated(this.query.value, false);
             }
             if (this.clipboardMonitorEnable !== null && mode !== 'popup') {
@@ -164,12 +159,7 @@ class DisplaySearch extends Display {
     onPopState() {
         const {query='', mode=''} = DisplaySearch.parseQueryStringFromLocation(window.location.href);
         document.documentElement.dataset.searchMode = mode;
-        if (this.isWanakanaEnabled()) {
-            this.setQuery(window.wanakana.toKana(query));
-        } else {
-            this.setQuery(query);
-        }
-
+        this.setQuery(query);
         this.onSearchQueryUpdated(this.query.value, false);
     }
 
@@ -203,7 +193,7 @@ class DisplaySearch extends Display {
     }
 
     onClipboardText(text) {
-        this.setQuery(this.isWanakanaEnabled() ? window.wanakana.toKana(text) : text);
+        this.setQuery(text);
         window.history.pushState(null, '', `${window.location.pathname}?query=${encodeURIComponent(text)}`);
         this.onSearchQueryUpdated(this.query.value, true);
     }
@@ -256,8 +246,9 @@ class DisplaySearch extends Display {
     }
 
     setQuery(query) {
-        this.query.value = query;
-        this.queryParser.setText(query);
+        const interpretedQuery = this.isWanakanaEnabled() ? window.wanakana.toKana(query) : query;
+        this.query.value = interpretedQuery;
+        this.queryParser.setText(interpretedQuery);
     }
 
     setIntroVisible(visible, animate) {
