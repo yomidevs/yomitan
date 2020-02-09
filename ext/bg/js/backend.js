@@ -597,7 +597,7 @@ class Backend {
     // Command handlers
 
     async _onCommandSearch(params) {
-        const {mode, query} = params || {mode: 'existingOrNewTab'};
+        const {mode='existingOrNewTab', query} = params || {};
 
         const options = await this.getOptions(this.optionsContext);
         const {popupWidth, popupHeight} = options.general;
@@ -613,11 +613,14 @@ class Backend {
                 try {
                     const tab = await Backend._findTab(1000, (url2) => (
                         url2 !== null &&
-                        url2.startsWith(url) &&
-                        (url2.length === url.length || url2[url.length] === '?' || url2[url.length] === '#')
+                        url2.startsWith(baseUrl) &&
+                        (url2.length === baseUrl.length || url2[baseUrl.length] === '?' || url2[baseUrl.length] === '#')
                     ));
                     if (tab !== null) {
                         await Backend._focusTab(tab);
+                        if (queryParams.query) {
+                            await new Promise((resolve) => chrome.tabs.update(tab.id, {url}, resolve));
+                        }
                         return;
                     }
                 } catch (e) {
