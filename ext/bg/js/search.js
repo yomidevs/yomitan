@@ -109,10 +109,12 @@ class DisplaySearch extends Display {
                 });
             }
 
+            chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
+
             window.addEventListener('popstate', (e) => this.onPopState(e));
             window.addEventListener('copy', (e) => this.onCopy(e));
 
-            this.clipboardMonitor.onClipboardText = (text) => this.onClipboardText(text);
+            this.clipboardMonitor.onClipboardText = (text) => this.onExternalSearchUpdate(text);
 
             this.updateSearchButton();
         } catch (e) {
@@ -163,6 +165,15 @@ class DisplaySearch extends Display {
         this.onSearchQueryUpdated(this.query.value, false);
     }
 
+    onRuntimeMessage({action, params}, sender, callback) {
+        const handler = DisplaySearch._runtimeMessageHandlers.get(action);
+        if (typeof handler !== 'function') { return false; }
+
+        const result = handler(this, params, sender);
+        callback(result);
+        return false;
+    }
+
     onKeyDown(e) {
         const key = Display.getKeyFromEvent(e);
         const ignoreKeys = DisplaySearch.onKeyDownIgnoreKeys;
@@ -192,9 +203,11 @@ class DisplaySearch extends Display {
         this.clipboardMonitor.setPreviousText(document.getSelection().toString().trim());
     }
 
-    onClipboardText(text) {
+    onExternalSearchUpdate(text) {
         this.setQuery(text);
-        window.history.pushState(null, '', `${window.location.pathname}?query=${encodeURIComponent(text)}`);
+        const url = new URL(window.location.href);
+        url.searchParams.set('query', text);
+        window.history.pushState(null, '', url.toString());
         this.onSearchQueryUpdated(this.query.value, true);
     }
 
@@ -339,5 +352,9 @@ DisplaySearch.onKeyDownIgnoreKeys = {
     'AltGraph': [],
     'Shift': []
 };
+
+DisplaySearch._runtimeMessageHandlers = new Map([
+    ['searchQueryUpdate', (self, {query}) => { self.onExternalSearchUpdate(query); }]
+]);
 
 DisplaySearch.instance = DisplaySearch.create();
