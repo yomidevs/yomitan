@@ -614,17 +614,21 @@ class Backend {
             return baseUrl2 === baseUrl && (queryParams2.mode === mode || (!queryParams2.mode && mode === 'existingOrNewTab'));
         };
 
+        const openInTab = async () => {
+            const tab = await Backend._findTab(1000, isTabMatch);
+            if (tab !== null) {
+                await Backend._focusTab(tab);
+                if (queryParams.query) {
+                    await new Promise((resolve) => chrome.tabs.update(tab.id, {url}, resolve));
+                }
+                return true;
+            }
+        };
+
         switch (mode) {
             case 'existingOrNewTab':
                 try {
-                    const tab = await Backend._findTab(1000, isTabMatch);
-                    if (tab !== null) {
-                        await Backend._focusTab(tab);
-                        if (queryParams.query) {
-                            await new Promise((resolve) => chrome.tabs.update(tab.id, {url}, resolve));
-                        }
-                        return;
-                    }
+                    if (await openInTab()) { return; }
                 } catch (e) {
                     // NOP
                 }
@@ -634,18 +638,23 @@ class Backend {
                 chrome.tabs.create({url});
                 return;
             case 'popup':
-                if (!isObject(chrome.windows)) {
+                try {
                     // chrome.windows not supported (e.g. on Firefox mobile)
-                    return;
+                    if (!isObject(chrome.windows)) { return; }
+                    if (await openInTab()) { return; }
+                    // if the previous popup is open in an invalid state, close it
+                    if (this.popupWindow !== null) {
+                        const callback = () => this.checkLastError(chrome.runtime.lastError);
+                        chrome.windows.remove(this.popupWindow.id, callback);
+                    }
+                    // open new popup
+                    this.popupWindow = await new Promise((resolve) => chrome.windows.create(
+                        {url, width: popupWidth, height: popupHeight, type: 'popup'},
+                        resolve
+                    ));
+                } catch (e) {
+                    // NOP
                 }
-                if (this.popupWindow !== null) {
-                    const callback = () => this.checkLastError(chrome.runtime.lastError);
-                    chrome.windows.remove(this.popupWindow.id, callback);
-                }
-                this.popupWindow = await new Promise((resolve) => chrome.windows.create(
-                    {url, width: popupWidth, height: popupHeight, type: 'popup'},
-                    resolve
-                ));
                 return;
         }
     }
