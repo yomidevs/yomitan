@@ -597,7 +597,7 @@ class Backend {
     // Command handlers
 
     async _onCommandSearch(params) {
-        const {mode, query} = params || {mode: 'sameTab'};
+        const {mode, query} = params || {mode: 'existingOrNewTab'};
 
         const options = await this.getOptions(this.optionsContext);
         const {popupWidth, popupHeight} = options.general;
@@ -609,7 +609,7 @@ class Backend {
         const url = `${baseUrl}?${queryString}`;
 
         switch (mode) {
-            case 'sameTab':
+            case 'existingOrNewTab':
                 try {
                     const tab = await Backend._findTab(1000, (url2) => (
                         url2 !== null &&
