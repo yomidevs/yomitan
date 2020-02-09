@@ -49,7 +49,7 @@ class DisplaySearch extends Display {
         try {
             await this.initialize();
 
-            const {query='', mode=''} = DisplaySearch.parseQueryStringFromLocation(window.location.href);
+            const {queryParams: {query='', mode=''}} = parseUrl(window.location.href);
 
             if (this.search !== null) {
                 this.search.addEventListener('click', (e) => this.onSearch(e), false);
@@ -66,7 +66,7 @@ class DisplaySearch extends Display {
                         this.wanakanaEnable.checked = false;
                     }
                     this.wanakanaEnable.addEventListener('change', (e) => {
-                        const {query=''} = DisplaySearch.parseQueryStringFromLocation(window.location.href);
+                        const {queryParams: {query=''}} = parseUrl(window.location.href);
                         if (e.target.checked) {
                             window.wanakana.bind(this.query);
                             apiOptionsSet({general: {enableWanakana: true}}, this.getOptionsContext());
@@ -157,7 +157,7 @@ class DisplaySearch extends Display {
     }
 
     onPopState() {
-        const {query='', mode=''} = DisplaySearch.parseQueryStringFromLocation(window.location.href);
+        const {queryParams: {query='', mode=''}} = parseUrl(window.location.href);
         document.documentElement.dataset.searchMode = mode;
         this.setQuery(query);
         this.onSearchQueryUpdated(this.query.value, false);
@@ -322,13 +322,6 @@ class DisplaySearch extends Display {
         } else {
             document.title = `${text} - Yomichan Search`;
         }
-    }
-
-    static parseQueryStringFromLocation(url) {
-        const parsedUrl = new URL(url);
-        const parsedSearch = new URLSearchParams(parsedUrl.search);
-        return Array.from(parsedSearch.entries())
-            .reduce((a, [k, v]) => Object.assign({}, a, {[k]: v}), {});
     }
 }
 

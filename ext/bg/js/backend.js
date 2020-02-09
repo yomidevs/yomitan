@@ -608,14 +608,16 @@ class Backend {
         const queryString = new URLSearchParams(queryParams).toString();
         const url = `${baseUrl}?${queryString}`;
 
+        const isTabMatch = (url2) => {
+            if (url2 === null || !url2.startsWith(baseUrl)) { return false; }
+            const {baseUrl: baseUrl2, queryParams: queryParams2} = parseUrl(url2);
+            return baseUrl2 === baseUrl && (queryParams2.mode === mode || (!queryParams2.mode && mode === 'existingOrNewTab'));
+        };
+
         switch (mode) {
             case 'existingOrNewTab':
                 try {
-                    const tab = await Backend._findTab(1000, (url2) => (
-                        url2 !== null &&
-                        url2.startsWith(baseUrl) &&
-                        (url2.length === baseUrl.length || url2[baseUrl.length] === '?' || url2[baseUrl.length] === '#')
-                    ));
+                    const tab = await Backend._findTab(1000, isTabMatch);
                     if (tab !== null) {
                         await Backend._focusTab(tab);
                         if (queryParams.query) {
