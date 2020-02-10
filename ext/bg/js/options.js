@@ -266,6 +266,7 @@ function profileOptionsCreateDefaults() {
     return {
         general: {
             enable: true,
+            enableClipboardPopups: false,
             resultOutputMode: 'group',
             debugInfo: false,
             maxResults: 32,

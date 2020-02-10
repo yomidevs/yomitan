@@ -22,6 +22,7 @@ class Backend {
         this.translator = new Translator();
         this.anki = new AnkiNull();
         this.mecab = new Mecab();
+        this.clipboardMonitor = new ClipboardMonitor();
         this.options = null;
         this.optionsSchema = null;
         this.optionsContext = {
@@ -33,6 +34,8 @@ class Backend {
         this.isPreparedPromise = new Promise((resolve) => (this.isPreparedResolve = resolve));
 
         this.clipboardPasteTarget = document.querySelector('#clipboard-paste-target');
+
+        this.popupWindow = null;
 
         this.apiForwarder = new BackendApiForwarder();
     }
@@ -67,6 +70,8 @@ class Backend {
         this.isPreparedResolve();
         this.isPreparedResolve = null;
         this.isPreparedPromise = null;
+
+        this.clipboardMonitor.onClipboardText = (text) => this._onClipboardText(text);
     }
 
     onOptionsUpdated(source) {
@@ -97,6 +102,10 @@ class Backend {
         }
     }
 
+    _onClipboardText(text) {
+        this._onCommandSearch({mode: 'popup', query: text});
+    }
+
     _onZoomChange({tabId, oldZoomFactor, newZoomFactor}) {
         const callback = () => this.checkLastError(chrome.runtime.lastError);
         chrome.tabs.sendMessage(tabId, {action: 'zoomChanged', params: {oldZoomFactor, newZoomFactor}}, callback);
@@ -120,6 +129,12 @@ class Backend {
             this.mecab.startListener();
         } else {
             this.mecab.stopListener();
+        }
+
+        if (options.general.enableClipboardPopups) {
+            this.clipboardMonitor.start();
+        } else {
+            this.clipboardMonitor.stop();
         }
     }
 
@@ -521,13 +536,30 @@ class Backend {
     }
 
     async _onApiClipboardGet() {
-        const clipboardPasteTarget = this.clipboardPasteTarget;
-        clipboardPasteTarget.value = '';
-        clipboardPasteTarget.focus();
-        document.execCommand('paste');
-        const result = clipboardPasteTarget.value;
-        clipboardPasteTarget.value = '';
-        return result;
+        /*
+        Notes:
+            document.execCommand('paste') doesn't work on Firefox.
+            This may be a bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1603985
+            Therefore, navigator.clipboard.readText() is used on Firefox.
+
+            navigator.clipboard.readText() can't be used in Chrome for two reasons:
+            * Requires page to be focused, else it rejects with an exception.
+            * When the page is focused, Chrome will request clipboard permission, despite already
+              being an extension with clipboard permissions. It effectively asks for the
+              non-extension permission for clipboard access.
+        */
+        const browser = await Backend._getBrowser();
+        if (browser === 'firefox' || browser === 'firefox-mobile') {
+            return await navigator.clipboard.readText();
+        } else {
+            const clipboardPasteTarget = this.clipboardPasteTarget;
+            clipboardPasteTarget.value = '';
+            clipboardPasteTarget.focus();
+            document.execCommand('paste');
+            const result = clipboardPasteTarget.value;
+            clipboardPasteTarget.value = '';
+            return result;
+        }
     }
 
     async _onApiGetDisplayTemplatesHtml() {
@@ -565,23 +597,68 @@ class Backend {
     // Command handlers
 
     async _onCommandSearch(params) {
-        const url = chrome.runtime.getURL('/bg/search.html');
-        if (!(params && params.newTab)) {
-            try {
-                const tab = await Backend._findTab(1000, (url2) => (
-                    url2 !== null &&
-                    url2.startsWith(url) &&
-                    (url2.length === url.length || url2[url.length] === '?' || url2[url.length] === '#')
-                ));
-                if (tab !== null) {
-                    await Backend._focusTab(tab);
-                    return;
+        const {mode='existingOrNewTab', query} = params || {};
+
+        const options = await this.getOptions(this.optionsContext);
+        const {popupWidth, popupHeight} = options.general;
+
+        const baseUrl = chrome.runtime.getURL('/bg/search.html');
+        const queryParams = {mode};
+        if (query && query.length > 0) { queryParams.query = query; }
+        const queryString = new URLSearchParams(queryParams).toString();
+        const url = `${baseUrl}?${queryString}`;
+
+        const isTabMatch = (url2) => {
+            if (url2 === null || !url2.startsWith(baseUrl)) { return false; }
+            const {baseUrl: baseUrl2, queryParams: queryParams2} = parseUrl(url2);
+            return baseUrl2 === baseUrl && (queryParams2.mode === mode || (!queryParams2.mode && mode === 'existingOrNewTab'));
+        };
+
+        const openInTab = async () => {
+            const tab = await Backend._findTab(1000, isTabMatch);
+            if (tab !== null) {
+                await Backend._focusTab(tab);
+                if (queryParams.query) {
+                    await new Promise((resolve) => chrome.tabs.sendMessage(
+                        tab.id, {action: 'searchQueryUpdate', params: {query: queryParams.query}}, resolve
+                    ));
                 }
-            } catch (e) {
-                // NOP
+                return true;
             }
+        };
+
+        switch (mode) {
+            case 'existingOrNewTab':
+                try {
+                    if (await openInTab()) { return; }
+                } catch (e) {
+                    // NOP
+                }
+                chrome.tabs.create({url});
+                return;
+            case 'newTab':
+                chrome.tabs.create({url});
+                return;
+            case 'popup':
+                try {
+                    // chrome.windows not supported (e.g. on Firefox mobile)
+                    if (!isObject(chrome.windows)) { return; }
+                    if (await openInTab()) { return; }
+                    // if the previous popup is open in an invalid state, close it
+                    if (this.popupWindow !== null) {
+                        const callback = () => this.checkLastError(chrome.runtime.lastError);
+                        chrome.windows.remove(this.popupWindow.id, callback);
+                    }
+                    // open new popup
+                    this.popupWindow = await new Promise((resolve) => chrome.windows.create(
+                        {url, width: popupWidth, height: popupHeight, type: 'popup'},
+                        resolve
+                    ));
+                } catch (e) {
+                    // NOP
+                }
+                return;
         }
-        chrome.tabs.create({url});
     }
 
     _onCommandHelp() {

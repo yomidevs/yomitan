@@ -79,6 +79,7 @@
                                 "type": "object",
                                 "required": [
                                     "enable",
+                                    "enableClipboardPopups",
                                     "resultOutputMode",
                                     "debugInfo",
                                     "maxResults",
@@ -110,6 +111,10 @@
                                     "enable": {
                                         "type": "boolean",
                                         "default": true
+                                    },
+                                    "enableClipboardPopups": {
+                                        "type": "boolean",
+                                        "default": false
                                     },
                                     "resultOutputMode": {
                                         "type": "string",
