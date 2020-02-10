@@ -20,10 +20,9 @@
 class QueryParserGenerator {
     constructor() {
         this._templateHandler = null;
-        this._initialize();
     }
 
-    async _initialize() {
+    async prepare() {
         const html = await apiGetQueryParserTemplatesHtml();
         this._templateHandler = new TemplateHandler(html);
     }

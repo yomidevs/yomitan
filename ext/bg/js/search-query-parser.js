@@ -31,6 +31,10 @@ class QueryParser extends TextScanner {
         this.queryParserGenerator = new QueryParserGenerator();
     }
 
+    async prepare() {
+        await this.queryParserGenerator.prepare();
+    }
+
     onError(error) {
         logError(error, false);
     }

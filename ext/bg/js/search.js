@@ -49,6 +49,8 @@ class DisplaySearch extends Display {
         try {
             await this.initialize();
 
+            await this.queryParser.prepare();
+
             const {queryParams: {query='', mode=''}} = parseUrl(window.location.href);
 
             if (this.search !== null) {
