@@ -20,15 +20,9 @@
 class TemplateHandler {
     constructor(html) {
         this._templates = new Map();
-        this._html = html;
-        this._doc = null;
 
-        this._initialize();
-    }
-
-    _initialize() {
-        this._doc = new DOMParser().parseFromString(this._html, 'text/html');
-        for (const template of this._doc.querySelectorAll('template')) {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        for (const template of doc.querySelectorAll('template')) {
             this._setTemplate(template);
         }
     }
