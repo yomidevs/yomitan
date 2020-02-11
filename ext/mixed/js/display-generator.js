@@ -307,6 +307,7 @@ class DisplayGenerator {
         const html = await apiGetDisplayTemplatesHtml();
         const doc = new DOMParser().parseFromString(html, 'text/html');
         this._setTemplates(doc);
+        this._isInitialized = true;
     }
 
     _setTemplates(doc) {
