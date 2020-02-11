@@ -227,8 +227,8 @@ button.action-button {
     display: block;
 }
 
-.tag-list>.tag+.tag {
-    margin-left: 0.375em;
+.tag-list>.tag:not(:last-child) {
+    margin-right: 0.375em;
 }
 
 html:root:not([data-enable-search-tags=true]) .tag[data-category=search] {
@@ -398,7 +398,7 @@ html:root:not([data-enable-search-tags=true]) .tag[data-category=search] {
 
 :root[data-compact-glossaries=true] .term-definition-tag-list,
 :root[data-compact-glossaries=true] .term-definition-only-list:not([data-count="0"]) {
-    display: inline-block;
+    display: inline;
 }
 
 :root[data-compact-glossaries=true] .term-glossary-list {
@@ -424,6 +424,11 @@ html:root:not([data-enable-search-tags=true]) .tag[data-category=search] {
     opacity: 0;
     white-space: pre-wrap;
 }
+
+.term-special-tags>.frequencies {
+    display: inline;
+}
+
 
 /*
  * Kanji
