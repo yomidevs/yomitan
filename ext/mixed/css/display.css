@@ -127,12 +127,12 @@ html:root[data-yomichan-page=float] .navigation-header:not([hidden])~.navigation
     user-select: none;
 }
 
-#query-parser {
+#query-parser-content {
     margin-top: 0.5em;
     font-size: 2em;
 }
 
-#query-parser[data-term-spacing=true] .query-parser-term {
+#query-parser-content[data-term-spacing=true] .query-parser-term {
     margin-right: 0.2em;
 }
 

@@ -105,6 +105,10 @@ function apiGetDisplayTemplatesHtml() {
     return _apiInvoke('getDisplayTemplatesHtml');
 }
 
+function apiGetQueryParserTemplatesHtml() {
+    return _apiInvoke('getQueryParserTemplatesHtml');
+}
+
 function apiGetZoom() {
     return _apiInvoke('getZoom');
 }
