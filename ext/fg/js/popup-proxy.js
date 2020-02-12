@@ -69,7 +69,7 @@ class PopupProxy {
         if (this._id === null) {
             return;
         }
-        this._invokeHostApi('setVisibleOverride', {id, visible});
+        this._invokeHostApi('setVisibleOverride', {id: this._id, visible});
     }
 
     async containsPoint(x, y) {
