@@ -47,7 +47,7 @@ class DisplaySearch extends Display {
 
     async prepare() {
         try {
-            await this.initialize();
+            await super.prepare();
 
             await this.queryParser.prepare();
 

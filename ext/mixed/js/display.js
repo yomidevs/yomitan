@@ -43,6 +43,16 @@ class Display {
         this.setInteractive(true);
     }
 
+    async prepare(options=null) {
+        await this.displayGenerator.prepare();
+        await this.updateOptions(options);
+        yomichan.on('optionsUpdate', () => this.updateOptions(null));
+    }
+
+    isPrepared() {
+        return this.options !== null;
+    }
+
     onError(_error) {
         throw new Error('Override me');
     }
@@ -238,16 +248,6 @@ class Display {
         throw new Error('Override me');
     }
 
-    isInitialized() {
-        return this.options !== null;
-    }
-
-    async initialize(options=null) {
-        await this.displayGenerator.prepare();
-        await this.updateOptions(options);
-        yomichan.on('optionsUpdate', () => this.updateOptions(null));
-    }
-
     async updateOptions(options) {
         this.options = options ? options : await apiOptionsGet(this.getOptionsContext());
         this.updateDocumentOptions(this.options);
@@ -358,7 +358,7 @@ class Display {
 
     async setContentTerms(definitions, context, token) {
         if (!context) { throw new Error('Context expected'); }
-        if (!this.isInitialized()) { return; }
+        if (!this.isPrepared()) { return; }
 
         this.setEventListenersActive(false);
 
@@ -419,7 +419,7 @@ class Display {
 
     async setContentKanji(definitions, context, token) {
         if (!context) { throw new Error('Context expected'); }
-        if (!this.isInitialized()) { return; }
+        if (!this.isPrepared()) { return; }
 
         this.setEventListenersActive(false);
 
