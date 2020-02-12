@@ -243,6 +243,7 @@ class Display {
     }
 
     async initialize(options=null) {
+        await this.displayGenerator.prepare();
         await this.updateOptions(options);
         yomichan.on('optionsUpdate', () => this.updateOptions(null));
     }
@@ -365,10 +366,7 @@ class Display {
             window.focus();
         }
 
-        if (!this.displayGenerator.isInitialized()) {
-            await this.displayGenerator.initialize();
-            if (this.setContentToken !== token) { return; }
-        }
+        if (this.setContentToken !== token) { return; }
 
         this.definitions = definitions;
         if (context.disableHistory) {
@@ -429,10 +427,7 @@ class Display {
             window.focus();
         }
 
-        if (!this.displayGenerator.isInitialized()) {
-            await this.displayGenerator.initialize();
-            if (this.setContentToken !== token) { return; }
-        }
+        if (this.setContentToken !== token) { return; }
 
         this.definitions = definitions;
         if (context.disableHistory) {

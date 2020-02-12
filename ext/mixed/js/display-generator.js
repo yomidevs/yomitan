@@ -19,9 +19,6 @@
 
 class DisplayGenerator {
     constructor() {
-        this._isInitialized = false;
-        this._initializationPromise = null;
-
         this._termEntryTemplate = null;
         this._termExpressionTemplate = null;
         this._termDefinitionItemTemplate = null;
@@ -40,18 +37,10 @@ class DisplayGenerator {
         this._tagFrequencyTemplate = null;
     }
 
-    isInitialized() {
-        return this._isInitialized;
-    }
-
-    initialize() {
-        if (this._isInitialized) {
-            return Promise.resolve();
-        }
-        if (this._initializationPromise === null) {
-            this._initializationPromise = this._initializeInternal();
-        }
-        return this._initializationPromise;
+    async prepare() {
+        const html = await apiGetDisplayTemplatesHtml();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        this._setTemplates(doc);
     }
 
     createTermEntry(details) {
@@ -301,13 +290,6 @@ class DisplayGenerator {
         node.dataset.frequency = details.frequency;
 
         return node;
-    }
-
-    async _initializeInternal() {
-        const html = await apiGetDisplayTemplatesHtml();
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        this._setTemplates(doc);
-        this._isInitialized = true;
     }
 
     _setTemplates(doc) {
