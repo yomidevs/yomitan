@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "array",
+    "description": "Data file containing kanji information.",
+    "additionalItems": {
+        "type": "array",
+        "description": "Information about a single kanji character.",
+        "minItems": 4,
+        "items": [
+            {
+                "type": "string",
+                "description": "Kanji character.",
+                "minLength": 1
+            },
+            {
+                "type": "string",
+                "description": "String of space-separated onyomi readings for the kanji character. An empty string is treated as no readings."
+            },
+            {
+                "type": "string",
+                "description": "String of space-separated kunyomi readings for the kanji character. An empty string is treated as no readings."
+            },
+            {
+                "type": "string",
+                "description": "String of space-separated tags for the kanji character. An empty string is treated as no tags."
+            }
+        ],
+        "additionalItems": {
+            "type": "string",
+            "description": "A meaning for the kanji character."
+        }
+    }
+}

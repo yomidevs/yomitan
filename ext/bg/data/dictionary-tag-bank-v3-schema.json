@@ -1,0 +1,32 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "array",
+    "description": "Data file containing tag information for terms and kanji.",
+    "additionalItems": {
+        "type": "array",
+        "description": "Information about a single tag.",
+        "minItems": 5,
+        "items": [
+            {
+                "type": "string",
+                "description": "Tag name."
+            },
+            {
+                "type": "string",
+                "description": "Category for the tag."
+            },
+            {
+                "type": "number",
+                "description": "Sorting order for the tag."
+            },
+            {
+                "type": "string",
+                "description": "Notes for the tag."
+            },
+            {
+                "type": "number",
+                "description": "Score used to determine popularity. Negative values are more rare and positive values are more frequent. This score is also used to sort search results."
+            }
+        ]
+    }
+}
