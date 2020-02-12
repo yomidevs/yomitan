@@ -10,6 +10,7 @@
         "es2017": true,
         "webextensions": true
     },
+    "plugins": ["no-unsanitized"],
     "ignorePatterns": [
         "/ext/mixed/lib/",
         "/ext/bg/js/templates.js"
@@ -32,7 +33,9 @@
         "quote-props": ["error", "consistent"],
         "quotes": ["error", "single", "avoid-escape"],
         "require-atomic-updates": "off",
-        "semi": "error"
+        "semi": "error",
+        "no-unsanitized/method": "error",
+        "no-unsanitized/property": "error"
     },
     "overrides": [
         {
