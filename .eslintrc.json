@@ -65,6 +65,15 @@
             "env": {
                 "jquery": true
             }
+        },
+        {
+            "files": ["test/**/*.js"],
+            "env": {
+                "browser": false,
+                "es2017": false,
+                "webextensions": false,
+                "node": true
+            }
         }
     ]
 }
