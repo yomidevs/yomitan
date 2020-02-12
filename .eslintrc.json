@@ -49,6 +49,7 @@
                 "stringReverse": "readonly",
                 "promiseTimeout": "readonly",
                 "stringReplaceAsync": "readonly",
+                "parseUrl": "readonly",
                 "EventDispatcher": "readonly",
                 "EXTENSION_IS_BROWSER_EDGE": "readonly"
             }

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global getOptionsContext, getOptionsMutable, getOptionsFullMutable, settingsSaveOptions, apiOptionsGetFull
+/*global getOptionsContext, getOptionsMutable, getOptionsFullMutable, settingsSaveOptions, apiOptionsGetFull, apiOptionsGet
 utilBackgroundIsolate, utilDatabaseDeleteDictionary, utilDatabaseGetDictionaryInfo, utilDatabaseGetDictionaryCounts
 utilDatabasePurge, utilDatabaseImport
 storageUpdateStats, storageEstimate

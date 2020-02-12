@@ -23,7 +23,7 @@ requestText, requestJson, optionsLoad
 dictConfigured, dictTermsSort, dictEnabledSet, dictNoteFormat
 audioGetUrl, audioInject
 jpConvertReading, jpDistributeFuriganaInflected, jpKatakanaToHiragana
-Translator, AnkiConnect, AnkiNull, Mecab, BackendApiForwarder, JsonSchema*/
+Translator, AnkiConnect, AnkiNull, Mecab, BackendApiForwarder, JsonSchema, ClipboardMonitor*/
 
 class Backend {
     constructor() {

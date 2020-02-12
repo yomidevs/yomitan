@@ -17,7 +17,7 @@
  */
 
 /*global jpIsStringPartiallyJapanese, apiOptionsSet, apiTermsFind, apiClipboardGet, apiGetEnvironmentInfo
-Display, QueryParser*/
+Display, QueryParser, ClipboardMonitor*/
 
 class DisplaySearch extends Display {
     constructor() {

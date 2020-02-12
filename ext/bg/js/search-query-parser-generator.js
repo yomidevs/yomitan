@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global apiGetQueryParserTemplatesHtml, TemplateHandler*/
 
 class QueryParserGenerator {
     constructor() {
