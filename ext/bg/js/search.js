@@ -16,8 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global jpIsStringPartiallyJapanese, apiOptionsSet, apiTermsFind, apiClipboardGet, apiGetEnvironmentInfo
-Display, QueryParser, ClipboardMonitor*/
+/*global apiOptionsSet, apiTermsFind, Display, QueryParser, ClipboardMonitor*/
 
 class DisplaySearch extends Display {
     constructor() {
