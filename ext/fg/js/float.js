@@ -45,6 +45,8 @@ class DisplayFloat extends Display {
         }
 
         this.setContentScale(scale);
+
+        window.parent.postMessage('initialized', '*');
     }
 
     onError(error) {
