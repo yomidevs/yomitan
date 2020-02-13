@@ -460,7 +460,7 @@ class Translator {
                 termList = [];
                 expressionsUnique.push(expression);
                 termsUnique.push(termList);
-                termsUniqueMap[expression] = termList;
+                termsUniqueMap.set(expression, termList);
             }
             termList.push(term);
 
