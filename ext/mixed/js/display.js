@@ -49,10 +49,6 @@ class Display {
         yomichan.on('optionsUpdate', () => this.updateOptions(null));
     }
 
-    isPrepared() {
-        return this.options !== null;
-    }
-
     onError(_error) {
         throw new Error('Override me');
     }
@@ -358,7 +354,6 @@ class Display {
 
     async setContentTerms(definitions, context, token) {
         if (!context) { throw new Error('Context expected'); }
-        if (!this.isPrepared()) { return; }
 
         this.setEventListenersActive(false);
 
@@ -419,7 +414,6 @@ class Display {
 
     async setContentKanji(definitions, context, token) {
         if (!context) { throw new Error('Context expected'); }
-        if (!this.isPrepared()) { return; }
 
         this.setEventListenersActive(false);
 
