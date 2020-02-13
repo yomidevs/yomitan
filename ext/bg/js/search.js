@@ -47,9 +47,9 @@ class DisplaySearch extends Display {
 
     async prepare() {
         try {
-            await super.prepare();
-
-            await this.queryParser.prepare();
+            const superPromise = super.prepare();
+            const queryParserPromise = this.queryParser.prepare();
+            await Promise.all([superPromise, queryParserPromise]);
 
             const {queryParams: {query='', mode=''}} = parseUrl(window.location.href);
 

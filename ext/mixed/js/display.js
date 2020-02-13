@@ -44,8 +44,9 @@ class Display {
     }
 
     async prepare(options=null) {
-        await this.displayGenerator.prepare();
-        await this.updateOptions(options);
+        const displayGeneratorPromise = this.displayGenerator.prepare();
+        const updateOptionsPromise = this.updateOptions(options);
+        await Promise.all([displayGeneratorPromise, updateOptionsPromise]);
         yomichan.on('optionsUpdate', () => this.updateOptions(null));
     }
 
