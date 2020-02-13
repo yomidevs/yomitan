@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global jpIsCharCodeKanji, jpDistributeFurigana, Handlebars*/
 
 function handlebarsEscape(text) {
     return Handlebars.Utils.escapeExpression(text);

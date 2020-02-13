@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global apiOptionsSet, apiTermsFind, Display, QueryParser, ClipboardMonitor*/
+
 class DisplaySearch extends Display {
     constructor() {
         super(document.querySelector('#spinner'), document.querySelector('#content'));

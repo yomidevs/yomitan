@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global getOptionsContext, getOptionsMutable, settingsSaveOptions
+AudioSourceUI, audioGetTextToSpeechVoice*/
 
 let audioSourceUI = null;
 

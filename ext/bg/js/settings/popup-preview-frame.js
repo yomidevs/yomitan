@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global apiOptionsGet, Popup, PopupProxyHost, Frontend, TextSourceRange*/
 
 class SettingsPopupPreview {
     constructor() {

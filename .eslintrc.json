@@ -1,7 +1,14 @@
 {
+    "root": true,
     "extends": "eslint:recommended",
     "parserOptions": {
-        "ecmaVersion": 8
+        "ecmaVersion": 8,
+        "sourceType": "script"
+    },
+    "env": {
+        "browser": true,
+        "es2017": true,
+        "webextensions": true
     },
     "ignorePatterns": [
         "/ext/mixed/lib/",
@@ -16,13 +23,57 @@
         "no-case-declarations": "error",
         "no-const-assign": "error",
         "no-constant-condition": "off",
-        "no-undef": "off",
+        "no-global-assign": "error",
+        "no-undef": "error",
         "no-unused-vars": ["error", {"vars": "local", "args": "after-used", "argsIgnorePattern": "^_", "caughtErrors": "none"}],
+        "no-unused-expressions": "error",
         "no-var": "error",
         "prefer-const": ["error", {"destructuring": "all"}],
         "quote-props": ["error", "consistent"],
         "quotes": ["error", "single", "avoid-escape"],
         "require-atomic-updates": "off",
         "semi": "error"
-    }
+    },
+    "overrides": [
+        {
+            "files": ["*.js"],
+            "excludedFiles": ["ext/mixed/js/core.js"],
+            "globals": {
+                "yomichan": "readonly",
+                "errorToJson": "readonly",
+                "jsonToError": "readonly",
+                "logError": "readonly",
+                "isObject": "readonly",
+                "hasOwn": "readonly",
+                "toIterable": "readonly",
+                "stringReverse": "readonly",
+                "promiseTimeout": "readonly",
+                "stringReplaceAsync": "readonly",
+                "parseUrl": "readonly",
+                "EventDispatcher": "readonly",
+                "EXTENSION_IS_BROWSER_EDGE": "readonly"
+            }
+        },
+        {
+            "files": ["ext/mixed/js/core.js"],
+            "globals": {
+                "chrome": "writable"
+            }
+        },
+        {
+            "files": ["ext/bg/js/settings/*.js"],
+            "env": {
+                "jquery": true
+            }
+        },
+        {
+            "files": ["test/**/*.js"],
+            "env": {
+                "browser": false,
+                "es2017": false,
+                "webextensions": false,
+                "node": true
+            }
+        }
+    ]
 }

@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global apiGetZoom, apiOptionsGet, apiTermsFind, apiKanjiFind, docSentenceExtract, TextScanner*/
 
 class Frontend extends TextScanner {
     constructor(popup, ignoreNodes) {

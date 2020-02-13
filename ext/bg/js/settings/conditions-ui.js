@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global conditionsNormalizeOptionValue*/
 
 class ConditionsUI {
     static instantiateTemplate(templateSelector) {

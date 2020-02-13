@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global FrontendApiSender*/
 
 class PopupProxy {
     constructor(depth, parentId, parentFrameId, url) {

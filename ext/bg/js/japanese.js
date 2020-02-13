@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global wanakana*/
 
 const JP_HALFWIDTH_KATAKANA_MAPPING = new Map([
     ['ｦ', 'ヲヺ-'],
