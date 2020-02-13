@@ -27,8 +27,6 @@ class Popup {
         this._child = null;
         this._childrenSupported = true;
         this._injectPromise = null;
-        this._isInjected = false;
-        this._isInjectedAndLoaded = false;
         this._visible = false;
         this._visibleOverride = null;
         this._options = null;
@@ -119,16 +117,12 @@ class Popup {
     }
 
     clearAutoPlayTimer() {
-        if (this._isInjectedAndLoaded) {
-            this._invokeApi('clearAutoPlayTimer');
-        }
+        this._invokeApi('clearAutoPlayTimer');
     }
 
     setContentScale(scale) {
         this._contentScale = scale;
-        if (this._isInjectedAndLoaded) {
-            this._invokeApi('setContentScale', {scale});
-        }
+        this._invokeApi('setContentScale', {scale});
     }
 
     onMessage(e) {
@@ -160,7 +154,7 @@ class Popup {
     }
 
     isVisibleSync() {
-        return this._isInjected && (this._visibleOverride !== null ? this._visibleOverride : this._visible);
+        return (this._visibleOverride !== null ? this._visibleOverride : this._visible);
     }
 
     updateTheme() {
@@ -239,7 +233,6 @@ class Popup {
         return new Promise((resolve) => {
             const parentFrameId = (typeof this._frameId === 'number' ? this._frameId : null);
             this._container.addEventListener('load', () => {
-                this._isInjectedAndLoaded = true;
                 this._invokeApi('initialize', {
                     options: this._options,
                     popupInfo: {
@@ -256,7 +249,6 @@ class Popup {
             this._observeFullscreen();
             this._onFullscreenChanged();
             this.setCustomOuterCss(this._options.general.customPopupOuterCss, false);
-            this._isInjected = true;
         });
     }
 
@@ -341,10 +333,9 @@ class Popup {
     }
 
     _invokeApi(action, params={}) {
-        if (!this._isInjectedAndLoaded) {
-            throw new Error('Frame not loaded');
+        if (this._container.contentWindow) {
+            this._container.contentWindow.postMessage({action, params}, '*');
         }
-        this._container.contentWindow.postMessage({action, params}, '*');
     }
 
     _observeFullscreen() {
