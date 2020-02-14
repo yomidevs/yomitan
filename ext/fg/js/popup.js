@@ -43,8 +43,6 @@ class Popup {
         this._container.style.height = '0px';
 
         this._updateVisibility();
-
-        window.addEventListener('message', (e) => this.onMessage(e), false);
     }
 
     // Public properties
@@ -125,15 +123,7 @@ class Popup {
         this._invokeApi('setContentScale', {scale});
     }
 
-    onMessage(e) {
-        const action = e.data;
-        const handler = Popup._windowMessageHandlers.get(action);
-        if (typeof handler !== 'function') { return; }
-
-        handler(this);
-    }
-
-    setInitialized() {
+    setDisplayInitialized() {
         throw new Error('Override me');
     }
 
@@ -244,7 +234,7 @@ class Popup {
                     childrenSupported: this._childrenSupported,
                     scale: this._contentScale
                 });
-                this.setInitialized = resolve;
+                this.setDisplayInitialized = resolve;
             });
             this._observeFullscreen();
             this._onFullscreenChanged();
@@ -539,9 +529,5 @@ class Popup {
         };
     }
 }
-
-Popup._windowMessageHandlers = new Map([
-    ['initialized', (self) => self.setInitialized()]
-]);
 
 Popup.outerStylesheet = null;

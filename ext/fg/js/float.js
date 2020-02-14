@@ -46,7 +46,7 @@ class DisplayFloat extends Display {
 
         this.setContentScale(scale);
 
-        window.parent.postMessage('initialized', '*');
+        apiForward('popupSetDisplayInitialized');
     }
 
     onError(error) {
