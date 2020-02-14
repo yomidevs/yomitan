@@ -34,6 +34,22 @@ class DisplayFloat extends Display {
         window.addEventListener('message', (e) => this.onMessage(e), false);
     }
 
+    async prepare(options, popupInfo, url, childrenSupported, scale) {
+        await super.prepare(options);
+
+        const {id, depth, parentFrameId} = popupInfo;
+        this.optionsContext.depth = depth;
+        this.optionsContext.url = url;
+
+        if (childrenSupported) {
+            popupNestedInitialize(id, depth, parentFrameId, url);
+        }
+
+        this.setContentScale(scale);
+
+        apiForward('popupSetDisplayInitialized');
+    }
+
     onError(error) {
         if (this._orphaned) {
             this.setContent('orphaned');
@@ -93,20 +109,6 @@ class DisplayFloat extends Display {
     setContentScale(scale) {
         document.body.style.fontSize = `${scale}em`;
     }
-
-    async initialize(options, popupInfo, url, childrenSupported, scale) {
-        await super.initialize(options);
-
-        const {id, depth, parentFrameId} = popupInfo;
-        this.optionsContext.depth = depth;
-        this.optionsContext.url = url;
-
-        if (childrenSupported) {
-            popupNestedInitialize(id, depth, parentFrameId, url);
-        }
-
-        this.setContentScale(scale);
-    }
 }
 
 DisplayFloat._onKeyDownHandlers = new Map([
@@ -123,7 +125,7 @@ DisplayFloat._messageHandlers = new Map([
     ['setContent', (self, {type, details}) => self.setContent(type, details)],
     ['clearAutoPlayTimer', (self) => self.clearAutoPlayTimer()],
     ['setCustomCss', (self, {css}) => self.setCustomCss(css)],
-    ['initialize', (self, {options, popupInfo, url, childrenSupported, scale}) => self.initialize(options, popupInfo, url, childrenSupported, scale)],
+    ['initialize', (self, {options, popupInfo, url, childrenSupported, scale}) => self.prepare(options, popupInfo, url, childrenSupported, scale)],
     ['setContentScale', (self, {scale}) => self.setContentScale(scale)]
 ]);
 

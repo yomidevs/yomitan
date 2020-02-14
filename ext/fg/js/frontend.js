@@ -244,5 +244,6 @@ Frontend._windowMessageHandlers = new Map([
 ]);
 
 Frontend._runtimeMessageHandlers = new Map([
-    ['popupSetVisibleOverride', (self, {visible}) => { self.popup.setVisibleOverride(visible); }]
+    ['popupSetVisibleOverride', (self, {visible}) => { self.popup.setVisibleOverride(visible); }],
+    ['popupSetDisplayInitialized', (self) => { self.popup.setDisplayInitialized(); }]
 ]);

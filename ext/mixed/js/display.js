@@ -48,6 +48,13 @@ class Display {
         this.setInteractive(true);
     }
 
+    async prepare(options=null) {
+        const displayGeneratorPromise = this.displayGenerator.prepare();
+        const updateOptionsPromise = this.updateOptions(options);
+        await Promise.all([displayGeneratorPromise, updateOptionsPromise]);
+        yomichan.on('optionsUpdate', () => this.updateOptions(null));
+    }
+
     onError(_error) {
         throw new Error('Override me');
     }
@@ -243,15 +250,6 @@ class Display {
         throw new Error('Override me');
     }
 
-    isInitialized() {
-        return this.options !== null;
-    }
-
-    async initialize(options=null) {
-        await this.updateOptions(options);
-        yomichan.on('optionsUpdate', () => this.updateOptions(null));
-    }
-
     async updateOptions(options) {
         this.options = options ? options : await apiOptionsGet(this.getOptionsContext());
         this.updateDocumentOptions(this.options);
@@ -362,7 +360,6 @@ class Display {
 
     async setContentTerms(definitions, context, token) {
         if (!context) { throw new Error('Context expected'); }
-        if (!this.isInitialized()) { return; }
 
         this.setEventListenersActive(false);
 
@@ -370,10 +367,7 @@ class Display {
             window.focus();
         }
 
-        if (!this.displayGenerator.isInitialized()) {
-            await this.displayGenerator.initialize();
-            if (this.setContentToken !== token) { return; }
-        }
+        if (this.setContentToken !== token) { return; }
 
         this.definitions = definitions;
         if (context.disableHistory) {
@@ -426,7 +420,6 @@ class Display {
 
     async setContentKanji(definitions, context, token) {
         if (!context) { throw new Error('Context expected'); }
-        if (!this.isInitialized()) { return; }
 
         this.setEventListenersActive(false);
 
@@ -434,10 +427,7 @@ class Display {
             window.focus();
         }
 
-        if (!this.displayGenerator.isInitialized()) {
-            await this.displayGenerator.initialize();
-            if (this.setContentToken !== token) { return; }
-        }
+        if (this.setContentToken !== token) { return; }
 
         this.definitions = definitions;
         if (context.disableHistory) {
