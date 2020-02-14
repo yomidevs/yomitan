@@ -135,11 +135,6 @@ function handlebarsRegisterHelpers() {
     }
 }
 
-function handlebarsRenderStatic(name, data) {
-    handlebarsRegisterHelpers();
-    return Handlebars.templates[name](data).trim();
-}
-
 function handlebarsRenderDynamic(template, data) {
     handlebarsRegisterHelpers();
     const cache = handlebarsRenderDynamic._cache;

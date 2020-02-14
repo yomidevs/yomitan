@@ -18,7 +18,7 @@
 
 /*global optionsSave, utilIsolate
 conditionsTestValue, profileConditionsDescriptor, profileOptionsGetDefaultFieldTemplates
-handlebarsRenderDynamic, handlebarsRenderStatic
+handlebarsRenderDynamic
 requestText, requestJson, optionsLoad
 dictConfigured, dictTermsSort, dictEnabledSet, dictNoteFormat
 audioGetUrl, audioInject
@@ -459,12 +459,8 @@ class Backend {
         return this.anki.guiBrowse(`nid:${noteId}`);
     }
 
-    async _onApiTemplateRender({template, data, dynamic}) {
-        return (
-            dynamic ?
-            handlebarsRenderDynamic(template, data) :
-            handlebarsRenderStatic(template, data)
-        );
+    async _onApiTemplateRender({template, data}) {
+        return handlebarsRenderDynamic(template, data);
     }
 
     async _onApiCommandExec({command, params}) {
