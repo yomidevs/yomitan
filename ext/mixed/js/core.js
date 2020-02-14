@@ -113,11 +113,7 @@ function toIterable(value) {
     if (value !== null && typeof value === 'object') {
         const length = value.length;
         if (typeof length === 'number' && Number.isFinite(length)) {
-            const array = [];
-            for (let i = 0; i < length; ++i) {
-                array.push(value[i]);
-            }
-            return array;
+            return Array.from(value);
         }
     }
 
