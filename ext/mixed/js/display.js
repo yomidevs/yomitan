@@ -32,7 +32,7 @@ class Display {
         this.index = 0;
         this.audioPlaying = null;
         this.audioFallback = null;
-        this.audioCache = {};
+        this.audioCache = new Map();
         this.styleNode = null;
 
         this.eventListeners = [];
