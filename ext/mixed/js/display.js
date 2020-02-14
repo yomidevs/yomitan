@@ -179,13 +179,15 @@ class Display {
         e.preventDefault();
         const link = e.currentTarget;
         const entry = link.closest('.entry');
-        const definitionIndex = this.entryIndexFind(entry);
+        const index = this.entryIndexFind(entry);
+        if (index < 0 || index >= this.definitions.length) { return; }
+
         const expressionIndex = Display.indexOf(entry.querySelectorAll('.term-expression .action-play-audio'), link);
         this.audioPlay(
-            this.definitions[definitionIndex],
+            this.definitions[index],
             // expressionIndex is used in audioPlay to detect result output mode
             Math.max(expressionIndex, this.options.general.resultOutputMode === 'merge' ? 0 : -1),
-            definitionIndex
+            index
         );
     }
 
@@ -193,6 +195,8 @@ class Display {
         e.preventDefault();
         const link = e.currentTarget;
         const index = this.entryIndexFind(link);
+        if (index < 0 || index >= this.definitions.length) { return; }
+
         this.noteAdd(this.definitions[index], link.dataset.mode);
     }
 
@@ -512,6 +516,8 @@ class Display {
     }
 
     autoPlayAudio() {
+        if (this.definitions.length === 0) { return; }
+
         this.audioPlay(this.definitions[0], this.firstExpressionIndex, 0);
     }
 
@@ -611,9 +617,12 @@ class Display {
     }
 
     noteTryAdd(mode) {
-        const button = this.adderButtonFind(this.index, mode);
+        const index = this.index;
+        if (index < 0 || index >= this.definitions.length) { return; }
+
+        const button = this.adderButtonFind(index, mode);
         if (button !== null && !button.classList.contains('disabled')) {
-            this.noteAdd(this.definitions[this.index], mode);
+            this.noteAdd(this.definitions[index], mode);
         }
     }
 
@@ -915,9 +924,12 @@ Display._onKeyDownHandlers = new Map([
 
     ['P', (self, e) => {
         if (e.altKey) {
-            const entry = self.getEntry(self.index);
+            const index = self.index;
+            if (index < 0 || index >= self.definitions.length) { return; }
+
+            const entry = self.getEntry(index);
             if (entry !== null && entry.dataset.type === 'term') {
-                self.audioPlay(self.definitions[self.index], self.firstExpressionIndex, self.index);
+                self.audioPlay(self.definitions[index], self.firstExpressionIndex, index);
             }
             return true;
         }
