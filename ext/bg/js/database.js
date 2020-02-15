@@ -153,11 +153,11 @@ class Database {
         this._validate();
 
         const promises = [];
-        const visited = {};
+        const visited = new Set();
         const results = [];
         const processRow = (row, index) => {
-            if (titles.includes(row.dictionary) && !hasOwn(visited, row.id)) {
-                visited[row.id] = true;
+            if (titles.includes(row.dictionary) && !visited.has(row.id)) {
+                visited.add(row.id);
                 results.push(Database._createTerm(row, index));
             }
         };
