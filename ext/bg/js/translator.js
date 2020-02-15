@@ -118,8 +118,7 @@ class Translator {
 
         dictTermsMergeByGloss(result, defaultDefinitions.concat(secondarySearchResults), definitionsByGloss, mergedByTermIndices);
 
-        for (const gloss in definitionsByGloss) {
-            const definition = definitionsByGloss[gloss];
+        for (const definition of definitionsByGloss.values()) {
             dictTagsSort(definition.definitionTags);
             result.definitions.push(definition);
         }

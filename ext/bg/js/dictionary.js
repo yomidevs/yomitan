@@ -175,10 +175,10 @@ function dictTermsMergeBySequence(definitions, mainDictionary) {
     return [sequencedDefinitions, nonSequencedDefinitions];
 }
 
-function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
-    const definitionsByGloss = appendTo || {};
+function dictTermsMergeByGloss(result, definitions, appendTo=null, mergedIndices=null) {
+    const definitionsByGloss = appendTo !== null ? appendTo : new Map();
     for (const [index, definition] of definitions.entries()) {
-        if (appendTo) {
+        if (appendTo !== null) {
             let match = false;
             for (const expression of result.expressions.keys()) {
                 if (definition.expression === expression) {
@@ -196,14 +196,15 @@ function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
 
             if (!match) {
                 continue;
-            } else if (mergedIndices) {
+            } else if (mergedIndices !== null) {
                 mergedIndices.add(index);
             }
         }
 
         const gloss = JSON.stringify(definition.glossary.concat(definition.dictionary));
-        if (!definitionsByGloss[gloss]) {
-            definitionsByGloss[gloss] = {
+        let glossDefinition = definitionsByGloss.get(gloss);
+        if (typeof glossDefinition === 'undefined') {
+            glossDefinition = {
                 expression: new Set(),
                 reading: new Set(),
                 definitionTags: [],
@@ -214,21 +215,22 @@ function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
                 id: definition.id,
                 dictionary: definition.dictionary
             };
+            definitionsByGloss.set(gloss, glossDefinition);
         }
 
-        definitionsByGloss[gloss].expression.add(definition.expression);
-        definitionsByGloss[gloss].reading.add(definition.reading);
+        glossDefinition.expression.add(definition.expression);
+        glossDefinition.reading.add(definition.reading);
 
         result.expression.add(definition.expression);
         result.reading.add(definition.reading);
 
         for (const tag of definition.definitionTags) {
-            if (!definitionsByGloss[gloss].definitionTags.find((existingTag) => existingTag.name === tag.name)) {
-                definitionsByGloss[gloss].definitionTags.push(tag);
+            if (!glossDefinition.definitionTags.find((existingTag) => existingTag.name === tag.name)) {
+                glossDefinition.definitionTags.push(tag);
             }
         }
 
-        if (!appendTo) {
+        if (appendTo === null) {
             // result->expressions[ Expression1[ Reading1[ Tag1, Tag2 ] ], Expression2, ... ]
             if (!result.expressions.has(definition.expression)) {
                 result.expressions.set(definition.expression, new Map());
@@ -245,8 +247,7 @@ function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
         }
     }
 
-    for (const gloss in definitionsByGloss) {
-        const definition = definitionsByGloss[gloss];
+    for (const definition of definitionsByGloss.values()) {
         definition.only = [];
         if (!utilSetEqual(definition.expression, result.expression)) {
             for (const expression of utilSetIntersection(definition.expression, result.expression)) {
