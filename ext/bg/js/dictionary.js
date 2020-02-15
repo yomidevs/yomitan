@@ -177,11 +177,17 @@ function dictTermsMergeBySequence(definitions, mainDictionary) {
 
 function dictTermsMergeByGloss(result, definitions, appendTo=null, mergedIndices=null) {
     const definitionsByGloss = appendTo !== null ? appendTo : new Map();
+
+    const resultExpressionsMap = result.expressions;
+    const resultExpressionSet = result.expression;
+    const resultReadingSet = result.reading;
+    const resultSource = result.source;
+
     for (const [index, definition] of definitions.entries()) {
         const {expression, reading} = definition;
 
         if (mergedIndices !== null) {
-            const expressionMap = result.expressions.get(expression);
+            const expressionMap = resultExpressionsMap.get(expression);
             if (
                 typeof expressionMap !== 'undefined' &&
                 typeof expressionMap.get(reading) !== 'undefined'
@@ -200,7 +206,7 @@ function dictTermsMergeByGloss(result, definitions, appendTo=null, mergedIndices
                 reading: new Set(),
                 definitionTags: [],
                 glossary: definition.glossary,
-                source: result.source,
+                source: resultSource,
                 reasons: [],
                 score: definition.score,
                 id: definition.id,
@@ -212,8 +218,8 @@ function dictTermsMergeByGloss(result, definitions, appendTo=null, mergedIndices
         glossDefinition.expression.add(expression);
         glossDefinition.reading.add(reading);
 
-        result.expression.add(expression);
-        result.reading.add(reading);
+        resultExpressionSet.add(expression);
+        resultReadingSet.add(reading);
 
         for (const tag of definition.definitionTags) {
             if (!glossDefinition.definitionTags.find((existingTag) => existingTag.name === tag.name)) {
@@ -235,10 +241,10 @@ function dictTermsMergeByGloss(result, definitions, appendTo=null, mergedIndices
                     ...
                 ]);
             */
-            let readingMap = result.expressions.get(expression);
+            let readingMap = resultExpressionsMap.get(expression);
             if (typeof readingMap === 'undefined') {
                 readingMap = new Map();
-                result.expressions.set(expression, readingMap);
+                resultExpressionsMap.set(expression, readingMap);
             }
 
             let termTagsMap = readingMap.get(reading);
@@ -257,13 +263,13 @@ function dictTermsMergeByGloss(result, definitions, appendTo=null, mergedIndices
 
     for (const definition of definitionsByGloss.values()) {
         definition.only = [];
-        if (!utilSetEqual(definition.expression, result.expression)) {
-            for (const expression of utilSetIntersection(definition.expression, result.expression)) {
+        if (!utilSetEqual(definition.expression, resultExpressionSet)) {
+            for (const expression of utilSetIntersection(definition.expression, resultExpressionSet)) {
                 definition.only.push(expression);
             }
         }
-        if (!utilSetEqual(definition.reading, result.reading)) {
-            for (const reading of utilSetIntersection(definition.reading, result.reading)) {
+        if (!utilSetEqual(definition.reading, resultReadingSet)) {
+            for (const reading of utilSetIntersection(definition.reading, resultReadingSet)) {
                 definition.only.push(reading);
             }
         }
