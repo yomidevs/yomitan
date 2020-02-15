@@ -19,15 +19,17 @@
 /*global utilSetEqual, utilSetIntersection, apiTemplateRender*/
 
 function dictEnabledSet(options) {
-    const dictionaries = {};
-    for (const title in options.dictionaries) {
-        const dictionary = options.dictionaries[title];
-        if (dictionary.enabled) {
-            dictionaries[title] = dictionary;
-        }
+    const enabledDictionaryMap = new Map();
+    const optionsDictionaries = options.dictionaries;
+    for (const title in optionsDictionaries) {
+        if (!hasOwn(optionsDictionaries, title)) { continue; }
+        const dictionary = optionsDictionaries[title];
+        if (!dictionary.enabled) { continue; }
+        enabledDictionaryMap.set(title, {
+            priority: dictionary.priority || 0
+        });
     }
-
-    return dictionaries;
+    return enabledDictionaryMap;
 }
 
 function dictConfigured(options) {
@@ -58,10 +60,11 @@ function dictTermsSort(definitions, dictionaries=null) {
     return definitions.sort((v1, v2) => {
         let i;
         if (dictionaries !== null) {
-            i = (
-                ((dictionaries[v2.dictionary] || {}).priority || 0) -
-                ((dictionaries[v1.dictionary] || {}).priority || 0)
-            );
+            const dictionaryInfo1 = dictionaries.get(v1.dictionary);
+            const dictionaryInfo2 = dictionaries.get(v2.dictionary);
+            const priority1 = typeof dictionaryInfo1 !== 'undefined' ? dictionaryInfo1.priority || 0 : 0;
+            const priority2 = typeof dictionaryInfo2 !== 'undefined' ? dictionaryInfo2.priority || 0 : 0;
+            i = priority2 - priority1;
             if (i !== 0) { return i; }
         }
 

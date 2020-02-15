@@ -85,7 +85,7 @@ class Translator {
             }
         }
 
-        const definitions = await this.database.findTermsExactBulk(expressionList, readingList, secondarySearchTitles);
+        const definitions = await this.database.findTermsExactBulk(expressionList, readingList, new Set(secondarySearchTitles));
         for (const definition of definitions) {
             const definitionTags = await this.expandTags(definition.definitionTags, definition.dictionary);
             definitionTags.push(dictTagBuildSource(definition.dictionary));
@@ -156,11 +156,10 @@ class Translator {
 
     async findTermsGrouped(text, details, options) {
         const dictionaries = dictEnabledSet(options);
-        const titles = Object.keys(dictionaries);
         const [definitions, length] = await this.findTermsInternal(text, dictionaries, details, options);
 
         const definitionsGrouped = dictTermsGroup(definitions, dictionaries);
-        await this.buildTermMeta(definitionsGrouped, titles);
+        await this.buildTermMeta(definitionsGrouped, dictionaries);
 
         if (options.general.compactTags) {
             for (const definition of definitionsGrouped) {
@@ -174,7 +173,6 @@ class Translator {
     async findTermsMerged(text, details, options) {
         const dictionaries = dictEnabledSet(options);
         const secondarySearchTitles = Object.keys(options.dictionaries).filter((dict) => options.dictionaries[dict].allowSecondarySearches);
-        const titles = Object.keys(dictionaries);
         const [definitions, length] = await this.findTermsInternal(text, dictionaries, details, options);
         const {sequencedDefinitions, defaultDefinitions} = await this.getSequencedDefinitions(definitions, options.general.mainDictionary);
         const definitionsMerged = [];
@@ -198,7 +196,7 @@ class Translator {
             definitionsMerged.push(groupedDefinition);
         }
 
-        await this.buildTermMeta(definitionsMerged, titles);
+        await this.buildTermMeta(definitionsMerged, dictionaries);
 
         if (options.general.compactTags) {
             for (const definition of definitionsMerged) {
@@ -211,10 +209,9 @@ class Translator {
 
     async findTermsSplit(text, details, options) {
         const dictionaries = dictEnabledSet(options);
-        const titles = Object.keys(dictionaries);
         const [definitions, length] = await this.findTermsInternal(text, dictionaries, details, options);
 
-        await this.buildTermMeta(definitions, titles);
+        await this.buildTermMeta(definitions, dictionaries);
 
         return [definitions, length];
     }
@@ -225,11 +222,10 @@ class Translator {
             return [[], 0];
         }
 
-        const titles = Object.keys(dictionaries);
         const deinflections = (
             details.wildcard ?
-            await this.findTermWildcard(text, titles, details.wildcard) :
-            await this.findTermDeinflections(text, titles, options)
+            await this.findTermWildcard(text, dictionaries, details.wildcard) :
+            await this.findTermDeinflections(text, dictionaries, options)
         );
 
         let definitions = [];
@@ -271,8 +267,8 @@ class Translator {
         return [definitions, length];
     }
 
-    async findTermWildcard(text, titles, wildcard) {
-        const definitions = await this.database.findTermsBulk([text], titles, wildcard);
+    async findTermWildcard(text, dictionaries, wildcard) {
+        const definitions = await this.database.findTermsBulk([text], dictionaries, wildcard);
         if (definitions.length === 0) {
             return [];
         }
@@ -287,7 +283,7 @@ class Translator {
         }];
     }
 
-    async findTermDeinflections(text, titles, options) {
+    async findTermDeinflections(text, dictionaries, options) {
         const deinflections = this.getAllDeinflections(text, options);
 
         if (deinflections.length === 0) {
@@ -309,7 +305,7 @@ class Translator {
             deinflectionArray.push(deinflection);
         }
 
-        const definitions = await this.database.findTermsBulk(uniqueDeinflectionTerms, titles, null);
+        const definitions = await this.database.findTermsBulk(uniqueDeinflectionTerms, dictionaries, null);
 
         for (const definition of definitions) {
             const definitionRules = Deinflector.rulesToRuleFlags(definition.rules);
@@ -399,13 +395,12 @@ class Translator {
 
     async findKanji(text, options) {
         const dictionaries = dictEnabledSet(options);
-        const titles = Object.keys(dictionaries);
         const kanjiUnique = new Set();
         for (const c of text) {
             kanjiUnique.add(c);
         }
 
-        const definitions = await this.database.findKanjiBulk([...kanjiUnique], titles);
+        const definitions = await this.database.findKanjiBulk([...kanjiUnique], dictionaries);
         if (definitions.length === 0) {
             return definitions;
         }
@@ -425,12 +420,12 @@ class Translator {
             definition.stats = stats;
         }
 
-        await this.buildKanjiMeta(definitions, titles);
+        await this.buildKanjiMeta(definitions, dictionaries);
 
         return definitions;
     }
 
-    async buildTermMeta(definitions, titles) {
+    async buildTermMeta(definitions, dictionaries) {
         const terms = [];
         for (const definition of definitions) {
             if (definition.expressions) {
@@ -464,7 +459,7 @@ class Translator {
             term.frequencies = [];
         }
 
-        const metas = await this.database.findTermMetaBulk(expressionsUnique, titles);
+        const metas = await this.database.findTermMetaBulk(expressionsUnique, dictionaries);
         for (const {expression, mode, data, dictionary, index} of metas) {
             switch (mode) {
                 case 'freq':
@@ -476,14 +471,14 @@ class Translator {
         }
     }
 
-    async buildKanjiMeta(definitions, titles) {
+    async buildKanjiMeta(definitions, dictionaries) {
         const kanjiList = [];
         for (const definition of definitions) {
             kanjiList.push(definition.character);
             definition.frequencies = [];
         }
 
-        const metas = await this.database.findKanjiMetaBulk(kanjiList, titles);
+        const metas = await this.database.findKanjiMetaBulk(kanjiList, dictionaries);
         for (const {character, mode, data, dictionary, index} of metas) {
             switch (mode) {
                 case 'freq':

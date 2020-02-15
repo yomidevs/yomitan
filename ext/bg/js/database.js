@@ -149,14 +149,14 @@ class Database {
         await Promise.all(promises);
     }
 
-    async findTermsBulk(termList, titles, wildcard) {
+    async findTermsBulk(termList, dictionaries, wildcard) {
         this._validate();
 
         const promises = [];
         const visited = new Set();
         const results = [];
         const processRow = (row, index) => {
-            if (titles.includes(row.dictionary) && !visited.has(row.id)) {
+            if (dictionaries.has(row.dictionary) && !visited.has(row.id)) {
                 visited.add(row.id);
                 results.push(Database._createTerm(row, index));
             }
@@ -184,13 +184,13 @@ class Database {
         return results;
     }
 
-    async findTermsExactBulk(termList, readingList, titles) {
+    async findTermsExactBulk(termList, readingList, dictionaries) {
         this._validate();
 
         const promises = [];
         const results = [];
         const processRow = (row, index) => {
-            if (row.reading === readingList[index] && titles.includes(row.dictionary)) {
+            if (row.reading === readingList[index] && dictionaries.has(row.dictionary)) {
                 results.push(Database._createTerm(row, index));
             }
         };
@@ -234,16 +234,16 @@ class Database {
         return results;
     }
 
-    async findTermMetaBulk(termList, titles) {
-        return this._findGenericBulk('termMeta', 'expression', termList, titles, Database._createTermMeta);
+    async findTermMetaBulk(termList, dictionaries) {
+        return this._findGenericBulk('termMeta', 'expression', termList, dictionaries, Database._createTermMeta);
     }
 
-    async findKanjiBulk(kanjiList, titles) {
-        return this._findGenericBulk('kanji', 'character', kanjiList, titles, Database._createKanji);
+    async findKanjiBulk(kanjiList, dictionaries) {
+        return this._findGenericBulk('kanji', 'character', kanjiList, dictionaries, Database._createKanji);
     }
 
-    async findKanjiMetaBulk(kanjiList, titles) {
-        return this._findGenericBulk('kanjiMeta', 'character', kanjiList, titles, Database._createKanjiMeta);
+    async findKanjiMetaBulk(kanjiList, dictionaries) {
+        return this._findGenericBulk('kanjiMeta', 'character', kanjiList, dictionaries, Database._createKanjiMeta);
     }
 
     async findTagForTitle(name, title) {
@@ -572,13 +572,13 @@ class Database {
         return count > 0;
     }
 
-    async _findGenericBulk(tableName, indexName, indexValueList, titles, createResult) {
+    async _findGenericBulk(tableName, indexName, indexValueList, dictionaries, createResult) {
         this._validate();
 
         const promises = [];
         const results = [];
         const processRow = (row, index) => {
-            if (titles.includes(row.dictionary)) {
+            if (dictionaries.has(row.dictionary)) {
                 results.push(createResult(row, index));
             }
         };
