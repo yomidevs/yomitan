@@ -178,26 +178,15 @@ function dictTermsMergeBySequence(definitions, mainDictionary) {
 function dictTermsMergeByGloss(result, definitions, appendTo=null, mergedIndices=null) {
     const definitionsByGloss = appendTo !== null ? appendTo : new Map();
     for (const [index, definition] of definitions.entries()) {
-        if (appendTo !== null) {
-            let match = false;
-            for (const expression of result.expressions.keys()) {
-                if (definition.expression === expression) {
-                    for (const reading of result.expressions.get(expression).keys()) {
-                        if (definition.reading === reading) {
-                            match = true;
-                            break;
-                        }
-                    }
-                }
-                if (match) {
-                    break;
-                }
-            }
-
-            if (!match) {
-                continue;
-            } else if (mergedIndices !== null) {
+        if (mergedIndices !== null) {
+            const expressionMap = result.expressions.get(definition.expression);
+            if (
+                typeof expressionMap !== 'undefined' &&
+                typeof expressionMap.get(definition.reading) !== 'undefined'
+            ) {
                 mergedIndices.add(index);
+            } else {
+                continue;
             }
         }
 
