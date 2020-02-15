@@ -127,7 +127,8 @@ class Translator {
 
         const expressions = [];
         for (const [expression, readingMap] of result.expressions.entries()) {
-            for (const [reading, termTags] of readingMap.entries()) {
+            for (const [reading, termTagsMap] of readingMap.entries()) {
+                const termTags = [...termTagsMap.values()];
                 const score = termTags.map((tag) => tag.score).reduce((p, v) => p + v, 0);
                 expressions.push(Translator.createExpression(expression, reading, dictTagsSort(termTags), Translator.scoreToTermFrequency(score)));
             }

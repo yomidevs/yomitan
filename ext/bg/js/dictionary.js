@@ -222,17 +222,34 @@ function dictTermsMergeByGloss(result, definitions, appendTo=null, mergedIndices
         }
 
         if (appendTo === null) {
-            // result->expressions[ Expression1[ Reading1[ Tag1, Tag2 ] ], Expression2, ... ]
-            if (!result.expressions.has(expression)) {
-                result.expressions.set(expression, new Map());
+            /*
+                Data layout:
+                result.expressions = new Map([
+                    [expression, new Map([
+                        [reading, new Map([
+                            [tagName, tagInfo],
+                            ...
+                        ])],
+                        ...
+                    ])],
+                    ...
+                ]);
+            */
+            let readingMap = result.expressions.get(expression);
+            if (typeof readingMap === 'undefined') {
+                readingMap = new Map();
+                result.expressions.set(expression, readingMap);
             }
-            if (!result.expressions.get(expression).has(reading)) {
-                result.expressions.get(expression).set(reading, []);
+
+            let termTagsMap = readingMap.get(reading);
+            if (typeof termTagsMap === 'undefined') {
+                termTagsMap = new Map();
+                readingMap.set(reading, termTagsMap);
             }
 
             for (const tag of definition.termTags) {
-                if (!result.expressions.get(expression).get(reading).find((existingTag) => existingTag.name === tag.name)) {
-                    result.expressions.get(expression).get(reading).push(tag);
+                if (!termTagsMap.has(tag.name)) {
+                    termTagsMap.set(tag.name, tag);
                 }
             }
         }
