@@ -72,19 +72,15 @@ class TextToSpeechAudio {
         const m = /^tts:[^#?]*\?([^#]*)/.exec(ttsUri);
         if (m === null) { return null; }
 
-        const searchParameters = {};
-        for (const group of m[1].split('&')) {
-            const sep = group.indexOf('=');
-            if (sep < 0) { continue; }
-            searchParameters[decodeURIComponent(group.substring(0, sep))] = decodeURIComponent(group.substring(sep + 1));
-        }
+        const searchParameters = new URLSearchParams(m[1]);
+        const text = searchParameters.get('text');
+        let voice = searchParameters.get('voice');
+        if (text === null || voice === null) { return null; }
 
-        if (!searchParameters.text) { return null; }
-
-        const voice = audioGetTextToSpeechVoice(searchParameters.voice);
+        voice = audioGetTextToSpeechVoice(voice);
         if (voice === null) { return null; }
 
-        return new TextToSpeechAudio(searchParameters.text, voice);
+        return new TextToSpeechAudio(text, voice);
     }
 
 }
