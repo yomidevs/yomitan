@@ -168,10 +168,8 @@ async function audioInject(definition, fields, sources, optionsContext) {
     }
 
     try {
-        let audioSourceDefinition = definition;
-        if (hasOwn(definition, 'expressions')) {
-            audioSourceDefinition = definition.expressions[0];
-        }
+        const expressions = definition.expressions;
+        const audioSourceDefinition = Array.isArray(expressions) ? expressions[0] : definition;
 
         const {url} = await audioGetFromSources(audioSourceDefinition, sources, optionsContext, true);
         if (url !== null) {
