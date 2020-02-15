@@ -141,14 +141,16 @@ class Translator {
         return result;
     }
 
-    async findTerms(text, details, options) {
-        switch (options.general.resultOutputMode) {
+    async findTerms(mode, text, details, options) {
+        switch (mode) {
             case 'group':
                 return await this.findTermsGrouped(text, details, options);
             case 'merge':
                 return await this.findTermsMerged(text, details, options);
             case 'split':
                 return await this.findTermsSplit(text, details, options);
+            case 'simple':
+                return await this.findTermsSimple(text, details, options);
             default:
                 return [[], 0];
         }
@@ -214,6 +216,11 @@ class Translator {
         await this.buildTermMeta(definitions, dictionaries);
 
         return [definitions, length];
+    }
+
+    async findTermsSimple(text, details, options) {
+        const dictionaries = dictEnabledSet(options);
+        return await this.findTermsInternal(text, dictionaries, details, options);
     }
 
     async findTermsInternal(text, dictionaries, details, options) {
