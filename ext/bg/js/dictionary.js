@@ -125,8 +125,7 @@ function dictTermsCompressTags(definitions) {
 function dictTermsGroup(definitions, dictionaries) {
     const groups = new Map();
     for (const definition of definitions) {
-        const key = [definition.source, definition.expression];
-        key.push(...definition.reasons);
+        const key = [definition.source, definition.expression, ...definition.reasons];
         if (definition.reading) {
             key.push(definition.reading);
         }
