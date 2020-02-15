@@ -26,7 +26,8 @@ function dictEnabledSet(options) {
         const dictionary = optionsDictionaries[title];
         if (!dictionary.enabled) { continue; }
         enabledDictionaryMap.set(title, {
-            priority: dictionary.priority || 0
+            priority: dictionary.priority || 0,
+            allowSecondarySearches: !!dictionary.allowSecondarySearches
         });
     }
     return enabledDictionaryMap;

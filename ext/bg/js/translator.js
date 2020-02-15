@@ -70,8 +70,8 @@ class Translator {
         return {sequencedDefinitions, defaultDefinitions};
     }
 
-    async getMergedSecondarySearchResults(text, expressionsMap, secondarySearchTitles) {
-        if (secondarySearchTitles.length === 0) {
+    async getMergedSecondarySearchResults(text, expressionsMap, secondarySearchDictionaries) {
+        if (secondarySearchDictionaries.length === 0) {
             return [];
         }
 
@@ -85,7 +85,7 @@ class Translator {
             }
         }
 
-        const definitions = await this.database.findTermsExactBulk(expressionList, readingList, new Set(secondarySearchTitles));
+        const definitions = await this.database.findTermsExactBulk(expressionList, readingList, secondarySearchDictionaries);
         for (const definition of definitions) {
             const definitionTags = await this.expandTags(definition.definitionTags, definition.dictionary);
             definitionTags.push(dictTagBuildSource(definition.dictionary));
@@ -101,7 +101,7 @@ class Translator {
         return definitions;
     }
 
-    async getMergedDefinition(text, dictionaries, sequencedDefinition, defaultDefinitions, secondarySearchTitles, mergedByTermIndices) {
+    async getMergedDefinition(text, dictionaries, sequencedDefinition, defaultDefinitions, secondarySearchDictionaries, mergedByTermIndices) {
         const result = sequencedDefinition.definitions;
         const rawDefinitionsBySequence = sequencedDefinition.rawDefinitions;
 
@@ -114,7 +114,7 @@ class Translator {
         }
 
         const definitionsByGloss = dictTermsMergeByGloss(result, rawDefinitionsBySequence);
-        const secondarySearchResults = await this.getMergedSecondarySearchResults(text, result.expressions, secondarySearchTitles);
+        const secondarySearchResults = await this.getMergedSecondarySearchResults(text, result.expressions, secondarySearchDictionaries);
 
         dictTermsMergeByGloss(result, defaultDefinitions.concat(secondarySearchResults), definitionsByGloss, mergedByTermIndices);
 
@@ -174,7 +174,12 @@ class Translator {
 
     async findTermsMerged(text, details, options) {
         const dictionaries = dictEnabledSet(options);
-        const secondarySearchTitles = Object.keys(options.dictionaries).filter((dict) => options.dictionaries[dict].allowSecondarySearches);
+        const secondarySearchDictionaries = new Map();
+        for (const [title, dictionary] of dictionaries.entries()) {
+            if (!dictionary.allowSecondarySearches) { continue; }
+            secondarySearchDictionaries.set(title, dictionary);
+        }
+
         const [definitions, length] = await this.findTermsInternal(text, dictionaries, details, options);
         const {sequencedDefinitions, defaultDefinitions} = await this.getSequencedDefinitions(definitions, options.general.mainDictionary);
         const definitionsMerged = [];
@@ -186,7 +191,7 @@ class Translator {
                 dictionaries,
                 sequencedDefinition,
                 defaultDefinitions,
-                secondarySearchTitles,
+                secondarySearchDictionaries,
                 mergedByTermIndices
             );
             definitionsMerged.push(result);
