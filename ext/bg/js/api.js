@@ -17,24 +17,16 @@
  */
 
 
-function apiTemplateRender(template, data, dynamic) {
-    return _apiInvoke('templateRender', {data, template, dynamic});
+function apiTemplateRender(template, data) {
+    return _apiInvoke('templateRender', {data, template});
 }
 
 function apiAudioGetUrl(definition, source, optionsContext) {
     return _apiInvoke('audioGetUrl', {definition, source, optionsContext});
 }
 
-function apiGetDisplayTemplatesHtml() {
-    return _apiInvoke('getDisplayTemplatesHtml');
-}
-
 function apiClipboardGet() {
     return _apiInvoke('clipboardGet');
-}
-
-function apiGetQueryParserTemplatesHtml() {
-    return _apiInvoke('getQueryParserTemplatesHtml');
 }
 
 function _apiInvoke(action, params={}) {

@@ -335,7 +335,7 @@ async function dictFieldFormat(field, definition, mode, options, templates, exce
         }
         data.marker = marker;
         try {
-            return await apiTemplateRender(templates, data, true);
+            return await apiTemplateRender(templates, data);
         } catch (e) {
             if (exceptions) { exceptions.push(e); }
             return `{${marker}-render-error}`;

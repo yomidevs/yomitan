@@ -114,8 +114,11 @@ function audioGetFromUrl(url, willDownload) {
 
 async function audioGetFromSources(expression, sources, optionsContext, willDownload, cache=null) {
     const key = `${expression.expression}:${expression.reading}`;
-    if (cache !== null && hasOwn(cache, expression)) {
-        return cache[key];
+    if (cache !== null) {
+        const cacheValue = cache.get(expression);
+        if (typeof cacheValue !== 'undefined') {
+            return cacheValue;
+        }
     }
 
     for (let i = 0, ii = sources.length; i < ii; ++i) {
@@ -133,7 +136,7 @@ async function audioGetFromSources(expression, sources, optionsContext, willDown
             }
             const result = {audio, url, source};
             if (cache !== null) {
-                cache[key] = result;
+                cache.set(key, result);
             }
             return result;
         } catch (e) {

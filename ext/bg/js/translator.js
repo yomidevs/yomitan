@@ -27,7 +27,7 @@ class Translator {
     constructor() {
         this.database = null;
         this.deinflector = null;
-        this.tagCache = {};
+        this.tagCache = new Map();
     }
 
     async prepare() {
@@ -44,12 +44,12 @@ class Translator {
     }
 
     async purgeDatabase() {
-        this.tagCache = {};
+        this.tagCache.clear();
         await this.database.purge();
     }
 
     async deleteDictionary(dictionaryName) {
-        this.tagCache = {};
+        this.tagCache.clear();
         await this.database.deleteDictionary(dictionaryName);
     }
 
@@ -537,22 +537,22 @@ class Translator {
 
     async getTagMetaList(names, title) {
         const tagMetaList = [];
-        const cache = (
-            hasOwn(this.tagCache, title) ?
-            this.tagCache[title] :
-            (this.tagCache[title] = {})
-        );
+        let cache = this.tagCache.get(title);
+        if (typeof cache === 'undefined') {
+            cache = new Map();
+            this.tagCache.set(title, cache);
+        }
 
         for (const name of names) {
             const base = Translator.getNameBase(name);
 
-            if (hasOwn(cache, base)) {
-                tagMetaList.push(cache[base]);
-            } else {
-                const tagMeta = await this.database.findTagForTitle(base, title);
-                cache[base] = tagMeta;
-                tagMetaList.push(tagMeta);
+            let tagMeta = cache.get(base);
+            if (typeof tagMeta === 'undefined') {
+                tagMeta = await this.database.findTagForTitle(base, title);
+                cache.set(base, tagMeta);
             }
+
+            tagMetaList.push(tagMeta);
         }
 
         return tagMetaList;

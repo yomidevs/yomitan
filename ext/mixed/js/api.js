@@ -65,8 +65,8 @@ function apiNoteView(noteId) {
     return _apiInvoke('noteView', {noteId});
 }
 
-function apiTemplateRender(template, data, dynamic) {
-    return _apiInvoke('templateRender', {data, template, dynamic});
+function apiTemplateRender(template, data) {
+    return _apiInvoke('templateRender', {data, template});
 }
 
 function apiAudioGetUrl(definition, source, optionsContext) {
