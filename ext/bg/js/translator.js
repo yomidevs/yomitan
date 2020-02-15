@@ -506,28 +506,29 @@ class Translator {
         const names = Object.keys(items);
         const tagMetaList = await this.getTagMetaList(names, title);
 
-        const stats = {};
+        const statsGroups = new Map();
         for (let i = 0; i < names.length; ++i) {
             const name = names[i];
             const meta = tagMetaList[i];
             if (meta === null) { continue; }
 
             const category = meta.category;
-            const group = (
-                hasOwn(stats, category) ?
-                stats[category] :
-                (stats[category] = [])
-            );
+            let group = statsGroups.get(category);
+            if (typeof group === 'undefined') {
+                group = [];
+                statsGroups.set(category, group);
+            }
 
             const stat = Object.assign({}, meta, {name, value: items[name]});
             group.push(dictTagSanitize(stat));
         }
 
+        const stats = {};
         const sortCompare = (a, b) => a.notes - b.notes;
-        for (const category in stats) {
-            stats[category].sort(sortCompare);
+        for (const [category, group] of statsGroups.entries()) {
+            group.sort(sortCompare);
+            stats[category] = group;
         }
-
         return stats;
     }
 
