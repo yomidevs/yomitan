@@ -400,16 +400,12 @@ class Translator {
     async findKanji(text, options) {
         const dictionaries = dictEnabledSet(options);
         const titles = Object.keys(dictionaries);
-        const kanjiUnique = {};
-        const kanjiList = [];
+        const kanjiUnique = new Set();
         for (const c of text) {
-            if (!hasOwn(kanjiUnique, c)) {
-                kanjiList.push(c);
-                kanjiUnique[c] = true;
-            }
+            kanjiUnique.add(c);
         }
 
-        const definitions = await this.database.findKanjiBulk(kanjiList, titles);
+        const definitions = await this.database.findKanjiBulk([...kanjiUnique], titles);
         if (definitions.length === 0) {
             return definitions;
         }
