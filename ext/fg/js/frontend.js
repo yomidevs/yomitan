@@ -56,7 +56,7 @@ class Frontend extends TextScanner {
             }
 
             yomichan.on('orphaned', () => this.onOrphaned());
-            yomichan.on('optionsUpdate', () => this.updateOptions());
+            yomichan.on('optionsUpdated', () => this.updateOptions());
             yomichan.on('zoomChanged', (e) => this.onZoomChanged(e));
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
 

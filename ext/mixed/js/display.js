@@ -52,7 +52,7 @@ class Display {
         const displayGeneratorPromise = this.displayGenerator.prepare();
         const updateOptionsPromise = this.updateOptions(options);
         await Promise.all([displayGeneratorPromise, updateOptionsPromise]);
-        yomichan.on('optionsUpdate', () => this.updateOptions(null));
+        yomichan.on('optionsUpdated', () => this.updateOptions(null));
     }
 
     onError(_error) {

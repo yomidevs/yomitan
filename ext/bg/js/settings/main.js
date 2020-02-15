@@ -242,7 +242,7 @@ async function settingsSaveOptions() {
     await apiOptionsSave(source);
 }
 
-async function onOptionsUpdate({source}) {
+async function onOptionsUpdated({source}) {
     const thisSource = await settingsGetSource();
     if (source === thisSource) { return; }
 
@@ -274,7 +274,7 @@ async function onReady() {
 
     storageInfoInitialize();
 
-    yomichan.on('optionsUpdate', onOptionsUpdate);
+    yomichan.on('optionsUpdated', onOptionsUpdated);
 }
 
 $(document).ready(() => onReady());

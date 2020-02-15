@@ -248,7 +248,7 @@ const yomichan = (() => {
 
             this._messageHandlers = new Map([
                 ['getUrl', this._onMessageGetUrl.bind(this)],
-                ['optionsUpdate', this._onMessageOptionsUpdate.bind(this)],
+                ['optionsUpdated', this._onMessageOptionsUpdated.bind(this)],
                 ['zoomChanged', this._onMessageZoomChanged.bind(this)]
             ]);
 
@@ -276,8 +276,8 @@ const yomichan = (() => {
             return {url: window.location.href};
         }
 
-        _onMessageOptionsUpdate({source}) {
-            this.trigger('optionsUpdate', {source});
+        _onMessageOptionsUpdated({source}) {
+            this.trigger('optionsUpdated', {source});
         }
 
         _onMessageZoomChanged({oldZoomFactor, newZoomFactor}) {
