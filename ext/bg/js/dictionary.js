@@ -79,20 +79,16 @@ function dictTermsSort(definitions, dictionaries=null) {
 }
 
 function dictTermsUndupe(definitions) {
-    const definitionGroups = {};
+    const definitionGroups = new Map();
     for (const definition of definitions) {
-        const definitionExisting = definitionGroups[definition.id];
-        if (!hasOwn(definitionGroups, definition.id) || definition.expression.length > definitionExisting.expression.length) {
-            definitionGroups[definition.id] = definition;
+        const id = definition.id;
+        const definitionExisting = definitionGroups.get(id);
+        if (typeof definitionExisting === 'undefined' || definition.expression.length > definitionExisting.expression.length) {
+            definitionGroups.set(id, definition);
         }
     }
 
-    const definitionsUnique = [];
-    for (const key in definitionGroups) {
-        definitionsUnique.push(definitionGroups[key]);
-    }
-
-    return definitionsUnique;
+    return [...definitionGroups.values()];
 }
 
 function dictTermsCompressTags(definitions) {
