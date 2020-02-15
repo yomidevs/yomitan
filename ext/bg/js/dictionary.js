@@ -123,7 +123,7 @@ function dictTermsCompressTags(definitions) {
 }
 
 function dictTermsGroup(definitions, dictionaries) {
-    const groups = {};
+    const groups = new Map();
     for (const definition of definitions) {
         const key = [definition.source, definition.expression];
         key.push(...definition.reasons);
@@ -132,26 +132,27 @@ function dictTermsGroup(definitions, dictionaries) {
         }
 
         const keyString = key.toString();
-        if (hasOwn(groups, keyString)) {
-            groups[keyString].push(definition);
-        } else {
-            groups[keyString] = [definition];
+        let groupDefinitions = groups.get(keyString);
+        if (typeof groupDefinitions === 'undefined') {
+            groupDefinitions = [];
+            groups.set(keyString, groupDefinitions);
         }
+
+        groupDefinitions.push(definition);
     }
 
     const results = [];
-    for (const key in groups) {
-        const groupDefs = groups[key];
-        const firstDef = groupDefs[0];
-        dictTermsSort(groupDefs, dictionaries);
+    for (const groupDefinitions of groups.values()) {
+        const firstDef = groupDefinitions[0];
+        dictTermsSort(groupDefinitions, dictionaries);
         results.push({
-            definitions: groupDefs,
+            definitions: groupDefinitions,
             expression: firstDef.expression,
             reading: firstDef.reading,
             furiganaSegments: firstDef.furiganaSegments,
             reasons: firstDef.reasons,
             termTags: firstDef.termTags,
-            score: groupDefs.reduce((p, v) => v.score > p ? v.score : p, Number.MIN_SAFE_INTEGER),
+            score: groupDefinitions.reduce((p, v) => v.score > p ? v.score : p, Number.MIN_SAFE_INTEGER),
             source: firstDef.source
         });
     }
