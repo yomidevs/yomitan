@@ -178,11 +178,13 @@ function dictTermsMergeBySequence(definitions, mainDictionary) {
 function dictTermsMergeByGloss(result, definitions, appendTo=null, mergedIndices=null) {
     const definitionsByGloss = appendTo !== null ? appendTo : new Map();
     for (const [index, definition] of definitions.entries()) {
+        const {expression, reading} = definition;
+
         if (mergedIndices !== null) {
-            const expressionMap = result.expressions.get(definition.expression);
+            const expressionMap = result.expressions.get(expression);
             if (
                 typeof expressionMap !== 'undefined' &&
-                typeof expressionMap.get(definition.reading) !== 'undefined'
+                typeof expressionMap.get(reading) !== 'undefined'
             ) {
                 mergedIndices.add(index);
             } else {
@@ -207,11 +209,11 @@ function dictTermsMergeByGloss(result, definitions, appendTo=null, mergedIndices
             definitionsByGloss.set(gloss, glossDefinition);
         }
 
-        glossDefinition.expression.add(definition.expression);
-        glossDefinition.reading.add(definition.reading);
+        glossDefinition.expression.add(expression);
+        glossDefinition.reading.add(reading);
 
-        result.expression.add(definition.expression);
-        result.reading.add(definition.reading);
+        result.expression.add(expression);
+        result.reading.add(reading);
 
         for (const tag of definition.definitionTags) {
             if (!glossDefinition.definitionTags.find((existingTag) => existingTag.name === tag.name)) {
@@ -221,16 +223,16 @@ function dictTermsMergeByGloss(result, definitions, appendTo=null, mergedIndices
 
         if (appendTo === null) {
             // result->expressions[ Expression1[ Reading1[ Tag1, Tag2 ] ], Expression2, ... ]
-            if (!result.expressions.has(definition.expression)) {
-                result.expressions.set(definition.expression, new Map());
+            if (!result.expressions.has(expression)) {
+                result.expressions.set(expression, new Map());
             }
-            if (!result.expressions.get(definition.expression).has(definition.reading)) {
-                result.expressions.get(definition.expression).set(definition.reading, []);
+            if (!result.expressions.get(expression).has(reading)) {
+                result.expressions.get(expression).set(reading, []);
             }
 
             for (const tag of definition.termTags) {
-                if (!result.expressions.get(definition.expression).get(definition.reading).find((existingTag) => existingTag.name === tag.name)) {
-                    result.expressions.get(definition.expression).get(definition.reading).push(tag);
+                if (!result.expressions.get(expression).get(reading).find((existingTag) => existingTag.name === tag.name)) {
+                    result.expressions.get(expression).get(reading).push(tag);
                 }
             }
         }
@@ -251,7 +253,7 @@ function dictTermsMergeByGloss(result, definitions, appendTo=null, mergedIndices
     }
 
     return definitionsByGloss;
-}
+  }
 
 function dictTagBuildSource(name) {
     return dictTagSanitize({name, category: 'dictionary', order: 100});
