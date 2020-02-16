@@ -220,6 +220,7 @@ class Popup {
             this._observeFullscreen(true);
             this._onFullscreenChanged();
             try {
+                Popup._injectStylesheet('yomichan-popup-outer-stylesheet', 'file', '/fg/css/client.css', true);
                 this.setCustomOuterCss(this._options.general.customPopupOuterCss, true);
             } catch (e) {
                 // NOP

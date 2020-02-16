@@ -30,7 +30,6 @@
             "fg/js/frontend.js",
             "fg/js/frontend-initialize.js"
         ],
-        "css": ["fg/css/client.css"],
         "match_about_blank": true,
         "all_frames": true
     }],
