@@ -18,43 +18,43 @@
 
 
 class PageExitPrevention {
-  constructor() {
-  }
+    constructor() {
+    }
 
-  start() {
-      PageExitPrevention._addInstance(this);
-  }
+    start() {
+        PageExitPrevention._addInstance(this);
+    }
 
-  end() {
-      PageExitPrevention._removeInstance(this);
-  }
+    end() {
+        PageExitPrevention._removeInstance(this);
+    }
 
-  static _addInstance(instance) {
-      const size = PageExitPrevention._instances.size;
-      PageExitPrevention._instances.set(instance, true);
-      if (size === 0) {
-          window.addEventListener('beforeunload', PageExitPrevention._onBeforeUnload);
-      }
-  }
+    static _addInstance(instance) {
+        const size = PageExitPrevention._instances.size;
+        PageExitPrevention._instances.set(instance, true);
+        if (size === 0) {
+            window.addEventListener('beforeunload', PageExitPrevention._onBeforeUnload);
+        }
+    }
 
-  static _removeInstance(instance) {
-      if (
-          PageExitPrevention._instances.delete(instance) &&
-          PageExitPrevention._instances.size === 0
-      ) {
-          window.removeEventListener('beforeunload', PageExitPrevention._onBeforeUnload);
-      }
-  }
+    static _removeInstance(instance) {
+        if (
+            PageExitPrevention._instances.delete(instance) &&
+            PageExitPrevention._instances.size === 0
+        ) {
+            window.removeEventListener('beforeunload', PageExitPrevention._onBeforeUnload);
+        }
+    }
 
-  static _onBeforeUnload(e) {
-      if (PageExitPrevention._instances.size === 0) {
-          return;
-      }
+    static _onBeforeUnload(e) {
+        if (PageExitPrevention._instances.size === 0) {
+            return;
+        }
 
-      e.preventDefault();
-      e.returnValue = '';
-      return '';
-  }
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+    }
 }
 
 PageExitPrevention._instances = new Map();
