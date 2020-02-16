@@ -192,8 +192,7 @@ function docSentenceExtract(source, extent) {
             if (terminators.includes(c)) {
                 endPos = i + 1;
                 break;
-            }
-            else if (c in quotesBwd) {
+            } else if (c in quotesBwd) {
                 endPos = i;
                 break;
             }

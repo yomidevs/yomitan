@@ -801,8 +801,11 @@ class Backend {
         await new Promise((resolve, reject) => {
             chrome.tabs.update(tab.id, {active: true}, () => {
                 const e = chrome.runtime.lastError;
-                if (e) { reject(e); }
-                else { resolve(); }
+                if (e) {
+                    reject(e);
+                } else {
+                    resolve();
+                }
             });
         });
 
@@ -815,16 +818,22 @@ class Backend {
             const tabWindow = await new Promise((resolve, reject) => {
                 chrome.windows.get(tab.windowId, {}, (tabWindow) => {
                     const e = chrome.runtime.lastError;
-                    if (e) { reject(e); }
-                    else { resolve(tabWindow); }
+                    if (e) {
+                        reject(e);
+                    } else {
+                        resolve(tabWindow);
+                    }
                 });
             });
             if (!tabWindow.focused) {
                 await new Promise((resolve, reject) => {
                     chrome.windows.update(tab.windowId, {focused: true}, () => {
                         const e = chrome.runtime.lastError;
-                        if (e) { reject(e); }
-                        else { resolve(); }
+                        if (e) {
+                            reject(e);
+                        } else {
+                            resolve();
+                        }
                     });
                 });
             }
