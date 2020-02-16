@@ -512,13 +512,15 @@ class Backend {
                 file: value,
                 runAt: 'document_start',
                 cssOrigin: 'author',
-                allFrames: false
+                allFrames: false,
+                matchAboutBlank: true
             } :
             {
                 code: value,
                 runAt: 'document_start',
                 cssOrigin: 'user',
-                allFrames: false
+                allFrames: false,
+                matchAboutBlank: true
             }
         );
         if (typeof frameId === 'number') {
