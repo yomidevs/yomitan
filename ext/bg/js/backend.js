@@ -499,19 +499,28 @@ class Backend {
         return Promise.resolve({frameId});
     }
 
-    _onApiInjectStylesheet({css}, sender) {
+    _onApiInjectStylesheet({type, value}, sender) {
         if (!sender.tab) {
             return Promise.reject(new Error('Invalid tab'));
         }
 
         const tabId = sender.tab.id;
         const frameId = sender.frameId;
-        const details = {
-            code: css,
-            runAt: 'document_start',
-            cssOrigin: 'user',
-            allFrames: false
-        };
+        const details = (
+            type === 'file' ?
+            {
+                file: value,
+                runAt: 'document_start',
+                cssOrigin: 'author',
+                allFrames: false
+            } :
+            {
+                code: value,
+                runAt: 'document_start',
+                cssOrigin: 'user',
+                allFrames: false
+            }
+        );
         if (typeof frameId === 'number') {
             details.frameId = frameId;
         }

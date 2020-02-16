@@ -167,7 +167,7 @@ class Popup {
         } else {
             if (!css) { return; }
             try {
-                await apiInjectStylesheet(css);
+                await apiInjectStylesheet('code', css);
                 this._stylesheetInjectedViaApi = true;
             } catch (e) {
                 // NOP
