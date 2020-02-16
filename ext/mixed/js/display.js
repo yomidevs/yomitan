@@ -450,7 +450,7 @@ class Display {
 
         for (let i = 0, ii = definitions.length; i < ii; ++i) {
             if (i > 0) {
-                await promiseTimeout(0);
+                await promiseTimeout(1);
                 if (this.setContentToken !== token) { return; }
             }
 
