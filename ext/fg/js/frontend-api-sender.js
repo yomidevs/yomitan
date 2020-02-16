@@ -19,7 +19,7 @@
 
 class FrontendApiSender {
     constructor() {
-        this.senderId = FrontendApiSender.generateId(16);
+        this.senderId = yomichan.generateId(16);
         this.ackTimeout = 3000; // 3 seconds
         this.responseTimeout = 10000; // 10 seconds
         this.callbacks = new Map();
@@ -122,13 +122,5 @@ class FrontendApiSender {
         this.callbacks.delete(id);
         info.timer = null;
         info.reject(new Error(reason));
-    }
-
-    static generateId(length) {
-        let id = '';
-        for (let i = 0; i < length; ++i) {
-            id += Math.floor(Math.random() * 256).toString(16).padStart(2, '0');
-        }
-        return id;
     }
 }

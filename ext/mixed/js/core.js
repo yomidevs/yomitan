@@ -257,6 +257,16 @@ const yomichan = (() => {
 
         // Public
 
+        generateId(length) {
+            const array = new Uint8Array(length);
+            window.crypto.getRandomValues(array);
+            let id = '';
+            for (const value of array) {
+                id += value.toString(16).padStart(2, '0');
+            }
+            return id;
+        }
+
         triggerOrphaned(error) {
             this.trigger('orphaned', {error});
         }
