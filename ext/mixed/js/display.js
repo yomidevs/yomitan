@@ -414,7 +414,7 @@ class Display {
 
         this.setEventListenersActive(true);
 
-        const states = await apiDefinitionsAddable(definitions, ['term-kanji', 'term-kana'], this.getOptionsContext());
+        const states = await this.getDefinitionsAddable(definitions, ['term-kanji', 'term-kana']);
         if (this.setContentToken !== token) { return; }
 
         this.updateAdderButtons(states);
@@ -463,7 +463,7 @@ class Display {
 
         this.setEventListenersActive(true);
 
-        const states = await apiDefinitionsAddable(definitions, ['kanji'], this.getOptionsContext());
+        const states = await this.getDefinitionsAddable(definitions, ['kanji']);
         if (this.setContentToken !== token) { return; }
 
         this.updateAdderButtons(states);
@@ -774,6 +774,14 @@ class Display {
     audioButtonFindImage(index) {
         const entry = this.getEntry(index);
         return entry !== null ? entry.querySelector('.action-play-audio>img') : null;
+    }
+
+    async getDefinitionsAddable(definitions, modes) {
+        try {
+            return await apiDefinitionsAddable(definitions, modes, this.getOptionsContext());
+        } catch (e) {
+            return [];
+        }
     }
 
     static delay(time) {

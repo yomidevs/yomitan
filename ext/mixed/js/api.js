@@ -58,7 +58,7 @@ function apiDefinitionAdd(definition, mode, context, optionsContext) {
 }
 
 function apiDefinitionsAddable(definitions, modes, optionsContext) {
-    return _apiInvoke('definitionsAddable', {definitions, modes, optionsContext}).catch(() => null);
+    return _apiInvoke('definitionsAddable', {definitions, modes, optionsContext});
 }
 
 function apiNoteView(noteId) {
