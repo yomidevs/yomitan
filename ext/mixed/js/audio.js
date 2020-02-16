@@ -54,7 +54,6 @@ class TextToSpeechAudio {
 
             speechSynthesis.cancel();
             speechSynthesis.speak(this._utterance);
-
         } catch (e) {
             // NOP
         }
@@ -82,7 +81,6 @@ class TextToSpeechAudio {
 
         return new TextToSpeechAudio(text, voice);
     }
-
 }
 
 function audioGetFromUrl(url, willDownload) {
