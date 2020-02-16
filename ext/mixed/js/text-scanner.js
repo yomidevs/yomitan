@@ -31,7 +31,7 @@ class TextScanner {
         this.options = null;
 
         this.enabled = false;
-        this.eventListeners = [];
+        this.eventListeners = new EventListenerCollection();
 
         this.primaryTouchIdentifier = null;
         this.preventNextContextMenu = false;
@@ -229,7 +229,7 @@ class TextScanner {
             }
         } else {
             if (this.enabled) {
-                this.clearEventListeners();
+                this.eventListeners.removeAllEventListeners();
                 this.enabled = false;
             }
             this.onSearchClear(false);
@@ -237,13 +237,13 @@ class TextScanner {
     }
 
     hookEvents() {
-        let eventListeners = this.getMouseEventListeners();
+        let eventListenerInfos = this.getMouseEventListeners();
         if (this.options.scanning.touchInputEnabled) {
-            eventListeners = eventListeners.concat(this.getTouchEventListeners());
+            eventListenerInfos = eventListenerInfos.concat(this.getTouchEventListeners());
         }
 
-        for (const [node, type, listener, options] of eventListeners) {
-            this.addEventListener(node, type, listener, options);
+        for (const [node, type, listener, options] of eventListenerInfos) {
+            this.eventListeners.addEventListener(node, type, listener, options);
         }
     }
 
@@ -266,18 +266,6 @@ class TextScanner {
             [this.node, 'touchmove', this.onTouchMove.bind(this), {passive: false}],
             [this.node, 'contextmenu', this.onContextMenu.bind(this)]
         ];
-    }
-
-    addEventListener(node, type, listener, options) {
-        node.addEventListener(type, listener, options);
-        this.eventListeners.push([node, type, listener, options]);
-    }
-
-    clearEventListeners() {
-        for (const [node, type, listener, options] of this.eventListeners) {
-            node.removeEventListener(type, listener, options);
-        }
-        this.eventListeners = [];
     }
 
     setOptions(options) {

@@ -179,7 +179,7 @@ class SettingsDictionaryEntryUI {
         this.dictionaryInfo = dictionaryInfo;
         this.optionsDictionary = optionsDictionary;
         this.counts = null;
-        this.eventListeners = [];
+        this.eventListeners = new EventListenerCollection();
         this.isDeleting = false;
 
         this.content = content;
@@ -198,10 +198,10 @@ class SettingsDictionaryEntryUI {
 
         this.applyValues();
 
-        this.addEventListener(this.enabledCheckbox, 'change', (e) => this.onEnabledChanged(e), false);
-        this.addEventListener(this.allowSecondarySearchesCheckbox, 'change', (e) => this.onAllowSecondarySearchesChanged(e), false);
-        this.addEventListener(this.priorityInput, 'change', (e) => this.onPriorityChanged(e), false);
-        this.addEventListener(this.deleteButton, 'click', (e) => this.onDeleteButtonClicked(e), false);
+        this.eventListeners.addEventListener(this.enabledCheckbox, 'change', (e) => this.onEnabledChanged(e), false);
+        this.eventListeners.addEventListener(this.allowSecondarySearchesCheckbox, 'change', (e) => this.onAllowSecondarySearchesChanged(e), false);
+        this.eventListeners.addEventListener(this.priorityInput, 'change', (e) => this.onPriorityChanged(e), false);
+        this.eventListeners.addEventListener(this.deleteButton, 'click', (e) => this.onDeleteButtonClicked(e), false);
     }
 
     cleanup() {
@@ -212,7 +212,7 @@ class SettingsDictionaryEntryUI {
             this.content = null;
         }
         this.dictionaryInfo = null;
-        this.clearEventListeners();
+        this.eventListeners.removeAllEventListeners();
     }
 
     setCounts(counts) {
@@ -227,18 +227,6 @@ class SettingsDictionaryEntryUI {
 
     save() {
         this.parent.save();
-    }
-
-    addEventListener(node, type, listener, options) {
-        node.addEventListener(type, listener, options);
-        this.eventListeners.push([node, type, listener, options]);
-    }
-
-    clearEventListeners() {
-        for (const [node, type, listener, options] of this.eventListeners) {
-            node.removeEventListener(type, listener, options);
-        }
-        this.eventListeners = [];
     }
 
     applyValues() {

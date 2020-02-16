@@ -236,6 +236,29 @@ class EventDispatcher {
     }
 }
 
+class EventListenerCollection {
+    constructor() {
+        this._eventListeners = [];
+    }
+
+    get size() {
+        return this._eventListeners.length;
+    }
+
+    addEventListener(node, type, listener, options) {
+        node.addEventListener(type, listener, options);
+        this._eventListeners.push([node, type, listener, options]);
+    }
+
+    removeAllEventListeners() {
+        if (this._eventListeners.length === 0) { return; }
+        for (const [node, type, listener, options] of this._eventListeners) {
+            node.removeEventListener(type, listener, options);
+        }
+        this._eventListeners = [];
+    }
+}
+
 
 /*
  * Default message handlers

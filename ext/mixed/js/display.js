@@ -35,8 +35,8 @@ class Display {
         this.audioCache = new Map();
         this.styleNode = null;
 
-        this.eventListeners = [];
-        this.persistentEventListeners = [];
+        this.eventListeners = new EventListenerCollection();
+        this.persistentEventListeners = new EventListenerCollection();
         this.interactive = false;
         this.eventListenersActive = false;
         this.clickScanPrevent = false;
@@ -301,13 +301,23 @@ class Display {
         this.interactive = interactive;
 
         if (interactive) {
-            Display.addEventListener(this.persistentEventListeners, document, 'keydown', this.onKeyDown.bind(this), false);
-            Display.addEventListener(this.persistentEventListeners, document, 'wheel', this.onWheel.bind(this), {passive: false});
-            Display.addEventListener(this.persistentEventListeners, document.querySelector('.action-previous'), 'click', this.onSourceTermView.bind(this));
-            Display.addEventListener(this.persistentEventListeners, document.querySelector('.action-next'), 'click', this.onNextTermView.bind(this));
-            Display.addEventListener(this.persistentEventListeners, document.querySelector('.navigation-header'), 'wheel', this.onHistoryWheel.bind(this), {passive: false});
+            const actionPrevious = document.querySelector('.action-previous');
+            const actionNext = document.querySelector('.action-next');
+            const navigationHeader = document.querySelector('.navigation-header');
+
+            this.persistentEventListeners.addEventListener(document, 'keydown', this.onKeyDown.bind(this), false);
+            this.persistentEventListeners.addEventListener(document, 'wheel', this.onWheel.bind(this), {passive: false});
+            if (actionPrevious !== null) {
+                this.persistentEventListeners.addEventListener(actionPrevious, 'click', this.onSourceTermView.bind(this));
+            }
+            if (actionNext !== null) {
+                this.persistentEventListeners.addEventListener(actionNext, 'click', this.onNextTermView.bind(this));
+            }
+            if (navigationHeader !== null) {
+                this.persistentEventListeners.addEventListener(navigationHeader, 'wheel', this.onHistoryWheel.bind(this), {passive: false});
+            }
         } else {
-            Display.clearEventListeners(this.persistentEventListeners);
+            this.persistentEventListeners.removeAllEventListeners();
         }
         this.setEventListenersActive(this.eventListenersActive);
     }
@@ -318,23 +328,23 @@ class Display {
         this.eventListenersActive = active;
 
         if (active) {
-            this.addEventListeners('.action-add-note', 'click', this.onNoteAdd.bind(this));
-            this.addEventListeners('.action-view-note', 'click', this.onNoteView.bind(this));
-            this.addEventListeners('.action-play-audio', 'click', this.onAudioPlay.bind(this));
-            this.addEventListeners('.kanji-link', 'click', this.onKanjiLookup.bind(this));
+            this.addMultipleEventListeners('.action-add-note', 'click', this.onNoteAdd.bind(this));
+            this.addMultipleEventListeners('.action-view-note', 'click', this.onNoteView.bind(this));
+            this.addMultipleEventListeners('.action-play-audio', 'click', this.onAudioPlay.bind(this));
+            this.addMultipleEventListeners('.kanji-link', 'click', this.onKanjiLookup.bind(this));
             if (this.options.scanning.enablePopupSearch) {
-                this.addEventListeners('.term-glossary-item, .tag', 'mouseup', this.onGlossaryMouseUp.bind(this));
-                this.addEventListeners('.term-glossary-item, .tag', 'mousedown', this.onGlossaryMouseDown.bind(this));
-                this.addEventListeners('.term-glossary-item, .tag', 'mousemove', this.onGlossaryMouseMove.bind(this));
+                this.addMultipleEventListeners('.term-glossary-item, .tag', 'mouseup', this.onGlossaryMouseUp.bind(this));
+                this.addMultipleEventListeners('.term-glossary-item, .tag', 'mousedown', this.onGlossaryMouseDown.bind(this));
+                this.addMultipleEventListeners('.term-glossary-item, .tag', 'mousemove', this.onGlossaryMouseMove.bind(this));
             }
         } else {
-            Display.clearEventListeners(this.eventListeners);
+            this.eventListeners.removeAllEventListeners();
         }
     }
 
-    addEventListeners(selector, type, listener, options) {
+    addMultipleEventListeners(selector, type, listener, options) {
         for (const node of this.container.querySelectorAll(selector)) {
-            Display.addEventListener(this.eventListeners, node, type, listener, options);
+            this.eventListeners.addEventListener(node, type, listener, options);
         }
     }
 
@@ -791,19 +801,6 @@ class Display {
             }
         }
         return -1;
-    }
-
-    static addEventListener(eventListeners, object, type, listener, options) {
-        if (object === null) { return; }
-        object.addEventListener(type, listener, options);
-        eventListeners.push([object, type, listener, options]);
-    }
-
-    static clearEventListeners(eventListeners) {
-        for (const [object, type, listener, options] of eventListeners) {
-            object.removeEventListener(type, listener, options);
-        }
-        eventListeners.length = 0;
     }
 
     static getElementTop(element) {
