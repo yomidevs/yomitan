@@ -42,6 +42,8 @@ class Popup {
         this._container.style.width = '0px';
         this._container.style.height = '0px';
 
+        this._fullscreenEventListeners = new EventListenerCollection();
+
         this._updateVisibility();
     }
 
@@ -242,6 +244,36 @@ class Popup {
         });
     }
 
+    _observeFullscreen(observe) {
+        if (!observe) {
+            this._fullscreenEventListeners.removeAllEventListeners();
+            return;
+        }
+
+        if (this._fullscreenEventListeners.size > 0) {
+            // Already observing
+            return;
+        }
+
+        const fullscreenEvents = [
+            'fullscreenchange',
+            'MSFullscreenChange',
+            'mozfullscreenchange',
+            'webkitfullscreenchange'
+        ];
+        const onFullscreenChanged = () => this._onFullscreenChanged();
+        for (const eventName of fullscreenEvents) {
+            this._fullscreenEventListeners.addEventListener(document, eventName, onFullscreenChanged, false);
+        }
+    }
+
+    _onFullscreenChanged() {
+        const parent = (Popup._getFullscreenElement() || document.body || null);
+        if (parent !== null && this._container.parentNode !== parent) {
+            parent.appendChild(this._container);
+        }
+    }
+
     async _show(elementRect, writingMode) {
         await this._inject();
 
@@ -328,32 +360,14 @@ class Popup {
         }
     }
 
-    _observeFullscreen() {
-        const fullscreenEvents = [
-            'fullscreenchange',
-            'MSFullscreenChange',
-            'mozfullscreenchange',
-            'webkitfullscreenchange'
-        ];
-        for (const eventName of fullscreenEvents) {
-            document.addEventListener(eventName, () => this._onFullscreenChanged(), false);
-        }
-    }
-
-    _getFullscreenElement() {
+    static _getFullscreenElement() {
         return (
             document.fullscreenElement ||
             document.msFullscreenElement ||
             document.mozFullScreenElement ||
-            document.webkitFullscreenElement
+            document.webkitFullscreenElement ||
+            null
         );
-    }
-
-    _onFullscreenChanged() {
-        const parent = (this._getFullscreenElement() || document.body || null);
-        if (parent !== null && this._container.parentNode !== parent) {
-            parent.appendChild(this._container);
-        }
     }
 
     static _listenForDisplayPrepareCompleted(uniqueId, resolve) {
