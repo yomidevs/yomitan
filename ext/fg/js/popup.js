@@ -238,7 +238,7 @@ class Popup {
             this._observeFullscreen();
             this._onFullscreenChanged();
             this.setCustomOuterCss(this._options.general.customPopupOuterCss, false);
-            this._container.contentDocument.location.href = chrome.runtime.getURL('/fg/float.html');
+            this._container.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
         });
     }
 
