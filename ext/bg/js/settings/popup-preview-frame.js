@@ -137,7 +137,7 @@ class SettingsPopupPreview {
 
     setCustomOuterCss(css) {
         if (this.frontend === null) { return; }
-        this.frontend.popup.setCustomOuterCss(css, true);
+        this.frontend.popup.setCustomOuterCss(css, false);
     }
 
     async updateSearch() {

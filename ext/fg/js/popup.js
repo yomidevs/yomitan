@@ -158,11 +158,11 @@ class Popup {
         this._container.dataset.yomichanSiteColor = this._getSiteColor();
     }
 
-    async setCustomOuterCss(css, injectDirectly) {
+    async setCustomOuterCss(css, useWebExtensionApi) {
         // Cannot repeatedly inject stylesheets using web extension APIs since there is no way to remove them.
         if (this._stylesheetInjectedViaApi) { return; }
 
-        if (injectDirectly || Popup._isOnExtensionPage()) {
+        if (!useWebExtensionApi || Popup._isOnExtensionPage()) {
             Popup.injectOuterStylesheet(css);
         } else {
             if (!css) { return; }
