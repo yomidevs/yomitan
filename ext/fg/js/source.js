@@ -82,7 +82,11 @@ class TextSourceRange {
     }
 
     equals(other) {
-        if (other === null) {
+        if (!(
+            typeof other === 'object' &&
+            other !== null &&
+            other instanceof TextSourceRange
+        )) {
             return false;
         }
         if (this.imposterSourceElement !== null) {
@@ -409,6 +413,12 @@ class TextSourceElement {
     }
 
     equals(other) {
-        return other && other.element === this.element && other.content === this.content;
+        return (
+            typeof other === 'object' &&
+            other !== null &&
+            other instanceof TextSourceElement &&
+            other.element === this.element &&
+            other.content === this.content
+        );
     }
 }
