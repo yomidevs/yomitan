@@ -141,18 +141,18 @@ class TextScanner {
         const textSourceCurrentPrevious = this.textSourceCurrent !== null ? this.textSourceCurrent.clone() : null;
 
         this.searchAt(primaryTouch.clientX, primaryTouch.clientY, 'touchStart')
-        .then(() => {
-            if (
-                this.textSourceCurrent === null ||
-                this.textSourceCurrent.equals(textSourceCurrentPrevious)
-            ) {
-                return;
-            }
+            .then(() => {
+                if (
+                    this.textSourceCurrent === null ||
+                    this.textSourceCurrent.equals(textSourceCurrentPrevious)
+                ) {
+                    return;
+                }
 
-            this.preventScroll = true;
-            this.preventNextContextMenu = true;
-            this.preventNextMouseDown = true;
-        });
+                this.preventScroll = true;
+                this.preventNextContextMenu = true;
+                this.preventNextMouseDown = true;
+            });
     }
 
     onTouchEnd(e) {
