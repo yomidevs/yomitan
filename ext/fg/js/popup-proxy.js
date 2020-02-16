@@ -103,11 +103,6 @@ class PopupProxy {
         this._invokeHostApi('setContentScale', {id, scale});
     }
 
-    async setDisplayInitialized() {
-        const id = await this._getPopupId();
-        this._invokeHostApi('setDisplayInitialized', {id});
-    }
-
     // Private
 
     _getPopupId() {

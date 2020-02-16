@@ -123,10 +123,6 @@ class Popup {
         this._invokeApi('setContentScale', {scale});
     }
 
-    setDisplayInitialized() {
-        throw new Error('Override me');
-    }
-
     // Popup-only public functions
 
     setParent(parent) {
@@ -223,7 +219,10 @@ class Popup {
         return new Promise((resolve) => {
             const parentFrameId = (typeof this._frameId === 'number' ? this._frameId : null);
             this._container.addEventListener('load', () => {
-                this._invokeApi('initialize', {
+                const uniqueId = yomichan.generateId(32);
+                Popup._listenForDisplayPrepareCompleted(uniqueId, resolve);
+
+                this._invokeApi('prepare', {
                     options: this._options,
                     popupInfo: {
                         id: this._id,
@@ -232,9 +231,9 @@ class Popup {
                     },
                     url: this.url,
                     childrenSupported: this._childrenSupported,
-                    scale: this._contentScale
+                    scale: this._contentScale,
+                    uniqueId
                 });
-                this.setDisplayInitialized = resolve;
             });
             this._observeFullscreen();
             this._onFullscreenChanged();
@@ -355,6 +354,23 @@ class Popup {
         if (parent !== null && this._container.parentNode !== parent) {
             parent.appendChild(this._container);
         }
+    }
+
+    static _listenForDisplayPrepareCompleted(uniqueId, resolve) {
+        const runtimeMessageCallback = ({action, params}, sender, callback) => {
+            if (
+                action === 'popupPrepareCompleted' &&
+                typeof params === 'object' &&
+                params !== null &&
+                params.uniqueId === uniqueId
+            ) {
+                chrome.runtime.onMessage.removeListener(runtimeMessageCallback);
+                callback();
+                resolve();
+                return false;
+            }
+        };
+        chrome.runtime.onMessage.addListener(runtimeMessageCallback);
     }
 
     static _getPositionForHorizontalText(elementRect, width, height, viewport, offsetScale, optionsGeneral) {

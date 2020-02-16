@@ -34,7 +34,7 @@ class DisplayFloat extends Display {
         window.addEventListener('message', (e) => this.onMessage(e), false);
     }
 
-    async prepare(options, popupInfo, url, childrenSupported, scale) {
+    async prepare(options, popupInfo, url, childrenSupported, scale, uniqueId) {
         await super.prepare(options);
 
         const {id, depth, parentFrameId} = popupInfo;
@@ -47,7 +47,7 @@ class DisplayFloat extends Display {
 
         this.setContentScale(scale);
 
-        apiForward('popupSetDisplayInitialized');
+        apiForward('popupPrepareCompleted', {uniqueId});
     }
 
     onError(error) {
@@ -125,7 +125,7 @@ DisplayFloat._messageHandlers = new Map([
     ['setContent', (self, {type, details}) => self.setContent(type, details)],
     ['clearAutoPlayTimer', (self) => self.clearAutoPlayTimer()],
     ['setCustomCss', (self, {css}) => self.setCustomCss(css)],
-    ['initialize', (self, {options, popupInfo, url, childrenSupported, scale}) => self.prepare(options, popupInfo, url, childrenSupported, scale)],
+    ['prepare', (self, {options, popupInfo, url, childrenSupported, scale, uniqueId}) => self.prepare(options, popupInfo, url, childrenSupported, scale, uniqueId)],
     ['setContentScale', (self, {scale}) => self.setContentScale(scale)]
 ]);
 
