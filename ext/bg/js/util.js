@@ -33,7 +33,7 @@ function utilIsolate(value) {
 }
 
 function utilFunctionIsolate(func) {
-    return function (...args) {
+    return function isolatedFunction(...args) {
         try {
             args = args.map((v) => utilIsolate(v));
             return func.call(this, ...args);

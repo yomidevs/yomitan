@@ -60,8 +60,8 @@ class SettingsPopupPreview {
 
         this.frontend = new Frontend(this.popup);
 
-        this.frontend.setEnabled = function () {};
-        this.frontend.searchClear = function () {};
+        this.frontend.setEnabled = () => {};
+        this.frontend.searchClear = () => {};
 
         await this.frontend.prepare();
 
