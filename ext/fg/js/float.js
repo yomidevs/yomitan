@@ -29,12 +29,16 @@ class DisplayFloat extends Display {
         };
 
         this._orphaned = false;
+        this._prepareInvoked = false;
 
         yomichan.on('orphaned', () => this.onOrphaned());
         window.addEventListener('message', (e) => this.onMessage(e), false);
     }
 
     async prepare(options, popupInfo, url, childrenSupported, scale, uniqueId) {
+        if (this._prepareInvoked) { return; }
+        this._prepareInvoked = true;
+
         await super.prepare(options);
 
         const {id, depth, parentFrameId} = popupInfo;
