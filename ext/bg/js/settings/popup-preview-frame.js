@@ -50,7 +50,7 @@ class SettingsPopupPreview {
         const popupHost = new PopupProxyHost();
         await popupHost.prepare();
 
-        const popup = popupHost.createPopup(null, 0);
+        const popup = popupHost.getOrCreatePopup();
         popup.setChildrenSupported(false);
 
         this.frontend = new Frontend(popup);

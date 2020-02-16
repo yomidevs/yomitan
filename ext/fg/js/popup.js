@@ -49,8 +49,16 @@ class Popup {
 
     // Public properties
 
+    get id() {
+        return this._id;
+    }
+
     get parent() {
         return this._parent;
+    }
+
+    get child() {
+        return this._child;
     }
 
     get depth() {

@@ -34,7 +34,7 @@ class PopupProxyHost {
         if (typeof frameId !== 'number') { return; }
 
         this._apiReceiver = new FrontendApiReceiver(`popup-proxy-host#${frameId}`, new Map([
-            ['createNestedPopup', ({parentId}) => this._onApiCreateNestedPopup(parentId)],
+            ['getOrCreatePopup', ({id, parentId}) => this._onApiGetOrCreatePopup(id, parentId)],
             ['setOptions', ({id, options}) => this._onApiSetOptions(id, options)],
             ['hide', ({id, changeFocus}) => this._onApiHide(id, changeFocus)],
             ['isVisible', ({id}) => this._onApiIsVisibleAsync(id)],
@@ -47,14 +47,51 @@ class PopupProxyHost {
         ]));
     }
 
-    createPopup(parentId, depth) {
-        return this._createPopupInternal(parentId, depth).popup;
+    getOrCreatePopup(id=null, parentId=null) {
+        // Find by existing id
+        if (id !== null) {
+            const popup = this._popups.get(id);
+            if (typeof popup !== 'undefined') {
+                return popup;
+            }
+        }
+
+        // Find by existing parent id
+        let parent = null;
+        if (parentId !== null) {
+            parent = this._popups.get(parentId);
+            if (typeof parent !== 'undefined') {
+                const popup = parent.child;
+                if (popup !== null) {
+                    return popup;
+                }
+            } else {
+                parent = null;
+            }
+        }
+
+        // New unique id
+        if (id === null) {
+            id = this._nextId++;
+        }
+
+        // Create new popup
+        const depth = (parent !== null ? parent.depth + 1 : 0);
+        const popup = new Popup(id, depth, this._frameIdPromise);
+        if (parent !== null) {
+            popup.setParent(parent);
+        }
+        this._popups.set(id, popup);
+        return popup;
     }
 
     // Message handlers
 
-    async _onApiCreateNestedPopup(parentId) {
-        return this._createPopupInternal(parentId, 0).id;
+    async _onApiGetOrCreatePopup(id, parentId) {
+        const popup = this.getOrCreatePopup(id, parentId);
+        return {
+            id: popup.id
+        };
     }
 
     async _onApiSetOptions(id, options) {
@@ -106,25 +143,10 @@ class PopupProxyHost {
 
     // Private functions
 
-    _createPopupInternal(parentId, depth) {
-        const parent = (typeof parentId === 'string' && this._popups.has(parentId) ? this._popups.get(parentId) : null);
-        const id = `${this._nextId}`;
-        if (parent !== null) {
-            depth = parent.depth + 1;
-        }
-        ++this._nextId;
-        const popup = new Popup(id, depth, this._frameIdPromise);
-        if (parent !== null) {
-            popup.setParent(parent);
-        }
-        this._popups.set(id, popup);
-        return {popup, id};
-    }
-
     _getPopup(id) {
         const popup = this._popups.get(id);
         if (typeof popup === 'undefined') {
-            throw new Error('Invalid popup ID');
+            throw new Error(`Invalid popup ID ${id}`);
         }
         return popup;
     }

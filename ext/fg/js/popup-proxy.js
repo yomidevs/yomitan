@@ -19,10 +19,10 @@
 /*global FrontendApiSender*/
 
 class PopupProxy {
-    constructor(depth, parentId, parentFrameId, url) {
+    constructor(id, depth, parentId, parentFrameId, url) {
         this._parentId = parentId;
         this._parentFrameId = parentFrameId;
-        this._id = null;
+        this._id = id;
         this._idPromise = null;
         this._depth = depth;
         this._url = url;
@@ -113,7 +113,7 @@ class PopupProxy {
     }
 
     async _getPopupIdAsync() {
-        const id = await this._invokeHostApi('createNestedPopup', {parentId: this._parentId});
+        const {id} = await this._invokeHostApi('getOrCreatePopup', {id: this._id, parentId: this._parentId});
         this._id = id;
         return id;
     }
