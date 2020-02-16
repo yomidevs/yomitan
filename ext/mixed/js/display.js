@@ -707,7 +707,7 @@ class Display {
     async getScreenshot() {
         try {
             await this.setPopupVisibleOverride(false);
-            await Display.delay(1); // Wait for popup to be hidden.
+            await promiseTimeout(1); // Wait for popup to be hidden.
 
             const {format, quality} = this.options.anki.screenshot;
             const dataUrl = await apiScreenshotGet({format, quality});
@@ -782,10 +782,6 @@ class Display {
         } catch (e) {
             return [];
         }
-    }
-
-    static delay(time) {
-        return new Promise((resolve) => setTimeout(resolve, time));
     }
 
     static indexOf(nodeList, node) {
