@@ -88,10 +88,9 @@ class SettingsPopupPreview {
         // This simulates the stylesheet priorities when injecting using the web extension API.
         const result = await this.popupSetCustomOuterCssOld.call(this.popup, ...args);
 
-        const outerStylesheet = Popup.outerStylesheet;
         const node = document.querySelector('#client-css');
-        if (node !== null && outerStylesheet !== null) {
-            node.parentNode.insertBefore(outerStylesheet, node);
+        if (node !== null && result !== null) {
+            node.parentNode.insertBefore(result, node);
         }
 
         return result;

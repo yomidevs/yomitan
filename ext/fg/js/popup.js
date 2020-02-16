@@ -31,7 +31,6 @@ class Popup {
         this._visible = false;
         this._visibleOverride = null;
         this._options = null;
-        this._stylesheetInjectedViaApi = false;
         this._contentScale = 1.0;
         this._containerSizeContentScale = null;
 
@@ -159,20 +158,12 @@ class Popup {
     }
 
     async setCustomOuterCss(css, useWebExtensionApi) {
-        // Cannot repeatedly inject stylesheets using web extension APIs since there is no way to remove them.
-        if (this._stylesheetInjectedViaApi) { return; }
-
-        if (!useWebExtensionApi || Popup._isOnExtensionPage()) {
-            Popup.injectOuterStylesheet(css);
-        } else {
-            if (!css) { return; }
-            try {
-                await apiInjectStylesheet('code', css);
-                this._stylesheetInjectedViaApi = true;
-            } catch (e) {
-                // NOP
-            }
-        }
+        return await Popup._injectStylesheet(
+            'yomichan-popup-outer-user-stylesheet',
+            'code',
+            css,
+            useWebExtensionApi
+        );
     }
 
     setChildrenSupported(value) {
@@ -185,26 +176,6 @@ class Popup {
 
     getContainerRect() {
         return this._container.getBoundingClientRect();
-    }
-
-    static injectOuterStylesheet(css) {
-        if (Popup.outerStylesheet === null) {
-            if (!css) { return; }
-            Popup.outerStylesheet = document.createElement('style');
-            Popup.outerStylesheet.id = 'yomichan-popup-outer-stylesheet';
-        }
-
-        const outerStylesheet = Popup.outerStylesheet;
-        if (css) {
-            outerStylesheet.textContent = css;
-
-            const par = document.head;
-            if (par && outerStylesheet.parentNode !== par) {
-                par.appendChild(outerStylesheet);
-            }
-        } else {
-            outerStylesheet.textContent = '';
-        }
     }
 
     // Private functions
@@ -248,7 +219,11 @@ class Popup {
             });
             this._observeFullscreen(true);
             this._onFullscreenChanged();
-            this.setCustomOuterCss(this._options.general.customPopupOuterCss, false);
+            try {
+                this.setCustomOuterCss(this._options.general.customPopupOuterCss, true);
+            } catch (e) {
+                // NOP
+            }
         });
     }
 
@@ -526,15 +501,6 @@ class Popup {
         ];
     }
 
-    static _isOnExtensionPage() {
-        try {
-            const url = chrome.runtime.getURL('/');
-            return window.location.href.substring(0, url.length) === url;
-        } catch (e) {
-            // NOP
-        }
-    }
-
     static _getViewport(useVisualViewport) {
         const visualViewport = window.visualViewport;
         if (visualViewport !== null && typeof visualViewport === 'object') {
@@ -567,6 +533,80 @@ class Popup {
             bottom: window.innerHeight
         };
     }
+
+    static _isOnExtensionPage() {
+        try {
+            const url = chrome.runtime.getURL('/');
+            return window.location.href.substring(0, url.length) === url;
+        } catch (e) {
+            // NOP
+        }
+    }
+
+    static async _injectStylesheet(id, type, value, useWebExtensionApi) {
+        const injectedStylesheets = Popup._injectedStylesheets;
+
+        if (Popup._isOnExtensionPage()) {
+            // Permissions error will occur if trying to use the WebExtension API to inject
+            // into an extension page.
+            useWebExtensionApi = false;
+        }
+
+        let styleNode = injectedStylesheets.get(id);
+        if (typeof styleNode !== 'undefined') {
+            if (styleNode === null) {
+                // Previously injected via WebExtension API
+                throw new Error(`Stylesheet with id ${id} has already been injected using the WebExtension API`);
+            }
+        } else {
+            styleNode = null;
+        }
+
+        if (useWebExtensionApi) {
+            // Inject via WebExtension API
+            if (styleNode !== null && styleNode.parentNode !== null) {
+                styleNode.parentNode.removeChild(styleNode);
+            }
+
+            await apiInjectStylesheet(type, value);
+
+            injectedStylesheets.set(id, null);
+            return null;
+        }
+
+        // Create node in document
+        const parentNode = document.head;
+        if (parentNode === null) {
+            throw new Error('No parent node');
+        }
+
+        // Create or reuse node
+        const isFile = (type === 'file');
+        const tagName = isFile ? 'link' : 'style';
+        if (styleNode === null || styleNode.nodeName.toLowerCase() !== tagName) {
+            if (styleNode !== null && styleNode.parentNode !== null) {
+                styleNode.parentNode.removeChild(styleNode);
+            }
+            styleNode = document.createElement(tagName);
+            styleNode.id = id;
+        }
+
+        // Update node style
+        if (isFile) {
+            styleNode.rel = value;
+        } else {
+            styleNode.textContent = value;
+        }
+
+        // Update parent
+        if (styleNode.parentNode !== parentNode) {
+            parentNode.appendChild(styleNode);
+        }
+
+        // Add to map
+        injectedStylesheets.set(id, styleNode);
+        return styleNode;
+    }
 }
 
-Popup.outerStylesheet = null;
+Popup._injectedStylesheets = new Map();
