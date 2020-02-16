@@ -39,7 +39,6 @@ class Popup {
         this._container.className = 'yomichan-float';
         this._container.addEventListener('mousedown', (e) => e.stopPropagation());
         this._container.addEventListener('scroll', (e) => e.stopPropagation());
-        this._container.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
         this._container.style.width = '0px';
         this._container.style.height = '0px';
 
@@ -240,6 +239,7 @@ class Popup {
             this._observeFullscreen();
             this._onFullscreenChanged();
             this.setCustomOuterCss(this._options.general.customPopupOuterCss, false);
+            this._container.contentDocument.location.href = chrome.runtime.getURL('/fg/float.html');
         });
     }
 
