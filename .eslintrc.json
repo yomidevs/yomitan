@@ -26,6 +26,7 @@
         "no-const-assign": "error",
         "no-constant-condition": "off",
         "no-global-assign": "error",
+        "no-param-reassign": "off",
         "no-shadow": ["error", {"builtinGlobals": false}],
         "no-undef": "error",
         "no-unneeded-ternary": "error",
