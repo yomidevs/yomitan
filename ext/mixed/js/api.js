@@ -89,8 +89,8 @@ function apiFrameInformationGet() {
     return _apiInvoke('frameInformationGet');
 }
 
-function apiInjectStylesheet(css) {
-    return _apiInvoke('injectStylesheet', {css});
+function apiInjectStylesheet(type, value) {
+    return _apiInvoke('injectStylesheet', {type, value});
 }
 
 function apiGetEnvironmentInfo() {
