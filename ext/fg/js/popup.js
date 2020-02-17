@@ -219,13 +219,22 @@ class Popup {
             });
             this._observeFullscreen(true);
             this._onFullscreenChanged();
-            try {
-                Popup._injectStylesheet('yomichan-popup-outer-stylesheet', 'file', '/fg/css/client.css', true);
-                this.setCustomOuterCss(this._options.general.customPopupOuterCss, true);
-            } catch (e) {
-                // NOP
-            }
+            this._injectStyles();
         });
+    }
+
+    async _injectStyles() {
+        try {
+            await Popup._injectStylesheet('yomichan-popup-outer-stylesheet', 'file', '/fg/css/client.css', true);
+        } catch (e) {
+            // NOP
+        }
+
+        try {
+            await this.setCustomOuterCss(this._options.general.customPopupOuterCss, true);
+        } catch (e) {
+            // NOP
+        }
     }
 
     _observeFullscreen(observe) {
