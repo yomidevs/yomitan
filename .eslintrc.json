@@ -26,6 +26,7 @@
         "no-const-assign": "error",
         "no-constant-condition": "off",
         "no-global-assign": "error",
+        "no-shadow": ["error", {"builtinGlobals": false}],
         "no-undef": "error",
         "no-unneeded-ternary": "error",
         "no-unused-vars": ["error", {"vars": "local", "args": "after-used", "argsIgnorePattern": "^_", "caughtErrors": "none"}],

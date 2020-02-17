@@ -401,7 +401,7 @@ class JsonSchemaProxyHandler {
             info.valuePush(i, propertyValue);
             JsonSchemaProxyHandler.validate(propertyValue, propertySchema, info);
             info.valuePop();
-            for (let i = 0; i < schemaPath.length; ++i) { info.schemaPop(); }
+            for (let j = 0, jj = schemaPath.length; j < jj; ++j) { info.schemaPop(); }
         }
     }
 

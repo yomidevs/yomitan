@@ -274,18 +274,18 @@ class Backend {
                 const node = nodes.pop();
                 for (const key of Object.keys(node.obj)) {
                     const path = node.path.concat(key);
-                    const obj = node.obj[key];
-                    if (obj !== null && typeof obj === 'object') {
-                        nodes.unshift({obj, path});
+                    const obj2 = node.obj[key];
+                    if (obj2 !== null && typeof obj2 === 'object') {
+                        nodes.unshift({obj: obj2, path});
                     } else {
-                        valuePaths.push([obj, path]);
+                        valuePaths.push([obj2, path]);
                     }
                 }
             }
             return valuePaths;
         }
 
-        function modifyOption(path, value, options) {
+        function modifyOption(path, value) {
             let pivot = options;
             for (const key of path.slice(0, -1)) {
                 if (!hasOwn(pivot, key)) {
@@ -298,7 +298,7 @@ class Backend {
         }
 
         for (const [value, path] of getValuePaths(changedOptions)) {
-            modifyOption(path, value, options);
+            modifyOption(path, value);
         }
 
         await this._onApiOptionsSave({source});
@@ -340,9 +340,9 @@ class Backend {
                 dictTermsSort(definitions);
                 const {expression, reading} = definitions[0];
                 const source = text.substring(0, sourceLength);
-                for (const {text, furigana} of jpDistributeFuriganaInflected(expression, reading, source)) {
-                    const reading = jpConvertReading(text, furigana, options.parsing.readingMode);
-                    term.push({text, reading});
+                for (const {text: text2, furigana} of jpDistributeFuriganaInflected(expression, reading, source)) {
+                    const reading2 = jpConvertReading(text2, furigana, options.parsing.readingMode);
+                    term.push({text: text2, reading: reading2});
                 }
                 text = text.substring(source.length);
             } else {
@@ -365,17 +365,17 @@ class Backend {
                 for (const {expression, reading, source} of parsedLine) {
                     const term = [];
                     if (expression !== null && reading !== null) {
-                        for (const {text, furigana} of jpDistributeFuriganaInflected(
+                        for (const {text: text2, furigana} of jpDistributeFuriganaInflected(
                             expression,
                             jpKatakanaToHiragana(reading),
                             source
                         )) {
-                            const reading = jpConvertReading(text, furigana, options.parsing.readingMode);
-                            term.push({text, reading});
+                            const reading2 = jpConvertReading(text2, furigana, options.parsing.readingMode);
+                            term.push({text: text2, reading: reading2});
                         }
                     } else {
-                        const reading = jpConvertReading(source, null, options.parsing.readingMode);
-                        term.push({text: source, reading});
+                        const reading2 = jpConvertReading(source, null, options.parsing.readingMode);
+                        term.push({text: source, reading: reading2});
                     }
                     result.push(term);
                 }
@@ -816,12 +816,12 @@ class Backend {
 
         try {
             const tabWindow = await new Promise((resolve, reject) => {
-                chrome.windows.get(tab.windowId, {}, (tabWindow) => {
+                chrome.windows.get(tab.windowId, {}, (value) => {
                     const e = chrome.runtime.lastError;
                     if (e) {
                         reject(e);
                     } else {
-                        resolve(tabWindow);
+                        resolve(value);
                     }
                 });
             });

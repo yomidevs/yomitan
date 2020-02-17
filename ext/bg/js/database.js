@@ -809,9 +809,9 @@ class Database {
             for (const objectStoreName of objectStoreNames) {
                 const {primaryKey, indices} = stores[objectStoreName];
 
-                const objectStoreNames = transaction.objectStoreNames || db.objectStoreNames;
+                const objectStoreNames2 = transaction.objectStoreNames || db.objectStoreNames;
                 const objectStore = (
-                    Database._listContains(objectStoreNames, objectStoreName) ?
+                    Database._listContains(objectStoreNames2, objectStoreName) ?
                     transaction.objectStore(objectStoreName) :
                     db.createObjectStore(objectStoreName, primaryKey)
                 );
