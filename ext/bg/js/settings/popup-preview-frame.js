@@ -27,6 +27,7 @@ class SettingsPopupPreview {
         this.popupShown = false;
         this.themeChangeTimeout = null;
         this.textSource = null;
+        this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
     }
 
     static create() {
@@ -97,6 +98,8 @@ class SettingsPopupPreview {
     }
 
     onMessage(e) {
+        if (e.origin !== this._targetOrigin) { return; }
+
         const {action, params} = e.data;
         const handler = SettingsPopupPreview._messageHandlers.get(action);
         if (typeof handler !== 'function') { return; }

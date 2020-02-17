@@ -33,6 +33,7 @@ class Popup {
         this._options = null;
         this._contentScale = 1.0;
         this._containerSizeContentScale = null;
+        this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
 
         this._container = document.createElement('iframe');
         this._container.className = 'yomichan-float';
@@ -349,7 +350,7 @@ class Popup {
 
     _invokeApi(action, params={}) {
         if (this._container.contentWindow) {
-            this._container.contentWindow.postMessage({action, params}, '*');
+            this._container.contentWindow.postMessage({action, params}, this._targetOrigin);
         }
     }
 
