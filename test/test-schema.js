@@ -30,7 +30,7 @@ function testValidate1() {
         ]
     };
 
-    const schemaValidate = (value, schema) => {
+    const schemaValidate = (value) => {
         try {
             JsonSchema.validate(value, schema);
             return true;
@@ -48,7 +48,7 @@ function testValidate1() {
             ) &&
             (
                 (
-                    (value % 3 )=== 0 ||
+                    (value % 3) === 0 ||
                     (value % 5) === 0
                 ) &&
                 (value % 15) !== 0
@@ -81,7 +81,7 @@ function testGetValidValueOrDefault1() {
 
     const testData = [
         [
-            void(0),
+            void 0,
             {test: 'default'}
         ],
         [
@@ -210,7 +210,7 @@ function testGetValidValueOrDefault3() {
             {test: 'value', test2: 2, test3: 10}
         ],
         [
-            {test: 'value', test2: 2, test3: void(0)},
+            {test: 'value', test2: 2, test3: void 0},
             {test: 'value', test2: 2, test3: 10}
         ]
     ];
