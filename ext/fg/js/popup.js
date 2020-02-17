@@ -245,7 +245,7 @@ class Popup {
                     uniqueId
                 });
             });
-            this._observeFullscreen();
+            this._observeFullscreen(true);
             this._onFullscreenChanged();
             this.setCustomOuterCss(this._options.general.customPopupOuterCss, false);
             this._container.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
