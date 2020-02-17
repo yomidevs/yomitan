@@ -316,6 +316,169 @@ class Database {
         return result;
     }
 
+    async importDictionaryNew(archiveSource, onProgress, details) {
+        this._validate();
+        const db = this.db;
+        const hasOnProgress = (typeof onProgress === 'function');
+
+        // Read archive
+        const archive = await JSZip.loadAsync(archiveSource);
+
+        // Read and validate index
+        const indexFile = archive.files['index.json'];
+        if (!indexFile) {
+            throw new Error('No dictionary index found in archive');
+        }
+
+        const index = JSON.parse(await indexFile.async('string'));
+
+        const dictionaryTitle = index.title;
+        const version = index.format || index.version;
+
+        if (!dictionaryTitle || !index.revision) {
+            throw new Error('Unrecognized dictionary format');
+        }
+
+        // Verify database is not already imported
+        if (await this._dictionaryExists(dictionaryTitle)) {
+            throw new Error('Dictionary is already imported');
+        }
+
+        // Data format converters
+        const convertTermBankEntry = (entry) => {
+            if (version === 1) {
+                const [expression, reading, definitionTags, rules, score, ...glossary] = entry;
+                return {expression, reading, definitionTags, rules, score, glossary};
+            } else {
+                const [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] = entry;
+                return {expression, reading, definitionTags, rules, score, glossary, sequence, termTags};
+            }
+        };
+
+        const convertTermMetaBankEntry = (entry) => {
+            const [expression, mode, data] = entry;
+            return {expression, mode, data};
+        };
+
+        const convertKanjiBankEntry = (entry) => {
+            if (version === 1) {
+                const [character, onyomi, kunyomi, tags, ...meanings] = entry;
+                return {character, onyomi, kunyomi, tags, meanings};
+            } else {
+                const [character, onyomi, kunyomi, tags, meanings, stats] = entry;
+                return {character, onyomi, kunyomi, tags, meanings, stats};
+            }
+        };
+
+        const convertKanjiMetaBankEntry = (entry) => {
+            const [character, mode, data] = entry;
+            return {character, mode, data};
+        };
+
+        const convertTagBankEntry = (entry) => {
+            const [name, category, order, notes, score] = entry;
+            return {name, category, order, notes, score};
+        };
+
+        // Archive file reading
+        const readFileSequence = async (fileNameFormat, convertEntry) => {
+            const results = [];
+            for (let i = 1; true; ++i) {
+                const fileName = fileNameFormat.replace(/\?/, `${i}`);
+                const file = archive.files[fileName];
+                if (!file) { break; }
+
+                const entries = JSON.parse(await file.async('string'));
+                for (let entry of entries) {
+                    entry = convertEntry(entry);
+                    entry.dictionary = dictionaryTitle;
+                    results.push(entry);
+                }
+            }
+            return results;
+        };
+
+        // Load data
+        const termList      = await readFileSequence('term_bank_?.json',       convertTermBankEntry);
+        const termMetaList  = await readFileSequence('term_meta_bank_?.json',  convertTermMetaBankEntry);
+        const kanjiList     = await readFileSequence('kanji_bank_?.json',      convertKanjiBankEntry);
+        const kanjiMetaList = await readFileSequence('kanji_meta_bank_?.json', convertKanjiMetaBankEntry);
+        const tagList       = await readFileSequence('tag_bank_?.json',        convertTagBankEntry);
+
+        // Old tags
+        const indexTagMeta = index.tagMeta;
+        if (typeof indexTagMeta === 'object' && indexTagMeta !== null) {
+            for (const name of Object.keys(indexTagMeta)) {
+                const {category, order, notes, score} = indexTagMeta[name];
+                tagList.push({name, category, order, notes, score});
+            }
+        }
+
+        // Prefix wildcard support
+        const prefixWildcardsSupported = !!details.prefixWildcardsSupported;
+        if (prefixWildcardsSupported) {
+            for (const entry of termList) {
+                entry.expressionReverse = stringReverse(entry.expression);
+                entry.readingReverse = stringReverse(entry.reading);
+            }
+        }
+
+        // Add dictionary
+        const summary = {
+            title: dictionaryTitle,
+            revision: index.revision,
+            sequenced: index.sequenced,
+            version,
+            prefixWildcardsSupported
+        };
+
+        {
+            const transaction = db.transaction(['dictionaries'], 'readwrite');
+            const objectStore = transaction.objectStore('dictionaries');
+            await Database._bulkAdd(objectStore, [summary], 0, 1);
+        }
+
+        // Add data
+        const errors = [];
+        const total = (
+            termList.length +
+            termMetaList.length +
+            kanjiList.length +
+            kanjiMetaList.length +
+            tagList.length
+        );
+        let loadedCount = 0;
+        const maxTransactionLength = 1000;
+
+        const bulkAdd = async (objectStoreName, entries) => {
+            const ii = entries.length;
+            for (let i = 0; i < ii; i += maxTransactionLength) {
+                const count = Math.min(maxTransactionLength, ii - i);
+
+                try {
+                    const transaction = db.transaction([objectStoreName], 'readwrite');
+                    const objectStore = transaction.objectStore(objectStoreName);
+                    await Database._bulkAdd(objectStore, entries, i, count);
+                } catch (e) {
+                    errors.push(e);
+                }
+
+                loadedCount += count;
+                if (hasOnProgress) {
+                    onProgress(total, loadedCount);
+                }
+            }
+        };
+
+        await bulkAdd('terms', termList);
+        await bulkAdd('termMeta', termMetaList);
+        await bulkAdd('kanji', kanjiList);
+        await bulkAdd('kanjiMeta', kanjiMetaList);
+        await bulkAdd('tagMeta', tagList);
+
+        return {result: summary, errors};
+    }
+
     async importDictionary(archive, progressCallback, details) {
         this._validate();
 
@@ -497,6 +660,15 @@ class Database {
         if (this.db === null) {
             throw new Error('Database not initialized');
         }
+    }
+
+    async _dictionaryExists(title) {
+        const db = this.db;
+        const dbCountTransaction = db.transaction(['dictionaries'], 'readonly');
+        const dbIndex = dbCountTransaction.objectStore('dictionaries').index('title');
+        const only = IDBKeyRange.only(title);
+        const count = await Database._getCount(dbIndex, only);
+        return count > 0;
     }
 
     async _findGenericBulk(tableName, indexName, indexValueList, titles, createResult) {
