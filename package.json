@@ -6,8 +6,9 @@
         "test": "test"
     },
     "scripts": {
-        "test": "npm run test-lint",
-        "test-lint": "eslint ."
+        "test": "npm run test-lint && npm run test-code",
+        "test-lint": "eslint .",
+        "test-code": "node ./test/test-schema.js"
     },
     "repository": {
         "type": "git",

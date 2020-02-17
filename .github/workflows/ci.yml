@@ -17,7 +17,11 @@ jobs:
       run: npm ci
     - name: Build
       run: npm run build --if-present
-    - name: Run tests
-      run: npm test
+    - name: Lint
+      run: npm run test-lint
+      env:
+        CI: true
+    - name: Tests
+      run: npm run test-code
       env:
         CI: true
