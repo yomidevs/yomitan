@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global dictFieldSplit, dictTagSanitize, JSZip*/
+/*global dictFieldSplit, JSZip*/
 
 class Database {
     constructor() {
@@ -316,7 +316,7 @@ class Database {
         return result;
     }
 
-    async importDictionaryNew(archiveSource, onProgress, details) {
+    async importDictionary(archiveSource, onProgress, details) {
         this._validate();
         const db = this.db;
         const hasOnProgress = (typeof onProgress === 'function');
@@ -479,181 +479,6 @@ class Database {
         return {result: summary, errors};
     }
 
-    async importDictionary(archive, progressCallback, details) {
-        this._validate();
-
-        const errors = [];
-        const prefixWildcardsSupported = details.prefixWildcardsSupported;
-
-        const maxTransactionLength = 1000;
-        const bulkAdd = async (objectStoreName, items, total, current) => {
-            const db = this.db;
-            for (let i = 0; i < items.length; i += maxTransactionLength) {
-                if (progressCallback) {
-                    progressCallback(total, current + i / items.length);
-                }
-
-                try {
-                    const count = Math.min(maxTransactionLength, items.length - i);
-                    const transaction = db.transaction([objectStoreName], 'readwrite');
-                    const objectStore = transaction.objectStore(objectStoreName);
-                    await Database._bulkAdd(objectStore, items, i, count);
-                } catch (e) {
-                    errors.push(e);
-                }
-            }
-        };
-
-        const indexDataLoaded = async (summary) => {
-            if (summary.version > 3) {
-                throw new Error('Unsupported dictionary version');
-            }
-
-            const db = this.db;
-            const dbCountTransaction = db.transaction(['dictionaries'], 'readonly');
-            const dbIndex = dbCountTransaction.objectStore('dictionaries').index('title');
-            const only = IDBKeyRange.only(summary.title);
-            const count = await Database._getCount(dbIndex, only);
-
-            if (count > 0) {
-                throw new Error('Dictionary is already imported');
-            }
-
-            const transaction = db.transaction(['dictionaries'], 'readwrite');
-            const objectStore = transaction.objectStore('dictionaries');
-            await Database._bulkAdd(objectStore, [summary], 0, 1);
-        };
-
-        const termDataLoaded = async (summary, entries, total, current) => {
-            const rows = [];
-            if (summary.version === 1) {
-                for (const [expression, reading, definitionTags, rules, score, ...glossary] of entries) {
-                    rows.push({
-                        expression,
-                        reading,
-                        definitionTags,
-                        rules,
-                        score,
-                        glossary,
-                        dictionary: summary.title
-                    });
-                }
-            } else {
-                for (const [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] of entries) {
-                    rows.push({
-                        expression,
-                        reading,
-                        definitionTags,
-                        rules,
-                        score,
-                        glossary,
-                        sequence,
-                        termTags,
-                        dictionary: summary.title
-                    });
-                }
-            }
-
-            if (prefixWildcardsSupported) {
-                for (const row of rows) {
-                    row.expressionReverse = stringReverse(row.expression);
-                    row.readingReverse = stringReverse(row.reading);
-                }
-            }
-
-            await bulkAdd('terms', rows, total, current);
-        };
-
-        const termMetaDataLoaded = async (summary, entries, total, current) => {
-            const rows = [];
-            for (const [expression, mode, data] of entries) {
-                rows.push({
-                    expression,
-                    mode,
-                    data,
-                    dictionary: summary.title
-                });
-            }
-
-            await bulkAdd('termMeta', rows, total, current);
-        };
-
-        const kanjiDataLoaded = async (summary, entries, total, current)  => {
-            const rows = [];
-            if (summary.version === 1) {
-                for (const [character, onyomi, kunyomi, tags, ...meanings] of entries) {
-                    rows.push({
-                        character,
-                        onyomi,
-                        kunyomi,
-                        tags,
-                        meanings,
-                        dictionary: summary.title
-                    });
-                }
-            } else {
-                for (const [character, onyomi, kunyomi, tags, meanings, stats] of entries) {
-                    rows.push({
-                        character,
-                        onyomi,
-                        kunyomi,
-                        tags,
-                        meanings,
-                        stats,
-                        dictionary: summary.title
-                    });
-                }
-            }
-
-            await bulkAdd('kanji', rows, total, current);
-        };
-
-        const kanjiMetaDataLoaded = async (summary, entries, total, current) => {
-            const rows = [];
-            for (const [character, mode, data] of entries) {
-                rows.push({
-                    character,
-                    mode,
-                    data,
-                    dictionary: summary.title
-                });
-            }
-
-            await bulkAdd('kanjiMeta', rows, total, current);
-        };
-
-        const tagDataLoaded = async (summary, entries, total, current) => {
-            const rows = [];
-            for (const [name, category, order, notes, score] of entries) {
-                const row = dictTagSanitize({
-                    name,
-                    category,
-                    order,
-                    notes,
-                    score,
-                    dictionary: summary.title
-                });
-
-                rows.push(row);
-            }
-
-            await bulkAdd('tagMeta', rows, total, current);
-        };
-
-        const result = await Database._importDictionaryZip(
-            archive,
-            indexDataLoaded,
-            termDataLoaded,
-            termMetaDataLoaded,
-            kanjiDataLoaded,
-            kanjiMetaDataLoaded,
-            tagDataLoaded,
-            details
-        );
-
-        return {result, errors};
-    }
-
     // Private
 
     _validate() {
@@ -694,96 +519,6 @@ class Database {
         await Promise.all(promises);
 
         return results;
-    }
-
-    static async _importDictionaryZip(
-        archive,
-        indexDataLoaded,
-        termDataLoaded,
-        termMetaDataLoaded,
-        kanjiDataLoaded,
-        kanjiMetaDataLoaded,
-        tagDataLoaded,
-        details
-    ) {
-        const zip = await JSZip.loadAsync(archive);
-
-        const indexFile = zip.files['index.json'];
-        if (!indexFile) {
-            throw new Error('No dictionary index found in archive');
-        }
-
-        const index = JSON.parse(await indexFile.async('string'));
-        if (!index.title || !index.revision) {
-            throw new Error('Unrecognized dictionary format');
-        }
-
-        const summary = {
-            title: index.title,
-            revision: index.revision,
-            sequenced: index.sequenced,
-            version: index.format || index.version,
-            prefixWildcardsSupported: !!details.prefixWildcardsSupported
-        };
-
-        await indexDataLoaded(summary);
-
-        const buildTermBankName      = (index) => `term_bank_${index + 1}.json`;
-        const buildTermMetaBankName  = (index) => `term_meta_bank_${index + 1}.json`;
-        const buildKanjiBankName     = (index) => `kanji_bank_${index + 1}.json`;
-        const buildKanjiMetaBankName = (index) => `kanji_meta_bank_${index + 1}.json`;
-        const buildTagBankName       = (index) => `tag_bank_${index + 1}.json`;
-
-        const countBanks = (namer) => {
-            let count = 0;
-            while (zip.files[namer(count)]) {
-                ++count;
-            }
-
-            return count;
-        };
-
-        const termBankCount      = countBanks(buildTermBankName);
-        const termMetaBankCount  = countBanks(buildTermMetaBankName);
-        const kanjiBankCount     = countBanks(buildKanjiBankName);
-        const kanjiMetaBankCount = countBanks(buildKanjiMetaBankName);
-        const tagBankCount       = countBanks(buildTagBankName);
-
-        let bankLoadedCount = 0;
-        let bankTotalCount =
-            termBankCount +
-            termMetaBankCount +
-            kanjiBankCount +
-            kanjiMetaBankCount +
-            tagBankCount;
-
-        if (tagDataLoaded && index.tagMeta) {
-            const bank = [];
-            for (const name in index.tagMeta) {
-                const tag = index.tagMeta[name];
-                bank.push([name, tag.category, tag.order, tag.notes, tag.score]);
-            }
-
-            tagDataLoaded(summary, bank, ++bankTotalCount, bankLoadedCount++);
-        }
-
-        const loadBank = async (summary, namer, count, callback) => {
-            if (callback) {
-                for (let i = 0; i < count; ++i) {
-                    const bankFile = zip.files[namer(i)];
-                    const bank = JSON.parse(await bankFile.async('string'));
-                    await callback(summary, bank, bankTotalCount, bankLoadedCount++);
-                }
-            }
-        };
-
-        await loadBank(summary, buildTermBankName, termBankCount, termDataLoaded);
-        await loadBank(summary, buildTermMetaBankName, termMetaBankCount, termMetaDataLoaded);
-        await loadBank(summary, buildKanjiBankName, kanjiBankCount, kanjiDataLoaded);
-        await loadBank(summary, buildKanjiMetaBankName, kanjiMetaBankCount, kanjiMetaDataLoaded);
-        await loadBank(summary, buildTagBankName, tagBankCount, tagDataLoaded);
-
-        return summary;
     }
 
     static _createTerm(row, index) {
