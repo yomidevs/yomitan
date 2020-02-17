@@ -228,6 +228,7 @@ class Popup {
 
         return new Promise((resolve) => {
             const parentFrameId = (typeof this._frameId === 'number' ? this._frameId : null);
+            this._container.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
             this._container.addEventListener('load', () => {
                 const uniqueId = yomichan.generateId(32);
                 Popup._listenForDisplayPrepareCompleted(uniqueId, resolve);
@@ -248,7 +249,6 @@ class Popup {
             this._observeFullscreen(true);
             this._onFullscreenChanged();
             this.setCustomOuterCss(this._options.general.customPopupOuterCss, false);
-            this._container.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
         });
     }
 
