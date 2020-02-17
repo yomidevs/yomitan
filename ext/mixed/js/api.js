@@ -113,6 +113,10 @@ function apiGetZoom() {
     return _apiInvoke('getZoom');
 }
 
+function apiGetMessageToken() {
+    return _apiInvoke('getMessageToken');
+}
+
 function _apiInvoke(action, params={}) {
     const data = {action, params};
     return new Promise((resolve, reject) => {

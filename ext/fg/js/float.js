@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global popupNestedInitialize, apiForward, Display*/
+/*global popupNestedInitialize, apiForward, apiGetMessageToken, Display*/
 
 class DisplayFloat extends Display {
     constructor() {
@@ -30,6 +30,8 @@ class DisplayFloat extends Display {
 
         this._orphaned = false;
         this._prepareInvoked = false;
+        this._messageToken = null;
+        this._messageTokenPromise = null;
 
         yomichan.on('orphaned', () => this.onOrphaned());
         window.addEventListener('message', (e) => this.onMessage(e), false);
@@ -75,11 +77,23 @@ class DisplayFloat extends Display {
     }
 
     onMessage(e) {
-        const {action, params} = e.data;
-        const handler = DisplayFloat._messageHandlers.get(action);
-        if (typeof handler !== 'function') { return; }
+        const data = e.data;
+        if (typeof data !== 'object' || data === null) { return; } // Invalid data
 
-        handler(this, params);
+        const token = data.token;
+        if (typeof token !== 'string') { return; } // Invalid data
+
+        if (this._messageToken === null) {
+            // Async
+            this.getMessageToken()
+                .then(
+                    () => { this.handleAction(token, data); },
+                    () => {}
+                );
+        } else {
+            // Sync
+            this.handleAction(token, data);
+        }
     }
 
     onKeyDown(e) {
@@ -92,6 +106,30 @@ class DisplayFloat extends Display {
             }
         }
         return super.onKeyDown(e);
+    }
+
+    async getMessageToken() {
+        // this._messageTokenPromise is used to ensure that only one call to apiGetMessageToken is made.
+        if (this._messageTokenPromise === null) {
+            this._messageTokenPromise = apiGetMessageToken();
+        }
+        const messageToken = await this._messageTokenPromise;
+        if (this._messageToken === null) {
+            this._messageToken = messageToken;
+        }
+        this._messageTokenPromise = null;
+    }
+
+    handleAction(token, {action, params}) {
+        if (token !== this._messageToken) {
+            // Invalid token
+            return;
+        }
+
+        const handler = DisplayFloat._messageHandlers.get(action);
+        if (typeof handler !== 'function') { return; }
+
+        handler(this, params);
     }
 
     getOptionsContext() {

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiInjectStylesheet*/
+/*global apiInjectStylesheet, apiGetMessageToken*/
 
 class Popup {
     constructor(id, depth, frameIdPromise) {
@@ -34,6 +34,7 @@ class Popup {
         this._contentScale = 1.0;
         this._containerSizeContentScale = null;
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
+        this._messageToken = null;
 
         this._container = document.createElement('iframe');
         this._container.className = 'yomichan-float';
@@ -198,6 +199,10 @@ class Popup {
             // NOP
         }
 
+        if (this._messageToken === null) {
+            this._messageToken = await apiGetMessageToken();
+        }
+
         return new Promise((resolve) => {
             const parentFrameId = (typeof this._frameId === 'number' ? this._frameId : null);
             this._container.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
@@ -349,9 +354,11 @@ class Popup {
     }
 
     _invokeApi(action, params={}) {
-        if (this._container.contentWindow) {
-            this._container.contentWindow.postMessage({action, params}, this._targetOrigin);
-        }
+        const token = this._messageToken;
+        const contentWindow = this._container.contentWindow;
+        if (token === null || contentWindow === null) { return; }
+
+        contentWindow.postMessage({action, params, token}, this._targetOrigin);
     }
 
     static _getFullscreenElement() {

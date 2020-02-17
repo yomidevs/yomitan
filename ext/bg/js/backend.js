@@ -46,6 +46,8 @@ class Backend {
         this.popupWindow = null;
 
         this.apiForwarder = new BackendApiForwarder();
+
+        this.messageToken = yomichan.generateId(16);
     }
 
     async prepare() {
@@ -614,6 +616,10 @@ class Backend {
         });
     }
 
+    async _onApiGetMessageToken() {
+        return this.messageToken;
+    }
+
     // Command handlers
 
     async _onCommandSearch(params) {
@@ -875,7 +881,8 @@ Backend._messageHandlers = new Map([
     ['clipboardGet', (self, ...args) => self._onApiClipboardGet(...args)],
     ['getDisplayTemplatesHtml', (self, ...args) => self._onApiGetDisplayTemplatesHtml(...args)],
     ['getQueryParserTemplatesHtml', (self, ...args) => self._onApiGetQueryParserTemplatesHtml(...args)],
-    ['getZoom', (self, ...args) => self._onApiGetZoom(...args)]
+    ['getZoom', (self, ...args) => self._onApiGetZoom(...args)],
+    ['getMessageToken', (self, ...args) => self._onApiGetMessageToken(...args)]
 ]);
 
 Backend._commandHandlers = new Map([
