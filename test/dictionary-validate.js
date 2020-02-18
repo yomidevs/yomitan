@@ -28,11 +28,8 @@ async function validateDictionaryBanks(zip, fileNameFormat, schema) {
     }
 }
 
-async function validateDictionary(fileName, schemas) {
-    const source = fs.readFileSync(fileName);
-    const zip = await JSZip.loadAsync(source);
-
-    const indexFile = zip.files['index.json'];
+async function validateDictionary(archive, schemas) {
+    const indexFile = archive.files['index.json'];
     if (!indexFile) {
         throw new Error('No dictionary index found in archive');
     }
@@ -42,11 +39,24 @@ async function validateDictionary(fileName, schemas) {
 
     JsonSchema.validate(index, schemas.index);
 
-    await validateDictionaryBanks(zip, 'term_bank_%s.json', version === 1 ? schemas.termBankV1 : schemas.termBankV3);
-    await validateDictionaryBanks(zip, 'term_meta_bank_%s.json', schemas.termMetaBankV3);
-    await validateDictionaryBanks(zip, 'kanji_bank_%s.json', version === 1 ? schemas.kanjiBankV1 : schemas.kanjiBankV3);
-    await validateDictionaryBanks(zip, 'kanji_meta_bank_%s.json', schemas.kanjiMetaBankV3);
-    await validateDictionaryBanks(zip, 'tag_bank_%s.json', schemas.tagBankV3);
+    await validateDictionaryBanks(archive, 'term_bank_%s.json', version === 1 ? schemas.termBankV1 : schemas.termBankV3);
+    await validateDictionaryBanks(archive, 'term_meta_bank_%s.json', schemas.termMetaBankV3);
+    await validateDictionaryBanks(archive, 'kanji_bank_%s.json', version === 1 ? schemas.kanjiBankV1 : schemas.kanjiBankV3);
+    await validateDictionaryBanks(archive, 'kanji_meta_bank_%s.json', schemas.kanjiMetaBankV3);
+    await validateDictionaryBanks(archive, 'tag_bank_%s.json', schemas.tagBankV3);
+}
+
+function getSchemas() {
+    return {
+        index: readSchema('../ext/bg/data/dictionary-index-schema.json'),
+        kanjiBankV1: readSchema('../ext/bg/data/dictionary-kanji-bank-v1-schema.json'),
+        kanjiBankV3: readSchema('../ext/bg/data/dictionary-kanji-bank-v3-schema.json'),
+        kanjiMetaBankV3: readSchema('../ext/bg/data/dictionary-kanji-meta-bank-v3-schema.json'),
+        tagBankV3: readSchema('../ext/bg/data/dictionary-tag-bank-v3-schema.json'),
+        termBankV1: readSchema('../ext/bg/data/dictionary-term-bank-v1-schema.json'),
+        termBankV3: readSchema('../ext/bg/data/dictionary-term-bank-v3-schema.json'),
+        termMetaBankV3: readSchema('../ext/bg/data/dictionary-term-meta-bank-v3-schema.json')
+    };
 }
 
 
@@ -60,21 +70,14 @@ async function main() {
         return;
     }
 
-    const schemas = {
-        index: readSchema('../ext/bg/data/dictionary-index-schema.json'),
-        kanjiBankV1: readSchema('../ext/bg/data/dictionary-kanji-bank-v1-schema.json'),
-        kanjiBankV3: readSchema('../ext/bg/data/dictionary-kanji-bank-v3-schema.json'),
-        kanjiMetaBankV3: readSchema('../ext/bg/data/dictionary-kanji-meta-bank-v3-schema.json'),
-        tagBankV3: readSchema('../ext/bg/data/dictionary-tag-bank-v3-schema.json'),
-        termBankV1: readSchema('../ext/bg/data/dictionary-term-bank-v1-schema.json'),
-        termBankV3: readSchema('../ext/bg/data/dictionary-term-bank-v3-schema.json'),
-        termMetaBankV3: readSchema('../ext/bg/data/dictionary-term-meta-bank-v3-schema.json')
-    };
+    const schemas = getSchemas();
 
     for (const dictionaryFileName of dictionaryFileNames) {
         try {
             console.log(`Validating ${dictionaryFileName}...`);
-            await validateDictionary(dictionaryFileName, schemas);
+            const source = fs.readFileSync(dictionaryFileName);
+            const archive = await JSZip.loadAsync(source);
+            await validateDictionary(archive, schemas);
             console.log('No issues found');
         } catch (e) {
             console.warn(e);
@@ -84,3 +87,9 @@ async function main() {
 
 
 if (require.main === module) { main(); }
+
+
+module.exports = {
+    getSchemas,
+    validateDictionary
+};
