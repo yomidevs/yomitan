@@ -1,13 +1,9 @@
 const fs = require('fs');
 const path = require('path');
+const yomichanTest = require('./yomichan-test');
 
-process.noDeprecation = true; // Suppress a warning about JSZip
-const JSZip = require(path.join(__dirname, '../ext/mixed/lib/jszip.min.js'));
-process.noDeprecation = false;
-
-const jsonSchemaFileName = path.join(__dirname, '../ext/bg/js/json-schema.js');
-const jsonSchemaFileSource = fs.readFileSync(jsonSchemaFileName, {encoding: 'utf8'});
-const JsonSchema = Function(`'use strict';${jsonSchemaFileSource};return JsonSchema;`)();
+const JSZip = yomichanTest.JSZip;
+const {JsonSchema} = yomichanTest.requireScript('ext/bg/js/json-schema.js', ['JsonSchema']);
 
 
 function readSchema(relativeFileName) {
