@@ -16,7 +16,7 @@ function readSchema(relativeFileName) {
 async function validateDictionaryBanks(zip, fileNameFormat, schema) {
     let index = 1;
     while (true) {
-        const fileName = fileNameFormat.replace(/%s/, index);
+        const fileName = fileNameFormat.replace(/\?/, index);
 
         const file = zip.files[fileName];
         if (!file) { break; }
@@ -39,11 +39,11 @@ async function validateDictionary(archive, schemas) {
 
     JsonSchema.validate(index, schemas.index);
 
-    await validateDictionaryBanks(archive, 'term_bank_%s.json', version === 1 ? schemas.termBankV1 : schemas.termBankV3);
-    await validateDictionaryBanks(archive, 'term_meta_bank_%s.json', schemas.termMetaBankV3);
-    await validateDictionaryBanks(archive, 'kanji_bank_%s.json', version === 1 ? schemas.kanjiBankV1 : schemas.kanjiBankV3);
-    await validateDictionaryBanks(archive, 'kanji_meta_bank_%s.json', schemas.kanjiMetaBankV3);
-    await validateDictionaryBanks(archive, 'tag_bank_%s.json', schemas.tagBankV3);
+    await validateDictionaryBanks(archive, 'term_bank_?.json', version === 1 ? schemas.termBankV1 : schemas.termBankV3);
+    await validateDictionaryBanks(archive, 'term_meta_bank_?.json', schemas.termMetaBankV3);
+    await validateDictionaryBanks(archive, 'kanji_bank_?.json', version === 1 ? schemas.kanjiBankV1 : schemas.kanjiBankV3);
+    await validateDictionaryBanks(archive, 'kanji_meta_bank_?.json', schemas.kanjiMetaBankV3);
+    await validateDictionaryBanks(archive, 'tag_bank_?.json', schemas.tagBankV3);
 }
 
 function getSchemas() {
