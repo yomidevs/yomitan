@@ -22,11 +22,13 @@
         },
         "format": {
             "type": "integer",
-            "description": "Format of data found in the JSON data files."
+            "description": "Format of data found in the JSON data files.",
+            "enum": [1, 2, 3]
         },
         "version": {
             "type": "integer",
-            "description": "Alias for format."
+            "description": "Alias for format.",
+            "enum": [1, 2, 3]
         },
         "tagMeta": {
             "type": "object",
