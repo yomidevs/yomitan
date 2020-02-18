@@ -27,6 +27,33 @@
         "version": {
             "type": "integer",
             "description": "Alias for format."
+        },
+        "tagMeta": {
+            "type": "object",
+            "description": "Tag information for terms and kanji. This object is obsolete and individual tag files should be used instead.",
+            "additionalProperties": {
+                "type": "object",
+                "description": "Information about a single tag. The object key is the name of the tag.",
+                "properties": {
+                    "category": {
+                        "type": "string",
+                        "description": "Category for the tag."
+                    },
+                    "order": {
+                        "type": "number",
+                        "description": "Sorting order for the tag."
+                    },
+                    "notes": {
+                        "type": "string",
+                        "description": "Notes for the tag."
+                    },
+                    "score": {
+                        "type": "number",
+                        "description": "Score used to determine popularity. Negative values are more rare and positive values are more frequent. This score is also used to sort search results."
+                    }
+                },
+                "additionalProperties": false
+            }
         }
     },
     "anyOf": [
