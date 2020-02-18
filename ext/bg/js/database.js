@@ -16,11 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global dictFieldSplit, JSZip*/
+/*global dictFieldSplit, requestJson, JsonSchema, JSZip*/
 
 class Database {
     constructor() {
         this.db = null;
+        this._schemas = new Map();
     }
 
     // Public
@@ -332,6 +333,9 @@ class Database {
 
         const index = JSON.parse(await indexFile.async('string'));
 
+        const indexSchema = await this._getSchema('/bg/data/dictionary-index-schema.json');
+        JsonSchema.validate(index, indexSchema);
+
         const dictionaryTitle = index.title;
         const version = index.format || index.version;
 
@@ -381,7 +385,7 @@ class Database {
         };
 
         // Archive file reading
-        const readFileSequence = async (fileNameFormat, convertEntry) => {
+        const readFileSequence = async (fileNameFormat, convertEntry, schema) => {
             const results = [];
             for (let i = 1; true; ++i) {
                 const fileName = fileNameFormat.replace(/\?/, `${i}`);
@@ -389,6 +393,8 @@ class Database {
                 if (!file) { break; }
 
                 const entries = JSON.parse(await file.async('string'));
+                JsonSchema.validate(entries, schema);
+
                 for (let entry of entries) {
                     entry = convertEntry(entry);
                     entry.dictionary = dictionaryTitle;
@@ -398,12 +404,16 @@ class Database {
             return results;
         };
 
+        // Load schemas
+        const dataBankSchemaPaths = this.constructor._getDataBankSchemaPaths(version);
+        const dataBankSchemas = await Promise.all(dataBankSchemaPaths.map((path) => this._getSchema(path)));
+
         // Load data
-        const termList      = await readFileSequence('term_bank_?.json',       convertTermBankEntry);
-        const termMetaList  = await readFileSequence('term_meta_bank_?.json',  convertTermMetaBankEntry);
-        const kanjiList     = await readFileSequence('kanji_bank_?.json',      convertKanjiBankEntry);
-        const kanjiMetaList = await readFileSequence('kanji_meta_bank_?.json', convertKanjiMetaBankEntry);
-        const tagList       = await readFileSequence('tag_bank_?.json',        convertTagBankEntry);
+        const termList      = await readFileSequence('term_bank_?.json',       convertTermBankEntry,      dataBankSchemas[0]);
+        const termMetaList  = await readFileSequence('term_meta_bank_?.json',  convertTermMetaBankEntry,  dataBankSchemas[1]);
+        const kanjiList     = await readFileSequence('kanji_bank_?.json',      convertKanjiBankEntry,     dataBankSchemas[2]);
+        const kanjiMetaList = await readFileSequence('kanji_meta_bank_?.json', convertKanjiMetaBankEntry, dataBankSchemas[3]);
+        const tagList       = await readFileSequence('tag_bank_?.json',        convertTagBankEntry,       dataBankSchemas[4]);
 
         // Old tags
         const indexTagMeta = index.tagMeta;
@@ -485,6 +495,35 @@ class Database {
         if (this.db === null) {
             throw new Error('Database not initialized');
         }
+    }
+
+    async _getSchema(fileName) {
+        let schemaPromise = this._schemas.get(fileName);
+        if (typeof schemaPromise !== 'undefined') {
+            return schemaPromise;
+        }
+
+        schemaPromise = requestJson(chrome.runtime.getURL(fileName), 'GET');
+        this._schemas.set(fileName, schemaPromise);
+        return schemaPromise;
+    }
+
+    static _getDataBankSchemaPaths(version) {
+        const termBank = (
+            version === 1 ?
+            '/bg/data/dictionary-term-bank-v1-schema.json' :
+            '/bg/data/dictionary-term-bank-v3-schema.json'
+        );
+        const termMetaBank = '/bg/data/dictionary-term-meta-bank-v3-schema.json';
+        const kanjiBank = (
+            version === 1 ?
+            '/bg/data/dictionary-kanji-bank-v1-schema.json' :
+            '/bg/data/dictionary-kanji-bank-v3-schema.json'
+        );
+        const kanjiMetaBank = '/bg/data/dictionary-kanji-meta-bank-v3-schema.json';
+        const tagBank = '/bg/data/dictionary-tag-bank-v3-schema.json';
+
+        return [termBank, termMetaBank, kanjiBank, kanjiMetaBank, tagBank];
     }
 
     async _dictionaryExists(title) {
