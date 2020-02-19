@@ -83,26 +83,30 @@ async function testDatabase1() {
     await database.prepare();
 
     for (const {cleanup} of iterations) {
+        const expectedSummary = {
+            title,
+            revision: 'test',
+            sequenced: true,
+            version: 3,
+            prefixWildcardsSupported: true
+        };
+
         // Import data
         let progressEvent = false;
-        await database.importDictionary(
+        const {result, errors} = await database.importDictionary(
             testDictionarySource,
             () => {
                 progressEvent = true;
             },
             {prefixWildcardsSupported: true}
         );
+        assert.deepStrictEqual(errors, []);
+        assert.deepStrictEqual(result, expectedSummary);
         assert.ok(progressEvent);
 
         // Get info summary
         const info = await database.getDictionaryInfo();
-        assert.deepStrictEqual(info, [{
-            title,
-            revision: 'test',
-            sequenced: true,
-            version: 3,
-            prefixWildcardsSupported: true
-        }]);
+        assert.deepStrictEqual(info, [expectedSummary]);
 
         // Get counts
         const counts = await database.getDictionaryCounts(
