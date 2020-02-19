@@ -26,8 +26,34 @@ function getJSZip() {
     return JSZip;
 }
 
+function createTestDictionaryArchive(dictionaryName) {
+    const fileNames = [
+        'index.json',
+        'tag_bank_1.json',
+        'tag_bank_2.json',
+        'term_bank_1.json',
+        'kanji_bank_1.json',
+        'term_meta_bank_1.json',
+        'kanji_meta_bank_1.json'
+    ];
+
+    const archive = new (getJSZip())();
+
+    for (const fileName of fileNames) {
+        const source = fs.readFileSync(path.join(__dirname, 'test-dictionary-data', fileName), {encoding: 'utf8'});
+        const json = JSON.parse(source);
+        if (fileName === 'index.json' && typeof dictionaryName === 'string') {
+            json.title = dictionaryName;
+        }
+        archive.file(fileName, JSON.stringify(json, null, 0));
+    }
+
+    return archive;
+}
+
 
 module.exports = {
     requireScript,
+    createTestDictionaryArchive,
     get JSZip() { return getJSZip(); }
 };
