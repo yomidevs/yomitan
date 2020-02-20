@@ -39,6 +39,18 @@ function countKanjiWithCharacter(kanji, character) {
 }
 
 
+async function clearDatabase() {
+    const indexedDB = global.indexedDB;
+    for (const {name} of await indexedDB.databases()) {
+        await new Promise((resolve, reject) => {
+            const request = indexedDB.deleteDatabase(name);
+            request.onerror = (e) => reject(e);
+            request.onsuccess = () => resolve();
+        });
+    }
+}
+
+
 async function testDatabase1() {
     // Load dictionary data
     const testDictionary = yomichanTest.createTestDictionaryArchive();
@@ -718,8 +730,53 @@ async function testFindTagForTitle1(database, title) {
 }
 
 
+async function testDatabase2() {
+    // Load dictionary data
+    const testDictionary = yomichanTest.createTestDictionaryArchive();
+    const testDictionarySource = await testDictionary.generateAsync({type: 'string'});
+    const testDictionaryIndex = JSON.parse(await testDictionary.files['index.json'].async('string'));
+
+    const title = testDictionaryIndex.title;
+    const titles = [title];
+
+    // Setup database
+    const database = new Database();
+
+    // Error: not prepared
+    await assert.rejects(async () => await database.purge());
+    await assert.rejects(async () => await database.deleteDictionary(title, () => {}, {}));
+    await assert.rejects(async () => await database.findTermsBulk(['?'], titles, null));
+    await assert.rejects(async () => await database.findTermsExactBulk(['?'], ['?'], titles));
+    await assert.rejects(async () => await database.findTermsBySequenceBulk([1], title));
+    await assert.rejects(async () => await database.findTermMetaBulk(['?'], titles));
+    await assert.rejects(async () => await database.findTermMetaBulk(['?'], titles));
+    await assert.rejects(async () => await database.findKanjiBulk(['?'], titles));
+    await assert.rejects(async () => await database.findKanjiMetaBulk(['?'], titles));
+    await assert.rejects(async () => await database.findTagForTitle('tag', title));
+    await assert.rejects(async () => await database.getDictionaryInfo());
+    await assert.rejects(async () => await database.getDictionaryCounts(titles, true));
+    await assert.rejects(async () => await database.importDictionary(testDictionarySource, () => {}, {}));
+
+    await database.prepare();
+
+    // Error: already prepared
+    await assert.rejects(async () => await database.prepare());
+
+    await database.importDictionary(testDictionarySource, () => {}, {});
+
+    // Error: dictionary already imported
+    await assert.rejects(async () => await database.importDictionary(testDictionarySource, () => {}, {}));
+
+    await database.close();
+}
+
+
 async function main() {
     await testDatabase1();
+    await clearDatabase();
+
+    await testDatabase2();
+    await clearDatabase();
 }
 
 
