@@ -72,11 +72,15 @@
         },
         {
             "files": ["test/**/*.js"],
+            "parserOptions": {
+                "ecmaVersion": 8,
+                "sourceType": "module"
+            },
             "env": {
                 "browser": false,
-                "es2017": false,
-                "webextensions": false,
-                "node": true
+                "es2017": true,
+                "node": true,
+                "webextensions": false
             }
         }
     ]
