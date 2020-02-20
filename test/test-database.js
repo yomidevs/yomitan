@@ -130,6 +130,8 @@ async function testDatabase1() {
         // Cleanup
         await cleanup();
     }
+
+    await database.close();
 }
 
 async function testDatabaseEmpty1(database) {

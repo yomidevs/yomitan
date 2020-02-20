@@ -96,6 +96,12 @@ class Database {
         }
     }
 
+    async close() {
+        this.validate();
+        this.db.close();
+        this.db = null;
+    }
+
     async purge() {
         this.validate();
 
