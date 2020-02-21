@@ -28,6 +28,7 @@
     "devDependencies": {
         "eslint": "^6.8.0",
         "eslint-plugin-no-unsanitized": "^3.0.2",
-        "fake-indexeddb": "^3.0.0"
+        "fake-indexeddb": "^3.0.0",
+        "jsdom": "^16.2.0"
     }
 }
