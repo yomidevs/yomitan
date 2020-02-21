@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Yomichan Tests</title>
+        <link rel="icon" type="image/gif" href="data:image/gif;base64,R0lGODlhEAAQAKEBAAAAAP///////////yH5BAEKAAIALAAAAAAQABAAAAImFI6Zpt0B4YkS0TCpq07xbmEgcGVRUpLaI46ZG7ppalY0jDCwUAAAOw==" />
+        <link rel="stylesheet" href="test-stylesheet.css" />
+    </head>
+<body>
+
+    <h1>Yomichan Tests</h1>
+
+    <div
+        class="test"
+        data-element-from-point-selector="span"
+        data-caret-range-from-point-selector="span"
+        data-start-node-selector="span"
+        data-start-offset="0"
+        data-end-node-selector="span"
+        data-end-offset="0"
+        data-result-type="TextSourceRange",
+        data-sentence-extent="100"
+        data-sentence="真白「心配してくださって、ありがとございます」"
+    >
+        <span>真白「心配してくださって、ありがとございます」</span>
+    </div>
+
+    <div
+        class="test"
+        data-element-from-point-selector="span"
+        data-caret-range-from-point-selector="span"
+        data-start-node-selector="span"
+        data-start-offset="5"
+        data-end-node-selector="span"
+        data-end-offset="5"
+        data-result-type="TextSourceRange",
+        data-sentence-extent="100"
+        data-sentence="心配してくださって、ありがとございます"
+    >
+        <span>真白「心配してくださって、ありがとございます」</span>
+    </div>
+
+    <div
+        class="test"
+        data-element-from-point-selector="input"
+        data-caret-range-from-point-selector="input"
+        data-start-node-selector="input"
+        data-start-offset="0"
+        data-end-node-selector="input"
+        data-end-offset="0"
+        data-result-type="TextSourceRange",
+        data-sentence-extent="100"
+        data-sentence="真白「心配してくださって、ありがとございます」"
+        data-has-imposter="true"
+    >
+        <input type="text" value="真白「心配してくださって、ありがとございます」" style="width: 100%; box-sizing: border-box; font-family: inherit; font-size: inherit; border: 1px solid #d8d8d8; padding: 0.2em;" />
+    </div>
+
+    <div
+        class="test"
+        data-element-from-point-selector="textarea"
+        data-caret-range-from-point-selector="textarea"
+        data-start-node-selector="textarea"
+        data-start-offset="0"
+        data-end-node-selector="textarea"
+        data-end-offset="0"
+        data-result-type="TextSourceRange",
+        data-sentence-extent="100"
+        data-sentence="真白「心配してくださって、ありがとございます」"
+        data-has-imposter="true"
+    >
+        <textarea style="width: 100%; height: 3em; box-sizing: border-box; font-family: inherit; font-size: inherit; border: 1px solid #d8d8d8; padding: 0.2em;">真白「心配してくださって、ありがとございます」</textarea>
+    </div>
+
+    <div
+        class="test"
+        data-element-from-point-selector="button"
+        data-caret-range-from-point-selector="button"
+        data-start-node-selector="button"
+        data-start-offset="0"
+        data-end-node-selector="button"
+        data-end-offset="0"
+        data-result-type="TextSourceElement",
+        data-sentence-extent="100"
+        data-sentence="よみちゃん"
+    >
+        <button style="width: 100%; box-sizing: border-box; font-family: inherit; font-size: inherit; border: 1px solid #d8d8d8; background-color: #f0f0f0; padding: 0.2em;">よみちゃん</button>
+    </div>
+
+    <div
+        class="test"
+        data-element-from-point-selector="img"
+        data-caret-range-from-point-selector="img"
+        data-start-node-selector="img"
+        data-start-offset="0"
+        data-end-node-selector="img"
+        data-end-offset="0"
+        data-result-type="TextSourceElement"
+        data-sentence="よみちゃん"
+    >
+        <img src="data:image/gif;base64,R0lGODdhBwAHAIABAAAAAP///ywAAAAABwAHAAACDIRvEaC32FpCbEkKCgA7" alt="よみちゃん" title="よみちゃん" style="width: 70px; height: 70px; image-rendering: crisp-edges; image-rendering: pixelated; display: block;" />
+    </div>
+
+</body>
+</html>
