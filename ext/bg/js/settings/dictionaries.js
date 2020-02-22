@@ -166,7 +166,7 @@ class SettingsDictionaryListUI {
         delete n.dataset.dict;
         $(n).modal('hide');
 
-        const index = this.dictionaryEntries.findIndex((e) => e.dictionaryInfo.title === title);
+        const index = this.dictionaryEntries.findIndex((entry) => entry.dictionaryInfo.title === title);
         if (index >= 0) {
             this.dictionaryEntries[index].deleteDictionary();
         }

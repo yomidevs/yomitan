@@ -160,9 +160,9 @@ function promiseTimeout(delay, resolveValue) {
     const resolve = (value) => complete(promiseResolve, value);
     const reject = (value) => complete(promiseReject, value);
 
-    const promise = new Promise((resolve, reject) => {
-        promiseResolve = resolve;
-        promiseReject = reject;
+    const promise = new Promise((resolve2, reject2) => {
+        promiseResolve = resolve2;
+        promiseReject = reject2;
     });
     timer = window.setTimeout(() => {
         timer = null;

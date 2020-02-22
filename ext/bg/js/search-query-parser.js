@@ -59,7 +59,7 @@ class QueryParser extends TextScanner {
 
         this.search.setContent('terms', {definitions, context: {
             focus: false,
-            disableHistory: cause === 'mouse' ? true : false,
+            disableHistory: cause === 'mouse',
             sentence: {text: searchText, offset: 0},
             url: window.location.href
         }});

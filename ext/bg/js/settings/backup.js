@@ -163,7 +163,6 @@ async function _showSettingsImportWarnings(warnings) {
                 sanitize: e.currentTarget.dataset.importSanitize === 'true'
             });
             modalNode.modal('hide');
-
         };
         const onModalHide = () => {
             complete({result: false});

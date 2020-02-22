@@ -70,7 +70,7 @@ class DisplaySearch extends Display {
                         this.wanakanaEnable.checked = false;
                     }
                     this.wanakanaEnable.addEventListener('change', (e) => {
-                        const {queryParams: {query=''}} = parseUrl(window.location.href);
+                        const {queryParams: {query: query2=''}} = parseUrl(window.location.href);
                         if (e.target.checked) {
                             window.wanakana.bind(this.query);
                             apiOptionsSet({general: {enableWanakana: true}}, this.getOptionsContext());
@@ -78,7 +78,7 @@ class DisplaySearch extends Display {
                             window.wanakana.unbind(this.query);
                             apiOptionsSet({general: {enableWanakana: false}}, this.getOptionsContext());
                         }
-                        this.setQuery(query);
+                        this.setQuery(query2);
                         this.onSearchQueryUpdated(this.query.value, false);
                     });
                 }

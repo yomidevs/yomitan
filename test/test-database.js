@@ -36,8 +36,8 @@ class XMLHttpRequest {
         callbacks.push(callback);
     }
 
-    open(action, url) {
-        this._url = url;
+    open(action, url2) {
+        this._url = url2;
     }
 
     send() {
@@ -116,10 +116,10 @@ function clearDatabase(timeout) {
         (async () => {
             const indexedDB = global.indexedDB;
             for (const {name} of await indexedDB.databases()) {
-                await new Promise((resolve, reject) => {
+                await new Promise((resolve2, reject2) => {
                     const request = indexedDB.deleteDatabase(name);
-                    request.onerror = (e) => reject(e);
-                    request.onsuccess = () => resolve();
+                    request.onerror = (e) => reject2(e);
+                    request.onsuccess = () => resolve2();
                 });
             }
             clearTimeout(timer);
