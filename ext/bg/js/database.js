@@ -326,7 +326,8 @@ class Database {
         const archive = await JSZip.loadAsync(archiveSource);
 
         // Read and validate index
-        const indexFile = archive.files['index.json'];
+        const indexFileName = 'index.json';
+        const indexFile = archive.files[indexFileName];
         if (!indexFile) {
             throw new Error('No dictionary index found in archive');
         }
@@ -334,7 +335,7 @@ class Database {
         const index = JSON.parse(await indexFile.async('string'));
 
         const indexSchema = await this._getSchema('/bg/data/dictionary-index-schema.json');
-        JsonSchema.validate(index, indexSchema);
+        Database._validateJsonSchema(index, indexSchema, indexFileName);
 
         const dictionaryTitle = index.title;
         const version = index.format || index.version;
@@ -393,7 +394,7 @@ class Database {
                 if (!file) { break; }
 
                 const entries = JSON.parse(await file.async('string'));
-                JsonSchema.validate(entries, schema);
+                Database._validateJsonSchema(entries, schema, fileName);
 
                 for (let entry of entries) {
                     entry = convertEntry(entry);
@@ -506,6 +507,42 @@ class Database {
         schemaPromise = requestJson(chrome.runtime.getURL(fileName), 'GET');
         this._schemas.set(fileName, schemaPromise);
         return schemaPromise;
+    }
+
+    static _validateJsonSchema(value, schema, fileName) {
+        try {
+            JsonSchema.validate(value, schema);
+        } catch (e) {
+            throw Database._formatSchemaError(e, fileName);
+        }
+    }
+
+    static _formatSchemaError(e, fileName) {
+        const valuePathString = Database._getSchemaErrorPathString(e.info.valuePath, 'dictionary');
+        const schemaPathString = Database._getSchemaErrorPathString(e.info.schemaPath, 'schema');
+
+        const e2 = new Error(`Dictionary has invalid data in '${fileName}' for value '${valuePathString}', validated against '${schemaPathString}': ${e.message}`);
+        e2.data = e;
+
+        return e2;
+    }
+
+    static _getSchemaErrorPathString(infoList, base='') {
+        let result = base;
+        for (const [part] of infoList) {
+            switch (typeof part) {
+                case 'string':
+                    if (result.length > 0) {
+                        result += '.';
+                    }
+                    result += part;
+                    break;
+                case 'number':
+                    result += `[${part}]`;
+                    break;
+            }
+        }
+        return result;
     }
 
     static _getDataBankSchemaPaths(version) {
