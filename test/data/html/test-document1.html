@@ -13,6 +13,7 @@
 
     <div
         class="test"
+        data-test-type="scan"
         data-element-from-point-selector="span"
         data-caret-range-from-point-selector="span"
         data-start-node-selector="span"
@@ -28,6 +29,7 @@
 
     <div
         class="test"
+        data-test-type="scan"
         data-element-from-point-selector="span"
         data-caret-range-from-point-selector="span"
         data-start-node-selector="span"
@@ -43,6 +45,7 @@
 
     <div
         class="test"
+        data-test-type="scan"
         data-element-from-point-selector="input"
         data-caret-range-from-point-selector="input"
         data-start-node-selector="input"
@@ -59,6 +62,7 @@
 
     <div
         class="test"
+        data-test-type="scan"
         data-element-from-point-selector="textarea"
         data-caret-range-from-point-selector="textarea"
         data-start-node-selector="textarea"
@@ -75,6 +79,7 @@
 
     <div
         class="test"
+        data-test-type="scan"
         data-element-from-point-selector="button"
         data-caret-range-from-point-selector="button"
         data-start-node-selector="button"
@@ -90,6 +95,7 @@
 
     <div
         class="test"
+        data-test-type="scan"
         data-element-from-point-selector="img"
         data-caret-range-from-point-selector="img"
         data-start-node-selector="img"
@@ -100,6 +106,158 @@
         data-sentence="よみちゃん"
     >
         <img src="data:image/gif;base64,R0lGODdhBwAHAIABAAAAAP///ywAAAAABwAHAAACDIRvEaC32FpCbEkKCgA7" alt="よみちゃん" title="よみちゃん" style="width: 70px; height: 70px; image-rendering: crisp-edges; image-rendering: pixelated; display: block;" />
+    </div>
+
+    <div
+        class="test"
+        data-test-type="text-source-range-seek"
+        data-seek-node-selector="span:nth-of-type(1)"
+        data-seek-node-is-text="true"
+        data-seek-offset="0"
+        data-seek-length="149"
+        data-seek-direction="forward"
+        data-expected-result-node-selector="span:nth-of-type(1)"
+        data-expected-result-node-is-text="true"
+        data-expected-result-offset="149"
+        data-expected-result-content="
+        あいうえお
+        かきくけこ
+        さしすせそ
+        たちつてと
+        なにぬねの
+        はひふへほ
+        まみむめも
+        や&#x3000;ゆ&#x3000;よ
+        らりるれろ
+        わゐ&#x3000;ゑを
+        "
+    >
+        <span>
+        あいうえお
+        かきくけこ
+        さしすせそ
+        たちつてと
+        なにぬねの
+        はひふへほ
+        まみむめも
+        や&#x3000;ゆ&#x3000;よ
+        らりるれろ
+        わゐ&#x3000;ゑを
+        </span><span>trailing content</span>
+    </div>
+
+    <div
+        class="test"
+        data-test-type="text-source-range-seek"
+        data-seek-node-selector="span:nth-of-type(1)"
+        data-seek-node-is-text="true"
+        data-seek-offset="149"
+        data-seek-length="149"
+        data-seek-direction="backward"
+        data-expected-result-node-selector="span:nth-of-type(1)"
+        data-expected-result-node-is-text="true"
+        data-expected-result-offset="0"
+        data-expected-result-content="
+        あいうえお
+        かきくけこ
+        さしすせそ
+        たちつてと
+        なにぬねの
+        はひふへほ
+        まみむめも
+        や&#x3000;ゆ&#x3000;よ
+        らりるれろ
+        わゐ&#x3000;ゑを
+        "
+    >
+        <span>
+        あいうえお
+        かきくけこ
+        さしすせそ
+        たちつてと
+        なにぬねの
+        はひふへほ
+        まみむめも
+        や&#x3000;ゆ&#x3000;よ
+        らりるれろ
+        わゐ&#x3000;ゑを
+        </span><span>trailing content</span>
+    </div>
+
+    <div
+        class="test"
+        data-test-type="text-source-range-seek"
+        data-seek-node-selector="span:nth-of-type(1)"
+        data-seek-node-is-text="true"
+        data-seek-offset="0"
+        data-seek-length="150"
+        data-seek-direction="forward"
+        data-expected-result-node-selector="span:nth-of-type(2)"
+        data-expected-result-node-is-text="true"
+        data-expected-result-offset="1"
+        data-expected-result-content="
+        あいうえお
+        かきくけこ
+        さしすせそ
+        たちつてと
+        なにぬねの
+        はひふへほ
+        まみむめも
+        や&#x3000;ゆ&#x3000;よ
+        らりるれろ
+        わゐ&#x3000;ゑを
+        t"
+    >
+        <span>
+        あいうえお
+        かきくけこ
+        さしすせそ
+        たちつてと
+        なにぬねの
+        はひふへほ
+        まみむめも
+        や&#x3000;ゆ&#x3000;よ
+        らりるれろ
+        わゐ&#x3000;ゑを
+        </span><span>trailing content</span>
+    </div>
+
+    <div
+        class="test"
+        data-test-type="text-source-range-seek"
+        data-seek-node-selector="span:nth-of-type(2)"
+        data-seek-node-is-text="true"
+        data-seek-offset="1"
+        data-seek-length="150"
+        data-seek-direction="backward"
+        data-expected-result-node-selector="span:nth-of-type(1)"
+        data-expected-result-node-is-text="true"
+        data-expected-result-offset="0"
+        data-expected-result-content="
+        あいうえお
+        かきくけこ
+        さしすせそ
+        たちつてと
+        なにぬねの
+        はひふへほ
+        まみむめも
+        や&#x3000;ゆ&#x3000;よ
+        らりるれろ
+        わゐ&#x3000;ゑを
+        t"
+    >
+        <span>
+        あいうえお
+        かきくけこ
+        さしすせそ
+        たちつてと
+        なにぬねの
+        はひふへほ
+        まみむめも
+        や&#x3000;ゆ&#x3000;よ
+        らりるれろ
+        わゐ&#x3000;ゑを
+        </span><span>trailing content</span>
     </div>
 
 </body>

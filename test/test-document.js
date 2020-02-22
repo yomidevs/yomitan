@@ -90,16 +90,17 @@ async function testDocument1() {
     );
 
     try {
-        await testDocument1Inner(dom, {docRangeFromPoint, docSentenceExtract, TextSourceRange, TextSourceElement});
+        await testDocumentTextScanningFunctions(dom, {docRangeFromPoint, docSentenceExtract, TextSourceRange, TextSourceElement});
+        await testTextSourceRangeSeekFunctions(dom, {TextSourceRange});
     } finally {
         window.close();
     }
 }
 
-async function testDocument1Inner(dom, {docRangeFromPoint, docSentenceExtract, TextSourceRange, TextSourceElement}) {
+async function testDocumentTextScanningFunctions(dom, {docRangeFromPoint, docSentenceExtract, TextSourceRange, TextSourceElement}) {
     const document = dom.window.document;
 
-    for (const testElement of document.querySelectorAll('.test')) {
+    for (const testElement of document.querySelectorAll('.test[data-test-type=scan]')) {
         // Get test parameters
         let {
             elementFromPointSelector,
@@ -168,6 +169,49 @@ async function testDocument1Inner(dom, {docRangeFromPoint, docSentenceExtract, T
 
         // Clean
         source.cleanup();
+    }
+}
+
+async function testTextSourceRangeSeekFunctions(dom, {TextSourceRange}) {
+    const document = dom.window.document;
+
+    for (const testElement of document.querySelectorAll('.test[data-test-type=text-source-range-seek]')) {
+        // Get test parameters
+        let {
+            seekNodeSelector,
+            seekNodeIsText,
+            seekOffset,
+            seekLength,
+            seekDirection,
+            expectedResultNodeSelector,
+            expectedResultNodeIsText,
+            expectedResultOffset,
+            expectedResultContent
+        } = testElement.dataset;
+
+        seekOffset = parseInt(seekOffset, 10);
+        seekLength = parseInt(seekLength, 10);
+        expectedResultOffset = parseInt(expectedResultOffset, 10);
+
+        let seekNode = testElement.querySelector(seekNodeSelector);
+        if (seekNodeIsText === 'true') {
+            seekNode = seekNode.firstChild;
+        }
+
+        let expectedResultNode = testElement.querySelector(expectedResultNodeSelector);
+        if (expectedResultNodeIsText === 'true') {
+            expectedResultNode = expectedResultNode.firstChild;
+        }
+
+        const {node, offset, content} = (
+            seekDirection === 'forward' ?
+            TextSourceRange.seekForward(seekNode, seekOffset, seekLength) :
+            TextSourceRange.seekBackward(seekNode, seekOffset, seekLength)
+        );
+
+        assert.strictEqual(node, expectedResultNode);
+        assert.strictEqual(offset, expectedResultOffset);
+        assert.strictEqual(content, expectedResultContent);
     }
 }
 
