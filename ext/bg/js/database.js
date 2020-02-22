@@ -100,7 +100,7 @@ class Database {
     }
 
     async close() {
-        this.validate();
+        this._validate();
         this.db.close();
         this.db = null;
     }
