@@ -849,6 +849,45 @@ async function testDatabase2() {
 }
 
 
+async function testDatabase3() {
+    const invalidDictionaries = [
+        'invalid-dictionary1',
+        'invalid-dictionary2',
+        'invalid-dictionary3',
+        'invalid-dictionary4',
+        'invalid-dictionary5',
+        'invalid-dictionary6'
+    ];
+
+    // Setup database
+    const database = new Database();
+    await database.prepare();
+
+    for (const invalidDictionary of invalidDictionaries) {
+        const testDictionary = yomichanTest.createTestDictionaryArchive(invalidDictionary);
+        const testDictionarySource = await testDictionary.generateAsync({type: 'string'});
+
+        let error = null;
+        try {
+            await database.importDictionary(testDictionarySource, () => {}, {});
+        } catch (e) {
+            error = e;
+        }
+
+        if (error === null) {
+            assert.ok(false, `Expected an error while importing ${invalidDictionary}`);
+        } else {
+            const prefix = 'Dictionary has invalid data';
+            const message = error.message;
+            assert.ok(typeof message, 'string');
+            assert.ok(message.startsWith(prefix), `Expected error message to start with '${prefix}': ${message}`);
+        }
+    }
+
+    await database.close();
+}
+
+
 async function main() {
     const clearTimeout = 5000;
     try {
@@ -856,6 +895,9 @@ async function main() {
         await clearDatabase(clearTimeout);
 
         await testDatabase2();
+        await clearDatabase(clearTimeout);
+
+        await testDatabase3();
         await clearDatabase(clearTimeout);
     } catch (e) {
         console.log(e);
