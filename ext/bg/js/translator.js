@@ -71,7 +71,7 @@ class Translator {
     }
 
     async getMergedSecondarySearchResults(text, expressionsMap, secondarySearchDictionaries) {
-        if (secondarySearchDictionaries.length === 0) {
+        if (secondarySearchDictionaries.size === 0) {
             return [];
         }
 

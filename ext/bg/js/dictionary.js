@@ -49,8 +49,8 @@ function dictTermsSort(definitions, dictionaries=null) {
         if (dictionaries !== null) {
             const dictionaryInfo1 = dictionaries.get(v1.dictionary);
             const dictionaryInfo2 = dictionaries.get(v2.dictionary);
-            const priority1 = typeof dictionaryInfo1 !== 'undefined' ? dictionaryInfo1.priority || 0 : 0;
-            const priority2 = typeof dictionaryInfo2 !== 'undefined' ? dictionaryInfo2.priority || 0 : 0;
+            const priority1 = typeof dictionaryInfo1 !== 'undefined' ? dictionaryInfo1.priority : 0;
+            const priority2 = typeof dictionaryInfo2 !== 'undefined' ? dictionaryInfo2.priority : 0;
             i = priority2 - priority1;
             if (i !== 0) { return i; }
         }
@@ -254,7 +254,7 @@ function dictTermsMergeByGloss(result, definitions, appendTo=null, mergedIndices
         if (appendTo === null) {
             /*
                 Data layout:
-                result.expressions = new Map([
+                resultExpressionsMap = new Map([
                     [expression, new Map([
                         [reading, new Map([
                             [tagName, tagInfo],
@@ -289,17 +289,17 @@ function dictTermsMergeByGloss(result, definitions, appendTo=null, mergedIndices
         const only = [];
         const expressionSet = definition.expression;
         const readingSet = definition.reading;
-        definition.only = only;
         if (!dictAreSetsEqual(expressionSet, resultExpressionSet)) {
             only.push(...dictGetSetIntersection(expressionSet, resultExpressionSet));
         }
         if (!dictAreSetsEqual(readingSet, resultReadingSet)) {
             only.push(...dictGetSetIntersection(readingSet, resultReadingSet));
         }
+        definition.only = only;
     }
 
     return definitionsByGloss;
-  }
+}
 
 function dictTagBuildSource(name) {
     return dictTagSanitize({name, category: 'dictionary', order: 100});
