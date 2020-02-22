@@ -1,3 +1,6 @@
+const fs = require('fs');
+const url = require('url');
+const path = require('path');
 const assert = require('assert');
 const yomichanTest = require('./yomichan-test');
 require('fake-indexeddb/auto');
@@ -5,21 +8,86 @@ require('fake-indexeddb/auto');
 const chrome = {
     runtime: {
         onMessage: {
-            addListener: () => { /* NOP */ }
+            addListener() { /* NOP */ }
+        },
+        getURL(path2) {
+            return url.pathToFileURL(path.join(__dirname, '..', 'ext', path2.replace(/^\//, '')));
         }
     }
 };
 
-const {Database} = yomichanTest.requireScript('ext/bg/js/database.js', ['Database']);
+class XMLHttpRequest {
+    constructor() {
+        this._eventCallbacks = new Map();
+        this._url = '';
+        this._responseText = null;
+    }
+
+    overrideMimeType() {
+        // NOP
+    }
+
+    addEventListener(eventName, callback) {
+        let callbacks = this._eventCallbacks.get(eventName);
+        if (typeof callbacks === 'undefined') {
+            callbacks = [];
+            this._eventCallbacks.set(eventName, callbacks);
+        }
+        callbacks.push(callback);
+    }
+
+    open(action, url) {
+        this._url = url;
+    }
+
+    send() {
+        const filePath = url.fileURLToPath(this._url);
+        Promise.resolve()
+            .then(() => {
+                let source;
+                try {
+                    source = fs.readFileSync(filePath, {encoding: 'utf8'});
+                } catch (e) {
+                    this._trigger('error');
+                    return;
+                }
+                this._responseText = source;
+                this._trigger('load');
+            });
+    }
+
+    get responseText() {
+        return this._responseText;
+    }
+
+    _trigger(eventName, ...args) {
+        const callbacks = this._eventCallbacks.get(eventName);
+        if (typeof callbacks === 'undefined') { return; }
+
+        for (let i = 0, ii = callbacks.length; i < ii; ++i) {
+            callbacks[i](...args);
+        }
+    }
+}
+
+const {JsonSchema} = yomichanTest.requireScript('ext/bg/js/json-schema.js', ['JsonSchema']);
 const {dictFieldSplit, dictTagSanitize} = yomichanTest.requireScript('ext/bg/js/dictionary.js', ['dictFieldSplit', 'dictTagSanitize']);
 const {stringReverse, hasOwn} = yomichanTest.requireScript('ext/mixed/js/core.js', ['stringReverse', 'hasOwn'], {chrome});
+const {requestJson} = yomichanTest.requireScript('ext/bg/js/request.js', ['requestJson'], {XMLHttpRequest});
 
-global.window = global;
-global.JSZip = yomichanTest.JSZip;
-global.dictFieldSplit = dictFieldSplit;
-global.dictTagSanitize = dictTagSanitize;
-global.stringReverse = stringReverse;
-global.hasOwn = hasOwn;
+const databaseGlobals = {
+    chrome,
+    JsonSchema,
+    requestJson,
+    stringReverse,
+    hasOwn,
+    dictFieldSplit,
+    dictTagSanitize,
+    indexedDB: global.indexedDB,
+    JSZip: yomichanTest.JSZip
+};
+databaseGlobals.window = databaseGlobals;
+const {Database} = yomichanTest.requireScript('ext/bg/js/database.js', ['Database'], databaseGlobals);
 
 
 function countTermsWithExpression(terms, expression) {
