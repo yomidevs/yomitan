@@ -1,9 +1,7 @@
 const fs = require('fs');
-const path = require('path');
+const yomichanTest = require('./yomichan-test');
 
-const jsonSchemaFileName = path.join(__dirname, '../ext/bg/js/json-schema.js');
-const jsonSchemaFileSource = fs.readFileSync(jsonSchemaFileName, {encoding: 'utf8'});
-const JsonSchema = Function(`'use strict';${jsonSchemaFileSource};return JsonSchema;`)();
+const {JsonSchema} = yomichanTest.requireScript('ext/bg/js/json-schema.js', ['JsonSchema']);
 
 
 function main() {
@@ -33,4 +31,4 @@ function main() {
 }
 
 
-main();
+if (require.main === module) { main(); }
