@@ -121,7 +121,7 @@ async function clearDatabase() {
 
 async function testDatabase1() {
     // Load dictionary data
-    const testDictionary = yomichanTest.createTestDictionaryArchive();
+    const testDictionary = yomichanTest.createTestDictionaryArchive('valid-dictionary1');
     const testDictionarySource = await testDictionary.generateAsync({type: 'string'});
     const testDictionaryIndex = JSON.parse(await testDictionary.files['index.json'].async('string'));
 
@@ -800,7 +800,7 @@ async function testFindTagForTitle1(database, title) {
 
 async function testDatabase2() {
     // Load dictionary data
-    const testDictionary = yomichanTest.createTestDictionaryArchive();
+    const testDictionary = yomichanTest.createTestDictionaryArchive('valid-dictionary1');
     const testDictionarySource = await testDictionary.generateAsync({type: 'string'});
     const testDictionaryIndex = JSON.parse(await testDictionary.files['index.json'].async('string'));
 

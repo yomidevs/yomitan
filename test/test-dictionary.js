@@ -3,7 +3,7 @@ const dictionaryValidate = require('./dictionary-validate');
 
 
 async function main() {
-    const archive = yomichanTest.createTestDictionaryArchive();
+    const archive = yomichanTest.createTestDictionaryArchive('valid-dictionary1');
     const schemas = dictionaryValidate.getSchemas();
     await dictionaryValidate.validateDictionary(archive, schemas);
 }
