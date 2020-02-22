@@ -319,7 +319,8 @@ class Backend {
 
     async _onApiTermsFind({text, details, optionsContext}) {
         const options = await this.getOptions(optionsContext);
-        const [definitions, length] = await this.translator.findTerms(text, details, options);
+        const mode = options.general.resultOutputMode;
+        const [definitions, length] = await this.translator.findTerms(mode, text, details, options);
         definitions.splice(options.general.maxResults);
         return {length, definitions};
     }
@@ -329,9 +330,9 @@ class Backend {
         const results = [];
         while (text.length > 0) {
             const term = [];
-            const [definitions, sourceLength] = await this.translator.findTermsInternal(
+            const [definitions, sourceLength] = await this.translator.findTerms(
+                'simple',
                 text.substring(0, options.scanning.length),
-                dictEnabledSet(options),
                 {},
                 options
             );

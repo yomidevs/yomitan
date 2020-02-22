@@ -158,7 +158,7 @@ class TextScanner {
     onTouchEnd(e) {
         if (
             this.primaryTouchIdentifier === null ||
-            TextScanner.getIndexOfTouch(e.changedTouches, this.primaryTouchIdentifier) < 0
+            TextScanner.getTouch(e.changedTouches, this.primaryTouchIdentifier) === null
         ) {
             return;
         }
@@ -181,13 +181,11 @@ class TextScanner {
             return;
         }
 
-        const touches = e.changedTouches;
-        const index = TextScanner.getIndexOfTouch(touches, this.primaryTouchIdentifier);
-        if (index < 0) {
+        const primaryTouch = TextScanner.getTouch(e.changedTouches, this.primaryTouchIdentifier);
+        if (primaryTouch === null) {
             return;
         }
 
-        const primaryTouch = touches[index];
         this.searchAt(primaryTouch.clientX, primaryTouch.clientY, 'touchMove');
 
         e.preventDefault(); // Disable scroll
@@ -356,13 +354,12 @@ class TextScanner {
         }
     }
 
-    static getIndexOfTouch(touchList, identifier) {
-        for (const i in touchList) {
-            const t = touchList[i];
-            if (t.identifier === identifier) {
-                return i;
+    static getTouch(touchList, identifier) {
+        for (const touch of touchList) {
+            if (touch.identifier === identifier) {
+                return touch;
             }
         }
-        return -1;
+        return null;
     }
 }

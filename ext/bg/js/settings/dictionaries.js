@@ -491,15 +491,18 @@ function dictionaryErrorsShow(errors) {
     dialog.textContent = '';
 
     if (errors !== null && errors.length > 0) {
-        const uniqueErrors = {};
+        const uniqueErrors = new Map();
         for (let e of errors) {
             console.error(e);
             e = dictionaryErrorToString(e);
-            uniqueErrors[e] = hasOwn(uniqueErrors, e) ? uniqueErrors[e] + 1 : 1;
+            let count = uniqueErrors.get(e);
+            if (typeof count === 'undefined') {
+                count = 0;
+            }
+            uniqueErrors.set(e, count + 1);
         }
 
-        for (const e in uniqueErrors) {
-            const count = uniqueErrors[e];
+        for (const [e, count] of uniqueErrors.entries()) {
             const div = document.createElement('p');
             if (count > 1) {
                 div.textContent = `${e} `;

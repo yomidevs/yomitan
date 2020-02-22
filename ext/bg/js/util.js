@@ -59,32 +59,6 @@ function utilBackgroundFunctionIsolate(func) {
     return backgroundPage.utilFunctionIsolate(func);
 }
 
-function utilSetEqual(setA, setB) {
-    if (setA.size !== setB.size) {
-        return false;
-    }
-
-    for (const value of setA) {
-        if (!setB.has(value)) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-function utilSetIntersection(setA, setB) {
-    return new Set(
-        [...setA].filter((value) => setB.has(value))
-    );
-}
-
-function utilSetDifference(setA, setB) {
-    return new Set(
-        [...setA].filter((value) => !setB.has(value))
-    );
-}
-
 function utilStringHashCode(string) {
     let hashCode = 0;
 

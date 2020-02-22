@@ -136,7 +136,9 @@ async function testDatabase1() {
     const testDictionaryIndex = JSON.parse(await testDictionary.files['index.json'].async('string'));
 
     const title = testDictionaryIndex.title;
-    const titles = [title];
+    const titles = new Map([
+        [title, {priority: 0, allowSecondarySearches: false}]
+    ]);
 
     // Setup iteration data
     const iterations = [
@@ -815,7 +817,9 @@ async function testDatabase2() {
     const testDictionaryIndex = JSON.parse(await testDictionary.files['index.json'].async('string'));
 
     const title = testDictionaryIndex.title;
-    const titles = [title];
+    const titles = new Map([
+        [title, {priority: 0, allowSecondarySearches: false}]
+    ]);
 
     // Setup database
     const database = new Database();

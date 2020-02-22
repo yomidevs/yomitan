@@ -16,18 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global utilSetEqual, utilSetIntersection, apiTemplateRender*/
+/*global apiTemplateRender*/
 
 function dictEnabledSet(options) {
-    const dictionaries = {};
-    for (const title in options.dictionaries) {
-        const dictionary = options.dictionaries[title];
-        if (dictionary.enabled) {
-            dictionaries[title] = dictionary;
-        }
+    const enabledDictionaryMap = new Map();
+    const optionsDictionaries = options.dictionaries;
+    for (const title in optionsDictionaries) {
+        if (!hasOwn(optionsDictionaries, title)) { continue; }
+        const dictionary = optionsDictionaries[title];
+        if (!dictionary.enabled) { continue; }
+        enabledDictionaryMap.set(title, {
+            priority: dictionary.priority || 0,
+            allowSecondarySearches: !!dictionary.allowSecondarySearches
+        });
     }
-
-    return dictionaries;
+    return enabledDictionaryMap;
 }
 
 function dictConfigured(options) {
@@ -40,28 +43,15 @@ function dictConfigured(options) {
     return false;
 }
 
-function dictRowsSort(rows, options) {
-    return rows.sort((ra, rb) => {
-        const pa = (options.dictionaries[ra.title] || {}).priority || 0;
-        const pb = (options.dictionaries[rb.title] || {}).priority || 0;
-        if (pa > pb) {
-            return -1;
-        } else if (pa < pb) {
-            return 1;
-        } else {
-            return 0;
-        }
-    });
-}
-
 function dictTermsSort(definitions, dictionaries=null) {
     return definitions.sort((v1, v2) => {
         let i;
         if (dictionaries !== null) {
-            i = (
-                ((dictionaries[v2.dictionary] || {}).priority || 0) -
-                ((dictionaries[v1.dictionary] || {}).priority || 0)
-            );
+            const dictionaryInfo1 = dictionaries.get(v1.dictionary);
+            const dictionaryInfo2 = dictionaries.get(v2.dictionary);
+            const priority1 = typeof dictionaryInfo1 !== 'undefined' ? dictionaryInfo1.priority : 0;
+            const priority2 = typeof dictionaryInfo2 !== 'undefined' ? dictionaryInfo2.priority : 0;
+            i = priority2 - priority1;
             if (i !== 0) { return i; }
         }
 
@@ -79,20 +69,16 @@ function dictTermsSort(definitions, dictionaries=null) {
 }
 
 function dictTermsUndupe(definitions) {
-    const definitionGroups = {};
+    const definitionGroups = new Map();
     for (const definition of definitions) {
-        const definitionExisting = definitionGroups[definition.id];
-        if (!hasOwn(definitionGroups, definition.id) || definition.expression.length > definitionExisting.expression.length) {
-            definitionGroups[definition.id] = definition;
+        const id = definition.id;
+        const definitionExisting = definitionGroups.get(id);
+        if (typeof definitionExisting === 'undefined' || definition.expression.length > definitionExisting.expression.length) {
+            definitionGroups.set(id, definition);
         }
     }
 
-    const definitionsUnique = [];
-    for (const key in definitionGroups) {
-        definitionsUnique.push(definitionGroups[key]);
-    }
-
-    return definitionsUnique;
+    return [...definitionGroups.values()];
 }
 
 function dictTermsCompressTags(definitions) {
@@ -123,40 +109,64 @@ function dictTermsCompressTags(definitions) {
 }
 
 function dictTermsGroup(definitions, dictionaries) {
-    const groups = {};
+    const groups = new Map();
     for (const definition of definitions) {
-        const key = [definition.source, definition.expression];
-        key.push(...definition.reasons);
+        const key = [definition.source, definition.expression, ...definition.reasons];
         if (definition.reading) {
             key.push(definition.reading);
         }
 
         const keyString = key.toString();
-        if (hasOwn(groups, keyString)) {
-            groups[keyString].push(definition);
-        } else {
-            groups[keyString] = [definition];
+        let groupDefinitions = groups.get(keyString);
+        if (typeof groupDefinitions === 'undefined') {
+            groupDefinitions = [];
+            groups.set(keyString, groupDefinitions);
         }
+
+        groupDefinitions.push(definition);
     }
 
     const results = [];
-    for (const key in groups) {
-        const groupDefs = groups[key];
-        const firstDef = groupDefs[0];
-        dictTermsSort(groupDefs, dictionaries);
+    for (const groupDefinitions of groups.values()) {
+        const firstDef = groupDefinitions[0];
+        dictTermsSort(groupDefinitions, dictionaries);
         results.push({
-            definitions: groupDefs,
+            definitions: groupDefinitions,
             expression: firstDef.expression,
             reading: firstDef.reading,
             furiganaSegments: firstDef.furiganaSegments,
             reasons: firstDef.reasons,
             termTags: firstDef.termTags,
-            score: groupDefs.reduce((p, v) => v.score > p ? v.score : p, Number.MIN_SAFE_INTEGER),
+            score: groupDefinitions.reduce((p, v) => v.score > p ? v.score : p, Number.MIN_SAFE_INTEGER),
             source: firstDef.source
         });
     }
 
     return dictTermsSort(results);
+}
+
+function dictAreSetsEqual(set1, set2) {
+    if (set1.size !== set2.size) {
+        return false;
+    }
+
+    for (const value of set1) {
+        if (!set2.has(value)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function dictGetSetIntersection(set1, set2) {
+    const result = [];
+    for (const value of set1) {
+        if (set2.has(value)) {
+            result.push(value);
+        }
+    }
+    return result;
 }
 
 function dictTermsMergeBySequence(definitions, mainDictionary) {
@@ -189,89 +199,103 @@ function dictTermsMergeBySequence(definitions, mainDictionary) {
     return [sequencedDefinitions, nonSequencedDefinitions];
 }
 
-function dictTermsMergeByGloss(result, definitions, appendTo, mergedIndices) {
-    const definitionsByGloss = appendTo || {};
-    for (const [index, definition] of definitions.entries()) {
-        if (appendTo) {
-            let match = false;
-            for (const expression of result.expressions.keys()) {
-                if (definition.expression === expression) {
-                    for (const reading of result.expressions.get(expression).keys()) {
-                        if (definition.reading === reading) {
-                            match = true;
-                            break;
-                        }
-                    }
-                }
-                if (match) {
-                    break;
-                }
-            }
+function dictTermsMergeByGloss(result, definitions, appendTo=null, mergedIndices=null) {
+    const definitionsByGloss = appendTo !== null ? appendTo : new Map();
 
-            if (!match) {
-                continue;
-            } else if (mergedIndices) {
+    const resultExpressionsMap = result.expressions;
+    const resultExpressionSet = result.expression;
+    const resultReadingSet = result.reading;
+    const resultSource = result.source;
+
+    for (const [index, definition] of definitions.entries()) {
+        const {expression, reading} = definition;
+
+        if (mergedIndices !== null) {
+            const expressionMap = resultExpressionsMap.get(expression);
+            if (
+                typeof expressionMap !== 'undefined' &&
+                typeof expressionMap.get(reading) !== 'undefined'
+            ) {
                 mergedIndices.add(index);
+            } else {
+                continue;
             }
         }
 
         const gloss = JSON.stringify(definition.glossary.concat(definition.dictionary));
-        if (!definitionsByGloss[gloss]) {
-            definitionsByGloss[gloss] = {
+        let glossDefinition = definitionsByGloss.get(gloss);
+        if (typeof glossDefinition === 'undefined') {
+            glossDefinition = {
                 expression: new Set(),
                 reading: new Set(),
                 definitionTags: [],
                 glossary: definition.glossary,
-                source: result.source,
+                source: resultSource,
                 reasons: [],
                 score: definition.score,
                 id: definition.id,
                 dictionary: definition.dictionary
             };
+            definitionsByGloss.set(gloss, glossDefinition);
         }
 
-        definitionsByGloss[gloss].expression.add(definition.expression);
-        definitionsByGloss[gloss].reading.add(definition.reading);
+        glossDefinition.expression.add(expression);
+        glossDefinition.reading.add(reading);
 
-        result.expression.add(definition.expression);
-        result.reading.add(definition.reading);
+        resultExpressionSet.add(expression);
+        resultReadingSet.add(reading);
 
         for (const tag of definition.definitionTags) {
-            if (!definitionsByGloss[gloss].definitionTags.find((existingTag) => existingTag.name === tag.name)) {
-                definitionsByGloss[gloss].definitionTags.push(tag);
+            if (!glossDefinition.definitionTags.find((existingTag) => existingTag.name === tag.name)) {
+                glossDefinition.definitionTags.push(tag);
             }
         }
 
-        if (!appendTo) {
-            // result->expressions[ Expression1[ Reading1[ Tag1, Tag2 ] ], Expression2, ... ]
-            if (!result.expressions.has(definition.expression)) {
-                result.expressions.set(definition.expression, new Map());
+        if (appendTo === null) {
+            /*
+                Data layout:
+                resultExpressionsMap = new Map([
+                    [expression, new Map([
+                        [reading, new Map([
+                            [tagName, tagInfo],
+                            ...
+                        ])],
+                        ...
+                    ])],
+                    ...
+                ]);
+            */
+            let readingMap = resultExpressionsMap.get(expression);
+            if (typeof readingMap === 'undefined') {
+                readingMap = new Map();
+                resultExpressionsMap.set(expression, readingMap);
             }
-            if (!result.expressions.get(definition.expression).has(definition.reading)) {
-                result.expressions.get(definition.expression).set(definition.reading, []);
+
+            let termTagsMap = readingMap.get(reading);
+            if (typeof termTagsMap === 'undefined') {
+                termTagsMap = new Map();
+                readingMap.set(reading, termTagsMap);
             }
 
             for (const tag of definition.termTags) {
-                if (!result.expressions.get(definition.expression).get(definition.reading).find((existingTag) => existingTag.name === tag.name)) {
-                    result.expressions.get(definition.expression).get(definition.reading).push(tag);
+                if (!termTagsMap.has(tag.name)) {
+                    termTagsMap.set(tag.name, tag);
                 }
             }
         }
     }
 
-    for (const gloss in definitionsByGloss) {
-        const definition = definitionsByGloss[gloss];
-        definition.only = [];
-        if (!utilSetEqual(definition.expression, result.expression)) {
-            for (const expression of utilSetIntersection(definition.expression, result.expression)) {
-                definition.only.push(expression);
-            }
+    for (const definition of definitionsByGloss.values()) {
+        const only = [];
+        const expressionSet = definition.expression;
+        const readingSet = definition.reading;
+        if (!dictAreSetsEqual(expressionSet, resultExpressionSet)) {
+            only.push(...dictGetSetIntersection(expressionSet, resultExpressionSet));
         }
-        if (!utilSetEqual(definition.reading, result.reading)) {
-            for (const reading of utilSetIntersection(definition.reading, result.reading)) {
-                definition.only.push(reading);
-            }
+        if (!dictAreSetsEqual(readingSet, resultReadingSet)) {
+            only.push(...dictGetSetIntersection(readingSet, resultReadingSet));
         }
+        definition.only = only;
     }
 
     return definitionsByGloss;
