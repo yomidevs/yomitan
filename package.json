@@ -8,7 +8,7 @@
     "scripts": {
         "test": "npm run test-lint && npm run test-code",
         "test-lint": "eslint .",
-        "test-code": "node ./test/test-schema.js && node ./test/test-dictionary.js && node ./test/test-database.js"
+        "test-code": "node ./test/test-schema.js && node ./test/test-dictionary.js && node ./test/test-database.js && node ./test/test-document.js"
     },
     "repository": {
         "type": "git",
