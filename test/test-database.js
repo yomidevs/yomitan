@@ -107,15 +107,25 @@ function countKanjiWithCharacter(kanji, character) {
 }
 
 
-async function clearDatabase() {
-    const indexedDB = global.indexedDB;
-    for (const {name} of await indexedDB.databases()) {
-        await new Promise((resolve, reject) => {
-            const request = indexedDB.deleteDatabase(name);
-            request.onerror = (e) => reject(e);
-            request.onsuccess = () => resolve();
-        });
-    }
+function clearDatabase(timeout) {
+    return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+            reject(new Error(`clearDatabase failed to resolve after ${timeout}ms`));
+        }, timeout);
+
+        (async () => {
+            const indexedDB = global.indexedDB;
+            for (const {name} of await indexedDB.databases()) {
+                await new Promise((resolve, reject) => {
+                    const request = indexedDB.deleteDatabase(name);
+                    request.onerror = (e) => reject(e);
+                    request.onsuccess = () => resolve();
+                });
+            }
+            clearTimeout(timer);
+            resolve();
+        })();
+    });
 }
 
 
@@ -840,11 +850,18 @@ async function testDatabase2() {
 
 
 async function main() {
-    await testDatabase1();
-    await clearDatabase();
+    const clearTimeout = 5000;
+    try {
+        await testDatabase1();
+        await clearDatabase(clearTimeout);
 
-    await testDatabase2();
-    await clearDatabase();
+        await testDatabase2();
+        await clearDatabase(clearTimeout);
+    } catch (e) {
+        console.log(e);
+        process.exit(-1);
+        throw e;
+    }
 }
 
 
