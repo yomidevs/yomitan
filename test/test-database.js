@@ -1,3 +1,6 @@
+const fs = require('fs');
+const url = require('url');
+const path = require('path');
 const assert = require('assert');
 const yomichanTest = require('./yomichan-test');
 require('fake-indexeddb/auto');
@@ -5,21 +8,86 @@ require('fake-indexeddb/auto');
 const chrome = {
     runtime: {
         onMessage: {
-            addListener: () => { /* NOP */ }
+            addListener() { /* NOP */ }
+        },
+        getURL(path2) {
+            return url.pathToFileURL(path.join(__dirname, '..', 'ext', path2.replace(/^\//, '')));
         }
     }
 };
 
-const {Database} = yomichanTest.requireScript('ext/bg/js/database.js', ['Database']);
+class XMLHttpRequest {
+    constructor() {
+        this._eventCallbacks = new Map();
+        this._url = '';
+        this._responseText = null;
+    }
+
+    overrideMimeType() {
+        // NOP
+    }
+
+    addEventListener(eventName, callback) {
+        let callbacks = this._eventCallbacks.get(eventName);
+        if (typeof callbacks === 'undefined') {
+            callbacks = [];
+            this._eventCallbacks.set(eventName, callbacks);
+        }
+        callbacks.push(callback);
+    }
+
+    open(action, url) {
+        this._url = url;
+    }
+
+    send() {
+        const filePath = url.fileURLToPath(this._url);
+        Promise.resolve()
+            .then(() => {
+                let source;
+                try {
+                    source = fs.readFileSync(filePath, {encoding: 'utf8'});
+                } catch (e) {
+                    this._trigger('error');
+                    return;
+                }
+                this._responseText = source;
+                this._trigger('load');
+            });
+    }
+
+    get responseText() {
+        return this._responseText;
+    }
+
+    _trigger(eventName, ...args) {
+        const callbacks = this._eventCallbacks.get(eventName);
+        if (typeof callbacks === 'undefined') { return; }
+
+        for (let i = 0, ii = callbacks.length; i < ii; ++i) {
+            callbacks[i](...args);
+        }
+    }
+}
+
+const {JsonSchema} = yomichanTest.requireScript('ext/bg/js/json-schema.js', ['JsonSchema']);
 const {dictFieldSplit, dictTagSanitize} = yomichanTest.requireScript('ext/bg/js/dictionary.js', ['dictFieldSplit', 'dictTagSanitize']);
 const {stringReverse, hasOwn} = yomichanTest.requireScript('ext/mixed/js/core.js', ['stringReverse', 'hasOwn'], {chrome});
+const {requestJson} = yomichanTest.requireScript('ext/bg/js/request.js', ['requestJson'], {XMLHttpRequest});
 
-global.window = global;
-global.JSZip = yomichanTest.JSZip;
-global.dictFieldSplit = dictFieldSplit;
-global.dictTagSanitize = dictTagSanitize;
-global.stringReverse = stringReverse;
-global.hasOwn = hasOwn;
+const databaseGlobals = {
+    chrome,
+    JsonSchema,
+    requestJson,
+    stringReverse,
+    hasOwn,
+    dictFieldSplit,
+    dictTagSanitize,
+    indexedDB: global.indexedDB,
+    JSZip: yomichanTest.JSZip
+};
+databaseGlobals.window = databaseGlobals;
+const {Database} = yomichanTest.requireScript('ext/bg/js/database.js', ['Database'], databaseGlobals);
 
 
 function countTermsWithExpression(terms, expression) {
@@ -39,21 +107,31 @@ function countKanjiWithCharacter(kanji, character) {
 }
 
 
-async function clearDatabase() {
-    const indexedDB = global.indexedDB;
-    for (const {name} of await indexedDB.databases()) {
-        await new Promise((resolve, reject) => {
-            const request = indexedDB.deleteDatabase(name);
-            request.onerror = (e) => reject(e);
-            request.onsuccess = () => resolve();
-        });
-    }
+function clearDatabase(timeout) {
+    return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+            reject(new Error(`clearDatabase failed to resolve after ${timeout}ms`));
+        }, timeout);
+
+        (async () => {
+            const indexedDB = global.indexedDB;
+            for (const {name} of await indexedDB.databases()) {
+                await new Promise((resolve, reject) => {
+                    const request = indexedDB.deleteDatabase(name);
+                    request.onerror = (e) => reject(e);
+                    request.onsuccess = () => resolve();
+                });
+            }
+            clearTimeout(timer);
+            resolve();
+        })();
+    });
 }
 
 
 async function testDatabase1() {
     // Load dictionary data
-    const testDictionary = yomichanTest.createTestDictionaryArchive();
+    const testDictionary = yomichanTest.createTestDictionaryArchive('valid-dictionary1');
     const testDictionarySource = await testDictionary.generateAsync({type: 'string'});
     const testDictionaryIndex = JSON.parse(await testDictionary.files['index.json'].async('string'));
 
@@ -732,7 +810,7 @@ async function testFindTagForTitle1(database, title) {
 
 async function testDatabase2() {
     // Load dictionary data
-    const testDictionary = yomichanTest.createTestDictionaryArchive();
+    const testDictionary = yomichanTest.createTestDictionaryArchive('valid-dictionary1');
     const testDictionarySource = await testDictionary.generateAsync({type: 'string'});
     const testDictionaryIndex = JSON.parse(await testDictionary.files['index.json'].async('string'));
 
@@ -771,12 +849,61 @@ async function testDatabase2() {
 }
 
 
-async function main() {
-    await testDatabase1();
-    await clearDatabase();
+async function testDatabase3() {
+    const invalidDictionaries = [
+        'invalid-dictionary1',
+        'invalid-dictionary2',
+        'invalid-dictionary3',
+        'invalid-dictionary4',
+        'invalid-dictionary5',
+        'invalid-dictionary6'
+    ];
 
-    await testDatabase2();
-    await clearDatabase();
+    // Setup database
+    const database = new Database();
+    await database.prepare();
+
+    for (const invalidDictionary of invalidDictionaries) {
+        const testDictionary = yomichanTest.createTestDictionaryArchive(invalidDictionary);
+        const testDictionarySource = await testDictionary.generateAsync({type: 'string'});
+
+        let error = null;
+        try {
+            await database.importDictionary(testDictionarySource, () => {}, {});
+        } catch (e) {
+            error = e;
+        }
+
+        if (error === null) {
+            assert.ok(false, `Expected an error while importing ${invalidDictionary}`);
+        } else {
+            const prefix = 'Dictionary has invalid data';
+            const message = error.message;
+            assert.ok(typeof message, 'string');
+            assert.ok(message.startsWith(prefix), `Expected error message to start with '${prefix}': ${message}`);
+        }
+    }
+
+    await database.close();
+}
+
+
+async function main() {
+    const clearTimeout = 5000;
+    try {
+        await testDatabase1();
+        await clearDatabase(clearTimeout);
+
+        await testDatabase2();
+        await clearDatabase(clearTimeout);
+
+        await testDatabase3();
+        await clearDatabase(clearTimeout);
+    } catch (e) {
+        console.log(e);
+        process.exit(-1);
+        throw e;
+    }
 }
 
 

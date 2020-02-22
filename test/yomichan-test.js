@@ -26,21 +26,14 @@ function getJSZip() {
     return JSZip;
 }
 
-function createTestDictionaryArchive(dictionaryName) {
-    const fileNames = [
-        'index.json',
-        'tag_bank_1.json',
-        'tag_bank_2.json',
-        'term_bank_1.json',
-        'kanji_bank_1.json',
-        'term_meta_bank_1.json',
-        'kanji_meta_bank_1.json'
-    ];
+function createTestDictionaryArchive(dictionary, dictionaryName) {
+    const dictionaryDirectory = path.join(__dirname, 'data', 'dictionaries', dictionary);
+    const fileNames = fs.readdirSync(dictionaryDirectory);
 
     const archive = new (getJSZip())();
 
     for (const fileName of fileNames) {
-        const source = fs.readFileSync(path.join(__dirname, 'test-dictionary-data', fileName), {encoding: 'utf8'});
+        const source = fs.readFileSync(path.join(dictionaryDirectory, fileName), {encoding: 'utf8'});
         const json = JSON.parse(source);
         if (fileName === 'index.json' && typeof dictionaryName === 'string') {
             json.title = dictionaryName;
