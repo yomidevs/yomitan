@@ -802,7 +802,7 @@ class Backend {
             chrome.tabs.update(tab.id, {active: true}, () => {
                 const e = chrome.runtime.lastError;
                 if (e) {
-                    reject(e);
+                    reject(new Error(e.message));
                 } else {
                     resolve();
                 }
@@ -819,7 +819,7 @@ class Backend {
                 chrome.windows.get(tab.windowId, {}, (value) => {
                     const e = chrome.runtime.lastError;
                     if (e) {
-                        reject(e);
+                        reject(new Error(e.message));
                     } else {
                         resolve(value);
                     }
@@ -830,7 +830,7 @@ class Backend {
                     chrome.windows.update(tab.windowId, {focused: true}, () => {
                         const e = chrome.runtime.lastError;
                         if (e) {
-                            reject(e);
+                            reject(new Error(e.message));
                         } else {
                             resolve();
                         }
