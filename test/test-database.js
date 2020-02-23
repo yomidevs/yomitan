@@ -109,7 +109,8 @@ function countKanjiWithCharacter(kanji, character) {
 
 function clearDatabase(timeout) {
     return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
+        let timer = setTimeout(() => {
+            timer = null;
             reject(new Error(`clearDatabase failed to resolve after ${timeout}ms`));
         }, timeout);
 
@@ -122,7 +123,9 @@ function clearDatabase(timeout) {
                     request.onsuccess = () => resolve2();
                 });
             }
-            clearTimeout(timer);
+            if (timer !== null) {
+                clearTimeout(timer);
+            }
             resolve();
         })();
     });
