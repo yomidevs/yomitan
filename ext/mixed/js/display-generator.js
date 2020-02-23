@@ -21,9 +21,6 @@
 class DisplayGenerator {
     constructor() {
         this._templateHandler = null;
-
-        this._tagTemplate = null;
-        this._tagFrequencyTemplate = null;
     }
 
     async prepare() {
