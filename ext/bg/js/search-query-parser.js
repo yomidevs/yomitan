@@ -164,7 +164,7 @@ class QueryParser extends TextScanner {
     }
 
     renderParserSelect() {
-        this.queryParserSelect.innerHTML = '';
+        this.queryParserSelect.textContent = '';
         if (this.parseResults.length > 1) {
             const select = this.queryParserGenerator.createParserSelect(this.parseResults, this.selectedParser);
             select.addEventListener('change', this.onParserChange.bind(this));

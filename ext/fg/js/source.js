@@ -366,7 +366,7 @@ class TextSourceElement {
     setEndOffset(length) {
         switch (this.element.nodeName.toUpperCase()) {
             case 'BUTTON':
-                this.content = this.element.innerHTML;
+                this.content = this.element.textContent;
                 break;
             case 'IMG':
                 this.content = this.element.getAttribute('alt');
