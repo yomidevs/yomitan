@@ -50,7 +50,7 @@ class QueryParserGenerator {
         const segmentTextContainer = segmentContainer.querySelector('.query-parser-segment-text');
         const segmentReadingContainer = segmentContainer.querySelector('.query-parser-segment-reading');
         segmentTextContainer.appendChild(this.createSegmentText(segment.text));
-        segmentReadingContainer.innerText = segment.reading;
+        segmentReadingContainer.textContent = segment.reading;
         return segmentContainer;
     }
 
@@ -58,7 +58,7 @@ class QueryParserGenerator {
         const fragment = document.createDocumentFragment();
         for (const chr of text) {
             const charContainer = this._templateHandler.instantiate('char');
-            charContainer.innerText = chr;
+            charContainer.textContent = chr;
             fragment.appendChild(charContainer);
         }
         return fragment;
@@ -69,7 +69,7 @@ class QueryParserGenerator {
         for (const parseResult of parseResults) {
             const optionContainer = this._templateHandler.instantiate('select-option');
             optionContainer.value = parseResult.id;
-            optionContainer.innerText = parseResult.name;
+            optionContainer.textContent = parseResult.name;
             optionContainer.defaultSelected = selectedParser === parseResult.id;
             selectContainer.appendChild(optionContainer);
         }

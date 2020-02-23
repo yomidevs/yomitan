@@ -52,7 +52,7 @@ const audioUrlBuilders = new Map([
         for (const row of dom.getElementsByClassName('dc-result-row')) {
             try {
                 const url = row.querySelector('audio>source[src]').getAttribute('src');
-                const reading = row.getElementsByClassName('dc-vocab_kana').item(0).innerText;
+                const reading = row.getElementsByClassName('dc-vocab_kana').item(0).textContent;
                 if (url && reading && (!definition.reading || definition.reading === reading)) {
                     return audioUrlNormalize(url, 'https://www.japanesepod101.com', '/learningcenter/reference/');
                 }

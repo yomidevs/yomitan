@@ -50,7 +50,7 @@ function docImposterCreate(element, isTextarea) {
     const imposter = document.createElement('div');
     const imposterStyle = imposter.style;
 
-    imposter.innerText = element.value;
+    imposter.textContent = element.value;
 
     for (let i = 0, ii = elementStyle.length; i < ii; ++i) {
         const property = elementStyle[i];
