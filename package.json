@@ -15,9 +15,10 @@
         "url": "git+https://github.com/FooSoft/yomichan.git"
     },
     "author": "FooSoft",
+    "license": "GPL-3.0-or-later",
     "licenses": [
         {
-            "type": "GPLv3",
+            "type": "GPL-3.0-or-later",
             "url": "https://www.gnu.org/licenses/gpl-3.0.html"
         }
     ],
