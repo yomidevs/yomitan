@@ -1,5 +1,39 @@
 [
     ["打", "freq", 1],
     ["打つ", "freq", 2],
-    ["打ち込む", "freq", 3]
+    ["打ち込む", "freq", 3],
+    [
+        "打ち込む",
+        "pitch",
+        {
+            "reading": "うちこむ",
+            "pitches": [
+                {"position": 0},
+                {"position": 3}
+            ]
+        }
+    ],
+    [
+        "打ち込む",
+        "pitch",
+        {
+            "reading": "ぶちこむ",
+            "pitches": [
+                {"position": 0},
+                {"position": 3}
+            ]
+        }
+    ],
+    [
+        "お手前",
+        "pitch",
+        {
+            "reading": "おてまえ",
+            "pitches": [
+                {"position": 2, "tags": ["ptag1"]},
+                {"position": 2, "tags": ["ptag2"]},
+                {"position": 0, "tags": ["ptag2"]}
+            ]
+        }
+    ]
 ]

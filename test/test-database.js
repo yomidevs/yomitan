@@ -231,8 +231,8 @@ async function testDatabase1() {
             true
         );
         vm.assert.deepStrictEqual(counts, {
-            counts: [{kanji: 2, kanjiMeta: 2, terms: 32, termMeta: 3, tagMeta: 12}],
-            total: {kanji: 2, kanjiMeta: 2, terms: 32, termMeta: 3, tagMeta: 12}
+            counts: [{kanji: 2, kanjiMeta: 2, terms: 32, termMeta: 6, tagMeta: 14}],
+            total: {kanji: 2, kanjiMeta: 2, terms: 32, termMeta: 6, tagMeta: 14}
         });
 
         // Test find* functions
@@ -648,9 +648,10 @@ async function testFindTermMetaBulk1(database, titles) {
                 }
             ],
             expectedResults: {
-                total: 1,
+                total: 3,
                 modes: [
-                    ['freq', 1]
+                    ['freq', 1],
+                    ['pitch', 2]
                 ]
             }
         },
