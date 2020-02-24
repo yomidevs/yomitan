@@ -68,7 +68,7 @@ async function formRead(options) {
     options.general.popupVerticalOffset = parseInt($('#popup-vertical-offset').val(), 10);
     options.general.popupHorizontalOffset2 = parseInt($('#popup-horizontal-offset2').val(), 0);
     options.general.popupVerticalOffset2 = parseInt($('#popup-vertical-offset2').val(), 10);
-    options.general.popupScalingFactor = parseInt($('#popup-scaling-factor').val(), 10);
+    options.general.popupScalingFactor = parseFloat($('#popup-scaling-factor').val());
     options.general.popupScaleRelativeToPageZoom = $('#popup-scale-relative-to-page-zoom').prop('checked');
     options.general.popupScaleRelativeToVisualViewport = $('#popup-scale-relative-to-visual-viewport').prop('checked');
     options.general.popupTheme = $('#popup-theme').val();
