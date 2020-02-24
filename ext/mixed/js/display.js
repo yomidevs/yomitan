@@ -303,7 +303,7 @@ class Display {
         if (interactive) {
             const actionPrevious = document.querySelector('.action-previous');
             const actionNext = document.querySelector('.action-next');
-            const navigationHeader = document.querySelector('.navigation-header');
+            // const navigationHeader = document.querySelector('.navigation-header');
 
             this.persistentEventListeners.addEventListener(document, 'keydown', this.onKeyDown.bind(this), false);
             this.persistentEventListeners.addEventListener(document, 'wheel', this.onWheel.bind(this), {passive: false});
@@ -313,9 +313,10 @@ class Display {
             if (actionNext !== null) {
                 this.persistentEventListeners.addEventListener(actionNext, 'click', this.onNextTermView.bind(this));
             }
-            if (navigationHeader !== null) {
-                this.persistentEventListeners.addEventListener(navigationHeader, 'wheel', this.onHistoryWheel.bind(this), {passive: false});
-            }
+            // temporarily disabled
+            // if (navigationHeader !== null) {
+            //     this.persistentEventListeners.addEventListener(navigationHeader, 'wheel', this.onHistoryWheel.bind(this), {passive: false});
+            // }
         } else {
             this.persistentEventListeners.removeAllEventListeners();
         }
