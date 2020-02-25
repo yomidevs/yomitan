@@ -16,17 +16,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global apiTermsFind, apiOptionsSet, apiTextParse, apiTextParseMecab, TextScanner, QueryParserGenerator*/
 
 class QueryParser extends TextScanner {
     constructor(search) {
-        super(document.querySelector('#query-parser'), [], [], []);
+        super(document.querySelector('#query-parser-content'), [], [], []);
         this.search = search;
 
         this.parseResults = [];
         this.selectedParser = null;
 
-        this.queryParser = document.querySelector('#query-parser');
-        this.queryParserSelect = document.querySelector('#query-parser-select');
+        this.queryParser = document.querySelector('#query-parser-content');
+        this.queryParserSelect = document.querySelector('#query-parser-select-container');
+
+        this.queryParserGenerator = new QueryParserGenerator();
+    }
+
+    async prepare() {
+        await this.queryParserGenerator.prepare();
     }
 
     onError(error) {
@@ -52,7 +59,7 @@ class QueryParser extends TextScanner {
 
         this.search.setContent('terms', {definitions, context: {
             focus: false,
-            disableHistory: cause === 'mouse' ? true : false,
+            disableHistory: cause === 'mouse',
             sentence: {text: searchText, offset: 0},
             url: window.location.href
         }});
@@ -64,7 +71,7 @@ class QueryParser extends TextScanner {
         const selectedParser = e.target.value;
         this.selectedParser = selectedParser;
         apiOptionsSet({parsing: {selectedParser}}, this.search.getOptionsContext());
-        this.renderParseResult(this.getParseResult());
+        this.renderParseResult();
     }
 
     getMouseEventListeners() {
@@ -113,13 +120,13 @@ class QueryParser extends TextScanner {
     async setText(text) {
         this.search.setSpinnerVisible(true);
 
-        await this.setPreview(text);
+        this.setPreview(text);
 
         this.parseResults = await this.parseText(text);
         this.refreshSelectedParser();
 
         this.renderParserSelect();
-        await this.renderParseResult();
+        this.renderParseResult();
 
         this.search.setSpinnerVisible(false);
     }
@@ -146,57 +153,29 @@ class QueryParser extends TextScanner {
         return results;
     }
 
-    async setPreview(text) {
+    setPreview(text) {
         const previewTerms = [];
         for (let i = 0, ii = text.length; i < ii; i += 2) {
             const tempText = text.substring(i, i + 2);
-            previewTerms.push([{text: tempText.split('')}]);
+            previewTerms.push([{text: tempText}]);
         }
-        this.queryParser.innerHTML = await apiTemplateRender('query-parser.html', {
-            terms: previewTerms,
-            preview: true
-        });
+        this.queryParser.textContent = '';
+        this.queryParser.appendChild(this.queryParserGenerator.createParseResult(previewTerms, true));
     }
 
     renderParserSelect() {
-        this.queryParserSelect.innerHTML = '';
+        this.queryParserSelect.textContent = '';
         if (this.parseResults.length > 1) {
-            const select = document.createElement('select');
-            select.classList.add('form-control');
-            for (const parseResult of this.parseResults) {
-                const option = document.createElement('option');
-                option.value = parseResult.id;
-                option.innerText = parseResult.name;
-                option.defaultSelected = this.selectedParser === parseResult.id;
-                select.appendChild(option);
-            }
+            const select = this.queryParserGenerator.createParserSelect(this.parseResults, this.selectedParser);
             select.addEventListener('change', this.onParserChange.bind(this));
             this.queryParserSelect.appendChild(select);
         }
     }
 
-    async renderParseResult() {
+    renderParseResult() {
         const parseResult = this.getParseResult();
-        if (!parseResult) {
-            this.queryParser.innerHTML = '';
-            return;
-        }
-
-        this.queryParser.innerHTML = await apiTemplateRender(
-            'query-parser.html',
-            {terms: QueryParser.processParseResultForDisplay(parseResult.parsedText)}
-        );
-    }
-
-    static processParseResultForDisplay(result) {
-        return result.map((term) => {
-            return term.filter((part) => part.text.trim()).map((part) => {
-                return {
-                    text: part.text.split(''),
-                    reading: part.reading,
-                    raw: !part.reading || !part.reading.trim()
-                };
-            });
-        });
+        this.queryParser.textContent = '';
+        if (!parseResult) { return; }
+        this.queryParser.appendChild(this.queryParserGenerator.createParseResult(parseResult.parsedText));
     }
 }

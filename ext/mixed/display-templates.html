@@ -15,7 +15,7 @@
             </div>
             <div class="term-reasons"></div>
         </div>
-        <div class="frequencies"></div>
+        <div class="term-special-tags"><div class="frequencies tag-list"></div></div>
     </div>
     <div class="term-definition-container"><ol class="term-definition-list"></ol></div>
     <pre class="debug-info"></pre>
@@ -31,8 +31,8 @@
     <ul class="term-glossary-list"></ul>
 </li></template>
 <template id="term-definition-only-template"><span class="term-definition-only"></span></template>
-<template id="term-glossary-item-template"><li class="term-glossary-item"><span class="term-glossary"></span></li></template>
-<template id="term-reason-template"><span class="term-reason"></span></template>
+<template id="term-glossary-item-template"><li class="term-glossary-item"><span class="term-glossary-separator"> </span><span class="term-glossary"></span></li></template>
+<template id="term-reason-template"><span class="term-reason"></span><span class="term-reason-separator"> </span></template>
 
 <template id="kanji-entry-template"><div class="entry" data-type="kanji">
     <div class="entry-header1">
@@ -75,7 +75,8 @@
 <template id="kanji-glossary-item-template"><li class="kanji-glossary-item"><span class="kanji-glossary"></span></li></template>
 <template id="kanji-reading-template"><dd class="kanji-reading"></dd></template>
 
-<template id="tag-template"><span class="tag"></span></template>
-<template id="tag-frequency-template"><span class="tag" data-category="frequency"><span class="term-frequency-dictionary-name"></span><span class="term-frequency-separator"></span><span class="term-frequency-value"></span></template>
+<template id="tag-template"><span class="tag"><span class="tag-inner"></span></span></template>
+<template id="tag-frequency-template"><span class="tag" data-category="frequency"><span class="tag-inner"><span class="term-frequency-dictionary-name"></span><span class="term-frequency-separator"></span><span class="term-frequency-value"></span></span></template>
+<template id="tag-search-template"><span class="tag" data-category="search"></span></template>
 
 </body></html>

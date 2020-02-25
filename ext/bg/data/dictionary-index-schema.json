@@ -1,0 +1,69 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "description": "Index file containing information about the data contained in the dictionary.",
+    "required": [
+        "title",
+        "revision"
+    ],
+    "properties": {
+        "title": {
+            "type": "string",
+            "description": "Title of the dictionary."
+        },
+        "revision": {
+            "type": "string",
+            "description": "Revision of the dictionary. This value is only used for displaying information."
+        },
+        "sequenced": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether or not this dictionary can be used as the primary dictionary. Primary dictionaries typically contain term/expression definitions."
+        },
+        "format": {
+            "type": "integer",
+            "description": "Format of data found in the JSON data files.",
+            "enum": [1, 2, 3]
+        },
+        "version": {
+            "type": "integer",
+            "description": "Alias for format.",
+            "enum": [1, 2, 3]
+        },
+        "tagMeta": {
+            "type": "object",
+            "description": "Tag information for terms and kanji. This object is obsolete and individual tag files should be used instead.",
+            "additionalProperties": {
+                "type": "object",
+                "description": "Information about a single tag. The object key is the name of the tag.",
+                "properties": {
+                    "category": {
+                        "type": "string",
+                        "description": "Category for the tag."
+                    },
+                    "order": {
+                        "type": "number",
+                        "description": "Sorting order for the tag."
+                    },
+                    "notes": {
+                        "type": "string",
+                        "description": "Notes for the tag."
+                    },
+                    "score": {
+                        "type": "number",
+                        "description": "Score used to determine popularity. Negative values are more rare and positive values are more frequent. This score is also used to sort search results."
+                    }
+                },
+                "additionalProperties": false
+            }
+        }
+    },
+    "anyOf": [
+        {
+            "required": ["format"]
+        },
+        {
+            "required": ["version"]
+        }
+    ]
+}

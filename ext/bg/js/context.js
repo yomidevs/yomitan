@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global apiCommandExec, apiGetEnvironmentInfo, apiOptionsGet*/
 
 function showExtensionInfo() {
     const node = document.getElementById('extension-info');
@@ -30,12 +31,12 @@ function setupButtonEvents(selector, command, url) {
     for (const node of nodes) {
         node.addEventListener('click', (e) => {
             if (e.button !== 0) { return; }
-            apiCommandExec(command, {newTab: e.ctrlKey});
+            apiCommandExec(command, {mode: e.ctrlKey ? 'newTab' : 'existingOrNewTab'});
             e.preventDefault();
         }, false);
         node.addEventListener('auxclick', (e) => {
             if (e.button !== 1) { return; }
-            apiCommandExec(command, {newTab: true});
+            apiCommandExec(command, {mode: 'newTab'});
             e.preventDefault();
         }, false);
 

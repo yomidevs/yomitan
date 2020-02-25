@@ -16,15 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global apiOptionsGet, Popup, PopupProxyHost, Frontend, TextSourceRange*/
 
 class SettingsPopupPreview {
     constructor() {
         this.frontend = null;
         this.apiOptionsGetOld = apiOptionsGet;
-        this.popupInjectOuterStylesheetOld = Popup.injectOuterStylesheet;
+        this.popup = null;
+        this.popupSetCustomOuterCssOld = null;
         this.popupShown = false;
         this.themeChangeTimeout = null;
         this.textSource = null;
+        this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
     }
 
     static create() {
@@ -49,18 +52,18 @@ class SettingsPopupPreview {
         const popupHost = new PopupProxyHost();
         await popupHost.prepare();
 
-        const popup = popupHost.createPopup(null, 0);
-        popup.setChildrenSupported(false);
+        this.popup = popupHost.getOrCreatePopup();
+        this.popup.setChildrenSupported(false);
 
-        this.frontend = new Frontend(popup);
+        this.popupSetCustomOuterCssOld = this.popup.setCustomOuterCss;
+        this.popup.setCustomOuterCss = (...args) => this.popupSetCustomOuterCss(...args);
 
-        this.frontend.setEnabled = function () {};
-        this.frontend.searchClear = function () {};
+        this.frontend = new Frontend(this.popup);
+
+        this.frontend.setEnabled = () => {};
+        this.frontend.searchClear = () => {};
 
         await this.frontend.prepare();
-
-        // Overwrite popup
-        Popup.injectOuterStylesheet = (...args) => this.popupInjectOuterStylesheet(...args);
 
         // Update search
         this.updateSearch();
@@ -82,20 +85,21 @@ class SettingsPopupPreview {
         return options;
     }
 
-    popupInjectOuterStylesheet(...args) {
+    async popupSetCustomOuterCss(...args) {
         // This simulates the stylesheet priorities when injecting using the web extension API.
-        const result = this.popupInjectOuterStylesheetOld(...args);
+        const result = await this.popupSetCustomOuterCssOld.call(this.popup, ...args);
 
-        const outerStylesheet = Popup.outerStylesheet;
         const node = document.querySelector('#client-css');
-        if (node !== null && outerStylesheet !== null) {
-            node.parentNode.insertBefore(outerStylesheet, node);
+        if (node !== null && result !== null) {
+            node.parentNode.insertBefore(result, node);
         }
 
         return result;
     }
 
     onMessage(e) {
+        if (e.origin !== this._targetOrigin) { return; }
+
         const {action, params} = e.data;
         const handler = SettingsPopupPreview._messageHandlers.get(action);
         if (typeof handler !== 'function') { return; }
@@ -136,7 +140,7 @@ class SettingsPopupPreview {
 
     setCustomOuterCss(css) {
         if (this.frontend === null) { return; }
-        this.frontend.popup.setCustomOuterCss(css, true);
+        this.frontend.popup.setCustomOuterCss(css, false);
     }
 
     async updateSearch() {

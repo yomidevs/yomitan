@@ -1,0 +1,25 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "array",
+    "description": "Custom metadata for terms/expressions.",
+    "additionalItems": {
+        "type": "array",
+        "description": "Metadata about a single term/expression.",
+        "minItems": 3,
+        "items": [
+            {
+                "type": "string",
+                "description": "Term or expression."
+            },
+            {
+                "type": "string",
+                "enum": ["freq"],
+                "description": "Type of data. \"freq\" corresponds to frequency information."
+            },
+            {
+                "type": ["string", "number"],
+                "description": "Data for the term/expression."
+            }
+        ]
+    }
+}

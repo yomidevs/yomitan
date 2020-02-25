@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global jpIsCharCodeKanji, jpDistributeFurigana, Handlebars*/
 
 function handlebarsEscape(text) {
     return Handlebars.Utils.escapeExpression(text);
@@ -132,11 +133,6 @@ function handlebarsRegisterHelpers() {
         Handlebars.registerHelper('regexReplace', handlebarsRegexReplace);
         Handlebars.registerHelper('regexMatch', handlebarsRegexMatch);
     }
-}
-
-function handlebarsRenderStatic(name, data) {
-    handlebarsRegisterHelpers();
-    return Handlebars.templates[name](data).trim();
 }
 
 function handlebarsRenderDynamic(template, data) {

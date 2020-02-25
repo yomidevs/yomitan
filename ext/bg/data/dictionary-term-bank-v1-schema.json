@@ -1,0 +1,36 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "array",
+    "description": "Data file containing term and expression information.",
+    "additionalItems": {
+        "type": "array",
+        "description": "Information about a single term/expression.",
+        "minItems": 5,
+        "items": [
+            {
+                "type": "string",
+                "description": "Term or expression."
+            },
+            {
+                "type": "string",
+                "description": "Reading of the term/expression, or an empty string if the reading is the same as the term/expression."
+            },
+            {
+                "type": ["string", "null"],
+                "description": "String of space-separated tags for the definition. An empty string is treated as no tags."
+            },
+            {
+                "type": "string",
+                "description": "String of space-separated rule identifiers for the definition which is used to validate delinflection. Valid rule identifiers are: v1: ichidan verb; v5: godan verb; vs: suru verb; vk: kuru verb; adj-i: i-adjective. An empty string corresponds to words which aren't inflected, such as nouns."
+            },
+            {
+                "type": "number",
+                "description": "Score used to determine popularity. Negative values are more rare and positive values are more frequent. This score is also used to sort search results."
+            }
+        ],
+        "additionalItems": {
+            "type": "string",
+            "description": "Single definition for the term/expression."
+        }
+    }
+}

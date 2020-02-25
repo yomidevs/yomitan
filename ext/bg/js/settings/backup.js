@@ -16,6 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global apiOptionsGetFull, apiGetEnvironmentInfo
+utilBackend, utilIsolate, utilBackgroundIsolate, utilReadFileArrayBuffer
+optionsGetDefault, optionsUpdateVersion
+profileOptionsGetDefaultFieldTemplates*/
 
 // Exporting
 
@@ -159,7 +163,6 @@ async function _showSettingsImportWarnings(warnings) {
                 sanitize: e.currentTarget.dataset.importSanitize === 'true'
             });
             modalNode.modal('hide');
-
         };
         const onModalHide = () => {
             complete({result: false});

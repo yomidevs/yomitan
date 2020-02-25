@@ -127,13 +127,17 @@ html:root[data-yomichan-page=float] .navigation-header:not([hidden])~.navigation
     user-select: none;
 }
 
-#query-parser {
+#query-parser-content {
     margin-top: 0.5em;
     font-size: 2em;
 }
 
-#query-parser[data-term-spacing=true] .query-parser-term {
+#query-parser-content[data-term-spacing=true] .query-parser-term {
     margin-right: 0.2em;
+}
+
+html:root[data-yomichan-page=search][data-search-mode=popup] .search-input {
+    display: none;
 }
 
 
@@ -208,19 +212,27 @@ button.action-button {
 }
 
 .tag {
-    display: inline;
+    display: inline-block;
     padding: 0.2em 0.6em 0.3em;
     font-size: 75%;
     font-weight: 700;
-    line-height: 1;
+    line-height: 1.25;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
     border-radius: 0.25em;
 }
 
-.tag-list>.tag+.tag {
-    margin-left: 0.375em;
+.tag-inner {
+    display: block;
+}
+
+.tag-list>.tag:not(:last-child) {
+    margin-right: 0.375em;
+}
+
+html:root:not([data-enable-search-tags=true]) .tag[data-category=search] {
+    display: none;
 }
 
 .entry-header2,
@@ -237,7 +249,7 @@ button.action-button {
     border-top-style: solid;
 }
 
-.entry[data-type=term][data-expression-multi=true]:not([data-expression-count="1"]) .actions>.action-play-audio {
+.entry[data-type=term][data-expression-multi=true] .actions>.action-play-audio {
     display: none;
 }
 
@@ -245,8 +257,9 @@ button.action-button {
     display: inline-block;
 }
 
-.term-reasons>.term-reason+.term-reason:before {
+.term-reasons>.term-reason+.term-reason-separator+.term-reason:before {
     content: " \00AB  "; /* The two spaces is not a typo */
+    white-space: pre-wrap;
     display: inline;
 }
 
@@ -284,13 +297,13 @@ button.action-button {
     content: "\3001";
 }
 
-.term-expression-list>.term-expression:last-of-type:not(:first-of-type):after {
+.term-expression-list[data-multi=true]>.term-expression:last-of-type:after {
     font-size: 2em;
     content: "\3000";
     visibility: hidden;
 }
 
-.term-expression-list[data-multi=true]:not([data-count="1"]) .term-expression-details {
+.term-expression-list[data-multi=true] .term-expression-details {
     display: inline-block;
     position: relative;
     width: 0;
@@ -298,21 +311,21 @@ button.action-button {
     visibility: hidden;
 }
 
-.term-expression-list[data-multi=true]:not([data-count="1"]) .term-expression:hover .term-expression-details {
+.term-expression-list[data-multi=true] .term-expression:hover .term-expression-details {
     visibility: visible;
 }
 
-.term-expression-list[data-multi=true]:not([data-count="1"]) .term-expression-details>.action-play-audio {
+.term-expression-list[data-multi=true] .term-expression-details>.action-play-audio {
     position: absolute;
     left: 0;
     bottom: 0.5em;
 }
 
-.term-expression-list[data-multi=true]:not([data-count="1"]) .term-expression-details>.action-play-audio {
+.term-expression-list[data-multi=true] .term-expression-details>.action-play-audio {
     display: block;
 }
 
-.term-expression-list[data-multi=true]:not([data-count="1"]) .term-expression-details>.tags {
+.term-expression-list[data-multi=true] .term-expression-details>.tags {
     display: block;
     position: absolute;
     left: 0;
@@ -320,7 +333,7 @@ button.action-button {
     white-space: nowrap;
 }
 
-.term-expression-list[data-multi=true]:not([data-count="1"]) .term-expression-details>.frequencies {
+.term-expression-list[data-multi=true] .term-expression-details>.frequencies {
     display: block;
     position: absolute;
     left: 0;
@@ -385,7 +398,7 @@ button.action-button {
 
 :root[data-compact-glossaries=true] .term-definition-tag-list,
 :root[data-compact-glossaries=true] .term-definition-only-list:not([data-count="0"]) {
-    display: inline-block;
+    display: inline;
 }
 
 :root[data-compact-glossaries=true] .term-glossary-list {
@@ -399,8 +412,23 @@ button.action-button {
 }
 
 :root[data-compact-glossaries=true] .term-glossary-list>li:not(:first-child):before {
+    white-space: pre-wrap;
     content: " | ";
+    display: inline;
 }
+
+.term-glossary-separator,
+.term-reason-separator {
+    display: inline;
+    font-size: 0;
+    opacity: 0;
+    white-space: pre-wrap;
+}
+
+.term-special-tags>.frequencies {
+    display: inline;
+}
+
 
 /*
  * Kanji

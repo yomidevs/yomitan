@@ -222,6 +222,20 @@ html:root[data-operating-system=openbsd] [data-show-for-operating-system~=openbs
     display: initial;
 }
 
+html:root[data-browser=edge] [data-hide-for-browser~=edge],
+html:root[data-browser=chrome] [data-hide-for-browser~=chrome],
+html:root[data-browser=firefox] [data-hide-for-browser~=firefox],
+html:root[data-browser=firefox-mobile] [data-hide-for-browser~=firefox-mobile],
+html:root[data-operating-system=mac] [data-hide-for-operating-system~=mac],
+html:root[data-operating-system=win] [data-hide-for-operating-system~=win],
+html:root[data-operating-system=android] [data-hide-for-operating-system~=android],
+html:root[data-operating-system=cros] [data-hide-for-operating-system~=cros],
+html:root[data-operating-system=linux] [data-hide-for-operating-system~=linux],
+html:root[data-operating-system=openbsd] [data-hide-for-operating-system~=openbsd] {
+    display: none;
+}
+
+
 @media screen and (max-width: 740px) {
     .col-xs-6 {
         float: none;

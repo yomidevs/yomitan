@@ -134,6 +134,10 @@
                     <label><input type="checkbox" id="enable"> Enable content scanning</label>
                 </div>
 
+                <div class="checkbox" data-hide-for-browser="firefox-mobile">
+                    <label><input type="checkbox" id="enable-clipboard-popups"> Enable native popups when copying Japanese text</label>
+                </div>
+
                 <div class="checkbox">
                     <label><input type="checkbox" id="show-usage-guide"> Show usage guide on startup</label>
                 </div>
@@ -481,7 +485,7 @@
                 </p>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="enable-search-within-first-popup"> Enable search when clicking glossary entries</label>
+                    <label><input type="checkbox" id="enable-search-within-first-popup"> Enable search when clicking glossary entries and tags</label>
                 </div>
 
                 <div class="checkbox">
@@ -490,6 +494,10 @@
 
                 <div class="checkbox">
                     <label><input type="checkbox" id="enable-scanning-of-popup-expressions"> Enable scanning of expressions in search results</label>
+                </div>
+
+                <div class="checkbox">
+                    <label><input type="checkbox" id="enable-search-tags"> Enable clickable and scannable tags for searching expressions and their readings</label>
                 </div>
 
                 <div class="form-group">
@@ -760,6 +768,13 @@
 
                     <div class="alert alert-danger" id="anki-error" hidden></div>
 
+                    <div class="alert alert-danger" id="anki-invalid-response-error" hidden>
+                        Attempting to connect to Anki can sometimes return an error message which includes "Invalid response",
+                        which may indicate that the value of the <strong>Interface server</strong> option is incorrect.
+                        The <strong>Show advanced options</strong> checkbox under General Options must be ticked ticked to show this option.
+                        Resetting it to the default value may fix issues that are occurring.
+                    </div>
+
                     <div class="form-group">
                         <label for="card-tags">Card tags <span class="label-light">(comma or space separated)</span></label>
                         <input type="text" id="card-tags" class="form-control">
@@ -771,7 +786,7 @@
                     </div>
 
                     <div class="form-group options-advanced">
-                        <label for="interface-server">Interface server</label>
+                        <label for="interface-server">Interface server <span class="label-light">(Default: http://127.0.0.1:8765)</span></label>
                         <input type="text" id="interface-server" class="form-control">
                     </div>
 
@@ -1073,16 +1088,15 @@
         <script src="/mixed/js/core.js"></script>
         <script src="/mixed/js/dom.js"></script>
         <script src="/mixed/js/api.js"></script>
-        <script src="/mixed/js/japanese.js"></script>
 
         <script src="/bg/js/anki.js"></script>
         <script src="/bg/js/conditions.js"></script>
         <script src="/bg/js/dictionary.js"></script>
         <script src="/bg/js/handlebars.js"></script>
+        <script src="/bg/js/japanese.js"></script>
         <script src="/bg/js/options.js"></script>
         <script src="/bg/js/page-exit-prevention.js"></script>
         <script src="/bg/js/profile-conditions.js"></script>
-        <script src="/bg/js/templates.js"></script>
         <script src="/bg/js/util.js"></script>
         <script src="/mixed/js/audio.js"></script>
 

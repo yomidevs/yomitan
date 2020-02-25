@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global utilStringHashCode*/
 
 /*
  * Generic options functions
@@ -266,6 +267,7 @@ function profileOptionsCreateDefaults() {
     return {
         general: {
             enable: true,
+            enableClipboardPopups: false,
             resultOutputMode: 'group',
             debugInfo: false,
             maxResults: 32,
@@ -316,7 +318,8 @@ function profileOptionsCreateDefaults() {
             popupNestingMaxDepth: 0,
             enablePopupSearch: false,
             enableOnPopupExpressions: false,
-            enableOnSearchPage: true
+            enableOnSearchPage: true,
+            enableSearchTags: false
         },
 
         translation: {

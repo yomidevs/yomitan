@@ -113,11 +113,7 @@ function toIterable(value) {
     if (value !== null && typeof value === 'object') {
         const length = value.length;
         if (typeof length === 'number' && Number.isFinite(length)) {
-            const array = [];
-            for (let i = 0; i < length; ++i) {
-                array.push(value[i]);
-            }
-            return array;
+            return Array.from(value);
         }
     }
 
@@ -126,6 +122,14 @@ function toIterable(value) {
 
 function stringReverse(string) {
     return string.split('').reverse().join('').replace(/([\uDC00-\uDFFF])([\uD800-\uDBFF])/g, '$2$1');
+}
+
+function parseUrl(url) {
+    const parsedUrl = new URL(url);
+    const baseUrl = `${parsedUrl.origin}${parsedUrl.pathname}`;
+    const queryParams = Array.from(parsedUrl.searchParams.entries())
+        .reduce((a, [k, v]) => Object.assign({}, a, {[k]: v}), {});
+    return {baseUrl, queryParams};
 }
 
 
@@ -156,9 +160,9 @@ function promiseTimeout(delay, resolveValue) {
     const resolve = (value) => complete(promiseResolve, value);
     const reject = (value) => complete(promiseReject, value);
 
-    const promise = new Promise((resolve, reject) => {
-        promiseResolve = resolve;
-        promiseReject = reject;
+    const promise = new Promise((resolve2, reject2) => {
+        promiseResolve = resolve2;
+        promiseReject = reject2;
     });
     timer = window.setTimeout(() => {
         timer = null;
@@ -232,6 +236,29 @@ class EventDispatcher {
     }
 }
 
+class EventListenerCollection {
+    constructor() {
+        this._eventListeners = [];
+    }
+
+    get size() {
+        return this._eventListeners.length;
+    }
+
+    addEventListener(node, type, listener, options) {
+        node.addEventListener(type, listener, options);
+        this._eventListeners.push([node, type, listener, options]);
+    }
+
+    removeAllEventListeners() {
+        if (this._eventListeners.length === 0) { return; }
+        for (const [node, type, listener, options] of this._eventListeners) {
+            node.removeEventListener(type, listener, options);
+        }
+        this._eventListeners = [];
+    }
+}
+
 
 /*
  * Default message handlers
@@ -244,7 +271,7 @@ const yomichan = (() => {
 
             this._messageHandlers = new Map([
                 ['getUrl', this._onMessageGetUrl.bind(this)],
-                ['optionsUpdate', this._onMessageOptionsUpdate.bind(this)],
+                ['optionsUpdated', this._onMessageOptionsUpdated.bind(this)],
                 ['zoomChanged', this._onMessageZoomChanged.bind(this)]
             ]);
 
@@ -252,6 +279,16 @@ const yomichan = (() => {
         }
 
         // Public
+
+        generateId(length) {
+            const array = new Uint8Array(length);
+            window.crypto.getRandomValues(array);
+            let id = '';
+            for (const value of array) {
+                id += value.toString(16).padStart(2, '0');
+            }
+            return id;
+        }
 
         triggerOrphaned(error) {
             this.trigger('orphaned', {error});
@@ -272,8 +309,8 @@ const yomichan = (() => {
             return {url: window.location.href};
         }
 
-        _onMessageOptionsUpdate({source}) {
-            this.trigger('optionsUpdate', {source});
+        _onMessageOptionsUpdated({source}) {
+            this.trigger('optionsUpdated', {source});
         }
 
         _onMessageZoomChanged({oldZoomFactor, newZoomFactor}) {

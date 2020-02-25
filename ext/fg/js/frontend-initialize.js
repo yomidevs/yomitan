@@ -16,18 +16,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global PopupProxyHost, PopupProxy, Frontend*/
 
 async function main() {
     const data = window.frontendInitializationData || {};
     const {id, depth=0, parentFrameId, ignoreNodes, url, proxy=false} = data;
 
-    let popupHost = null;
-    if (!proxy) {
-        popupHost = new PopupProxyHost();
+    let popup;
+    if (proxy) {
+        popup = new PopupProxy(null, depth + 1, id, parentFrameId, url);
+    } else {
+        const popupHost = new PopupProxyHost();
         await popupHost.prepare();
+
+        popup = popupHost.getOrCreatePopup();
     }
 
-    const popup = proxy ? new PopupProxy(depth + 1, id, parentFrameId, url) : popupHost.createPopup(null, depth);
     const frontend = new Frontend(popup, ignoreNodes);
     await frontend.prepare();
 }

@@ -16,6 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global getOptionsContext, getOptionsMutable, settingsSaveOptions
+utilBackgroundIsolate, utilAnkiGetDeckNames, utilAnkiGetModelNames, utilAnkiGetModelFieldNames
+onFormOptionsChanged*/
 
 // Private
 
@@ -33,14 +36,27 @@ function _ankiSpinnerShow(show) {
 
 function _ankiSetError(error) {
     const node = document.querySelector('#anki-error');
-    if (!node) { return; }
+    const node2 = document.querySelector('#anki-invalid-response-error');
     if (error) {
-        node.hidden = false;
-        node.textContent = `${error}`;
-        _ankiSetErrorData(node, error);
+        const errorString = `${error}`;
+        if (node !== null) {
+            node.hidden = false;
+            node.textContent = errorString;
+            _ankiSetErrorData(node, error);
+        }
+
+        if (node2 !== null) {
+            node2.hidden = (errorString.indexOf('Invalid response') < 0);
+        }
     } else {
-        node.hidden = true;
-        node.textContent = '';
+        if (node !== null) {
+            node.hidden = true;
+            node.textContent = '';
+        }
+
+        if (node2 !== null) {
+            node2.hidden = true;
+        }
     }
 }
 

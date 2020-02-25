@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global docRangeFromPoint, TextSourceRange, DOM*/
 
 class TextScanner {
     constructor(node, ignoreNodes, ignoreElements, ignorePoints) {
@@ -30,7 +31,7 @@ class TextScanner {
         this.options = null;
 
         this.enabled = false;
-        this.eventListeners = [];
+        this.eventListeners = new EventListenerCollection();
 
         this.primaryTouchIdentifier = null;
         this.preventNextContextMenu = false;
@@ -140,24 +141,24 @@ class TextScanner {
         const textSourceCurrentPrevious = this.textSourceCurrent !== null ? this.textSourceCurrent.clone() : null;
 
         this.searchAt(primaryTouch.clientX, primaryTouch.clientY, 'touchStart')
-        .then(() => {
-            if (
-                this.textSourceCurrent === null ||
-                this.textSourceCurrent.equals(textSourceCurrentPrevious)
-            ) {
-                return;
-            }
+            .then(() => {
+                if (
+                    this.textSourceCurrent === null ||
+                    this.textSourceCurrent.equals(textSourceCurrentPrevious)
+                ) {
+                    return;
+                }
 
-            this.preventScroll = true;
-            this.preventNextContextMenu = true;
-            this.preventNextMouseDown = true;
-        });
+                this.preventScroll = true;
+                this.preventNextContextMenu = true;
+                this.preventNextMouseDown = true;
+            });
     }
 
     onTouchEnd(e) {
         if (
             this.primaryTouchIdentifier === null ||
-            TextScanner.getIndexOfTouch(e.changedTouches, this.primaryTouchIdentifier) < 0
+            TextScanner.getTouch(e.changedTouches, this.primaryTouchIdentifier) === null
         ) {
             return;
         }
@@ -180,13 +181,11 @@ class TextScanner {
             return;
         }
 
-        const touches = e.changedTouches;
-        const index = TextScanner.getIndexOfTouch(touches, this.primaryTouchIdentifier);
-        if (index < 0) {
+        const primaryTouch = TextScanner.getTouch(e.changedTouches, this.primaryTouchIdentifier);
+        if (primaryTouch === null) {
             return;
         }
 
-        const primaryTouch = touches[index];
         this.searchAt(primaryTouch.clientX, primaryTouch.clientY, 'touchMove');
 
         e.preventDefault(); // Disable scroll
@@ -228,7 +227,7 @@ class TextScanner {
             }
         } else {
             if (this.enabled) {
-                this.clearEventListeners();
+                this.eventListeners.removeAllEventListeners();
                 this.enabled = false;
             }
             this.onSearchClear(false);
@@ -236,13 +235,13 @@ class TextScanner {
     }
 
     hookEvents() {
-        let eventListeners = this.getMouseEventListeners();
+        let eventListenerInfos = this.getMouseEventListeners();
         if (this.options.scanning.touchInputEnabled) {
-            eventListeners = eventListeners.concat(this.getTouchEventListeners());
+            eventListenerInfos = eventListenerInfos.concat(this.getTouchEventListeners());
         }
 
-        for (const [node, type, listener, options] of eventListeners) {
-            this.addEventListener(node, type, listener, options);
+        for (const [node, type, listener, options] of eventListenerInfos) {
+            this.eventListeners.addEventListener(node, type, listener, options);
         }
     }
 
@@ -265,18 +264,6 @@ class TextScanner {
             [this.node, 'touchmove', this.onTouchMove.bind(this), {passive: false}],
             [this.node, 'contextmenu', this.onContextMenu.bind(this)]
         ];
-    }
-
-    addEventListener(node, type, listener, options) {
-        node.addEventListener(type, listener, options);
-        this.eventListeners.push([node, type, listener, options]);
-    }
-
-    clearEventListeners() {
-        for (const [node, type, listener, options] of this.eventListeners) {
-            node.removeEventListener(type, listener, options);
-        }
-        this.eventListeners = [];
     }
 
     setOptions(options) {
@@ -367,13 +354,12 @@ class TextScanner {
         }
     }
 
-    static getIndexOfTouch(touchList, identifier) {
-        for (const i in touchList) {
-            const t = touchList[i];
-            if (t.identifier === identifier) {
-                return i;
+    static getTouch(touchList, identifier) {
+        for (const touch of touchList) {
+            if (touch.identifier === identifier) {
+                return touch;
             }
         }
-        return -1;
+        return null;
     }
 }

@@ -82,7 +82,11 @@ class TextSourceRange {
     }
 
     equals(other) {
-        if (other === null) {
+        if (!(
+            typeof other === 'object' &&
+            other !== null &&
+            other instanceof TextSourceRange
+        )) {
             return false;
         }
         if (this.imposterSourceElement !== null) {
@@ -362,7 +366,7 @@ class TextSourceElement {
     setEndOffset(length) {
         switch (this.element.nodeName.toUpperCase()) {
             case 'BUTTON':
-                this.content = this.element.innerHTML;
+                this.content = this.element.textContent;
                 break;
             case 'IMG':
                 this.content = this.element.getAttribute('alt');
@@ -409,6 +413,12 @@ class TextSourceElement {
     }
 
     equals(other) {
-        return other && other.element === this.element && other.content === this.content;
+        return (
+            typeof other === 'object' &&
+            other !== null &&
+            other instanceof TextSourceElement &&
+            other.element === this.element &&
+            other.content === this.content
+        );
     }
 }

@@ -16,13 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global jpIsStringEntirelyKana, audioGetFromSources*/
 
 const audioUrlBuilders = new Map([
     ['jpod101', async (definition) => {
         let kana = definition.reading;
         let kanji = definition.expression;
 
-        if (!kana && wanakana.isHiragana(kanji)) {
+        if (!kana && jpIsStringEntirelyKana(kanji)) {
             kana = kanji;
             kanji = null;
         }
@@ -51,7 +52,7 @@ const audioUrlBuilders = new Map([
         for (const row of dom.getElementsByClassName('dc-result-row')) {
             try {
                 const url = row.querySelector('audio>source[src]').getAttribute('src');
-                const reading = row.getElementsByClassName('dc-vocab_kana').item(0).innerText;
+                const reading = row.getElementsByClassName('dc-vocab_kana').item(0).textContent;
                 if (url && reading && (!definition.reading || definition.reading === reading)) {
                     return audioUrlNormalize(url, 'https://www.japanesepod101.com', '/learningcenter/reference/');
                 }
@@ -167,10 +168,8 @@ async function audioInject(definition, fields, sources, optionsContext) {
     }
 
     try {
-        let audioSourceDefinition = definition;
-        if (hasOwn(definition, 'expressions')) {
-            audioSourceDefinition = definition.expressions[0];
-        }
+        const expressions = definition.expressions;
+        const audioSourceDefinition = Array.isArray(expressions) ? expressions[0] : definition;
 
         const {url} = await audioGetFromSources(audioSourceDefinition, sources, optionsContext, true);
         if (url !== null) {

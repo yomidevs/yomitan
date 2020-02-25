@@ -40,20 +40,22 @@ function showAppearancePreview() {
 
     window.wanakana.bind(text[0]);
 
+    const targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
+
     text.on('input', () => {
         const action = 'setText';
         const params = {text: text.val()};
-        frame.contentWindow.postMessage({action, params}, '*');
+        frame.contentWindow.postMessage({action, params}, targetOrigin);
     });
     customCss.on('input', () => {
         const action = 'setCustomCss';
         const params = {css: customCss.val()};
-        frame.contentWindow.postMessage({action, params}, '*');
+        frame.contentWindow.postMessage({action, params}, targetOrigin);
     });
     customOuterCss.on('input', () => {
         const action = 'setCustomOuterCss';
         const params = {css: customOuterCss.val()};
-        frame.contentWindow.postMessage({action, params}, '*');
+        frame.contentWindow.postMessage({action, params}, targetOrigin);
     });
 
     container.append(frame);

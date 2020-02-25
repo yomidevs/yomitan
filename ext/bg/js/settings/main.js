@@ -16,6 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global getOptionsContext, apiOptionsSave
+utilBackend, utilIsolate, utilBackgroundIsolate
+ankiErrorShown, ankiFieldsToDict
+ankiTemplatesUpdateValue, onAnkiOptionsChanged, onDictionaryOptionsChanged
+appearanceInitialize, audioSettingsInitialize, profileOptionsSetup, dictSettingsInitialize
+ankiInitialize, ankiTemplatesInitialize, storageInfoInitialize
+*/
+
 function getOptionsMutable(optionsContext) {
     return utilBackend().getOptions(
         utilBackgroundIsolate(optionsContext)
@@ -28,6 +36,22 @@ function getOptionsFullMutable() {
 
 async function formRead(options) {
     options.general.enable = $('#enable').prop('checked');
+    const enableClipboardPopups = $('#enable-clipboard-popups').prop('checked');
+    if (enableClipboardPopups) {
+        options.general.enableClipboardPopups = await new Promise((resolve, _reject) => {
+            chrome.permissions.request(
+                {permissions: ['clipboardRead']},
+                (granted) => {
+                    if (!granted) {
+                        $('#enable-clipboard-popups').prop('checked', false);
+                    }
+                    resolve(granted);
+                }
+            );
+        });
+    } else {
+        options.general.enableClipboardPopups = false;
+    }
     options.general.showGuide = $('#show-usage-guide').prop('checked');
     options.general.compactTags = $('#compact-tags').prop('checked');
     options.general.compactGlossaries = $('#compact-glossaries').prop('checked');
@@ -44,7 +68,7 @@ async function formRead(options) {
     options.general.popupVerticalOffset = parseInt($('#popup-vertical-offset').val(), 10);
     options.general.popupHorizontalOffset2 = parseInt($('#popup-horizontal-offset2').val(), 0);
     options.general.popupVerticalOffset2 = parseInt($('#popup-vertical-offset2').val(), 10);
-    options.general.popupScalingFactor = parseInt($('#popup-scaling-factor').val(), 10);
+    options.general.popupScalingFactor = parseFloat($('#popup-scaling-factor').val());
     options.general.popupScaleRelativeToPageZoom = $('#popup-scale-relative-to-page-zoom').prop('checked');
     options.general.popupScaleRelativeToVisualViewport = $('#popup-scale-relative-to-visual-viewport').prop('checked');
     options.general.popupTheme = $('#popup-theme').val();
@@ -67,6 +91,7 @@ async function formRead(options) {
     options.scanning.enablePopupSearch = $('#enable-search-within-first-popup').prop('checked');
     options.scanning.enableOnPopupExpressions = $('#enable-scanning-of-popup-expressions').prop('checked');
     options.scanning.enableOnSearchPage = $('#enable-scanning-on-search-page').prop('checked');
+    options.scanning.enableSearchTags = $('#enable-search-tags').prop('checked');
     options.scanning.delay = parseInt($('#scan-delay').val(), 10);
     options.scanning.length = parseInt($('#scan-length').val(), 10);
     options.scanning.modifier = $('#scan-modifier-key').val();
@@ -103,6 +128,7 @@ async function formRead(options) {
 
 async function formWrite(options) {
     $('#enable').prop('checked', options.general.enable);
+    $('#enable-clipboard-popups').prop('checked', options.general.enableClipboardPopups);
     $('#show-usage-guide').prop('checked', options.general.showGuide);
     $('#compact-tags').prop('checked', options.general.compactTags);
     $('#compact-glossaries').prop('checked', options.general.compactGlossaries);
@@ -142,6 +168,7 @@ async function formWrite(options) {
     $('#enable-search-within-first-popup').prop('checked', options.scanning.enablePopupSearch);
     $('#enable-scanning-of-popup-expressions').prop('checked', options.scanning.enableOnPopupExpressions);
     $('#enable-scanning-on-search-page').prop('checked', options.scanning.enableOnSearchPage);
+    $('#enable-search-tags').prop('checked', options.scanning.enableSearchTags);
     $('#scan-delay').val(options.scanning.delay);
     $('#scan-length').val(options.scanning.length);
     $('#scan-modifier-key').val(options.scanning.modifier);
@@ -167,7 +194,7 @@ async function formWrite(options) {
 
     await ankiTemplatesUpdateValue();
     await onAnkiOptionsChanged(options);
-    await onDictionaryOptionsChanged(options);
+    await onDictionaryOptionsChanged();
 
     formUpdateVisibility(options);
 }
@@ -215,7 +242,7 @@ async function settingsSaveOptions() {
     await apiOptionsSave(source);
 }
 
-async function onOptionsUpdate({source}) {
+async function onOptionsUpdated({source}) {
     const thisSource = await settingsGetSource();
     if (source === thisSource) { return; }
 
@@ -247,7 +274,7 @@ async function onReady() {
 
     storageInfoInitialize();
 
-    yomichan.on('optionsUpdate', onOptionsUpdate);
+    yomichan.on('optionsUpdated', onOptionsUpdated);
 }
 
 $(document).ready(() => onReady());

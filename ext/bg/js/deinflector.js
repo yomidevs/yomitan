@@ -76,17 +76,19 @@ class Deinflector {
         const ruleTypes = Deinflector.ruleTypes;
         let value = 0;
         for (const rule of rules) {
-            value |= ruleTypes[rule];
+            const ruleBits = ruleTypes.get(rule);
+            if (typeof ruleBits === 'undefined') { continue; }
+            value |= ruleBits;
         }
         return value;
     }
 }
 
-Deinflector.ruleTypes = {
-    'v1':    0b0000001, // Verb ichidan
-    'v5':    0b0000010, // Verb godan
-    'vs':    0b0000100, // Verb suru
-    'vk':    0b0001000, // Verb kuru
-    'adj-i': 0b0010000, // Adjective i
-    'iru':   0b0100000  // Intermediate -iru endings for progressive or perfect tense
-};
+Deinflector.ruleTypes = new Map([
+    ['v1',    0b0000001], // Verb ichidan
+    ['v5',    0b0000010], // Verb godan
+    ['vs',    0b0000100], // Verb suru
+    ['vk',    0b0001000], // Verb kuru
+    ['adj-i', 0b0010000], // Adjective i
+    ['iru',   0b0100000] // Intermediate -iru endings for progressive or perfect tense
+]);

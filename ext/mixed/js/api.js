@@ -58,15 +58,15 @@ function apiDefinitionAdd(definition, mode, context, optionsContext) {
 }
 
 function apiDefinitionsAddable(definitions, modes, optionsContext) {
-    return _apiInvoke('definitionsAddable', {definitions, modes, optionsContext}).catch(() => null);
+    return _apiInvoke('definitionsAddable', {definitions, modes, optionsContext});
 }
 
 function apiNoteView(noteId) {
     return _apiInvoke('noteView', {noteId});
 }
 
-function apiTemplateRender(template, data, dynamic) {
-    return _apiInvoke('templateRender', {data, template, dynamic});
+function apiTemplateRender(template, data) {
+    return _apiInvoke('templateRender', {data, template});
 }
 
 function apiAudioGetUrl(definition, source, optionsContext) {
@@ -89,8 +89,8 @@ function apiFrameInformationGet() {
     return _apiInvoke('frameInformationGet');
 }
 
-function apiInjectStylesheet(css) {
-    return _apiInvoke('injectStylesheet', {css});
+function apiInjectStylesheet(type, value) {
+    return _apiInvoke('injectStylesheet', {type, value});
 }
 
 function apiGetEnvironmentInfo() {
@@ -105,8 +105,16 @@ function apiGetDisplayTemplatesHtml() {
     return _apiInvoke('getDisplayTemplatesHtml');
 }
 
+function apiGetQueryParserTemplatesHtml() {
+    return _apiInvoke('getQueryParserTemplatesHtml');
+}
+
 function apiGetZoom() {
     return _apiInvoke('getZoom');
+}
+
+function apiGetMessageToken() {
+    return _apiInvoke('getMessageToken');
 }
 
 function _apiInvoke(action, params={}) {

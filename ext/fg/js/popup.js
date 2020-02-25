@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global apiInjectStylesheet, apiGetMessageToken*/
 
 class Popup {
     constructor(id, depth, frameIdPromise) {
@@ -27,30 +28,38 @@ class Popup {
         this._child = null;
         this._childrenSupported = true;
         this._injectPromise = null;
-        this._isInjected = false;
-        this._isInjectedAndLoaded = false;
         this._visible = false;
         this._visibleOverride = null;
         this._options = null;
-        this._stylesheetInjectedViaApi = false;
         this._contentScale = 1.0;
         this._containerSizeContentScale = null;
+        this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
+        this._messageToken = null;
 
         this._container = document.createElement('iframe');
         this._container.className = 'yomichan-float';
         this._container.addEventListener('mousedown', (e) => e.stopPropagation());
         this._container.addEventListener('scroll', (e) => e.stopPropagation());
-        this._container.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
         this._container.style.width = '0px';
         this._container.style.height = '0px';
+
+        this._fullscreenEventListeners = new EventListenerCollection();
 
         this._updateVisibility();
     }
 
     // Public properties
 
+    get id() {
+        return this._id;
+    }
+
     get parent() {
         return this._parent;
+    }
+
+    get child() {
+        return this._child;
     }
 
     get depth() {
@@ -117,16 +126,12 @@ class Popup {
     }
 
     clearAutoPlayTimer() {
-        if (this._isInjectedAndLoaded) {
-            this._invokeApi('clearAutoPlayTimer');
-        }
+        this._invokeApi('clearAutoPlayTimer');
     }
 
     setContentScale(scale) {
         this._contentScale = scale;
-        if (this._isInjectedAndLoaded) {
-            this._invokeApi('setContentScale', {scale});
-        }
+        this._invokeApi('setContentScale', {scale});
     }
 
     // Popup-only public functions
@@ -146,7 +151,7 @@ class Popup {
     }
 
     isVisibleSync() {
-        return this._isInjected && (this._visibleOverride !== null ? this._visibleOverride : this._visible);
+        return (this._visibleOverride !== null ? this._visibleOverride : this._visible);
     }
 
     updateTheme() {
@@ -154,21 +159,13 @@ class Popup {
         this._container.dataset.yomichanSiteColor = this._getSiteColor();
     }
 
-    async setCustomOuterCss(css, injectDirectly) {
-        // Cannot repeatedly inject stylesheets using web extension APIs since there is no way to remove them.
-        if (this._stylesheetInjectedViaApi) { return; }
-
-        if (injectDirectly || Popup._isOnExtensionPage()) {
-            Popup.injectOuterStylesheet(css);
-        } else {
-            if (!css) { return; }
-            try {
-                await apiInjectStylesheet(css);
-                this._stylesheetInjectedViaApi = true;
-            } catch (e) {
-                // NOP
-            }
-        }
+    async setCustomOuterCss(css, useWebExtensionApi) {
+        return await Popup._injectStylesheet(
+            'yomichan-popup-outer-user-stylesheet',
+            'code',
+            css,
+            useWebExtensionApi
+        );
     }
 
     setChildrenSupported(value) {
@@ -181,26 +178,6 @@ class Popup {
 
     getContainerRect() {
         return this._container.getBoundingClientRect();
-    }
-
-    static injectOuterStylesheet(css) {
-        if (Popup.outerStylesheet === null) {
-            if (!css) { return; }
-            Popup.outerStylesheet = document.createElement('style');
-            Popup.outerStylesheet.id = 'yomichan-popup-outer-stylesheet';
-        }
-
-        const outerStylesheet = Popup.outerStylesheet;
-        if (css) {
-            outerStylesheet.textContent = css;
-
-            const par = document.head;
-            if (par && outerStylesheet.parentNode !== par) {
-                par.appendChild(outerStylesheet);
-            }
-        } else {
-            outerStylesheet.textContent = '';
-        }
     }
 
     // Private functions
@@ -222,11 +199,18 @@ class Popup {
             // NOP
         }
 
+        if (this._messageToken === null) {
+            this._messageToken = await apiGetMessageToken();
+        }
+
         return new Promise((resolve) => {
             const parentFrameId = (typeof this._frameId === 'number' ? this._frameId : null);
+            this._container.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
             this._container.addEventListener('load', () => {
-                this._isInjectedAndLoaded = true;
-                this._invokeApi('initialize', {
+                const uniqueId = yomichan.generateId(32);
+                Popup._listenForDisplayPrepareCompleted(uniqueId, resolve);
+
+                this._invokeApi('prepare', {
                     options: this._options,
                     popupInfo: {
                         id: this._id,
@@ -235,15 +219,58 @@ class Popup {
                     },
                     url: this.url,
                     childrenSupported: this._childrenSupported,
-                    scale: this._contentScale
+                    scale: this._contentScale,
+                    uniqueId
                 });
-                resolve();
             });
-            this._observeFullscreen();
+            this._observeFullscreen(true);
             this._onFullscreenChanged();
-            this.setCustomOuterCss(this._options.general.customPopupOuterCss, false);
-            this._isInjected = true;
+            this._injectStyles();
         });
+    }
+
+    async _injectStyles() {
+        try {
+            await Popup._injectStylesheet('yomichan-popup-outer-stylesheet', 'file', '/fg/css/client.css', true);
+        } catch (e) {
+            // NOP
+        }
+
+        try {
+            await this.setCustomOuterCss(this._options.general.customPopupOuterCss, true);
+        } catch (e) {
+            // NOP
+        }
+    }
+
+    _observeFullscreen(observe) {
+        if (!observe) {
+            this._fullscreenEventListeners.removeAllEventListeners();
+            return;
+        }
+
+        if (this._fullscreenEventListeners.size > 0) {
+            // Already observing
+            return;
+        }
+
+        const fullscreenEvents = [
+            'fullscreenchange',
+            'MSFullscreenChange',
+            'mozfullscreenchange',
+            'webkitfullscreenchange'
+        ];
+        const onFullscreenChanged = () => this._onFullscreenChanged();
+        for (const eventName of fullscreenEvents) {
+            this._fullscreenEventListeners.addEventListener(document, eventName, onFullscreenChanged, false);
+        }
+    }
+
+    _onFullscreenChanged() {
+        const parent = (Popup._getFullscreenElement() || document.body || null);
+        if (parent !== null && this._container.parentNode !== parent) {
+            parent.appendChild(this._container);
+        }
     }
 
     async _show(elementRect, writingMode) {
@@ -327,38 +354,38 @@ class Popup {
     }
 
     _invokeApi(action, params={}) {
-        if (!this._isInjectedAndLoaded) {
-            throw new Error('Frame not loaded');
-        }
-        this._container.contentWindow.postMessage({action, params}, '*');
+        const token = this._messageToken;
+        const contentWindow = this._container.contentWindow;
+        if (token === null || contentWindow === null) { return; }
+
+        contentWindow.postMessage({action, params, token}, this._targetOrigin);
     }
 
-    _observeFullscreen() {
-        const fullscreenEvents = [
-            'fullscreenchange',
-            'MSFullscreenChange',
-            'mozfullscreenchange',
-            'webkitfullscreenchange'
-        ];
-        for (const eventName of fullscreenEvents) {
-            document.addEventListener(eventName, () => this._onFullscreenChanged(), false);
-        }
-    }
-
-    _getFullscreenElement() {
+    static _getFullscreenElement() {
         return (
             document.fullscreenElement ||
             document.msFullscreenElement ||
             document.mozFullScreenElement ||
-            document.webkitFullscreenElement
+            document.webkitFullscreenElement ||
+            null
         );
     }
 
-    _onFullscreenChanged() {
-        const parent = (this._getFullscreenElement() || document.body || null);
-        if (parent !== null && this._container.parentNode !== parent) {
-            parent.appendChild(this._container);
-        }
+    static _listenForDisplayPrepareCompleted(uniqueId, resolve) {
+        const runtimeMessageCallback = ({action, params}, sender, callback) => {
+            if (
+                action === 'popupPrepareCompleted' &&
+                typeof params === 'object' &&
+                params !== null &&
+                params.uniqueId === uniqueId
+            ) {
+                chrome.runtime.onMessage.removeListener(runtimeMessageCallback);
+                callback();
+                resolve();
+                return false;
+            }
+        };
+        chrome.runtime.onMessage.addListener(runtimeMessageCallback);
     }
 
     static _getPositionForHorizontalText(elementRect, width, height, viewport, offsetScale, optionsGeneral) {
@@ -492,15 +519,6 @@ class Popup {
         ];
     }
 
-    static _isOnExtensionPage() {
-        try {
-            const url = chrome.runtime.getURL('/');
-            return window.location.href.substring(0, url.length) === url;
-        } catch (e) {
-            // NOP
-        }
-    }
-
     static _getViewport(useVisualViewport) {
         const visualViewport = window.visualViewport;
         if (visualViewport !== null && typeof visualViewport === 'object') {
@@ -533,6 +551,80 @@ class Popup {
             bottom: window.innerHeight
         };
     }
+
+    static _isOnExtensionPage() {
+        try {
+            const url = chrome.runtime.getURL('/');
+            return window.location.href.substring(0, url.length) === url;
+        } catch (e) {
+            // NOP
+        }
+    }
+
+    static async _injectStylesheet(id, type, value, useWebExtensionApi) {
+        const injectedStylesheets = Popup._injectedStylesheets;
+
+        if (Popup._isOnExtensionPage()) {
+            // Permissions error will occur if trying to use the WebExtension API to inject
+            // into an extension page.
+            useWebExtensionApi = false;
+        }
+
+        let styleNode = injectedStylesheets.get(id);
+        if (typeof styleNode !== 'undefined') {
+            if (styleNode === null) {
+                // Previously injected via WebExtension API
+                throw new Error(`Stylesheet with id ${id} has already been injected using the WebExtension API`);
+            }
+        } else {
+            styleNode = null;
+        }
+
+        if (useWebExtensionApi) {
+            // Inject via WebExtension API
+            if (styleNode !== null && styleNode.parentNode !== null) {
+                styleNode.parentNode.removeChild(styleNode);
+            }
+
+            await apiInjectStylesheet(type, value);
+
+            injectedStylesheets.set(id, null);
+            return null;
+        }
+
+        // Create node in document
+        const parentNode = document.head;
+        if (parentNode === null) {
+            throw new Error('No parent node');
+        }
+
+        // Create or reuse node
+        const isFile = (type === 'file');
+        const tagName = isFile ? 'link' : 'style';
+        if (styleNode === null || styleNode.nodeName.toLowerCase() !== tagName) {
+            if (styleNode !== null && styleNode.parentNode !== null) {
+                styleNode.parentNode.removeChild(styleNode);
+            }
+            styleNode = document.createElement(tagName);
+            styleNode.id = id;
+        }
+
+        // Update node style
+        if (isFile) {
+            styleNode.rel = value;
+        } else {
+            styleNode.textContent = value;
+        }
+
+        // Update parent
+        if (styleNode.parentNode !== parentNode) {
+            parentNode.appendChild(styleNode);
+        }
+
+        // Add to map
+        injectedStylesheets.set(id, styleNode);
+        return styleNode;
+    }
 }
 
-Popup.outerStylesheet = null;
+Popup._injectedStylesheets = new Map();

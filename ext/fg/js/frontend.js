@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global apiGetZoom, apiOptionsGet, apiTermsFind, apiKanjiFind, docSentenceExtract, TextScanner*/
 
 class Frontend extends TextScanner {
     constructor(popup, ignoreNodes) {
@@ -55,7 +56,7 @@ class Frontend extends TextScanner {
             }
 
             yomichan.on('orphaned', () => this.onOrphaned());
-            yomichan.on('optionsUpdate', () => this.updateOptions());
+            yomichan.on('optionsUpdated', () => this.updateOptions());
             yomichan.on('zoomChanged', (e) => this.onZoomChanged(e));
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
 

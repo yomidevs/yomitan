@@ -33,7 +33,7 @@ function utilIsolate(value) {
 }
 
 function utilFunctionIsolate(func) {
-    return function (...args) {
+    return function isolatedFunction(...args) {
         try {
             args = args.map((v) => utilIsolate(v));
             return func.call(this, ...args);
@@ -57,32 +57,6 @@ function utilBackgroundIsolate(data) {
 function utilBackgroundFunctionIsolate(func) {
     const backgroundPage = chrome.extension.getBackgroundPage();
     return backgroundPage.utilFunctionIsolate(func);
-}
-
-function utilSetEqual(setA, setB) {
-    if (setA.size !== setB.size) {
-        return false;
-    }
-
-    for (const value of setA) {
-        if (!setB.has(value)) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-function utilSetIntersection(setA, setB) {
-    return new Set(
-        [...setA].filter((value) => setB.has(value))
-    );
-}
-
-function utilSetDifference(setA, setB) {
-    return new Set(
-        [...setA].filter((value) => !setB.has(value))
-    );
 }
 
 function utilStringHashCode(string) {

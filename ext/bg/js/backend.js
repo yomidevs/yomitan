@@ -16,12 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global optionsSave, utilIsolate
+conditionsTestValue, profileConditionsDescriptor, profileOptionsGetDefaultFieldTemplates
+handlebarsRenderDynamic
+requestText, requestJson, optionsLoad
+dictConfigured, dictTermsSort, dictEnabledSet, dictNoteFormat
+audioGetUrl, audioInject
+jpConvertReading, jpDistributeFuriganaInflected, jpKatakanaToHiragana
+Translator, AnkiConnect, AnkiNull, Mecab, BackendApiForwarder, JsonSchema, ClipboardMonitor*/
 
 class Backend {
     constructor() {
         this.translator = new Translator();
         this.anki = new AnkiNull();
         this.mecab = new Mecab();
+        this.clipboardMonitor = new ClipboardMonitor();
         this.options = null;
         this.optionsSchema = null;
         this.optionsContext = {
@@ -34,7 +43,11 @@ class Backend {
 
         this.clipboardPasteTarget = document.querySelector('#clipboard-paste-target');
 
+        this.popupWindow = null;
+
         this.apiForwarder = new BackendApiForwarder();
+
+        this.messageToken = yomichan.generateId(16);
     }
 
     async prepare() {
@@ -67,6 +80,8 @@ class Backend {
         this.isPreparedResolve();
         this.isPreparedResolve = null;
         this.isPreparedPromise = null;
+
+        this.clipboardMonitor.onClipboardText = (text) => this._onClipboardText(text);
     }
 
     onOptionsUpdated(source) {
@@ -75,7 +90,7 @@ class Backend {
         const callback = () => this.checkLastError(chrome.runtime.lastError);
         chrome.tabs.query({}, (tabs) => {
             for (const tab of tabs) {
-                chrome.tabs.sendMessage(tab.id, {action: 'optionsUpdate', params: {source}}, callback);
+                chrome.tabs.sendMessage(tab.id, {action: 'optionsUpdated', params: {source}}, callback);
             }
         });
     }
@@ -95,6 +110,10 @@ class Backend {
             callback({error: errorToJson(error)});
             return false;
         }
+    }
+
+    _onClipboardText(text) {
+        this._onCommandSearch({mode: 'popup', query: text});
     }
 
     _onZoomChange({tabId, oldZoomFactor, newZoomFactor}) {
@@ -120,6 +139,12 @@ class Backend {
             this.mecab.startListener();
         } else {
             this.mecab.stopListener();
+        }
+
+        if (options.general.enableClipboardPopups) {
+            this.clipboardMonitor.start();
+        } else {
+            this.clipboardMonitor.stop();
         }
     }
 
@@ -249,18 +274,18 @@ class Backend {
                 const node = nodes.pop();
                 for (const key of Object.keys(node.obj)) {
                     const path = node.path.concat(key);
-                    const obj = node.obj[key];
-                    if (obj !== null && typeof obj === 'object') {
-                        nodes.unshift({obj, path});
+                    const obj2 = node.obj[key];
+                    if (obj2 !== null && typeof obj2 === 'object') {
+                        nodes.unshift({obj: obj2, path});
                     } else {
-                        valuePaths.push([obj, path]);
+                        valuePaths.push([obj2, path]);
                     }
                 }
             }
             return valuePaths;
         }
 
-        function modifyOption(path, value, options) {
+        function modifyOption(path, value) {
             let pivot = options;
             for (const key of path.slice(0, -1)) {
                 if (!hasOwn(pivot, key)) {
@@ -273,7 +298,7 @@ class Backend {
         }
 
         for (const [value, path] of getValuePaths(changedOptions)) {
-            modifyOption(path, value, options);
+            modifyOption(path, value);
         }
 
         await this._onApiOptionsSave({source});
@@ -294,7 +319,8 @@ class Backend {
 
     async _onApiTermsFind({text, details, optionsContext}) {
         const options = await this.getOptions(optionsContext);
-        const [definitions, length] = await this.translator.findTerms(text, details, options);
+        const mode = options.general.resultOutputMode;
+        const [definitions, length] = await this.translator.findTerms(mode, text, details, options);
         definitions.splice(options.general.maxResults);
         return {length, definitions};
     }
@@ -304,9 +330,9 @@ class Backend {
         const results = [];
         while (text.length > 0) {
             const term = [];
-            const [definitions, sourceLength] = await this.translator.findTermsInternal(
+            const [definitions, sourceLength] = await this.translator.findTerms(
+                'simple',
                 text.substring(0, options.scanning.length),
-                dictEnabledSet(options),
                 {},
                 options
             );
@@ -314,9 +340,9 @@ class Backend {
                 dictTermsSort(definitions);
                 const {expression, reading} = definitions[0];
                 const source = text.substring(0, sourceLength);
-                for (const {text, furigana} of jpDistributeFuriganaInflected(expression, reading, source)) {
-                    const reading = jpConvertReading(text, furigana, options.parsing.readingMode);
-                    term.push({text, reading});
+                for (const {text: text2, furigana} of jpDistributeFuriganaInflected(expression, reading, source)) {
+                    const reading2 = jpConvertReading(text2, furigana, options.parsing.readingMode);
+                    term.push({text: text2, reading: reading2});
                 }
                 text = text.substring(source.length);
             } else {
@@ -339,17 +365,17 @@ class Backend {
                 for (const {expression, reading, source} of parsedLine) {
                     const term = [];
                     if (expression !== null && reading !== null) {
-                        for (const {text, furigana} of jpDistributeFuriganaInflected(
+                        for (const {text: text2, furigana} of jpDistributeFuriganaInflected(
                             expression,
                             jpKatakanaToHiragana(reading),
                             source
                         )) {
-                            const reading = jpConvertReading(text, furigana, options.parsing.readingMode);
-                            term.push({text, reading});
+                            const reading2 = jpConvertReading(text2, furigana, options.parsing.readingMode);
+                            term.push({text: text2, reading: reading2});
                         }
                     } else {
-                        const reading = jpConvertReading(source, null, options.parsing.readingMode);
-                        term.push({text: source, reading});
+                        const reading2 = jpConvertReading(source, null, options.parsing.readingMode);
+                        term.push({text: source, reading: reading2});
                     }
                     result.push(term);
                 }
@@ -436,12 +462,8 @@ class Backend {
         return this.anki.guiBrowse(`nid:${noteId}`);
     }
 
-    async _onApiTemplateRender({template, data, dynamic}) {
-        return (
-            dynamic ?
-            handlebarsRenderDynamic(template, data) :
-            handlebarsRenderStatic(template, data)
-        );
+    async _onApiTemplateRender({template, data}) {
+        return handlebarsRenderDynamic(template, data);
     }
 
     async _onApiCommandExec({command, params}) {
@@ -480,19 +502,30 @@ class Backend {
         return Promise.resolve({frameId});
     }
 
-    _onApiInjectStylesheet({css}, sender) {
+    _onApiInjectStylesheet({type, value}, sender) {
         if (!sender.tab) {
             return Promise.reject(new Error('Invalid tab'));
         }
 
         const tabId = sender.tab.id;
         const frameId = sender.frameId;
-        const details = {
-            code: css,
-            runAt: 'document_start',
-            cssOrigin: 'user',
-            allFrames: false
-        };
+        const details = (
+            type === 'file' ?
+            {
+                file: value,
+                runAt: 'document_start',
+                cssOrigin: 'author',
+                allFrames: false,
+                matchAboutBlank: true
+            } :
+            {
+                code: value,
+                runAt: 'document_start',
+                cssOrigin: 'user',
+                allFrames: false,
+                matchAboutBlank: true
+            }
+        );
         if (typeof frameId === 'number') {
             details.frameId = frameId;
         }
@@ -521,17 +554,39 @@ class Backend {
     }
 
     async _onApiClipboardGet() {
-        const clipboardPasteTarget = this.clipboardPasteTarget;
-        clipboardPasteTarget.value = '';
-        clipboardPasteTarget.focus();
-        document.execCommand('paste');
-        const result = clipboardPasteTarget.value;
-        clipboardPasteTarget.value = '';
-        return result;
+        /*
+        Notes:
+            document.execCommand('paste') doesn't work on Firefox.
+            This may be a bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1603985
+            Therefore, navigator.clipboard.readText() is used on Firefox.
+
+            navigator.clipboard.readText() can't be used in Chrome for two reasons:
+            * Requires page to be focused, else it rejects with an exception.
+            * When the page is focused, Chrome will request clipboard permission, despite already
+              being an extension with clipboard permissions. It effectively asks for the
+              non-extension permission for clipboard access.
+        */
+        const browser = await Backend._getBrowser();
+        if (browser === 'firefox' || browser === 'firefox-mobile') {
+            return await navigator.clipboard.readText();
+        } else {
+            const clipboardPasteTarget = this.clipboardPasteTarget;
+            clipboardPasteTarget.value = '';
+            clipboardPasteTarget.focus();
+            document.execCommand('paste');
+            const result = clipboardPasteTarget.value;
+            clipboardPasteTarget.value = '';
+            return result;
+        }
     }
 
     async _onApiGetDisplayTemplatesHtml() {
         const url = chrome.runtime.getURL('/mixed/display-templates.html');
+        return await requestText(url, 'GET');
+    }
+
+    async _onApiGetQueryParserTemplatesHtml() {
+        const url = chrome.runtime.getURL('/bg/query-parser-templates.html');
         return await requestText(url, 'GET');
     }
 
@@ -562,26 +617,75 @@ class Backend {
         });
     }
 
+    async _onApiGetMessageToken() {
+        return this.messageToken;
+    }
+
     // Command handlers
 
     async _onCommandSearch(params) {
-        const url = chrome.runtime.getURL('/bg/search.html');
-        if (!(params && params.newTab)) {
-            try {
-                const tab = await Backend._findTab(1000, (url2) => (
-                    url2 !== null &&
-                    url2.startsWith(url) &&
-                    (url2.length === url.length || url2[url.length] === '?' || url2[url.length] === '#')
-                ));
-                if (tab !== null) {
-                    await Backend._focusTab(tab);
-                    return;
+        const {mode='existingOrNewTab', query} = params || {};
+
+        const options = await this.getOptions(this.optionsContext);
+        const {popupWidth, popupHeight} = options.general;
+
+        const baseUrl = chrome.runtime.getURL('/bg/search.html');
+        const queryParams = {mode};
+        if (query && query.length > 0) { queryParams.query = query; }
+        const queryString = new URLSearchParams(queryParams).toString();
+        const url = `${baseUrl}?${queryString}`;
+
+        const isTabMatch = (url2) => {
+            if (url2 === null || !url2.startsWith(baseUrl)) { return false; }
+            const {baseUrl: baseUrl2, queryParams: queryParams2} = parseUrl(url2);
+            return baseUrl2 === baseUrl && (queryParams2.mode === mode || (!queryParams2.mode && mode === 'existingOrNewTab'));
+        };
+
+        const openInTab = async () => {
+            const tab = await Backend._findTab(1000, isTabMatch);
+            if (tab !== null) {
+                await Backend._focusTab(tab);
+                if (queryParams.query) {
+                    await new Promise((resolve) => chrome.tabs.sendMessage(
+                        tab.id, {action: 'searchQueryUpdate', params: {query: queryParams.query}}, resolve
+                    ));
                 }
-            } catch (e) {
-                // NOP
+                return true;
             }
+        };
+
+        switch (mode) {
+            case 'existingOrNewTab':
+                try {
+                    if (await openInTab()) { return; }
+                } catch (e) {
+                    // NOP
+                }
+                chrome.tabs.create({url});
+                return;
+            case 'newTab':
+                chrome.tabs.create({url});
+                return;
+            case 'popup':
+                try {
+                    // chrome.windows not supported (e.g. on Firefox mobile)
+                    if (!isObject(chrome.windows)) { return; }
+                    if (await openInTab()) { return; }
+                    // if the previous popup is open in an invalid state, close it
+                    if (this.popupWindow !== null) {
+                        const callback = () => this.checkLastError(chrome.runtime.lastError);
+                        chrome.windows.remove(this.popupWindow.id, callback);
+                    }
+                    // open new popup
+                    this.popupWindow = await new Promise((resolve) => chrome.windows.create(
+                        {url, width: popupWidth, height: popupHeight, type: 'popup'},
+                        resolve
+                    ));
+                } catch (e) {
+                    // NOP
+                }
+                return;
         }
-        chrome.tabs.create({url});
     }
 
     _onCommandHelp() {
@@ -697,8 +801,11 @@ class Backend {
         await new Promise((resolve, reject) => {
             chrome.tabs.update(tab.id, {active: true}, () => {
                 const e = chrome.runtime.lastError;
-                if (e) { reject(e); }
-                else { resolve(); }
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve();
+                }
             });
         });
 
@@ -708,19 +815,25 @@ class Backend {
         }
 
         try {
-            const tabWindow = await new Promise((resolve) => {
-                chrome.windows.get(tab.windowId, {}, (tabWindow) => {
+            const tabWindow = await new Promise((resolve, reject) => {
+                chrome.windows.get(tab.windowId, {}, (value) => {
                     const e = chrome.runtime.lastError;
-                    if (e) { reject(e); }
-                    else { resolve(tabWindow); }
+                    if (e) {
+                        reject(new Error(e.message));
+                    } else {
+                        resolve(value);
+                    }
                 });
             });
             if (!tabWindow.focused) {
                 await new Promise((resolve, reject) => {
                     chrome.windows.update(tab.windowId, {focused: true}, () => {
                         const e = chrome.runtime.lastError;
-                        if (e) { reject(e); }
-                        else { resolve(); }
+                        if (e) {
+                            reject(new Error(e.message));
+                        } else {
+                            resolve();
+                        }
                     });
                 });
             }
@@ -777,7 +890,9 @@ Backend._messageHandlers = new Map([
     ['getEnvironmentInfo', (self, ...args) => self._onApiGetEnvironmentInfo(...args)],
     ['clipboardGet', (self, ...args) => self._onApiClipboardGet(...args)],
     ['getDisplayTemplatesHtml', (self, ...args) => self._onApiGetDisplayTemplatesHtml(...args)],
-    ['getZoom', (self, ...args) => self._onApiGetZoom(...args)]
+    ['getQueryParserTemplatesHtml', (self, ...args) => self._onApiGetQueryParserTemplatesHtml(...args)],
+    ['getZoom', (self, ...args) => self._onApiGetZoom(...args)],
+    ['getMessageToken', (self, ...args) => self._onApiGetMessageToken(...args)]
 ]);
 
 Backend._commandHandlers = new Map([

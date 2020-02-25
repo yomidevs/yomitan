@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global TextSourceElement, TextSourceRange, DOM*/
 
 const REGEX_TRANSPARENT_COLOR = /rgba\s*\([^)]*,\s*0(?:\.0+)?\s*\)/;
 
@@ -49,7 +50,9 @@ function docImposterCreate(element, isTextarea) {
     const imposter = document.createElement('div');
     const imposterStyle = imposter.style;
 
-    imposter.innerText = element.value;
+    let value = element.value;
+    if (value.endsWith('\n')) { value += '\n'; }
+    imposter.textContent = value;
 
     for (let i = 0, ii = elementStyle.length; i < ii; ++i) {
         const property = elementStyle[i];
@@ -191,8 +194,7 @@ function docSentenceExtract(source, extent) {
             if (terminators.includes(c)) {
                 endPos = i + 1;
                 break;
-            }
-            else if (c in quotesBwd) {
+            } else if (c in quotesBwd) {
                 endPos = i;
                 break;
             }

@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global apiOptionsSet, apiTermsFind, Display, QueryParser, ClipboardMonitor*/
+
 class DisplaySearch extends Display {
     constructor() {
         super(document.querySelector('#spinner'), document.querySelector('#content'));
@@ -36,12 +38,7 @@ class DisplaySearch extends Display {
         this.introVisible = true;
         this.introAnimationTimer = null;
 
-        this.isFirefox = false;
-
-        this.clipboardMonitorTimerId = null;
-        this.clipboardMonitorTimerToken = null;
-        this.clipboardInterval = 250;
-        this.clipboardPreviousText = null;
+        this.clipboardMonitor = new ClipboardMonitor();
     }
 
     static create() {
@@ -52,13 +49,17 @@ class DisplaySearch extends Display {
 
     async prepare() {
         try {
-            await this.initialize();
-            this.isFirefox = await DisplaySearch._isFirefox();
+            const superPromise = super.prepare();
+            const queryParserPromise = this.queryParser.prepare();
+            await Promise.all([superPromise, queryParserPromise]);
+
+            const {queryParams: {query='', mode=''}} = parseUrl(window.location.href);
 
             if (this.search !== null) {
                 this.search.addEventListener('click', (e) => this.onSearch(e), false);
             }
             if (this.query !== null) {
+                document.documentElement.dataset.searchMode = mode;
                 this.query.addEventListener('input', () => this.onSearchInput(), false);
 
                 if (this.wanakanaEnable !== null) {
@@ -69,34 +70,26 @@ class DisplaySearch extends Display {
                         this.wanakanaEnable.checked = false;
                     }
                     this.wanakanaEnable.addEventListener('change', (e) => {
-                        const query = DisplaySearch.getSearchQueryFromLocation(window.location.href) || '';
+                        const {queryParams: {query: query2=''}} = parseUrl(window.location.href);
                         if (e.target.checked) {
                             window.wanakana.bind(this.query);
-                            this.setQuery(window.wanakana.toKana(query));
                             apiOptionsSet({general: {enableWanakana: true}}, this.getOptionsContext());
                         } else {
                             window.wanakana.unbind(this.query);
-                            this.setQuery(query);
                             apiOptionsSet({general: {enableWanakana: false}}, this.getOptionsContext());
                         }
+                        this.setQuery(query2);
                         this.onSearchQueryUpdated(this.query.value, false);
                     });
                 }
 
-                const query = DisplaySearch.getSearchQueryFromLocation(window.location.href);
-                if (query !== null) {
-                    if (this.isWanakanaEnabled()) {
-                        this.setQuery(window.wanakana.toKana(query));
-                    } else {
-                        this.setQuery(query);
-                    }
-                    this.onSearchQueryUpdated(this.query.value, false);
-                }
+                this.setQuery(query);
+                this.onSearchQueryUpdated(this.query.value, false);
             }
-            if (this.clipboardMonitorEnable !== null) {
+            if (this.clipboardMonitorEnable !== null && mode !== 'popup') {
                 if (this.options.general.enableClipboardMonitor === true) {
                     this.clipboardMonitorEnable.checked = true;
-                    this.startClipboardMonitor();
+                    this.clipboardMonitor.start();
                 } else {
                     this.clipboardMonitorEnable.checked = false;
                 }
@@ -106,7 +99,7 @@ class DisplaySearch extends Display {
                             {permissions: ['clipboardRead']},
                             (granted) => {
                                 if (granted) {
-                                    this.startClipboardMonitor();
+                                    this.clipboardMonitor.start();
                                     apiOptionsSet({general: {enableClipboardMonitor: true}}, this.getOptionsContext());
                                 } else {
                                     e.target.checked = false;
@@ -114,16 +107,20 @@ class DisplaySearch extends Display {
                             }
                         );
                     } else {
-                        this.stopClipboardMonitor();
+                        this.clipboardMonitor.stop();
                         apiOptionsSet({general: {enableClipboardMonitor: false}}, this.getOptionsContext());
                     }
                 });
             }
 
+            chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
+
             window.addEventListener('popstate', (e) => this.onPopState(e));
+            window.addEventListener('copy', (e) => this.onCopy(e));
+
+            this.clipboardMonitor.onClipboardText = (text) => this.onExternalSearchUpdate(text);
 
             this.updateSearchButton();
-            this.initClipboardMonitor();
         } catch (e) {
             this.onError(e);
         }
@@ -159,23 +156,30 @@ class DisplaySearch extends Display {
         e.preventDefault();
 
         const query = this.query.value;
+
         this.queryParser.setText(query);
-        const queryString = query.length > 0 ? `?query=${encodeURIComponent(query)}` : '';
-        window.history.pushState(null, '', `${window.location.pathname}${queryString}`);
+
+        const url = new URL(window.location.href);
+        url.searchParams.set('query', query);
+        window.history.pushState(null, '', url.toString());
+
         this.onSearchQueryUpdated(query, true);
     }
 
     onPopState() {
-        const query = DisplaySearch.getSearchQueryFromLocation(window.location.href) || '';
-        if (this.query !== null) {
-            if (this.isWanakanaEnabled()) {
-                this.setQuery(window.wanakana.toKana(query));
-            } else {
-                this.setQuery(query);
-            }
-        }
-
+        const {queryParams: {query='', mode=''}} = parseUrl(window.location.href);
+        document.documentElement.dataset.searchMode = mode;
+        this.setQuery(query);
         this.onSearchQueryUpdated(this.query.value, false);
+    }
+
+    onRuntimeMessage({action, params}, sender, callback) {
+        const handler = DisplaySearch._runtimeMessageHandlers.get(action);
+        if (typeof handler !== 'function') { return false; }
+
+        const result = handler(this, params, sender);
+        callback(result);
+        return false;
     }
 
     onKeyDown(e) {
@@ -200,6 +204,19 @@ class DisplaySearch extends Display {
         if (!super.onKeyDown(e) && !preventFocus && document.activeElement !== this.query) {
             this.query.focus({preventScroll: true});
         }
+    }
+
+    onCopy() {
+        // ignore copy from search page
+        this.clipboardMonitor.setPreviousText(document.getSelection().toString().trim());
+    }
+
+    onExternalSearchUpdate(text) {
+        this.setQuery(text);
+        const url = new URL(window.location.href);
+        url.searchParams.set('query', text);
+        window.history.pushState(null, '', url.toString());
+        this.onSearchQueryUpdated(this.query.value, true);
     }
 
     async onSearchQueryUpdated(query, animate) {
@@ -241,74 +258,6 @@ class DisplaySearch extends Display {
         this.queryParser.setOptions(this.options);
     }
 
-    initClipboardMonitor() {
-        // ignore copy from search page
-        window.addEventListener('copy', () => {
-            this.clipboardPreviousText = document.getSelection().toString().trim();
-        });
-    }
-
-    startClipboardMonitor() {
-        // The token below is used as a unique identifier to ensure that a new clipboard monitor
-        // hasn't been started during the await call. The check below the await this.getClipboardText()
-        // call will exit early if the reference has changed.
-        const token = {};
-        const intervalCallback = async () => {
-            this.clipboardMonitorTimerId = null;
-
-            let text = await this.getClipboardText();
-            if (this.clipboardMonitorTimerToken !== token) { return; }
-
-            if (
-                typeof text === 'string' &&
-                (text = text.trim()).length > 0 &&
-                text !== this.clipboardPreviousText
-            ) {
-                this.clipboardPreviousText = text;
-                if (jpIsStringPartiallyJapanese(text)) {
-                    this.setQuery(this.isWanakanaEnabled() ? window.wanakana.toKana(text) : text);
-                    window.history.pushState(null, '', `${window.location.pathname}?query=${encodeURIComponent(text)}`);
-                    this.onSearchQueryUpdated(this.query.value, true);
-                }
-            }
-
-            this.clipboardMonitorTimerId = setTimeout(intervalCallback, this.clipboardInterval);
-        };
-
-        this.clipboardMonitorTimerToken = token;
-
-        intervalCallback();
-    }
-
-    stopClipboardMonitor() {
-        this.clipboardMonitorTimerToken = null;
-        if (this.clipboardMonitorTimerId !== null) {
-            clearTimeout(this.clipboardMonitorTimerId);
-            this.clipboardMonitorTimerId = null;
-        }
-    }
-
-    async getClipboardText() {
-        /*
-        Notes:
-            apiClipboardGet doesn't work on Firefox because document.execCommand('paste')
-            results in an empty string on the web extension background page.
-            This may be a bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1603985
-            Therefore, navigator.clipboard.readText() is used on Firefox.
-
-            navigator.clipboard.readText() can't be used in Chrome for two reasons:
-            * Requires page to be focused, else it rejects with an exception.
-            * When the page is focused, Chrome will request clipboard permission, despite already
-              being an extension with clipboard permissions. It effectively asks for the
-              non-extension permission for clipboard access.
-        */
-        try {
-            return this.isFirefox ? await navigator.clipboard.readText() : await apiClipboardGet();
-        } catch (e) {
-            return null;
-        }
-    }
-
     isWanakanaEnabled() {
         return this.wanakanaEnable !== null && this.wanakanaEnable.checked;
     }
@@ -318,8 +267,9 @@ class DisplaySearch extends Display {
     }
 
     setQuery(query) {
-        this.query.value = query;
-        this.queryParser.setText(query);
+        const interpretedQuery = this.isWanakanaEnabled() ? window.wanakana.toKana(query) : query;
+        this.query.value = interpretedQuery;
+        this.queryParser.setText(interpretedQuery);
     }
 
     setIntroVisible(visible, animate) {
@@ -394,22 +344,6 @@ class DisplaySearch extends Display {
             document.title = `${text} - Yomichan Search`;
         }
     }
-
-    static getSearchQueryFromLocation(url) {
-        const match = /^[^?#]*\?(?:[^&#]*&)?query=([^&#]*)/.exec(url);
-        return match !== null ? decodeURIComponent(match[1]) : null;
-    }
-
-    static async _isFirefox() {
-        const {browser} = await apiGetEnvironmentInfo();
-        switch (browser) {
-            case 'firefox':
-            case 'firefox-mobile':
-                return true;
-            default:
-                return false;
-        }
-    }
 }
 
 DisplaySearch.onKeyDownIgnoreKeys = {
@@ -426,5 +360,9 @@ DisplaySearch.onKeyDownIgnoreKeys = {
     'AltGraph': [],
     'Shift': []
 };
+
+DisplaySearch._runtimeMessageHandlers = new Map([
+    ['searchQueryUpdate', (self, {query}) => { self.onExternalSearchUpdate(query); }]
+]);
 
 DisplaySearch.instance = DisplaySearch.create();

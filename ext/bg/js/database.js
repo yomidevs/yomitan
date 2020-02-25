@@ -16,11 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global dictFieldSplit, requestJson, JsonSchema, JSZip*/
 
 class Database {
     constructor() {
         this.db = null;
+        this._schemas = new Map();
     }
+
+    // Public
 
     async prepare() {
         if (this.db !== null) {
@@ -28,8 +32,8 @@ class Database {
         }
 
         try {
-            this.db = await Database.open('dict', 5, (db, transaction, oldVersion) => {
-                Database.upgrade(db, transaction, oldVersion, [
+            this.db = await Database._open('dict', 5, (db, transaction, oldVersion) => {
+                Database._upgrade(db, transaction, oldVersion, [
                     {
                         version: 2,
                         stores: {
@@ -95,18 +99,24 @@ class Database {
         }
     }
 
+    async close() {
+        this._validate();
+        this.db.close();
+        this.db = null;
+    }
+
     async purge() {
-        this.validate();
+        this._validate();
 
         this.db.close();
-        await Database.deleteDatabase(this.db.name);
+        await Database._deleteDatabase(this.db.name);
         this.db = null;
 
         await this.prepare();
     }
 
     async deleteDictionary(dictionaryName, onProgress, progressSettings) {
-        this.validate();
+        this._validate();
 
         const targets = [
             ['dictionaries', 'title'],
@@ -133,22 +143,22 @@ class Database {
             const dbObjectStore = dbTransaction.objectStore(objectStoreName);
             const dbIndex = dbObjectStore.index(index);
             const only = IDBKeyRange.only(dictionaryName);
-            promises.push(Database.deleteValues(dbObjectStore, dbIndex, only, onProgress, progressData, progressRate));
+            promises.push(Database._deleteValues(dbObjectStore, dbIndex, only, onProgress, progressData, progressRate));
         }
 
         await Promise.all(promises);
     }
 
-    async findTermsBulk(termList, titles, wildcard) {
-        this.validate();
+    async findTermsBulk(termList, dictionaries, wildcard) {
+        this._validate();
 
         const promises = [];
-        const visited = {};
+        const visited = new Set();
         const results = [];
         const processRow = (row, index) => {
-            if (titles.includes(row.dictionary) && !hasOwn(visited, row.id)) {
-                visited[row.id] = true;
-                results.push(Database.createTerm(row, index));
+            if (dictionaries.has(row.dictionary) && !visited.has(row.id)) {
+                visited.add(row.id);
+                results.push(Database._createTerm(row, index));
             }
         };
 
@@ -164,8 +174,8 @@ class Database {
             const term = prefixWildcard ? stringReverse(termList[i]) : termList[i];
             const query = useWildcard ? IDBKeyRange.bound(term, `${term}\uffff`, false, false) : IDBKeyRange.only(term);
             promises.push(
-                Database.getAll(dbIndex1, query, i, processRow),
-                Database.getAll(dbIndex2, query, i, processRow)
+                Database._getAll(dbIndex1, query, i, processRow),
+                Database._getAll(dbIndex2, query, i, processRow)
             );
         }
 
@@ -174,14 +184,14 @@ class Database {
         return results;
     }
 
-    async findTermsExactBulk(termList, readingList, titles) {
-        this.validate();
+    async findTermsExactBulk(termList, readingList, dictionaries) {
+        this._validate();
 
         const promises = [];
         const results = [];
         const processRow = (row, index) => {
-            if (row.reading === readingList[index] && titles.includes(row.dictionary)) {
-                results.push(Database.createTerm(row, index));
+            if (row.reading === readingList[index] && dictionaries.has(row.dictionary)) {
+                results.push(Database._createTerm(row, index));
             }
         };
 
@@ -191,7 +201,7 @@ class Database {
 
         for (let i = 0; i < termList.length; ++i) {
             const only = IDBKeyRange.only(termList[i]);
-            promises.push(Database.getAll(dbIndex, only, i, processRow));
+            promises.push(Database._getAll(dbIndex, only, i, processRow));
         }
 
         await Promise.all(promises);
@@ -200,13 +210,13 @@ class Database {
     }
 
     async findTermsBySequenceBulk(sequenceList, mainDictionary) {
-        this.validate();
+        this._validate();
 
         const promises = [];
         const results = [];
         const processRow = (row, index) => {
             if (row.dictionary === mainDictionary) {
-                results.push(Database.createTerm(row, index));
+                results.push(Database._createTerm(row, index));
             }
         };
 
@@ -216,7 +226,7 @@ class Database {
 
         for (let i = 0; i < sequenceList.length; ++i) {
             const only = IDBKeyRange.only(sequenceList[i]);
-            promises.push(Database.getAll(dbIndex, only, i, processRow));
+            promises.push(Database._getAll(dbIndex, only, i, processRow));
         }
 
         await Promise.all(promises);
@@ -224,52 +234,27 @@ class Database {
         return results;
     }
 
-    async findTermMetaBulk(termList, titles) {
-        return this.findGenericBulk('termMeta', 'expression', termList, titles, Database.createTermMeta);
+    async findTermMetaBulk(termList, dictionaries) {
+        return this._findGenericBulk('termMeta', 'expression', termList, dictionaries, Database._createTermMeta);
     }
 
-    async findKanjiBulk(kanjiList, titles) {
-        return this.findGenericBulk('kanji', 'character', kanjiList, titles, Database.createKanji);
+    async findKanjiBulk(kanjiList, dictionaries) {
+        return this._findGenericBulk('kanji', 'character', kanjiList, dictionaries, Database._createKanji);
     }
 
-    async findKanjiMetaBulk(kanjiList, titles) {
-        return this.findGenericBulk('kanjiMeta', 'character', kanjiList, titles, Database.createKanjiMeta);
-    }
-
-    async findGenericBulk(tableName, indexName, indexValueList, titles, createResult) {
-        this.validate();
-
-        const promises = [];
-        const results = [];
-        const processRow = (row, index) => {
-            if (titles.includes(row.dictionary)) {
-                results.push(createResult(row, index));
-            }
-        };
-
-        const dbTransaction = this.db.transaction([tableName], 'readonly');
-        const dbTerms = dbTransaction.objectStore(tableName);
-        const dbIndex = dbTerms.index(indexName);
-
-        for (let i = 0; i < indexValueList.length; ++i) {
-            const only = IDBKeyRange.only(indexValueList[i]);
-            promises.push(Database.getAll(dbIndex, only, i, processRow));
-        }
-
-        await Promise.all(promises);
-
-        return results;
+    async findKanjiMetaBulk(kanjiList, dictionaries) {
+        return this._findGenericBulk('kanjiMeta', 'character', kanjiList, dictionaries, Database._createKanjiMeta);
     }
 
     async findTagForTitle(name, title) {
-        this.validate();
+        this._validate();
 
         let result = null;
         const dbTransaction = this.db.transaction(['tagMeta'], 'readonly');
         const dbTerms = dbTransaction.objectStore('tagMeta');
         const dbIndex = dbTerms.index('name');
         const only = IDBKeyRange.only(name);
-        await Database.getAll(dbIndex, only, null, (row) => {
+        await Database._getAll(dbIndex, only, null, (row) => {
             if (title === row.dictionary) {
                 result = row;
             }
@@ -279,19 +264,19 @@ class Database {
     }
 
     async getDictionaryInfo() {
-        this.validate();
+        this._validate();
 
         const results = [];
         const dbTransaction = this.db.transaction(['dictionaries'], 'readonly');
         const dbDictionaries = dbTransaction.objectStore('dictionaries');
 
-        await Database.getAll(dbDictionaries, null, null, (info) => results.push(info));
+        await Database._getAll(dbDictionaries, null, null, (info) => results.push(info));
 
         return results;
     }
 
     async getDictionaryCounts(dictionaryNames, getTotal) {
-        this.validate();
+        this._validate();
 
         const objectStoreNames = [
             'kanji',
@@ -312,7 +297,7 @@ class Database {
 
         // Query is required for Edge, otherwise index.count throws an exception.
         const query1 = IDBKeyRange.lowerBound('', false);
-        const totalPromise = getTotal ? Database.getCounts(targets, query1) : null;
+        const totalPromise = getTotal ? Database._getCounts(targets, query1) : null;
 
         const counts = [];
         const countPromises = [];
@@ -320,7 +305,7 @@ class Database {
             counts.push(null);
             const index = i;
             const query2 = IDBKeyRange.only(dictionaryNames[i]);
-            const countPromise = Database.getCounts(targets, query2).then((v) => counts[index] = v);
+            const countPromise = Database._getCounts(targets, query2).then((v) => counts[index] = v);
             countPromises.push(countPromise);
         }
         await Promise.all(countPromises);
@@ -332,278 +317,287 @@ class Database {
         return result;
     }
 
-    async importDictionary(archive, progressCallback, details) {
-        this.validate();
+    async importDictionary(archiveSource, onProgress, details) {
+        this._validate();
+        const db = this.db;
+        const hasOnProgress = (typeof onProgress === 'function');
 
-        const errors = [];
-        const prefixWildcardsSupported = details.prefixWildcardsSupported;
+        // Read archive
+        const archive = await JSZip.loadAsync(archiveSource);
 
-        const maxTransactionLength = 1000;
-        const bulkAdd = async (objectStoreName, items, total, current) => {
-            const db = this.db;
-            for (let i = 0; i < items.length; i += maxTransactionLength) {
-                if (progressCallback) {
-                    progressCallback(total, current + i / items.length);
-                }
-
-                try {
-                    const count = Math.min(maxTransactionLength, items.length - i);
-                    const transaction = db.transaction([objectStoreName], 'readwrite');
-                    const objectStore = transaction.objectStore(objectStoreName);
-                    await Database.bulkAdd(objectStore, items, i, count);
-                } catch (e) {
-                    errors.push(e);
-                }
-            }
-        };
-
-        const indexDataLoaded = async (summary) => {
-            if (summary.version > 3) {
-                throw new Error('Unsupported dictionary version');
-            }
-
-            const db = this.db;
-            const dbCountTransaction = db.transaction(['dictionaries'], 'readonly');
-            const dbIndex = dbCountTransaction.objectStore('dictionaries').index('title');
-            const only = IDBKeyRange.only(summary.title);
-            const count = await Database.getCount(dbIndex, only);
-
-            if (count > 0) {
-                throw new Error('Dictionary is already imported');
-            }
-
-            const transaction = db.transaction(['dictionaries'], 'readwrite');
-            const objectStore = transaction.objectStore('dictionaries');
-            await Database.bulkAdd(objectStore, [summary], 0, 1);
-        };
-
-        const termDataLoaded = async (summary, entries, total, current) => {
-            const rows = [];
-            if (summary.version === 1) {
-                for (const [expression, reading, definitionTags, rules, score, ...glossary] of entries) {
-                    rows.push({
-                        expression,
-                        reading,
-                        definitionTags,
-                        rules,
-                        score,
-                        glossary,
-                        dictionary: summary.title
-                    });
-                }
-            } else {
-                for (const [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] of entries) {
-                    rows.push({
-                        expression,
-                        reading,
-                        definitionTags,
-                        rules,
-                        score,
-                        glossary,
-                        sequence,
-                        termTags,
-                        dictionary: summary.title
-                    });
-                }
-            }
-
-            if (prefixWildcardsSupported) {
-                for (const row of rows) {
-                    row.expressionReverse = stringReverse(row.expression);
-                    row.readingReverse = stringReverse(row.reading);
-                }
-            }
-
-            await bulkAdd('terms', rows, total, current);
-        };
-
-        const termMetaDataLoaded = async (summary, entries, total, current) => {
-            const rows = [];
-            for (const [expression, mode, data] of entries) {
-                rows.push({
-                    expression,
-                    mode,
-                    data,
-                    dictionary: summary.title
-                });
-            }
-
-            await bulkAdd('termMeta', rows, total, current);
-        };
-
-        const kanjiDataLoaded = async (summary, entries, total, current)  => {
-            const rows = [];
-            if (summary.version === 1) {
-                for (const [character, onyomi, kunyomi, tags, ...meanings] of entries) {
-                    rows.push({
-                        character,
-                        onyomi,
-                        kunyomi,
-                        tags,
-                        meanings,
-                        dictionary: summary.title
-                    });
-                }
-            } else {
-                for (const [character, onyomi, kunyomi, tags, meanings, stats] of entries) {
-                    rows.push({
-                        character,
-                        onyomi,
-                        kunyomi,
-                        tags,
-                        meanings,
-                        stats,
-                        dictionary: summary.title
-                    });
-                }
-            }
-
-            await bulkAdd('kanji', rows, total, current);
-        };
-
-        const kanjiMetaDataLoaded = async (summary, entries, total, current) => {
-            const rows = [];
-            for (const [character, mode, data] of entries) {
-                rows.push({
-                    character,
-                    mode,
-                    data,
-                    dictionary: summary.title
-                });
-            }
-
-            await bulkAdd('kanjiMeta', rows, total, current);
-        };
-
-        const tagDataLoaded = async (summary, entries, total, current) => {
-            const rows = [];
-            for (const [name, category, order, notes, score] of entries) {
-                const row = dictTagSanitize({
-                    name,
-                    category,
-                    order,
-                    notes,
-                    score,
-                    dictionary: summary.title
-                });
-
-                rows.push(row);
-            }
-
-            await bulkAdd('tagMeta', rows, total, current);
-        };
-
-        const result = await Database.importDictionaryZip(
-            archive,
-            indexDataLoaded,
-            termDataLoaded,
-            termMetaDataLoaded,
-            kanjiDataLoaded,
-            kanjiMetaDataLoaded,
-            tagDataLoaded,
-            details
-        );
-
-        return {result, errors};
-    }
-
-    validate() {
-        if (this.db === null) {
-            throw new Error('Database not initialized');
-        }
-    }
-
-    static async importDictionaryZip(
-        archive,
-        indexDataLoaded,
-        termDataLoaded,
-        termMetaDataLoaded,
-        kanjiDataLoaded,
-        kanjiMetaDataLoaded,
-        tagDataLoaded,
-        details
-    ) {
-        const zip = await JSZip.loadAsync(archive);
-
-        const indexFile = zip.files['index.json'];
+        // Read and validate index
+        const indexFileName = 'index.json';
+        const indexFile = archive.files[indexFileName];
         if (!indexFile) {
             throw new Error('No dictionary index found in archive');
         }
 
         const index = JSON.parse(await indexFile.async('string'));
-        if (!index.title || !index.revision) {
+
+        const indexSchema = await this._getSchema('/bg/data/dictionary-index-schema.json');
+        Database._validateJsonSchema(index, indexSchema, indexFileName);
+
+        const dictionaryTitle = index.title;
+        const version = index.format || index.version;
+
+        if (!dictionaryTitle || !index.revision) {
             throw new Error('Unrecognized dictionary format');
         }
 
-        const summary = {
-            title: index.title,
-            revision: index.revision,
-            sequenced: index.sequenced,
-            version: index.format || index.version,
-            prefixWildcardsSupported: !!details.prefixWildcardsSupported
-        };
-
-        await indexDataLoaded(summary);
-
-        const buildTermBankName      = (index) => `term_bank_${index + 1}.json`;
-        const buildTermMetaBankName  = (index) => `term_meta_bank_${index + 1}.json`;
-        const buildKanjiBankName     = (index) => `kanji_bank_${index + 1}.json`;
-        const buildKanjiMetaBankName = (index) => `kanji_meta_bank_${index + 1}.json`;
-        const buildTagBankName       = (index) => `tag_bank_${index + 1}.json`;
-
-        const countBanks = (namer) => {
-            let count = 0;
-            while (zip.files[namer(count)]) {
-                ++count;
-            }
-
-            return count;
-        };
-
-        const termBankCount      = countBanks(buildTermBankName);
-        const termMetaBankCount  = countBanks(buildTermMetaBankName);
-        const kanjiBankCount     = countBanks(buildKanjiBankName);
-        const kanjiMetaBankCount = countBanks(buildKanjiMetaBankName);
-        const tagBankCount       = countBanks(buildTagBankName);
-
-        let bankLoadedCount = 0;
-        let bankTotalCount =
-            termBankCount +
-            termMetaBankCount +
-            kanjiBankCount +
-            kanjiMetaBankCount +
-            tagBankCount;
-
-        if (tagDataLoaded && index.tagMeta) {
-            const bank = [];
-            for (const name in index.tagMeta) {
-                const tag = index.tagMeta[name];
-                bank.push([name, tag.category, tag.order, tag.notes, tag.score]);
-            }
-
-            tagDataLoaded(summary, bank, ++bankTotalCount, bankLoadedCount++);
+        // Verify database is not already imported
+        if (await this._dictionaryExists(dictionaryTitle)) {
+            throw new Error('Dictionary is already imported');
         }
 
-        const loadBank = async (summary, namer, count, callback) => {
-            if (callback) {
-                for (let i = 0; i < count; ++i) {
-                    const bankFile = zip.files[namer(i)];
-                    const bank = JSON.parse(await bankFile.async('string'));
-                    await callback(summary, bank, bankTotalCount, bankLoadedCount++);
+        // Data format converters
+        const convertTermBankEntry = (entry) => {
+            if (version === 1) {
+                const [expression, reading, definitionTags, rules, score, ...glossary] = entry;
+                return {expression, reading, definitionTags, rules, score, glossary};
+            } else {
+                const [expression, reading, definitionTags, rules, score, glossary, sequence, termTags] = entry;
+                return {expression, reading, definitionTags, rules, score, glossary, sequence, termTags};
+            }
+        };
+
+        const convertTermMetaBankEntry = (entry) => {
+            const [expression, mode, data] = entry;
+            return {expression, mode, data};
+        };
+
+        const convertKanjiBankEntry = (entry) => {
+            if (version === 1) {
+                const [character, onyomi, kunyomi, tags, ...meanings] = entry;
+                return {character, onyomi, kunyomi, tags, meanings};
+            } else {
+                const [character, onyomi, kunyomi, tags, meanings, stats] = entry;
+                return {character, onyomi, kunyomi, tags, meanings, stats};
+            }
+        };
+
+        const convertKanjiMetaBankEntry = (entry) => {
+            const [character, mode, data] = entry;
+            return {character, mode, data};
+        };
+
+        const convertTagBankEntry = (entry) => {
+            const [name, category, order, notes, score] = entry;
+            return {name, category, order, notes, score};
+        };
+
+        // Archive file reading
+        const readFileSequence = async (fileNameFormat, convertEntry, schema) => {
+            const results = [];
+            for (let i = 1; true; ++i) {
+                const fileName = fileNameFormat.replace(/\?/, `${i}`);
+                const file = archive.files[fileName];
+                if (!file) { break; }
+
+                const entries = JSON.parse(await file.async('string'));
+                Database._validateJsonSchema(entries, schema, fileName);
+
+                for (let entry of entries) {
+                    entry = convertEntry(entry);
+                    entry.dictionary = dictionaryTitle;
+                    results.push(entry);
+                }
+            }
+            return results;
+        };
+
+        // Load schemas
+        const dataBankSchemaPaths = this.constructor._getDataBankSchemaPaths(version);
+        const dataBankSchemas = await Promise.all(dataBankSchemaPaths.map((path) => this._getSchema(path)));
+
+        // Load data
+        const termList      = await readFileSequence('term_bank_?.json',       convertTermBankEntry,      dataBankSchemas[0]);
+        const termMetaList  = await readFileSequence('term_meta_bank_?.json',  convertTermMetaBankEntry,  dataBankSchemas[1]);
+        const kanjiList     = await readFileSequence('kanji_bank_?.json',      convertKanjiBankEntry,     dataBankSchemas[2]);
+        const kanjiMetaList = await readFileSequence('kanji_meta_bank_?.json', convertKanjiMetaBankEntry, dataBankSchemas[3]);
+        const tagList       = await readFileSequence('tag_bank_?.json',        convertTagBankEntry,       dataBankSchemas[4]);
+
+        // Old tags
+        const indexTagMeta = index.tagMeta;
+        if (typeof indexTagMeta === 'object' && indexTagMeta !== null) {
+            for (const name of Object.keys(indexTagMeta)) {
+                const {category, order, notes, score} = indexTagMeta[name];
+                tagList.push({name, category, order, notes, score});
+            }
+        }
+
+        // Prefix wildcard support
+        const prefixWildcardsSupported = !!details.prefixWildcardsSupported;
+        if (prefixWildcardsSupported) {
+            for (const entry of termList) {
+                entry.expressionReverse = stringReverse(entry.expression);
+                entry.readingReverse = stringReverse(entry.reading);
+            }
+        }
+
+        // Add dictionary
+        const summary = {
+            title: dictionaryTitle,
+            revision: index.revision,
+            sequenced: index.sequenced,
+            version,
+            prefixWildcardsSupported
+        };
+
+        {
+            const transaction = db.transaction(['dictionaries'], 'readwrite');
+            const objectStore = transaction.objectStore('dictionaries');
+            await Database._bulkAdd(objectStore, [summary], 0, 1);
+        }
+
+        // Add data
+        const errors = [];
+        const total = (
+            termList.length +
+            termMetaList.length +
+            kanjiList.length +
+            kanjiMetaList.length +
+            tagList.length
+        );
+        let loadedCount = 0;
+        const maxTransactionLength = 1000;
+
+        const bulkAdd = async (objectStoreName, entries) => {
+            const ii = entries.length;
+            for (let i = 0; i < ii; i += maxTransactionLength) {
+                const count = Math.min(maxTransactionLength, ii - i);
+
+                try {
+                    const transaction = db.transaction([objectStoreName], 'readwrite');
+                    const objectStore = transaction.objectStore(objectStoreName);
+                    await Database._bulkAdd(objectStore, entries, i, count);
+                } catch (e) {
+                    errors.push(e);
+                }
+
+                loadedCount += count;
+                if (hasOnProgress) {
+                    onProgress(total, loadedCount);
                 }
             }
         };
 
-        await loadBank(summary, buildTermBankName, termBankCount, termDataLoaded);
-        await loadBank(summary, buildTermMetaBankName, termMetaBankCount, termMetaDataLoaded);
-        await loadBank(summary, buildKanjiBankName, kanjiBankCount, kanjiDataLoaded);
-        await loadBank(summary, buildKanjiMetaBankName, kanjiMetaBankCount, kanjiMetaDataLoaded);
-        await loadBank(summary, buildTagBankName, tagBankCount, tagDataLoaded);
+        await bulkAdd('terms', termList);
+        await bulkAdd('termMeta', termMetaList);
+        await bulkAdd('kanji', kanjiList);
+        await bulkAdd('kanjiMeta', kanjiMetaList);
+        await bulkAdd('tagMeta', tagList);
 
-        return summary;
+        return {result: summary, errors};
     }
 
-    static createTerm(row, index) {
+    // Private
+
+    _validate() {
+        if (this.db === null) {
+            throw new Error('Database not initialized');
+        }
+    }
+
+    async _getSchema(fileName) {
+        let schemaPromise = this._schemas.get(fileName);
+        if (typeof schemaPromise !== 'undefined') {
+            return schemaPromise;
+        }
+
+        schemaPromise = requestJson(chrome.runtime.getURL(fileName), 'GET');
+        this._schemas.set(fileName, schemaPromise);
+        return schemaPromise;
+    }
+
+    static _validateJsonSchema(value, schema, fileName) {
+        try {
+            JsonSchema.validate(value, schema);
+        } catch (e) {
+            throw Database._formatSchemaError(e, fileName);
+        }
+    }
+
+    static _formatSchemaError(e, fileName) {
+        const valuePathString = Database._getSchemaErrorPathString(e.info.valuePath, 'dictionary');
+        const schemaPathString = Database._getSchemaErrorPathString(e.info.schemaPath, 'schema');
+
+        const e2 = new Error(`Dictionary has invalid data in '${fileName}' for value '${valuePathString}', validated against '${schemaPathString}': ${e.message}`);
+        e2.data = e;
+
+        return e2;
+    }
+
+    static _getSchemaErrorPathString(infoList, base='') {
+        let result = base;
+        for (const [part] of infoList) {
+            switch (typeof part) {
+                case 'string':
+                    if (result.length > 0) {
+                        result += '.';
+                    }
+                    result += part;
+                    break;
+                case 'number':
+                    result += `[${part}]`;
+                    break;
+            }
+        }
+        return result;
+    }
+
+    static _getDataBankSchemaPaths(version) {
+        const termBank = (
+            version === 1 ?
+            '/bg/data/dictionary-term-bank-v1-schema.json' :
+            '/bg/data/dictionary-term-bank-v3-schema.json'
+        );
+        const termMetaBank = '/bg/data/dictionary-term-meta-bank-v3-schema.json';
+        const kanjiBank = (
+            version === 1 ?
+            '/bg/data/dictionary-kanji-bank-v1-schema.json' :
+            '/bg/data/dictionary-kanji-bank-v3-schema.json'
+        );
+        const kanjiMetaBank = '/bg/data/dictionary-kanji-meta-bank-v3-schema.json';
+        const tagBank = '/bg/data/dictionary-tag-bank-v3-schema.json';
+
+        return [termBank, termMetaBank, kanjiBank, kanjiMetaBank, tagBank];
+    }
+
+    async _dictionaryExists(title) {
+        const db = this.db;
+        const dbCountTransaction = db.transaction(['dictionaries'], 'readonly');
+        const dbIndex = dbCountTransaction.objectStore('dictionaries').index('title');
+        const only = IDBKeyRange.only(title);
+        const count = await Database._getCount(dbIndex, only);
+        return count > 0;
+    }
+
+    async _findGenericBulk(tableName, indexName, indexValueList, dictionaries, createResult) {
+        this._validate();
+
+        const promises = [];
+        const results = [];
+        const processRow = (row, index) => {
+            if (dictionaries.has(row.dictionary)) {
+                results.push(createResult(row, index));
+            }
+        };
+
+        const dbTransaction = this.db.transaction([tableName], 'readonly');
+        const dbTerms = dbTransaction.objectStore(tableName);
+        const dbIndex = dbTerms.index(indexName);
+
+        for (let i = 0; i < indexValueList.length; ++i) {
+            const only = IDBKeyRange.only(indexValueList[i]);
+            promises.push(Database._getAll(dbIndex, only, i, processRow));
+        }
+
+        await Promise.all(promises);
+
+        return results;
+    }
+
+    static _createTerm(row, index) {
         return {
             index,
             expression: row.expression,
@@ -619,7 +613,7 @@ class Database {
         };
     }
 
-    static createKanji(row, index) {
+    static _createKanji(row, index) {
         return {
             index,
             character: row.character,
@@ -632,20 +626,20 @@ class Database {
         };
     }
 
-    static createTermMeta({expression, mode, data, dictionary}, index) {
+    static _createTermMeta({expression, mode, data, dictionary}, index) {
         return {expression, mode, data, dictionary, index};
     }
 
-    static createKanjiMeta({character, mode, data, dictionary}, index) {
+    static _createKanjiMeta({character, mode, data, dictionary}, index) {
         return {character, mode, data, dictionary, index};
     }
 
-    static getAll(dbIndex, query, context, processRow) {
-        const fn = typeof dbIndex.getAll === 'function' ? Database.getAllFast : Database.getAllUsingCursor;
+    static _getAll(dbIndex, query, context, processRow) {
+        const fn = typeof dbIndex.getAll === 'function' ? Database._getAllFast : Database._getAllUsingCursor;
         return fn(dbIndex, query, context, processRow);
     }
 
-    static getAllFast(dbIndex, query, context, processRow) {
+    static _getAllFast(dbIndex, query, context, processRow) {
         return new Promise((resolve, reject) => {
             const request = dbIndex.getAll(query);
             request.onerror = (e) => reject(e);
@@ -658,7 +652,7 @@ class Database {
         });
     }
 
-    static getAllUsingCursor(dbIndex, query, context, processRow) {
+    static _getAllUsingCursor(dbIndex, query, context, processRow) {
         return new Promise((resolve, reject) => {
             const request = dbIndex.openCursor(query, 'next');
             request.onerror = (e) => reject(e);
@@ -674,18 +668,18 @@ class Database {
         });
     }
 
-    static getCounts(targets, query) {
+    static _getCounts(targets, query) {
         const countPromises = [];
         const counts = {};
         for (const [objectStoreName, index] of targets) {
             const n = objectStoreName;
-            const countPromise = Database.getCount(index, query).then((count) => counts[n] = count);
+            const countPromise = Database._getCount(index, query).then((count) => counts[n] = count);
             countPromises.push(countPromise);
         }
         return Promise.all(countPromises).then(() => counts);
     }
 
-    static getCount(dbIndex, query) {
+    static _getCount(dbIndex, query) {
         return new Promise((resolve, reject) => {
             const request = dbIndex.count(query);
             request.onerror = (e) => reject(e);
@@ -693,12 +687,12 @@ class Database {
         });
     }
 
-    static getAllKeys(dbIndex, query) {
-        const fn = typeof dbIndex.getAllKeys === 'function' ? Database.getAllKeysFast : Database.getAllKeysUsingCursor;
+    static _getAllKeys(dbIndex, query) {
+        const fn = typeof dbIndex.getAllKeys === 'function' ? Database._getAllKeysFast : Database._getAllKeysUsingCursor;
         return fn(dbIndex, query);
     }
 
-    static getAllKeysFast(dbIndex, query) {
+    static _getAllKeysFast(dbIndex, query) {
         return new Promise((resolve, reject) => {
             const request = dbIndex.getAllKeys(query);
             request.onerror = (e) => reject(e);
@@ -706,7 +700,7 @@ class Database {
         });
     }
 
-    static getAllKeysUsingCursor(dbIndex, query) {
+    static _getAllKeysUsingCursor(dbIndex, query) {
         return new Promise((resolve, reject) => {
             const primaryKeys = [];
             const request = dbIndex.openKeyCursor(query, 'next');
@@ -723,9 +717,9 @@ class Database {
         });
     }
 
-    static async deleteValues(dbObjectStore, dbIndex, query, onProgress, progressData, progressRate) {
+    static async _deleteValues(dbObjectStore, dbIndex, query, onProgress, progressData, progressRate) {
         const hasProgress = (typeof onProgress === 'function');
-        const count = await Database.getCount(dbIndex, query);
+        const count = await Database._getCount(dbIndex, query);
         ++progressData.storesProcesed;
         progressData.count += count;
         if (hasProgress) {
@@ -744,16 +738,16 @@ class Database {
         );
 
         const promises = [];
-        const primaryKeys = await Database.getAllKeys(dbIndex, query);
+        const primaryKeys = await Database._getAllKeys(dbIndex, query);
         for (const key of primaryKeys) {
-            const promise = Database.deleteValue(dbObjectStore, key).then(onValueDeleted);
+            const promise = Database._deleteValue(dbObjectStore, key).then(onValueDeleted);
             promises.push(promise);
         }
 
         await Promise.all(promises);
     }
 
-    static deleteValue(dbObjectStore, key) {
+    static _deleteValue(dbObjectStore, key) {
         return new Promise((resolve, reject) => {
             const request = dbObjectStore.delete(key);
             request.onerror = (e) => reject(e);
@@ -761,7 +755,7 @@ class Database {
         });
     }
 
-    static bulkAdd(objectStore, items, start, count) {
+    static _bulkAdd(objectStore, items, start, count) {
         return new Promise((resolve, reject) => {
             if (start + count > items.length) {
                 count = items.length - start;
@@ -789,7 +783,7 @@ class Database {
         });
     }
 
-    static open(name, version, onUpgradeNeeded) {
+    static _open(name, version, onUpgradeNeeded) {
         return new Promise((resolve, reject) => {
             const request = window.indexedDB.open(name, version * 10);
 
@@ -807,7 +801,7 @@ class Database {
         });
     }
 
-    static upgrade(db, transaction, oldVersion, upgrades) {
+    static _upgrade(db, transaction, oldVersion, upgrades) {
         for (const {version, stores} of upgrades) {
             if (oldVersion >= version) { continue; }
 
@@ -815,15 +809,15 @@ class Database {
             for (const objectStoreName of objectStoreNames) {
                 const {primaryKey, indices} = stores[objectStoreName];
 
-                const objectStoreNames = transaction.objectStoreNames || db.objectStoreNames;
+                const objectStoreNames2 = transaction.objectStoreNames || db.objectStoreNames;
                 const objectStore = (
-                    Database.listContains(objectStoreNames, objectStoreName) ?
+                    Database._listContains(objectStoreNames2, objectStoreName) ?
                     transaction.objectStore(objectStoreName) :
                     db.createObjectStore(objectStoreName, primaryKey)
                 );
 
                 for (const indexName of indices) {
-                    if (Database.listContains(objectStore.indexNames, indexName)) { continue; }
+                    if (Database._listContains(objectStore.indexNames, indexName)) { continue; }
 
                     objectStore.createIndex(indexName, indexName, {});
                 }
@@ -831,7 +825,7 @@ class Database {
         }
     }
 
-    static deleteDatabase(dbName) {
+    static _deleteDatabase(dbName) {
         return new Promise((resolve, reject) => {
             const request = indexedDB.deleteDatabase(dbName);
             request.onerror = (e) => reject(e);
@@ -839,7 +833,7 @@ class Database {
         });
     }
 
-    static listContains(list, value) {
+    static _listContains(list, value) {
         for (let i = 0, ii = list.length; i < ii; ++i) {
             if (list[i] === value) { return true; }
         }

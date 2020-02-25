@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*global wanakana*/
 
 const JP_HALFWIDTH_KATAKANA_MAPPING = new Map([
     ['ｦ', 'ヲヺ-'],
@@ -108,7 +109,7 @@ const JP_JAPANESE_RANGES = [
     [0xff1a, 0xff1f], // Fullwidth punctuation 2
     [0xff3b, 0xff3f], // Fullwidth punctuation 3
     [0xff5b, 0xff60], // Fullwidth punctuation 4
-    [0xffe0, 0xffee], // Currency markers
+    [0xffe0, 0xffee]  // Currency markers
 ];
 
 
@@ -223,15 +224,15 @@ function jpDistributeFurigana(expression, reading) {
     }
 
     let isAmbiguous = false;
-    const segmentize = (reading, groups) => {
+    const segmentize = (reading2, groups) => {
         if (groups.length === 0 || isAmbiguous) {
             return [];
         }
 
         const group = groups[0];
         if (group.mode === 'kana') {
-            if (jpKatakanaToHiragana(reading).startsWith(jpKatakanaToHiragana(group.text))) {
-                const readingLeft = reading.substring(group.text.length);
+            if (jpKatakanaToHiragana(reading2).startsWith(jpKatakanaToHiragana(group.text))) {
+                const readingLeft = reading2.substring(group.text.length);
                 const segs = segmentize(readingLeft, groups.splice(1));
                 if (segs) {
                     return [{text: group.text}].concat(segs);
@@ -239,9 +240,9 @@ function jpDistributeFurigana(expression, reading) {
             }
         } else {
             let foundSegments = null;
-            for (let i = reading.length; i >= group.text.length; --i) {
-                const readingUsed = reading.substring(0, i);
-                const readingLeft = reading.substring(i);
+            for (let i = reading2.length; i >= group.text.length; --i) {
+                const readingUsed = reading2.substring(0, i);
+                const readingLeft = reading2.substring(i);
                 const segs = segmentize(readingLeft, groups.slice(1));
                 if (segs) {
                     if (foundSegments !== null) {

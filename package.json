@@ -1,0 +1,34 @@
+{
+    "name": "yomichan",
+    "version": "0.0.0",
+    "description": "Japanese pop-up dictionary extension for Chrome and Firefox.",
+    "directories": {
+        "test": "test"
+    },
+    "scripts": {
+        "test": "npm run test-lint && npm run test-code",
+        "test-lint": "eslint .",
+        "test-code": "node ./test/test-schema.js && node ./test/test-dictionary.js && node ./test/test-database.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/FooSoft/yomichan.git"
+    },
+    "author": "FooSoft",
+    "license": "GPL-3.0-or-later",
+    "licenses": [
+        {
+            "type": "GPL-3.0-or-later",
+            "url": "https://www.gnu.org/licenses/gpl-3.0.html"
+        }
+    ],
+    "bugs": {
+        "url": "https://github.com/FooSoft/yomichan/issues"
+    },
+    "homepage": "https://foosoft.net/projects/yomichan/",
+    "devDependencies": {
+        "eslint": "^6.8.0",
+        "eslint-plugin-no-unsanitized": "^3.0.2",
+        "fake-indexeddb": "^3.0.0"
+    }
+}
