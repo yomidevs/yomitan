@@ -693,9 +693,10 @@ class Backend {
     }
 
     _onCommandOptions(params) {
-        if (!(params && params.newTab)) {
+        const {mode='existingOrNewTab'} = params || {};
+        if (mode === 'existingOrNewTab') {
             chrome.runtime.openOptionsPage();
-        } else {
+        } else if (mode === 'newTab') {
             const manifest = chrome.runtime.getManifest();
             const url = chrome.runtime.getURL(manifest.options_ui.page);
             chrome.tabs.create({url});
