@@ -90,7 +90,7 @@ class XMLHttpRequest {
 
 const {JsonSchema} = yomichanTest.requireScript('ext/bg/js/json-schema.js', ['JsonSchema']);
 const {dictFieldSplit, dictTagSanitize} = yomichanTest.requireScript('ext/bg/js/dictionary.js', ['dictFieldSplit', 'dictTagSanitize']);
-const {stringReverse, hasOwn} = yomichanTest.requireScript('ext/mixed/js/core.js', ['stringReverse', 'hasOwn'], {chrome});
+const {stringReverse} = yomichanTest.requireScript('ext/mixed/js/core.js', ['stringReverse'], {chrome});
 const {requestJson} = yomichanTest.requireScript('ext/bg/js/request.js', ['requestJson'], {XMLHttpRequest});
 
 const databaseGlobals = {
@@ -98,7 +98,6 @@ const databaseGlobals = {
     JsonSchema,
     requestJson,
     stringReverse,
-    hasOwn,
     dictFieldSplit,
     dictTagSanitize,
     indexedDB: global.indexedDB,
