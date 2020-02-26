@@ -22,6 +22,7 @@
         "dot-notation": "error",
         "eqeqeq": "error",
         "func-names": ["error", "always"],
+        "guard-for-in": "error",
         "no-case-declarations": "error",
         "no-const-assign": "error",
         "no-constant-condition": "off",
