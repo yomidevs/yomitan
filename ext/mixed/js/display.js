@@ -520,15 +520,13 @@ class Display {
 
     updateAdderButtons(states) {
         for (let i = 0; i < states.length; ++i) {
-            const state = states[i];
             let noteId = null;
-            for (const mode in state) {
+            for (const [mode, info] of Object.entries(states[i])) {
                 const button = this.adderButtonFind(i, mode);
                 if (button === null) {
                     continue;
                 }
 
-                const info = state[mode];
                 if (!info.canAdd && noteId === null && info.noteId) {
                     noteId = info.noteId;
                 }
