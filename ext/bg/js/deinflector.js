@@ -57,9 +57,9 @@ class Deinflector {
 
     static normalizeReasons(reasons) {
         const normalizedReasons = [];
-        for (const reason in reasons) {
+        for (const [reason, reasonInfo] of Object.entries(reasons)) {
             const variants = [];
-            for (const {kanaIn, kanaOut, rulesIn, rulesOut} of reasons[reason]) {
+            for (const {kanaIn, kanaOut, rulesIn, rulesOut} of reasonInfo) {
                 variants.push([
                     kanaIn,
                     kanaOut,
