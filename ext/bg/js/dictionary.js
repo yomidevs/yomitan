@@ -20,22 +20,16 @@
 
 function dictEnabledSet(options) {
     const enabledDictionaryMap = new Map();
-    const optionsDictionaries = options.dictionaries;
-    for (const title in optionsDictionaries) {
-        if (!hasOwn(optionsDictionaries, title)) { continue; }
-        const dictionary = optionsDictionaries[title];
-        if (!dictionary.enabled) { continue; }
-        enabledDictionaryMap.set(title, {
-            priority: dictionary.priority || 0,
-            allowSecondarySearches: !!dictionary.allowSecondarySearches
-        });
+    for (const [title, {enabled, priority, allowSecondarySearches}] of Object.entries(options.dictionaries)) {
+        if (!enabled) { continue; }
+        enabledDictionaryMap.set(title, {priority, allowSecondarySearches});
     }
     return enabledDictionaryMap;
 }
 
 function dictConfigured(options) {
-    for (const title in options.dictionaries) {
-        if (options.dictionaries[title].enabled) {
+    for (const {enabled} of Object.values(options.dictionaries)) {
+        if (enabled) {
             return true;
         }
     }
