@@ -30,8 +30,8 @@
  * General
  */
 
-html:root[data-yomichan-page=float]:not([data-yomichan-theme]),
-html:root[data-yomichan-page=float]:not([data-yomichan-theme]) body {
+:root[data-yomichan-page=float]:not([data-yomichan-theme]),
+:root[data-yomichan-page=float]:not([data-yomichan-theme]) body {
     background-color: transparent;
 }
 
@@ -65,10 +65,6 @@ ol, ul {
     height: 2.28571428em; /* 14px => 32px */
 }
 
-.invisible {
-    visibility: hidden;
-}
-
 /*
  * Navigation
  */
@@ -84,15 +80,15 @@ ol, ul {
     border-bottom-style: solid;
 }
 
-html:root[data-yomichan-page=search] .navigation-header {
+:root[data-yomichan-page=search] .navigation-header {
     position: sticky;
 }
 
-html:root[data-yomichan-page=float] .navigation-header {
+:root[data-yomichan-page=float] .navigation-header {
     position: fixed;
 }
 
-html:root[data-yomichan-page=float] .navigation-header:not([hidden])~.navigation-header-spacer {
+:root[data-yomichan-page=float] .navigation-header:not([hidden])~.navigation-header-spacer {
     height: 2.1em;
 }
 
@@ -136,7 +132,7 @@ html:root[data-yomichan-page=float] .navigation-header:not([hidden])~.navigation
     margin-right: 0.2em;
 }
 
-html:root[data-yomichan-page=search][data-search-mode=popup] .search-input {
+:root[data-yomichan-page=search][data-search-mode=popup] .search-input {
     display: none;
 }
 
@@ -150,7 +146,7 @@ html:root[data-yomichan-page=search][data-search-mode=popup] .search-input {
     padding-bottom: 0.72em;
 }
 
-html:root[data-yomichan-page=float] .entry {
+:root[data-yomichan-page=float] .entry {
     padding-left: 0.72em;
     padding-right: 0.72em;
 }
@@ -231,7 +227,7 @@ button.action-button {
     margin-right: 0.375em;
 }
 
-html:root:not([data-enable-search-tags=true]) .tag[data-category=search] {
+:root:not([data-enable-search-tags=true]) .tag[data-category=search] {
     display: none;
 }
 
