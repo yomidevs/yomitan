@@ -156,8 +156,8 @@ function audioBuildFilename(definition) {
 
 async function audioInject(definition, fields, sources, optionsContext) {
     let usesAudio = false;
-    for (const name in fields) {
-        if (fields[name].includes('{audio}')) {
+    for (const fieldValue of Object.values(fields)) {
+        if (fieldValue.includes('{audio}')) {
             usesAudio = true;
             break;
         }

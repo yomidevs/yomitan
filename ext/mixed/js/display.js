@@ -705,8 +705,8 @@ class Display {
 
     noteUsesScreenshot() {
         const fields = this.options.anki.terms.fields;
-        for (const name in fields) {
-            if (fields[name].includes('{screenshot}')) {
+        for (const fieldValue of Object.values(fields)) {
+            if (fieldValue.includes('{screenshot}')) {
                 return true;
             }
         }

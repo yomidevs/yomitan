@@ -719,8 +719,8 @@ class Backend {
 
     async _injectScreenshot(definition, fields, screenshot) {
         let usesScreenshot = false;
-        for (const name in fields) {
-            if (fields[name].includes('{screenshot}')) {
+        for (const fieldValue of Object.values(fields)) {
+            if (fieldValue.includes('{screenshot}')) {
                 usesScreenshot = true;
                 break;
             }
