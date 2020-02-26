@@ -633,7 +633,7 @@ class Display {
             this.setSpinnerVisible(true);
 
             const context = {};
-            if (this.noteUsesScreenshot()) {
+            if (this.noteUsesScreenshot(mode)) {
                 const screenshot = await this.getScreenshot();
                 if (screenshot) {
                     context.screenshot = screenshot;
@@ -703,8 +703,9 @@ class Display {
         }
     }
 
-    noteUsesScreenshot() {
-        const fields = this.options.anki.terms.fields;
+    noteUsesScreenshot(mode) {
+        const optionsAnki = this.options.anki;
+        const fields = (mode === 'kanji' ? optionsAnki.kanji : optionsAnki.terms).fields;
         for (const fieldValue of Object.values(fields)) {
             if (fieldValue.includes('{screenshot}')) {
                 return true;
