@@ -388,40 +388,39 @@ dictFieldFormat.markers = new Set([
 ]);
 
 async function dictNoteFormat(definition, mode, options, templates) {
-    const note = {fields: {}, tags: options.anki.tags};
-    let fields = [];
+    const isKanji = (mode === 'kanji');
+    const tags = options.anki.tags;
+    const modeOptions = isKanji ? options.anki.kanji : options.anki.terms;
+    const modeOptionsFieldEntries = Object.entries(modeOptions.fields);
 
-    if (mode === 'kanji') {
-        fields = options.anki.kanji.fields;
-        note.deckName = options.anki.kanji.deck;
-        note.modelName = options.anki.kanji.model;
-    } else {
-        fields = options.anki.terms.fields;
-        note.deckName = options.anki.terms.deck;
-        note.modelName = options.anki.terms.model;
+    const note = {
+        fields: {},
+        tags,
+        deckName: modeOptions.deck,
+        modelName: modeOptions.model
+    };
 
-        if (definition.audio) {
-            const audio = {
+    for (const [fieldName, fieldValue] of modeOptionsFieldEntries) {
+        note.fields[fieldName] = await dictFieldFormat(fieldValue, definition, mode, options, templates);
+    }
+
+    if (!isKanji && definition.audio) {
+        const audioFields = [];
+
+        for (const [fieldName, fieldValue] of modeOptionsFieldEntries) {
+            if (fieldValue.includes('{audio}')) {
+                audioFields.push(fieldName);
+            }
+        }
+
+        if (audioFields.length > 0) {
+            note.audio = {
                 url: definition.audio.url,
                 filename: definition.audio.filename,
                 skipHash: '7e2c2f954ef6051373ba916f000168dc',
-                fields: []
+                fields: audioFields
             };
-
-            for (const name in fields) {
-                if (fields[name].includes('{audio}')) {
-                    audio.fields.push(name);
-                }
-            }
-
-            if (audio.fields.length > 0) {
-                note.audio = audio;
-            }
         }
-    }
-
-    for (const name in fields) {
-        note.fields[name] = await dictFieldFormat(fields[name], definition, mode, options, templates);
     }
 
     return note;
