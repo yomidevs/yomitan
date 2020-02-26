@@ -142,11 +142,11 @@ class QueryParser extends TextScanner {
         }
         if (this.search.options.parsing.enableMecabParser) {
             const mecabResults = await apiTextParseMecab(text, this.search.getOptionsContext());
-            for (const mecabDictName in mecabResults) {
+            for (const [mecabDictName, mecabDictResults] of mecabResults) {
                 results.push({
                     name: `MeCab: ${mecabDictName}`,
                     id: `mecab-${mecabDictName}`,
-                    parsedText: mecabResults[mecabDictName]
+                    parsedText: mecabDictResults
                 });
             }
         }

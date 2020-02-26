@@ -357,11 +357,11 @@ class Backend {
 
     async _onApiTextParseMecab({text, optionsContext}) {
         const options = await this.getOptions(optionsContext);
-        const results = {};
+        const results = [];
         const rawResults = await this.mecab.parseText(text);
-        for (const mecabName in rawResults) {
+        for (const [mecabName, parsedLines] of Object.entries(rawResults)) {
             const result = [];
-            for (const parsedLine of rawResults[mecabName]) {
+            for (const parsedLine of parsedLines) {
                 for (const {expression, reading, source} of parsedLine) {
                     const term = [];
                     if (expression !== null && reading !== null) {
@@ -381,7 +381,7 @@ class Backend {
                 }
                 result.push([{text: '\n'}]);
             }
-            results[mecabName] = result;
+            results.push([mecabName, result]);
         }
         return results;
     }
