@@ -235,10 +235,10 @@ ConditionsUI.Condition = class Condition {
     updateInput() {
         const conditionDescriptors = this.parent.parent.conditionDescriptors;
         const {type, operator} = this.condition;
-        const props = {
-            placeholder: '',
-            type: 'text'
-        };
+        const props = new Map([
+            ['placeholder', ''],
+            ['type', 'text']
+        ]);
 
         const objects = [];
         if (hasOwn(conditionDescriptors, type)) {
@@ -252,20 +252,20 @@ ConditionsUI.Condition = class Condition {
 
         for (const object of objects) {
             if (hasOwn(object, 'placeholder')) {
-                props.placeholder = object.placeholder;
+                props.set('placeholder', object.placeholder);
             }
             if (object.type === 'number') {
-                props.type = 'number';
+                props.set('type', 'number');
                 for (const prop of ['step', 'min', 'max']) {
                     if (hasOwn(object, prop)) {
-                        props[prop] = object[prop];
+                        props.set(prop, object[prop]);
                     }
                 }
             }
         }
 
-        for (const prop in props) {
-            this.input.prop(prop, props[prop]);
+        for (const [prop, value] of props.entries()) {
+            this.input.prop(prop, value);
         }
 
         const {valid} = this.validateValue(this.condition.value);
