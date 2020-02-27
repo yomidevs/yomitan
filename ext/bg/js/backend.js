@@ -48,6 +48,41 @@ class Backend {
         this.apiForwarder = new BackendApiForwarder();
 
         this.messageToken = yomichan.generateId(16);
+
+        this._messageHandlers = new Map([
+            ['optionsSchemaGet', this._onApiOptionsSchemaGet.bind(this)],
+            ['optionsGet', this._onApiOptionsGet.bind(this)],
+            ['optionsGetFull', this._onApiOptionsGetFull.bind(this)],
+            ['optionsSet', this._onApiOptionsSet.bind(this)],
+            ['optionsSave', this._onApiOptionsSave.bind(this)],
+            ['kanjiFind', this._onApiKanjiFind.bind(this)],
+            ['termsFind', this._onApiTermsFind.bind(this)],
+            ['textParse', this._onApiTextParse.bind(this)],
+            ['textParseMecab', this._onApiTextParseMecab.bind(this)],
+            ['definitionAdd', this._onApiDefinitionAdd.bind(this)],
+            ['definitionsAddable', this._onApiDefinitionsAddable.bind(this)],
+            ['noteView', this._onApiNoteView.bind(this)],
+            ['templateRender', this._onApiTemplateRender.bind(this)],
+            ['commandExec', this._onApiCommandExec.bind(this)],
+            ['audioGetUrl', this._onApiAudioGetUrl.bind(this)],
+            ['screenshotGet', this._onApiScreenshotGet.bind(this)],
+            ['forward', this._onApiForward.bind(this)],
+            ['frameInformationGet', this._onApiFrameInformationGet.bind(this)],
+            ['injectStylesheet', this._onApiInjectStylesheet.bind(this)],
+            ['getEnvironmentInfo', this._onApiGetEnvironmentInfo.bind(this)],
+            ['clipboardGet', this._onApiClipboardGet.bind(this)],
+            ['getDisplayTemplatesHtml', this._onApiGetDisplayTemplatesHtml.bind(this)],
+            ['getQueryParserTemplatesHtml', this._onApiGetQueryParserTemplatesHtml.bind(this)],
+            ['getZoom', this._onApiGetZoom.bind(this)],
+            ['getMessageToken', this._onApiGetMessageToken.bind(this)]
+        ]);
+
+        this._commandHandlers = new Map([
+            ['search', this._onCommandSearch.bind(this)],
+            ['help', this._onCommandHelp.bind(this)],
+            ['options', this._onCommandOptions.bind(this)],
+            ['toggle', this._onCommandToggle.bind(this)]
+        ]);
     }
 
     async prepare() {
@@ -96,11 +131,11 @@ class Backend {
     }
 
     onMessage({action, params}, sender, callback) {
-        const handler = Backend._messageHandlers.get(action);
+        const handler = this._messageHandlers.get(action);
         if (typeof handler !== 'function') { return false; }
 
         try {
-            const promise = handler(this, params, sender);
+            const promise = handler(params, sender);
             promise.then(
                 (result) => callback({result}),
                 (error) => callback({error: errorToJson(error)})
@@ -243,10 +278,10 @@ class Backend {
     }
 
     _runCommand(command, params) {
-        const handler = Backend._commandHandlers.get(command);
+        const handler = this._commandHandlers.get(command);
         if (typeof handler !== 'function') { return false; }
 
-        handler(this, params);
+        handler(params);
         return true;
     }
 
@@ -867,41 +902,6 @@ class Backend {
         return typeof templates === 'string' ? templates : profileOptionsGetDefaultFieldTemplates();
     }
 }
-
-Backend._messageHandlers = new Map([
-    ['optionsSchemaGet', (self, ...args) => self._onApiOptionsSchemaGet(...args)],
-    ['optionsGet', (self, ...args) => self._onApiOptionsGet(...args)],
-    ['optionsGetFull', (self, ...args) => self._onApiOptionsGetFull(...args)],
-    ['optionsSet', (self, ...args) => self._onApiOptionsSet(...args)],
-    ['optionsSave', (self, ...args) => self._onApiOptionsSave(...args)],
-    ['kanjiFind', (self, ...args) => self._onApiKanjiFind(...args)],
-    ['termsFind', (self, ...args) => self._onApiTermsFind(...args)],
-    ['textParse', (self, ...args) => self._onApiTextParse(...args)],
-    ['textParseMecab', (self, ...args) => self._onApiTextParseMecab(...args)],
-    ['definitionAdd', (self, ...args) => self._onApiDefinitionAdd(...args)],
-    ['definitionsAddable', (self, ...args) => self._onApiDefinitionsAddable(...args)],
-    ['noteView', (self, ...args) => self._onApiNoteView(...args)],
-    ['templateRender', (self, ...args) => self._onApiTemplateRender(...args)],
-    ['commandExec', (self, ...args) => self._onApiCommandExec(...args)],
-    ['audioGetUrl', (self, ...args) => self._onApiAudioGetUrl(...args)],
-    ['screenshotGet', (self, ...args) => self._onApiScreenshotGet(...args)],
-    ['forward', (self, ...args) => self._onApiForward(...args)],
-    ['frameInformationGet', (self, ...args) => self._onApiFrameInformationGet(...args)],
-    ['injectStylesheet', (self, ...args) => self._onApiInjectStylesheet(...args)],
-    ['getEnvironmentInfo', (self, ...args) => self._onApiGetEnvironmentInfo(...args)],
-    ['clipboardGet', (self, ...args) => self._onApiClipboardGet(...args)],
-    ['getDisplayTemplatesHtml', (self, ...args) => self._onApiGetDisplayTemplatesHtml(...args)],
-    ['getQueryParserTemplatesHtml', (self, ...args) => self._onApiGetQueryParserTemplatesHtml(...args)],
-    ['getZoom', (self, ...args) => self._onApiGetZoom(...args)],
-    ['getMessageToken', (self, ...args) => self._onApiGetMessageToken(...args)]
-]);
-
-Backend._commandHandlers = new Map([
-    ['search', (self, ...args) => self._onCommandSearch(...args)],
-    ['help', (self, ...args) => self._onCommandHelp(...args)],
-    ['options', (self, ...args) => self._onCommandOptions(...args)],
-    ['toggle', (self, ...args) => self._onCommandToggle(...args)]
-]);
 
 window.yomichanBackend = new Backend();
 window.yomichanBackend.prepare();
