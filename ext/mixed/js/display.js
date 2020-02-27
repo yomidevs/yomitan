@@ -45,6 +45,110 @@ class Display {
         this.displayGenerator = new DisplayGenerator();
         this.windowScroll = new WindowScroll();
 
+        this._onKeyDownHandlers = new Map([
+            ['Escape', () => {
+                this.onSearchClear();
+                return true;
+            }],
+            ['PageUp', (e) => {
+                if (e.altKey) {
+                    this.entryScrollIntoView(this.index - 3, null, true);
+                    return true;
+                }
+                return false;
+            }],
+            ['PageDown', (e) => {
+                if (e.altKey) {
+                    this.entryScrollIntoView(this.index + 3, null, true);
+                    return true;
+                }
+                return false;
+            }],
+            ['End', (e) => {
+                if (e.altKey) {
+                    this.entryScrollIntoView(this.definitions.length - 1, null, true);
+                    return true;
+                }
+                return false;
+            }],
+            ['Home', (e) => {
+                if (e.altKey) {
+                    this.entryScrollIntoView(0, null, true);
+                    return true;
+                }
+                return false;
+            }],
+            ['ArrowUp', (e) => {
+                if (e.altKey) {
+                    this.entryScrollIntoView(this.index - 1, null, true);
+                    return true;
+                }
+                return false;
+            }],
+            ['ArrowDown', (e) => {
+                if (e.altKey) {
+                    this.entryScrollIntoView(this.index + 1, null, true);
+                    return true;
+                }
+                return false;
+            }],
+            ['B', (e) => {
+                if (e.altKey) {
+                    this.sourceTermView();
+                    return true;
+                }
+                return false;
+            }],
+            ['F', (e) => {
+                if (e.altKey) {
+                    this.nextTermView();
+                    return true;
+                }
+                return false;
+            }],
+            ['E', (e) => {
+                if (e.altKey) {
+                    this.noteTryAdd('term-kanji');
+                    return true;
+                }
+                return false;
+            }],
+            ['K', (e) => {
+                if (e.altKey) {
+                    this.noteTryAdd('kanji');
+                    return true;
+                }
+                return false;
+            }],
+            ['R', (e) => {
+                if (e.altKey) {
+                    this.noteTryAdd('term-kana');
+                    return true;
+                }
+                return false;
+            }],
+            ['P', (e) => {
+                if (e.altKey) {
+                    const index = this.index;
+                    if (index < 0 || index >= this.definitions.length) { return; }
+
+                    const entry = this.getEntry(index);
+                    if (entry !== null && entry.dataset.type === 'term') {
+                        this.audioPlay(this.definitions[index], this.firstExpressionIndex, index);
+                    }
+                    return true;
+                }
+                return false;
+            }],
+            ['V', (e) => {
+                if (e.altKey) {
+                    this.noteTryView();
+                    return true;
+                }
+                return false;
+            }]
+        ]);
+
         this.setInteractive(true);
     }
 
@@ -215,9 +319,9 @@ class Display {
 
     onKeyDown(e) {
         const key = Display.getKeyFromEvent(e);
-        const handler = Display._onKeyDownHandlers.get(key);
+        const handler = this._onKeyDownHandlers.get(key);
         if (typeof handler === 'function') {
-            if (handler(this, e)) {
+            if (handler(e)) {
                 e.preventDefault();
                 return true;
             }
@@ -814,120 +918,3 @@ class Display {
         return (typeof key === 'string' ? (key.length === 1 ? key.toUpperCase() : key) : '');
     }
 }
-
-Display._onKeyDownHandlers = new Map([
-    ['Escape', (self) => {
-        self.onSearchClear();
-        return true;
-    }],
-
-    ['PageUp', (self, e) => {
-        if (e.altKey) {
-            self.entryScrollIntoView(self.index - 3, null, true);
-            return true;
-        }
-        return false;
-    }],
-
-    ['PageDown', (self, e) => {
-        if (e.altKey) {
-            self.entryScrollIntoView(self.index + 3, null, true);
-            return true;
-        }
-        return false;
-    }],
-
-    ['End', (self, e) => {
-        if (e.altKey) {
-            self.entryScrollIntoView(self.definitions.length - 1, null, true);
-            return true;
-        }
-        return false;
-    }],
-
-    ['Home', (self, e) => {
-        if (e.altKey) {
-            self.entryScrollIntoView(0, null, true);
-            return true;
-        }
-        return false;
-    }],
-
-    ['ArrowUp', (self, e) => {
-        if (e.altKey) {
-            self.entryScrollIntoView(self.index - 1, null, true);
-            return true;
-        }
-        return false;
-    }],
-
-    ['ArrowDown', (self, e) => {
-        if (e.altKey) {
-            self.entryScrollIntoView(self.index + 1, null, true);
-            return true;
-        }
-        return false;
-    }],
-
-    ['B', (self, e) => {
-        if (e.altKey) {
-            self.sourceTermView();
-            return true;
-        }
-        return false;
-    }],
-
-    ['F', (self, e) => {
-        if (e.altKey) {
-            self.nextTermView();
-            return true;
-        }
-        return false;
-    }],
-
-    ['E', (self, e) => {
-        if (e.altKey) {
-            self.noteTryAdd('term-kanji');
-            return true;
-        }
-        return false;
-    }],
-
-    ['K', (self, e) => {
-        if (e.altKey) {
-            self.noteTryAdd('kanji');
-            return true;
-        }
-        return false;
-    }],
-
-    ['R', (self, e) => {
-        if (e.altKey) {
-            self.noteTryAdd('term-kana');
-            return true;
-        }
-        return false;
-    }],
-
-    ['P', (self, e) => {
-        if (e.altKey) {
-            const index = self.index;
-            if (index < 0 || index >= self.definitions.length) { return; }
-
-            const entry = self.getEntry(index);
-            if (entry !== null && entry.dataset.type === 'term') {
-                self.audioPlay(self.definitions[index], self.firstExpressionIndex, index);
-            }
-            return true;
-        }
-        return false;
-    }],
-
-    ['V', (self, e) => {
-        if (e.altKey) {
-            self.noteTryView();
-            return true;
-        }
-        return false;
-    }]
-]);
