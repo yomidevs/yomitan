@@ -39,6 +39,15 @@ class Frontend extends TextScanner {
         this._contentScale = 1.0;
         this._orphaned = true;
         this._lastShowPromise = Promise.resolve();
+
+        this._windowMessageHandlers = new Map([
+            ['popupClose', () => this.onSearchClear(true)],
+            ['selectionCopy', () => document.execCommand('copy')]
+        ]);
+
+        this._runtimeMessageHandlers = new Map([
+            ['popupSetVisibleOverride', ({visible}) => { this.popup.setVisibleOverride(visible); }]
+        ]);
     }
 
     async prepare() {
@@ -72,17 +81,17 @@ class Frontend extends TextScanner {
 
     onWindowMessage(e) {
         const action = e.data;
-        const handler = Frontend._windowMessageHandlers.get(action);
+        const handler = this._windowMessageHandlers.get(action);
         if (typeof handler !== 'function') { return false; }
 
-        handler(this);
+        handler();
     }
 
     onRuntimeMessage({action, params}, sender, callback) {
-        const handler = Frontend._runtimeMessageHandlers.get(action);
+        const handler = this._runtimeMessageHandlers.get(action);
         if (typeof handler !== 'function') { return false; }
 
-        const result = handler(this, params, sender);
+        const result = handler(params, sender);
         callback(result);
         return false;
     }
@@ -237,12 +246,3 @@ class Frontend extends TextScanner {
         return visualViewport !== null && typeof visualViewport === 'object' ? visualViewport.scale : 1.0;
     }
 }
-
-Frontend._windowMessageHandlers = new Map([
-    ['popupClose', (self) => self.onSearchClear(true)],
-    ['selectionCopy', () => document.execCommand('copy')]
-]);
-
-Frontend._runtimeMessageHandlers = new Map([
-    ['popupSetVisibleOverride', (self, {visible}) => { self.popup.setVisibleOverride(visible); }]
-]);
