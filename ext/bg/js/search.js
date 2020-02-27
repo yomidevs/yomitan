@@ -39,6 +39,21 @@ class DisplaySearch extends Display {
         this.introAnimationTimer = null;
 
         this.clipboardMonitor = new ClipboardMonitor();
+
+        this._onKeyDownIgnoreKeys = new Map([
+            ['ANY_MOD', new Set([
+                'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageDown', 'PageUp', 'Home', 'End',
+                'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10',
+                'F11', 'F12', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19', 'F20',
+                'F21', 'F22', 'F23', 'F24'
+            ])],
+            ['Control', new Set(['C', 'A', 'Z', 'Y', 'X', 'F', 'G'])],
+            ['Meta', new Set(['C', 'A', 'Z', 'Y', 'X', 'F', 'G'])],
+            ['OS', []],
+            ['Alt', []],
+            ['AltGraph', []],
+            ['Shift', []]
+        ]);
     }
 
     static create() {
@@ -151,18 +166,18 @@ class DisplaySearch extends Display {
 
     onKeyDown(e) {
         const key = Display.getKeyFromEvent(e);
-        const ignoreKeys = DisplaySearch.onKeyDownIgnoreKeys;
+        const ignoreKeys = this._onKeyDownIgnoreKeys;
 
-        const activeModifierMap = {
-            'Control': e.ctrlKey,
-            'Meta': e.metaKey,
-            'ANY_MOD': true
-        };
+        const activeModifierMap = new Map([
+            ['Control', e.ctrlKey],
+            ['Meta', e.metaKey],
+            ['ANY_MOD', true]
+        ]);
 
         let preventFocus = false;
-        for (const [modifier, keys] of Object.entries(ignoreKeys)) {
-            const modifierActive = activeModifierMap[modifier];
-            if (key === modifier || (modifierActive && keys.includes(key))) {
+        for (const [modifier, keys] of ignoreKeys.entries()) {
+            const modifierActive = activeModifierMap.get(modifier);
+            if (key === modifier || (modifierActive && keys.has(key))) {
                 preventFocus = true;
                 break;
             }
@@ -344,21 +359,6 @@ class DisplaySearch extends Display {
         }
     }
 }
-
-DisplaySearch.onKeyDownIgnoreKeys = {
-    'ANY_MOD': [
-        'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageDown', 'PageUp', 'Home', 'End',
-        'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10',
-        'F11', 'F12', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19', 'F20',
-        'F21', 'F22', 'F23', 'F24'
-    ],
-    'Control': ['C', 'A', 'Z', 'Y', 'X', 'F', 'G'],
-    'Meta': ['C', 'A', 'Z', 'Y', 'X', 'F', 'G'],
-    'OS': [],
-    'Alt': [],
-    'AltGraph': [],
-    'Shift': []
-};
 
 DisplaySearch._runtimeMessageHandlers = new Map([
     ['searchQueryUpdate', (self, {query}) => { self.onExternalSearchUpdate(query); }]
