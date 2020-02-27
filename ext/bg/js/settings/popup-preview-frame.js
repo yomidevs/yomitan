@@ -28,6 +28,12 @@ class SettingsPopupPreview {
         this.themeChangeTimeout = null;
         this.textSource = null;
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
+
+        this._windowMessageHandlers = new Map([
+            ['setText', ({text}) => this.setText(text)],
+            ['setCustomCss', ({css}) => this.setCustomCss(css)],
+            ['setCustomOuterCss', ({css}) => this.setCustomOuterCss(css)]
+        ]);
     }
 
     static create() {
@@ -101,10 +107,10 @@ class SettingsPopupPreview {
         if (e.origin !== this._targetOrigin) { return; }
 
         const {action, params} = e.data;
-        const handler = SettingsPopupPreview._messageHandlers.get(action);
+        const handler = this._windowMessageHandlers.get(action);
         if (typeof handler !== 'function') { return; }
 
-        handler(this, params);
+        handler(params);
     }
 
     onThemeDarkCheckboxChanged(node) {
@@ -170,12 +176,6 @@ class SettingsPopupPreview {
         this.setInfoVisible(!this.popupShown);
     }
 }
-
-SettingsPopupPreview._messageHandlers = new Map([
-    ['setText', (self, {text}) => self.setText(text)],
-    ['setCustomCss', (self, {css}) => self.setCustomCss(css)],
-    ['setCustomOuterCss', (self, {css}) => self.setCustomOuterCss(css)]
-]);
 
 SettingsPopupPreview.instance = SettingsPopupPreview.create();
 
