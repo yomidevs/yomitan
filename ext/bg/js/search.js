@@ -55,27 +55,19 @@ class DisplaySearch extends Display {
 
             const {queryParams: {query='', mode=''}} = parseUrl(window.location.href);
 
-            if (this.search !== null) {
-                this.search.addEventListener('click', (e) => this.onSearch(e), false);
-            }
-            if (this.query !== null) {
-                document.documentElement.dataset.searchMode = mode;
-                this.query.addEventListener('input', () => this.onSearchInput(), false);
+            document.documentElement.dataset.searchMode = mode;
 
-                if (this.wanakanaEnable !== null) {
-                    if (this.options.general.enableWanakana === true) {
-                        this.wanakanaEnable.checked = true;
-                        window.wanakana.bind(this.query);
-                    } else {
-                        this.wanakanaEnable.checked = false;
-                    }
-                    this.wanakanaEnable.addEventListener('change', (e) => this.onWanakanaEnableChange(e));
-                }
-
-                this.setQuery(query);
-                this.onSearchQueryUpdated(this.query.value, false);
+            if (this.options.general.enableWanakana === true) {
+                this.wanakanaEnable.checked = true;
+                window.wanakana.bind(this.query);
+            } else {
+                this.wanakanaEnable.checked = false;
             }
-            if (this.clipboardMonitorEnable !== null && mode !== 'popup') {
+
+            this.setQuery(query);
+            this.onSearchQueryUpdated(this.query.value, false);
+
+            if (mode !== 'popup') {
                 if (this.options.general.enableClipboardMonitor === true) {
                     this.clipboardMonitorEnable.checked = true;
                     this.clipboardMonitor.start();
@@ -87,6 +79,9 @@ class DisplaySearch extends Display {
 
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
 
+            this.search.addEventListener('click', (e) => this.onSearch(e), false);
+            this.query.addEventListener('input', () => this.onSearchInput(), false);
+            this.wanakanaEnable.addEventListener('change', (e) => this.onWanakanaEnableChange(e));
             window.addEventListener('popstate', (e) => this.onPopState(e));
             window.addEventListener('copy', (e) => this.onCopy(e));
 
