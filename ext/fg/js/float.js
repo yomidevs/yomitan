@@ -33,6 +33,24 @@ class DisplayFloat extends Display {
         this._messageToken = null;
         this._messageTokenPromise = null;
 
+        this._onKeyDownHandlers = new Map([
+            ['C', (e) => {
+                if (e.ctrlKey && !window.getSelection().toString()) {
+                    this.onSelectionCopy();
+                    return true;
+                }
+                return false;
+            }]
+        ]);
+
+        this._windowMessageHandlers = new Map([
+            ['setContent', ({type, details}) => this.setContent(type, details)],
+            ['clearAutoPlayTimer', () => this.clearAutoPlayTimer()],
+            ['setCustomCss', ({css}) => this.setCustomCss(css)],
+            ['prepare', ({options, popupInfo, url, childrenSupported, scale, uniqueId}) => this.prepare(options, popupInfo, url, childrenSupported, scale, uniqueId)],
+            ['setContentScale', ({scale}) => this.setContentScale(scale)]
+        ]);
+
         yomichan.on('orphaned', () => this.onOrphaned());
         window.addEventListener('message', (e) => this.onMessage(e), false);
     }
@@ -98,9 +116,9 @@ class DisplayFloat extends Display {
 
     onKeyDown(e) {
         const key = Display.getKeyFromEvent(e);
-        const handler = DisplayFloat._onKeyDownHandlers.get(key);
+        const handler = this._onKeyDownHandlers.get(key);
         if (typeof handler === 'function') {
-            if (handler(this, e)) {
+            if (handler(e)) {
                 e.preventDefault();
                 return true;
             }
@@ -126,10 +144,10 @@ class DisplayFloat extends Display {
             return;
         }
 
-        const handler = DisplayFloat._messageHandlers.get(action);
+        const handler = this._windowMessageHandlers.get(action);
         if (typeof handler !== 'function') { return; }
 
-        handler(this, params);
+        handler(params);
     }
 
     getOptionsContext() {
@@ -152,23 +170,5 @@ class DisplayFloat extends Display {
         document.body.style.fontSize = `${scale}em`;
     }
 }
-
-DisplayFloat._onKeyDownHandlers = new Map([
-    ['C', (self, e) => {
-        if (e.ctrlKey && !window.getSelection().toString()) {
-            self.onSelectionCopy();
-            return true;
-        }
-        return false;
-    }]
-]);
-
-DisplayFloat._messageHandlers = new Map([
-    ['setContent', (self, {type, details}) => self.setContent(type, details)],
-    ['clearAutoPlayTimer', (self) => self.clearAutoPlayTimer()],
-    ['setCustomCss', (self, {css}) => self.setCustomCss(css)],
-    ['prepare', (self, {options, popupInfo, url, childrenSupported, scale, uniqueId}) => self.prepare(options, popupInfo, url, childrenSupported, scale, uniqueId)],
-    ['setContentScale', (self, {scale}) => self.setContentScale(scale)]
-]);
 
 DisplayFloat.instance = new DisplayFloat();
