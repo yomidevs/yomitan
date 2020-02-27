@@ -29,7 +29,7 @@ async function audioSettingsInitialize() {
         document.querySelector('.audio-source-list'),
         document.querySelector('.audio-source-add')
     );
-    audioSourceUI.save = () => settingsSaveOptions();
+    audioSourceUI.save = settingsSaveOptions;
 
     textToSpeechInitialize();
 }
@@ -37,11 +37,11 @@ async function audioSettingsInitialize() {
 function textToSpeechInitialize() {
     if (typeof speechSynthesis === 'undefined') { return; }
 
-    speechSynthesis.addEventListener('voiceschanged', () => updateTextToSpeechVoices(), false);
+    speechSynthesis.addEventListener('voiceschanged', updateTextToSpeechVoices, false);
     updateTextToSpeechVoices();
 
-    document.querySelector('#text-to-speech-voice').addEventListener('change', (e) => onTextToSpeechVoiceChange(e), false);
-    document.querySelector('#text-to-speech-voice-test').addEventListener('click', () => textToSpeechTest(), false);
+    document.querySelector('#text-to-speech-voice').addEventListener('change', onTextToSpeechVoiceChange, false);
+    document.querySelector('#text-to-speech-voice-test').addEventListener('click', textToSpeechTest, false);
 }
 
 function updateTextToSpeechVoices() {

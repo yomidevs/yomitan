@@ -57,7 +57,7 @@ async function storageInfoInitialize() {
 
     await storageShowInfo();
 
-    document.querySelector('#storage-refresh').addEventListener('click', () => storageShowInfo(), false);
+    document.querySelector('#storage-refresh').addEventListener('click', storageShowInfo, false);
 }
 
 async function storageUpdateStats() {

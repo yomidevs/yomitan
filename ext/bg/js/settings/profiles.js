@@ -39,16 +39,16 @@ async function profileOptionsSetup() {
 }
 
 function profileOptionsSetupEventListeners() {
-    $('#profile-target').change((e) => onTargetProfileChanged(e));
-    $('#profile-name').change((e) => onProfileNameChanged(e));
-    $('#profile-add').click((e) => onProfileAdd(e));
-    $('#profile-remove').click((e) => onProfileRemove(e));
-    $('#profile-remove-confirm').click((e) => onProfileRemoveConfirm(e));
-    $('#profile-copy').click((e) => onProfileCopy(e));
-    $('#profile-copy-confirm').click((e) => onProfileCopyConfirm(e));
+    $('#profile-target').change(onTargetProfileChanged);
+    $('#profile-name').change(onProfileNameChanged);
+    $('#profile-add').click(onProfileAdd);
+    $('#profile-remove').click(onProfileRemove);
+    $('#profile-remove-confirm').click(onProfileRemoveConfirm);
+    $('#profile-copy').click(onProfileCopy);
+    $('#profile-copy-confirm').click(onProfileCopyConfirm);
     $('#profile-move-up').click(() => onProfileMove(-1));
     $('#profile-move-down').click(() => onProfileMove(1));
-    $('.profile-form').find('input, select, textarea').not('.profile-form-manual').change((e) => onProfileOptionsChanged(e));
+    $('.profile-form').find('input, select, textarea').not('.profile-form-manual').change(onProfileOptionsChanged);
 }
 
 function tryGetIntegerValue(selector, min, max) {

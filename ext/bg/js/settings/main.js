@@ -200,7 +200,7 @@ async function formWrite(options) {
 }
 
 function formSetupEventListeners() {
-    $('input, select, textarea').not('.anki-model').not('.ignore-form-changes *').change((e) => onFormOptionsChanged(e));
+    $('input, select, textarea').not('.anki-model').not('.ignore-form-changes *').change(onFormOptionsChanged);
 }
 
 function formUpdateVisibility(options) {

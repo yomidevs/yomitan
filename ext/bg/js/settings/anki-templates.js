@@ -45,10 +45,10 @@ function ankiTemplatesInitialize() {
         node.addEventListener('click', onAnkiTemplateMarkerClicked, false);
     }
 
-    $('#field-templates').on('change', (e) => onAnkiFieldTemplatesChanged(e));
-    $('#field-template-render').on('click', (e) => onAnkiTemplateRender(e));
-    $('#field-templates-reset').on('click', (e) => onAnkiFieldTemplatesReset(e));
-    $('#field-templates-reset-confirm').on('click', (e) => onAnkiFieldTemplatesResetConfirm(e));
+    $('#field-templates').on('change', onAnkiFieldTemplatesChanged);
+    $('#field-template-render').on('click', onAnkiTemplateRender);
+    $('#field-templates-reset').on('click', onAnkiFieldTemplatesReset);
+    $('#field-templates-reset-confirm').on('click', onAnkiFieldTemplatesResetConfirm);
 
     ankiTemplatesUpdateValue();
 }

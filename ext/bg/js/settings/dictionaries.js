@@ -341,14 +341,14 @@ async function dictSettingsInitialize() {
         document.querySelector('#dict-groups-extra'),
         document.querySelector('#dict-extra-template')
     );
-    dictionaryUI.save = () => settingsSaveOptions();
+    dictionaryUI.save = settingsSaveOptions;
 
-    document.querySelector('#dict-purge-button').addEventListener('click', (e) => onDictionaryPurgeButtonClick(e), false);
-    document.querySelector('#dict-purge-confirm').addEventListener('click', (e) => onDictionaryPurge(e), false);
-    document.querySelector('#dict-file-button').addEventListener('click', (e) => onDictionaryImportButtonClick(e), false);
-    document.querySelector('#dict-file').addEventListener('change', (e) => onDictionaryImport(e), false);
-    document.querySelector('#dict-main').addEventListener('change', (e) => onDictionaryMainChanged(e), false);
-    document.querySelector('#database-enable-prefix-wildcard-searches').addEventListener('change', (e) => onDatabaseEnablePrefixWildcardSearchesChanged(e), false);
+    document.querySelector('#dict-purge-button').addEventListener('click', onDictionaryPurgeButtonClick, false);
+    document.querySelector('#dict-purge-confirm').addEventListener('click', onDictionaryPurge, false);
+    document.querySelector('#dict-file-button').addEventListener('click', onDictionaryImportButtonClick, false);
+    document.querySelector('#dict-file').addEventListener('change', onDictionaryImport, false);
+    document.querySelector('#dict-main').addEventListener('change', onDictionaryMainChanged, false);
+    document.querySelector('#database-enable-prefix-wildcard-searches').addEventListener('change', onDatabaseEnablePrefixWildcardSearchesChanged, false);
 
     await onDictionaryOptionsChanged();
     await onDatabaseUpdated();
