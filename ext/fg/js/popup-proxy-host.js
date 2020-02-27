@@ -34,16 +34,16 @@ class PopupProxyHost {
         if (typeof frameId !== 'number') { return; }
 
         this._apiReceiver = new FrontendApiReceiver(`popup-proxy-host#${frameId}`, new Map([
-            ['getOrCreatePopup', ({id, parentId}) => this._onApiGetOrCreatePopup(id, parentId)],
-            ['setOptions', ({id, options}) => this._onApiSetOptions(id, options)],
-            ['hide', ({id, changeFocus}) => this._onApiHide(id, changeFocus)],
-            ['isVisible', ({id}) => this._onApiIsVisibleAsync(id)],
-            ['setVisibleOverride', ({id, visible}) => this._onApiSetVisibleOverride(id, visible)],
-            ['containsPoint', ({id, x, y}) => this._onApiContainsPoint(id, x, y)],
-            ['showContent', ({id, elementRect, writingMode, type, details}) => this._onApiShowContent(id, elementRect, writingMode, type, details)],
-            ['setCustomCss', ({id, css}) => this._onApiSetCustomCss(id, css)],
-            ['clearAutoPlayTimer', ({id}) => this._onApiClearAutoPlayTimer(id)],
-            ['setContentScale', ({id, scale}) => this._onApiSetContentScale(id, scale)]
+            ['getOrCreatePopup', this._onApiGetOrCreatePopup.bind(this)],
+            ['setOptions', this._onApiSetOptions.bind(this)],
+            ['hide', this._onApiHide.bind(this)],
+            ['isVisible', this._onApiIsVisibleAsync.bind(this)],
+            ['setVisibleOverride', this._onApiSetVisibleOverride.bind(this)],
+            ['containsPoint', this._onApiContainsPoint.bind(this)],
+            ['showContent', this._onApiShowContent.bind(this)],
+            ['setCustomCss', this._onApiSetCustomCss.bind(this)],
+            ['clearAutoPlayTimer', this._onApiClearAutoPlayTimer.bind(this)],
+            ['setContentScale', this._onApiSetContentScale.bind(this)]
         ]));
     }
 
@@ -87,56 +87,56 @@ class PopupProxyHost {
 
     // Message handlers
 
-    async _onApiGetOrCreatePopup(id, parentId) {
+    async _onApiGetOrCreatePopup({id, parentId}) {
         const popup = this.getOrCreatePopup(id, parentId);
         return {
             id: popup.id
         };
     }
 
-    async _onApiSetOptions(id, options) {
+    async _onApiSetOptions({id, options}) {
         const popup = this._getPopup(id);
         return await popup.setOptions(options);
     }
 
-    async _onApiHide(id, changeFocus) {
+    async _onApiHide({id, changeFocus}) {
         const popup = this._getPopup(id);
         return popup.hide(changeFocus);
     }
 
-    async _onApiIsVisibleAsync(id) {
+    async _onApiIsVisibleAsync({id}) {
         const popup = this._getPopup(id);
         return await popup.isVisible();
     }
 
-    async _onApiSetVisibleOverride(id, visible) {
+    async _onApiSetVisibleOverride({id, visible}) {
         const popup = this._getPopup(id);
         return await popup.setVisibleOverride(visible);
     }
 
-    async _onApiContainsPoint(id, x, y) {
+    async _onApiContainsPoint({id, x, y}) {
         const popup = this._getPopup(id);
         return await popup.containsPoint(x, y);
     }
 
-    async _onApiShowContent(id, elementRect, writingMode, type, details) {
+    async _onApiShowContent({id, elementRect, writingMode, type, details}) {
         const popup = this._getPopup(id);
         elementRect = PopupProxyHost._convertJsonRectToDOMRect(popup, elementRect);
         if (!PopupProxyHost._popupCanShow(popup)) { return; }
         return await popup.showContent(elementRect, writingMode, type, details);
     }
 
-    async _onApiSetCustomCss(id, css) {
+    async _onApiSetCustomCss({id, css}) {
         const popup = this._getPopup(id);
         return popup.setCustomCss(css);
     }
 
-    async _onApiClearAutoPlayTimer(id) {
+    async _onApiClearAutoPlayTimer({id}) {
         const popup = this._getPopup(id);
         return popup.clearAutoPlayTimer();
     }
 
-    async _onApiSetContentScale(id, scale) {
+    async _onApiSetContentScale({id, scale}) {
         const popup = this._getPopup(id);
         return popup.setContentScale(scale);
     }
