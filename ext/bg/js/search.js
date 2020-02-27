@@ -69,18 +69,7 @@ class DisplaySearch extends Display {
                     } else {
                         this.wanakanaEnable.checked = false;
                     }
-                    this.wanakanaEnable.addEventListener('change', (e) => {
-                        const {queryParams: {query: query2=''}} = parseUrl(window.location.href);
-                        if (e.target.checked) {
-                            window.wanakana.bind(this.query);
-                            apiOptionsSet({general: {enableWanakana: true}}, this.getOptionsContext());
-                        } else {
-                            window.wanakana.unbind(this.query);
-                            apiOptionsSet({general: {enableWanakana: false}}, this.getOptionsContext());
-                        }
-                        this.setQuery(query2);
-                        this.onSearchQueryUpdated(this.query.value, false);
-                    });
+                    this.wanakanaEnable.addEventListener('change', (e) => this.onWanakanaEnableChange(e));
                 }
 
                 this.setQuery(query);
@@ -93,24 +82,7 @@ class DisplaySearch extends Display {
                 } else {
                     this.clipboardMonitorEnable.checked = false;
                 }
-                this.clipboardMonitorEnable.addEventListener('change', (e) => {
-                    if (e.target.checked) {
-                        chrome.permissions.request(
-                            {permissions: ['clipboardRead']},
-                            (granted) => {
-                                if (granted) {
-                                    this.clipboardMonitor.start();
-                                    apiOptionsSet({general: {enableClipboardMonitor: true}}, this.getOptionsContext());
-                                } else {
-                                    e.target.checked = false;
-                                }
-                            }
-                        );
-                    } else {
-                        this.clipboardMonitor.stop();
-                        apiOptionsSet({general: {enableClipboardMonitor: false}}, this.getOptionsContext());
-                    }
-                });
+                this.clipboardMonitorEnable.addEventListener('change', (e) => this.onClipboardMonitorEnableChange(e));
             }
 
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
@@ -250,6 +222,38 @@ class DisplaySearch extends Display {
             window.parent.postMessage('popupClose', '*');
         } catch (e) {
             this.onError(e);
+        }
+    }
+
+    onWanakanaEnableChange(e) {
+        const {queryParams: {query=''}} = parseUrl(window.location.href);
+        const enableWanakana = e.target.checked;
+        if (enableWanakana) {
+            window.wanakana.bind(this.query);
+        } else {
+            window.wanakana.unbind(this.query);
+        }
+        this.setQuery(query);
+        this.onSearchQueryUpdated(this.query.value, false);
+        apiOptionsSet({general: {enableWanakana}}, this.getOptionsContext());
+    }
+
+    onClipboardMonitorEnableChange(e) {
+        if (e.target.checked) {
+            chrome.permissions.request(
+                {permissions: ['clipboardRead']},
+                (granted) => {
+                    if (granted) {
+                        this.clipboardMonitor.start();
+                        apiOptionsSet({general: {enableClipboardMonitor: true}}, this.getOptionsContext());
+                    } else {
+                        e.target.checked = false;
+                    }
+                }
+            );
+        } else {
+            this.clipboardMonitor.stop();
+            apiOptionsSet({general: {enableClipboardMonitor: false}}, this.getOptionsContext());
         }
     }
 
