@@ -54,6 +54,10 @@ class DisplaySearch extends Display {
             ['AltGraph', []],
             ['Shift', []]
         ]);
+
+        this._runtimeMessageHandlers = new Map([
+            ['searchQueryUpdate', ({query}) => { this.onExternalSearchUpdate(query); }]
+        ]);
     }
 
     static create() {
@@ -156,10 +160,10 @@ class DisplaySearch extends Display {
     }
 
     onRuntimeMessage({action, params}, sender, callback) {
-        const handler = DisplaySearch._runtimeMessageHandlers.get(action);
+        const handler = this._runtimeMessageHandlers.get(action);
         if (typeof handler !== 'function') { return false; }
 
-        const result = handler(this, params, sender);
+        const result = handler(params, sender);
         callback(result);
         return false;
     }
@@ -359,9 +363,5 @@ class DisplaySearch extends Display {
         }
     }
 }
-
-DisplaySearch._runtimeMessageHandlers = new Map([
-    ['searchQueryUpdate', (self, {query}) => { self.onExternalSearchUpdate(query); }]
-]);
 
 DisplaySearch.instance = DisplaySearch.create();
