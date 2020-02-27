@@ -46,10 +46,7 @@ class SettingsPopupPreview {
         // Setup events
         window.addEventListener('message', this.onMessage.bind(this), false);
 
-        const themeDarkCheckbox = document.querySelector('#theme-dark-checkbox');
-        if (themeDarkCheckbox !== null) {
-            themeDarkCheckbox.addEventListener('change', () => this.onThemeDarkCheckboxChanged(themeDarkCheckbox), false);
-        }
+        document.querySelector('#theme-dark-checkbox').addEventListener('change', this.onThemeDarkCheckboxChanged.bind(this), false);
 
         // Overwrite API functions
         window.apiOptionsGet = this.apiOptionsGet.bind(this);
@@ -113,8 +110,8 @@ class SettingsPopupPreview {
         handler(params);
     }
 
-    onThemeDarkCheckboxChanged(node) {
-        document.documentElement.classList.toggle('dark', node.checked);
+    onThemeDarkCheckboxChanged(e) {
+        document.documentElement.classList.toggle('dark', e.target.checked);
         if (this.themeChangeTimeout !== null) {
             clearTimeout(this.themeChangeTimeout);
         }
