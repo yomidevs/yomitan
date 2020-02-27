@@ -41,7 +41,7 @@ ConditionsUI.Container = class Container {
             this.children.push(new ConditionsUI.ConditionGroup(this, conditionGroup));
         }
 
-        this.addButton.on('click', () => this.onAddConditionGroup());
+        this.addButton.on('click', this.onAddConditionGroup.bind(this));
     }
 
     cleanup() {
@@ -127,7 +127,7 @@ ConditionsUI.ConditionGroup = class ConditionGroup {
             this.children.push(new ConditionsUI.Condition(this, condition));
         }
 
-        this.addButton.on('click', () => this.onAddCondition());
+        this.addButton.on('click', this.onAddCondition.bind(this));
     }
 
     cleanup() {
@@ -185,10 +185,10 @@ ConditionsUI.Condition = class Condition {
         this.updateOperators();
         this.updateInput();
 
-        this.input.on('change', () => this.onInputChanged());
-        this.typeSelect.on('change', () => this.onConditionTypeChanged());
-        this.operatorSelect.on('change', () => this.onConditionOperatorChanged());
-        this.removeButton.on('click', () => this.onRemoveClicked());
+        this.input.on('change', this.onInputChanged.bind(this));
+        this.typeSelect.on('change', this.onConditionTypeChanged.bind(this));
+        this.operatorSelect.on('change', this.onConditionOperatorChanged.bind(this));
+        this.removeButton.on('click', this.onRemoveClicked.bind(this));
     }
 
     cleanup() {

@@ -37,7 +37,7 @@ AudioSourceUI.Container = class Container {
             this.children.push(new AudioSourceUI.AudioSource(this, audioSource, this.children.length));
         }
 
-        this._clickListener = () => this.onAddAudioSource();
+        this._clickListener = this.onAddAudioSource.bind(this);
         this.addButton.addEventListener('click', this._clickListener, false);
     }
 
@@ -105,8 +105,8 @@ AudioSourceUI.AudioSource = class AudioSource {
 
         this.select.value = audioSource;
 
-        this._selectChangeListener = () => this.onSelectChanged();
-        this._removeClickListener = () => this.onRemoveClicked();
+        this._selectChangeListener = this.onSelectChanged.bind(this);
+        this._removeClickListener = this.onRemoveClicked.bind(this);
 
         this.select.addEventListener('change', this._selectChangeListener, false);
         this.removeButton.addEventListener('click', this._removeClickListener, false);

@@ -51,8 +51,8 @@ class DisplayFloat extends Display {
             ['setContentScale', ({scale}) => this.setContentScale(scale)]
         ]);
 
-        yomichan.on('orphaned', () => this.onOrphaned());
-        window.addEventListener('message', (e) => this.onMessage(e), false);
+        yomichan.on('orphaned', this.onOrphaned.bind(this));
+        window.addEventListener('message', this.onMessage.bind(this), false);
     }
 
     async prepare(options, popupInfo, url, childrenSupported, scale, uniqueId) {

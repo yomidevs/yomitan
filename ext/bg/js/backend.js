@@ -100,10 +100,10 @@ class Backend {
         this.onOptionsUpdated('background');
 
         if (isObject(chrome.commands) && isObject(chrome.commands.onCommand)) {
-            chrome.commands.onCommand.addListener((command) => this._runCommand(command));
+            chrome.commands.onCommand.addListener(this._runCommand.bind(this));
         }
         if (isObject(chrome.tabs) && isObject(chrome.tabs.onZoomChange)) {
-            chrome.tabs.onZoomChange.addListener((info) => this._onZoomChange(info));
+            chrome.tabs.onZoomChange.addListener(this._onZoomChange.bind(this));
         }
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
 
@@ -116,7 +116,7 @@ class Backend {
         this.isPreparedResolve = null;
         this.isPreparedPromise = null;
 
-        this.clipboardMonitor.onClipboardText = (text) => this._onClipboardText(text);
+        this.clipboardMonitor.onClipboardText = this._onClipboardText.bind(this);
     }
 
     onOptionsUpdated(source) {

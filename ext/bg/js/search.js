@@ -93,18 +93,18 @@ class DisplaySearch extends Display {
                 } else {
                     this.clipboardMonitorEnable.checked = false;
                 }
-                this.clipboardMonitorEnable.addEventListener('change', (e) => this.onClipboardMonitorEnableChange(e));
+                this.clipboardMonitorEnable.addEventListener('change', this.onClipboardMonitorEnableChange.bind(this));
             }
 
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
 
-            this.search.addEventListener('click', (e) => this.onSearch(e), false);
-            this.query.addEventListener('input', () => this.onSearchInput(), false);
-            this.wanakanaEnable.addEventListener('change', (e) => this.onWanakanaEnableChange(e));
-            window.addEventListener('popstate', (e) => this.onPopState(e));
-            window.addEventListener('copy', (e) => this.onCopy(e));
+            this.search.addEventListener('click', this.onSearch.bind(this), false);
+            this.query.addEventListener('input', this.onSearchInput.bind(this), false);
+            this.wanakanaEnable.addEventListener('change', this.onWanakanaEnableChange.bind(this));
+            window.addEventListener('popstate', this.onPopState.bind(this));
+            window.addEventListener('copy', this.onCopy.bind(this));
 
-            this.clipboardMonitor.onClipboardText = (text) => this.onExternalSearchUpdate(text);
+            this.clipboardMonitor.onClipboardText = this.onExternalSearchUpdate.bind(this);
 
             this.updateSearchButton();
         } catch (e) {

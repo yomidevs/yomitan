@@ -36,7 +36,7 @@ class SettingsDictionaryListUI {
         this.dictionaryEntries = [];
         this.extra = null;
 
-        document.querySelector('#dict-delete-confirm').addEventListener('click', (e) => this.onDictionaryConfirmDelete(e), false);
+        document.querySelector('#dict-delete-confirm').addEventListener('click', this.onDictionaryConfirmDelete.bind(this), false);
     }
 
     setOptionsDictionaries(optionsDictionaries) {
@@ -198,10 +198,10 @@ class SettingsDictionaryEntryUI {
 
         this.applyValues();
 
-        this.eventListeners.addEventListener(this.enabledCheckbox, 'change', (e) => this.onEnabledChanged(e), false);
-        this.eventListeners.addEventListener(this.allowSecondarySearchesCheckbox, 'change', (e) => this.onAllowSecondarySearchesChanged(e), false);
-        this.eventListeners.addEventListener(this.priorityInput, 'change', (e) => this.onPriorityChanged(e), false);
-        this.eventListeners.addEventListener(this.deleteButton, 'click', (e) => this.onDeleteButtonClicked(e), false);
+        this.eventListeners.addEventListener(this.enabledCheckbox, 'change', this.onEnabledChanged.bind(this), false);
+        this.eventListeners.addEventListener(this.allowSecondarySearchesCheckbox, 'change', this.onAllowSecondarySearchesChanged.bind(this), false);
+        this.eventListeners.addEventListener(this.priorityInput, 'change', this.onPriorityChanged.bind(this), false);
+        this.eventListeners.addEventListener(this.deleteButton, 'click', this.onDeleteButtonClicked.bind(this), false);
     }
 
     cleanup() {

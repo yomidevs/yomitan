@@ -44,7 +44,7 @@ class SettingsPopupPreview {
 
     async prepare() {
         // Setup events
-        window.addEventListener('message', (e) => this.onMessage(e), false);
+        window.addEventListener('message', this.onMessage.bind(this), false);
 
         const themeDarkCheckbox = document.querySelector('#theme-dark-checkbox');
         if (themeDarkCheckbox !== null) {
@@ -52,7 +52,7 @@ class SettingsPopupPreview {
         }
 
         // Overwrite API functions
-        window.apiOptionsGet = (...args) => this.apiOptionsGet(...args);
+        window.apiOptionsGet = this.apiOptionsGet.bind(this);
 
         // Overwrite frontend
         const popupHost = new PopupProxyHost();
@@ -62,7 +62,7 @@ class SettingsPopupPreview {
         this.popup.setChildrenSupported(false);
 
         this.popupSetCustomOuterCssOld = this.popup.setCustomOuterCss;
-        this.popup.setCustomOuterCss = (...args) => this.popupSetCustomOuterCss(...args);
+        this.popup.setCustomOuterCss = this.popupSetCustomOuterCss.bind(this);
 
         this.frontend = new Frontend(this.popup);
 

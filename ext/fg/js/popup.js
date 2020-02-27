@@ -260,7 +260,7 @@ class Popup {
             'mozfullscreenchange',
             'webkitfullscreenchange'
         ];
-        const onFullscreenChanged = () => this._onFullscreenChanged();
+        const onFullscreenChanged = this._onFullscreenChanged.bind(this);
         for (const eventName of fullscreenEvents) {
             this._fullscreenEventListeners.addEventListener(document, eventName, onFullscreenChanged, false);
         }

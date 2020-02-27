@@ -26,7 +26,7 @@ class WindowScroll {
         this.animationEndTime = 0;
         this.animationEndX = 0;
         this.animationEndY = 0;
-        this.requestAnimationFrameCallback = (t) => this.onAnimationFrame(t);
+        this.requestAnimationFrameCallback = this.onAnimationFrame.bind(this);
     }
 
     toY(y) {

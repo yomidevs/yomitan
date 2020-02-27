@@ -64,9 +64,9 @@ class Frontend extends TextScanner {
                 window.visualViewport.addEventListener('resize', this.onVisualViewportResize.bind(this));
             }
 
-            yomichan.on('orphaned', () => this.onOrphaned());
-            yomichan.on('optionsUpdated', () => this.updateOptions());
-            yomichan.on('zoomChanged', (e) => this.onZoomChanged(e));
+            yomichan.on('orphaned', this.onOrphaned.bind(this));
+            yomichan.on('optionsUpdated', this.updateOptions.bind(this));
+            yomichan.on('zoomChanged', this.onZoomChanged.bind(this));
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
 
             this._updateContentScale();
