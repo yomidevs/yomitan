@@ -49,10 +49,10 @@ class DisplaySearch extends Display {
             ])],
             ['Control', new Set(['C', 'A', 'Z', 'Y', 'X', 'F', 'G'])],
             ['Meta', new Set(['C', 'A', 'Z', 'Y', 'X', 'F', 'G'])],
-            ['OS', []],
-            ['Alt', []],
-            ['AltGraph', []],
-            ['Shift', []]
+            ['OS', new Set()],
+            ['Alt', new Set()],
+            ['AltGraph', new Set()],
+            ['Shift', new Set()]
         ]);
 
         this._runtimeMessageHandlers = new Map([
@@ -175,6 +175,8 @@ class DisplaySearch extends Display {
         const activeModifierMap = new Map([
             ['Control', e.ctrlKey],
             ['Meta', e.metaKey],
+            ['Shift', e.shiftKey],
+            ['Alt', e.altKey],
             ['ANY_MOD', true]
         ]);
 
