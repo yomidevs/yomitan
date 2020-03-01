@@ -59,12 +59,14 @@ h2 { border-bottom-color: #2f2f2f; }
     color: #666666;
 }
 
-.term-definition-container,
-.kanji-glossary-container {
+.term-definition-list,
+.term-pitch-accent-group-list,
+.kanji-glossary-list {
     color: #888888;
 }
 
 .term-glossary,
+.term-pitch-accent,
 .kanji-glossary {
     color: #d4d4d4;
 }
@@ -74,3 +76,5 @@ h2 { border-bottom-color: #2f2f2f; }
     background-color: #d4d4d4;
     color: #1e1e1e;
 }
+
+.term-pitch-accent-character:before { border-color: #ffffff; }

@@ -37,9 +37,14 @@ class DisplayGenerator {
 
         const expressionsContainer = node.querySelector('.term-expression-list');
         const reasonsContainer = node.querySelector('.term-reasons');
+        const pitchesContainer = node.querySelector('.term-pitch-accent-group-list');
         const frequenciesContainer = node.querySelector('.frequencies');
         const definitionsContainer = node.querySelector('.term-definition-list');
         const debugInfoContainer = node.querySelector('.debug-info');
+        const bodyContainer = node.querySelector('.term-entry-body');
+
+        const pitches = DisplayGenerator._getPitchInfos(details);
+        const pitchCount = pitches.reduce((i, v) => i + v[1].length, 0);
 
         const expressionMulti = Array.isArray(details.expressions);
         const definitionMulti = Array.isArray(details.definitions);
@@ -52,9 +57,12 @@ class DisplayGenerator {
         node.dataset.expressionCount = `${expressionCount}`;
         node.dataset.definitionCount = `${definitionCount}`;
         node.dataset.uniqueExpressionCount = `${uniqueExpressionCount}`;
+        node.dataset.pitchAccentDictionaryCount = `${pitches.length}`;
+        node.dataset.pitchAccentCount = `${pitchCount}`;
 
         bodyContainer.dataset.sectionCount = `${
-            (definitionCount > 0 ? 1 : 0)
+            (definitionCount > 0 ? 1 : 0) +
+            (pitches.length > 0 ? 1 : 0)
         }`;
 
         const termTags = details.termTags;
@@ -64,6 +72,7 @@ class DisplayGenerator {
         DisplayGenerator._appendMultiple(expressionsContainer, this.createTermExpression.bind(this), expressions, [[details, termTags]]);
         DisplayGenerator._appendMultiple(reasonsContainer, this.createTermReason.bind(this), details.reasons);
         DisplayGenerator._appendMultiple(frequenciesContainer, this.createFrequencyTag.bind(this), details.frequencies);
+        DisplayGenerator._appendMultiple(pitchesContainer, this.createPitches.bind(this), pitches);
         DisplayGenerator._appendMultiple(definitionsContainer, this.createTermDefinitionItem.bind(this), details.definitions, [details]);
 
         if (debugInfoContainer !== null) {
@@ -270,6 +279,73 @@ class DisplayGenerator {
         return node;
     }
 
+    createPitches(details) {
+        if (!this._termPitchAccentStaticTemplateIsSetup) {
+            this._termPitchAccentStaticTemplateIsSetup = true;
+            const t = this._templateHandler.instantiate('term-pitch-accent-static');
+            document.head.appendChild(t);
+        }
+
+        const [dictionary, dictionaryPitches] = details;
+
+        const node = this._templateHandler.instantiate('term-pitch-accent-group');
+        node.dataset.dictionary = dictionary;
+        node.dataset.pitchesMulti = 'true';
+        node.dataset.pitchesCount = `${dictionaryPitches.length}`;
+
+        const tag = this.createTag({notes: '', name: dictionary, category: 'dictionary'});
+        node.querySelector('.term-pitch-accent-group-tag-list').appendChild(tag);
+
+        const n = node.querySelector('.term-pitch-accent-list');
+        DisplayGenerator._appendMultiple(n, this.createPitch.bind(this), dictionaryPitches);
+
+        return node;
+    }
+
+    createPitch(details) {
+        const {expressions, reading, position, tags} = details;
+        const morae = DisplayGenerator._jpGetKanaMorae(reading);
+
+        const node = this._templateHandler.instantiate('term-pitch-accent');
+
+        node.dataset.pitchAccentPosition = `${position}`;
+        node.dataset.tagCount = `${tags.length}`;
+
+        let n = node.querySelector('.term-pitch-accent-position');
+        n.textContent = `${position}`;
+
+        n = node.querySelector('.term-pitch-accent-tag-list');
+        DisplayGenerator._appendMultiple(n, this.createTag.bind(this), tags);
+
+        n = node.querySelector('.term-pitch-accent-expression-list');
+        DisplayGenerator._appendMultiple(n, this.createPitchExpression.bind(this), expressions);
+
+        n = node.querySelector('.term-pitch-accent-characters');
+        for (let i = 0, ii = morae.length; i < ii; ++i) {
+            const mora = morae[i];
+            const highPitch = DisplayGenerator._jpIsMoraPitchHigh(i, position);
+            const highPitchNext = DisplayGenerator._jpIsMoraPitchHigh(i + 1, position);
+
+            const n1 = this._templateHandler.instantiate('term-pitch-accent-character');
+            const n2 = n1.querySelector('.term-pitch-accent-character-inner');
+
+            n1.dataset.position = `${i}`;
+            n1.dataset.pitch = highPitch ? 'high' : 'low';
+            n1.dataset.pitchNext = highPitchNext ? 'high' : 'low';
+            n2.textContent = mora;
+
+            n.appendChild(n1);
+        }
+
+        return node;
+    }
+
+    createPitchExpression(expression) {
+        const node = this._templateHandler.instantiate('term-pitch-accent-expression');
+        node.textContent = expression;
+        return node;
+    }
+
     createFrequencyTag(details) {
         const node = this._templateHandler.instantiate('tag-frequency');
 
@@ -356,4 +432,85 @@ class DisplayGenerator {
             container.appendChild(document.createTextNode(parts[i]));
         }
     }
+
+    static _getPitchInfos(definition) {
+        const results = new Map();
+
+        const expressions = definition.expressions;
+        const sources = Array.isArray(expressions) ? expressions : [definition];
+        for (const {pitches: expressionPitches, expression} of sources) {
+            for (const {reading, pitches, dictionary} of expressionPitches) {
+                let dictionaryResults = results.get(dictionary);
+                if (typeof dictionaryResults === 'undefined') {
+                    dictionaryResults = [];
+                    results.set(dictionary, dictionaryResults);
+                }
+
+                for (const {position, tags} of pitches) {
+                    let pitchInfo = DisplayGenerator._findExistingPitchInfo(reading, position, tags, dictionaryResults);
+                    if (pitchInfo === null) {
+                        pitchInfo = {expressions: new Set(), reading, position, tags};
+                        dictionaryResults.push(pitchInfo);
+                    }
+                    pitchInfo.expressions.add(expression);
+                }
+            }
+        }
+
+        return [...results.entries()];
+    }
+
+    static _findExistingPitchInfo(reading, position, tags, pitchInfoList) {
+        for (const pitchInfo of pitchInfoList) {
+            if (
+                pitchInfo.reading === reading &&
+                pitchInfo.position === position &&
+                DisplayGenerator._areTagListsEqual(pitchInfo.tags, tags)
+            ) {
+                return pitchInfo;
+            }
+        }
+        return null;
+    }
+
+    static _areTagListsEqual(tagList1, tagList2) {
+        const ii = tagList1.length;
+        if (tagList2.length !== ii) { return false; }
+
+        for (let i = 0; i < ii; ++i) {
+            const tag1 = tagList1[i];
+            const tag2 = tagList2[i];
+            if (tag1.name !== tag2.name || tag1.dictionary !== tag2.dictionary) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    static _jpGetKanaMorae(text) {
+        // This function splits Japanese kana reading into its individual mora
+        // components. It is assumed that the text is well-formed.
+        const smallKanaSet = DisplayGenerator._smallKanaSet;
+        const morae = [];
+        let i;
+        for (const c of text) {
+            if (smallKanaSet.has(c) && (i = morae.length) > 0) {
+                morae[i - 1] += c;
+            } else {
+                morae.push(c);
+            }
+        }
+        return morae;
+    }
+
+    static _jpCreateSmallKanaSet() {
+        return new Set(Array.from('ぁぃぅぇぉゃゅょゎァィゥェォャュョヮ'));
+    }
+
+    static _jpIsMoraPitchHigh(moraIndex, pitchAccentPosition) {
+        return pitchAccentPosition === 0 ? (moraIndex > 0) : (moraIndex < pitchAccentPosition);
+    }
 }
+
+DisplayGenerator._smallKanaSet = DisplayGenerator._jpCreateSmallKanaSet();

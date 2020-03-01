@@ -437,6 +437,107 @@ button.action-button {
 
 
 /*
+ * Pitch accent styles
+ */
+
+.term-pitch-accent-group-list {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.term-pitch-accent-group-list:not([data-count="0"]):not([data-count="1"]) {
+    padding-left: 1.4em;
+    list-style-type: decimal;
+}
+
+.term-pitch-accent-list {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    display: inline;
+}
+
+.term-pitch-accent-list:not([data-count="0"]):not([data-count="1"]) {
+    padding-left: 1.4em;
+    list-style-type: circle;
+    display: block;
+}
+
+.term-pitch-accent {
+    display: inline;
+    line-height: 1.5em;
+}
+
+.term-pitch-accent-list:not([data-count="0"]):not([data-count="1"])>.term-pitch-accent {
+    display: list-item;
+}
+
+.term-pitch-accent-group-tag-list {
+    margin-right: 0.375em;
+}
+.entry[data-unique-expression-count="1"] .term-pitch-accent-expression-list {
+    display: none;
+}
+.term-pitch-accent-expression:not(:last-of-type):after {
+    content: "\3001";
+}
+.term-pitch-accent-expression:last-of-type:after {
+    content: "\FF1A";
+}
+
+.term-pitch-accent-tag-list:not([data-count="0"]) {
+    margin-right: 0.375em;
+}
+
+.term-special-tags>.pitches {
+    display: inline;
+}
+
+.term-pitch-accent-character {
+    display: inline-block;
+    position: relative;
+}
+.term-pitch-accent-character[data-pitch='high']:before {
+    content: "";
+    display: block;
+    user-select: none;
+    pointer-events: none;
+    position: absolute;
+    top: 0.1em;
+    left: 0;
+    right: 0;
+    height: 0;
+    border-top-width: 0.1em;
+    border-top-style: solid;
+}
+.term-pitch-accent-character[data-pitch='high'][data-pitch-next='low']:before {
+    right: -0.1em;
+    height: 0.4em;
+    border-right-width: 0.1em;
+    border-right-style: solid;
+}
+.term-pitch-accent-character[data-pitch='high'][data-pitch-next='low'] {
+    padding-right: 0.1em;
+    margin-right: 0.1em;
+}
+
+.term-pitch-accent-position:before {
+    content: " [";
+}
+.term-pitch-accent-position:after {
+    content: "]";
+}
+
+.term-pitch-accent-details {
+    display: inline-block;
+    height: 0;
+    padding: 0 0.25em;
+    vertical-align: middle;
+}
+
+
+/*
  * Kanji
  */
 
