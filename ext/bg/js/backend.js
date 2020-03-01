@@ -48,6 +48,7 @@ class Backend {
         this.messageToken = yomichan.generateId(16);
 
         this._messageHandlers = new Map([
+            ['isBackendReady', this._onApiIsBackendReady.bind(this)],
             ['optionsSchemaGet', this._onApiOptionsSchemaGet.bind(this)],
             ['optionsGet', this._onApiOptionsGet.bind(this)],
             ['optionsGetFull', this._onApiOptionsGetFull.bind(this)],
@@ -266,6 +267,10 @@ class Backend {
     }
 
     // Message handlers
+
+    async _onApiIsBackendReady() {
+        return true;
+    }
 
     async _onApiOptionsSchemaGet() {
         return this.getOptionsSchema();

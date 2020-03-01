@@ -122,6 +122,30 @@ function apiGetDefaultAnkiFieldTemplates() {
 }
 
 function _apiInvoke(action, params={}) {
+    if (!_isBackendReady) {
+        if (_isBackendReadyPromise === null) {
+            _isBackendReadyPromise = new Promise((resolve) => (_isBackendReadyResolve = resolve));
+            const checkBackendReady = async () => {
+                try {
+                    if (await _apiInvokeRaw('isBackendReady')) {
+                        _isBackendReady = true;
+                        _isBackendReadyResolve();
+                    }
+                } catch (e) {
+                    // NOP
+                }
+                setTimeout(checkBackendReady, 100); // poll Backend until it responds
+            };
+            checkBackendReady();
+        }
+        return _isBackendReadyPromise.then(
+            () => _apiInvokeRaw(action, params)
+        );
+    }
+    return _apiInvokeRaw(action, params);
+}
+
+function _apiInvokeRaw(action, params={}) {
     const data = {action, params};
     return new Promise((resolve, reject) => {
         try {
@@ -148,3 +172,7 @@ function _apiInvoke(action, params={}) {
 function _apiCheckLastError() {
     // NOP
 }
+
+let _isBackendReady = false;
+let _isBackendReadyResolve = null;
+let _isBackendReadyPromise = null;
