@@ -199,8 +199,19 @@ class Translator {
 
         const strayDefinitions = defaultDefinitions.filter((definition, index) => !mergedByTermIndices.has(index));
         for (const groupedDefinition of dictTermsGroup(strayDefinitions, dictionaries)) {
-            groupedDefinition.expressions = [Translator.createExpression(groupedDefinition.expression, groupedDefinition.reading)];
-            definitionsMerged.push(groupedDefinition);
+            // from dictTermsMergeBySequence
+            const {reasons, score, expression, reading, source, dictionary} = groupedDefinition;
+            const compatibilityDefinition = {
+                reasons,
+                score,
+                expression: [expression],
+                reading: [reading],
+                expressions: [Translator.createExpression(groupedDefinition.expression, groupedDefinition.reading)],
+                source,
+                dictionary,
+                definitions: groupedDefinition.definitions
+            };
+            definitionsMerged.push(compatibilityDefinition);
         }
 
         await this.buildTermMeta(definitionsMerged, dictionaries);
