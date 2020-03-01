@@ -39,9 +39,6 @@ class Backend {
             url: window.location.href
         };
 
-        this.isPreparedResolve = null;
-        this.isPreparedPromise = new Promise((resolve) => (this.isPreparedResolve = resolve));
-
         this.clipboardPasteTarget = document.querySelector('#clipboard-paste-target');
 
         this.popupWindow = null;
@@ -110,14 +107,10 @@ class Backend {
         }
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
 
-        const options = this.getOptionsSync(this.optionsContext);
+        const options = this.getOptions(this.optionsContext);
         if (options.general.showGuide) {
             chrome.tabs.create({url: chrome.runtime.getURL('/bg/guide.html')});
         }
-
-        this.isPreparedResolve();
-        this.isPreparedResolve = null;
-        this.isPreparedPromise = null;
 
         this.clipboardMonitor.onClipboardText = this._onClipboardText.bind(this);
     }
@@ -160,7 +153,7 @@ class Backend {
     }
 
     applyOptions() {
-        const options = this.getOptionsSync(this.optionsContext);
+        const options = this.getOptions(this.optionsContext);
         if (!options.general.enable) {
             this.setExtensionBadgeBackgroundColor('#555555');
             this.setExtensionBadgeText('off');
@@ -186,24 +179,15 @@ class Backend {
         }
     }
 
-    async getOptionsSchema() {
-        if (this.isPreparedPromise !== null) {
-            await this.isPreparedPromise;
-        }
+    getOptionsSchema() {
         return this.optionsSchema;
     }
 
-    async getFullOptions() {
-        if (this.isPreparedPromise !== null) {
-            await this.isPreparedPromise;
-        }
+    getFullOptions() {
         return this.options;
     }
 
-    async setFullOptions(options) {
-        if (this.isPreparedPromise !== null) {
-            await this.isPreparedPromise;
-        }
+    setFullOptions(options) {
         try {
             this.options = JsonSchema.getValidValueOrDefault(this.optionsSchema, utilIsolate(options));
         } catch (e) {
@@ -212,18 +196,11 @@ class Backend {
         }
     }
 
-    async getOptions(optionsContext) {
-        if (this.isPreparedPromise !== null) {
-            await this.isPreparedPromise;
-        }
-        return this.getOptionsSync(optionsContext);
+    getOptions(optionsContext) {
+        return this.getProfile(optionsContext).options;
     }
 
-    getOptionsSync(optionsContext) {
-        return this.getProfileSync(optionsContext).options;
-    }
-
-    getProfileSync(optionsContext) {
+    getProfile(optionsContext) {
         const profiles = this.options.profiles;
         if (typeof optionsContext.index === 'number') {
             return profiles[optionsContext.index];
@@ -290,20 +267,20 @@ class Backend {
 
     // Message handlers
 
-    _onApiOptionsSchemaGet() {
+    async _onApiOptionsSchemaGet() {
         return this.getOptionsSchema();
     }
 
-    _onApiOptionsGet({optionsContext}) {
+    async _onApiOptionsGet({optionsContext}) {
         return this.getOptions(optionsContext);
     }
 
-    _onApiOptionsGetFull() {
+    async _onApiOptionsGetFull() {
         return this.getFullOptions();
     }
 
     async _onApiOptionsSet({changedOptions, optionsContext, source}) {
-        const options = await this.getOptions(optionsContext);
+        const options = this.getOptions(optionsContext);
 
         function getValuePaths(obj) {
             const valuePaths = [];
@@ -343,20 +320,20 @@ class Backend {
     }
 
     async _onApiOptionsSave({source}) {
-        const options = await this.getFullOptions();
+        const options = this.getFullOptions();
         await optionsSave(options);
         this.onOptionsUpdated(source);
     }
 
     async _onApiKanjiFind({text, optionsContext}) {
-        const options = await this.getOptions(optionsContext);
+        const options = this.getOptions(optionsContext);
         const definitions = await this.translator.findKanji(text, options);
         definitions.splice(options.general.maxResults);
         return definitions;
     }
 
     async _onApiTermsFind({text, details, optionsContext}) {
-        const options = await this.getOptions(optionsContext);
+        const options = this.getOptions(optionsContext);
         const mode = options.general.resultOutputMode;
         const [definitions, length] = await this.translator.findTerms(mode, text, details, options);
         definitions.splice(options.general.maxResults);
@@ -364,7 +341,7 @@ class Backend {
     }
 
     async _onApiTextParse({text, optionsContext}) {
-        const options = await this.getOptions(optionsContext);
+        const options = this.getOptions(optionsContext);
         const results = [];
         while (text.length > 0) {
             const term = [];
@@ -394,7 +371,7 @@ class Backend {
     }
 
     async _onApiTextParseMecab({text, optionsContext}) {
-        const options = await this.getOptions(optionsContext);
+        const options = this.getOptions(optionsContext);
         const results = [];
         const rawResults = await this.mecab.parseText(text);
         for (const [mecabName, parsedLines] of Object.entries(rawResults)) {
@@ -425,7 +402,7 @@ class Backend {
     }
 
     async _onApiDefinitionAdd({definition, mode, context, optionsContext}) {
-        const options = await this.getOptions(optionsContext);
+        const options = this.getOptions(optionsContext);
         const templates = this.defaultAnkiFieldTemplates;
 
         if (mode !== 'kanji') {
@@ -450,7 +427,7 @@ class Backend {
     }
 
     async _onApiDefinitionsAddable({definitions, modes, optionsContext}) {
-        const options = await this.getOptions(optionsContext);
+        const options = this.getOptions(optionsContext);
         const templates = this.defaultAnkiFieldTemplates;
         const states = [];
 
@@ -497,7 +474,7 @@ class Backend {
     }
 
     async _onApiNoteView({noteId}) {
-        return this.anki.guiBrowse(`nid:${noteId}`);
+        return await this.anki.guiBrowse(`nid:${noteId}`);
     }
 
     async _onApiTemplateRender({template, data}) {
@@ -509,7 +486,7 @@ class Backend {
     }
 
     async _onApiAudioGetUrl({definition, source, optionsContext}) {
-        const options = await this.getOptions(optionsContext);
+        const options = this.getOptions(optionsContext);
         return await audioGetUrl(definition, source, options);
     }
 
@@ -668,7 +645,7 @@ class Backend {
     async _onCommandSearch(params) {
         const {mode='existingOrNewTab', query} = params || {};
 
-        const options = await this.getOptions(this.optionsContext);
+        const options = this.getOptions(this.optionsContext);
         const {popupWidth, popupHeight} = options.general;
 
         const baseUrl = chrome.runtime.getURL('/bg/search.html');
@@ -752,7 +729,7 @@ class Backend {
         };
         const source = 'popup';
 
-        const options = await this.getOptions(optionsContext);
+        const options = this.getOptions(optionsContext);
         options.general.enable = !options.general.enable;
         await this._onApiOptionsSave({source});
     }

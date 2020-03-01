@@ -120,7 +120,7 @@ async function _onSettingsExportClick() {
 // Importing
 
 async function _settingsImportSetOptionsFull(optionsFull) {
-    return utilIsolate(await utilBackend().setFullOptions(
+    return utilIsolate(utilBackend().setFullOptions(
         utilBackgroundIsolate(optionsFull)
     ));
 }
