@@ -78,6 +78,7 @@ ol, ul {
     padding: 0.25em 0.5em;
     border-bottom-width: 0.07142857em; /* 14px => 1px */
     border-bottom-style: solid;
+    z-index: 10;
 }
 
 :root[data-yomichan-page=search] .navigation-header {
