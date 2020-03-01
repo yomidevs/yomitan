@@ -369,7 +369,7 @@ class Display {
     updateDocumentOptions(options) {
         const data = document.documentElement.dataset;
         data.ankiEnabled = `${options.anki.enable}`;
-        data.audioEnabled = `${options.audio.enable}`;
+        data.audioEnabled = `${options.audio.enabled}`;
         data.compactGlossaries = `${options.general.compactGlossaries}`;
         data.enableSearchTags = `${options.scanning.enableSearchTags}`;
         data.debug = `${options.general.debugInfo}`;

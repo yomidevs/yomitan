@@ -277,10 +277,6 @@ button.action-button {
     display: inline;
 }
 
-.term-expression-details>.action-play-audio {
-    display: none;
-}
-
 .term-expression-details>.tags {
     display: inline;
 }
@@ -318,8 +314,8 @@ button.action-button {
     bottom: 0.5em;
 }
 
-.term-expression-list[data-multi=true] .term-expression-details>.action-play-audio {
-    display: block;
+.term-expression-list:not([data-multi=true]) .term-expression-details>.action-play-audio {
+    display: none;
 }
 
 .term-expression-list[data-multi=true] .term-expression-details>.tags {
