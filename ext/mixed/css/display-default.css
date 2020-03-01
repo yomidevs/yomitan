@@ -19,6 +19,8 @@
 
 body { background-color: #ffffff; color: #333333; }
 
+h2 { border-bottom-color: #eeeeee; }
+
 .navigation-header {
     background-color: #ffffff;
     border-bottom-color: #eeeeee;

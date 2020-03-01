@@ -19,6 +19,8 @@
 
 body { background-color: #1e1e1e; color: #d4d4d4; }
 
+h2 { border-bottom-color: #2f2f2f; }
+
 .navigation-header {
     background-color: #1e1e1e;
     border-bottom-color: #2f2f2f;

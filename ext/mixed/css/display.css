@@ -65,6 +65,14 @@ ol, ul {
     height: 2.28571428em; /* 14px => 32px */
 }
 
+h2 {
+    font-size: 1.25em;
+    font-weight: normal;
+    margin: 0.25em 0 0;
+    border-bottom-width: 0.05714285714285714em; /* 14px * 1.25em => 1px */
+    border-bottom-style: solid;
+}
+
 /*
  * Navigation
  */
@@ -420,6 +428,11 @@ button.action-button {
 
 .term-special-tags>.frequencies {
     display: inline;
+}
+
+.term-entry-body[data-section-count="0"] .term-entry-body-section-header,
+.term-entry-body[data-section-count="1"] .term-entry-body-section-header {
+    display: none;
 }
 
 
