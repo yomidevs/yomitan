@@ -490,6 +490,7 @@ class Translator {
 
             // New data
             term.frequencies = [];
+            term.pitches = [];
         }
 
         const metas = await this.database.findTermMetaBulk(expressionsUnique, dictionaries);
@@ -498,6 +499,13 @@ class Translator {
                 case 'freq':
                     for (const term of termsUnique[index]) {
                         term.frequencies.push({expression, frequency: data, dictionary});
+                    }
+                    break;
+                case 'pitch':
+                    for (const term of termsUnique[index]) {
+                        const pitchData = await this.getPitchData(expression, data, dictionary, term);
+                        if (pitchData === null) { continue; }
+                        term.pitches.push(pitchData);
                     }
                     break;
             }
@@ -581,6 +589,20 @@ class Translator {
         }
 
         return tagMetaList;
+    }
+
+    async getPitchData(expression, data, dictionary, term) {
+        const reading = data.reading;
+        const termReading = term.reading || expression;
+        if (reading !== termReading) { return null; }
+
+        const pitches = [];
+        for (let {position, tags} of data.pitches) {
+            tags = Array.isArray(tags) ? await this.getTagMetaList(tags, dictionary) : [];
+            pitches.push({position, tags});
+        }
+
+        return {reading, pitches, dictionary};
     }
 
     static createExpression(expression, reading, termTags=null, termFrequency=null) {
