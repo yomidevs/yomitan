@@ -40,7 +40,8 @@ class DisplayFloat extends Display {
                     return true;
                 }
                 return false;
-            }]
+            }],
+            ...this._onKeyDownHandlers
         ]);
 
         this._windowMessageHandlers = new Map([
@@ -112,18 +113,6 @@ class DisplayFloat extends Display {
             // Sync
             this.handleAction(token, data);
         }
-    }
-
-    onKeyDown(e) {
-        const key = Display.getKeyFromEvent(e);
-        const handler = this._onKeyDownHandlers.get(key);
-        if (typeof handler === 'function') {
-            if (handler(e)) {
-                e.preventDefault();
-                return true;
-            }
-        }
-        return super.onKeyDown(e);
     }
 
     async getMessageToken() {
