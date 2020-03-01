@@ -45,11 +45,13 @@ class DisplayGenerator {
         const definitionMulti = Array.isArray(details.definitions);
         const expressionCount = expressionMulti ? details.expressions.length : 1;
         const definitionCount = definitionMulti ? details.definitions.length : 1;
+        const uniqueExpressionCount = Array.isArray(details.expression) ? new Set(details.expression).size : 1;
 
         node.dataset.expressionMulti = `${expressionMulti}`;
         node.dataset.definitionMulti = `${definitionMulti}`;
         node.dataset.expressionCount = `${expressionCount}`;
         node.dataset.definitionCount = `${definitionCount}`;
+        node.dataset.uniqueExpressionCount = `${uniqueExpressionCount}`;
 
         bodyContainer.dataset.sectionCount = `${
             (definitionCount > 0 ? 1 : 0)
