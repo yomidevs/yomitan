@@ -25,6 +25,7 @@
 class DisplayGenerator {
     constructor() {
         this._templateHandler = null;
+        this._termPitchAccentStaticTemplateIsSetup = false;
     }
 
     async prepare() {
@@ -337,6 +338,10 @@ class DisplayGenerator {
             n.appendChild(n1);
         }
 
+        if (morae.length > 0) {
+            this.populatePitchGraph(node.querySelector('.term-pitch-accent-graph'), position, morae);
+        }
+
         return node;
     }
 
@@ -344,6 +349,46 @@ class DisplayGenerator {
         const node = this._templateHandler.instantiate('term-pitch-accent-expression');
         node.textContent = expression;
         return node;
+    }
+
+    populatePitchGraph(svg, position, morae) {
+        const svgns = svg.getAttribute('xmlns');
+        const ii = morae.length;
+        svg.setAttribute('viewBox', `0 0 ${50 * (ii + 1)} 100`);
+
+        const pathPoints = [];
+        for (let i = 0; i < ii; ++i) {
+            const highPitch = DisplayGenerator._jpIsMoraPitchHigh(i, position);
+            const highPitchNext = DisplayGenerator._jpIsMoraPitchHigh(i + 1, position);
+            const graphic = (highPitch && !highPitchNext ? '#term-pitch-accent-graph-dot-downstep' : '#term-pitch-accent-graph-dot');
+            const x = `${i * 50 + 25}`;
+            const y = highPitch ? '25' : '75';
+            const use = document.createElementNS(svgns, 'use');
+            use.setAttribute('href', graphic);
+            use.setAttribute('x', x);
+            use.setAttribute('y', y);
+            svg.appendChild(use);
+            pathPoints.push(`${x} ${y}`);
+        }
+
+        let path = svg.querySelector('.term-pitch-accent-graph-line');
+        path.setAttribute('d', `M${pathPoints.join(' L')}`);
+
+        pathPoints.splice(0, ii - 1);
+        {
+            const highPitch = DisplayGenerator._jpIsMoraPitchHigh(ii, position);
+            const x = `${ii * 50 + 25}`;
+            const y = highPitch ? '25' : '75';
+            const use = document.createElementNS(svgns, 'use');
+            use.setAttribute('href', '#term-pitch-accent-graph-triangle');
+            use.setAttribute('x', x);
+            use.setAttribute('y', y);
+            svg.appendChild(use);
+            pathPoints.push(`${x} ${y}`);
+        }
+
+        path = svg.querySelector('.term-pitch-accent-graph-line-tail');
+        path.setAttribute('d', `M${pathPoints.join(' L')}`);
     }
 
     createFrequencyTag(details) {

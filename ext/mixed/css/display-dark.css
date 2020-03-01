@@ -78,3 +78,16 @@ h2 { border-bottom-color: #2f2f2f; }
 }
 
 .term-pitch-accent-character:before { border-color: #ffffff; }
+
+.term-pitch-accent-graph-line,
+.term-pitch-accent-graph-line-tail,
+#term-pitch-accent-graph-dot,
+#term-pitch-accent-graph-dot-downstep,
+#term-pitch-accent-graph-triangle {
+    stroke: #ffffff;
+}
+
+#term-pitch-accent-graph-dot,
+#term-pitch-accent-graph-dot-downstep>circle:last-of-type {
+    fill: #ffffff;
+}

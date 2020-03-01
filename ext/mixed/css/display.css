@@ -538,6 +538,44 @@ button.action-button {
 
 
 /*
+ * Pitch accent graph styles
+ */
+
+.term-pitch-accent-graph {
+    display: block;
+    height: 1.5em;
+    transform: translateY(-0.875em);
+}
+.term-pitch-accent-graph-line,
+.term-pitch-accent-graph-line-tail {
+    fill: none;
+    stroke: #000000;
+    stroke-width: 5;
+}
+.term-pitch-accent-graph-line-tail {
+    stroke-dasharray: 5 5;
+}
+#term-pitch-accent-graph-dot {
+    fill: #000000;
+    stroke: #000000;
+    stroke-width: 5;
+}
+#term-pitch-accent-graph-dot-downstep {
+    fill: none;
+    stroke: #000000;
+    stroke-width: 5;
+}
+#term-pitch-accent-graph-dot-downstep>circle:last-of-type {
+    fill: #000000;
+}
+#term-pitch-accent-graph-triangle {
+    fill: none;
+    stroke: #000000;
+    stroke-width: 5;
+}
+
+
+/*
  * Kanji
  */
 
