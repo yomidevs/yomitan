@@ -537,6 +537,19 @@ button.action-button {
 }
 
 
+:root[data-show-pitch-accent-downstep-notation=false] .term-pitch-accent-characters {
+    display: none;
+}
+
+:root[data-show-pitch-accent-position-notation=false] .term-pitch-accent-position {
+    display: none;
+}
+
+:root[data-show-pitch-accent-graph=false] .term-pitch-accent-details {
+    display: none;
+}
+
+
 /*
  * Pitch accent graph styles
  */

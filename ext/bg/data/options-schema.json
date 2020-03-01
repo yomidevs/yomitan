@@ -105,7 +105,10 @@
                                     "customPopupCss",
                                     "customPopupOuterCss",
                                     "enableWanakana",
-                                    "enableClipboardMonitor"
+                                    "enableClipboardMonitor",
+                                    "showPitchAccentDownstepNotation",
+                                    "showPitchAccentPositionNotation",
+                                    "showPitchAccentGraph"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -225,6 +228,18 @@
                                         "default": true
                                     },
                                     "enableClipboardMonitor": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "showPitchAccentDownstepNotation": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
+                                    "showPitchAccentPositionNotation": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
+                                    "showPitchAccentGraph": {
                                         "type": "boolean",
                                         "default": false
                                     }
