@@ -17,21 +17,23 @@
  */
 
 /*global getOptionsContext, getOptionsMutable, settingsSaveOptions
-profileOptionsGetDefaultFieldTemplates, ankiGetFieldMarkers, ankiGetFieldMarkersHtml, dictFieldFormat
-apiOptionsGet, apiTermsFind*/
+ankiGetFieldMarkers, ankiGetFieldMarkersHtml, dictFieldFormat
+apiOptionsGet, apiTermsFind, apiGetDefaultAnkiFieldTemplates*/
 
 function onAnkiFieldTemplatesReset(e) {
     e.preventDefault();
     $('#field-template-reset-modal').modal('show');
 }
 
-function onAnkiFieldTemplatesResetConfirm(e) {
+async function onAnkiFieldTemplatesResetConfirm(e) {
     e.preventDefault();
 
     $('#field-template-reset-modal').modal('hide');
 
+    const value = await apiGetDefaultAnkiFieldTemplates();
+
     const element = document.querySelector('#field-templates');
-    element.value = profileOptionsGetDefaultFieldTemplates();
+    element.value = value;
     element.dispatchEvent(new Event('change'));
 }
 
@@ -57,7 +59,7 @@ async function ankiTemplatesUpdateValue() {
     const optionsContext = getOptionsContext();
     const options = await apiOptionsGet(optionsContext);
     let templates = options.anki.fieldTemplates;
-    if (typeof templates !== 'string') { templates = profileOptionsGetDefaultFieldTemplates(); }
+    if (typeof templates !== 'string') { templates = await apiGetDefaultAnkiFieldTemplates(); }
     $('#field-templates').val(templates);
 
     onAnkiTemplatesValidateCompile();
@@ -89,7 +91,7 @@ async function ankiTemplatesValidate(infoNode, field, mode, showSuccessResult, i
         if (definition !== null) {
             const options = await apiOptionsGet(optionsContext);
             let templates = options.anki.fieldTemplates;
-            if (typeof templates !== 'string') { templates = profileOptionsGetDefaultFieldTemplates(); }
+            if (typeof templates !== 'string') { templates = await apiGetDefaultAnkiFieldTemplates(); }
             result = await dictFieldFormat(field, definition, mode, options, templates, exceptions);
         }
     } catch (e) {
@@ -109,7 +111,7 @@ async function ankiTemplatesValidate(infoNode, field, mode, showSuccessResult, i
 async function onAnkiFieldTemplatesChanged(e) {
     // Get value
     let templates = e.currentTarget.value;
-    if (templates === profileOptionsGetDefaultFieldTemplates()) {
+    if (templates === await apiGetDefaultAnkiFieldTemplates()) {
         // Default
         templates = null;
     }

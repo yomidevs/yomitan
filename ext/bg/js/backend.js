@@ -17,7 +17,7 @@
  */
 
 /*global optionsSave, utilIsolate
-conditionsTestValue, profileConditionsDescriptor, profileOptionsGetDefaultFieldTemplates
+conditionsTestValue, profileConditionsDescriptor
 handlebarsRenderDynamic
 requestText, requestJson, optionsLoad
 dictConfigured, dictTermsSort, dictEnabledSet, dictNoteFormat
@@ -33,6 +33,7 @@ class Backend {
         this.clipboardMonitor = new ClipboardMonitor();
         this.options = null;
         this.optionsSchema = null;
+        this.defaultAnkiFieldTemplates = null;
         this.optionsContext = {
             depth: 0,
             url: window.location.href
@@ -74,7 +75,8 @@ class Backend {
             ['getDisplayTemplatesHtml', this._onApiGetDisplayTemplatesHtml.bind(this)],
             ['getQueryParserTemplatesHtml', this._onApiGetQueryParserTemplatesHtml.bind(this)],
             ['getZoom', this._onApiGetZoom.bind(this)],
-            ['getMessageToken', this._onApiGetMessageToken.bind(this)]
+            ['getMessageToken', this._onApiGetMessageToken.bind(this)],
+            ['getDefaultAnkiFieldTemplates', this._onApiGetDefaultAnkiFieldTemplates.bind(this)]
         ]);
 
         this._commandHandlers = new Map([
@@ -89,6 +91,7 @@ class Backend {
         await this.translator.prepare();
 
         this.optionsSchema = await requestJson(chrome.runtime.getURL('/bg/data/options-schema.json'), 'GET');
+        this.defaultAnkiFieldTemplates = await requestText(chrome.runtime.getURL('/bg/data/default-anki-field-templates.handlebars'), 'GET');
         this.options = await optionsLoad();
         try {
             this.options = JsonSchema.getValidValueOrDefault(this.optionsSchema, this.options);
@@ -423,7 +426,7 @@ class Backend {
 
     async _onApiDefinitionAdd({definition, mode, context, optionsContext}) {
         const options = await this.getOptions(optionsContext);
-        const templates = Backend._getTemplates(options);
+        const templates = this.defaultAnkiFieldTemplates;
 
         if (mode !== 'kanji') {
             await audioInject(
@@ -448,7 +451,7 @@ class Backend {
 
     async _onApiDefinitionsAddable({definitions, modes, optionsContext}) {
         const options = await this.getOptions(optionsContext);
-        const templates = Backend._getTemplates(options);
+        const templates = this.defaultAnkiFieldTemplates;
         const states = [];
 
         try {
@@ -654,6 +657,10 @@ class Backend {
 
     async _onApiGetMessageToken() {
         return this.messageToken;
+    }
+
+    async _onApiGetDefaultAnkiFieldTemplates() {
+        return this.defaultAnkiFieldTemplates;
     }
 
     // Command handlers
@@ -895,11 +902,6 @@ class Backend {
         } else {
             return 'chrome';
         }
-    }
-
-    static _getTemplates(options) {
-        const templates = options.anki.fieldTemplates;
-        return typeof templates === 'string' ? templates : profileOptionsGetDefaultFieldTemplates();
     }
 }
 

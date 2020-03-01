@@ -117,6 +117,10 @@ function apiGetMessageToken() {
     return _apiInvoke('getMessageToken');
 }
 
+function apiGetDefaultAnkiFieldTemplates() {
+    return _apiInvoke('getDefaultAnkiFieldTemplates');
+}
+
 function _apiInvoke(action, params={}) {
     const data = {action, params};
     return new Promise((resolve, reject) => {

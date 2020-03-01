@@ -16,10 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiOptionsGetFull, apiGetEnvironmentInfo
+/*global apiOptionsGetFull, apiGetEnvironmentInfo, apiGetDefaultAnkiFieldTemplates
 utilBackend, utilIsolate, utilBackgroundIsolate, utilReadFileArrayBuffer
-optionsGetDefault, optionsUpdateVersion
-profileOptionsGetDefaultFieldTemplates*/
+optionsGetDefault, optionsUpdateVersion*/
 
 // Exporting
 
@@ -47,8 +46,7 @@ function _getSettingsExportDateString(date, dateSeparator, dateTimeSeparator, ti
 async function _getSettingsExportData(date) {
     const optionsFull = await apiOptionsGetFull();
     const environment = await apiGetEnvironmentInfo();
-
-    const fieldTemplatesDefault = profileOptionsGetDefaultFieldTemplates();
+    const fieldTemplatesDefault = await apiGetDefaultAnkiFieldTemplates();
 
     // Format options
     for (const {options} of optionsFull.profiles) {
