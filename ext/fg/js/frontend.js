@@ -52,7 +52,6 @@ class Frontend extends TextScanner {
 
     async prepare() {
         try {
-            await yomichan.prepare();
             await this.updateOptions();
             const {zoomFactor} = await apiGetZoom();
             this._pageZoomFactor = zoomFactor;
