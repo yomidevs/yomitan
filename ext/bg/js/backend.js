@@ -120,6 +120,7 @@ class Backend {
         this.clipboardMonitor.onClipboardText = this._onClipboardText.bind(this);
 
         this._sendMessageAllTabs('backendPrepared');
+        chrome.runtime.sendMessage({action: 'backendPrepared'});
     }
 
     _sendMessageAllTabs(action, params={}) {
