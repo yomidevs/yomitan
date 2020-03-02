@@ -280,7 +280,7 @@ const yomichan = (() => {
             ]);
 
             chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
-            chrome.runtime.sendMessage({action: 'yomichanOnline'});
+            chrome.runtime.sendMessage({action: 'yomichanCoreReady'});
         }
 
         // Public

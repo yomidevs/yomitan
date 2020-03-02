@@ -48,7 +48,7 @@ class Backend {
         this.messageToken = yomichan.generateId(16);
 
         this._messageHandlers = new Map([
-            ['yomichanOnline', this._onApiYomichanOnline.bind(this)],
+            ['yomichanCoreReady', this._onApiYomichanCoreReady.bind(this)],
             ['optionsSchemaGet', this._onApiOptionsSchemaGet.bind(this)],
             ['optionsGet', this._onApiOptionsGet.bind(this)],
             ['optionsGetFull', this._onApiOptionsGetFull.bind(this)],
@@ -273,7 +273,7 @@ class Backend {
 
     // Message handlers
 
-    async _onApiYomichanOnline(_params, sender) {
+    async _onApiYomichanCoreReady(_params, sender) {
         const tabId = sender.tab.id;
         return new Promise((resolve) => {
             chrome.tabs.sendMessage(tabId, {action: 'backendPrepared'}, resolve);
