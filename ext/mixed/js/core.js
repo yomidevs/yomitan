@@ -269,16 +269,25 @@ const yomichan = (() => {
         constructor() {
             super();
 
+            this._isBackendPreparedResolve = null;
+            this._isBackendPreparedPromise = new Promise((resolve) => (this._isBackendPreparedResolve = resolve));
+
             this._messageHandlers = new Map([
+                ['backendPrepared', this._onBackendPrepared.bind(this)],
                 ['getUrl', this._onMessageGetUrl.bind(this)],
                 ['optionsUpdated', this._onMessageOptionsUpdated.bind(this)],
                 ['zoomChanged', this._onMessageZoomChanged.bind(this)]
             ]);
 
             chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
+            chrome.runtime.sendMessage({action: 'yomichanOnline'});
         }
 
         // Public
+
+        prepare() {
+            return this._isBackendPreparedPromise;
+        }
 
         generateId(length) {
             const array = new Uint8Array(length);
@@ -303,6 +312,10 @@ const yomichan = (() => {
             const result = handler(params, sender);
             callback(result);
             return false;
+        }
+
+        _onBackendPrepared() {
+            this._isBackendPreparedResolve();
         }
 
         _onMessageGetUrl() {

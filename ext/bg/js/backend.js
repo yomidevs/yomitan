@@ -48,7 +48,7 @@ class Backend {
         this.messageToken = yomichan.generateId(16);
 
         this._messageHandlers = new Map([
-            ['isBackendReady', this._onApiIsBackendReady.bind(this)],
+            ['yomichanOnline', this._onApiYomichanOnline.bind(this)],
             ['optionsSchemaGet', this._onApiOptionsSchemaGet.bind(this)],
             ['optionsGet', this._onApiOptionsGet.bind(this)],
             ['optionsGetFull', this._onApiOptionsGetFull.bind(this)],
@@ -114,17 +114,22 @@ class Backend {
         }
 
         this.clipboardMonitor.onClipboardText = this._onClipboardText.bind(this);
+
+        this._sendMessageAllTabs('backendPrepared');
+    }
+
+    _sendMessageAllTabs(action, params={}) {
+        const callback = () => this.checkLastError(chrome.runtime.lastError);
+        chrome.tabs.query({}, (tabs) => {
+            for (const tab of tabs) {
+                chrome.tabs.sendMessage(tab.id, {action, params}, callback);
+            }
+        });
     }
 
     onOptionsUpdated(source) {
         this.applyOptions();
-
-        const callback = () => this.checkLastError(chrome.runtime.lastError);
-        chrome.tabs.query({}, (tabs) => {
-            for (const tab of tabs) {
-                chrome.tabs.sendMessage(tab.id, {action: 'optionsUpdated', params: {source}}, callback);
-            }
-        });
+        this._sendMessageAllTabs('optionsUpdated', {source});
     }
 
     onMessage({action, params}, sender, callback) {
@@ -268,8 +273,11 @@ class Backend {
 
     // Message handlers
 
-    async _onApiIsBackendReady() {
-        return true;
+    async _onApiYomichanOnline(_params, sender) {
+        const tabId = sender.tab.id;
+        return new Promise((resolve) => {
+            chrome.tabs.sendMessage(tabId, {action: 'backendPrepared'}, resolve);
+        });
     }
 
     async _onApiOptionsSchemaGet() {

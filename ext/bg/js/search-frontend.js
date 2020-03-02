@@ -19,6 +19,8 @@
 /*global apiOptionsGet*/
 
 async function searchFrontendSetup() {
+    await yomichan.prepare();
+
     const optionsContext = {
         depth: 0,
         url: window.location.href
