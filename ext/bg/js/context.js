@@ -48,7 +48,9 @@ function setupButtonEvents(selector, command, url) {
     }
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
+    await yomichan.prepare();
+
     showExtensionInfo();
 
     apiGetEnvironmentInfo().then(({browser}) => {
