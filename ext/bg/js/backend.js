@@ -39,6 +39,8 @@ class Backend {
             url: window.location.href
         };
 
+        this.isPrepared = false;
+
         this.clipboardPasteTarget = document.querySelector('#clipboard-paste-target');
 
         this.popupWindow = null;
@@ -107,6 +109,8 @@ class Backend {
             chrome.tabs.onZoomChange.addListener(this._onZoomChange.bind(this));
         }
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
+
+        this.isPrepared = true;
 
         const options = this.getOptions(this.optionsContext);
         if (options.general.showGuide) {
