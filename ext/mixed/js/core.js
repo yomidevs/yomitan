@@ -280,12 +280,12 @@ const yomichan = (() => {
             ]);
 
             chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
-            chrome.runtime.sendMessage({action: 'yomichanCoreReady'});
         }
 
         // Public
 
         prepare() {
+            chrome.runtime.sendMessage({action: 'yomichanCoreReady'});
             return this._isBackendPreparedPromise;
         }
 
