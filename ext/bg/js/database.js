@@ -33,7 +33,7 @@ class Database {
         }
 
         try {
-            this.db = await Database._open('dict', 5, (db, transaction, oldVersion) => {
+            this.db = await Database._open('dict', 6, (db, transaction, oldVersion) => {
                 Database._upgrade(db, transaction, oldVersion, [
                     {
                         version: 2,
@@ -88,6 +88,15 @@ class Database {
                             terms: {
                                 primaryKey: {keyPath: 'id', autoIncrement: true},
                                 indices: ['dictionary', 'expression', 'reading', 'sequence', 'expressionReverse', 'readingReverse']
+                            }
+                        }
+                    },
+                    {
+                        version: 6,
+                        stores: {
+                            media: {
+                                primaryKey: {keyPath: 'id', autoIncrement: true},
+                                indices: ['dictionary', 'path']
                             }
                         }
                     }
