@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 const {JSDOM} = require('jsdom');
-const yomichanTest = require('./yomichan-test');
+const {VM} = require('./yomichan-vm');
 
 
 // DOMRect class definition
@@ -74,20 +74,18 @@ async function testDocument1() {
     const Node = window.Node;
     const Range = window.Range;
 
-    const {DOM} = yomichanTest.requireScript(
-        'ext/mixed/js/dom.js',
-        ['DOM']
-    );
-    const {TextSourceRange, TextSourceElement} = yomichanTest.requireScript(
-        'ext/fg/js/source.js',
-        ['TextSourceRange', 'TextSourceElement'],
-        {document, window, Range, Node}
-    );
-    const {docRangeFromPoint, docSentenceExtract} = yomichanTest.requireScript(
-        'ext/fg/js/document.js',
-        ['docRangeFromPoint', 'docSentenceExtract'],
-        {document, window, Node, TextSourceElement, TextSourceRange, DOM}
-    );
+    const vm = new VM({document, window, Range, Node});
+    vm.execute([
+        'mixed/js/dom.js',
+        'fg/js/source.js',
+        'fg/js/document.js'
+    ]);
+    const [TextSourceRange, TextSourceElement, docRangeFromPoint, docSentenceExtract] = vm.get([
+        'TextSourceRange',
+        'TextSourceElement',
+        'docRangeFromPoint',
+        'docSentenceExtract'
+    ]);
 
     try {
         await testDocumentTextScanningFunctions(dom, {docRangeFromPoint, docSentenceExtract, TextSourceRange, TextSourceElement});

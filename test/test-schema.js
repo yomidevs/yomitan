@@ -17,9 +17,11 @@
  */
 
 const assert = require('assert');
-const yomichanTest = require('./yomichan-test');
+const {VM} = require('./yomichan-vm');
 
-const {JsonSchema} = yomichanTest.requireScript('ext/bg/js/json-schema.js', ['JsonSchema']);
+const vm = new VM();
+vm.execute('bg/js/json-schema.js');
+const JsonSchema = vm.get('JsonSchema');
 
 
 function testValidate1() {
@@ -138,7 +140,7 @@ function testGetValidValueOrDefault1() {
 
     for (const [value, expected] of testData) {
         const actual = JsonSchema.getValidValueOrDefault(schema, value);
-        assert.deepStrictEqual(actual, expected);
+        vm.assert.deepStrictEqual(actual, expected);
     }
 }
 
@@ -177,7 +179,7 @@ function testGetValidValueOrDefault2() {
 
     for (const [value, expected] of testData) {
         const actual = JsonSchema.getValidValueOrDefault(schema, value);
-        assert.deepStrictEqual(actual, expected);
+        vm.assert.deepStrictEqual(actual, expected);
     }
 }
 
@@ -235,7 +237,7 @@ function testGetValidValueOrDefault3() {
 
     for (const [value, expected] of testData) {
         const actual = JsonSchema.getValidValueOrDefault(schema, value);
-        assert.deepStrictEqual(actual, expected);
+        vm.assert.deepStrictEqual(actual, expected);
     }
 }
 
