@@ -120,7 +120,7 @@ async function _onSettingsExportClick() {
 // Importing
 
 async function _settingsImportSetOptionsFull(optionsFull) {
-    return utilIsolate(await utilBackend().setFullOptions(
+    return utilIsolate(utilBackend().setFullOptions(
         utilBackgroundIsolate(optionsFull)
     ));
 }
@@ -362,10 +362,10 @@ async function _onSettingsResetConfirmClick() {
 
 // Setup
 
-window.addEventListener('DOMContentLoaded', () => {
+function backupInitialize() {
     document.querySelector('#settings-export').addEventListener('click', _onSettingsExportClick, false);
     document.querySelector('#settings-import').addEventListener('click', _onSettingsImportClick, false);
     document.querySelector('#settings-import-file').addEventListener('change', _onSettingsImportFileChange, false);
     document.querySelector('#settings-reset').addEventListener('click', _onSettingsResetClick, false);
     document.querySelector('#settings-reset-modal-confirm').addEventListener('click', _onSettingsResetConfirmClick, false);
-}, false);
+}

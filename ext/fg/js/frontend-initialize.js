@@ -19,6 +19,8 @@
 /*global PopupProxyHost, PopupProxy, Frontend*/
 
 async function main() {
+    await yomichan.prepare();
+
     const data = window.frontendInitializationData || {};
     const {id, depth=0, parentFrameId, ignoreNodes, url, proxy=false} = data;
 

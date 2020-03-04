@@ -30,6 +30,9 @@ const chrome = {
         },
         getURL(path2) {
             return url.pathToFileURL(path.join(__dirname, '..', 'ext', path2.replace(/^\//, '')));
+        },
+        sendMessage() {
+            // NOP
         }
     }
 };

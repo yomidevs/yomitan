@@ -21,7 +21,7 @@ utilBackend, utilIsolate, utilBackgroundIsolate
 ankiErrorShown, ankiFieldsToDict
 ankiTemplatesUpdateValue, onAnkiOptionsChanged, onDictionaryOptionsChanged
 appearanceInitialize, audioSettingsInitialize, profileOptionsSetup, dictSettingsInitialize
-ankiInitialize, ankiTemplatesInitialize, storageInfoInitialize
+ankiInitialize, ankiTemplatesInitialize, storageInfoInitialize, backupInitialize
 */
 
 function getOptionsMutable(optionsContext) {
@@ -262,6 +262,8 @@ function showExtensionInformation() {
 
 
 async function onReady() {
+    await yomichan.prepare();
+
     showExtensionInformation();
 
     formSetupEventListeners();
@@ -271,6 +273,7 @@ async function onReady() {
     await dictSettingsInitialize();
     ankiInitialize();
     ankiTemplatesInitialize();
+    backupInitialize();
 
     storageInfoInitialize();
 
