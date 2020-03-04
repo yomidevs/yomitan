@@ -278,10 +278,11 @@ class Backend {
 
     // Message handlers
 
-    async _onApiYomichanCoreReady(_params, sender) {
+    _onApiYomichanCoreReady(_params, sender) {
         // tab ID isn't set in background (e.g. browser_action)
         if (typeof sender.tab === 'undefined') {
-            return chrome.runtime.sendMessage({action: 'backendPrepared'});
+            chrome.runtime.sendMessage({action: 'backendPrepared'});
+            return Promise.resolve();
         }
 
         const tabId = sender.tab.id;
