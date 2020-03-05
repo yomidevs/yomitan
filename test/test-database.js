@@ -21,6 +21,7 @@ const url = require('url');
 const path = require('path');
 const assert = require('assert');
 const yomichanTest = require('./yomichan-test');
+const {VM} = require('./yomichan-vm');
 require('fake-indexeddb/auto');
 
 const chrome = {
@@ -91,23 +92,24 @@ class XMLHttpRequest {
     }
 }
 
-const {JsonSchema} = yomichanTest.requireScript('ext/bg/js/json-schema.js', ['JsonSchema']);
-const {dictFieldSplit, dictTagSanitize} = yomichanTest.requireScript('ext/bg/js/dictionary.js', ['dictFieldSplit', 'dictTagSanitize']);
-const {stringReverse} = yomichanTest.requireScript('ext/mixed/js/core.js', ['stringReverse'], {chrome});
-const {requestJson} = yomichanTest.requireScript('ext/bg/js/request.js', ['requestJson'], {XMLHttpRequest});
 
-const databaseGlobals = {
+const vm = new VM({
     chrome,
-    JsonSchema,
-    requestJson,
-    stringReverse,
-    dictFieldSplit,
-    dictTagSanitize,
+    XMLHttpRequest,
     indexedDB: global.indexedDB,
+    IDBKeyRange: global.IDBKeyRange,
     JSZip: yomichanTest.JSZip
-};
-databaseGlobals.window = databaseGlobals;
-const {Database} = yomichanTest.requireScript('ext/bg/js/database.js', ['Database'], databaseGlobals);
+});
+vm.context.window = vm.context;
+
+vm.execute([
+    'bg/js/json-schema.js',
+    'bg/js/dictionary.js',
+    'mixed/js/core.js',
+    'bg/js/request.js',
+    'bg/js/database.js'
+]);
+const Database = vm.get('Database');
 
 
 function countTermsWithExpression(terms, expression) {
@@ -215,20 +217,20 @@ async function testDatabase1() {
             },
             {prefixWildcardsSupported: true}
         );
-        assert.deepStrictEqual(errors, []);
-        assert.deepStrictEqual(result, expectedSummary);
+        vm.assert.deepStrictEqual(errors, []);
+        vm.assert.deepStrictEqual(result, expectedSummary);
         assert.ok(progressEvent);
 
         // Get info summary
         const info = await database.getDictionaryInfo();
-        assert.deepStrictEqual(info, [expectedSummary]);
+        vm.assert.deepStrictEqual(info, [expectedSummary]);
 
         // Get counts
         const counts = await database.getDictionaryCounts(
             info.map((v) => v.title),
             true
         );
-        assert.deepStrictEqual(counts, {
+        vm.assert.deepStrictEqual(counts, {
             counts: [{kanji: 2, kanjiMeta: 2, terms: 32, termMeta: 3, tagMeta: 12}],
             total: {kanji: 2, kanjiMeta: 2, terms: 32, termMeta: 3, tagMeta: 12}
         });
@@ -251,10 +253,10 @@ async function testDatabase1() {
 
 async function testDatabaseEmpty1(database) {
     const info = await database.getDictionaryInfo();
-    assert.deepStrictEqual(info, []);
+    vm.assert.deepStrictEqual(info, []);
 
     const counts = await database.getDictionaryCounts([], true);
-    assert.deepStrictEqual(counts, {
+    vm.assert.deepStrictEqual(counts, {
         counts: [],
         total: {kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0}
     });
@@ -827,7 +829,7 @@ async function testFindTagForTitle1(database, title) {
     for (const {inputs, expectedResults} of data) {
         for (const {name} of inputs) {
             const result = await database.findTagForTitle(name, title);
-            assert.deepStrictEqual(result, expectedResults.value);
+            vm.assert.deepStrictEqual(result, expectedResults.value);
         }
     }
 }

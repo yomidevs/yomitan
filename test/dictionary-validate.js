@@ -18,10 +18,12 @@
 
 const fs = require('fs');
 const path = require('path');
-const yomichanTest = require('./yomichan-test');
+const {JSZip} = require('./yomichan-test');
+const {VM} = require('./yomichan-vm');
 
-const JSZip = yomichanTest.JSZip;
-const {JsonSchema} = yomichanTest.requireScript('ext/bg/js/json-schema.js', ['JsonSchema']);
+const vm = new VM();
+vm.execute('bg/js/json-schema.js');
+const JsonSchema = vm.get('JsonSchema');
 
 
 function readSchema(relativeFileName) {

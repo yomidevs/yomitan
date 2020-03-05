@@ -17,9 +17,11 @@
  */
 
 const fs = require('fs');
-const yomichanTest = require('./yomichan-test');
+const {VM} = require('./yomichan-vm');
 
-const {JsonSchema} = yomichanTest.requireScript('ext/bg/js/json-schema.js', ['JsonSchema']);
+const vm = new VM();
+vm.execute('bg/js/json-schema.js');
+const JsonSchema = vm.get('JsonSchema');
 
 
 function main() {
