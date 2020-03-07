@@ -120,7 +120,8 @@ class Backend {
         this.clipboardMonitor.onClipboardText = this._onClipboardText.bind(this);
 
         this._sendMessageAllTabs('backendPrepared');
-        chrome.runtime.sendMessage({action: 'backendPrepared'});
+        const callback = () => this.checkLastError(chrome.runtime.lastError);
+        chrome.runtime.sendMessage({action: 'backendPrepared'}, callback);
     }
 
     _sendMessageAllTabs(action, params={}) {
@@ -281,7 +282,8 @@ class Backend {
     _onApiYomichanCoreReady(_params, sender) {
         // tab ID isn't set in background (e.g. browser_action)
         if (typeof sender.tab === 'undefined') {
-            chrome.runtime.sendMessage({action: 'backendPrepared'});
+            const callback = () => this.checkLastError(chrome.runtime.lastError);
+            chrome.runtime.sendMessage({action: 'backendPrepared'}, callback);
             return Promise.resolve();
         }
 
