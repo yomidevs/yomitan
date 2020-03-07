@@ -19,8 +19,7 @@
 /*global docRangeFromPoint, docSentenceExtract
 apiKanjiFind, apiTermsFind, apiNoteView, apiOptionsGet, apiDefinitionsAddable, apiDefinitionAdd
 apiScreenshotGet, apiForward
-audioPrepareTextToSpeech, audioGetFromSources
-DisplayGenerator, WindowScroll, DisplayContext, DOM*/
+AudioSystem, DisplayGenerator, WindowScroll, DisplayContext, DOM*/
 
 class Display {
     constructor(spinner, container) {
@@ -32,7 +31,7 @@ class Display {
         this.index = 0;
         this.audioPlaying = null;
         this.audioFallback = null;
-        this.audioCache = new Map();
+        this.audioSystem = new AudioSystem();
         this.styleNode = null;
 
         this.eventListeners = new EventListenerCollection();
@@ -364,7 +363,6 @@ class Display {
         this.updateDocumentOptions(this.options);
         this.updateTheme(this.options.general.popupTheme);
         this.setCustomCss(this.options.general.customPopupCss);
-        audioPrepareTextToSpeech(this.options);
     }
 
     updateDocumentOptions(options) {
@@ -775,16 +773,16 @@ class Display {
             }
 
             const sources = this.options.audio.sources;
-            let {audio, source} = await audioGetFromSources(expression, sources, this.getOptionsContext(), false, this.audioCache);
-            let info;
-            if (audio === null) {
+            let audio, source, info;
+            try {
+                ({audio, source} = await this.audioSystem.getExpressionAudio(expression, sources, this.getOptionsContext()));
+                info = `From source ${1 + sources.indexOf(source)}: ${source}`;
+            } catch (e) {
                 if (this.audioFallback === null) {
                     this.audioFallback = new Audio('/mixed/mp3/button.mp3');
                 }
                 audio = this.audioFallback;
                 info = 'Could not find audio';
-            } else {
-                info = `From source ${1 + sources.indexOf(source)}: ${source}`;
             }
 
             const button = this.audioButtonFindImage(entryIndex);
