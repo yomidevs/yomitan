@@ -18,7 +18,7 @@
 
 /*global docRangeFromPoint, docSentenceExtract
 apiKanjiFind, apiTermsFind, apiNoteView, apiOptionsGet, apiDefinitionsAddable, apiDefinitionAdd
-apiScreenshotGet, apiForward, apiAudioGetUrl
+apiScreenshotGet, apiForward, apiAudioGetUri
 AudioSystem, DisplayGenerator, WindowScroll, DisplayContext, DOM*/
 
 class Display {
@@ -919,6 +919,6 @@ class Display {
 
     async _getAudioUri(definition, source) {
         const optionsContext = this.getOptionsContext();
-        return await apiAudioGetUrl(definition, source, optionsContext);
+        return await apiAudioGetUri(definition, source, optionsContext);
     }
 }

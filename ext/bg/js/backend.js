@@ -67,7 +67,7 @@ class Backend {
             ['noteView', this._onApiNoteView.bind(this)],
             ['templateRender', this._onApiTemplateRender.bind(this)],
             ['commandExec', this._onApiCommandExec.bind(this)],
-            ['audioGetUrl', this._onApiAudioGetUrl.bind(this)],
+            ['audioGetUri', this._onApiAudioGetUri.bind(this)],
             ['screenshotGet', this._onApiScreenshotGet.bind(this)],
             ['forward', this._onApiForward.bind(this)],
             ['frameInformationGet', this._onApiFrameInformationGet.bind(this)],
@@ -513,7 +513,7 @@ class Backend {
         return this._runCommand(command, params);
     }
 
-    async _onApiAudioGetUrl({definition, source, optionsContext}) {
+    async _onApiAudioGetUri({definition, source, optionsContext}) {
         const options = this.getOptions(optionsContext);
         return await this.audioUriBuilder.getUri(source, definition, options);
     }
