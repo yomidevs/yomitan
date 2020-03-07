@@ -116,8 +116,8 @@ class PopupProxyHost {
 
     async _onApiContainsPoint({id, x, y}) {
         const popup = this._getPopup(id);
-        const rootPagePoint = PopupProxyHost._convertPopupPointToRootPagePoint(popup, x, y);
-        return await popup.containsPoint(...rootPagePoint);
+        [x, y] = PopupProxyHost._convertPopupPointToRootPagePoint(popup, x, y);
+        return await popup.containsPoint(x, y);
     }
 
     async _onApiShowContent({id, elementRect, writingMode, type, details}) {
