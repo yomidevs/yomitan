@@ -55,7 +55,7 @@ class QueryParser extends TextScanner {
         const {definitions, length} = await apiTermsFind(searchText, {}, this.search.getOptionsContext());
         if (definitions.length === 0) { return null; }
 
-        const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
+        const sentence = docSentenceExtract(textSource, this.search.options.anki.sentenceExt);
 
         textSource.setEndOffset(length);
 
