@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiOptionsSet, apiTermsFind, Display, QueryParser, ClipboardMonitor*/
+/*global apiOptionsSet, apiTermsFind, apiClipboardGet, Display, QueryParser, ClipboardMonitor*/
 
 class DisplaySearch extends Display {
     constructor() {
@@ -38,7 +38,7 @@ class DisplaySearch extends Display {
         this.introVisible = true;
         this.introAnimationTimer = null;
 
-        this.clipboardMonitor = new ClipboardMonitor();
+        this.clipboardMonitor = new ClipboardMonitor({getClipboard: apiClipboardGet});
 
         this._onKeyDownIgnoreKeys = new Map([
             ['ANY_MOD', new Set([

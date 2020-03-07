@@ -30,7 +30,7 @@ class Backend {
         this.translator = new Translator();
         this.anki = new AnkiNull();
         this.mecab = new Mecab();
-        this.clipboardMonitor = new ClipboardMonitor();
+        this.clipboardMonitor = new ClipboardMonitor({getClipboard: this._onApiClipboardGet.bind(this)});
         this.options = null;
         this.optionsSchema = null;
         this.defaultAnkiFieldTemplates = null;

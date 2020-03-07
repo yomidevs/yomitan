@@ -25,10 +25,6 @@ function apiAudioGetUrl(definition, source, optionsContext) {
     return _apiInvoke('audioGetUrl', {definition, source, optionsContext});
 }
 
-function apiClipboardGet() {
-    return _apiInvoke('clipboardGet');
-}
-
 function _apiInvoke(action, params={}) {
     const data = {action, params};
     return new Promise((resolve, reject) => {

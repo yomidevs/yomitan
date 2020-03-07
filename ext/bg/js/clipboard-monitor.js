@@ -16,22 +16,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiClipboardGet, jpIsStringPartiallyJapanese*/
+/*global jpIsStringPartiallyJapanese*/
 
 class ClipboardMonitor extends EventDispatcher {
-    constructor() {
+    constructor({getClipboard}) {
         super();
         this.timerId = null;
         this.timerToken = null;
         this.interval = 250;
         this.previousText = null;
+        this.getClipboard = getClipboard;
     }
 
     start() {
         this.stop();
 
         // The token below is used as a unique identifier to ensure that a new clipboard monitor
-        // hasn't been started during the await call. The check below the await apiClipboardGet()
+        // hasn't been started during the await call. The check below the await this.getClipboard()
         // call will exit early if the reference has changed.
         const token = {};
         const intervalCallback = async () => {
@@ -39,7 +40,7 @@ class ClipboardMonitor extends EventDispatcher {
 
             let text = null;
             try {
-                text = await apiClipboardGet();
+                text = await this.getClipboard();
             } catch (e) {
                 // NOP
             }
