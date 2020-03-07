@@ -117,7 +117,7 @@ class Backend {
             chrome.tabs.create({url: chrome.runtime.getURL('/bg/guide.html')});
         }
 
-        this.clipboardMonitor.onClipboardText = this._onClipboardText.bind(this);
+        this.clipboardMonitor.on('change', this._onClipboardText.bind(this));
 
         this._sendMessageAllTabs('backendPrepared');
         chrome.runtime.sendMessage({action: 'backendPrepared'});
@@ -154,7 +154,7 @@ class Backend {
         }
     }
 
-    _onClipboardText(text) {
+    _onClipboardText({text}) {
         this._onCommandSearch({mode: 'popup', query: text});
     }
 

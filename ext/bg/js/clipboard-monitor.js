@@ -18,16 +18,13 @@
 
 /*global apiClipboardGet, jpIsStringPartiallyJapanese*/
 
-class ClipboardMonitor {
+class ClipboardMonitor extends EventDispatcher {
     constructor() {
+        super();
         this.timerId = null;
         this.timerToken = null;
         this.interval = 250;
         this.previousText = null;
-    }
-
-    onClipboardText(_text) {
-        throw new Error('Override me');
     }
 
     start() {
@@ -55,7 +52,7 @@ class ClipboardMonitor {
             ) {
                 this.previousText = text;
                 if (jpIsStringPartiallyJapanese(text)) {
-                    this.onClipboardText(text);
+                    this.trigger('change', {text});
                 }
             }
 

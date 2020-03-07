@@ -102,8 +102,7 @@ class DisplaySearch extends Display {
             this.wanakanaEnable.addEventListener('change', this.onWanakanaEnableChange.bind(this));
             window.addEventListener('popstate', this.onPopState.bind(this));
             window.addEventListener('copy', this.onCopy.bind(this));
-
-            this.clipboardMonitor.onClipboardText = this.onExternalSearchUpdate.bind(this);
+            this.clipboardMonitor.on('change', this.onExternalSearchUpdate.bind(this));
 
             this.updateSearchButton();
         } catch (e) {
@@ -198,7 +197,7 @@ class DisplaySearch extends Display {
         this.clipboardMonitor.setPreviousText(document.getSelection().toString().trim());
     }
 
-    onExternalSearchUpdate(text) {
+    onExternalSearchUpdate({text}) {
         this.setQuery(text);
         const url = new URL(window.location.href);
         url.searchParams.set('query', text);
