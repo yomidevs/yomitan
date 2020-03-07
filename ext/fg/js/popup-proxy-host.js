@@ -116,6 +116,7 @@ class PopupProxyHost {
 
     async _onApiContainsPoint({id, x, y}) {
         const popup = this._getPopup(id);
+        [x, y] = PopupProxyHost._convertPopupPointToRootPagePoint(popup, x, y);
         return await popup.containsPoint(x, y);
     }
 
@@ -152,14 +153,17 @@ class PopupProxyHost {
     }
 
     static _convertJsonRectToDOMRect(popup, jsonRect) {
-        let x = jsonRect.x;
-        let y = jsonRect.y;
+        const [x, y] = PopupProxyHost._convertPopupPointToRootPagePoint(popup, jsonRect.x, jsonRect.y);
+        return new DOMRect(x, y, jsonRect.width, jsonRect.height);
+    }
+
+    static _convertPopupPointToRootPagePoint(popup, x, y) {
         if (popup.parent !== null) {
             const popupRect = popup.parent.getContainerRect();
             x += popupRect.x;
             y += popupRect.y;
         }
-        return new DOMRect(x, y, jsonRect.width, jsonRect.height);
+        return [x, y];
     }
 
     static _popupCanShow(popup) {
