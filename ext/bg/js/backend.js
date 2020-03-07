@@ -21,9 +21,8 @@ conditionsTestValue, profileConditionsDescriptor
 handlebarsRenderDynamic
 requestText, requestJson, optionsLoad
 dictConfigured, dictTermsSort, dictEnabledSet
-audioGetUrl
 jpConvertReading, jpDistributeFuriganaInflected, jpKatakanaToHiragana
-AnkiNoteBuilder, AudioSystem, Translator, AnkiConnect, AnkiNull, Mecab, BackendApiForwarder, JsonSchema, ClipboardMonitor*/
+AnkiNoteBuilder, AudioSystem, AudioUriBuilder, Translator, AnkiConnect, AnkiNull, Mecab, BackendApiForwarder, JsonSchema, ClipboardMonitor*/
 
 class Backend {
     constructor() {
@@ -36,6 +35,7 @@ class Backend {
         this.optionsSchema = null;
         this.defaultAnkiFieldTemplates = null;
         this.audioSystem = new AudioSystem({getAudioUri: this._getAudioUri.bind(this)});
+        this.audioUriBuilder = new AudioUriBuilder();
         this.optionsContext = {
             depth: 0,
             url: window.location.href
@@ -515,7 +515,7 @@ class Backend {
 
     async _onApiAudioGetUrl({definition, source, optionsContext}) {
         const options = this.getOptions(optionsContext);
-        return await audioGetUrl(definition, source, options);
+        return await this.audioUriBuilder.getUri(source, definition, options);
     }
 
     _onApiScreenshotGet({options}, sender) {
@@ -771,7 +771,7 @@ class Backend {
         }
 
         const options = this.getOptions(optionsContext);
-        return await audioGetUrl(definition, source, options);
+        return await this.audioUriBuilder.getUri(source, definition, options);
     }
 
     async _audioInject(definition, fields, sources, optionsContext) {
