@@ -775,7 +775,7 @@ class Display {
             const sources = this.options.audio.sources;
             let audio, source, info;
             try {
-                ({audio, source} = await this.audioSystem.getExpressionAudio(expression, sources));
+                ({audio, source} = await this.audioSystem.getDefinitionAudio(expression, sources));
                 info = `From source ${1 + sources.indexOf(source)}: ${source}`;
             } catch (e) {
                 if (this.audioFallback === null) {

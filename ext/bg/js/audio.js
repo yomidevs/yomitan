@@ -171,7 +171,7 @@ async function audioInject(definition, fields, sources, optionsContext, audioSys
         const expressions = definition.expressions;
         const audioSourceDefinition = Array.isArray(expressions) ? expressions[0] : definition;
 
-        const {uri} = await audioSystem.getExpressionAudio(audioSourceDefinition, sources, {tts: false, optionsContext});
+        const {uri} = await audioSystem.getDefinitionAudio(audioSourceDefinition, sources, {tts: false, optionsContext});
         const filename = audioBuildFilename(audioSourceDefinition);
         if (filename !== null) {
             definition.audio = {url: uri, filename};
