@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global jpIsStringEntirelyKana, audioGetFromSources*/
+/*global jpIsStringEntirelyKana*/
 
 const audioUrlBuilders = new Map([
     ['jpod101', async (definition) => {
@@ -154,7 +154,7 @@ function audioBuildFilename(definition) {
     return null;
 }
 
-async function audioInject(definition, fields, sources, optionsContext) {
+async function audioInject(definition, fields, sources, optionsContext, audioSystem) {
     let usesAudio = false;
     for (const fieldValue of Object.values(fields)) {
         if (fieldValue.includes('{audio}')) {
@@ -171,12 +171,10 @@ async function audioInject(definition, fields, sources, optionsContext) {
         const expressions = definition.expressions;
         const audioSourceDefinition = Array.isArray(expressions) ? expressions[0] : definition;
 
-        const {url} = await audioGetFromSources(audioSourceDefinition, sources, optionsContext, true);
-        if (url !== null) {
-            const filename = audioBuildFilename(audioSourceDefinition);
-            if (filename !== null) {
-                definition.audio = {url, filename};
-            }
+        const {uri} = await audioSystem.getExpressionAudio(audioSourceDefinition, sources, optionsContext, {tts: false});
+        const filename = audioBuildFilename(audioSourceDefinition);
+        if (filename !== null) {
+            definition.audio = {url: uri, filename};
         }
 
         return true;

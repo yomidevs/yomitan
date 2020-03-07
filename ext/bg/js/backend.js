@@ -23,7 +23,7 @@ requestText, requestJson, optionsLoad
 dictConfigured, dictTermsSort, dictEnabledSet, dictNoteFormat
 audioGetUrl, audioInject
 jpConvertReading, jpDistributeFuriganaInflected, jpKatakanaToHiragana
-Translator, AnkiConnect, AnkiNull, Mecab, BackendApiForwarder, JsonSchema, ClipboardMonitor*/
+AudioSystem, Translator, AnkiConnect, AnkiNull, Mecab, BackendApiForwarder, JsonSchema, ClipboardMonitor*/
 
 class Backend {
     constructor() {
@@ -34,6 +34,7 @@ class Backend {
         this.options = null;
         this.optionsSchema = null;
         this.defaultAnkiFieldTemplates = null;
+        this.audioSystem = new AudioSystem();
         this.optionsContext = {
             depth: 0,
             url: window.location.href
@@ -436,7 +437,8 @@ class Backend {
                 definition,
                 options.anki.terms.fields,
                 options.audio.sources,
-                optionsContext
+                optionsContext,
+                this.audioSystem
             );
         }
 
