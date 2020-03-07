@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiTermsFind, apiOptionsSet, apiTextParse, apiTextParseMecab, TextScanner, QueryParserGenerator*/
+/*global apiTermsFind, apiOptionsSet, apiTextParse, apiTextParseMecab, TextScanner, QueryParserGenerator, docSentenceExtract*/
 
 class QueryParser extends TextScanner {
     constructor(search) {
@@ -55,12 +55,14 @@ class QueryParser extends TextScanner {
         const {definitions, length} = await apiTermsFind(searchText, {}, this.search.getOptionsContext());
         if (definitions.length === 0) { return null; }
 
+        const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
+
         textSource.setEndOffset(length);
 
         this.search.setContent('terms', {definitions, context: {
             focus: false,
             disableHistory: cause === 'mouse',
-            sentence: {text: searchText, offset: 0},
+            sentence,
             url: window.location.href
         }});
 
