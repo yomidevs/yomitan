@@ -93,7 +93,7 @@ class AnkiNoteBuilder {
         };
         const markers = this._markers;
         const pattern = /\{([\w-]+)\}/g;
-        return await stringReplaceAsync(field, pattern, async (g0, marker) => {
+        return await AnkiNoteBuilder.stringReplaceAsync(field, pattern, async (g0, marker) => {
             if (!markers.has(marker)) {
                 return g0;
             }
@@ -105,5 +105,20 @@ class AnkiNoteBuilder {
                 return `{${marker}-render-error}`;
             }
         });
+    }
+
+    static stringReplaceAsync(str, regex, replacer) {
+        let match;
+        let index = 0;
+        const parts = [];
+        while ((match = regex.exec(str)) !== null) {
+            parts.push(str.substring(index, match.index), replacer(...match, match.index, str));
+            index = regex.lastIndex;
+        }
+        if (parts.length === 0) {
+            return Promise.resolve(str);
+        }
+        parts.push(str.substring(index));
+        return Promise.all(parts).then((v) => v.join(''));
     }
 }
