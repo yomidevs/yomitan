@@ -34,7 +34,7 @@ class Backend {
         this.options = null;
         this.optionsSchema = null;
         this.defaultAnkiFieldTemplates = null;
-        this.audioSystem = new AudioSystem();
+        this.audioSystem = new AudioSystem({getAudioUri: this._getAudioUri.bind(this)});
         this.optionsContext = {
             depth: 0,
             url: window.location.href
@@ -763,6 +763,16 @@ class Backend {
     }
 
     // Utilities
+
+    async _getAudioUri(definition, source, details) {
+        let optionsContext = (typeof details === 'object' && details !== null ? details.optionsContext : null);
+        if (!(typeof optionsContext === 'object' && optionsContext !== null)) {
+            optionsContext = this.optionsContext;
+        }
+
+        const options = this.getOptions(optionsContext);
+        return await audioGetUrl(definition, source, options);
+    }
 
     async _injectScreenshot(definition, fields, screenshot) {
         let usesScreenshot = false;

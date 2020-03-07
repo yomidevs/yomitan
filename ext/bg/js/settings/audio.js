@@ -16,14 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global getOptionsContext, getOptionsMutable, settingsSaveOptions
+/*global getOptionsContext, getOptionsMutable, settingsSaveOptions, apiAudioGetUrl
 AudioSystem, AudioSourceUI*/
 
 let audioSourceUI = null;
 let audioSystem = null;
 
 async function audioSettingsInitialize() {
-    audioSystem = new AudioSystem();
+    audioSystem = new AudioSystem({
+        getAudioUri: async (definition, source) => {
+            const optionsContext = getOptionsContext();
+            return await apiAudioGetUrl(definition, source, optionsContext);
+        }
+    });
 
     const optionsContext = getOptionsContext();
     const options = await getOptionsMutable(optionsContext);

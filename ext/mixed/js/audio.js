@@ -16,8 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiAudioGetUrl*/
-
 class TextToSpeechAudio {
     constructor(text, voice) {
         this.text = text;
@@ -69,9 +67,10 @@ class TextToSpeechAudio {
 }
 
 class AudioSystem {
-    constructor() {
+    constructor({getAudioUri}) {
         this._cache = new Map();
         this._cacheSizeMaximum = 32;
+        this._getAudioUri = getAudioUri;
 
         if (typeof speechSynthesis !== 'undefined') {
             // speechSynthesis.getVoices() will not be populated unless some API call is made.
@@ -79,7 +78,7 @@ class AudioSystem {
         }
     }
 
-    async getExpressionAudio(expression, sources, optionsContext, details) {
+    async getExpressionAudio(expression, sources, details) {
         const key = `${expression.expression}:${expression.reading}`;
         const cacheValue = this._cache.get(expression);
         if (typeof cacheValue !== 'undefined') {
@@ -88,7 +87,7 @@ class AudioSystem {
         }
 
         for (const source of sources) {
-            const uri = await apiAudioGetUrl(expression, source, optionsContext);
+            const uri = await this._getAudioUri(expression, source, details);
             if (uri === null) { continue; }
 
             try {

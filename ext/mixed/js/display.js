@@ -18,7 +18,7 @@
 
 /*global docRangeFromPoint, docSentenceExtract
 apiKanjiFind, apiTermsFind, apiNoteView, apiOptionsGet, apiDefinitionsAddable, apiDefinitionAdd
-apiScreenshotGet, apiForward
+apiScreenshotGet, apiForward, apiAudioGetUrl
 AudioSystem, DisplayGenerator, WindowScroll, DisplayContext, DOM*/
 
 class Display {
@@ -31,7 +31,7 @@ class Display {
         this.index = 0;
         this.audioPlaying = null;
         this.audioFallback = null;
-        this.audioSystem = new AudioSystem();
+        this.audioSystem = new AudioSystem({getAudioUri: this._getAudioUri.bind(this)});
         this.styleNode = null;
 
         this.eventListeners = new EventListenerCollection();
@@ -775,7 +775,7 @@ class Display {
             const sources = this.options.audio.sources;
             let audio, source, info;
             try {
-                ({audio, source} = await this.audioSystem.getExpressionAudio(expression, sources, this.getOptionsContext()));
+                ({audio, source} = await this.audioSystem.getExpressionAudio(expression, sources));
                 info = `From source ${1 + sources.indexOf(source)}: ${source}`;
             } catch (e) {
                 if (this.audioFallback === null) {
@@ -915,5 +915,10 @@ class Display {
     static getKeyFromEvent(event) {
         const key = event.key;
         return (typeof key === 'string' ? (key.length === 1 ? key.toUpperCase() : key) : '');
+    }
+
+    async _getAudioUri(definition, source) {
+        const optionsContext = this.getOptionsContext();
+        return await apiAudioGetUrl(definition, source, optionsContext);
     }
 }
