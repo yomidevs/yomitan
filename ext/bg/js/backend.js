@@ -20,10 +20,10 @@
 conditionsTestValue, profileConditionsDescriptor
 handlebarsRenderDynamic
 requestText, requestJson, optionsLoad
-dictConfigured, dictTermsSort, dictEnabledSet, dictNoteFormat
+dictConfigured, dictTermsSort, dictEnabledSet
 audioGetUrl, audioInject
 jpConvertReading, jpDistributeFuriganaInflected, jpKatakanaToHiragana
-AudioSystem, Translator, AnkiConnect, AnkiNull, Mecab, BackendApiForwarder, JsonSchema, ClipboardMonitor*/
+AnkiNoteBuilder, AudioSystem, Translator, AnkiConnect, AnkiNull, Mecab, BackendApiForwarder, JsonSchema, ClipboardMonitor*/
 
 class Backend {
     constructor() {
@@ -31,6 +31,7 @@ class Backend {
         this.anki = new AnkiNull();
         this.mecab = new Mecab();
         this.clipboardMonitor = new ClipboardMonitor({getClipboard: this._onApiClipboardGet.bind(this)});
+        this.ankiNoteBuilder = new AnkiNoteBuilder();
         this.options = null;
         this.optionsSchema = null;
         this.defaultAnkiFieldTemplates = null;
@@ -450,7 +451,7 @@ class Backend {
             );
         }
 
-        const note = await dictNoteFormat(definition, mode, options, templates);
+        const note = await this.ankiNoteBuilder.createNote(definition, mode, options, templates);
         return this.anki.addNote(note);
     }
 
@@ -463,7 +464,7 @@ class Backend {
             const notes = [];
             for (const definition of definitions) {
                 for (const mode of modes) {
-                    const note = await dictNoteFormat(definition, mode, options, templates);
+                    const note = await this.ankiNoteBuilder.createNote(definition, mode, options, templates);
                     notes.push(note);
                 }
             }
