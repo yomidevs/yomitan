@@ -31,7 +31,7 @@ class Backend {
         this.anki = new AnkiNull();
         this.mecab = new Mecab();
         this.clipboardMonitor = new ClipboardMonitor({getClipboard: this._onApiClipboardGet.bind(this)});
-        this.ankiNoteBuilder = new AnkiNoteBuilder();
+        this.ankiNoteBuilder = new AnkiNoteBuilder({renderTemplate: this._renderTemplate.bind(this)});
         this.options = null;
         this.optionsSchema = null;
         this.defaultAnkiFieldTemplates = null;
@@ -507,7 +507,7 @@ class Backend {
     }
 
     async _onApiTemplateRender({template, data}) {
-        return handlebarsRenderDynamic(template, data);
+        return this._renderTemplate(template, data);
     }
 
     async _onApiCommandExec({command, params}) {
@@ -809,6 +809,10 @@ class Backend {
         }
 
         definition.screenshotFileName = filename;
+    }
+
+    async _renderTemplate(template, data) {
+        return handlebarsRenderDynamic(template, data);
     }
 
     static _getTabUrl(tab) {

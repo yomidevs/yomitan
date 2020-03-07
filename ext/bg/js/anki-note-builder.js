@@ -16,10 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiTemplateRender*/
-
 class AnkiNoteBuilder {
-    constructor() {
+    constructor({renderTemplate}) {
+        this._renderTemplate = renderTemplate;
         this._markers = new Set([
             'audio',
             'character',
@@ -100,7 +99,7 @@ class AnkiNoteBuilder {
             }
             data.marker = marker;
             try {
-                return await apiTemplateRender(templates, data);
+                return await this._renderTemplate(templates, data);
             } catch (e) {
                 if (errors) { errors.push(e); }
                 return `{${marker}-render-error}`;

@@ -17,10 +17,6 @@
  */
 
 
-function apiTemplateRender(template, data) {
-    return _apiInvoke('templateRender', {data, template});
-}
-
 function _apiInvoke(action, params={}) {
     const data = {action, params};
     return new Promise((resolve, reject) => {
