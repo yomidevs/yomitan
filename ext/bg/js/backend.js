@@ -21,7 +21,7 @@ conditionsTestValue, profileConditionsDescriptor
 handlebarsRenderDynamic
 requestText, requestJson, optionsLoad
 dictConfigured, dictTermsSort, dictEnabledSet
-audioGetUrl, audioInject
+audioGetUrl
 jpConvertReading, jpDistributeFuriganaInflected, jpKatakanaToHiragana
 AnkiNoteBuilder, AudioSystem, Translator, AnkiConnect, AnkiNull, Mecab, BackendApiForwarder, JsonSchema, ClipboardMonitor*/
 
@@ -434,12 +434,11 @@ class Backend {
         const templates = this.defaultAnkiFieldTemplates;
 
         if (mode !== 'kanji') {
-            await audioInject(
+            await this._audioInject(
                 definition,
                 options.anki.terms.fields,
                 options.audio.sources,
-                optionsContext,
-                this.audioSystem
+                optionsContext
             );
         }
 
@@ -775,6 +774,35 @@ class Backend {
         return await audioGetUrl(definition, source, options);
     }
 
+    async _audioInject(definition, fields, sources, optionsContext) {
+        let usesAudio = false;
+        for (const fieldValue of Object.values(fields)) {
+            if (fieldValue.includes('{audio}')) {
+                usesAudio = true;
+                break;
+            }
+        }
+
+        if (!usesAudio) {
+            return true;
+        }
+
+        try {
+            const expressions = definition.expressions;
+            const audioSourceDefinition = Array.isArray(expressions) ? expressions[0] : definition;
+
+            const {uri} = await this.audioSystem.getDefinitionAudio(audioSourceDefinition, sources, {tts: false, optionsContext});
+            const filename = this._createInjectedAudioFileName(audioSourceDefinition);
+            if (filename !== null) {
+                definition.audio = {url: uri, filename};
+            }
+
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
     async _injectScreenshot(definition, fields, screenshot) {
         let usesScreenshot = false;
         for (const fieldValue of Object.values(fields)) {
@@ -813,6 +841,17 @@ class Backend {
 
     async _renderTemplate(template, data) {
         return handlebarsRenderDynamic(template, data);
+    }
+
+    _createInjectedAudioFileName(definition) {
+        const {reading, expression} = definition;
+        if (!reading && !expression) { return null; }
+
+        let filename = 'yomichan';
+        if (reading) { filename += `_${reading}`; }
+        if (expression) { filename += `_${expression}`; }
+        filename += '.mp3';
+        return filename;
     }
 
     static _getTabUrl(tab) {
