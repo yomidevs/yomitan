@@ -16,66 +16,64 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiClipboardGet, jpIsStringPartiallyJapanese*/
+/*global jpIsStringPartiallyJapanese*/
 
-class ClipboardMonitor {
-    constructor() {
-        this.timerId = null;
-        this.timerToken = null;
-        this.interval = 250;
-        this.previousText = null;
-    }
-
-    onClipboardText(_text) {
-        throw new Error('Override me');
+class ClipboardMonitor extends EventDispatcher {
+    constructor({getClipboard}) {
+        super();
+        this._timerId = null;
+        this._timerToken = null;
+        this._interval = 250;
+        this._previousText = null;
+        this._getClipboard = getClipboard;
     }
 
     start() {
         this.stop();
 
         // The token below is used as a unique identifier to ensure that a new clipboard monitor
-        // hasn't been started during the await call. The check below the await apiClipboardGet()
+        // hasn't been started during the await call. The check below the await this._getClipboard()
         // call will exit early if the reference has changed.
         const token = {};
         const intervalCallback = async () => {
-            this.timerId = null;
+            this._timerId = null;
 
             let text = null;
             try {
-                text = await apiClipboardGet();
+                text = await this._getClipboard();
             } catch (e) {
                 // NOP
             }
-            if (this.timerToken !== token) { return; }
+            if (this._timerToken !== token) { return; }
 
             if (
                 typeof text === 'string' &&
                 (text = text.trim()).length > 0 &&
-                text !== this.previousText
+                text !== this._previousText
             ) {
-                this.previousText = text;
+                this._previousText = text;
                 if (jpIsStringPartiallyJapanese(text)) {
-                    this.onClipboardText(text);
+                    this.trigger('change', {text});
                 }
             }
 
-            this.timerId = setTimeout(intervalCallback, this.interval);
+            this._timerId = setTimeout(intervalCallback, this._interval);
         };
 
-        this.timerToken = token;
+        this._timerToken = token;
 
         intervalCallback();
     }
 
     stop() {
-        this.timerToken = null;
-        if (this.timerId !== null) {
-            clearTimeout(this.timerId);
-            this.timerId = null;
+        this._timerToken = null;
+        if (this._timerId !== null) {
+            clearTimeout(this._timerId);
+            this._timerId = null;
         }
     }
 
     setPreviousText(text) {
-        this.previousText = text;
+        this._previousText = text;
     }
 }

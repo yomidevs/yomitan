@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiOptionsSet, apiTermsFind, Display, QueryParser, ClipboardMonitor*/
+/*global apiOptionsSet, apiTermsFind, apiClipboardGet, Display, QueryParser, ClipboardMonitor*/
 
 class DisplaySearch extends Display {
     constructor() {
@@ -38,7 +38,7 @@ class DisplaySearch extends Display {
         this.introVisible = true;
         this.introAnimationTimer = null;
 
-        this.clipboardMonitor = new ClipboardMonitor();
+        this.clipboardMonitor = new ClipboardMonitor({getClipboard: apiClipboardGet});
 
         this._onKeyDownIgnoreKeys = new Map([
             ['ANY_MOD', new Set([
@@ -102,8 +102,7 @@ class DisplaySearch extends Display {
             this.wanakanaEnable.addEventListener('change', this.onWanakanaEnableChange.bind(this));
             window.addEventListener('popstate', this.onPopState.bind(this));
             window.addEventListener('copy', this.onCopy.bind(this));
-
-            this.clipboardMonitor.onClipboardText = this.onExternalSearchUpdate.bind(this);
+            this.clipboardMonitor.on('change', this.onExternalSearchUpdate.bind(this));
 
             this.updateSearchButton();
         } catch (e) {
@@ -198,7 +197,7 @@ class DisplaySearch extends Display {
         this.clipboardMonitor.setPreviousText(document.getSelection().toString().trim());
     }
 
-    onExternalSearchUpdate(text) {
+    onExternalSearchUpdate({text}) {
         this.setQuery(text);
         const url = new URL(window.location.href);
         url.searchParams.set('query', text);

@@ -30,7 +30,7 @@ class Backend {
         this.translator = new Translator();
         this.anki = new AnkiNull();
         this.mecab = new Mecab();
-        this.clipboardMonitor = new ClipboardMonitor();
+        this.clipboardMonitor = new ClipboardMonitor({getClipboard: this._onApiClipboardGet.bind(this)});
         this.options = null;
         this.optionsSchema = null;
         this.defaultAnkiFieldTemplates = null;
@@ -117,7 +117,7 @@ class Backend {
             chrome.tabs.create({url: chrome.runtime.getURL('/bg/guide.html')});
         }
 
-        this.clipboardMonitor.onClipboardText = this._onClipboardText.bind(this);
+        this.clipboardMonitor.on('change', this._onClipboardText.bind(this));
 
         this._sendMessageAllTabs('backendPrepared');
         const callback = () => this.checkLastError(chrome.runtime.lastError);
@@ -155,7 +155,7 @@ class Backend {
         }
     }
 
-    _onClipboardText(text) {
+    _onClipboardText({text}) {
         this._onCommandSearch({mode: 'popup', query: text});
     }
 
