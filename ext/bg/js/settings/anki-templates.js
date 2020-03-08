@@ -17,8 +17,9 @@
  */
 
 /*global getOptionsContext, getOptionsMutable, settingsSaveOptions
-ankiGetFieldMarkers, ankiGetFieldMarkersHtml, dictFieldFormat
-apiOptionsGet, apiTermsFind, apiGetDefaultAnkiFieldTemplates*/
+ankiGetFieldMarkers, ankiGetFieldMarkersHtml
+apiOptionsGet, apiTermsFind, apiGetDefaultAnkiFieldTemplates, apiTemplateRender
+AnkiNoteBuilder*/
 
 function onAnkiFieldTemplatesReset(e) {
     e.preventDefault();
@@ -92,7 +93,8 @@ async function ankiTemplatesValidate(infoNode, field, mode, showSuccessResult, i
             const options = await apiOptionsGet(optionsContext);
             let templates = options.anki.fieldTemplates;
             if (typeof templates !== 'string') { templates = await apiGetDefaultAnkiFieldTemplates(); }
-            result = await dictFieldFormat(field, definition, mode, options, templates, exceptions);
+            const ankiNoteBuilder = new AnkiNoteBuilder({renderTemplate: apiTemplateRender});
+            result = await ankiNoteBuilder.formatField(field, definition, mode, options, templates, exceptions);
         }
     } catch (e) {
         exceptions.push(e);

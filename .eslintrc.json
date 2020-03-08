@@ -86,7 +86,6 @@
                 "toIterable": "readonly",
                 "stringReverse": "readonly",
                 "promiseTimeout": "readonly",
-                "stringReplaceAsync": "readonly",
                 "parseUrl": "readonly",
                 "EventDispatcher": "readonly",
                 "EventListenerCollection": "readonly",

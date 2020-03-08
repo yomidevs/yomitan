@@ -175,21 +175,6 @@ function promiseTimeout(delay, resolveValue) {
     return promise;
 }
 
-function stringReplaceAsync(str, regex, replacer) {
-    let match;
-    let index = 0;
-    const parts = [];
-    while ((match = regex.exec(str)) !== null) {
-        parts.push(str.substring(index, match.index), replacer(...match, match.index, str));
-        index = regex.lastIndex;
-    }
-    if (parts.length === 0) {
-        return Promise.resolve(str);
-    }
-    parts.push(str.substring(index));
-    return Promise.all(parts).then((v) => v.join(''));
-}
-
 
 /*
  * Common events

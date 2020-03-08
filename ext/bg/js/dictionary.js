@@ -16,8 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiTemplateRender*/
-
 function dictEnabledSet(options) {
     const enabledDictionaryMap = new Map();
     for (const [title, {enabled, priority, allowSecondarySearches}] of Object.entries(options.dictionaries)) {
@@ -332,90 +330,4 @@ function dictTagsSort(tags) {
 
 function dictFieldSplit(field) {
     return field.length === 0 ? [] : field.split(' ');
-}
-
-async function dictFieldFormat(field, definition, mode, options, templates, exceptions) {
-    const data = {
-        marker: null,
-        definition,
-        group: options.general.resultOutputMode === 'group',
-        merge: options.general.resultOutputMode === 'merge',
-        modeTermKanji: mode === 'term-kanji',
-        modeTermKana: mode === 'term-kana',
-        modeKanji: mode === 'kanji',
-        compactGlossaries: options.general.compactGlossaries
-    };
-    const markers = dictFieldFormat.markers;
-    const pattern = /\{([\w-]+)\}/g;
-    return await stringReplaceAsync(field, pattern, async (g0, marker) => {
-        if (!markers.has(marker)) {
-            return g0;
-        }
-        data.marker = marker;
-        try {
-            return await apiTemplateRender(templates, data);
-        } catch (e) {
-            if (exceptions) { exceptions.push(e); }
-            return `{${marker}-render-error}`;
-        }
-    });
-}
-dictFieldFormat.markers = new Set([
-    'audio',
-    'character',
-    'cloze-body',
-    'cloze-prefix',
-    'cloze-suffix',
-    'dictionary',
-    'expression',
-    'furigana',
-    'furigana-plain',
-    'glossary',
-    'glossary-brief',
-    'kunyomi',
-    'onyomi',
-    'reading',
-    'screenshot',
-    'sentence',
-    'tags',
-    'url'
-]);
-
-async function dictNoteFormat(definition, mode, options, templates) {
-    const isKanji = (mode === 'kanji');
-    const tags = options.anki.tags;
-    const modeOptions = isKanji ? options.anki.kanji : options.anki.terms;
-    const modeOptionsFieldEntries = Object.entries(modeOptions.fields);
-
-    const note = {
-        fields: {},
-        tags,
-        deckName: modeOptions.deck,
-        modelName: modeOptions.model
-    };
-
-    for (const [fieldName, fieldValue] of modeOptionsFieldEntries) {
-        note.fields[fieldName] = await dictFieldFormat(fieldValue, definition, mode, options, templates);
-    }
-
-    if (!isKanji && definition.audio) {
-        const audioFields = [];
-
-        for (const [fieldName, fieldValue] of modeOptionsFieldEntries) {
-            if (fieldValue.includes('{audio}')) {
-                audioFields.push(fieldName);
-            }
-        }
-
-        if (audioFields.length > 0) {
-            note.audio = {
-                url: definition.audio.url,
-                filename: definition.audio.filename,
-                skipHash: '7e2c2f954ef6051373ba916f000168dc',
-                fields: audioFields
-            };
-        }
-    }
-
-    return note;
 }
