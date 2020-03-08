@@ -19,26 +19,6 @@
 class AnkiNoteBuilder {
     constructor({renderTemplate}) {
         this._renderTemplate = renderTemplate;
-        this._markers = new Set([
-            'audio',
-            'character',
-            'cloze-body',
-            'cloze-prefix',
-            'cloze-suffix',
-            'dictionary',
-            'expression',
-            'furigana',
-            'furigana-plain',
-            'glossary',
-            'glossary-brief',
-            'kunyomi',
-            'onyomi',
-            'reading',
-            'screenshot',
-            'sentence',
-            'tags',
-            'url'
-        ]);
     }
 
     async createNote(definition, mode, options, templates) {
@@ -91,12 +71,8 @@ class AnkiNoteBuilder {
             modeKanji: mode === 'kanji',
             compactGlossaries: options.general.compactGlossaries
         };
-        const markers = this._markers;
         const pattern = /\{([\w-]+)\}/g;
         return await AnkiNoteBuilder.stringReplaceAsync(field, pattern, async (g0, marker) => {
-            if (!markers.has(marker)) {
-                return g0;
-            }
             data.marker = marker;
             try {
                 return await this._renderTemplate(templates, data);
