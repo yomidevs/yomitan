@@ -23,7 +23,7 @@ requestText, requestJson, optionsLoad
 dictConfigured, dictTermsSort, dictEnabledSet, dictNoteFormat
 audioGetUrl, audioInject
 jpConvertReading, jpDistributeFuriganaInflected, jpKatakanaToHiragana
-Translator, AnkiConnect, AnkiNull, Mecab, BackendApiForwarder, JsonSchema, ClipboardMonitor*/
+AudioSystem, Translator, AnkiConnect, AnkiNull, Mecab, BackendApiForwarder, JsonSchema, ClipboardMonitor*/
 
 class Backend {
     constructor() {
@@ -34,6 +34,7 @@ class Backend {
         this.options = null;
         this.optionsSchema = null;
         this.defaultAnkiFieldTemplates = null;
+        this.audioSystem = new AudioSystem({getAudioUri: this._getAudioUri.bind(this)});
         this.optionsContext = {
             depth: 0,
             url: window.location.href
@@ -436,7 +437,8 @@ class Backend {
                 definition,
                 options.anki.terms.fields,
                 options.audio.sources,
-                optionsContext
+                optionsContext,
+                this.audioSystem
             );
         }
 
@@ -761,6 +763,16 @@ class Backend {
     }
 
     // Utilities
+
+    async _getAudioUri(definition, source, details) {
+        let optionsContext = (typeof details === 'object' && details !== null ? details.optionsContext : null);
+        if (!(typeof optionsContext === 'object' && optionsContext !== null)) {
+            optionsContext = this.optionsContext;
+        }
+
+        const options = this.getOptions(optionsContext);
+        return await audioGetUrl(definition, source, options);
+    }
 
     async _injectScreenshot(definition, fields, screenshot) {
         let usesScreenshot = false;

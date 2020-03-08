@@ -21,10 +21,6 @@ function apiTemplateRender(template, data) {
     return _apiInvoke('templateRender', {data, template});
 }
 
-function apiAudioGetUrl(definition, source, optionsContext) {
-    return _apiInvoke('audioGetUrl', {definition, source, optionsContext});
-}
-
 function _apiInvoke(action, params={}) {
     const data = {action, params};
     return new Promise((resolve, reject) => {

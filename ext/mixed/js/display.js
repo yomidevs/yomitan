@@ -18,9 +18,8 @@
 
 /*global docRangeFromPoint, docSentenceExtract
 apiKanjiFind, apiTermsFind, apiNoteView, apiOptionsGet, apiDefinitionsAddable, apiDefinitionAdd
-apiScreenshotGet, apiForward
-audioPrepareTextToSpeech, audioGetFromSources
-DisplayGenerator, WindowScroll, DisplayContext, DOM*/
+apiScreenshotGet, apiForward, apiAudioGetUrl
+AudioSystem, DisplayGenerator, WindowScroll, DisplayContext, DOM*/
 
 class Display {
     constructor(spinner, container) {
@@ -32,7 +31,7 @@ class Display {
         this.index = 0;
         this.audioPlaying = null;
         this.audioFallback = null;
-        this.audioCache = new Map();
+        this.audioSystem = new AudioSystem({getAudioUri: this._getAudioUri.bind(this)});
         this.styleNode = null;
 
         this.eventListeners = new EventListenerCollection();
@@ -364,7 +363,6 @@ class Display {
         this.updateDocumentOptions(this.options);
         this.updateTheme(this.options.general.popupTheme);
         this.setCustomCss(this.options.general.customPopupCss);
-        audioPrepareTextToSpeech(this.options);
     }
 
     updateDocumentOptions(options) {
@@ -775,16 +773,16 @@ class Display {
             }
 
             const sources = this.options.audio.sources;
-            let {audio, source} = await audioGetFromSources(expression, sources, this.getOptionsContext(), false, this.audioCache);
-            let info;
-            if (audio === null) {
+            let audio, source, info;
+            try {
+                ({audio, source} = await this.audioSystem.getDefinitionAudio(expression, sources));
+                info = `From source ${1 + sources.indexOf(source)}: ${source}`;
+            } catch (e) {
                 if (this.audioFallback === null) {
                     this.audioFallback = new Audio('/mixed/mp3/button.mp3');
                 }
                 audio = this.audioFallback;
                 info = 'Could not find audio';
-            } else {
-                info = `From source ${1 + sources.indexOf(source)}: ${source}`;
             }
 
             const button = this.audioButtonFindImage(entryIndex);
@@ -917,5 +915,10 @@ class Display {
     static getKeyFromEvent(event) {
         const key = event.key;
         return (typeof key === 'string' ? (key.length === 1 ? key.toUpperCase() : key) : '');
+    }
+
+    async _getAudioUri(definition, source) {
+        const optionsContext = this.getOptionsContext();
+        return await apiAudioGetUrl(definition, source, optionsContext);
     }
 }

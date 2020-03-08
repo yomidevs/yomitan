@@ -16,12 +16,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global getOptionsContext, getOptionsMutable, settingsSaveOptions
-AudioSourceUI, audioGetTextToSpeechVoice*/
+/*global getOptionsContext, getOptionsMutable, settingsSaveOptions, apiAudioGetUrl
+AudioSystem, AudioSourceUI*/
 
 let audioSourceUI = null;
+let audioSystem = null;
 
 async function audioSettingsInitialize() {
+    audioSystem = new AudioSystem({
+        getAudioUri: async (definition, source) => {
+            const optionsContext = getOptionsContext();
+            return await apiAudioGetUrl(definition, source, optionsContext);
+        }
+    });
+
     const optionsContext = getOptionsContext();
     const options = await getOptionsMutable(optionsContext);
     audioSourceUI = new AudioSourceUI.Container(
@@ -100,16 +108,11 @@ function textToSpeechVoiceCompare(a, b) {
 function textToSpeechTest() {
     try {
         const text = document.querySelector('#text-to-speech-voice-test').dataset.speechText || '';
-        const voiceURI = document.querySelector('#text-to-speech-voice').value;
-        const voice = audioGetTextToSpeechVoice(voiceURI);
-        if (voice === null) { return; }
+        const voiceUri = document.querySelector('#text-to-speech-voice').value;
 
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'ja-JP';
-        utterance.voice = voice;
-        utterance.volume = 1.0;
-
-        speechSynthesis.speak(utterance);
+        const audio = audioSystem.createTextToSpeechAudio({text, voiceUri});
+        audio.volume = 1.0;
+        audio.play();
     } catch (e) {
         // NOP
     }
