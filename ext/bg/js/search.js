@@ -56,7 +56,7 @@ class DisplaySearch extends Display {
         ]);
 
         this._runtimeMessageHandlers = new Map([
-            ['searchQueryUpdate', ({query}) => { this.onExternalSearchUpdate(query); }]
+            ['searchQueryUpdate', this.onExternalSearchUpdate.bind(this)]
         ]);
     }
 
