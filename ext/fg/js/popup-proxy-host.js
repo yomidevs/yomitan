@@ -47,7 +47,7 @@ class PopupProxyHost {
         ]));
     }
 
-    getOrCreatePopup(id=null, parentId=null) {
+    getOrCreatePopup(id=null, parentId=null, depth=0) {
         // Find by existing id
         if (id !== null) {
             const popup = this._popups.get(id);
@@ -76,7 +76,12 @@ class PopupProxyHost {
         }
 
         // Create new popup
-        const depth = (parent !== null ? parent.depth + 1 : 0);
+        if (parent !== null) {
+            if (depth !== 0) {
+                throw new Error('Depth cannot be set when parent exists');
+            }
+            depth = parent.depth + 1;
+        }
         const popup = new Popup(id, depth, this._frameIdPromise);
         if (parent !== null) {
             popup.setParent(parent);

@@ -31,7 +31,7 @@ async function main() {
         const popupHost = new PopupProxyHost();
         await popupHost.prepare();
 
-        popup = popupHost.getOrCreatePopup();
+        popup = popupHost.getOrCreatePopup(null, null, depth);
     }
 
     const frontend = new Frontend(popup, ignoreNodes);
