@@ -515,7 +515,7 @@ class Backend {
 
     async _onApiAudioGetUri({definition, source, optionsContext}) {
         const options = this.getOptions(optionsContext);
-        return await this.audioUriBuilder.getUri(source, definition, options);
+        return await this.audioUriBuilder.getUri(definition, source, options);
     }
 
     _onApiScreenshotGet({options}, sender) {
@@ -771,7 +771,7 @@ class Backend {
         }
 
         const options = this.getOptions(optionsContext);
-        return await this.audioUriBuilder.getUri(source, definition, options);
+        return await this.audioUriBuilder.getUri(definition, source, options);
     }
 
     async _audioInject(definition, fields, sources, optionsContext) {
