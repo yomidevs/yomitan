@@ -298,7 +298,7 @@ class DisplayGenerator {
     }
 
     static _isCharacterKanji(c) {
-        const code = c.charCodeAt(0);
+        const code = c.codePointAt(0);
         return (
             code >= 0x4e00 && code < 0x9fb0 ||
             code >= 0x3400 && code < 0x4dc0

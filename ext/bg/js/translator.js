@@ -20,7 +20,7 @@
 dictTermsMergeBySequence, dictTagBuildSource, dictTermsMergeByGloss, dictTermsSort, dictTagsSort
 dictEnabledSet, dictTermsGroup, dictTermsCompressTags, dictTermsUndupe, dictTagSanitize
 jpDistributeFurigana, jpConvertHalfWidthKanaToFullWidth, jpConvertNumericTofullWidth
-jpConvertAlphabeticToKana, jpHiraganaToKatakana, jpKatakanaToHiragana, jpIsCharCodeJapanese
+jpConvertAlphabeticToKana, jpHiraganaToKatakana, jpKatakanaToHiragana, jpIsCodePointJapanese
 Database, Deinflector*/
 
 class Translator {
@@ -621,13 +621,14 @@ class Translator {
 
     static getSearchableText(text, options) {
         if (!options.scanning.alphanumeric) {
-            const ii = text.length;
-            for (let i = 0; i < ii; ++i) {
-                if (!jpIsCharCodeJapanese(text.charCodeAt(i))) {
-                    text = text.substring(0, i);
+            let newText = '';
+            for (const c of text) {
+                if (!jpIsCodePointJapanese(c.codePointAt(0))) {
                     break;
                 }
+                newText += c;
             }
+            text = newText;
         }
 
         return text;
