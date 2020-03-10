@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global jpIsCharCodeKanji, jpDistributeFurigana, Handlebars*/
+/*global jpIsCodePointKanji, jpDistributeFurigana, Handlebars*/
 
 function handlebarsEscape(text) {
     return Handlebars.Utils.escapeExpression(text);
@@ -62,7 +62,7 @@ function handlebarsFuriganaPlain(options) {
 function handlebarsKanjiLinks(options) {
     let result = '';
     for (const c of options.fn(this)) {
-        if (jpIsCharCodeKanji(c.charCodeAt(0))) {
+        if (jpIsCodePointKanji(c.codePointAt(0))) {
             result += `<a href="#" class="kanji-link">${c}</a>`;
         } else {
             result += c;

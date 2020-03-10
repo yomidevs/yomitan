@@ -115,9 +115,9 @@ const JP_JAPANESE_RANGES = [
 
 // Helper functions
 
-function _jpIsCharCodeInRanges(charCode, ranges) {
+function _jpIsCodePointInRanges(codePoint, ranges) {
     for (const [min, max] of ranges) {
-        if (charCode >= min && charCode <= max) {
+        if (codePoint >= min && codePoint <= max) {
             return true;
         }
     }
@@ -127,16 +127,16 @@ function _jpIsCharCodeInRanges(charCode, ranges) {
 
 // Character code testing functions
 
-function jpIsCharCodeKanji(charCode) {
-    return _jpIsCharCodeInRanges(charCode, JP_CJK_RANGES);
+function jpIsCodePointKanji(codePoint) {
+    return _jpIsCodePointInRanges(codePoint, JP_CJK_RANGES);
 }
 
-function jpIsCharCodeKana(charCode) {
-    return _jpIsCharCodeInRanges(charCode, JP_KANA_RANGES);
+function jpIsCodePointKana(codePoint) {
+    return _jpIsCodePointInRanges(codePoint, JP_KANA_RANGES);
 }
 
-function jpIsCharCodeJapanese(charCode) {
-    return _jpIsCharCodeInRanges(charCode, JP_JAPANESE_RANGES);
+function jpIsCodePointJapanese(codePoint) {
+    return _jpIsCodePointInRanges(codePoint, JP_JAPANESE_RANGES);
 }
 
 
@@ -144,8 +144,8 @@ function jpIsCharCodeJapanese(charCode) {
 
 function jpIsStringEntirelyKana(str) {
     if (str.length === 0) { return false; }
-    for (let i = 0, ii = str.length; i < ii; ++i) {
-        if (!jpIsCharCodeKana(str.charCodeAt(i))) {
+    for (const c of str) {
+        if (!jpIsCodePointKana(c.codePointAt(0))) {
             return false;
         }
     }
@@ -154,8 +154,8 @@ function jpIsStringEntirelyKana(str) {
 
 function jpIsStringPartiallyJapanese(str) {
     if (str.length === 0) { return false; }
-    for (let i = 0, ii = str.length; i < ii; ++i) {
-        if (jpIsCharCodeJapanese(str.charCodeAt(i))) {
+    for (const c of str) {
+        if (jpIsCodePointJapanese(c.codePointAt(0))) {
             return true;
         }
     }
@@ -264,8 +264,8 @@ function jpDistributeFurigana(expression, reading) {
     const groups = [];
     let modePrev = null;
     for (const c of expression) {
-        const charCode = c.charCodeAt(0);
-        const modeCurr = jpIsCharCodeKanji(charCode) || charCode === JP_ITERATION_MARK_CHAR_CODE ? 'kanji' : 'kana';
+        const codePoint = c.codePointAt(0);
+        const modeCurr = jpIsCodePointKanji(codePoint) || codePoint === JP_ITERATION_MARK_CHAR_CODE ? 'kanji' : 'kana';
         if (modeCurr === modePrev) {
             groups[groups.length - 1].text += c;
         } else {
@@ -311,10 +311,11 @@ function jpDistributeFuriganaInflected(expression, reading, source) {
 
 function jpConvertHalfWidthKanaToFullWidth(text, sourceMapping) {
     let result = '';
-    const ii = text.length;
     const hasSourceMapping = Array.isArray(sourceMapping);
 
-    for (let i = 0; i < ii; ++i) {
+    // This function is safe to use charCodeAt instead of codePointAt, since all
+    // the relevant characters are represented with a single UTF-16 character code.
+    for (let i = 0, ii = text.length; i < ii; ++i) {
         const c = text[i];
         const mapping = JP_HALFWIDTH_KATAKANA_MAPPING.get(c);
         if (typeof mapping !== 'string') {
@@ -355,13 +356,13 @@ function jpConvertHalfWidthKanaToFullWidth(text, sourceMapping) {
 
 function jpConvertNumericTofullWidth(text) {
     let result = '';
-    for (let i = 0, ii = text.length; i < ii; ++i) {
-        let c = text.charCodeAt(i);
+    for (const char of text) {
+        let c = char.codePointAt(0);
         if (c >= 0x30 && c <= 0x39) { // ['0', '9']
             c += 0xff10 - 0x30; // 0xff10 = '0' full width
-            result += String.fromCharCode(c);
+            result += String.fromCodePoint(c);
         } else {
-            result += text[i];
+            result += char;
         }
     }
     return result;
@@ -377,9 +378,9 @@ function jpConvertAlphabeticToKana(text, sourceMapping) {
         sourceMapping.fill(1);
     }
 
-    for (let i = 0; i < ii; ++i) {
+    for (const char of text) {
         // Note: 0x61 is the character code for 'a'
-        let c = text.charCodeAt(i);
+        let c = char.codePointAt(0);
         if (c >= 0x41 && c <= 0x5a) { // ['A', 'Z']
             c += (0x61 - 0x41);
         } else if (c >= 0x61 && c <= 0x7a) { // ['a', 'z']
@@ -395,10 +396,10 @@ function jpConvertAlphabeticToKana(text, sourceMapping) {
                 result += jpToHiragana(part, sourceMapping, result.length);
                 part = '';
             }
-            result += text[i];
+            result += char;
             continue;
         }
-        part += String.fromCharCode(c);
+        part += String.fromCodePoint(c);
     }
 
     if (part.length > 0) {
