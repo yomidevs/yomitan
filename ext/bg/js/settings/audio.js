@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global getOptionsContext, getOptionsMutable, settingsSaveOptions, apiAudioGetUrl
+/*global getOptionsContext, getOptionsMutable, settingsSaveOptions, apiAudioGetUri
 AudioSystem, AudioSourceUI*/
 
 let audioSourceUI = null;
@@ -26,7 +26,7 @@ async function audioSettingsInitialize() {
     audioSystem = new AudioSystem({
         getAudioUri: async (definition, source) => {
             const optionsContext = getOptionsContext();
-            return await apiAudioGetUrl(definition, source, optionsContext);
+            return await apiAudioGetUri(definition, source, optionsContext);
         }
     });
 
