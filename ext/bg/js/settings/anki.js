@@ -16,9 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global getOptionsContext, getOptionsMutable, settingsSaveOptions
-utilBackgroundIsolate, utilAnkiGetDeckNames, utilAnkiGetModelNames, utilAnkiGetModelFieldNames
-onFormOptionsChanged*/
+/* global
+ * getOptionsContext
+ * getOptionsMutable
+ * onFormOptionsChanged
+ * settingsSaveOptions
+ * utilAnkiGetDeckNames
+ * utilAnkiGetModelFieldNames
+ * utilAnkiGetModelNames
+ * utilBackgroundIsolate
+ */
 
 // Private
 

@@ -16,7 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*global apiGetDisplayTemplatesHtml, TemplateHandler*/
+/* global
+ * TemplateHandler
+ * apiGetDisplayTemplatesHtml
+ */
 
 class DisplayGenerator {
     constructor() {

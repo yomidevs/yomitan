@@ -16,10 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global getOptionsContext, getOptionsMutable, settingsSaveOptions
-ankiGetFieldMarkers, ankiGetFieldMarkersHtml
-apiOptionsGet, apiTermsFind, apiGetDefaultAnkiFieldTemplates, apiTemplateRender
-AnkiNoteBuilder*/
+/* global
+ * AnkiNoteBuilder
+ * ankiGetFieldMarkers
+ * ankiGetFieldMarkersHtml
+ * apiGetDefaultAnkiFieldTemplates
+ * apiOptionsGet
+ * apiTemplateRender
+ * apiTermsFind
+ * getOptionsContext
+ * getOptionsMutable
+ * settingsSaveOptions
+ */
 
 function onAnkiFieldTemplatesReset(e) {
     e.preventDefault();

@@ -16,12 +16,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global requestJson
-dictTermsMergeBySequence, dictTagBuildSource, dictTermsMergeByGloss, dictTermsSort, dictTagsSort
-dictEnabledSet, dictTermsGroup, dictTermsCompressTags, dictTermsUndupe, dictTagSanitize
-jpDistributeFurigana, jpConvertHalfWidthKanaToFullWidth, jpConvertNumericTofullWidth
-jpConvertAlphabeticToKana, jpHiraganaToKatakana, jpKatakanaToHiragana, jpIsCodePointJapanese
-Database, Deinflector*/
+/* global
+ * Database
+ * Deinflector
+ * dictEnabledSet
+ * dictTagBuildSource
+ * dictTagSanitize
+ * dictTagsSort
+ * dictTermsCompressTags
+ * dictTermsGroup
+ * dictTermsMergeByGloss
+ * dictTermsMergeBySequence
+ * dictTermsSort
+ * dictTermsUndupe
+ * jpConvertAlphabeticToKana
+ * jpConvertHalfWidthKanaToFullWidth
+ * jpConvertNumericTofullWidth
+ * jpDistributeFurigana
+ * jpHiraganaToKatakana
+ * jpIsCodePointJapanese
+ * jpKatakanaToHiragana
+ * requestJson
+ */
 
 class Translator {
     constructor() {

@@ -16,7 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global popupNestedInitialize, apiForward, apiGetMessageToken, Display*/
+/* global
+ * Display
+ * apiForward
+ * apiGetMessageToken
+ * popupNestedInitialize
+ */
 
 class DisplayFloat extends Display {
     constructor() {

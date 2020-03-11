@@ -63,7 +63,7 @@
         "semi-spacing": ["error", {"before": false, "after": true}],
         "space-in-parens": ["error", "never"],
         "space-unary-ops": "error",
-        "spaced-comment": ["error", "always", {"markers": ["global"]}],
+        "spaced-comment": ["error", "always"],
         "switch-colon-spacing": ["error", {"after": true, "before": false}],
         "template-curly-spacing": ["error", "never"],
         "template-tag-spacing": ["error", "never"],

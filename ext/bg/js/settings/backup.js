@@ -16,9 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiOptionsGetFull, apiGetEnvironmentInfo, apiGetDefaultAnkiFieldTemplates
-utilBackend, utilIsolate, utilBackgroundIsolate, utilReadFileArrayBuffer
-optionsGetDefault, optionsUpdateVersion*/
+/* global
+ * apiGetDefaultAnkiFieldTemplates
+ * apiGetEnvironmentInfo
+ * apiOptionsGetFull
+ * optionsGetDefault
+ * optionsUpdateVersion
+ * utilBackend
+ * utilBackgroundIsolate
+ * utilIsolate
+ * utilReadFileArrayBuffer
+ */
 
 // Exporting
 

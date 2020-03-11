@@ -16,8 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global getOptionsContext, getOptionsMutable, settingsSaveOptions, apiAudioGetUri
-AudioSystem, AudioSourceUI*/
+/* global
+ * AudioSourceUI
+ * AudioSystem
+ * apiAudioGetUri
+ * getOptionsContext
+ * getOptionsMutable
+ * settingsSaveOptions
+ */
 
 let audioSourceUI = null;
 let audioSystem = null;

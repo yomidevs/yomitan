@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiOptionsGet*/
+/* global
+ * apiOptionsGet
+ */
 
 let popupNestedInitialized = false;
 

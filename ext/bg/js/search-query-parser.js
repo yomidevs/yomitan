@@ -16,7 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiTermsFind, apiOptionsSet, apiTextParse, apiTextParseMecab, TextScanner, QueryParserGenerator, docSentenceExtract*/
+/* global
+ * QueryParserGenerator
+ * TextScanner
+ * apiOptionsSet
+ * apiTermsFind
+ * apiTextParse
+ * apiTextParseMecab
+ * docSentenceExtract
+ */
 
 class QueryParser extends TextScanner {
     constructor(search) {
