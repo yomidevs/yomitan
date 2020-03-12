@@ -32,9 +32,7 @@
  * dictEnabledSet
  * dictTermsSort
  * handlebarsRenderDynamic
- * jpConvertReading
- * jpDistributeFuriganaInflected
- * jpKatakanaToHiragana
+ * jp
  * optionsLoad
  * optionsSave
  * profileConditionsDescriptor
@@ -402,13 +400,13 @@ class Backend {
                 dictTermsSort(definitions);
                 const {expression, reading} = definitions[0];
                 const source = text.substring(0, sourceLength);
-                for (const {text: text2, furigana} of jpDistributeFuriganaInflected(expression, reading, source)) {
-                    const reading2 = jpConvertReading(text2, furigana, options.parsing.readingMode);
+                for (const {text: text2, furigana} of jp.distributeFuriganaInflected(expression, reading, source)) {
+                    const reading2 = jp.convertReading(text2, furigana, options.parsing.readingMode);
                     term.push({text: text2, reading: reading2});
                 }
                 text = text.substring(source.length);
             } else {
-                const reading = jpConvertReading(text[0], null, options.parsing.readingMode);
+                const reading = jp.convertReading(text[0], null, options.parsing.readingMode);
                 term.push({text: text[0], reading});
                 text = text.substring(1);
             }
@@ -427,16 +425,16 @@ class Backend {
                 for (const {expression, reading, source} of parsedLine) {
                     const term = [];
                     if (expression !== null && reading !== null) {
-                        for (const {text: text2, furigana} of jpDistributeFuriganaInflected(
+                        for (const {text: text2, furigana} of jp.distributeFuriganaInflected(
                             expression,
-                            jpKatakanaToHiragana(reading),
+                            jp.convertKatakanaToHiragana(reading),
                             source
                         )) {
-                            const reading2 = jpConvertReading(text2, furigana, options.parsing.readingMode);
+                            const reading2 = jp.convertReading(text2, furigana, options.parsing.readingMode);
                             term.push({text: text2, reading: reading2});
                         }
                     } else {
-                        const reading2 = jpConvertReading(source, null, options.parsing.readingMode);
+                        const reading2 = jp.convertReading(source, null, options.parsing.readingMode);
                         term.push({text: source, reading: reading2});
                     }
                     result.push(term);

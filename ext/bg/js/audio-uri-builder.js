@@ -17,7 +17,7 @@
  */
 
 /* global
- * jpIsStringEntirelyKana
+ * jp
  */
 
 class AudioUriBuilder {
@@ -66,7 +66,7 @@ class AudioUriBuilder {
         let kana = definition.reading;
         let kanji = definition.expression;
 
-        if (!kana && jpIsStringEntirelyKana(kanji)) {
+        if (!kana && jp.isStringEntirelyKana(kanji)) {
             kana = kanji;
             kanji = null;
         }

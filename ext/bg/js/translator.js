@@ -29,13 +29,7 @@
  * dictTermsMergeBySequence
  * dictTermsSort
  * dictTermsUndupe
- * jpConvertAlphabeticToKana
- * jpConvertHalfWidthKanaToFullWidth
- * jpConvertNumericTofullWidth
- * jpDistributeFurigana
- * jpHiraganaToKatakana
- * jpIsCodePointJapanese
- * jpKatakanaToHiragana
+ * jp
  * requestJson
  */
 
@@ -275,7 +269,7 @@ class Translator {
                 const termTags = await this.expandTags(definition.termTags, definition.dictionary);
 
                 const {expression, reading} = definition;
-                const furiganaSegments = jpDistributeFurigana(expression, reading);
+                const furiganaSegments = jp.distributeFurigana(expression, reading);
 
                 definitions.push({
                     source: deinflection.source,
@@ -376,20 +370,20 @@ class Translator {
             let sourceMapping = null;
             if (halfWidth) {
                 if (sourceMapping === null) { sourceMapping = Translator.createTextSourceMapping(text2); }
-                text2 = jpConvertHalfWidthKanaToFullWidth(text2, sourceMapping);
+                text2 = jp.convertHalfWidthKanaToFullWidth(text2, sourceMapping);
             }
             if (numeric) {
-                text2 = jpConvertNumericTofullWidth(text2);
+                text2 = jp.convertNumericTofullWidth(text2);
             }
             if (alphabetic) {
                 if (sourceMapping === null) { sourceMapping = Translator.createTextSourceMapping(text2); }
-                text2 = jpConvertAlphabeticToKana(text2, sourceMapping);
+                text2 = jp.convertAlphabeticToKana(text2, sourceMapping);
             }
             if (katakana) {
-                text2 = jpHiraganaToKatakana(text2);
+                text2 = jp.convertHiraganaToKatakana(text2);
             }
             if (hiragana) {
-                text2 = jpKatakanaToHiragana(text2);
+                text2 = jp.convertKatakanaToHiragana(text2);
             }
 
             for (let i = text2.length; i > 0; --i) {
@@ -590,7 +584,7 @@ class Translator {
     }
 
     static createExpression(expression, reading, termTags=null, termFrequency=null) {
-        const furiganaSegments = jpDistributeFurigana(expression, reading);
+        const furiganaSegments = jp.distributeFurigana(expression, reading);
         return {
             expression,
             reading,
@@ -639,7 +633,7 @@ class Translator {
         if (!options.scanning.alphanumeric) {
             let newText = '';
             for (const c of text) {
-                if (!jpIsCodePointJapanese(c.codePointAt(0))) {
+                if (!jp.isCodePointJapanese(c.codePointAt(0))) {
                     break;
                 }
                 newText += c;
