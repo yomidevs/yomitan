@@ -68,28 +68,28 @@ function testGetProperty2() {
     const accessor = new ObjectPropertyAccessor(object);
 
     const data = [
-        [0],
-        ['0', 'invalid'],
-        ['invalid'],
-        ['value1', 'invalid'],
-        ['value1', 'value2', 'invalid'],
-        ['value1', 'value2', 0],
-        ['value1', 'value3', 'invalid'],
-        ['value1', 'value3', 0],
-        ['value1', 'value4', 'invalid'],
-        ['value1', 'value4', 0],
-        ['value5', 'length'],
-        ['value5', 0, 'invalid'],
-        ['value5', 0, 0],
-        ['value5', 1, 'invalid'],
-        ['value5', 1, 0],
-        ['value5', 2, 'invalid'],
-        ['value5', 2, 0],
-        ['value5', 2.5]
+        [[0], 'Invalid path: [0]'],
+        [['0', 'invalid'], 'Invalid path: ["0"].invalid'],
+        [['invalid'], 'Invalid path: invalid'],
+        [['value1', 'invalid'], 'Invalid path: value1.invalid'],
+        [['value1', 'value2', 'invalid'], 'Invalid path: value1.value2.invalid'],
+        [['value1', 'value2', 0], 'Invalid path: value1.value2[0]'],
+        [['value1', 'value3', 'invalid'], 'Invalid path: value1.value3.invalid'],
+        [['value1', 'value3', 0], 'Invalid path: value1.value3[0]'],
+        [['value1', 'value4', 'invalid'], 'Invalid path: value1.value4.invalid'],
+        [['value1', 'value4', 0], 'Invalid path: value1.value4[0]'],
+        [['value5', 'length'], 'Invalid path: value5.length'],
+        [['value5', 0, 'invalid'], 'Invalid path: value5[0].invalid'],
+        [['value5', 0, 0], 'Invalid path: value5[0][0]'],
+        [['value5', 1, 'invalid'], 'Invalid path: value5[1].invalid'],
+        [['value5', 1, 0], 'Invalid path: value5[1][0]'],
+        [['value5', 2, 'invalid'], 'Invalid path: value5[2].invalid'],
+        [['value5', 2, 0], 'Invalid path: value5[2][0]'],
+        [['value5', 2.5], 'Invalid index']
     ];
 
-    for (const pathArray of data) {
-        assert.throws(() => accessor.getProperty(pathArray));
+    for (const [pathArray, message] of data) {
+        assert.throws(() => accessor.getProperty(pathArray), {message});
     }
 }
 
@@ -123,20 +123,20 @@ function testSetProperty2() {
 
     const testValue = {};
     const data = [
-        [0],
-        ['0', 'invalid'],
-        ['value1', 'value2', 0],
-        ['value1', 'value3', 'invalid'],
-        ['value1', 'value4', 'invalid'],
-        ['value1', 'value4', 0],
-        ['value5', 1, 'invalid'],
-        ['value5', 2, 'invalid'],
-        ['value5', 2, 0],
-        ['value5', 2.5]
+        [[0], 'Invalid path: [0]'],
+        [['0', 'invalid'], 'Invalid path: ["0"].invalid'],
+        [['value1', 'value2', 0], 'Invalid path: value1.value2[0]'],
+        [['value1', 'value3', 'invalid'], 'Invalid path: value1.value3.invalid'],
+        [['value1', 'value4', 'invalid'], 'Invalid path: value1.value4.invalid'],
+        [['value1', 'value4', 0], 'Invalid path: value1.value4[0]'],
+        [['value5', 1, 'invalid'], 'Invalid path: value5[1].invalid'],
+        [['value5', 2, 'invalid'], 'Invalid path: value5[2].invalid'],
+        [['value5', 2, 0], 'Invalid path: value5[2][0]'],
+        [['value5', 2.5], 'Invalid index']
     ];
 
-    for (const pathArray of data) {
-        assert.throws(() => accessor.setProperty(pathArray, testValue));
+    for (const [pathArray, message] of data) {
+        assert.throws(() => accessor.setProperty(pathArray, testValue), {message});
     }
 }
 
@@ -163,12 +163,12 @@ function testGetPathString1() {
 
 function testGetPathString2() {
     const data = [
-        [1.5],
-        [null]
+        [[1.5], 'Invalid index'],
+        [[null], 'Invalid type: object']
     ];
 
-    for (const pathArray of data) {
-        assert.throws(() => ObjectPropertyAccessor.getPathString(pathArray));
+    for (const [pathArray, message] of data) {
+        assert.throws(() => ObjectPropertyAccessor.getPathString(pathArray), {message});
     }
 }
 
