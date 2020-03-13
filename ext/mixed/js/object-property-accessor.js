@@ -31,7 +31,7 @@ class ObjectPropertyAccessor {
         for (let i = 0; i < ii; ++i) {
             const key = pathArray[i];
             if (!ObjectPropertyAccessor.hasProperty(target, key)) {
-                throw new Error(`Invalid path: ${this.getPathString(pathArray.slice(0, i + 1))}`);
+                throw new Error(`Invalid path: ${ObjectPropertyAccessor.getPathString(pathArray.slice(0, i + 1))}`);
             }
             target = target[key];
         }
@@ -46,7 +46,7 @@ class ObjectPropertyAccessor {
         const target = this.getProperty(pathArray, pathArray.length - 1);
         const key = pathArray[pathArray.length - 1];
         if (!ObjectPropertyAccessor.isValidPropertyType(target, key)) {
-            throw new Error(`Invalid path: ${this.getPathString(pathArray)}`);
+            throw new Error(`Invalid path: ${ObjectPropertyAccessor.getPathString(pathArray)}`);
         }
 
         if (this._setter !== null) {
