@@ -85,6 +85,7 @@ function testGetProperty2() {
         [['value5', 1, 0], 'Invalid path: value5[1][0]'],
         [['value5', 2, 'invalid'], 'Invalid path: value5[2].invalid'],
         [['value5', 2, 0], 'Invalid path: value5[2][0]'],
+        [['value5', 2, 0, 'invalid'], 'Invalid path: value5[2][0]'],
         [['value5', 2.5], 'Invalid index']
     ];
 
@@ -132,6 +133,7 @@ function testSetProperty2() {
         [['value5', 1, 'invalid'], 'Invalid path: value5[1].invalid'],
         [['value5', 2, 'invalid'], 'Invalid path: value5[2].invalid'],
         [['value5', 2, 0], 'Invalid path: value5[2][0]'],
+        [['value5', 2, 0, 'invalid'], 'Invalid path: value5[2][0]'],
         [['value5', 2.5], 'Invalid index']
     ];
 
