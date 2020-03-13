@@ -40,6 +40,7 @@ class Display {
         this.spinner = spinner;
         this.container = container;
         this.definitions = [];
+        this.optionsContext = null;
         this.options = null;
         this.context = null;
         this.index = 0;
@@ -165,12 +166,11 @@ class Display {
         this.setInteractive(true);
     }
 
-    async prepare(options=null) {
+    async prepare() {
         await yomichan.prepare();
-        const displayGeneratorPromise = this.displayGenerator.prepare();
-        const updateOptionsPromise = this.updateOptions(options);
-        await Promise.all([displayGeneratorPromise, updateOptionsPromise]);
-        yomichan.on('optionsUpdated', () => this.updateOptions(null));
+        await this.displayGenerator.prepare();
+        await this.updateOptions();
+        yomichan.on('optionsUpdated', () => this.updateOptions());
     }
 
     onError(_error) {
@@ -369,11 +369,11 @@ class Display {
     }
 
     getOptionsContext() {
-        throw new Error('Override me');
+        return this.optionsContext;
     }
 
-    async updateOptions(options) {
-        this.options = options ? options : await apiOptionsGet(this.getOptionsContext());
+    async updateOptions() {
+        this.options = await apiOptionsGet(this.getOptionsContext());
         this.updateDocumentOptions(this.options);
         this.updateTheme(this.options.general.popupTheme);
         this.setCustomCss(this.options.general.customPopupCss);
@@ -851,7 +851,7 @@ class Display {
     }
 
     setPopupVisibleOverride(visible) {
-        return apiForward('popupSetVisibleOverride', {visible});
+        return apiForward('popupSetVisibleOverride', {visible, targetPopupId: 'all'});
     }
 
     setSpinnerVisible(visible) {

@@ -26,10 +26,9 @@
  */
 
 class Frontend extends TextScanner {
-    constructor(popup, ignoreNodes) {
+    constructor(popup) {
         super(
             window,
-            ignoreNodes,
             popup.isProxy() ? [] : [popup.getContainer()],
             [(x, y) => this.popup.containsPoint(x, y)]
         );
@@ -95,6 +94,9 @@ class Frontend extends TextScanner {
     }
 
     onRuntimeMessage({action, params}, sender, callback) {
+        const {targetPopupId} = params || {};
+        if (targetPopupId !== 'all' && targetPopupId !== this.popup.id) { return; }
+
         const handler = this._runtimeMessageHandlers.get(action);
         if (typeof handler !== 'function') { return false; }
 
@@ -129,8 +131,20 @@ class Frontend extends TextScanner {
 
     async updateOptions() {
         this.setOptions(await apiOptionsGet(this.getOptionsContext()));
+
+        const ignoreNodes = ['.scan-disable', '.scan-disable *'];
+        if (!this.options.scanning.enableOnPopupExpressions) {
+            ignoreNodes.push('.source-text', '.source-text *');
+        }
+        this.ignoreNodes = ignoreNodes.join(',');
+
         await this.popup.setOptions(this.options);
+
         this._updateContentScale();
+
+        if (this.textSourceCurrent !== null && this.causeCurrent !== null) {
+            await this.onSearchSource(this.textSourceCurrent, this.causeCurrent);
+        }
     }
 
     async onSearchSource(textSource, cause) {

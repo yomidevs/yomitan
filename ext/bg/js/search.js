@@ -247,15 +247,12 @@ class DisplaySearch extends Display {
     }
 
     onWanakanaEnableChange(e) {
-        const {queryParams: {query=''}} = parseUrl(window.location.href);
         const enableWanakana = e.target.checked;
         if (enableWanakana) {
             window.wanakana.bind(this.query);
         } else {
             window.wanakana.unbind(this.query);
         }
-        this.setQuery(query);
-        this.onSearchQueryUpdated(this.query.value, false);
         apiOptionsSet({general: {enableWanakana}}, this.getOptionsContext());
     }
 
@@ -278,17 +275,18 @@ class DisplaySearch extends Display {
         }
     }
 
-    async updateOptions(options) {
-        await super.updateOptions(options);
+    async updateOptions() {
+        await super.updateOptions();
         this.queryParser.setOptions(this.options);
+        const query = this.query.value;
+        if (query) {
+            this.setQuery(query);
+            this.onSearchQueryUpdated(query, false);
+        }
     }
 
     isWanakanaEnabled() {
         return this.wanakanaEnable !== null && this.wanakanaEnable.checked;
-    }
-
-    getOptionsContext() {
-        return this.optionsContext;
     }
 
     setQuery(query) {
