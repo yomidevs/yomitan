@@ -29,12 +29,18 @@ class DisplaySearch extends Display {
     constructor() {
         super(document.querySelector('#spinner'), document.querySelector('#content'));
 
+        this._isPrepared = false;
+
         this.optionsContext = {
             depth: 0,
             url: window.location.href
         };
 
-        this.queryParser = new QueryParser(this);
+        this.queryParser = new QueryParser({
+            getOptionsContext: this.getOptionsContext.bind(this),
+            setContent: this.setContent.bind(this),
+            setSpinnerVisible: this.setSpinnerVisible.bind(this)
+        });
 
         this.search = document.querySelector('#search');
         this.query = document.querySelector('#query');
@@ -112,6 +118,8 @@ class DisplaySearch extends Display {
             this.clipboardMonitor.on('change', this.onExternalSearchUpdate.bind(this));
 
             this.updateSearchButton();
+
+            this._isPrepared = true;
         } catch (e) {
             this.onError(e);
         }
@@ -278,6 +286,7 @@ class DisplaySearch extends Display {
     async updateOptions() {
         await super.updateOptions();
         this.queryParser.setOptions(this.options);
+        if (!this._isPrepared) { return; }
         const query = this.query.value;
         if (query) {
             this.setQuery(query);
