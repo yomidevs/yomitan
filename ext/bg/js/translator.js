@@ -16,12 +16,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global requestJson
-dictTermsMergeBySequence, dictTagBuildSource, dictTermsMergeByGloss, dictTermsSort, dictTagsSort
-dictEnabledSet, dictTermsGroup, dictTermsCompressTags, dictTermsUndupe, dictTagSanitize
-jpDistributeFurigana, jpConvertHalfWidthKanaToFullWidth, jpConvertNumericTofullWidth
-jpConvertAlphabeticToKana, jpHiraganaToKatakana, jpKatakanaToHiragana, jpIsCharCodeJapanese
-Database, Deinflector*/
+/* global
+ * Database
+ * Deinflector
+ * dictEnabledSet
+ * dictTagBuildSource
+ * dictTagSanitize
+ * dictTagsSort
+ * dictTermsCompressTags
+ * dictTermsGroup
+ * dictTermsMergeByGloss
+ * dictTermsMergeBySequence
+ * dictTermsSort
+ * dictTermsUndupe
+ * jpConvertAlphabeticToKana
+ * jpConvertHalfWidthKanaToFullWidth
+ * jpConvertNumericTofullWidth
+ * jpDistributeFurigana
+ * jpHiraganaToKatakana
+ * jpIsCodePointJapanese
+ * jpKatakanaToHiragana
+ * requestJson
+ */
 
 class Translator {
     constructor() {
@@ -199,8 +215,19 @@ class Translator {
 
         const strayDefinitions = defaultDefinitions.filter((definition, index) => !mergedByTermIndices.has(index));
         for (const groupedDefinition of dictTermsGroup(strayDefinitions, dictionaries)) {
-            groupedDefinition.expressions = [Translator.createExpression(groupedDefinition.expression, groupedDefinition.reading)];
-            definitionsMerged.push(groupedDefinition);
+            // from dictTermsMergeBySequence
+            const {reasons, score, expression, reading, source, dictionary} = groupedDefinition;
+            const compatibilityDefinition = {
+                reasons,
+                score,
+                expression: [expression],
+                reading: [reading],
+                expressions: [Translator.createExpression(groupedDefinition.expression, groupedDefinition.reading)],
+                source,
+                dictionary,
+                definitions: groupedDefinition.definitions
+            };
+            definitionsMerged.push(compatibilityDefinition);
         }
 
         await this.buildTermMeta(definitionsMerged, dictionaries);
@@ -610,13 +637,14 @@ class Translator {
 
     static getSearchableText(text, options) {
         if (!options.scanning.alphanumeric) {
-            const ii = text.length;
-            for (let i = 0; i < ii; ++i) {
-                if (!jpIsCharCodeJapanese(text.charCodeAt(i))) {
-                    text = text.substring(0, i);
+            let newText = '';
+            for (const c of text) {
+                if (!jpIsCodePointJapanese(c.codePointAt(0))) {
                     break;
                 }
+                newText += c;
             }
+            text = newText;
         }
 
         return text;

@@ -16,13 +16,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global getOptionsContext, apiOptionsSave
-utilBackend, utilIsolate, utilBackgroundIsolate
-ankiErrorShown, ankiFieldsToDict
-ankiTemplatesUpdateValue, onAnkiOptionsChanged, onDictionaryOptionsChanged
-appearanceInitialize, audioSettingsInitialize, profileOptionsSetup, dictSettingsInitialize
-ankiInitialize, ankiTemplatesInitialize, storageInfoInitialize
-*/
+/* global
+ * ankiErrorShown
+ * ankiFieldsToDict
+ * ankiInitialize
+ * ankiTemplatesInitialize
+ * ankiTemplatesUpdateValue
+ * apiOptionsSave
+ * appearanceInitialize
+ * audioSettingsInitialize
+ * backupInitialize
+ * dictSettingsInitialize
+ * getOptionsContext
+ * onAnkiOptionsChanged
+ * onDictionaryOptionsChanged
+ * profileOptionsSetup
+ * storageInfoInitialize
+ * utilBackend
+ * utilBackgroundIsolate
+ * utilIsolate
+ */
 
 function getOptionsMutable(optionsContext) {
     return utilBackend().getOptions(
@@ -200,7 +213,7 @@ async function formWrite(options) {
 }
 
 function formSetupEventListeners() {
-    $('input, select, textarea').not('.anki-model').not('.ignore-form-changes *').change((e) => onFormOptionsChanged(e));
+    $('input, select, textarea').not('.anki-model').not('.ignore-form-changes *').change(onFormOptionsChanged);
 }
 
 function formUpdateVisibility(options) {
@@ -262,6 +275,8 @@ function showExtensionInformation() {
 
 
 async function onReady() {
+    await yomichan.prepare();
+
     showExtensionInformation();
 
     formSetupEventListeners();
@@ -271,6 +286,7 @@ async function onReady() {
     await dictSettingsInitialize();
     ankiInitialize();
     ankiTemplatesInitialize();
+    backupInitialize();
 
     storageInfoInitialize();
 

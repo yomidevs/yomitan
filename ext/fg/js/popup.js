@@ -16,7 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiInjectStylesheet, apiGetMessageToken*/
+/* global
+ * apiGetMessageToken
+ * apiInjectStylesheet
+ */
 
 class Popup {
     constructor(id, depth, frameIdPromise) {
@@ -260,7 +263,7 @@ class Popup {
             'mozfullscreenchange',
             'webkitfullscreenchange'
         ];
-        const onFullscreenChanged = () => this._onFullscreenChanged();
+        const onFullscreenChanged = this._onFullscreenChanged.bind(this);
         for (const eventName of fullscreenEvents) {
             this._fullscreenEventListeners.addEventListener(document, eventName, onFullscreenChanged, false);
         }

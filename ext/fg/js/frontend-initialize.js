@@ -16,9 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global PopupProxyHost, PopupProxy, Frontend*/
+/* global
+ * Frontend
+ * PopupProxy
+ * PopupProxyHost
+ */
 
 async function main() {
+    await yomichan.prepare();
+
     const data = window.frontendInitializationData || {};
     const {id, depth=0, parentFrameId, ignoreNodes, url, proxy=false} = data;
 
@@ -29,7 +35,7 @@ async function main() {
         const popupHost = new PopupProxyHost();
         await popupHost.prepare();
 
-        popup = popupHost.getOrCreatePopup();
+        popup = popupHost.getOrCreatePopup(null, null, depth);
     }
 
     const frontend = new Frontend(popup, ignoreNodes);

@@ -16,10 +16,53 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global jpIsStringEntirelyKana, audioGetFromSources*/
+/* global
+ * jpIsStringEntirelyKana
+ */
 
-const audioUrlBuilders = new Map([
-    ['jpod101', async (definition) => {
+class AudioUriBuilder {
+    constructor() {
+        this._getUrlHandlers = new Map([
+            ['jpod101', this._getUriJpod101.bind(this)],
+            ['jpod101-alternate', this._getUriJpod101Alternate.bind(this)],
+            ['jisho', this._getUriJisho.bind(this)],
+            ['text-to-speech', this._getUriTextToSpeech.bind(this)],
+            ['text-to-speech-reading', this._getUriTextToSpeechReading.bind(this)],
+            ['custom', this._getUriCustom.bind(this)]
+        ]);
+    }
+
+    normalizeUrl(url, baseUrl, basePath) {
+        if (url) {
+            if (url[0] === '/') {
+                if (url.length >= 2 && url[1] === '/') {
+                    // Begins with "//"
+                    url = baseUrl.substring(0, baseUrl.indexOf(':') + 1) + url;
+                } else {
+                    // Begins with "/"
+                    url = baseUrl + url;
+                }
+            } else if (!/^[a-z][a-z0-9\-+.]*:/i.test(url)) {
+                // No URI scheme => relative path
+                url = baseUrl + basePath + url;
+            }
+        }
+        return url;
+    }
+
+    async getUri(definition, source, options) {
+        const handler = this._getUrlHandlers.get(source);
+        if (typeof handler === 'function') {
+            try {
+                return await handler(definition, options);
+            } catch (e) {
+                // NOP
+            }
+        }
+        return null;
+    }
+
+    async _getUriJpod101(definition) {
         let kana = definition.reading;
         let kanji = definition.expression;
 
@@ -37,8 +80,9 @@ const audioUrlBuilders = new Map([
         }
 
         return `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?${params.join('&')}`;
-    }],
-    ['jpod101-alternate', async (definition) => {
+    }
+
+    async _getUriJpod101Alternate(definition) {
         const response = await new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.open('POST', 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post');
@@ -54,7 +98,7 @@ const audioUrlBuilders = new Map([
                 const url = row.querySelector('audio>source[src]').getAttribute('src');
                 const reading = row.getElementsByClassName('dc-vocab_kana').item(0).textContent;
                 if (url && reading && (!definition.reading || definition.reading === reading)) {
-                    return audioUrlNormalize(url, 'https://www.japanesepod101.com', '/learningcenter/reference/');
+                    return this.normalizeUrl(url, 'https://www.japanesepod101.com', '/learningcenter/reference/');
                 }
             } catch (e) {
                 // NOP
@@ -62,8 +106,9 @@ const audioUrlBuilders = new Map([
         }
 
         throw new Error('Failed to find audio URL');
-    }],
-    ['jisho', async (definition) => {
+    }
+
+    async _getUriJisho(definition) {
         const response = await new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.open('GET', `https://jisho.org/search/${definition.expression}`);
@@ -78,7 +123,7 @@ const audioUrlBuilders = new Map([
             if (audio !== null) {
                 const url = audio.getElementsByTagName('source').item(0).getAttribute('src');
                 if (url) {
-                    return audioUrlNormalize(url, 'https://jisho.org', '/search/');
+                    return this.normalizeUrl(url, 'https://jisho.org', '/search/');
                 }
             }
         } catch (e) {
@@ -86,101 +131,28 @@ const audioUrlBuilders = new Map([
         }
 
         throw new Error('Failed to find audio URL');
-    }],
-    ['text-to-speech', async (definition, options) => {
+    }
+
+    async _getUriTextToSpeech(definition, options) {
         const voiceURI = options.audio.textToSpeechVoice;
         if (!voiceURI) {
             throw new Error('No voice');
         }
 
         return `tts:?text=${encodeURIComponent(definition.expression)}&voice=${encodeURIComponent(voiceURI)}`;
-    }],
-    ['text-to-speech-reading', async (definition, options) => {
+    }
+
+    async _getUriTextToSpeechReading(definition, options) {
         const voiceURI = options.audio.textToSpeechVoice;
         if (!voiceURI) {
             throw new Error('No voice');
         }
 
         return `tts:?text=${encodeURIComponent(definition.reading || definition.expression)}&voice=${encodeURIComponent(voiceURI)}`;
-    }],
-    ['custom', async (definition, options) => {
+    }
+
+    async _getUriCustom(definition, options) {
         const customSourceUrl = options.audio.customSourceUrl;
         return customSourceUrl.replace(/\{([^}]*)\}/g, (m0, m1) => (hasOwn(definition, m1) ? `${definition[m1]}` : m0));
-    }]
-]);
-
-async function audioGetUrl(definition, mode, options, download) {
-    const handler = audioUrlBuilders.get(mode);
-    if (typeof handler === 'function') {
-        try {
-            return await handler(definition, options, download);
-        } catch (e) {
-            // NOP
-        }
-    }
-    return null;
-}
-
-function audioUrlNormalize(url, baseUrl, basePath) {
-    if (url) {
-        if (url[0] === '/') {
-            if (url.length >= 2 && url[1] === '/') {
-                // Begins with "//"
-                url = baseUrl.substring(0, baseUrl.indexOf(':') + 1) + url;
-            } else {
-                // Begins with "/"
-                url = baseUrl + url;
-            }
-        } else if (!/^[a-z][a-z0-9\-+.]*:/i.test(url)) {
-            // No URI scheme => relative path
-            url = baseUrl + basePath + url;
-        }
-    }
-    return url;
-}
-
-function audioBuildFilename(definition) {
-    if (definition.reading || definition.expression) {
-        let filename = 'yomichan';
-        if (definition.reading) {
-            filename += `_${definition.reading}`;
-        }
-        if (definition.expression) {
-            filename += `_${definition.expression}`;
-        }
-
-        return filename += '.mp3';
-    }
-    return null;
-}
-
-async function audioInject(definition, fields, sources, optionsContext) {
-    let usesAudio = false;
-    for (const name in fields) {
-        if (fields[name].includes('{audio}')) {
-            usesAudio = true;
-            break;
-        }
-    }
-
-    if (!usesAudio) {
-        return true;
-    }
-
-    try {
-        const expressions = definition.expressions;
-        const audioSourceDefinition = Array.isArray(expressions) ? expressions[0] : definition;
-
-        const {url} = await audioGetFromSources(audioSourceDefinition, sources, optionsContext, true);
-        if (url !== null) {
-            const filename = audioBuildFilename(audioSourceDefinition);
-            if (filename !== null) {
-                definition.audio = {url, filename};
-            }
-        }
-
-        return true;
-    } catch (e) {
-        return false;
     }
 }

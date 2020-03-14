@@ -16,7 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiTermsFind, apiOptionsSet, apiTextParse, apiTextParseMecab, TextScanner, QueryParserGenerator*/
+/* global
+ * QueryParserGenerator
+ * TextScanner
+ * apiOptionsSet
+ * apiTermsFind
+ * apiTextParse
+ * apiTextParseMecab
+ * docSentenceExtract
+ */
 
 class QueryParser extends TextScanner {
     constructor(search) {
@@ -55,12 +63,14 @@ class QueryParser extends TextScanner {
         const {definitions, length} = await apiTermsFind(searchText, {}, this.search.getOptionsContext());
         if (definitions.length === 0) { return null; }
 
+        const sentence = docSentenceExtract(textSource, this.search.options.anki.sentenceExt);
+
         textSource.setEndOffset(length);
 
         this.search.setContent('terms', {definitions, context: {
             focus: false,
             disableHistory: cause === 'mouse',
-            sentence: {text: searchText, offset: 0},
+            sentence,
             url: window.location.href
         }});
 
@@ -142,11 +152,11 @@ class QueryParser extends TextScanner {
         }
         if (this.search.options.parsing.enableMecabParser) {
             const mecabResults = await apiTextParseMecab(text, this.search.getOptionsContext());
-            for (const mecabDictName in mecabResults) {
+            for (const [mecabDictName, mecabDictResults] of mecabResults) {
                 results.push({
                     name: `MeCab: ${mecabDictName}`,
                     id: `mecab-${mecabDictName}`,
-                    parsedText: mecabResults[mecabDictName]
+                    parsedText: mecabDictResults
                 });
             }
         }

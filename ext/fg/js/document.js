@@ -16,7 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global TextSourceElement, TextSourceRange, DOM*/
+/* global
+ * DOM
+ * TextSourceElement
+ * TextSourceRange
+ */
 
 const REGEX_TRANSPARENT_COLOR = /rgba\s*\([^)]*,\s*0(?:\.0+)?\s*\)/;
 

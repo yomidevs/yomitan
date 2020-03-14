@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiGetEnvironmentInfo*/
+/* global
+ * apiGetEnvironmentInfo
+ */
 
 function storageBytesToLabeledString(size) {
     const base = 1000;
@@ -57,7 +59,7 @@ async function storageInfoInitialize() {
 
     await storageShowInfo();
 
-    document.querySelector('#storage-refresh').addEventListener('click', () => storageShowInfo(), false);
+    document.querySelector('#storage-refresh').addEventListener('click', storageShowInfo, false);
 }
 
 async function storageUpdateStats() {

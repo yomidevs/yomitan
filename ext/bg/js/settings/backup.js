@@ -16,10 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiOptionsGetFull, apiGetEnvironmentInfo
-utilBackend, utilIsolate, utilBackgroundIsolate, utilReadFileArrayBuffer
-optionsGetDefault, optionsUpdateVersion
-profileOptionsGetDefaultFieldTemplates*/
+/* global
+ * apiGetDefaultAnkiFieldTemplates
+ * apiGetEnvironmentInfo
+ * apiOptionsGetFull
+ * optionsGetDefault
+ * optionsUpdateVersion
+ * utilBackend
+ * utilBackgroundIsolate
+ * utilIsolate
+ * utilReadFileArrayBuffer
+ */
 
 // Exporting
 
@@ -47,8 +54,7 @@ function _getSettingsExportDateString(date, dateSeparator, dateTimeSeparator, ti
 async function _getSettingsExportData(date) {
     const optionsFull = await apiOptionsGetFull();
     const environment = await apiGetEnvironmentInfo();
-
-    const fieldTemplatesDefault = profileOptionsGetDefaultFieldTemplates();
+    const fieldTemplatesDefault = await apiGetDefaultAnkiFieldTemplates();
 
     // Format options
     for (const {options} of optionsFull.profiles) {
@@ -122,7 +128,7 @@ async function _onSettingsExportClick() {
 // Importing
 
 async function _settingsImportSetOptionsFull(optionsFull) {
-    return utilIsolate(await utilBackend().setFullOptions(
+    return utilIsolate(utilBackend().setFullOptions(
         utilBackgroundIsolate(optionsFull)
     ));
 }
@@ -364,10 +370,10 @@ async function _onSettingsResetConfirmClick() {
 
 // Setup
 
-window.addEventListener('DOMContentLoaded', () => {
+function backupInitialize() {
     document.querySelector('#settings-export').addEventListener('click', _onSettingsExportClick, false);
     document.querySelector('#settings-import').addEventListener('click', _onSettingsImportClick, false);
     document.querySelector('#settings-import-file').addEventListener('change', _onSettingsImportFileChange, false);
     document.querySelector('#settings-reset').addEventListener('click', _onSettingsResetClick, false);
     document.querySelector('#settings-reset-modal-confirm').addEventListener('click', _onSettingsResetConfirmClick, false);
-}, false);
+}

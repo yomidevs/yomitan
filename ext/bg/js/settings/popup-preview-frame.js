@@ -16,7 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiOptionsGet, Popup, PopupProxyHost, Frontend, TextSourceRange*/
+/* global
+ * Frontend
+ * Popup
+ * PopupProxyHost
+ * TextSourceRange
+ * apiOptionsGet
+ */
 
 class SettingsPopupPreview {
     constructor() {
@@ -28,6 +34,12 @@ class SettingsPopupPreview {
         this.themeChangeTimeout = null;
         this.textSource = null;
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
+
+        this._windowMessageHandlers = new Map([
+            ['setText', ({text}) => this.setText(text)],
+            ['setCustomCss', ({css}) => this.setCustomCss(css)],
+            ['setCustomOuterCss', ({css}) => this.setCustomOuterCss(css)]
+        ]);
     }
 
     static create() {
@@ -38,15 +50,12 @@ class SettingsPopupPreview {
 
     async prepare() {
         // Setup events
-        window.addEventListener('message', (e) => this.onMessage(e), false);
+        window.addEventListener('message', this.onMessage.bind(this), false);
 
-        const themeDarkCheckbox = document.querySelector('#theme-dark-checkbox');
-        if (themeDarkCheckbox !== null) {
-            themeDarkCheckbox.addEventListener('change', () => this.onThemeDarkCheckboxChanged(themeDarkCheckbox), false);
-        }
+        document.querySelector('#theme-dark-checkbox').addEventListener('change', this.onThemeDarkCheckboxChanged.bind(this), false);
 
         // Overwrite API functions
-        window.apiOptionsGet = (...args) => this.apiOptionsGet(...args);
+        window.apiOptionsGet = this.apiOptionsGet.bind(this);
 
         // Overwrite frontend
         const popupHost = new PopupProxyHost();
@@ -56,7 +65,7 @@ class SettingsPopupPreview {
         this.popup.setChildrenSupported(false);
 
         this.popupSetCustomOuterCssOld = this.popup.setCustomOuterCss;
-        this.popup.setCustomOuterCss = (...args) => this.popupSetCustomOuterCss(...args);
+        this.popup.setCustomOuterCss = this.popupSetCustomOuterCss.bind(this);
 
         this.frontend = new Frontend(this.popup);
 
@@ -101,14 +110,14 @@ class SettingsPopupPreview {
         if (e.origin !== this._targetOrigin) { return; }
 
         const {action, params} = e.data;
-        const handler = SettingsPopupPreview._messageHandlers.get(action);
+        const handler = this._windowMessageHandlers.get(action);
         if (typeof handler !== 'function') { return; }
 
-        handler(this, params);
+        handler(params);
     }
 
-    onThemeDarkCheckboxChanged(node) {
-        document.documentElement.classList.toggle('dark', node.checked);
+    onThemeDarkCheckboxChanged(e) {
+        document.documentElement.classList.toggle('dark', e.target.checked);
         if (this.themeChangeTimeout !== null) {
             clearTimeout(this.themeChangeTimeout);
         }
@@ -170,12 +179,6 @@ class SettingsPopupPreview {
         this.setInfoVisible(!this.popupShown);
     }
 }
-
-SettingsPopupPreview._messageHandlers = new Map([
-    ['setText', (self, {text}) => self.setText(text)],
-    ['setCustomCss', (self, {css}) => self.setCustomCss(css)],
-    ['setCustomOuterCss', (self, {css}) => self.setCustomOuterCss(css)]
-]);
 
 SettingsPopupPreview.instance = SettingsPopupPreview.create();
 

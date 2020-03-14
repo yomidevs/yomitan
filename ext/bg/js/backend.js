@@ -16,30 +16,51 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global optionsSave, utilIsolate
-conditionsTestValue, profileConditionsDescriptor, profileOptionsGetDefaultFieldTemplates
-handlebarsRenderDynamic
-requestText, requestJson, optionsLoad
-dictConfigured, dictTermsSort, dictEnabledSet, dictNoteFormat
-audioGetUrl, audioInject
-jpConvertReading, jpDistributeFuriganaInflected, jpKatakanaToHiragana
-Translator, AnkiConnect, AnkiNull, Mecab, BackendApiForwarder, JsonSchema, ClipboardMonitor*/
+/* global
+ * AnkiConnect
+ * AnkiNoteBuilder
+ * AnkiNull
+ * AudioSystem
+ * AudioUriBuilder
+ * BackendApiForwarder
+ * ClipboardMonitor
+ * JsonSchema
+ * Mecab
+ * Translator
+ * conditionsTestValue
+ * dictConfigured
+ * dictEnabledSet
+ * dictTermsSort
+ * handlebarsRenderDynamic
+ * jpConvertReading
+ * jpDistributeFuriganaInflected
+ * jpKatakanaToHiragana
+ * optionsLoad
+ * optionsSave
+ * profileConditionsDescriptor
+ * requestJson
+ * requestText
+ * utilIsolate
+ */
 
 class Backend {
     constructor() {
         this.translator = new Translator();
         this.anki = new AnkiNull();
         this.mecab = new Mecab();
-        this.clipboardMonitor = new ClipboardMonitor();
+        this.clipboardMonitor = new ClipboardMonitor({getClipboard: this._onApiClipboardGet.bind(this)});
+        this.ankiNoteBuilder = new AnkiNoteBuilder({renderTemplate: this._renderTemplate.bind(this)});
         this.options = null;
         this.optionsSchema = null;
+        this.defaultAnkiFieldTemplates = null;
+        this.audioSystem = new AudioSystem({getAudioUri: this._getAudioUri.bind(this)});
+        this.audioUriBuilder = new AudioUriBuilder();
         this.optionsContext = {
             depth: 0,
             url: window.location.href
         };
 
-        this.isPreparedResolve = null;
-        this.isPreparedPromise = new Promise((resolve) => (this.isPreparedResolve = resolve));
+        this.isPrepared = false;
 
         this.clipboardPasteTarget = document.querySelector('#clipboard-paste-target');
 
@@ -48,12 +69,50 @@ class Backend {
         this.apiForwarder = new BackendApiForwarder();
 
         this.messageToken = yomichan.generateId(16);
+
+        this._messageHandlers = new Map([
+            ['yomichanCoreReady', this._onApiYomichanCoreReady.bind(this)],
+            ['optionsSchemaGet', this._onApiOptionsSchemaGet.bind(this)],
+            ['optionsGet', this._onApiOptionsGet.bind(this)],
+            ['optionsGetFull', this._onApiOptionsGetFull.bind(this)],
+            ['optionsSet', this._onApiOptionsSet.bind(this)],
+            ['optionsSave', this._onApiOptionsSave.bind(this)],
+            ['kanjiFind', this._onApiKanjiFind.bind(this)],
+            ['termsFind', this._onApiTermsFind.bind(this)],
+            ['textParse', this._onApiTextParse.bind(this)],
+            ['textParseMecab', this._onApiTextParseMecab.bind(this)],
+            ['definitionAdd', this._onApiDefinitionAdd.bind(this)],
+            ['definitionsAddable', this._onApiDefinitionsAddable.bind(this)],
+            ['noteView', this._onApiNoteView.bind(this)],
+            ['templateRender', this._onApiTemplateRender.bind(this)],
+            ['commandExec', this._onApiCommandExec.bind(this)],
+            ['audioGetUri', this._onApiAudioGetUri.bind(this)],
+            ['screenshotGet', this._onApiScreenshotGet.bind(this)],
+            ['forward', this._onApiForward.bind(this)],
+            ['frameInformationGet', this._onApiFrameInformationGet.bind(this)],
+            ['injectStylesheet', this._onApiInjectStylesheet.bind(this)],
+            ['getEnvironmentInfo', this._onApiGetEnvironmentInfo.bind(this)],
+            ['clipboardGet', this._onApiClipboardGet.bind(this)],
+            ['getDisplayTemplatesHtml', this._onApiGetDisplayTemplatesHtml.bind(this)],
+            ['getQueryParserTemplatesHtml', this._onApiGetQueryParserTemplatesHtml.bind(this)],
+            ['getZoom', this._onApiGetZoom.bind(this)],
+            ['getMessageToken', this._onApiGetMessageToken.bind(this)],
+            ['getDefaultAnkiFieldTemplates', this._onApiGetDefaultAnkiFieldTemplates.bind(this)]
+        ]);
+
+        this._commandHandlers = new Map([
+            ['search', this._onCommandSearch.bind(this)],
+            ['help', this._onCommandHelp.bind(this)],
+            ['options', this._onCommandOptions.bind(this)],
+            ['toggle', this._onCommandToggle.bind(this)]
+        ]);
     }
 
     async prepare() {
         await this.translator.prepare();
 
         this.optionsSchema = await requestJson(chrome.runtime.getURL('/bg/data/options-schema.json'), 'GET');
+        this.defaultAnkiFieldTemplates = await requestText(chrome.runtime.getURL('/bg/data/default-anki-field-templates.handlebars'), 'GET');
         this.options = await optionsLoad();
         try {
             this.options = JsonSchema.getValidValueOrDefault(this.optionsSchema, this.options);
@@ -65,42 +124,47 @@ class Backend {
         this.onOptionsUpdated('background');
 
         if (isObject(chrome.commands) && isObject(chrome.commands.onCommand)) {
-            chrome.commands.onCommand.addListener((command) => this._runCommand(command));
+            chrome.commands.onCommand.addListener(this._runCommand.bind(this));
         }
         if (isObject(chrome.tabs) && isObject(chrome.tabs.onZoomChange)) {
-            chrome.tabs.onZoomChange.addListener((info) => this._onZoomChange(info));
+            chrome.tabs.onZoomChange.addListener(this._onZoomChange.bind(this));
         }
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
 
-        const options = this.getOptionsSync(this.optionsContext);
+        this.isPrepared = true;
+
+        const options = this.getOptions(this.optionsContext);
         if (options.general.showGuide) {
             chrome.tabs.create({url: chrome.runtime.getURL('/bg/guide.html')});
         }
 
-        this.isPreparedResolve();
-        this.isPreparedResolve = null;
-        this.isPreparedPromise = null;
+        this.clipboardMonitor.on('change', this._onClipboardText.bind(this));
 
-        this.clipboardMonitor.onClipboardText = (text) => this._onClipboardText(text);
+        this._sendMessageAllTabs('backendPrepared');
+        const callback = () => this.checkLastError(chrome.runtime.lastError);
+        chrome.runtime.sendMessage({action: 'backendPrepared'}, callback);
     }
 
-    onOptionsUpdated(source) {
-        this.applyOptions();
-
+    _sendMessageAllTabs(action, params={}) {
         const callback = () => this.checkLastError(chrome.runtime.lastError);
         chrome.tabs.query({}, (tabs) => {
             for (const tab of tabs) {
-                chrome.tabs.sendMessage(tab.id, {action: 'optionsUpdated', params: {source}}, callback);
+                chrome.tabs.sendMessage(tab.id, {action, params}, callback);
             }
         });
     }
 
+    onOptionsUpdated(source) {
+        this.applyOptions();
+        this._sendMessageAllTabs('optionsUpdated', {source});
+    }
+
     onMessage({action, params}, sender, callback) {
-        const handler = Backend._messageHandlers.get(action);
+        const handler = this._messageHandlers.get(action);
         if (typeof handler !== 'function') { return false; }
 
         try {
-            const promise = handler(this, params, sender);
+            const promise = handler(params, sender);
             promise.then(
                 (result) => callback({result}),
                 (error) => callback({error: errorToJson(error)})
@@ -112,7 +176,7 @@ class Backend {
         }
     }
 
-    _onClipboardText(text) {
+    _onClipboardText({text}) {
         this._onCommandSearch({mode: 'popup', query: text});
     }
 
@@ -122,7 +186,7 @@ class Backend {
     }
 
     applyOptions() {
-        const options = this.getOptionsSync(this.optionsContext);
+        const options = this.getOptions(this.optionsContext);
         if (!options.general.enable) {
             this.setExtensionBadgeBackgroundColor('#555555');
             this.setExtensionBadgeText('off');
@@ -148,24 +212,15 @@ class Backend {
         }
     }
 
-    async getOptionsSchema() {
-        if (this.isPreparedPromise !== null) {
-            await this.isPreparedPromise;
-        }
+    getOptionsSchema() {
         return this.optionsSchema;
     }
 
-    async getFullOptions() {
-        if (this.isPreparedPromise !== null) {
-            await this.isPreparedPromise;
-        }
+    getFullOptions() {
         return this.options;
     }
 
-    async setFullOptions(options) {
-        if (this.isPreparedPromise !== null) {
-            await this.isPreparedPromise;
-        }
+    setFullOptions(options) {
         try {
             this.options = JsonSchema.getValidValueOrDefault(this.optionsSchema, utilIsolate(options));
         } catch (e) {
@@ -174,18 +229,11 @@ class Backend {
         }
     }
 
-    async getOptions(optionsContext) {
-        if (this.isPreparedPromise !== null) {
-            await this.isPreparedPromise;
-        }
-        return this.getOptionsSync(optionsContext);
+    getOptions(optionsContext) {
+        return this.getProfile(optionsContext).options;
     }
 
-    getOptionsSync(optionsContext) {
-        return this.getProfileSync(optionsContext).options;
-    }
-
-    getProfileSync(optionsContext) {
+    getProfile(optionsContext) {
         const profiles = this.options.profiles;
         if (typeof optionsContext.index === 'number') {
             return profiles[optionsContext.index];
@@ -243,29 +291,43 @@ class Backend {
     }
 
     _runCommand(command, params) {
-        const handler = Backend._commandHandlers.get(command);
+        const handler = this._commandHandlers.get(command);
         if (typeof handler !== 'function') { return false; }
 
-        handler(this, params);
+        handler(params);
         return true;
     }
 
     // Message handlers
 
-    _onApiOptionsSchemaGet() {
+    _onApiYomichanCoreReady(_params, sender) {
+        // tab ID isn't set in background (e.g. browser_action)
+        if (typeof sender.tab === 'undefined') {
+            const callback = () => this.checkLastError(chrome.runtime.lastError);
+            chrome.runtime.sendMessage({action: 'backendPrepared'}, callback);
+            return Promise.resolve();
+        }
+
+        const tabId = sender.tab.id;
+        return new Promise((resolve) => {
+            chrome.tabs.sendMessage(tabId, {action: 'backendPrepared'}, resolve);
+        });
+    }
+
+    async _onApiOptionsSchemaGet() {
         return this.getOptionsSchema();
     }
 
-    _onApiOptionsGet({optionsContext}) {
+    async _onApiOptionsGet({optionsContext}) {
         return this.getOptions(optionsContext);
     }
 
-    _onApiOptionsGetFull() {
+    async _onApiOptionsGetFull() {
         return this.getFullOptions();
     }
 
     async _onApiOptionsSet({changedOptions, optionsContext, source}) {
-        const options = await this.getOptions(optionsContext);
+        const options = this.getOptions(optionsContext);
 
         function getValuePaths(obj) {
             const valuePaths = [];
@@ -305,20 +367,20 @@ class Backend {
     }
 
     async _onApiOptionsSave({source}) {
-        const options = await this.getFullOptions();
+        const options = this.getFullOptions();
         await optionsSave(options);
         this.onOptionsUpdated(source);
     }
 
     async _onApiKanjiFind({text, optionsContext}) {
-        const options = await this.getOptions(optionsContext);
+        const options = this.getOptions(optionsContext);
         const definitions = await this.translator.findKanji(text, options);
         definitions.splice(options.general.maxResults);
         return definitions;
     }
 
     async _onApiTermsFind({text, details, optionsContext}) {
-        const options = await this.getOptions(optionsContext);
+        const options = this.getOptions(optionsContext);
         const mode = options.general.resultOutputMode;
         const [definitions, length] = await this.translator.findTerms(mode, text, details, options);
         definitions.splice(options.general.maxResults);
@@ -326,7 +388,7 @@ class Backend {
     }
 
     async _onApiTextParse({text, optionsContext}) {
-        const options = await this.getOptions(optionsContext);
+        const options = this.getOptions(optionsContext);
         const results = [];
         while (text.length > 0) {
             const term = [];
@@ -356,12 +418,12 @@ class Backend {
     }
 
     async _onApiTextParseMecab({text, optionsContext}) {
-        const options = await this.getOptions(optionsContext);
-        const results = {};
+        const options = this.getOptions(optionsContext);
+        const results = [];
         const rawResults = await this.mecab.parseText(text);
-        for (const mecabName in rawResults) {
+        for (const [mecabName, parsedLines] of Object.entries(rawResults)) {
             const result = [];
-            for (const parsedLine of rawResults[mecabName]) {
+            for (const parsedLine of parsedLines) {
                 for (const {expression, reading, source} of parsedLine) {
                     const term = [];
                     if (expression !== null && reading !== null) {
@@ -381,17 +443,17 @@ class Backend {
                 }
                 result.push([{text: '\n'}]);
             }
-            results[mecabName] = result;
+            results.push([mecabName, result]);
         }
         return results;
     }
 
     async _onApiDefinitionAdd({definition, mode, context, optionsContext}) {
-        const options = await this.getOptions(optionsContext);
-        const templates = Backend._getTemplates(options);
+        const options = this.getOptions(optionsContext);
+        const templates = this.defaultAnkiFieldTemplates;
 
         if (mode !== 'kanji') {
-            await audioInject(
+            await this._audioInject(
                 definition,
                 options.anki.terms.fields,
                 options.audio.sources,
@@ -407,20 +469,20 @@ class Backend {
             );
         }
 
-        const note = await dictNoteFormat(definition, mode, options, templates);
+        const note = await this.ankiNoteBuilder.createNote(definition, mode, options, templates);
         return this.anki.addNote(note);
     }
 
     async _onApiDefinitionsAddable({definitions, modes, optionsContext}) {
-        const options = await this.getOptions(optionsContext);
-        const templates = Backend._getTemplates(options);
+        const options = this.getOptions(optionsContext);
+        const templates = this.defaultAnkiFieldTemplates;
         const states = [];
 
         try {
             const notes = [];
             for (const definition of definitions) {
                 for (const mode of modes) {
-                    const note = await dictNoteFormat(definition, mode, options, templates);
+                    const note = await this.ankiNoteBuilder.createNote(definition, mode, options, templates);
                     notes.push(note);
                 }
             }
@@ -459,20 +521,20 @@ class Backend {
     }
 
     async _onApiNoteView({noteId}) {
-        return this.anki.guiBrowse(`nid:${noteId}`);
+        return await this.anki.guiBrowse(`nid:${noteId}`);
     }
 
     async _onApiTemplateRender({template, data}) {
-        return handlebarsRenderDynamic(template, data);
+        return this._renderTemplate(template, data);
     }
 
     async _onApiCommandExec({command, params}) {
         return this._runCommand(command, params);
     }
 
-    async _onApiAudioGetUrl({definition, source, optionsContext}) {
-        const options = await this.getOptions(optionsContext);
-        return await audioGetUrl(definition, source, options);
+    async _onApiAudioGetUri({definition, source, optionsContext}) {
+        const options = this.getOptions(optionsContext);
+        return await this.audioUriBuilder.getUri(definition, source, options);
     }
 
     _onApiScreenshotGet({options}, sender) {
@@ -621,12 +683,16 @@ class Backend {
         return this.messageToken;
     }
 
+    async _onApiGetDefaultAnkiFieldTemplates() {
+        return this.defaultAnkiFieldTemplates;
+    }
+
     // Command handlers
 
     async _onCommandSearch(params) {
         const {mode='existingOrNewTab', query} = params || {};
 
-        const options = await this.getOptions(this.optionsContext);
+        const options = this.getOptions(this.optionsContext);
         const {popupWidth, popupHeight} = options.general;
 
         const baseUrl = chrome.runtime.getURL('/bg/search.html');
@@ -647,7 +713,7 @@ class Backend {
                 await Backend._focusTab(tab);
                 if (queryParams.query) {
                     await new Promise((resolve) => chrome.tabs.sendMessage(
-                        tab.id, {action: 'searchQueryUpdate', params: {query: queryParams.query}}, resolve
+                        tab.id, {action: 'searchQueryUpdate', params: {text: queryParams.query}}, resolve
                     ));
                 }
                 return true;
@@ -693,9 +759,10 @@ class Backend {
     }
 
     _onCommandOptions(params) {
-        if (!(params && params.newTab)) {
+        const {mode='existingOrNewTab'} = params || {};
+        if (mode === 'existingOrNewTab') {
             chrome.runtime.openOptionsPage();
-        } else {
+        } else if (mode === 'newTab') {
             const manifest = chrome.runtime.getManifest();
             const url = chrome.runtime.getURL(manifest.options_ui.page);
             chrome.tabs.create({url});
@@ -709,17 +776,56 @@ class Backend {
         };
         const source = 'popup';
 
-        const options = await this.getOptions(optionsContext);
+        const options = this.getOptions(optionsContext);
         options.general.enable = !options.general.enable;
         await this._onApiOptionsSave({source});
     }
 
     // Utilities
 
+    async _getAudioUri(definition, source, details) {
+        let optionsContext = (typeof details === 'object' && details !== null ? details.optionsContext : null);
+        if (!(typeof optionsContext === 'object' && optionsContext !== null)) {
+            optionsContext = this.optionsContext;
+        }
+
+        const options = this.getOptions(optionsContext);
+        return await this.audioUriBuilder.getUri(definition, source, options);
+    }
+
+    async _audioInject(definition, fields, sources, optionsContext) {
+        let usesAudio = false;
+        for (const fieldValue of Object.values(fields)) {
+            if (fieldValue.includes('{audio}')) {
+                usesAudio = true;
+                break;
+            }
+        }
+
+        if (!usesAudio) {
+            return true;
+        }
+
+        try {
+            const expressions = definition.expressions;
+            const audioSourceDefinition = Array.isArray(expressions) ? expressions[0] : definition;
+
+            const {uri} = await this.audioSystem.getDefinitionAudio(audioSourceDefinition, sources, {tts: false, optionsContext});
+            const filename = this._createInjectedAudioFileName(audioSourceDefinition);
+            if (filename !== null) {
+                definition.audio = {url: uri, filename};
+            }
+
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
     async _injectScreenshot(definition, fields, screenshot) {
         let usesScreenshot = false;
-        for (const name in fields) {
-            if (fields[name].includes('{screenshot}')) {
+        for (const fieldValue of Object.values(fields)) {
+            if (fieldValue.includes('{screenshot}')) {
                 usesScreenshot = true;
                 break;
             }
@@ -750,6 +856,21 @@ class Backend {
         }
 
         definition.screenshotFileName = filename;
+    }
+
+    async _renderTemplate(template, data) {
+        return handlebarsRenderDynamic(template, data);
+    }
+
+    _createInjectedAudioFileName(definition) {
+        const {reading, expression} = definition;
+        if (!reading && !expression) { return null; }
+
+        let filename = 'yomichan';
+        if (reading) { filename += `_${reading}`; }
+        if (expression) { filename += `_${expression}`; }
+        filename += '.mp3';
+        return filename;
     }
 
     static _getTabUrl(tab) {
@@ -860,47 +981,7 @@ class Backend {
             return 'chrome';
         }
     }
-
-    static _getTemplates(options) {
-        const templates = options.anki.fieldTemplates;
-        return typeof templates === 'string' ? templates : profileOptionsGetDefaultFieldTemplates();
-    }
 }
-
-Backend._messageHandlers = new Map([
-    ['optionsSchemaGet', (self, ...args) => self._onApiOptionsSchemaGet(...args)],
-    ['optionsGet', (self, ...args) => self._onApiOptionsGet(...args)],
-    ['optionsGetFull', (self, ...args) => self._onApiOptionsGetFull(...args)],
-    ['optionsSet', (self, ...args) => self._onApiOptionsSet(...args)],
-    ['optionsSave', (self, ...args) => self._onApiOptionsSave(...args)],
-    ['kanjiFind', (self, ...args) => self._onApiKanjiFind(...args)],
-    ['termsFind', (self, ...args) => self._onApiTermsFind(...args)],
-    ['textParse', (self, ...args) => self._onApiTextParse(...args)],
-    ['textParseMecab', (self, ...args) => self._onApiTextParseMecab(...args)],
-    ['definitionAdd', (self, ...args) => self._onApiDefinitionAdd(...args)],
-    ['definitionsAddable', (self, ...args) => self._onApiDefinitionsAddable(...args)],
-    ['noteView', (self, ...args) => self._onApiNoteView(...args)],
-    ['templateRender', (self, ...args) => self._onApiTemplateRender(...args)],
-    ['commandExec', (self, ...args) => self._onApiCommandExec(...args)],
-    ['audioGetUrl', (self, ...args) => self._onApiAudioGetUrl(...args)],
-    ['screenshotGet', (self, ...args) => self._onApiScreenshotGet(...args)],
-    ['forward', (self, ...args) => self._onApiForward(...args)],
-    ['frameInformationGet', (self, ...args) => self._onApiFrameInformationGet(...args)],
-    ['injectStylesheet', (self, ...args) => self._onApiInjectStylesheet(...args)],
-    ['getEnvironmentInfo', (self, ...args) => self._onApiGetEnvironmentInfo(...args)],
-    ['clipboardGet', (self, ...args) => self._onApiClipboardGet(...args)],
-    ['getDisplayTemplatesHtml', (self, ...args) => self._onApiGetDisplayTemplatesHtml(...args)],
-    ['getQueryParserTemplatesHtml', (self, ...args) => self._onApiGetQueryParserTemplatesHtml(...args)],
-    ['getZoom', (self, ...args) => self._onApiGetZoom(...args)],
-    ['getMessageToken', (self, ...args) => self._onApiGetMessageToken(...args)]
-]);
-
-Backend._commandHandlers = new Map([
-    ['search', (self, ...args) => self._onCommandSearch(...args)],
-    ['help', (self, ...args) => self._onCommandHelp(...args)],
-    ['options', (self, ...args) => self._onCommandOptions(...args)],
-    ['toggle', (self, ...args) => self._onCommandToggle(...args)]
-]);
 
 window.yomichanBackend = new Backend();
 window.yomichanBackend.prepare();

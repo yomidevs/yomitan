@@ -16,7 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiOptionsSet, apiTermsFind, Display, QueryParser, ClipboardMonitor*/
+/* global
+ * ClipboardMonitor
+ * Display
+ * QueryParser
+ * apiClipboardGet
+ * apiOptionsSet
+ * apiTermsFind
+ */
 
 class DisplaySearch extends Display {
     constructor() {
@@ -38,7 +45,26 @@ class DisplaySearch extends Display {
         this.introVisible = true;
         this.introAnimationTimer = null;
 
-        this.clipboardMonitor = new ClipboardMonitor();
+        this.clipboardMonitor = new ClipboardMonitor({getClipboard: apiClipboardGet});
+
+        this._onKeyDownIgnoreKeys = new Map([
+            ['ANY_MOD', new Set([
+                'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageDown', 'PageUp', 'Home', 'End',
+                'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10',
+                'F11', 'F12', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19', 'F20',
+                'F21', 'F22', 'F23', 'F24'
+            ])],
+            ['Control', new Set(['C', 'A', 'Z', 'Y', 'X', 'F', 'G'])],
+            ['Meta', new Set(['C', 'A', 'Z', 'Y', 'X', 'F', 'G'])],
+            ['OS', new Set()],
+            ['Alt', new Set()],
+            ['AltGraph', new Set()],
+            ['Shift', new Set()]
+        ]);
+
+        this._runtimeMessageHandlers = new Map([
+            ['searchQueryUpdate', this.onExternalSearchUpdate.bind(this)]
+        ]);
     }
 
     static create() {
@@ -49,76 +75,41 @@ class DisplaySearch extends Display {
 
     async prepare() {
         try {
-            const superPromise = super.prepare();
-            const queryParserPromise = this.queryParser.prepare();
-            await Promise.all([superPromise, queryParserPromise]);
+            await super.prepare();
+            await this.queryParser.prepare();
 
             const {queryParams: {query='', mode=''}} = parseUrl(window.location.href);
 
-            if (this.search !== null) {
-                this.search.addEventListener('click', (e) => this.onSearch(e), false);
-            }
-            if (this.query !== null) {
-                document.documentElement.dataset.searchMode = mode;
-                this.query.addEventListener('input', () => this.onSearchInput(), false);
+            document.documentElement.dataset.searchMode = mode;
 
-                if (this.wanakanaEnable !== null) {
-                    if (this.options.general.enableWanakana === true) {
-                        this.wanakanaEnable.checked = true;
-                        window.wanakana.bind(this.query);
-                    } else {
-                        this.wanakanaEnable.checked = false;
-                    }
-                    this.wanakanaEnable.addEventListener('change', (e) => {
-                        const {queryParams: {query: query2=''}} = parseUrl(window.location.href);
-                        if (e.target.checked) {
-                            window.wanakana.bind(this.query);
-                            apiOptionsSet({general: {enableWanakana: true}}, this.getOptionsContext());
-                        } else {
-                            window.wanakana.unbind(this.query);
-                            apiOptionsSet({general: {enableWanakana: false}}, this.getOptionsContext());
-                        }
-                        this.setQuery(query2);
-                        this.onSearchQueryUpdated(this.query.value, false);
-                    });
-                }
-
-                this.setQuery(query);
-                this.onSearchQueryUpdated(this.query.value, false);
+            if (this.options.general.enableWanakana === true) {
+                this.wanakanaEnable.checked = true;
+                window.wanakana.bind(this.query);
+            } else {
+                this.wanakanaEnable.checked = false;
             }
-            if (this.clipboardMonitorEnable !== null && mode !== 'popup') {
+
+            this.setQuery(query);
+            this.onSearchQueryUpdated(this.query.value, false);
+
+            if (mode !== 'popup') {
                 if (this.options.general.enableClipboardMonitor === true) {
                     this.clipboardMonitorEnable.checked = true;
                     this.clipboardMonitor.start();
                 } else {
                     this.clipboardMonitorEnable.checked = false;
                 }
-                this.clipboardMonitorEnable.addEventListener('change', (e) => {
-                    if (e.target.checked) {
-                        chrome.permissions.request(
-                            {permissions: ['clipboardRead']},
-                            (granted) => {
-                                if (granted) {
-                                    this.clipboardMonitor.start();
-                                    apiOptionsSet({general: {enableClipboardMonitor: true}}, this.getOptionsContext());
-                                } else {
-                                    e.target.checked = false;
-                                }
-                            }
-                        );
-                    } else {
-                        this.clipboardMonitor.stop();
-                        apiOptionsSet({general: {enableClipboardMonitor: false}}, this.getOptionsContext());
-                    }
-                });
+                this.clipboardMonitorEnable.addEventListener('change', this.onClipboardMonitorEnableChange.bind(this));
             }
 
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
 
-            window.addEventListener('popstate', (e) => this.onPopState(e));
-            window.addEventListener('copy', (e) => this.onCopy(e));
-
-            this.clipboardMonitor.onClipboardText = (text) => this.onExternalSearchUpdate(text);
+            this.search.addEventListener('click', this.onSearch.bind(this), false);
+            this.query.addEventListener('input', this.onSearchInput.bind(this), false);
+            this.wanakanaEnable.addEventListener('change', this.onWanakanaEnableChange.bind(this));
+            window.addEventListener('popstate', this.onPopState.bind(this));
+            window.addEventListener('copy', this.onCopy.bind(this));
+            this.clipboardMonitor.on('change', this.onExternalSearchUpdate.bind(this));
 
             this.updateSearchButton();
         } catch (e) {
@@ -174,28 +165,30 @@ class DisplaySearch extends Display {
     }
 
     onRuntimeMessage({action, params}, sender, callback) {
-        const handler = DisplaySearch._runtimeMessageHandlers.get(action);
+        const handler = this._runtimeMessageHandlers.get(action);
         if (typeof handler !== 'function') { return false; }
 
-        const result = handler(this, params, sender);
+        const result = handler(params, sender);
         callback(result);
         return false;
     }
 
     onKeyDown(e) {
         const key = Display.getKeyFromEvent(e);
-        const ignoreKeys = DisplaySearch.onKeyDownIgnoreKeys;
+        const ignoreKeys = this._onKeyDownIgnoreKeys;
 
-        const activeModifierMap = {
-            'Control': e.ctrlKey,
-            'Meta': e.metaKey,
-            'ANY_MOD': true
-        };
+        const activeModifierMap = new Map([
+            ['Control', e.ctrlKey],
+            ['Meta', e.metaKey],
+            ['Shift', e.shiftKey],
+            ['Alt', e.altKey],
+            ['ANY_MOD', true]
+        ]);
 
         let preventFocus = false;
-        for (const [modifier, keys] of Object.entries(ignoreKeys)) {
-            const modifierActive = activeModifierMap[modifier];
-            if (key === modifier || (modifierActive && keys.includes(key))) {
+        for (const [modifier, keys] of ignoreKeys.entries()) {
+            const modifierActive = activeModifierMap.get(modifier);
+            if (key === modifier || (modifierActive && keys.has(key))) {
                 preventFocus = true;
                 break;
             }
@@ -211,7 +204,7 @@ class DisplaySearch extends Display {
         this.clipboardMonitor.setPreviousText(document.getSelection().toString().trim());
     }
 
-    onExternalSearchUpdate(text) {
+    onExternalSearchUpdate({text}) {
         this.setQuery(text);
         const url = new URL(window.location.href);
         url.searchParams.set('query', text);
@@ -250,6 +243,38 @@ class DisplaySearch extends Display {
             window.parent.postMessage('popupClose', '*');
         } catch (e) {
             this.onError(e);
+        }
+    }
+
+    onWanakanaEnableChange(e) {
+        const {queryParams: {query=''}} = parseUrl(window.location.href);
+        const enableWanakana = e.target.checked;
+        if (enableWanakana) {
+            window.wanakana.bind(this.query);
+        } else {
+            window.wanakana.unbind(this.query);
+        }
+        this.setQuery(query);
+        this.onSearchQueryUpdated(this.query.value, false);
+        apiOptionsSet({general: {enableWanakana}}, this.getOptionsContext());
+    }
+
+    onClipboardMonitorEnableChange(e) {
+        if (e.target.checked) {
+            chrome.permissions.request(
+                {permissions: ['clipboardRead']},
+                (granted) => {
+                    if (granted) {
+                        this.clipboardMonitor.start();
+                        apiOptionsSet({general: {enableClipboardMonitor: true}}, this.getOptionsContext());
+                    } else {
+                        e.target.checked = false;
+                    }
+                }
+            );
+        } else {
+            this.clipboardMonitor.stop();
+            apiOptionsSet({general: {enableClipboardMonitor: false}}, this.getOptionsContext());
         }
     }
 
@@ -345,24 +370,5 @@ class DisplaySearch extends Display {
         }
     }
 }
-
-DisplaySearch.onKeyDownIgnoreKeys = {
-    'ANY_MOD': [
-        'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageDown', 'PageUp', 'Home', 'End',
-        'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10',
-        'F11', 'F12', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19', 'F20',
-        'F21', 'F22', 'F23', 'F24'
-    ],
-    'Control': ['C', 'A', 'Z', 'Y', 'X', 'F', 'G'],
-    'Meta': ['C', 'A', 'Z', 'Y', 'X', 'F', 'G'],
-    'OS': [],
-    'Alt': [],
-    'AltGraph': [],
-    'Shift': []
-};
-
-DisplaySearch._runtimeMessageHandlers = new Map([
-    ['searchQueryUpdate', (self, {query}) => { self.onExternalSearchUpdate(query); }]
-]);
 
 DisplaySearch.instance = DisplaySearch.create();

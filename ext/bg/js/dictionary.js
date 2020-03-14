@@ -16,26 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiTemplateRender*/
-
 function dictEnabledSet(options) {
     const enabledDictionaryMap = new Map();
-    const optionsDictionaries = options.dictionaries;
-    for (const title in optionsDictionaries) {
-        if (!hasOwn(optionsDictionaries, title)) { continue; }
-        const dictionary = optionsDictionaries[title];
-        if (!dictionary.enabled) { continue; }
-        enabledDictionaryMap.set(title, {
-            priority: dictionary.priority || 0,
-            allowSecondarySearches: !!dictionary.allowSecondarySearches
-        });
+    for (const [title, {enabled, priority, allowSecondarySearches}] of Object.entries(options.dictionaries)) {
+        if (!enabled) { continue; }
+        enabledDictionaryMap.set(title, {priority, allowSecondarySearches});
     }
     return enabledDictionaryMap;
 }
 
 function dictConfigured(options) {
-    for (const title in options.dictionaries) {
-        if (options.dictionaries[title].enabled) {
+    for (const {enabled} of Object.values(options.dictionaries)) {
+        if (enabled) {
             return true;
         }
     }
@@ -338,91 +330,4 @@ function dictTagsSort(tags) {
 
 function dictFieldSplit(field) {
     return field.length === 0 ? [] : field.split(' ');
-}
-
-async function dictFieldFormat(field, definition, mode, options, templates, exceptions) {
-    const data = {
-        marker: null,
-        definition,
-        group: options.general.resultOutputMode === 'group',
-        merge: options.general.resultOutputMode === 'merge',
-        modeTermKanji: mode === 'term-kanji',
-        modeTermKana: mode === 'term-kana',
-        modeKanji: mode === 'kanji',
-        compactGlossaries: options.general.compactGlossaries
-    };
-    const markers = dictFieldFormat.markers;
-    const pattern = /\{([\w-]+)\}/g;
-    return await stringReplaceAsync(field, pattern, async (g0, marker) => {
-        if (!markers.has(marker)) {
-            return g0;
-        }
-        data.marker = marker;
-        try {
-            return await apiTemplateRender(templates, data);
-        } catch (e) {
-            if (exceptions) { exceptions.push(e); }
-            return `{${marker}-render-error}`;
-        }
-    });
-}
-dictFieldFormat.markers = new Set([
-    'audio',
-    'character',
-    'cloze-body',
-    'cloze-prefix',
-    'cloze-suffix',
-    'dictionary',
-    'expression',
-    'furigana',
-    'furigana-plain',
-    'glossary',
-    'glossary-brief',
-    'kunyomi',
-    'onyomi',
-    'reading',
-    'screenshot',
-    'sentence',
-    'tags',
-    'url'
-]);
-
-async function dictNoteFormat(definition, mode, options, templates) {
-    const note = {fields: {}, tags: options.anki.tags};
-    let fields = [];
-
-    if (mode === 'kanji') {
-        fields = options.anki.kanji.fields;
-        note.deckName = options.anki.kanji.deck;
-        note.modelName = options.anki.kanji.model;
-    } else {
-        fields = options.anki.terms.fields;
-        note.deckName = options.anki.terms.deck;
-        note.modelName = options.anki.terms.model;
-
-        if (definition.audio) {
-            const audio = {
-                url: definition.audio.url,
-                filename: definition.audio.filename,
-                skipHash: '7e2c2f954ef6051373ba916f000168dc',
-                fields: []
-            };
-
-            for (const name in fields) {
-                if (fields[name].includes('{audio}')) {
-                    audio.fields.push(name);
-                }
-            }
-
-            if (audio.fields.length > 0) {
-                note.audio = audio;
-            }
-        }
-    }
-
-    for (const name in fields) {
-        note.fields[name] = await dictFieldFormat(fields[name], definition, mode, options, templates);
-    }
-
-    return note;
 }

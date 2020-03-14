@@ -16,11 +16,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global getOptionsContext, getOptionsMutable, getOptionsFullMutable, settingsSaveOptions, apiOptionsGetFull, apiOptionsGet
-utilBackgroundIsolate, utilDatabaseDeleteDictionary, utilDatabaseGetDictionaryInfo, utilDatabaseGetDictionaryCounts
-utilDatabasePurge, utilDatabaseImport
-storageUpdateStats, storageEstimate
-PageExitPrevention*/
+/* global
+ * PageExitPrevention
+ * apiOptionsGet
+ * apiOptionsGetFull
+ * getOptionsContext
+ * getOptionsFullMutable
+ * getOptionsMutable
+ * settingsSaveOptions
+ * storageEstimate
+ * storageUpdateStats
+ * utilBackgroundIsolate
+ * utilDatabaseDeleteDictionary
+ * utilDatabaseGetDictionaryCounts
+ * utilDatabaseGetDictionaryInfo
+ * utilDatabaseImport
+ * utilDatabasePurge
+ */
 
 let dictionaryUI = null;
 
@@ -36,7 +48,7 @@ class SettingsDictionaryListUI {
         this.dictionaryEntries = [];
         this.extra = null;
 
-        document.querySelector('#dict-delete-confirm').addEventListener('click', (e) => this.onDictionaryConfirmDelete(e), false);
+        document.querySelector('#dict-delete-confirm').addEventListener('click', this.onDictionaryConfirmDelete.bind(this), false);
     }
 
     setOptionsDictionaries(optionsDictionaries) {
@@ -198,10 +210,10 @@ class SettingsDictionaryEntryUI {
 
         this.applyValues();
 
-        this.eventListeners.addEventListener(this.enabledCheckbox, 'change', (e) => this.onEnabledChanged(e), false);
-        this.eventListeners.addEventListener(this.allowSecondarySearchesCheckbox, 'change', (e) => this.onAllowSecondarySearchesChanged(e), false);
-        this.eventListeners.addEventListener(this.priorityInput, 'change', (e) => this.onPriorityChanged(e), false);
-        this.eventListeners.addEventListener(this.deleteButton, 'click', (e) => this.onDeleteButtonClicked(e), false);
+        this.eventListeners.addEventListener(this.enabledCheckbox, 'change', this.onEnabledChanged.bind(this), false);
+        this.eventListeners.addEventListener(this.allowSecondarySearchesCheckbox, 'change', this.onAllowSecondarySearchesChanged.bind(this), false);
+        this.eventListeners.addEventListener(this.priorityInput, 'change', this.onPriorityChanged.bind(this), false);
+        this.eventListeners.addEventListener(this.deleteButton, 'click', this.onDeleteButtonClicked.bind(this), false);
     }
 
     cleanup() {
@@ -341,14 +353,14 @@ async function dictSettingsInitialize() {
         document.querySelector('#dict-groups-extra'),
         document.querySelector('#dict-extra-template')
     );
-    dictionaryUI.save = () => settingsSaveOptions();
+    dictionaryUI.save = settingsSaveOptions;
 
-    document.querySelector('#dict-purge-button').addEventListener('click', (e) => onDictionaryPurgeButtonClick(e), false);
-    document.querySelector('#dict-purge-confirm').addEventListener('click', (e) => onDictionaryPurge(e), false);
-    document.querySelector('#dict-file-button').addEventListener('click', (e) => onDictionaryImportButtonClick(e), false);
-    document.querySelector('#dict-file').addEventListener('change', (e) => onDictionaryImport(e), false);
-    document.querySelector('#dict-main').addEventListener('change', (e) => onDictionaryMainChanged(e), false);
-    document.querySelector('#database-enable-prefix-wildcard-searches').addEventListener('change', (e) => onDatabaseEnablePrefixWildcardSearchesChanged(e), false);
+    document.querySelector('#dict-purge-button').addEventListener('click', onDictionaryPurgeButtonClick, false);
+    document.querySelector('#dict-purge-confirm').addEventListener('click', onDictionaryPurge, false);
+    document.querySelector('#dict-file-button').addEventListener('click', onDictionaryImportButtonClick, false);
+    document.querySelector('#dict-file').addEventListener('change', onDictionaryImport, false);
+    document.querySelector('#dict-main').addEventListener('change', onDictionaryMainChanged, false);
+    document.querySelector('#database-enable-prefix-wildcard-searches').addEventListener('change', onDatabaseEnablePrefixWildcardSearchesChanged, false);
 
     await onDictionaryOptionsChanged();
     await onDatabaseUpdated();

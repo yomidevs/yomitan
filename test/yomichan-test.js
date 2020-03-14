@@ -22,18 +22,6 @@ const path = require('path');
 
 let JSZip = null;
 
-function requireScript(fileName, exportNames, variables) {
-    const absoluteFileName = path.join(__dirname, '..', fileName);
-    const source = fs.readFileSync(absoluteFileName, {encoding: 'utf8'});
-    const exportNamesString = Array.isArray(exportNames) ? exportNames.join(',') : '';
-    const variablesArgumentName = '__variables__';
-    let variableString = '';
-    if (typeof variables === 'object' && variables !== null) {
-        variableString = Object.keys(variables).join(',');
-        variableString = `const {${variableString}} = ${variablesArgumentName};`;
-    }
-    return Function(variablesArgumentName, `'use strict';${variableString}${source}\n;return {${exportNamesString}};`)(variables);
-}
 
 function getJSZip() {
     if (JSZip === null) {
@@ -62,9 +50,29 @@ function createTestDictionaryArchive(dictionary, dictionaryName) {
     return archive;
 }
 
+function getAllFiles(baseDirectory, predicate=null) {
+    const results = [];
+    const directories = [path.resolve(baseDirectory)];
+    while (directories.length > 0) {
+        const directory = directories.shift();
+        for (const fileName of fs.readdirSync(directory)) {
+            const fullFileName = path.resolve(directory, fileName);
+            const stats = fs.statSync(fullFileName);
+            if (stats.isFile()) {
+                if (typeof predicate !== 'function' || predicate(fullFileName, directory, baseDirectory)) {
+                    results.push(fullFileName);
+                }
+            } else if (stats.isDirectory()) {
+                directories.push(fullFileName);
+            }
+        }
+    }
+    return results;
+}
+
 
 module.exports = {
-    requireScript,
     createTestDictionaryArchive,
+    getAllFiles,
     get JSZip() { return getJSZip(); }
 };

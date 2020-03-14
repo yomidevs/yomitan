@@ -69,8 +69,8 @@ function apiTemplateRender(template, data) {
     return _apiInvoke('templateRender', {data, template});
 }
 
-function apiAudioGetUrl(definition, source, optionsContext) {
-    return _apiInvoke('audioGetUrl', {definition, source, optionsContext});
+function apiAudioGetUri(definition, source, optionsContext) {
+    return _apiInvoke('audioGetUri', {definition, source, optionsContext});
 }
 
 function apiCommandExec(command, params) {
@@ -115,6 +115,10 @@ function apiGetZoom() {
 
 function apiGetMessageToken() {
     return _apiInvoke('getMessageToken');
+}
+
+function apiGetDefaultAnkiFieldTemplates() {
+    return _apiInvoke('getDefaultAnkiFieldTemplates');
 }
 
 function _apiInvoke(action, params={}) {

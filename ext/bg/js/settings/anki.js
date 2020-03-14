@@ -16,9 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global getOptionsContext, getOptionsMutable, settingsSaveOptions
-utilBackgroundIsolate, utilAnkiGetDeckNames, utilAnkiGetModelNames, utilAnkiGetModelFieldNames
-onFormOptionsChanged*/
+/* global
+ * getOptionsContext
+ * getOptionsMutable
+ * onFormOptionsChanged
+ * settingsSaveOptions
+ * utilAnkiGetDeckNames
+ * utilAnkiGetModelFieldNames
+ * utilAnkiGetModelNames
+ * utilBackgroundIsolate
+ */
 
 // Private
 
@@ -154,10 +161,10 @@ async function _ankiFieldsPopulate(tabId, options) {
     container.appendChild(fragment);
 
     for (const node of container.querySelectorAll('.anki-field-value')) {
-        node.addEventListener('change', (e) => onFormOptionsChanged(e), false);
+        node.addEventListener('change', onFormOptionsChanged, false);
     }
     for (const node of container.querySelectorAll('.marker-link')) {
-        node.addEventListener('click', (e) => _onAnkiMarkerClicked(e), false);
+        node.addEventListener('click', _onAnkiMarkerClicked, false);
     }
 }
 
@@ -267,7 +274,7 @@ function ankiGetFieldMarkers(type) {
 
 function ankiInitialize() {
     for (const node of document.querySelectorAll('#anki-terms-model,#anki-kanji-model')) {
-        node.addEventListener('change', (e) => _onAnkiModelChanged(e), false);
+        node.addEventListener('change', _onAnkiModelChanged, false);
     }
 }
 

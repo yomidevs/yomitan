@@ -16,11 +16,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global docRangeFromPoint, docSentenceExtract
-apiKanjiFind, apiTermsFind, apiNoteView, apiOptionsGet, apiDefinitionsAddable, apiDefinitionAdd
-apiScreenshotGet, apiForward
-audioPrepareTextToSpeech, audioGetFromSources
-DisplayGenerator, WindowScroll, DisplayContext, DOM*/
+/* global
+ * AudioSystem
+ * DOM
+ * DisplayContext
+ * DisplayGenerator
+ * WindowScroll
+ * apiAudioGetUri
+ * apiDefinitionAdd
+ * apiDefinitionsAddable
+ * apiForward
+ * apiKanjiFind
+ * apiNoteView
+ * apiOptionsGet
+ * apiScreenshotGet
+ * apiTermsFind
+ * docRangeFromPoint
+ * docSentenceExtract
+ */
 
 class Display {
     constructor(spinner, container) {
@@ -32,7 +45,7 @@ class Display {
         this.index = 0;
         this.audioPlaying = null;
         this.audioFallback = null;
-        this.audioCache = new Map();
+        this.audioSystem = new AudioSystem({getAudioUri: this._getAudioUri.bind(this)});
         this.styleNode = null;
 
         this.eventListeners = new EventListenerCollection();
@@ -45,10 +58,115 @@ class Display {
         this.displayGenerator = new DisplayGenerator();
         this.windowScroll = new WindowScroll();
 
+        this._onKeyDownHandlers = new Map([
+            ['Escape', () => {
+                this.onSearchClear();
+                return true;
+            }],
+            ['PageUp', (e) => {
+                if (e.altKey) {
+                    this.entryScrollIntoView(this.index - 3, null, true);
+                    return true;
+                }
+                return false;
+            }],
+            ['PageDown', (e) => {
+                if (e.altKey) {
+                    this.entryScrollIntoView(this.index + 3, null, true);
+                    return true;
+                }
+                return false;
+            }],
+            ['End', (e) => {
+                if (e.altKey) {
+                    this.entryScrollIntoView(this.definitions.length - 1, null, true);
+                    return true;
+                }
+                return false;
+            }],
+            ['Home', (e) => {
+                if (e.altKey) {
+                    this.entryScrollIntoView(0, null, true);
+                    return true;
+                }
+                return false;
+            }],
+            ['ArrowUp', (e) => {
+                if (e.altKey) {
+                    this.entryScrollIntoView(this.index - 1, null, true);
+                    return true;
+                }
+                return false;
+            }],
+            ['ArrowDown', (e) => {
+                if (e.altKey) {
+                    this.entryScrollIntoView(this.index + 1, null, true);
+                    return true;
+                }
+                return false;
+            }],
+            ['B', (e) => {
+                if (e.altKey) {
+                    this.sourceTermView();
+                    return true;
+                }
+                return false;
+            }],
+            ['F', (e) => {
+                if (e.altKey) {
+                    this.nextTermView();
+                    return true;
+                }
+                return false;
+            }],
+            ['E', (e) => {
+                if (e.altKey) {
+                    this.noteTryAdd('term-kanji');
+                    return true;
+                }
+                return false;
+            }],
+            ['K', (e) => {
+                if (e.altKey) {
+                    this.noteTryAdd('kanji');
+                    return true;
+                }
+                return false;
+            }],
+            ['R', (e) => {
+                if (e.altKey) {
+                    this.noteTryAdd('term-kana');
+                    return true;
+                }
+                return false;
+            }],
+            ['P', (e) => {
+                if (e.altKey) {
+                    const index = this.index;
+                    if (index < 0 || index >= this.definitions.length) { return; }
+
+                    const entry = this.getEntry(index);
+                    if (entry !== null && entry.dataset.type === 'term') {
+                        this.audioPlay(this.definitions[index], this.firstExpressionIndex, index);
+                    }
+                    return true;
+                }
+                return false;
+            }],
+            ['V', (e) => {
+                if (e.altKey) {
+                    this.noteTryView();
+                    return true;
+                }
+                return false;
+            }]
+        ]);
+
         this.setInteractive(true);
     }
 
     async prepare(options=null) {
+        await yomichan.prepare();
         const displayGeneratorPromise = this.displayGenerator.prepare();
         const updateOptionsPromise = this.updateOptions(options);
         await Promise.all([displayGeneratorPromise, updateOptionsPromise]);
@@ -215,9 +333,9 @@ class Display {
 
     onKeyDown(e) {
         const key = Display.getKeyFromEvent(e);
-        const handler = Display._onKeyDownHandlers.get(key);
+        const handler = this._onKeyDownHandlers.get(key);
         if (typeof handler === 'function') {
-            if (handler(this, e)) {
+            if (handler(e)) {
                 e.preventDefault();
                 return true;
             }
@@ -259,13 +377,12 @@ class Display {
         this.updateDocumentOptions(this.options);
         this.updateTheme(this.options.general.popupTheme);
         this.setCustomCss(this.options.general.customPopupCss);
-        audioPrepareTextToSpeech(this.options);
     }
 
     updateDocumentOptions(options) {
         const data = document.documentElement.dataset;
         data.ankiEnabled = `${options.anki.enable}`;
-        data.audioEnabled = `${options.audio.enable}`;
+        data.audioEnabled = `${options.audio.enabled}`;
         data.compactGlossaries = `${options.general.compactGlossaries}`;
         data.enableSearchTags = `${options.scanning.enableSearchTags}`;
         data.debug = `${options.general.debugInfo}`;
@@ -520,15 +637,13 @@ class Display {
 
     updateAdderButtons(states) {
         for (let i = 0; i < states.length; ++i) {
-            const state = states[i];
             let noteId = null;
-            for (const mode in state) {
+            for (const [mode, info] of Object.entries(states[i])) {
                 const button = this.adderButtonFind(i, mode);
                 if (button === null) {
                     continue;
                 }
 
-                const info = state[mode];
                 if (!info.canAdd && noteId === null && info.noteId) {
                     noteId = info.noteId;
                 }
@@ -635,7 +750,7 @@ class Display {
             this.setSpinnerVisible(true);
 
             const context = {};
-            if (this.noteUsesScreenshot()) {
+            if (this.noteUsesScreenshot(mode)) {
                 const screenshot = await this.getScreenshot();
                 if (screenshot) {
                     context.screenshot = screenshot;
@@ -672,16 +787,16 @@ class Display {
             }
 
             const sources = this.options.audio.sources;
-            let {audio, source} = await audioGetFromSources(expression, sources, this.getOptionsContext(), false, this.audioCache);
-            let info;
-            if (audio === null) {
+            let audio, source, info;
+            try {
+                ({audio, source} = await this.audioSystem.getDefinitionAudio(expression, sources));
+                info = `From source ${1 + sources.indexOf(source)}: ${source}`;
+            } catch (e) {
                 if (this.audioFallback === null) {
                     this.audioFallback = new Audio('/mixed/mp3/button.mp3');
                 }
                 audio = this.audioFallback;
                 info = 'Could not find audio';
-            } else {
-                info = `From source ${1 + sources.indexOf(source)}: ${source}`;
             }
 
             const button = this.audioButtonFindImage(entryIndex);
@@ -705,10 +820,11 @@ class Display {
         }
     }
 
-    noteUsesScreenshot() {
-        const fields = this.options.anki.terms.fields;
-        for (const name in fields) {
-            if (fields[name].includes('{screenshot}')) {
+    noteUsesScreenshot(mode) {
+        const optionsAnki = this.options.anki;
+        const fields = (mode === 'kanji' ? optionsAnki.kanji : optionsAnki.terms).fields;
+        for (const fieldValue of Object.values(fields)) {
+            if (fieldValue.includes('{screenshot}')) {
                 return true;
             }
         }
@@ -814,121 +930,9 @@ class Display {
         const key = event.key;
         return (typeof key === 'string' ? (key.length === 1 ? key.toUpperCase() : key) : '');
     }
+
+    async _getAudioUri(definition, source) {
+        const optionsContext = this.getOptionsContext();
+        return await apiAudioGetUri(definition, source, optionsContext);
+    }
 }
-
-Display._onKeyDownHandlers = new Map([
-    ['Escape', (self) => {
-        self.onSearchClear();
-        return true;
-    }],
-
-    ['PageUp', (self, e) => {
-        if (e.altKey) {
-            self.entryScrollIntoView(self.index - 3, null, true);
-            return true;
-        }
-        return false;
-    }],
-
-    ['PageDown', (self, e) => {
-        if (e.altKey) {
-            self.entryScrollIntoView(self.index + 3, null, true);
-            return true;
-        }
-        return false;
-    }],
-
-    ['End', (self, e) => {
-        if (e.altKey) {
-            self.entryScrollIntoView(self.definitions.length - 1, null, true);
-            return true;
-        }
-        return false;
-    }],
-
-    ['Home', (self, e) => {
-        if (e.altKey) {
-            self.entryScrollIntoView(0, null, true);
-            return true;
-        }
-        return false;
-    }],
-
-    ['ArrowUp', (self, e) => {
-        if (e.altKey) {
-            self.entryScrollIntoView(self.index - 1, null, true);
-            return true;
-        }
-        return false;
-    }],
-
-    ['ArrowDown', (self, e) => {
-        if (e.altKey) {
-            self.entryScrollIntoView(self.index + 1, null, true);
-            return true;
-        }
-        return false;
-    }],
-
-    ['B', (self, e) => {
-        if (e.altKey) {
-            self.sourceTermView();
-            return true;
-        }
-        return false;
-    }],
-
-    ['F', (self, e) => {
-        if (e.altKey) {
-            self.nextTermView();
-            return true;
-        }
-        return false;
-    }],
-
-    ['E', (self, e) => {
-        if (e.altKey) {
-            self.noteTryAdd('term-kanji');
-            return true;
-        }
-        return false;
-    }],
-
-    ['K', (self, e) => {
-        if (e.altKey) {
-            self.noteTryAdd('kanji');
-            return true;
-        }
-        return false;
-    }],
-
-    ['R', (self, e) => {
-        if (e.altKey) {
-            self.noteTryAdd('term-kana');
-            return true;
-        }
-        return false;
-    }],
-
-    ['P', (self, e) => {
-        if (e.altKey) {
-            const index = self.index;
-            if (index < 0 || index >= self.definitions.length) { return; }
-
-            const entry = self.getEntry(index);
-            if (entry !== null && entry.dataset.type === 'term') {
-                self.audioPlay(self.definitions[index], self.firstExpressionIndex, index);
-            }
-            return true;
-        }
-        return false;
-    }],
-
-    ['V', (self, e) => {
-        if (e.altKey) {
-            self.noteTryView();
-            return true;
-        }
-        return false;
-    }]
-]);

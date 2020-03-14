@@ -31,6 +31,8 @@ class FrontendApiSender {
 
     invoke(action, params, target) {
         if (this.disconnected) {
+            // attempt to reconnect the next time
+            this.disconnected = false;
             return Promise.reject(new Error('Disconnected'));
         }
 
@@ -70,6 +72,7 @@ class FrontendApiSender {
 
     onDisconnect() {
         this.disconnected = true;
+        this.port = null;
 
         for (const id of this.callbacks.keys()) {
             this.onError(id, 'Disconnected');

@@ -73,7 +73,11 @@ function utilStringHashCode(string) {
 }
 
 function utilBackend() {
-    return chrome.extension.getBackgroundPage().yomichanBackend;
+    const backend = chrome.extension.getBackgroundPage().yomichanBackend;
+    if (!backend.isPrepared) {
+        throw new Error('Backend not ready yet');
+    }
+    return backend;
 }
 
 async function utilAnkiGetModelNames() {

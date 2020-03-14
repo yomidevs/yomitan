@@ -175,21 +175,6 @@ function promiseTimeout(delay, resolveValue) {
     return promise;
 }
 
-function stringReplaceAsync(str, regex, replacer) {
-    let match;
-    let index = 0;
-    const parts = [];
-    while ((match = regex.exec(str)) !== null) {
-        parts.push(str.substring(index, match.index), replacer(...match, match.index, str));
-        index = regex.lastIndex;
-    }
-    if (parts.length === 0) {
-        return Promise.resolve(str);
-    }
-    parts.push(str.substring(index));
-    return Promise.all(parts).then((v) => v.join(''));
-}
-
 
 /*
  * Common events
@@ -269,7 +254,11 @@ const yomichan = (() => {
         constructor() {
             super();
 
+            this._isBackendPreparedResolve = null;
+            this._isBackendPreparedPromise = new Promise((resolve) => (this._isBackendPreparedResolve = resolve));
+
             this._messageHandlers = new Map([
+                ['backendPrepared', this._onBackendPrepared.bind(this)],
                 ['getUrl', this._onMessageGetUrl.bind(this)],
                 ['optionsUpdated', this._onMessageOptionsUpdated.bind(this)],
                 ['zoomChanged', this._onMessageZoomChanged.bind(this)]
@@ -279,6 +268,11 @@ const yomichan = (() => {
         }
 
         // Public
+
+        prepare() {
+            chrome.runtime.sendMessage({action: 'yomichanCoreReady'});
+            return this._isBackendPreparedPromise;
+        }
 
         generateId(length) {
             const array = new Uint8Array(length);
@@ -303,6 +297,10 @@ const yomichan = (() => {
             const result = handler(params, sender);
             callback(result);
             return false;
+        }
+
+        _onBackendPrepared() {
+            this._isBackendPreparedResolve();
         }
 
         _onMessageGetUrl() {

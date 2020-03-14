@@ -16,12 +16,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global getOptionsContext, getOptionsMutable, settingsSaveOptions
-AudioSourceUI, audioGetTextToSpeechVoice*/
+/* global
+ * AudioSourceUI
+ * AudioSystem
+ * apiAudioGetUri
+ * getOptionsContext
+ * getOptionsMutable
+ * settingsSaveOptions
+ */
 
 let audioSourceUI = null;
+let audioSystem = null;
 
 async function audioSettingsInitialize() {
+    audioSystem = new AudioSystem({
+        getAudioUri: async (definition, source) => {
+            const optionsContext = getOptionsContext();
+            return await apiAudioGetUri(definition, source, optionsContext);
+        }
+    });
+
     const optionsContext = getOptionsContext();
     const options = await getOptionsMutable(optionsContext);
     audioSourceUI = new AudioSourceUI.Container(
@@ -29,7 +43,7 @@ async function audioSettingsInitialize() {
         document.querySelector('.audio-source-list'),
         document.querySelector('.audio-source-add')
     );
-    audioSourceUI.save = () => settingsSaveOptions();
+    audioSourceUI.save = settingsSaveOptions;
 
     textToSpeechInitialize();
 }
@@ -37,11 +51,11 @@ async function audioSettingsInitialize() {
 function textToSpeechInitialize() {
     if (typeof speechSynthesis === 'undefined') { return; }
 
-    speechSynthesis.addEventListener('voiceschanged', () => updateTextToSpeechVoices(), false);
+    speechSynthesis.addEventListener('voiceschanged', updateTextToSpeechVoices, false);
     updateTextToSpeechVoices();
 
-    document.querySelector('#text-to-speech-voice').addEventListener('change', (e) => onTextToSpeechVoiceChange(e), false);
-    document.querySelector('#text-to-speech-voice-test').addEventListener('click', () => textToSpeechTest(), false);
+    document.querySelector('#text-to-speech-voice').addEventListener('change', onTextToSpeechVoiceChange, false);
+    document.querySelector('#text-to-speech-voice-test').addEventListener('click', textToSpeechTest, false);
 }
 
 function updateTextToSpeechVoices() {
@@ -100,16 +114,11 @@ function textToSpeechVoiceCompare(a, b) {
 function textToSpeechTest() {
     try {
         const text = document.querySelector('#text-to-speech-voice-test').dataset.speechText || '';
-        const voiceURI = document.querySelector('#text-to-speech-voice').value;
-        const voice = audioGetTextToSpeechVoice(voiceURI);
-        if (voice === null) { return; }
+        const voiceUri = document.querySelector('#text-to-speech-voice').value;
 
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'ja-JP';
-        utterance.voice = voice;
-        utterance.volume = 1.0;
-
-        speechSynthesis.speak(utterance);
+        const audio = audioSystem.createTextToSpeechAudio({text, voiceUri});
+        audio.volume = 1.0;
+        audio.play();
     } catch (e) {
         // NOP
     }
