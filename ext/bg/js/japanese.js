@@ -293,12 +293,6 @@ const jp = (() => {
     function convertAlphabeticToKana(text, sourceMapping) {
         let part = '';
         let result = '';
-        const ii = text.length;
-
-        if (sourceMapping.length === ii) {
-            sourceMapping.length = ii;
-            sourceMapping.fill(1);
-        }
 
         for (const char of text) {
             // Note: 0x61 is the character code for 'a'
