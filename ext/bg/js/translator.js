@@ -373,7 +373,7 @@ class Translator {
                 text2 = jp.convertHalfWidthKanaToFullWidth(text2, sourceMapping);
             }
             if (numeric) {
-                text2 = jp.convertNumericTofullWidth(text2);
+                text2 = jp.convertNumericToFullWidth(text2);
             }
             if (alphabetic) {
                 if (sourceMapping === null) { sourceMapping = Translator.createTextSourceMapping(text2); }

@@ -231,7 +231,7 @@ const jp = (() => {
         }
     }
 
-    function convertNumericTofullWidth(text) {
+    function convertNumericToFullWidth(text) {
         let result = '';
         for (const char of text) {
             let c = char.codePointAt(0);
@@ -485,7 +485,7 @@ const jp = (() => {
         convertHiraganaToKatakana,
         convertToRomaji,
         convertReading,
-        convertNumericTofullWidth,
+        convertNumericToFullWidth,
         convertHalfWidthKanaToFullWidth,
         convertAlphabeticToKana,
         distributeFurigana,
