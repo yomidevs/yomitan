@@ -16,7 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global dictFieldSplit, requestJson, JsonSchema, JSZip*/
+/* global
+ * JSZip
+ * JsonSchema
+ * dictFieldSplit
+ * requestJson
+ */
 
 class Database {
     constructor() {

@@ -16,7 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiOptionsSet, apiTermsFind, apiClipboardGet, Display, QueryParser, ClipboardMonitor*/
+/* global
+ * ClipboardMonitor
+ * Display
+ * QueryParser
+ * apiClipboardGet
+ * apiOptionsSet
+ * apiTermsFind
+ */
 
 class DisplaySearch extends Display {
     constructor() {

@@ -16,7 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiFrameInformationGet, FrontendApiReceiver, Popup*/
+/* global
+ * FrontendApiReceiver
+ * Popup
+ * apiFrameInformationGet
+ */
 
 class PopupProxyHost {
     constructor() {

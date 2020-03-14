@@ -50,8 +50,29 @@ function createTestDictionaryArchive(dictionary, dictionaryName) {
     return archive;
 }
 
+function getAllFiles(baseDirectory, predicate=null) {
+    const results = [];
+    const directories = [path.resolve(baseDirectory)];
+    while (directories.length > 0) {
+        const directory = directories.shift();
+        for (const fileName of fs.readdirSync(directory)) {
+            const fullFileName = path.resolve(directory, fileName);
+            const stats = fs.statSync(fullFileName);
+            if (stats.isFile()) {
+                if (typeof predicate !== 'function' || predicate(fullFileName, directory, baseDirectory)) {
+                    results.push(fullFileName);
+                }
+            } else if (stats.isDirectory()) {
+                directories.push(fullFileName);
+            }
+        }
+    }
+    return results;
+}
+
 
 module.exports = {
     createTestDictionaryArchive,
+    getAllFiles,
     get JSZip() { return getJSZip(); }
 };

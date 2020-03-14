@@ -16,7 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiGetEnvironmentInfo*/
+/* global
+ * apiGetEnvironmentInfo
+ */
 
 function storageBytesToLabeledString(size) {
     const base = 1000;

@@ -16,7 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global docRangeFromPoint, TextSourceRange, DOM*/
+/* global
+ * DOM
+ * TextSourceRange
+ * docRangeFromPoint
+ */
 
 class TextScanner {
     constructor(node, ignoreNodes, ignoreElements, ignorePoints) {

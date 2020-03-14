@@ -16,7 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global PopupProxyHost, PopupProxy, Frontend*/
+/* global
+ * Frontend
+ * PopupProxy
+ * PopupProxyHost
+ */
 
 async function main() {
     await yomichan.prepare();

@@ -16,9 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global getOptionsMutable, getOptionsFullMutable, settingsSaveOptions, apiOptionsGetFull
-utilBackgroundIsolate, formWrite
-conditionsClearCaches, ConditionsUI, profileConditionsDescriptor*/
+/* global
+ * ConditionsUI
+ * apiOptionsGetFull
+ * conditionsClearCaches
+ * formWrite
+ * getOptionsFullMutable
+ * getOptionsMutable
+ * profileConditionsDescriptor
+ * settingsSaveOptions
+ * utilBackgroundIsolate
+ */
 
 let currentProfileIndex = 0;
 let profileConditionsContainer = null;

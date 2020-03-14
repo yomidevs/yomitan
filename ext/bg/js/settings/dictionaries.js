@@ -16,11 +16,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global getOptionsContext, getOptionsMutable, getOptionsFullMutable, settingsSaveOptions, apiOptionsGetFull, apiOptionsGet
-utilBackgroundIsolate, utilDatabaseDeleteDictionary, utilDatabaseGetDictionaryInfo, utilDatabaseGetDictionaryCounts
-utilDatabasePurge, utilDatabaseImport
-storageUpdateStats, storageEstimate
-PageExitPrevention*/
+/* global
+ * PageExitPrevention
+ * apiOptionsGet
+ * apiOptionsGetFull
+ * getOptionsContext
+ * getOptionsFullMutable
+ * getOptionsMutable
+ * settingsSaveOptions
+ * storageEstimate
+ * storageUpdateStats
+ * utilBackgroundIsolate
+ * utilDatabaseDeleteDictionary
+ * utilDatabaseGetDictionaryCounts
+ * utilDatabaseGetDictionaryInfo
+ * utilDatabaseImport
+ * utilDatabasePurge
+ */
 
 let dictionaryUI = null;
 

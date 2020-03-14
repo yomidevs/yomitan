@@ -16,13 +16,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global optionsSave, utilIsolate
-conditionsTestValue, profileConditionsDescriptor
-handlebarsRenderDynamic
-requestText, requestJson, optionsLoad
-dictConfigured, dictTermsSort, dictEnabledSet
-jpConvertReading, jpDistributeFuriganaInflected, jpKatakanaToHiragana
-AnkiNoteBuilder, AudioSystem, AudioUriBuilder, Translator, AnkiConnect, AnkiNull, Mecab, BackendApiForwarder, JsonSchema, ClipboardMonitor*/
+/* global
+ * AnkiConnect
+ * AnkiNoteBuilder
+ * AnkiNull
+ * AudioSystem
+ * AudioUriBuilder
+ * BackendApiForwarder
+ * ClipboardMonitor
+ * JsonSchema
+ * Mecab
+ * Translator
+ * conditionsTestValue
+ * dictConfigured
+ * dictEnabledSet
+ * dictTermsSort
+ * handlebarsRenderDynamic
+ * jpConvertReading
+ * jpDistributeFuriganaInflected
+ * jpKatakanaToHiragana
+ * optionsLoad
+ * optionsSave
+ * profileConditionsDescriptor
+ * requestJson
+ * requestText
+ * utilIsolate
+ */
 
 class Backend {
     constructor() {

@@ -16,7 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*global apiInjectStylesheet, apiGetMessageToken*/
+/* global
+ * apiGetMessageToken
+ * apiInjectStylesheet
+ */
 
 class Popup {
     constructor(id, depth, frameIdPromise) {
