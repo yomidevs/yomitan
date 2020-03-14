@@ -110,18 +110,6 @@ class QueryParser extends TextScanner {
         this.queryParser.dataset.termSpacing = `${options.parsing.termSpacing}`;
     }
 
-    getOptionsContext() {
-        throw new Error('Override me');
-    }
-
-    setContent(_type, _details) {
-        throw new Error('Override me');
-    }
-
-    setSpinnerVisible(_visible) {
-        throw new Error('Override me');
-    }
-
     refreshSelectedParser() {
         if (this.parseResults.length > 0) {
             if (!this.getParseResult()) {
