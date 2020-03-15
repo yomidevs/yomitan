@@ -89,32 +89,32 @@ class ObjectPropertyAccessor {
 
     static getPathArray(pathString) {
         const pathArray = [];
-        let state = 0;
+        let state = 'empty';
         let quote = 0;
         let value = '';
         let escaped = false;
         for (const c of pathString) {
             const v = c.codePointAt(0);
             switch (state) {
-                case 0: // Empty
-                case 1: // Expecting identifier start
+                case 'empty': // Empty
+                case 'id-start': // Expecting identifier start
                     if (v === 0x5b) { // '['
-                        if (state === 1) {
+                        if (state === 'id-start') {
                             throw new Error(`Unexpected character: ${c}`);
                         }
-                        state = 3;
+                        state = 'open-bracket';
                     } else if (
                         (v >= 0x41 && v <= 0x5a) || // ['A', 'Z']
                         (v >= 0x61 && v <= 0x7a) || // ['a', 'z']
                         v === 0x5f // '_'
                     ) {
-                        state = 2;
+                        state = 'id';
                         value += c;
                     } else {
                         throw new Error(`Unexpected character: ${c}`);
                     }
                     break;
-                case 2: // Identifier
+                case 'id': // Identifier
                     if (
                         (v >= 0x41 && v <= 0x5a) || // ['A', 'Z']
                         (v >= 0x61 && v <= 0x7a) || // ['a', 'z']
@@ -125,27 +125,27 @@ class ObjectPropertyAccessor {
                     } else if (v === 0x5b) { // '['
                         pathArray.push(value);
                         value = '';
-                        state = 3;
+                        state = 'open-bracket';
                     } else if (v === 0x2e) { // '.'
                         pathArray.push(value);
                         value = '';
-                        state = 1;
+                        state = 'id-start';
                     } else {
                         throw new Error(`Unexpected character: ${c}`);
                     }
                     break;
-                case 3: // Open bracket
+                case 'open-bracket': // Open bracket
                     if (v === 0x22 || v === 0x27) { // '"' or '\''
                         quote = v;
-                        state = 4;
+                        state = 'string';
                     } else if (v >= 0x30 && v <= 0x39) { // ['0', '9']
-                        state = 5;
+                        state = 'number';
                         value += c;
                     } else {
                         throw new Error(`Unexpected character: ${c}`);
                     }
                     break;
-                case 4: // Quoted string
+                case 'string': // Quoted string
                     if (escaped) {
                         value += c;
                         escaped = false;
@@ -154,34 +154,34 @@ class ObjectPropertyAccessor {
                     } else if (v !== quote) {
                         value += c;
                     } else {
-                        state = 6;
+                        state = 'close-bracket';
                     }
                     break;
-                case 5: // Number
+                case 'number': // Number
                     if (v >= 0x30 && v <= 0x39) { // ['0', '9']
                         value += c;
                     } else if (v === 0x5d) { // ']'
                         pathArray.push(Number.parseInt(value, 10));
                         value = '';
-                        state = 7;
+                        state = 'next';
                     } else {
                         throw new Error(`Unexpected character: ${c}`);
                     }
                     break;
-                case 6: // Expecting closing bracket after quoted string
+                case 'close-bracket': // Expecting closing bracket after quoted string
                     if (v === 0x5d) { // ']'
                         pathArray.push(value);
                         value = '';
-                        state = 7;
+                        state = 'next';
                     } else {
                         throw new Error(`Unexpected character: ${c}`);
                     }
                     break;
-                case 7: // Expecting . or [
+                case 'next': // Expecting . or [
                     if (v === 0x5b) { // '['
-                        state = 3;
+                        state = 'open-bracket';
                     } else if (v === 0x2e) { // '.'
-                        state = 1;
+                        state = 'id-start';
                     } else {
                         throw new Error(`Unexpected character: ${c}`);
                     }
@@ -189,10 +189,10 @@ class ObjectPropertyAccessor {
             }
         }
         switch (state) {
-            case 0:
-            case 7:
+            case 'empty':
+            case 'next':
                 break;
-            case 2:
+            case 'id':
                 pathArray.push(value);
                 value = '';
                 break;
