@@ -851,7 +851,7 @@ class Display {
     }
 
     setPopupVisibleOverride(visible) {
-        return apiForward('popupSetVisibleOverride', {visible, targetPopupId: 'all'});
+        return apiForward('popupSetVisibleOverride', {visible});
     }
 
     setSpinnerVisible(visible) {

@@ -95,7 +95,7 @@ class Frontend extends TextScanner {
 
     onRuntimeMessage({action, params}, sender, callback) {
         const {targetPopupId} = params || {};
-        if (targetPopupId !== 'all' && targetPopupId !== this.popup.id) { return; }
+        if (typeof targetPopupId !== 'undefined' && targetPopupId !== this.popup.id) { return; }
 
         const handler = this._runtimeMessageHandlers.get(action);
         if (typeof handler !== 'function') { return false; }
