@@ -53,8 +53,8 @@ function apiKanjiFind(text, optionsContext) {
     return _apiInvoke('kanjiFind', {text, optionsContext});
 }
 
-function apiDefinitionAdd(definition, mode, context, optionsContext) {
-    return _apiInvoke('definitionAdd', {definition, mode, context, optionsContext});
+function apiDefinitionAdd(definition, mode, details, optionsContext) {
+    return _apiInvoke('definitionAdd', {definition, mode, details, optionsContext});
 }
 
 function apiDefinitionsAddable(definitions, modes, optionsContext) {

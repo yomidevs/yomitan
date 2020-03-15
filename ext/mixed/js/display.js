@@ -752,15 +752,15 @@ class Display {
         try {
             this.setSpinnerVisible(true);
 
-            const context = {};
+            const details = {};
             if (this.noteUsesScreenshot(mode)) {
                 const screenshot = await this.getScreenshot();
                 if (screenshot) {
-                    context.screenshot = screenshot;
+                    details.screenshot = screenshot;
                 }
             }
 
-            const noteId = await apiDefinitionAdd(definition, mode, context, this.getOptionsContext());
+            const noteId = await apiDefinitionAdd(definition, mode, details, this.getOptionsContext());
             if (noteId) {
                 const index = this.definitions.indexOf(definition);
                 const adderButton = this.adderButtonFind(index, mode);

@@ -455,7 +455,7 @@ class Backend {
         return results;
     }
 
-    async _onApiDefinitionAdd({definition, mode, context, optionsContext}) {
+    async _onApiDefinitionAdd({definition, mode, details, optionsContext}) {
         const options = this.getOptions(optionsContext);
         const templates = this.defaultAnkiFieldTemplates;
 
@@ -468,11 +468,11 @@ class Backend {
             );
         }
 
-        if (context && context.screenshot) {
+        if (details && details.screenshot) {
             await this._injectScreenshot(
                 definition,
                 options.anki.terms.fields,
-                context.screenshot
+                details.screenshot
             );
         }
 
