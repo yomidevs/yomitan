@@ -1,1 +1,1 @@
-tmpl/*.html text eol=lf
+*.handlebars text eol=lf
