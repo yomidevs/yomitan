@@ -99,10 +99,11 @@ async function ankiTemplatesValidate(infoNode, field, mode, showSuccessResult, i
         const definition = await ankiTemplatesValidateGetDefinition(text, optionsContext);
         if (definition !== null) {
             const options = await apiOptionsGet(optionsContext);
+            const context = {};
             let templates = options.anki.fieldTemplates;
             if (typeof templates !== 'string') { templates = await apiGetDefaultAnkiFieldTemplates(); }
             const ankiNoteBuilder = new AnkiNoteBuilder({renderTemplate: apiTemplateRender});
-            result = await ankiNoteBuilder.formatField(field, definition, mode, options, templates, exceptions);
+            result = await ankiNoteBuilder.formatField(field, definition, mode, context, options, templates, exceptions);
         }
     } catch (e) {
         exceptions.push(e);

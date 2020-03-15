@@ -21,7 +21,7 @@ class AnkiNoteBuilder {
         this._renderTemplate = renderTemplate;
     }
 
-    async createNote(definition, mode, options, templates) {
+    async createNote(definition, mode, context, options, templates) {
         const isKanji = (mode === 'kanji');
         const tags = options.anki.tags;
         const modeOptions = isKanji ? options.anki.kanji : options.anki.terms;
@@ -35,7 +35,7 @@ class AnkiNoteBuilder {
         };
 
         for (const [fieldName, fieldValue] of modeOptionsFieldEntries) {
-            note.fields[fieldName] = await this.formatField(fieldValue, definition, mode, options, templates, null);
+            note.fields[fieldName] = await this.formatField(fieldValue, definition, mode, context, options, templates, null);
         }
 
         if (!isKanji && definition.audio) {
@@ -60,7 +60,7 @@ class AnkiNoteBuilder {
         return note;
     }
 
-    async formatField(field, definition, mode, options, templates, errors=null) {
+    async formatField(field, definition, mode, context, options, templates, errors=null) {
         const data = {
             marker: null,
             definition,
@@ -69,7 +69,8 @@ class AnkiNoteBuilder {
             modeTermKanji: mode === 'term-kanji',
             modeTermKana: mode === 'term-kana',
             modeKanji: mode === 'kanji',
-            compactGlossaries: options.general.compactGlossaries
+            compactGlossaries: options.general.compactGlossaries,
+            context
         };
         const pattern = /\{([\w-]+)\}/g;
         return await AnkiNoteBuilder.stringReplaceAsync(field, pattern, async (g0, marker) => {

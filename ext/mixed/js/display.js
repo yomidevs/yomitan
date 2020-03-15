@@ -760,7 +760,7 @@ class Display {
                 }
             }
 
-            const noteId = await apiDefinitionAdd(definition, mode, details, this.getOptionsContext());
+            const noteId = await apiDefinitionAdd(definition, mode, this._getNoteContext(), details, this.getOptionsContext());
             if (noteId) {
                 const index = this.definitions.indexOf(definition);
                 const adderButton = this.adderButtonFind(index, mode);
@@ -908,7 +908,7 @@ class Display {
 
     async getDefinitionsAddable(definitions, modes) {
         try {
-            return await apiDefinitionsAddable(definitions, modes, this.getOptionsContext());
+            return await apiDefinitionsAddable(definitions, modes, this._getNoteContext(), this.getOptionsContext());
         } catch (e) {
             return [];
         }
@@ -932,6 +932,10 @@ class Display {
     static getKeyFromEvent(event) {
         const key = event.key;
         return (typeof key === 'string' ? (key.length === 1 ? key.toUpperCase() : key) : '');
+    }
+
+    _getNoteContext() {
+        return {};
     }
 
     async _getAudioUri(definition, source) {
