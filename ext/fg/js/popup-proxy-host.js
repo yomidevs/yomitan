@@ -25,7 +25,6 @@
 class PopupProxyHost {
     constructor() {
         this._popups = new Map();
-        this._nextId = 0;
         this._apiReceiver = null;
         this._frameIdPromise = null;
     }
@@ -76,7 +75,7 @@ class PopupProxyHost {
 
         // New unique id
         if (id === null) {
-            id = this._nextId++;
+            id = yomichan.generateId(16);
         }
 
         // Create new popup
