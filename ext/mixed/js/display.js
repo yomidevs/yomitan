@@ -935,7 +935,11 @@ class Display {
     }
 
     _getNoteContext() {
-        return {};
+        return {
+            document: {
+                title: document.title
+            }
+        };
     }
 
     async _getAudioUri(definition, source) {
