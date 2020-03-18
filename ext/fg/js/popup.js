@@ -23,11 +23,10 @@
  */
 
 class Popup {
-    constructor(id, depth, frameIdPromise) {
+    constructor(id, depth, frameId) {
         this._id = id;
         this._depth = depth;
-        this._frameIdPromise = frameIdPromise;
-        this._frameId = null;
+        this._frameId = frameId;
         this._parent = null;
         this._child = null;
         this._childrenSupported = true;
@@ -80,16 +79,8 @@ class Popup {
         return false;
     }
 
-    async broadcastRootPopupInformation() {
+    broadcastRootPopupInformation() {
         if (this._depth === 0) {
-            try {
-                const {frameId} = await this._frameIdPromise;
-                if (typeof frameId === 'number') {
-                    this._frameId = frameId;
-                }
-            } catch (e) {
-                // NOP
-            }
             apiForward('rootPopupInformation', {popupId: this._id, frameId: this._frameId});
         }
     }
@@ -208,18 +199,7 @@ class Popup {
     }
 
     async _createInjectPromise() {
-        try {
-            const {frameId} = await this._frameIdPromise;
-            if (typeof frameId === 'number') {
-                this._frameId = frameId;
-            }
-        } catch (e) {
-            // NOP
-        }
-
-        if (this._depth === 0) {
-            apiForward('rootPopupInformation', {popupId: this._id, frameId: this._frameId});
-        }
+        this.broadcastRootPopupInformation();
 
         if (this._messageToken === null) {
             this._messageToken = await apiGetMessageToken();
