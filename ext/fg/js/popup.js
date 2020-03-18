@@ -17,6 +17,7 @@
  */
 
 /* global
+ * apiForward
  * apiGetMessageToken
  * apiInjectStylesheet
  */
@@ -77,6 +78,20 @@ class Popup {
 
     isProxy() {
         return false;
+    }
+
+    async broadcastRootPopupInformation() {
+        if (this._depth === 0) {
+            try {
+                const {frameId} = await this._frameIdPromise;
+                if (typeof frameId === 'number') {
+                    this._frameId = frameId;
+                }
+            } catch (e) {
+                // NOP
+            }
+            apiForward('rootPopupInformation', {popupId: this._id, frameId: this._frameId});
+        }
     }
 
     async setOptions(options) {
@@ -200,6 +215,10 @@ class Popup {
             }
         } catch (e) {
             // NOP
+        }
+
+        if (this._depth === 0) {
+            apiForward('rootPopupInformation', {popupId: this._id, frameId: this._frameId});
         }
 
         if (this._messageToken === null) {

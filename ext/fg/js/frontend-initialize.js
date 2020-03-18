@@ -20,6 +20,7 @@
  * Frontend
  * PopupProxy
  * PopupProxyHost
+ * apiForward
  */
 
 async function main() {
@@ -29,7 +30,25 @@ async function main() {
     const {id, depth=0, parentFrameId, url, proxy=false} = data;
 
     let popup;
-    if (proxy) {
+    if (!proxy && (window !== window.parent)) {
+        let rootPopupInformationResolve;
+        const rootPopupInformationPromise = new Promise((resolve) => (rootPopupInformationResolve = resolve));
+
+        const runtimeMessageCallback = ({action, params}, sender, callback) => {
+            if (action === 'rootPopupInformation') {
+                chrome.runtime.onMessage.removeListener(runtimeMessageCallback);
+                callback();
+                rootPopupInformationResolve(params);
+                return false;
+            }
+        };
+        chrome.runtime.onMessage.addListener(runtimeMessageCallback);
+        apiForward('rootPopupInformationGet');
+
+        const {popupId, frameId} = await rootPopupInformationPromise;
+
+        popup = new PopupProxy(popupId, 0, null, frameId, url);
+    } else if (proxy) {
         popup = new PopupProxy(null, depth + 1, id, parentFrameId, url);
     } else {
         const popupHost = new PopupProxyHost();
