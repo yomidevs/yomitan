@@ -199,8 +199,6 @@ class Popup {
     }
 
     async _createInjectPromise() {
-        this.broadcastRootPopupInformation();
-
         if (this._messageToken === null) {
             this._messageToken = await apiGetMessageToken();
         }

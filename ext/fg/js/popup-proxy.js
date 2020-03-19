@@ -61,6 +61,10 @@ class PopupProxy {
         return true;
     }
 
+    broadcastRootPopupInformation() {
+        // NOP
+    }
+
     async setOptions(options) {
         const id = await this._getPopupId();
         return await this._invokeHostApi('setOptions', {id, options});
@@ -97,11 +101,11 @@ class PopupProxy {
 
     async showContent(elementRect, writingMode, type=null, details=null) {
         const id = await this._getPopupId();
-        let {x, y, width, height} = PopupProxy._convertDOMRectToJson(elementRect);
+        let {x, y, width, height} = elementRect;
         if (this._depth === 0) {
             [x, y] = await PopupProxy._convertIframePointToRootPagePoint(x, y);
-            elementRect = {x, y, width, height};
         }
+        elementRect = {x, y, width, height};
         return await this._invokeHostApi('showContent', {id, elementRect, writingMode, type, details});
     }
 
@@ -196,14 +200,5 @@ class PopupProxy {
         const {offset} = await frameOffsetPromise;
 
         return offset;
-    }
-
-    static _convertDOMRectToJson(domRect) {
-        return {
-            x: domRect.x,
-            y: domRect.y,
-            width: domRect.width,
-            height: domRect.height
-        };
     }
 }

@@ -77,6 +77,7 @@ class Frontend extends TextScanner {
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
 
             this._updateContentScale();
+            this.popup.broadcastRootPopupInformation();
         } catch (e) {
             this.onError(e);
         }
