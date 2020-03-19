@@ -48,8 +48,10 @@ async function main() {
         const {popupId, frameId} = await rootPopupInformationPromise;
 
         popup = new PopupProxy(popupId, 0, null, frameId, url);
+        await popup.prepare();
     } else if (proxy) {
         popup = new PopupProxy(null, depth + 1, id, parentFrameId, url);
+        await popup.prepare();
     } else {
         const popupHost = new PopupProxyHost();
         await popupHost.prepare();
