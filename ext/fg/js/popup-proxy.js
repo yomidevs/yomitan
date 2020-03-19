@@ -21,19 +21,14 @@
  */
 
 class PopupProxy {
-    constructor(id, depth, parentId, parentFrameId, url) {
+    constructor(id, depth, parentId, parentFrameId, url, applyFrameOffset=async (x, y) => [x, y]) {
         this._parentId = parentId;
         this._parentFrameId = parentFrameId;
         this._id = id;
         this._depth = depth;
         this._url = url;
         this._apiSender = new FrontendApiSender();
-
-        this._windowMessageHandlers = new Map([
-            ['getIframeOffset', ({offset, uniqueId}, e) => { return this._onGetIframeOffset(offset, uniqueId, e); }]
-        ]);
-
-        window.addEventListener('message', this.onMessage.bind(this), false);
+        this._applyFrameOffset = applyFrameOffset;
     }
 
     // Public properties
@@ -87,7 +82,7 @@ class PopupProxy {
 
     async containsPoint(x, y) {
         if (this._depth === 0) {
-            [x, y] = await PopupProxy._convertIframePointToRootPagePoint(x, y);
+            [x, y] = await this._applyFrameOffset(x, y);
         }
         return await this._invokeHostApi('containsPoint', {id: this._id, x, y});
     }
@@ -95,7 +90,7 @@ class PopupProxy {
     async showContent(elementRect, writingMode, type=null, details=null) {
         let {x, y, width, height} = elementRect;
         if (this._depth === 0) {
-            [x, y] = await PopupProxy._convertIframePointToRootPagePoint(x, y);
+            [x, y] = await this._applyFrameOffset(x, y);
         }
         elementRect = {x, y, width, height};
         return await this._invokeHostApi('showContent', {id: this._id, elementRect, writingMode, type, details});
@@ -113,31 +108,6 @@ class PopupProxy {
         this._invokeHostApi('setContentScale', {id: this._id, scale});
     }
 
-    // Window message handlers
-
-    onMessage(e) {
-        const {action, params} = e.data;
-        const handler = this._windowMessageHandlers.get(action);
-        if (typeof handler !== 'function') { return; }
-        handler(params, e);
-    }
-
-    _onGetIframeOffset(offset, uniqueId, e) {
-        let sourceIframe = null;
-        for (const iframe of document.querySelectorAll('iframe:not(.yomichan-float)')) {
-            if (iframe.contentWindow !== e.source) { continue; }
-            sourceIframe = iframe;
-            break;
-        }
-        if (sourceIframe === null) { return; }
-
-        const [forwardedX, forwardedY] = offset;
-        const {x, y} = sourceIframe.getBoundingClientRect();
-        offset = [forwardedX + x, forwardedY + y];
-        window.parent.postMessage({action: 'getIframeOffset', params: {offset, uniqueId}}, '*');
-    }
-
-
     // Private
 
     _invokeHostApi(action, params={}) {
@@ -145,34 +115,5 @@ class PopupProxy {
             return Promise.reject(new Error('Invalid frame'));
         }
         return this._apiSender.invoke(action, params, `popup-proxy-host#${this._parentFrameId}`);
-    }
-
-    static async _convertIframePointToRootPagePoint(x, y) {
-        const uniqueId = yomichan.generateId(16);
-
-        let frameOffsetResolve = null;
-        const frameOffsetPromise = new Promise((resolve) => (frameOffsetResolve = resolve));
-
-        const runtimeMessageCallback = ({action, params}, sender, callback) => {
-            if (action === 'iframeOffset' && isObject(params) && params.uniqueId === uniqueId) {
-                chrome.runtime.onMessage.removeListener(runtimeMessageCallback);
-                callback();
-                frameOffsetResolve(params);
-                return false;
-            }
-        };
-        chrome.runtime.onMessage.addListener(runtimeMessageCallback);
-
-        window.parent.postMessage({
-            action: 'getIframeOffset',
-            params: {
-                uniqueId,
-                offset: [x, y]
-            }
-        }, '*');
-
-        const {offset} = await frameOffsetPromise;
-
-        return offset;
     }
 }

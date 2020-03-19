@@ -17,6 +17,7 @@
  */
 
 /* global
+ * FrameOffsetForwarder
  * Frontend
  * PopupProxy
  * PopupProxyHost
@@ -47,12 +48,15 @@ async function main() {
 
         const {popupId, frameId} = await rootPopupInformationPromise;
 
-        popup = new PopupProxy(popupId, 0, null, frameId, url);
+        window._frameOffsetForwarder = new FrameOffsetForwarder();
+        const applyFrameOffset = window._frameOffsetForwarder.applyOffset.bind(window._frameOffsetForwarder);
+        popup = new PopupProxy(popupId, 0, null, frameId, url, applyFrameOffset);
         await popup.prepare();
     } else if (proxy) {
         popup = new PopupProxy(null, depth + 1, id, parentFrameId, url);
         await popup.prepare();
     } else {
+        window._frameOffsetForwarder = new FrameOffsetForwarder();
         const popupHost = new PopupProxyHost();
         await popupHost.prepare();
 

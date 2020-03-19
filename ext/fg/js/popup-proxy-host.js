@@ -19,7 +19,6 @@
 /* global
  * FrontendApiReceiver
  * Popup
- * apiForward
  * apiFrameInformationGet
  */
 
@@ -49,12 +48,6 @@ class PopupProxyHost {
             ['clearAutoPlayTimer', this._onApiClearAutoPlayTimer.bind(this)],
             ['setContentScale', this._onApiSetContentScale.bind(this)]
         ]));
-
-        this._windowMessageHandlers = new Map([
-            ['getIframeOffset', ({offset, uniqueId}, e) => { return this._onGetIframeOffset(offset, uniqueId, e); }]
-        ]);
-
-        window.addEventListener('message', this.onMessage.bind(this), false);
     }
 
     getOrCreatePopup(id=null, parentId=null, depth=null) {
@@ -157,30 +150,6 @@ class PopupProxyHost {
     async _onApiSetContentScale({id, scale}) {
         const popup = this._getPopup(id);
         return popup.setContentScale(scale);
-    }
-
-    // Window message handlers
-
-    onMessage(e) {
-        const {action, params} = e.data;
-        const handler = this._windowMessageHandlers.get(action);
-        if (typeof handler !== 'function') { return; }
-        handler(params, e);
-    }
-
-    _onGetIframeOffset(offset, uniqueId, e) {
-        let sourceIframe = null;
-        for (const iframe of document.querySelectorAll('iframe:not(.yomichan-float)')) {
-            if (iframe.contentWindow !== e.source) { continue; }
-            sourceIframe = iframe;
-            break;
-        }
-        if (sourceIframe === null) { return; }
-
-        const [forwardedX, forwardedY] = offset;
-        const {x, y} = sourceIframe.getBoundingClientRect();
-        offset = [forwardedX + x, forwardedY + y];
-        apiForward('iframeOffset', {offset, uniqueId});
     }
 
     // Private functions
