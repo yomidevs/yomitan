@@ -36,12 +36,7 @@ async function popupNestedInitialize(id, depth, parentFrameId, url) {
         return;
     }
 
-    const ignoreNodes = ['.scan-disable', '.scan-disable *'];
-    if (!options.scanning.enableOnPopupExpressions) {
-        ignoreNodes.push('.source-text', '.source-text *');
-    }
-
-    window.frontendInitializationData = {id, depth, parentFrameId, ignoreNodes, url, proxy: true};
+    window.frontendInitializationData = {id, depth, parentFrameId, url, proxy: true};
 
     const scriptSrcs = [
         '/mixed/js/text-scanner.js',

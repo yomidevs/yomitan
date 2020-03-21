@@ -23,13 +23,15 @@
  */
 
 class TextScanner {
-    constructor(node, ignoreNodes, ignoreElements, ignorePoints) {
+    constructor(node, ignoreElements, ignorePoints) {
         this.node = node;
-        this.ignoreNodes = (Array.isArray(ignoreNodes) && ignoreNodes.length > 0 ? ignoreNodes.join(',') : null);
         this.ignoreElements = ignoreElements;
         this.ignorePoints = ignorePoints;
 
+        this.ignoreNodes = null;
+
         this.scanTimerPromise = null;
+        this.causeCurrent = null;
         this.textSourceCurrent = null;
         this.pendingLookup = false;
         this.options = null;
@@ -298,6 +300,7 @@ class TextScanner {
                 this.pendingLookup = true;
                 const result = await this.onSearchSource(textSource, cause);
                 if (result !== null) {
+                    this.causeCurrent = cause;
                     this.textSourceCurrent = textSource;
                     if (this.options.scanning.selectText) {
                         textSource.select();

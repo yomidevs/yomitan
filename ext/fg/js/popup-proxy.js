@@ -33,6 +33,10 @@ class PopupProxy {
 
     // Public properties
 
+    get id() {
+        return this._id;
+    }
+
     get parent() {
         return null;
     }
