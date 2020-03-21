@@ -188,7 +188,47 @@ function testConvertReading() {
         [['有り難う', 'ありがとう', 'katakana'], 'アリガトウ'],
         [['有り難う', 'ありがとう', 'romaji'], 'arigatou'],
         [['有り難う', 'ありがとう', 'none'], null],
-        [['有り難う', 'ありがとう', 'default'], 'ありがとう']
+        [['有り難う', 'ありがとう', 'default'], 'ありがとう'],
+
+        // Cases with falsy readings
+
+        [['ありがとう', '', 'hiragana'], ''],
+        [['ありがとう', '', 'katakana'], ''],
+        [['ありがとう', '', 'romaji'], 'arigatou'],
+        [['ありがとう', '', 'none'], null],
+        [['ありがとう', '', 'default'], ''],
+
+        [['ありがとう', null, 'hiragana'], ''],
+        [['ありがとう', null, 'katakana'], ''],
+        [['ありがとう', null, 'romaji'], 'arigatou'],
+        [['ありがとう', null, 'none'], null],
+        [['ありがとう', null, 'default'], null],
+
+        [['ありがとう', void 0, 'hiragana'], ''],
+        [['ありがとう', void 0, 'katakana'], ''],
+        [['ありがとう', void 0, 'romaji'], 'arigatou'],
+        [['ありがとう', void 0, 'none'], null],
+        [['ありがとう', void 0, 'default'], void 0],
+
+        // Cases with falsy readings and kanji expressions
+
+        [['有り難う', '', 'hiragana'], ''],
+        [['有り難う', '', 'katakana'], ''],
+        [['有り難う', '', 'romaji'], ''],
+        [['有り難う', '', 'none'], null],
+        [['有り難う', '', 'default'], ''],
+
+        [['有り難う', null, 'hiragana'], ''],
+        [['有り難う', null, 'katakana'], ''],
+        [['有り難う', null, 'romaji'], null],
+        [['有り難う', null, 'none'], null],
+        [['有り難う', null, 'default'], null],
+
+        [['有り難う', void 0, 'hiragana'], ''],
+        [['有り難う', void 0, 'katakana'], ''],
+        [['有り難う', void 0, 'romaji'], void 0],
+        [['有り難う', void 0, 'none'], null],
+        [['有り難う', void 0, 'default'], void 0]
     ];
 
     for (const [[expressionFragment, readingFragment, readingMode], expected] of data) {
