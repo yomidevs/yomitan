@@ -22,6 +22,7 @@ const {VM} = require('./yomichan-vm');
 const vm = new VM();
 vm.execute([
     'mixed/lib/wanakana.min.js',
+    'mixed/js/japanese.js',
     'bg/js/japanese.js'
 ]);
 const jp = vm.get('jp');
