@@ -19,6 +19,7 @@
 /* global
  * TemplateHandler
  * apiGetDisplayTemplatesHtml
+ * jp
  */
 
 class DisplayGenerator {
@@ -283,7 +284,7 @@ class DisplayGenerator {
     _appendKanjiLinks(container, text) {
         let part = '';
         for (const c of text) {
-            if (DisplayGenerator._isCharacterKanji(c)) {
+            if (jp.isCodePointKanji(c.codePointAt(0))) {
                 if (part.length > 0) {
                     container.appendChild(document.createTextNode(part));
                     part = '';
@@ -298,14 +299,6 @@ class DisplayGenerator {
         if (part.length > 0) {
             container.appendChild(document.createTextNode(part));
         }
-    }
-
-    static _isCharacterKanji(c) {
-        const code = c.codePointAt(0);
-        return (
-            code >= 0x4e00 && code < 0x9fb0 ||
-            code >= 0x3400 && code < 0x4dc0
-        );
     }
 
     static _appendMultiple(container, createItem, detailsArray, fallback=[]) {
