@@ -44,17 +44,14 @@ class FrameOffsetForwarder {
     async applyOffset(x, y) {
         const uniqueId = yomichan.generateId(16);
 
-        let frameOffsetResolve = null;
-        const frameOffsetPromise = new Promise((resolve) => (frameOffsetResolve = resolve));
-
-        const runtimeMessageCallback = ({action, params}, sender, callback) => {
-            if (action === 'frameOffset' && isObject(params) && params.uniqueId === uniqueId) {
-                chrome.runtime.onMessage.removeListener(runtimeMessageCallback);
-                callback();
-                frameOffsetResolve(params);
+        const frameOffsetPromise = yomichan.getTemporaryListenerResult(
+            chrome.runtime.onMessage,
+            ({action, params}, {resolve}) => {
+                if (action === 'frameOffset' && isObject(params) && params.uniqueId === uniqueId) {
+                    resolve(params);
+                }
             }
-        };
-        chrome.runtime.onMessage.addListener(runtimeMessageCallback);
+        );
 
         window.parent.postMessage({
             action: 'getFrameOffset',

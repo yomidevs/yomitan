@@ -32,19 +32,15 @@ async function main() {
 
     let popup;
     if (!proxy && (window !== window.parent)) {
-        let rootPopupInformationResolve;
-        const rootPopupInformationPromise = new Promise((resolve) => (rootPopupInformationResolve = resolve));
-
-        const runtimeMessageCallback = ({action, params}, sender, callback) => {
-            if (action === 'rootPopupInformation') {
-                chrome.runtime.onMessage.removeListener(runtimeMessageCallback);
-                callback();
-                rootPopupInformationResolve(params);
+        const rootPopupInformationPromise = yomichan.getTemporaryListenerResult(
+            chrome.runtime.onMessage,
+            ({action, params}, {resolve}) => {
+                if (action === 'rootPopupInformation') {
+                    resolve(params);
+                }
             }
-        };
-        chrome.runtime.onMessage.addListener(runtimeMessageCallback);
+        );
         apiForward('rootPopupRequestInformationBroadcast');
-
         const {popupId, frameId} = await rootPopupInformationPromise;
 
         const frameOffsetForwarder = new FrameOffsetForwarder();

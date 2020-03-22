@@ -312,6 +312,42 @@ const yomichan = (() => {
             this.trigger('orphaned', {error});
         }
 
+        getTemporaryListenerResult(eventHandler, userCallback, timeout=30000) {
+            let resolved = false;
+            let resolve;
+            let reject;
+            const listenerPromise = new Promise((_resolve, _reject) => {
+                resolve = _resolve;
+                reject = _reject;
+            });
+
+            if (eventHandler === chrome.runtime.onMessage) {
+                const runtimeMessageCallback = ({action, params}, sender, sendResponse) => {
+                    const cleanupResolve = (value) => {
+                        resolved = true;
+                        eventHandler.removeListener(runtimeMessageCallback);
+                        sendResponse();
+                        resolve(value);
+                    };
+
+                    setTimeout(() => {
+                        if (!resolved) {
+                            reject(new Error(`Listener timed out in ${timeout} ms`));
+                            eventHandler.removeListener(runtimeMessageCallback);
+                        }
+                    }, timeout);
+
+                    userCallback({action, params}, {resolve: cleanupResolve, sender});
+                };
+
+                eventHandler.addListener(runtimeMessageCallback);
+            } else {
+                throw new Error('Event handler type not supported');
+            }
+
+            return listenerPromise;
+        }
+
         // Private
 
         _onMessage({action, params}, sender, callback) {
