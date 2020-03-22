@@ -21,14 +21,18 @@
  */
 
 class PopupProxy {
-    constructor(id, depth, parentId, parentFrameId, url, applyFrameOffset=null) {
+    constructor(id, depth, parentId, parentFrameId, url, getFrameOffset=null) {
         this._parentId = parentId;
         this._parentFrameId = parentFrameId;
         this._id = id;
         this._depth = depth;
         this._url = url;
         this._apiSender = new FrontendApiSender();
-        this._applyFrameOffset = applyFrameOffset;
+        this._getFrameOffset = getFrameOffset;
+
+        this._frameOffset = null;
+        this._frameOffsetPromise = null;
+        this._frameOffsetUpdatedAt = null;
     }
 
     // Public properties
@@ -81,16 +85,18 @@ class PopupProxy {
     }
 
     async containsPoint(x, y) {
-        if (this._applyFrameOffset !== null) {
-            [x, y] = await this._applyFrameOffset(x, y);
+        if (this._getFrameOffset !== null) {
+            await this._updateFrameOffset();
+            [x, y] = this._applyFrameOffset(x, y);
         }
         return await this._invokeHostApi('containsPoint', {id: this._id, x, y});
     }
 
     async showContent(elementRect, writingMode, type=null, details=null) {
         let {x, y, width, height} = elementRect;
-        if (this._applyFrameOffset !== null) {
-            [x, y] = await this._applyFrameOffset(x, y);
+        if (this._getFrameOffset !== null) {
+            await this._updateFrameOffset();
+            [x, y] = this._applyFrameOffset(x, y);
         }
         elementRect = {x, y, width, height};
         return await this._invokeHostApi('showContent', {id: this._id, elementRect, writingMode, type, details});
@@ -115,5 +121,33 @@ class PopupProxy {
             return Promise.reject(new Error('Invalid frame'));
         }
         return this._apiSender.invoke(action, params, `popup-proxy-host#${this._parentFrameId}`);
+    }
+
+    async _updateFrameOffset() {
+        const firstRun = this._frameOffsetUpdatedAt === null;
+        const expired = firstRun || this._frameOffsetUpdatedAt < Date.now() - 1000;
+        if (this._frameOffsetPromise === null && !expired) { return; }
+
+        if (this._frameOffsetPromise !== null) {
+            await this._frameOffsetPromise;
+            return;
+        }
+
+        if (firstRun) {
+            this._frameOffsetPromise = this._getFrameOffset();
+            this._frameOffset = await this._frameOffsetPromise;
+            this._frameOffsetPromise = null;
+            this._frameOffsetUpdatedAt = Date.now();
+        } else {
+            this._getFrameOffset().then((offset) => {
+                this._frameOffset = offset;
+                this._frameOffsetUpdatedAt = Date.now();
+            });
+        }
+    }
+
+    _applyFrameOffset(x, y) {
+        const [offsetX, offsetY] = this._frameOffset;
+        return [x + offsetX, y + offsetY];
     }
 }

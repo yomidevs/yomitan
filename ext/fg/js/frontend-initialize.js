@@ -45,9 +45,9 @@ async function main() {
 
         const frameOffsetForwarder = new FrameOffsetForwarder();
         frameOffsetForwarder.start();
-        const applyFrameOffset = frameOffsetForwarder.applyOffset.bind(frameOffsetForwarder);
+        const getFrameOffset = frameOffsetForwarder.getOffset.bind(frameOffsetForwarder);
 
-        popup = new PopupProxy(popupId, 0, null, frameId, url, applyFrameOffset);
+        popup = new PopupProxy(popupId, 0, null, frameId, url, getFrameOffset);
         await popup.prepare();
     } else if (proxy) {
         popup = new PopupProxy(null, depth + 1, id, parentFrameId, url);

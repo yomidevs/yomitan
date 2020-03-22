@@ -41,7 +41,7 @@ class FrameOffsetForwarder {
         this._started = true;
     }
 
-    async applyOffset(x, y) {
+    async getOffset() {
         const uniqueId = yomichan.generateId(16);
 
         const frameOffsetPromise = yomichan.getTemporaryListenerResult(
@@ -58,7 +58,7 @@ class FrameOffsetForwarder {
             action: 'getFrameOffset',
             params: {
                 uniqueId,
-                offset: [x, y]
+                offset: [0, 0]
             }
         }, '*');
 
