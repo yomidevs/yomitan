@@ -312,8 +312,7 @@ const yomichan = (() => {
             this.trigger('orphaned', {error});
         }
 
-        getTemporaryListenerResult(eventHandler, userCallback, timeout=30000) {
-            let resolved = false;
+        getTemporaryListenerResult(eventHandler, userCallback, timeout=null) {
             let resolve;
             let reject;
             const listenerPromise = new Promise((_resolve, _reject) => {
@@ -323,19 +322,23 @@ const yomichan = (() => {
 
             if (eventHandler === chrome.runtime.onMessage) {
                 const runtimeMessageCallback = ({action, params}, sender, sendResponse) => {
+                    let timeoutId = null;
+                    if (timeout !== null) {
+                        timeoutId = window.setTimeout(() => {
+                            timeoutId = null;
+                            reject(new Error(`Listener timed out in ${timeout} ms`));
+                            eventHandler.removeListener(runtimeMessageCallback);
+                        }, timeout);
+                    }
+
                     const cleanupResolve = (value) => {
-                        resolved = true;
+                        if (timeoutId !== null) {
+                            window.clearTimeout(timeoutId);
+                        }
                         eventHandler.removeListener(runtimeMessageCallback);
                         sendResponse();
                         resolve(value);
                     };
-
-                    setTimeout(() => {
-                        if (!resolved) {
-                            reject(new Error(`Listener timed out in ${timeout} ms`));
-                            eventHandler.removeListener(runtimeMessageCallback);
-                        }
-                    }, timeout);
 
                     userCallback({action, params}, {resolve: cleanupResolve, sender});
                 };

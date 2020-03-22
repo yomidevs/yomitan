@@ -50,7 +50,8 @@ class FrameOffsetForwarder {
                 if (action === 'frameOffset' && isObject(params) && params.uniqueId === uniqueId) {
                     resolve(params);
                 }
-            }
+            },
+            5000
         );
 
         window.parent.postMessage({
