@@ -40,23 +40,26 @@ async function main() {
                 chrome.runtime.onMessage.removeListener(runtimeMessageCallback);
                 callback();
                 rootPopupInformationResolve(params);
-                return false;
             }
         };
         chrome.runtime.onMessage.addListener(runtimeMessageCallback);
-        apiForward('rootPopupInformationGet');
+        apiForward('rootPopupRequestInformationBroadcast');
 
         const {popupId, frameId} = await rootPopupInformationPromise;
 
-        window._frameOffsetForwarder = new FrameOffsetForwarder();
-        const applyFrameOffset = window._frameOffsetForwarder.applyOffset.bind(window._frameOffsetForwarder);
+        const frameOffsetForwarder = new FrameOffsetForwarder();
+        frameOffsetForwarder.start();
+        const applyFrameOffset = frameOffsetForwarder.applyOffset.bind(frameOffsetForwarder);
+
         popup = new PopupProxy(popupId, 0, null, frameId, url, applyFrameOffset);
         await popup.prepare();
     } else if (proxy) {
         popup = new PopupProxy(null, depth + 1, id, parentFrameId, url);
         await popup.prepare();
     } else {
-        window._frameOffsetForwarder = new FrameOffsetForwarder();
+        const frameOffsetForwarder = new FrameOffsetForwarder();
+        frameOffsetForwarder.start();
+
         const popupHost = new PopupProxyHost();
         await popupHost.prepare();
 

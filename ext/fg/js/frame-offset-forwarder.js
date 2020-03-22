@@ -22,15 +22,23 @@
 
 class FrameOffsetForwarder {
     constructor() {
-        this._forwardFrameOffset = window !== window.parent ?
+        this._started = false;
+
+        this._forwardFrameOffset = (
+            window !== window.parent ?
             this._forwardFrameOffsetParent.bind(this) :
-            this._forwardFrameOffsetOrigin.bind(this);
+            this._forwardFrameOffsetOrigin.bind(this)
+        );
 
         this._windowMessageHandlers = new Map([
-            ['getFrameOffset', ({offset, uniqueId}, e) => { return this._onGetFrameOffset(offset, uniqueId, e); }]
+            ['getFrameOffset', ({offset, uniqueId}, e) => this._onGetFrameOffset(offset, uniqueId, e)]
         ]);
+    }
 
+    start() {
+        if (this._started) { return; }
         window.addEventListener('message', this.onMessage.bind(this), false);
+        this._started = true;
     }
 
     async applyOffset(x, y) {
@@ -44,7 +52,6 @@ class FrameOffsetForwarder {
                 chrome.runtime.onMessage.removeListener(runtimeMessageCallback);
                 callback();
                 frameOffsetResolve(params);
-                return false;
             }
         };
         chrome.runtime.onMessage.addListener(runtimeMessageCallback);

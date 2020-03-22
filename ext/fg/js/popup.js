@@ -368,7 +368,6 @@ class Popup {
                 chrome.runtime.onMessage.removeListener(runtimeMessageCallback);
                 callback();
                 resolve();
-                return false;
             }
         };
         chrome.runtime.onMessage.addListener(runtimeMessageCallback);

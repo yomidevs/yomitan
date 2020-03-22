@@ -21,7 +21,7 @@
  */
 
 class PopupProxy {
-    constructor(id, depth, parentId, parentFrameId, url, applyFrameOffset=async (x, y) => [x, y]) {
+    constructor(id, depth, parentId, parentFrameId, url, applyFrameOffset=null) {
         this._parentId = parentId;
         this._parentFrameId = parentFrameId;
         this._id = id;
@@ -81,7 +81,7 @@ class PopupProxy {
     }
 
     async containsPoint(x, y) {
-        if (this._depth === 0) {
+        if (this._applyFrameOffset !== null) {
             [x, y] = await this._applyFrameOffset(x, y);
         }
         return await this._invokeHostApi('containsPoint', {id: this._id, x, y});
@@ -89,7 +89,7 @@ class PopupProxy {
 
     async showContent(elementRect, writingMode, type=null, details=null) {
         let {x, y, width, height} = elementRect;
-        if (this._depth === 0) {
+        if (this._applyFrameOffset !== null) {
             [x, y] = await this._applyFrameOffset(x, y);
         }
         elementRect = {x, y, width, height};

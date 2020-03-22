@@ -53,7 +53,7 @@ class Frontend extends TextScanner {
 
         this._runtimeMessageHandlers = new Map([
             ['popupSetVisibleOverride', ({visible}) => { this.popup.setVisibleOverride(visible); }],
-            ['rootPopupInformationGet', () => { this.popup.broadcastRootPopupInformation(); }]
+            ['rootPopupRequestInformationBroadcast', () => { this.popup.broadcastRootPopupInformation(); }]
         ]);
     }
 
