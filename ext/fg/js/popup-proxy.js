@@ -129,19 +129,29 @@ class PopupProxy {
         if (this._frameOffsetPromise === null && !expired) { return; }
 
         if (this._frameOffsetPromise !== null) {
-            await this._frameOffsetPromise;
+            if (firstRun) {
+                await this._frameOffsetPromise;
+            }
             return;
         }
 
+        this._frameOffsetPromise = this._getFrameOffset();
         if (firstRun) {
-            this._frameOffsetPromise = this._getFrameOffset();
-            this._frameOffset = await this._frameOffsetPromise;
+            try {
+                this._frameOffset = await this._frameOffsetPromise;
+                this._frameOffsetUpdatedAt = Date.now();
+            } catch (e) {
+                console.error(e);
+            }
             this._frameOffsetPromise = null;
-            this._frameOffsetUpdatedAt = Date.now();
         } else {
-            this._getFrameOffset().then((offset) => {
+            this._frameOffsetPromise.then((offset) => {
                 this._frameOffset = offset;
                 this._frameOffsetUpdatedAt = Date.now();
+                this._frameOffsetPromise = null;
+            }, (e) => {
+                console.error(e);
+                this._frameOffsetPromise = null;
             });
         }
     }
