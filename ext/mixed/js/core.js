@@ -278,11 +278,16 @@ const yomichan = (() => {
         constructor() {
             super();
 
-            this._isBackendPreparedResolve = null;
-            this._isBackendPreparedPromise = new Promise((resolve) => (this._isBackendPreparedResolve = resolve));
+            this._isBackendPreparedPromise = this.getTemporaryListenerResult(
+                chrome.runtime.onMessage,
+                ({action}, {resolve}) => {
+                    if (action === 'backendPrepared') {
+                        resolve();
+                    }
+                }
+            );
 
             this._messageHandlers = new Map([
-                ['backendPrepared', this._onBackendPrepared.bind(this)],
                 ['getUrl', this._onMessageGetUrl.bind(this)],
                 ['optionsUpdated', this._onMessageOptionsUpdated.bind(this)],
                 ['zoomChanged', this._onMessageZoomChanged.bind(this)]
@@ -360,10 +365,6 @@ const yomichan = (() => {
             const result = handler(params, sender);
             callback(result);
             return false;
-        }
-
-        _onBackendPrepared() {
-            this._isBackendPreparedResolve();
         }
 
         _onMessageGetUrl() {
