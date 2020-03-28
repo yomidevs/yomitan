@@ -41,6 +41,7 @@ h2 { border-bottom-color: #eeeeee; }
 .tag[data-category=frequency]    { background-color: #5cb85c; }
 .tag[data-category=partOfSpeech] { background-color: #565656; }
 .tag[data-category=search]       { background-color: #8a8a91; }
+.tag[data-category=pitch-accent-dictionary] { background-color: #6640be; }
 
 .term-reasons { color: #777777; }
 
@@ -76,6 +77,8 @@ h2 { border-bottom-color: #eeeeee; }
     background-color: #333333;
     color: #ffffff;
 }
+
+.term-pitch-accent-container { border-bottom-color: #eeeeee; }
 
 .term-pitch-accent-character:before { border-color: #000000; }
 

@@ -441,6 +441,17 @@ button.action-button {
  * Pitch accent styles
  */
 
+.entry[data-pitch-accent-count='0'] .term-pitch-accent-container {
+    display: none;
+}
+
+.term-pitch-accent-container {
+    border-bottom-width: 0.05714285714285714em; /* 14px * 1.25em => 1px */
+    border-bottom-style: solid;
+    padding-bottom: 0.25em;
+    margin-bottom: 0.25em;
+}
+
 .term-pitch-accent-group-list {
     margin: 0;
     padding: 0;
