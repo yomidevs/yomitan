@@ -305,7 +305,7 @@ class DisplayGenerator {
 
     createPitch(details) {
         const {expressions, reading, position, tags} = details;
-        const morae = DisplayGenerator._jpGetKanaMorae(reading);
+        const morae = jp.getKanaMorae(reading);
 
         const node = this._templateHandler.instantiate('term-pitch-accent');
 
@@ -324,8 +324,8 @@ class DisplayGenerator {
         n = node.querySelector('.term-pitch-accent-characters');
         for (let i = 0, ii = morae.length; i < ii; ++i) {
             const mora = morae[i];
-            const highPitch = DisplayGenerator._jpIsMoraPitchHigh(i, position);
-            const highPitchNext = DisplayGenerator._jpIsMoraPitchHigh(i + 1, position);
+            const highPitch = jp.isMoraPitchHigh(i, position);
+            const highPitchNext = jp.isMoraPitchHigh(i + 1, position);
 
             const n1 = this._templateHandler.instantiate('term-pitch-accent-character');
             const n2 = n1.querySelector('.term-pitch-accent-character-inner');
@@ -358,8 +358,8 @@ class DisplayGenerator {
 
         const pathPoints = [];
         for (let i = 0; i < ii; ++i) {
-            const highPitch = DisplayGenerator._jpIsMoraPitchHigh(i, position);
-            const highPitchNext = DisplayGenerator._jpIsMoraPitchHigh(i + 1, position);
+            const highPitch = jp.isMoraPitchHigh(i, position);
+            const highPitchNext = jp.isMoraPitchHigh(i + 1, position);
             const graphic = (highPitch && !highPitchNext ? '#term-pitch-accent-graph-dot-downstep' : '#term-pitch-accent-graph-dot');
             const x = `${i * 50 + 25}`;
             const y = highPitch ? '25' : '75';
@@ -376,7 +376,7 @@ class DisplayGenerator {
 
         pathPoints.splice(0, ii - 1);
         {
-            const highPitch = DisplayGenerator._jpIsMoraPitchHigh(ii, position);
+            const highPitch = jp.isMoraPitchHigh(ii, position);
             const x = `${ii * 50 + 25}`;
             const y = highPitch ? '25' : '75';
             const use = document.createElementNS(svgns, 'use');
@@ -532,30 +532,4 @@ class DisplayGenerator {
 
         return true;
     }
-
-    static _jpGetKanaMorae(text) {
-        // This function splits Japanese kana reading into its individual mora
-        // components. It is assumed that the text is well-formed.
-        const smallKanaSet = DisplayGenerator._smallKanaSet;
-        const morae = [];
-        let i;
-        for (const c of text) {
-            if (smallKanaSet.has(c) && (i = morae.length) > 0) {
-                morae[i - 1] += c;
-            } else {
-                morae.push(c);
-            }
-        }
-        return morae;
-    }
-
-    static _jpCreateSmallKanaSet() {
-        return new Set(Array.from('ぁぃぅぇぉゃゅょゎァィゥェォャュョヮ'));
-    }
-
-    static _jpIsMoraPitchHigh(moraIndex, pitchAccentPosition) {
-        return pitchAccentPosition === 0 ? (moraIndex > 0) : (moraIndex < pitchAccentPosition);
-    }
 }
-
-DisplayGenerator._smallKanaSet = DisplayGenerator._jpCreateSmallKanaSet();
