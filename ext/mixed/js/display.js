@@ -908,10 +908,15 @@ class Display {
 
     async getDefinitionsAddable(definitions, modes) {
         try {
-            return await apiDefinitionsAddable(definitions, modes, this._getNoteContext(), this.getOptionsContext());
+            const context = await this._getNoteContext();
+            return await apiDefinitionsAddable(definitions, modes, context, this.getOptionsContext());
         } catch (e) {
             return [];
         }
+    }
+
+    async getDocumentTitle() {
+        return document.title;
     }
 
     static indexOf(nodeList, node) {
@@ -934,10 +939,11 @@ class Display {
         return (typeof key === 'string' ? (key.length === 1 ? key.toUpperCase() : key) : '');
     }
 
-    _getNoteContext() {
+    async _getNoteContext() {
+        const documentTitle = await this.getDocumentTitle();
         return {
             document: {
-                title: document.title
+                title: documentTitle
             }
         };
     }
