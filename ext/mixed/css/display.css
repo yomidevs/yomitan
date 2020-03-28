@@ -310,6 +310,7 @@ button.action-button {
     width: 0;
     height: 0;
     visibility: hidden;
+    z-index: 1;
 }
 
 .term-expression-list[data-multi=true] .term-expression:hover .term-expression-details {
