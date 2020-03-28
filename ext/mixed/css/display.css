@@ -488,14 +488,25 @@ button.action-button {
 .term-pitch-accent-group-tag-list {
     margin-right: 0.375em;
 }
-.entry[data-unique-expression-count="1"] .term-pitch-accent-expression-list {
+
+.term-pitch-accent-expression-list {
+    padding-right: 0.25em;
+}
+
+.term-pitch-accent-expression-list[data-count="0"] {
     display: none;
 }
-.term-pitch-accent-expression:not(:last-of-type):after {
-    content: "\3001";
+
+.term-pitch-accent-expression-list:before {
+    content: "(";
 }
-.term-pitch-accent-expression:last-of-type:after {
-    content: "\FF1A";
+
+.term-pitch-accent-expression-list:after {
+    content: " only)";
+}
+
+.term-pitch-accent-expression+.term-pitch-accent-expression:before {
+    content: ", ";
 }
 
 .term-pitch-accent-tag-list:not([data-count="0"]) {

@@ -304,7 +304,7 @@ class DisplayGenerator {
     }
 
     createPitch(details) {
-        const {expressions, reading, position, tags} = details;
+        const {exclusiveExpressions, reading, position, tags} = details;
         const morae = jp.getKanaMorae(reading);
 
         const node = this._templateHandler.instantiate('term-pitch-accent');
@@ -319,7 +319,7 @@ class DisplayGenerator {
         DisplayGenerator._appendMultiple(n, this.createTag.bind(this), tags);
 
         n = node.querySelector('.term-pitch-accent-expression-list');
-        DisplayGenerator._appendMultiple(n, this.createPitchExpression.bind(this), expressions);
+        DisplayGenerator._appendMultiple(n, this.createPitchExpression.bind(this), exclusiveExpressions);
 
         n = node.querySelector('.term-pitch-accent-characters');
         for (let i = 0, ii = morae.length; i < ii; ++i) {
@@ -481,6 +481,7 @@ class DisplayGenerator {
     static _getPitchInfos(definition) {
         const results = new Map();
 
+        const allExpressions = new Set();
         const expressions = definition.expressions;
         const sources = Array.isArray(expressions) ? expressions : [definition];
         for (const {pitches: expressionPitches, expression} of sources) {
@@ -498,7 +499,19 @@ class DisplayGenerator {
                         dictionaryResults.push(pitchInfo);
                     }
                     pitchInfo.expressions.add(expression);
+                    allExpressions.add(expression);
                 }
+            }
+        }
+
+        for (const dictionaryResults of results.values()) {
+            for (const result of dictionaryResults) {
+                const exclusiveExpressions = [];
+                const resultExpressions = result.expressions;
+                if (!areSetsEqual(resultExpressions, allExpressions)) {
+                    exclusiveExpressions.push(...getSetIntersection(resultExpressions, allExpressions));
+                }
+                result.exclusiveExpressions = exclusiveExpressions;
             }
         }
 
