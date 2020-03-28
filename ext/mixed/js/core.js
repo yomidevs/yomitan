@@ -132,6 +132,30 @@ function parseUrl(url) {
     return {baseUrl, queryParams};
 }
 
+function areSetsEqual(set1, set2) {
+    if (set1.size !== set2.size) {
+        return false;
+    }
+
+    for (const value of set1) {
+        if (!set2.has(value)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function getSetIntersection(set1, set2) {
+    const result = [];
+    for (const value of set1) {
+        if (set2.has(value)) {
+            result.push(value);
+        }
+    }
+    return result;
+}
+
 
 /*
  * Async utilities
