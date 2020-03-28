@@ -243,6 +243,7 @@ function ankiGetFieldMarkers(type) {
                 'cloze-prefix',
                 'cloze-suffix',
                 'dictionary',
+                'document-title',
                 'expression',
                 'furigana',
                 'furigana-plain',
@@ -258,6 +259,7 @@ function ankiGetFieldMarkers(type) {
             return [
                 'character',
                 'dictionary',
+                'document-title',
                 'glossary',
                 'kunyomi',
                 'onyomi',
