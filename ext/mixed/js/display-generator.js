@@ -304,7 +304,7 @@ class DisplayGenerator {
     }
 
     createPitch(details) {
-        const {exclusiveExpressions, reading, position, tags} = details;
+        const {reading, position, tags, exclusiveExpressions, exclusiveReadings} = details;
         const morae = jp.getKanaMorae(reading);
 
         const node = this._templateHandler.instantiate('term-pitch-accent');
@@ -319,7 +319,7 @@ class DisplayGenerator {
         DisplayGenerator._appendMultiple(n, this.createTag.bind(this), tags);
 
         n = node.querySelector('.term-pitch-accent-disambiguation-list');
-        DisplayGenerator._appendMultiple(n, this.createPitchExpression.bind(this), exclusiveExpressions);
+        this.createPitchAccentDisambiguations(n, exclusiveExpressions, exclusiveReadings);
 
         n = node.querySelector('.term-pitch-accent-characters');
         for (let i = 0, ii = morae.length; i < ii; ++i) {
@@ -345,10 +345,26 @@ class DisplayGenerator {
         return node;
     }
 
-    createPitchExpression(expression) {
-        const node = this._templateHandler.instantiate('term-pitch-accent-disambiguation');
-        node.textContent = expression;
-        return node;
+    createPitchAccentDisambiguations(container, exclusiveExpressions, exclusiveReadings) {
+        const templateName = 'term-pitch-accent-disambiguation';
+        for (const exclusiveExpression of exclusiveExpressions) {
+            const node = this._templateHandler.instantiate(templateName);
+            node.dataset.type = 'expression';
+            node.textContent = exclusiveExpression;
+            container.appendChild(node);
+        }
+
+        for (const exclusiveReading of exclusiveReadings) {
+            const node = this._templateHandler.instantiate(templateName);
+            node.dataset.type = 'reading';
+            node.textContent = exclusiveReading;
+            container.appendChild(node);
+        }
+
+        container.dataset.multi = 'true';
+        container.dataset.count = `${exclusiveExpressions.length + exclusiveReadings.length}`;
+        container.dataset.expressionCount = `${exclusiveExpressions.length}`;
+        container.dataset.readingCount = `${exclusiveReadings.length}`;
     }
 
     populatePitchGraph(svg, position, morae) {
@@ -482,10 +498,13 @@ class DisplayGenerator {
         const results = new Map();
 
         const allExpressions = new Set();
+        const allReadings = new Set();
         const expressions = definition.expressions;
         const sources = Array.isArray(expressions) ? expressions : [definition];
         for (const {pitches: expressionPitches, expression} of sources) {
+            allExpressions.add(expression);
             for (const {reading, pitches, dictionary} of expressionPitches) {
+                allReadings.add(reading);
                 let dictionaryResults = results.get(dictionary);
                 if (typeof dictionaryResults === 'undefined') {
                     dictionaryResults = [];
@@ -499,7 +518,6 @@ class DisplayGenerator {
                         dictionaryResults.push(pitchInfo);
                     }
                     pitchInfo.expressions.add(expression);
-                    allExpressions.add(expression);
                 }
             }
         }
@@ -507,11 +525,16 @@ class DisplayGenerator {
         for (const dictionaryResults of results.values()) {
             for (const result of dictionaryResults) {
                 const exclusiveExpressions = [];
+                const exclusiveReadings = [];
                 const resultExpressions = result.expressions;
                 if (!areSetsEqual(resultExpressions, allExpressions)) {
                     exclusiveExpressions.push(...getSetIntersection(resultExpressions, allExpressions));
                 }
+                if (allReadings.size > 1) {
+                    exclusiveReadings.push(result.reading);
+                }
                 result.exclusiveExpressions = exclusiveExpressions;
+                result.exclusiveReadings = exclusiveReadings;
             }
         }
 
