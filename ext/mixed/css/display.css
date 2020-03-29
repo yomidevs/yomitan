@@ -493,10 +493,6 @@ button.action-button {
     padding-right: 0.25em;
 }
 
-.term-pitch-accent-disambiguation-list[data-count="0"] {
-    display: none;
-}
-
 .term-pitch-accent-disambiguation-list:before {
     content: "(";
 }
@@ -507,6 +503,12 @@ button.action-button {
 
 .term-pitch-accent-disambiguation+.term-pitch-accent-disambiguation:before {
     content: ", ";
+}
+
+.term-pitch-accent-disambiguation-list[data-count="0"],
+:root[data-show-pitch-accent-downstep-notation=true] .term-pitch-accent-disambiguation-list[data-expression-count="0"],
+:root[data-show-pitch-accent-downstep-notation=true] .term-pitch-accent-disambiguation[data-type=reading] {
+    display: none;
 }
 
 .term-pitch-accent-tag-list:not([data-count="0"]) {
