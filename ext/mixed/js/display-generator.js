@@ -318,7 +318,7 @@ class DisplayGenerator {
         n = node.querySelector('.term-pitch-accent-tag-list');
         DisplayGenerator._appendMultiple(n, this.createTag.bind(this), tags);
 
-        n = node.querySelector('.term-pitch-accent-expression-list');
+        n = node.querySelector('.term-pitch-accent-disambiguation-list');
         DisplayGenerator._appendMultiple(n, this.createPitchExpression.bind(this), exclusiveExpressions);
 
         n = node.querySelector('.term-pitch-accent-characters');
@@ -346,7 +346,7 @@ class DisplayGenerator {
     }
 
     createPitchExpression(expression) {
-        const node = this._templateHandler.instantiate('term-pitch-accent-expression');
+        const node = this._templateHandler.instantiate('term-pitch-accent-disambiguation');
         node.textContent = expression;
         return node;
     }

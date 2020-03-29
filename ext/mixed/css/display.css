@@ -489,23 +489,23 @@ button.action-button {
     margin-right: 0.375em;
 }
 
-.term-pitch-accent-expression-list {
+.term-pitch-accent-disambiguation-list {
     padding-right: 0.25em;
 }
 
-.term-pitch-accent-expression-list[data-count="0"] {
+.term-pitch-accent-disambiguation-list[data-count="0"] {
     display: none;
 }
 
-.term-pitch-accent-expression-list:before {
+.term-pitch-accent-disambiguation-list:before {
     content: "(";
 }
 
-.term-pitch-accent-expression-list:after {
+.term-pitch-accent-disambiguation-list:after {
     content: " only)";
 }
 
-.term-pitch-accent-expression+.term-pitch-accent-expression:before {
+.term-pitch-accent-disambiguation+.term-pitch-accent-disambiguation:before {
     content: ", ";
 }
 

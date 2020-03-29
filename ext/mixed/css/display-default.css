@@ -62,7 +62,7 @@ h2 { border-bottom-color: #eeeeee; }
 
 .term-definition-list,
 .term-pitch-accent-group-list,
-.term-pitch-accent-expression-list,
+.term-pitch-accent-disambiguation-list,
 .kanji-glossary-list {
     color: #777777;
 }
