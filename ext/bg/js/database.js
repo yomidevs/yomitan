@@ -322,9 +322,39 @@ class Database {
         return result;
     }
 
+    bulkAdd(objectStoreName, items, start, count) {
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([objectStoreName], 'readwrite');
+            const objectStore = transaction.objectStore(objectStoreName);
+
+            if (start + count > items.length) {
+                count = items.length - start;
+            }
+
+            if (count <= 0) {
+                resolve();
+                return;
+            }
+
+            const end = start + count;
+            let completedCount = 0;
+            const onError = (e) => reject(e);
+            const onSuccess = () => {
+                if (++completedCount >= count) {
+                    resolve();
+                }
+            };
+
+            for (let i = start; i < end; ++i) {
+                const request = objectStore.add(items[i]);
+                request.onerror = onError;
+                request.onsuccess = onSuccess;
+            }
+        });
+    }
+
     async importDictionary(archiveSource, onProgress, details) {
         this._validate();
-        const db = this.db;
         const hasOnProgress = (typeof onProgress === 'function');
 
         // Read archive
@@ -448,11 +478,7 @@ class Database {
             prefixWildcardsSupported
         };
 
-        {
-            const transaction = db.transaction(['dictionaries'], 'readwrite');
-            const objectStore = transaction.objectStore('dictionaries');
-            await Database._bulkAdd(objectStore, [summary], 0, 1);
-        }
+        await this.bulkAdd('dictionaries', [summary], 0, 1);
 
         // Add data
         const errors = [];
@@ -472,9 +498,7 @@ class Database {
                 const count = Math.min(maxTransactionLength, ii - i);
 
                 try {
-                    const transaction = db.transaction([objectStoreName], 'readwrite');
-                    const objectStore = transaction.objectStore(objectStoreName);
-                    await Database._bulkAdd(objectStore, entries, i, count);
+                    await this.bulkAdd(objectStoreName, entries, i, count);
                 } catch (e) {
                     errors.push(e);
                 }
@@ -757,34 +781,6 @@ class Database {
             const request = dbObjectStore.delete(key);
             request.onerror = (e) => reject(e);
             request.onsuccess = () => resolve();
-        });
-    }
-
-    static _bulkAdd(objectStore, items, start, count) {
-        return new Promise((resolve, reject) => {
-            if (start + count > items.length) {
-                count = items.length - start;
-            }
-
-            if (count <= 0) {
-                resolve();
-                return;
-            }
-
-            const end = start + count;
-            let completedCount = 0;
-            const onError = (e) => reject(e);
-            const onSuccess = () => {
-                if (++completedCount >= count) {
-                    resolve();
-                }
-            };
-
-            for (let i = start; i < end; ++i) {
-                const request = objectStore.add(items[i]);
-                request.onerror = onError;
-                request.onsuccess = onSuccess;
-            }
         });
     }
 
