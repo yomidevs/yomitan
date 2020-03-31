@@ -17,7 +17,6 @@
  */
 
 /* global
- * Database
  * Deinflector
  * dictEnabledSet
  * dictTagBuildSource
@@ -34,23 +33,16 @@
  */
 
 class Translator {
-    constructor() {
-        this.database = null;
+    constructor(database) {
+        this.database = database;
         this.deinflector = null;
         this.tagCache = new Map();
     }
 
     async prepare() {
-        if (!this.database) {
-            this.database = new Database();
-            await this.database.prepare();
-        }
-
-        if (!this.deinflector) {
-            const url = chrome.runtime.getURL('/bg/lang/deinflect.json');
-            const reasons = await requestJson(url, 'GET');
-            this.deinflector = new Deinflector(reasons);
-        }
+        const url = chrome.runtime.getURL('/bg/lang/deinflect.json');
+        const reasons = await requestJson(url, 'GET');
+        this.deinflector = new Deinflector(reasons);
     }
 
     async purgeDatabase() {

@@ -24,6 +24,7 @@
  * AudioUriBuilder
  * BackendApiForwarder
  * ClipboardMonitor
+ * Database
  * JsonSchema
  * Mecab
  * Translator
@@ -43,7 +44,8 @@
 
 class Backend {
     constructor() {
-        this.translator = new Translator();
+        this.database = new Database();
+        this.translator = new Translator(this.database);
         this.anki = new AnkiNull();
         this.mecab = new Mecab();
         this.clipboardMonitor = new ClipboardMonitor({getClipboard: this._onApiClipboardGet.bind(this)});
@@ -107,6 +109,7 @@ class Backend {
     }
 
     async prepare() {
+        await this.database.prepare();
         await this.translator.prepare();
 
         this.optionsSchema = await requestJson(chrome.runtime.getURL('/bg/data/options-schema.json'), 'GET');
