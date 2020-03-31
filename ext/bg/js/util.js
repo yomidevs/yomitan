@@ -118,7 +118,7 @@ async function utilDatabaseDeleteDictionary(dictionaryName, onProgress) {
 
 async function utilDatabaseImport(data, onProgress, details) {
     data = await utilReadFile(data);
-    return utilIsolate(await utilBackend().translator.database.importDictionary(
+    return utilIsolate(await utilBackend().importDictionary(
         utilBackgroundIsolate(data),
         utilBackgroundFunctionIsolate(onProgress),
         utilBackgroundIsolate(details)

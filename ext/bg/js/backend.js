@@ -299,6 +299,10 @@ class Backend {
         return true;
     }
 
+    async importDictionary(archiveSource, onProgress, details) {
+        return await this.translator.database.importDictionary(archiveSource, onProgress, details);
+    }
+
     // Message handlers
 
     _onApiYomichanCoreReady(_params, sender) {
