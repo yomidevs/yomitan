@@ -322,6 +322,15 @@ class Database {
         return result;
     }
 
+    async dictionaryExists(title) {
+        this._validate();
+        const transaction = this.db.transaction(['dictionaries'], 'readonly');
+        const index = transaction.objectStore('dictionaries').index('title');
+        const query = IDBKeyRange.only(title);
+        const count = await Database._getCount(index, query);
+        return count > 0;
+    }
+
     bulkAdd(objectStoreName, items, start, count) {
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([objectStoreName], 'readwrite');
@@ -380,7 +389,7 @@ class Database {
         }
 
         // Verify database is not already imported
-        if (await this._dictionaryExists(dictionaryTitle)) {
+        if (await this.dictionaryExists(dictionaryTitle)) {
             throw new Error('Dictionary is already imported');
         }
 
@@ -590,15 +599,6 @@ class Database {
         const tagBank = '/bg/data/dictionary-tag-bank-v3-schema.json';
 
         return [termBank, termMetaBank, kanjiBank, kanjiMetaBank, tagBank];
-    }
-
-    async _dictionaryExists(title) {
-        const db = this.db;
-        const dbCountTransaction = db.transaction(['dictionaries'], 'readonly');
-        const dbIndex = dbCountTransaction.objectStore('dictionaries').index('title');
-        const only = IDBKeyRange.only(title);
-        const count = await Database._getCount(dbIndex, only);
-        return count > 0;
     }
 
     async _findGenericBulk(tableName, indexName, indexValueList, dictionaries, createResult) {
