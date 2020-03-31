@@ -110,6 +110,10 @@ class Database {
         this.db = null;
     }
 
+    isPrepared() {
+        return this.db !== null;
+    }
+
     async purge() {
         this._validate();
 
