@@ -25,6 +25,7 @@
  * BackendApiForwarder
  * ClipboardMonitor
  * Database
+ * DictionaryImporter
  * JsonSchema
  * Mecab
  * Translator
@@ -45,6 +46,7 @@
 class Backend {
     constructor() {
         this.database = new Database();
+        this.dictionaryImporter = new DictionaryImporter();
         this.translator = new Translator(this.database);
         this.anki = new AnkiNull();
         this.mecab = new Mecab();
@@ -300,7 +302,7 @@ class Backend {
     }
 
     async importDictionary(archiveSource, onProgress, details) {
-        return await this.translator.database.importDictionary(archiveSource, onProgress, details);
+        return await this.dictionaryImporter.import(this.database, archiveSource, onProgress, details);
     }
 
     // Message handlers
