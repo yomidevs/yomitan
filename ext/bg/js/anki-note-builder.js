@@ -84,6 +84,82 @@ class AnkiNoteBuilder {
         });
     }
 
+    async injectAudio(definition, fields, sources, audioSystem, optionsContext) {
+        let usesAudio = false;
+        for (const fieldValue of Object.values(fields)) {
+            if (fieldValue.includes('{audio}')) {
+                usesAudio = true;
+                break;
+            }
+        }
+
+        if (!usesAudio) {
+            return true;
+        }
+
+        try {
+            const expressions = definition.expressions;
+            const audioSourceDefinition = Array.isArray(expressions) ? expressions[0] : definition;
+
+            const {uri} = await audioSystem.getDefinitionAudio(audioSourceDefinition, sources, {tts: false, optionsContext});
+            const filename = this._createInjectedAudioFileName(audioSourceDefinition);
+            if (filename !== null) {
+                definition.audio = {url: uri, filename};
+            }
+
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    async injectScreenshot(definition, fields, screenshot, anki) {
+        let usesScreenshot = false;
+        for (const fieldValue of Object.values(fields)) {
+            if (fieldValue.includes('{screenshot}')) {
+                usesScreenshot = true;
+                break;
+            }
+        }
+
+        if (!usesScreenshot) {
+            return;
+        }
+
+        const dateToString = (date) => {
+            const year = date.getUTCFullYear();
+            const month = date.getUTCMonth().toString().padStart(2, '0');
+            const day = date.getUTCDate().toString().padStart(2, '0');
+            const hours = date.getUTCHours().toString().padStart(2, '0');
+            const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+            const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+            return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
+        };
+
+        const now = new Date(Date.now());
+        const filename = `yomichan_browser_screenshot_${definition.reading}_${dateToString(now)}.${screenshot.format}`;
+        const data = screenshot.dataUrl.replace(/^data:[\w\W]*?,/, '');
+
+        try {
+            await anki.storeMediaFile(filename, data);
+        } catch (e) {
+            return;
+        }
+
+        definition.screenshotFileName = filename;
+    }
+
+    _createInjectedAudioFileName(definition) {
+        const {reading, expression} = definition;
+        if (!reading && !expression) { return null; }
+
+        let filename = 'yomichan';
+        if (reading) { filename += `_${reading}`; }
+        if (expression) { filename += `_${expression}`; }
+        filename += '.mp3';
+        return filename;
+    }
+
     static stringReplaceAsync(str, regex, replacer) {
         let match;
         let index = 0;
