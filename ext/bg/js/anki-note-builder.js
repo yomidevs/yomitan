@@ -126,18 +126,8 @@ class AnkiNoteBuilder {
             return;
         }
 
-        const dateToString = (date) => {
-            const year = date.getUTCFullYear();
-            const month = date.getUTCMonth().toString().padStart(2, '0');
-            const day = date.getUTCDate().toString().padStart(2, '0');
-            const hours = date.getUTCHours().toString().padStart(2, '0');
-            const minutes = date.getUTCMinutes().toString().padStart(2, '0');
-            const seconds = date.getUTCSeconds().toString().padStart(2, '0');
-            return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
-        };
-
         const now = new Date(Date.now());
-        const filename = `yomichan_browser_screenshot_${definition.reading}_${dateToString(now)}.${screenshot.format}`;
+        const filename = `yomichan_browser_screenshot_${definition.reading}_${this._dateToString(now)}.${screenshot.format}`;
         const data = screenshot.dataUrl.replace(/^data:[\w\W]*?,/, '');
 
         try {
@@ -158,6 +148,16 @@ class AnkiNoteBuilder {
         if (expression) { filename += `_${expression}`; }
         filename += '.mp3';
         return filename;
+    }
+
+    _dateToString(date) {
+        const year = date.getUTCFullYear();
+        const month = date.getUTCMonth().toString().padStart(2, '0');
+        const day = date.getUTCDate().toString().padStart(2, '0');
+        const hours = date.getUTCHours().toString().padStart(2, '0');
+        const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+        const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+        return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
     }
 
     static stringReplaceAsync(str, regex, replacer) {
