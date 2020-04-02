@@ -96,10 +96,8 @@ class AnkiNoteBuilder {
             if (filename !== null) {
                 definition.audio = {url: uri, filename};
             }
-
-            return true;
         } catch (e) {
-            return false;
+            // NOP
         }
     }
 
