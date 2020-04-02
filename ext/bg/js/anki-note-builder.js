@@ -85,17 +85,7 @@ class AnkiNoteBuilder {
     }
 
     async injectAudio(definition, fields, sources, audioSystem, optionsContext) {
-        let usesAudio = false;
-        for (const fieldValue of Object.values(fields)) {
-            if (fieldValue.includes('{audio}')) {
-                usesAudio = true;
-                break;
-            }
-        }
-
-        if (!usesAudio) {
-            return true;
-        }
+        if (!this._containsMarker(fields, 'audio')) { return; }
 
         try {
             const expressions = definition.expressions;
@@ -114,17 +104,7 @@ class AnkiNoteBuilder {
     }
 
     async injectScreenshot(definition, fields, screenshot, anki) {
-        let usesScreenshot = false;
-        for (const fieldValue of Object.values(fields)) {
-            if (fieldValue.includes('{screenshot}')) {
-                usesScreenshot = true;
-                break;
-            }
-        }
-
-        if (!usesScreenshot) {
-            return;
-        }
+        if (!this._containsMarker(fields, 'screenshot')) { return; }
 
         const now = new Date(Date.now());
         const filename = `yomichan_browser_screenshot_${definition.reading}_${this._dateToString(now)}.${screenshot.format}`;
@@ -158,6 +138,16 @@ class AnkiNoteBuilder {
         const minutes = date.getUTCMinutes().toString().padStart(2, '0');
         const seconds = date.getUTCSeconds().toString().padStart(2, '0');
         return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
+    }
+
+    _containsMarker(fields, marker) {
+        marker = `{${marker}}`;
+        for (const fieldValue of Object.values(fields)) {
+            if (fieldValue.includes(marker)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     static stringReplaceAsync(str, regex, replacer) {
