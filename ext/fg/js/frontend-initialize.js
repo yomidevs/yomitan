@@ -22,6 +22,7 @@
  * PopupProxy
  * PopupProxyHost
  * apiForward
+ * apiOptionsGet
  */
 
 async function main() {
@@ -30,8 +31,11 @@ async function main() {
     const data = window.frontendInitializationData || {};
     const {id, depth=0, parentFrameId, url, proxy=false} = data;
 
+    const optionsContext = {depth, url};
+    const options = await apiOptionsGet(optionsContext);
+
     let popup;
-    if (!proxy && (window !== window.parent)) {
+    if (!proxy && (window !== window.parent) && options.general.showIframePopupsInRootFrame) {
         const rootPopupInformationPromise = yomichan.getTemporaryListenerResult(
             chrome.runtime.onMessage,
             ({action, params}, {resolve}) => {

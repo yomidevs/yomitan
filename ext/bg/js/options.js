@@ -127,7 +127,8 @@ function profileOptionsCreateDefaults() {
             enableClipboardMonitor: false,
             showPitchAccentDownstepNotation: true,
             showPitchAccentPositionNotation: true,
-            showPitchAccentGraph: false
+            showPitchAccentGraph: false,
+            showIframePopupsInRootFrame: false
         },
 
         audio: {

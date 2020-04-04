@@ -108,7 +108,8 @@
                                     "enableClipboardMonitor",
                                     "showPitchAccentDownstepNotation",
                                     "showPitchAccentPositionNotation",
-                                    "showPitchAccentGraph"
+                                    "showPitchAccentGraph",
+                                    "showIframePopupsInRootFrame"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -240,6 +241,10 @@
                                         "default": true
                                     },
                                     "showPitchAccentGraph": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "showIframePopupsInRootFrame": {
                                         "type": "boolean",
                                         "default": false
                                     }
