@@ -121,7 +121,7 @@ class PopupProxy {
 
     async _updateFrameOffset() {
         const firstRun = this._frameOffsetUpdatedAt === null;
-        const expired = firstRun || this._frameOffsetUpdatedAt < Date.now() - 1000;
+        const expired = firstRun || this._frameOffsetUpdatedAt < Date.now() - PopupProxy._frameOffsetExpireTimeout;
         if (this._frameOffsetPromise === null && !expired) { return; }
 
         if (this._frameOffsetPromise !== null) {
@@ -158,3 +158,5 @@ class PopupProxy {
         return [x + offsetX, y + offsetY];
     }
 }
+
+PopupProxy._frameOffsetExpireTimeout = 1000;
