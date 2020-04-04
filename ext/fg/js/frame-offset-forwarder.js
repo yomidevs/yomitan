@@ -80,7 +80,10 @@ class FrameOffsetForwarder {
             sourceFrame = frame;
             break;
         }
-        if (sourceFrame === null) { return; }
+        if (sourceFrame === null) {
+            this._forwardFrameOffsetOrigin(null, uniqueId);
+            return;
+        }
 
         const [forwardedX, forwardedY] = offset;
         const {x, y} = sourceFrame.getBoundingClientRect();

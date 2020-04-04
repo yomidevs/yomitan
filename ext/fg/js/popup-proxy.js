@@ -138,7 +138,8 @@ class PopupProxy {
         this._frameOffsetPromise = this._getFrameOffset();
         if (firstRun) {
             try {
-                this._frameOffset = await this._frameOffsetPromise;
+                const offset = await this._frameOffsetPromise;
+                this._frameOffset = offset !== null ? offset : [0, 0];
                 this._frameOffsetUpdatedAt = Date.now();
             } catch (e) {
                 console.error(e);
@@ -146,7 +147,7 @@ class PopupProxy {
             this._frameOffsetPromise = null;
         } else {
             this._frameOffsetPromise.then((offset) => {
-                this._frameOffset = offset;
+                this._frameOffset = offset !== null ? offset : [0, 0];
                 this._frameOffsetUpdatedAt = Date.now();
                 this._frameOffsetPromise = null;
             }, (e) => {
