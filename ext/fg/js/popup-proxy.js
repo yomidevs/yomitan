@@ -64,10 +64,6 @@ class PopupProxy {
         return true;
     }
 
-    broadcastRootPopupInformation() {
-        // NOP
-    }
-
     async setOptions(options) {
         return await this._invokeHostApi('setOptions', {id: this._id, options});
     }

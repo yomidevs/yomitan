@@ -18,6 +18,7 @@
 
 /* global
  * TextScanner
+ * apiForward
  * apiGetZoom
  * apiKanjiFind
  * apiOptionsGet
@@ -53,7 +54,7 @@ class Frontend extends TextScanner {
 
         this._runtimeMessageHandlers = new Map([
             ['popupSetVisibleOverride', ({visible}) => { this.popup.setVisibleOverride(visible); }],
-            ['rootPopupRequestInformationBroadcast', () => { this.popup.broadcastRootPopupInformation(); }]
+            ['rootPopupRequestInformationBroadcast', () => { this._broadcastRootPopupInformation(); }]
         ]);
     }
 
@@ -77,7 +78,7 @@ class Frontend extends TextScanner {
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
 
             this._updateContentScale();
-            this.popup.broadcastRootPopupInformation();
+            this._broadcastRootPopupInformation();
         } catch (e) {
             this.onError(e);
         }
@@ -255,6 +256,12 @@ class Frontend extends TextScanner {
         this._contentScale = contentScale;
         this.popup.setContentScale(this._contentScale);
         this._updatePopupPosition();
+    }
+
+    _broadcastRootPopupInformation() {
+        if (!this.popup.isProxy() && this.popup.depth === 0) {
+            apiForward('rootPopupInformation', {popupId: this.popup.id, frameId: this.popup.frameId});
+        }
     }
 
     async _updatePopupPosition() {

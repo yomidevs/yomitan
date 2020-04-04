@@ -17,7 +17,6 @@
  */
 
 /* global
- * apiForward
  * apiGetMessageToken
  * apiInjectStylesheet
  */
@@ -69,6 +68,10 @@ class Popup {
         return this._depth;
     }
 
+    get frameId() {
+        return this._frameId;
+    }
+
     get url() {
         return window.location.href;
     }
@@ -77,12 +80,6 @@ class Popup {
 
     isProxy() {
         return false;
-    }
-
-    broadcastRootPopupInformation() {
-        if (this._depth === 0) {
-            apiForward('rootPopupInformation', {popupId: this._id, frameId: this._frameId});
-        }
     }
 
     async setOptions(options) {
