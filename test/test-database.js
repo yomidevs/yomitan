@@ -27,7 +27,8 @@ require('fake-indexeddb/auto');
 const chrome = {
     runtime: {
         onMessage: {
-            addListener() { /* NOP */ }
+            addListener() { /* NOP */ },
+            removeListener() { /* NOP */ }
         },
         getURL(path2) {
             return url.pathToFileURL(path.join(__dirname, '..', 'ext', path2.replace(/^\//, '')));
