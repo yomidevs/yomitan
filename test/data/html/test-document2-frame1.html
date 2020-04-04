@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Yomichan Tests</title>
+        <script src="test-document2-script.js"></script>
+        <style>
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    padding: 0;
+    margin: 0;
+    background-color: #f8f8f8;
+}
+a, a:visited {
+    color: #1080c0;
+    text-decoration: underline;
+}
+.content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0.5em;
+    background-color: #f8f8f8;
+}
+        </style>
+    </head>
+<body><div class="content">
+<div>
+    ありがとう
+</div>
+<div>
+    <a href="#" id="fullscreen-link">Toggle fullscreen</a>
+    <script>
+document.querySelector('#fullscreen-link').addEventListener('click', () => toggleFullscreen(document.body), false);
+    </script>
+</div>
+</div></body>
+</html>
