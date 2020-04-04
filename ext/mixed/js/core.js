@@ -331,14 +331,15 @@ const yomichan = (() => {
                     if (timeout !== null) {
                         timeoutId = window.setTimeout(() => {
                             timeoutId = null;
-                            reject(new Error(`Listener timed out in ${timeout} ms`));
                             eventHandler.removeListener(runtimeMessageCallback);
+                            reject(new Error(`Listener timed out in ${timeout} ms`));
                         }, timeout);
                     }
 
                     const cleanupResolve = (value) => {
                         if (timeoutId !== null) {
                             window.clearTimeout(timeoutId);
+                            timeoutId = null;
                         }
                         eventHandler.removeListener(runtimeMessageCallback);
                         sendResponse();
