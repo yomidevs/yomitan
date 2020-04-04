@@ -325,34 +325,37 @@ const yomichan = (() => {
                 reject = _reject;
             });
 
-            if (eventHandler === chrome.runtime.onMessage) {
-                const runtimeMessageCallback = ({action, params}, sender, sendResponse) => {
-                    let timeoutId = null;
-                    if (timeout !== null) {
-                        timeoutId = window.setTimeout(() => {
-                            timeoutId = null;
-                            eventHandler.removeListener(runtimeMessageCallback);
-                            reject(new Error(`Listener timed out in ${timeout} ms`));
-                        }, timeout);
-                    }
-
-                    const cleanupResolve = (value) => {
-                        if (timeoutId !== null) {
-                            window.clearTimeout(timeoutId);
-                            timeoutId = null;
-                        }
-                        eventHandler.removeListener(runtimeMessageCallback);
-                        sendResponse();
-                        resolve(value);
-                    };
-
-                    userCallback({action, params}, {resolve: cleanupResolve, sender});
-                };
-
-                eventHandler.addListener(runtimeMessageCallback);
-            } else {
+            if (
+                typeof eventHandler.addListener === 'undefined' ||
+                typeof eventHandler.removeListener === 'undefined'
+            ) {
                 throw new Error('Event handler type not supported');
             }
+
+            const runtimeMessageCallback = ({action, params}, sender, sendResponse) => {
+                let timeoutId = null;
+                if (timeout !== null) {
+                    timeoutId = window.setTimeout(() => {
+                        timeoutId = null;
+                        eventHandler.removeListener(runtimeMessageCallback);
+                        reject(new Error(`Listener timed out in ${timeout} ms`));
+                    }, timeout);
+                }
+
+                const cleanupResolve = (value) => {
+                    if (timeoutId !== null) {
+                        window.clearTimeout(timeoutId);
+                        timeoutId = null;
+                    }
+                    eventHandler.removeListener(runtimeMessageCallback);
+                    sendResponse();
+                    resolve(value);
+                };
+
+                userCallback({action, params}, {resolve: cleanupResolve, sender});
+            };
+
+            eventHandler.addListener(runtimeMessageCallback);
 
             return listenerPromise;
         }
