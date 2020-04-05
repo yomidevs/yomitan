@@ -23,9 +23,11 @@ const vm = new VM();
 vm.execute([
     'mixed/lib/wanakana.min.js',
     'mixed/js/japanese.js',
+    'bg/js/text-source-map.js',
     'bg/js/japanese.js'
 ]);
 const jp = vm.get('jp');
+const TextSourceMap = vm.get('TextSourceMap');
 
 
 function testIsCodePointKanji() {
@@ -262,13 +264,13 @@ function testConvertHalfWidthKanaToFullWidth() {
     ];
 
     for (const [string, expected, expectedSourceMapping] of data) {
-        const sourceMapping = new Array(string.length).fill(1);
+        const sourceMap = new TextSourceMap(string);
         const actual1 = jp.convertHalfWidthKanaToFullWidth(string, null);
-        const actual2 = jp.convertHalfWidthKanaToFullWidth(string, sourceMapping);
+        const actual2 = jp.convertHalfWidthKanaToFullWidth(string, sourceMap);
         assert.strictEqual(actual1, expected);
         assert.strictEqual(actual2, expected);
-        if (Array.isArray(expectedSourceMapping)) {
-            vm.assert.deepStrictEqual(sourceMapping, expectedSourceMapping);
+        if (typeof expectedSourceMapping !== 'undefined') {
+            assert.ok(sourceMap.equals(new TextSourceMap(string, expectedSourceMapping)));
         }
     }
 }
@@ -285,13 +287,13 @@ function testConvertAlphabeticToKana() {
     ];
 
     for (const [string, expected, expectedSourceMapping] of data) {
-        const sourceMapping = new Array(string.length).fill(1);
+        const sourceMap = new TextSourceMap(string);
         const actual1 = jp.convertAlphabeticToKana(string, null);
-        const actual2 = jp.convertAlphabeticToKana(string, sourceMapping);
+        const actual2 = jp.convertAlphabeticToKana(string, sourceMap);
         assert.strictEqual(actual1, expected);
         assert.strictEqual(actual2, expected);
-        if (Array.isArray(expectedSourceMapping)) {
-            vm.assert.deepStrictEqual(sourceMapping, expectedSourceMapping);
+        if (typeof expectedSourceMapping !== 'undefined') {
+            assert.ok(sourceMap.equals(new TextSourceMap(string, expectedSourceMapping)));
         }
     }
 }

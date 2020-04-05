@@ -158,9 +158,8 @@
         return result;
     }
 
-    function convertHalfWidthKanaToFullWidth(text, sourceMapping) {
+    function convertHalfWidthKanaToFullWidth(text, sourceMap=null) {
         let result = '';
-        const hasSourceMapping = Array.isArray(sourceMapping);
 
         // This function is safe to use charCodeAt instead of codePointAt, since all
         // the relevant characters are represented with a single UTF-16 character code.
@@ -192,10 +191,8 @@
                 }
             }
 
-            if (hasSourceMapping && index > 0) {
-                index = result.length;
-                const v = sourceMapping.splice(index + 1, 1)[0];
-                sourceMapping[index] += v;
+            if (sourceMap !== null && index > 0) {
+                sourceMap.combine(result.length, 1);
             }
             result += c2;
         }
@@ -203,7 +200,7 @@
         return result;
     }
 
-    function convertAlphabeticToKana(text, sourceMapping) {
+    function convertAlphabeticToKana(text, sourceMap=null) {
         let part = '';
         let result = '';
 
@@ -222,7 +219,7 @@
                 c = 0x2d; // '-'
             } else {
                 if (part.length > 0) {
-                    result += convertAlphabeticPartToKana(part, sourceMapping, result.length);
+                    result += convertAlphabeticPartToKana(part, sourceMap, result.length);
                     part = '';
                 }
                 result += char;
@@ -232,17 +229,16 @@
         }
 
         if (part.length > 0) {
-            result += convertAlphabeticPartToKana(part, sourceMapping, result.length);
+            result += convertAlphabeticPartToKana(part, sourceMap, result.length);
         }
         return result;
     }
 
-    function convertAlphabeticPartToKana(text, sourceMapping, sourceMappingStart) {
+    function convertAlphabeticPartToKana(text, sourceMap, sourceMapStart) {
         const result = wanakana.toHiragana(text);
 
         // Generate source mapping
-        if (Array.isArray(sourceMapping)) {
-            if (typeof sourceMappingStart !== 'number') { sourceMappingStart = 0; }
+        if (sourceMap !== null) {
             let i = 0;
             let resultPos = 0;
             const ii = text.length;
@@ -262,18 +258,15 @@
                 // Merge characters
                 const removals = iNext - i - 1;
                 if (removals > 0) {
-                    let sum = 0;
-                    const vs = sourceMapping.splice(sourceMappingStart + 1, removals);
-                    for (const v of vs) { sum += v; }
-                    sourceMapping[sourceMappingStart] += sum;
+                    sourceMap.combine(sourceMapStart, removals);
                 }
-                ++sourceMappingStart;
+                ++sourceMapStart;
 
                 // Empty elements
                 const additions = resultPosNext - resultPos - 1;
                 for (let j = 0; j < additions; ++j) {
-                    sourceMapping.splice(sourceMappingStart, 0, 0);
-                    ++sourceMappingStart;
+                    sourceMap.insert(sourceMapStart, 0);
+                    ++sourceMapStart;
                 }
 
                 i = iNext;

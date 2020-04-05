@@ -19,6 +19,7 @@
 /* global
  * Database
  * Deinflector
+ * TextSourceMap
  * dictEnabledSet
  * dictTagBuildSource
  * dictTagSanitize
@@ -367,17 +368,15 @@ class Translator {
         const used = new Set();
         for (const [halfWidth, numeric, alphabetic, katakana, hiragana] of Translator.getArrayVariants(textOptionVariantArray)) {
             let text2 = text;
-            let sourceMapping = null;
+            const sourceMap = new TextSourceMap(text2);
             if (halfWidth) {
-                if (sourceMapping === null) { sourceMapping = Translator.createTextSourceMapping(text2); }
-                text2 = jp.convertHalfWidthKanaToFullWidth(text2, sourceMapping);
+                text2 = jp.convertHalfWidthKanaToFullWidth(text2, sourceMap);
             }
             if (numeric) {
                 text2 = jp.convertNumericToFullWidth(text2);
             }
             if (alphabetic) {
-                if (sourceMapping === null) { sourceMapping = Translator.createTextSourceMapping(text2); }
-                text2 = jp.convertAlphabeticToKana(text2, sourceMapping);
+                text2 = jp.convertAlphabeticToKana(text2, sourceMap);
             }
             if (katakana) {
                 text2 = jp.convertHiraganaToKatakana(text2);
@@ -391,7 +390,7 @@ class Translator {
                 if (used.has(text2Substring)) { break; }
                 used.add(text2Substring);
                 for (const deinflection of this.deinflector.deinflect(text2Substring)) {
-                    deinflection.rawSource = Translator.getDeinflectionRawSource(text, i, sourceMapping);
+                    deinflection.rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
                     deinflections.push(deinflection);
                 }
             }
@@ -405,25 +404,6 @@ class Translator {
             case 'variant': return [false, true];
             default: return [false];
         }
-    }
-
-    static getDeinflectionRawSource(source, length, sourceMapping) {
-        if (sourceMapping === null) {
-            return source.substring(0, length);
-        }
-
-        let result = '';
-        let index = 0;
-        for (let i = 0; i < length; ++i) {
-            const c = sourceMapping[i];
-            result += source.substring(index, index + c);
-            index += c;
-        }
-        return result;
-    }
-
-    static createTextSourceMapping(text) {
-        return new Array(text.length).fill(1);
     }
 
     async findKanji(text, options) {
