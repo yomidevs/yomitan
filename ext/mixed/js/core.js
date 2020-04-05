@@ -319,7 +319,7 @@ const yomichan = (() => {
 
         getTemporaryListenerResult(eventHandler, userCallback, timeout=null) {
             if (!(
-                typeof eventHandler.addListener === 'function' ||
+                typeof eventHandler.addListener === 'function' &&
                 typeof eventHandler.removeListener === 'function'
             )) {
                 throw new Error('Event handler type not supported');
