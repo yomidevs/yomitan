@@ -107,8 +107,10 @@ vm.execute([
     'bg/js/dictionary.js',
     'mixed/js/core.js',
     'bg/js/request.js',
+    'bg/js/dictionary-importer.js',
     'bg/js/database.js'
 ]);
+const DictionaryImporter = vm.get('DictionaryImporter');
 const Database = vm.get('Database');
 
 
@@ -196,6 +198,7 @@ async function testDatabase1() {
     ];
 
     // Setup database
+    const dictionaryImporter = new DictionaryImporter();
     const database = new Database();
     await database.prepare();
 
@@ -210,7 +213,8 @@ async function testDatabase1() {
 
         // Import data
         let progressEvent = false;
-        const {result, errors} = await database.importDictionary(
+        const {result, errors} = await dictionaryImporter.import(
+            database,
             testDictionarySource,
             () => {
                 progressEvent = true;
@@ -848,6 +852,7 @@ async function testDatabase2() {
     ]);
 
     // Setup database
+    const dictionaryImporter = new DictionaryImporter();
     const database = new Database();
 
     // Error: not prepared
@@ -863,17 +868,17 @@ async function testDatabase2() {
     await assert.rejects(async () => await database.findTagForTitle('tag', title));
     await assert.rejects(async () => await database.getDictionaryInfo());
     await assert.rejects(async () => await database.getDictionaryCounts(titles, true));
-    await assert.rejects(async () => await database.importDictionary(testDictionarySource, () => {}, {}));
+    await assert.rejects(async () => await dictionaryImporter.import(database, testDictionarySource, () => {}, {}));
 
     await database.prepare();
 
     // Error: already prepared
     await assert.rejects(async () => await database.prepare());
 
-    await database.importDictionary(testDictionarySource, () => {}, {});
+    await dictionaryImporter.import(database, testDictionarySource, () => {}, {});
 
     // Error: dictionary already imported
-    await assert.rejects(async () => await database.importDictionary(testDictionarySource, () => {}, {}));
+    await assert.rejects(async () => await dictionaryImporter.import(database, testDictionarySource, () => {}, {}));
 
     await database.close();
 }
@@ -890,6 +895,7 @@ async function testDatabase3() {
     ];
 
     // Setup database
+    const dictionaryImporter = new DictionaryImporter();
     const database = new Database();
     await database.prepare();
 
@@ -899,7 +905,7 @@ async function testDatabase3() {
 
         let error = null;
         try {
-            await database.importDictionary(testDictionarySource, () => {}, {});
+            await dictionaryImporter.import(database, testDictionarySource, () => {}, {});
         } catch (e) {
             error = e;
         }
