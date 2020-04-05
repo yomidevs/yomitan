@@ -57,14 +57,14 @@ document.querySelector('#fullscreen-link1').addEventListener('click', () => togg
 
     <div class="test">
         <div class="description">&lt;iframe&gt; element.</div>
-        <iframe src="test-document2-frame1.html" style="width: 100%; height: 200px; border: 1px solid #d8d8d8;"></iframe>
+        <iframe src="test-document2-frame1.html" allowfullscreen="true" style="width: 100%; height: 200px; border: 1px solid #d8d8d8;"></iframe>
     </div>
 
     <div class="test">
         <div class="description">&lt;iframe&gt; element inside of a shadow DOM.</div>
         <div id="shadow-iframe-container"></div>
         <template id="shadow-iframe-container-content-template">
-            <iframe src="test-document2-frame1.html" style="width: 100%; height: 200px; border: 1px solid #d8d8d8;"></iframe>
+            <iframe src="test-document2-frame1.html" allowfullscreen="true" style="width: 100%; height: 200px; border: 1px solid #d8d8d8;"></iframe>
         </template>
         <script>
 (() => {
