@@ -643,9 +643,9 @@ async function onDictionaryImport(e) {
             await settingsSaveOptions();
 
             if (errors.length > 0) {
-                errors.push(...errors);
-                errors.push(`Dictionary may not have been imported properly: ${errors.length} error${errors.length === 1 ? '' : 's'} reported.`);
-                dictionaryErrorsShow(errors);
+                const errors2 = errors.map((error) => jsonToError(error));
+                errors2.push(`Dictionary may not have been imported properly: ${errors2.length} error${errors2.length === 1 ? '' : 's'} reported.`);
+                dictionaryErrorsShow(errors2);
             }
 
             onDatabaseUpdated();
