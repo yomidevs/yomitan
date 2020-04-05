@@ -505,7 +505,7 @@ function dictionaryErrorsShow(errors) {
     if (errors !== null && errors.length > 0) {
         const uniqueErrors = new Map();
         for (let e of errors) {
-            console.error(e);
+            logError(e);
             e = dictionaryErrorToString(e);
             let count = uniqueErrors.get(e);
             if (typeof count === 'undefined') {
