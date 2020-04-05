@@ -106,6 +106,7 @@
         },
         {
             "files": ["test/**/*.js"],
+            "excludedFiles": ["test/data/html/*.js"],
             "parserOptions": {
                 "ecmaVersion": 8,
                 "sourceType": "module"

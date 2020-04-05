@@ -7,11 +7,25 @@ body {
     margin: 0 auto;
     background-color: #f8f8f8;
     counter-reset: test-id;
+    overflow-y: scroll;
 }
 
 h1 {
     font-size: 2em;
     margin: 0.67em 0;
+}
+
+p {
+    margin: 0.33em 0;
+}
+
+h1+p {
+    margin-top: -0.67em;
+}
+
+a, a:visited {
+    color: #1080c0;
+    text-decoration: underline;
 }
 
 .test {
@@ -29,4 +43,9 @@ h1 {
     margin-bottom: 0.5em;
     border-bottom: 1px solid #d8d8d8;
     font-weight: bold;
+}
+
+.description {
+    color: #444444;
+    font-style: italic;
 }
