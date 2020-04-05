@@ -87,6 +87,7 @@ async function formRead(options) {
     options.general.showPitchAccentDownstepNotation = $('#show-pitch-accent-downstep-notation').prop('checked');
     options.general.showPitchAccentPositionNotation = $('#show-pitch-accent-position-notation').prop('checked');
     options.general.showPitchAccentGraph = $('#show-pitch-accent-graph').prop('checked');
+    options.general.showIframePopupsInRootFrame = $('#show-iframe-popups-in-root-frame').prop('checked');
     options.general.popupTheme = $('#popup-theme').val();
     options.general.popupOuterTheme = $('#popup-outer-theme').val();
     options.general.customPopupCss = $('#custom-popup-css').val();
@@ -167,6 +168,7 @@ async function formWrite(options) {
     $('#show-pitch-accent-downstep-notation').prop('checked', options.general.showPitchAccentDownstepNotation);
     $('#show-pitch-accent-position-notation').prop('checked', options.general.showPitchAccentPositionNotation);
     $('#show-pitch-accent-graph').prop('checked', options.general.showPitchAccentGraph);
+    $('#show-iframe-popups-in-root-frame').prop('checked', options.general.showIframePopupsInRootFrame);
     $('#popup-theme').val(options.general.popupTheme);
     $('#popup-outer-theme').val(options.general.popupOuterTheme);
     $('#custom-popup-css').val(options.general.customPopupCss);

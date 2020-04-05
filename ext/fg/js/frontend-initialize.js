@@ -17,9 +17,12 @@
  */
 
 /* global
+ * FrameOffsetForwarder
  * Frontend
  * PopupProxy
  * PopupProxyHost
+ * apiForward
+ * apiOptionsGet
  */
 
 async function main() {
@@ -28,10 +31,35 @@ async function main() {
     const data = window.frontendInitializationData || {};
     const {id, depth=0, parentFrameId, url, proxy=false} = data;
 
+    const optionsContext = {depth, url};
+    const options = await apiOptionsGet(optionsContext);
+
     let popup;
-    if (proxy) {
+    if (!proxy && (window !== window.parent) && options.general.showIframePopupsInRootFrame) {
+        const rootPopupInformationPromise = yomichan.getTemporaryListenerResult(
+            chrome.runtime.onMessage,
+            ({action, params}, {resolve}) => {
+                if (action === 'rootPopupInformation') {
+                    resolve(params);
+                }
+            }
+        );
+        apiForward('rootPopupRequestInformationBroadcast');
+        const {popupId, frameId} = await rootPopupInformationPromise;
+
+        const frameOffsetForwarder = new FrameOffsetForwarder();
+        frameOffsetForwarder.start();
+        const getFrameOffset = frameOffsetForwarder.getOffset.bind(frameOffsetForwarder);
+
+        popup = new PopupProxy(popupId, 0, null, frameId, url, getFrameOffset);
+        await popup.prepare();
+    } else if (proxy) {
         popup = new PopupProxy(null, depth + 1, id, parentFrameId, url);
+        await popup.prepare();
     } else {
+        const frameOffsetForwarder = new FrameOffsetForwarder();
+        frameOffsetForwarder.start();
+
         const popupHost = new PopupProxyHost();
         await popupHost.prepare();
 

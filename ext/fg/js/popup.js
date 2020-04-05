@@ -22,11 +22,10 @@
  */
 
 class Popup {
-    constructor(id, depth, frameIdPromise) {
+    constructor(id, depth, frameId) {
         this._id = id;
         this._depth = depth;
-        this._frameIdPromise = frameIdPromise;
-        this._frameId = null;
+        this._frameId = frameId;
         this._parent = null;
         this._child = null;
         this._childrenSupported = true;
@@ -67,6 +66,10 @@ class Popup {
 
     get depth() {
         return this._depth;
+    }
+
+    get frameId() {
+        return this._frameId;
     }
 
     get url() {
@@ -193,40 +196,42 @@ class Popup {
     }
 
     async _createInjectPromise() {
-        try {
-            const {frameId} = await this._frameIdPromise;
-            if (typeof frameId === 'number') {
-                this._frameId = frameId;
-            }
-        } catch (e) {
-            // NOP
-        }
-
         if (this._messageToken === null) {
             this._messageToken = await apiGetMessageToken();
         }
 
-        return new Promise((resolve) => {
-            const parentFrameId = (typeof this._frameId === 'number' ? this._frameId : null);
-            this._container.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
-            this._container.addEventListener('load', () => {
-                this._listenForDisplayPrepareCompleted(resolve);
+        const popupPreparedPromise = yomichan.getTemporaryListenerResult(
+            chrome.runtime.onMessage,
+            ({action, params}, {resolve}) => {
+                if (
+                    action === 'popupPrepareCompleted' &&
+                    isObject(params) &&
+                    params.targetPopupId === this._id
+                ) {
+                    resolve();
+                }
+            }
+        );
 
-                this._invokeApi('prepare', {
-                    popupInfo: {
-                        id: this._id,
-                        depth: this._depth,
-                        parentFrameId
-                    },
-                    url: this.url,
-                    childrenSupported: this._childrenSupported,
-                    scale: this._contentScale
-                });
+        const parentFrameId = (typeof this._frameId === 'number' ? this._frameId : null);
+        this._container.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
+        this._container.addEventListener('load', () => {
+            this._invokeApi('prepare', {
+                popupInfo: {
+                    id: this._id,
+                    depth: this._depth,
+                    parentFrameId
+                },
+                url: this.url,
+                childrenSupported: this._childrenSupported,
+                scale: this._contentScale
             });
-            this._observeFullscreen(true);
-            this._onFullscreenChanged();
-            this._injectStyles();
         });
+        this._observeFullscreen(true);
+        this._onFullscreenChanged();
+        this._injectStyles();
+
+        return popupPreparedPromise;
     }
 
     async _injectStyles() {
@@ -359,22 +364,6 @@ class Popup {
         if (token === null || contentWindow === null) { return; }
 
         contentWindow.postMessage({action, params, token}, this._targetOrigin);
-    }
-
-    _listenForDisplayPrepareCompleted(resolve) {
-        const runtimeMessageCallback = ({action, params}, sender, callback) => {
-            if (
-                action === 'popupPrepareCompleted' &&
-                isObject(params) &&
-                params.targetPopupId === this._id
-            ) {
-                chrome.runtime.onMessage.removeListener(runtimeMessageCallback);
-                callback();
-                resolve();
-                return false;
-            }
-        };
-        chrome.runtime.onMessage.addListener(runtimeMessageCallback);
     }
 
     static _getFullscreenElement() {
