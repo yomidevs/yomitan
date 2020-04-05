@@ -132,24 +132,26 @@ class PopupProxy {
         }
 
         this._frameOffsetPromise = this._getFrameOffset();
+
+        const handleOffset = (offset) => {
+            this._frameOffset = offset !== null ? offset : [0, 0];
+            this._frameOffsetUpdatedAt = Date.now();
+            this._frameOffsetPromise = null;
+        };
+
+        const handleError = (e) => {
+            console.error(e);
+            this._frameOffsetPromise = null;
+        };
+
         if (firstRun) {
             try {
-                const offset = await this._frameOffsetPromise;
-                this._frameOffset = offset !== null ? offset : [0, 0];
-                this._frameOffsetUpdatedAt = Date.now();
+                handleOffset(await this._frameOffsetPromise);
             } catch (e) {
-                console.error(e);
+                handleError(e);
             }
-            this._frameOffsetPromise = null;
         } else {
-            this._frameOffsetPromise.then((offset) => {
-                this._frameOffset = offset !== null ? offset : [0, 0];
-                this._frameOffsetUpdatedAt = Date.now();
-                this._frameOffsetPromise = null;
-            }, (e) => {
-                console.error(e);
-                this._frameOffsetPromise = null;
-            });
+            this._frameOffsetPromise.then(handleOffset, handleError);
         }
     }
 
