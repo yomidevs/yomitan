@@ -385,6 +385,9 @@ class Display {
         data.audioEnabled = `${options.audio.enabled}`;
         data.compactGlossaries = `${options.general.compactGlossaries}`;
         data.enableSearchTags = `${options.scanning.enableSearchTags}`;
+        data.showPitchAccentDownstepNotation = `${options.general.showPitchAccentDownstepNotation}`;
+        data.showPitchAccentPositionNotation = `${options.general.showPitchAccentPositionNotation}`;
+        data.showPitchAccentGraph = `${options.general.showPitchAccentGraph}`;
         data.debug = `${options.general.debugInfo}`;
     }
 

@@ -87,6 +87,8 @@
                 "stringReverse": "readonly",
                 "promiseTimeout": "readonly",
                 "parseUrl": "readonly",
+                "areSetsEqual": "readonly",
+                "getSetIntersection": "readonly",
                 "EventDispatcher": "readonly",
                 "EventListenerCollection": "readonly",
                 "EXTENSION_IS_BROWSER_EDGE": "readonly"

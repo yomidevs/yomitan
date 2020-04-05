@@ -65,6 +65,14 @@ ol, ul {
     height: 2.28571428em; /* 14px => 32px */
 }
 
+h2 {
+    font-size: 1.25em;
+    font-weight: normal;
+    margin: 0.25em 0 0;
+    border-bottom-width: 0.05714285714285714em; /* 14px * 1.25em => 1px */
+    border-bottom-style: solid;
+}
+
 /*
  * Navigation
  */
@@ -302,6 +310,7 @@ button.action-button {
     width: 0;
     height: 0;
     visibility: hidden;
+    z-index: 1;
 }
 
 .term-expression-list[data-multi=true] .term-expression:hover .term-expression-details {
@@ -420,6 +429,187 @@ button.action-button {
 
 .term-special-tags>.frequencies {
     display: inline;
+}
+
+.term-entry-body[data-section-count="0"] .term-entry-body-section-header,
+.term-entry-body[data-section-count="1"] .term-entry-body-section-header {
+    display: none;
+}
+
+
+/*
+ * Pitch accent styles
+ */
+
+.entry[data-pitch-accent-count='0'] .term-pitch-accent-container {
+    display: none;
+}
+
+.term-pitch-accent-container {
+    border-bottom-width: 0.05714285714285714em; /* 14px * 1.25em => 1px */
+    border-bottom-style: solid;
+    padding-bottom: 0.25em;
+    margin-bottom: 0.25em;
+}
+
+.term-pitch-accent-group-list {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.term-pitch-accent-group-list:not([data-count="0"]):not([data-count="1"]) {
+    padding-left: 1.4em;
+    list-style-type: decimal;
+}
+
+.term-pitch-accent-list {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    display: inline;
+}
+
+.term-pitch-accent-list:not([data-count="0"]):not([data-count="1"]) {
+    padding-left: 1.4em;
+    list-style-type: circle;
+    display: block;
+}
+
+.term-pitch-accent {
+    display: inline;
+    line-height: 1.5em;
+}
+
+.term-pitch-accent-list:not([data-count="0"]):not([data-count="1"])>.term-pitch-accent {
+    display: list-item;
+}
+
+.term-pitch-accent-group-tag-list {
+    margin-right: 0.375em;
+}
+
+.term-pitch-accent-disambiguation-list {
+    padding-right: 0.25em;
+}
+
+.term-pitch-accent-disambiguation-list:before {
+    content: "(";
+}
+
+.term-pitch-accent-disambiguation-list:after {
+    content: " only)";
+}
+
+.term-pitch-accent-disambiguation+.term-pitch-accent-disambiguation:before {
+    content: ", ";
+}
+
+.term-pitch-accent-disambiguation-list[data-count="0"],
+:root[data-show-pitch-accent-downstep-notation=true] .term-pitch-accent-disambiguation-list[data-expression-count="0"],
+:root[data-show-pitch-accent-downstep-notation=true] .term-pitch-accent-disambiguation[data-type=reading] {
+    display: none;
+}
+
+.term-pitch-accent-tag-list:not([data-count="0"]) {
+    margin-right: 0.375em;
+}
+
+.term-special-tags>.pitches {
+    display: inline;
+}
+
+.term-pitch-accent-character {
+    display: inline-block;
+    position: relative;
+}
+.term-pitch-accent-character[data-pitch='high']:before {
+    content: "";
+    display: block;
+    user-select: none;
+    pointer-events: none;
+    position: absolute;
+    top: 0.1em;
+    left: 0;
+    right: 0;
+    height: 0;
+    border-top-width: 0.1em;
+    border-top-style: solid;
+}
+.term-pitch-accent-character[data-pitch='high'][data-pitch-next='low']:before {
+    right: -0.1em;
+    height: 0.4em;
+    border-right-width: 0.1em;
+    border-right-style: solid;
+}
+.term-pitch-accent-character[data-pitch='high'][data-pitch-next='low'] {
+    padding-right: 0.1em;
+    margin-right: 0.1em;
+}
+
+.term-pitch-accent-position:before {
+    content: " [";
+}
+.term-pitch-accent-position:after {
+    content: "]";
+}
+
+.term-pitch-accent-details {
+    display: inline-block;
+    height: 0;
+    padding: 0 0.25em;
+    vertical-align: middle;
+}
+
+
+:root[data-show-pitch-accent-downstep-notation=false] .term-pitch-accent-characters {
+    display: none;
+}
+
+:root[data-show-pitch-accent-position-notation=false] .term-pitch-accent-position {
+    display: none;
+}
+
+:root[data-show-pitch-accent-graph=false] .term-pitch-accent-details {
+    display: none;
+}
+
+
+/*
+ * Pitch accent graph styles
+ */
+
+.term-pitch-accent-graph {
+    display: block;
+    height: 1.5em;
+    transform: translateY(-0.875em);
+}
+.term-pitch-accent-graph-line,
+.term-pitch-accent-graph-line-tail {
+    fill: none;
+    stroke: #000000;
+    stroke-width: 5;
+}
+.term-pitch-accent-graph-line-tail {
+    stroke-dasharray: 5 5;
+}
+#term-pitch-accent-graph-dot {
+    fill: #000000;
+    stroke: #000000;
+    stroke-width: 5;
+}
+#term-pitch-accent-graph-dot-downstep {
+    fill: none;
+    stroke: #000000;
+    stroke-width: 5;
+}
+#term-pitch-accent-graph-dot-downstep>circle:last-of-type {
+    fill: #000000;
+}
+#term-pitch-accent-graph-triangle {
+    fill: none;
+    stroke: #000000;
+    stroke-width: 5;
 }
 
 

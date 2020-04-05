@@ -13,12 +13,70 @@
             },
             {
                 "type": "string",
-                "enum": ["freq"],
-                "description": "Type of data. \"freq\" corresponds to frequency information."
+                "enum": ["freq", "pitch"],
+                "description": "Type of data. \"freq\" corresponds to frequency information; \"pitch\" corresponds to pitch information."
             },
             {
-                "type": ["string", "number"],
                 "description": "Data for the term/expression."
+            }
+        ],
+        "oneOf": [
+            {
+                "items": [
+                    {},
+                    {"enum": ["freq"]},
+                    {
+                        "type": ["string", "number"],
+                        "description": "Frequency information for the term or expression."
+                    }
+                ]
+            },
+            {
+                "items": [
+                    {},
+                    {"enum": ["pitch"]},
+                    {
+                        "type": ["object"],
+                        "description": "Pitch accent information for the term or expression.",
+                        "required": [
+                            "reading",
+                            "pitches"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "reading": {
+                                "type": "string",
+                                "description": "Reading for the term or expression."
+                            },
+                            "pitches": {
+                                "type": "array",
+                                "description": "List of different pitch accent information for the term and reading combination.",
+                                "additionalItems": {
+                                    "type": "object",
+                                    "required": [
+                                        "position"
+                                    ],
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "position": {
+                                            "type": "integer",
+                                            "description": "Mora position of the pitch accent downstep. A value of 0 indicates that the word does not have a downstep (heiban).",
+                                            "minimum": 0
+                                        },
+                                        "tags": {
+                                            "type": "array",
+                                            "description": "List of tags for this pitch accent.",
+                                            "items": {
+                                                "type": "string",
+                                                "description": "Tag for this pitch accent. This typically corresponds to a certain type of part of speech."
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
             }
         ]
     }

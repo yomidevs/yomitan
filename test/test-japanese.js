@@ -392,6 +392,59 @@ function testDistributeFuriganaInflected() {
     }
 }
 
+function testIsMoraPitchHigh() {
+    const data = [
+        [[0, 0], false],
+        [[1, 0], true],
+        [[2, 0], true],
+        [[3, 0], true],
+
+        [[0, 1], true],
+        [[1, 1], false],
+        [[2, 1], false],
+        [[3, 1], false],
+
+        [[0, 2], true],
+        [[1, 2], true],
+        [[2, 2], false],
+        [[3, 2], false],
+
+        [[0, 3], true],
+        [[1, 3], true],
+        [[2, 3], true],
+        [[3, 3], false],
+
+        [[0, 4], true],
+        [[1, 4], true],
+        [[2, 4], true],
+        [[3, 4], true]
+    ];
+
+    for (const [[moraIndex, pitchAccentPosition], expected] of data) {
+        const actual = jp.isMoraPitchHigh(moraIndex, pitchAccentPosition);
+        assert.strictEqual(actual, expected);
+    }
+}
+
+function testGetKanaMorae() {
+    const data = [
+        ['かこ', ['か', 'こ']],
+        ['かっこ', ['か', 'っ', 'こ']],
+        ['カコ', ['カ', 'コ']],
+        ['カッコ', ['カ', 'ッ', 'コ']],
+        ['コート', ['コ', 'ー', 'ト']],
+        ['ちゃんと', ['ちゃ', 'ん', 'と']],
+        ['とうきょう', ['と', 'う', 'きょ', 'う']],
+        ['ぎゅう', ['ぎゅ', 'う']],
+        ['ディスコ', ['ディ', 'ス', 'コ']]
+    ];
+
+    for (const [text, expected] of data) {
+        const actual = jp.getKanaMorae(text);
+        vm.assert.deepStrictEqual(actual, expected);
+    }
+}
+
 
 function main() {
     testIsCodePointKanji();
@@ -408,6 +461,8 @@ function main() {
     testConvertAlphabeticToKana();
     testDistributeFurigana();
     testDistributeFuriganaInflected();
+    testIsMoraPitchHigh();
+    testGetKanaMorae();
 }
 
 

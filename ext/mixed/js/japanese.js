@@ -64,6 +64,8 @@ const jp = (() => {
         [0xffe0, 0xffee]  // Currency markers
     ];
 
+    const SMALL_KANA_SET = new Set(Array.from('ぁぃぅぇぉゃゅょゎァィゥェォャュョヮ'));
+
 
     // Character code testing functions
 
@@ -112,6 +114,26 @@ const jp = (() => {
     }
 
 
+    // Mora functions
+
+    function isMoraPitchHigh(moraIndex, pitchAccentPosition) {
+        return pitchAccentPosition === 0 ? (moraIndex > 0) : (moraIndex < pitchAccentPosition);
+    }
+
+    function getKanaMorae(text) {
+        const morae = [];
+        let i;
+        for (const c of text) {
+            if (SMALL_KANA_SET.has(c) && (i = morae.length) > 0) {
+                morae[i - 1] += c;
+            } else {
+                morae.push(c);
+            }
+        }
+        return morae;
+    }
+
+
     // Exports
 
     return {
@@ -119,6 +141,8 @@ const jp = (() => {
         isCodePointKana,
         isCodePointJapanese,
         isStringEntirelyKana,
-        isStringPartiallyJapanese
+        isStringPartiallyJapanese,
+        isMoraPitchHigh,
+        getKanaMorae
     };
 })();
