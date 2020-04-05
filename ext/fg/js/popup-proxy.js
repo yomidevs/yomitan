@@ -120,8 +120,9 @@ class PopupProxy {
     }
 
     async _updateFrameOffset() {
+        const now = Date.now();
         const firstRun = this._frameOffsetUpdatedAt === null;
-        const expired = firstRun || this._frameOffsetUpdatedAt < Date.now() - PopupProxy._frameOffsetExpireTimeout;
+        const expired = firstRun || this._frameOffsetUpdatedAt < now - PopupProxy._frameOffsetExpireTimeout;
         if (this._frameOffsetPromise === null && !expired) { return; }
 
         if (this._frameOffsetPromise !== null) {
@@ -131,27 +132,22 @@ class PopupProxy {
             return;
         }
 
-        this._frameOffsetPromise = this._getFrameOffset();
-
-        const handleOffset = (offset) => {
-            this._frameOffset = offset !== null ? offset : [0, 0];
-            this._frameOffsetUpdatedAt = Date.now();
-            this._frameOffsetPromise = null;
-        };
-
-        const handleError = (e) => {
-            console.error(e);
-            this._frameOffsetPromise = null;
-        };
-
+        const promise = this._updateFrameOffsetInner(now);
         if (firstRun) {
-            try {
-                handleOffset(await this._frameOffsetPromise);
-            } catch (e) {
-                handleError(e);
-            }
-        } else {
-            this._frameOffsetPromise.then(handleOffset, handleError);
+            await promise;
+        }
+    }
+
+    async _updateFrameOffsetInner(now) {
+        this._frameOffsetPromise = this._getFrameOffset();
+        try {
+            const offset = await this._frameOffsetPromise;
+            this._frameOffset = offset !== null ? offset : [0, 0];
+            this._frameOffsetUpdatedAt = now;
+        } catch (e) {
+            logError(e);
+        } finally {
+            this._frameOffsetPromise = null;
         }
     }
 
