@@ -150,13 +150,7 @@ class DictionaryImporter {
         }
 
         // Add dictionary
-        const summary = {
-            title: dictionaryTitle,
-            revision: index.revision,
-            sequenced: index.sequenced,
-            version,
-            prefixWildcardsSupported
-        };
+        const summary = this._createSummary(dictionaryTitle, version, index, {prefixWildcardsSupported});
 
         database.bulkAdd('dictionaries', [summary], 0, 1);
 
@@ -197,6 +191,25 @@ class DictionaryImporter {
         await bulkAdd('tagMeta', tagList);
 
         return {result: summary, errors};
+    }
+
+    _createSummary(dictionaryTitle, version, index, details) {
+        const summary = {
+            title: dictionaryTitle,
+            revision: index.revision,
+            sequenced: index.sequenced,
+            version
+        };
+
+        const {author, url, description, attribution} = index;
+        if (typeof author === 'string') { summary.author = author; }
+        if (typeof url === 'string') { summary.url = url; }
+        if (typeof description === 'string') { summary.description = description; }
+        if (typeof attribution === 'string') { summary.attribution = attribution; }
+
+        Object.assign(summary, details);
+
+        return summary;
     }
 
     async _getSchema(fileName) {
