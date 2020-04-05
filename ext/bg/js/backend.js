@@ -51,12 +51,16 @@ class Backend {
         this.anki = new AnkiNull();
         this.mecab = new Mecab();
         this.clipboardMonitor = new ClipboardMonitor({getClipboard: this._onApiClipboardGet.bind(this)});
-        this.ankiNoteBuilder = new AnkiNoteBuilder({renderTemplate: this._renderTemplate.bind(this)});
         this.options = null;
         this.optionsSchema = null;
         this.defaultAnkiFieldTemplates = null;
         this.audioSystem = new AudioSystem({getAudioUri: this._getAudioUri.bind(this)});
         this.audioUriBuilder = new AudioUriBuilder();
+        this.ankiNoteBuilder = new AnkiNoteBuilder({
+            audioSystem: this.audioSystem,
+            renderTemplate: this._renderTemplate.bind(this)
+        });
+
         this.optionsContext = {
             depth: 0,
             url: window.location.href
@@ -464,7 +468,6 @@ class Backend {
                 definition,
                 options.anki.terms.fields,
                 options.audio.sources,
-                this.audioSystem,
                 optionsContext
             );
         }
