@@ -760,7 +760,8 @@ class Display {
                 }
             }
 
-            const noteId = await apiDefinitionAdd(definition, mode, this._getNoteContext(), details, this.getOptionsContext());
+            const context = await this._getNoteContext();
+            const noteId = await apiDefinitionAdd(definition, mode, context, details, this.getOptionsContext());
             if (noteId) {
                 const index = this.definitions.indexOf(definition);
                 const adderButton = this.adderButtonFind(index, mode);
