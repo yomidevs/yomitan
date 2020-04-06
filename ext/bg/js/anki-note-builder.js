@@ -92,7 +92,7 @@ class AnkiNoteBuilder {
             const expressions = definition.expressions;
             const audioSourceDefinition = Array.isArray(expressions) ? expressions[0] : definition;
 
-            const {uri} = await this.audioSystem.getDefinitionAudio(audioSourceDefinition, sources, {tts: false, optionsContext});
+            const {uri} = await this._audioSystem.getDefinitionAudio(audioSourceDefinition, sources, {tts: false, optionsContext});
             const filename = this._createInjectedAudioFileName(audioSourceDefinition);
             if (filename !== null) {
                 definition.audio = {url: uri, filename};
