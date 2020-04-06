@@ -162,6 +162,33 @@ class DisplayFloat extends Display {
     setContentScale(scale) {
         document.body.style.fontSize = `${scale}em`;
     }
+
+    async getDocumentTitle() {
+        try {
+            const uniqueId = yomichan.generateId(16);
+
+            const promise = yomichan.getTemporaryListenerResult(
+                chrome.runtime.onMessage,
+                ({action, params}, {resolve}) => {
+                    if (
+                        action === 'documentInformationBroadcast' &&
+                        isObject(params) &&
+                        params.uniqueId === uniqueId &&
+                        params.frameId === 0
+                    ) {
+                        resolve(params);
+                    }
+                },
+                2000
+            );
+            apiForward('requestDocumentInformationBroadcast', {uniqueId});
+
+            const {title} = await promise;
+            return title;
+        } catch (e) {
+            return '';
+        }
+    }
 }
 
 DisplayFloat.instance = new DisplayFloat();
