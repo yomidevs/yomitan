@@ -78,9 +78,9 @@ class Backend {
 
         this._messageHandlers = new Map([
             ['yomichanCoreReady', {handler: this._onApiYomichanCoreReady.bind(this), async: true}],
-            ['optionsSchemaGet', {handler: this._onApiOptionsSchemaGet.bind(this), async: true}],
-            ['optionsGet', {handler: this._onApiOptionsGet.bind(this), async: true}],
-            ['optionsGetFull', {handler: this._onApiOptionsGetFull.bind(this), async: true}],
+            ['optionsSchemaGet', {handler: this._onApiOptionsSchemaGet.bind(this), async: false}],
+            ['optionsGet', {handler: this._onApiOptionsGet.bind(this), async: false}],
+            ['optionsGetFull', {handler: this._onApiOptionsGetFull.bind(this), async: false}],
             ['optionsSet', {handler: this._onApiOptionsSet.bind(this), async: true}],
             ['optionsSave', {handler: this._onApiOptionsSave.bind(this), async: true}],
             ['kanjiFind', {handler: this._onApiKanjiFind.bind(this), async: true}],
@@ -91,7 +91,7 @@ class Backend {
             ['definitionsAddable', {handler: this._onApiDefinitionsAddable.bind(this), async: true}],
             ['noteView', {handler: this._onApiNoteView.bind(this), async: true}],
             ['templateRender', {handler: this._onApiTemplateRender.bind(this), async: true}],
-            ['commandExec', {handler: this._onApiCommandExec.bind(this), async: true}],
+            ['commandExec', {handler: this._onApiCommandExec.bind(this), async: false}],
             ['audioGetUri', {handler: this._onApiAudioGetUri.bind(this), async: true}],
             ['screenshotGet', {handler: this._onApiScreenshotGet.bind(this), async: true}],
             ['forward', {handler: this._onApiForward.bind(this), async: true}],
@@ -102,8 +102,8 @@ class Backend {
             ['getDisplayTemplatesHtml', {handler: this._onApiGetDisplayTemplatesHtml.bind(this), async: true}],
             ['getQueryParserTemplatesHtml', {handler: this._onApiGetQueryParserTemplatesHtml.bind(this), async: true}],
             ['getZoom', {handler: this._onApiGetZoom.bind(this), async: true}],
-            ['getMessageToken', {handler: this._onApiGetMessageToken.bind(this), async: true}],
-            ['getDefaultAnkiFieldTemplates', {handler: this._onApiGetDefaultAnkiFieldTemplates.bind(this), async: true}]
+            ['getMessageToken', {handler: this._onApiGetMessageToken.bind(this), async: false}],
+            ['getDefaultAnkiFieldTemplates', {handler: this._onApiGetDefaultAnkiFieldTemplates.bind(this), async: false}]
         ]);
 
         this._commandHandlers = new Map([
@@ -332,15 +332,15 @@ class Backend {
         });
     }
 
-    async _onApiOptionsSchemaGet() {
+    _onApiOptionsSchemaGet() {
         return this.getOptionsSchema();
     }
 
-    async _onApiOptionsGet({optionsContext}) {
+    _onApiOptionsGet({optionsContext}) {
         return this.getOptions(optionsContext);
     }
 
-    async _onApiOptionsGetFull() {
+    _onApiOptionsGetFull() {
         return this.getFullOptions();
     }
 
@@ -547,7 +547,7 @@ class Backend {
         return this._renderTemplate(template, data);
     }
 
-    async _onApiCommandExec({command, params}) {
+    _onApiCommandExec({command, params}) {
         return this._runCommand(command, params);
     }
 
@@ -698,11 +698,11 @@ class Backend {
         });
     }
 
-    async _onApiGetMessageToken() {
+    _onApiGetMessageToken() {
         return this.messageToken;
     }
 
-    async _onApiGetDefaultAnkiFieldTemplates() {
+    _onApiGetDefaultAnkiFieldTemplates() {
         return this.defaultAnkiFieldTemplates;
     }
 
