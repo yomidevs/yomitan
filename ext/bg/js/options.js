@@ -91,6 +91,15 @@ const profileOptionsVersionUpdates = [
         if (utilStringHashCode(options.anki.fieldTemplates) === 1444379824) {
             options.anki.fieldTemplates = null;
         }
+    },
+    (options) => {
+        // Version 13 changes:
+        //  Default anki field tempaltes updated to include {document-title}.
+        let fieldTemplates = options.anki.fieldTemplates;
+        if (typeof fieldTemplates === 'string') {
+            fieldTemplates += '\n\n{{#*inline "document-title"}}\n    {{~context.document.title~}}\n{{/inline}}';
+            options.anki.fieldTemplates = fieldTemplates;
+        }
     }
 ];
 

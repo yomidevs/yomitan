@@ -54,7 +54,8 @@ class Frontend extends TextScanner {
 
         this._runtimeMessageHandlers = new Map([
             ['popupSetVisibleOverride', ({visible}) => { this.popup.setVisibleOverride(visible); }],
-            ['rootPopupRequestInformationBroadcast', () => { this._broadcastRootPopupInformation(); }]
+            ['rootPopupRequestInformationBroadcast', () => { this._broadcastRootPopupInformation(); }],
+            ['requestDocumentInformationBroadcast', ({uniqueId}) => { this._broadcastDocumentInformation(uniqueId); }]
         ]);
     }
 
@@ -262,6 +263,14 @@ class Frontend extends TextScanner {
         if (!this.popup.isProxy() && this.popup.depth === 0) {
             apiForward('rootPopupInformation', {popupId: this.popup.id, frameId: this.popup.frameId});
         }
+    }
+
+    _broadcastDocumentInformation(uniqueId) {
+        apiForward('documentInformationBroadcast', {
+            uniqueId,
+            frameId: this.popup.frameId,
+            title: document.title
+        });
     }
 
     async _updatePopupPosition() {

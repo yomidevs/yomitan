@@ -752,15 +752,16 @@ class Display {
         try {
             this.setSpinnerVisible(true);
 
-            const context = {};
+            const details = {};
             if (this.noteUsesScreenshot(mode)) {
                 const screenshot = await this.getScreenshot();
                 if (screenshot) {
-                    context.screenshot = screenshot;
+                    details.screenshot = screenshot;
                 }
             }
 
-            const noteId = await apiDefinitionAdd(definition, mode, context, this.getOptionsContext());
+            const context = await this._getNoteContext();
+            const noteId = await apiDefinitionAdd(definition, mode, context, details, this.getOptionsContext());
             if (noteId) {
                 const index = this.definitions.indexOf(definition);
                 const adderButton = this.adderButtonFind(index, mode);
@@ -908,10 +909,15 @@ class Display {
 
     async getDefinitionsAddable(definitions, modes) {
         try {
-            return await apiDefinitionsAddable(definitions, modes, this.getOptionsContext());
+            const context = await this._getNoteContext();
+            return await apiDefinitionsAddable(definitions, modes, context, this.getOptionsContext());
         } catch (e) {
             return [];
         }
+    }
+
+    async getDocumentTitle() {
+        return document.title;
     }
 
     static indexOf(nodeList, node) {
@@ -932,6 +938,15 @@ class Display {
     static getKeyFromEvent(event) {
         const key = event.key;
         return (typeof key === 'string' ? (key.length === 1 ? key.toUpperCase() : key) : '');
+    }
+
+    async _getNoteContext() {
+        const documentTitle = await this.getDocumentTitle();
+        return {
+            document: {
+                title: documentTitle
+            }
+        };
     }
 
     async _getAudioUri(definition, source) {

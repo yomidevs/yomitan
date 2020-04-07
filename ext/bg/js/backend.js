@@ -455,7 +455,7 @@ class Backend {
         return results;
     }
 
-    async _onApiDefinitionAdd({definition, mode, context, optionsContext}) {
+    async _onApiDefinitionAdd({definition, mode, context, details, optionsContext}) {
         const options = this.getOptions(optionsContext);
         const templates = this.defaultAnkiFieldTemplates;
 
@@ -468,19 +468,19 @@ class Backend {
             );
         }
 
-        if (context && context.screenshot) {
+        if (details && details.screenshot) {
             await this._injectScreenshot(
                 definition,
                 options.anki.terms.fields,
-                context.screenshot
+                details.screenshot
             );
         }
 
-        const note = await this.ankiNoteBuilder.createNote(definition, mode, options, templates);
+        const note = await this.ankiNoteBuilder.createNote(definition, mode, context, options, templates);
         return this.anki.addNote(note);
     }
 
-    async _onApiDefinitionsAddable({definitions, modes, optionsContext}) {
+    async _onApiDefinitionsAddable({definitions, modes, context, optionsContext}) {
         const options = this.getOptions(optionsContext);
         const templates = this.defaultAnkiFieldTemplates;
         const states = [];
@@ -489,7 +489,7 @@ class Backend {
             const notes = [];
             for (const definition of definitions) {
                 for (const mode of modes) {
-                    const note = await this.ankiNoteBuilder.createNote(definition, mode, options, templates);
+                    const note = await this.ankiNoteBuilder.createNote(definition, mode, context, options, templates);
                     notes.push(note);
                 }
             }
