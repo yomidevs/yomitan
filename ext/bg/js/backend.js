@@ -77,7 +77,7 @@ class Backend {
         this.messageToken = yomichan.generateId(16);
 
         this._messageHandlers = new Map([
-            ['yomichanCoreReady', {handler: this._onApiYomichanCoreReady.bind(this), async: true}],
+            ['yomichanCoreReady', {handler: this._onApiYomichanCoreReady.bind(this), async: false}],
             ['optionsSchemaGet', {handler: this._onApiOptionsSchemaGet.bind(this), async: false}],
             ['optionsGet', {handler: this._onApiOptionsGet.bind(this), async: false}],
             ['optionsGetFull', {handler: this._onApiOptionsGetFull.bind(this), async: false}],
@@ -320,16 +320,15 @@ class Backend {
 
     _onApiYomichanCoreReady(_params, sender) {
         // tab ID isn't set in background (e.g. browser_action)
+        const callback = () => this.checkLastError(chrome.runtime.lastError);
+        const data = {action: 'backendPrepared'};
         if (typeof sender.tab === 'undefined') {
-            const callback = () => this.checkLastError(chrome.runtime.lastError);
-            chrome.runtime.sendMessage({action: 'backendPrepared'}, callback);
-            return Promise.resolve();
+            chrome.runtime.sendMessage(data, callback);
+            return false;
+        } else {
+            chrome.tabs.sendMessage(sender.tab.id, data, callback);
+            return true;
         }
-
-        const tabId = sender.tab.id;
-        return new Promise((resolve) => {
-            chrome.tabs.sendMessage(tabId, {action: 'backendPrepared'}, resolve);
-        });
     }
 
     _onApiOptionsSchemaGet() {
