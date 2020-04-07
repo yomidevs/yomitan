@@ -23,9 +23,9 @@
  * DisplayGenerator
  * WindowScroll
  * apiAudioGetUri
+ * apiBroadcast
  * apiDefinitionAdd
  * apiDefinitionsAddable
- * apiForward
  * apiKanjiFind
  * apiNoteView
  * apiOptionsGet
@@ -855,7 +855,7 @@ class Display {
     }
 
     setPopupVisibleOverride(visible) {
-        return apiForward('popupSetVisibleOverride', {visible});
+        return apiBroadcast('popupSetVisibleOverride', {visible});
     }
 
     setSpinnerVisible(visible) {

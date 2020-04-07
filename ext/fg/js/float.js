@@ -18,7 +18,7 @@
 
 /* global
  * Display
- * apiForward
+ * apiBroadcast
  * apiGetMessageToken
  * popupNestedInitialize
  */
@@ -80,7 +80,7 @@ class DisplayFloat extends Display {
 
         this.setContentScale(scale);
 
-        apiForward('popupPrepareCompleted', {targetPopupId: this._popupId});
+        apiBroadcast('popupPrepareCompleted', {targetPopupId: this._popupId});
     }
 
     onError(error) {
@@ -181,7 +181,7 @@ class DisplayFloat extends Display {
                 },
                 2000
             );
-            apiForward('requestDocumentInformationBroadcast', {uniqueId});
+            apiBroadcast('requestDocumentInformationBroadcast', {uniqueId});
 
             const {title} = await promise;
             return title;

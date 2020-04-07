@@ -21,7 +21,7 @@
  * Frontend
  * PopupProxy
  * PopupProxyHost
- * apiForward
+ * apiBroadcast
  * apiOptionsGet
  */
 
@@ -44,7 +44,7 @@ async function main() {
                 }
             }
         );
-        apiForward('rootPopupRequestInformationBroadcast');
+        apiBroadcast('rootPopupRequestInformationBroadcast');
         const {popupId, frameId} = await rootPopupInformationPromise;
 
         const frameOffsetForwarder = new FrameOffsetForwarder();

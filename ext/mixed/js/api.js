@@ -81,8 +81,8 @@ function apiScreenshotGet(options) {
     return _apiInvoke('screenshotGet', {options});
 }
 
-function apiForward(action, params) {
-    return _apiInvoke('forward', {action, params});
+function apiBroadcast(action, params) {
+    return _apiInvoke('broadcast', {action, params});
 }
 
 function apiFrameInformationGet() {
