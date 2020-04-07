@@ -30,6 +30,22 @@
             "description": "Alias for format.",
             "enum": [1, 2, 3]
         },
+        "author": {
+            "type": "string",
+            "description": "Creator of the dictionary."
+        },
+        "url": {
+            "type": "string",
+            "description": "URL for the source of the dictionary."
+        },
+        "description": {
+            "type": "string",
+            "description": "Description of the dictionary data."
+        },
+        "attribution": {
+            "type": "string",
+            "description": "Attribution information for the dictionary data."
+        },
         "tagMeta": {
             "type": "object",
             "description": "Tag information for terms and kanji. This object is obsolete and individual tag files should be used instead.",
