@@ -99,7 +99,7 @@ class Database {
             });
             return true;
         } catch (e) {
-            console.error(e);
+            logError(e);
             return false;
         }
     }

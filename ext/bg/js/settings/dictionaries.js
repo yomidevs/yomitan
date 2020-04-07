@@ -555,7 +555,7 @@ function dictionaryErrorsShow(errors) {
     if (errors !== null && errors.length > 0) {
         const uniqueErrors = new Map();
         for (let e of errors) {
-            console.error(e);
+            logError(e);
             e = dictionaryErrorToString(e);
             let count = uniqueErrors.get(e);
             if (typeof count === 'undefined') {
@@ -693,9 +693,9 @@ async function onDictionaryImport(e) {
             await settingsSaveOptions();
 
             if (errors.length > 0) {
-                errors.push(...errors);
-                errors.push(`Dictionary may not have been imported properly: ${errors.length} error${errors.length === 1 ? '' : 's'} reported.`);
-                dictionaryErrorsShow(errors);
+                const errors2 = errors.map((error) => jsonToError(error));
+                errors2.push(`Dictionary may not have been imported properly: ${errors2.length} error${errors2.length === 1 ? '' : 's'} reported.`);
+                dictionaryErrorsShow(errors2);
             }
 
             onDatabaseUpdated();

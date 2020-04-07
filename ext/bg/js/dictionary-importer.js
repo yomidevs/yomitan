@@ -174,7 +174,7 @@ class DictionaryImporter {
                 try {
                     await database.bulkAdd(objectStoreName, entries, i, count);
                 } catch (e) {
-                    errors.push(e);
+                    errors.push(errorToJson(e));
                 }
 
                 loadedCount += count;
