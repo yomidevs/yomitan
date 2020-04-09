@@ -19,18 +19,7 @@
  * apiOptionsGet
  */
 
-async function searchFrontendSetup() {
-    await yomichan.prepare();
-
-    const optionsContext = {
-        depth: 0,
-        url: window.location.href
-    };
-    const options = await apiOptionsGet(optionsContext);
-    if (!options.scanning.enableOnSearchPage) { return; }
-
-    window.frontendInitializationData = {depth: 1, proxy: false};
-
+function injectSearchFrontend() {
     const scriptSrcs = [
         '/mixed/js/text-scanner.js',
         '/fg/js/frontend-api-receiver.js',
@@ -62,4 +51,26 @@ async function searchFrontendSetup() {
     }
 }
 
-searchFrontendSetup();
+async function main() {
+    await yomichan.prepare();
+
+    const applyOptions = async () => {
+        const optionsContext = {
+            depth: 0,
+            url: window.location.href
+        };
+        const options = await apiOptionsGet(optionsContext);
+        if (!options.scanning.enableOnSearchPage) { return; }
+
+        window.frontendInitializationData = {depth: 1, proxy: false};
+        injectSearchFrontend();
+
+        yomichan.off('optionsUpdated', applyOptions);
+    };
+
+    yomichan.on('optionsUpdated', applyOptions);
+
+    await applyOptions();
+}
+
+main();
