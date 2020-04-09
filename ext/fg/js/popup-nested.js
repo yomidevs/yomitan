@@ -44,14 +44,23 @@ async function popupNestedInitialize(id, depth, parentFrameId, url) {
     }
     popupNestedInitialized = true;
 
+    let optionsApplied = false;
+
     const applyOptions = async () => {
         const optionsContext = {depth, url};
         const options = await apiOptionsGet(optionsContext);
         const popupNestingMaxDepth = options.scanning.popupNestingMaxDepth;
 
-        if (!(typeof popupNestingMaxDepth === 'number' && typeof depth === 'number' && depth < popupNestingMaxDepth)) {
+        const maxPopupDepthExceeded = !(
+            typeof popupNestingMaxDepth === 'number' &&
+            typeof depth === 'number' &&
+            depth < popupNestingMaxDepth
+        );
+        if (maxPopupDepthExceeded || optionsApplied) {
             return;
         }
+
+        optionsApplied = true;
 
         window.frontendInitializationData = {id, depth, parentFrameId, url, proxy: true};
         injectPopupNested();
