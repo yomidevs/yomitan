@@ -22,10 +22,12 @@
  */
 
 class TextScanner {
-    constructor(node, ignoreElements, ignorePoints) {
+    constructor(node, ignoreElements, ignorePoints, canEnable=null) {
         this.node = node;
         this.ignoreElements = ignoreElements;
         this.ignorePoints = ignorePoints;
+
+        this.canEnable = canEnable;
 
         this.ignoreNodes = null;
 
@@ -225,6 +227,10 @@ class TextScanner {
     }
 
     setEnabled(enabled) {
+        if (this.canEnable !== null && !this.canEnable()) {
+            enabled = false;
+        }
+
         if (enabled) {
             if (!this.enabled) {
                 this.hookEvents();

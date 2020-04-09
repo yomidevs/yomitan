@@ -30,7 +30,8 @@ class Frontend extends TextScanner {
         super(
             window,
             popup.isProxy() ? [] : [popup.getContainer()],
-            [(x, y) => this.popup.containsPoint(x, y)]
+            [(x, y) => this.popup.containsPoint(x, y)],
+            () => this.popup.depth <= this.options.scanning.popupNestingMaxDepth
         );
 
         this.popup = popup;
