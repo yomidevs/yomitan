@@ -81,6 +81,8 @@ primary language is not English, you may consider also importing the English ver
     *   [kanjidic\_spanish.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_spanish.zip)
 *   **[Innocent Corpus](https://forum.koohii.com/post-168613.html#pid168613)** (Term and Kanji frequencies across 5000+ novels)
     *   [innocent\_corpus.zip](https://foosoft.net/projects/yomichan/dl/dict/innocent_corpus.zip)
+*   **[Kanjium](https://github.com/mifunetoshiro/kanjium)** (Pitch dictionary, see [related project page](https://github.com/toasted-nutbread/yomichan-pitch-accent-dictionary) for details)
+    *   [kanjium_pitch_accents.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjium_pitch_accents.zip)
 
 ## Basic Usage ##
 
@@ -321,6 +323,22 @@ this extension for copyright reasons.
 Developing Yomichan requires a significant understanding of Japanese sentence structure and grammar. I have no time
 to invest in learning yet another language; therefore other languages will not be supported. I will also not accept
 pull request containing this functionality, as I will ultimately be the one maintaining your code.
+
+## Legal ##
+
+Required licensing notices for this project follow below:
+
+*   **EDRDG License**
+
+    This package uses the [EDICT](https://www.edrdg.org/jmdict/edict.html) and
+    [KANJIDIC](https://www.edrdg.org/wiki/index.php/KANJIDIC_Project) dictionary files. These files are the property of
+    the [Electronic Dictionary Research and Development Group](https://www.edrdg.org/), and are used in conformance with
+    the Group's [license](https://www.edrdg.org/edrdg/licence.html).
+
+*   **Kanjium License**
+
+    The pitch accent notation, verb particle data, phonetics, homonyms and other additions or modifications to EDICT,
+    KANJIDIC or KRADFILE were provided by Uros Ozvatic through his free database.
 
 ## Screenshots ##
 
