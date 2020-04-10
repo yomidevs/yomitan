@@ -134,7 +134,7 @@ class TextScanner {
         this.preventNextClick = false;
 
         const primaryTouch = e.changedTouches[0];
-        if (DOM.isPointInSelection(primaryTouch.clientX, primaryTouch.clientY, this.node.getSelection())) {
+        if (DOM.isPointInSelection(primaryTouch.clientX, primaryTouch.clientY, window.getSelection())) {
             return;
         }
 
