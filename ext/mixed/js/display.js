@@ -810,7 +810,7 @@ class Display {
                 info = 'Could not find audio';
             }
 
-            const button = this.audioButtonFindImage(entryIndex);
+            const button = this.audioButtonFindImage(entryIndex, expressionIndex);
             if (button !== null) {
                 let titleDefault = button.dataset.titleDefault;
                 if (!titleDefault) {
@@ -909,9 +909,16 @@ class Display {
         viewerButton.dataset.noteId = noteId;
     }
 
-    audioButtonFindImage(index) {
+    audioButtonFindImage(index, expressionIndex) {
         const entry = this.getEntry(index);
-        return entry !== null ? entry.querySelector('.action-play-audio>img') : null;
+        if (entry === null) { return null; }
+
+        const container = (
+            expressionIndex >= 0 ?
+            entry.querySelector(`.term-expression:nth-of-type(${expressionIndex + 1})`) :
+            entry
+        );
+        return container !== null ? container.querySelector('.action-play-audio>img') : null;
     }
 
     async getDefinitionsAddable(definitions, modes) {
