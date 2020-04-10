@@ -26,15 +26,19 @@
  */
 
 class Frontend extends TextScanner {
-    constructor(popup) {
+    constructor(popup, initEventDispatcher) {
         super(
             window,
             popup.isProxy() ? [] : [popup.getContainer()],
             [(x, y) => this.popup.containsPoint(x, y)],
-            () => this.popup.depth <= this.options.scanning.popupNestingMaxDepth
+            () => this.popup.depth <= this.options.scanning.popupNestingMaxDepth && !this._disabledOverride
         );
 
         this.popup = popup;
+        this.initEventDispatcher = initEventDispatcher;
+
+        this._disabledOverride = false;
+
         this.options = null;
 
         this.optionsContext = {
@@ -72,6 +76,8 @@ class Frontend extends TextScanner {
                 window.visualViewport.addEventListener('scroll', this.onVisualViewportScroll.bind(this));
                 window.visualViewport.addEventListener('resize', this.onVisualViewportResize.bind(this));
             }
+
+            this.initEventDispatcher.on('setDisabledOverride', this.onSetDisabledOverride.bind(this));
 
             yomichan.on('orphaned', this.onOrphaned.bind(this));
             yomichan.on('optionsUpdated', this.updateOptions.bind(this));
@@ -226,6 +232,14 @@ class Frontend extends TextScanner {
         this.popup.hide(changeFocus);
         this.popup.clearAutoPlayTimer();
         super.onSearchClear(changeFocus);
+    }
+
+    onSetDisabledOverride({disabled}) {
+        this._disabledOverride = disabled;
+        // other cases handed by regular options update
+        if (disabled && this.enabled) {
+            this.setEnabled(false);
+        }
     }
 
     getOptionsContext() {

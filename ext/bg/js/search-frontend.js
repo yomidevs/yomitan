@@ -65,7 +65,7 @@ async function main() {
         if (!options.scanning.enableOnSearchPage || optionsApplied) { return; }
         optionsApplied = true;
 
-        window.frontendInitializationData = {depth: 1, proxy: false};
+        window.frontendInitializationData = {depth: 1, proxy: false, isSearchPage: true};
         injectSearchFrontend();
 
         yomichan.off('optionsUpdated', applyOptions);

@@ -28,7 +28,18 @@ async function main() {
     await yomichan.prepare();
 
     const data = window.frontendInitializationData || {};
-    const {id, depth=0, parentFrameId, url, proxy=false} = data;
+    const {id, depth=0, parentFrameId, url, proxy=false, isSearchPage=false} = data;
+
+    const initEventDispatcher = new EventDispatcher();
+
+    yomichan.on('optionsUpdated', async () => {
+        const optionsContext = {depth: isSearchPage ? 0 : depth, url};
+        const options = await apiOptionsGet(optionsContext);
+        if (isSearchPage) {
+            const disabled = !options.scanning.enableOnSearchPage;
+            initEventDispatcher.trigger('setDisabledOverride', {disabled});
+        }
+    });
 
     const optionsContext = {depth, url};
     const options = await apiOptionsGet(optionsContext);
@@ -65,7 +76,7 @@ async function main() {
         popup = popupHost.getOrCreatePopup(null, null, depth);
     }
 
-    const frontend = new Frontend(popup);
+    const frontend = new Frontend(popup, initEventDispatcher);
     await frontend.prepare();
 }
 
