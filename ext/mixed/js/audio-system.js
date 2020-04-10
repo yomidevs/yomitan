@@ -66,8 +66,8 @@ class TextToSpeechAudio {
 }
 
 class AudioSystem {
-    constructor({audioUriBuilder}) {
-        this._cache = new Map();
+    constructor({audioUriBuilder, useCache}) {
+        this._cache = useCache ? new Map() : null;
         this._cacheSizeMaximum = 32;
         this._audioUriBuilder = audioUriBuilder;
 
@@ -79,10 +79,14 @@ class AudioSystem {
 
     async getDefinitionAudio(definition, sources, details) {
         const key = `${definition.expression}:${definition.reading}`;
-        const cacheValue = this._cache.get(definition);
-        if (typeof cacheValue !== 'undefined') {
-            const {audio, uri, source} = cacheValue;
-            return {audio, uri, source};
+        const hasCache = (this._cache !== null);
+
+        if (hasCache) {
+            const cacheValue = this._cache.get(key);
+            if (typeof cacheValue !== 'undefined') {
+                const {audio, uri, source} = cacheValue;
+                return {audio, uri, source};
+            }
         }
 
         for (const source of sources) {
@@ -91,8 +95,10 @@ class AudioSystem {
 
             try {
                 const audio = await this._createAudio(uri);
-                this._cacheCheck();
-                this._cache.set(key, {audio, uri, source});
+                if (hasCache) {
+                    this._cacheCheck();
+                    this._cache.set(key, {audio, uri, source});
+                }
                 return {audio, uri, source};
             } catch (e) {
                 // NOP

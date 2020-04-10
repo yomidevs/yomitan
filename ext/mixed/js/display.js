@@ -50,7 +50,8 @@ class Display {
                 async getUri(definition, source, details) {
                     return await apiAudioGetUri(definition, source, details);
                 }
-            }
+            },
+            useCache: true
         });
         this.styleNode = null;
 

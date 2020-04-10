@@ -53,7 +53,8 @@ class Backend {
         this.defaultAnkiFieldTemplates = null;
         this.audioUriBuilder = new AudioUriBuilder();
         this.audioSystem = new AudioSystem({
-            audioUriBuilder: this.audioUriBuilder
+            audioUriBuilder: this.audioUriBuilder,
+            useCache: false
         });
         this.ankiNoteBuilder = new AnkiNoteBuilder({
             anki: this.anki,
