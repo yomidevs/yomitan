@@ -365,19 +365,19 @@ button.action-button {
     list-style-type: circle;
 }
 
-.term-definition-only-list[data-count="0"] {
+.term-definition-disambiguation-list[data-count="0"] {
     display: none;
 }
 
-.term-definition-only-list:before {
+.term-definition-disambiguation-list:before {
     content: "(";
 }
 
-.term-definition-only-list:after {
+.term-definition-disambiguation-list:after {
     content: " only)";
 }
 
-.term-definition-only+.term-definition-only:before {
+.term-definition-disambiguation+.term-definition-disambiguation:before {
     content: ", ";
 }
 
@@ -399,7 +399,7 @@ button.action-button {
 }
 
 :root[data-compact-glossaries=true] .term-definition-tag-list,
-:root[data-compact-glossaries=true] .term-definition-only-list:not([data-count="0"]) {
+:root[data-compact-glossaries=true] .term-definition-disambiguation-list:not([data-count="0"]) {
     display: inline;
 }
 

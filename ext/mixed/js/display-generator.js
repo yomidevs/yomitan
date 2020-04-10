@@ -176,13 +176,13 @@ class DisplayGenerator {
         const node = this._templateHandler.instantiate('term-definition-item');
 
         const tagListContainer = node.querySelector('.term-definition-tag-list');
-        const onlyListContainer = node.querySelector('.term-definition-only-list');
+        const onlyListContainer = node.querySelector('.term-definition-disambiguation-list');
         const glossaryContainer = node.querySelector('.term-glossary-list');
 
         node.dataset.dictionary = details.dictionary;
 
         this._appendMultiple(tagListContainer, this._createTag.bind(this), details.definitionTags);
-        this._appendMultiple(onlyListContainer, this._createTermOnly.bind(this), details.only);
+        this._appendMultiple(onlyListContainer, this._createTermDisambiguation.bind(this), details.only);
         this._appendMultiple(glossaryContainer, this._createTermGlossaryItem.bind(this), details.glossary);
 
         return node;
@@ -197,10 +197,10 @@ class DisplayGenerator {
         return node;
     }
 
-    _createTermOnly(only) {
-        const node = this._templateHandler.instantiate('term-definition-only');
-        node.dataset.only = only;
-        node.textContent = only;
+    _createTermDisambiguation(disambiguation) {
+        const node = this._templateHandler.instantiate('term-definition-disambiguation');
+        node.dataset.term = disambiguation;
+        node.textContent = disambiguation;
         return node;
     }
 
