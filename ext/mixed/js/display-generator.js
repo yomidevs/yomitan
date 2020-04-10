@@ -68,9 +68,9 @@ class DisplayGenerator {
 
         const termTags = details.termTags;
         let expressions = details.expressions;
-        expressions = Array.isArray(expressions) ? expressions.map((e) => [e, termTags]) : [[details, termTags]];
+        expressions = Array.isArray(expressions) ? expressions : [details];
 
-        this._appendMultiple(expressionsContainer, this._createTermExpression.bind(this), expressions);
+        this._appendMultiple(expressionsContainer, this._createTermExpression.bind(this), expressions, termTags);
         this._appendMultiple(reasonsContainer, this._createTermReason.bind(this), details.reasons);
         this._appendMultiple(frequenciesContainer, this._createFrequencyTag.bind(this), details.frequencies);
         this._appendMultiple(pitchesContainer, this._createPitches.bind(this), pitches);
@@ -130,7 +130,7 @@ class DisplayGenerator {
 
     // Private
 
-    _createTermExpression([details, termTags]) {
+    _createTermExpression(details, termTags) {
         const node = this._templateHandler.instantiate('term-expression');
 
         const expressionContainer = node.querySelector('.term-expression-text');
@@ -455,11 +455,11 @@ class DisplayGenerator {
         );
     }
 
-    _appendMultiple(container, createItem, detailsIterable) {
+    _appendMultiple(container, createItem, detailsIterable, ...args) {
         let count = 0;
         if (container !== null && this._isIterable(detailsIterable)) {
             for (const details of detailsIterable) {
-                const item = createItem(details);
+                const item = createItem(details, ...args);
                 if (item === null) { continue; }
                 container.appendChild(item);
                 ++count;
