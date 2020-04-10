@@ -298,13 +298,13 @@ button.action-button {
     content: "\3001";
 }
 
-.term-expression-list[data-multi=true]>.term-expression:last-of-type:after {
+.entry[data-expression-multi=true] .term-expression-list>.term-expression:last-of-type:after {
     font-size: 2em;
     content: "\3000";
     visibility: hidden;
 }
 
-.term-expression-list[data-multi=true] .term-expression-details {
+.entry[data-expression-multi=true] .term-expression-list .term-expression-details {
     display: inline-block;
     position: relative;
     width: 0;
@@ -313,21 +313,21 @@ button.action-button {
     z-index: 1;
 }
 
-.term-expression-list[data-multi=true] .term-expression:hover .term-expression-details {
+.entry[data-expression-multi=true] .term-expression:hover .term-expression-details {
     visibility: visible;
 }
 
-.term-expression-list[data-multi=true] .term-expression-details>.action-play-audio {
+.entry[data-expression-multi=true] .term-expression-list .term-expression-details>.action-play-audio {
     position: absolute;
     left: 0;
     bottom: 0.5em;
 }
 
-.term-expression-list:not([data-multi=true]) .term-expression-details>.action-play-audio {
+.entry:not([data-expression-multi=true]) .term-expression-list .term-expression-details>.action-play-audio {
     display: none;
 }
 
-.term-expression-list[data-multi=true] .term-expression-details>.tags {
+.entry[data-expression-multi=true] .term-expression-list .term-expression-details>.tags {
     display: block;
     position: absolute;
     left: 0;
@@ -335,7 +335,7 @@ button.action-button {
     white-space: nowrap;
 }
 
-.term-expression-list[data-multi=true] .term-expression-details>.frequencies {
+.entry[data-expression-multi=true] .term-expression-list .term-expression-details>.frequencies {
     display: block;
     position: absolute;
     left: 0;
