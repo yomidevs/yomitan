@@ -796,11 +796,12 @@ class Display {
                 this.audioPlaying = null;
             }
 
-            let audio, source, info;
+            let audio, info;
             try {
                 const {sources, textToSpeechVoice, customSourceUrl} = this.options.audio;
-                ({audio, source} = await this.audioSystem.getDefinitionAudio(expression, sources, {textToSpeechVoice, customSourceUrl}));
-                info = `From source ${1 + sources.indexOf(source)}: ${source}`;
+                let index;
+                ({audio, index} = await this.audioSystem.getDefinitionAudio(expression, sources, {textToSpeechVoice, customSourceUrl}));
+                info = `From source ${1 + index}: ${sources[index]}`;
             } catch (e) {
                 if (this.audioFallback === null) {
                     this.audioFallback = new Audio('/mixed/mp3/button.mp3');

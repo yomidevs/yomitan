@@ -85,13 +85,15 @@ class AudioSystem {
             const cacheValue = this._cache.get(key);
             if (typeof cacheValue !== 'undefined') {
                 const {audio, uri, source} = cacheValue;
-                if (sources.includes(source)) {
-                    return {audio, uri, source};
+                const index = sources.indexOf(source);
+                if (index >= 0) {
+                    return {audio, uri, index};
                 }
             }
         }
 
-        for (const source of sources) {
+        for (let i = 0, ii = sources.length; i < ii; ++i) {
+            const source = sources[i];
             const uri = await this._getAudioUri(definition, source, details);
             if (uri === null) { continue; }
 
@@ -101,7 +103,7 @@ class AudioSystem {
                     this._cacheCheck();
                     this._cache.set(key, {audio, uri, source});
                 }
-                return {audio, uri, source};
+                return {audio, uri, index: i};
             } catch (e) {
                 // NOP
             }
