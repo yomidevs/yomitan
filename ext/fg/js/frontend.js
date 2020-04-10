@@ -26,7 +26,7 @@
  */
 
 class Frontend extends TextScanner {
-    constructor(popup, initEventDispatcher) {
+    constructor(popup, initEventDispatcher=null) {
         super(
             window,
             () => this.popup.isProxy() ? [] : [this.popup.getContainer()],
@@ -77,8 +77,10 @@ class Frontend extends TextScanner {
                 window.visualViewport.addEventListener('resize', this.onVisualViewportResize.bind(this));
             }
 
-            this.initEventDispatcher.on('setDisabledOverride', this.onSetDisabledOverride.bind(this));
-            this.initEventDispatcher.on('popupChange', this.onPopupChange.bind(this));
+            if (this.initEventDispatcher !== null) {
+                this.initEventDispatcher.on('setDisabledOverride', this.onSetDisabledOverride.bind(this));
+                this.initEventDispatcher.on('popupChange', this.onPopupChange.bind(this));
+            }
 
             yomichan.on('orphaned', this.onOrphaned.bind(this));
             yomichan.on('optionsUpdated', this.updateOptions.bind(this));
