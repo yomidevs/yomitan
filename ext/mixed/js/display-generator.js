@@ -44,13 +44,15 @@ class DisplayGenerator {
         const debugInfoContainer = node.querySelector('.debug-info');
         const bodyContainer = node.querySelector('.term-entry-body');
 
+        const {termTags, expressions, definitions} = details;
+
         const pitches = this._getPitchInfos(details);
         const pitchCount = pitches.reduce((i, v) => i + v[1].length, 0);
 
-        const expressionMulti = Array.isArray(details.expressions);
-        const definitionMulti = Array.isArray(details.definitions);
-        const expressionCount = expressionMulti ? details.expressions.length : 1;
-        const definitionCount = definitionMulti ? details.definitions.length : 1;
+        const expressionMulti = Array.isArray(expressions);
+        const definitionMulti = Array.isArray(definitions);
+        const expressionCount = expressionMulti ? expressions.length : 1;
+        const definitionCount = definitionMulti ? definitions.length : 1;
         const uniqueExpressionCount = Array.isArray(details.expression) ? new Set(details.expression).size : 1;
 
         node.dataset.expressionMulti = `${expressionMulti}`;
@@ -66,15 +68,11 @@ class DisplayGenerator {
             (pitches.length > 0 ? 1 : 0)
         }`;
 
-        const termTags = details.termTags;
-        let expressions = details.expressions;
-        expressions = Array.isArray(expressions) ? expressions : [details];
-
-        this._appendMultiple(expressionsContainer, this._createTermExpression.bind(this), expressions, termTags);
+        this._appendMultiple(expressionsContainer, this._createTermExpression.bind(this), expressionMulti ? expressions : [details], termTags);
         this._appendMultiple(reasonsContainer, this._createTermReason.bind(this), details.reasons);
         this._appendMultiple(frequenciesContainer, this._createFrequencyTag.bind(this), details.frequencies);
         this._appendMultiple(pitchesContainer, this._createPitches.bind(this), pitches);
-        this._appendMultiple(definitionsContainer, this._createTermDefinitionItem.bind(this), definitionMulti ? details.definitions : [details]);
+        this._appendMultiple(definitionsContainer, this._createTermDefinitionItem.bind(this), definitionMulti ? definitions : [details]);
 
         if (debugInfoContainer !== null) {
             debugInfoContainer.textContent = JSON.stringify(details, null, 4);
