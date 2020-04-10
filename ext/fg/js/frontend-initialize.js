@@ -86,10 +86,6 @@ async function main() {
     const applyOptions = async () => {
         const optionsContext = {depth: isSearchPage ? 0 : depth, url};
         const options = await apiOptionsGet(optionsContext);
-        if (isSearchPage) {
-            const disabled = !options.scanning.enableOnSearchPage;
-            initEventDispatcher.trigger('setDisabledOverride', {disabled});
-        }
 
         let popup;
         if (isIframe && options.general.showIframePopupsInRootFrame) {
@@ -101,6 +97,15 @@ async function main() {
         } else {
             popup = popups.normal || await getOrCreatePopup(depth);
             popups.normal = popup;
+        }
+
+        if (isSearchPage) {
+            const disabled = !options.scanning.enableOnSearchPage;
+            initEventDispatcher.trigger('setDisabledOverride', {disabled});
+        }
+
+        if (isIframe) {
+            initEventDispatcher.trigger('popupChange', {popup});
         }
 
         if (frontend === null) {

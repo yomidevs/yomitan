@@ -48,7 +48,7 @@ class TextScanner {
     }
 
     onMouseOver(e) {
-        if (this.ignoreElements.includes(e.target)) {
+        if (this.ignoreElements().includes(e.target)) {
             this.scanTimerClear();
         }
     }

@@ -29,7 +29,7 @@ class Frontend extends TextScanner {
     constructor(popup, initEventDispatcher) {
         super(
             window,
-            popup.isProxy() ? [] : [popup.getContainer()],
+            () => this.popup.isProxy() ? [] : [this.popup.getContainer()],
             [(x, y) => this.popup.containsPoint(x, y)],
             () => this.popup.depth <= this.options.scanning.popupNestingMaxDepth && !this._disabledOverride
         );
@@ -78,6 +78,7 @@ class Frontend extends TextScanner {
             }
 
             this.initEventDispatcher.on('setDisabledOverride', this.onSetDisabledOverride.bind(this));
+            this.initEventDispatcher.on('popupChange', this.onPopupChange.bind(this));
 
             yomichan.on('orphaned', this.onOrphaned.bind(this));
             yomichan.on('optionsUpdated', this.updateOptions.bind(this));
@@ -242,6 +243,12 @@ class Frontend extends TextScanner {
         }
     }
 
+    async onPopupChange({popup}) {
+        this.onSearchClear(true);
+        this.popup = popup;
+        await popup.setOptions(this.options);
+    }
+
     getOptionsContext() {
         this.optionsContext.url = this.popup.url;
         return this.optionsContext;
@@ -274,7 +281,7 @@ class Frontend extends TextScanner {
     }
 
     _broadcastRootPopupInformation() {
-        if (!this.popup.isProxy() && this.popup.depth === 0) {
+        if (!this.popup.isProxy() && this.popup.depth === 0 && this.popup.frameId === 0) {
             apiBroadcastTab('rootPopupInformation', {popupId: this.popup.id, frameId: this.popup.frameId});
         }
     }
