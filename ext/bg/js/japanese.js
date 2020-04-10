@@ -377,11 +377,11 @@
 
     // Miscellaneous
 
-    function collapseEmphaticSequences(sourceText, fullCollapse, sourceMap=null) {
+    function collapseEmphaticSequences(text, fullCollapse, sourceMap=null) {
         let result = '';
         let collapseCodePoint = -1;
         const hasSourceMap = (sourceMap !== null);
-        for (const char of sourceText) {
+        for (const char of text) {
             const c = char.codePointAt(0);
             if (c === HIRAGANA_SMALL_TSU_CODE_POINT || c === KATAKANA_SMALL_TSU_CODE_POINT) {
                 if (collapseCodePoint !== c) {
@@ -398,10 +398,7 @@
             }
 
             if (hasSourceMap) {
-                const index = result.length;
-                if (index > 0) {
-                    sourceMap.combine(index - 1, 1);
-                }
+                sourceMap.combine(Math.max(0, result.length - 1), 1);
             }
         }
         return result;
