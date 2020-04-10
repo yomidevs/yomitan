@@ -44,7 +44,7 @@ class DisplayGenerator {
         const debugInfoContainer = node.querySelector('.debug-info');
         const bodyContainer = node.querySelector('.term-entry-body');
 
-        const pitches = DisplayGenerator._getPitchInfos(details);
+        const pitches = this._getPitchInfos(details);
         const pitchCount = pitches.reduce((i, v) => i + v[1].length, 0);
 
         const expressionMulti = Array.isArray(details.expressions);
@@ -70,11 +70,11 @@ class DisplayGenerator {
         let expressions = details.expressions;
         expressions = Array.isArray(expressions) ? expressions.map((e) => [e, termTags]) : null;
 
-        DisplayGenerator._appendMultiple(expressionsContainer, this.createTermExpression.bind(this), expressions, [[details, termTags]]);
-        DisplayGenerator._appendMultiple(reasonsContainer, this.createTermReason.bind(this), details.reasons);
-        DisplayGenerator._appendMultiple(frequenciesContainer, this.createFrequencyTag.bind(this), details.frequencies);
-        DisplayGenerator._appendMultiple(pitchesContainer, this.createPitches.bind(this), pitches);
-        DisplayGenerator._appendMultiple(definitionsContainer, this.createTermDefinitionItem.bind(this), details.definitions, [details]);
+        this._appendMultiple(expressionsContainer, this.createTermExpression.bind(this), expressions, [[details, termTags]]);
+        this._appendMultiple(reasonsContainer, this.createTermReason.bind(this), details.reasons);
+        this._appendMultiple(frequenciesContainer, this.createFrequencyTag.bind(this), details.frequencies);
+        this._appendMultiple(pitchesContainer, this.createPitches.bind(this), pitches);
+        this._appendMultiple(definitionsContainer, this.createTermDefinitionItem.bind(this), details.definitions, [details]);
 
         if (debugInfoContainer !== null) {
             debugInfoContainer.textContent = JSON.stringify(details, null, 4);
@@ -100,7 +100,7 @@ class DisplayGenerator {
                 // This case should not occur
                 furiganaSegments = [{text: details.expression, furigana: details.reading}];
             }
-            DisplayGenerator._appendFurigana(expressionContainer, furiganaSegments, this._appendKanjiLinks.bind(this));
+            this._appendFurigana(expressionContainer, furiganaSegments, this._appendKanjiLinks.bind(this));
         }
 
         if (!Array.isArray(termTags)) {
@@ -110,9 +110,9 @@ class DisplayGenerator {
         const searchQueries = [details.expression, details.reading]
             .filter((x) => !!x)
             .map((x) => ({query: x}));
-        DisplayGenerator._appendMultiple(tagContainer, this.createTag.bind(this), termTags);
-        DisplayGenerator._appendMultiple(tagContainer, this.createSearchTag.bind(this), searchQueries);
-        DisplayGenerator._appendMultiple(frequencyContainer, this.createFrequencyTag.bind(this), details.frequencies);
+        this._appendMultiple(tagContainer, this.createTag.bind(this), termTags);
+        this._appendMultiple(tagContainer, this.createSearchTag.bind(this), searchQueries);
+        this._appendMultiple(frequencyContainer, this.createFrequencyTag.bind(this), details.frequencies);
 
         return node;
     }
@@ -134,9 +134,9 @@ class DisplayGenerator {
 
         node.dataset.dictionary = details.dictionary;
 
-        DisplayGenerator._appendMultiple(tagListContainer, this.createTag.bind(this), details.definitionTags);
-        DisplayGenerator._appendMultiple(onlyListContainer, this.createTermOnly.bind(this), details.only);
-        DisplayGenerator._appendMultiple(glossaryContainer, this.createTermGlossaryItem.bind(this), details.glossary);
+        this._appendMultiple(tagListContainer, this.createTag.bind(this), details.definitionTags);
+        this._appendMultiple(onlyListContainer, this.createTermOnly.bind(this), details.only);
+        this._appendMultiple(glossaryContainer, this.createTermGlossaryItem.bind(this), details.glossary);
 
         return node;
     }
@@ -145,7 +145,7 @@ class DisplayGenerator {
         const node = this._templateHandler.instantiate('term-glossary-item');
         const container = node.querySelector('.term-glossary');
         if (container !== null) {
-            DisplayGenerator._appendMultilineText(container, glossary);
+            this._appendMultilineText(container, glossary);
         }
         return node;
     }
@@ -184,11 +184,11 @@ class DisplayGenerator {
             glyphContainer.textContent = details.character;
         }
 
-        DisplayGenerator._appendMultiple(frequenciesContainer, this.createFrequencyTag.bind(this), details.frequencies);
-        DisplayGenerator._appendMultiple(tagContainer, this.createTag.bind(this), details.tags);
-        DisplayGenerator._appendMultiple(glossaryContainer, this.createKanjiGlossaryItem.bind(this), details.glossary);
-        DisplayGenerator._appendMultiple(chineseReadingsContainer, this.createKanjiReading.bind(this), details.onyomi);
-        DisplayGenerator._appendMultiple(japaneseReadingsContainer, this.createKanjiReading.bind(this), details.kunyomi);
+        this._appendMultiple(frequenciesContainer, this.createFrequencyTag.bind(this), details.frequencies);
+        this._appendMultiple(tagContainer, this.createTag.bind(this), details.tags);
+        this._appendMultiple(glossaryContainer, this.createKanjiGlossaryItem.bind(this), details.glossary);
+        this._appendMultiple(chineseReadingsContainer, this.createKanjiReading.bind(this), details.onyomi);
+        this._appendMultiple(japaneseReadingsContainer, this.createKanjiReading.bind(this), details.kunyomi);
 
         if (statisticsContainer !== null) {
             statisticsContainer.appendChild(this.createKanjiInfoTable(details.stats.misc));
@@ -214,7 +214,7 @@ class DisplayGenerator {
         const node = this._templateHandler.instantiate('kanji-glossary-item');
         const container = node.querySelector('.kanji-glossary');
         if (container !== null) {
-            DisplayGenerator._appendMultilineText(container, glossary);
+            this._appendMultilineText(container, glossary);
         }
         return node;
     }
@@ -231,7 +231,7 @@ class DisplayGenerator {
         const container = node.querySelector('.kanji-info-table-body');
 
         if (container !== null) {
-            const count = DisplayGenerator._appendMultiple(container, this.createKanjiInfoTableItem.bind(this), details);
+            const count = this._appendMultiple(container, this.createKanjiInfoTableItem.bind(this), details);
             if (count === 0) {
                 const n = this.createKanjiInfoTableItemEmpty();
                 container.appendChild(n);
@@ -298,7 +298,7 @@ class DisplayGenerator {
         node.querySelector('.term-pitch-accent-group-tag-list').appendChild(tag);
 
         const n = node.querySelector('.term-pitch-accent-list');
-        DisplayGenerator._appendMultiple(n, this.createPitch.bind(this), dictionaryPitches);
+        this._appendMultiple(n, this.createPitch.bind(this), dictionaryPitches);
 
         return node;
     }
@@ -316,7 +316,7 @@ class DisplayGenerator {
         n.textContent = `${position}`;
 
         n = node.querySelector('.term-pitch-accent-tag-list');
-        DisplayGenerator._appendMultiple(n, this.createTag.bind(this), tags);
+        this._appendMultiple(n, this.createTag.bind(this), tags);
 
         n = node.querySelector('.term-pitch-accent-disambiguation-list');
         this.createPitchAccentDisambiguations(n, exclusiveExpressions, exclusiveReadings);
@@ -445,7 +445,7 @@ class DisplayGenerator {
         }
     }
 
-    static _appendMultiple(container, createItem, detailsIterable, fallback=[]) {
+    _appendMultiple(container, createItem, detailsIterable, fallback=[]) {
         if (container === null) { return 0; }
 
         const multi = (
@@ -468,7 +468,7 @@ class DisplayGenerator {
         return count;
     }
 
-    static _appendFurigana(container, segments, addText) {
+    _appendFurigana(container, segments, addText) {
         for (const {text, furigana} of segments) {
             if (furigana) {
                 const ruby = document.createElement('ruby');
@@ -483,7 +483,7 @@ class DisplayGenerator {
         }
     }
 
-    static _appendMultilineText(container, text) {
+    _appendMultilineText(container, text) {
         const parts = text.split('\n');
         container.appendChild(document.createTextNode(parts[0]));
         for (let i = 1, ii = parts.length; i < ii; ++i) {
@@ -492,7 +492,7 @@ class DisplayGenerator {
         }
     }
 
-    static _getPitchInfos(definition) {
+    _getPitchInfos(definition) {
         const results = new Map();
 
         const allExpressions = new Set();
@@ -510,7 +510,7 @@ class DisplayGenerator {
                 }
 
                 for (const {position, tags} of pitches) {
-                    let pitchInfo = DisplayGenerator._findExistingPitchInfo(reading, position, tags, dictionaryResults);
+                    let pitchInfo = this._findExistingPitchInfo(reading, position, tags, dictionaryResults);
                     if (pitchInfo === null) {
                         pitchInfo = {expressions: new Set(), reading, position, tags};
                         dictionaryResults.push(pitchInfo);
@@ -539,12 +539,12 @@ class DisplayGenerator {
         return [...results.entries()];
     }
 
-    static _findExistingPitchInfo(reading, position, tags, pitchInfoList) {
+    _findExistingPitchInfo(reading, position, tags, pitchInfoList) {
         for (const pitchInfo of pitchInfoList) {
             if (
                 pitchInfo.reading === reading &&
                 pitchInfo.position === position &&
-                DisplayGenerator._areTagListsEqual(pitchInfo.tags, tags)
+                this._areTagListsEqual(pitchInfo.tags, tags)
             ) {
                 return pitchInfo;
             }
@@ -552,7 +552,7 @@ class DisplayGenerator {
         return null;
     }
 
-    static _areTagListsEqual(tagList1, tagList2) {
+    _areTagListsEqual(tagList1, tagList2) {
         const ii = tagList1.length;
         if (tagList2.length !== ii) { return false; }
 
