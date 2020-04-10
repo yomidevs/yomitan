@@ -85,7 +85,9 @@ class AudioSystem {
             const cacheValue = this._cache.get(key);
             if (typeof cacheValue !== 'undefined') {
                 const {audio, uri, source} = cacheValue;
-                return {audio, uri, source};
+                if (sources.includes(source)) {
+                    return {audio, uri, source};
+                }
             }
         }
 
