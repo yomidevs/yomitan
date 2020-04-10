@@ -45,7 +45,13 @@ class Display {
         this.index = 0;
         this.audioPlaying = null;
         this.audioFallback = null;
-        this.audioSystem = new AudioSystem({getAudioUri: this._getAudioUri.bind(this)});
+        this.audioSystem = new AudioSystem({
+            audioUriBuilder: {
+                async getUri(definition, source, details) {
+                    return await apiAudioGetUri(definition, source, details);
+                }
+            }
+        });
         this.styleNode = null;
 
         this.eventListeners = new EventListenerCollection();
@@ -789,10 +795,10 @@ class Display {
                 this.audioPlaying = null;
             }
 
-            const sources = this.options.audio.sources;
             let audio, source, info;
             try {
-                ({audio, source} = await this.audioSystem.getDefinitionAudio(expression, sources));
+                const {sources, textToSpeechVoice, customSourceUrl} = this.options.audio;
+                ({audio, source} = await this.audioSystem.getDefinitionAudio(expression, sources, {textToSpeechVoice, customSourceUrl}));
                 info = `From source ${1 + sources.indexOf(source)}: ${source}`;
             } catch (e) {
                 if (this.audioFallback === null) {
@@ -946,10 +952,5 @@ class Display {
                 title: documentTitle
             }
         };
-    }
-
-    async _getAudioUri(definition, source) {
-        const optionsContext = this.getOptionsContext();
-        return await apiAudioGetUri(definition, source, optionsContext);
     }
 }

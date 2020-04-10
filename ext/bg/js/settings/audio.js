@@ -28,12 +28,7 @@ let audioSourceUI = null;
 let audioSystem = null;
 
 async function audioSettingsInitialize() {
-    audioSystem = new AudioSystem({
-        getAudioUri: async (definition, source) => {
-            const optionsContext = getOptionsContext();
-            return await apiAudioGetUri(definition, source, optionsContext);
-        }
-    });
+    audioSystem = new AudioSystem({audioUriBuilder: null});
 
     const optionsContext = getOptionsContext();
     const options = await getOptionsMutable(optionsContext);

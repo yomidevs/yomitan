@@ -49,11 +49,11 @@ class AudioUriBuilder {
         return url;
     }
 
-    async getUri(definition, source, options) {
+    async getUri(definition, source, details) {
         const handler = this._getUrlHandlers.get(source);
         if (typeof handler === 'function') {
             try {
-                return await handler(definition, options);
+                return await handler(definition, details);
             } catch (e) {
                 // NOP
             }
@@ -132,26 +132,24 @@ class AudioUriBuilder {
         throw new Error('Failed to find audio URL');
     }
 
-    async _getUriTextToSpeech(definition, options) {
-        const voiceURI = options.audio.textToSpeechVoice;
-        if (!voiceURI) {
+    async _getUriTextToSpeech(definition, {textToSpeechVoice}) {
+        if (!textToSpeechVoice) {
             throw new Error('No voice');
         }
-
-        return `tts:?text=${encodeURIComponent(definition.expression)}&voice=${encodeURIComponent(voiceURI)}`;
+        return `tts:?text=${encodeURIComponent(definition.expression)}&voice=${encodeURIComponent(textToSpeechVoice)}`;
     }
 
-    async _getUriTextToSpeechReading(definition, options) {
-        const voiceURI = options.audio.textToSpeechVoice;
-        if (!voiceURI) {
+    async _getUriTextToSpeechReading(definition, {textToSpeechVoice}) {
+        if (!textToSpeechVoice) {
             throw new Error('No voice');
         }
-
-        return `tts:?text=${encodeURIComponent(definition.reading || definition.expression)}&voice=${encodeURIComponent(voiceURI)}`;
+        return `tts:?text=${encodeURIComponent(definition.reading || definition.expression)}&voice=${encodeURIComponent(textToSpeechVoice)}`;
     }
 
-    async _getUriCustom(definition, options) {
-        const customSourceUrl = options.audio.customSourceUrl;
+    async _getUriCustom(definition, {customSourceUrl}) {
+        if (typeof customSourceUrl !== 'string') {
+            throw new Error('No custom URL defined');
+        }
         return customSourceUrl.replace(/\{([^}]*)\}/g, (m0, m1) => (hasOwn(definition, m1) ? `${definition[m1]}` : m0));
     }
 }

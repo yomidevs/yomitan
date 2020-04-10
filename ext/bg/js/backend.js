@@ -51,8 +51,10 @@ class Backend {
         this.options = null;
         this.optionsSchema = null;
         this.defaultAnkiFieldTemplates = null;
-        this.audioSystem = new AudioSystem({getAudioUri: this._getAudioUri.bind(this)});
         this.audioUriBuilder = new AudioUriBuilder();
+        this.audioSystem = new AudioSystem({
+            audioUriBuilder: this.audioUriBuilder
+        });
         this.ankiNoteBuilder = new AnkiNoteBuilder({
             anki: this.anki,
             audioSystem: this.audioSystem,
@@ -494,11 +496,12 @@ class Backend {
         const templates = this.defaultAnkiFieldTemplates;
 
         if (mode !== 'kanji') {
+            const {customSourceUrl} = options.audio;
             await this.ankiNoteBuilder.injectAudio(
                 definition,
                 options.anki.terms.fields,
                 options.audio.sources,
-                optionsContext
+                {textToSpeechVoice: null, customSourceUrl}
             );
         }
 
@@ -573,9 +576,8 @@ class Backend {
         return this._runCommand(command, params);
     }
 
-    async _onApiAudioGetUri({definition, source, optionsContext}) {
-        const options = this.getOptions(optionsContext);
-        return await this.audioUriBuilder.getUri(definition, source, options);
+    async _onApiAudioGetUri({definition, source, details}) {
+        return await this.audioUriBuilder.getUri(definition, source, details);
     }
 
     _onApiScreenshotGet({options}, sender) {
@@ -859,16 +861,6 @@ class Backend {
         if (!(typeof url === 'string' && yomichan.isExtensionUrl(url))) {
             throw new Error('Invalid message sender');
         }
-    }
-
-    async _getAudioUri(definition, source, details) {
-        let optionsContext = (typeof details === 'object' && details !== null ? details.optionsContext : null);
-        if (!(typeof optionsContext === 'object' && optionsContext !== null)) {
-            optionsContext = this.optionsContext;
-        }
-
-        const options = this.getOptions(optionsContext);
-        return await this.audioUriBuilder.getUri(definition, source, options);
     }
 
     async _renderTemplate(template, data) {

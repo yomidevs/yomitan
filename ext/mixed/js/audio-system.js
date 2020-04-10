@@ -66,10 +66,10 @@ class TextToSpeechAudio {
 }
 
 class AudioSystem {
-    constructor({getAudioUri}) {
+    constructor({audioUriBuilder}) {
         this._cache = new Map();
         this._cacheSizeMaximum = 32;
-        this._getAudioUri = getAudioUri;
+        this._audioUriBuilder = audioUriBuilder;
 
         if (typeof speechSynthesis !== 'undefined') {
             // speechSynthesis.getVoices() will not be populated unless some API call is made.
@@ -90,7 +90,7 @@ class AudioSystem {
             if (uri === null) { continue; }
 
             try {
-                const audio = await this._createAudio(uri, details);
+                const audio = await this._createAudio(uri);
                 this._cacheCheck();
                 this._cache.set(key, {audio, uri, source});
                 return {audio, uri, source};
@@ -114,18 +114,21 @@ class AudioSystem {
         // NOP
     }
 
-    async _createAudio(uri, details) {
+    async _createAudio(uri) {
         const ttsParameters = this._getTextToSpeechParameters(uri);
         if (ttsParameters !== null) {
-            if (typeof details === 'object' && details !== null) {
-                if (details.tts === false) {
-                    throw new Error('Text-to-speech not permitted');
-                }
-            }
             return this.createTextToSpeechAudio(ttsParameters);
         }
 
         return await this._createAudioFromUrl(uri);
+    }
+
+    _getAudioUri(definition, source, details) {
+        return (
+            this._audioUriBuilder !== null ?
+            this._audioUriBuilder.getUri(definition, source, details) :
+            null
+        );
     }
 
     _createAudioFromUrl(url) {
