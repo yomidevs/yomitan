@@ -361,7 +361,6 @@ class DisplayGenerator {
             container.appendChild(node);
         }
 
-        container.dataset.multi = 'true';
         container.dataset.count = `${exclusiveExpressions.length + exclusiveReadings.length}`;
         container.dataset.expressionCount = `${exclusiveExpressions.length}`;
         container.dataset.readingCount = `${exclusiveReadings.length}`;
@@ -464,7 +463,6 @@ class DisplayGenerator {
             ++count;
         }
 
-        container.dataset.multi = `${multi}`;
         container.dataset.count = `${count}`;
 
         return count;
