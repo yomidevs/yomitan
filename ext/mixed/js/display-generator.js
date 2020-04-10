@@ -70,11 +70,11 @@ class DisplayGenerator {
         let expressions = details.expressions;
         expressions = Array.isArray(expressions) ? expressions.map((e) => [e, termTags]) : null;
 
-        this._appendMultiple(expressionsContainer, this.createTermExpression.bind(this), expressions, [[details, termTags]]);
-        this._appendMultiple(reasonsContainer, this.createTermReason.bind(this), details.reasons);
-        this._appendMultiple(frequenciesContainer, this.createFrequencyTag.bind(this), details.frequencies);
-        this._appendMultiple(pitchesContainer, this.createPitches.bind(this), pitches);
-        this._appendMultiple(definitionsContainer, this.createTermDefinitionItem.bind(this), details.definitions, [details]);
+        this._appendMultiple(expressionsContainer, this._createTermExpression.bind(this), expressions, [[details, termTags]]);
+        this._appendMultiple(reasonsContainer, this._createTermReason.bind(this), details.reasons);
+        this._appendMultiple(frequenciesContainer, this._createFrequencyTag.bind(this), details.frequencies);
+        this._appendMultiple(pitchesContainer, this._createPitches.bind(this), pitches);
+        this._appendMultiple(definitionsContainer, this._createTermDefinitionItem.bind(this), details.definitions, [details]);
 
         if (debugInfoContainer !== null) {
             debugInfoContainer.textContent = JSON.stringify(details, null, 4);
@@ -83,7 +83,7 @@ class DisplayGenerator {
         return node;
     }
 
-    createTermExpression([details, termTags]) {
+    _createTermExpression([details, termTags]) {
         const node = this._templateHandler.instantiate('term-expression');
 
         const expressionContainer = node.querySelector('.term-expression-text');
@@ -110,14 +110,14 @@ class DisplayGenerator {
         const searchQueries = [details.expression, details.reading]
             .filter((x) => !!x)
             .map((x) => ({query: x}));
-        this._appendMultiple(tagContainer, this.createTag.bind(this), termTags);
-        this._appendMultiple(tagContainer, this.createSearchTag.bind(this), searchQueries);
-        this._appendMultiple(frequencyContainer, this.createFrequencyTag.bind(this), details.frequencies);
+        this._appendMultiple(tagContainer, this._createTag.bind(this), termTags);
+        this._appendMultiple(tagContainer, this._createSearchTag.bind(this), searchQueries);
+        this._appendMultiple(frequencyContainer, this._createFrequencyTag.bind(this), details.frequencies);
 
         return node;
     }
 
-    createTermReason(reason) {
+    _createTermReason(reason) {
         const fragment = this._templateHandler.instantiateFragment('term-reason');
         const node = fragment.querySelector('.term-reason');
         node.textContent = reason;
@@ -125,7 +125,7 @@ class DisplayGenerator {
         return fragment;
     }
 
-    createTermDefinitionItem(details) {
+    _createTermDefinitionItem(details) {
         const node = this._templateHandler.instantiate('term-definition-item');
 
         const tagListContainer = node.querySelector('.term-definition-tag-list');
@@ -134,14 +134,14 @@ class DisplayGenerator {
 
         node.dataset.dictionary = details.dictionary;
 
-        this._appendMultiple(tagListContainer, this.createTag.bind(this), details.definitionTags);
-        this._appendMultiple(onlyListContainer, this.createTermOnly.bind(this), details.only);
-        this._appendMultiple(glossaryContainer, this.createTermGlossaryItem.bind(this), details.glossary);
+        this._appendMultiple(tagListContainer, this._createTag.bind(this), details.definitionTags);
+        this._appendMultiple(onlyListContainer, this._createTermOnly.bind(this), details.only);
+        this._appendMultiple(glossaryContainer, this._createTermGlossaryItem.bind(this), details.glossary);
 
         return node;
     }
 
-    createTermGlossaryItem(glossary) {
+    _createTermGlossaryItem(glossary) {
         const node = this._templateHandler.instantiate('term-glossary-item');
         const container = node.querySelector('.term-glossary');
         if (container !== null) {
@@ -150,14 +150,14 @@ class DisplayGenerator {
         return node;
     }
 
-    createTermOnly(only) {
+    _createTermOnly(only) {
         const node = this._templateHandler.instantiate('term-definition-only');
         node.dataset.only = only;
         node.textContent = only;
         return node;
     }
 
-    createKanjiLink(character) {
+    _createKanjiLink(character) {
         const node = document.createElement('a');
         node.href = '#';
         node.className = 'kanji-link';
@@ -184,23 +184,23 @@ class DisplayGenerator {
             glyphContainer.textContent = details.character;
         }
 
-        this._appendMultiple(frequenciesContainer, this.createFrequencyTag.bind(this), details.frequencies);
-        this._appendMultiple(tagContainer, this.createTag.bind(this), details.tags);
-        this._appendMultiple(glossaryContainer, this.createKanjiGlossaryItem.bind(this), details.glossary);
-        this._appendMultiple(chineseReadingsContainer, this.createKanjiReading.bind(this), details.onyomi);
-        this._appendMultiple(japaneseReadingsContainer, this.createKanjiReading.bind(this), details.kunyomi);
+        this._appendMultiple(frequenciesContainer, this._createFrequencyTag.bind(this), details.frequencies);
+        this._appendMultiple(tagContainer, this._createTag.bind(this), details.tags);
+        this._appendMultiple(glossaryContainer, this._createKanjiGlossaryItem.bind(this), details.glossary);
+        this._appendMultiple(chineseReadingsContainer, this._createKanjiReading.bind(this), details.onyomi);
+        this._appendMultiple(japaneseReadingsContainer, this._createKanjiReading.bind(this), details.kunyomi);
 
         if (statisticsContainer !== null) {
-            statisticsContainer.appendChild(this.createKanjiInfoTable(details.stats.misc));
+            statisticsContainer.appendChild(this._createKanjiInfoTable(details.stats.misc));
         }
         if (classificationsContainer !== null) {
-            classificationsContainer.appendChild(this.createKanjiInfoTable(details.stats.class));
+            classificationsContainer.appendChild(this._createKanjiInfoTable(details.stats.class));
         }
         if (codepointsContainer !== null) {
-            codepointsContainer.appendChild(this.createKanjiInfoTable(details.stats.code));
+            codepointsContainer.appendChild(this._createKanjiInfoTable(details.stats.code));
         }
         if (dictionaryIndicesContainer !== null) {
-            dictionaryIndicesContainer.appendChild(this.createKanjiInfoTable(details.stats.index));
+            dictionaryIndicesContainer.appendChild(this._createKanjiInfoTable(details.stats.index));
         }
 
         if (debugInfoContainer !== null) {
@@ -210,7 +210,7 @@ class DisplayGenerator {
         return node;
     }
 
-    createKanjiGlossaryItem(glossary) {
+    _createKanjiGlossaryItem(glossary) {
         const node = this._templateHandler.instantiate('kanji-glossary-item');
         const container = node.querySelector('.kanji-glossary');
         if (container !== null) {
@@ -219,21 +219,21 @@ class DisplayGenerator {
         return node;
     }
 
-    createKanjiReading(reading) {
+    _createKanjiReading(reading) {
         const node = this._templateHandler.instantiate('kanji-reading');
         node.textContent = reading;
         return node;
     }
 
-    createKanjiInfoTable(details) {
+    _createKanjiInfoTable(details) {
         const node = this._templateHandler.instantiate('kanji-info-table');
 
         const container = node.querySelector('.kanji-info-table-body');
 
         if (container !== null) {
-            const count = this._appendMultiple(container, this.createKanjiInfoTableItem.bind(this), details);
+            const count = this._appendMultiple(container, this._createKanjiInfoTableItem.bind(this), details);
             if (count === 0) {
-                const n = this.createKanjiInfoTableItemEmpty();
+                const n = this._createKanjiInfoTableItemEmpty();
                 container.appendChild(n);
             }
         }
@@ -241,7 +241,7 @@ class DisplayGenerator {
         return node;
     }
 
-    createKanjiInfoTableItem(details) {
+    _createKanjiInfoTableItem(details) {
         const node = this._templateHandler.instantiate('kanji-info-table-item');
         const nameNode = node.querySelector('.kanji-info-table-item-header');
         const valueNode = node.querySelector('.kanji-info-table-item-value');
@@ -254,11 +254,11 @@ class DisplayGenerator {
         return node;
     }
 
-    createKanjiInfoTableItemEmpty() {
+    _createKanjiInfoTableItemEmpty() {
         return this._templateHandler.instantiate('kanji-info-table-empty');
     }
 
-    createTag(details) {
+    _createTag(details) {
         const node = this._templateHandler.instantiate('tag');
 
         const inner = node.querySelector('.tag-inner');
@@ -270,7 +270,7 @@ class DisplayGenerator {
         return node;
     }
 
-    createSearchTag(details) {
+    _createSearchTag(details) {
         const node = this._templateHandler.instantiate('tag-search');
 
         node.textContent = details.query;
@@ -280,7 +280,7 @@ class DisplayGenerator {
         return node;
     }
 
-    createPitches(details) {
+    _createPitches(details) {
         if (!this._termPitchAccentStaticTemplateIsSetup) {
             this._termPitchAccentStaticTemplateIsSetup = true;
             const t = this._templateHandler.instantiate('term-pitch-accent-static');
@@ -294,16 +294,16 @@ class DisplayGenerator {
         node.dataset.pitchesMulti = 'true';
         node.dataset.pitchesCount = `${dictionaryPitches.length}`;
 
-        const tag = this.createTag({notes: '', name: dictionary, category: 'pitch-accent-dictionary'});
+        const tag = this._createTag({notes: '', name: dictionary, category: 'pitch-accent-dictionary'});
         node.querySelector('.term-pitch-accent-group-tag-list').appendChild(tag);
 
         const n = node.querySelector('.term-pitch-accent-list');
-        this._appendMultiple(n, this.createPitch.bind(this), dictionaryPitches);
+        this._appendMultiple(n, this._createPitch.bind(this), dictionaryPitches);
 
         return node;
     }
 
-    createPitch(details) {
+    _createPitch(details) {
         const {reading, position, tags, exclusiveExpressions, exclusiveReadings} = details;
         const morae = jp.getKanaMorae(reading);
 
@@ -316,10 +316,10 @@ class DisplayGenerator {
         n.textContent = `${position}`;
 
         n = node.querySelector('.term-pitch-accent-tag-list');
-        this._appendMultiple(n, this.createTag.bind(this), tags);
+        this._appendMultiple(n, this._createTag.bind(this), tags);
 
         n = node.querySelector('.term-pitch-accent-disambiguation-list');
-        this.createPitchAccentDisambiguations(n, exclusiveExpressions, exclusiveReadings);
+        this._createPitchAccentDisambiguations(n, exclusiveExpressions, exclusiveReadings);
 
         n = node.querySelector('.term-pitch-accent-characters');
         for (let i = 0, ii = morae.length; i < ii; ++i) {
@@ -339,13 +339,13 @@ class DisplayGenerator {
         }
 
         if (morae.length > 0) {
-            this.populatePitchGraph(node.querySelector('.term-pitch-accent-graph'), position, morae);
+            this._populatePitchGraph(node.querySelector('.term-pitch-accent-graph'), position, morae);
         }
 
         return node;
     }
 
-    createPitchAccentDisambiguations(container, exclusiveExpressions, exclusiveReadings) {
+    _createPitchAccentDisambiguations(container, exclusiveExpressions, exclusiveReadings) {
         const templateName = 'term-pitch-accent-disambiguation';
         for (const exclusiveExpression of exclusiveExpressions) {
             const node = this._templateHandler.instantiate(templateName);
@@ -366,7 +366,7 @@ class DisplayGenerator {
         container.dataset.readingCount = `${exclusiveReadings.length}`;
     }
 
-    populatePitchGraph(svg, position, morae) {
+    _populatePitchGraph(svg, position, morae) {
         const svgns = svg.getAttribute('xmlns');
         const ii = morae.length;
         svg.setAttribute('viewBox', `0 0 ${50 * (ii + 1)} 100`);
@@ -406,7 +406,7 @@ class DisplayGenerator {
         path.setAttribute('d', `M${pathPoints.join(' L')}`);
     }
 
-    createFrequencyTag(details) {
+    _createFrequencyTag(details) {
         const node = this._templateHandler.instantiate('tag-frequency');
 
         let n = node.querySelector('.term-frequency-dictionary-name');
@@ -434,7 +434,7 @@ class DisplayGenerator {
                     part = '';
                 }
 
-                const link = this.createKanjiLink(c);
+                const link = this._createKanjiLink(c);
                 container.appendChild(link);
             } else {
                 part += c;
