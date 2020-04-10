@@ -27,7 +27,8 @@ require('fake-indexeddb/auto');
 const chrome = {
     runtime: {
         onMessage: {
-            addListener() { /* NOP */ }
+            addListener() { /* NOP */ },
+            removeListener() { /* NOP */ }
         },
         getURL(path2) {
             return url.pathToFileURL(path.join(__dirname, '..', 'ext', path2.replace(/^\//, '')));
@@ -107,8 +108,10 @@ vm.execute([
     'bg/js/dictionary.js',
     'mixed/js/core.js',
     'bg/js/request.js',
+    'bg/js/dictionary-importer.js',
     'bg/js/database.js'
 ]);
+const DictionaryImporter = vm.get('DictionaryImporter');
 const Database = vm.get('Database');
 
 
@@ -196,6 +199,7 @@ async function testDatabase1() {
     ];
 
     // Setup database
+    const dictionaryImporter = new DictionaryImporter();
     const database = new Database();
     await database.prepare();
 
@@ -210,7 +214,8 @@ async function testDatabase1() {
 
         // Import data
         let progressEvent = false;
-        const {result, errors} = await database.importDictionary(
+        const {result, errors} = await dictionaryImporter.import(
+            database,
             testDictionarySource,
             () => {
                 progressEvent = true;
@@ -231,8 +236,8 @@ async function testDatabase1() {
             true
         );
         vm.assert.deepStrictEqual(counts, {
-            counts: [{kanji: 2, kanjiMeta: 2, terms: 32, termMeta: 3, tagMeta: 12}],
-            total: {kanji: 2, kanjiMeta: 2, terms: 32, termMeta: 3, tagMeta: 12}
+            counts: [{kanji: 2, kanjiMeta: 2, terms: 32, termMeta: 6, tagMeta: 14}],
+            total: {kanji: 2, kanjiMeta: 2, terms: 32, termMeta: 6, tagMeta: 14}
         });
 
         // Test find* functions
@@ -648,9 +653,10 @@ async function testFindTermMetaBulk1(database, titles) {
                 }
             ],
             expectedResults: {
-                total: 1,
+                total: 3,
                 modes: [
-                    ['freq', 1]
+                    ['freq', 1],
+                    ['pitch', 2]
                 ]
             }
         },
@@ -847,6 +853,7 @@ async function testDatabase2() {
     ]);
 
     // Setup database
+    const dictionaryImporter = new DictionaryImporter();
     const database = new Database();
 
     // Error: not prepared
@@ -862,17 +869,17 @@ async function testDatabase2() {
     await assert.rejects(async () => await database.findTagForTitle('tag', title));
     await assert.rejects(async () => await database.getDictionaryInfo());
     await assert.rejects(async () => await database.getDictionaryCounts(titles, true));
-    await assert.rejects(async () => await database.importDictionary(testDictionarySource, () => {}, {}));
+    await assert.rejects(async () => await dictionaryImporter.import(database, testDictionarySource, () => {}, {}));
 
     await database.prepare();
 
     // Error: already prepared
     await assert.rejects(async () => await database.prepare());
 
-    await database.importDictionary(testDictionarySource, () => {}, {});
+    await dictionaryImporter.import(database, testDictionarySource, () => {}, {});
 
     // Error: dictionary already imported
-    await assert.rejects(async () => await database.importDictionary(testDictionarySource, () => {}, {}));
+    await assert.rejects(async () => await dictionaryImporter.import(database, testDictionarySource, () => {}, {}));
 
     await database.close();
 }
@@ -889,6 +896,7 @@ async function testDatabase3() {
     ];
 
     // Setup database
+    const dictionaryImporter = new DictionaryImporter();
     const database = new Database();
     await database.prepare();
 
@@ -898,7 +906,7 @@ async function testDatabase3() {
 
         let error = null;
         try {
-            await database.importDictionary(testDictionarySource, () => {}, {});
+            await dictionaryImporter.import(database, testDictionarySource, () => {}, {});
         } catch (e) {
             error = e;
         }

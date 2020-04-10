@@ -18,8 +18,7 @@
 
 /* global
  * Handlebars
- * jpDistributeFurigana
- * jpIsCodePointKanji
+ * jp
  */
 
 function handlebarsEscape(text) {
@@ -33,7 +32,7 @@ function handlebarsDumpObject(options) {
 
 function handlebarsFurigana(options) {
     const definition = options.fn(this);
-    const segs = jpDistributeFurigana(definition.expression, definition.reading);
+    const segs = jp.distributeFurigana(definition.expression, definition.reading);
 
     let result = '';
     for (const seg of segs) {
@@ -49,7 +48,7 @@ function handlebarsFurigana(options) {
 
 function handlebarsFuriganaPlain(options) {
     const definition = options.fn(this);
-    const segs = jpDistributeFurigana(definition.expression, definition.reading);
+    const segs = jp.distributeFurigana(definition.expression, definition.reading);
 
     let result = '';
     for (const seg of segs) {
@@ -66,7 +65,7 @@ function handlebarsFuriganaPlain(options) {
 function handlebarsKanjiLinks(options) {
     let result = '';
     for (const c of options.fn(this)) {
-        if (jpIsCodePointKanji(c.codePointAt(0))) {
+        if (jp.isCodePointKanji(c.codePointAt(0))) {
             result += `<a href="#" class="kanji-link">${c}</a>`;
         } else {
             result += c;

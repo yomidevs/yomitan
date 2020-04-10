@@ -25,19 +25,18 @@
 class PopupProxyHost {
     constructor() {
         this._popups = new Map();
-        this._nextId = 0;
         this._apiReceiver = null;
-        this._frameIdPromise = null;
+        this._frameId = null;
     }
 
     // Public functions
 
     async prepare() {
-        this._frameIdPromise = apiFrameInformationGet();
-        const {frameId} = await this._frameIdPromise;
+        const {frameId} = await apiFrameInformationGet();
         if (typeof frameId !== 'number') { return; }
+        this._frameId = frameId;
 
-        this._apiReceiver = new FrontendApiReceiver(`popup-proxy-host#${frameId}`, new Map([
+        this._apiReceiver = new FrontendApiReceiver(`popup-proxy-host#${this._frameId}`, new Map([
             ['getOrCreatePopup', this._onApiGetOrCreatePopup.bind(this)],
             ['setOptions', this._onApiSetOptions.bind(this)],
             ['hide', this._onApiHide.bind(this)],
@@ -76,7 +75,7 @@ class PopupProxyHost {
 
         // New unique id
         if (id === null) {
-            id = this._nextId++;
+            id = yomichan.generateId(16);
         }
 
         // Create new popup
@@ -88,7 +87,7 @@ class PopupProxyHost {
         } else if (depth === null) {
             depth = 0;
         }
-        const popup = new Popup(id, depth, this._frameIdPromise);
+        const popup = new Popup(id, depth, this._frameId);
         if (parent !== null) {
             popup.setParent(parent);
         }
@@ -96,7 +95,7 @@ class PopupProxyHost {
         return popup;
     }
 
-    // Message handlers
+    // API message handlers
 
     async _onApiGetOrCreatePopup({id, parentId}) {
         const popup = this.getOrCreatePopup(id, parentId);

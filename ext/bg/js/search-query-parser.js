@@ -27,12 +27,14 @@
  */
 
 class QueryParser extends TextScanner {
-    constructor(search) {
-        super(document.querySelector('#query-parser-content'), [], [], []);
-        this.search = search;
+    constructor({getOptionsContext, setContent, setSpinnerVisible}) {
+        super(document.querySelector('#query-parser-content'), [], []);
+
+        this.getOptionsContext = getOptionsContext;
+        this.setContent = setContent;
+        this.setSpinnerVisible = setSpinnerVisible;
 
         this.parseResults = [];
-        this.selectedParser = null;
 
         this.queryParser = document.querySelector('#query-parser-content');
         this.queryParserSelect = document.querySelector('#query-parser-select-container');
@@ -56,18 +58,18 @@ class QueryParser extends TextScanner {
     async onSearchSource(textSource, cause) {
         if (textSource === null) { return null; }
 
-        this.setTextSourceScanLength(textSource, this.search.options.scanning.length);
+        this.setTextSourceScanLength(textSource, this.options.scanning.length);
         const searchText = textSource.text();
         if (searchText.length === 0) { return; }
 
-        const {definitions, length} = await apiTermsFind(searchText, {}, this.search.getOptionsContext());
+        const {definitions, length} = await apiTermsFind(searchText, {}, this.getOptionsContext());
         if (definitions.length === 0) { return null; }
 
-        const sentence = docSentenceExtract(textSource, this.search.options.anki.sentenceExt);
+        const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
 
         textSource.setEndOffset(length);
 
-        this.search.setContent('terms', {definitions, context: {
+        this.setContent('terms', {definitions, context: {
             focus: false,
             disableHistory: cause === 'mouse',
             sentence,
@@ -79,9 +81,7 @@ class QueryParser extends TextScanner {
 
     onParserChange(e) {
         const selectedParser = e.target.value;
-        this.selectedParser = selectedParser;
-        apiOptionsSet({parsing: {selectedParser}}, this.search.getOptionsContext());
-        this.renderParseResult();
+        apiOptionsSet({parsing: {selectedParser}}, this.getOptionsContext());
     }
 
     getMouseEventListeners() {
@@ -112,23 +112,20 @@ class QueryParser extends TextScanner {
 
     refreshSelectedParser() {
         if (this.parseResults.length > 0) {
-            if (this.selectedParser === null) {
-                this.selectedParser = this.search.options.parsing.selectedParser;
-            }
-            if (this.selectedParser === null || !this.getParseResult()) {
+            if (!this.getParseResult()) {
                 const selectedParser = this.parseResults[0].id;
-                this.selectedParser = selectedParser;
-                apiOptionsSet({parsing: {selectedParser}}, this.search.getOptionsContext());
+                apiOptionsSet({parsing: {selectedParser}}, this.getOptionsContext());
             }
         }
     }
 
     getParseResult() {
-        return this.parseResults.find((r) => r.id === this.selectedParser);
+        const {selectedParser} = this.options.parsing;
+        return this.parseResults.find((r) => r.id === selectedParser);
     }
 
     async setText(text) {
-        this.search.setSpinnerVisible(true);
+        this.setSpinnerVisible(true);
 
         this.setPreview(text);
 
@@ -138,20 +135,20 @@ class QueryParser extends TextScanner {
         this.renderParserSelect();
         this.renderParseResult();
 
-        this.search.setSpinnerVisible(false);
+        this.setSpinnerVisible(false);
     }
 
     async parseText(text) {
         const results = [];
-        if (this.search.options.parsing.enableScanningParser) {
+        if (this.options.parsing.enableScanningParser) {
             results.push({
                 name: 'Scanning parser',
                 id: 'scan',
-                parsedText: await apiTextParse(text, this.search.getOptionsContext())
+                parsedText: await apiTextParse(text, this.getOptionsContext())
             });
         }
-        if (this.search.options.parsing.enableMecabParser) {
-            const mecabResults = await apiTextParseMecab(text, this.search.getOptionsContext());
+        if (this.options.parsing.enableMecabParser) {
+            const mecabResults = await apiTextParseMecab(text, this.getOptionsContext());
             for (const [mecabDictName, mecabDictResults] of mecabResults) {
                 results.push({
                     name: `MeCab: ${mecabDictName}`,
@@ -176,7 +173,8 @@ class QueryParser extends TextScanner {
     renderParserSelect() {
         this.queryParserSelect.textContent = '';
         if (this.parseResults.length > 1) {
-            const select = this.queryParserGenerator.createParserSelect(this.parseResults, this.selectedParser);
+            const {selectedParser} = this.options.parsing;
+            const select = this.queryParserGenerator.createParserSelect(this.parseResults, selectedParser);
             select.addEventListener('change', this.onParserChange.bind(this));
             this.queryParserSelect.appendChild(select);
         }

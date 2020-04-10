@@ -18,6 +18,7 @@
 
 /* global
  * TextScanner
+ * apiForward
  * apiGetZoom
  * apiKanjiFind
  * apiOptionsGet
@@ -26,10 +27,9 @@
  */
 
 class Frontend extends TextScanner {
-    constructor(popup, ignoreNodes) {
+    constructor(popup) {
         super(
             window,
-            ignoreNodes,
             popup.isProxy() ? [] : [popup.getContainer()],
             [(x, y) => this.popup.containsPoint(x, y)]
         );
@@ -53,7 +53,9 @@ class Frontend extends TextScanner {
         ]);
 
         this._runtimeMessageHandlers = new Map([
-            ['popupSetVisibleOverride', ({visible}) => { this.popup.setVisibleOverride(visible); }]
+            ['popupSetVisibleOverride', ({visible}) => { this.popup.setVisibleOverride(visible); }],
+            ['rootPopupRequestInformationBroadcast', () => { this._broadcastRootPopupInformation(); }],
+            ['requestDocumentInformationBroadcast', ({uniqueId}) => { this._broadcastDocumentInformation(uniqueId); }]
         ]);
     }
 
@@ -77,6 +79,7 @@ class Frontend extends TextScanner {
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
 
             this._updateContentScale();
+            this._broadcastRootPopupInformation();
         } catch (e) {
             this.onError(e);
         }
@@ -95,6 +98,9 @@ class Frontend extends TextScanner {
     }
 
     onRuntimeMessage({action, params}, sender, callback) {
+        const {targetPopupId} = params || {};
+        if (typeof targetPopupId !== 'undefined' && targetPopupId !== this.popup.id) { return; }
+
         const handler = this._runtimeMessageHandlers.get(action);
         if (typeof handler !== 'function') { return false; }
 
@@ -129,8 +135,20 @@ class Frontend extends TextScanner {
 
     async updateOptions() {
         this.setOptions(await apiOptionsGet(this.getOptionsContext()));
+
+        const ignoreNodes = ['.scan-disable', '.scan-disable *'];
+        if (!this.options.scanning.enableOnPopupExpressions) {
+            ignoreNodes.push('.source-text', '.source-text *');
+        }
+        this.ignoreNodes = ignoreNodes.join(',');
+
         await this.popup.setOptions(this.options);
+
         this._updateContentScale();
+
+        if (this.textSourceCurrent !== null && this.causeCurrent !== null) {
+            await this.onSearchSource(this.textSourceCurrent, this.causeCurrent);
+        }
     }
 
     async onSearchSource(textSource, cause) {
@@ -239,6 +257,20 @@ class Frontend extends TextScanner {
         this._contentScale = contentScale;
         this.popup.setContentScale(this._contentScale);
         this._updatePopupPosition();
+    }
+
+    _broadcastRootPopupInformation() {
+        if (!this.popup.isProxy() && this.popup.depth === 0) {
+            apiForward('rootPopupInformation', {popupId: this.popup.id, frameId: this.popup.frameId});
+        }
+    }
+
+    _broadcastDocumentInformation(uniqueId) {
+        apiForward('documentInformationBroadcast', {
+            uniqueId,
+            frameId: this.popup.frameId,
+            title: document.title
+        });
     }
 
     async _updatePopupPosition() {

@@ -40,6 +40,7 @@ class Display {
         this.spinner = spinner;
         this.container = container;
         this.definitions = [];
+        this.optionsContext = null;
         this.options = null;
         this.context = null;
         this.index = 0;
@@ -165,12 +166,11 @@ class Display {
         this.setInteractive(true);
     }
 
-    async prepare(options=null) {
+    async prepare() {
         await yomichan.prepare();
-        const displayGeneratorPromise = this.displayGenerator.prepare();
-        const updateOptionsPromise = this.updateOptions(options);
-        await Promise.all([displayGeneratorPromise, updateOptionsPromise]);
-        yomichan.on('optionsUpdated', () => this.updateOptions(null));
+        await this.displayGenerator.prepare();
+        await this.updateOptions();
+        yomichan.on('optionsUpdated', () => this.updateOptions());
     }
 
     onError(_error) {
@@ -369,11 +369,11 @@ class Display {
     }
 
     getOptionsContext() {
-        throw new Error('Override me');
+        return this.optionsContext;
     }
 
-    async updateOptions(options) {
-        this.options = options ? options : await apiOptionsGet(this.getOptionsContext());
+    async updateOptions() {
+        this.options = await apiOptionsGet(this.getOptionsContext());
         this.updateDocumentOptions(this.options);
         this.updateTheme(this.options.general.popupTheme);
         this.setCustomCss(this.options.general.customPopupCss);
@@ -385,6 +385,9 @@ class Display {
         data.audioEnabled = `${options.audio.enabled}`;
         data.compactGlossaries = `${options.general.compactGlossaries}`;
         data.enableSearchTags = `${options.scanning.enableSearchTags}`;
+        data.showPitchAccentDownstepNotation = `${options.general.showPitchAccentDownstepNotation}`;
+        data.showPitchAccentPositionNotation = `${options.general.showPitchAccentPositionNotation}`;
+        data.showPitchAccentGraph = `${options.general.showPitchAccentGraph}`;
         data.debug = `${options.general.debugInfo}`;
     }
 
@@ -749,15 +752,16 @@ class Display {
         try {
             this.setSpinnerVisible(true);
 
-            const context = {};
+            const details = {};
             if (this.noteUsesScreenshot(mode)) {
                 const screenshot = await this.getScreenshot();
                 if (screenshot) {
-                    context.screenshot = screenshot;
+                    details.screenshot = screenshot;
                 }
             }
 
-            const noteId = await apiDefinitionAdd(definition, mode, context, this.getOptionsContext());
+            const context = await this._getNoteContext();
+            const noteId = await apiDefinitionAdd(definition, mode, context, details, this.getOptionsContext());
             if (noteId) {
                 const index = this.definitions.indexOf(definition);
                 const adderButton = this.adderButtonFind(index, mode);
@@ -905,10 +909,15 @@ class Display {
 
     async getDefinitionsAddable(definitions, modes) {
         try {
-            return await apiDefinitionsAddable(definitions, modes, this.getOptionsContext());
+            const context = await this._getNoteContext();
+            return await apiDefinitionsAddable(definitions, modes, context, this.getOptionsContext());
         } catch (e) {
             return [];
         }
+    }
+
+    async getDocumentTitle() {
+        return document.title;
     }
 
     static indexOf(nodeList, node) {
@@ -929,6 +938,15 @@ class Display {
     static getKeyFromEvent(event) {
         const key = event.key;
         return (typeof key === 'string' ? (key.length === 1 ? key.toUpperCase() : key) : '');
+    }
+
+    async _getNoteContext() {
+        const documentTitle = await this.getDocumentTitle();
+        return {
+            document: {
+                title: documentTitle
+            }
+        };
     }
 
     async _getAudioUri(definition, source) {

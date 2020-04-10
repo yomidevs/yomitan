@@ -19,6 +19,8 @@
 
 body { background-color: #1e1e1e; color: #d4d4d4; }
 
+h2 { border-bottom-color: #2f2f2f; }
+
 .navigation-header {
     background-color: #1e1e1e;
     border-bottom-color: #2f2f2f;
@@ -39,6 +41,7 @@ body { background-color: #1e1e1e; color: #d4d4d4; }
 .tag[data-category=frequency]    { background-color: #489148; }
 .tag[data-category=partOfSpeech] { background-color: #565656; }
 .tag[data-category=search]       { background-color: #69696e; }
+.tag[data-category=pitch-accent-dictionary] { background-color: #6640be; }
 
 .term-reasons { color: #888888; }
 
@@ -57,12 +60,15 @@ body { background-color: #1e1e1e; color: #d4d4d4; }
     color: #666666;
 }
 
-.term-definition-container,
-.kanji-glossary-container {
+.term-definition-list,
+.term-pitch-accent-group-list,
+.term-pitch-accent-disambiguation-list,
+.kanji-glossary-list {
     color: #888888;
 }
 
 .term-glossary,
+.term-pitch-accent,
 .kanji-glossary {
     color: #d4d4d4;
 }
@@ -71,4 +77,21 @@ body { background-color: #1e1e1e; color: #d4d4d4; }
     /* invert colors */
     background-color: #d4d4d4;
     color: #1e1e1e;
+}
+
+.term-pitch-accent-container { border-bottom-color: #2f2f2f; }
+
+.term-pitch-accent-character:before { border-color: #ffffff; }
+
+.term-pitch-accent-graph-line,
+.term-pitch-accent-graph-line-tail,
+#term-pitch-accent-graph-dot,
+#term-pitch-accent-graph-dot-downstep,
+#term-pitch-accent-graph-triangle {
+    stroke: #ffffff;
+}
+
+#term-pitch-accent-graph-dot,
+#term-pitch-accent-graph-dot-downstep>circle:last-of-type {
+    fill: #ffffff;
 }

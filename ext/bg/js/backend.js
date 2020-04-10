@@ -24,6 +24,8 @@
  * AudioUriBuilder
  * BackendApiForwarder
  * ClipboardMonitor
+ * Database
+ * DictionaryImporter
  * JsonSchema
  * Mecab
  * Translator
@@ -32,9 +34,7 @@
  * dictEnabledSet
  * dictTermsSort
  * handlebarsRenderDynamic
- * jpConvertReading
- * jpDistributeFuriganaInflected
- * jpKatakanaToHiragana
+ * jp
  * optionsLoad
  * optionsSave
  * profileConditionsDescriptor
@@ -45,16 +45,22 @@
 
 class Backend {
     constructor() {
-        this.translator = new Translator();
+        this.database = new Database();
+        this.dictionaryImporter = new DictionaryImporter();
+        this.translator = new Translator(this.database);
         this.anki = new AnkiNull();
         this.mecab = new Mecab();
         this.clipboardMonitor = new ClipboardMonitor({getClipboard: this._onApiClipboardGet.bind(this)});
-        this.ankiNoteBuilder = new AnkiNoteBuilder({renderTemplate: this._renderTemplate.bind(this)});
         this.options = null;
         this.optionsSchema = null;
         this.defaultAnkiFieldTemplates = null;
         this.audioSystem = new AudioSystem({getAudioUri: this._getAudioUri.bind(this)});
         this.audioUriBuilder = new AudioUriBuilder();
+        this.ankiNoteBuilder = new AnkiNoteBuilder({
+            audioSystem: this.audioSystem,
+            renderTemplate: this._renderTemplate.bind(this)
+        });
+
         this.optionsContext = {
             depth: 0,
             url: window.location.href
@@ -109,6 +115,7 @@ class Backend {
     }
 
     async prepare() {
+        await this.database.prepare();
         await this.translator.prepare();
 
         this.optionsSchema = await requestJson(chrome.runtime.getURL('/bg/data/options-schema.json'), 'GET');
@@ -298,6 +305,10 @@ class Backend {
         return true;
     }
 
+    async importDictionary(archiveSource, onProgress, details) {
+        return await this.dictionaryImporter.import(this.database, archiveSource, onProgress, details);
+    }
+
     // Message handlers
 
     _onApiYomichanCoreReady(_params, sender) {
@@ -402,13 +413,13 @@ class Backend {
                 dictTermsSort(definitions);
                 const {expression, reading} = definitions[0];
                 const source = text.substring(0, sourceLength);
-                for (const {text: text2, furigana} of jpDistributeFuriganaInflected(expression, reading, source)) {
-                    const reading2 = jpConvertReading(text2, furigana, options.parsing.readingMode);
+                for (const {text: text2, furigana} of jp.distributeFuriganaInflected(expression, reading, source)) {
+                    const reading2 = jp.convertReading(text2, furigana, options.parsing.readingMode);
                     term.push({text: text2, reading: reading2});
                 }
                 text = text.substring(source.length);
             } else {
-                const reading = jpConvertReading(text[0], null, options.parsing.readingMode);
+                const reading = jp.convertReading(text[0], null, options.parsing.readingMode);
                 term.push({text: text[0], reading});
                 text = text.substring(1);
             }
@@ -427,16 +438,16 @@ class Backend {
                 for (const {expression, reading, source} of parsedLine) {
                     const term = [];
                     if (expression !== null && reading !== null) {
-                        for (const {text: text2, furigana} of jpDistributeFuriganaInflected(
+                        for (const {text: text2, furigana} of jp.distributeFuriganaInflected(
                             expression,
-                            jpKatakanaToHiragana(reading),
+                            jp.convertKatakanaToHiragana(reading),
                             source
                         )) {
-                            const reading2 = jpConvertReading(text2, furigana, options.parsing.readingMode);
+                            const reading2 = jp.convertReading(text2, furigana, options.parsing.readingMode);
                             term.push({text: text2, reading: reading2});
                         }
                     } else {
-                        const reading2 = jpConvertReading(source, null, options.parsing.readingMode);
+                        const reading2 = jp.convertReading(source, null, options.parsing.readingMode);
                         term.push({text: source, reading: reading2});
                     }
                     result.push(term);
@@ -448,12 +459,12 @@ class Backend {
         return results;
     }
 
-    async _onApiDefinitionAdd({definition, mode, context, optionsContext}) {
+    async _onApiDefinitionAdd({definition, mode, context, details, optionsContext}) {
         const options = this.getOptions(optionsContext);
         const templates = this.defaultAnkiFieldTemplates;
 
         if (mode !== 'kanji') {
-            await this._audioInject(
+            await this.ankiNoteBuilder.injectAudio(
                 definition,
                 options.anki.terms.fields,
                 options.audio.sources,
@@ -461,19 +472,20 @@ class Backend {
             );
         }
 
-        if (context && context.screenshot) {
-            await this._injectScreenshot(
+        if (details && details.screenshot) {
+            await this.ankiNoteBuilder.injectScreenshot(
                 definition,
                 options.anki.terms.fields,
-                context.screenshot
+                details.screenshot,
+                this.anki
             );
         }
 
-        const note = await this.ankiNoteBuilder.createNote(definition, mode, options, templates);
+        const note = await this.ankiNoteBuilder.createNote(definition, mode, context, options, templates);
         return this.anki.addNote(note);
     }
 
-    async _onApiDefinitionsAddable({definitions, modes, optionsContext}) {
+    async _onApiDefinitionsAddable({definitions, modes, context, optionsContext}) {
         const options = this.getOptions(optionsContext);
         const templates = this.defaultAnkiFieldTemplates;
         const states = [];
@@ -482,7 +494,7 @@ class Backend {
             const notes = [];
             for (const definition of definitions) {
                 for (const mode of modes) {
-                    const note = await this.ankiNoteBuilder.createNote(definition, mode, options, templates);
+                    const note = await this.ankiNoteBuilder.createNote(definition, mode, context, options, templates);
                     notes.push(note);
                 }
             }
@@ -793,84 +805,8 @@ class Backend {
         return await this.audioUriBuilder.getUri(definition, source, options);
     }
 
-    async _audioInject(definition, fields, sources, optionsContext) {
-        let usesAudio = false;
-        for (const fieldValue of Object.values(fields)) {
-            if (fieldValue.includes('{audio}')) {
-                usesAudio = true;
-                break;
-            }
-        }
-
-        if (!usesAudio) {
-            return true;
-        }
-
-        try {
-            const expressions = definition.expressions;
-            const audioSourceDefinition = Array.isArray(expressions) ? expressions[0] : definition;
-
-            const {uri} = await this.audioSystem.getDefinitionAudio(audioSourceDefinition, sources, {tts: false, optionsContext});
-            const filename = this._createInjectedAudioFileName(audioSourceDefinition);
-            if (filename !== null) {
-                definition.audio = {url: uri, filename};
-            }
-
-            return true;
-        } catch (e) {
-            return false;
-        }
-    }
-
-    async _injectScreenshot(definition, fields, screenshot) {
-        let usesScreenshot = false;
-        for (const fieldValue of Object.values(fields)) {
-            if (fieldValue.includes('{screenshot}')) {
-                usesScreenshot = true;
-                break;
-            }
-        }
-
-        if (!usesScreenshot) {
-            return;
-        }
-
-        const dateToString = (date) => {
-            const year = date.getUTCFullYear();
-            const month = date.getUTCMonth().toString().padStart(2, '0');
-            const day = date.getUTCDate().toString().padStart(2, '0');
-            const hours = date.getUTCHours().toString().padStart(2, '0');
-            const minutes = date.getUTCMinutes().toString().padStart(2, '0');
-            const seconds = date.getUTCSeconds().toString().padStart(2, '0');
-            return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
-        };
-
-        const now = new Date(Date.now());
-        const filename = `yomichan_browser_screenshot_${definition.reading}_${dateToString(now)}.${screenshot.format}`;
-        const data = screenshot.dataUrl.replace(/^data:[\w\W]*?,/, '');
-
-        try {
-            await this.anki.storeMediaFile(filename, data);
-        } catch (e) {
-            return;
-        }
-
-        definition.screenshotFileName = filename;
-    }
-
     async _renderTemplate(template, data) {
         return handlebarsRenderDynamic(template, data);
-    }
-
-    _createInjectedAudioFileName(definition) {
-        const {reading, expression} = definition;
-        if (!reading && !expression) { return null; }
-
-        let filename = 'yomichan';
-        if (reading) { filename += `_${reading}`; }
-        if (expression) { filename += `_${expression}`; }
-        filename += '.mp3';
-        return filename;
     }
 
     static _getTabUrl(tab) {

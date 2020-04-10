@@ -30,16 +30,12 @@ async function searchFrontendSetup() {
     const options = await apiOptionsGet(optionsContext);
     if (!options.scanning.enableOnSearchPage) { return; }
 
-    const ignoreNodes = ['.scan-disable', '.scan-disable *'];
-    if (!options.scanning.enableOnPopupExpressions) {
-        ignoreNodes.push('.source-text', '.source-text *');
-    }
-
-    window.frontendInitializationData = {depth: 1, ignoreNodes, proxy: false};
+    window.frontendInitializationData = {depth: 1, proxy: false};
 
     const scriptSrcs = [
         '/mixed/js/text-scanner.js',
         '/fg/js/frontend-api-receiver.js',
+        '/fg/js/frame-offset-forwarder.js',
         '/fg/js/popup.js',
         '/fg/js/popup-proxy-host.js',
         '/fg/js/frontend.js',

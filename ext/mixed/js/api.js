@@ -53,12 +53,12 @@ function apiKanjiFind(text, optionsContext) {
     return _apiInvoke('kanjiFind', {text, optionsContext});
 }
 
-function apiDefinitionAdd(definition, mode, context, optionsContext) {
-    return _apiInvoke('definitionAdd', {definition, mode, context, optionsContext});
+function apiDefinitionAdd(definition, mode, context, details, optionsContext) {
+    return _apiInvoke('definitionAdd', {definition, mode, context, details, optionsContext});
 }
 
-function apiDefinitionsAddable(definitions, modes, optionsContext) {
-    return _apiInvoke('definitionsAddable', {definitions, modes, optionsContext});
+function apiDefinitionsAddable(definitions, modes, context, optionsContext) {
+    return _apiInvoke('definitionsAddable', {definitions, modes, context, optionsContext});
 }
 
 function apiNoteView(noteId) {

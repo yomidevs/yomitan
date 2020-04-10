@@ -21,17 +21,25 @@
  */
 
 class PopupProxy {
-    constructor(id, depth, parentId, parentFrameId, url) {
+    constructor(id, depth, parentId, parentFrameId, url, getFrameOffset=null) {
         this._parentId = parentId;
         this._parentFrameId = parentFrameId;
         this._id = id;
-        this._idPromise = null;
         this._depth = depth;
         this._url = url;
         this._apiSender = new FrontendApiSender();
+        this._getFrameOffset = getFrameOffset;
+
+        this._frameOffset = null;
+        this._frameOffsetPromise = null;
+        this._frameOffsetUpdatedAt = null;
     }
 
     // Public properties
+
+    get id() {
+        return this._id;
+    }
 
     get parent() {
         return null;
@@ -47,78 +55,62 @@ class PopupProxy {
 
     // Public functions
 
+    async prepare() {
+        const {id} = await this._invokeHostApi('getOrCreatePopup', {id: this._id, parentId: this._parentId});
+        this._id = id;
+    }
+
     isProxy() {
         return true;
     }
 
     async setOptions(options) {
-        const id = await this._getPopupId();
-        return await this._invokeHostApi('setOptions', {id, options});
+        return await this._invokeHostApi('setOptions', {id: this._id, options});
     }
 
     hide(changeFocus) {
-        if (this._id === null) {
-            return;
-        }
         this._invokeHostApi('hide', {id: this._id, changeFocus});
     }
 
     async isVisible() {
-        const id = await this._getPopupId();
-        return await this._invokeHostApi('isVisible', {id});
+        return await this._invokeHostApi('isVisible', {id: this._id});
     }
 
     setVisibleOverride(visible) {
-        if (this._id === null) {
-            return;
-        }
         this._invokeHostApi('setVisibleOverride', {id: this._id, visible});
     }
 
     async containsPoint(x, y) {
-        if (this._id === null) {
-            return false;
+        if (this._getFrameOffset !== null) {
+            await this._updateFrameOffset();
+            [x, y] = this._applyFrameOffset(x, y);
         }
         return await this._invokeHostApi('containsPoint', {id: this._id, x, y});
     }
 
     async showContent(elementRect, writingMode, type=null, details=null) {
-        const id = await this._getPopupId();
-        elementRect = PopupProxy._convertDOMRectToJson(elementRect);
-        return await this._invokeHostApi('showContent', {id, elementRect, writingMode, type, details});
+        let {x, y, width, height} = elementRect;
+        if (this._getFrameOffset !== null) {
+            await this._updateFrameOffset();
+            [x, y] = this._applyFrameOffset(x, y);
+        }
+        elementRect = {x, y, width, height};
+        return await this._invokeHostApi('showContent', {id: this._id, elementRect, writingMode, type, details});
     }
 
     async setCustomCss(css) {
-        const id = await this._getPopupId();
-        return await this._invokeHostApi('setCustomCss', {id, css});
+        return await this._invokeHostApi('setCustomCss', {id: this._id, css});
     }
 
     clearAutoPlayTimer() {
-        if (this._id === null) {
-            return;
-        }
         this._invokeHostApi('clearAutoPlayTimer', {id: this._id});
     }
 
     async setContentScale(scale) {
-        const id = await this._getPopupId();
-        this._invokeHostApi('setContentScale', {id, scale});
+        this._invokeHostApi('setContentScale', {id: this._id, scale});
     }
 
     // Private
-
-    _getPopupId() {
-        if (this._idPromise === null) {
-            this._idPromise = this._getPopupIdAsync();
-        }
-        return this._idPromise;
-    }
-
-    async _getPopupIdAsync() {
-        const {id} = await this._invokeHostApi('getOrCreatePopup', {id: this._id, parentId: this._parentId});
-        this._id = id;
-        return id;
-    }
 
     _invokeHostApi(action, params={}) {
         if (typeof this._parentFrameId !== 'number') {
@@ -127,12 +119,42 @@ class PopupProxy {
         return this._apiSender.invoke(action, params, `popup-proxy-host#${this._parentFrameId}`);
     }
 
-    static _convertDOMRectToJson(domRect) {
-        return {
-            x: domRect.x,
-            y: domRect.y,
-            width: domRect.width,
-            height: domRect.height
-        };
+    async _updateFrameOffset() {
+        const now = Date.now();
+        const firstRun = this._frameOffsetUpdatedAt === null;
+        const expired = firstRun || this._frameOffsetUpdatedAt < now - PopupProxy._frameOffsetExpireTimeout;
+        if (this._frameOffsetPromise === null && !expired) { return; }
+
+        if (this._frameOffsetPromise !== null) {
+            if (firstRun) {
+                await this._frameOffsetPromise;
+            }
+            return;
+        }
+
+        const promise = this._updateFrameOffsetInner(now);
+        if (firstRun) {
+            await promise;
+        }
+    }
+
+    async _updateFrameOffsetInner(now) {
+        this._frameOffsetPromise = this._getFrameOffset();
+        try {
+            const offset = await this._frameOffsetPromise;
+            this._frameOffset = offset !== null ? offset : [0, 0];
+            this._frameOffsetUpdatedAt = now;
+        } catch (e) {
+            logError(e);
+        } finally {
+            this._frameOffsetPromise = null;
+        }
+    }
+
+    _applyFrameOffset(x, y) {
+        const [offsetX, offsetY] = this._frameOffset;
+        return [x + offsetX, y + offsetY];
     }
 }
+
+PopupProxy._frameOffsetExpireTimeout = 1000;

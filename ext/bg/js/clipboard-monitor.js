@@ -17,7 +17,7 @@
  */
 
 /* global
- * jpIsStringPartiallyJapanese
+ * jp
  */
 
 class ClipboardMonitor extends EventDispatcher {
@@ -54,7 +54,7 @@ class ClipboardMonitor extends EventDispatcher {
                 text !== this._previousText
             ) {
                 this._previousText = text;
-                if (jpIsStringPartiallyJapanese(text)) {
+                if (jp.isStringPartiallyJapanese(text)) {
                     this.trigger('change', {text});
                 }
             }

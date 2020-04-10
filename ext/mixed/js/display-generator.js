@@ -19,11 +19,13 @@
 /* global
  * TemplateHandler
  * apiGetDisplayTemplatesHtml
+ * jp
  */
 
 class DisplayGenerator {
     constructor() {
         this._templateHandler = null;
+        this._termPitchAccentStaticTemplateIsSetup = false;
     }
 
     async prepare() {
@@ -36,17 +38,33 @@ class DisplayGenerator {
 
         const expressionsContainer = node.querySelector('.term-expression-list');
         const reasonsContainer = node.querySelector('.term-reasons');
+        const pitchesContainer = node.querySelector('.term-pitch-accent-group-list');
         const frequenciesContainer = node.querySelector('.frequencies');
         const definitionsContainer = node.querySelector('.term-definition-list');
         const debugInfoContainer = node.querySelector('.debug-info');
+        const bodyContainer = node.querySelector('.term-entry-body');
+
+        const pitches = DisplayGenerator._getPitchInfos(details);
+        const pitchCount = pitches.reduce((i, v) => i + v[1].length, 0);
 
         const expressionMulti = Array.isArray(details.expressions);
         const definitionMulti = Array.isArray(details.definitions);
+        const expressionCount = expressionMulti ? details.expressions.length : 1;
+        const definitionCount = definitionMulti ? details.definitions.length : 1;
+        const uniqueExpressionCount = Array.isArray(details.expression) ? new Set(details.expression).size : 1;
 
         node.dataset.expressionMulti = `${expressionMulti}`;
         node.dataset.definitionMulti = `${definitionMulti}`;
-        node.dataset.expressionCount = `${expressionMulti ? details.expressions.length : 1}`;
-        node.dataset.definitionCount = `${definitionMulti ? details.definitions.length : 1}`;
+        node.dataset.expressionCount = `${expressionCount}`;
+        node.dataset.definitionCount = `${definitionCount}`;
+        node.dataset.uniqueExpressionCount = `${uniqueExpressionCount}`;
+        node.dataset.pitchAccentDictionaryCount = `${pitches.length}`;
+        node.dataset.pitchAccentCount = `${pitchCount}`;
+
+        bodyContainer.dataset.sectionCount = `${
+            (definitionCount > 0 ? 1 : 0) +
+            (pitches.length > 0 ? 1 : 0)
+        }`;
 
         const termTags = details.termTags;
         let expressions = details.expressions;
@@ -55,6 +73,7 @@ class DisplayGenerator {
         DisplayGenerator._appendMultiple(expressionsContainer, this.createTermExpression.bind(this), expressions, [[details, termTags]]);
         DisplayGenerator._appendMultiple(reasonsContainer, this.createTermReason.bind(this), details.reasons);
         DisplayGenerator._appendMultiple(frequenciesContainer, this.createFrequencyTag.bind(this), details.frequencies);
+        DisplayGenerator._appendMultiple(pitchesContainer, this.createPitches.bind(this), pitches);
         DisplayGenerator._appendMultiple(definitionsContainer, this.createTermDefinitionItem.bind(this), details.definitions, [details]);
 
         if (debugInfoContainer !== null) {
@@ -261,6 +280,133 @@ class DisplayGenerator {
         return node;
     }
 
+    createPitches(details) {
+        if (!this._termPitchAccentStaticTemplateIsSetup) {
+            this._termPitchAccentStaticTemplateIsSetup = true;
+            const t = this._templateHandler.instantiate('term-pitch-accent-static');
+            document.head.appendChild(t);
+        }
+
+        const [dictionary, dictionaryPitches] = details;
+
+        const node = this._templateHandler.instantiate('term-pitch-accent-group');
+        node.dataset.dictionary = dictionary;
+        node.dataset.pitchesMulti = 'true';
+        node.dataset.pitchesCount = `${dictionaryPitches.length}`;
+
+        const tag = this.createTag({notes: '', name: dictionary, category: 'pitch-accent-dictionary'});
+        node.querySelector('.term-pitch-accent-group-tag-list').appendChild(tag);
+
+        const n = node.querySelector('.term-pitch-accent-list');
+        DisplayGenerator._appendMultiple(n, this.createPitch.bind(this), dictionaryPitches);
+
+        return node;
+    }
+
+    createPitch(details) {
+        const {reading, position, tags, exclusiveExpressions, exclusiveReadings} = details;
+        const morae = jp.getKanaMorae(reading);
+
+        const node = this._templateHandler.instantiate('term-pitch-accent');
+
+        node.dataset.pitchAccentPosition = `${position}`;
+        node.dataset.tagCount = `${tags.length}`;
+
+        let n = node.querySelector('.term-pitch-accent-position');
+        n.textContent = `${position}`;
+
+        n = node.querySelector('.term-pitch-accent-tag-list');
+        DisplayGenerator._appendMultiple(n, this.createTag.bind(this), tags);
+
+        n = node.querySelector('.term-pitch-accent-disambiguation-list');
+        this.createPitchAccentDisambiguations(n, exclusiveExpressions, exclusiveReadings);
+
+        n = node.querySelector('.term-pitch-accent-characters');
+        for (let i = 0, ii = morae.length; i < ii; ++i) {
+            const mora = morae[i];
+            const highPitch = jp.isMoraPitchHigh(i, position);
+            const highPitchNext = jp.isMoraPitchHigh(i + 1, position);
+
+            const n1 = this._templateHandler.instantiate('term-pitch-accent-character');
+            const n2 = n1.querySelector('.term-pitch-accent-character-inner');
+
+            n1.dataset.position = `${i}`;
+            n1.dataset.pitch = highPitch ? 'high' : 'low';
+            n1.dataset.pitchNext = highPitchNext ? 'high' : 'low';
+            n2.textContent = mora;
+
+            n.appendChild(n1);
+        }
+
+        if (morae.length > 0) {
+            this.populatePitchGraph(node.querySelector('.term-pitch-accent-graph'), position, morae);
+        }
+
+        return node;
+    }
+
+    createPitchAccentDisambiguations(container, exclusiveExpressions, exclusiveReadings) {
+        const templateName = 'term-pitch-accent-disambiguation';
+        for (const exclusiveExpression of exclusiveExpressions) {
+            const node = this._templateHandler.instantiate(templateName);
+            node.dataset.type = 'expression';
+            node.textContent = exclusiveExpression;
+            container.appendChild(node);
+        }
+
+        for (const exclusiveReading of exclusiveReadings) {
+            const node = this._templateHandler.instantiate(templateName);
+            node.dataset.type = 'reading';
+            node.textContent = exclusiveReading;
+            container.appendChild(node);
+        }
+
+        container.dataset.multi = 'true';
+        container.dataset.count = `${exclusiveExpressions.length + exclusiveReadings.length}`;
+        container.dataset.expressionCount = `${exclusiveExpressions.length}`;
+        container.dataset.readingCount = `${exclusiveReadings.length}`;
+    }
+
+    populatePitchGraph(svg, position, morae) {
+        const svgns = svg.getAttribute('xmlns');
+        const ii = morae.length;
+        svg.setAttribute('viewBox', `0 0 ${50 * (ii + 1)} 100`);
+
+        const pathPoints = [];
+        for (let i = 0; i < ii; ++i) {
+            const highPitch = jp.isMoraPitchHigh(i, position);
+            const highPitchNext = jp.isMoraPitchHigh(i + 1, position);
+            const graphic = (highPitch && !highPitchNext ? '#term-pitch-accent-graph-dot-downstep' : '#term-pitch-accent-graph-dot');
+            const x = `${i * 50 + 25}`;
+            const y = highPitch ? '25' : '75';
+            const use = document.createElementNS(svgns, 'use');
+            use.setAttribute('href', graphic);
+            use.setAttribute('x', x);
+            use.setAttribute('y', y);
+            svg.appendChild(use);
+            pathPoints.push(`${x} ${y}`);
+        }
+
+        let path = svg.querySelector('.term-pitch-accent-graph-line');
+        path.setAttribute('d', `M${pathPoints.join(' L')}`);
+
+        pathPoints.splice(0, ii - 1);
+        {
+            const highPitch = jp.isMoraPitchHigh(ii, position);
+            const x = `${ii * 50 + 25}`;
+            const y = highPitch ? '25' : '75';
+            const use = document.createElementNS(svgns, 'use');
+            use.setAttribute('href', '#term-pitch-accent-graph-triangle');
+            use.setAttribute('x', x);
+            use.setAttribute('y', y);
+            svg.appendChild(use);
+            pathPoints.push(`${x} ${y}`);
+        }
+
+        path = svg.querySelector('.term-pitch-accent-graph-line-tail');
+        path.setAttribute('d', `M${pathPoints.join(' L')}`);
+    }
+
     createFrequencyTag(details) {
         const node = this._templateHandler.instantiate('tag-frequency');
 
@@ -283,7 +429,7 @@ class DisplayGenerator {
     _appendKanjiLinks(container, text) {
         let part = '';
         for (const c of text) {
-            if (DisplayGenerator._isCharacterKanji(c)) {
+            if (jp.isCodePointKanji(c.codePointAt(0))) {
                 if (part.length > 0) {
                     container.appendChild(document.createTextNode(part));
                     part = '';
@@ -300,30 +446,28 @@ class DisplayGenerator {
         }
     }
 
-    static _isCharacterKanji(c) {
-        const code = c.codePointAt(0);
-        return (
-            code >= 0x4e00 && code < 0x9fb0 ||
-            code >= 0x3400 && code < 0x4dc0
-        );
-    }
-
-    static _appendMultiple(container, createItem, detailsArray, fallback=[]) {
+    static _appendMultiple(container, createItem, detailsIterable, fallback=[]) {
         if (container === null) { return 0; }
 
-        const isArray = Array.isArray(detailsArray);
-        if (!isArray) { detailsArray = fallback; }
+        const multi = (
+            detailsIterable !== null &&
+            typeof detailsIterable === 'object' &&
+            typeof detailsIterable[Symbol.iterator] !== 'undefined'
+        );
+        if (!multi) { detailsIterable = fallback; }
 
-        container.dataset.multi = `${isArray}`;
-        container.dataset.count = `${detailsArray.length}`;
-
-        for (const details of detailsArray) {
+        let count = 0;
+        for (const details of detailsIterable) {
             const item = createItem(details);
             if (item === null) { continue; }
             container.appendChild(item);
+            ++count;
         }
 
-        return detailsArray.length;
+        container.dataset.multi = `${multi}`;
+        container.dataset.count = `${count}`;
+
+        return count;
     }
 
     static _appendFurigana(container, segments, addText) {
@@ -348,5 +492,80 @@ class DisplayGenerator {
             container.appendChild(document.createElement('br'));
             container.appendChild(document.createTextNode(parts[i]));
         }
+    }
+
+    static _getPitchInfos(definition) {
+        const results = new Map();
+
+        const allExpressions = new Set();
+        const allReadings = new Set();
+        const expressions = definition.expressions;
+        const sources = Array.isArray(expressions) ? expressions : [definition];
+        for (const {pitches: expressionPitches, expression} of sources) {
+            allExpressions.add(expression);
+            for (const {reading, pitches, dictionary} of expressionPitches) {
+                allReadings.add(reading);
+                let dictionaryResults = results.get(dictionary);
+                if (typeof dictionaryResults === 'undefined') {
+                    dictionaryResults = [];
+                    results.set(dictionary, dictionaryResults);
+                }
+
+                for (const {position, tags} of pitches) {
+                    let pitchInfo = DisplayGenerator._findExistingPitchInfo(reading, position, tags, dictionaryResults);
+                    if (pitchInfo === null) {
+                        pitchInfo = {expressions: new Set(), reading, position, tags};
+                        dictionaryResults.push(pitchInfo);
+                    }
+                    pitchInfo.expressions.add(expression);
+                }
+            }
+        }
+
+        for (const dictionaryResults of results.values()) {
+            for (const result of dictionaryResults) {
+                const exclusiveExpressions = [];
+                const exclusiveReadings = [];
+                const resultExpressions = result.expressions;
+                if (!areSetsEqual(resultExpressions, allExpressions)) {
+                    exclusiveExpressions.push(...getSetIntersection(resultExpressions, allExpressions));
+                }
+                if (allReadings.size > 1) {
+                    exclusiveReadings.push(result.reading);
+                }
+                result.exclusiveExpressions = exclusiveExpressions;
+                result.exclusiveReadings = exclusiveReadings;
+            }
+        }
+
+        return [...results.entries()];
+    }
+
+    static _findExistingPitchInfo(reading, position, tags, pitchInfoList) {
+        for (const pitchInfo of pitchInfoList) {
+            if (
+                pitchInfo.reading === reading &&
+                pitchInfo.position === position &&
+                DisplayGenerator._areTagListsEqual(pitchInfo.tags, tags)
+            ) {
+                return pitchInfo;
+            }
+        }
+        return null;
+    }
+
+    static _areTagListsEqual(tagList1, tagList2) {
+        const ii = tagList1.length;
+        if (tagList2.length !== ii) { return false; }
+
+        for (let i = 0; i < ii; ++i) {
+            const tag1 = tagList1[i];
+            const tag2 = tagList2[i];
+            if (tag1.name !== tag2.name || tag1.dictionary !== tag2.dictionary) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

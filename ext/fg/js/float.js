@@ -28,6 +28,8 @@ class DisplayFloat extends Display {
         super(document.querySelector('#spinner'), document.querySelector('#definitions'));
         this.autoPlayAudioTimer = null;
 
+        this._popupId = null;
+
         this.optionsContext = {
             depth: 0,
             url: window.location.href
@@ -53,7 +55,7 @@ class DisplayFloat extends Display {
             ['setContent', ({type, details}) => this.setContent(type, details)],
             ['clearAutoPlayTimer', () => this.clearAutoPlayTimer()],
             ['setCustomCss', ({css}) => this.setCustomCss(css)],
-            ['prepare', ({options, popupInfo, url, childrenSupported, scale, uniqueId}) => this.prepare(options, popupInfo, url, childrenSupported, scale, uniqueId)],
+            ['prepare', ({popupInfo, url, childrenSupported, scale}) => this.prepare(popupInfo, url, childrenSupported, scale)],
             ['setContentScale', ({scale}) => this.setContentScale(scale)]
         ]);
 
@@ -61,15 +63,16 @@ class DisplayFloat extends Display {
         window.addEventListener('message', this.onMessage.bind(this), false);
     }
 
-    async prepare(options, popupInfo, url, childrenSupported, scale, uniqueId) {
+    async prepare(popupInfo, url, childrenSupported, scale) {
         if (this._prepareInvoked) { return; }
         this._prepareInvoked = true;
 
-        await super.prepare(options);
-
         const {id, depth, parentFrameId} = popupInfo;
+        this._popupId = id;
         this.optionsContext.depth = depth;
         this.optionsContext.url = url;
+
+        await super.prepare();
 
         if (childrenSupported) {
             popupNestedInitialize(id, depth, parentFrameId, url);
@@ -77,7 +80,7 @@ class DisplayFloat extends Display {
 
         this.setContentScale(scale);
 
-        apiForward('popupPrepareCompleted', {uniqueId});
+        apiForward('popupPrepareCompleted', {targetPopupId: this._popupId});
     }
 
     onError(error) {
@@ -144,10 +147,6 @@ class DisplayFloat extends Display {
         handler(params);
     }
 
-    getOptionsContext() {
-        return this.optionsContext;
-    }
-
     autoPlayAudio() {
         this.clearAutoPlayTimer();
         this.autoPlayAudioTimer = window.setTimeout(() => super.autoPlayAudio(), 400);
@@ -162,6 +161,33 @@ class DisplayFloat extends Display {
 
     setContentScale(scale) {
         document.body.style.fontSize = `${scale}em`;
+    }
+
+    async getDocumentTitle() {
+        try {
+            const uniqueId = yomichan.generateId(16);
+
+            const promise = yomichan.getTemporaryListenerResult(
+                chrome.runtime.onMessage,
+                ({action, params}, {resolve}) => {
+                    if (
+                        action === 'documentInformationBroadcast' &&
+                        isObject(params) &&
+                        params.uniqueId === uniqueId &&
+                        params.frameId === 0
+                    ) {
+                        resolve(params);
+                    }
+                },
+                2000
+            );
+            apiForward('requestDocumentInformationBroadcast', {uniqueId});
+
+            const {title} = await promise;
+            return title;
+        } catch (e) {
+            return '';
+        }
     }
 }
 

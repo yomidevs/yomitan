@@ -8,7 +8,7 @@
     "scripts": {
         "test": "npm run test-lint && npm run test-code",
         "test-lint": "eslint . && node ./test/lint/global-declarations.js",
-        "test-code": "node ./test/test-schema.js && node ./test/test-dictionary.js && node ./test/test-database.js && node ./test/test-document.js"
+        "test-code": "node ./test/test-schema.js && node ./test/test-dictionary.js && node ./test/test-database.js && node ./test/test-document.js && node ./test/test-object-property-accessor.js && node ./test/test-japanese.js && node ./test/test-text-source-map.js"
     },
     "repository": {
         "type": "git",
@@ -30,6 +30,6 @@
         "eslint": "^6.8.0",
         "eslint-plugin-no-unsanitized": "^3.0.2",
         "fake-indexeddb": "^3.0.0",
-        "jsdom": "^16.2.0"
+        "jsdom": "^16.2.1"
     }
 }

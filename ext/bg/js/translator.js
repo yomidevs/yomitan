@@ -17,8 +17,8 @@
  */
 
 /* global
- * Database
  * Deinflector
+ * TextSourceMap
  * dictEnabledSet
  * dictTagBuildSource
  * dictTagSanitize
@@ -29,34 +29,21 @@
  * dictTermsMergeBySequence
  * dictTermsSort
  * dictTermsUndupe
- * jpConvertAlphabeticToKana
- * jpConvertHalfWidthKanaToFullWidth
- * jpConvertNumericTofullWidth
- * jpDistributeFurigana
- * jpHiraganaToKatakana
- * jpIsCodePointJapanese
- * jpKatakanaToHiragana
+ * jp
  * requestJson
  */
 
 class Translator {
-    constructor() {
-        this.database = null;
+    constructor(database) {
+        this.database = database;
         this.deinflector = null;
         this.tagCache = new Map();
     }
 
     async prepare() {
-        if (!this.database) {
-            this.database = new Database();
-            await this.database.prepare();
-        }
-
-        if (!this.deinflector) {
-            const url = chrome.runtime.getURL('/bg/lang/deinflect.json');
-            const reasons = await requestJson(url, 'GET');
-            this.deinflector = new Deinflector(reasons);
-        }
+        const url = chrome.runtime.getURL('/bg/lang/deinflect.json');
+        const reasons = await requestJson(url, 'GET');
+        this.deinflector = new Deinflector(reasons);
     }
 
     async purgeDatabase() {
@@ -275,7 +262,7 @@ class Translator {
                 const termTags = await this.expandTags(definition.termTags, definition.dictionary);
 
                 const {expression, reading} = definition;
-                const furiganaSegments = jpDistributeFurigana(expression, reading);
+                const furiganaSegments = jp.distributeFurigana(expression, reading);
 
                 definitions.push({
                     source: deinflection.source,
@@ -373,23 +360,21 @@ class Translator {
         const used = new Set();
         for (const [halfWidth, numeric, alphabetic, katakana, hiragana] of Translator.getArrayVariants(textOptionVariantArray)) {
             let text2 = text;
-            let sourceMapping = null;
+            const sourceMap = new TextSourceMap(text2);
             if (halfWidth) {
-                if (sourceMapping === null) { sourceMapping = Translator.createTextSourceMapping(text2); }
-                text2 = jpConvertHalfWidthKanaToFullWidth(text2, sourceMapping);
+                text2 = jp.convertHalfWidthKanaToFullWidth(text2, sourceMap);
             }
             if (numeric) {
-                text2 = jpConvertNumericTofullWidth(text2);
+                text2 = jp.convertNumericToFullWidth(text2);
             }
             if (alphabetic) {
-                if (sourceMapping === null) { sourceMapping = Translator.createTextSourceMapping(text2); }
-                text2 = jpConvertAlphabeticToKana(text2, sourceMapping);
+                text2 = jp.convertAlphabeticToKana(text2, sourceMap);
             }
             if (katakana) {
-                text2 = jpHiraganaToKatakana(text2);
+                text2 = jp.convertHiraganaToKatakana(text2);
             }
             if (hiragana) {
-                text2 = jpKatakanaToHiragana(text2);
+                text2 = jp.convertKatakanaToHiragana(text2);
             }
 
             for (let i = text2.length; i > 0; --i) {
@@ -397,7 +382,7 @@ class Translator {
                 if (used.has(text2Substring)) { break; }
                 used.add(text2Substring);
                 for (const deinflection of this.deinflector.deinflect(text2Substring)) {
-                    deinflection.rawSource = Translator.getDeinflectionRawSource(text, i, sourceMapping);
+                    deinflection.rawSource = sourceMap.source.substring(0, sourceMap.getSourceLength(i));
                     deinflections.push(deinflection);
                 }
             }
@@ -411,25 +396,6 @@ class Translator {
             case 'variant': return [false, true];
             default: return [false];
         }
-    }
-
-    static getDeinflectionRawSource(source, length, sourceMapping) {
-        if (sourceMapping === null) {
-            return source.substring(0, length);
-        }
-
-        let result = '';
-        let index = 0;
-        for (let i = 0; i < length; ++i) {
-            const c = sourceMapping[i];
-            result += source.substring(index, index + c);
-            index += c;
-        }
-        return result;
-    }
-
-    static createTextSourceMapping(text) {
-        return new Array(text.length).fill(1);
     }
 
     async findKanji(text, options) {
@@ -496,6 +462,7 @@ class Translator {
 
             // New data
             term.frequencies = [];
+            term.pitches = [];
         }
 
         const metas = await this.database.findTermMetaBulk(expressionsUnique, dictionaries);
@@ -504,6 +471,13 @@ class Translator {
                 case 'freq':
                     for (const term of termsUnique[index]) {
                         term.frequencies.push({expression, frequency: data, dictionary});
+                    }
+                    break;
+                case 'pitch':
+                    for (const term of termsUnique[index]) {
+                        const pitchData = await this.getPitchData(expression, data, dictionary, term);
+                        if (pitchData === null) { continue; }
+                        term.pitches.push(pitchData);
                     }
                     break;
             }
@@ -589,8 +563,22 @@ class Translator {
         return tagMetaList;
     }
 
+    async getPitchData(expression, data, dictionary, term) {
+        const reading = data.reading;
+        const termReading = term.reading || expression;
+        if (reading !== termReading) { return null; }
+
+        const pitches = [];
+        for (let {position, tags} of data.pitches) {
+            tags = Array.isArray(tags) ? await this.getTagMetaList(tags, dictionary) : [];
+            pitches.push({position, tags});
+        }
+
+        return {reading, pitches, dictionary};
+    }
+
     static createExpression(expression, reading, termTags=null, termFrequency=null) {
-        const furiganaSegments = jpDistributeFurigana(expression, reading);
+        const furiganaSegments = jp.distributeFurigana(expression, reading);
         return {
             expression,
             reading,
@@ -639,7 +627,7 @@ class Translator {
         if (!options.scanning.alphanumeric) {
             let newText = '';
             for (const c of text) {
-                if (!jpIsCodePointJapanese(c.codePointAt(0))) {
+                if (!jp.isCodePointJapanese(c.codePointAt(0))) {
                     break;
                 }
                 newText += c;

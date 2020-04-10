@@ -199,10 +199,15 @@ class SettingsDictionaryEntryUI {
         this.allowSecondarySearchesCheckbox = this.content.querySelector('.dict-allow-secondary-searches');
         this.priorityInput = this.content.querySelector('.dict-priority');
         this.deleteButton = this.content.querySelector('.dict-delete-button');
+        this.detailsToggleLink = this.content.querySelector('.dict-details-toggle-link');
+        this.detailsContainer = this.content.querySelector('.dict-details');
+        this.detailsTable = this.content.querySelector('.dict-details-table');
 
         if (this.dictionaryInfo.version < 3) {
             this.content.querySelector('.dict-outdated').hidden = false;
         }
+
+        this.setupDetails(dictionaryInfo);
 
         this.content.querySelector('.dict-title').textContent = this.dictionaryInfo.title;
         this.content.querySelector('.dict-revision').textContent = `rev.${this.dictionaryInfo.revision}`;
@@ -214,6 +219,45 @@ class SettingsDictionaryEntryUI {
         this.eventListeners.addEventListener(this.allowSecondarySearchesCheckbox, 'change', this.onAllowSecondarySearchesChanged.bind(this), false);
         this.eventListeners.addEventListener(this.priorityInput, 'change', this.onPriorityChanged.bind(this), false);
         this.eventListeners.addEventListener(this.deleteButton, 'click', this.onDeleteButtonClicked.bind(this), false);
+        this.eventListeners.addEventListener(this.detailsToggleLink, 'click', this.onDetailsToggleLinkClicked.bind(this), false);
+    }
+
+    setupDetails(dictionaryInfo) {
+        const targets = [
+            ['Author', 'author'],
+            ['URL', 'url'],
+            ['Description', 'description'],
+            ['Attribution', 'attribution']
+        ];
+
+        let count = 0;
+        for (const [label, key] of targets) {
+            const info = dictionaryInfo[key];
+            if (typeof info !== 'string') { continue; }
+
+            const n1 = document.createElement('div');
+            n1.className = 'dict-details-entry';
+            n1.dataset.type = key;
+
+            const n2 = document.createElement('span');
+            n2.className = 'dict-details-entry-label';
+            n2.textContent = `${label}:`;
+            n1.appendChild(n2);
+
+            const n3 = document.createElement('span');
+            n3.className = 'dict-details-entry-info';
+            n3.textContent = info;
+            n1.appendChild(n3);
+
+            this.detailsTable.appendChild(n1);
+
+            ++count;
+        }
+
+        if (count === 0) {
+            this.detailsContainer.hidden = true;
+            this.detailsToggleLink.hidden = true;
+        }
     }
 
     cleanup() {
@@ -317,6 +361,12 @@ class SettingsDictionaryEntryUI {
         n.dataset.dict = title;
         document.querySelector('#dict-remove-modal-dict-name').textContent = title;
         $(n).modal('show');
+    }
+
+    onDetailsToggleLinkClicked(e) {
+        e.preventDefault();
+
+        this.detailsContainer.hidden = !this.detailsContainer.hidden;
     }
 }
 
@@ -505,7 +555,7 @@ function dictionaryErrorsShow(errors) {
     if (errors !== null && errors.length > 0) {
         const uniqueErrors = new Map();
         for (let e of errors) {
-            console.error(e);
+            logError(e);
             e = dictionaryErrorToString(e);
             let count = uniqueErrors.get(e);
             if (typeof count === 'undefined') {
@@ -643,9 +693,9 @@ async function onDictionaryImport(e) {
             await settingsSaveOptions();
 
             if (errors.length > 0) {
-                errors.push(...errors);
-                errors.push(`Dictionary may not have been imported properly: ${errors.length} error${errors.length === 1 ? '' : 's'} reported.`);
-                dictionaryErrorsShow(errors);
+                const errors2 = errors.map((error) => jsonToError(error));
+                errors2.push(`Dictionary may not have been imported properly: ${errors2.length} error${errors2.length === 1 ? '' : 's'} reported.`);
+                dictionaryErrorsShow(errors2);
             }
 
             onDatabaseUpdated();

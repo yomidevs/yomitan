@@ -137,30 +137,6 @@ function dictTermsGroup(definitions, dictionaries) {
     return dictTermsSort(results);
 }
 
-function dictAreSetsEqual(set1, set2) {
-    if (set1.size !== set2.size) {
-        return false;
-    }
-
-    for (const value of set1) {
-        if (!set2.has(value)) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-function dictGetSetIntersection(set1, set2) {
-    const result = [];
-    for (const value of set1) {
-        if (set2.has(value)) {
-            result.push(value);
-        }
-    }
-    return result;
-}
-
 function dictTermsMergeBySequence(definitions, mainDictionary) {
     const sequencedDefinitions = new Map();
     const nonSequencedDefinitions = [];
@@ -281,11 +257,11 @@ function dictTermsMergeByGloss(result, definitions, appendTo=null, mergedIndices
         const only = [];
         const expressionSet = definition.expression;
         const readingSet = definition.reading;
-        if (!dictAreSetsEqual(expressionSet, resultExpressionSet)) {
-            only.push(...dictGetSetIntersection(expressionSet, resultExpressionSet));
+        if (!areSetsEqual(expressionSet, resultExpressionSet)) {
+            only.push(...getSetIntersection(expressionSet, resultExpressionSet));
         }
-        if (!dictAreSetsEqual(readingSet, resultReadingSet)) {
-            only.push(...dictGetSetIntersection(readingSet, resultReadingSet));
+        if (!areSetsEqual(readingSet, resultReadingSet)) {
+            only.push(...getSetIntersection(readingSet, resultReadingSet));
         }
         definition.only = only;
     }

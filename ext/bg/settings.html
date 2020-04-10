@@ -163,6 +163,22 @@
                 </div>
 
                 <div class="checkbox options-advanced">
+                    <label><input type="checkbox" id="show-pitch-accent-downstep-notation"> Show downstep notation for pitch accents</label>
+                </div>
+
+                <div class="checkbox options-position">
+                    <label><input type="checkbox" id="show-pitch-accent-position-notation"> Show position notation for pitch accents</label>
+                </div>
+
+                <div class="checkbox options-advanced">
+                    <label><input type="checkbox" id="show-pitch-accent-graph"> Show graph for pitch accents</label>
+                </div>
+
+                <div class="checkbox options-advanced">
+                    <label><input type="checkbox" id="show-iframe-popups-in-root-frame"> Show iframe popups in root frame</label>
+                </div>
+
+                <div class="checkbox options-advanced">
                     <label><input type="checkbox" id="show-debug-info"> Show debug information</label>
                 </div>
 
@@ -658,6 +674,10 @@
                         <label class="dict-result-priority-label">Result priority</label>
                         <input type="number" class="form-control dict-priority">
                     </div>
+                    <div class="dict-details-container">
+                        <a class="dict-details-toggle-link">Details...</a>
+                        <div class="dict-details" hidden><div class="dict-details-table"></div></div>
+                    </div>
                     <div class="dict-delete-table">
                         <div>
                             <button class="btn btn-default dict-delete-button">Delete Dictionary</button>
@@ -1088,6 +1108,7 @@
         <script src="/mixed/js/core.js"></script>
         <script src="/mixed/js/dom.js"></script>
         <script src="/mixed/js/api.js"></script>
+        <script src="/mixed/js/japanese.js"></script>
 
         <script src="/bg/js/anki.js"></script>
         <script src="/bg/js/anki-note-builder.js"></script>

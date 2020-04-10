@@ -105,7 +105,11 @@
                                     "customPopupCss",
                                     "customPopupOuterCss",
                                     "enableWanakana",
-                                    "enableClipboardMonitor"
+                                    "enableClipboardMonitor",
+                                    "showPitchAccentDownstepNotation",
+                                    "showPitchAccentPositionNotation",
+                                    "showPitchAccentGraph",
+                                    "showIframePopupsInRootFrame"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -225,6 +229,22 @@
                                         "default": true
                                     },
                                     "enableClipboardMonitor": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "showPitchAccentDownstepNotation": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
+                                    "showPitchAccentPositionNotation": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
+                                    "showPitchAccentGraph": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "showIframePopupsInRootFrame": {
                                         "type": "boolean",
                                         "default": false
                                     }
