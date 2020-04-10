@@ -68,13 +68,13 @@ class DisplayGenerator {
 
         const termTags = details.termTags;
         let expressions = details.expressions;
-        expressions = Array.isArray(expressions) ? expressions.map((e) => [e, termTags]) : null;
+        expressions = Array.isArray(expressions) ? expressions.map((e) => [e, termTags]) : [[details, termTags]];
 
-        this._appendMultiple(expressionsContainer, this._createTermExpression.bind(this), expressions, [[details, termTags]]);
+        this._appendMultiple(expressionsContainer, this._createTermExpression.bind(this), expressions);
         this._appendMultiple(reasonsContainer, this._createTermReason.bind(this), details.reasons);
         this._appendMultiple(frequenciesContainer, this._createFrequencyTag.bind(this), details.frequencies);
         this._appendMultiple(pitchesContainer, this._createPitches.bind(this), pitches);
-        this._appendMultiple(definitionsContainer, this._createTermDefinitionItem.bind(this), details.definitions, [details]);
+        this._appendMultiple(definitionsContainer, this._createTermDefinitionItem.bind(this), definitionMulti ? details.definitions : [details]);
 
         if (debugInfoContainer !== null) {
             debugInfoContainer.textContent = JSON.stringify(details, null, 4);
@@ -447,22 +447,23 @@ class DisplayGenerator {
         }
     }
 
-    _appendMultiple(container, createItem, detailsIterable, fallback=[]) {
-        if (container === null) { return 0; }
-
-        const multi = (
-            detailsIterable !== null &&
-            typeof detailsIterable === 'object' &&
-            typeof detailsIterable[Symbol.iterator] !== 'undefined'
+    _isIterable(value) {
+        return (
+            value !== null &&
+            typeof value === 'object' &&
+            typeof value[Symbol.iterator] !== 'undefined'
         );
-        if (!multi) { detailsIterable = fallback; }
+    }
 
+    _appendMultiple(container, createItem, detailsIterable) {
         let count = 0;
-        for (const details of detailsIterable) {
-            const item = createItem(details);
-            if (item === null) { continue; }
-            container.appendChild(item);
-            ++count;
+        if (container !== null && this._isIterable(detailsIterable)) {
+            for (const details of detailsIterable) {
+                const item = createItem(details);
+                if (item === null) { continue; }
+                container.appendChild(item);
+                ++count;
+            }
         }
 
         container.dataset.count = `${count}`;
