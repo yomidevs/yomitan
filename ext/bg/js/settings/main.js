@@ -119,6 +119,7 @@ async function formRead(options) {
     options.translation.convertAlphabeticCharacters = $('#translation-convert-alphabetic-characters').val();
     options.translation.convertHiraganaToKatakana = $('#translation-convert-hiragana-to-katakana').val();
     options.translation.convertKatakanaToHiragana = $('#translation-convert-katakana-to-hiragana').val();
+    options.translation.collapseEmphaticSequences = $('#translation-collapse-emphatic-sequences').val();
 
     options.parsing.enableScanningParser = $('#parsing-scan-enable').prop('checked');
     options.parsing.enableMecabParser = $('#parsing-mecab-enable').prop('checked');
@@ -200,6 +201,7 @@ async function formWrite(options) {
     $('#translation-convert-alphabetic-characters').val(options.translation.convertAlphabeticCharacters);
     $('#translation-convert-hiragana-to-katakana').val(options.translation.convertHiraganaToKatakana);
     $('#translation-convert-katakana-to-hiragana').val(options.translation.convertKatakanaToHiragana);
+    $('#translation-collapse-emphatic-sequences').val(options.translation.collapseEmphaticSequences);
 
     $('#parsing-scan-enable').prop('checked', options.parsing.enableScanningParser);
     $('#parsing-mecab-enable').prop('checked', options.parsing.enableMecabParser);
