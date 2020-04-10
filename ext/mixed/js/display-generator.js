@@ -83,6 +83,53 @@ class DisplayGenerator {
         return node;
     }
 
+    createKanjiEntry(details) {
+        const node = this._templateHandler.instantiate('kanji-entry');
+
+        const glyphContainer = node.querySelector('.kanji-glyph');
+        const frequenciesContainer = node.querySelector('.frequencies');
+        const tagContainer = node.querySelector('.tags');
+        const glossaryContainer = node.querySelector('.kanji-glossary-list');
+        const chineseReadingsContainer = node.querySelector('.kanji-readings-chinese');
+        const japaneseReadingsContainer = node.querySelector('.kanji-readings-japanese');
+        const statisticsContainer = node.querySelector('.kanji-statistics');
+        const classificationsContainer = node.querySelector('.kanji-classifications');
+        const codepointsContainer = node.querySelector('.kanji-codepoints');
+        const dictionaryIndicesContainer = node.querySelector('.kanji-dictionary-indices');
+        const debugInfoContainer = node.querySelector('.debug-info');
+
+        if (glyphContainer !== null) {
+            glyphContainer.textContent = details.character;
+        }
+
+        this._appendMultiple(frequenciesContainer, this._createFrequencyTag.bind(this), details.frequencies);
+        this._appendMultiple(tagContainer, this._createTag.bind(this), details.tags);
+        this._appendMultiple(glossaryContainer, this._createKanjiGlossaryItem.bind(this), details.glossary);
+        this._appendMultiple(chineseReadingsContainer, this._createKanjiReading.bind(this), details.onyomi);
+        this._appendMultiple(japaneseReadingsContainer, this._createKanjiReading.bind(this), details.kunyomi);
+
+        if (statisticsContainer !== null) {
+            statisticsContainer.appendChild(this._createKanjiInfoTable(details.stats.misc));
+        }
+        if (classificationsContainer !== null) {
+            classificationsContainer.appendChild(this._createKanjiInfoTable(details.stats.class));
+        }
+        if (codepointsContainer !== null) {
+            codepointsContainer.appendChild(this._createKanjiInfoTable(details.stats.code));
+        }
+        if (dictionaryIndicesContainer !== null) {
+            dictionaryIndicesContainer.appendChild(this._createKanjiInfoTable(details.stats.index));
+        }
+
+        if (debugInfoContainer !== null) {
+            debugInfoContainer.textContent = JSON.stringify(details, null, 4);
+        }
+
+        return node;
+    }
+
+    // Private
+
     _createTermExpression([details, termTags]) {
         const node = this._templateHandler.instantiate('term-expression');
 
@@ -162,51 +209,6 @@ class DisplayGenerator {
         node.href = '#';
         node.className = 'kanji-link';
         node.textContent = character;
-        return node;
-    }
-
-    createKanjiEntry(details) {
-        const node = this._templateHandler.instantiate('kanji-entry');
-
-        const glyphContainer = node.querySelector('.kanji-glyph');
-        const frequenciesContainer = node.querySelector('.frequencies');
-        const tagContainer = node.querySelector('.tags');
-        const glossaryContainer = node.querySelector('.kanji-glossary-list');
-        const chineseReadingsContainer = node.querySelector('.kanji-readings-chinese');
-        const japaneseReadingsContainer = node.querySelector('.kanji-readings-japanese');
-        const statisticsContainer = node.querySelector('.kanji-statistics');
-        const classificationsContainer = node.querySelector('.kanji-classifications');
-        const codepointsContainer = node.querySelector('.kanji-codepoints');
-        const dictionaryIndicesContainer = node.querySelector('.kanji-dictionary-indices');
-        const debugInfoContainer = node.querySelector('.debug-info');
-
-        if (glyphContainer !== null) {
-            glyphContainer.textContent = details.character;
-        }
-
-        this._appendMultiple(frequenciesContainer, this._createFrequencyTag.bind(this), details.frequencies);
-        this._appendMultiple(tagContainer, this._createTag.bind(this), details.tags);
-        this._appendMultiple(glossaryContainer, this._createKanjiGlossaryItem.bind(this), details.glossary);
-        this._appendMultiple(chineseReadingsContainer, this._createKanjiReading.bind(this), details.onyomi);
-        this._appendMultiple(japaneseReadingsContainer, this._createKanjiReading.bind(this), details.kunyomi);
-
-        if (statisticsContainer !== null) {
-            statisticsContainer.appendChild(this._createKanjiInfoTable(details.stats.misc));
-        }
-        if (classificationsContainer !== null) {
-            classificationsContainer.appendChild(this._createKanjiInfoTable(details.stats.class));
-        }
-        if (codepointsContainer !== null) {
-            codepointsContainer.appendChild(this._createKanjiInfoTable(details.stats.code));
-        }
-        if (dictionaryIndicesContainer !== null) {
-            dictionaryIndicesContainer.appendChild(this._createKanjiInfoTable(details.stats.index));
-        }
-
-        if (debugInfoContainer !== null) {
-            debugInfoContainer.textContent = JSON.stringify(details, null, 4);
-        }
-
         return node;
     }
 
