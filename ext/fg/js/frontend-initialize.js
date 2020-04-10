@@ -24,6 +24,47 @@
  * apiOptionsGet
  */
 
+async function createIframePopupProxy(url) {
+    const rootPopupInformationPromise = yomichan.getTemporaryListenerResult(
+        chrome.runtime.onMessage,
+        ({action, params}, {resolve}) => {
+            if (action === 'rootPopupInformation') {
+                resolve(params);
+            }
+        }
+    );
+    apiBroadcastTab('rootPopupRequestInformationBroadcast');
+    const {popupId, frameId} = await rootPopupInformationPromise;
+
+    const frameOffsetForwarder = new FrameOffsetForwarder();
+    frameOffsetForwarder.start();
+    const getFrameOffset = frameOffsetForwarder.getOffset.bind(frameOffsetForwarder);
+
+    const popup = new PopupProxy(popupId, 0, null, frameId, url, getFrameOffset);
+    await popup.prepare();
+
+    return popup;
+}
+
+async function getOrCreatePopup(depth) {
+    const frameOffsetForwarder = new FrameOffsetForwarder();
+    frameOffsetForwarder.start();
+
+    const popupHost = new PopupProxyHost();
+    await popupHost.prepare();
+
+    const popup = popupHost.getOrCreatePopup(null, null, depth);
+
+    return popup;
+}
+
+async function createPopupProxy(depth, id, parentFrameId, url) {
+    const popup = new PopupProxy(null, depth + 1, id, parentFrameId, url);
+    await popup.prepare();
+
+    return popup;
+}
+
 async function main() {
     await yomichan.prepare();
 
@@ -46,34 +87,11 @@ async function main() {
 
     let popup;
     if (!proxy && (window !== window.parent) && options.general.showIframePopupsInRootFrame) {
-        const rootPopupInformationPromise = yomichan.getTemporaryListenerResult(
-            chrome.runtime.onMessage,
-            ({action, params}, {resolve}) => {
-                if (action === 'rootPopupInformation') {
-                    resolve(params);
-                }
-            }
-        );
-        apiBroadcastTab('rootPopupRequestInformationBroadcast');
-        const {popupId, frameId} = await rootPopupInformationPromise;
-
-        const frameOffsetForwarder = new FrameOffsetForwarder();
-        frameOffsetForwarder.start();
-        const getFrameOffset = frameOffsetForwarder.getOffset.bind(frameOffsetForwarder);
-
-        popup = new PopupProxy(popupId, 0, null, frameId, url, getFrameOffset);
-        await popup.prepare();
+        popup = await createIframePopupProxy(url);
     } else if (proxy) {
-        popup = new PopupProxy(null, depth + 1, id, parentFrameId, url);
-        await popup.prepare();
+        popup = await createPopupProxy(depth, id, parentFrameId, url);
     } else {
-        const frameOffsetForwarder = new FrameOffsetForwarder();
-        frameOffsetForwarder.start();
-
-        const popupHost = new PopupProxyHost();
-        await popupHost.prepare();
-
-        popup = popupHost.getOrCreatePopup(null, null, depth);
+        popup = await getOrCreatePopup(depth);
     }
 
     const frontend = new Frontend(popup, initEventDispatcher);
