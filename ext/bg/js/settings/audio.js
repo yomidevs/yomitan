@@ -110,7 +110,7 @@ function textToSpeechTest() {
         const text = document.querySelector('#text-to-speech-voice-test').dataset.speechText || '';
         const voiceUri = document.querySelector('#text-to-speech-voice').value;
 
-        const audio = audioSystem.createTextToSpeechAudio({text, voiceUri});
+        const audio = audioSystem.createTextToSpeechAudio(text, voiceUri);
         audio.volume = 1.0;
         audio.play();
     } catch (e) {

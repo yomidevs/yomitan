@@ -102,7 +102,7 @@ class AudioSystem {
         throw new Error('Could not create audio');
     }
 
-    createTextToSpeechAudio({text, voiceUri}) {
+    createTextToSpeechAudio(text, voiceUri) {
         const voice = this._getTextToSpeechVoiceFromVoiceUri(voiceUri);
         if (voice === null) {
             throw new Error('Invalid text-to-speech voice');
@@ -117,7 +117,8 @@ class AudioSystem {
     async _createAudio(uri) {
         const ttsParameters = this._getTextToSpeechParameters(uri);
         if (ttsParameters !== null) {
-            return this.createTextToSpeechAudio(ttsParameters);
+            const {text, voiceUri} = ttsParameters;
+            return this.createTextToSpeechAudio(text, voiceUri);
         }
 
         return await this._createAudioFromUrl(uri);
