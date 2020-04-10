@@ -71,31 +71,47 @@ async function main() {
     const data = window.frontendInitializationData || {};
     const {id, depth=0, parentFrameId, url, proxy=false, isSearchPage=false} = data;
 
+    const isIframe = !proxy && (window !== window.parent);
+
     const initEventDispatcher = new EventDispatcher();
 
-    yomichan.on('optionsUpdated', async () => {
+    const popups = {
+        iframe: null,
+        proxy: null,
+        normal: null
+    };
+
+    let frontend = null;
+
+    const applyOptions = async () => {
         const optionsContext = {depth: isSearchPage ? 0 : depth, url};
         const options = await apiOptionsGet(optionsContext);
         if (isSearchPage) {
             const disabled = !options.scanning.enableOnSearchPage;
             initEventDispatcher.trigger('setDisabledOverride', {disabled});
         }
-    });
 
-    const optionsContext = {depth, url};
-    const options = await apiOptionsGet(optionsContext);
+        let popup;
+        if (isIframe && options.general.showIframePopupsInRootFrame) {
+            popup = popups.iframe || await createIframePopupProxy(url);
+            popups.iframe = popup;
+        } else if (proxy) {
+            popup = popups.proxy || await createPopupProxy(depth, id, parentFrameId, url);
+            popups.proxy = popup;
+        } else {
+            popup = popups.normal || await getOrCreatePopup(depth);
+            popups.normal = popup;
+        }
 
-    let popup;
-    if (!proxy && (window !== window.parent) && options.general.showIframePopupsInRootFrame) {
-        popup = await createIframePopupProxy(url);
-    } else if (proxy) {
-        popup = await createPopupProxy(depth, id, parentFrameId, url);
-    } else {
-        popup = await getOrCreatePopup(depth);
-    }
+        if (frontend === null) {
+            frontend = new Frontend(popup, initEventDispatcher);
+            await frontend.prepare();
+        }
+    };
 
-    const frontend = new Frontend(popup, initEventDispatcher);
-    await frontend.prepare();
+    yomichan.on('optionsUpdated', applyOptions);
+
+    await applyOptions();
 }
 
 main();
