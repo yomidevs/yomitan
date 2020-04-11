@@ -20,6 +20,7 @@
  * DOM
  * DisplayContext
  * DisplayGenerator
+ * MediaLoader
  * WindowScroll
  * apiAudioGetUri
  * apiBroadcastTab
@@ -62,7 +63,8 @@ class Display {
         this.clickScanPrevent = false;
         this.setContentToken = null;
 
-        this.displayGenerator = new DisplayGenerator();
+        this.mediaLoader = new MediaLoader();
+        this.displayGenerator = new DisplayGenerator({mediaLoader: this.mediaLoader});
         this.windowScroll = new WindowScroll();
 
         this._onKeyDownHandlers = new Map([
@@ -479,6 +481,8 @@ class Display {
         const token = {}; // Unique identifier token
         this.setContentToken = token;
         try {
+            this.mediaLoader.unloadAll();
+
             switch (type) {
                 case 'terms':
                     await this.setContentTerms(details.definitions, details.context, token);
