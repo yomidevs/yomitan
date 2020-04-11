@@ -36,14 +36,7 @@ function injectPopupNested() {
     }
 }
 
-let popupNestedInitialized = false;
-
 async function popupNestedInitialize(id, depth, parentFrameId, url) {
-    if (popupNestedInitialized) {
-        return;
-    }
-    popupNestedInitialized = true;
-
     let optionsApplied = false;
 
     const applyOptions = async () => {
