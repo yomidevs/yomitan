@@ -414,6 +414,17 @@ function testCollapseEmphaticSequences() {
         [['っっっこい', false], ['っこい', [3, 1, 1]]],
         [['っっっこい', true], ['こい', [4, 1]]],
 
+        [['すごい', false], ['すごい', [1, 1, 1]]],
+        [['すごい', true], ['すごい', [1, 1, 1]]],
+        [['すごーい', false], ['すごーい', [1, 1, 1, 1]]],
+        [['すごーい', true], ['すごい', [1, 2, 1]]],
+        [['すごーーい', false], ['すごーい', [1, 1, 2, 1]]],
+        [['すごーーい', true], ['すごい', [1, 3, 1]]],
+        [['すっごーい', false], ['すっごーい', [1, 1, 1, 1, 1]]],
+        [['すっごーい', true], ['すごい', [2, 2, 1]]],
+        [['すっっごーーい', false], ['すっごーい', [1, 2, 1, 2, 1]]],
+        [['すっっごーーい', true], ['すごい', [3, 3, 1]]],
+
         [['', false], ['', []]],
         [['', true], ['', []]],
         [['っ', false], ['っ', [1]]],
@@ -431,8 +442,6 @@ function testCollapseEmphaticSequences() {
         assert.strictEqual(actual1, expected);
         assert.strictEqual(actual2, expected);
         if (typeof expectedSourceMapping !== 'undefined') {
-            console.log('actual', JSON.stringify(actual1), sourceMap);
-            console.log('expected', JSON.stringify(expected), new TextSourceMap(text, expectedSourceMapping));
             assert.ok(sourceMap.equals(new TextSourceMap(text, expectedSourceMapping)));
         }
     }
