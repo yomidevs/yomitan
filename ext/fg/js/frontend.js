@@ -30,8 +30,7 @@ class Frontend extends TextScanner {
         super(
             window,
             () => this.popup.isProxy() ? [] : [this.popup.getContainer()],
-            [(x, y) => this.popup.containsPoint(x, y)],
-            () => this.popup.depth <= this.options.scanning.popupNestingMaxDepth && !this._disabledOverride
+            [(x, y) => this.popup.containsPoint(x, y)]
         );
 
         this.popup = popup;
@@ -138,10 +137,7 @@ class Frontend extends TextScanner {
 
     setDisabledOverride(disabled) {
         this._disabledOverride = disabled;
-        // other cases handed by regular options update
-        if (disabled && this.enabled) {
-            this.setEnabled(false);
-        }
+        this.setEnabled(this.options.general.enable, this._canEnable());
     }
 
     async setPopup(popup) {
@@ -151,7 +147,7 @@ class Frontend extends TextScanner {
     }
 
     async updateOptions() {
-        this.setOptions(await apiOptionsGet(this.getOptionsContext()));
+        this.setOptions(await apiOptionsGet(this.getOptionsContext()), this._canEnable());
 
         const ignoreNodes = ['.scan-disable', '.scan-disable *'];
         if (!this.options.scanning.enableOnPopupExpressions) {
@@ -288,6 +284,11 @@ class Frontend extends TextScanner {
             frameId: this.popup.frameId,
             title: document.title
         });
+    }
+
+    _canEnable() {
+        if (this.options === null) { return true; } // called by updateOptions for the first time
+        return this.popup.depth <= this.options.scanning.popupNestingMaxDepth && !this._disabledOverride;
     }
 
     async _updatePopupPosition() {

@@ -22,12 +22,10 @@
  */
 
 class TextScanner {
-    constructor(node, ignoreElements, ignorePoints, canEnable=null) {
+    constructor(node, ignoreElements, ignorePoints) {
         this.node = node;
         this.ignoreElements = ignoreElements;
         this.ignorePoints = ignorePoints;
-
-        this.canEnable = canEnable;
 
         this.ignoreNodes = null;
 
@@ -226,12 +224,8 @@ class TextScanner {
         }
     }
 
-    setEnabled(enabled) {
-        if (this.canEnable !== null && !this.canEnable()) {
-            enabled = false;
-        }
-
-        if (enabled) {
+    setEnabled(enabled, canEnable) {
+        if (enabled && canEnable) {
             if (!this.enabled) {
                 this.hookEvents();
                 this.enabled = true;
@@ -277,9 +271,9 @@ class TextScanner {
         ];
     }
 
-    setOptions(options) {
+    setOptions(options, canEnable=true) {
         this.options = options;
-        this.setEnabled(this.options.general.enable);
+        this.setEnabled(this.options.general.enable, canEnable);
     }
 
     async searchAt(x, y, cause) {

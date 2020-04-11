@@ -80,6 +80,7 @@ async function main() {
     };
 
     let frontend = null;
+    let frontendPreparePromise = null;
 
     const applyOptions = async () => {
         const optionsContext = {depth: isSearchPage ? 0 : depth, url};
@@ -99,8 +100,10 @@ async function main() {
 
         if (frontend === null) {
             frontend = new Frontend(popup);
-            await frontend.prepare();
+            frontendPreparePromise = frontend.prepare();
+            await frontendPreparePromise;
         } else {
+            await frontendPreparePromise;
             if (isSearchPage) {
                 const disabled = !options.scanning.enableOnSearchPage;
                 frontend.setDisabledOverride(disabled);
