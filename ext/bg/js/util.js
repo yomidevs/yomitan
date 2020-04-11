@@ -58,19 +58,6 @@ function utilBackgroundFunctionIsolate(func) {
     return backgroundPage.utilFunctionIsolate(func);
 }
 
-function utilStringHashCode(string) {
-    let hashCode = 0;
-
-    if (typeof string !== 'string') { return hashCode; }
-
-    for (let i = 0, charCode = string.charCodeAt(i); i < string.length; charCode = string.charCodeAt(++i)) {
-        hashCode = ((hashCode << 5) - hashCode) + charCode;
-        hashCode |= 0;
-    }
-
-    return hashCode;
-}
-
 function utilBackend() {
     const backend = chrome.extension.getBackgroundPage().yomichanBackend;
     if (!backend.isPrepared) {
