@@ -209,7 +209,7 @@ class DisplaySearch extends Display {
 
     onCopy() {
         // ignore copy from search page
-        this.clipboardMonitor.setPreviousText(document.getSelection().toString().trim());
+        this.clipboardMonitor.setPreviousText(window.getSelection().toString().trim());
     }
 
     onExternalSearchUpdate({text}) {
