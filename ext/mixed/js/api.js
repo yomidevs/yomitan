@@ -140,6 +140,10 @@ function apiPurgeDatabase() {
     return _apiInvoke('purgeDatabase');
 }
 
+function apiGetMedia(targets) {
+    return _apiInvoke('getMedia', {targets});
+}
+
 function _apiInvoke(action, params={}) {
     const data = {action, params};
     return new Promise((resolve, reject) => {

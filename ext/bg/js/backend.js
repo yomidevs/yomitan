@@ -111,7 +111,8 @@ class Backend {
             ['getAnkiModelFieldNames', {handler: this._onApiGetAnkiModelFieldNames.bind(this), async: true}],
             ['getDictionaryInfo', {handler: this._onApiGetDictionaryInfo.bind(this), async: true}],
             ['getDictionaryCounts', {handler: this._onApiGetDictionaryCounts.bind(this), async: true}],
-            ['purgeDatabase', {handler: this._onApiPurgeDatabase.bind(this), async: true}]
+            ['purgeDatabase', {handler: this._onApiPurgeDatabase.bind(this), async: true}],
+            ['getMedia', {handler: this._onApiGetMedia.bind(this), async: true}]
         ]);
 
         this._commandHandlers = new Map([
@@ -760,6 +761,10 @@ class Backend {
     async _onApiPurgeDatabase(params, sender) {
         this._validatePrivilegedMessageSender(sender);
         return await this.translator.purgeDatabase();
+    }
+
+    async _onApiGetMedia({targets}) {
+        return await this.database.getMedia(targets);
     }
 
     // Command handlers
