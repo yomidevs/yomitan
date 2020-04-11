@@ -30,5 +30,6 @@
     ["打ち込む", "ぶちこむ", "tag1 tag2", "v5", 29, ["definition1a (打ち込む, ぶちこむ)", "definition1b (打ち込む, ぶちこむ)"], 6, "tag3 tag4 tag5"],
     ["打ち込む", "ぶちこむ", "tag1 tag2", "v5", 30, ["definition2a (打ち込む, ぶちこむ)", "definition2b (打ち込む, ぶちこむ)"], 6, "tag3 tag4 tag5"],
     ["打ち込む", "ぶちこむ", "tag1 tag2", "v5", 31, ["definition3a (打ち込む, ぶちこむ)", "definition3b (打ち込む, ぶちこむ)"], 6, "tag3 tag4 tag5"],
-    ["打ち込む", "ぶちこむ", "tag1 tag2", "v5", 32, ["definition4a (打ち込む, ぶちこむ)", "definition4b (打ち込む, ぶちこむ)"], 6, "tag3 tag4 tag5"]
+    ["打ち込む", "ぶちこむ", "tag1 tag2", "v5", 32, ["definition4a (打ち込む, ぶちこむ)", "definition4b (打ち込む, ぶちこむ)"], 6, "tag3 tag4 tag5"],
+    ["画像", "がぞう", "tag1 tag2", "", 33, ["definition1a (画像, がぞう)", {"type": "image", "path": "image.gif", "width": 350, "height": 350, "description": "An image", "pixelated": true}], 7, "tag3 tag4 tag5"]
 ]
