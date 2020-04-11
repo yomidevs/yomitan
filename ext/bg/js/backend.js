@@ -94,7 +94,7 @@ class Backend {
             ['commandExec', {handler: this._onApiCommandExec.bind(this), async: false}],
             ['audioGetUri', {handler: this._onApiAudioGetUri.bind(this), async: true}],
             ['screenshotGet', {handler: this._onApiScreenshotGet.bind(this), async: true}],
-            ['broadcast', {handler: this._onApiBroadcast.bind(this), async: false}],
+            ['broadcastTab', {handler: this._onApiBroadcastTab.bind(this), async: false}],
             ['frameInformationGet', {handler: this._onApiFrameInformationGet.bind(this), async: true}],
             ['injectStylesheet', {handler: this._onApiInjectStylesheet.bind(this), async: true}],
             ['getEnvironmentInfo', {handler: this._onApiGetEnvironmentInfo.bind(this), async: true}],
@@ -566,7 +566,7 @@ class Backend {
         });
     }
 
-    _onApiBroadcast({action, params}, sender) {
+    _onApiBroadcastTab({action, params}, sender) {
         if (!(sender && sender.tab)) {
             return false;
         }
