@@ -79,35 +79,6 @@ function utilBackend() {
     return backend;
 }
 
-async function utilAnkiGetModelNames() {
-    return utilIsolate(await utilBackend().anki.getModelNames());
-}
-
-async function utilAnkiGetDeckNames() {
-    return utilIsolate(await utilBackend().anki.getDeckNames());
-}
-
-async function utilDatabaseGetDictionaryInfo() {
-    return utilIsolate(await utilBackend().translator.database.getDictionaryInfo());
-}
-
-async function utilDatabaseGetDictionaryCounts(dictionaryNames, getTotal) {
-    return utilIsolate(await utilBackend().translator.database.getDictionaryCounts(
-        utilBackgroundIsolate(dictionaryNames),
-        utilBackgroundIsolate(getTotal)
-    ));
-}
-
-async function utilAnkiGetModelFieldNames(modelName) {
-    return utilIsolate(await utilBackend().anki.getModelFieldNames(
-        utilBackgroundIsolate(modelName)
-    ));
-}
-
-async function utilDatabasePurge() {
-    return utilIsolate(await utilBackend().translator.purgeDatabase());
-}
-
 async function utilDatabaseDeleteDictionary(dictionaryName, onProgress) {
     return utilIsolate(await utilBackend().translator.database.deleteDictionary(
         utilBackgroundIsolate(dictionaryName),
