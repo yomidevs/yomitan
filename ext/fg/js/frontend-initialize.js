@@ -73,8 +73,6 @@ async function main() {
 
     const isIframe = !proxy && (window !== window.parent);
 
-    const initEventDispatcher = new EventDispatcher();
-
     const popups = {
         iframe: null,
         proxy: null,
@@ -99,18 +97,18 @@ async function main() {
             popups.normal = popup;
         }
 
-        if (isSearchPage) {
-            const disabled = !options.scanning.enableOnSearchPage;
-            initEventDispatcher.trigger('setDisabledOverride', {disabled});
-        }
-
-        if (isIframe) {
-            initEventDispatcher.trigger('popupChange', {popup});
-        }
-
         if (frontend === null) {
-            frontend = new Frontend(popup, initEventDispatcher);
+            frontend = new Frontend(popup);
             await frontend.prepare();
+        } else {
+            if (isSearchPage) {
+                const disabled = !options.scanning.enableOnSearchPage;
+                frontend.setDisabledOverride(disabled);
+            }
+
+            if (isIframe) {
+                await frontend.setPopup(popup);
+            }
         }
     };
 

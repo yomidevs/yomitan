@@ -26,7 +26,7 @@
  */
 
 class Frontend extends TextScanner {
-    constructor(popup, initEventDispatcher=null) {
+    constructor(popup) {
         super(
             window,
             () => this.popup.isProxy() ? [] : [this.popup.getContainer()],
@@ -35,7 +35,6 @@ class Frontend extends TextScanner {
         );
 
         this.popup = popup;
-        this.initEventDispatcher = initEventDispatcher;
 
         this._disabledOverride = false;
 
@@ -75,11 +74,6 @@ class Frontend extends TextScanner {
             if (visualViewport !== null && typeof visualViewport === 'object') {
                 window.visualViewport.addEventListener('scroll', this.onVisualViewportScroll.bind(this));
                 window.visualViewport.addEventListener('resize', this.onVisualViewportResize.bind(this));
-            }
-
-            if (this.initEventDispatcher !== null) {
-                this.initEventDispatcher.on('setDisabledOverride', this.onSetDisabledOverride.bind(this));
-                this.initEventDispatcher.on('popupChange', this.onPopupChange.bind(this));
             }
 
             yomichan.on('orphaned', this.onOrphaned.bind(this));
@@ -140,6 +134,20 @@ class Frontend extends TextScanner {
             ...super.getMouseEventListeners(),
             [window, 'message', this.onWindowMessage.bind(this)]
         ];
+    }
+
+    setDisabledOverride(disabled) {
+        this._disabledOverride = disabled;
+        // other cases handed by regular options update
+        if (disabled && this.enabled) {
+            this.setEnabled(false);
+        }
+    }
+
+    async setPopup(popup) {
+        this.onSearchClear(true);
+        this.popup = popup;
+        await popup.setOptions(this.options);
     }
 
     async updateOptions() {
@@ -235,20 +243,6 @@ class Frontend extends TextScanner {
         this.popup.hide(changeFocus);
         this.popup.clearAutoPlayTimer();
         super.onSearchClear(changeFocus);
-    }
-
-    onSetDisabledOverride({disabled}) {
-        this._disabledOverride = disabled;
-        // other cases handed by regular options update
-        if (disabled && this.enabled) {
-            this.setEnabled(false);
-        }
-    }
-
-    async onPopupChange({popup}) {
-        this.onSearchClear(true);
-        this.popup = popup;
-        await popup.setOptions(this.options);
     }
 
     getOptionsContext() {
