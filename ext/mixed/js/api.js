@@ -80,8 +80,8 @@ function apiScreenshotGet(options) {
     return _apiInvoke('screenshotGet', {options});
 }
 
-function apiForward(action, params) {
-    return _apiInvoke('forward', {action, params});
+function apiBroadcastTab(action, params) {
+    return _apiInvoke('broadcastTab', {action, params});
 }
 
 function apiFrameInformationGet() {

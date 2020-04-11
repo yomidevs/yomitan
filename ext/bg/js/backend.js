@@ -76,33 +76,33 @@ class Backend {
         this.messageToken = yomichan.generateId(16);
 
         this._messageHandlers = new Map([
-            ['yomichanCoreReady', this._onApiYomichanCoreReady.bind(this)],
-            ['optionsSchemaGet', this._onApiOptionsSchemaGet.bind(this)],
-            ['optionsGet', this._onApiOptionsGet.bind(this)],
-            ['optionsGetFull', this._onApiOptionsGetFull.bind(this)],
-            ['optionsSet', this._onApiOptionsSet.bind(this)],
-            ['optionsSave', this._onApiOptionsSave.bind(this)],
-            ['kanjiFind', this._onApiKanjiFind.bind(this)],
-            ['termsFind', this._onApiTermsFind.bind(this)],
-            ['textParse', this._onApiTextParse.bind(this)],
-            ['textParseMecab', this._onApiTextParseMecab.bind(this)],
-            ['definitionAdd', this._onApiDefinitionAdd.bind(this)],
-            ['definitionsAddable', this._onApiDefinitionsAddable.bind(this)],
-            ['noteView', this._onApiNoteView.bind(this)],
-            ['templateRender', this._onApiTemplateRender.bind(this)],
-            ['commandExec', this._onApiCommandExec.bind(this)],
-            ['audioGetUri', this._onApiAudioGetUri.bind(this)],
-            ['screenshotGet', this._onApiScreenshotGet.bind(this)],
-            ['forward', this._onApiForward.bind(this)],
-            ['frameInformationGet', this._onApiFrameInformationGet.bind(this)],
-            ['injectStylesheet', this._onApiInjectStylesheet.bind(this)],
-            ['getEnvironmentInfo', this._onApiGetEnvironmentInfo.bind(this)],
-            ['clipboardGet', this._onApiClipboardGet.bind(this)],
-            ['getDisplayTemplatesHtml', this._onApiGetDisplayTemplatesHtml.bind(this)],
-            ['getQueryParserTemplatesHtml', this._onApiGetQueryParserTemplatesHtml.bind(this)],
-            ['getZoom', this._onApiGetZoom.bind(this)],
-            ['getMessageToken', this._onApiGetMessageToken.bind(this)],
-            ['getDefaultAnkiFieldTemplates', this._onApiGetDefaultAnkiFieldTemplates.bind(this)]
+            ['yomichanCoreReady', {handler: this._onApiYomichanCoreReady.bind(this), async: false}],
+            ['optionsSchemaGet', {handler: this._onApiOptionsSchemaGet.bind(this), async: false}],
+            ['optionsGet', {handler: this._onApiOptionsGet.bind(this), async: false}],
+            ['optionsGetFull', {handler: this._onApiOptionsGetFull.bind(this), async: false}],
+            ['optionsSet', {handler: this._onApiOptionsSet.bind(this), async: true}],
+            ['optionsSave', {handler: this._onApiOptionsSave.bind(this), async: true}],
+            ['kanjiFind', {handler: this._onApiKanjiFind.bind(this), async: true}],
+            ['termsFind', {handler: this._onApiTermsFind.bind(this), async: true}],
+            ['textParse', {handler: this._onApiTextParse.bind(this), async: true}],
+            ['textParseMecab', {handler: this._onApiTextParseMecab.bind(this), async: true}],
+            ['definitionAdd', {handler: this._onApiDefinitionAdd.bind(this), async: true}],
+            ['definitionsAddable', {handler: this._onApiDefinitionsAddable.bind(this), async: true}],
+            ['noteView', {handler: this._onApiNoteView.bind(this), async: true}],
+            ['templateRender', {handler: this._onApiTemplateRender.bind(this), async: true}],
+            ['commandExec', {handler: this._onApiCommandExec.bind(this), async: false}],
+            ['audioGetUri', {handler: this._onApiAudioGetUri.bind(this), async: true}],
+            ['screenshotGet', {handler: this._onApiScreenshotGet.bind(this), async: true}],
+            ['broadcastTab', {handler: this._onApiBroadcastTab.bind(this), async: false}],
+            ['frameInformationGet', {handler: this._onApiFrameInformationGet.bind(this), async: true}],
+            ['injectStylesheet', {handler: this._onApiInjectStylesheet.bind(this), async: true}],
+            ['getEnvironmentInfo', {handler: this._onApiGetEnvironmentInfo.bind(this), async: true}],
+            ['clipboardGet', {handler: this._onApiClipboardGet.bind(this), async: true}],
+            ['getDisplayTemplatesHtml', {handler: this._onApiGetDisplayTemplatesHtml.bind(this), async: true}],
+            ['getQueryParserTemplatesHtml', {handler: this._onApiGetQueryParserTemplatesHtml.bind(this), async: true}],
+            ['getZoom', {handler: this._onApiGetZoom.bind(this), async: true}],
+            ['getMessageToken', {handler: this._onApiGetMessageToken.bind(this), async: false}],
+            ['getDefaultAnkiFieldTemplates', {handler: this._onApiGetDefaultAnkiFieldTemplates.bind(this), async: false}]
         ]);
 
         this._commandHandlers = new Map([
@@ -166,16 +166,23 @@ class Backend {
     }
 
     onMessage({action, params}, sender, callback) {
-        const handler = this._messageHandlers.get(action);
-        if (typeof handler !== 'function') { return false; }
+        const messageHandler = this._messageHandlers.get(action);
+        if (typeof messageHandler === 'undefined') { return false; }
+
+        const {handler, async} = messageHandler;
 
         try {
-            const promise = handler(params, sender);
-            promise.then(
-                (result) => callback({result}),
-                (error) => callback({error: errorToJson(error)})
-            );
-            return true;
+            const promiseOrResult = handler(params, sender);
+            if (async) {
+                promiseOrResult.then(
+                    (result) => callback({result}),
+                    (error) => callback({error: errorToJson(error)})
+                );
+                return true;
+            } else {
+                callback({result: promiseOrResult});
+                return false;
+            }
         } catch (error) {
             callback({error: errorToJson(error)});
             return false;
@@ -312,27 +319,26 @@ class Backend {
 
     _onApiYomichanCoreReady(_params, sender) {
         // tab ID isn't set in background (e.g. browser_action)
+        const callback = () => this.checkLastError(chrome.runtime.lastError);
+        const data = {action: 'backendPrepared'};
         if (typeof sender.tab === 'undefined') {
-            const callback = () => this.checkLastError(chrome.runtime.lastError);
-            chrome.runtime.sendMessage({action: 'backendPrepared'}, callback);
-            return Promise.resolve();
+            chrome.runtime.sendMessage(data, callback);
+            return false;
+        } else {
+            chrome.tabs.sendMessage(sender.tab.id, data, callback);
+            return true;
         }
-
-        const tabId = sender.tab.id;
-        return new Promise((resolve) => {
-            chrome.tabs.sendMessage(tabId, {action: 'backendPrepared'}, resolve);
-        });
     }
 
-    async _onApiOptionsSchemaGet() {
+    _onApiOptionsSchemaGet() {
         return this.getOptionsSchema();
     }
 
-    async _onApiOptionsGet({optionsContext}) {
+    _onApiOptionsGet({optionsContext}) {
         return this.getOptions(optionsContext);
     }
 
-    async _onApiOptionsGetFull() {
+    _onApiOptionsGetFull() {
         return this.getFullOptions();
     }
 
@@ -539,7 +545,7 @@ class Backend {
         return this._renderTemplate(template, data);
     }
 
-    async _onApiCommandExec({command, params}) {
+    _onApiCommandExec({command, params}) {
         return this._runCommand(command, params);
     }
 
@@ -559,15 +565,15 @@ class Backend {
         });
     }
 
-    _onApiForward({action, params}, sender) {
+    _onApiBroadcastTab({action, params}, sender) {
         if (!(sender && sender.tab)) {
-            return Promise.resolve();
+            return false;
         }
 
         const tabId = sender.tab.id;
-        return new Promise((resolve) => {
-            chrome.tabs.sendMessage(tabId, {action, params}, (response) => resolve(response));
-        });
+        const callback = () => this.checkLastError(chrome.runtime.lastError);
+        chrome.tabs.sendMessage(tabId, {action, params}, callback);
+        return true;
     }
 
     _onApiFrameInformationGet(params, sender) {
@@ -690,11 +696,11 @@ class Backend {
         });
     }
 
-    async _onApiGetMessageToken() {
+    _onApiGetMessageToken() {
         return this.messageToken;
     }
 
-    async _onApiGetDefaultAnkiFieldTemplates() {
+    _onApiGetDefaultAnkiFieldTemplates() {
         return this.defaultAnkiFieldTemplates;
     }
 

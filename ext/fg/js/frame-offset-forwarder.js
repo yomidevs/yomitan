@@ -16,7 +16,7 @@
  */
 
 /* global
- * apiForward
+ * apiBroadcastTab
  */
 
 class FrameOffsetForwarder {
@@ -96,6 +96,6 @@ class FrameOffsetForwarder {
     }
 
     _forwardFrameOffsetOrigin(offset, uniqueId) {
-        apiForward('frameOffset', {offset, uniqueId});
+        apiBroadcastTab('frameOffset', {offset, uniqueId});
     }
 }

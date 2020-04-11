@@ -17,7 +17,7 @@
 
 /* global
  * TextScanner
- * apiForward
+ * apiBroadcastTab
  * apiGetZoom
  * apiKanjiFind
  * apiOptionsGet
@@ -260,12 +260,12 @@ class Frontend extends TextScanner {
 
     _broadcastRootPopupInformation() {
         if (!this.popup.isProxy() && this.popup.depth === 0) {
-            apiForward('rootPopupInformation', {popupId: this.popup.id, frameId: this.popup.frameId});
+            apiBroadcastTab('rootPopupInformation', {popupId: this.popup.id, frameId: this.popup.frameId});
         }
     }
 
     _broadcastDocumentInformation(uniqueId) {
-        apiForward('documentInformationBroadcast', {
+        apiBroadcastTab('documentInformationBroadcast', {
             uniqueId,
             frameId: this.popup.frameId,
             title: document.title
