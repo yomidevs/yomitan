@@ -354,7 +354,7 @@ class Translator {
                 collapseEmphaticOptions.push([true, false]);
                 break;
             case 'full':
-                collapseEmphaticOptions.push([true, true]);
+                collapseEmphaticOptions.push([true, false], [true, true]);
                 break;
         }
         const textOptionVariantArray = [
