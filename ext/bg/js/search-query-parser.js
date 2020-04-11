@@ -27,7 +27,7 @@
 
 class QueryParser extends TextScanner {
     constructor({getOptionsContext, setContent, setSpinnerVisible}) {
-        super(document.querySelector('#query-parser-content'), [], []);
+        super(document.querySelector('#query-parser-content'), () => [], []);
 
         this.getOptionsContext = getOptionsContext;
         this.setContent = setContent;
