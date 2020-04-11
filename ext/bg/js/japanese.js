@@ -85,6 +85,7 @@
 
     const HIRAGANA_SMALL_TSU_CODE_POINT = 0x3063;
     const KATAKANA_SMALL_TSU_CODE_POINT = 0x30c3;
+    const KANA_PROLONGED_SOUND_MARK_CODE_POINT = 0x30fc;
 
     // Existing functions
 
@@ -383,7 +384,11 @@
         const hasSourceMap = (sourceMap !== null);
         for (const char of text) {
             const c = char.codePointAt(0);
-            if (c === HIRAGANA_SMALL_TSU_CODE_POINT || c === KATAKANA_SMALL_TSU_CODE_POINT) {
+            if (
+                c === HIRAGANA_SMALL_TSU_CODE_POINT ||
+                c === KATAKANA_SMALL_TSU_CODE_POINT ||
+                c === KANA_PROLONGED_SOUND_MARK_CODE_POINT
+            ) {
                 if (collapseCodePoint !== c) {
                     collapseCodePoint = c;
                     if (!fullCollapse) {
