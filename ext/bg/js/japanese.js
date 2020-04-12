@@ -82,6 +82,9 @@
 
     const ITERATION_MARK_CODE_POINT = 0x3005;
 
+    const HIRAGANA_SMALL_TSU_CODE_POINT = 0x3063;
+    const KATAKANA_SMALL_TSU_CODE_POINT = 0x30c3;
+    const KANA_PROLONGED_SOUND_MARK_CODE_POINT = 0x30fc;
 
     // Existing functions
 
@@ -372,6 +375,40 @@
     }
 
 
+    // Miscellaneous
+
+    function collapseEmphaticSequences(text, fullCollapse, sourceMap=null) {
+        let result = '';
+        let collapseCodePoint = -1;
+        const hasSourceMap = (sourceMap !== null);
+        for (const char of text) {
+            const c = char.codePointAt(0);
+            if (
+                c === HIRAGANA_SMALL_TSU_CODE_POINT ||
+                c === KATAKANA_SMALL_TSU_CODE_POINT ||
+                c === KANA_PROLONGED_SOUND_MARK_CODE_POINT
+            ) {
+                if (collapseCodePoint !== c) {
+                    collapseCodePoint = c;
+                    if (!fullCollapse) {
+                        result += char;
+                        continue;
+                    }
+                }
+            } else {
+                collapseCodePoint = -1;
+                result += char;
+                continue;
+            }
+
+            if (hasSourceMap) {
+                sourceMap.combine(Math.max(0, result.length - 1), 1);
+            }
+        }
+        return result;
+    }
+
+
     // Exports
 
     Object.assign(jp, {
@@ -383,6 +420,7 @@
         convertHalfWidthKanaToFullWidth,
         convertAlphabeticToKana,
         distributeFurigana,
-        distributeFuriganaInflected
+        distributeFuriganaInflected,
+        collapseEmphaticSequences
     });
 })();

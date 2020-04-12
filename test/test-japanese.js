@@ -393,6 +393,59 @@ function testDistributeFuriganaInflected() {
     }
 }
 
+function testCollapseEmphaticSequences() {
+    const data = [
+        [['かこい', false], ['かこい', [1, 1, 1]]],
+        [['かこい', true], ['かこい', [1, 1, 1]]],
+        [['かっこい', false], ['かっこい', [1, 1, 1, 1]]],
+        [['かっこい', true], ['かこい', [2, 1, 1]]],
+        [['かっっこい', false], ['かっこい', [1, 2, 1, 1]]],
+        [['かっっこい', true], ['かこい', [3, 1, 1]]],
+        [['かっっっこい', false], ['かっこい', [1, 3, 1, 1]]],
+        [['かっっっこい', true], ['かこい', [4, 1, 1]]],
+
+        [['こい', false], ['こい', [1, 1]]],
+        [['こい', true], ['こい', [1, 1]]],
+        [['っこい', false], ['っこい', [1, 1, 1]]],
+        [['っこい', true], ['こい', [2, 1]]],
+        [['っっこい', false], ['っこい', [2, 1, 1]]],
+        [['っっこい', true], ['こい', [3, 1]]],
+        [['っっっこい', false], ['っこい', [3, 1, 1]]],
+        [['っっっこい', true], ['こい', [4, 1]]],
+
+        [['すごい', false], ['すごい', [1, 1, 1]]],
+        [['すごい', true], ['すごい', [1, 1, 1]]],
+        [['すごーい', false], ['すごーい', [1, 1, 1, 1]]],
+        [['すごーい', true], ['すごい', [1, 2, 1]]],
+        [['すごーーい', false], ['すごーい', [1, 1, 2, 1]]],
+        [['すごーーい', true], ['すごい', [1, 3, 1]]],
+        [['すっごーい', false], ['すっごーい', [1, 1, 1, 1, 1]]],
+        [['すっごーい', true], ['すごい', [2, 2, 1]]],
+        [['すっっごーーい', false], ['すっごーい', [1, 2, 1, 2, 1]]],
+        [['すっっごーーい', true], ['すごい', [3, 3, 1]]],
+
+        [['', false], ['', []]],
+        [['', true], ['', []]],
+        [['っ', false], ['っ', [1]]],
+        [['っ', true], ['', [1]]],
+        [['っっ', false], ['っ', [2]]],
+        [['っっ', true], ['', [2]]],
+        [['っっっ', false], ['っ', [3]]],
+        [['っっっ', true], ['', [3]]]
+    ];
+
+    for (const [[text, fullCollapse], [expected, expectedSourceMapping]] of data) {
+        const sourceMap = new TextSourceMap(text);
+        const actual1 = jp.collapseEmphaticSequences(text, fullCollapse, null);
+        const actual2 = jp.collapseEmphaticSequences(text, fullCollapse, sourceMap);
+        assert.strictEqual(actual1, expected);
+        assert.strictEqual(actual2, expected);
+        if (typeof expectedSourceMapping !== 'undefined') {
+            assert.ok(sourceMap.equals(new TextSourceMap(text, expectedSourceMapping)));
+        }
+    }
+}
+
 function testIsMoraPitchHigh() {
     const data = [
         [[0, 0], false],
@@ -462,6 +515,7 @@ function main() {
     testConvertAlphabeticToKana();
     testDistributeFurigana();
     testDistributeFuriganaInflected();
+    testCollapseEmphaticSequences();
     testIsMoraPitchHigh();
     testGetKanaMorae();
 }
