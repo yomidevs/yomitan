@@ -69,7 +69,7 @@ async function main() {
     await yomichan.prepare();
 
     const data = window.frontendInitializationData || {};
-    const {id, depth=0, parentFrameId, url, proxy=false, isSearchPage=false} = data;
+    const {id, depth=0, parentFrameId, url=window.location.href, proxy=false, isSearchPage=false} = data;
 
     const isIframe = !proxy && (window !== window.parent);
 
