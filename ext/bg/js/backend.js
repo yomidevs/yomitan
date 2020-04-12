@@ -47,7 +47,7 @@ class Backend {
         this.database = new Database();
         this.dictionaryImporter = new DictionaryImporter();
         this.translator = new Translator(this.database);
-        this.anki = new AnkiNull();
+        this.anki = new AnkiConnect();
         this.mecab = new Mecab();
         this.clipboardMonitor = new ClipboardMonitor({getClipboard: this._onApiClipboardGet.bind(this)});
         this.options = null;
@@ -210,7 +210,8 @@ class Backend {
             this.setExtensionBadgeText('');
         }
 
-        this.anki = options.anki.enable ? new AnkiConnect(options.anki.server) : new AnkiNull();
+        this.anki.setServer(options.anki.server);
+        this.anki.setEnabled(options.anki.enable);
 
         if (options.parsing.enableMecabParser) {
             this.mecab.startListener();
