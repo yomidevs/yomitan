@@ -19,10 +19,6 @@
  * requestJson
  */
 
-/*
- * AnkiConnect
- */
-
 class AnkiConnect {
     constructor(server) {
         this._enabled = false;
@@ -130,40 +126,5 @@ class AnkiConnect {
 
         const key = fieldNames[0];
         return `${key.toLowerCase()}:"${this._escapeQuery(fields[key])}"`;
-    }
-}
-
-
-/*
- * AnkiNull
- */
-
-class AnkiNull {
-    async addNote() {
-        return null;
-    }
-
-    async canAddNotes() {
-        return [];
-    }
-
-    async getDeckNames() {
-        return [];
-    }
-
-    async getModelNames() {
-        return [];
-    }
-
-    async getModelFieldNames() {
-        return [];
-    }
-
-    async guiBrowse() {
-        return [];
-    }
-
-    async findNoteIds() {
-        return [];
     }
 }
