@@ -25,47 +25,74 @@
 
 class AnkiConnect {
     constructor(server) {
+        this._enabled = true;
         this._server = server;
         this._localVersion = 2;
         this._remoteVersion = 0;
     }
 
+    setServer(server) {
+        this._server = server;
+    }
+
+    getServer() {
+        return this._server;
+    }
+
+    setEnabled(enabled) {
+        this._enabled = enabled;
+    }
+
+    isEnabled() {
+        return this._enabled;
+    }
+
     async addNote(note) {
+        if (!this._enabled) { return null; }
         await this._checkVersion();
         return await this._ankiInvoke('addNote', {note});
     }
 
     async canAddNotes(notes) {
+        if (!this._enabled) { return []; }
         await this._checkVersion();
         return await this._ankiInvoke('canAddNotes', {notes});
     }
 
     async getDeckNames() {
+        if (!this._enabled) { return []; }
         await this._checkVersion();
         return await this._ankiInvoke('deckNames');
     }
 
     async getModelNames() {
+        if (!this._enabled) { return []; }
         await this._checkVersion();
         return await this._ankiInvoke('modelNames');
     }
 
     async getModelFieldNames(modelName) {
+        if (!this._enabled) { return []; }
         await this._checkVersion();
         return await this._ankiInvoke('modelFieldNames', {modelName});
     }
 
     async guiBrowse(query) {
+        if (!this._enabled) { return []; }
         await this._checkVersion();
         return await this._ankiInvoke('guiBrowse', {query});
     }
 
     async storeMediaFile(filename, dataBase64) {
+        if (!this._enabled) {
+            return {result: null, error: 'AnkiConnect not enabled'};
+        }
         await this._checkVersion();
         return await this._ankiInvoke('storeMediaFile', {filename, data: dataBase64});
     }
 
     async findNoteIds(notes) {
+        if (!this._enabled) { return []; }
         await this._checkVersion();
         const actions = notes.map((note) => ({
             action: 'findNotes',
