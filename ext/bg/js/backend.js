@@ -77,6 +77,7 @@ class Backend {
 
         this._defaultBrowserActionTitle = null;
         this._isPrepared = false;
+        this._badgePrepareDelayTimer = null;
 
         this._messageHandlers = new Map([
             ['yomichanCoreReady', {handler: this._onApiYomichanCoreReady.bind(this), async: false}],
@@ -123,6 +124,10 @@ class Backend {
 
     async prepare() {
         this._defaultBrowserActionTitle = await this._getBrowserIconTitle();
+        this._badgePrepareDelayTimer = setTimeout(() => {
+            this._badgePrepareDelayTimer = null;
+            this._updateBadge();
+        }, 1000);
         this._updateBadge();
         await this.database.prepare();
         await this.translator.prepare();
@@ -157,6 +162,11 @@ class Backend {
         this._sendMessageAllTabs('backendPrepared');
         const callback = () => this.checkLastError(chrome.runtime.lastError);
         chrome.runtime.sendMessage({action: 'backendPrepared'}, callback);
+
+        if (this._badgePrepareDelayTimer !== null) {
+            clearTimeout(this._badgePrepareDelayTimer);
+            this._badgePrepareDelayTimer = null;
+        }
 
         this._isPrepared = true;
         this._updateBadge();
@@ -878,9 +888,11 @@ class Backend {
         let status = null;
 
         if (!this._isPrepared) {
-            text = '...';
-            color = '#f0ad4e';
-            status = 'Loading';
+            if (this._badgePrepareDelayTimer === null) {
+                text = '...';
+                color = '#f0ad4e';
+                status = 'Loading';
+            }
         } else if (!this._anyOptionsMatches((options) => options.general.enable)) {
             text = 'off';
             color = '#555555';
