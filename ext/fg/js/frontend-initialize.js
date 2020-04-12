@@ -24,7 +24,7 @@
  * apiOptionsGet
  */
 
-async function createIframePopupProxy(url) {
+async function createIframePopupProxy(url, frameOffsetForwarder) {
     const rootPopupInformationPromise = yomichan.getTemporaryListenerResult(
         chrome.runtime.onMessage,
         ({action, params}, {resolve}) => {
@@ -36,8 +36,6 @@ async function createIframePopupProxy(url) {
     apiBroadcastTab('rootPopupRequestInformationBroadcast');
     const {popupId, frameId} = await rootPopupInformationPromise;
 
-    const frameOffsetForwarder = new FrameOffsetForwarder();
-    frameOffsetForwarder.start();
     const getFrameOffset = frameOffsetForwarder.getOffset.bind(frameOffsetForwarder);
 
     const popup = new PopupProxy(popupId, 0, null, frameId, url, getFrameOffset);
@@ -47,9 +45,6 @@ async function createIframePopupProxy(url) {
 }
 
 async function getOrCreatePopup(depth) {
-    const frameOffsetForwarder = new FrameOffsetForwarder();
-    frameOffsetForwarder.start();
-
     const popupHost = new PopupProxyHost();
     await popupHost.prepare();
 
@@ -81,14 +76,20 @@ async function main() {
 
     let frontend = null;
     let frontendPreparePromise = null;
+    let frameOffsetForwarder = null;
 
     const applyOptions = async () => {
         const optionsContext = {depth: isSearchPage ? 0 : depth, url};
         const options = await apiOptionsGet(optionsContext);
 
+        if (!proxy && frameOffsetForwarder === null) {
+            frameOffsetForwarder = new FrameOffsetForwarder();
+            frameOffsetForwarder.start();
+        }
+
         let popup;
         if (isIframe && options.general.showIframePopupsInRootFrame) {
-            popup = popups.iframe || await createIframePopupProxy(url);
+            popup = popups.iframe || await createIframePopupProxy(url, frameOffsetForwarder);
             popups.iframe = popup;
         } else if (proxy) {
             popup = popups.proxy || await createPopupProxy(depth, id, parentFrameId, url);
