@@ -67,8 +67,6 @@ class Backend {
             url: window.location.href
         };
 
-        this.isPrepared = false;
-
         this.clipboardPasteTarget = document.querySelector('#clipboard-paste-target');
 
         this.popupWindow = null;
@@ -76,6 +74,8 @@ class Backend {
         this.apiForwarder = new BackendApiForwarder();
 
         this.messageToken = yomichan.generateId(16);
+
+        this._isPrepared = false;
 
         this._messageHandlers = new Map([
             ['yomichanCoreReady', {handler: this._onApiYomichanCoreReady.bind(this), async: false}],
@@ -144,8 +144,6 @@ class Backend {
         }
         chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
 
-        this.isPrepared = true;
-
         const options = this.getOptions(this.optionsContext);
         if (options.general.showGuide) {
             chrome.tabs.create({url: chrome.runtime.getURL('/bg/guide.html')});
@@ -156,6 +154,12 @@ class Backend {
         this._sendMessageAllTabs('backendPrepared');
         const callback = () => this.checkLastError(chrome.runtime.lastError);
         chrome.runtime.sendMessage({action: 'backendPrepared'}, callback);
+
+        this._isPrepared = true;
+    }
+
+    isPrepared() {
+        return this._isPrepared;
     }
 
     _sendMessageAllTabs(action, params={}) {

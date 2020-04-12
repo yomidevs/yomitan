@@ -60,7 +60,7 @@ function utilBackgroundFunctionIsolate(func) {
 
 function utilBackend() {
     const backend = chrome.extension.getBackgroundPage().yomichanBackend;
-    if (!backend.isPrepared) {
+    if (!backend.isPrepared()) {
         throw new Error('Backend not ready yet');
     }
     return backend;
