@@ -77,6 +77,7 @@ class Backend {
 
         this._defaultBrowserActionTitle = null;
         this._isPrepared = false;
+        this._prepareError = false;
         this._badgePrepareDelayTimer = null;
 
         this._messageHandlers = new Map([
@@ -123,53 +124,56 @@ class Backend {
     }
 
     async prepare() {
-        this._defaultBrowserActionTitle = await this._getBrowserIconTitle();
-        this._badgePrepareDelayTimer = setTimeout(() => {
-            this._badgePrepareDelayTimer = null;
-            this._updateBadge();
-        }, 1000);
-        this._updateBadge();
-        await this.database.prepare();
-        await this.translator.prepare();
-
-        this.optionsSchema = await requestJson(chrome.runtime.getURL('/bg/data/options-schema.json'), 'GET');
-        this.defaultAnkiFieldTemplates = await requestText(chrome.runtime.getURL('/bg/data/default-anki-field-templates.handlebars'), 'GET');
-        this.options = await optionsLoad();
         try {
+            this._defaultBrowserActionTitle = await this._getBrowserIconTitle();
+            this._badgePrepareDelayTimer = setTimeout(() => {
+                this._badgePrepareDelayTimer = null;
+                this._updateBadge();
+            }, 1000);
+            this._updateBadge();
+
+            await this.database.prepare();
+            await this.translator.prepare();
+
+            this.optionsSchema = await requestJson(chrome.runtime.getURL('/bg/data/options-schema.json'), 'GET');
+            this.defaultAnkiFieldTemplates = await requestText(chrome.runtime.getURL('/bg/data/default-anki-field-templates.handlebars'), 'GET');
+            this.options = await optionsLoad();
             this.options = JsonSchema.getValidValueOrDefault(this.optionsSchema, this.options);
+
+            this.onOptionsUpdated('background');
+
+            if (isObject(chrome.commands) && isObject(chrome.commands.onCommand)) {
+                chrome.commands.onCommand.addListener(this._runCommand.bind(this));
+            }
+            if (isObject(chrome.tabs) && isObject(chrome.tabs.onZoomChange)) {
+                chrome.tabs.onZoomChange.addListener(this._onZoomChange.bind(this));
+            }
+            chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
+
+            const options = this.getOptions(this.optionsContext);
+            if (options.general.showGuide) {
+                chrome.tabs.create({url: chrome.runtime.getURL('/bg/guide.html')});
+            }
+
+            this.clipboardMonitor.on('change', this._onClipboardText.bind(this));
+
+            this._sendMessageAllTabs('backendPrepared');
+            const callback = () => this.checkLastError(chrome.runtime.lastError);
+            chrome.runtime.sendMessage({action: 'backendPrepared'}, callback);
+
+            this._isPrepared = true;
         } catch (e) {
-            // This shouldn't happen, but catch errors just in case of bugs
+            this._prepareError = true;
             logError(e);
+            throw e;
+        } finally {
+            if (this._badgePrepareDelayTimer !== null) {
+                clearTimeout(this._badgePrepareDelayTimer);
+                this._badgePrepareDelayTimer = null;
+            }
+
+            this._updateBadge();
         }
-
-        this.onOptionsUpdated('background');
-
-        if (isObject(chrome.commands) && isObject(chrome.commands.onCommand)) {
-            chrome.commands.onCommand.addListener(this._runCommand.bind(this));
-        }
-        if (isObject(chrome.tabs) && isObject(chrome.tabs.onZoomChange)) {
-            chrome.tabs.onZoomChange.addListener(this._onZoomChange.bind(this));
-        }
-        chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
-
-        const options = this.getOptions(this.optionsContext);
-        if (options.general.showGuide) {
-            chrome.tabs.create({url: chrome.runtime.getURL('/bg/guide.html')});
-        }
-
-        this.clipboardMonitor.on('change', this._onClipboardText.bind(this));
-
-        this._sendMessageAllTabs('backendPrepared');
-        const callback = () => this.checkLastError(chrome.runtime.lastError);
-        chrome.runtime.sendMessage({action: 'backendPrepared'}, callback);
-
-        if (this._badgePrepareDelayTimer !== null) {
-            clearTimeout(this._badgePrepareDelayTimer);
-            this._badgePrepareDelayTimer = null;
-        }
-
-        this._isPrepared = true;
-        this._updateBadge();
     }
 
     isPrepared() {
@@ -888,7 +892,11 @@ class Backend {
         let status = null;
 
         if (!this._isPrepared) {
-            if (this._badgePrepareDelayTimer === null) {
+            if (this._prepareError !== null) {
+                text = '!!';
+                color = '#f04e4e';
+                status = 'Error';
+            } else if (this._badgePrepareDelayTimer === null) {
                 text = '...';
                 color = '#f0ad4e';
                 status = 'Loading';
