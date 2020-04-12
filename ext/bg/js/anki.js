@@ -25,82 +25,84 @@
 
 class AnkiConnect {
     constructor(server) {
-        this.server = server;
-        this.localVersion = 2;
-        this.remoteVersion = 0;
+        this._server = server;
+        this._localVersion = 2;
+        this._remoteVersion = 0;
     }
 
     async addNote(note) {
-        await this.checkVersion();
-        return await this.ankiInvoke('addNote', {note});
+        await this._checkVersion();
+        return await this._ankiInvoke('addNote', {note});
     }
 
     async canAddNotes(notes) {
-        await this.checkVersion();
-        return await this.ankiInvoke('canAddNotes', {notes});
+        await this._checkVersion();
+        return await this._ankiInvoke('canAddNotes', {notes});
     }
 
     async getDeckNames() {
-        await this.checkVersion();
-        return await this.ankiInvoke('deckNames');
+        await this._checkVersion();
+        return await this._ankiInvoke('deckNames');
     }
 
     async getModelNames() {
-        await this.checkVersion();
-        return await this.ankiInvoke('modelNames');
+        await this._checkVersion();
+        return await this._ankiInvoke('modelNames');
     }
 
     async getModelFieldNames(modelName) {
-        await this.checkVersion();
-        return await this.ankiInvoke('modelFieldNames', {modelName});
+        await this._checkVersion();
+        return await this._ankiInvoke('modelFieldNames', {modelName});
     }
 
     async guiBrowse(query) {
-        await this.checkVersion();
-        return await this.ankiInvoke('guiBrowse', {query});
+        await this._checkVersion();
+        return await this._ankiInvoke('guiBrowse', {query});
     }
 
     async storeMediaFile(filename, dataBase64) {
-        await this.checkVersion();
-        return await this.ankiInvoke('storeMediaFile', {filename, data: dataBase64});
+        await this._checkVersion();
+        return await this._ankiInvoke('storeMediaFile', {filename, data: dataBase64});
     }
 
-    async checkVersion() {
-        if (this.remoteVersion < this.localVersion) {
-            this.remoteVersion = await this.ankiInvoke('version');
-            if (this.remoteVersion < this.localVersion) {
+    async findNoteIds(notes) {
+        await this._checkVersion();
+        const actions = notes.map((note) => ({
+            action: 'findNotes',
+            params: {
+                query: `deck:"${this._escapeQuery(note.deckName)}" ${this._fieldsToQuery(note.fields)}`
+            }
+        }));
+        return await this._ankiInvoke('multi', {actions});
+    }
+
+    // Private
+
+    async _checkVersion() {
+        if (this._remoteVersion < this._localVersion) {
+            this._remoteVersion = await this._ankiInvoke('version');
+            if (this._remoteVersion < this._localVersion) {
                 throw new Error('Extension and plugin versions incompatible');
             }
         }
     }
 
-    async findNoteIds(notes) {
-        await this.checkVersion();
-        const actions = notes.map((note) => ({
-            action: 'findNotes',
-            params: {
-                query: `deck:"${AnkiConnect.escapeQuery(note.deckName)}" ${AnkiConnect.fieldsToQuery(note.fields)}`
-            }
-        }));
-        return await this.ankiInvoke('multi', {actions});
+    _ankiInvoke(action, params) {
+        return requestJson(this._server, 'POST', {action, params, version: this._localVersion});
     }
 
-    ankiInvoke(action, params) {
-        return requestJson(this.server, 'POST', {action, params, version: this.localVersion});
-    }
-
-    static escapeQuery(text) {
+    _escapeQuery(text) {
         return text.replace(/"/g, '');
     }
 
-    static fieldsToQuery(fields) {
+    _fieldsToQuery(fields) {
         const fieldNames = Object.keys(fields);
         if (fieldNames.length === 0) {
             return '';
         }
 
         const key = fieldNames[0];
-        return `${key.toLowerCase()}:"${AnkiConnect.escapeQuery(fields[key])}"`;
+        return `${key.toLowerCase()}:"${this._escapeQuery(fields[key])}"`;
     }
 }
 
