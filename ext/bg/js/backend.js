@@ -75,6 +75,7 @@ class Backend {
 
         this.messageToken = yomichan.generateId(16);
 
+        this._defaultBrowserActionTitle = null;
         this._isPrepared = false;
 
         this._messageHandlers = new Map([
@@ -121,6 +122,8 @@ class Backend {
     }
 
     async prepare() {
+        this._defaultBrowserActionTitle = await this._getBrowserIconTitle();
+        this._updateBadge();
         await this.database.prepare();
         await this.translator.prepare();
 
@@ -156,6 +159,7 @@ class Backend {
         chrome.runtime.sendMessage({action: 'backendPrepared'}, callback);
 
         this._isPrepared = true;
+        this._updateBadge();
     }
 
     isPrepared() {
@@ -211,15 +215,7 @@ class Backend {
 
     applyOptions() {
         const options = this.getOptions(this.optionsContext);
-        if (!options.general.enable) {
-            this.setExtensionBadgeBackgroundColor('#555555');
-            this.setExtensionBadgeText('off');
-        } else if (!dictConfigured(options)) {
-            this.setExtensionBadgeBackgroundColor('#f0ad4e');
-            this.setExtensionBadgeText('!');
-        } else {
-            this.setExtensionBadgeText('');
-        }
+        this._updateBadge();
 
         this.anki.setServer(options.anki.server);
         this.anki.setEnabled(options.anki.enable);
@@ -297,18 +293,6 @@ class Backend {
             }
         }
         return true;
-    }
-
-    setExtensionBadgeBackgroundColor(color) {
-        if (typeof chrome.browserAction.setBadgeBackgroundColor === 'function') {
-            chrome.browserAction.setBadgeBackgroundColor({color});
-        }
-    }
-
-    setExtensionBadgeText(text) {
-        if (typeof chrome.browserAction.setBadgeText === 'function') {
-            chrome.browserAction.setBadgeText({text});
-        }
     }
 
     checkLastError() {
@@ -866,6 +850,76 @@ class Backend {
         if (!(typeof url === 'string' && yomichan.isExtensionUrl(url))) {
             throw new Error('Invalid message sender');
         }
+    }
+
+    _getBrowserIconTitle() {
+        return (
+            chrome.browserAction !== null &&
+            typeof chrome.browserAction === 'object' &&
+            typeof chrome.browserAction.getTitle === 'function' ?
+            new Promise((resolve) => chrome.browserAction.getTitle({}, resolve)) :
+            Promise.resolve('')
+        );
+    }
+
+    _updateBadge() {
+        let title = this._defaultBrowserActionTitle;
+        if (
+            title === null ||
+            chrome.browserAction === null ||
+            typeof chrome.browserAction !== 'object'
+        ) {
+            // Not ready or invalid
+            return;
+        }
+
+        let text = '';
+        let color = null;
+        let status = null;
+
+        if (!this._isPrepared) {
+            text = '...';
+            color = '#f0ad4e';
+            status = 'Loading';
+        } else if (!this._anyOptionsMatches((options) => options.general.enable)) {
+            text = 'off';
+            color = '#555555';
+            status = 'Disabled';
+        } else if (!this._anyOptionsMatches((options) => this._isAnyDictionaryEnabled(options))) {
+            text = '!';
+            color = '#f0ad4e';
+            status = 'No dictionaries installed';
+        }
+
+        if (color !== null && typeof chrome.browserAction.setBadgeBackgroundColor === 'function') {
+            chrome.browserAction.setBadgeBackgroundColor({color});
+        }
+        if (text !== null && typeof chrome.browserAction.setBadgeText === 'function') {
+            chrome.browserAction.setBadgeText({text});
+        }
+        if (typeof chrome.browserAction.setTitle === 'function') {
+            if (status !== null) {
+                title = `${title} - ${status}`;
+            }
+            chrome.browserAction.setTitle({title});
+        }
+    }
+
+    _isAnyDictionaryEnabled(options) {
+        for (const {enabled} of Object.values(options.dictionaries)) {
+            if (enabled) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    _anyOptionsMatches(predicate) {
+        for (const {options} of this.options.profiles) {
+            const value = predicate(options);
+            if (value) { return value; }
+        }
+        return false;
     }
 
     async _renderTemplate(template, data) {
