@@ -43,7 +43,7 @@ class Frontend extends TextScanner {
 
         this._pageZoomFactor = 1.0;
         this._contentScale = 1.0;
-        this._orphaned = true;
+        this._orphaned = false;
         this._lastShowPromise = Promise.resolve();
 
         this._windowMessageHandlers = new Map([
