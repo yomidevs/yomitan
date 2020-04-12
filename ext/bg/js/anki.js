@@ -81,7 +81,7 @@ class AnkiConnect {
 
     async storeMediaFile(filename, dataBase64) {
         if (!this._enabled) {
-            return {result: null, error: 'AnkiConnect not enabled'};
+            throw new Error('AnkiConnect not enabled');
         }
         await this._checkVersion();
         return await this._ankiInvoke('storeMediaFile', {filename, data: dataBase64});
@@ -110,8 +110,19 @@ class AnkiConnect {
         }
     }
 
-    _ankiInvoke(action, params) {
-        return requestJson(this._server, 'POST', {action, params, version: this._localVersion});
+    async _ankiInvoke(action, params) {
+        const result = await requestJson(this._server, 'POST', {action, params, version: this._localVersion});
+        if (
+            result !== null &&
+            typeof result === 'object' &&
+            !Array.isArray(result)
+        ) {
+            const error = result.error;
+            if (typeof error !== 'undefined') {
+                throw new Error(`AnkiConnect error: ${error}`);
+            }
+        }
+        return result;
     }
 
     _escapeQuery(text) {
