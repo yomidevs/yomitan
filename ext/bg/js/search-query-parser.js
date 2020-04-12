@@ -21,7 +21,6 @@
  * apiOptionsSet
  * apiTermsFind
  * apiTextParse
- * apiTextParseMecab
  * docSentenceExtract
  */
 
@@ -128,35 +127,13 @@ class QueryParser extends TextScanner {
 
         this.setPreview(text);
 
-        this.parseResults = await this.parseText(text);
+        this.parseResults = await apiTextParse(text, this.getOptionsContext());
         this.refreshSelectedParser();
 
         this.renderParserSelect();
         this.renderParseResult();
 
         this.setSpinnerVisible(false);
-    }
-
-    async parseText(text) {
-        const results = [];
-        if (this.options.parsing.enableScanningParser) {
-            results.push({
-                name: 'Scanning parser',
-                id: 'scan',
-                parsedText: await apiTextParse(text, this.getOptionsContext())
-            });
-        }
-        if (this.options.parsing.enableMecabParser) {
-            const mecabResults = await apiTextParseMecab(text, this.getOptionsContext());
-            for (const [mecabDictName, mecabDictResults] of mecabResults) {
-                results.push({
-                    name: `MeCab: ${mecabDictName}`,
-                    id: `mecab-${mecabDictName}`,
-                    parsedText: mecabDictResults
-                });
-            }
-        }
-        return results;
     }
 
     setPreview(text) {
@@ -183,6 +160,6 @@ class QueryParser extends TextScanner {
         const parseResult = this.getParseResult();
         this.queryParser.textContent = '';
         if (!parseResult) { return; }
-        this.queryParser.appendChild(this.queryParserGenerator.createParseResult(parseResult.parsedText));
+        this.queryParser.appendChild(this.queryParserGenerator.createParseResult(parseResult.content));
     }
 }

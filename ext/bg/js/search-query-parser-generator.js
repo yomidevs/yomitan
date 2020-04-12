@@ -71,7 +71,16 @@ class QueryParserGenerator {
         for (const parseResult of parseResults) {
             const optionContainer = this._templateHandler.instantiate('select-option');
             optionContainer.value = parseResult.id;
-            optionContainer.textContent = parseResult.name;
+            switch (parseResult.source) {
+                case 'scanning-parser':
+                    optionContainer.textContent = 'Scanning parser';
+                    break;
+                case 'mecab':
+                    optionContainer.textContent = `MeCab: ${parseResult.dictionary}`;
+                    break;
+                default:
+                    optionContainer.textContent = 'Unrecognized dictionary';
+            }
             optionContainer.defaultSelected = selectedParser === parseResult.id;
             selectContainer.appendChild(optionContainer);
         }

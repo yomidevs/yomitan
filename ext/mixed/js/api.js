@@ -44,10 +44,6 @@ function apiTextParse(text, optionsContext) {
     return _apiInvoke('textParse', {text, optionsContext});
 }
 
-function apiTextParseMecab(text, optionsContext) {
-    return _apiInvoke('textParseMecab', {text, optionsContext});
-}
-
 function apiKanjiFind(text, optionsContext) {
     return _apiInvoke('kanjiFind', {text, optionsContext});
 }

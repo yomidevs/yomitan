@@ -85,7 +85,6 @@ class Backend {
             ['kanjiFind', {handler: this._onApiKanjiFind.bind(this), async: true}],
             ['termsFind', {handler: this._onApiTermsFind.bind(this), async: true}],
             ['textParse', {handler: this._onApiTextParse.bind(this), async: true}],
-            ['textParseMecab', {handler: this._onApiTextParseMecab.bind(this), async: true}],
             ['definitionAdd', {handler: this._onApiDefinitionAdd.bind(this), async: true}],
             ['definitionsAddable', {handler: this._onApiDefinitionsAddable.bind(this), async: true}],
             ['noteView', {handler: this._onApiNoteView.bind(this), async: true}],
@@ -315,6 +314,65 @@ class Backend {
         return await this.dictionaryImporter.import(this.database, archiveSource, onProgress, details);
     }
 
+    async _textParseScanning(text, options) {
+        const results = [];
+        while (text.length > 0) {
+            const term = [];
+            const [definitions, sourceLength] = await this.translator.findTerms(
+                'simple',
+                text.substring(0, options.scanning.length),
+                {},
+                options
+            );
+            if (definitions.length > 0) {
+                dictTermsSort(definitions);
+                const {expression, reading} = definitions[0];
+                const source = text.substring(0, sourceLength);
+                for (const {text: text2, furigana} of jp.distributeFuriganaInflected(expression, reading, source)) {
+                    const reading2 = jp.convertReading(text2, furigana, options.parsing.readingMode);
+                    term.push({text: text2, reading: reading2});
+                }
+                text = text.substring(source.length);
+            } else {
+                const reading = jp.convertReading(text[0], null, options.parsing.readingMode);
+                term.push({text: text[0], reading});
+                text = text.substring(1);
+            }
+            results.push(term);
+        }
+        return results;
+    }
+
+    async _textParseMecab(text, options) {
+        const results = [];
+        const rawResults = await this.mecab.parseText(text);
+        for (const [mecabName, parsedLines] of Object.entries(rawResults)) {
+            const result = [];
+            for (const parsedLine of parsedLines) {
+                for (const {expression, reading, source} of parsedLine) {
+                    const term = [];
+                    if (expression !== null && reading !== null) {
+                        for (const {text: text2, furigana} of jp.distributeFuriganaInflected(
+                            expression,
+                            jp.convertKatakanaToHiragana(reading),
+                            source
+                        )) {
+                            const reading2 = jp.convertReading(text2, furigana, options.parsing.readingMode);
+                            term.push({text: text2, reading: reading2});
+                        }
+                    } else {
+                        const reading2 = jp.convertReading(source, null, options.parsing.readingMode);
+                        term.push({text: source, reading: reading2});
+                    }
+                    result.push(term);
+                }
+                result.push([{text: '\n'}]);
+            }
+            results.push([mecabName, result]);
+        }
+        return results;
+    }
+
     // Message handlers
 
     _onApiYomichanCoreReady(_params, sender) {
@@ -406,61 +464,27 @@ class Backend {
     async _onApiTextParse({text, optionsContext}) {
         const options = this.getOptions(optionsContext);
         const results = [];
-        while (text.length > 0) {
-            const term = [];
-            const [definitions, sourceLength] = await this.translator.findTerms(
-                'simple',
-                text.substring(0, options.scanning.length),
-                {},
-                options
-            );
-            if (definitions.length > 0) {
-                dictTermsSort(definitions);
-                const {expression, reading} = definitions[0];
-                const source = text.substring(0, sourceLength);
-                for (const {text: text2, furigana} of jp.distributeFuriganaInflected(expression, reading, source)) {
-                    const reading2 = jp.convertReading(text2, furigana, options.parsing.readingMode);
-                    term.push({text: text2, reading: reading2});
-                }
-                text = text.substring(source.length);
-            } else {
-                const reading = jp.convertReading(text[0], null, options.parsing.readingMode);
-                term.push({text: text[0], reading});
-                text = text.substring(1);
-            }
-            results.push(term);
-        }
-        return results;
-    }
 
-    async _onApiTextParseMecab({text, optionsContext}) {
-        const options = this.getOptions(optionsContext);
-        const results = [];
-        const rawResults = await this.mecab.parseText(text);
-        for (const [mecabName, parsedLines] of Object.entries(rawResults)) {
-            const result = [];
-            for (const parsedLine of parsedLines) {
-                for (const {expression, reading, source} of parsedLine) {
-                    const term = [];
-                    if (expression !== null && reading !== null) {
-                        for (const {text: text2, furigana} of jp.distributeFuriganaInflected(
-                            expression,
-                            jp.convertKatakanaToHiragana(reading),
-                            source
-                        )) {
-                            const reading2 = jp.convertReading(text2, furigana, options.parsing.readingMode);
-                            term.push({text: text2, reading: reading2});
-                        }
-                    } else {
-                        const reading2 = jp.convertReading(source, null, options.parsing.readingMode);
-                        term.push({text: source, reading: reading2});
-                    }
-                    result.push(term);
-                }
-                result.push([{text: '\n'}]);
-            }
-            results.push([mecabName, result]);
+        if (options.parsing.enableScanningParser) {
+            results.push({
+                source: 'scanning-parser',
+                id: 'scan',
+                content: await this._textParseScanning(text, options)
+            });
         }
+
+        if (options.parsing.enableMecabParser) {
+            const mecabResults = await this._textParseMecab(text, options);
+            for (const [mecabDictName, mecabDictResults] of mecabResults) {
+                results.push({
+                    source: 'mecab',
+                    dictionary: mecabDictName,
+                    id: `mecab-${mecabDictName}`,
+                    content: mecabDictResults
+                });
+            }
+        }
+
         return results;
     }
 
