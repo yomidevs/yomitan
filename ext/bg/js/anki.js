@@ -46,37 +46,37 @@ class AnkiConnect {
     async addNote(note) {
         if (!this._enabled) { return null; }
         await this._checkVersion();
-        return await this._ankiInvoke('addNote', {note});
+        return await this._invoke('addNote', {note});
     }
 
     async canAddNotes(notes) {
         if (!this._enabled) { return []; }
         await this._checkVersion();
-        return await this._ankiInvoke('canAddNotes', {notes});
+        return await this._invoke('canAddNotes', {notes});
     }
 
     async getDeckNames() {
         if (!this._enabled) { return []; }
         await this._checkVersion();
-        return await this._ankiInvoke('deckNames');
+        return await this._invoke('deckNames');
     }
 
     async getModelNames() {
         if (!this._enabled) { return []; }
         await this._checkVersion();
-        return await this._ankiInvoke('modelNames');
+        return await this._invoke('modelNames');
     }
 
     async getModelFieldNames(modelName) {
         if (!this._enabled) { return []; }
         await this._checkVersion();
-        return await this._ankiInvoke('modelFieldNames', {modelName});
+        return await this._invoke('modelFieldNames', {modelName});
     }
 
     async guiBrowse(query) {
         if (!this._enabled) { return []; }
         await this._checkVersion();
-        return await this._ankiInvoke('guiBrowse', {query});
+        return await this._invoke('guiBrowse', {query});
     }
 
     async storeMediaFile(filename, dataBase64) {
@@ -84,7 +84,7 @@ class AnkiConnect {
             throw new Error('AnkiConnect not enabled');
         }
         await this._checkVersion();
-        return await this._ankiInvoke('storeMediaFile', {filename, data: dataBase64});
+        return await this._invoke('storeMediaFile', {filename, data: dataBase64});
     }
 
     async findNoteIds(notes) {
@@ -96,21 +96,21 @@ class AnkiConnect {
                 query: `deck:"${this._escapeQuery(note.deckName)}" ${this._fieldsToQuery(note.fields)}`
             }
         }));
-        return await this._ankiInvoke('multi', {actions});
+        return await this._invoke('multi', {actions});
     }
 
     // Private
 
     async _checkVersion() {
         if (this._remoteVersion < this._localVersion) {
-            this._remoteVersion = await this._ankiInvoke('version');
+            this._remoteVersion = await this._invoke('version');
             if (this._remoteVersion < this._localVersion) {
                 throw new Error('Extension and plugin versions incompatible');
             }
         }
     }
 
-    async _ankiInvoke(action, params) {
+    async _invoke(action, params) {
         const result = await requestJson(this._server, 'POST', {action, params, version: this._localVersion});
         if (
             result !== null &&
