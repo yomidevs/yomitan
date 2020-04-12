@@ -56,6 +56,7 @@ class Backend {
         this.audioSystem = new AudioSystem({getAudioUri: this._getAudioUri.bind(this)});
         this.audioUriBuilder = new AudioUriBuilder();
         this.ankiNoteBuilder = new AnkiNoteBuilder({
+            anki: this.anki,
             audioSystem: this.audioSystem,
             renderTemplate: this._renderTemplate.bind(this)
         });
@@ -482,8 +483,7 @@ class Backend {
             await this.ankiNoteBuilder.injectScreenshot(
                 definition,
                 options.anki.terms.fields,
-                details.screenshot,
-                this.anki
+                details.screenshot
             );
         }
 

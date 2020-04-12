@@ -16,7 +16,8 @@
  */
 
 class AnkiNoteBuilder {
-    constructor({audioSystem, renderTemplate}) {
+    constructor({anki, audioSystem, renderTemplate}) {
+        this._anki = anki;
         this._audioSystem = audioSystem;
         this._renderTemplate = renderTemplate;
     }
@@ -101,7 +102,7 @@ class AnkiNoteBuilder {
         }
     }
 
-    async injectScreenshot(definition, fields, screenshot, anki) {
+    async injectScreenshot(definition, fields, screenshot) {
         if (!this._containsMarker(fields, 'screenshot')) { return; }
 
         const now = new Date(Date.now());
@@ -109,7 +110,7 @@ class AnkiNoteBuilder {
         const data = screenshot.dataUrl.replace(/^data:[\w\W]*?,/, '');
 
         try {
-            await anki.storeMediaFile(filename, data);
+            await this._anki.storeMediaFile(filename, data);
         } catch (e) {
             return;
         }
