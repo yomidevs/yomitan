@@ -30,7 +30,6 @@
  * Translator
  * conditionsTestValue
  * dictConfigured
- * dictEnabledSet
  * dictTermsSort
  * handlebarsRenderDynamic
  * jp

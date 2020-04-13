@@ -16,10 +16,7 @@
  */
 
 /* global
- * JSZip
- * JsonSchema
  * dictFieldSplit
- * requestJson
  */
 
 class Database {
