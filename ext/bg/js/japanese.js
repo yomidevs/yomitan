@@ -124,25 +124,25 @@
         return wanakana.toRomaji(text);
     }
 
-    function convertReading(expressionFragment, readingFragment, readingMode) {
+    function convertReading(expression, reading, readingMode) {
         switch (readingMode) {
             case 'hiragana':
-                return convertKatakanaToHiragana(readingFragment);
+                return convertKatakanaToHiragana(reading);
             case 'katakana':
-                return convertHiraganaToKatakana(readingFragment);
+                return convertHiraganaToKatakana(reading);
             case 'romaji':
-                if (readingFragment) {
-                    return convertToRomaji(readingFragment);
+                if (reading) {
+                    return convertToRomaji(reading);
                 } else {
-                    if (isStringEntirelyKana(expressionFragment)) {
-                        return convertToRomaji(expressionFragment);
+                    if (isStringEntirelyKana(expression)) {
+                        return convertToRomaji(expression);
                     }
                 }
-                return readingFragment;
+                return reading;
             case 'none':
                 return '';
             default:
-                return readingFragment;
+                return reading;
         }
     }
 

@@ -208,8 +208,8 @@ function testConvertReading() {
         [['有り難う', '', 'default'], '']
     ];
 
-    for (const [[expressionFragment, readingFragment, readingMode], expected] of data) {
-        assert.strictEqual(jp.convertReading(expressionFragment, readingFragment, readingMode), expected);
+    for (const [[expression, reading, readingMode], expected] of data) {
+        assert.strictEqual(jp.convertReading(expression, reading, readingMode), expected);
     }
 }
 
