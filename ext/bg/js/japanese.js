@@ -127,9 +127,9 @@
     function convertReading(expressionFragment, readingFragment, readingMode) {
         switch (readingMode) {
             case 'hiragana':
-                return convertKatakanaToHiragana(readingFragment || '');
+                return convertKatakanaToHiragana(readingFragment);
             case 'katakana':
-                return convertHiraganaToKatakana(readingFragment || '');
+                return convertHiraganaToKatakana(readingFragment);
             case 'romaji':
                 if (readingFragment) {
                     return convertToRomaji(readingFragment);
@@ -140,7 +140,7 @@
                 }
                 return readingFragment;
             case 'none':
-                return null;
+                return '';
             default:
                 return readingFragment;
         }
@@ -300,7 +300,7 @@
                     const readingLeft = reading2.substring(group.text.length);
                     const segs = segmentize(readingLeft, groups.splice(1));
                     if (segs) {
-                        return [{text: group.text}].concat(segs);
+                        return [{text: group.text, furigana: ''}].concat(segs);
                     }
                 }
             } else {
@@ -368,7 +368,7 @@
         }
 
         if (stemLength !== source.length) {
-            output.push({text: source.substring(stemLength)});
+            output.push({text: source.substring(stemLength), furigana: ''});
         }
 
         return output;

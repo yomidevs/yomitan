@@ -36,7 +36,7 @@ class QueryParserGenerator {
             const termContainer = this._templateHandler.instantiate(preview ? 'term-preview' : 'term');
             for (const segment of term) {
                 if (!segment.text.trim()) { continue; }
-                if (!segment.reading || !segment.reading.trim()) {
+                if (!segment.reading.trim()) {
                     termContainer.appendChild(this.createSegmentText(segment.text));
                 } else {
                     termContainer.appendChild(this.createSegment(segment));

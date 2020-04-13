@@ -140,7 +140,7 @@ class QueryParser extends TextScanner {
         const previewTerms = [];
         for (let i = 0, ii = text.length; i < ii; i += 2) {
             const tempText = text.substring(i, i + 2);
-            previewTerms.push([{text: tempText}]);
+            previewTerms.push([{text: tempText, reading: ''}]);
         }
         this.queryParser.textContent = '';
         this.queryParser.appendChild(this.queryParserGenerator.createParseResult(previewTerms, true));

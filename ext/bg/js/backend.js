@@ -334,7 +334,7 @@ class Backend {
                 }
                 text = text.substring(source.length);
             } else {
-                const reading = jp.convertReading(text[0], null, options.parsing.readingMode);
+                const reading = jp.convertReading(text[0], '', options.parsing.readingMode);
                 term.push({text: text[0], reading});
                 text = text.substring(1);
             }
@@ -349,24 +349,20 @@ class Backend {
         for (const [mecabName, parsedLines] of Object.entries(rawResults)) {
             const result = [];
             for (const parsedLine of parsedLines) {
-                for (const {expression, reading, source} of parsedLine) {
+                for (let {expression, reading, source} of parsedLine) {
                     const term = [];
-                    if (expression !== null && reading !== null) {
-                        for (const {text: text2, furigana} of jp.distributeFuriganaInflected(
-                            expression,
-                            jp.convertKatakanaToHiragana(reading),
-                            source
-                        )) {
-                            const reading2 = jp.convertReading(text2, furigana, options.parsing.readingMode);
-                            term.push({text: text2, reading: reading2});
-                        }
-                    } else {
-                        const reading2 = jp.convertReading(source, null, options.parsing.readingMode);
-                        term.push({text: source, reading: reading2});
+                    if (expression === '') { expression = source; }
+                    for (const {text: text2, furigana} of jp.distributeFuriganaInflected(
+                        expression,
+                        jp.convertKatakanaToHiragana(reading),
+                        source
+                    )) {
+                        const reading2 = jp.convertReading(text2, furigana, options.parsing.readingMode);
+                        term.push({text: text2, reading: reading2});
                     }
                     result.push(term);
                 }
-                result.push([{text: '\n'}]);
+                result.push([{text: '\n', reading: ''}]);
             }
             results.push([mecabName, result]);
         }

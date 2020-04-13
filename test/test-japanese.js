@@ -176,19 +176,19 @@ function testConvertReading() {
         [['アリガトウ', 'アリガトウ', 'hiragana'], 'ありがとう'],
         [['アリガトウ', 'アリガトウ', 'katakana'], 'アリガトウ'],
         [['アリガトウ', 'アリガトウ', 'romaji'], 'arigatou'],
-        [['アリガトウ', 'アリガトウ', 'none'], null],
+        [['アリガトウ', 'アリガトウ', 'none'], ''],
         [['アリガトウ', 'アリガトウ', 'default'], 'アリガトウ'],
 
         [['ありがとう', 'ありがとう', 'hiragana'], 'ありがとう'],
         [['ありがとう', 'ありがとう', 'katakana'], 'アリガトウ'],
         [['ありがとう', 'ありがとう', 'romaji'], 'arigatou'],
-        [['ありがとう', 'ありがとう', 'none'], null],
+        [['ありがとう', 'ありがとう', 'none'], ''],
         [['ありがとう', 'ありがとう', 'default'], 'ありがとう'],
 
         [['有り難う', 'ありがとう', 'hiragana'], 'ありがとう'],
         [['有り難う', 'ありがとう', 'katakana'], 'アリガトウ'],
         [['有り難う', 'ありがとう', 'romaji'], 'arigatou'],
-        [['有り難う', 'ありがとう', 'none'], null],
+        [['有り難う', 'ありがとう', 'none'], ''],
         [['有り難う', 'ありがとう', 'default'], 'ありがとう'],
 
         // Cases with falsy readings
@@ -196,40 +196,16 @@ function testConvertReading() {
         [['ありがとう', '', 'hiragana'], ''],
         [['ありがとう', '', 'katakana'], ''],
         [['ありがとう', '', 'romaji'], 'arigatou'],
-        [['ありがとう', '', 'none'], null],
+        [['ありがとう', '', 'none'], ''],
         [['ありがとう', '', 'default'], ''],
-
-        [['ありがとう', null, 'hiragana'], ''],
-        [['ありがとう', null, 'katakana'], ''],
-        [['ありがとう', null, 'romaji'], 'arigatou'],
-        [['ありがとう', null, 'none'], null],
-        [['ありがとう', null, 'default'], null],
-
-        [['ありがとう', void 0, 'hiragana'], ''],
-        [['ありがとう', void 0, 'katakana'], ''],
-        [['ありがとう', void 0, 'romaji'], 'arigatou'],
-        [['ありがとう', void 0, 'none'], null],
-        [['ありがとう', void 0, 'default'], void 0],
 
         // Cases with falsy readings and kanji expressions
 
         [['有り難う', '', 'hiragana'], ''],
         [['有り難う', '', 'katakana'], ''],
         [['有り難う', '', 'romaji'], ''],
-        [['有り難う', '', 'none'], null],
-        [['有り難う', '', 'default'], ''],
-
-        [['有り難う', null, 'hiragana'], ''],
-        [['有り難う', null, 'katakana'], ''],
-        [['有り難う', null, 'romaji'], null],
-        [['有り難う', null, 'none'], null],
-        [['有り難う', null, 'default'], null],
-
-        [['有り難う', void 0, 'hiragana'], ''],
-        [['有り難う', void 0, 'katakana'], ''],
-        [['有り難う', void 0, 'romaji'], void 0],
-        [['有り難う', void 0, 'none'], null],
-        [['有り難う', void 0, 'default'], void 0]
+        [['有り難う', '', 'none'], ''],
+        [['有り難う', '', 'default'], '']
     ];
 
     for (const [[expressionFragment, readingFragment, readingMode], expected] of data) {
@@ -303,9 +279,9 @@ function testDistributeFurigana() {
             ['有り難う', 'ありがとう'],
             [
                 {text: '有', furigana: 'あ'},
-                {text: 'り'},
+                {text: 'り', furigana: ''},
                 {text: '難', furigana: 'がと'},
-                {text: 'う'}
+                {text: 'う', furigana: ''}
             ]
         ],
         [
@@ -317,23 +293,23 @@ function testDistributeFurigana() {
         [
             ['お祝い', 'おいわい'],
             [
-                {text: 'お'},
+                {text: 'お', furigana: ''},
                 {text: '祝', furigana: 'いわ'},
-                {text: 'い'}
+                {text: 'い', furigana: ''}
             ]
         ],
         [
             ['美味しい', 'おいしい'],
             [
                 {text: '美味', furigana: 'おい'},
-                {text: 'しい'}
+                {text: 'しい', furigana: ''}
             ]
         ],
         [
             ['食べ物', 'たべもの'],
             [
                 {text: '食', furigana: 'た'},
-                {text: 'べ'},
+                {text: 'べ', furigana: ''},
                 {text: '物', furigana: 'もの'}
             ]
         ],
@@ -341,9 +317,9 @@ function testDistributeFurigana() {
             ['試し切り', 'ためしぎり'],
             [
                 {text: '試', furigana: 'ため'},
-                {text: 'し'},
+                {text: 'し', furigana: ''},
                 {text: '切', furigana: 'ぎ'},
-                {text: 'り'}
+                {text: 'り', furigana: ''}
             ]
         ],
         // Ambiguous
@@ -373,16 +349,16 @@ function testDistributeFuriganaInflected() {
             ['美味しい', 'おいしい', '美味しかた'],
             [
                 {text: '美味', furigana: 'おい'},
-                {text: 'し'},
-                {text: 'かた'}
+                {text: 'し', furigana: ''},
+                {text: 'かた', furigana: ''}
             ]
         ],
         [
             ['食べる', 'たべる', '食べた'],
             [
                 {text: '食', furigana: 'た'},
-                {text: 'べ'},
-                {text: 'た'}
+                {text: 'べ', furigana: ''},
+                {text: 'た', furigana: ''}
             ]
         ]
     ];
