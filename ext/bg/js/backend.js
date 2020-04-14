@@ -349,11 +349,10 @@ class Backend {
         for (const [mecabName, parsedLines] of Object.entries(rawResults)) {
             const result = [];
             for (const parsedLine of parsedLines) {
-                for (let {expression, reading, source} of parsedLine) {
+                for (const {expression, reading, source} of parsedLine) {
                     const term = [];
-                    if (expression === '') { expression = source; }
                     for (const {text: text2, furigana} of jp.distributeFuriganaInflected(
-                        expression,
+                        expression.length > 0 ? expression : source,
                         jp.convertKatakanaToHiragana(reading),
                         source
                     )) {
