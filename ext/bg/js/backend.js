@@ -324,7 +324,7 @@ class Backend {
                 {},
                 options
             );
-            if (definitions.length > 0) {
+            if (definitions.length > 0 && sourceLength > 0) {
                 dictTermsSort(definitions);
                 const {expression, reading} = definitions[0];
                 const source = text.substring(0, sourceLength);
