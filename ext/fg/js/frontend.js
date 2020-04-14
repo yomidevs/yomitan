@@ -141,7 +141,7 @@ class Frontend extends TextScanner {
     }
 
     async setPopup(popup) {
-        this.onSearchClear(true);
+        this.onSearchClear(false);
         this.popup = popup;
         await popup.setOptions(this.options);
     }
