@@ -147,7 +147,8 @@ class Frontend extends TextScanner {
     }
 
     async updateOptions() {
-        this.setOptions(await apiOptionsGet(this.getOptionsContext()), this._canEnable());
+        this.options = await apiOptionsGet(this.getOptionsContext());
+        this.setOptions(this.options, this._canEnable());
 
         const ignoreNodes = ['.scan-disable', '.scan-disable *'];
         if (!this.options.scanning.enableOnPopupExpressions) {
@@ -287,7 +288,6 @@ class Frontend extends TextScanner {
     }
 
     _canEnable() {
-        if (this.options === null) { return true; } // called by updateOptions for the first time
         return this.popup.depth <= this.options.scanning.popupNestingMaxDepth && !this._disabledOverride;
     }
 
