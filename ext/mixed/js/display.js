@@ -47,7 +47,7 @@ class Display {
         this.audioFallback = null;
         this.audioSystem = new AudioSystem({
             audioUriBuilder: {
-                async getUri(definition, source, details) {
+                getUri: async (definition, source, details) => {
                     return await apiAudioGetUri(definition, source, details);
                 }
             },
