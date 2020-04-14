@@ -80,6 +80,7 @@ class QueryParserGenerator {
                     break;
                 default:
                     optionContainer.textContent = 'Unrecognized dictionary';
+                    break;
             }
             optionContainer.defaultSelected = selectedParser === parseResult.id;
             selectContainer.appendChild(optionContainer);
