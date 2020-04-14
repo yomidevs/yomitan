@@ -18,7 +18,6 @@
 /* global
  * AudioSourceUI
  * AudioSystem
- * apiAudioGetUri
  * getOptionsContext
  * getOptionsMutable
  * settingsSaveOptions
