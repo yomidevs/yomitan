@@ -46,7 +46,7 @@ class TextScanner {
     }
 
     onMouseOver(e) {
-        if (this.ignoreElements.includes(e.target)) {
+        if (this.ignoreElements().includes(e.target)) {
             this.scanTimerClear();
         }
     }
@@ -224,8 +224,8 @@ class TextScanner {
         }
     }
 
-    setEnabled(enabled) {
-        if (enabled) {
+    setEnabled(enabled, canEnable) {
+        if (enabled && canEnable) {
             if (!this.enabled) {
                 this.hookEvents();
                 this.enabled = true;
@@ -271,9 +271,9 @@ class TextScanner {
         ];
     }
 
-    setOptions(options) {
+    setOptions(options, canEnable=true) {
         this.options = options;
-        this.setEnabled(this.options.general.enable);
+        this.setEnabled(this.options.general.enable, canEnable);
     }
 
     async searchAt(x, y, cause) {

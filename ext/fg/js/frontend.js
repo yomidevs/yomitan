@@ -29,11 +29,14 @@ class Frontend extends TextScanner {
     constructor(popup) {
         super(
             window,
-            popup.isProxy() ? [] : [popup.getContainer()],
+            () => this.popup.isProxy() ? [] : [this.popup.getContainer()],
             [(x, y) => this.popup.containsPoint(x, y)]
         );
 
         this.popup = popup;
+
+        this._disabledOverride = false;
+
         this.options = null;
 
         this.optionsContext = {
@@ -132,8 +135,20 @@ class Frontend extends TextScanner {
         ];
     }
 
+    setDisabledOverride(disabled) {
+        this._disabledOverride = disabled;
+        this.setEnabled(this.options.general.enable, this._canEnable());
+    }
+
+    async setPopup(popup) {
+        this.onSearchClear(false);
+        this.popup = popup;
+        await popup.setOptions(this.options);
+    }
+
     async updateOptions() {
-        this.setOptions(await apiOptionsGet(this.getOptionsContext()));
+        this.options = await apiOptionsGet(this.getOptionsContext());
+        this.setOptions(this.options, this._canEnable());
 
         const ignoreNodes = ['.scan-disable', '.scan-disable *'];
         if (!this.options.scanning.enableOnPopupExpressions) {
@@ -259,7 +274,7 @@ class Frontend extends TextScanner {
     }
 
     _broadcastRootPopupInformation() {
-        if (!this.popup.isProxy() && this.popup.depth === 0) {
+        if (!this.popup.isProxy() && this.popup.depth === 0 && this.popup.frameId === 0) {
             apiBroadcastTab('rootPopupInformation', {popupId: this.popup.id, frameId: this.popup.frameId});
         }
     }
@@ -270,6 +285,10 @@ class Frontend extends TextScanner {
             frameId: this.popup.frameId,
             title: document.title
         });
+    }
+
+    _canEnable() {
+        return this.popup.depth <= this.options.scanning.popupNestingMaxDepth && !this._disabledOverride;
     }
 
     async _updatePopupPosition() {
