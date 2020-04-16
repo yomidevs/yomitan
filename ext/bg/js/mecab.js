@@ -40,7 +40,36 @@ class Mecab {
     }
 
     async parseText(text) {
-        return await this.invoke('parse_text', {text});
+        const rawResults = await this.invoke('parse_text', {text});
+        // {
+        //     'mecab-name': [
+        //         // line1
+        //         [
+        //             {str expression: 'expression', str reading: 'reading', str source: 'source'},
+        //             {str expression: 'expression2', str reading: 'reading2', str source: 'source2'}
+        //         ],
+        //         line2,
+        //         ...
+        //     ],
+        //     'mecab-name2': [...]
+        // }
+        const results = {};
+        for (const [mecabName, parsedLines] of Object.entries(rawResults)) {
+            const result = [];
+            for (const parsedLine of parsedLines) {
+                const line = [];
+                for (const {expression, reading, source} of parsedLine) {
+                    line.push({
+                        expression: expression || '',
+                        reading: reading || '',
+                        source: source || ''
+                    });
+                }
+                result.push(line);
+            }
+            results[mecabName] = result;
+        }
+        return results;
     }
 
     startListener() {

@@ -124,25 +124,25 @@
         return wanakana.toRomaji(text);
     }
 
-    function convertReading(expressionFragment, readingFragment, readingMode) {
+    function convertReading(expression, reading, readingMode) {
         switch (readingMode) {
             case 'hiragana':
-                return convertKatakanaToHiragana(readingFragment || '');
+                return convertKatakanaToHiragana(reading);
             case 'katakana':
-                return convertHiraganaToKatakana(readingFragment || '');
+                return convertHiraganaToKatakana(reading);
             case 'romaji':
-                if (readingFragment) {
-                    return convertToRomaji(readingFragment);
+                if (reading) {
+                    return convertToRomaji(reading);
                 } else {
-                    if (isStringEntirelyKana(expressionFragment)) {
-                        return convertToRomaji(expressionFragment);
+                    if (isStringEntirelyKana(expression)) {
+                        return convertToRomaji(expression);
                     }
                 }
-                return readingFragment;
+                return reading;
             case 'none':
-                return null;
+                return '';
             default:
-                return readingFragment;
+                return reading;
         }
     }
 
@@ -300,7 +300,7 @@
                     const readingLeft = reading2.substring(group.text.length);
                     const segs = segmentize(readingLeft, groups.splice(1));
                     if (segs) {
-                        return [{text: group.text}].concat(segs);
+                        return [{text: group.text, furigana: ''}].concat(segs);
                     }
                 }
             } else {
@@ -368,7 +368,7 @@
         }
 
         if (stemLength !== source.length) {
-            output.push({text: source.substring(stemLength)});
+            output.push({text: source.substring(stemLength), furigana: ''});
         }
 
         return output;
