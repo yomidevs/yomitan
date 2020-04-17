@@ -20,7 +20,7 @@
  */
 
 class PopupProxy {
-    constructor(id, depth, parentId, parentFrameId, url, getFrameOffset=null) {
+    constructor(id, depth, parentId, parentFrameId, url, getFrameOffset=null, setDisabled=null) {
         this._parentId = parentId;
         this._parentFrameId = parentFrameId;
         this._id = id;
@@ -28,6 +28,7 @@ class PopupProxy {
         this._url = url;
         this._apiSender = new FrontendApiSender();
         this._getFrameOffset = getFrameOffset;
+        this._setDisabled = setDisabled;
 
         this._frameOffset = null;
         this._frameOffsetPromise = null;
@@ -142,6 +143,10 @@ class PopupProxy {
         try {
             const offset = await this._frameOffsetPromise;
             this._frameOffset = offset !== null ? offset : [0, 0];
+            if (offset === null && this._setDisabled !== null) {
+                this._setDisabled();
+                return;
+            }
             this._frameOffsetUpdatedAt = now;
         } catch (e) {
             logError(e);
