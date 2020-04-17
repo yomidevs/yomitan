@@ -40,7 +40,7 @@ class TextToSpeechAudio {
         }
     }
 
-    play() {
+    async play() {
         try {
             if (this._utterance === null) {
                 this._utterance = new SpeechSynthesisUtterance(this.text || '');

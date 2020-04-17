@@ -823,7 +823,14 @@ class Display {
             this.audioPlaying = audio;
             audio.currentTime = 0;
             audio.volume = this.options.audio.volume / 100.0;
-            audio.play();
+            const playPromise = audio.play();
+            if (typeof playPromise !== 'undefined') {
+                try {
+                    await playPromise;
+                } catch (e2) {
+                    // NOP
+                }
+            }
         } catch (e) {
             this.onError(e);
         } finally {
