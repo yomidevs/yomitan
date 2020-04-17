@@ -112,11 +112,7 @@ class AnkiConnect {
 
     async _invoke(action, params) {
         const result = await requestJson(this._server, 'POST', {action, params, version: this._localVersion});
-        if (
-            result !== null &&
-            typeof result === 'object' &&
-            !Array.isArray(result)
-        ) {
+        if (isObject(result)) {
             const error = result.error;
             if (typeof error !== 'undefined') {
                 throw new Error(`AnkiConnect error: ${error}`);
