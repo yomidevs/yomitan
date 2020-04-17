@@ -16,6 +16,7 @@
  */
 
 /* global
+ * DOM
  * FrameOffsetForwarder
  * Frontend
  * PopupProxy
@@ -95,7 +96,7 @@ async function main() {
         }
 
         let popup;
-        if (isIframe && options.general.showIframePopupsInRootFrame && !document.fullscreen && iframePopupsInRootFrameAvailable) {
+        if (isIframe && options.general.showIframePopupsInRootFrame && DOM.getFullscreenElement() === null && iframePopupsInRootFrameAvailable) {
             popup = popups.iframe || await createIframePopupProxy(url, frameOffsetForwarder, disableIframePopupsInRootFrame);
             popups.iframe = popup;
         } else if (proxy) {

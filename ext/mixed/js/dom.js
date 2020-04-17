@@ -62,4 +62,14 @@ class DOM {
             default: return false;
         }
     }
+
+    static getFullscreenElement() {
+        return (
+            document.fullscreenElement ||
+            document.msFullscreenElement ||
+            document.mozFullScreenElement ||
+            document.webkitFullscreenElement ||
+            null
+        );
+    }
 }
