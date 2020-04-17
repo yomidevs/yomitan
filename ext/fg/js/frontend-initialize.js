@@ -88,7 +88,7 @@ async function main() {
         }
 
         let popup;
-        if (isIframe && options.general.showIframePopupsInRootFrame) {
+        if (isIframe && options.general.showIframePopupsInRootFrame && !document.fullscreen) {
             popup = popups.iframe || await createIframePopupProxy(url, frameOffsetForwarder);
             popups.iframe = popup;
         } else if (proxy) {
@@ -117,6 +117,7 @@ async function main() {
     };
 
     yomichan.on('optionsUpdated', applyOptions);
+    window.addEventListener('fullscreenchange', applyOptions, false);
 
     await applyOptions();
 }
