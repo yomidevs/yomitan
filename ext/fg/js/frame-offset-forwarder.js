@@ -81,23 +81,9 @@ class FrameOffsetForwarder {
         }
 
         if (sourceFrame === null) {
-            const getShadowRootElements = (documentOrElement) => {
-                const elements = Array.from(documentOrElement.querySelectorAll('*'))
-                    .filter((el) => !!el.shadowRoot);
-                const childElements = elements
-                    .map((el) => el.shadowRoot)
-                    .map(getShadowRootElements);
-                elements.push(childElements.flat());
-
-                return elements.flat();
-            };
-
-            sourceFrame = getShadowRootElements(document)
-                .map((el) => Array.from(el.shadowRoot.querySelectorAll('frame, iframe:not(.yomichan-float)')))
-                .flat()
-                .find((el) => el.contentWindow === e.source);
-
+            sourceFrame = this._getOpenShadowRootSourceFrame(e.source);
             if (!sourceFrame) {
+                // closed shadow root etc.
                 this._forwardFrameOffsetOrigin(null, uniqueId);
                 return;
             }
@@ -108,6 +94,24 @@ class FrameOffsetForwarder {
         offset = [forwardedX + x, forwardedY + y];
 
         this._forwardFrameOffset(offset, uniqueId);
+    }
+
+    _getOpenShadowRootSourceFrame(sourceWindow) {
+        const getShadowRootElements = (documentOrElement) => {
+            const elements = Array.from(documentOrElement.querySelectorAll('*'))
+                .filter((el) => !!el.shadowRoot);
+            const childElements = elements
+                .map((el) => el.shadowRoot)
+                .map(getShadowRootElements);
+            elements.push(childElements.flat());
+
+            return elements.flat();
+        };
+
+        return getShadowRootElements(document)
+            .map((el) => Array.from(el.shadowRoot.querySelectorAll('frame, iframe:not(.yomichan-float)')))
+            .flat()
+            .find((el) => el.contentWindow === sourceWindow);
     }
 
     _forwardFrameOffsetParent(offset, uniqueId) {
