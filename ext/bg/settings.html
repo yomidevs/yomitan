@@ -427,7 +427,7 @@
 
                 <p class="help-block">
                     The conversion options below are listed in the order that the conversions are applied to the input text.
-                    Each conversion has three possible values:
+                    Conversions commonly have three possible values:
                 </p>
 
                 <ul class="help-block">
@@ -488,6 +488,15 @@
                         <option value="false">Disabled</option>
                         <option value="true">Enabled</option>
                         <option value="variant">Use both variants</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="translation-collapse-emphatic-sequences">Collapse emphatic character sequences <span class="label-light">(すっっごーーい &rarr; すっごーい / すごい)</span></label>
+                    <select class="form-control" id="translation-collapse-emphatic-sequences">
+                        <option value="false">Disabled</option>
+                        <option value="true">Collapse into single character</option>
+                        <option value="full">Remove all characters</option>
                     </select>
                 </div>
             </div>

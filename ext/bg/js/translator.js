@@ -347,17 +347,27 @@ class Translator {
 
     getAllDeinflections(text, options) {
         const translationOptions = options.translation;
+        const collapseEmphaticOptions = [[false, false]];
+        switch (translationOptions.collapseEmphaticSequences) {
+            case 'true':
+                collapseEmphaticOptions.push([true, false]);
+                break;
+            case 'full':
+                collapseEmphaticOptions.push([true, false], [true, true]);
+                break;
+        }
         const textOptionVariantArray = [
             Translator.getTextOptionEntryVariants(translationOptions.convertHalfWidthCharacters),
             Translator.getTextOptionEntryVariants(translationOptions.convertNumericCharacters),
             Translator.getTextOptionEntryVariants(translationOptions.convertAlphabeticCharacters),
             Translator.getTextOptionEntryVariants(translationOptions.convertHiraganaToKatakana),
-            Translator.getTextOptionEntryVariants(translationOptions.convertKatakanaToHiragana)
+            Translator.getTextOptionEntryVariants(translationOptions.convertKatakanaToHiragana),
+            collapseEmphaticOptions
         ];
 
         const deinflections = [];
         const used = new Set();
-        for (const [halfWidth, numeric, alphabetic, katakana, hiragana] of Translator.getArrayVariants(textOptionVariantArray)) {
+        for (const [halfWidth, numeric, alphabetic, katakana, hiragana, [collapseEmphatic, collapseEmphaticFull]] of Translator.getArrayVariants(textOptionVariantArray)) {
             let text2 = text;
             const sourceMap = new TextSourceMap(text2);
             if (halfWidth) {
@@ -374,6 +384,9 @@ class Translator {
             }
             if (hiragana) {
                 text2 = jp.convertKatakanaToHiragana(text2);
+            }
+            if (collapseEmphatic) {
+                text2 = jp.collapseEmphaticSequences(text2, collapseEmphaticFull, sourceMap);
             }
 
             for (let i = text2.length; i > 0; --i) {

@@ -82,6 +82,9 @@
 
     const ITERATION_MARK_CODE_POINT = 0x3005;
 
+    const HIRAGANA_SMALL_TSU_CODE_POINT = 0x3063;
+    const KATAKANA_SMALL_TSU_CODE_POINT = 0x30c3;
+    const KANA_PROLONGED_SOUND_MARK_CODE_POINT = 0x30fc;
 
     // Existing functions
 
@@ -121,25 +124,25 @@
         return wanakana.toRomaji(text);
     }
 
-    function convertReading(expressionFragment, readingFragment, readingMode) {
+    function convertReading(expression, reading, readingMode) {
         switch (readingMode) {
             case 'hiragana':
-                return convertKatakanaToHiragana(readingFragment || '');
+                return convertKatakanaToHiragana(reading);
             case 'katakana':
-                return convertHiraganaToKatakana(readingFragment || '');
+                return convertHiraganaToKatakana(reading);
             case 'romaji':
-                if (readingFragment) {
-                    return convertToRomaji(readingFragment);
+                if (reading) {
+                    return convertToRomaji(reading);
                 } else {
-                    if (isStringEntirelyKana(expressionFragment)) {
-                        return convertToRomaji(expressionFragment);
+                    if (isStringEntirelyKana(expression)) {
+                        return convertToRomaji(expression);
                     }
                 }
-                return readingFragment;
+                return reading;
             case 'none':
-                return null;
+                return '';
             default:
-                return readingFragment;
+                return reading;
         }
     }
 
@@ -297,7 +300,7 @@
                     const readingLeft = reading2.substring(group.text.length);
                     const segs = segmentize(readingLeft, groups.splice(1));
                     if (segs) {
-                        return [{text: group.text}].concat(segs);
+                        return [{text: group.text, furigana: ''}].concat(segs);
                     }
                 }
             } else {
@@ -365,10 +368,44 @@
         }
 
         if (stemLength !== source.length) {
-            output.push({text: source.substring(stemLength)});
+            output.push({text: source.substring(stemLength), furigana: ''});
         }
 
         return output;
+    }
+
+
+    // Miscellaneous
+
+    function collapseEmphaticSequences(text, fullCollapse, sourceMap=null) {
+        let result = '';
+        let collapseCodePoint = -1;
+        const hasSourceMap = (sourceMap !== null);
+        for (const char of text) {
+            const c = char.codePointAt(0);
+            if (
+                c === HIRAGANA_SMALL_TSU_CODE_POINT ||
+                c === KATAKANA_SMALL_TSU_CODE_POINT ||
+                c === KANA_PROLONGED_SOUND_MARK_CODE_POINT
+            ) {
+                if (collapseCodePoint !== c) {
+                    collapseCodePoint = c;
+                    if (!fullCollapse) {
+                        result += char;
+                        continue;
+                    }
+                }
+            } else {
+                collapseCodePoint = -1;
+                result += char;
+                continue;
+            }
+
+            if (hasSourceMap) {
+                sourceMap.combine(Math.max(0, result.length - 1), 1);
+            }
+        }
+        return result;
     }
 
 
@@ -383,6 +420,7 @@
         convertHalfWidthKanaToFullWidth,
         convertAlphabeticToKana,
         distributeFurigana,
-        distributeFuriganaInflected
+        distributeFuriganaInflected,
+        collapseEmphaticSequences
     });
 })();

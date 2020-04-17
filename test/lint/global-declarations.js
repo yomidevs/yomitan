@@ -37,6 +37,18 @@ function getNewline(string) {
     }
 }
 
+function getSubstringCount(string, substring) {
+    let start = 0;
+    let count = 0;
+    while (true) {
+        const pos = string.indexOf(substring, start);
+        if (pos < 0) { break; }
+        ++count;
+        start = pos + substring.length;
+    }
+    return count;
+}
+
 
 function validateGlobals(fileName, fix) {
     const pattern = /\/\*\s*global\s+([\w\W]*?)\*\//g;
@@ -47,6 +59,7 @@ function validateGlobals(fileName, fix) {
     let first = true;
     let endIndex = 0;
     let newSource = '';
+    const allGlobals = [];
     const newline = getNewline(source);
     while ((match = pattern.exec(source)) !== null) {
         if (!first) {
@@ -74,15 +87,27 @@ function validateGlobals(fileName, fix) {
         newSource += source.substring(0, match.index);
         newSource += expected;
         endIndex = match.index + match[0].length;
+
+        allGlobals.push(...parts);
     }
 
     newSource += source.substring(endIndex);
+
+    // This is an approximate check to see if a global variable is unused.
+    // If the global appears in a comment, string, or similar, the check will pass.
+    let errorCount = 0;
+    for (const global of allGlobals) {
+        if (getSubstringCount(newSource, global) <= 1) {
+            console.error(`Global variable ${global} appears to be unused in ${fileName}`);
+            ++errorCount;
+        }
+    }
 
     if (fix) {
         fs.writeFileSync(fileName, newSource, {encoding: 'utf8'});
     }
 
-    return true;
+    return errorCount === 0;
 }
 
 
