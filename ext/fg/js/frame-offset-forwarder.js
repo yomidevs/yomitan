@@ -79,9 +79,28 @@ class FrameOffsetForwarder {
             sourceFrame = frame;
             break;
         }
+
         if (sourceFrame === null) {
-            this._forwardFrameOffsetOrigin(null, uniqueId);
-            return;
+            const getShadowRootElements = (documentOrElement) => {
+                const elements = Array.from(documentOrElement.querySelectorAll('*'))
+                    .filter((el) => !!el.shadowRoot);
+                const childElements = elements
+                    .map((el) => el.shadowRoot)
+                    .map(getShadowRootElements);
+                elements.push(childElements.flat());
+
+                return elements.flat();
+            };
+
+            sourceFrame = getShadowRootElements(document)
+                .map((el) => Array.from(el.shadowRoot.querySelectorAll('frame, iframe:not(.yomichan-float)')))
+                .flat()
+                .find((el) => el.contentWindow === e.source);
+
+            if (!sourceFrame) {
+                this._forwardFrameOffsetOrigin(null, uniqueId);
+                return;
+            }
         }
 
         const [forwardedX, forwardedY] = offset;
