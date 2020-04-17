@@ -868,21 +868,16 @@ class Backend {
 
     _getBrowserIconTitle() {
         return (
-            chrome.browserAction !== null &&
-            typeof chrome.browserAction === 'object' &&
+            isObject(chrome.browserAction) &&
             typeof chrome.browserAction.getTitle === 'function' ?
-            new Promise((resolve) => chrome.browserAction.getTitle({}, resolve)) :
-            Promise.resolve('')
+                new Promise((resolve) => chrome.browserAction.getTitle({}, resolve)) :
+                Promise.resolve('')
         );
     }
 
     _updateBadge() {
         let title = this._defaultBrowserActionTitle;
-        if (
-            title === null ||
-            chrome.browserAction === null ||
-            typeof chrome.browserAction !== 'object'
-        ) {
+        if (title === null || !isObject(chrome.browserAction)) {
             // Not ready or invalid
             return;
         }
