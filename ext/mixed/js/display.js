@@ -791,10 +791,7 @@ class Display {
 
             const expression = expressionIndex === -1 ? definition : definition.expressions[expressionIndex];
 
-            if (this.audioPlaying !== null) {
-                this.audioPlaying.pause();
-                this.audioPlaying = null;
-            }
+            this._stopPlayingAudio();
 
             let audio, info;
             try {
@@ -820,6 +817,8 @@ class Display {
                 button.title = `${titleDefault}\n${info}`;
             }
 
+            this._stopPlayingAudio();
+
             this.audioPlaying = audio;
             audio.currentTime = 0;
             audio.volume = this.options.audio.volume / 100.0;
@@ -835,6 +834,13 @@ class Display {
             this.onError(e);
         } finally {
             this.setSpinnerVisible(false);
+        }
+    }
+
+    _stopPlayingAudio() {
+        if (this.audioPlaying !== null) {
+            this.audioPlaying.pause();
+            this.audioPlaying = null;
         }
     }
 
