@@ -18,7 +18,6 @@
 /* global
  * AnkiConnect
  * AnkiNoteBuilder
- * AnkiNull
  * AudioSystem
  * AudioUriBuilder
  * BackendApiForwarder
@@ -46,7 +45,7 @@ class Backend {
         this.database = new Database();
         this.dictionaryImporter = new DictionaryImporter();
         this.translator = new Translator(this.database);
-        this.anki = new AnkiNull();
+        this.anki = new AnkiConnect();
         this.mecab = new Mecab();
         this.clipboardMonitor = new ClipboardMonitor({getClipboard: this._onApiClipboardGet.bind(this)});
         this.options = null;
@@ -55,6 +54,7 @@ class Backend {
         this.audioSystem = new AudioSystem({getAudioUri: this._getAudioUri.bind(this)});
         this.audioUriBuilder = new AudioUriBuilder();
         this.ankiNoteBuilder = new AnkiNoteBuilder({
+            anki: this.anki,
             audioSystem: this.audioSystem,
             renderTemplate: this._renderTemplate.bind(this)
         });
@@ -214,7 +214,8 @@ class Backend {
             this.setExtensionBadgeText('');
         }
 
-        this.anki = options.anki.enable ? new AnkiConnect(options.anki.server) : new AnkiNull();
+        this.anki.setServer(options.anki.server);
+        this.anki.setEnabled(options.anki.enable);
 
         if (options.parsing.enableMecabParser) {
             this.mecab.startListener();
@@ -505,8 +506,7 @@ class Backend {
             await this.ankiNoteBuilder.injectScreenshot(
                 definition,
                 options.anki.terms.fields,
-                details.screenshot,
-                this.anki
+                details.screenshot
             );
         }
 

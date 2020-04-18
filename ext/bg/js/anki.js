@@ -19,122 +19,119 @@
  * requestJson
  */
 
-/*
- * AnkiConnect
- */
-
 class AnkiConnect {
     constructor(server) {
-        this.server = server;
-        this.localVersion = 2;
-        this.remoteVersion = 0;
+        this._enabled = false;
+        this._server = server;
+        this._localVersion = 2;
+        this._remoteVersion = 0;
+    }
+
+    setServer(server) {
+        this._server = server;
+    }
+
+    getServer() {
+        return this._server;
+    }
+
+    setEnabled(enabled) {
+        this._enabled = enabled;
+    }
+
+    isEnabled() {
+        return this._enabled;
     }
 
     async addNote(note) {
-        await this.checkVersion();
-        return await this.ankiInvoke('addNote', {note});
+        if (!this._enabled) { return null; }
+        await this._checkVersion();
+        return await this._invoke('addNote', {note});
     }
 
     async canAddNotes(notes) {
-        await this.checkVersion();
-        return await this.ankiInvoke('canAddNotes', {notes});
+        if (!this._enabled) { return []; }
+        await this._checkVersion();
+        return await this._invoke('canAddNotes', {notes});
     }
 
     async getDeckNames() {
-        await this.checkVersion();
-        return await this.ankiInvoke('deckNames');
+        if (!this._enabled) { return []; }
+        await this._checkVersion();
+        return await this._invoke('deckNames');
     }
 
     async getModelNames() {
-        await this.checkVersion();
-        return await this.ankiInvoke('modelNames');
+        if (!this._enabled) { return []; }
+        await this._checkVersion();
+        return await this._invoke('modelNames');
     }
 
     async getModelFieldNames(modelName) {
-        await this.checkVersion();
-        return await this.ankiInvoke('modelFieldNames', {modelName});
+        if (!this._enabled) { return []; }
+        await this._checkVersion();
+        return await this._invoke('modelFieldNames', {modelName});
     }
 
     async guiBrowse(query) {
-        await this.checkVersion();
-        return await this.ankiInvoke('guiBrowse', {query});
+        if (!this._enabled) { return []; }
+        await this._checkVersion();
+        return await this._invoke('guiBrowse', {query});
     }
 
     async storeMediaFile(filename, dataBase64) {
-        await this.checkVersion();
-        return await this.ankiInvoke('storeMediaFile', {filename, data: dataBase64});
+        if (!this._enabled) {
+            throw new Error('AnkiConnect not enabled');
+        }
+        await this._checkVersion();
+        return await this._invoke('storeMediaFile', {filename, data: dataBase64});
     }
 
-    async checkVersion() {
-        if (this.remoteVersion < this.localVersion) {
-            this.remoteVersion = await this.ankiInvoke('version');
-            if (this.remoteVersion < this.localVersion) {
+    async findNoteIds(notes) {
+        if (!this._enabled) { return []; }
+        await this._checkVersion();
+        const actions = notes.map((note) => ({
+            action: 'findNotes',
+            params: {
+                query: `deck:"${this._escapeQuery(note.deckName)}" ${this._fieldsToQuery(note.fields)}`
+            }
+        }));
+        return await this._invoke('multi', {actions});
+    }
+
+    // Private
+
+    async _checkVersion() {
+        if (this._remoteVersion < this._localVersion) {
+            this._remoteVersion = await this._invoke('version');
+            if (this._remoteVersion < this._localVersion) {
                 throw new Error('Extension and plugin versions incompatible');
             }
         }
     }
 
-    async findNoteIds(notes) {
-        await this.checkVersion();
-        const actions = notes.map((note) => ({
-            action: 'findNotes',
-            params: {
-                query: `deck:"${AnkiConnect.escapeQuery(note.deckName)}" ${AnkiConnect.fieldsToQuery(note.fields)}`
+    async _invoke(action, params) {
+        const result = await requestJson(this._server, 'POST', {action, params, version: this._localVersion});
+        if (isObject(result)) {
+            const error = result.error;
+            if (typeof error !== 'undefined') {
+                throw new Error(`AnkiConnect error: ${error}`);
             }
-        }));
-        return await this.ankiInvoke('multi', {actions});
+        }
+        return result;
     }
 
-    ankiInvoke(action, params) {
-        return requestJson(this.server, 'POST', {action, params, version: this.localVersion});
-    }
-
-    static escapeQuery(text) {
+    _escapeQuery(text) {
         return text.replace(/"/g, '');
     }
 
-    static fieldsToQuery(fields) {
+    _fieldsToQuery(fields) {
         const fieldNames = Object.keys(fields);
         if (fieldNames.length === 0) {
             return '';
         }
 
         const key = fieldNames[0];
-        return `${key.toLowerCase()}:"${AnkiConnect.escapeQuery(fields[key])}"`;
-    }
-}
-
-
-/*
- * AnkiNull
- */
-
-class AnkiNull {
-    async addNote() {
-        return null;
-    }
-
-    async canAddNotes() {
-        return [];
-    }
-
-    async getDeckNames() {
-        return [];
-    }
-
-    async getModelNames() {
-        return [];
-    }
-
-    async getModelFieldNames() {
-        return [];
-    }
-
-    async guiBrowse() {
-        return [];
-    }
-
-    async findNoteIds() {
-        return [];
+        return `${key.toLowerCase()}:"${this._escapeQuery(fields[key])}"`;
     }
 }
