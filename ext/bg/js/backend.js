@@ -28,7 +28,6 @@
  * Mecab
  * Translator
  * conditionsTestValue
- * dictConfigured
  * dictTermsSort
  * handlebarsRenderDynamic
  * jp
