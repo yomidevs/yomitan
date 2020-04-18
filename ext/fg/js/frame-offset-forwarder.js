@@ -23,6 +23,7 @@ class FrameOffsetForwarder {
     constructor() {
         this._started = false;
         this._frameCache = new Set();
+        this._unreachableContentWindowCache = new Set();
 
         this._forwardFrameOffset = (
             window !== window.parent ?
@@ -74,9 +75,13 @@ class FrameOffsetForwarder {
     }
 
     _onGetFrameOffset(offset, uniqueId, e) {
-        const sourceFrame = this._findFrameWithContentWindow(e.source);
+        let sourceFrame = null;
+        if (!this._unreachableContentWindowCache.has(e.source)) {
+            sourceFrame = this._findFrameWithContentWindow(e.source);
+        }
         if (sourceFrame === null) {
             // closed shadow root etc.
+            this._unreachableContentWindowCache.add(e.source);
             this._forwardFrameOffsetOrigin(null, uniqueId);
             return;
         }
