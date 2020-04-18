@@ -18,7 +18,6 @@
 /* global
  * AnkiConnect
  * AnkiNoteBuilder
- * AnkiNull
  * AudioSystem
  * AudioUriBuilder
  * BackendApiForwarder
