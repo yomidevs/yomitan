@@ -94,50 +94,40 @@ class FrameOffsetForwarder {
     }
 
     _findFrameWithContentWindow(contentWindow) {
-        const elementSources = [
-            () => [...this._frameCache],
-            // will contain duplicates, but frame elements are cheap to handle
-            () => [...document.querySelectorAll('frame, iframe:not(.yomichan-float)')],
-            () => [document.documentElement]
-        ];
-        const getMoreElements = () => {
-            while (true) {
-                const source = elementSources.shift();
-                if (source) {
-                    const elements = source();
-                    if (elements.length === 0) { continue; }
-                    return elements;
-                }
-                return [];
-            }
-        };
-
-        const elements = [];
         const ELEMENT_NODE = Node.ELEMENT_NODE;
-        while (elements.length > 0 || elements.push(...getMoreElements())) {
-            const element = elements.shift();
-            if (element.contentWindow === contentWindow) {
-                this._frameCache.add(element);
-                return element;
-            }
+        for (const elements of this._getFrameElementSources()) {
+            while (elements.length > 0) {
+                const element = elements.shift();
+                if (element.contentWindow === contentWindow) {
+                    this._frameCache.add(element);
+                    return element;
+                }
 
-            const shadowRoot = element.shadowRoot;
-            if (shadowRoot) {
-                for (const child of shadowRoot.children) {
+                const shadowRoot = element.shadowRoot;
+                if (shadowRoot) {
+                    for (const child of shadowRoot.children) {
+                        if (child.nodeType === ELEMENT_NODE) {
+                            elements.push(child);
+                        }
+                    }
+                }
+
+                for (const child of element.children) {
                     if (child.nodeType === ELEMENT_NODE) {
                         elements.push(child);
                     }
                 }
             }
-
-            for (const child of element.children) {
-                if (child.nodeType === ELEMENT_NODE) {
-                    elements.push(child);
-                }
-            }
         }
 
         return null;
+    }
+
+    *_getFrameElementSources() {
+        yield [...this._frameCache];
+        // will contain duplicates, but frame elements are cheap to handle
+        yield [...document.querySelectorAll('frame, iframe:not(.yomichan-float)')];
+        yield [document.documentElement];
     }
 
     _forwardFrameOffsetParent(offset, uniqueId) {
