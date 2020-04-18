@@ -23,6 +23,10 @@ class FrameOffsetForwarder {
     constructor() {
         this._started = false;
 
+        this._cacheMaxSize = 1000;
+        this._frameCache = new Set();
+        this._unreachableContentWindowCache = new Set();
+
         this._forwardFrameOffset = (
             window !== window.parent ?
             this._forwardFrameOffsetParent.bind(this) :
@@ -74,12 +78,12 @@ class FrameOffsetForwarder {
 
     _onGetFrameOffset(offset, uniqueId, e) {
         let sourceFrame = null;
-        for (const frame of document.querySelectorAll('frame, iframe:not(.yomichan-float)')) {
-            if (frame.contentWindow !== e.source) { continue; }
-            sourceFrame = frame;
-            break;
+        if (!this._unreachableContentWindowCache.has(e.source)) {
+            sourceFrame = this._findFrameWithContentWindow(e.source);
         }
         if (sourceFrame === null) {
+            // closed shadow root etc.
+            this._addToCache(this._unreachableContentWindowCache, e.source);
             this._forwardFrameOffsetOrigin(null, uniqueId);
             return;
         }
@@ -89,6 +93,64 @@ class FrameOffsetForwarder {
         offset = [forwardedX + x, forwardedY + y];
 
         this._forwardFrameOffset(offset, uniqueId);
+    }
+
+    _findFrameWithContentWindow(contentWindow) {
+        const ELEMENT_NODE = Node.ELEMENT_NODE;
+        for (const elements of this._getFrameElementSources()) {
+            while (elements.length > 0) {
+                const element = elements.shift();
+                if (element.contentWindow === contentWindow) {
+                    this._addToCache(this._frameCache, element);
+                    return element;
+                }
+
+                const shadowRoot = element.shadowRoot;
+                if (shadowRoot) {
+                    for (const child of shadowRoot.children) {
+                        if (child.nodeType === ELEMENT_NODE) {
+                            elements.push(child);
+                        }
+                    }
+                }
+
+                for (const child of element.children) {
+                    if (child.nodeType === ELEMENT_NODE) {
+                        elements.push(child);
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    *_getFrameElementSources() {
+        const frameCache = [];
+        for (const frame of this._frameCache) {
+            // removed from DOM
+            if (!frame.isConnected) {
+                this._frameCache.delete(frame);
+                continue;
+            }
+            frameCache.push(frame);
+        }
+        yield frameCache;
+        // will contain duplicates, but frame elements are cheap to handle
+        yield [...document.querySelectorAll('frame, iframe:not(.yomichan-float)')];
+        yield [document.documentElement];
+    }
+
+    _addToCache(cache, value) {
+        let freeSlots = this._cacheMaxSize - cache.size;
+        if (freeSlots <= 0) {
+            for (const cachedValue of cache) {
+                cache.delete(cachedValue);
+                ++freeSlots;
+                if (freeSlots > 0) { break; }
+            }
+        }
+        cache.add(value);
     }
 
     _forwardFrameOffsetParent(offset, uniqueId) {

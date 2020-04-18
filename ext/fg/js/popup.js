@@ -16,6 +16,7 @@
  */
 
 /* global
+ * DOM
  * apiGetMessageToken
  * apiInjectStylesheet
  */
@@ -271,7 +272,7 @@ class Popup {
     }
 
     _onFullscreenChanged() {
-        const parent = (Popup._getFullscreenElement() || document.body || null);
+        const parent = (DOM.getFullscreenElement() || document.body || null);
         if (parent !== null && this._container.parentNode !== parent) {
             parent.appendChild(this._container);
         }
@@ -363,16 +364,6 @@ class Popup {
         if (token === null || contentWindow === null) { return; }
 
         contentWindow.postMessage({action, params, token}, this._targetOrigin);
-    }
-
-    static _getFullscreenElement() {
-        return (
-            document.fullscreenElement ||
-            document.msFullscreenElement ||
-            document.mozFullScreenElement ||
-            document.webkitFullscreenElement ||
-            null
-        );
     }
 
     static _getPositionForHorizontalText(elementRect, width, height, viewport, offsetScale, optionsGeneral) {
