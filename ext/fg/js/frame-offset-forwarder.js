@@ -22,6 +22,7 @@
 class FrameOffsetForwarder {
     constructor() {
         this._started = false;
+        this._frameCache = new Set();
 
         this._forwardFrameOffset = (
             window !== window.parent ?
@@ -73,20 +74,11 @@ class FrameOffsetForwarder {
     }
 
     _onGetFrameOffset(offset, uniqueId, e) {
-        let sourceFrame = null;
-        for (const frame of document.querySelectorAll('frame, iframe:not(.yomichan-float)')) {
-            if (frame.contentWindow !== e.source) { continue; }
-            sourceFrame = frame;
-            break;
-        }
-
+        const sourceFrame = this._findFrameWithContentWindow(e.source);
         if (sourceFrame === null) {
-            sourceFrame = this._getOpenShadowRootSourceFrame(e.source);
-            if (!sourceFrame) {
-                // closed shadow root etc.
-                this._forwardFrameOffsetOrigin(null, uniqueId);
-                return;
-            }
+            // closed shadow root etc.
+            this._forwardFrameOffsetOrigin(null, uniqueId);
+            return;
         }
 
         const [forwardedX, forwardedY] = offset;
@@ -96,22 +88,38 @@ class FrameOffsetForwarder {
         this._forwardFrameOffset(offset, uniqueId);
     }
 
-    _getOpenShadowRootSourceFrame(sourceWindow) {
-        const getShadowRootElements = (documentOrElement) => {
-            const elements = Array.from(documentOrElement.querySelectorAll('*'))
-                .filter((el) => !!el.shadowRoot);
-            const childElements = elements
-                .map((el) => el.shadowRoot)
-                .map(getShadowRootElements);
-            elements.push(childElements.flat());
+    _findFrameWithContentWindow(contentWindow) {
+        const elements = [
+            ...this._frameCache,
+            // will contain duplicates, but frame elements are cheap to handle
+            ...document.querySelectorAll('frame, iframe:not(.yomichan-float)'),
+            document.documentElement
+        ];
+        const ELEMENT_NODE = Node.ELEMENT_NODE;
+        while (elements.length > 0) {
+            const element = elements.shift();
+            if (element.contentWindow === contentWindow) {
+                this._frameCache.add(element);
+                return element;
+            }
 
-            return elements.flat();
-        };
+            const shadowRoot = element.shadowRoot;
+            if (shadowRoot) {
+                for (const child of shadowRoot.children) {
+                    if (child.nodeType === ELEMENT_NODE) {
+                        elements.push(child);
+                    }
+                }
+            }
 
-        return getShadowRootElements(document)
-            .map((el) => Array.from(el.shadowRoot.querySelectorAll('frame, iframe:not(.yomichan-float)')))
-            .flat()
-            .find((el) => el.contentWindow === sourceWindow);
+            for (const child of element.children) {
+                if (child.nodeType === ELEMENT_NODE) {
+                    elements.push(child);
+                }
+            }
+        }
+
+        return null;
     }
 
     _forwardFrameOffsetParent(offset, uniqueId) {
