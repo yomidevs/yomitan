@@ -26,8 +26,30 @@
                     {},
                     {"enum": ["freq"]},
                     {
-                        "type": ["string", "number"],
-                        "description": "Frequency information for the term or expression."
+                        "oneOf": [
+                            {
+                                "type": ["string", "number"],
+                                "description": "Frequency information for the term or expression."
+                            },
+                            {
+                                "type": ["object"],
+                                "required": [
+                                    "reading",
+                                    "frequency"
+                                ],
+                                "additionalProperties": false,
+                                "properties": {
+                                    "reading": {
+                                        "type": "string",
+                                        "description": "Reading for the term or expression."
+                                    },
+                                    "frequency": {
+                                        "type": ["string", "number"],
+                                        "description": "Frequency information for the term or expression."
+                                    }
+                                }
+                            }
+                        ]
                     }
                 ]
             },
