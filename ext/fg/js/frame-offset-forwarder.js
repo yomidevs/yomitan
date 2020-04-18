@@ -89,14 +89,27 @@ class FrameOffsetForwarder {
     }
 
     _findFrameWithContentWindow(contentWindow) {
-        const elements = [
-            ...this._frameCache,
+        const elementSources = [
+            () => [...this._frameCache],
             // will contain duplicates, but frame elements are cheap to handle
-            ...document.querySelectorAll('frame, iframe:not(.yomichan-float)'),
-            document.documentElement
+            () => [...document.querySelectorAll('frame, iframe:not(.yomichan-float)')],
+            () => [document.documentElement]
         ];
+        const getMoreElements = () => {
+            while (true) {
+                const source = elementSources.shift();
+                if (source) {
+                    const elements = source();
+                    if (elements.length === 0) { continue; }
+                    return elements;
+                }
+                return [];
+            }
+        };
+
+        const elements = [];
         const ELEMENT_NODE = Node.ELEMENT_NODE;
-        while (elements.length > 0) {
+        while (elements.length > 0 || elements.push(...getMoreElements())) {
             const element = elements.shift();
             if (element.contentWindow === contentWindow) {
                 this._frameCache.add(element);
