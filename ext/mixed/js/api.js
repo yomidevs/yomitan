@@ -116,6 +116,30 @@ function apiGetDefaultAnkiFieldTemplates() {
     return _apiInvoke('getDefaultAnkiFieldTemplates');
 }
 
+function apiGetAnkiDeckNames() {
+    return _apiInvoke('getAnkiDeckNames');
+}
+
+function apiGetAnkiModelNames() {
+    return _apiInvoke('getAnkiModelNames');
+}
+
+function apiGetAnkiModelFieldNames(modelName) {
+    return _apiInvoke('getAnkiModelFieldNames', {modelName});
+}
+
+function apiGetDictionaryInfo() {
+    return _apiInvoke('getDictionaryInfo');
+}
+
+function apiGetDictionaryCounts(dictionaryNames, getTotal) {
+    return _apiInvoke('getDictionaryCounts', {dictionaryNames, getTotal});
+}
+
+function apiPurgeDatabase() {
+    return _apiInvoke('purgeDatabase');
+}
+
 function _apiInvoke(action, params={}) {
     const data = {action, params};
     return new Promise((resolve, reject) => {

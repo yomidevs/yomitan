@@ -316,6 +316,15 @@ const yomichan = (() => {
             this.trigger('orphaned', {error});
         }
 
+        isExtensionUrl(url) {
+            try {
+                const urlBase = chrome.runtime.getURL('/');
+                return url.substring(0, urlBase.length) === urlBase;
+            } catch (e) {
+                return false;
+            }
+        }
+
         getTemporaryListenerResult(eventHandler, userCallback, timeout=null) {
             if (!(
                 typeof eventHandler.addListener === 'function' &&

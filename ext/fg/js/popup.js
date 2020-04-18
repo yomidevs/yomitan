@@ -539,19 +539,10 @@ class Popup {
         };
     }
 
-    static _isOnExtensionPage() {
-        try {
-            const url = chrome.runtime.getURL('/');
-            return window.location.href.substring(0, url.length) === url;
-        } catch (e) {
-            // NOP
-        }
-    }
-
     static async _injectStylesheet(id, type, value, useWebExtensionApi) {
         const injectedStylesheets = Popup._injectedStylesheets;
 
-        if (Popup._isOnExtensionPage()) {
+        if (yomichan.isExtensionUrl(window.location.href)) {
             // Permissions error will occur if trying to use the WebExtension API to inject
             // into an extension page.
             useWebExtensionApi = false;

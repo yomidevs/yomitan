@@ -17,8 +17,11 @@
 
 /* global
  * PageExitPrevention
+ * apiGetDictionaryCounts
+ * apiGetDictionaryInfo
  * apiOptionsGet
  * apiOptionsGetFull
+ * apiPurgeDatabase
  * getOptionsContext
  * getOptionsFullMutable
  * getOptionsMutable
@@ -27,10 +30,7 @@
  * storageUpdateStats
  * utilBackgroundIsolate
  * utilDatabaseDeleteDictionary
- * utilDatabaseGetDictionaryCounts
- * utilDatabaseGetDictionaryInfo
  * utilDatabaseImport
- * utilDatabasePurge
  */
 
 let dictionaryUI = null;
@@ -431,7 +431,7 @@ async function onDictionaryOptionsChanged() {
 
 async function onDatabaseUpdated() {
     try {
-        const dictionaries = await utilDatabaseGetDictionaryInfo();
+        const dictionaries = await apiGetDictionaryInfo();
         dictionaryUI.setDictionaries(dictionaries);
 
         document.querySelector('#dict-warning').hidden = (dictionaries.length > 0);
@@ -439,7 +439,7 @@ async function onDatabaseUpdated() {
         updateMainDictionarySelectOptions(dictionaries);
         await updateMainDictionarySelectValue();
 
-        const {counts, total} = await utilDatabaseGetDictionaryCounts(dictionaries.map((v) => v.title), true);
+        const {counts, total} = await apiGetDictionaryCounts(dictionaries.map((v) => v.title), true);
         dictionaryUI.setCounts(counts, total);
     } catch (e) {
         dictionaryErrorsShow([e]);
@@ -618,7 +618,7 @@ async function onDictionaryPurge(e) {
         dictionaryErrorsShow(null);
         dictionarySpinnerShow(true);
 
-        await utilDatabasePurge();
+        await apiPurgeDatabase();
         for (const {options} of toIterable((await getOptionsFullMutable()).profiles)) {
             options.dictionaries = utilBackgroundIsolate({});
             options.general.mainDictionary = '';

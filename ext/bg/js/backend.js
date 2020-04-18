@@ -100,7 +100,13 @@ class Backend {
             ['getQueryParserTemplatesHtml', {handler: this._onApiGetQueryParserTemplatesHtml.bind(this), async: true}],
             ['getZoom', {handler: this._onApiGetZoom.bind(this), async: true}],
             ['getMessageToken', {handler: this._onApiGetMessageToken.bind(this), async: false}],
-            ['getDefaultAnkiFieldTemplates', {handler: this._onApiGetDefaultAnkiFieldTemplates.bind(this), async: false}]
+            ['getDefaultAnkiFieldTemplates', {handler: this._onApiGetDefaultAnkiFieldTemplates.bind(this), async: false}],
+            ['getAnkiDeckNames', {handler: this._onApiGetAnkiDeckNames.bind(this), async: true}],
+            ['getAnkiModelNames', {handler: this._onApiGetAnkiModelNames.bind(this), async: true}],
+            ['getAnkiModelFieldNames', {handler: this._onApiGetAnkiModelFieldNames.bind(this), async: true}],
+            ['getDictionaryInfo', {handler: this._onApiGetDictionaryInfo.bind(this), async: true}],
+            ['getDictionaryCounts', {handler: this._onApiGetDictionaryCounts.bind(this), async: true}],
+            ['purgeDatabase', {handler: this._onApiPurgeDatabase.bind(this), async: true}]
         ]);
 
         this._commandHandlers = new Map([
@@ -722,6 +728,36 @@ class Backend {
         return this.defaultAnkiFieldTemplates;
     }
 
+    async _onApiGetAnkiDeckNames(params, sender) {
+        this._validatePrivilegedMessageSender(sender);
+        return await this.anki.getDeckNames();
+    }
+
+    async _onApiGetAnkiModelNames(params, sender) {
+        this._validatePrivilegedMessageSender(sender);
+        return await this.anki.getModelNames();
+    }
+
+    async _onApiGetAnkiModelFieldNames({modelName}, sender) {
+        this._validatePrivilegedMessageSender(sender);
+        return await this.anki.getModelFieldNames(modelName);
+    }
+
+    async _onApiGetDictionaryInfo(params, sender) {
+        this._validatePrivilegedMessageSender(sender);
+        return await this.translator.database.getDictionaryInfo();
+    }
+
+    async _onApiGetDictionaryCounts({dictionaryNames, getTotal}, sender) {
+        this._validatePrivilegedMessageSender(sender);
+        return await this.translator.database.getDictionaryCounts(dictionaryNames, getTotal);
+    }
+
+    async _onApiPurgeDatabase(params, sender) {
+        this._validatePrivilegedMessageSender(sender);
+        return await this.translator.purgeDatabase();
+    }
+
     // Command handlers
 
     async _onCommandSearch(params) {
@@ -817,6 +853,13 @@ class Backend {
     }
 
     // Utilities
+
+    _validatePrivilegedMessageSender(sender) {
+        const url = sender.url;
+        if (!(typeof url === 'string' && yomichan.isExtensionUrl(url))) {
+            throw new Error('Invalid message sender');
+        }
+    }
 
     async _getAudioUri(definition, source, details) {
         let optionsContext = (typeof details === 'object' && details !== null ? details.optionsContext : null);
