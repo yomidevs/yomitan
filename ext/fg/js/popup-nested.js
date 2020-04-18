@@ -19,24 +19,7 @@
  * apiOptionsGet
  */
 
-let popupNestedInitialized = false;
-
-async function popupNestedInitialize(id, depth, parentFrameId, url) {
-    if (popupNestedInitialized) {
-        return;
-    }
-    popupNestedInitialized = true;
-
-    const optionsContext = {depth, url};
-    const options = await apiOptionsGet(optionsContext);
-    const popupNestingMaxDepth = options.scanning.popupNestingMaxDepth;
-
-    if (!(typeof popupNestingMaxDepth === 'number' && typeof depth === 'number' && depth < popupNestingMaxDepth)) {
-        return;
-    }
-
-    window.frontendInitializationData = {id, depth, parentFrameId, url, proxy: true};
-
+function injectPopupNested() {
     const scriptSrcs = [
         '/mixed/js/text-scanner.js',
         '/fg/js/frontend-api-sender.js',
@@ -51,4 +34,34 @@ async function popupNestedInitialize(id, depth, parentFrameId, url) {
         script.src = src;
         document.body.appendChild(script);
     }
+}
+
+async function popupNestedInitialize(id, depth, parentFrameId, url) {
+    let optionsApplied = false;
+
+    const applyOptions = async () => {
+        const optionsContext = {depth, url};
+        const options = await apiOptionsGet(optionsContext);
+        const popupNestingMaxDepth = options.scanning.popupNestingMaxDepth;
+
+        const maxPopupDepthExceeded = !(
+            typeof popupNestingMaxDepth === 'number' &&
+            typeof depth === 'number' &&
+            depth < popupNestingMaxDepth
+        );
+        if (maxPopupDepthExceeded || optionsApplied) {
+            return;
+        }
+
+        optionsApplied = true;
+
+        window.frontendInitializationData = {id, depth, parentFrameId, url, proxy: true};
+        injectPopupNested();
+
+        yomichan.off('optionsUpdated', applyOptions);
+    };
+
+    yomichan.on('optionsUpdated', applyOptions);
+
+    await applyOptions();
 }

@@ -46,7 +46,7 @@ class TextScanner {
     }
 
     onMouseOver(e) {
-        if (this.ignoreElements.includes(e.target)) {
+        if (this.ignoreElements().includes(e.target)) {
             this.scanTimerClear();
         }
     }
@@ -133,7 +133,7 @@ class TextScanner {
         this.preventNextClick = false;
 
         const primaryTouch = e.changedTouches[0];
-        if (DOM.isPointInSelection(primaryTouch.clientX, primaryTouch.clientY, this.node.getSelection())) {
+        if (DOM.isPointInSelection(primaryTouch.clientX, primaryTouch.clientY, window.getSelection())) {
             return;
         }
 
@@ -224,8 +224,8 @@ class TextScanner {
         }
     }
 
-    setEnabled(enabled) {
-        if (enabled) {
+    setEnabled(enabled, canEnable) {
+        if (enabled && canEnable) {
             if (!this.enabled) {
                 this.hookEvents();
                 this.enabled = true;
@@ -271,9 +271,9 @@ class TextScanner {
         ];
     }
 
-    setOptions(options) {
+    setOptions(options, canEnable=true) {
         this.options = options;
-        this.setEnabled(this.options.general.enable);
+        this.setEnabled(this.options.general.enable, canEnable);
     }
 
     async searchAt(x, y, cause) {

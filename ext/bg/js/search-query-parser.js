@@ -21,13 +21,12 @@
  * apiOptionsSet
  * apiTermsFind
  * apiTextParse
- * apiTextParseMecab
  * docSentenceExtract
  */
 
 class QueryParser extends TextScanner {
     constructor({getOptionsContext, setContent, setSpinnerVisible}) {
-        super(document.querySelector('#query-parser-content'), [], []);
+        super(document.querySelector('#query-parser-content'), () => [], []);
 
         this.getOptionsContext = getOptionsContext;
         this.setContent = setContent;
@@ -128,7 +127,7 @@ class QueryParser extends TextScanner {
 
         this.setPreview(text);
 
-        this.parseResults = await this.parseText(text);
+        this.parseResults = await apiTextParse(text, this.getOptionsContext());
         this.refreshSelectedParser();
 
         this.renderParserSelect();
@@ -137,33 +136,11 @@ class QueryParser extends TextScanner {
         this.setSpinnerVisible(false);
     }
 
-    async parseText(text) {
-        const results = [];
-        if (this.options.parsing.enableScanningParser) {
-            results.push({
-                name: 'Scanning parser',
-                id: 'scan',
-                parsedText: await apiTextParse(text, this.getOptionsContext())
-            });
-        }
-        if (this.options.parsing.enableMecabParser) {
-            const mecabResults = await apiTextParseMecab(text, this.getOptionsContext());
-            for (const [mecabDictName, mecabDictResults] of mecabResults) {
-                results.push({
-                    name: `MeCab: ${mecabDictName}`,
-                    id: `mecab-${mecabDictName}`,
-                    parsedText: mecabDictResults
-                });
-            }
-        }
-        return results;
-    }
-
     setPreview(text) {
         const previewTerms = [];
         for (let i = 0, ii = text.length; i < ii; i += 2) {
             const tempText = text.substring(i, i + 2);
-            previewTerms.push([{text: tempText}]);
+            previewTerms.push([{text: tempText, reading: ''}]);
         }
         this.queryParser.textContent = '';
         this.queryParser.appendChild(this.queryParserGenerator.createParseResult(previewTerms, true));
@@ -183,6 +160,6 @@ class QueryParser extends TextScanner {
         const parseResult = this.getParseResult();
         this.queryParser.textContent = '';
         if (!parseResult) { return; }
-        this.queryParser.appendChild(this.queryParserGenerator.createParseResult(parseResult.parsedText));
+        this.queryParser.appendChild(this.queryParserGenerator.createParseResult(parseResult.content));
     }
 }

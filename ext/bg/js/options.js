@@ -170,7 +170,8 @@ function profileOptionsCreateDefaults() {
             convertNumericCharacters: 'false',
             convertAlphabeticCharacters: 'false',
             convertHiraganaToKatakana: 'false',
-            convertKatakanaToHiragana: 'variant'
+            convertKatakanaToHiragana: 'variant',
+            collapseEmphaticSequences: 'false'
         },
 
         dictionaries: {},

@@ -388,7 +388,8 @@
                                     "convertNumericCharacters",
                                     "convertAlphabeticCharacters",
                                     "convertHiraganaToKatakana",
-                                    "convertKatakanaToHiragana"
+                                    "convertKatakanaToHiragana",
+                                    "collapseEmphaticSequences"
                                 ],
                                 "properties": {
                                     "convertHalfWidthCharacters": {
@@ -415,6 +416,11 @@
                                         "type": "string",
                                         "enum": ["false", "true", "variant"],
                                         "default": "variant"
+                                    },
+                                    "collapseEmphaticSequences": {
+                                        "type": "string",
+                                        "enum": ["false", "true", "full"],
+                                        "default": "false"
                                     }
                                 }
                             },

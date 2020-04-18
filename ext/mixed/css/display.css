@@ -297,13 +297,13 @@ button.action-button {
     content: "\3001";
 }
 
-.term-expression-list[data-multi=true]>.term-expression:last-of-type:after {
+.entry[data-expression-multi=true] .term-expression-list>.term-expression:last-of-type:after {
     font-size: 2em;
     content: "\3000";
     visibility: hidden;
 }
 
-.term-expression-list[data-multi=true] .term-expression-details {
+.entry[data-expression-multi=true] .term-expression-list .term-expression-details {
     display: inline-block;
     position: relative;
     width: 0;
@@ -312,21 +312,21 @@ button.action-button {
     z-index: 1;
 }
 
-.term-expression-list[data-multi=true] .term-expression:hover .term-expression-details {
+.entry[data-expression-multi=true] .term-expression:hover .term-expression-details {
     visibility: visible;
 }
 
-.term-expression-list[data-multi=true] .term-expression-details>.action-play-audio {
+.entry[data-expression-multi=true] .term-expression-list .term-expression-details>.action-play-audio {
     position: absolute;
     left: 0;
     bottom: 0.5em;
 }
 
-.term-expression-list:not([data-multi=true]) .term-expression-details>.action-play-audio {
+.entry:not([data-expression-multi=true]) .term-expression-list .term-expression-details>.action-play-audio {
     display: none;
 }
 
-.term-expression-list[data-multi=true] .term-expression-details>.tags {
+.entry[data-expression-multi=true] .term-expression-list .term-expression-details>.tags {
     display: block;
     position: absolute;
     left: 0;
@@ -334,7 +334,7 @@ button.action-button {
     white-space: nowrap;
 }
 
-.term-expression-list[data-multi=true] .term-expression-details>.frequencies {
+.entry[data-expression-multi=true] .term-expression-list .term-expression-details>.frequencies {
     display: block;
     position: absolute;
     left: 0;
@@ -364,19 +364,19 @@ button.action-button {
     list-style-type: circle;
 }
 
-.term-definition-only-list[data-count="0"] {
+.term-definition-disambiguation-list[data-count="0"] {
     display: none;
 }
 
-.term-definition-only-list:before {
+.term-definition-disambiguation-list:before {
     content: "(";
 }
 
-.term-definition-only-list:after {
+.term-definition-disambiguation-list:after {
     content: " only)";
 }
 
-.term-definition-only+.term-definition-only:before {
+.term-definition-disambiguation+.term-definition-disambiguation:before {
     content: ", ";
 }
 
@@ -398,7 +398,7 @@ button.action-button {
 }
 
 :root[data-compact-glossaries=true] .term-definition-tag-list,
-:root[data-compact-glossaries=true] .term-definition-only-list:not([data-count="0"]) {
+:root[data-compact-glossaries=true] .term-definition-disambiguation-list:not([data-count="0"]) {
     display: inline;
 }
 

@@ -44,10 +44,6 @@ function apiTextParse(text, optionsContext) {
     return _apiInvoke('textParse', {text, optionsContext});
 }
 
-function apiTextParseMecab(text, optionsContext) {
-    return _apiInvoke('textParseMecab', {text, optionsContext});
-}
-
 function apiKanjiFind(text, optionsContext) {
     return _apiInvoke('kanjiFind', {text, optionsContext});
 }
@@ -80,8 +76,8 @@ function apiScreenshotGet(options) {
     return _apiInvoke('screenshotGet', {options});
 }
 
-function apiForward(action, params) {
-    return _apiInvoke('forward', {action, params});
+function apiBroadcastTab(action, params) {
+    return _apiInvoke('broadcastTab', {action, params});
 }
 
 function apiFrameInformationGet() {

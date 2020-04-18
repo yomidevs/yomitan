@@ -82,7 +82,11 @@ primary language is not English, you may consider also importing the English ver
 *   **[Innocent Corpus](https://forum.koohii.com/post-168613.html#pid168613)** (Term and Kanji frequencies across 5000+ novels)
     *   [innocent\_corpus.zip](https://foosoft.net/projects/yomichan/dl/dict/innocent_corpus.zip)
 *   **[Kanjium](https://github.com/mifunetoshiro/kanjium)** (Pitch dictionary, see [related project page](https://github.com/toasted-nutbread/yomichan-pitch-accent-dictionary) for details)
+<<<<<<< HEAD
     *   [kanjium_pitch_accents.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjium_pitch_accents.zip)
+=======
+    *   [kanjium_pitch_accents.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjium_pitch_accents.zip) (currently available for **testing version only**)
+>>>>>>> master
 
 ## Basic Usage ##
 
