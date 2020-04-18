@@ -22,6 +22,8 @@
 class FrameOffsetForwarder {
     constructor() {
         this._started = false;
+
+        this._cacheMaxSize = 1000;
         this._frameCache = new Set();
         this._unreachableContentWindowCache = new Set();
 
@@ -81,7 +83,7 @@ class FrameOffsetForwarder {
         }
         if (sourceFrame === null) {
             // closed shadow root etc.
-            this._unreachableContentWindowCache.add(e.source);
+            this._addToCache(this._unreachableContentWindowCache, e.source);
             this._forwardFrameOffsetOrigin(null, uniqueId);
             return;
         }
@@ -99,7 +101,7 @@ class FrameOffsetForwarder {
             while (elements.length > 0) {
                 const element = elements.shift();
                 if (element.contentWindow === contentWindow) {
-                    this._frameCache.add(element);
+                    this._addToCache(this._frameCache, element);
                     return element;
                 }
 
@@ -124,10 +126,31 @@ class FrameOffsetForwarder {
     }
 
     *_getFrameElementSources() {
-        yield [...this._frameCache];
+        const frameCache = [];
+        for (const frame of this._frameCache) {
+            // removed from DOM
+            if (!frame.isConnected) {
+                this._frameCache.delete(frame);
+                continue;
+            }
+            frameCache.push(frame);
+        }
+        yield frameCache;
         // will contain duplicates, but frame elements are cheap to handle
         yield [...document.querySelectorAll('frame, iframe:not(.yomichan-float)')];
         yield [document.documentElement];
+    }
+
+    _addToCache(cache, value) {
+        let freeSlots = this._cacheMaxSize - cache.size;
+        if (freeSlots <= 0) {
+            for (const cachedValue of cache) {
+                cache.delete(cachedValue);
+                ++freeSlots;
+                if (freeSlots > 0) { break; }
+            }
+        }
+        cache.add(value);
     }
 
     _forwardFrameOffsetParent(offset, uniqueId) {
