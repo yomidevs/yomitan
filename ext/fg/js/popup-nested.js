@@ -26,7 +26,7 @@ function injectPopupNested() {
         '/fg/js/popup.js',
         '/fg/js/popup-proxy.js',
         '/fg/js/frontend.js',
-        '/fg/js/frontend-initialize.js'
+        '/fg/js/content-script-main.js'
     ];
     for (const src of scriptSrcs) {
         const script = document.createElement('script');

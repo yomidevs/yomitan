@@ -27,7 +27,7 @@ function injectSearchFrontend() {
         '/fg/js/popup.js',
         '/fg/js/popup-proxy-host.js',
         '/fg/js/frontend.js',
-        '/fg/js/frontend-initialize.js'
+        '/fg/js/content-script-main.js'
     ];
     for (const src of scriptSrcs) {
         const node = document.querySelector(`script[src='${src}']`);

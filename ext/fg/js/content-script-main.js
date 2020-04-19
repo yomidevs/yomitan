@@ -61,7 +61,7 @@ async function createPopupProxy(depth, id, parentFrameId, url) {
     return popup;
 }
 
-async function main() {
+async function contentScriptMain() {
     await yomichan.prepare();
 
     const data = window.frontendInitializationData || {};
@@ -130,4 +130,4 @@ async function main() {
     await applyOptions();
 }
 
-main();
+contentScriptMain();
