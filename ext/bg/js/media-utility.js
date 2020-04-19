@@ -52,7 +52,7 @@ const mediaUtility = (() => {
         }
     }
 
-    function loadImage(mediaType, base64Source) {
+    function loadImage(mediaType, content) {
         return new Promise((resolve, reject) => {
             const image = new Image();
             const eventListeners = new EventListenerCollection();
@@ -64,7 +64,7 @@ const mediaUtility = (() => {
                 eventListeners.removeAllEventListeners();
                 reject(new Error('Image failed to load'));
             }, false);
-            image.src = `data:${mediaType};base64,${base64Source}`;
+            image.src = `data:${mediaType};base64,${content}`;
         });
     }
 

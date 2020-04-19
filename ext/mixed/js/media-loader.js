@@ -86,7 +86,7 @@ class MediaLoader {
         const token = this._token;
         const data = (await apiGetMedia([{path, dictionaryName}]))[0];
         if (token === this._token && data !== null) {
-            const sourceArrayBuffer = this._base64ToArrayBuffer(data.source);
+            const sourceArrayBuffer = this._base64ToArrayBuffer(data.content);
             const blob = new Blob([sourceArrayBuffer], {type: data.mediaType});
             const url = URL.createObjectURL(blob);
             cachedData.data = data;
@@ -95,8 +95,8 @@ class MediaLoader {
         return cachedData;
     }
 
-    _base64ToArrayBuffer(source) {
-        const binarySource = window.atob(source);
+    _base64ToArrayBuffer(content) {
+        const binarySource = window.atob(content);
         const length = binarySource.length;
         const array = new Uint8Array(length);
         for (let i = 0; i < length; ++i) {

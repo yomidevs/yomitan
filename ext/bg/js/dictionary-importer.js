@@ -323,7 +323,7 @@ class DictionaryImporter {
             throw new Error(`Could not find image at path ${JSON.stringify(path)} for ${errorSource}`);
         }
 
-        const source = await file.async('base64');
+        const content = await file.async('base64');
         const mediaType = mediaUtility.getImageMediaTypeFromFileName(path);
         if (mediaType === null) {
             throw new Error(`Could not determine media type for image at path ${JSON.stringify(path)} for ${errorSource}`);
@@ -331,7 +331,7 @@ class DictionaryImporter {
 
         let image;
         try {
-            image = await mediaUtility.loadImage(mediaType, source);
+            image = await mediaUtility.loadImage(mediaType, content);
         } catch (e) {
             throw new Error(`Could not load image at path ${JSON.stringify(path)} for ${errorSource}`);
         }
@@ -346,7 +346,7 @@ class DictionaryImporter {
             mediaType,
             width,
             height,
-            source
+            content
         };
         context.media.set(path, mediaData);
 
