@@ -886,7 +886,7 @@ class Backend {
         let status = null;
 
         if (!this._isPrepared) {
-            if (this._prepareError !== null) {
+            if (this._prepareError) {
                 text = '!!';
                 color = '#f04e4e';
                 status = 'Error';
