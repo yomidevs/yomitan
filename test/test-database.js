@@ -92,9 +92,56 @@ class XMLHttpRequest {
     }
 }
 
+class Image {
+    constructor() {
+        this._src = '';
+        this._loadCallbacks = [];
+    }
+
+    get src() {
+        return this._src;
+    }
+
+    set src(value) {
+        this._src = value;
+        this._delayTriggerLoad();
+    }
+
+    get naturalWidth() {
+        return 100;
+    }
+
+    get naturalHeight() {
+        return 100;
+    }
+
+    addEventListener(eventName, callback) {
+        if (eventName === 'load') {
+            this._loadCallbacks.push(callback);
+        }
+    }
+
+    removeEventListener(eventName, callback) {
+        if (eventName === 'load') {
+            const index = this._loadCallbacks.indexOf(callback);
+            if (index >= 0) {
+                this._loadCallbacks.splice(index, 1);
+            }
+        }
+    }
+
+    async _delayTriggerLoad() {
+        await Promise.resolve();
+        for (const callback of this._loadCallbacks) {
+            callback();
+        }
+    }
+}
+
 
 const vm = new VM({
     chrome,
+    Image,
     XMLHttpRequest,
     indexedDB: global.indexedDB,
     IDBKeyRange: global.IDBKeyRange,
@@ -106,6 +153,7 @@ vm.execute([
     'bg/js/json-schema.js',
     'bg/js/dictionary.js',
     'mixed/js/core.js',
+    'bg/js/media-utility.js',
     'bg/js/request.js',
     'bg/js/dictionary-importer.js',
     'bg/js/database.js'
@@ -235,8 +283,8 @@ async function testDatabase1() {
             true
         );
         vm.assert.deepStrictEqual(counts, {
-            counts: [{kanji: 2, kanjiMeta: 2, terms: 32, termMeta: 12, tagMeta: 14}],
-            total: {kanji: 2, kanjiMeta: 2, terms: 32, termMeta: 12, tagMeta: 14}
+            counts: [{kanji: 2, kanjiMeta: 2, terms: 33, termMeta: 12, tagMeta: 14}],
+            total: {kanji: 2, kanjiMeta: 2, terms: 33, termMeta: 12, tagMeta: 14}
         });
 
         // Test find* functions

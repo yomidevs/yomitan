@@ -94,3 +94,10 @@ h2 { border-bottom-color: #eeeeee; }
 #term-pitch-accent-graph-dot-downstep>circle:last-of-type {
     fill: #000000;
 }
+
+.term-glossary-image-container {
+    background-color: #eeeeee;
+}
+.term-glossary-image-container-overlay {
+    color: #777777;
+}

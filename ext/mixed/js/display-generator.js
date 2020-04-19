@@ -22,7 +22,8 @@
  */
 
 class DisplayGenerator {
-    constructor() {
+    constructor({mediaLoader}) {
+        this._mediaLoader = mediaLoader;
         this._templateHandler = null;
         this._termPitchAccentStaticTemplateIsSetup = false;
     }
@@ -176,22 +177,98 @@ class DisplayGenerator {
         const onlyListContainer = node.querySelector('.term-definition-disambiguation-list');
         const glossaryContainer = node.querySelector('.term-glossary-list');
 
-        node.dataset.dictionary = details.dictionary;
+        const dictionary = details.dictionary;
+        node.dataset.dictionary = dictionary;
 
         this._appendMultiple(tagListContainer, this._createTag.bind(this), details.definitionTags);
         this._appendMultiple(onlyListContainer, this._createTermDisambiguation.bind(this), details.only);
-        this._appendMultiple(glossaryContainer, this._createTermGlossaryItem.bind(this), details.glossary);
+        this._appendMultiple(glossaryContainer, this._createTermGlossaryItem.bind(this), details.glossary, dictionary);
 
         return node;
     }
 
-    _createTermGlossaryItem(glossary) {
+    _createTermGlossaryItem(glossary, dictionary) {
+        if (typeof glossary === 'string') {
+            return this._createTermGlossaryItemText(glossary);
+        } else if (typeof glossary === 'object' && glossary !== null) {
+            switch (glossary.type) {
+                case 'image':
+                    return this._createTermGlossaryItemImage(glossary, dictionary);
+            }
+        }
+
+        return null;
+    }
+
+    _createTermGlossaryItemText(glossary) {
         const node = this._templateHandler.instantiate('term-glossary-item');
         const container = node.querySelector('.term-glossary');
         if (container !== null) {
             this._appendMultilineText(container, glossary);
         }
         return node;
+    }
+
+    _createTermGlossaryItemImage(data, dictionary) {
+        const {path, width, height, preferredWidth, preferredHeight, title, description, pixelated} = data;
+
+        const usedWidth = (
+            typeof preferredWidth === 'number' ?
+            preferredWidth :
+            width
+        );
+        const aspectRatio = (
+            typeof preferredWidth === 'number' &&
+            typeof preferredHeight === 'number' ?
+            preferredWidth / preferredHeight :
+            width / height
+        );
+
+        const node = this._templateHandler.instantiate('term-glossary-item-image');
+        node.dataset.path = path;
+        node.dataset.dictionary = dictionary;
+        node.dataset.imageLoadState = 'not-loaded';
+
+        const imageContainer = node.querySelector('.term-glossary-image-container');
+        imageContainer.style.width = `${usedWidth}em`;
+        if (typeof title === 'string') {
+            imageContainer.title = title;
+        }
+
+        const aspectRatioSizer = node.querySelector('.term-glossary-image-aspect-ratio-sizer');
+        aspectRatioSizer.style.paddingTop = `${aspectRatio * 100.0}%`;
+
+        const image = node.querySelector('img.term-glossary-image');
+        const imageLink = node.querySelector('.term-glossary-image-link');
+        image.dataset.pixelated = `${pixelated === true}`;
+
+        if (this._mediaLoader !== null) {
+            this._mediaLoader.loadMedia(
+                path,
+                dictionary,
+                (url) => this._setImageData(node, image, imageLink, url, false),
+                () => this._setImageData(node, image, imageLink, null, true)
+            );
+        }
+
+        if (typeof description === 'string') {
+            const container = node.querySelector('.term-glossary-image-description');
+            this._appendMultilineText(container, description);
+        }
+
+        return node;
+    }
+
+    _setImageData(container, image, imageLink, url, unloaded) {
+        if (url !== null) {
+            image.src = url;
+            imageLink.href = url;
+            container.dataset.imageLoadState = 'loaded';
+        } else {
+            image.removeAttribute('src');
+            imageLink.removeAttribute('href');
+            container.dataset.imageLoadState = unloaded ? 'unloaded' : 'load-error';
+        }
     }
 
     _createTermDisambiguation(disambiguation) {

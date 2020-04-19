@@ -611,6 +611,121 @@ button.action-button {
     stroke-width: 5;
 }
 
+.term-glossary-image-container {
+    display: inline-block;
+    white-space: nowrap;
+    max-width: 100%;
+    position: relative;
+    vertical-align: top;
+    line-height: 0;
+    font-size: 0.07142857em; /* 14px => 1px */
+    overflow: hidden;
+}
+
+.term-glossary-image-link {
+    cursor: inherit;
+    color: inherit;
+}
+
+.term-glossary-image-link[href]:hover {
+    cursor: pointer;
+}
+
+.term-glossary-image-container-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 14em; /* 1px => 14px; */
+    line-height: 1.42857143; /* 14px => 20px */
+    display: table;
+    table-layout: fixed;
+    white-space: normal;
+}
+
+.term-glossary-item[data-has-image=true][data-image-load-state=load-error] .term-glossary-image-container-overlay:after {
+    content: "Image failed to load";
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+    text-align: center;
+    padding: 0.25em;
+}
+
+.term-glossary-image {
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    vertical-align: top;
+    object-fit: contain;
+    border: none;
+    outline: none;
+}
+
+.term-glossary-image:not([src]) {
+    display: none;
+}
+
+.term-glossary-image[data-pixelated=true] {
+    image-rendering: auto;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.term-glossary-image-aspect-ratio-sizer {
+    content: "";
+    display: inline-block;
+    width: 0;
+    vertical-align: top;
+    font-size: 0;
+}
+
+.term-glossary-image-link-text:before {
+    content: "[";
+}
+
+.term-glossary-image-link-text:after {
+    content: "]";
+}
+
+:root[data-compact-glossaries=true] .term-glossary-image-container {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 100%;
+    z-index: 1;
+}
+
+:root[data-compact-glossaries=true] .entry:nth-last-of-type(1):not(:nth-of-type(1)) .term-glossary-image-container {
+    bottom: 100%;
+    top: auto;
+}
+
+:root[data-compact-glossaries=true] .term-glossary-image-link {
+    position: relative;
+    display: inline-block;
+}
+
+:root[data-compact-glossaries=true] .term-glossary-image-link:hover .term-glossary-image-container,
+:root[data-compact-glossaries=true] .term-glossary-image-link:focus .term-glossary-image-container {
+    display: block;
+}
+
+:root:not([data-compact-glossaries=true]) .term-glossary-image-link-text {
+    display: none;
+}
+
+:root:not([data-compact-glossaries=true]) .term-glossary-image-description {
+    display: block;
+}
+
 
 /*
  * Kanji

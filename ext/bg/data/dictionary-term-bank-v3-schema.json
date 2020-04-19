@@ -31,8 +31,85 @@
                 "type": "array",
                 "description": "Array of definitions for the term/expression.",
                 "items": {
-                    "type": "string",
-                    "description": "Single definition for the term/expression."
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "description": "Single definition for the term/expression."
+                        },
+                        {
+                            "type": "object",
+                            "description": "Single detailed definition for the term/expression.",
+                            "required": [
+                                "type"
+                            ],
+                            "properties": {
+                                "type": {
+                                    "type": "string",
+                                    "description": "The type of the data for this definition.",
+                                    "enum": ["text", "image"]
+                                }
+                            },
+                            "oneOf": [
+                                {
+                                    "required": [
+                                        "type",
+                                        "text"
+                                    ],
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "enum": ["text"]
+                                        },
+                                        "text": {
+                                            "type": "string",
+                                            "description": "Single definition for the term/expression."
+                                        }
+                                    }
+                                },
+                                {
+                                    "required": [
+                                        "type",
+                                        "path"
+                                    ],
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "enum": ["image"]
+                                        },
+                                        "path": {
+                                            "type": "string",
+                                            "description": "Path to the image file in the archive."
+                                        },
+                                        "width": {
+                                            "type": "integer",
+                                            "description": "Preferred width of the image.",
+                                            "minimum": 1
+                                        },
+                                        "height": {
+                                            "type": "integer",
+                                            "description": "Preferred width of the image.",
+                                            "minimum": 1
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "description": "Hover text for the image."
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "description": "Description of the image."
+                                        },
+                                        "pixelated": {
+                                            "type": "boolean",
+                                            "description": "Whether or not the image should appear pixelated at sizes larger than the image's native resolution.",
+                                            "default": false
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
                 }
             },
             {
