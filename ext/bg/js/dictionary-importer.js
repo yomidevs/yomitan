@@ -331,7 +331,7 @@ class DictionaryImporter {
 
         let image;
         try {
-            image = await mediaUtility.loadImage(mediaType, content);
+            image = await mediaUtility.loadImageBase64(mediaType, content);
         } catch (e) {
             throw new Error(`Could not load image at path ${JSON.stringify(path)} for ${errorSource}`);
         }

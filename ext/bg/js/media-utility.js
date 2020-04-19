@@ -52,7 +52,7 @@ const mediaUtility = (() => {
         }
     }
 
-    function loadImage(mediaType, content) {
+    function loadImageBase64(mediaType, content) {
         return new Promise((resolve, reject) => {
             const image = new Image();
             const eventListeners = new EventListenerCollection();
@@ -70,6 +70,6 @@ const mediaUtility = (() => {
 
     return {
         getImageMediaTypeFromFileName,
-        loadImage
+        loadImageBase64
     };
 })();
