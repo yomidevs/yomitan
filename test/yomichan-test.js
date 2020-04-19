@@ -39,15 +39,15 @@ function createTestDictionaryArchive(dictionary, dictionaryName) {
 
     for (const fileName of fileNames) {
         if (/\.json$/.test(fileName)) {
-            const source = fs.readFileSync(path.join(dictionaryDirectory, fileName), {encoding: 'utf8'});
-            const json = JSON.parse(source);
+            const content = fs.readFileSync(path.join(dictionaryDirectory, fileName), {encoding: 'utf8'});
+            const json = JSON.parse(content);
             if (fileName === 'index.json' && typeof dictionaryName === 'string') {
                 json.title = dictionaryName;
             }
             archive.file(fileName, JSON.stringify(json, null, 0));
         } else {
-            const source = fs.readFileSync(path.join(dictionaryDirectory, fileName), {encoding: null});
-            archive.file(fileName, source);
+            const content = fs.readFileSync(path.join(dictionaryDirectory, fileName), {encoding: null});
+            archive.file(fileName, content);
         }
     }
 
