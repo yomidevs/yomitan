@@ -28,7 +28,6 @@
  * Mecab
  * Translator
  * conditionsTestValue
- * dictConfigured
  * dictTermsSort
  * handlebarsRenderDynamic
  * jp
@@ -67,8 +66,6 @@ class Backend {
             url: window.location.href
         };
 
-        this.isPrepared = false;
-
         this.clipboardPasteTarget = document.querySelector('#clipboard-paste-target');
 
         this.popupWindow = null;
@@ -76,6 +73,11 @@ class Backend {
         this.apiForwarder = new BackendApiForwarder();
 
         this.messageToken = yomichan.generateId(16);
+
+        this._defaultBrowserActionTitle = null;
+        this._isPrepared = false;
+        this._prepareError = false;
+        this._badgePrepareDelayTimer = null;
 
         this._messageHandlers = new Map([
             ['yomichanCoreReady', {handler: this._onApiYomichanCoreReady.bind(this), async: false}],
@@ -121,41 +123,60 @@ class Backend {
     }
 
     async prepare() {
-        await this.database.prepare();
-        await this.translator.prepare();
-
-        this.optionsSchema = await requestJson(chrome.runtime.getURL('/bg/data/options-schema.json'), 'GET');
-        this.defaultAnkiFieldTemplates = await requestText(chrome.runtime.getURL('/bg/data/default-anki-field-templates.handlebars'), 'GET');
-        this.options = await optionsLoad();
         try {
+            this._defaultBrowserActionTitle = await this._getBrowserIconTitle();
+            this._badgePrepareDelayTimer = setTimeout(() => {
+                this._badgePrepareDelayTimer = null;
+                this._updateBadge();
+            }, 1000);
+            this._updateBadge();
+
+            await this.database.prepare();
+            await this.translator.prepare();
+
+            this.optionsSchema = await requestJson(chrome.runtime.getURL('/bg/data/options-schema.json'), 'GET');
+            this.defaultAnkiFieldTemplates = await requestText(chrome.runtime.getURL('/bg/data/default-anki-field-templates.handlebars'), 'GET');
+            this.options = await optionsLoad();
             this.options = JsonSchema.getValidValueOrDefault(this.optionsSchema, this.options);
+
+            this.onOptionsUpdated('background');
+
+            if (isObject(chrome.commands) && isObject(chrome.commands.onCommand)) {
+                chrome.commands.onCommand.addListener(this._runCommand.bind(this));
+            }
+            if (isObject(chrome.tabs) && isObject(chrome.tabs.onZoomChange)) {
+                chrome.tabs.onZoomChange.addListener(this._onZoomChange.bind(this));
+            }
+            chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
+
+            const options = this.getOptions(this.optionsContext);
+            if (options.general.showGuide) {
+                chrome.tabs.create({url: chrome.runtime.getURL('/bg/guide.html')});
+            }
+
+            this.clipboardMonitor.on('change', this._onClipboardText.bind(this));
+
+            this._sendMessageAllTabs('backendPrepared');
+            const callback = () => this.checkLastError(chrome.runtime.lastError);
+            chrome.runtime.sendMessage({action: 'backendPrepared'}, callback);
+
+            this._isPrepared = true;
         } catch (e) {
-            // This shouldn't happen, but catch errors just in case of bugs
+            this._prepareError = true;
             logError(e);
+            throw e;
+        } finally {
+            if (this._badgePrepareDelayTimer !== null) {
+                clearTimeout(this._badgePrepareDelayTimer);
+                this._badgePrepareDelayTimer = null;
+            }
+
+            this._updateBadge();
         }
+    }
 
-        this.onOptionsUpdated('background');
-
-        if (isObject(chrome.commands) && isObject(chrome.commands.onCommand)) {
-            chrome.commands.onCommand.addListener(this._runCommand.bind(this));
-        }
-        if (isObject(chrome.tabs) && isObject(chrome.tabs.onZoomChange)) {
-            chrome.tabs.onZoomChange.addListener(this._onZoomChange.bind(this));
-        }
-        chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
-
-        this.isPrepared = true;
-
-        const options = this.getOptions(this.optionsContext);
-        if (options.general.showGuide) {
-            chrome.tabs.create({url: chrome.runtime.getURL('/bg/guide.html')});
-        }
-
-        this.clipboardMonitor.on('change', this._onClipboardText.bind(this));
-
-        this._sendMessageAllTabs('backendPrepared');
-        const callback = () => this.checkLastError(chrome.runtime.lastError);
-        chrome.runtime.sendMessage({action: 'backendPrepared'}, callback);
+    isPrepared() {
+        return this._isPrepared;
     }
 
     _sendMessageAllTabs(action, params={}) {
@@ -207,15 +228,7 @@ class Backend {
 
     applyOptions() {
         const options = this.getOptions(this.optionsContext);
-        if (!options.general.enable) {
-            this.setExtensionBadgeBackgroundColor('#555555');
-            this.setExtensionBadgeText('off');
-        } else if (!dictConfigured(options)) {
-            this.setExtensionBadgeBackgroundColor('#f0ad4e');
-            this.setExtensionBadgeText('!');
-        } else {
-            this.setExtensionBadgeText('');
-        }
+        this._updateBadge();
 
         this.anki.setServer(options.anki.server);
         this.anki.setEnabled(options.anki.enable);
@@ -293,18 +306,6 @@ class Backend {
             }
         }
         return true;
-    }
-
-    setExtensionBadgeBackgroundColor(color) {
-        if (typeof chrome.browserAction.setBadgeBackgroundColor === 'function') {
-            chrome.browserAction.setBadgeBackgroundColor({color});
-        }
-    }
-
-    setExtensionBadgeText(text) {
-        if (typeof chrome.browserAction.setBadgeText === 'function') {
-            chrome.browserAction.setBadgeText({text});
-        }
     }
 
     checkLastError() {
@@ -862,6 +863,77 @@ class Backend {
         if (!(typeof url === 'string' && yomichan.isExtensionUrl(url))) {
             throw new Error('Invalid message sender');
         }
+    }
+
+    _getBrowserIconTitle() {
+        return (
+            isObject(chrome.browserAction) &&
+            typeof chrome.browserAction.getTitle === 'function' ?
+                new Promise((resolve) => chrome.browserAction.getTitle({}, resolve)) :
+                Promise.resolve('')
+        );
+    }
+
+    _updateBadge() {
+        let title = this._defaultBrowserActionTitle;
+        if (title === null || !isObject(chrome.browserAction)) {
+            // Not ready or invalid
+            return;
+        }
+
+        let text = '';
+        let color = null;
+        let status = null;
+
+        if (!this._isPrepared) {
+            if (this._prepareError) {
+                text = '!!';
+                color = '#f04e4e';
+                status = 'Error';
+            } else if (this._badgePrepareDelayTimer === null) {
+                text = '...';
+                color = '#f0ad4e';
+                status = 'Loading';
+            }
+        } else if (!this._anyOptionsMatches((options) => options.general.enable)) {
+            text = 'off';
+            color = '#555555';
+            status = 'Disabled';
+        } else if (!this._anyOptionsMatches((options) => this._isAnyDictionaryEnabled(options))) {
+            text = '!';
+            color = '#f0ad4e';
+            status = 'No dictionaries installed';
+        }
+
+        if (color !== null && typeof chrome.browserAction.setBadgeBackgroundColor === 'function') {
+            chrome.browserAction.setBadgeBackgroundColor({color});
+        }
+        if (text !== null && typeof chrome.browserAction.setBadgeText === 'function') {
+            chrome.browserAction.setBadgeText({text});
+        }
+        if (typeof chrome.browserAction.setTitle === 'function') {
+            if (status !== null) {
+                title = `${title} - ${status}`;
+            }
+            chrome.browserAction.setTitle({title});
+        }
+    }
+
+    _isAnyDictionaryEnabled(options) {
+        for (const {enabled} of Object.values(options.dictionaries)) {
+            if (enabled) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    _anyOptionsMatches(predicate) {
+        for (const {options} of this.options.profiles) {
+            const value = predicate(options);
+            if (value) { return value; }
+        }
+        return false;
     }
 
     async _renderTemplate(template, data) {
