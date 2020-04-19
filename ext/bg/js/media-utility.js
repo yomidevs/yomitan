@@ -16,13 +16,13 @@
  */
 
 const mediaUtility = (() => {
-    function getFileNameExtension(fileName) {
-        const match = /\.[^.]*$/.exec(fileName);
+    function getFileNameExtension(path) {
+        const match = /\.[^./\\]*$/.exec(path);
         return match !== null ? match[0] : '';
     }
 
-    function getImageMediaTypeFromFileName(fileName) {
-        switch (getFileNameExtension(fileName).toLowerCase()) {
+    function getImageMediaTypeFromFileName(path) {
+        switch (getFileNameExtension(path).toLowerCase()) {
             case '.apng':
                 return 'image/apng';
             case '.bmp':
