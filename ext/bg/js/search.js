@@ -72,12 +72,6 @@ class DisplaySearch extends Display {
         ]);
     }
 
-    static create() {
-        const instance = new DisplaySearch();
-        instance.prepare();
-        return instance;
-    }
-
     async prepare() {
         try {
             await super.prepare();
@@ -376,5 +370,3 @@ class DisplaySearch extends Display {
         }
     }
 }
-
-DisplaySearch.instance = DisplaySearch.create();

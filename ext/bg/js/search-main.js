@@ -16,6 +16,7 @@
  */
 
 /* global
+ * DisplaySearch
  * apiOptionsGet
  */
 
@@ -53,6 +54,9 @@ function injectSearchFrontend() {
 
 async function main() {
     await yomichan.prepare();
+
+    const displaySearch = new DisplaySearch();
+    await displaySearch.prepare();
 
     let optionsApplied = false;
 
