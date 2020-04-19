@@ -64,8 +64,8 @@ function apiTemplateRender(template, data) {
     return _apiInvoke('templateRender', {data, template});
 }
 
-function apiAudioGetUri(definition, source, optionsContext) {
-    return _apiInvoke('audioGetUri', {definition, source, optionsContext});
+function apiAudioGetUri(definition, source, details) {
+    return _apiInvoke('audioGetUri', {definition, source, details});
 }
 
 function apiCommandExec(command, params) {
