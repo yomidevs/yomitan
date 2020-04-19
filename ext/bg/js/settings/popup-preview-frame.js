@@ -41,12 +41,6 @@ class SettingsPopupPreview {
         ]);
     }
 
-    static create() {
-        const instance = new SettingsPopupPreview();
-        instance.prepare();
-        return instance;
-    }
-
     async prepare() {
         // Setup events
         window.addEventListener('message', this.onMessage.bind(this), false);
@@ -178,8 +172,3 @@ class SettingsPopupPreview {
         this.setInfoVisible(!this.popupShown);
     }
 }
-
-SettingsPopupPreview.instance = SettingsPopupPreview.create();
-
-
-
