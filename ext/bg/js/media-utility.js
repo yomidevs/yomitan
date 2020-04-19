@@ -15,12 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * mediaUtility is an object containing helper methods related to media processing.
+ */
 const mediaUtility = (() => {
+    /**
+     * Gets the file extension of a file path. URL search queries and hash
+     * fragments are not handled.
+     * @param path The path to the file.
+     * @returns The file extension, including the '.', or an empty string
+     *   if there is no file extension.
+     */
     function getFileNameExtension(path) {
         const match = /\.[^./\\]*$/.exec(path);
         return match !== null ? match[0] : '';
     }
 
+    /**
+     * Gets an image file's media type using a file path.
+     * @param path The path to the file.
+     * @returns The media type string if it can be determined from the file path,
+     *   otherwise null.
+     */
     function getImageMediaTypeFromFileName(path) {
         switch (getFileNameExtension(path).toLowerCase()) {
             case '.apng':
@@ -52,6 +68,13 @@ const mediaUtility = (() => {
         }
     }
 
+    /**
+     * Attempts to load an image using a base64 encoded content and a media type.
+     * @param mediaType The media type for the image content.
+     * @param content The binary content for the image, encoded in base64.
+     * @returns A Promise which resolves with an HTMLImageElement instance on
+     *   successful load, otherwise an error is thrown.
+     */
     function loadImageBase64(mediaType, content) {
         return new Promise((resolve, reject) => {
             const image = new Image();
