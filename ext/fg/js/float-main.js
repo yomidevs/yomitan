@@ -17,7 +17,55 @@
 
 /* global
  * DisplayFloat
+ * apiOptionsGet
  */
+
+function injectPopupNested() {
+    const scriptSrcs = [
+        '/mixed/js/text-scanner.js',
+        '/fg/js/frontend-api-sender.js',
+        '/fg/js/popup.js',
+        '/fg/js/popup-proxy.js',
+        '/fg/js/frontend.js',
+        '/fg/js/content-script-main.js'
+    ];
+    for (const src of scriptSrcs) {
+        const script = document.createElement('script');
+        script.async = false;
+        script.src = src;
+        document.body.appendChild(script);
+    }
+}
+
+async function popupNestedInitialize(id, depth, parentFrameId, url) {
+    let optionsApplied = false;
+
+    const applyOptions = async () => {
+        const optionsContext = {depth, url};
+        const options = await apiOptionsGet(optionsContext);
+        const popupNestingMaxDepth = options.scanning.popupNestingMaxDepth;
+
+        const maxPopupDepthExceeded = !(
+            typeof popupNestingMaxDepth === 'number' &&
+            typeof depth === 'number' &&
+            depth < popupNestingMaxDepth
+        );
+        if (maxPopupDepthExceeded || optionsApplied) {
+            return;
+        }
+
+        optionsApplied = true;
+
+        window.frontendInitializationData = {id, depth, parentFrameId, url, proxy: true};
+        injectPopupNested();
+
+        yomichan.off('optionsUpdated', applyOptions);
+    };
+
+    yomichan.on('optionsUpdated', applyOptions);
+
+    await applyOptions();
+}
 
 async function main() {
     new DisplayFloat();
