@@ -22,6 +22,7 @@
  * apiClipboardGet
  * apiOptionsSet
  * apiTermsFind
+ * wanakana
  */
 
 class DisplaySearch extends Display {
@@ -89,7 +90,7 @@ class DisplaySearch extends Display {
 
             if (this.options.general.enableWanakana === true) {
                 this.wanakanaEnable.checked = true;
-                window.wanakana.bind(this.query);
+                wanakana.bind(this.query);
             } else {
                 this.wanakanaEnable.checked = false;
             }
@@ -256,9 +257,9 @@ class DisplaySearch extends Display {
     onWanakanaEnableChange(e) {
         const enableWanakana = e.target.checked;
         if (enableWanakana) {
-            window.wanakana.bind(this.query);
+            wanakana.bind(this.query);
         } else {
-            window.wanakana.unbind(this.query);
+            wanakana.unbind(this.query);
         }
         apiOptionsSet({general: {enableWanakana}}, this.getOptionsContext());
     }
@@ -298,7 +299,7 @@ class DisplaySearch extends Display {
     }
 
     setQuery(query) {
-        const interpretedQuery = this.isWanakanaEnabled() ? window.wanakana.toKana(query) : query;
+        const interpretedQuery = this.isWanakanaEnabled() ? wanakana.toKana(query) : query;
         this.query.value = interpretedQuery;
         this.queryParser.setText(interpretedQuery);
     }
