@@ -15,6 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global
+ * wanakana
+ */
 
 function appearanceInitialize() {
     let previewVisible = false;
@@ -37,7 +40,7 @@ function showAppearancePreview() {
     frame.src = '/bg/settings-popup-preview.html';
     frame.id = 'settings-popup-preview-frame';
 
-    window.wanakana.bind(text[0]);
+    wanakana.bind(text[0]);
 
     const targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
 
