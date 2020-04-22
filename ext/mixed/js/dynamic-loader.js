@@ -48,12 +48,14 @@ const dynamicLoader = (() => {
     }
 
     function loadScriptSentinel(resolve, reject) {
+        const parent = document.body;
         const script = document.createElement('script');
 
         const sentinelEventName = 'dynamicLoaderSentinel';
         const sentinelEventCallback = (e) => {
             if (e.script !== script) { return; }
             yomichan.off(sentinelEventName, sentinelEventCallback);
+            parent.removeChild(script);
             resolve();
         };
         yomichan.on(sentinelEventName, sentinelEventCallback);
@@ -61,7 +63,7 @@ const dynamicLoader = (() => {
         try {
             script.async = false;
             script.src = '/mixed/js/dynamic-loader-sentinel.js';
-            document.body.appendChild(script);
+            parent.appendChild(script);
         } catch (e) {
             yomichan.off(sentinelEventName, sentinelEventCallback);
             reject(e);
