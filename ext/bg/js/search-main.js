@@ -16,47 +16,61 @@
  */
 
 /* global
+ * DisplaySearch
  * apiOptionsGet
  */
 
-function injectPopupNested() {
+function injectSearchFrontend() {
     const scriptSrcs = [
         '/mixed/js/text-scanner.js',
-        '/fg/js/frontend-api-sender.js',
+        '/fg/js/frontend-api-receiver.js',
+        '/fg/js/frame-offset-forwarder.js',
         '/fg/js/popup.js',
-        '/fg/js/popup-proxy.js',
+        '/fg/js/popup-proxy-host.js',
         '/fg/js/frontend.js',
-        '/fg/js/frontend-initialize.js'
+        '/fg/js/content-script-main.js'
     ];
     for (const src of scriptSrcs) {
+        const node = document.querySelector(`script[src='${src}']`);
+        if (node !== null) { continue; }
+
         const script = document.createElement('script');
         script.async = false;
         script.src = src;
         document.body.appendChild(script);
     }
+
+    const styleSrcs = [
+        '/fg/css/client.css'
+    ];
+    for (const src of styleSrcs) {
+        const style = document.createElement('link');
+        style.rel = 'stylesheet';
+        style.type = 'text/css';
+        style.href = src;
+        document.head.appendChild(style);
+    }
 }
 
-async function popupNestedInitialize(id, depth, parentFrameId, url) {
+(async () => {
+    await yomichan.prepare();
+
+    const displaySearch = new DisplaySearch();
+    await displaySearch.prepare();
+
     let optionsApplied = false;
 
     const applyOptions = async () => {
-        const optionsContext = {depth, url};
+        const optionsContext = {
+            depth: 0,
+            url: window.location.href
+        };
         const options = await apiOptionsGet(optionsContext);
-        const popupNestingMaxDepth = options.scanning.popupNestingMaxDepth;
-
-        const maxPopupDepthExceeded = !(
-            typeof popupNestingMaxDepth === 'number' &&
-            typeof depth === 'number' &&
-            depth < popupNestingMaxDepth
-        );
-        if (maxPopupDepthExceeded || optionsApplied) {
-            return;
-        }
-
+        if (!options.scanning.enableOnSearchPage || optionsApplied) { return; }
         optionsApplied = true;
 
-        window.frontendInitializationData = {id, depth, parentFrameId, url, proxy: true};
-        injectPopupNested();
+        window.frontendInitializationData = {depth: 1, proxy: false, isSearchPage: true};
+        injectSearchFrontend();
 
         yomichan.off('optionsUpdated', applyOptions);
     };
@@ -64,4 +78,4 @@ async function popupNestedInitialize(id, depth, parentFrameId, url) {
     yomichan.on('optionsUpdated', applyOptions);
 
     await applyOptions();
-}
+})();

@@ -1059,6 +1059,3 @@ class Backend {
         }
     }
 }
-
-window.yomichanBackend = new Backend();
-window.yomichanBackend.prepare();

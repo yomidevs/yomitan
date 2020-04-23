@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Yomichan Authors
+ * Copyright (C) 2020  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,57 +16,48 @@
  */
 
 /* global
+ * DisplayFloat
  * apiOptionsGet
  */
 
-function injectSearchFrontend() {
+function injectPopupNested() {
     const scriptSrcs = [
         '/mixed/js/text-scanner.js',
-        '/fg/js/frontend-api-receiver.js',
-        '/fg/js/frame-offset-forwarder.js',
+        '/fg/js/frontend-api-sender.js',
         '/fg/js/popup.js',
-        '/fg/js/popup-proxy-host.js',
+        '/fg/js/popup-proxy.js',
         '/fg/js/frontend.js',
-        '/fg/js/frontend-initialize.js'
+        '/fg/js/content-script-main.js'
     ];
     for (const src of scriptSrcs) {
-        const node = document.querySelector(`script[src='${src}']`);
-        if (node !== null) { continue; }
-
         const script = document.createElement('script');
         script.async = false;
         script.src = src;
         document.body.appendChild(script);
     }
-
-    const styleSrcs = [
-        '/fg/css/client.css'
-    ];
-    for (const src of styleSrcs) {
-        const style = document.createElement('link');
-        style.rel = 'stylesheet';
-        style.type = 'text/css';
-        style.href = src;
-        document.head.appendChild(style);
-    }
 }
 
-async function main() {
-    await yomichan.prepare();
-
+async function popupNestedInitialize(id, depth, parentFrameId, url) {
     let optionsApplied = false;
 
     const applyOptions = async () => {
-        const optionsContext = {
-            depth: 0,
-            url: window.location.href
-        };
+        const optionsContext = {depth, url};
         const options = await apiOptionsGet(optionsContext);
-        if (!options.scanning.enableOnSearchPage || optionsApplied) { return; }
+        const popupNestingMaxDepth = options.scanning.popupNestingMaxDepth;
+
+        const maxPopupDepthExceeded = !(
+            typeof popupNestingMaxDepth === 'number' &&
+            typeof depth === 'number' &&
+            depth < popupNestingMaxDepth
+        );
+        if (maxPopupDepthExceeded || optionsApplied) {
+            return;
+        }
+
         optionsApplied = true;
 
-        window.frontendInitializationData = {depth: 1, proxy: false, isSearchPage: true};
-        injectSearchFrontend();
+        window.frontendInitializationData = {id, depth, parentFrameId, url, proxy: true};
+        injectPopupNested();
 
         yomichan.off('optionsUpdated', applyOptions);
     };
@@ -76,4 +67,6 @@ async function main() {
     await applyOptions();
 }
 
-main();
+(async () => {
+    new DisplayFloat();
+})();

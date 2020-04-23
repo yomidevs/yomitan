@@ -189,5 +189,3 @@ class DisplayFloat extends Display {
         }
     }
 }
-
-DisplayFloat.instance = new DisplayFloat();

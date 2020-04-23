@@ -61,7 +61,7 @@ async function createPopupProxy(depth, id, parentFrameId, url) {
     return popup;
 }
 
-async function main() {
+(async () => {
     await yomichan.prepare();
 
     const data = window.frontendInitializationData || {};
@@ -128,6 +128,4 @@ async function main() {
     window.addEventListener('fullscreenchange', applyOptions, false);
 
     await applyOptions();
-}
-
-main();
+})();
