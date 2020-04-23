@@ -19,9 +19,7 @@
  * Backend
  */
 
-async function main() {
+(async () => {
     window.yomichanBackend = new Backend();
     await window.yomichanBackend.prepare();
-}
-
-main();
+})();

@@ -19,9 +19,7 @@
  * SettingsPopupPreview
  */
 
-async function main() {
+(async () => {
     const instance = new SettingsPopupPreview();
     await instance.prepare();
-}
-
-main();
+})();

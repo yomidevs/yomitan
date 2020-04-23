@@ -52,7 +52,7 @@ function injectSearchFrontend() {
     }
 }
 
-async function main() {
+(async () => {
     await yomichan.prepare();
 
     const displaySearch = new DisplaySearch();
@@ -78,6 +78,4 @@ async function main() {
     yomichan.on('optionsUpdated', applyOptions);
 
     await applyOptions();
-}
-
-main();
+})();

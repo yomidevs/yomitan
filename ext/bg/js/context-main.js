@@ -88,8 +88,6 @@ async function mainInner() {
     });
 }
 
-async function main() {
+(async () => {
     window.addEventListener('DOMContentLoaded', mainInner, false);
-}
-
-main();
+})();

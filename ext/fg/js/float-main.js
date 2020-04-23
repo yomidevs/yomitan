@@ -67,8 +67,6 @@ async function popupNestedInitialize(id, depth, parentFrameId, url) {
     await applyOptions();
 }
 
-async function main() {
+(async () => {
     new DisplayFloat();
-}
-
-main();
+})();
