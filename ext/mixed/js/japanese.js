@@ -116,7 +116,11 @@ const jp = (() => {
     // Mora functions
 
     function isMoraPitchHigh(moraIndex, pitchAccentPosition) {
-        return pitchAccentPosition === 0 ? (moraIndex > 0) : (moraIndex < pitchAccentPosition);
+        switch (pitchAccentPosition) {
+            case 0: return (moraIndex > 0);
+            case 1: return (moraIndex < 1);
+            default: return (moraIndex > 0 && moraIndex < pitchAccentPosition);
+        }
     }
 
     function getKanaMorae(text) {
