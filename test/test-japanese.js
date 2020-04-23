@@ -434,17 +434,17 @@ function testIsMoraPitchHigh() {
         [[2, 1], false],
         [[3, 1], false],
 
-        [[0, 2], true],
+        [[0, 2], false],
         [[1, 2], true],
         [[2, 2], false],
         [[3, 2], false],
 
-        [[0, 3], true],
+        [[0, 3], false],
         [[1, 3], true],
         [[2, 3], true],
         [[3, 3], false],
 
-        [[0, 4], true],
+        [[0, 4], false],
         [[1, 4], true],
         [[2, 4], true],
         [[3, 4], true]
