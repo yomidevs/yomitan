@@ -496,7 +496,7 @@ class Backend {
 
     async _onApiDefinitionAdd({definition, mode, context, details, optionsContext}) {
         const options = this.getOptions(optionsContext);
-        const templates = this.defaultAnkiFieldTemplates;
+        const templates = this._getTemplates(options);
 
         if (mode !== 'kanji') {
             const {customSourceUrl} = options.audio;
@@ -522,7 +522,7 @@ class Backend {
 
     async _onApiDefinitionsAddable({definitions, modes, context, optionsContext}) {
         const options = this.getOptions(optionsContext);
-        const templates = this.defaultAnkiFieldTemplates;
+        const templates = this._getTemplates(options);
         const states = [];
 
         try {
@@ -943,6 +943,11 @@ class Backend {
 
     async _renderTemplate(template, data) {
         return handlebarsRenderDynamic(template, data);
+    }
+
+    _getTemplates(options) {
+        const templates = options.anki.fieldTemplates;
+        return typeof templates === 'string' ? templates : this.defaultAnkiFieldTemplates;
     }
 
     static _getTabUrl(tab) {
