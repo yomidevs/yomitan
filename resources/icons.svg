@@ -15,10 +15,11 @@
    viewBox="0 0 16 16"
    version="1.1"
    id="svg8"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
    sodipodi:docname="icons.svg"
-   inkscape:export-xdpi="96"
-   inkscape:export-ydpi="96">
+   inkscape:export-xdpi="192"
+   inkscape:export-ydpi="192"
+   inkscape:export-filename="../ext/mixed/img/icon32.png">
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -27,15 +28,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="31.678384"
-     inkscape:cx="4.6828273"
-     inkscape:cy="7.5629224"
+     inkscape:cx="6.7837201"
+     inkscape:cy="7.0569373"
      inkscape:document-units="px"
-     inkscape:current-layer="layer16"
+     inkscape:current-layer="layer24"
      showgrid="true"
      units="px"
      inkscape:snap-center="true"
      inkscape:window-width="1920"
-     inkscape:window-height="1018"
+     inkscape:window-height="1017"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
@@ -498,12 +499,12 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <g
-     style="display:inline"
+     style="display:none"
      inkscape:label="Add Term Kanji"
      id="layer5"
      inkscape:groupmode="layer">
@@ -520,7 +521,7 @@
          style="image-rendering:optimizeSpeed"
          xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0 U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAJvSURBVDjLpZPrS5NhGIf9W7YvBYOkhlko qCklWChv2WyKik7blnNris72bi6dus0DLZ0TDxW1odtopDs4D8MDZuLU0kXq61CijSIIasOvv94V TUfLiB74fXngup7nvrnvJABJ/5PfLnTTdcwOj4RsdYmo5glBWP6iOtzwvIKSWstI0Wgx80SBblpK tE9KQs/We7EaWoT/8wbWP61gMmCH0lMDvokT4j25TiQU/ITFkek9Ow6+7WH2gwsmahCPdwyw75uw 9HEO2gUZSkfyI9zBPCJOoJ2SMmg46N61YO/rNoa39Xi41oFuXysMfh36/Fp0b7bAfWAH6RGi0Hgl WNCbzYgJaFjRv6zGuy+b9It96N3SQvNKiV9HvSaDfFEIxXItnPs23BzJQd6DDEVM0OKsoVwBG/1V MzpXVWhbkUM2K4oJBDYuGmbKIJ0qxsAbHfRLzbjcnUbFBIpx/qH3vQv9b3U03IQ/HfFkERTzfFj8 w8jSpR7GBE123uFEYAzaDRIqX/2JAtJbDat/COkd7CNBva2cMvq0MGxp0PRSCPF8BXjWG3FgNHc9 XPT71Ojy3sMFdfJRCeKxEsVtKwFHwALZfCUk3tIfNR8XiJwc1LmL4dg141JPKtj3WUdNFJqLGFVP C4OkR4BxajTWsChY64wmCnMxsWPCHcutKBxMVp5mxA1S+aMComToaqTRUQknLTH62kHOVEE+VQnj ahscNCy0cMBWsSI0TCQcZc5ALkEYckL5A5noWSBhfm2AecMAjbcRWV0pUTh0HE64TNf0mczcnnQy u/MilaFJCae1nw2fbz1DnVOxyGTlKeZft/Ff8x1BRssfACjTwQAAAABJRU5ErkJggg== "
          id="image4539"
-         x="4.7683716e-007"
+         x="4.7683716e-07"
          y="292.76669" />
     </g>
     <g
@@ -887,6 +888,34 @@
          d="m 10.5,7 c 0,0 0,-1.5 0,-1.5 0,0 -7,0 -7,0 0,0 0,-2 0,-2 0,0 -3,3 -3,3 0,0 0,1 0,1 0,0 3,3 3,3 0,0 0,-2 0,-2 0,0 7,0 7,0 0,0 0,-1.5 0,-1.5"
          style="fill:url(#linearGradient5227);fill-opacity:1;stroke:url(#linearGradient5219);stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          inkscape:connector-curvature="0" />
+    </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer22"
+     inkscape:label="Yomichan">
+    <g
+       inkscape:groupmode="layer"
+       id="layer23"
+       inkscape:label="Background"
+       style="display:inline">
+      <rect
+         id="rect3857"
+         width="16"
+         height="16"
+         x="0"
+         y="0"
+         rx="1.625"
+         ry="1.625" />
+    </g>
+    <g
+       inkscape:groupmode="layer"
+       id="layer24"
+       inkscape:label="Characters">
+      <path
+         style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 2 2 L 2 4 L 5 4 L 5 7 L 2 7 L 2 9 L 5 9 L 5 12 L 2 12 L 2 14 L 7 14 L 7 2 L 2 2 z M 9 2 L 9 4 L 14 4 L 14 2 L 9 2 z M 9 7 L 9 9 L 14 9 L 14 7 L 9 7 z M 9 12 L 9 14 L 14 14 L 14 12 L 9 12 z "
+         id="path3859" />
     </g>
   </g>
 </svg>
