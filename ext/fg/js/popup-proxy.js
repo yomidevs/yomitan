@@ -148,7 +148,7 @@ class PopupProxy {
             }
             this._frameOffsetUpdatedAt = now;
         } catch (e) {
-            logError(e);
+            yomichan.logError(e);
         } finally {
             this._frameOffsetPromise = null;
         }

@@ -52,42 +52,33 @@ if (EXTENSION_IS_BROWSER_EDGE) {
  */
 
 function errorToJson(error) {
+    try {
+        if (isObject(error)) {
+            return {
+                name: error.name,
+                message: error.message,
+                stack: error.stack,
+                data: error.data
+            };
+        }
+    } catch (e) {
+        // NOP
+    }
     return {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-        data: error.data
+        value: error,
+        hasValue: true
     };
 }
 
 function jsonToError(jsonError) {
+    if (jsonError.hasValue) {
+        return jsonError.value;
+    }
     const error = new Error(jsonError.message);
     error.name = jsonError.name;
     error.stack = jsonError.stack;
     error.data = jsonError.data;
     return error;
-}
-
-function logError(error, alert) {
-    const manifest = chrome.runtime.getManifest();
-    let errorMessage = `${manifest.name} v${manifest.version} has encountered an error.\n`;
-    errorMessage += `Originating URL: ${window.location.href}\n`;
-
-    const errorString = `${error.toString ? error.toString() : error}`;
-    const stack = `${error.stack}`.trimRight();
-    if (!stack.startsWith(errorString)) { errorMessage += `${errorString}\n`; }
-    errorMessage += stack;
-
-    const data = error.data;
-    if (typeof data !== 'undefined') { errorMessage += `\nData: ${JSON.stringify(data, null, 4)}`; }
-
-    errorMessage += '\n\nIssues can be reported at https://github.com/FooSoft/yomichan/issues';
-
-    console.error(errorMessage);
-
-    if (alert) {
-        window.alert(`${errorString}\n\nCheck the developer console for more details.`);
-    }
 }
 
 
@@ -361,7 +352,76 @@ const yomichan = (() => {
             });
         }
 
+        logWarning(error) {
+            this.log(error, 'warn');
+        }
+
+        logError(error) {
+            this.log(error, 'error');
+        }
+
+        log(error, level, context=null) {
+            if (!isObject(context)) {
+                context = this._getLogContext();
+            }
+
+            let errorString;
+            try {
+                errorString = error.toString();
+                if (/^\[object \w+\]$/.test(errorString)) {
+                    errorString = JSON.stringify(error);
+                }
+            } catch (e) {
+                errorString = `${error}`;
+            }
+
+            let errorStack;
+            try {
+                errorStack = (typeof error.stack === 'string' ? error.stack.trimRight() : '');
+            } catch (e) {
+                errorStack = '';
+            }
+
+            let errorData;
+            try {
+                errorData = error.data;
+            } catch (e) {
+                // NOP
+            }
+
+            if (errorStack.startsWith(errorString)) {
+                errorString = errorStack;
+            } else if (errorStack.length > 0) {
+                errorString += `\n${errorStack}`;
+            }
+
+            const manifest = chrome.runtime.getManifest();
+            let message = `${manifest.name} v${manifest.version} has encountered a problem.`;
+            message += `\nOriginating URL: ${context.url}\n`;
+            message += errorString;
+            if (typeof errorData !== 'undefined') {
+                message += `\nData: ${JSON.stringify(errorData, null, 4)}`;
+            }
+            message += '\n\nIssues can be reported at https://github.com/FooSoft/yomichan/issues';
+
+            switch (level) {
+                case 'info': console.info(message); break;
+                case 'debug': console.debug(message); break;
+                case 'warn': console.warn(message); break;
+                case 'error': console.error(message); break;
+                default: console.log(message); break;
+            }
+
+            this.trigger('log', {error, level, context});
+        }
+
         // Private
+
+        _getLogContext() {
+            return {
+                url: window.location.href
+            };
+        }
 
         _onMessage({action, params}, sender, callback) {
             const handler = this._messageHandlers.get(action);

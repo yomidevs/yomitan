@@ -17,6 +17,7 @@
 
 /* global
  * DisplaySearch
+ * apiForwardLogsToBackend
  * apiOptionsGet
  */
 
@@ -53,6 +54,7 @@ function injectSearchFrontend() {
 }
 
 (async () => {
+    apiForwardLogsToBackend();
     await yomichan.prepare();
 
     const displaySearch = new DisplaySearch();

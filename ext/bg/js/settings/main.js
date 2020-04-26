@@ -21,6 +21,7 @@
  * ankiInitialize
  * ankiTemplatesInitialize
  * ankiTemplatesUpdateValue
+ * apiForwardLogsToBackend
  * apiOptionsSave
  * appearanceInitialize
  * audioSettingsInitialize
@@ -284,6 +285,7 @@ function showExtensionInformation() {
 
 
 async function onReady() {
+    apiForwardLogsToBackend();
     await yomichan.prepare();
 
     showExtensionInformation();

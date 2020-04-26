@@ -81,12 +81,12 @@ class FrontendApiSender {
     onAck(id) {
         const info = this.callbacks.get(id);
         if (typeof info === 'undefined') {
-            console.warn(`ID ${id} not found for ack`);
+            yomichan.logWarning(new Error(`ID ${id} not found for ack`));
             return;
         }
 
         if (info.ack) {
-            console.warn(`Request ${id} already ack'd`);
+            yomichan.logWarning(new Error(`Request ${id} already ack'd`));
             return;
         }
 
@@ -98,12 +98,12 @@ class FrontendApiSender {
     onResult(id, data) {
         const info = this.callbacks.get(id);
         if (typeof info === 'undefined') {
-            console.warn(`ID ${id} not found`);
+            yomichan.logWarning(new Error(`ID ${id} not found`));
             return;
         }
 
         if (!info.ack) {
-            console.warn(`Request ${id} not ack'd`);
+            yomichan.logWarning(new Error(`Request ${id} not ack'd`));
             return;
         }
 

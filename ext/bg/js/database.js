@@ -104,7 +104,7 @@ class Database {
             });
             return true;
         } catch (e) {
-            logError(e);
+            yomichan.logError(e);
             return false;
         }
     }

@@ -201,7 +201,7 @@ class TextScanner {
     }
 
     onError(error) {
-        logError(error, false);
+        yomichan.logError(error);
     }
 
     async scanTimerWait() {

@@ -554,7 +554,7 @@ function dictionaryErrorsShow(errors) {
     if (errors !== null && errors.length > 0) {
         const uniqueErrors = new Map();
         for (let e of errors) {
-            logError(e);
+            yomichan.logError(e);
             e = dictionaryErrorToString(e);
             let count = uniqueErrors.get(e);
             if (typeof count === 'undefined') {

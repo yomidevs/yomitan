@@ -145,7 +145,10 @@ const vm = new VM({
     XMLHttpRequest,
     indexedDB: global.indexedDB,
     IDBKeyRange: global.IDBKeyRange,
-    JSZip: yomichanTest.JSZip
+    JSZip: yomichanTest.JSZip,
+    addEventListener() {
+        // NOP
+    }
 });
 vm.context.window = vm.context;
 

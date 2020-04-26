@@ -144,6 +144,14 @@ function apiGetMedia(targets) {
     return _apiInvoke('getMedia', {targets});
 }
 
+function apiLog(error, level, context) {
+    return _apiInvoke('log', {error, level, context});
+}
+
+function apiLogIndicatorClear() {
+    return _apiInvoke('logIndicatorClear');
+}
+
 function _apiInvoke(action, params={}) {
     const data = {action, params};
     return new Promise((resolve, reject) => {
@@ -170,4 +178,18 @@ function _apiInvoke(action, params={}) {
 
 function _apiCheckLastError() {
     // NOP
+}
+
+let _apiForwardLogsToBackendEnabled = false;
+function apiForwardLogsToBackend() {
+    if (_apiForwardLogsToBackendEnabled) { return; }
+    _apiForwardLogsToBackendEnabled = true;
+
+    yomichan.on('log', async ({error, level, context}) => {
+        try {
+            await apiLog(errorToJson(error), level, context);
+        } catch (e) {
+            // NOP
+        }
+    });
 }

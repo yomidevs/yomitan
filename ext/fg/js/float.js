@@ -84,7 +84,7 @@ class DisplayFloat extends Display {
         if (this._orphaned) {
             this.setContent('orphaned');
         } else {
-            logError(error, true);
+            yomichan.logError(error);
         }
     }
 

@@ -17,6 +17,7 @@
 
 /* global
  * DisplayFloat
+ * apiForwardLogsToBackend
  * apiOptionsGet
  */
 
@@ -68,5 +69,6 @@ async function popupNestedInitialize(id, depth, parentFrameId, url) {
 }
 
 (async () => {
+    apiForwardLogsToBackend();
     new DisplayFloat();
 })();

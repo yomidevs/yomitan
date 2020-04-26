@@ -45,7 +45,7 @@ class QueryParser extends TextScanner {
     }
 
     onError(error) {
-        logError(error, false);
+        yomichan.logError(error);
     }
 
     onClick(e) {

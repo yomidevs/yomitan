@@ -24,7 +24,7 @@ class Mecab {
     }
 
     onError(error) {
-        logError(error, false);
+        yomichan.logError(error);
     }
 
     async checkVersion() {

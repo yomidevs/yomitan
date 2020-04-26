@@ -22,6 +22,7 @@
  * PopupProxy
  * PopupProxyHost
  * apiBroadcastTab
+ * apiForwardLogsToBackend
  * apiOptionsGet
  */
 
@@ -62,6 +63,7 @@ async function createPopupProxy(depth, id, parentFrameId) {
 }
 
 (async () => {
+    apiForwardLogsToBackend();
     await yomichan.prepare();
 
     const data = window.frontendInitializationData || {};

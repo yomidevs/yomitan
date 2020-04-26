@@ -122,7 +122,7 @@ class DisplaySearch extends Display {
     }
 
     onError(error) {
-        logError(error, true);
+        yomichan.logError(error);
     }
 
     onSearchClear() {

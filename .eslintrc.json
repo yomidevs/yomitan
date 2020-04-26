@@ -80,7 +80,6 @@
                 "yomichan": "readonly",
                 "errorToJson": "readonly",
                 "jsonToError": "readonly",
-                "logError": "readonly",
                 "isObject": "readonly",
                 "hasOwn": "readonly",
                 "toIterable": "readonly",

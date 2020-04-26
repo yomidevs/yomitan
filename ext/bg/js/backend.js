@@ -78,6 +78,7 @@ class Backend {
         this._isPrepared = false;
         this._prepareError = false;
         this._badgePrepareDelayTimer = null;
+        this._logErrorLevel = null;
 
         this._messageHandlers = new Map([
             ['yomichanCoreReady', {handler: this._onApiYomichanCoreReady.bind(this), async: false}],
@@ -112,7 +113,9 @@ class Backend {
             ['getDictionaryInfo', {handler: this._onApiGetDictionaryInfo.bind(this), async: true}],
             ['getDictionaryCounts', {handler: this._onApiGetDictionaryCounts.bind(this), async: true}],
             ['purgeDatabase', {handler: this._onApiPurgeDatabase.bind(this), async: true}],
-            ['getMedia', {handler: this._onApiGetMedia.bind(this), async: true}]
+            ['getMedia', {handler: this._onApiGetMedia.bind(this), async: true}],
+            ['log', {handler: this._onApiLog.bind(this), async: false}],
+            ['logIndicatorClear', {handler: this._onApiLogIndicatorClear.bind(this), async: false}]
         ]);
 
         this._commandHandlers = new Map([
@@ -164,7 +167,7 @@ class Backend {
             this._isPrepared = true;
         } catch (e) {
             this._prepareError = true;
-            logError(e);
+            yomichan.logError(e);
             throw e;
         } finally {
             if (this._badgePrepareDelayTimer !== null) {
@@ -260,7 +263,7 @@ class Backend {
             this.options = JsonSchema.getValidValueOrDefault(this.optionsSchema, utilIsolate(options));
         } catch (e) {
             // This shouldn't happen, but catch errors just in case of bugs
-            logError(e);
+            yomichan.logError(e);
         }
     }
 
@@ -767,7 +770,33 @@ class Backend {
         return await this.database.getMedia(targets);
     }
 
+    _onApiLog({error, level, context}) {
+        yomichan.log(jsonToError(error), level, context);
+
+        const levelValue = this._getErrorLevelValue(level);
+        if (levelValue <= this._getErrorLevelValue(this._logErrorLevel)) { return; }
+
+        this._logErrorLevel = level;
+        this._updateBadge();
+    }
+
+    _onApiLogIndicatorClear() {
+        if (this._logErrorLevel === null) { return; }
+        this._logErrorLevel = null;
+        this._updateBadge();
+    }
+
     // Command handlers
+
+    _getErrorLevelValue(errorLevel) {
+        switch (errorLevel) {
+            case 'info': return 0;
+            case 'debug': return 0;
+            case 'warn': return 1;
+            case 'error': return 2;
+            default: return 0;
+        }
+    }
 
     async _onCommandSearch(params) {
         const {mode='existingOrNewTab', query} = params || {};
@@ -890,7 +919,20 @@ class Backend {
         let color = null;
         let status = null;
 
-        if (!this._isPrepared) {
+        if (this._logErrorLevel !== null) {
+            switch (this._logErrorLevel) {
+                case 'error':
+                    text = '!!';
+                    color = '#f04e4e';
+                    status = 'Error';
+                    break;
+                default: // 'warn'
+                    text = '!';
+                    color = '#f0ad4e';
+                    status = 'Warning';
+                    break;
+            }
+        } else if (!this._isPrepared) {
             if (this._prepareError) {
                 text = '!!';
                 color = '#f04e4e';
