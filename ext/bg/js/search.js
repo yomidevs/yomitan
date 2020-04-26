@@ -76,6 +76,8 @@ class DisplaySearch extends Display {
     async prepare() {
         try {
             await super.prepare();
+            await this.updateOptions();
+            yomichan.on('optionsUpdated', () => this.updateOptions());
             await this.queryParser.prepare();
 
             const {queryParams: {query='', mode=''}} = parseUrl(window.location.href);
@@ -231,7 +233,7 @@ class DisplaySearch extends Display {
             this.setIntroVisible(!valid, animate);
             this.updateSearchButton();
             if (valid) {
-                const {definitions} = await apiTermsFind(query, details, this.optionsContext);
+                const {definitions} = await apiTermsFind(query, details, this.getOptionsContext());
                 this.setContent('terms', {definitions, context: {
                     focus: false,
                     disableHistory: true,

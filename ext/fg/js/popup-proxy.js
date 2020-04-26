@@ -20,12 +20,11 @@
  */
 
 class PopupProxy {
-    constructor(id, depth, parentId, parentFrameId, url, getFrameOffset=null, setDisabled=null) {
+    constructor(id, depth, parentId, parentFrameId, getFrameOffset=null, setDisabled=null) {
         this._parentId = parentId;
         this._parentFrameId = parentFrameId;
         this._id = id;
         this._depth = depth;
-        this._url = url;
         this._apiSender = new FrontendApiSender();
         this._getFrameOffset = getFrameOffset;
         this._setDisabled = setDisabled;
@@ -49,10 +48,6 @@ class PopupProxy {
         return this._depth;
     }
 
-    get url() {
-        return this._url;
-    }
-
     // Public functions
 
     async prepare() {
@@ -64,8 +59,8 @@ class PopupProxy {
         return true;
     }
 
-    async setOptions(options) {
-        return await this._invokeHostApi('setOptions', {id: this._id, options});
+    async setOptionsContext(optionsContext, source) {
+        return await this._invokeHostApi('setOptionsContext', {id: this._id, optionsContext, source});
     }
 
     hide(changeFocus) {
@@ -88,14 +83,14 @@ class PopupProxy {
         return await this._invokeHostApi('containsPoint', {id: this._id, x, y});
     }
 
-    async showContent(elementRect, writingMode, type=null, details=null) {
+    async showContent(elementRect, writingMode, type, details, context) {
         let {x, y, width, height} = elementRect;
         if (this._getFrameOffset !== null) {
             await this._updateFrameOffset();
             [x, y] = this._applyFrameOffset(x, y);
         }
         elementRect = {x, y, width, height};
-        return await this._invokeHostApi('showContent', {id: this._id, elementRect, writingMode, type, details});
+        return await this._invokeHostApi('showContent', {id: this._id, elementRect, writingMode, type, details, context});
     }
 
     async setCustomCss(css) {
@@ -108,6 +103,10 @@ class PopupProxy {
 
     async setContentScale(scale) {
         this._invokeHostApi('setContentScale', {id: this._id, scale});
+    }
+
+    async getHostUrl() {
+        return await this._invokeHostApi('getHostUrl', {});
     }
 
     // Private

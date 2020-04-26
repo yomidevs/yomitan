@@ -32,19 +32,24 @@ class SettingsPopupPreview {
         this.popupShown = false;
         this.themeChangeTimeout = null;
         this.textSource = null;
+        this.optionsContext = null;
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
 
         this._windowMessageHandlers = new Map([
+            ['prepare', ({optionsContext}) => this.prepare(optionsContext)],
             ['setText', ({text}) => this.setText(text)],
             ['setCustomCss', ({css}) => this.setCustomCss(css)],
-            ['setCustomOuterCss', ({css}) => this.setCustomOuterCss(css)]
+            ['setCustomOuterCss', ({css}) => this.setCustomOuterCss(css)],
+            ['updateOptionsContext', ({optionsContext}) => this.updateOptionsContext(optionsContext)]
         ]);
+
+        window.addEventListener('message', this.onMessage.bind(this), false);
     }
 
-    async prepare() {
-        // Setup events
-        window.addEventListener('message', this.onMessage.bind(this), false);
+    async prepare(optionsContext) {
+        this.optionsContext = optionsContext;
 
+        // Setup events
         document.querySelector('#theme-dark-checkbox').addEventListener('change', this.onThemeDarkCheckboxChanged.bind(this), false);
 
         // Overwrite API functions
@@ -62,8 +67,9 @@ class SettingsPopupPreview {
 
         this.frontend = new Frontend(this.popup);
 
+        this.frontend.getOptionsContext = async () => this.optionsContext;
         this.frontend.setEnabled = () => {};
-        this.frontend.searchClear = () => {};
+        this.frontend.onSearchClear = () => {};
 
         await this.frontend.prepare();
 
@@ -143,6 +149,12 @@ class SettingsPopupPreview {
     setCustomOuterCss(css) {
         if (this.frontend === null) { return; }
         this.frontend.popup.setCustomOuterCss(css, false);
+    }
+
+    async updateOptionsContext(optionsContext) {
+        this.optionsContext = optionsContext;
+        await this.frontend.updateOptions();
+        await this.updateSearch();
     }
 
     async updateSearch() {

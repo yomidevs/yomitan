@@ -19,6 +19,7 @@
  * DOM
  * apiGetMessageToken
  * apiInjectStylesheet
+ * apiOptionsGet
  */
 
 class Popup {
@@ -33,10 +34,12 @@ class Popup {
         this._visible = false;
         this._visibleOverride = null;
         this._options = null;
+        this._optionsContext = null;
         this._contentScale = 1.0;
         this._containerSizeContentScale = null;
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
         this._messageToken = null;
+        this._previousOptionsContextSource = null;
 
         this._container = document.createElement('iframe');
         this._container.className = 'yomichan-float';
@@ -72,19 +75,20 @@ class Popup {
         return this._frameId;
     }
 
-    get url() {
-        return window.location.href;
-    }
-
     // Public functions
 
     isProxy() {
         return false;
     }
 
-    async setOptions(options) {
-        this._options = options;
+    async setOptionsContext(optionsContext, source) {
+        this._optionsContext = optionsContext;
+        this._previousOptionsContextSource = source;
+
+        this._options = await apiOptionsGet(optionsContext);
         this.updateTheme();
+
+        this._invokeApi('setOptionsContext', {optionsContext});
     }
 
     hide(changeFocus) {
@@ -120,8 +124,14 @@ class Popup {
         return false;
     }
 
-    async showContent(elementRect, writingMode, type=null, details=null) {
+    async showContent(elementRect, writingMode, type, details, context) {
         if (this._options === null) { throw new Error('Options not assigned'); }
+
+        const {optionsContext, source} = context;
+        if (source !== this._previousOptionsContextSource) {
+            await this.setOptionsContext(optionsContext, source);
+        }
+
         await this._show(elementRect, writingMode);
         if (type === null) { return; }
         this._invokeApi('setContent', {type, details});
@@ -219,10 +229,9 @@ class Popup {
             this._invokeApi('prepare', {
                 popupInfo: {
                     id: this._id,
-                    depth: this._depth,
                     parentFrameId
                 },
-                url: this.url,
+                optionsContext: this._optionsContext,
                 childrenSupported: this._childrenSupported,
                 scale: this._contentScale
             });

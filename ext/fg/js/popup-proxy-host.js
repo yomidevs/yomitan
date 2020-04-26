@@ -37,7 +37,7 @@ class PopupProxyHost {
 
         this._apiReceiver = new FrontendApiReceiver(`popup-proxy-host#${this._frameId}`, new Map([
             ['getOrCreatePopup', this._onApiGetOrCreatePopup.bind(this)],
-            ['setOptions', this._onApiSetOptions.bind(this)],
+            ['setOptionsContext', this._onApiSetOptionsContext.bind(this)],
             ['hide', this._onApiHide.bind(this)],
             ['isVisible', this._onApiIsVisibleAsync.bind(this)],
             ['setVisibleOverride', this._onApiSetVisibleOverride.bind(this)],
@@ -45,7 +45,8 @@ class PopupProxyHost {
             ['showContent', this._onApiShowContent.bind(this)],
             ['setCustomCss', this._onApiSetCustomCss.bind(this)],
             ['clearAutoPlayTimer', this._onApiClearAutoPlayTimer.bind(this)],
-            ['setContentScale', this._onApiSetContentScale.bind(this)]
+            ['setContentScale', this._onApiSetContentScale.bind(this)],
+            ['getHostUrl', this._onApiGetHostUrl.bind(this)]
         ]));
     }
 
@@ -103,9 +104,9 @@ class PopupProxyHost {
         };
     }
 
-    async _onApiSetOptions({id, options}) {
+    async _onApiSetOptionsContext({id, optionsContext, source}) {
         const popup = this._getPopup(id);
-        return await popup.setOptions(options);
+        return await popup.setOptionsContext(optionsContext, source);
     }
 
     async _onApiHide({id, changeFocus}) {
@@ -129,11 +130,11 @@ class PopupProxyHost {
         return await popup.containsPoint(x, y);
     }
 
-    async _onApiShowContent({id, elementRect, writingMode, type, details}) {
+    async _onApiShowContent({id, elementRect, writingMode, type, details, context}) {
         const popup = this._getPopup(id);
         elementRect = PopupProxyHost._convertJsonRectToDOMRect(popup, elementRect);
         if (!PopupProxyHost._popupCanShow(popup)) { return; }
-        return await popup.showContent(elementRect, writingMode, type, details);
+        return await popup.showContent(elementRect, writingMode, type, details, context);
     }
 
     async _onApiSetCustomCss({id, css}) {
@@ -149,6 +150,10 @@ class PopupProxyHost {
     async _onApiSetContentScale({id, scale}) {
         const popup = this._getPopup(id);
         return popup.setContentScale(scale);
+    }
+
+    async _onApiGetHostUrl() {
+        return window.location.href;
     }
 
     // Private functions

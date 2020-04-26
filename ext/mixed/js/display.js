@@ -177,8 +177,6 @@ class Display {
     async prepare() {
         await yomichan.prepare();
         await this.displayGenerator.prepare();
-        await this.updateOptions();
-        yomichan.on('optionsUpdated', () => this.updateOptions());
     }
 
     onError(_error) {

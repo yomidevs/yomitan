@@ -29,11 +29,6 @@ class DisplayFloat extends Display {
 
         this._popupId = null;
 
-        this.optionsContext = {
-            depth: 0,
-            url: window.location.href
-        };
-
         this._orphaned = false;
         this._prepareInvoked = false;
         this._messageToken = null;
@@ -51,10 +46,11 @@ class DisplayFloat extends Display {
         ]);
 
         this._windowMessageHandlers = new Map([
+            ['setOptionsContext', ({optionsContext}) => this.setOptionsContext(optionsContext)],
             ['setContent', ({type, details}) => this.setContent(type, details)],
             ['clearAutoPlayTimer', () => this.clearAutoPlayTimer()],
             ['setCustomCss', ({css}) => this.setCustomCss(css)],
-            ['prepare', ({popupInfo, url, childrenSupported, scale}) => this.prepare(popupInfo, url, childrenSupported, scale)],
+            ['prepare', ({popupInfo, optionsContext, childrenSupported, scale}) => this.prepare(popupInfo, optionsContext, childrenSupported, scale)],
             ['setContentScale', ({scale}) => this.setContentScale(scale)]
         ]);
 
@@ -62,18 +58,20 @@ class DisplayFloat extends Display {
         window.addEventListener('message', this.onMessage.bind(this), false);
     }
 
-    async prepare(popupInfo, url, childrenSupported, scale) {
+    async prepare(popupInfo, optionsContext, childrenSupported, scale) {
         if (this._prepareInvoked) { return; }
         this._prepareInvoked = true;
 
-        const {id, depth, parentFrameId} = popupInfo;
+        const {id, parentFrameId} = popupInfo;
         this._popupId = id;
-        this.optionsContext.depth = depth;
-        this.optionsContext.url = url;
+
+        this.optionsContext = optionsContext;
 
         await super.prepare();
+        await this.updateOptions();
 
         if (childrenSupported) {
+            const {depth, url} = optionsContext;
             popupNestedInitialize(id, depth, parentFrameId, url);
         }
 
@@ -156,6 +154,11 @@ class DisplayFloat extends Display {
             window.clearTimeout(this.autoPlayAudioTimer);
             this.autoPlayAudioTimer = null;
         }
+    }
+
+    async setOptionsContext(optionsContext) {
+        this.optionsContext = optionsContext;
+        await this.updateOptions();
     }
 
     setContentScale(scale) {

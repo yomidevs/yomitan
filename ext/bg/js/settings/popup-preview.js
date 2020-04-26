@@ -16,6 +16,7 @@
  */
 
 /* global
+ * getOptionsContext
  * wanakana
  */
 
@@ -57,6 +58,23 @@ function showAppearancePreview() {
     customOuterCss.on('input', () => {
         const action = 'setCustomOuterCss';
         const params = {css: customOuterCss.val()};
+        frame.contentWindow.postMessage({action, params}, targetOrigin);
+    });
+
+    const updateOptionsContext = () => {
+        const action = 'updateOptionsContext';
+        const params = {
+            optionsContext: getOptionsContext()
+        };
+        frame.contentWindow.postMessage({action, params}, targetOrigin);
+    };
+    yomichan.on('modifyingProfileChange', updateOptionsContext);
+
+    frame.addEventListener('load', () => {
+        const action = 'prepare';
+        const params = {
+            optionsContext: getOptionsContext()
+        };
         frame.contentWindow.postMessage({action, params}, targetOrigin);
     });
 
