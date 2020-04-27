@@ -131,6 +131,7 @@ async function formRead(options) {
     options.anki.tags = utilBackgroundIsolate($('#card-tags').val().split(/[,; ]+/));
     options.anki.sentenceExt = parseInt($('#sentence-detection-extent').val(), 10);
     options.anki.server = $('#interface-server').val();
+    options.anki.duplicateScope = $('#duplicate-scope').val();
     options.anki.screenshot.format = $('#screenshot-format').val();
     options.anki.screenshot.quality = parseInt($('#screenshot-quality').val(), 10);
 
@@ -212,6 +213,7 @@ async function formWrite(options) {
     $('#card-tags').val(options.anki.tags.join(' '));
     $('#sentence-detection-extent').val(options.anki.sentenceExt);
     $('#interface-server').val(options.anki.server);
+    $('#duplicate-scope').val(options.anki.duplicateScope);
     $('#screenshot-format').val(options.anki.screenshot.format);
     $('#screenshot-quality').val(options.anki.screenshot.quality);
 

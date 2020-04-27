@@ -87,15 +87,14 @@ class AnkiConnect {
         return await this._invoke('storeMediaFile', {filename, data: dataBase64});
     }
 
-    async findNoteIds(notes) {
+    async findNoteIds(notes, duplicateScope) {
         if (!this._enabled) { return []; }
         await this._checkVersion();
-        const actions = notes.map((note) => ({
-            action: 'findNotes',
-            params: {
-                query: `deck:"${this._escapeQuery(note.deckName)}" ${this._fieldsToQuery(note.fields)}`
-            }
-        }));
+        const actions = notes.map((note) => {
+            let query = (duplicateScope === 'deck' ? `"deck:${this._escapeQuery(note.deckName)}" ` : '');
+            query += this._fieldsToQuery(note.fields);
+            return {action: 'findNotes', params: {query}};
+        });
         return await this._invoke('multi', {actions});
     }
 
@@ -132,6 +131,6 @@ class AnkiConnect {
         }
 
         const key = fieldNames[0];
-        return `${key.toLowerCase()}:"${this._escapeQuery(fields[key])}"`;
+        return `"${key.toLowerCase()}:${this._escapeQuery(fields[key])}"`;
     }
 }

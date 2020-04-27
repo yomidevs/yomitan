@@ -32,7 +32,10 @@ class AnkiNoteBuilder {
             fields: {},
             tags,
             deckName: modeOptions.deck,
-            modelName: modeOptions.model
+            modelName: modeOptions.model,
+            options: {
+                duplicateScope: options.anki.duplicateScope
+            }
         };
 
         for (const [fieldName, fieldValue] of modeOptionsFieldEntries) {
