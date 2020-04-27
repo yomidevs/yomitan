@@ -44,12 +44,7 @@ class QueryParser extends TextScanner {
         await this.queryParserGenerator.prepare();
     }
 
-    onError(error) {
-        yomichan.logError(error);
-    }
-
-    onClick(e) {
-        super.onClick(e);
+    onClick2(e) {
         this.searchAt(e.clientX, e.clientY, 'click');
     }
 
@@ -84,22 +79,8 @@ class QueryParser extends TextScanner {
 
     getMouseEventListeners() {
         return [
-            [this.node, 'click', this.onClick.bind(this)],
-            [this.node, 'mousedown', this.onMouseDown.bind(this)],
-            [this.node, 'mousemove', this.onMouseMove.bind(this)],
-            [this.node, 'mouseover', this.onMouseOver.bind(this)],
-            [this.node, 'mouseout', this.onMouseOut.bind(this)]
-        ];
-    }
-
-    getTouchEventListeners() {
-        return [
-            [this.node, 'auxclick', this.onAuxClick.bind(this)],
-            [this.node, 'touchstart', this.onTouchStart.bind(this)],
-            [this.node, 'touchend', this.onTouchEnd.bind(this)],
-            [this.node, 'touchcancel', this.onTouchCancel.bind(this)],
-            [this.node, 'touchmove', this.onTouchMove.bind(this), {passive: false}],
-            [this.node, 'contextmenu', this.onContextMenu.bind(this)]
+            ...super.getMouseEventListeners(),
+            [this.node, 'click', this.onClick2.bind(this)]
         ];
     }
 

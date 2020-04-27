@@ -69,7 +69,7 @@ class SettingsPopupPreview {
 
         this.frontend.getOptionsContext = async () => this.optionsContext;
         this.frontend.setEnabled = () => {};
-        this.frontend.onSearchClear = () => {};
+        this.frontend.clearSelection = () => {};
 
         await this.frontend.prepare();
 

@@ -21,8 +21,9 @@
  * docRangeFromPoint
  */
 
-class TextScanner {
+class TextScanner extends EventDispatcher {
     constructor(node, ignoreElements, ignorePoints) {
+        super();
         this.node = node;
         this.ignoreElements = ignoreElements;
         this.ignorePoints = ignorePoints;
@@ -32,6 +33,7 @@ class TextScanner {
         this.scanTimerPromise = null;
         this.causeCurrent = null;
         this.textSourceCurrent = null;
+        this.textSourceCurrentSelected = false;
         this.pendingLookup = false;
         this.options = null;
 
@@ -92,7 +94,7 @@ class TextScanner {
 
         if (DOM.isMouseButtonDown(e, 'primary')) {
             this.scanTimerClear();
-            this.onSearchClear(true);
+            this.clearSelection(false);
         }
     }
 
@@ -200,10 +202,6 @@ class TextScanner {
         throw new Error('Override me');
     }
 
-    onError(error) {
-        yomichan.logError(error);
-    }
-
     async scanTimerWait() {
         const delay = this.options.scanning.delay;
         const promise = promiseTimeout(delay, true);
@@ -225,17 +223,12 @@ class TextScanner {
     }
 
     setEnabled(enabled, canEnable) {
-        if (enabled && canEnable) {
-            if (!this.enabled) {
-                this.hookEvents();
-                this.enabled = true;
-            }
+        this.eventListeners.removeAllEventListeners();
+        this.enabled = enabled && canEnable;
+        if (this.enabled) {
+            this.hookEvents();
         } else {
-            if (this.enabled) {
-                this.eventListeners.removeAllEventListeners();
-                this.enabled = false;
-            }
-            this.onSearchClear(false);
+            this.clearSelection(true);
         }
     }
 
@@ -300,10 +293,7 @@ class TextScanner {
                 const result = await this.onSearchSource(textSource, cause);
                 if (result !== null) {
                     this.causeCurrent = cause;
-                    this.textSourceCurrent = textSource;
-                    if (this.options.scanning.selectText) {
-                        textSource.select();
-                    }
+                    this.setCurrentTextSource(textSource);
                 }
                 this.pendingLookup = false;
             } finally {
@@ -312,7 +302,7 @@ class TextScanner {
                 }
             }
         } catch (e) {
-            this.onError(e);
+            yomichan.logError(e);
         }
     }
 
@@ -333,13 +323,15 @@ class TextScanner {
         }
     }
 
-    onSearchClear(_) {
+    clearSelection(passive) {
         if (this.textSourceCurrent !== null) {
-            if (this.options.scanning.selectText) {
+            if (this.textSourceCurrentSelected) {
                 this.textSourceCurrent.deselect();
             }
             this.textSourceCurrent = null;
+            this.textSourceCurrentSelected = false;
         }
+        this.trigger('clearSelection', {passive});
     }
 
     getCurrentTextSource() {
@@ -347,7 +339,13 @@ class TextScanner {
     }
 
     setCurrentTextSource(textSource) {
-        return this.textSourceCurrent = textSource;
+        this.textSourceCurrent = textSource;
+        if (this.options.scanning.selectText) {
+            this.textSourceCurrent.select();
+            this.textSourceCurrentSelected = true;
+        } else {
+            this.textSourceCurrentSelected = false;
+        }
     }
 
     static isScanningModifierPressed(scanningModifier, mouseEvent) {

@@ -92,7 +92,7 @@ class DisplayFloat extends Display {
         this._orphaned = true;
     }
 
-    onSearchClear() {
+    onEscape() {
         window.parent.postMessage('popupClose', '*');
     }
 

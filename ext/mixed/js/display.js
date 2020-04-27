@@ -69,7 +69,7 @@ class Display {
 
         this._onKeyDownHandlers = new Map([
             ['Escape', () => {
-                this.onSearchClear();
+                this.onEscape();
                 return true;
             }],
             ['PageUp', (e) => {
@@ -183,7 +183,7 @@ class Display {
         throw new Error('Override me');
     }
 
-    onSearchClear() {
+    onEscape() {
         throw new Error('Override me');
     }
 

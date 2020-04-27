@@ -49,7 +49,7 @@ class Frontend extends TextScanner {
         this._lastShowPromise = Promise.resolve();
 
         this._windowMessageHandlers = new Map([
-            ['popupClose', () => this.onSearchClear(true)],
+            ['popupClose', () => this.clearSelection(false)],
             ['selectionCopy', () => document.execCommand('copy')]
         ]);
 
@@ -79,10 +79,12 @@ class Frontend extends TextScanner {
             yomichan.on('zoomChanged', this.onZoomChanged.bind(this));
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
 
+            this.on('clearSelection', this.onClearSelection.bind(this));
+
             this._updateContentScale();
             this._broadcastRootPopupInformation();
         } catch (e) {
-            this.onError(e);
+            yomichan.logError(e);
         }
     }
 
@@ -140,7 +142,7 @@ class Frontend extends TextScanner {
     }
 
     async setPopup(popup) {
-        this.onSearchClear(false);
+        this.clearSelection(true);
         this.popup = popup;
         await popup.setOptionsContext(await this.getOptionsContext(), this._id);
     }
@@ -186,11 +188,11 @@ class Frontend extends TextScanner {
                     this._showPopupContent(textSource, await this.getOptionsContext(), 'orphaned');
                 }
             } else {
-                this.onError(e);
+                yomichan.logError(e);
             }
         } finally {
             if (results === null && this.options.scanning.autoHideResults) {
-                this.onSearchClear(true);
+                this.clearSelection(false);
             }
         }
 
@@ -238,10 +240,9 @@ class Frontend extends TextScanner {
         return {definitions, type: 'kanji'};
     }
 
-    onSearchClear(changeFocus) {
-        this.popup.hide(changeFocus);
+    onClearSelection({passive}) {
+        this.popup.hide(!passive);
         this.popup.clearAutoPlayTimer();
-        super.onSearchClear(changeFocus);
     }
 
     async getOptionsContext() {
@@ -269,7 +270,9 @@ class Frontend extends TextScanner {
             contentScale /= this._pageZoomFactor;
         }
         if (popupScaleRelativeToVisualViewport) {
-            contentScale /= Frontend._getVisualViewportScale();
+            const visualViewport = window.visualViewport;
+            const visualViewportScale = (visualViewport !== null && typeof visualViewport === 'object' ? visualViewport.scale : 1.0);
+            contentScale /= visualViewportScale;
         }
         if (contentScale === this._contentScale) { return; }
 
@@ -301,10 +304,5 @@ class Frontend extends TextScanner {
         if (textSource !== null && await this.popup.isVisible()) {
             this._showPopupContent(textSource, await this.getOptionsContext());
         }
-    }
-
-    static _getVisualViewportScale() {
-        const visualViewport = window.visualViewport;
-        return visualViewport !== null && typeof visualViewport === 'object' ? visualViewport.scale : 1.0;
     }
 }
