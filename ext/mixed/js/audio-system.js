@@ -196,7 +196,7 @@ class AudioSystem {
     }
 
     _isAudioBinaryValid(arrayBuffer) {
-        const digest = TextToSpeechAudio.arrayBufferDigest(arrayBuffer);
+        const digest = AudioSystem.arrayBufferDigest(arrayBuffer);
         switch (digest) {
             case 'ae6398b5a27bc8c0a771df6c907ade794be15518174773c58c7c7ddd17098906': // jpod101 invalid audio
                 return false;
