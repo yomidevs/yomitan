@@ -281,7 +281,7 @@ class Popup {
     }
 
     _onFullscreenChanged() {
-        const parent = (DOM.getFullscreenElement() || document.body || null);
+        const parent = this._getFrameParentElement();
         if (parent !== null && this._container.parentNode !== parent) {
             parent.appendChild(this._container);
         }
@@ -373,6 +373,22 @@ class Popup {
         if (token === null || contentWindow === null) { return; }
 
         contentWindow.postMessage({action, params, token}, this._targetOrigin);
+    }
+
+    _getFrameParentElement() {
+        const defaultParent = document.body;
+        const fullscreenElement = DOM.getFullscreenElement();
+        if (fullscreenElement === null || fullscreenElement.shadowRoot) {
+            return defaultParent;
+        }
+
+        switch (fullscreenElement.nodeName.toUpperCase()) {
+            case 'IFRAME':
+            case 'FRAME':
+                return defaultParent;
+        }
+
+        return fullscreenElement;
     }
 
     static _getPositionForHorizontalText(elementRect, width, height, viewport, offsetScale, optionsGeneral) {
