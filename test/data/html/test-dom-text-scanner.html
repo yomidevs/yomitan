@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Yomichan DOMTextScanner Tests</title>
+        <link rel="icon" type="image/gif" href="data:image/gif;base64,R0lGODlhEAAQAKEBAAAAAP///////////yH5BAEKAAIALAAAAAAQABAAAAImFI6Zpt0B4YkS0TCpq07xbmEgcGVRUpLaI46ZG7ppalY0jDCwUAAAOw==" />
+        <link rel="stylesheet" href="test-stylesheet.css" />
+    </head>
+<body>
+
+    <h1>Yomichan DOMTextScanner Tests</h1>
+
+    <y-test
+        data-test-data='{
+            "node": "div:nth-of-type(1)",
+            "offset": 0,
+            "length": 15,
+            "expected": {
+                "node": "div:nth-of-type(2)>div::text",
+                "offset": 3,
+                "content": "小ぢん\nまり1\n小ぢん\nまり2"
+            }
+        }'
+    >
+        <y-description>Layout newlines expected due to entering and exiting display:block nodes.</y-description>
+<div><div>小ぢん</div>まり1</div>
+<div>小ぢん<div>まり2</div></div>
+    </y-test>
+
+    <y-test
+        data-test-data='{
+            "node": "div:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 13,
+            "expected": {
+                "node": "div:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1\n小ぢんまり2"
+            }
+        }'
+    >
+        <y-description>Layout newline expected due to sequential display:block elements.</y-description>
+<div>小ぢんまり1</div><div>小ぢんまり2</div>
+    </y-test>
+
+    <y-test
+        data-test-data='{
+            "node": "div:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 13,
+            "expected": {
+                "node": "div:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1\n小ぢんまり2"
+            }
+        }'
+    >
+        <y-description>Layout newline expected due to sequential display:block elements separated by a newline.</y-description>
+<div>小ぢんまり1</div>
+<div>小ぢんまり2</div>
+    </y-test>
+
+    <y-test
+        data-test-data='{
+            "node": "span:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 12,
+            "expected": {
+                "node": "span:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1小ぢんまり2"
+            }
+        }'
+    >
+        <y-description>No newlines expected due to display:inline.</y-description>
+<span>小ぢんまり1</span><span>小ぢんまり2</span>
+    </y-test>
+
+    <y-test
+        data-test-data='{
+            "node": "span:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 13,
+            "expected": {
+                "node": "span:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1\n小ぢんまり2"
+            }
+        }'
+    >
+        <y-description>No newlines expected due to white-space:normal.</y-description>
+<span>小ぢんまり1</span>
+<span>小ぢんまり2</span>
+    </y-test>
+
+    <y-test
+        data-test-data='{
+            "node": "span:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 13,
+            "expected": {
+                "node": "span:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1\n小ぢんまり2"
+            }
+        }'
+    >
+        <y-description>Newline expected due to white-space:pre.</y-description>
+<pre>
+<span>小ぢんまり1</span>
+<span>小ぢんまり2</span>
+</pre>
+    </y-test>
+
+    <y-test
+        data-test-data='{
+            "node": "span:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 12,
+            "expected": {
+                "node": "span:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1小ぢんまり2"
+            }
+        }'
+    >
+        <y-description>No newlines expected due to display:inline-block. Actual layout flow cannot be determined by DOM/CSS alone.</y-description>
+<span style="display: inline-block;">小ぢんまり1</span><span style="display: inline-block;">小ぢんまり2</span>
+    </y-test>
+
+    <y-test
+        style="position: relative;"
+        data-test-data='{
+            "node": "div:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 13,
+            "expected": {
+                "node": "div:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1\n小ぢんまり2"
+            }
+        }'
+    >
+        <y-description>Single newline expected due to display:block layout.</y-description>
+<div>小ぢんまり1</div><div style="position: relative;">小ぢんまり2</div>
+    </y-test>
+
+    <y-test
+        style="position: relative; overflow: hidden;"
+        data-test-data='{
+            "node": "div:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 14,
+            "expected": {
+                "node": "div:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1\n\n小ぢんまり2"
+            }
+        }'
+    >
+        <y-description>Two newlines expected due to position:absolute causing a significant layout change.</y-description>
+<div>小ぢんまり1</div><div style="position: absolute;">小ぢんまり2</div>
+    </y-test>
+
+    <y-test
+        style="position: relative; overflow: hidden;"
+        data-test-data='{
+            "node": "div:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 14,
+            "expected": {
+                "node": "div:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1\n\n小ぢんまり2"
+            }
+        }'
+    >
+        <y-description>Two newlines expected due to position:fixed causing a significant layout change.</y-description>
+<div>小ぢんまり1</div><div style="position: fixed;">小ぢんまり2</div>
+    </y-test>
+
+    <y-test
+        style="position: relative;"
+        data-test-data='{
+            "node": "div:nth-of-type(1)::text",
+            "offset": 0,
+            "length": 14,
+            "expected": {
+                "node": "div:nth-of-type(2)::text",
+                "offset": 6,
+                "content": "小ぢんまり1\n\n小ぢんまり2"
+            }
+        }'
+    >
+        <y-description>Two newlines expected due to position:sticky being able to cause a significant layout change.</y-description>
+<div>小ぢんまり1</div><div style="position: sticky;">小ぢんまり2</div>
+    </y-test>
+
+    <y-test
+        data-test-data='{
+            "node": "rt",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::text",
+                "offset": 5,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <y-description>Scanning text starting in an &lt;rt&gt; element. Should start scanning at the start of the &lt;ruby&gt; tag instead.</y-description>
+<div><ruby>小<rp>(</rp><rt>こ</rt><rp>)</rp></ruby>ぢんまり1</div>
+    </y-test>
+
+    <y-test
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <y-description>Skip &lt;script&gt; content.</y-description>
+<div>小ぢん<script>/*comment*/</script>まり1</div>
+    </y-test>
+
+    <y-test
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <y-description>Skip &lt;style&gt; content.</y-description>
+<div>小ぢん<style>/*comment*/</style>まり1</div>
+    </y-test>
+
+    <y-test
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <y-description>Skip &lt;textarea&gt; content.</y-description>
+<div>小ぢん<textarea>textarea content</textarea>まり1</div>
+    </y-test>
+
+    <y-test
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <y-description>Skip &lt;input&gt; content.</y-description>
+<div>小ぢん<input value="content" />まり1</div>
+    </y-test>
+
+    <y-test
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <y-description>Skip &lt;button&gt; content.</y-description>
+<div>小ぢん<button>content</button>まり1</div>
+    </y-test>
+
+    <y-test
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <y-description>Skip content with font-size:0.</y-description>
+<div>小ぢん<span style="font-size: 0;">content</span>まり1</div>
+    </y-test>
+
+    <y-test
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <y-description>Skip content with opacity:0.</y-description>
+<div>小ぢん<span style="opacity: 0;">content</span>まり1</div>
+    </y-test>
+
+    <y-test
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <y-description>Skip content with visibility:hidden.</y-description>
+<div>小ぢん<span style="visibility: hidden;">content</span>まり1</div>
+    </y-test>
+
+    <y-test
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <y-description>Skip content with display:none.</y-description>
+<div>小ぢん<span style="display: none;">content</span>まり1</div>
+    </y-test>
+
+    <y-test
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <y-description>Don't skip content with user-select:none.</y-description>
+<div>小ぢ<span style="user-select: none;">ん</span>まり1</div>
+    </y-test>
+
+    <y-test
+        data-test-data='{
+            "node": "div",
+            "offset": 0,
+            "length": 6,
+            "expected": {
+                "node": "div::nth-text(2)",
+                "offset": 3,
+                "content": "小ぢんまり1"
+            }
+        }'
+    >
+        <y-description>Skip content with user-select:none <em>and</em> a transparent color.</y-description>
+<div>小ぢん<span style="user-select: none; color: rgba(0, 0, 0, 0);">content</span>まり1</div>
+    </y-test>
+
+</body>
+</html>
