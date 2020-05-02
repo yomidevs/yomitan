@@ -42,25 +42,6 @@ class AnkiNoteBuilder {
             note.fields[fieldName] = await this.formatField(fieldValue, definition, mode, context, options, templates, null);
         }
 
-        if (!isKanji && definition.audio) {
-            const audioFields = [];
-
-            for (const [fieldName, fieldValue] of modeOptionsFieldEntries) {
-                if (fieldValue.includes('{audio}')) {
-                    audioFields.push(fieldName);
-                }
-            }
-
-            if (audioFields.length > 0) {
-                note.audio = {
-                    url: definition.audio.url,
-                    filename: definition.audio.filename,
-                    skipHash: '7e2c2f954ef6051373ba916f000168dc', // hash of audio data that should be skipped
-                    fields: audioFields
-                };
-            }
-        }
-
         return note;
     }
 
@@ -88,18 +69,31 @@ class AnkiNoteBuilder {
         });
     }
 
-    async injectAudio(definition, fields, sources, details) {
+    async injectAudio(definition, fields, sources, customSourceUrl) {
         if (!this._containsMarker(fields, 'audio')) { return; }
 
         try {
             const expressions = definition.expressions;
             const audioSourceDefinition = Array.isArray(expressions) ? expressions[0] : definition;
 
-            const {uri} = await this._audioSystem.getDefinitionAudio(audioSourceDefinition, sources, details);
             const filename = this._createInjectedAudioFileName(audioSourceDefinition);
-            if (filename !== null) {
-                definition.audio = {url: uri, filename};
-            }
+            if (filename === null) { return; }
+
+            const {audio} = await this._audioSystem.getDefinitionAudio(
+                audioSourceDefinition,
+                sources,
+                {
+                    textToSpeechVoice: null,
+                    customSourceUrl,
+                    binary: true,
+                    disableCache: true
+                }
+            );
+
+            const data = AnkiNoteBuilder.arrayBufferToBase64(audio);
+            await this._anki.storeMediaFile(filename, data);
+
+            definition.audioFileName = filename;
         } catch (e) {
             // NOP
         }
@@ -129,6 +123,7 @@ class AnkiNoteBuilder {
         if (reading) { filename += `_${reading}`; }
         if (expression) { filename += `_${expression}`; }
         filename += '.mp3';
+        filename = filename.replace(/\]/g, '');
         return filename;
     }
 
@@ -150,6 +145,10 @@ class AnkiNoteBuilder {
             }
         }
         return false;
+    }
+
+    static arrayBufferToBase64(arrayBuffer) {
+        return window.btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
     }
 
     static stringReplaceAsync(str, regex, replacer) {

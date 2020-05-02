@@ -507,7 +507,7 @@ class Backend {
                 definition,
                 options.anki.terms.fields,
                 options.audio.sources,
-                {textToSpeechVoice: null, customSourceUrl}
+                customSourceUrl
             );
         }
 

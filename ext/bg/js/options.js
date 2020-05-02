@@ -108,6 +108,25 @@ const profileOptionsVersionUpdates = [
             fieldTemplates += '\n\n{{#*inline "document-title"}}\n    {{~context.document.title~}}\n{{/inline}}';
             options.anki.fieldTemplates = fieldTemplates;
         }
+    },
+    (options) => {
+        // Version 14 changes:
+        //  Changed template for Anki audio.
+        let fieldTemplates = options.anki.fieldTemplates;
+        if (typeof fieldTemplates !== 'string') { return; }
+
+        const replacement = '{{#*inline "audio"~}}\n    [sound:{{definition.audioFileName}}]\n{{~/inline}}';
+        let replaced = false;
+        fieldTemplates = fieldTemplates.replace(/\{\{#\*inline "audio"\}\}\{\{\/inline\}\}/g, () => {
+            replaced = true;
+            return replacement;
+        });
+
+        if (!replaced) {
+            fieldTemplates += '\n\n' + replacement;
+        }
+
+        options.anki.fieldTemplates = fieldTemplates;
     }
 ];
 
