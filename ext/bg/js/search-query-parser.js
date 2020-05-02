@@ -86,6 +86,7 @@ class QueryParser extends TextScanner {
 
     setOptions(options) {
         super.setOptions(options);
+        super.setEnabled(true);
         this.queryParser.dataset.termSpacing = `${options.parsing.termSpacing}`;
     }
 

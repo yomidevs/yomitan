@@ -25,14 +25,8 @@
  * docSentenceExtract
  */
 
-class Frontend extends TextScanner {
+class Frontend {
     constructor(popup, getUrl=null) {
-        super(
-            window,
-            () => this.popup.isProxy() ? [] : [this.popup.getContainer()],
-            [(x, y) => this.popup.containsPoint(x, y)]
-        );
-
         this._id = yomichan.generateId(16);
 
         this.popup = popup;
@@ -41,15 +35,23 @@ class Frontend extends TextScanner {
 
         this._disabledOverride = false;
 
-        this.options = null;
+        this._options = null;
 
         this._pageZoomFactor = 1.0;
         this._contentScale = 1.0;
         this._orphaned = false;
         this._lastShowPromise = Promise.resolve();
 
+        this._enabledEventListeners = new EventListenerCollection();
+        this._textScanner = new TextScanner(
+            window,
+            () => this.popup.isProxy() ? [] : [this.popup.getContainer()],
+            [(x, y) => this.popup.containsPoint(x, y)]
+        );
+        this._textScanner.onSearchSource = this.onSearchSource.bind(this);
+
         this._windowMessageHandlers = new Map([
-            ['popupClose', () => this.clearSelection(false)],
+            ['popupClose', () => this._textScanner.clearSelection(false)],
             ['selectionCopy', () => document.execCommand('copy')]
         ]);
 
@@ -58,6 +60,14 @@ class Frontend extends TextScanner {
             ['rootPopupRequestInformationBroadcast', () => { this._broadcastRootPopupInformation(); }],
             ['requestDocumentInformationBroadcast', ({uniqueId}) => { this._broadcastDocumentInformation(uniqueId); }]
         ]);
+    }
+
+    get canClearSelection() {
+        return this._textScanner.canClearSelection;
+    }
+
+    set canClearSelection(value) {
+        this._textScanner.canClearSelection = value;
     }
 
     async prepare() {
@@ -79,7 +89,7 @@ class Frontend extends TextScanner {
             yomichan.on('zoomChanged', this.onZoomChanged.bind(this));
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
 
-            this.on('clearSelection', this.onClearSelection.bind(this));
+            this._textScanner.on('clearSelection', this.onClearSelection.bind(this));
 
             this._updateContentScale();
             this._broadcastRootPopupInformation();
@@ -129,42 +139,43 @@ class Frontend extends TextScanner {
         this._updateContentScale();
     }
 
-    getMouseEventListeners() {
-        return [
-            ...super.getMouseEventListeners(),
-            [window, 'message', this.onWindowMessage.bind(this)]
-        ];
-    }
-
     setDisabledOverride(disabled) {
         this._disabledOverride = disabled;
-        this.setEnabled(this.options.general.enable, this._canEnable());
+        this._updateTextScannerEnabled();
     }
 
     async setPopup(popup) {
-        this.clearSelection(true);
+        this._textScanner.clearSelection(true);
         this.popup = popup;
         await popup.setOptionsContext(await this.getOptionsContext(), this._id);
     }
 
     async updateOptions() {
         const optionsContext = await this.getOptionsContext();
-        this.options = await apiOptionsGet(optionsContext);
-        this.setOptions(this.options, this._canEnable());
+        this._options = await apiOptionsGet(optionsContext);
+        this._textScanner.setOptions(this._options);
+        this._updateTextScannerEnabled();
 
         const ignoreNodes = ['.scan-disable', '.scan-disable *'];
-        if (!this.options.scanning.enableOnPopupExpressions) {
+        if (!this._options.scanning.enableOnPopupExpressions) {
             ignoreNodes.push('.source-text', '.source-text *');
         }
-        this.ignoreNodes = ignoreNodes.join(',');
+        this._textScanner.ignoreNodes = ignoreNodes.join(',');
 
         await this.popup.setOptionsContext(optionsContext, this._id);
 
         this._updateContentScale();
 
-        if (this.textSourceCurrent !== null && this.causeCurrent !== null) {
-            await this.onSearchSource(this.textSourceCurrent, this.causeCurrent);
+        const textSourceCurrent = this._textScanner.getCurrentTextSource();
+        const causeCurrent = this._textScanner.causeCurrent;
+        if (textSourceCurrent !== null && causeCurrent !== null) {
+            await this.onSearchSource(textSourceCurrent, causeCurrent);
         }
+    }
+
+    async setTextSource(textSource) {
+        await this.onSearchSource(textSource, 'script');
+        this._textScanner.setCurrentTextSource(textSource);
     }
 
     async onSearchSource(textSource, cause) {
@@ -184,15 +195,15 @@ class Frontend extends TextScanner {
             }
         } catch (e) {
             if (this._orphaned) {
-                if (textSource !== null && this.options.scanning.modifier !== 'none') {
+                if (textSource !== null && this._options.scanning.modifier !== 'none') {
                     this._showPopupContent(textSource, await this.getOptionsContext(), 'orphaned');
                 }
             } else {
                 yomichan.logError(e);
             }
         } finally {
-            if (results === null && this.options.scanning.autoHideResults) {
-                this.clearSelection(false);
+            if (results === null && this._options.scanning.autoHideResults) {
+                this._textScanner.clearSelection(false);
             }
         }
 
@@ -201,7 +212,7 @@ class Frontend extends TextScanner {
 
     showContent(textSource, focus, definitions, type, optionsContext) {
         const {url} = optionsContext;
-        const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
+        const sentence = docSentenceExtract(textSource, this._options.anki.sentenceExt);
         this._showPopupContent(
             textSource,
             optionsContext,
@@ -215,7 +226,7 @@ class Frontend extends TextScanner {
     }
 
     async findTerms(textSource, optionsContext) {
-        this.setTextSourceScanLength(textSource, this.options.scanning.length);
+        this._textScanner.setTextSourceScanLength(textSource, this._options.scanning.length);
 
         const searchText = textSource.text();
         if (searchText.length === 0) { return null; }
@@ -229,7 +240,7 @@ class Frontend extends TextScanner {
     }
 
     async findKanji(textSource, optionsContext) {
-        this.setTextSourceScanLength(textSource, 1);
+        this._textScanner.setTextSourceScanLength(textSource, 1);
 
         const searchText = textSource.text();
         if (searchText.length === 0) { return null; }
@@ -263,8 +274,21 @@ class Frontend extends TextScanner {
         return this._lastShowPromise;
     }
 
+    _updateTextScannerEnabled() {
+        const enabled = (
+            this._options.general.enable &&
+            this.popup.depth <= this._options.scanning.popupNestingMaxDepth &&
+            !this._disabledOverride
+        );
+        this._enabledEventListeners.removeAllEventListeners();
+        this._textScanner.setEnabled(enabled);
+        if (enabled) {
+            this._enabledEventListeners.addEventListener(window, 'message', this.onWindowMessage.bind(this));
+        }
+    }
+
     _updateContentScale() {
-        const {popupScalingFactor, popupScaleRelativeToPageZoom, popupScaleRelativeToVisualViewport} = this.options.general;
+        const {popupScalingFactor, popupScaleRelativeToPageZoom, popupScaleRelativeToVisualViewport} = this._options.general;
         let contentScale = popupScalingFactor;
         if (popupScaleRelativeToPageZoom) {
             contentScale /= this._pageZoomFactor;
@@ -295,12 +319,8 @@ class Frontend extends TextScanner {
         });
     }
 
-    _canEnable() {
-        return this.popup.depth <= this.options.scanning.popupNestingMaxDepth && !this._disabledOverride;
-    }
-
     async _updatePopupPosition() {
-        const textSource = this.getCurrentTextSource();
+        const textSource = this._textScanner.getCurrentTextSource();
         if (textSource !== null && await this.popup.isVisible()) {
             this._showPopupContent(textSource, await this.getOptionsContext());
         }

@@ -66,12 +66,10 @@ class SettingsPopupPreview {
         this.popup.setCustomOuterCss = this.popupSetCustomOuterCss.bind(this);
 
         this.frontend = new Frontend(this.popup);
-
         this.frontend.getOptionsContext = async () => this.optionsContext;
-        this.frontend.setEnabled = () => {};
-        this.frontend.clearSelection = () => {};
-
         await this.frontend.prepare();
+        this.frontend.setDisabledOverride(true);
+        this.frontend.canClearSelection = false;
 
         // Update search
         this.updateSearch();
@@ -169,8 +167,7 @@ class SettingsPopupPreview {
         const source = new TextSourceRange(range, range.toString(), null, null);
 
         try {
-            await this.frontend.onSearchSource(source, 'script');
-            this.frontend.setCurrentTextSource(source);
+            await this.frontend.setTextSource(source);
         } finally {
             source.cleanup();
         }

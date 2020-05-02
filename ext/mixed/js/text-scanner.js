@@ -45,6 +45,16 @@ class TextScanner extends EventDispatcher {
         this.preventNextMouseDown = false;
         this.preventNextClick = false;
         this.preventScroll = false;
+
+        this._canClearSelection = true;
+    }
+
+    get canClearSelection() {
+        return this._canClearSelection;
+    }
+
+    set canClearSelection(value) {
+        this._canClearSelection = value;
     }
 
     onMouseOver(e) {
@@ -222,9 +232,9 @@ class TextScanner extends EventDispatcher {
         }
     }
 
-    setEnabled(enabled, canEnable) {
+    setEnabled(enabled) {
         this.eventListeners.removeAllEventListeners();
-        this.enabled = enabled && canEnable;
+        this.enabled = enabled;
         if (this.enabled) {
             this.hookEvents();
         } else {
@@ -233,9 +243,9 @@ class TextScanner extends EventDispatcher {
     }
 
     hookEvents() {
-        let eventListenerInfos = this.getMouseEventListeners();
+        const eventListenerInfos = this.getMouseEventListeners();
         if (this.options.scanning.touchInputEnabled) {
-            eventListenerInfos = eventListenerInfos.concat(this.getTouchEventListeners());
+            eventListenerInfos.push(...this.getTouchEventListeners());
         }
 
         for (const [node, type, listener, options] of eventListenerInfos) {
@@ -264,9 +274,8 @@ class TextScanner extends EventDispatcher {
         ];
     }
 
-    setOptions(options, canEnable=true) {
+    setOptions(options) {
         this.options = options;
-        this.setEnabled(this.options.general.enable, canEnable);
     }
 
     async searchAt(x, y, cause) {
@@ -324,6 +333,7 @@ class TextScanner extends EventDispatcher {
     }
 
     clearSelection(passive) {
+        if (!this._canClearSelection) { return; }
         if (this.textSourceCurrent !== null) {
             if (this.textSourceCurrentSelected) {
                 this.textSourceCurrent.deselect();
