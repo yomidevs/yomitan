@@ -31,8 +31,13 @@ const dynamicLoader = (() => {
     }
 
     function loadScripts(urls) {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             const parent = document.body;
+            if (parent === null) {
+                reject(new Error('Missing body'));
+                return;
+            }
+
             for (const url of urls) {
                 const node = parent.querySelector(`script[src='${escapeCSSAttribute(url)}']`);
                 if (node !== null) { continue; }
@@ -43,12 +48,11 @@ const dynamicLoader = (() => {
                 parent.appendChild(script);
             }
 
-            loadScriptSentinel(resolve);
+            loadScriptSentinel(parent, resolve, reject);
         });
     }
 
-    function loadScriptSentinel(resolve, reject) {
-        const parent = document.body;
+    function loadScriptSentinel(parent, resolve, reject) {
         const script = document.createElement('script');
 
         const sentinelEventName = 'dynamicLoaderSentinel';

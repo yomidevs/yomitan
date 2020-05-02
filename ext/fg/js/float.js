@@ -162,7 +162,9 @@ class DisplayFloat extends Display {
     }
 
     setContentScale(scale) {
-        document.body.style.fontSize = `${scale}em`;
+        const body = document.body;
+        if (body === null) { return; }
+        body.style.fontSize = `${scale}em`;
     }
 
     async getDocumentTitle() {

@@ -389,8 +389,13 @@ class Popup {
 
     _getSiteColor() {
         const color = [255, 255, 255];
-        Popup._addColor(color, Popup._getColorInfo(window.getComputedStyle(document.documentElement).backgroundColor));
-        Popup._addColor(color, Popup._getColorInfo(window.getComputedStyle(document.body).backgroundColor));
+        const {documentElement, body} = document;
+        if (documentElement !== null) {
+            Popup._addColor(color, Popup._getColorInfo(window.getComputedStyle(documentElement).backgroundColor));
+        }
+        if (body !== null) {
+            Popup._addColor(color, Popup._getColorInfo(window.getComputedStyle(body).backgroundColor));
+        }
         const dark = (color[0] < 128 && color[1] < 128 && color[2] < 128);
         return dark ? 'dark' : 'light';
     }
@@ -575,10 +580,11 @@ class Popup {
             }
         }
 
+        const body = document.body;
         return {
             left: 0,
             top: 0,
-            right: document.body.clientWidth,
+            right: (body !== null ? body.clientWidth : 0),
             bottom: window.innerHeight
         };
     }
