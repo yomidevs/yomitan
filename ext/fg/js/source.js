@@ -94,7 +94,15 @@ class TextSourceRange {
                 this.rangeStartOffset === other.rangeStartOffset
             );
         } else {
-            return this.range.compareBoundaryPoints(Range.START_TO_START, other.range) === 0;
+            try {
+                return this.range.compareBoundaryPoints(Range.START_TO_START, other.range) === 0;
+            } catch (e) {
+                if (e.name === 'WrongDocumentError') {
+                    // This can happen with shadow DOMs if the ranges are in different documents.
+                    return false;
+                }
+                throw e;
+            }
         }
     }
 
