@@ -20,38 +20,42 @@ class FrontendApiReceiver {
     constructor(source='', handlers=new Map()) {
         this._source = source;
         this._handlers = handlers;
-
-        chrome.runtime.onConnect.addListener(this.onConnect.bind(this));
     }
 
-    onConnect(port) {
+    prepare() {
+        chrome.runtime.onConnect.addListener(this._onConnect.bind(this));
+    }
+
+    _onConnect(port) {
         if (port.name !== 'frontend-api-receiver') { return; }
 
-        port.onMessage.addListener(this.onMessage.bind(this, port));
+        port.onMessage.addListener(this._onMessage.bind(this, port));
     }
 
-    onMessage(port, {id, action, params, target, senderId}) {
+    _onMessage(port, {id, action, params, target, senderId}) {
         if (target !== this._source) { return; }
 
         const handler = this._handlers.get(action);
         if (typeof handler !== 'function') { return; }
 
-        this.sendAck(port, id, senderId);
-
-        handler(params).then(
-            (result) => {
-                this.sendResult(port, id, senderId, {result});
-            },
-            (error) => {
-                this.sendResult(port, id, senderId, {error: errorToJson(error)});
-            });
+        this._sendAck(port, id, senderId);
+        this._invokeHandler(handler, params, port, id, senderId);
     }
 
-    sendAck(port, id, senderId) {
+    async _invokeHandler(handler, params, port, id, senderId) {
+        try {
+            const result = await handler(params);
+            this._sendResult(port, id, senderId, {result});
+        } catch (error) {
+            this._sendResult(port, id, senderId, {error: errorToJson(error)});
+        }
+    }
+
+    _sendAck(port, id, senderId) {
         port.postMessage({type: 'ack', id, senderId});
     }
 
-    sendResult(port, id, senderId, data) {
+    _sendResult(port, id, senderId, data) {
         port.postMessage({type: 'result', id, senderId, data});
     }
 }

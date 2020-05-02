@@ -70,7 +70,8 @@ class Backend {
 
         this.popupWindow = null;
 
-        this.apiForwarder = new BackendApiForwarder();
+        const apiForwarder = new BackendApiForwarder();
+        apiForwarder.prepare();
 
         this.messageToken = yomichan.generateId(16);
 

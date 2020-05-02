@@ -24,7 +24,6 @@
 class PopupProxyHost {
     constructor() {
         this._popups = new Map();
-        this._apiReceiver = null;
         this._frameId = null;
     }
 
@@ -35,7 +34,7 @@ class PopupProxyHost {
         if (typeof frameId !== 'number') { return; }
         this._frameId = frameId;
 
-        this._apiReceiver = new FrontendApiReceiver(`popup-proxy-host#${this._frameId}`, new Map([
+        const apiReceiver = new FrontendApiReceiver(`popup-proxy-host#${this._frameId}`, new Map([
             ['getOrCreatePopup', this._onApiGetOrCreatePopup.bind(this)],
             ['setOptionsContext', this._onApiSetOptionsContext.bind(this)],
             ['hide', this._onApiHide.bind(this)],
@@ -48,6 +47,7 @@ class PopupProxyHost {
             ['setContentScale', this._onApiSetContentScale.bind(this)],
             ['getHostUrl', this._onApiGetHostUrl.bind(this)]
         ]));
+        apiReceiver.prepare();
     }
 
     getOrCreatePopup(id=null, parentId=null, depth=null) {
