@@ -40,29 +40,30 @@ function createTestObject() {
 }
 
 
-function testGetProperty1() {
-    const object = createTestObject();
-    const accessor = new ObjectPropertyAccessor(object);
-
+function testGet1() {
     const data = [
-        [[], object],
-        [['0'], object['0']],
-        [['value1'], object.value1],
-        [['value1', 'value2'], object.value1.value2],
-        [['value1', 'value3'], object.value1.value3],
-        [['value1', 'value4'], object.value1.value4],
-        [['value5'], object.value5],
-        [['value5', 0], object.value5[0]],
-        [['value5', 1], object.value5[1]],
-        [['value5', 2], object.value5[2]]
+        [[], (object) => object],
+        [['0'], (object) => object['0']],
+        [['value1'], (object) => object.value1],
+        [['value1', 'value2'], (object) => object.value1.value2],
+        [['value1', 'value3'], (object) => object.value1.value3],
+        [['value1', 'value4'], (object) => object.value1.value4],
+        [['value5'], (object) => object.value5],
+        [['value5', 0], (object) => object.value5[0]],
+        [['value5', 1], (object) => object.value5[1]],
+        [['value5', 2], (object) => object.value5[2]]
     ];
 
-    for (const [pathArray, expected] of data) {
-        assert.strictEqual(accessor.getProperty(pathArray), expected);
+    for (const [pathArray, getExpected] of data) {
+        const object = createTestObject();
+        const accessor = new ObjectPropertyAccessor(object);
+        const expected = getExpected(object);
+
+        assert.strictEqual(accessor.get(pathArray), expected);
     }
 }
 
-function testGetProperty2() {
+function testGet2() {
     const object = createTestObject();
     const accessor = new ObjectPropertyAccessor(object);
 
@@ -89,15 +90,12 @@ function testGetProperty2() {
     ];
 
     for (const [pathArray, message] of data) {
-        assert.throws(() => accessor.getProperty(pathArray), {message});
+        assert.throws(() => accessor.get(pathArray), {message});
     }
 }
 
 
-function testSetProperty1() {
-    const object = createTestObject();
-    const accessor = new ObjectPropertyAccessor(object);
-
+function testSet1() {
     const testValue = {};
     const data = [
         ['0'],
@@ -112,17 +110,21 @@ function testSetProperty1() {
     ];
 
     for (const pathArray of data) {
-        accessor.setProperty(pathArray, testValue);
-        assert.strictEqual(accessor.getProperty(pathArray), testValue);
+        const object = createTestObject();
+        const accessor = new ObjectPropertyAccessor(object);
+
+        accessor.set(pathArray, testValue);
+        assert.strictEqual(accessor.get(pathArray), testValue);
     }
 }
 
-function testSetProperty2() {
+function testSet2() {
     const object = createTestObject();
     const accessor = new ObjectPropertyAccessor(object);
 
     const testValue = {};
     const data = [
+        [[], 'Invalid path'],
         [[0], 'Invalid path: [0]'],
         [['0', 'invalid'], 'Invalid path: ["0"].invalid'],
         [['value1', 'value2', 0], 'Invalid path: value1.value2[0]'],
@@ -137,7 +139,127 @@ function testSetProperty2() {
     ];
 
     for (const [pathArray, message] of data) {
-        assert.throws(() => accessor.setProperty(pathArray, testValue), {message});
+        assert.throws(() => accessor.set(pathArray, testValue), {message});
+    }
+}
+
+
+function testDelete1() {
+    const hasOwn = (object, property) => Object.prototype.hasOwnProperty.call(object, property);
+
+    const data = [
+        [['0'], (object) => !hasOwn(object, '0')],
+        [['value1', 'value2'], (object) => !hasOwn(object.value1, 'value2')],
+        [['value1', 'value3'], (object) => !hasOwn(object.value1, 'value3')],
+        [['value1', 'value4'], (object) => !hasOwn(object.value1, 'value4')],
+        [['value1'], (object) => !hasOwn(object, 'value1')],
+        [['value5'], (object) => !hasOwn(object, 'value5')]
+    ];
+
+    for (const [pathArray, validate] of data) {
+        const object = createTestObject();
+        const accessor = new ObjectPropertyAccessor(object);
+
+        accessor.delete(pathArray);
+        assert.ok(validate(object));
+    }
+}
+
+function testDelete2() {
+    const data = [
+        [[], 'Invalid path'],
+        [[0], 'Invalid path: [0]'],
+        [['0', 'invalid'], 'Invalid path: ["0"].invalid'],
+        [['value1', 'value2', 0], 'Invalid path: value1.value2[0]'],
+        [['value1', 'value3', 'invalid'], 'Invalid path: value1.value3.invalid'],
+        [['value1', 'value4', 'invalid'], 'Invalid path: value1.value4.invalid'],
+        [['value1', 'value4', 0], 'Invalid path: value1.value4[0]'],
+        [['value5', 1, 'invalid'], 'Invalid path: value5[1].invalid'],
+        [['value5', 2, 'invalid'], 'Invalid path: value5[2].invalid'],
+        [['value5', 2, 0], 'Invalid path: value5[2][0]'],
+        [['value5', 2, 0, 'invalid'], 'Invalid path: value5[2][0]'],
+        [['value5', 2.5], 'Invalid index'],
+        [['value5', 0], 'Invalid type'],
+        [['value5', 1], 'Invalid type'],
+        [['value5', 2], 'Invalid type']
+    ];
+
+    for (const [pathArray, message] of data) {
+        const object = createTestObject();
+        const accessor = new ObjectPropertyAccessor(object);
+
+        assert.throws(() => accessor.delete(pathArray), {message});
+    }
+}
+
+
+function testSwap1() {
+    const data = [
+        [['0'], true],
+        [['value1', 'value2'], true],
+        [['value1', 'value3'], true],
+        [['value1', 'value4'], true],
+        [['value1'], false],
+        [['value5', 0], true],
+        [['value5', 1], true],
+        [['value5', 2], true],
+        [['value5'], false]
+    ];
+
+    for (const [pathArray1, compareValues1] of data) {
+        for (const [pathArray2, compareValues2] of data) {
+            const object = createTestObject();
+            const accessor = new ObjectPropertyAccessor(object);
+
+            const value1a = accessor.get(pathArray1);
+            const value2a = accessor.get(pathArray2);
+
+            accessor.swap(pathArray1, pathArray2);
+
+            if (!compareValues1 || !compareValues2) { continue; }
+
+            const value1b = accessor.get(pathArray1);
+            const value2b = accessor.get(pathArray2);
+
+            assert.deepStrictEqual(value1a, value2b);
+            assert.deepStrictEqual(value2a, value1b);
+        }
+    }
+}
+
+function testSwap2() {
+    const data = [
+        [[], [], false, 'Invalid path 1'],
+        [['0'], [], false, 'Invalid path 2'],
+        [[], ['0'], false, 'Invalid path 1'],
+        [[0], ['0'], false, 'Invalid path 1: [0]'],
+        [['0'], [0], false, 'Invalid path 2: [0]']
+    ];
+
+    for (const [pathArray1, pathArray2, checkRevert, message] of data) {
+        const object = createTestObject();
+        const accessor = new ObjectPropertyAccessor(object);
+
+        let value1a;
+        let value2a;
+        if (checkRevert) {
+            try {
+                value1a = accessor.get(pathArray1);
+                value2a = accessor.get(pathArray2);
+            } catch (e) {
+                // NOP
+            }
+        }
+
+        assert.throws(() => accessor.swap(pathArray1, pathArray2), {message});
+
+        if (!checkRevert) { continue; }
+
+        const value1b = accessor.get(pathArray1);
+        const value2b = accessor.get(pathArray2);
+
+        assert.deepStrictEqual(value1a, value1b);
+        assert.deepStrictEqual(value2a, value2b);
     }
 }
 
@@ -272,10 +394,14 @@ function testIsValidPropertyType() {
 
 
 function main() {
-    testGetProperty1();
-    testGetProperty2();
-    testSetProperty1();
-    testSetProperty2();
+    testGet1();
+    testGet2();
+    testSet1();
+    testSet2();
+    testDelete1();
+    testDelete2();
+    testSwap1();
+    testSwap2();
     testGetPathString1();
     testGetPathString2();
     testGetPathArray1();
