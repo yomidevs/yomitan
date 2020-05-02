@@ -118,7 +118,8 @@ class TextSourceRange {
         return !(
             style.visibility === 'hidden' ||
             style.display === 'none' ||
-            parseFloat(style.fontSize) === 0);
+            parseFloat(style.fontSize) === 0
+        );
     }
 
     static getRubyElement(node) {

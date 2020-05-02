@@ -896,7 +896,9 @@ class Backend {
                 await Backend._focusTab(tab);
                 if (queryParams.query) {
                     await new Promise((resolve) => chrome.tabs.sendMessage(
-                        tab.id, {action: 'searchQueryUpdate', params: {text: queryParams.query}}, resolve
+                        tab.id,
+                        {action: 'searchQueryUpdate', params: {text: queryParams.query}},
+                        resolve
                     ));
                 }
                 return true;

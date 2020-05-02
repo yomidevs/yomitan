@@ -23,6 +23,7 @@
         "eqeqeq": "error",
         "func-names": ["error", "always"],
         "guard-for-in": "error",
+        "new-parens": "error",
         "no-case-declarations": "error",
         "no-const-assign": "error",
         "no-constant-condition": "off",
@@ -31,6 +32,7 @@
         "no-prototype-builtins": "error",
         "no-shadow": ["error", {"builtinGlobals": false}],
         "no-undef": "error",
+        "no-unexpected-multiline": "error",
         "no-unneeded-ternary": "error",
         "no-unused-vars": ["error", {"vars": "local", "args": "after-used", "argsIgnorePattern": "^_", "caughtErrors": "none"}],
         "no-unused-expressions": "error",
@@ -40,6 +42,7 @@
         "quotes": ["error", "single", "avoid-escape"],
         "require-atomic-updates": "off",
         "semi": "error",
+        "wrap-iife": ["error", "inside"],
 
         // Whitespace rules
         "brace-style": ["error", "1tbs", {"allowSingleLine": true}],
@@ -53,6 +56,7 @@
         "comma-spacing": ["error", { "before": false, "after": true }],
         "computed-property-spacing": ["error", "never"],
         "func-call-spacing": ["error", "never"],
+        "function-paren-newline": ["error", "multiline-arguments"],
         "generator-star-spacing": ["error", "before"],
         "key-spacing": ["error", {"beforeColon": false, "afterColon": true, "mode": "strict"}],
         "keyword-spacing": ["error", {"before": true, "after": true}],
@@ -61,6 +65,11 @@
         "object-curly-spacing": ["error", "never"],
         "rest-spread-spacing": ["error", "never"],
         "semi-spacing": ["error", {"before": false, "after": true}],
+        "space-before-function-paren": ["error", {
+            "anonymous": "never",
+            "named": "never",
+            "asyncArrow": "always"
+        }],
         "space-in-parens": ["error", "never"],
         "space-unary-ops": "error",
         "spaced-comment": ["error", "always"],
