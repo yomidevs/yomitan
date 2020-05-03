@@ -17,6 +17,7 @@
 
 /* global
  * ClipboardMonitor
+ * DOM
  * Display
  * QueryParser
  * apiClipboardGet
@@ -178,7 +179,7 @@ class DisplaySearch extends Display {
     }
 
     onKeyDown(e) {
-        const key = Display.getKeyFromEvent(e);
+        const key = DOM.getKeyFromEvent(e);
         const ignoreKeys = this._onKeyDownIgnoreKeys;
 
         const activeModifierMap = new Map([

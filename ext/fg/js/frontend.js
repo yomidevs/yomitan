@@ -50,6 +50,9 @@ class Frontend {
         );
         this._textScanner.onSearchSource = this.onSearchSource.bind(this);
 
+        this._activeModifiers = new Set();
+        this._optionsUpdatePending = false;
+
         this._windowMessageHandlers = new Map([
             ['popupClose', () => this._textScanner.clearSelection(false)],
             ['selectionCopy', () => document.execCommand('copy')]
@@ -90,6 +93,7 @@ class Frontend {
             chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
 
             this._textScanner.on('clearSelection', this.onClearSelection.bind(this));
+            this._textScanner.on('activeModifiersChanged', this.onActiveModifiersChanged.bind(this));
 
             this._updateContentScale();
             this._broadcastRootPopupInformation();
@@ -173,12 +177,21 @@ class Frontend {
         }
     }
 
+    async updatePendingOptions() {
+        if (this._optionsUpdatePending) {
+            this._optionsUpdatePending = false;
+            await this.updateOptions();
+        }
+    }
+
     async setTextSource(textSource) {
         await this.onSearchSource(textSource, 'script');
         this._textScanner.setCurrentTextSource(textSource);
     }
 
     async onSearchSource(textSource, cause) {
+        await this.updatePendingOptions();
+
         let results = null;
 
         try {
@@ -254,12 +267,24 @@ class Frontend {
     onClearSelection({passive}) {
         this.popup.hide(!passive);
         this.popup.clearAutoPlayTimer();
+        this.updatePendingOptions();
+    }
+
+    async onActiveModifiersChanged({modifiers}) {
+        if (areSetsEqual(modifiers, this._activeModifiers)) { return; }
+        this._activeModifiers = modifiers;
+        if (await this.popup.isVisible()) {
+            this._optionsUpdatePending = true;
+            return;
+        }
+        await this.updateOptions();
     }
 
     async getOptionsContext() {
         const url = this._getUrl !== null ? await this._getUrl() : window.location.href;
         const depth = this.popup.depth;
-        return {depth, url};
+        const modifierKeys = [...this._activeModifiers];
+        return {depth, url, modifierKeys};
     }
 
     _showPopupContent(textSource, optionsContext, type=null, details=null) {

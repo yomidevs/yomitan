@@ -146,6 +146,12 @@ function getSetIntersection(set1, set2) {
     return result;
 }
 
+function getSetDifference(set1, set2) {
+    return new Set(
+        [...set1].filter((value) => !set2.has(value))
+    );
+}
+
 
 /*
  * Async utilities

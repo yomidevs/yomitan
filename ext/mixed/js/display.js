@@ -338,7 +338,7 @@ class Display {
     }
 
     onKeyDown(e) {
-        const key = Display.getKeyFromEvent(e);
+        const key = DOM.getKeyFromEvent(e);
         const handler = this._onKeyDownHandlers.get(key);
         if (typeof handler === 'function') {
             if (handler(e)) {
@@ -962,11 +962,6 @@ class Display {
         const elementRect = element.getBoundingClientRect();
         const documentRect = document.documentElement.getBoundingClientRect();
         return elementRect.top - documentRect.top;
-    }
-
-    static getKeyFromEvent(event) {
-        const key = event.key;
-        return (typeof key === 'string' ? (key.length === 1 ? key.toUpperCase() : key) : '');
     }
 
     async _getNoteContext() {

@@ -63,6 +63,20 @@ class DOM {
         }
     }
 
+    static getActiveModifiers(event) {
+        const modifiers = new Set();
+        if (event.altKey) { modifiers.add('alt'); }
+        if (event.ctrlKey) { modifiers.add('ctrl'); }
+        if (event.metaKey) { modifiers.add('meta'); }
+        if (event.shiftKey) { modifiers.add('shift'); }
+        return modifiers;
+    }
+
+    static getKeyFromEvent(event) {
+        const key = event.key;
+        return (typeof key === 'string' ? (key.length === 1 ? key.toUpperCase() : key) : '');
+    }
+
     static getFullscreenElement() {
         return (
             document.fullscreenElement ||
