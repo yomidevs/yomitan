@@ -369,6 +369,7 @@ class TextScanner extends EventDispatcher {
             case 'alt': return mouseEvent.altKey;
             case 'ctrl': return mouseEvent.ctrlKey;
             case 'shift': return mouseEvent.shiftKey;
+            case 'meta': return mouseEvent.metaKey;
             case 'none': return true;
             default: return false;
         }
