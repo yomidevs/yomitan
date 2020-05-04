@@ -51,8 +51,7 @@ class QueryParser extends TextScanner {
     async onSearchSource(textSource, cause) {
         if (textSource === null) { return null; }
 
-        this.setTextSourceScanLength(textSource, this.options.scanning.length);
-        const searchText = textSource.text();
+        const searchText = this.getTextSourceContent(textSource, this.options.scanning.length);
         if (searchText.length === 0) { return; }
 
         const {definitions, length} = await apiTermsFind(searchText, {}, this.getOptionsContext());

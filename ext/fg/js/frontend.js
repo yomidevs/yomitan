@@ -239,9 +239,7 @@ class Frontend {
     }
 
     async findTerms(textSource, optionsContext) {
-        this._textScanner.setTextSourceScanLength(textSource, this._options.scanning.length);
-
-        const searchText = textSource.text();
+        const searchText = this._textScanner.getTextSourceContent(textSource, this._options.scanning.length);
         if (searchText.length === 0) { return null; }
 
         const {definitions, length} = await apiTermsFind(searchText, {}, optionsContext);
@@ -253,9 +251,7 @@ class Frontend {
     }
 
     async findKanji(textSource, optionsContext) {
-        this._textScanner.setTextSourceScanLength(textSource, 1);
-
-        const searchText = textSource.text();
+        const searchText = this._textScanner.getTextSourceContent(textSource, 1);
         if (searchText.length === 0) { return null; }
 
         const definitions = await apiKanjiFind(searchText, optionsContext);
