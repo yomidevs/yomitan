@@ -21,7 +21,7 @@
  * Display
  * QueryParser
  * apiClipboardGet
- * apiOptionsSet
+ * apiModifySettings
  * apiTermsFind
  * wanakana
  */
@@ -252,13 +252,19 @@ class DisplaySearch extends Display {
     }
 
     onWanakanaEnableChange(e) {
-        const enableWanakana = e.target.checked;
-        if (enableWanakana) {
+        const value = e.target.checked;
+        if (value) {
             wanakana.bind(this.query);
         } else {
             wanakana.unbind(this.query);
         }
-        apiOptionsSet({general: {enableWanakana}}, this.getOptionsContext());
+        apiModifySettings([{
+            action: 'set',
+            path: 'general.enableWanakana',
+            value,
+            scope: 'profile',
+            optionsContext: this.getOptionsContext()
+        }], 'search');
     }
 
     onClipboardMonitorEnableChange(e) {
@@ -268,7 +274,13 @@ class DisplaySearch extends Display {
                 (granted) => {
                     if (granted) {
                         this.clipboardMonitor.start();
-                        apiOptionsSet({general: {enableClipboardMonitor: true}}, this.getOptionsContext());
+                        apiModifySettings([{
+                            action: 'set',
+                            path: 'general.enableClipboardMonitor',
+                            value: true,
+                            scope: 'profile',
+                            optionsContext: this.getOptionsContext()
+                        }], 'search');
                     } else {
                         e.target.checked = false;
                     }
@@ -276,7 +288,13 @@ class DisplaySearch extends Display {
             );
         } else {
             this.clipboardMonitor.stop();
-            apiOptionsSet({general: {enableClipboardMonitor: false}}, this.getOptionsContext());
+            apiModifySettings([{
+                action: 'set',
+                path: 'general.enableClipboardMonitor',
+                value: false,
+                scope: 'profile',
+                optionsContext: this.getOptionsContext()
+            }], 'search');
         }
     }
 

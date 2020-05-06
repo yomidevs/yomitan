@@ -18,7 +18,7 @@
 /* global
  * QueryParserGenerator
  * TextScanner
- * apiOptionsSet
+ * apiModifySettings
  * apiTermsFind
  * apiTextParse
  * docSentenceExtract
@@ -72,8 +72,14 @@ class QueryParser extends TextScanner {
     }
 
     onParserChange(e) {
-        const selectedParser = e.target.value;
-        apiOptionsSet({parsing: {selectedParser}}, this.getOptionsContext());
+        const value = e.target.value;
+        apiModifySettings([{
+            action: 'set',
+            path: 'parsing.selectedParser',
+            value,
+            scope: 'profile',
+            optionsContext: this.getOptionsContext()
+        }], 'search');
     }
 
     getMouseEventListeners() {
@@ -92,8 +98,14 @@ class QueryParser extends TextScanner {
     refreshSelectedParser() {
         if (this.parseResults.length > 0) {
             if (!this.getParseResult()) {
-                const selectedParser = this.parseResults[0].id;
-                apiOptionsSet({parsing: {selectedParser}}, this.getOptionsContext());
+                const value = this.parseResults[0].id;
+                apiModifySettings([{
+                    action: 'set',
+                    path: 'parsing.selectedParser',
+                    value,
+                    scope: 'profile',
+                    optionsContext: this.getOptionsContext()
+                }], 'search');
             }
         }
     }

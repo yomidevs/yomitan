@@ -28,10 +28,6 @@ function apiOptionsGetFull() {
     return _apiInvoke('optionsGetFull');
 }
 
-function apiOptionsSet(changedOptions, optionsContext, source) {
-    return _apiInvoke('optionsSet', {changedOptions, optionsContext, source});
-}
-
 function apiOptionsSave(source) {
     return _apiInvoke('optionsSave', {source});
 }
@@ -158,6 +154,10 @@ function apiImportDictionaryArchive(archiveContent, details, onProgress) {
 
 function apiDeleteDictionary(dictionaryName, onProgress) {
     return _apiInvokeWithProgress('deleteDictionary', {dictionaryName}, onProgress);
+}
+
+function apiModifySettings(targets, source) {
+    return _apiInvoke('modifySettings', {targets, source});
 }
 
 function _apiCreateActionPort(timeout=5000) {

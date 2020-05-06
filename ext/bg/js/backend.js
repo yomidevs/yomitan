@@ -26,6 +26,7 @@
  * DictionaryImporter
  * JsonSchema
  * Mecab
+ * ObjectPropertyAccessor
  * Translator
  * conditionsTestValue
  * dictTermsSort
@@ -84,7 +85,6 @@ class Backend {
             ['optionsSchemaGet', {handler: this._onApiOptionsSchemaGet.bind(this), async: false}],
             ['optionsGet', {handler: this._onApiOptionsGet.bind(this), async: false}],
             ['optionsGetFull', {handler: this._onApiOptionsGetFull.bind(this), async: false}],
-            ['optionsSet', {handler: this._onApiOptionsSet.bind(this), async: true}],
             ['optionsSave', {handler: this._onApiOptionsSave.bind(this), async: true}],
             ['kanjiFind', {handler: this._onApiKanjiFind.bind(this), async: true}],
             ['termsFind', {handler: this._onApiTermsFind.bind(this), async: true}],
@@ -115,7 +115,8 @@ class Backend {
             ['getMedia', {handler: this._onApiGetMedia.bind(this), async: true}],
             ['log', {handler: this._onApiLog.bind(this), async: false}],
             ['logIndicatorClear', {handler: this._onApiLogIndicatorClear.bind(this), async: false}],
-            ['createActionPort', {handler: this._onApiCreateActionPort.bind(this), async: false}]
+            ['createActionPort', {handler: this._onApiCreateActionPort.bind(this), async: false}],
+            ['modifySettings', {handler: this._onApiModifySettings.bind(this), async: true}]
         ]);
         this._messageHandlersWithProgress = new Map([
             ['importDictionaryArchive', {handler: this._onApiImportDictionaryArchive.bind(this), async: true}],
@@ -258,8 +259,9 @@ class Backend {
         return this.optionsSchema;
     }
 
-    getFullOptions() {
-        return this.options;
+    getFullOptions(useSchema=false) {
+        const options = this.options;
+        return useSchema ? JsonSchema.createProxy(options, this.optionsSchema) : options;
     }
 
     setFullOptions(options) {
@@ -271,21 +273,22 @@ class Backend {
         }
     }
 
-    getOptions(optionsContext) {
-        return this.getProfile(optionsContext).options;
+    getOptions(optionsContext, useSchema=false) {
+        return this.getProfile(optionsContext, useSchema).options;
     }
 
-    getProfile(optionsContext) {
-        const profiles = this.options.profiles;
+    getProfile(optionsContext, useSchema=false) {
+        const options = this.getFullOptions(useSchema);
+        const profiles = options.profiles;
         if (typeof optionsContext.index === 'number') {
             return profiles[optionsContext.index];
         }
-        const profile = this.getProfileFromContext(optionsContext);
-        return profile !== null ? profile : this.options.profiles[this.options.profileCurrent];
+        const profile = this.getProfileFromContext(options, optionsContext);
+        return profile !== null ? profile : options.profiles[options.profileCurrent];
     }
 
-    getProfileFromContext(optionsContext) {
-        for (const profile of this.options.profiles) {
+    getProfileFromContext(options, optionsContext) {
+        for (const profile of options.profiles) {
             const conditionGroups = profile.conditionGroups;
             if (conditionGroups.length > 0 && Backend.testConditionGroups(conditionGroups, optionsContext)) {
                 return profile;
@@ -411,46 +414,6 @@ class Backend {
 
     _onApiOptionsGetFull() {
         return this.getFullOptions();
-    }
-
-    async _onApiOptionsSet({changedOptions, optionsContext, source}) {
-        const options = this.getOptions(optionsContext);
-
-        function getValuePaths(obj) {
-            const valuePaths = [];
-            const nodes = [{obj, path: []}];
-            while (nodes.length > 0) {
-                const node = nodes.pop();
-                for (const key of Object.keys(node.obj)) {
-                    const path = node.path.concat(key);
-                    const obj2 = node.obj[key];
-                    if (obj2 !== null && typeof obj2 === 'object') {
-                        nodes.unshift({obj: obj2, path});
-                    } else {
-                        valuePaths.push([obj2, path]);
-                    }
-                }
-            }
-            return valuePaths;
-        }
-
-        function modifyOption(path, value) {
-            let pivot = options;
-            for (const key of path.slice(0, -1)) {
-                if (!hasOwn(pivot, key)) {
-                    return false;
-                }
-                pivot = pivot[key];
-            }
-            pivot[path[path.length - 1]] = value;
-            return true;
-        }
-
-        for (const [value, path] of getValuePaths(changedOptions)) {
-            modifyOption(path, value);
-        }
-
-        await this._onApiOptionsSave({source});
     }
 
     async _onApiOptionsSave({source}) {
@@ -829,6 +792,20 @@ class Backend {
         await this.database.deleteDictionary(dictionaryName, {rate: 1000}, onProgress);
     }
 
+    async _onApiModifySettings({targets, source}) {
+        const results = [];
+        for (const target of targets) {
+            try {
+                this._modifySetting(target);
+                results.push({result: true});
+            } catch (e) {
+                results.push({error: errorToJson(e)});
+            }
+        }
+        await this._onApiOptionsSave({source});
+        return results;
+    }
+
     // Command handlers
 
     _createActionListenerPort(port, sender, handlers) {
@@ -987,6 +964,63 @@ class Backend {
     }
 
     // Utilities
+
+    _getModifySettingObject(target) {
+        const scope = target.scope;
+        switch (scope) {
+            case 'profile':
+                if (!isObject(target.optionsContext)) { throw new Error('Invalid optionsContext'); }
+                return this.getOptions(target.optionsContext, true);
+            case 'global':
+                return this.getFullOptions(true);
+            default:
+                throw new Error(`Invalid scope: ${scope}`);
+        }
+    }
+
+    async _modifySetting(target) {
+        const options = this._getModifySettingObject(target);
+        const accessor = new ObjectPropertyAccessor(options);
+        const action = target.action;
+        switch (action) {
+            case 'set':
+                {
+                    const {path, value} = target;
+                    if (typeof path !== 'string') { throw new Error('Invalid path'); }
+                    accessor.set(ObjectPropertyAccessor.getPathArray(path), value);
+                }
+                break;
+            case 'delete':
+                {
+                    const {path} = target;
+                    if (typeof path !== 'string') { throw new Error('Invalid path'); }
+                    accessor.delete(ObjectPropertyAccessor.getPathArray(path));
+                }
+                break;
+            case 'swap':
+                {
+                    const {path1, path2} = target;
+                    if (typeof path1 !== 'string') { throw new Error('Invalid path1'); }
+                    if (typeof path2 !== 'string') { throw new Error('Invalid path2'); }
+                    accessor.swap(ObjectPropertyAccessor.getPathArray(path1), ObjectPropertyAccessor.getPathArray(path2));
+                }
+                break;
+            case 'splice':
+                {
+                    const {path, start, deleteCount, items} = target;
+                    if (typeof path !== 'string') { throw new Error('Invalid path'); }
+                    if (typeof start !== 'number' || Math.floor(start) !== start) { throw new Error('Invalid start'); }
+                    if (typeof deleteCount !== 'number' || Math.floor(deleteCount) !== deleteCount) { throw new Error('Invalid deleteCount'); }
+                    if (!Array.isArray(items)) { throw new Error('Invalid items'); }
+                    const array = accessor.get(ObjectPropertyAccessor.getPathArray(path));
+                    if (!Array.isArray(array)) { throw new Error('Invalid target type'); }
+                    array.splice(start, deleteCount, ...items);
+                }
+                break;
+            default:
+                throw new Error(`Unknown action: ${action}`);
+        }
+    }
 
     _validatePrivilegedMessageSender(sender) {
         const url = sender.url;
