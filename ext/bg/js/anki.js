@@ -79,12 +79,12 @@ class AnkiConnect {
         return await this._invoke('guiBrowse', {query});
     }
 
-    async storeMediaFile(filename, dataBase64) {
+    async storeMediaFile(fileName, dataBase64) {
         if (!this._enabled) {
             throw new Error('AnkiConnect not enabled');
         }
         await this._checkVersion();
-        return await this._invoke('storeMediaFile', {filename, data: dataBase64});
+        return await this._invoke('storeMediaFile', {filename: fileName, data: dataBase64});
     }
 
     async findNoteIds(notes, duplicateScope) {
