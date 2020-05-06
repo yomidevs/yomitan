@@ -257,6 +257,8 @@ class Frontend {
         const definitions = await apiKanjiFind(searchText, optionsContext);
         if (definitions.length === 0) { return null; }
 
+        textSource.setEndOffset(1);
+
         return {definitions, type: 'kanji'};
     }
 

@@ -301,6 +301,11 @@ class DisplaySearch extends Display {
         this.queryParser.setText(interpretedQuery);
     }
 
+    async setContent(type, details) {
+        this.query.blur();
+        await super.setContent(type, details);
+    }
+
     setIntroVisible(visible, animate) {
         if (this.introVisible === visible) {
             return;
