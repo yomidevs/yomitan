@@ -103,7 +103,8 @@ async function testDomTextScanner(dom, {DOMTextScanner}) {
                 expected: {
                     node: expectedNode,
                     offset: expectedOffset,
-                    content: expectedContent
+                    content: expectedContent,
+                    remainder: expectedRemainder
                 }
             } = testDataItem;
 
@@ -115,10 +116,11 @@ async function testDomTextScanner(dom, {DOMTextScanner}) {
                 const scanner = new DOMTextScanner(node, offset, forcePreserveWhitespace, generateLayoutContent);
                 scanner.seek(length);
 
-                const {node: actualNode1, offset: actualOffset1, content: actualContent1} = scanner;
+                const {node: actualNode1, offset: actualOffset1, content: actualContent1, remainder: actualRemainder1} = scanner;
                 assert.strictEqual(actualContent1, expectedContent);
                 assert.strictEqual(actualOffset1, expectedOffset);
                 assert.strictEqual(actualNode1, expectedNode);
+                assert.strictEqual(actualRemainder1, expectedRemainder || 0);
             }
 
             // Substring tests
