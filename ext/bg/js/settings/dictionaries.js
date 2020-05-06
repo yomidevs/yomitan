@@ -17,8 +17,10 @@
 
 /* global
  * PageExitPrevention
+ * apiDeleteDictionary
  * apiGetDictionaryCounts
  * apiGetDictionaryInfo
+ * apiImportDictionaryArchive
  * apiOptionsGet
  * apiOptionsGetFull
  * apiPurgeDatabase
@@ -29,8 +31,6 @@
  * storageEstimate
  * storageUpdateStats
  * utilBackgroundIsolate
- * utilDatabaseDeleteDictionary
- * utilDatabaseImport
  */
 
 let dictionaryUI = null;
@@ -312,7 +312,7 @@ class SettingsDictionaryEntryUI {
                 progressBar.style.width = `${percent}%`;
             };
 
-            await utilDatabaseDeleteDictionary(this.dictionaryInfo.title, onProgress, {rate: 1000});
+            await apiDeleteDictionary(this.dictionaryInfo.title, onProgress);
         } catch (e) {
             dictionaryErrorsShow([e]);
         } finally {
@@ -679,7 +679,8 @@ async function onDictionaryImport(e) {
                 dictImportInfo.textContent = `(${i + 1} of ${ii})`;
             }
 
-            const {result, errors} = await utilDatabaseImport(files[i], updateProgress, importDetails);
+            const archiveContent = await dictReadFile(files[i]);
+            const {result, errors} = await apiImportDictionaryArchive(archiveContent, importDetails, updateProgress);
             for (const {options} of toIterable((await getOptionsFullMutable()).profiles)) {
                 const dictionaryOptions = SettingsDictionaryListUI.createDictionaryOptions();
                 dictionaryOptions.enabled = true;
@@ -711,6 +712,15 @@ async function onDictionaryImport(e) {
         dictControls.show();
         dictProgress.hide();
     }
+}
+
+function dictReadFile(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsBinaryString(file);
+    });
 }
 
 

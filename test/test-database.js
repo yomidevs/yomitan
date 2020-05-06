@@ -233,10 +233,10 @@ async function testDatabase1() {
                 let progressEvent = false;
                 await database.deleteDictionary(
                     title,
+                    {rate: 1000},
                     () => {
                         progressEvent = true;
-                    },
-                    {rate: 1000}
+                    }
                 );
                 assert.ok(progressEvent);
 
@@ -267,10 +267,10 @@ async function testDatabase1() {
         const {result, errors} = await dictionaryImporter.import(
             database,
             testDictionarySource,
+            {prefixWildcardsSupported: true},
             () => {
                 progressEvent = true;
-            },
-            {prefixWildcardsSupported: true}
+            }
         );
         vm.assert.deepStrictEqual(errors, []);
         vm.assert.deepStrictEqual(result, expectedSummary);
@@ -908,7 +908,7 @@ async function testDatabase2() {
 
     // Error: not prepared
     await assert.rejects(async () => await database.purge());
-    await assert.rejects(async () => await database.deleteDictionary(title, () => {}, {}));
+    await assert.rejects(async () => await database.deleteDictionary(title, {}, () => {}));
     await assert.rejects(async () => await database.findTermsBulk(['?'], titles, null));
     await assert.rejects(async () => await database.findTermsExactBulk(['?'], ['?'], titles));
     await assert.rejects(async () => await database.findTermsBySequenceBulk([1], title));
@@ -919,17 +919,17 @@ async function testDatabase2() {
     await assert.rejects(async () => await database.findTagForTitle('tag', title));
     await assert.rejects(async () => await database.getDictionaryInfo());
     await assert.rejects(async () => await database.getDictionaryCounts(titles, true));
-    await assert.rejects(async () => await dictionaryImporter.import(database, testDictionarySource, () => {}, {}));
+    await assert.rejects(async () => await dictionaryImporter.import(database, testDictionarySource, {}, () => {}));
 
     await database.prepare();
 
     // Error: already prepared
     await assert.rejects(async () => await database.prepare());
 
-    await dictionaryImporter.import(database, testDictionarySource, () => {}, {});
+    await dictionaryImporter.import(database, testDictionarySource, {}, () => {});
 
     // Error: dictionary already imported
-    await assert.rejects(async () => await dictionaryImporter.import(database, testDictionarySource, () => {}, {}));
+    await assert.rejects(async () => await dictionaryImporter.import(database, testDictionarySource, {}, () => {}));
 
     await database.close();
 }
@@ -956,7 +956,7 @@ async function testDatabase3() {
 
         let error = null;
         try {
-            await dictionaryImporter.import(database, testDictionarySource, () => {}, {});
+            await dictionaryImporter.import(database, testDictionarySource, {}, () => {});
         } catch (e) {
             error = e;
         }

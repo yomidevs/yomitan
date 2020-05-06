@@ -129,7 +129,7 @@ class Database {
         await this.prepare();
     }
 
-    async deleteDictionary(dictionaryName, onProgress, progressSettings) {
+    async deleteDictionary(dictionaryName, progressSettings, onProgress) {
         this._validate();
 
         const targets = [

@@ -117,7 +117,10 @@ class Backend {
             ['logIndicatorClear', {handler: this._onApiLogIndicatorClear.bind(this), async: false}],
             ['createActionPort', {handler: this._onApiCreateActionPort.bind(this), async: false}]
         ]);
-        this._messageHandlersWithProgress = new Map();
+        this._messageHandlersWithProgress = new Map([
+            ['importDictionaryArchive', {handler: this._onApiImportDictionaryArchive.bind(this), async: true}],
+            ['deleteDictionary', {handler: this._onApiDeleteDictionary.bind(this), async: true}]
+        ]);
 
         this._commandHandlers = new Map([
             ['search', this._onCommandSearch.bind(this)],
@@ -771,7 +774,8 @@ class Backend {
 
     async _onApiPurgeDatabase(params, sender) {
         this._validatePrivilegedMessageSender(sender);
-        return await this.translator.purgeDatabase();
+        this.translator.clearDatabaseCaches();
+        await this.database.purge();
     }
 
     async _onApiGetMedia({targets}) {
@@ -814,12 +818,23 @@ class Backend {
         return portName;
     }
 
+    async _onApiImportDictionaryArchive({archiveContent, details}, sender, onProgress) {
+        this._validatePrivilegedMessageSender(sender);
+        return await this.dictionaryImporter.import(this.database, archiveContent, details, onProgress);
+    }
+
+    async _onApiDeleteDictionary({dictionaryName}, sender, onProgress) {
+        this._validatePrivilegedMessageSender(sender);
+        this.translator.clearDatabaseCaches();
+        await this.database.deleteDictionary(dictionaryName, {rate: 1000}, onProgress);
+    }
+
     // Command handlers
 
     _createActionListenerPort(port, sender, handlers) {
         let hasStarted = false;
 
-        const onProgress = (data) => {
+        const onProgress = (...data) => {
             try {
                 if (port === null) { return; }
                 port.postMessage({type: 'progress', data});
@@ -847,7 +862,7 @@ class Backend {
                 port.postMessage({type: 'complete', data: result});
             } catch (e) {
                 if (port !== null) {
-                    port.postMessage({type: 'error', data: e});
+                    port.postMessage({type: 'error', data: errorToJson(e)});
                 }
                 cleanup();
             }

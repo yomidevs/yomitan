@@ -66,31 +66,6 @@ function utilBackend() {
     return backend;
 }
 
-async function utilDatabaseDeleteDictionary(dictionaryName, onProgress) {
-    return utilIsolate(await utilBackend().translator.database.deleteDictionary(
-        utilBackgroundIsolate(dictionaryName),
-        utilBackgroundFunctionIsolate(onProgress)
-    ));
-}
-
-async function utilDatabaseImport(data, onProgress, details) {
-    data = await utilReadFile(data);
-    return utilIsolate(await utilBackend().importDictionary(
-        utilBackgroundIsolate(data),
-        utilBackgroundFunctionIsolate(onProgress),
-        utilBackgroundIsolate(details)
-    ));
-}
-
-function utilReadFile(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = () => reject(reader.error);
-        reader.readAsBinaryString(file);
-    });
-}
-
 function utilReadFileArrayBuffer(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();

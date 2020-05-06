@@ -45,14 +45,8 @@ class Translator {
         this.deinflector = new Deinflector(reasons);
     }
 
-    async purgeDatabase() {
+    clearDatabaseCaches() {
         this.tagCache.clear();
-        await this.database.purge();
-    }
-
-    async deleteDictionary(dictionaryName) {
-        this.tagCache.clear();
-        await this.database.deleteDictionary(dictionaryName);
     }
 
     async getSequencedDefinitions(definitions, mainDictionary) {
