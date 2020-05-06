@@ -128,9 +128,9 @@ const profileConditionsDescriptor = {
             are: {
                 name: 'are',
                 placeholder: 'Press one or more modifier keys here',
-                defaultValue: '',
+                defaultValue: [],
                 type: 'keyMulti',
-                transform: (optionValue) => optionValue
+                transformInput: (optionValue) => optionValue
                     .split(' + ')
                     .filter((v) => v.length > 0)
                     .map((v) => _profileModifierNameToValue.get(v)),
@@ -142,9 +142,9 @@ const profileConditionsDescriptor = {
             areNot: {
                 name: 'are not',
                 placeholder: 'Press one or more modifier keys here',
-                defaultValue: '',
+                defaultValue: [],
                 type: 'keyMulti',
-                transform: (optionValue) => optionValue
+                transformInput: (optionValue) => optionValue
                     .split(' + ')
                     .filter((v) => v.length > 0)
                     .map((v) => _profileModifierNameToValue.get(v)),

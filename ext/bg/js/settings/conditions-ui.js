@@ -104,11 +104,11 @@ ConditionsUI.Container = class Container {
             if (hasOwn(conditionDescriptor.operators, operator)) {
                 const operatorDescriptor = conditionDescriptor.operators[operator];
                 if (hasOwn(operatorDescriptor, 'defaultValue')) {
-                    return {value: operatorDescriptor.defaultValue, fromOperator: true};
+                    return {value: this.isolate(operatorDescriptor.defaultValue), fromOperator: true};
                 }
             }
             if (hasOwn(conditionDescriptor, 'defaultValue')) {
-                return {value: conditionDescriptor.defaultValue, fromOperator: false};
+                return {value: this.isolate(conditionDescriptor.defaultValue), fromOperator: false};
             }
         }
         return {fromOperator: false};
@@ -205,6 +205,10 @@ ConditionsUI.Condition = class Condition {
         this.parent.save();
     }
 
+    isolate(object) {
+        return this.parent.isolate(object);
+    }
+
     updateTypes() {
         const conditionDescriptors = this.parent.parent.conditionDescriptors;
         const optionGroup = this.typeSelect.find('optgroup');
@@ -266,9 +270,9 @@ ConditionsUI.Condition = class Condition {
         this.inputInner.appendTo(this.input);
         this.inputInner.on('change', this.onInputChanged.bind(this));
 
-        const {valid} = this.validateValue(this.condition.value);
+        const {valid, value} = this.validateValue(this.condition.value);
         this.inputInner.toggleClass('is-invalid', !valid);
-        this.inputInner.val(this.condition.value);
+        this.inputInner.val(value);
     }
 
     createInputElement(objects) {
@@ -366,7 +370,7 @@ ConditionsUI.Condition = class Condition {
                 data.set('values', object.values);
             }
             if (hasOwn(object, 'defaultValue')) {
-                data.set('defaultValue', object.defaultValue);
+                data.set('defaultValue', this.isolate(object.defaultValue));
             }
         }
 
@@ -379,33 +383,35 @@ ConditionsUI.Condition = class Condition {
 
         const defaultValue = data.get('defaultValue');
         if (defaultValue !== null) {
-            inputInner.val(defaultValue);
+            inputInner.val(this.isolate(defaultValue));
         }
 
         return inputInner;
     }
 
-    validateValue(value) {
+    validateValue(value, isInput=false) {
         const conditionDescriptors = this.parent.parent.conditionDescriptors;
         let valid = true;
+        let inputTransformedValue = null;
         try {
-            value = conditionsNormalizeOptionValue(
+            [value, inputTransformedValue] = conditionsNormalizeOptionValue(
                 conditionDescriptors,
                 this.condition.type,
                 this.condition.operator,
-                value
+                value,
+                isInput
             );
         } catch (e) {
             valid = false;
         }
-        return {valid, value};
+        return {valid, value, inputTransformedValue};
     }
 
     onInputChanged() {
-        const {valid, value} = this.validateValue(this.inputInner.val());
+        const {valid, value, inputTransformedValue} = this.validateValue(this.inputInner.val(), true);
         this.inputInner.toggleClass('is-invalid', !valid);
         this.inputInner.val(value);
-        this.condition.value = value;
+        this.condition.value = inputTransformedValue !== null ? inputTransformedValue : value;
         this.save();
     }
 
