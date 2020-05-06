@@ -120,7 +120,7 @@ class SettingsPopupPreview {
         }
         this.themeChangeTimeout = setTimeout(() => {
             this.themeChangeTimeout = null;
-            this.frontend.popup.updateTheme();
+            this.popup.updateTheme();
         }, 300);
     }
 
@@ -141,12 +141,12 @@ class SettingsPopupPreview {
 
     setCustomCss(css) {
         if (this.frontend === null) { return; }
-        this.frontend.popup.setCustomCss(css);
+        this.popup.setCustomCss(css);
     }
 
     setCustomOuterCss(css) {
         if (this.frontend === null) { return; }
-        this.frontend.popup.setCustomOuterCss(css, false);
+        this.popup.setCustomOuterCss(css, false);
     }
 
     async updateOptionsContext(optionsContext) {
@@ -174,7 +174,7 @@ class SettingsPopupPreview {
         this.textSource = source;
         await this.frontend.showContentCompleted();
 
-        if (this.frontend.popup.isVisibleSync()) {
+        if (this.popup.isVisibleSync()) {
             this.popupShown = true;
         }
 
