@@ -22,8 +22,7 @@ const vm = new VM();
 vm.execute([
     'mixed/lib/wanakana.min.js',
     'mixed/js/japanese.js',
-    'bg/js/text-source-map.js',
-    'bg/js/japanese.js'
+    'bg/js/text-source-map.js'
 ]);
 const jp = vm.get('jp');
 const TextSourceMap = vm.get('TextSourceMap');
