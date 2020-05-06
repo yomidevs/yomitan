@@ -46,10 +46,14 @@ class TextSourceRange {
         return this.content;
     }
 
-    setEndOffset(length) {
-        const state = TextSourceRange.seekForward(this.range.startContainer, this.range.startOffset, length);
+    setEndOffset(length, fromEnd=false) {
+        const state = (
+            fromEnd ?
+            TextSourceRange.seekForward(this.range.endContainer, this.range.endOffset, length) :
+            TextSourceRange.seekForward(this.range.startContainer, this.range.startOffset, length)
+        );
         this.range.setEnd(state.node, state.offset);
-        this.content = state.content;
+        this.content = (fromEnd ? this.content + state.content : state.content);
         return length - state.remainder;
     }
 
