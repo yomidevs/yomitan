@@ -56,5 +56,6 @@ async function popupNestedInitialize(id, depth, parentFrameId, url) {
 
 (async () => {
     apiForwardLogsToBackend();
-    new DisplayFloat();
+    const display = new DisplayFloat();
+    await display.prepare();
 })();

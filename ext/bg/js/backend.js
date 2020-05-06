@@ -73,8 +73,6 @@ class Backend {
         const apiForwarder = new BackendApiForwarder();
         apiForwarder.prepare();
 
-        this.messageToken = yomichan.generateId(16);
-
         this._defaultBrowserActionTitle = null;
         this._isPrepared = false;
         this._prepareError = false;
@@ -98,6 +96,7 @@ class Backend {
             ['commandExec', {handler: this._onApiCommandExec.bind(this), async: false}],
             ['audioGetUri', {handler: this._onApiAudioGetUri.bind(this), async: true}],
             ['screenshotGet', {handler: this._onApiScreenshotGet.bind(this), async: true}],
+            ['sendMessageToFrame', {handler: this._onApiSendMessageToFrame.bind(this), async: false}],
             ['broadcastTab', {handler: this._onApiBroadcastTab.bind(this), async: false}],
             ['frameInformationGet', {handler: this._onApiFrameInformationGet.bind(this), async: true}],
             ['injectStylesheet', {handler: this._onApiInjectStylesheet.bind(this), async: true}],
@@ -106,7 +105,6 @@ class Backend {
             ['getDisplayTemplatesHtml', {handler: this._onApiGetDisplayTemplatesHtml.bind(this), async: true}],
             ['getQueryParserTemplatesHtml', {handler: this._onApiGetQueryParserTemplatesHtml.bind(this), async: true}],
             ['getZoom', {handler: this._onApiGetZoom.bind(this), async: true}],
-            ['getMessageToken', {handler: this._onApiGetMessageToken.bind(this), async: false}],
             ['getDefaultAnkiFieldTemplates', {handler: this._onApiGetDefaultAnkiFieldTemplates.bind(this), async: false}],
             ['getAnkiDeckNames', {handler: this._onApiGetAnkiDeckNames.bind(this), async: true}],
             ['getAnkiModelNames', {handler: this._onApiGetAnkiModelNames.bind(this), async: true}],
@@ -600,6 +598,17 @@ class Backend {
         });
     }
 
+    _onApiSendMessageToFrame({frameId, action, params}, sender) {
+        if (!(sender && sender.tab)) {
+            return false;
+        }
+
+        const tabId = sender.tab.id;
+        const callback = () => this.checkLastError(chrome.runtime.lastError);
+        chrome.tabs.sendMessage(tabId, {action, params}, {frameId}, callback);
+        return true;
+    }
+
     _onApiBroadcastTab({action, params}, sender) {
         if (!(sender && sender.tab)) {
             return false;
@@ -729,10 +738,6 @@ class Backend {
                 }
             });
         });
-    }
-
-    _onApiGetMessageToken() {
-        return this.messageToken;
     }
 
     _onApiGetDefaultAnkiFieldTemplates() {

@@ -76,6 +76,10 @@ function apiScreenshotGet(options) {
     return _apiInvoke('screenshotGet', {options});
 }
 
+function apiSendMessageToFrame(frameId, action, params) {
+    return _apiInvoke('sendMessageToFrame', {frameId, action, params});
+}
+
 function apiBroadcastTab(action, params) {
     return _apiInvoke('broadcastTab', {action, params});
 }
@@ -106,10 +110,6 @@ function apiGetQueryParserTemplatesHtml() {
 
 function apiGetZoom() {
     return _apiInvoke('getZoom');
-}
-
-function apiGetMessageToken() {
-    return _apiInvoke('getMessageToken');
 }
 
 function apiGetDefaultAnkiFieldTemplates() {

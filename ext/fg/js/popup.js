@@ -17,7 +17,6 @@
 
 /* global
  * DOM
- * apiGetMessageToken
  * apiInjectStylesheet
  * apiOptionsGet
  */
@@ -39,8 +38,9 @@ class Popup {
         this._contentScale = 1.0;
         this._containerSizeContentScale = null;
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
-        this._messageToken = null;
         this._previousOptionsContextSource = null;
+        this._containerSecret = null;
+        this._containerToken = null;
 
         this._container = document.createElement('iframe');
         this._container.className = 'yomichan-float';
@@ -216,40 +216,154 @@ class Popup {
         return injectPromise;
     }
 
-    async _createInjectPromise() {
-        if (this._messageToken === null) {
-            this._messageToken = await apiGetMessageToken();
-        }
+    _initializeFrame(frame, targetOrigin, frameId, setupFrame, timeout=10000) {
+        return new Promise((resolve, reject) => {
+            const tokenMap = new Map();
+            let timer = null;
+            let containerLoadedResolve = null;
+            let containerLoadedReject = null;
+            const containerLoaded = new Promise((resolve2, reject2) => {
+                containerLoadedResolve = resolve2;
+                containerLoadedReject = reject2;
+            });
 
+            const postMessage = (action, params) => {
+                const contentWindow = frame.contentWindow;
+                if (contentWindow === null) { throw new Error('Frame missing content window'); }
+
+                let validOrigin = true;
+                try {
+                    validOrigin = (contentWindow.location.origin === targetOrigin);
+                } catch (e) {
+                    // NOP
+                }
+                if (!validOrigin) { throw new Error('Unexpected frame origin'); }
+
+                contentWindow.postMessage({action, params}, targetOrigin);
+            };
+
+            const onMessage = (message) => {
+                onMessageInner(message);
+                return false;
+            };
+
+            const onMessageInner = async (message) => {
+                try {
+                    if (!isObject(message)) { return; }
+                    const {action, params} = message;
+                    if (!isObject(params)) { return; }
+                    await containerLoaded;
+                    if (timer === null) { return; } // Done
+
+                    switch (action) {
+                        case 'popupPrepared':
+                            {
+                                const {secret} = params;
+                                const token = yomichan.generateId(16);
+                                tokenMap.set(secret, token);
+                                postMessage('initialize', {secret, token, frameId});
+                            }
+                            break;
+                        case 'popupInitialized':
+                            {
+                                const {secret, token} = params;
+                                const token2 = tokenMap.get(secret);
+                                if (typeof token2 !== 'undefined' && token === token2) {
+                                    cleanup();
+                                    resolve({secret, token});
+                                }
+                            }
+                            break;
+                    }
+                } catch (e) {
+                    cleanup();
+                    reject(e);
+                }
+            };
+
+            const onLoad = () => {
+                if (containerLoadedResolve === null) {
+                    cleanup();
+                    reject(new Error('Unexpected load event'));
+                    return;
+                }
+
+                if (Popup.isFrameAboutBlank(frame)) {
+                    return;
+                }
+
+                containerLoadedResolve();
+                containerLoadedResolve = null;
+                containerLoadedReject = null;
+            };
+
+            const cleanup = () => {
+                if (timer === null) { return; } // Done
+                clearTimeout(timer);
+                timer = null;
+
+                containerLoadedResolve = null;
+                if (containerLoadedReject !== null) {
+                    containerLoadedReject(new Error('Terminated'));
+                    containerLoadedReject = null;
+                }
+
+                chrome.runtime.onMessage.removeListener(onMessage);
+                frame.removeEventListener('load', onLoad);
+            };
+
+            // Start
+            timer = setTimeout(() => {
+                cleanup();
+                reject(new Error('Timeout'));
+            }, timeout);
+
+            chrome.runtime.onMessage.addListener(onMessage);
+            frame.addEventListener('load', onLoad);
+
+            // Prevent unhandled rejections
+            containerLoaded.catch(() => {}); // NOP
+
+            setupFrame(frame);
+        });
+    }
+
+    async _createInjectPromise() {
+        this._injectStyles();
+
+        const {secret, token} = await this._initializeFrame(this._container, this._targetOrigin, this._frameId, (frame) => {
+            frame.removeAttribute('src');
+            frame.removeAttribute('srcdoc');
+            frame.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
+            this._observeFullscreen(true);
+            this._onFullscreenChanged();
+        });
+        this._containerSecret = secret;
+        this._containerToken = token;
+
+        // Configure
+        const messageId = yomichan.generateId(16);
         const popupPreparedPromise = yomichan.getTemporaryListenerResult(
             chrome.runtime.onMessage,
-            ({action, params}, {resolve}) => {
+            (message, {resolve}) => {
                 if (
-                    action === 'popupPrepareCompleted' &&
-                    isObject(params) &&
-                    params.targetPopupId === this._id
+                    isObject(message) &&
+                    message.action === 'popupConfigured' &&
+                    isObject(message.params) &&
+                    message.params.messageId === messageId
                 ) {
                     resolve();
                 }
             }
         );
-
-        const parentFrameId = (typeof this._frameId === 'number' ? this._frameId : null);
-        this._container.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
-        this._container.addEventListener('load', () => {
-            this._invokeApi('prepare', {
-                popupInfo: {
-                    id: this._id,
-                    parentFrameId
-                },
-                optionsContext: this._optionsContext,
-                childrenSupported: this._childrenSupported,
-                scale: this._contentScale
-            });
+        this._invokeApi('configure', {
+            messageId,
+            frameId: this._frameId,
+            popupId: this._id,
+            optionsContext: this._optionsContext,
+            childrenSupported: this._childrenSupported,
+            scale: this._contentScale
         });
-        this._observeFullscreen(true);
-        this._onFullscreenChanged();
-        this._injectStyles();
 
         return popupPreparedPromise;
     }
@@ -267,6 +381,8 @@ class Popup {
         this._container.removeAttribute('src');
         this._container.removeAttribute('srcdoc');
 
+        this._containerSecret = null;
+        this._containerToken = null;
         this._injectPromise = null;
         this._injectPromiseComplete = false;
     }
@@ -401,11 +517,12 @@ class Popup {
     }
 
     _invokeApi(action, params={}) {
-        const token = this._messageToken;
+        const secret = this._containerSecret;
+        const token = this._containerToken;
         const contentWindow = this._container.contentWindow;
-        if (token === null || contentWindow === null) { return; }
+        if (secret === null || token === null || contentWindow === null) { return; }
 
-        contentWindow.postMessage({action, params, token}, this._targetOrigin);
+        contentWindow.postMessage({action, params, secret, token}, this._targetOrigin);
     }
 
     _getFrameParentElement() {
@@ -652,6 +769,17 @@ class Popup {
         // Add to map
         injectedStylesheets.set(id, styleNode);
         return styleNode;
+    }
+
+    static isFrameAboutBlank(frame) {
+        try {
+            const contentDocument = frame.contentDocument;
+            if (contentDocument === null) { return false; }
+            const url = contentDocument.location.href;
+            return /^about:blank(?:[#?]|$)/.test(url);
+        } catch (e) {
+            return false;
+        }
     }
 }
 
