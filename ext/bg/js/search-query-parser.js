@@ -27,48 +27,67 @@
 class QueryParser {
     constructor({getOptionsContext, setContent, setSpinnerVisible}) {
         this._options = null;
-        this.getOptionsContext = getOptionsContext;
-        this.setContent = setContent;
-        this.setSpinnerVisible = setSpinnerVisible;
-
-        this.parseResults = [];
-
-        this.queryParser = document.querySelector('#query-parser-content');
-        this.queryParserSelect = document.querySelector('#query-parser-select-container');
-
-        this.queryParserGenerator = new QueryParserGenerator();
-
+        this._getOptionsContext = getOptionsContext;
+        this._setContent = setContent;
+        this._setSpinnerVisible = setSpinnerVisible;
+        this._parseResults = [];
+        this._queryParser = document.querySelector('#query-parser-content');
+        this._queryParserSelect = document.querySelector('#query-parser-select-container');
+        this._queryParserGenerator = new QueryParserGenerator();
         this._textScanner = new TextScanner(
-            this.queryParser,
+            this._queryParser,
             () => [],
             []
         );
-        this._textScanner.onSearchSource = this.onSearchSource.bind(this);
+        this._textScanner.onSearchSource = this._onSearchSource.bind(this);
     }
 
     async prepare() {
-        await this.queryParserGenerator.prepare();
-        this.queryParser.addEventListener('click', this.onClick2.bind(this));
+        await this._queryParserGenerator.prepare();
+        this._queryParser.addEventListener('click', this._onClick.bind(this));
     }
 
-    onClick2(e) {
+    setOptions(options) {
+        this._options = options;
+        this._textScanner.setOptions(options);
+        this._textScanner.setEnabled(true);
+        this._queryParser.dataset.termSpacing = `${options.parsing.termSpacing}`;
+    }
+
+    async setText(text) {
+        this._setSpinnerVisible(true);
+
+        this._setPreview(text);
+
+        this._parseResults = await apiTextParse(text, this._getOptionsContext());
+        this._refreshSelectedParser();
+
+        this._renderParserSelect();
+        this._renderParseResult();
+
+        this._setSpinnerVisible(false);
+    }
+
+    // Private
+
+    _onClick(e) {
         this._textScanner.searchAt(e.clientX, e.clientY, 'click');
     }
 
-    async onSearchSource(textSource, cause) {
+    async _onSearchSource(textSource, cause) {
         if (textSource === null) { return null; }
 
         const searchText = this._textScanner.getTextSourceContent(textSource, this._options.scanning.length);
         if (searchText.length === 0) { return; }
 
-        const {definitions, length} = await apiTermsFind(searchText, {}, this.getOptionsContext());
+        const {definitions, length} = await apiTermsFind(searchText, {}, this._getOptionsContext());
         if (definitions.length === 0) { return null; }
 
         const sentence = docSentenceExtract(textSource, this._options.anki.sentenceExt);
 
         textSource.setEndOffset(length);
 
-        this.setContent('terms', {definitions, context: {
+        this._setContent('terms', {definitions, context: {
             focus: false,
             disableHistory: cause === 'mouse',
             sentence,
@@ -78,82 +97,61 @@ class QueryParser {
         return {definitions, type: 'terms'};
     }
 
-    onParserChange(e) {
+    _onParserChange(e) {
         const value = e.target.value;
         apiModifySettings([{
             action: 'set',
             path: 'parsing.selectedParser',
             value,
             scope: 'profile',
-            optionsContext: this.getOptionsContext()
+            optionsContext: this._getOptionsContext()
         }], 'search');
     }
 
-    setOptions(options) {
-        this._options = options;
-        this._textScanner.setOptions(options);
-        this._textScanner.setEnabled(true);
-        this.queryParser.dataset.termSpacing = `${options.parsing.termSpacing}`;
-    }
-
-    refreshSelectedParser() {
-        if (this.parseResults.length > 0) {
-            if (!this.getParseResult()) {
-                const value = this.parseResults[0].id;
+    _refreshSelectedParser() {
+        if (this._parseResults.length > 0) {
+            if (!this._getParseResult()) {
+                const value = this._parseResults[0].id;
                 apiModifySettings([{
                     action: 'set',
                     path: 'parsing.selectedParser',
                     value,
                     scope: 'profile',
-                    optionsContext: this.getOptionsContext()
+                    optionsContext: this._getOptionsContext()
                 }], 'search');
             }
         }
     }
 
-    getParseResult() {
+    _getParseResult() {
         const {selectedParser} = this._options.parsing;
-        return this.parseResults.find((r) => r.id === selectedParser);
+        return this._parseResults.find((r) => r.id === selectedParser);
     }
 
-    async setText(text) {
-        this.setSpinnerVisible(true);
-
-        this.setPreview(text);
-
-        this.parseResults = await apiTextParse(text, this.getOptionsContext());
-        this.refreshSelectedParser();
-
-        this.renderParserSelect();
-        this.renderParseResult();
-
-        this.setSpinnerVisible(false);
-    }
-
-    setPreview(text) {
+    _setPreview(text) {
         const previewTerms = [];
         for (let i = 0, ii = text.length; i < ii; i += 2) {
             const tempText = text.substring(i, i + 2);
             previewTerms.push([{text: tempText, reading: ''}]);
         }
-        this.queryParser.textContent = '';
-        this.queryParser.appendChild(this.queryParserGenerator.createParseResult(previewTerms, true));
+        this._queryParser.textContent = '';
+        this._queryParser.appendChild(this._queryParserGenerator.createParseResult(previewTerms, true));
     }
 
-    renderParserSelect() {
-        this.queryParserSelect.textContent = '';
-        if (this.parseResults.length > 1) {
+    _renderParserSelect() {
+        this._queryParserSelect.textContent = '';
+        if (this._parseResults.length > 1) {
             const {selectedParser} = this._options.parsing;
-            const select = this.queryParserGenerator.createParserSelect(this.parseResults, selectedParser);
-            select.addEventListener('change', this.onParserChange.bind(this));
-            this.queryParserSelect.appendChild(select);
+            const select = this._queryParserGenerator.createParserSelect(this._parseResults, selectedParser);
+            select.addEventListener('change', this._onParserChange.bind(this));
+            this._queryParserSelect.appendChild(select);
         }
     }
 
-    renderParseResult() {
-        const parseResult = this.getParseResult();
-        this.queryParser.textContent = '';
+    _renderParseResult() {
+        const parseResult = this._getParseResult();
+        this._queryParser.textContent = '';
         if (!parseResult) { return; }
-        this.queryParser.appendChild(this.queryParserGenerator.createParseResult(parseResult.content));
+        this._queryParser.appendChild(this._queryParserGenerator.createParseResult(parseResult.content));
     }
 }
