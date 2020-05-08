@@ -41,7 +41,7 @@ class Frontend {
         this._optionsUpdatePending = false;
         this._textScanner = new TextScanner({
             node: window,
-            ignoreElements: () => this._popup.isProxy() ? [] : [this._popup.getContainer()],
+            ignoreElements: () => this._popup.isProxy() ? [] : [this._popup.getFrame()],
             ignorePoint: (x, y) => this._popup.containsPoint(x, y),
             search: this._search.bind(this)
         });

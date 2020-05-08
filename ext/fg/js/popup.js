@@ -36,23 +36,18 @@ class Popup {
         this._options = null;
         this._optionsContext = null;
         this._contentScale = 1.0;
-        this._containerSizeContentScale = null;
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
         this._previousOptionsContextSource = null;
-        this._containerSecret = null;
-        this._containerToken = null;
 
-        this._container = document.createElement('iframe');
-        this._container.className = 'yomichan-float';
-        this._container.addEventListener('mousedown', (e) => e.stopPropagation());
-        this._container.addEventListener('scroll', (e) => e.stopPropagation());
-        this._container.style.width = '0px';
-        this._container.style.height = '0px';
-        this._container.addEventListener('load', this._onFrameLoad.bind(this));
+        this._frameSizeContentScale = null;
+        this._frameSecret = null;
+        this._frameToken = null;
+        this._frame = document.createElement('iframe');
+        this._frame.className = 'yomichan-float';
+        this._frame.style.width = '0';
+        this._frame.style.height = '0';
 
         this._fullscreenEventListeners = new EventListenerCollection();
-
-        this._updateVisibility();
     }
 
     // Public properties
@@ -78,6 +73,13 @@ class Popup {
     }
 
     // Public functions
+
+    prepare() {
+        this._updateVisibility();
+        this._frame.addEventListener('mousedown', (e) => e.stopPropagation());
+        this._frame.addEventListener('scroll', (e) => e.stopPropagation());
+        this._frame.addEventListener('load', this._onFrameLoad.bind(this));
+    }
 
     isProxy() {
         return false;
@@ -118,7 +120,7 @@ class Popup {
 
     async containsPoint(x, y) {
         for (let popup = this; popup !== null && popup.isVisibleSync(); popup = popup._child) {
-            const rect = popup._container.getBoundingClientRect();
+            const rect = popup._frame.getBoundingClientRect();
             if (x >= rect.left && y >= rect.top && x < rect.right && y < rect.bottom) {
                 return true;
             }
@@ -173,12 +175,12 @@ class Popup {
     }
 
     updateTheme() {
-        this._container.dataset.yomichanTheme = this._options.general.popupOuterTheme;
-        this._container.dataset.yomichanSiteColor = this._getSiteColor();
+        this._frame.dataset.yomichanTheme = this._options.general.popupOuterTheme;
+        this._frame.dataset.yomichanSiteColor = this._getSiteColor();
     }
 
     async setCustomOuterCss(css, useWebExtensionApi) {
-        return await Popup._injectStylesheet(
+        return await this._injectStylesheet(
             'yomichan-popup-outer-user-stylesheet',
             'code',
             css,
@@ -190,12 +192,12 @@ class Popup {
         this._childrenSupported = value;
     }
 
-    getContainer() {
-        return this._container;
+    getFrame() {
+        return this._frame;
     }
 
-    getContainerRect() {
-        return this._container.getBoundingClientRect();
+    getFrameRect() {
+        return this._frame.getBoundingClientRect();
     }
 
     // Private functions
@@ -220,11 +222,11 @@ class Popup {
         return new Promise((resolve, reject) => {
             const tokenMap = new Map();
             let timer = null;
-            let containerLoadedResolve = null;
-            let containerLoadedReject = null;
-            const containerLoaded = new Promise((resolve2, reject2) => {
-                containerLoadedResolve = resolve2;
-                containerLoadedReject = reject2;
+            let frameLoadedResolve = null;
+            let frameLoadedReject = null;
+            const frameLoaded = new Promise((resolve2, reject2) => {
+                frameLoadedResolve = resolve2;
+                frameLoadedReject = reject2;
             });
 
             const postMessage = (action, params) => {
@@ -252,7 +254,7 @@ class Popup {
                     if (!isObject(message)) { return; }
                     const {action, params} = message;
                     if (!isObject(params)) { return; }
-                    await containerLoaded;
+                    await frameLoaded;
                     if (timer === null) { return; } // Done
 
                     switch (action) {
@@ -282,7 +284,7 @@ class Popup {
             };
 
             const onLoad = () => {
-                if (containerLoadedResolve === null) {
+                if (frameLoadedResolve === null) {
                     cleanup();
                     reject(new Error('Unexpected load event'));
                     return;
@@ -292,9 +294,9 @@ class Popup {
                     return;
                 }
 
-                containerLoadedResolve();
-                containerLoadedResolve = null;
-                containerLoadedReject = null;
+                frameLoadedResolve();
+                frameLoadedResolve = null;
+                frameLoadedReject = null;
             };
 
             const cleanup = () => {
@@ -302,10 +304,10 @@ class Popup {
                 clearTimeout(timer);
                 timer = null;
 
-                containerLoadedResolve = null;
-                if (containerLoadedReject !== null) {
-                    containerLoadedReject(new Error('Terminated'));
-                    containerLoadedReject = null;
+                frameLoadedResolve = null;
+                if (frameLoadedReject !== null) {
+                    frameLoadedReject(new Error('Terminated'));
+                    frameLoadedReject = null;
                 }
 
                 chrome.runtime.onMessage.removeListener(onMessage);
@@ -322,7 +324,7 @@ class Popup {
             frame.addEventListener('load', onLoad);
 
             // Prevent unhandled rejections
-            containerLoaded.catch(() => {}); // NOP
+            frameLoaded.catch(() => {}); // NOP
 
             setupFrame(frame);
         });
@@ -331,15 +333,15 @@ class Popup {
     async _createInjectPromise() {
         this._injectStyles();
 
-        const {secret, token} = await this._initializeFrame(this._container, this._targetOrigin, this._frameId, (frame) => {
+        const {secret, token} = await this._initializeFrame(this._frame, this._targetOrigin, this._frameId, (frame) => {
             frame.removeAttribute('src');
             frame.removeAttribute('srcdoc');
             frame.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
             this._observeFullscreen(true);
             this._onFullscreenChanged();
         });
-        this._containerSecret = secret;
-        this._containerToken = token;
+        this._frameSecret = secret;
+        this._frameToken = token;
 
         // Configure
         const messageId = yomichan.generateId(16);
@@ -374,22 +376,22 @@ class Popup {
     }
 
     _resetFrame() {
-        const parent = this._container.parentNode;
+        const parent = this._frame.parentNode;
         if (parent !== null) {
-            parent.removeChild(this._container);
+            parent.removeChild(this._frame);
         }
-        this._container.removeAttribute('src');
-        this._container.removeAttribute('srcdoc');
+        this._frame.removeAttribute('src');
+        this._frame.removeAttribute('srcdoc');
 
-        this._containerSecret = null;
-        this._containerToken = null;
+        this._frameSecret = null;
+        this._frameToken = null;
         this._injectPromise = null;
         this._injectPromiseComplete = false;
     }
 
     async _injectStyles() {
         try {
-            await Popup._injectStylesheet('yomichan-popup-outer-stylesheet', 'file', '/fg/css/client.css', true);
+            await this._injectStylesheet('yomichan-popup-outer-stylesheet', 'file', '/fg/css/client.css', true);
         } catch (e) {
             // NOP
         }
@@ -426,8 +428,8 @@ class Popup {
 
     _onFullscreenChanged() {
         const parent = this._getFrameParentElement();
-        if (parent !== null && this._container.parentNode !== parent) {
-            parent.appendChild(this._container);
+        if (parent !== null && this._frame.parentNode !== parent) {
+            parent.appendChild(this._frame);
         }
     }
 
@@ -435,31 +437,31 @@ class Popup {
         await this._inject();
 
         const optionsGeneral = this._options.general;
-        const container = this._container;
-        const containerRect = container.getBoundingClientRect();
-        const getPosition = (
-            writingMode === 'horizontal-tb' || optionsGeneral.popupVerticalTextPosition === 'default' ?
-            Popup._getPositionForHorizontalText :
-            Popup._getPositionForVerticalText
-        );
+        const frame = this._frame;
+        const frameRect = frame.getBoundingClientRect();
 
-        const viewport = Popup._getViewport(optionsGeneral.popupScaleRelativeToVisualViewport);
+        const viewport = this._getViewport(optionsGeneral.popupScaleRelativeToVisualViewport);
         const scale = this._contentScale;
-        const scaleRatio = this._containerSizeContentScale === null ? 1.0 : scale / this._containerSizeContentScale;
-        this._containerSizeContentScale = scale;
-        let [x, y, width, height, below] = getPosition(
+        const scaleRatio = this._frameSizeContentScale === null ? 1.0 : scale / this._frameSizeContentScale;
+        this._frameSizeContentScale = scale;
+        const getPositionArgs = [
             elementRect,
-            Math.max(containerRect.width * scaleRatio, optionsGeneral.popupWidth * scale),
-            Math.max(containerRect.height * scaleRatio, optionsGeneral.popupHeight * scale),
+            Math.max(frameRect.width * scaleRatio, optionsGeneral.popupWidth * scale),
+            Math.max(frameRect.height * scaleRatio, optionsGeneral.popupHeight * scale),
             viewport,
             scale,
             optionsGeneral,
             writingMode
+        ];
+        let [x, y, width, height, below] = (
+            writingMode === 'horizontal-tb' || optionsGeneral.popupVerticalTextPosition === 'default' ?
+            this._getPositionForHorizontalText(...getPositionArgs) :
+            this._getPositionForVerticalText(...getPositionArgs)
         );
 
         const fullWidth = (optionsGeneral.popupDisplayMode === 'full-width');
-        container.classList.toggle('yomichan-float-full-width', fullWidth);
-        container.classList.toggle('yomichan-float-above', !below);
+        frame.classList.toggle('yomichan-float-full-width', fullWidth);
+        frame.classList.toggle('yomichan-float-above', !below);
 
         if (optionsGeneral.popupDisplayMode === 'full-width') {
             x = viewport.left;
@@ -467,10 +469,10 @@ class Popup {
             width = viewport.right - viewport.left;
         }
 
-        container.style.left = `${x}px`;
-        container.style.top = `${y}px`;
-        container.style.width = `${width}px`;
-        container.style.height = `${height}px`;
+        frame.style.left = `${x}px`;
+        frame.style.top = `${y}px`;
+        frame.style.width = `${width}px`;
+        frame.style.height = `${height}px`;
 
         this._setVisible(true);
         if (this._child !== null) {
@@ -484,20 +486,20 @@ class Popup {
     }
 
     _updateVisibility() {
-        this._container.style.setProperty('visibility', this.isVisibleSync() ? 'visible' : 'hidden', 'important');
+        this._frame.style.setProperty('visibility', this.isVisibleSync() ? 'visible' : 'hidden', 'important');
     }
 
     _focusParent() {
         if (this._parent !== null) {
             // Chrome doesn't like focusing iframe without contentWindow.
-            const contentWindow = this._parent._container.contentWindow;
+            const contentWindow = this._parent.getFrame().contentWindow;
             if (contentWindow !== null) {
                 contentWindow.focus();
             }
         } else {
             // Firefox doesn't like focusing window without first blurring the iframe.
-            // this.container.contentWindow.blur() doesn't work on Firefox for some reason.
-            this._container.blur();
+            // this._frame.contentWindow.blur() doesn't work on Firefox for some reason.
+            this._frame.blur();
             // This is needed for Chrome.
             window.focus();
         }
@@ -507,19 +509,19 @@ class Popup {
         const color = [255, 255, 255];
         const {documentElement, body} = document;
         if (documentElement !== null) {
-            Popup._addColor(color, Popup._getColorInfo(window.getComputedStyle(documentElement).backgroundColor));
+            this._addColor(color, window.getComputedStyle(documentElement).backgroundColor);
         }
         if (body !== null) {
-            Popup._addColor(color, Popup._getColorInfo(window.getComputedStyle(body).backgroundColor));
+            this._addColor(color, window.getComputedStyle(body).backgroundColor);
         }
         const dark = (color[0] < 128 && color[1] < 128 && color[2] < 128);
         return dark ? 'dark' : 'light';
     }
 
     _invokeApi(action, params={}) {
-        const secret = this._containerSecret;
-        const token = this._containerToken;
-        const contentWindow = this._container.contentWindow;
+        const secret = this._frameSecret;
+        const token = this._frameToken;
+        const contentWindow = this._frame.contentWindow;
         if (secret === null || token === null || contentWindow === null) { return; }
 
         contentWindow.postMessage({action, params, secret, token}, this._targetOrigin);
@@ -541,12 +543,12 @@ class Popup {
         return fullscreenElement;
     }
 
-    static _getPositionForHorizontalText(elementRect, width, height, viewport, offsetScale, optionsGeneral) {
+    _getPositionForHorizontalText(elementRect, width, height, viewport, offsetScale, optionsGeneral) {
         const preferBelow = (optionsGeneral.popupHorizontalTextPosition === 'below');
         const horizontalOffset = optionsGeneral.popupHorizontalOffset * offsetScale;
         const verticalOffset = optionsGeneral.popupVerticalOffset * offsetScale;
 
-        const [x, w] = Popup._getConstrainedPosition(
+        const [x, w] = this._getConstrainedPosition(
             elementRect.right - horizontalOffset,
             elementRect.left + horizontalOffset,
             width,
@@ -554,7 +556,7 @@ class Popup {
             viewport.right,
             true
         );
-        const [y, h, below] = Popup._getConstrainedPositionBinary(
+        const [y, h, below] = this._getConstrainedPositionBinary(
             elementRect.top - verticalOffset,
             elementRect.bottom + verticalOffset,
             height,
@@ -565,12 +567,12 @@ class Popup {
         return [x, y, w, h, below];
     }
 
-    static _getPositionForVerticalText(elementRect, width, height, viewport, offsetScale, optionsGeneral, writingMode) {
-        const preferRight = Popup._isVerticalTextPopupOnRight(optionsGeneral.popupVerticalTextPosition, writingMode);
+    _getPositionForVerticalText(elementRect, width, height, viewport, offsetScale, optionsGeneral, writingMode) {
+        const preferRight = this._isVerticalTextPopupOnRight(optionsGeneral.popupVerticalTextPosition, writingMode);
         const horizontalOffset = optionsGeneral.popupHorizontalOffset2 * offsetScale;
         const verticalOffset = optionsGeneral.popupVerticalOffset2 * offsetScale;
 
-        const [x, w] = Popup._getConstrainedPositionBinary(
+        const [x, w] = this._getConstrainedPositionBinary(
             elementRect.left - horizontalOffset,
             elementRect.right + horizontalOffset,
             width,
@@ -578,7 +580,7 @@ class Popup {
             viewport.right,
             preferRight
         );
-        const [y, h, below] = Popup._getConstrainedPosition(
+        const [y, h, below] = this._getConstrainedPosition(
             elementRect.bottom - verticalOffset,
             elementRect.top + verticalOffset,
             height,
@@ -589,20 +591,22 @@ class Popup {
         return [x, y, w, h, below];
     }
 
-    static _isVerticalTextPopupOnRight(positionPreference, writingMode) {
+    _isVerticalTextPopupOnRight(positionPreference, writingMode) {
         switch (positionPreference) {
             case 'before':
-                return !Popup._isWritingModeLeftToRight(writingMode);
+                return !this._isWritingModeLeftToRight(writingMode);
             case 'after':
-                return Popup._isWritingModeLeftToRight(writingMode);
+                return this._isWritingModeLeftToRight(writingMode);
             case 'left':
                 return false;
             case 'right':
                 return true;
+            default:
+                return false;
         }
     }
 
-    static _isWritingModeLeftToRight(writingMode) {
+    _isWritingModeLeftToRight(writingMode) {
         switch (writingMode) {
             case 'vertical-lr':
             case 'sideways-lr':
@@ -612,7 +616,7 @@ class Popup {
         }
     }
 
-    static _getConstrainedPosition(positionBefore, positionAfter, size, minLimit, maxLimit, after) {
+    _getConstrainedPosition(positionBefore, positionAfter, size, minLimit, maxLimit, after) {
         size = Math.min(size, maxLimit - minLimit);
 
         let position;
@@ -627,7 +631,7 @@ class Popup {
         return [position, size, after];
     }
 
-    static _getConstrainedPositionBinary(positionBefore, positionAfter, size, minLimit, maxLimit, after) {
+    _getConstrainedPositionBinary(positionBefore, positionAfter, size, minLimit, maxLimit, after) {
         const overflowBefore = minLimit - (positionBefore - size);
         const overflowAfter = (positionAfter + size) - maxLimit;
 
@@ -647,7 +651,10 @@ class Popup {
         return [position, size, after];
     }
 
-    static _addColor(target, color) {
+    _addColor(target, cssColor) {
+        if (typeof cssColor !== 'string') { return; }
+
+        const color = this._getColorInfo(cssColor);
         if (color === null) { return; }
 
         const a = color[3];
@@ -659,7 +666,7 @@ class Popup {
         }
     }
 
-    static _getColorInfo(cssColor) {
+    _getColorInfo(cssColor) {
         const m = /^\s*rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)\s*$/.exec(cssColor);
         if (m === null) { return null; }
 
@@ -672,7 +679,7 @@ class Popup {
         ];
     }
 
-    static _getViewport(useVisualViewport) {
+    _getViewport(useVisualViewport) {
         const visualViewport = window.visualViewport;
         if (visualViewport !== null && typeof visualViewport === 'object') {
             const left = visualViewport.offsetLeft;
@@ -706,7 +713,7 @@ class Popup {
         };
     }
 
-    static async _injectStylesheet(id, type, value, useWebExtensionApi) {
+    async _injectStylesheet(id, type, value, useWebExtensionApi) {
         const injectedStylesheets = Popup._injectedStylesheets;
 
         if (yomichan.isExtensionUrl(window.location.href)) {
