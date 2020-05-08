@@ -22,11 +22,12 @@
  */
 
 class TextScanner extends EventDispatcher {
-    constructor(node, ignoreElements, ignorePoints) {
+    constructor({node, ignoreElements, ignorePoint, search}) {
         super();
         this._node = node;
         this._ignoreElements = ignoreElements;
-        this._ignorePoints = ignorePoints;
+        this._ignorePoint = ignorePoint;
+        this._search = search;
 
         this._ignoreNodes = null;
 
@@ -68,6 +69,103 @@ class TextScanner extends EventDispatcher {
     get causeCurrent() {
         return this._causeCurrent;
     }
+
+    setEnabled(enabled) {
+        this._eventListeners.removeAllEventListeners();
+        this._enabled = enabled;
+        if (this._enabled) {
+            this._hookEvents();
+        } else {
+            this.clearSelection(true);
+        }
+    }
+
+    setOptions(options) {
+        this._options = options;
+    }
+
+    async searchAt(x, y, cause) {
+        try {
+            this._scanTimerClear();
+
+            if (this._pendingLookup) {
+                return;
+            }
+
+            if (typeof this._ignorePoint === 'function' && await this._ignorePoint(x, y)) {
+                return;
+            }
+
+            const textSource = docRangeFromPoint(x, y, this._options.scanning.deepDomScan);
+            try {
+                if (this._textSourceCurrent !== null && this._textSourceCurrent.equals(textSource)) {
+                    return;
+                }
+
+                this._pendingLookup = true;
+                const result = await this._search(textSource, cause);
+                if (result !== null) {
+                    this._causeCurrent = cause;
+                    this.setCurrentTextSource(textSource);
+                }
+                this._pendingLookup = false;
+            } finally {
+                if (textSource !== null) {
+                    textSource.cleanup();
+                }
+            }
+        } catch (e) {
+            yomichan.logError(e);
+        }
+    }
+
+    getTextSourceContent(textSource, length) {
+        const clonedTextSource = textSource.clone();
+
+        clonedTextSource.setEndOffset(length);
+
+        if (this._ignoreNodes !== null && clonedTextSource.range) {
+            length = clonedTextSource.text().length;
+            while (clonedTextSource.range && length > 0) {
+                const nodes = TextSourceRange.getNodesInRange(clonedTextSource.range);
+                if (!TextSourceRange.anyNodeMatchesSelector(nodes, this._ignoreNodes)) {
+                    break;
+                }
+                --length;
+                clonedTextSource.setEndOffset(length);
+            }
+        }
+
+        return clonedTextSource.text();
+    }
+
+    clearSelection(passive) {
+        if (!this._canClearSelection) { return; }
+        if (this._textSourceCurrent !== null) {
+            if (this._textSourceCurrentSelected) {
+                this._textSourceCurrent.deselect();
+            }
+            this._textSourceCurrent = null;
+            this._textSourceCurrentSelected = false;
+        }
+        this.trigger('clearSelection', {passive});
+    }
+
+    getCurrentTextSource() {
+        return this._textSourceCurrent;
+    }
+
+    setCurrentTextSource(textSource) {
+        this._textSourceCurrent = textSource;
+        if (this._options.scanning.selectText) {
+            this._textSourceCurrent.select();
+            this._textSourceCurrentSelected = true;
+        } else {
+            this._textSourceCurrentSelected = false;
+        }
+    }
+
+    // Private
 
     _onMouseOver(e) {
         if (this._ignoreElements().includes(e.target)) {
@@ -221,10 +319,6 @@ class TextScanner extends EventDispatcher {
         e.preventDefault(); // Disable scroll
     }
 
-    async onSearchSource(_textSource, _cause) {
-        throw new Error('Override me');
-    }
-
     async _scanTimerWait() {
         const delay = this._options.scanning.delay;
         const promise = promiseTimeout(delay, true);
@@ -242,16 +336,6 @@ class TextScanner extends EventDispatcher {
         if (this._scanTimerPromise !== null) {
             this._scanTimerPromise.resolve(false);
             this._scanTimerPromise = null;
-        }
-    }
-
-    setEnabled(enabled) {
-        this._eventListeners.removeAllEventListeners();
-        this._enabled = enabled;
-        if (this._enabled) {
-            this._hookEvents();
-        } else {
-            this.clearSelection(true);
         }
     }
 
@@ -285,93 +369,6 @@ class TextScanner extends EventDispatcher {
             [this._node, 'touchmove', this._onTouchMove.bind(this), {passive: false}],
             [this._node, 'contextmenu', this._onContextMenu.bind(this)]
         ];
-    }
-
-    setOptions(options) {
-        this._options = options;
-    }
-
-    async searchAt(x, y, cause) {
-        try {
-            this._scanTimerClear();
-
-            if (this._pendingLookup) {
-                return;
-            }
-
-            for (const ignorePointFn of this._ignorePoints) {
-                if (await ignorePointFn(x, y)) {
-                    return;
-                }
-            }
-
-            const textSource = docRangeFromPoint(x, y, this._options.scanning.deepDomScan);
-            try {
-                if (this._textSourceCurrent !== null && this._textSourceCurrent.equals(textSource)) {
-                    return;
-                }
-
-                this._pendingLookup = true;
-                const result = await this.onSearchSource(textSource, cause);
-                if (result !== null) {
-                    this._causeCurrent = cause;
-                    this.setCurrentTextSource(textSource);
-                }
-                this._pendingLookup = false;
-            } finally {
-                if (textSource !== null) {
-                    textSource.cleanup();
-                }
-            }
-        } catch (e) {
-            yomichan.logError(e);
-        }
-    }
-
-    getTextSourceContent(textSource, length) {
-        const clonedTextSource = textSource.clone();
-
-        clonedTextSource.setEndOffset(length);
-
-        if (this._ignoreNodes !== null && clonedTextSource.range) {
-            length = clonedTextSource.text().length;
-            while (clonedTextSource.range && length > 0) {
-                const nodes = TextSourceRange.getNodesInRange(clonedTextSource.range);
-                if (!TextSourceRange.anyNodeMatchesSelector(nodes, this._ignoreNodes)) {
-                    break;
-                }
-                --length;
-                clonedTextSource.setEndOffset(length);
-            }
-        }
-
-        return clonedTextSource.text();
-    }
-
-    clearSelection(passive) {
-        if (!this._canClearSelection) { return; }
-        if (this._textSourceCurrent !== null) {
-            if (this._textSourceCurrentSelected) {
-                this._textSourceCurrent.deselect();
-            }
-            this._textSourceCurrent = null;
-            this._textSourceCurrentSelected = false;
-        }
-        this.trigger('clearSelection', {passive});
-    }
-
-    getCurrentTextSource() {
-        return this._textSourceCurrent;
-    }
-
-    setCurrentTextSource(textSource) {
-        this._textSourceCurrent = textSource;
-        if (this._options.scanning.selectText) {
-            this._textSourceCurrent.select();
-            this._textSourceCurrentSelected = true;
-        } else {
-            this._textSourceCurrentSelected = false;
-        }
     }
 
     _isScanningModifierPressed(scanningModifier, mouseEvent) {

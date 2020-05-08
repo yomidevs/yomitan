@@ -39,12 +39,12 @@ class Frontend {
         this._enabledEventListeners = new EventListenerCollection();
         this._activeModifiers = new Set();
         this._optionsUpdatePending = false;
-        this._textScanner = new TextScanner(
-            window,
-            () => this._popup.isProxy() ? [] : [this._popup.getContainer()],
-            [(x, y) => this._popup.containsPoint(x, y)]
-        );
-        this._textScanner.onSearchSource = this._onSearchSource.bind(this);
+        this._textScanner = new TextScanner({
+            node: window,
+            ignoreElements: () => this._popup.isProxy() ? [] : [this._popup.getContainer()],
+            ignorePoint: (x, y) => this._popup.containsPoint(x, y),
+            search: this._search.bind(this)
+        });
 
         this._windowMessageHandlers = new Map([
             ['popupClose', () => this._textScanner.clearSelection(false)],
@@ -107,7 +107,7 @@ class Frontend {
     }
 
     async setTextSource(textSource) {
-        await this._onSearchSource(textSource, 'script');
+        await this._search(textSource, 'script');
         this._textScanner.setCurrentTextSource(textSource);
     }
 
@@ -137,7 +137,7 @@ class Frontend {
         const textSourceCurrent = this._textScanner.getCurrentTextSource();
         const causeCurrent = this._textScanner.causeCurrent;
         if (textSourceCurrent !== null && causeCurrent !== null) {
-            await this._onSearchSource(textSourceCurrent, causeCurrent);
+            await this._search(textSourceCurrent, causeCurrent);
         }
     }
 
@@ -204,7 +204,7 @@ class Frontend {
         await this.updateOptions();
     }
 
-    async _onSearchSource(textSource, cause) {
+    async _search(textSource, cause) {
         await this._updatePendingOptions();
 
         let results = null;

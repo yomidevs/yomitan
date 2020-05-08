@@ -34,12 +34,12 @@ class QueryParser {
         this._queryParser = document.querySelector('#query-parser-content');
         this._queryParserSelect = document.querySelector('#query-parser-select-container');
         this._queryParserGenerator = new QueryParserGenerator();
-        this._textScanner = new TextScanner(
-            this._queryParser,
-            () => [],
-            []
-        );
-        this._textScanner.onSearchSource = this._onSearchSource.bind(this);
+        this._textScanner = new TextScanner({
+            node: this._queryParser,
+            ignoreElements: () => [],
+            ignorePoint: null,
+            search: this._search.bind(this)
+        });
     }
 
     async prepare() {
@@ -74,11 +74,11 @@ class QueryParser {
         this._textScanner.searchAt(e.clientX, e.clientY, 'click');
     }
 
-    async _onSearchSource(textSource, cause) {
+    async _search(textSource, cause) {
         if (textSource === null) { return null; }
 
         const searchText = this._textScanner.getTextSourceContent(textSource, this._options.scanning.length);
-        if (searchText.length === 0) { return; }
+        if (searchText.length === 0) { return null; }
 
         const {definitions, length} = await apiTermsFind(searchText, {}, this._getOptionsContext());
         if (definitions.length === 0) { return null; }
