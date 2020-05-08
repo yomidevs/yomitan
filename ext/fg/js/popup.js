@@ -139,7 +139,7 @@ class Popup {
         this._invokeApi('setContent', {type, details});
     }
 
-    async setCustomCss(css) {
+    setCustomCss(css) {
         this._invokeApi('setCustomCss', {css});
     }
 

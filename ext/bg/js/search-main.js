@@ -31,7 +31,7 @@ async function injectSearchFrontend() {
         '/fg/js/frontend-api-receiver.js',
         '/fg/js/frame-offset-forwarder.js',
         '/fg/js/popup.js',
-        '/fg/js/popup-proxy-host.js',
+        '/fg/js/popup-factory.js',
         '/fg/js/frontend.js',
         '/fg/js/content-script-main.js'
     ]);

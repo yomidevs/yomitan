@@ -19,10 +19,11 @@
  * DOM
  * FrameOffsetForwarder
  * Frontend
+ * PopupFactory
  * PopupProxy
- * PopupProxyHost
  * apiBroadcastTab
  * apiForwardLogsToBackend
+ * apiFrameInformationGet
  * apiOptionsGet
  */
 
@@ -47,10 +48,17 @@ async function createIframePopupProxy(frameOffsetForwarder, setDisabled) {
 }
 
 async function getOrCreatePopup(depth) {
-    const popupHost = new PopupProxyHost();
-    await popupHost.prepare();
+    const {frameId} = await apiFrameInformationGet();
+    if (typeof frameId !== 'number') {
+        const error = new Error('Failed to get frameId');
+        yomichan.logError(error);
+        throw error;
+    }
 
-    const popup = popupHost.getOrCreatePopup(null, null, depth);
+    const popupFactory = new PopupFactory(frameId);
+    await popupFactory.prepare();
+
+    const popup = popupFactory.getOrCreatePopup(null, null, depth);
 
     return popup;
 }
@@ -89,20 +97,20 @@ async function createPopupProxy(depth, id, parentFrameId) {
     };
 
     let urlUpdatedAt = 0;
-    let proxyHostUrlCached = url;
-    const getProxyHostUrl = async () => {
+    let popupProxyUrlCached = url;
+    const getPopupProxyUrl = async () => {
         const now = Date.now();
         if (popups.proxy !== null && now - urlUpdatedAt > 500) {
-            proxyHostUrlCached = await popups.proxy.getHostUrl();
+            popupProxyUrlCached = await popups.proxy.getUrl();
             urlUpdatedAt = now;
         }
-        return proxyHostUrlCached;
+        return popupProxyUrlCached;
     };
 
     const applyOptions = async () => {
         const optionsContext = {
             depth: isSearchPage ? 0 : depth,
-            url: proxy ? await getProxyHostUrl() : window.location.href
+            url: proxy ? await getPopupProxyUrl() : window.location.href
         };
         const options = await apiOptionsGet(optionsContext);
 
@@ -124,7 +132,7 @@ async function createPopupProxy(depth, id, parentFrameId) {
         }
 
         if (frontend === null) {
-            const getUrl = proxy ? getProxyHostUrl : null;
+            const getUrl = proxy ? getPopupProxyUrl : null;
             frontend = new Frontend(popup, getUrl);
             frontendPreparePromise = frontend.prepare();
             await frontendPreparePromise;

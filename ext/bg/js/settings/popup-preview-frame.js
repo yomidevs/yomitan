@@ -18,8 +18,9 @@
 /* global
  * Frontend
  * Popup
- * PopupProxyHost
+ * PopupFactory
  * TextSourceRange
+ * apiFrameInformationGet
  * apiOptionsGet
  */
 
@@ -56,10 +57,12 @@ class SettingsPopupPreview {
         window.apiOptionsGet = this.apiOptionsGet.bind(this);
 
         // Overwrite frontend
-        const popupHost = new PopupProxyHost();
-        await popupHost.prepare();
+        const {frameId} = await apiFrameInformationGet();
 
-        this.popup = popupHost.getOrCreatePopup();
+        const popupFactory = new PopupFactory(frameId);
+        await popupFactory.prepare();
+
+        this.popup = popupFactory.getOrCreatePopup();
         this.popup.setChildrenSupported(false);
 
         this.popupSetCustomOuterCssOld = this.popup.setCustomOuterCss;

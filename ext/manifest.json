@@ -44,9 +44,9 @@
             "fg/js/frontend-api-receiver.js",
             "fg/js/popup.js",
             "fg/js/source.js",
+            "fg/js/popup-factory.js",
             "fg/js/frame-offset-forwarder.js",
             "fg/js/popup-proxy.js",
-            "fg/js/popup-proxy-host.js",
             "fg/js/frontend.js",
             "fg/js/content-script-main.js"
         ],

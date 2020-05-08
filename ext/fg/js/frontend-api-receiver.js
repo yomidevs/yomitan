@@ -17,9 +17,9 @@
 
 
 class FrontendApiReceiver {
-    constructor(source='', handlers=new Map()) {
+    constructor(source, messageHandlers) {
         this._source = source;
-        this._handlers = handlers;
+        this._messageHandlers = messageHandlers;
     }
 
     prepare() {
@@ -35,14 +35,29 @@ class FrontendApiReceiver {
     _onMessage(port, {id, action, params, target, senderId}) {
         if (target !== this._source) { return; }
 
-        const handler = this._handlers.get(action);
-        if (typeof handler !== 'function') { return; }
+        const messageHandler = this._messageHandlers.get(action);
+        if (typeof messageHandler === 'undefined') { return; }
+
+        const {handler, async} = messageHandler;
 
         this._sendAck(port, id, senderId);
-        this._invokeHandler(handler, params, port, id, senderId);
+        if (async) {
+            this._invokeHandlerAsync(handler, params, port, id, senderId);
+        } else {
+            this._invokeHandler(handler, params, port, id, senderId);
+        }
     }
 
-    async _invokeHandler(handler, params, port, id, senderId) {
+    _invokeHandler(handler, params, port, id, senderId) {
+        try {
+            const result = handler(params);
+            this._sendResult(port, id, senderId, {result});
+        } catch (error) {
+            this._sendResult(port, id, senderId, {error: errorToJson(error)});
+        }
+    }
+
+    async _invokeHandlerAsync(handler, params, port, id, senderId) {
         try {
             const result = await handler(params);
             this._sendResult(port, id, senderId, {result});

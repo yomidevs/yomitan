@@ -51,7 +51,7 @@ class PopupProxy {
     // Public functions
 
     async prepare() {
-        const {id} = await this._invokeHostApi('getOrCreatePopup', {id: this._id, parentId: this._parentId});
+        const {id} = await this._invoke('getOrCreatePopup', {id: this._id, parentId: this._parentId});
         this._id = id;
     }
 
@@ -60,19 +60,19 @@ class PopupProxy {
     }
 
     async setOptionsContext(optionsContext, source) {
-        return await this._invokeHostApi('setOptionsContext', {id: this._id, optionsContext, source});
+        return await this._invoke('setOptionsContext', {id: this._id, optionsContext, source});
     }
 
     hide(changeFocus) {
-        this._invokeHostApi('hide', {id: this._id, changeFocus});
+        this._invoke('hide', {id: this._id, changeFocus});
     }
 
     async isVisible() {
-        return await this._invokeHostApi('isVisible', {id: this._id});
+        return await this._invoke('isVisible', {id: this._id});
     }
 
     setVisibleOverride(visible) {
-        this._invokeHostApi('setVisibleOverride', {id: this._id, visible});
+        this._invoke('setVisibleOverride', {id: this._id, visible});
     }
 
     async containsPoint(x, y) {
@@ -80,7 +80,7 @@ class PopupProxy {
             await this._updateFrameOffset();
             [x, y] = this._applyFrameOffset(x, y);
         }
-        return await this._invokeHostApi('containsPoint', {id: this._id, x, y});
+        return await this._invoke('containsPoint', {id: this._id, x, y});
     }
 
     async showContent(elementRect, writingMode, type, details, context) {
@@ -90,32 +90,32 @@ class PopupProxy {
             [x, y] = this._applyFrameOffset(x, y);
         }
         elementRect = {x, y, width, height};
-        return await this._invokeHostApi('showContent', {id: this._id, elementRect, writingMode, type, details, context});
+        return await this._invoke('showContent', {id: this._id, elementRect, writingMode, type, details, context});
     }
 
-    async setCustomCss(css) {
-        return await this._invokeHostApi('setCustomCss', {id: this._id, css});
+    setCustomCss(css) {
+        this._invoke('setCustomCss', {id: this._id, css});
     }
 
     clearAutoPlayTimer() {
-        this._invokeHostApi('clearAutoPlayTimer', {id: this._id});
+        this._invoke('clearAutoPlayTimer', {id: this._id});
     }
 
-    async setContentScale(scale) {
-        this._invokeHostApi('setContentScale', {id: this._id, scale});
+    setContentScale(scale) {
+        this._invoke('setContentScale', {id: this._id, scale});
     }
 
-    async getHostUrl() {
-        return await this._invokeHostApi('getHostUrl', {});
+    async getUrl() {
+        return await this._invoke('getUrl', {});
     }
 
     // Private
 
-    _invokeHostApi(action, params={}) {
+    _invoke(action, params={}) {
         if (typeof this._parentFrameId !== 'number') {
             return Promise.reject(new Error('Invalid frame'));
         }
-        return this._apiSender.invoke(action, params, `popup-proxy-host#${this._parentFrameId}`);
+        return this._apiSender.invoke(action, params, `popup-factory#${this._parentFrameId}`);
     }
 
     async _updateFrameOffset() {
