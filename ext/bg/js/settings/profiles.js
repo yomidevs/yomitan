@@ -23,6 +23,7 @@
  * getOptionsFullMutable
  * getOptionsMutable
  * profileConditionsDescriptor
+ * profileConditionsDescriptorPromise
  * settingsSaveOptions
  * utilBackgroundIsolate
  */
@@ -98,6 +99,7 @@ async function profileFormWrite(optionsFull) {
         profileConditionsContainer.cleanup();
     }
 
+    await profileConditionsDescriptorPromise;
     profileConditionsContainer = new ConditionsUI.Container(
         profileConditionsDescriptor,
         'popupLevel',
@@ -128,7 +130,7 @@ function profileOptionsPopulateSelect(select, profiles, currentValue, ignoreIndi
 }
 
 async function profileOptionsUpdateTarget(optionsFull) {
-    profileFormWrite(optionsFull);
+    await profileFormWrite(optionsFull);
 
     const optionsContext = getOptionsContext();
     const options = await getOptionsMutable(optionsContext);

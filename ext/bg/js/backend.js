@@ -24,6 +24,7 @@
  * ClipboardMonitor
  * Database
  * DictionaryImporter
+ * Environment
  * JsonSchema
  * Mecab
  * ObjectPropertyAccessor
@@ -35,6 +36,7 @@
  * optionsLoad
  * optionsSave
  * profileConditionsDescriptor
+ * profileConditionsDescriptorPromise
  * requestJson
  * requestText
  * utilIsolate
@@ -42,6 +44,7 @@
 
 class Backend {
     constructor() {
+        this.environment = new Environment();
         this.database = new Database();
         this.dictionaryImporter = new DictionaryImporter();
         this.translator = new Translator(this.database);
@@ -100,7 +103,7 @@ class Backend {
             ['broadcastTab',                 {async: false, contentScript: true,  handler: this._onApiBroadcastTab.bind(this)}],
             ['frameInformationGet',          {async: true,  contentScript: true,  handler: this._onApiFrameInformationGet.bind(this)}],
             ['injectStylesheet',             {async: true,  contentScript: true,  handler: this._onApiInjectStylesheet.bind(this)}],
-            ['getEnvironmentInfo',           {async: true,  contentScript: true,  handler: this._onApiGetEnvironmentInfo.bind(this)}],
+            ['getEnvironmentInfo',           {async: false, contentScript: true,  handler: this._onApiGetEnvironmentInfo.bind(this)}],
             ['clipboardGet',                 {async: true,  contentScript: true,  handler: this._onApiClipboardGet.bind(this)}],
             ['getDisplayTemplatesHtml',      {async: true,  contentScript: true,  handler: this._onApiGetDisplayTemplatesHtml.bind(this)}],
             ['getQueryParserTemplatesHtml',  {async: true,  contentScript: true,  handler: this._onApiGetQueryParserTemplatesHtml.bind(this)}],
@@ -140,8 +143,11 @@ class Backend {
             }, 1000);
             this._updateBadge();
 
+            await this.environment.prepare();
             await this.database.prepare();
             await this.translator.prepare();
+
+            await profileConditionsDescriptorPromise;
 
             this.optionsSchema = await requestJson(chrome.runtime.getURL('/bg/data/options-schema.json'), 'GET');
             this.defaultAnkiFieldTemplates = await requestText(chrome.runtime.getURL('/bg/data/default-anki-field-templates.handlebars'), 'GET');
@@ -635,15 +641,8 @@ class Backend {
         });
     }
 
-    async _onApiGetEnvironmentInfo() {
-        const browser = await Backend._getBrowser();
-        const platform = await new Promise((resolve) => chrome.runtime.getPlatformInfo(resolve));
-        return {
-            browser,
-            platform: {
-                os: platform.os
-            }
-        };
+    _onApiGetEnvironmentInfo() {
+        return this.environment.getInfo();
     }
 
     async _onApiClipboardGet() {
@@ -659,7 +658,7 @@ class Backend {
               being an extension with clipboard permissions. It effectively asks for the
               non-extension permission for clipboard access.
         */
-        const browser = await Backend._getBrowser();
+        const {browser} = this.environment.getInfo();
         if (browser === 'firefox' || browser === 'firefox-mobile') {
             return await navigator.clipboard.readText();
         } else {
@@ -1209,25 +1208,6 @@ class Backend {
             }
         } catch (e) {
             // Edge throws exception for no reason here.
-        }
-    }
-
-    static async _getBrowser() {
-        if (EXTENSION_IS_BROWSER_EDGE) {
-            return 'edge';
-        }
-        if (typeof browser !== 'undefined') {
-            try {
-                const info = await browser.runtime.getBrowserInfo();
-                if (info.name === 'Fennec') {
-                    return 'firefox-mobile';
-                }
-            } catch (e) {
-                // NOP
-            }
-            return 'firefox';
-        } else {
-            return 'chrome';
         }
     }
 }

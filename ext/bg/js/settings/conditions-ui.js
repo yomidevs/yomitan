@@ -310,9 +310,13 @@ ConditionsUI.Condition = class Condition {
         inputInner.prop('readonly', true);
 
         let values = [];
+        let keySeparator = ' + ';
         for (const object of objects) {
             if (hasOwn(object, 'values')) {
                 values = object.values;
+            }
+            if (hasOwn(object, 'keySeparator')) {
+                keySeparator = object.keySeparator;
             }
         }
 
@@ -347,7 +351,7 @@ ConditionsUI.Condition = class Condition {
                 }
             }
 
-            const inputValue = [...pressedKeyIndices].map((i) => values[i].name).join(' + ');
+            const inputValue = [...pressedKeyIndices].map((i) => values[i].name).join(keySeparator);
             inputInner.val(inputValue);
             inputInner.change();
         };

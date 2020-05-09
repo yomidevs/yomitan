@@ -22,6 +22,7 @@
  * ankiTemplatesInitialize
  * ankiTemplatesUpdateValue
  * apiForwardLogsToBackend
+ * apiGetEnvironmentInfo
  * apiOptionsSave
  * appearanceInitialize
  * audioSettingsInitialize
@@ -285,6 +286,23 @@ function showExtensionInformation() {
     node.textContent = `${manifest.name} v${manifest.version}`;
 }
 
+async function settingsPopulateModifierKeys() {
+    const scanModifierKeySelect = document.querySelector('#scan-modifier-key');
+    scanModifierKeySelect.textContent = '';
+
+    const environment = await apiGetEnvironmentInfo();
+    const modifierKeys = [
+        {value: 'none', name: 'None'},
+        ...environment.modifiers.keys
+    ];
+    for (const {value, name} of modifierKeys) {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = name;
+        scanModifierKeySelect.appendChild(option);
+    }
+}
+
 
 async function onReady() {
     apiForwardLogsToBackend();
@@ -292,6 +310,7 @@ async function onReady() {
 
     showExtensionInformation();
 
+    await settingsPopulateModifierKeys();
     formSetupEventListeners();
     appearanceInitialize();
     await audioSettingsInitialize();
