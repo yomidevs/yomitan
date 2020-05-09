@@ -20,12 +20,11 @@
  */
 
 class PopupProxy {
-    constructor(id, depth, parentId, parentFrameId, getFrameOffset=null, setDisabled=null) {
-        this._parentId = parentId;
-        this._parentFrameId = parentFrameId;
+    constructor(id, depth, parentPopupId, parentFrameId, getFrameOffset=null, setDisabled=null) {
         this._id = id;
         this._depth = depth;
-        this._apiSender = new FrontendApiSender();
+        this._parentPopupId = parentPopupId;
+        this._apiSender = new FrontendApiSender(`popup-factory#${parentFrameId}`);
         this._getFrameOffset = getFrameOffset;
         this._setDisabled = setDisabled;
 
@@ -51,7 +50,7 @@ class PopupProxy {
     // Public functions
 
     async prepare() {
-        const {id} = await this._invoke('getOrCreatePopup', {id: this._id, parentId: this._parentId});
+        const {id} = await this._invoke('getOrCreatePopup', {id: this._id, parentId: this._parentPopupId});
         this._id = id;
     }
 
@@ -112,10 +111,7 @@ class PopupProxy {
     // Private
 
     _invoke(action, params={}) {
-        if (typeof this._parentFrameId !== 'number') {
-            return Promise.reject(new Error('Invalid frame'));
-        }
-        return this._apiSender.invoke(action, params, `popup-factory#${this._parentFrameId}`);
+        return this._apiSender.invoke(action, params);
     }
 
     async _updateFrameOffset() {

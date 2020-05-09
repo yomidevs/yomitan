@@ -17,7 +17,8 @@
 
 
 class FrontendApiSender {
-    constructor() {
+    constructor(target) {
+        this._target = target;
         this._senderId = yomichan.generateId(16);
         this._ackTimeout = 3000; // 3 seconds
         this._responseTimeout = 10000; // 10 seconds
@@ -27,7 +28,7 @@ class FrontendApiSender {
         this._port = null;
     }
 
-    invoke(action, params, target) {
+    invoke(action, params) {
         if (this._disconnected) {
             // attempt to reconnect the next time
             this._disconnected = false;
@@ -46,7 +47,7 @@ class FrontendApiSender {
             this._callbacks.set(id, info);
             info.timer = setTimeout(() => this._onError(id, 'Timeout (ack)'), this._ackTimeout);
 
-            this._port.postMessage({id, action, params, target, senderId: this._senderId});
+            this._port.postMessage({id, action, params, target: this._target, senderId: this._senderId});
         });
     }
 

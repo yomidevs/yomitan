@@ -47,14 +47,14 @@ class Frontend {
         });
 
         this._windowMessageHandlers = new Map([
-            ['popupClose', () => this._textScanner.clearSelection(false)],
-            ['selectionCopy', () => document.execCommand('copy')]
+            ['popupClose', this._onMessagePopupClose.bind(this)],
+            ['selectionCopy', this._onMessageSelectionCopy.bind()]
         ]);
 
         this._runtimeMessageHandlers = new Map([
-            ['popupSetVisibleOverride', ({visible}) => { this._popup.setVisibleOverride(visible); }],
-            ['rootPopupRequestInformationBroadcast', () => { this._broadcastRootPopupInformation(); }],
-            ['requestDocumentInformationBroadcast', ({uniqueId}) => { this._broadcastDocumentInformation(uniqueId); }]
+            ['popupSetVisibleOverride', this._onMessagePopupSetVisibleOverride.bind(this)],
+            ['rootPopupRequestInformationBroadcast', this._onMessageRootPopupRequestInformationBroadcast.bind(this)],
+            ['requestDocumentInformationBroadcast', this._onMessageRequestDocumentInformationBroadcast.bind(this)]
         ]);
     }
 
@@ -145,6 +145,28 @@ class Frontend {
         return this._lastShowPromise;
     }
 
+    // Message handlers
+
+    _onMessagePopupClose() {
+        this._textScanner.clearSelection(false);
+    }
+
+    _onMessageSelectionCopy() {
+        document.execCommand('copy');
+    }
+
+    _onMessagePopupSetVisibleOverride({visible}) {
+        this._popup.setVisibleOverride(visible);
+    }
+
+    _onMessageRootPopupRequestInformationBroadcast() {
+        this._broadcastRootPopupInformation();
+    }
+
+    _onMessageRequestDocumentInformationBroadcast({uniqueId}) {
+        this._broadcastDocumentInformation(uniqueId);
+    }
+
     // Private
 
     _onResize() {
@@ -160,9 +182,6 @@ class Frontend {
     }
 
     _onRuntimeMessage({action, params}, sender, callback) {
-        const {targetPopupId} = params || {};
-        if (typeof targetPopupId !== 'undefined' && targetPopupId !== this._popup.id) { return; }
-
         const handler = this._runtimeMessageHandlers.get(action);
         if (typeof handler !== 'function') { return false; }
 
