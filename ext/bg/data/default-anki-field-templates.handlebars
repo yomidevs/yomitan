@@ -14,9 +14,11 @@
     {{~/if~}}
 {{/inline}}
 
-{{#*inline "audio"~}}
-    [sound:{{definition.audioFileName}}]
-{{~/inline}}
+{{#*inline "audio"}}
+    {{~#if definition.audioFileName~}}
+        [sound:{{definition.audioFileName}}]
+    {{~/if~}}
+{{/inline}}
 
 {{#*inline "character"}}
     {{~definition.character~}}

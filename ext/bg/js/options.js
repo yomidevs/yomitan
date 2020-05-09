@@ -115,7 +115,7 @@ const profileOptionsVersionUpdates = [
         let fieldTemplates = options.anki.fieldTemplates;
         if (typeof fieldTemplates !== 'string') { return; }
 
-        const replacement = '{{#*inline "audio"~}}\n    [sound:{{definition.audioFileName}}]\n{{~/inline}}';
+        const replacement = '{{#*inline "audio"}}\n    {{~#if definition.audioFileName~}}\n        [sound:{{definition.audioFileName}}]\n    {{~/if~}}\n{{/inline}}';
         let replaced = false;
         fieldTemplates = fieldTemplates.replace(/\{\{#\*inline "audio"\}\}\{\{\/inline\}\}/g, () => {
             replaced = true;
