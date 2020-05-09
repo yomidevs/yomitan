@@ -173,9 +173,9 @@ class AudioSystem {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.responseType = 'arraybuffer';
-            xhr.addEventListener('load', () => {
+            xhr.addEventListener('load', async () => {
                 const arrayBuffer = xhr.response;
-                if (!this._isAudioBinaryValid(arrayBuffer)) {
+                if (!await this._isAudioBinaryValid(arrayBuffer)) {
                     reject(new Error('Could not retrieve audio'));
                 } else {
                     resolve(arrayBuffer);
@@ -195,8 +195,8 @@ class AudioSystem {
         );
     }
 
-    _isAudioBinaryValid(arrayBuffer) {
-        const digest = AudioSystem.arrayBufferDigest(arrayBuffer);
+    async _isAudioBinaryValid(arrayBuffer) {
+        const digest = await AudioSystem.arrayBufferDigest(arrayBuffer);
         switch (digest) {
             case 'ae6398b5a27bc8c0a771df6c907ade794be15518174773c58c7c7ddd17098906': // jpod101 invalid audio
                 return false;
