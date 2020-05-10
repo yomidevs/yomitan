@@ -399,12 +399,6 @@ class Display {
 
     updateTheme(themeName) {
         document.documentElement.dataset.yomichanTheme = themeName;
-
-        const stylesheets = document.querySelectorAll('link[data-yomichan-theme-name]');
-        for (const stylesheet of stylesheets) {
-            const match = (stylesheet.dataset.yomichanThemeName === themeName);
-            stylesheet.rel = (match ? 'stylesheet' : 'stylesheet alternate');
-        }
     }
 
     setCustomCss(css) {

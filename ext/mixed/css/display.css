@@ -15,6 +15,72 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*
+ * Variables
+ */
+
+:root {
+    --background-color: #ffffff;
+    --glossary-image-background-color: #eeeeee;
+
+    --dark-text-color: #000000;
+    --default-text-color: #333333;
+    --light-text-color: #777777;
+    --very-light-text-color: #999999;
+
+    --light-border-color: #eeeeee;
+    --medium-border-color: #dddddd;
+    --dark-border-color: #777777;
+
+    --popuplar-kanji-text-color: #0275d8;
+
+    --pitch-accent-annotation-color: #000000;
+
+    --tag-text-color: #ffffff;
+    --tag-default-background-color: #8a8a91;
+    --tag-name-background-color: #5cb85c;
+    --tag-expression-background-color: #f0ad4e;
+    --tag-popular-background-color: #0275d8;
+    --tag-frequent-background-color: #5bc0de;
+    --tag-archaism-background-color: #d9534f;
+    --tag-dictionary-background-color: #aa66cc;
+    --tag-frequency-background-color: #5cb85c;
+    --tag-part-of-speech-background-color: #565656;
+    --tag-search-background-color: #8a8a91;
+    --tag-pitch-accent-dictionary-background-color: #6640be;
+}
+
+:root[data-yomichan-theme=dark] {
+    --background-color: #1e1e1e;
+    --glossary-image-background-color: #2f2f2f;
+
+    --dark-text-color: #d8d8d8;
+    --default-text-color: #d4d4d4;
+    --light-text-color: #888888;
+    --very-light-text-color: #666666;
+
+    --light-border-color: #2f2f2f;
+    --medium-border-color: #3f3f3f;
+    --dark-border-color: #888888;
+
+    --popuplar-kanji-text-color: #0275d8;
+
+    --pitch-accent-annotation-color: #ffffff;
+
+    --tag-text-color: #e1e1e1;
+    --tag-default-background-color: #69696e;
+    --tag-name-background-color: #489148;
+    --tag-expression-background-color: #b07f39;
+    --tag-popular-background-color: #025caa;
+    --tag-frequent-background-color: #4490a7;
+    --tag-archaism-background-color: #b04340;
+    --tag-dictionary-background-color: #9057ad;
+    --tag-frequency-background-color: #489148;
+    --tag-part-of-speech-background-color: #565656;
+    --tag-search-background-color: #69696e;
+    --tag-pitch-accent-dictionary-background-color: #6640be;
+}
+
 
 /*
  * Fonts
@@ -24,6 +90,7 @@
     font-family: kanji-stroke-orders;
     src: url('/mixed/ttf/kanji-stroke-orders.ttf');
 }
+
 
 /*
  * General
@@ -45,6 +112,8 @@ body {
     border: 0;
     padding: 0;
     overflow-y: scroll; /* always show scroll bar */
+    background-color: var(--background-color);
+    color: var(--default-text-color);
 }
 
 ol, ul {
@@ -68,9 +137,9 @@ h2 {
     font-size: 1.25em;
     font-weight: normal;
     margin: 0.25em 0 0;
-    border-bottom-width: 0.05714285714285714em; /* 14px * 1.25em => 1px */
-    border-bottom-style: solid;
+    border-bottom: 0.05714285714285714em solid var(--light-border-color); /* 14px * 1.25em => 1px */
 }
+
 
 /*
  * Navigation
@@ -83,8 +152,8 @@ h2 {
     height: 2.1em;
     box-sizing: border-box;
     padding: 0.25em 0.5em;
-    border-bottom-width: 0.07142857em; /* 14px => 1px */
-    border-bottom-style: solid;
+    border-bottom: 0.07142857em solid var(--light-border-color); /* 14px => 1px */
+    background-color: var(--background-color);
     z-index: 10;
 }
 
@@ -129,6 +198,12 @@ h2 {
     font-size: 1.6em;
     padding: 0.1em;
     user-select: none;
+}
+
+.icon-checkbox:checked+label {
+    /* Invert colors */
+    background-color: var(--default-text-color);
+    color: var(--background-color);
 }
 
 #query-parser-content {
@@ -206,9 +281,19 @@ button.action-button {
 }
 
 .term-expression .kanji-link {
-    border-bottom-width: 0.03571428em; /* 28px => 1px */
-    border-bottom-style: dashed;
+    border-bottom: 0.03571428em dashed var(--dark-border-color); /* 28px => 1px */
+    color: var(--default-text-color);
     text-decoration: none;
+}
+
+.term-expression[data-frequency=popular]>.term-expression-text,
+.term-expression[data-frequency=popular]>.term-expression-text .kanji-link {
+    color: var(--popuplar-kanji-text-color);
+}
+
+.term-expression[data-frequency=rare]>.term-expression-text,
+.term-expression[data-frequency=rare]>.term-expression-text .kanji-link {
+    color: var(--very-light-text-color);
 }
 
 .entry:not(.entry-current) .current {
@@ -225,6 +310,48 @@ button.action-button {
     white-space: nowrap;
     vertical-align: baseline;
     border-radius: 0.25em;
+    color: var(--tag-text-color);
+    background-color: var(--tag-default-background-color);
+}
+
+.tag[data-category=name] {
+    background-color: var(--tag-name-background-color);
+}
+
+.tag[data-category=expression] {
+    background-color: var(--tag-expression-background-color);
+}
+
+.tag[data-category=popular] {
+    background-color: var(--tag-popular-background-color);
+}
+
+.tag[data-category=frequent] {
+    background-color: var(--tag-frequent-background-color);
+}
+
+.tag[data-category=archaism] {
+    background-color: var(--tag-archaism-background-color);
+}
+
+.tag[data-category=dictionary] {
+    background-color: var(--tag-dictionary-background-color);
+}
+
+.tag[data-category=frequency] {
+    background-color: var(--tag-frequency-background-color);
+}
+
+.tag[data-category=partOfSpeech] {
+    background-color: var(--tag-part-of-speech-background-color);
+}
+
+.tag[data-category=search] {
+    background-color: var(--tag-search-background-color);
+}
+
+.tag[data-category=pitch-accent-dictionary] {
+    background-color: var(--tag-pitch-accent-dictionary-background-color);
 }
 
 .tag-inner {
@@ -249,8 +376,7 @@ button.action-button {
 }
 
 .entry+.entry {
-    border-top-width: 0.07142857em; /* 14px => 1px */
-    border-top-style: solid;
+    border-top: 0.07142857em solid var(--light-border-color); /* 14px => 1px */
 }
 
 .entry[data-type=term][data-expression-multi=true] .actions>.action-play-audio {
@@ -259,6 +385,7 @@ button.action-button {
 
 .term-reasons {
     display: inline-block;
+    color: var(--light-text-color);
 }
 
 .term-reasons>.term-reason+.term-reason-separator+.term-reason:before {
@@ -346,6 +473,7 @@ button.action-button {
     margin: 0;
     padding: 0;
     list-style-type: none;
+    color: var(--light-text-color);
 }
 
 .term-definition-list:not([data-count="0"]):not([data-count="1"]) {
@@ -362,6 +490,10 @@ button.action-button {
 .term-glossary-list:not([data-count="0"]):not([data-count="1"]) {
     padding-left: 1.4em;
     list-style-type: circle;
+}
+
+.term-glossary {
+    color: var(--dark-text-color);
 }
 
 .term-definition-disambiguation-list[data-count="0"] {
@@ -445,8 +577,7 @@ button.action-button {
 }
 
 .term-pitch-accent-container {
-    border-bottom-width: 0.05714285714285714em; /* 14px * 1.25em => 1px */
-    border-bottom-style: solid;
+    border-bottom: 0.05714285714285714em solid var(--light-border-color); /* 14px * 1.25em => 1px */
     padding-bottom: 0.25em;
     margin-bottom: 0.25em;
 }
@@ -455,6 +586,7 @@ button.action-button {
     margin: 0;
     padding: 0;
     list-style-type: none;
+    color: var(--light-text-color);
 }
 
 .term-pitch-accent-group-list:not([data-count="0"]):not([data-count="1"]) {
@@ -478,6 +610,7 @@ button.action-button {
 .term-pitch-accent {
     display: inline;
     line-height: 1.5em;
+    color: var(--dark-text-color);
 }
 
 .term-pitch-accent-list:not([data-count="0"]):not([data-count="1"])>.term-pitch-accent {
@@ -490,6 +623,7 @@ button.action-button {
 
 .term-pitch-accent-disambiguation-list {
     padding-right: 0.25em;
+    color: var(--light-text-color);
 }
 
 .term-pitch-accent-disambiguation-list:before {
@@ -521,6 +655,9 @@ button.action-button {
 .term-pitch-accent-character {
     display: inline-block;
     position: relative;
+}
+.term-pitch-accent-character:before {
+    border-color: var(--pitch-accent-annotation-color);
 }
 .term-pitch-accent-character[data-pitch='high']:before {
     content: "";
@@ -586,30 +723,35 @@ button.action-button {
 .term-pitch-accent-graph-line,
 .term-pitch-accent-graph-line-tail {
     fill: none;
-    stroke: #000000;
+    stroke: var(--pitch-accent-annotation-color);
     stroke-width: 5;
 }
 .term-pitch-accent-graph-line-tail {
     stroke-dasharray: 5 5;
 }
 #term-pitch-accent-graph-dot {
-    fill: #000000;
-    stroke: #000000;
+    fill: var(--pitch-accent-annotation-color);
+    stroke: var(--pitch-accent-annotation-color);
     stroke-width: 5;
 }
 #term-pitch-accent-graph-dot-downstep {
     fill: none;
-    stroke: #000000;
+    stroke: var(--pitch-accent-annotation-color);
     stroke-width: 5;
 }
 #term-pitch-accent-graph-dot-downstep>circle:last-of-type {
-    fill: #000000;
+    fill: var(--pitch-accent-annotation-color);
 }
 #term-pitch-accent-graph-triangle {
     fill: none;
-    stroke: #000000;
+    stroke: var(--pitch-accent-annotation-color);
     stroke-width: 5;
 }
+
+
+/*
+ * Glossary images
+ */
 
 .term-glossary-image-container {
     display: inline-block;
@@ -620,6 +762,7 @@ button.action-button {
     line-height: 0;
     font-size: 0.07142857em; /* 14px => 1px */
     overflow: hidden;
+    background-color: var(--glossary-image-background-color);
 }
 
 .term-glossary-image-link {
@@ -642,6 +785,7 @@ button.action-button {
     display: table;
     table-layout: fixed;
     white-space: normal;
+    color: var(--light-text-color);
 }
 
 .term-glossary-item[data-has-image=true][data-image-load-state=load-error] .term-glossary-image-container-overlay:after {
@@ -746,8 +890,7 @@ button.action-button {
 }
 
 .kanji-glyph-data>tbody>tr>* {
-    border-top-width: 0.07142857em; /* 14px => 1px */
-    border-top-style: solid;
+    border-top: 0.07142857em solid var(--medium-border-color); /* 14px => 1px */
     text-align: left;
     vertical-align: top;
     padding: 0.36em;
@@ -783,9 +926,14 @@ button.action-button {
     margin: 0;
     padding: 0;
     list-style-type: none;
+    color: var(--light-text-color);
 }
 
 .kanji-glossary-list:not([data-count="0"]):not([data-count="1"]) {
     padding-left: 1.4em;
     list-style-type: decimal;
+}
+
+.kanji-glossary {
+    color: var(--dark-text-color);
 }

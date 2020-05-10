@@ -88,7 +88,7 @@
     "applications": {
         "gecko": {
             "id": "alex@foosoft.net",
-            "strict_min_version": "53.0"
+            "strict_min_version": "55.0"
         }
     }
 }
