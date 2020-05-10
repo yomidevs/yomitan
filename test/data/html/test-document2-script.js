@@ -39,3 +39,27 @@ function toggleFullscreen(element) {
         requestFullscreen(element);
     }
 }
+
+function setup(container, fullscreenElement=null) {
+    const fullscreenLink = container.querySelector('.fullscreen-link');
+    if (fullscreenLink !== null) {
+        if (fullscreenElement === null) {
+            fullscreenElement = container.querySelector('.fullscreen-element');
+        }
+        fullscreenLink.addEventListener('click', (e) => {
+            toggleFullscreen(fullscreenElement);
+            e.preventDefault();
+            return false;
+        }, false);
+    }
+
+    const template = container.querySelector('template');
+    const templateContentContainer = container.querySelector('.template-content-container');
+    if (template !== null && templateContentContainer !== null) {
+        const mode = container.dataset.shadowMode;
+        const shadow = templateContentContainer.attachShadow({mode});
+        const content = document.importNode(template.content, true);
+        setup(content);
+        shadow.appendChild(content);
+    }
+}

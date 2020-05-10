@@ -19,7 +19,8 @@ p {
     margin: 0.33em 0;
 }
 
-h1+p {
+h1+p,
+h1+y-description {
     margin-top: -0.67em;
 }
 
