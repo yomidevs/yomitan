@@ -61,7 +61,7 @@ class TextSourceRange {
         const state = TextSourceRange.seekBackward(this.range.startContainer, this.range.startOffset, length);
         this.range.setStart(state.node, state.offset);
         this.rangeStartOffset = this.range.startOffset;
-        this.content = state.content;
+        this.content = state.content + this.content;
         return length - state.remainder;
     }
 
