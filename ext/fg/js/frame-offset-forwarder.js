@@ -105,7 +105,10 @@ class FrameOffsetForwarder {
                     return element;
                 }
 
-                const shadowRoot = element.shadowRoot;
+                const shadowRoot = (
+                    element.shadowRoot ||
+                    element.openOrClosedShadowRoot // Available to Firefox 63+ for WebExtensions
+                );
                 if (shadowRoot) {
                     for (const child of shadowRoot.children) {
                         if (child.nodeType === ELEMENT_NODE) {

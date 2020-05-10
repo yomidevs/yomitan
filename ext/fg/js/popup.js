@@ -530,7 +530,11 @@ class Popup {
     _getFrameParentElement() {
         const defaultParent = document.body;
         const fullscreenElement = DOM.getFullscreenElement();
-        if (fullscreenElement === null || fullscreenElement.shadowRoot) {
+        if (
+            fullscreenElement === null ||
+            fullscreenElement.shadowRoot ||
+            fullscreenElement.openOrClosedShadowRoot // Available to Firefox 63+ for WebExtensions
+        ) {
             return defaultParent;
         }
 
