@@ -17,8 +17,8 @@
 
 /* global
  * DOM
- * apiInjectStylesheet
  * apiOptionsGet
+ * dynamicLoader
  */
 
 class Popup {
@@ -180,12 +180,7 @@ class Popup {
     }
 
     async setCustomOuterCss(css, useWebExtensionApi) {
-        return await this._injectStylesheet(
-            'yomichan-popup-outer-user-stylesheet',
-            'code',
-            css,
-            useWebExtensionApi
-        );
+        return await dynamicLoader.loadStyle('yomichan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi);
     }
 
     setChildrenSupported(value) {
@@ -391,7 +386,7 @@ class Popup {
 
     async _injectStyles() {
         try {
-            await this._injectStylesheet('yomichan-popup-outer-stylesheet', 'file', '/fg/css/client.css', true);
+            await dynamicLoader.loadStyle('yomichan-popup-outer-stylesheet', 'file', '/fg/css/client.css', true);
         } catch (e) {
             // NOP
         }
@@ -717,71 +712,6 @@ class Popup {
         };
     }
 
-    async _injectStylesheet(id, type, value, useWebExtensionApi) {
-        const injectedStylesheets = Popup._injectedStylesheets;
-
-        if (yomichan.isExtensionUrl(window.location.href)) {
-            // Permissions error will occur if trying to use the WebExtension API to inject
-            // into an extension page.
-            useWebExtensionApi = false;
-        }
-
-        let styleNode = injectedStylesheets.get(id);
-        if (typeof styleNode !== 'undefined') {
-            if (styleNode === null) {
-                // Previously injected via WebExtension API
-                throw new Error(`Stylesheet with id ${id} has already been injected using the WebExtension API`);
-            }
-        } else {
-            styleNode = null;
-        }
-
-        if (useWebExtensionApi) {
-            // Inject via WebExtension API
-            if (styleNode !== null && styleNode.parentNode !== null) {
-                styleNode.parentNode.removeChild(styleNode);
-            }
-
-            await apiInjectStylesheet(type, value);
-
-            injectedStylesheets.set(id, null);
-            return null;
-        }
-
-        // Create node in document
-        const parentNode = document.head;
-        if (parentNode === null) {
-            throw new Error('No parent node');
-        }
-
-        // Create or reuse node
-        const isFile = (type === 'file');
-        const tagName = isFile ? 'link' : 'style';
-        if (styleNode === null || styleNode.nodeName.toLowerCase() !== tagName) {
-            if (styleNode !== null && styleNode.parentNode !== null) {
-                styleNode.parentNode.removeChild(styleNode);
-            }
-            styleNode = document.createElement(tagName);
-            styleNode.id = id;
-        }
-
-        // Update node style
-        if (isFile) {
-            styleNode.rel = value;
-        } else {
-            styleNode.textContent = value;
-        }
-
-        // Update parent
-        if (styleNode.parentNode !== parentNode) {
-            parentNode.appendChild(styleNode);
-        }
-
-        // Add to map
-        injectedStylesheets.set(id, styleNode);
-        return styleNode;
-    }
-
     static isFrameAboutBlank(frame) {
         try {
             const contentDocument = frame.contentDocument;
@@ -793,5 +723,3 @@ class Popup {
         }
     }
 }
-
-Popup._injectedStylesheets = new Map();

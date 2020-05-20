@@ -23,9 +23,6 @@
  */
 
 async function injectSearchFrontend() {
-    dynamicLoader.loadStyles([
-        '/fg/css/client.css'
-    ]);
     await dynamicLoader.loadScripts([
         '/mixed/js/text-scanner.js',
         '/fg/js/frontend-api-receiver.js',

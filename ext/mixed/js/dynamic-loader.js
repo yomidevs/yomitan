@@ -15,19 +15,72 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const dynamicLoader = (() => {
-    function loadStyles(urls) {
-        const parent = document.head;
-        for (const url of urls) {
-            const node = parent.querySelector(`link[href='${escapeCSSAttribute(url)}']`);
-            if (node !== null) { continue; }
+/* global
+ * apiInjectStylesheet
+ */
 
-            const style = document.createElement('link');
-            style.rel = 'stylesheet';
-            style.type = 'text/css';
-            style.href = url;
-            parent.appendChild(style);
+const dynamicLoader = (() => {
+    const injectedStylesheets = new Map();
+
+    async function loadStyle(id, type, value, useWebExtensionApi=false) {
+        if (useWebExtensionApi && yomichan.isExtensionUrl(window.location.href)) {
+            // Permissions error will occur if trying to use the WebExtension API to inject into an extension page
+            useWebExtensionApi = false;
         }
+
+        let styleNode = injectedStylesheets.get(id);
+        if (typeof styleNode !== 'undefined') {
+            if (styleNode === null) {
+                // Previously injected via WebExtension API
+                throw new Error(`Stylesheet with id ${id} has already been injected using the WebExtension API`);
+            }
+        } else {
+            styleNode = null;
+        }
+
+        if (useWebExtensionApi) {
+            // Inject via WebExtension API
+            if (styleNode !== null && styleNode.parentNode !== null) {
+                styleNode.parentNode.removeChild(styleNode);
+            }
+
+            injectedStylesheets.set(id, null);
+            await apiInjectStylesheet(type, value);
+            return null;
+        }
+
+        // Create node in document
+        const parentNode = document.head;
+        if (parentNode === null) {
+            throw new Error('No parent node');
+        }
+
+        // Create or reuse node
+        const isFile = (type === 'file');
+        const tagName = isFile ? 'link' : 'style';
+        if (styleNode === null || styleNode.nodeName.toLowerCase() !== tagName) {
+            if (styleNode !== null && styleNode.parentNode !== null) {
+                styleNode.parentNode.removeChild(styleNode);
+            }
+            styleNode = document.createElement(tagName);
+        }
+
+        // Update node style
+        if (isFile) {
+            styleNode.rel = 'stylesheet';
+            styleNode.href = value;
+        } else {
+            styleNode.textContent = value;
+        }
+
+        // Update parent
+        if (styleNode.parentNode !== parentNode) {
+            parentNode.appendChild(styleNode);
+        }
+
+        // Add to map
+        injectedStylesheets.set(id, styleNode);
+        return styleNode;
     }
 
     function loadScripts(urls) {
@@ -80,7 +133,7 @@ const dynamicLoader = (() => {
 
 
     return {
-        loadStyles,
+        loadStyle,
         loadScripts
     };
 })();

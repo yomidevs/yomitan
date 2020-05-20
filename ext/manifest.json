@@ -38,6 +38,7 @@
             "mixed/js/core.js",
             "mixed/js/dom.js",
             "mixed/js/api.js",
+            "mixed/js/dynamic-loader.js",
             "mixed/js/text-scanner.js",
             "fg/js/document.js",
             "fg/js/frontend-api-sender.js",
