@@ -2,7 +2,7 @@
 
 Yomichan turns your web browser into a tool for building Japanese language literacy by helping you to decipher texts
 which would be otherwise too difficult tackle. This extension is similar to
-[Rikaichan](https://addons.mozilla.org/en-US/firefox/addon/rikaichan/) for Firefox and
+[Rikaichamp](https://addons.mozilla.org/en-US/firefox/addon/rikaichamp/) for Firefox and
 [Rikaikun](https://chrome.google.com/webstore/detail/rikaikun/jipdnfibhldikgcjhfnomkfpcebammhp?hl=en) for Chrome, but it
 stands apart in its goal of being an all-encompassing learning tool as opposed to a mere browser-based dictionary.
 
@@ -79,7 +79,7 @@ primary language is not English, you may consider also importing the English ver
     *   [kanjidic\_french.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_french.zip)
     *   [kanjidic\_portuguese.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_portuguese.zip)
     *   [kanjidic\_spanish.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjidic_spanish.zip)
-*   **[Innocent Corpus](https://forum.koohii.com/post-168613.html#pid168613)** (Term and Kanji frequencies across 5000+ novels)
+*   **[Innocent Corpus](https://web.archive.org/web/20190309073023/https://forum.koohii.com/thread-9459.html#pid168613)** (Term and Kanji frequencies across 5000+ novels)
     *   [innocent\_corpus.zip](https://foosoft.net/projects/yomichan/dl/dict/innocent_corpus.zip)
 *   **[Kanjium](https://github.com/mifunetoshiro/kanjium)** (Pitch dictionary, see [related project page](https://github.com/toasted-nutbread/yomichan-pitch-accent-dictionary) for details)
     *   [kanjium_pitch_accents.zip](https://foosoft.net/projects/yomichan/dl/dict/kanjium_pitch_accents.zip)
@@ -289,9 +289,9 @@ your database and install the latest version of the KANJIDIC to see additional i
 Developing Yomichan is a constant balance between including useful features and keeping complexity at a minimum.
 With the new user-editable card template system, it is possible to create text-only cards without having to double
 the number field of templates in the extension itself. If you would like to stop HTML tags from being added to your
-cards, simply copy the contents of the <a href="dl/fields.txt">text-only field template</a> into the template box on
-the Anki settings page (make sure you have the *Show advanced options* checkbox ticked), making sure to replace the
-existing values.
+cards, simply copy the contents of the [text-only field template](https://foosoft.net/projects/yomichan/dl/fields.txt)
+into the template box on the Anki settings page (make sure you have the *Show advanced options* checkbox ticked),
+making sure to replace the existing values.
 
 **Will you add support for online dictionaries?**
 
