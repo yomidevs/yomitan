@@ -4,7 +4,7 @@ Yomichan turns your web browser into a tool for building Japanese language liter
 which would be otherwise too difficult tackle. This extension is similar to
 [Rikaichan](https://addons.mozilla.org/en-US/firefox/addon/rikaichan/) for Firefox and
 [Rikaikun](https://chrome.google.com/webstore/detail/rikaikun/jipdnfibhldikgcjhfnomkfpcebammhp?hl=en) for Chrome, but it
-stands apart in its goal of being a all-encompassing learning tool as opposed to a mere browser-based dictionary.
+stands apart in its goal of being an all-encompassing learning tool as opposed to a mere browser-based dictionary.
 
 Yomichan provides advanced features not available in other browser-based dictionaries:
 
@@ -38,7 +38,7 @@ Yomichan comes in two flavors: *stable* and *testing*. Over the years, this exte
 complex features, which have become increasingly difficult for me to test across different browsers, versions, and
 environments. All new changes are initially introduced into the *testing* version, and when I am reasonably confident
 that they are bug free, they will get promoted to the *stable* version. If you are technically savvy and don't mind
-submitting issues on GitHub, try the *testing* version, otherwise the *stable* version will be your best bet.
+submitting issues on GitHub, try the *testing* version; otherwise, the *stable* version will be your best bet.
 
 *   **Google Chrome**
     ([stable](https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami) or [testing](https://chrome.google.com/webstore/detail/yomichan-testing/bcknnfebhefllbjhagijobjklocakpdm))
@@ -120,7 +120,7 @@ Yomichan supports the use of custom dictionaries including the esoteric but popu
 similar to the ones pictured below. These dictionaries are often sought after by language learners for their correctness
 and excellent coverage of the Japanese language.
 
-Unfortunately, as most of the dictionaries released in this format are proprietary I am unable to bundle them with
+Unfortunately, as most of the dictionaries released in this format are proprietary, I am unable to bundle them with
 Yomichan. You will need to procure these dictionaries yourself and import them with [Yomichan
 Import](https://foosoft.net/projects/yomichan-import). Please see the project page for additional details.
 
@@ -136,7 +136,7 @@ Please see the respective project page for more information about how to set up 
 
 Before flashcards can be automatically created, you must configure the templates used to create term and/or Kanji notes.
 If you are unfamiliar with Anki deck and model management, this would be a good time to reference the [Anki
-Manual](https://apps.ankiweb.net/docs/manual.html). In short, you must specify what information should be included in the
+Manual](https://docs.ankiweb.net/#/). In short, you must specify what information should be included in the
 flashcards that Yomichan creates through AnkiConnect.
 
 Flashcard fields can be configured with the following steps:
@@ -260,7 +260,7 @@ versions packaged.
 **I'm having problems importing dictionaries in Firefox, what do I do?**
 
 Yomichan uses the cross-browser IndexedDB system for storing imported dictionary data into your user profile. Although
-everything "just works" in Chrome, depending on settings, Firefox users can run into problems due browser bugs.
+everything "just works" in Chrome, depending on settings, Firefox users can run into problems due to browser bugs.
 Yomichan catches errors and tries to offer suggestions about how to work around Firefox issues, but in general at least
 one of the following solutions should work for you:
 
@@ -280,8 +280,8 @@ one of the following solutions should work for you:
 **Why does the Kanji results page display "No data found" for several fields?**
 
 You are using data from the KANJIDIC dictionary that was exported for an earlier version of Yomichan. It does not
-contain the additional information which newer versions of Yofomichan expect. Unfortunately, since major browser
-implementations of IndexedDB do not provide reliable means for selective bulk data deletion, you will need purge
+contain the additional information which newer versions of Yomichan expect. Unfortunately, since major browser
+implementations of IndexedDB do not provide reliable means for selective bulk data deletion, you will need to purge
 your database and install the latest version of the KANJIDIC to see additional information about characters.
 
 **Can I still create cards without HTML formatting? The option for it is gone!**
