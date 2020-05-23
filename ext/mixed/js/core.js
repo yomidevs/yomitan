@@ -255,15 +255,37 @@ class EventListenerCollection {
         return this._eventListeners.length;
     }
 
-    addEventListener(node, type, listener, options) {
-        node.addEventListener(type, listener, options);
-        this._eventListeners.push([node, type, listener, options]);
+    addEventListener(object, ...args) {
+        object.addEventListener(...args);
+        this._eventListeners.push(['removeEventListener', object, ...args]);
+    }
+
+    addListener(object, ...args) {
+        object.addListener(args);
+        this._eventListeners.push(['removeListener', object, ...args]);
+    }
+
+    on(object, ...args) {
+        object.on(args);
+        this._eventListeners.push(['off', object, ...args]);
     }
 
     removeAllEventListeners() {
         if (this._eventListeners.length === 0) { return; }
-        for (const [node, type, listener, options] of this._eventListeners) {
-            node.removeEventListener(type, listener, options);
+        for (const [removeFunctionName, object, ...args] of this._eventListeners) {
+            switch (removeFunctionName) {
+                case 'removeEventListener':
+                    object.removeEventListener(...args);
+                    break;
+                case 'removeListener':
+                    object.removeListener(...args);
+                    break;
+                case 'off':
+                    object.off(...args);
+                    break;
+                default:
+                    throw new Error(`Unknown remove function: ${removeFunctionName}`);
+            }
         }
         this._eventListeners = [];
     }
