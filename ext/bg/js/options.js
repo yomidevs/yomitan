@@ -111,19 +111,31 @@ const profileOptionsVersionUpdates = [
     },
     (options) => {
         // Version 14 changes:
-        //  Changed template for Anki audio.
+        //  Changed template for Anki audio and tags.
         let fieldTemplates = options.anki.fieldTemplates;
         if (typeof fieldTemplates !== 'string') { return; }
 
-        const replacement = '{{#*inline "audio"}}\n    {{~#if definition.audioFileName~}}\n        [sound:{{definition.audioFileName}}]\n    {{~/if~}}\n{{/inline}}';
-        let replaced = false;
-        fieldTemplates = fieldTemplates.replace(/\{\{#\*inline "audio"\}\}\{\{\/inline\}\}/g, () => {
-            replaced = true;
-            return replacement;
-        });
+        const replacements = [
+            [
+                '{{#*inline "audio"}}{{/inline}}',
+                '{{#*inline "audio"}}\n    {{~#if definition.audioFileName~}}\n        [sound:{{definition.audioFileName}}]\n    {{~/if~}}\n{{/inline}}'
+            ],
+            [
+                '{{#*inline "tags"}}\n    {{~#each definition.definitionTags}}{{name}}{{#unless @last}}, {{/unless}}{{/each~}}\n{{/inline}}',
+                '{{#*inline "tags"}}\n    {{~#mergeTags definition group merge}}{{this}}{{/mergeTags~}}\n{{/inline}}'
+            ]
+        ];
 
-        if (!replaced) {
-            fieldTemplates += '\n\n' + replacement;
+        for (const [pattern, replacement] of replacements) {
+            let replaced = false;
+            fieldTemplates = fieldTemplates.replace(new RegExp(escapeRegExp(pattern), 'g'), () => {
+                replaced = true;
+                return replacement;
+            });
+
+            if (!replaced) {
+                fieldTemplates += '\n\n' + replacement;
+            }
         }
 
         options.anki.fieldTemplates = fieldTemplates;

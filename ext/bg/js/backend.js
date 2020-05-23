@@ -150,7 +150,7 @@ class Backend {
             await profileConditionsDescriptorPromise;
 
             this.optionsSchema = await requestJson(chrome.runtime.getURL('/bg/data/options-schema.json'), 'GET');
-            this.defaultAnkiFieldTemplates = await requestText(chrome.runtime.getURL('/bg/data/default-anki-field-templates.handlebars'), 'GET');
+            this.defaultAnkiFieldTemplates = (await requestText(chrome.runtime.getURL('/bg/data/default-anki-field-templates.handlebars'), 'GET')).trim();
             this.options = await optionsLoad();
             this.options = JsonSchema.getValidValueOrDefault(this.optionsSchema, this.options);
 

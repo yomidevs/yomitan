@@ -151,7 +151,7 @@
 {{/inline}}
 
 {{#*inline "tags"}}
-    {{~#each definition.definitionTags}}{{name}}{{#unless @last}}, {{/unless}}{{/each~}}
+    {{~#mergeTags definition group merge}}{{this}}{{/mergeTags~}}
 {{/inline}}
 
 {{#*inline "url"}}

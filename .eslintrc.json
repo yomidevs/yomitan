@@ -98,6 +98,7 @@
                 "areSetsEqual": "readonly",
                 "getSetIntersection": "readonly",
                 "getSetDifference": "readonly",
+                "escapeRegExp": "readonly",
                 "EventDispatcher": "readonly",
                 "EventListenerCollection": "readonly",
                 "EXTENSION_IS_BROWSER_EDGE": "readonly"
