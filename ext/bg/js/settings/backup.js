@@ -133,7 +133,7 @@ async function _settingsImportSetOptionsFull(optionsFull) {
 }
 
 function _showSettingsImportError(error) {
-    logError(error);
+    yomichan.logError(error);
     document.querySelector('#settings-import-error-modal-message').textContent = `${error}`;
     $('#settings-import-error-modal').modal('show');
 }

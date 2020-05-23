@@ -16,7 +16,8 @@
  */
 
 class AnkiNoteBuilder {
-    constructor({audioSystem, renderTemplate}) {
+    constructor({anki, audioSystem, renderTemplate}) {
+        this._anki = anki;
         this._audioSystem = audioSystem;
         this._renderTemplate = renderTemplate;
     }
@@ -31,30 +32,14 @@ class AnkiNoteBuilder {
             fields: {},
             tags,
             deckName: modeOptions.deck,
-            modelName: modeOptions.model
+            modelName: modeOptions.model,
+            options: {
+                duplicateScope: options.anki.duplicateScope
+            }
         };
 
         for (const [fieldName, fieldValue] of modeOptionsFieldEntries) {
             note.fields[fieldName] = await this.formatField(fieldValue, definition, mode, context, options, templates, null);
-        }
-
-        if (!isKanji && definition.audio) {
-            const audioFields = [];
-
-            for (const [fieldName, fieldValue] of modeOptionsFieldEntries) {
-                if (fieldValue.includes('{audio}')) {
-                    audioFields.push(fieldName);
-                }
-            }
-
-            if (audioFields.length > 0) {
-                note.audio = {
-                    url: definition.audio.url,
-                    filename: definition.audio.filename,
-                    skipHash: '7e2c2f954ef6051373ba916f000168dc', // hash of audio data that should be skipped
-                    fields: audioFields
-                };
-            }
         }
 
         return note;
@@ -84,48 +69,64 @@ class AnkiNoteBuilder {
         });
     }
 
-    async injectAudio(definition, fields, sources, optionsContext) {
+    async injectAudio(definition, fields, sources, customSourceUrl) {
         if (!this._containsMarker(fields, 'audio')) { return; }
 
         try {
             const expressions = definition.expressions;
             const audioSourceDefinition = Array.isArray(expressions) ? expressions[0] : definition;
 
-            const {uri} = await this._audioSystem.getDefinitionAudio(audioSourceDefinition, sources, {tts: false, optionsContext});
-            const filename = this._createInjectedAudioFileName(audioSourceDefinition);
-            if (filename !== null) {
-                definition.audio = {url: uri, filename};
-            }
+            let fileName = this._createInjectedAudioFileName(audioSourceDefinition);
+            if (fileName === null) { return; }
+            fileName = AnkiNoteBuilder.replaceInvalidFileNameCharacters(fileName);
+
+            const {audio} = await this._audioSystem.getDefinitionAudio(
+                audioSourceDefinition,
+                sources,
+                {
+                    textToSpeechVoice: null,
+                    customSourceUrl,
+                    binary: true,
+                    disableCache: true
+                }
+            );
+
+            const data = AnkiNoteBuilder.arrayBufferToBase64(audio);
+            await this._anki.storeMediaFile(fileName, data);
+
+            definition.audioFileName = fileName;
         } catch (e) {
             // NOP
         }
     }
 
-    async injectScreenshot(definition, fields, screenshot, anki) {
+    async injectScreenshot(definition, fields, screenshot) {
         if (!this._containsMarker(fields, 'screenshot')) { return; }
 
         const now = new Date(Date.now());
-        const filename = `yomichan_browser_screenshot_${definition.reading}_${this._dateToString(now)}.${screenshot.format}`;
+        let fileName = `yomichan_browser_screenshot_${definition.reading}_${this._dateToString(now)}.${screenshot.format}`;
+        fileName = AnkiNoteBuilder.replaceInvalidFileNameCharacters(fileName);
         const data = screenshot.dataUrl.replace(/^data:[\w\W]*?,/, '');
 
         try {
-            await anki.storeMediaFile(filename, data);
+            await this._anki.storeMediaFile(fileName, data);
         } catch (e) {
             return;
         }
 
-        definition.screenshotFileName = filename;
+        definition.screenshotFileName = fileName;
     }
 
     _createInjectedAudioFileName(definition) {
         const {reading, expression} = definition;
         if (!reading && !expression) { return null; }
 
-        let filename = 'yomichan';
-        if (reading) { filename += `_${reading}`; }
-        if (expression) { filename += `_${expression}`; }
-        filename += '.mp3';
-        return filename;
+        let fileName = 'yomichan';
+        if (reading) { fileName += `_${reading}`; }
+        if (expression) { fileName += `_${expression}`; }
+        fileName += '.mp3';
+        fileName = fileName.replace(/\]/g, '');
+        return fileName;
     }
 
     _dateToString(date) {
@@ -146,6 +147,15 @@ class AnkiNoteBuilder {
             }
         }
         return false;
+    }
+
+    static replaceInvalidFileNameCharacters(fileName) {
+        // eslint-disable-next-line no-control-regex
+        return fileName.replace(/[<>:"/\\|?*\x00-\x1F]/g, '-');
+    }
+
+    static arrayBufferToBase64(arrayBuffer) {
+        return window.btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
     }
 
     static stringReplaceAsync(str, regex, replacer) {

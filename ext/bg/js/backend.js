@@ -18,24 +18,25 @@
 /* global
  * AnkiConnect
  * AnkiNoteBuilder
- * AnkiNull
  * AudioSystem
  * AudioUriBuilder
  * BackendApiForwarder
  * ClipboardMonitor
  * Database
  * DictionaryImporter
+ * Environment
  * JsonSchema
  * Mecab
+ * ObjectPropertyAccessor
  * Translator
  * conditionsTestValue
- * dictConfigured
  * dictTermsSort
  * handlebarsRenderDynamic
  * jp
  * optionsLoad
  * optionsSave
  * profileConditionsDescriptor
+ * profileConditionsDescriptorPromise
  * requestJson
  * requestText
  * utilIsolate
@@ -43,18 +44,23 @@
 
 class Backend {
     constructor() {
+        this.environment = new Environment();
         this.database = new Database();
         this.dictionaryImporter = new DictionaryImporter();
         this.translator = new Translator(this.database);
-        this.anki = new AnkiNull();
+        this.anki = new AnkiConnect();
         this.mecab = new Mecab();
         this.clipboardMonitor = new ClipboardMonitor({getClipboard: this._onApiClipboardGet.bind(this)});
         this.options = null;
         this.optionsSchema = null;
         this.defaultAnkiFieldTemplates = null;
-        this.audioSystem = new AudioSystem({getAudioUri: this._getAudioUri.bind(this)});
         this.audioUriBuilder = new AudioUriBuilder();
+        this.audioSystem = new AudioSystem({
+            audioUriBuilder: this.audioUriBuilder,
+            useCache: false
+        });
         this.ankiNoteBuilder = new AnkiNoteBuilder({
+            anki: this.anki,
             audioSystem: this.audioSystem,
             renderTemplate: this._renderTemplate.bind(this)
         });
@@ -64,89 +70,128 @@ class Backend {
             url: window.location.href
         };
 
-        this.isPrepared = false;
-
         this.clipboardPasteTarget = document.querySelector('#clipboard-paste-target');
 
         this.popupWindow = null;
 
-        this.apiForwarder = new BackendApiForwarder();
+        const apiForwarder = new BackendApiForwarder();
+        apiForwarder.prepare();
 
-        this.messageToken = yomichan.generateId(16);
+        this._defaultBrowserActionTitle = null;
+        this._isPrepared = false;
+        this._prepareError = false;
+        this._badgePrepareDelayTimer = null;
+        this._logErrorLevel = null;
 
         this._messageHandlers = new Map([
-            ['yomichanCoreReady', {handler: this._onApiYomichanCoreReady.bind(this), async: false}],
-            ['optionsSchemaGet', {handler: this._onApiOptionsSchemaGet.bind(this), async: false}],
-            ['optionsGet', {handler: this._onApiOptionsGet.bind(this), async: false}],
-            ['optionsGetFull', {handler: this._onApiOptionsGetFull.bind(this), async: false}],
-            ['optionsSet', {handler: this._onApiOptionsSet.bind(this), async: true}],
-            ['optionsSave', {handler: this._onApiOptionsSave.bind(this), async: true}],
-            ['kanjiFind', {handler: this._onApiKanjiFind.bind(this), async: true}],
-            ['termsFind', {handler: this._onApiTermsFind.bind(this), async: true}],
-            ['textParse', {handler: this._onApiTextParse.bind(this), async: true}],
-            ['definitionAdd', {handler: this._onApiDefinitionAdd.bind(this), async: true}],
-            ['definitionsAddable', {handler: this._onApiDefinitionsAddable.bind(this), async: true}],
-            ['noteView', {handler: this._onApiNoteView.bind(this), async: true}],
-            ['templateRender', {handler: this._onApiTemplateRender.bind(this), async: true}],
-            ['commandExec', {handler: this._onApiCommandExec.bind(this), async: false}],
-            ['audioGetUri', {handler: this._onApiAudioGetUri.bind(this), async: true}],
-            ['screenshotGet', {handler: this._onApiScreenshotGet.bind(this), async: true}],
-            ['broadcastTab', {handler: this._onApiBroadcastTab.bind(this), async: false}],
-            ['frameInformationGet', {handler: this._onApiFrameInformationGet.bind(this), async: true}],
-            ['injectStylesheet', {handler: this._onApiInjectStylesheet.bind(this), async: true}],
-            ['getEnvironmentInfo', {handler: this._onApiGetEnvironmentInfo.bind(this), async: true}],
-            ['clipboardGet', {handler: this._onApiClipboardGet.bind(this), async: true}],
-            ['getDisplayTemplatesHtml', {handler: this._onApiGetDisplayTemplatesHtml.bind(this), async: true}],
-            ['getQueryParserTemplatesHtml', {handler: this._onApiGetQueryParserTemplatesHtml.bind(this), async: true}],
-            ['getZoom', {handler: this._onApiGetZoom.bind(this), async: true}],
-            ['getMessageToken', {handler: this._onApiGetMessageToken.bind(this), async: false}],
-            ['getDefaultAnkiFieldTemplates', {handler: this._onApiGetDefaultAnkiFieldTemplates.bind(this), async: false}]
+            ['yomichanCoreReady',            {async: false, contentScript: true,  handler: this._onApiYomichanCoreReady.bind(this)}],
+            ['optionsSchemaGet',             {async: false, contentScript: true,  handler: this._onApiOptionsSchemaGet.bind(this)}],
+            ['optionsGet',                   {async: false, contentScript: true,  handler: this._onApiOptionsGet.bind(this)}],
+            ['optionsGetFull',               {async: false, contentScript: true,  handler: this._onApiOptionsGetFull.bind(this)}],
+            ['optionsSave',                  {async: true,  contentScript: true,  handler: this._onApiOptionsSave.bind(this)}],
+            ['kanjiFind',                    {async: true,  contentScript: true,  handler: this._onApiKanjiFind.bind(this)}],
+            ['termsFind',                    {async: true,  contentScript: true,  handler: this._onApiTermsFind.bind(this)}],
+            ['textParse',                    {async: true,  contentScript: true,  handler: this._onApiTextParse.bind(this)}],
+            ['definitionAdd',                {async: true,  contentScript: true,  handler: this._onApiDefinitionAdd.bind(this)}],
+            ['definitionsAddable',           {async: true,  contentScript: true,  handler: this._onApiDefinitionsAddable.bind(this)}],
+            ['noteView',                     {async: true,  contentScript: true,  handler: this._onApiNoteView.bind(this)}],
+            ['templateRender',               {async: true,  contentScript: true,  handler: this._onApiTemplateRender.bind(this)}],
+            ['commandExec',                  {async: false, contentScript: true,  handler: this._onApiCommandExec.bind(this)}],
+            ['audioGetUri',                  {async: true,  contentScript: true,  handler: this._onApiAudioGetUri.bind(this)}],
+            ['screenshotGet',                {async: true,  contentScript: true,  handler: this._onApiScreenshotGet.bind(this)}],
+            ['sendMessageToFrame',           {async: false, contentScript: true,  handler: this._onApiSendMessageToFrame.bind(this)}],
+            ['broadcastTab',                 {async: false, contentScript: true,  handler: this._onApiBroadcastTab.bind(this)}],
+            ['frameInformationGet',          {async: true,  contentScript: true,  handler: this._onApiFrameInformationGet.bind(this)}],
+            ['injectStylesheet',             {async: true,  contentScript: true,  handler: this._onApiInjectStylesheet.bind(this)}],
+            ['getEnvironmentInfo',           {async: false, contentScript: true,  handler: this._onApiGetEnvironmentInfo.bind(this)}],
+            ['clipboardGet',                 {async: true,  contentScript: true,  handler: this._onApiClipboardGet.bind(this)}],
+            ['getDisplayTemplatesHtml',      {async: true,  contentScript: true,  handler: this._onApiGetDisplayTemplatesHtml.bind(this)}],
+            ['getQueryParserTemplatesHtml',  {async: true,  contentScript: true,  handler: this._onApiGetQueryParserTemplatesHtml.bind(this)}],
+            ['getZoom',                      {async: true,  contentScript: true,  handler: this._onApiGetZoom.bind(this)}],
+            ['getDefaultAnkiFieldTemplates', {async: false, contentScript: true,  handler: this._onApiGetDefaultAnkiFieldTemplates.bind(this)}],
+            ['getAnkiDeckNames',             {async: true,  contentScript: false, handler: this._onApiGetAnkiDeckNames.bind(this)}],
+            ['getAnkiModelNames',            {async: true,  contentScript: false, handler: this._onApiGetAnkiModelNames.bind(this)}],
+            ['getAnkiModelFieldNames',       {async: true,  contentScript: false, handler: this._onApiGetAnkiModelFieldNames.bind(this)}],
+            ['getDictionaryInfo',            {async: true,  contentScript: false, handler: this._onApiGetDictionaryInfo.bind(this)}],
+            ['getDictionaryCounts',          {async: true,  contentScript: false, handler: this._onApiGetDictionaryCounts.bind(this)}],
+            ['purgeDatabase',                {async: true,  contentScript: false, handler: this._onApiPurgeDatabase.bind(this)}],
+            ['getMedia',                     {async: true,  contentScript: true,  handler: this._onApiGetMedia.bind(this)}],
+            ['log',                          {async: false, contentScript: true,  handler: this._onApiLog.bind(this)}],
+            ['logIndicatorClear',            {async: false, contentScript: true,  handler: this._onApiLogIndicatorClear.bind(this)}],
+            ['createActionPort',             {async: false, contentScript: true,  handler: this._onApiCreateActionPort.bind(this)}],
+            ['modifySettings',               {async: true,  contentScript: true,  handler: this._onApiModifySettings.bind(this)}]
+        ]);
+        this._messageHandlersWithProgress = new Map([
+            ['importDictionaryArchive', {async: true,  contentScript: false, handler: this._onApiImportDictionaryArchive.bind(this)}],
+            ['deleteDictionary',        {async: true,  contentScript: false, handler: this._onApiDeleteDictionary.bind(this)}]
         ]);
 
         this._commandHandlers = new Map([
-            ['search', this._onCommandSearch.bind(this)],
-            ['help', this._onCommandHelp.bind(this)],
+            ['search',  this._onCommandSearch.bind(this)],
+            ['help',    this._onCommandHelp.bind(this)],
             ['options', this._onCommandOptions.bind(this)],
-            ['toggle', this._onCommandToggle.bind(this)]
+            ['toggle',  this._onCommandToggle.bind(this)]
         ]);
     }
 
     async prepare() {
-        await this.database.prepare();
-        await this.translator.prepare();
-
-        this.optionsSchema = await requestJson(chrome.runtime.getURL('/bg/data/options-schema.json'), 'GET');
-        this.defaultAnkiFieldTemplates = await requestText(chrome.runtime.getURL('/bg/data/default-anki-field-templates.handlebars'), 'GET');
-        this.options = await optionsLoad();
         try {
+            this._defaultBrowserActionTitle = await this._getBrowserIconTitle();
+            this._badgePrepareDelayTimer = setTimeout(() => {
+                this._badgePrepareDelayTimer = null;
+                this._updateBadge();
+            }, 1000);
+            this._updateBadge();
+
+            await this.environment.prepare();
+            await this.database.prepare();
+            await this.translator.prepare();
+
+            await profileConditionsDescriptorPromise;
+
+            this.optionsSchema = await requestJson(chrome.runtime.getURL('/bg/data/options-schema.json'), 'GET');
+            this.defaultAnkiFieldTemplates = (await requestText(chrome.runtime.getURL('/bg/data/default-anki-field-templates.handlebars'), 'GET')).trim();
+            this.options = await optionsLoad();
             this.options = JsonSchema.getValidValueOrDefault(this.optionsSchema, this.options);
+
+            this.onOptionsUpdated('background');
+
+            if (isObject(chrome.commands) && isObject(chrome.commands.onCommand)) {
+                chrome.commands.onCommand.addListener(this._runCommand.bind(this));
+            }
+            if (isObject(chrome.tabs) && isObject(chrome.tabs.onZoomChange)) {
+                chrome.tabs.onZoomChange.addListener(this._onZoomChange.bind(this));
+            }
+            chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
+
+            const options = this.getOptions(this.optionsContext);
+            if (options.general.showGuide) {
+                chrome.tabs.create({url: chrome.runtime.getURL('/bg/guide.html')});
+            }
+
+            this.clipboardMonitor.on('change', this._onClipboardText.bind(this));
+
+            this._sendMessageAllTabs('backendPrepared');
+            const callback = () => this.checkLastError(chrome.runtime.lastError);
+            chrome.runtime.sendMessage({action: 'backendPrepared'}, callback);
+
+            this._isPrepared = true;
         } catch (e) {
-            // This shouldn't happen, but catch errors just in case of bugs
-            logError(e);
+            this._prepareError = true;
+            yomichan.logError(e);
+            throw e;
+        } finally {
+            if (this._badgePrepareDelayTimer !== null) {
+                clearTimeout(this._badgePrepareDelayTimer);
+                this._badgePrepareDelayTimer = null;
+            }
+
+            this._updateBadge();
         }
+    }
 
-        this.onOptionsUpdated('background');
-
-        if (isObject(chrome.commands) && isObject(chrome.commands.onCommand)) {
-            chrome.commands.onCommand.addListener(this._runCommand.bind(this));
-        }
-        if (isObject(chrome.tabs) && isObject(chrome.tabs.onZoomChange)) {
-            chrome.tabs.onZoomChange.addListener(this._onZoomChange.bind(this));
-        }
-        chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
-
-        this.isPrepared = true;
-
-        const options = this.getOptions(this.optionsContext);
-        if (options.general.showGuide) {
-            chrome.tabs.create({url: chrome.runtime.getURL('/bg/guide.html')});
-        }
-
-        this.clipboardMonitor.on('change', this._onClipboardText.bind(this));
-
-        this._sendMessageAllTabs('backendPrepared');
-        const callback = () => this.checkLastError(chrome.runtime.lastError);
-        chrome.runtime.sendMessage({action: 'backendPrepared'}, callback);
+    isPrepared() {
+        return this._isPrepared;
     }
 
     _sendMessageAllTabs(action, params={}) {
@@ -167,9 +212,13 @@ class Backend {
         const messageHandler = this._messageHandlers.get(action);
         if (typeof messageHandler === 'undefined') { return false; }
 
-        const {handler, async} = messageHandler;
+        const {handler, async, contentScript} = messageHandler;
 
         try {
+            if (!contentScript) {
+                this._validatePrivilegedMessageSender(sender);
+            }
+
             const promiseOrResult = handler(params, sender);
             if (async) {
                 promiseOrResult.then(
@@ -198,17 +247,10 @@ class Backend {
 
     applyOptions() {
         const options = this.getOptions(this.optionsContext);
-        if (!options.general.enable) {
-            this.setExtensionBadgeBackgroundColor('#555555');
-            this.setExtensionBadgeText('off');
-        } else if (!dictConfigured(options)) {
-            this.setExtensionBadgeBackgroundColor('#f0ad4e');
-            this.setExtensionBadgeText('!');
-        } else {
-            this.setExtensionBadgeText('');
-        }
+        this._updateBadge();
 
-        this.anki = options.anki.enable ? new AnkiConnect(options.anki.server) : new AnkiNull();
+        this.anki.setServer(options.anki.server);
+        this.anki.setEnabled(options.anki.enable);
 
         if (options.parsing.enableMecabParser) {
             this.mecab.startListener();
@@ -227,8 +269,9 @@ class Backend {
         return this.optionsSchema;
     }
 
-    getFullOptions() {
-        return this.options;
+    getFullOptions(useSchema=false) {
+        const options = this.options;
+        return useSchema ? JsonSchema.createProxy(options, this.optionsSchema) : options;
     }
 
     setFullOptions(options) {
@@ -236,25 +279,26 @@ class Backend {
             this.options = JsonSchema.getValidValueOrDefault(this.optionsSchema, utilIsolate(options));
         } catch (e) {
             // This shouldn't happen, but catch errors just in case of bugs
-            logError(e);
+            yomichan.logError(e);
         }
     }
 
-    getOptions(optionsContext) {
-        return this.getProfile(optionsContext).options;
+    getOptions(optionsContext, useSchema=false) {
+        return this.getProfile(optionsContext, useSchema).options;
     }
 
-    getProfile(optionsContext) {
-        const profiles = this.options.profiles;
+    getProfile(optionsContext, useSchema=false) {
+        const options = this.getFullOptions(useSchema);
+        const profiles = options.profiles;
         if (typeof optionsContext.index === 'number') {
             return profiles[optionsContext.index];
         }
-        const profile = this.getProfileFromContext(optionsContext);
-        return profile !== null ? profile : this.options.profiles[this.options.profileCurrent];
+        const profile = this.getProfileFromContext(options, optionsContext);
+        return profile !== null ? profile : options.profiles[options.profileCurrent];
     }
 
-    getProfileFromContext(optionsContext) {
-        for (const profile of this.options.profiles) {
+    getProfileFromContext(options, optionsContext) {
+        for (const profile of options.profiles) {
             const conditionGroups = profile.conditionGroups;
             if (conditionGroups.length > 0 && Backend.testConditionGroups(conditionGroups, optionsContext)) {
                 return profile;
@@ -283,18 +327,6 @@ class Backend {
             }
         }
         return true;
-    }
-
-    setExtensionBadgeBackgroundColor(color) {
-        if (typeof chrome.browserAction.setBadgeBackgroundColor === 'function') {
-            chrome.browserAction.setBadgeBackgroundColor({color});
-        }
-    }
-
-    setExtensionBadgeText(text) {
-        if (typeof chrome.browserAction.setBadgeText === 'function') {
-            chrome.browserAction.setBadgeText({text});
-        }
     }
 
     checkLastError() {
@@ -394,46 +426,6 @@ class Backend {
         return this.getFullOptions();
     }
 
-    async _onApiOptionsSet({changedOptions, optionsContext, source}) {
-        const options = this.getOptions(optionsContext);
-
-        function getValuePaths(obj) {
-            const valuePaths = [];
-            const nodes = [{obj, path: []}];
-            while (nodes.length > 0) {
-                const node = nodes.pop();
-                for (const key of Object.keys(node.obj)) {
-                    const path = node.path.concat(key);
-                    const obj2 = node.obj[key];
-                    if (obj2 !== null && typeof obj2 === 'object') {
-                        nodes.unshift({obj: obj2, path});
-                    } else {
-                        valuePaths.push([obj2, path]);
-                    }
-                }
-            }
-            return valuePaths;
-        }
-
-        function modifyOption(path, value) {
-            let pivot = options;
-            for (const key of path.slice(0, -1)) {
-                if (!hasOwn(pivot, key)) {
-                    return false;
-                }
-                pivot = pivot[key];
-            }
-            pivot[path[path.length - 1]] = value;
-            return true;
-        }
-
-        for (const [value, path] of getValuePaths(changedOptions)) {
-            modifyOption(path, value);
-        }
-
-        await this._onApiOptionsSave({source});
-    }
-
     async _onApiOptionsSave({source}) {
         const options = this.getFullOptions();
         await optionsSave(options);
@@ -484,14 +476,15 @@ class Backend {
 
     async _onApiDefinitionAdd({definition, mode, context, details, optionsContext}) {
         const options = this.getOptions(optionsContext);
-        const templates = this.defaultAnkiFieldTemplates;
+        const templates = this._getTemplates(options);
 
         if (mode !== 'kanji') {
+            const {customSourceUrl} = options.audio;
             await this.ankiNoteBuilder.injectAudio(
                 definition,
                 options.anki.terms.fields,
                 options.audio.sources,
-                optionsContext
+                customSourceUrl
             );
         }
 
@@ -499,8 +492,7 @@ class Backend {
             await this.ankiNoteBuilder.injectScreenshot(
                 definition,
                 options.anki.terms.fields,
-                details.screenshot,
-                this.anki
+                details.screenshot
             );
         }
 
@@ -510,7 +502,7 @@ class Backend {
 
     async _onApiDefinitionsAddable({definitions, modes, context, optionsContext}) {
         const options = this.getOptions(optionsContext);
-        const templates = this.defaultAnkiFieldTemplates;
+        const templates = this._getTemplates(options);
         const states = [];
 
         try {
@@ -540,7 +532,7 @@ class Backend {
             }
 
             if (cannotAdd.length > 0) {
-                const noteIdsArray = await this.anki.findNoteIds(cannotAdd.map((e) => e[0]));
+                const noteIdsArray = await this.anki.findNoteIds(cannotAdd.map((e) => e[0]), options.anki.duplicateScope);
                 for (let i = 0, ii = Math.min(cannotAdd.length, noteIdsArray.length); i < ii; ++i) {
                     const noteIds = noteIdsArray[i];
                     if (noteIds.length > 0) {
@@ -567,9 +559,8 @@ class Backend {
         return this._runCommand(command, params);
     }
 
-    async _onApiAudioGetUri({definition, source, optionsContext}) {
-        const options = this.getOptions(optionsContext);
-        return await this.audioUriBuilder.getUri(definition, source, options);
+    async _onApiAudioGetUri({definition, source, details}) {
+        return await this.audioUriBuilder.getUri(definition, source, details);
     }
 
     _onApiScreenshotGet({options}, sender) {
@@ -581,6 +572,17 @@ class Backend {
         return new Promise((resolve) => {
             chrome.tabs.captureVisibleTab(windowId, options, (dataUrl) => resolve(dataUrl));
         });
+    }
+
+    _onApiSendMessageToFrame({frameId, action, params}, sender) {
+        if (!(sender && sender.tab)) {
+            return false;
+        }
+
+        const tabId = sender.tab.id;
+        const callback = () => this.checkLastError(chrome.runtime.lastError);
+        chrome.tabs.sendMessage(tabId, {action, params}, {frameId}, callback);
+        return true;
     }
 
     _onApiBroadcastTab({action, params}, sender) {
@@ -639,15 +641,8 @@ class Backend {
         });
     }
 
-    async _onApiGetEnvironmentInfo() {
-        const browser = await Backend._getBrowser();
-        const platform = await new Promise((resolve) => chrome.runtime.getPlatformInfo(resolve));
-        return {
-            browser,
-            platform: {
-                os: platform.os
-            }
-        };
+    _onApiGetEnvironmentInfo() {
+        return this.environment.getInfo();
     }
 
     async _onApiClipboardGet() {
@@ -663,7 +658,7 @@ class Backend {
               being an extension with clipboard permissions. It effectively asks for the
               non-extension permission for clipboard access.
         */
-        const browser = await Backend._getBrowser();
+        const {browser} = this.environment.getInfo();
         if (browser === 'firefox' || browser === 'firefox-mobile') {
             return await navigator.clipboard.readText();
         } else {
@@ -714,15 +709,164 @@ class Backend {
         });
     }
 
-    _onApiGetMessageToken() {
-        return this.messageToken;
-    }
-
     _onApiGetDefaultAnkiFieldTemplates() {
         return this.defaultAnkiFieldTemplates;
     }
 
+    async _onApiGetAnkiDeckNames() {
+        return await this.anki.getDeckNames();
+    }
+
+    async _onApiGetAnkiModelNames() {
+        return await this.anki.getModelNames();
+    }
+
+    async _onApiGetAnkiModelFieldNames({modelName}) {
+        return await this.anki.getModelFieldNames(modelName);
+    }
+
+    async _onApiGetDictionaryInfo() {
+        return await this.translator.database.getDictionaryInfo();
+    }
+
+    async _onApiGetDictionaryCounts({dictionaryNames, getTotal}) {
+        return await this.translator.database.getDictionaryCounts(dictionaryNames, getTotal);
+    }
+
+    async _onApiPurgeDatabase() {
+        this.translator.clearDatabaseCaches();
+        await this.database.purge();
+    }
+
+    async _onApiGetMedia({targets}) {
+        return await this.database.getMedia(targets);
+    }
+
+    _onApiLog({error, level, context}) {
+        yomichan.log(jsonToError(error), level, context);
+
+        const levelValue = this._getErrorLevelValue(level);
+        if (levelValue <= this._getErrorLevelValue(this._logErrorLevel)) { return; }
+
+        this._logErrorLevel = level;
+        this._updateBadge();
+    }
+
+    _onApiLogIndicatorClear() {
+        if (this._logErrorLevel === null) { return; }
+        this._logErrorLevel = null;
+        this._updateBadge();
+    }
+
+    _onApiCreateActionPort(params, sender) {
+        if (!sender || !sender.tab) { throw new Error('Invalid sender'); }
+        const tabId = sender.tab.id;
+        if (typeof tabId !== 'number') { throw new Error('Sender has invalid tab ID'); }
+
+        const frameId = sender.frameId;
+        const id = yomichan.generateId(16);
+        const portName = `action-port-${id}`;
+
+        const port = chrome.tabs.connect(tabId, {name: portName, frameId});
+        try {
+            this._createActionListenerPort(port, sender, this._messageHandlersWithProgress);
+        } catch (e) {
+            port.disconnect();
+            throw e;
+        }
+
+        return portName;
+    }
+
+    async _onApiImportDictionaryArchive({archiveContent, details}, sender, onProgress) {
+        return await this.dictionaryImporter.import(this.database, archiveContent, details, onProgress);
+    }
+
+    async _onApiDeleteDictionary({dictionaryName}, sender, onProgress) {
+        this.translator.clearDatabaseCaches();
+        await this.database.deleteDictionary(dictionaryName, {rate: 1000}, onProgress);
+    }
+
+    async _onApiModifySettings({targets, source}) {
+        const results = [];
+        for (const target of targets) {
+            try {
+                this._modifySetting(target);
+                results.push({result: true});
+            } catch (e) {
+                results.push({error: errorToJson(e)});
+            }
+        }
+        await this._onApiOptionsSave({source});
+        return results;
+    }
+
     // Command handlers
+
+    _createActionListenerPort(port, sender, handlers) {
+        let hasStarted = false;
+
+        const onProgress = (...data) => {
+            try {
+                if (port === null) { return; }
+                port.postMessage({type: 'progress', data});
+            } catch (e) {
+                // NOP
+            }
+        };
+
+        const onMessage = async ({action, params}) => {
+            if (hasStarted) { return; }
+            hasStarted = true;
+            port.onMessage.removeListener(onMessage);
+
+            try {
+                port.postMessage({type: 'ack'});
+
+                const messageHandler = handlers.get(action);
+                if (typeof messageHandler === 'undefined') {
+                    throw new Error('Invalid action');
+                }
+                const {handler, async, contentScript} = messageHandler;
+
+                if (!contentScript) {
+                    this._validatePrivilegedMessageSender(sender);
+                }
+
+                const promiseOrResult = handler(params, sender, onProgress);
+                const result = async ? await promiseOrResult : promiseOrResult;
+                port.postMessage({type: 'complete', data: result});
+            } catch (e) {
+                if (port !== null) {
+                    port.postMessage({type: 'error', data: errorToJson(e)});
+                }
+                cleanup();
+            }
+        };
+
+        const cleanup = () => {
+            if (port === null) { return; }
+            if (!hasStarted) {
+                port.onMessage.removeListener(onMessage);
+            }
+            port.onDisconnect.removeListener(cleanup);
+            port = null;
+            handlers = null;
+        };
+
+        port.onMessage.addListener(onMessage);
+        port.onDisconnect.addListener(cleanup);
+    }
+
+    _getErrorLevelValue(errorLevel) {
+        switch (errorLevel) {
+            case 'info': return 0;
+            case 'debug': return 0;
+            case 'warn': return 1;
+            case 'error': return 2;
+            default: return 0;
+        }
+    }
 
     async _onCommandSearch(params) {
         const {mode='existingOrNewTab', query} = params || {};
@@ -748,7 +892,9 @@ class Backend {
                 await Backend._focusTab(tab);
                 if (queryParams.query) {
                     await new Promise((resolve) => chrome.tabs.sendMessage(
-                        tab.id, {action: 'searchQueryUpdate', params: {text: queryParams.query}}, resolve
+                        tab.id,
+                        {action: 'searchQueryUpdate', params: {text: queryParams.query}},
+                        resolve
                     ));
                 }
                 return true;
@@ -818,18 +964,161 @@ class Backend {
 
     // Utilities
 
-    async _getAudioUri(definition, source, details) {
-        let optionsContext = (typeof details === 'object' && details !== null ? details.optionsContext : null);
-        if (!(typeof optionsContext === 'object' && optionsContext !== null)) {
-            optionsContext = this.optionsContext;
+    _getModifySettingObject(target) {
+        const scope = target.scope;
+        switch (scope) {
+            case 'profile':
+                if (!isObject(target.optionsContext)) { throw new Error('Invalid optionsContext'); }
+                return this.getOptions(target.optionsContext, true);
+            case 'global':
+                return this.getFullOptions(true);
+            default:
+                throw new Error(`Invalid scope: ${scope}`);
+        }
+    }
+
+    async _modifySetting(target) {
+        const options = this._getModifySettingObject(target);
+        const accessor = new ObjectPropertyAccessor(options);
+        const action = target.action;
+        switch (action) {
+            case 'set':
+                {
+                    const {path, value} = target;
+                    if (typeof path !== 'string') { throw new Error('Invalid path'); }
+                    accessor.set(ObjectPropertyAccessor.getPathArray(path), value);
+                }
+                break;
+            case 'delete':
+                {
+                    const {path} = target;
+                    if (typeof path !== 'string') { throw new Error('Invalid path'); }
+                    accessor.delete(ObjectPropertyAccessor.getPathArray(path));
+                }
+                break;
+            case 'swap':
+                {
+                    const {path1, path2} = target;
+                    if (typeof path1 !== 'string') { throw new Error('Invalid path1'); }
+                    if (typeof path2 !== 'string') { throw new Error('Invalid path2'); }
+                    accessor.swap(ObjectPropertyAccessor.getPathArray(path1), ObjectPropertyAccessor.getPathArray(path2));
+                }
+                break;
+            case 'splice':
+                {
+                    const {path, start, deleteCount, items} = target;
+                    if (typeof path !== 'string') { throw new Error('Invalid path'); }
+                    if (typeof start !== 'number' || Math.floor(start) !== start) { throw new Error('Invalid start'); }
+                    if (typeof deleteCount !== 'number' || Math.floor(deleteCount) !== deleteCount) { throw new Error('Invalid deleteCount'); }
+                    if (!Array.isArray(items)) { throw new Error('Invalid items'); }
+                    const array = accessor.get(ObjectPropertyAccessor.getPathArray(path));
+                    if (!Array.isArray(array)) { throw new Error('Invalid target type'); }
+                    array.splice(start, deleteCount, ...items);
+                }
+                break;
+            default:
+                throw new Error(`Unknown action: ${action}`);
+        }
+    }
+
+    _validatePrivilegedMessageSender(sender) {
+        const url = sender.url;
+        if (!(typeof url === 'string' && yomichan.isExtensionUrl(url))) {
+            throw new Error('Invalid message sender');
+        }
+    }
+
+    _getBrowserIconTitle() {
+        return (
+            isObject(chrome.browserAction) &&
+            typeof chrome.browserAction.getTitle === 'function' ?
+                new Promise((resolve) => chrome.browserAction.getTitle({}, resolve)) :
+                Promise.resolve('')
+        );
+    }
+
+    _updateBadge() {
+        let title = this._defaultBrowserActionTitle;
+        if (title === null || !isObject(chrome.browserAction)) {
+            // Not ready or invalid
+            return;
         }
 
-        const options = this.getOptions(optionsContext);
-        return await this.audioUriBuilder.getUri(definition, source, options);
+        let text = '';
+        let color = null;
+        let status = null;
+
+        if (this._logErrorLevel !== null) {
+            switch (this._logErrorLevel) {
+                case 'error':
+                    text = '!!';
+                    color = '#f04e4e';
+                    status = 'Error';
+                    break;
+                default: // 'warn'
+                    text = '!';
+                    color = '#f0ad4e';
+                    status = 'Warning';
+                    break;
+            }
+        } else if (!this._isPrepared) {
+            if (this._prepareError) {
+                text = '!!';
+                color = '#f04e4e';
+                status = 'Error';
+            } else if (this._badgePrepareDelayTimer === null) {
+                text = '...';
+                color = '#f0ad4e';
+                status = 'Loading';
+            }
+        } else if (!this._anyOptionsMatches((options) => options.general.enable)) {
+            text = 'off';
+            color = '#555555';
+            status = 'Disabled';
+        } else if (!this._anyOptionsMatches((options) => this._isAnyDictionaryEnabled(options))) {
+            text = '!';
+            color = '#f0ad4e';
+            status = 'No dictionaries installed';
+        }
+
+        if (color !== null && typeof chrome.browserAction.setBadgeBackgroundColor === 'function') {
+            chrome.browserAction.setBadgeBackgroundColor({color});
+        }
+        if (text !== null && typeof chrome.browserAction.setBadgeText === 'function') {
+            chrome.browserAction.setBadgeText({text});
+        }
+        if (typeof chrome.browserAction.setTitle === 'function') {
+            if (status !== null) {
+                title = `${title} - ${status}`;
+            }
+            chrome.browserAction.setTitle({title});
+        }
+    }
+
+    _isAnyDictionaryEnabled(options) {
+        for (const {enabled} of Object.values(options.dictionaries)) {
+            if (enabled) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    _anyOptionsMatches(predicate) {
+        for (const {options} of this.options.profiles) {
+            const value = predicate(options);
+            if (value) { return value; }
+        }
+        return false;
     }
 
     async _renderTemplate(template, data) {
         return handlebarsRenderDynamic(template, data);
+    }
+
+    _getTemplates(options) {
+        const templates = options.anki.fieldTemplates;
+        return typeof templates === 'string' ? templates : this.defaultAnkiFieldTemplates;
     }
 
     static _getTabUrl(tab) {
@@ -921,26 +1210,4 @@ class Backend {
             // Edge throws exception for no reason here.
         }
     }
-
-    static async _getBrowser() {
-        if (EXTENSION_IS_BROWSER_EDGE) {
-            return 'edge';
-        }
-        if (typeof browser !== 'undefined') {
-            try {
-                const info = await browser.runtime.getBrowserInfo();
-                if (info.name === 'Fennec') {
-                    return 'firefox-mobile';
-                }
-            } catch (e) {
-                // NOP
-            }
-            return 'firefox';
-        } else {
-            return 'chrome';
-        }
-    }
 }
-
-window.yomichanBackend = new Backend();
-window.yomichanBackend.prepare();

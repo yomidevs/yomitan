@@ -23,6 +23,7 @@
  * getOptionsFullMutable
  * getOptionsMutable
  * profileConditionsDescriptor
+ * profileConditionsDescriptorPromise
  * settingsSaveOptions
  * utilBackgroundIsolate
  */
@@ -98,6 +99,7 @@ async function profileFormWrite(optionsFull) {
         profileConditionsContainer.cleanup();
     }
 
+    await profileConditionsDescriptorPromise;
     profileConditionsContainer = new ConditionsUI.Container(
         profileConditionsDescriptor,
         'popupLevel',
@@ -128,7 +130,7 @@ function profileOptionsPopulateSelect(select, profiles, currentValue, ignoreIndi
 }
 
 async function profileOptionsUpdateTarget(optionsFull) {
-    profileFormWrite(optionsFull);
+    await profileFormWrite(optionsFull);
 
     const optionsContext = getOptionsContext();
     const options = await getOptionsMutable(optionsContext);
@@ -190,6 +192,8 @@ async function onTargetProfileChanged() {
     currentProfileIndex = index;
 
     await profileOptionsUpdateTarget(optionsFull);
+
+    yomichan.trigger('modifyingProfileChange');
 }
 
 async function onProfileAdd() {
@@ -197,9 +201,13 @@ async function onProfileAdd() {
     const profile = utilBackgroundIsolate(optionsFull.profiles[currentProfileIndex]);
     profile.name = profileOptionsCreateCopyName(profile.name, optionsFull.profiles, 100);
     optionsFull.profiles.push(profile);
+
     currentProfileIndex = optionsFull.profiles.length - 1;
+
     await profileOptionsUpdateTarget(optionsFull);
     await settingsSaveOptions();
+
+    yomichan.trigger('modifyingProfileChange');
 }
 
 async function onProfileRemove(e) {
@@ -238,6 +246,8 @@ async function onProfileRemoveConfirm() {
 
     await profileOptionsUpdateTarget(optionsFull);
     await settingsSaveOptions();
+
+    yomichan.trigger('modifyingProfileChange');
 }
 
 function onProfileNameChanged() {
@@ -263,6 +273,8 @@ async function onProfileMove(offset) {
 
     await profileOptionsUpdateTarget(optionsFull);
     await settingsSaveOptions();
+
+    yomichan.trigger('modifyingProfileChange');
 }
 
 async function onProfileCopy() {

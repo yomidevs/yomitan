@@ -28,6 +28,9 @@ function docSetImposterStyle(style, propertyName, value) {
 }
 
 function docImposterCreate(element, isTextarea) {
+    const body = document.body;
+    if (body === null) { return [null, null]; }
+
     const elementStyle = window.getComputedStyle(element);
     const elementRect = element.getBoundingClientRect();
     const documentRect = document.documentElement.getBoundingClientRect();
@@ -78,7 +81,7 @@ function docImposterCreate(element, isTextarea) {
     }
 
     container.appendChild(imposter);
-    document.body.appendChild(container);
+    body.appendChild(container);
 
     // Adjust size
     const imposterRect = imposter.getBoundingClientRect();
@@ -156,7 +159,7 @@ function docSentenceExtract(source, extent) {
 
     const sourceLocal = source.clone();
     const position = sourceLocal.setStartOffset(extent);
-    sourceLocal.setEndOffset(position + extent);
+    sourceLocal.setEndOffset(extent * 2 - position, true);
     const content = sourceLocal.text();
 
     let quoteStack = [];

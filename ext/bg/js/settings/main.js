@@ -21,6 +21,8 @@
  * ankiInitialize
  * ankiTemplatesInitialize
  * ankiTemplatesUpdateValue
+ * apiForwardLogsToBackend
+ * apiGetEnvironmentInfo
  * apiOptionsSave
  * appearanceInitialize
  * audioSettingsInitialize
@@ -130,6 +132,7 @@ async function formRead(options) {
     options.anki.tags = utilBackgroundIsolate($('#card-tags').val().split(/[,; ]+/));
     options.anki.sentenceExt = parseInt($('#sentence-detection-extent').val(), 10);
     options.anki.server = $('#interface-server').val();
+    options.anki.duplicateScope = $('#duplicate-scope').val();
     options.anki.screenshot.format = $('#screenshot-format').val();
     options.anki.screenshot.quality = parseInt($('#screenshot-quality').val(), 10);
 
@@ -211,6 +214,7 @@ async function formWrite(options) {
     $('#card-tags').val(options.anki.tags.join(' '));
     $('#sentence-detection-extent').val(options.anki.sentenceExt);
     $('#interface-server').val(options.anki.server);
+    $('#duplicate-scope').val(options.anki.duplicateScope);
     $('#screenshot-format').val(options.anki.screenshot.format);
     $('#screenshot-quality').val(options.anki.screenshot.quality);
 
@@ -282,12 +286,31 @@ function showExtensionInformation() {
     node.textContent = `${manifest.name} v${manifest.version}`;
 }
 
+async function settingsPopulateModifierKeys() {
+    const scanModifierKeySelect = document.querySelector('#scan-modifier-key');
+    scanModifierKeySelect.textContent = '';
+
+    const environment = await apiGetEnvironmentInfo();
+    const modifierKeys = [
+        {value: 'none', name: 'None'},
+        ...environment.modifiers.keys
+    ];
+    for (const {value, name} of modifierKeys) {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = name;
+        scanModifierKeySelect.appendChild(option);
+    }
+}
+
 
 async function onReady() {
+    apiForwardLogsToBackend();
     await yomichan.prepare();
 
     showExtensionInformation();
 
+    await settingsPopulateModifierKeys();
     formSetupEventListeners();
     appearanceInitialize();
     await audioSettingsInitialize();

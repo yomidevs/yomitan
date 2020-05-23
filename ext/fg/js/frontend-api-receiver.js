@@ -17,41 +17,60 @@
 
 
 class FrontendApiReceiver {
-    constructor(source='', handlers=new Map()) {
+    constructor(source, messageHandlers) {
         this._source = source;
-        this._handlers = handlers;
-
-        chrome.runtime.onConnect.addListener(this.onConnect.bind(this));
+        this._messageHandlers = messageHandlers;
     }
 
-    onConnect(port) {
+    prepare() {
+        chrome.runtime.onConnect.addListener(this._onConnect.bind(this));
+    }
+
+    _onConnect(port) {
         if (port.name !== 'frontend-api-receiver') { return; }
 
-        port.onMessage.addListener(this.onMessage.bind(this, port));
+        port.onMessage.addListener(this._onMessage.bind(this, port));
     }
 
-    onMessage(port, {id, action, params, target, senderId}) {
+    _onMessage(port, {id, action, params, target, senderId}) {
         if (target !== this._source) { return; }
 
-        const handler = this._handlers.get(action);
-        if (typeof handler !== 'function') { return; }
+        const messageHandler = this._messageHandlers.get(action);
+        if (typeof messageHandler === 'undefined') { return; }
 
-        this.sendAck(port, id, senderId);
+        const {handler, async} = messageHandler;
 
-        handler(params).then(
-            (result) => {
-                this.sendResult(port, id, senderId, {result});
-            },
-            (error) => {
-                this.sendResult(port, id, senderId, {error: errorToJson(error)});
-            });
+        this._sendAck(port, id, senderId);
+        if (async) {
+            this._invokeHandlerAsync(handler, params, port, id, senderId);
+        } else {
+            this._invokeHandler(handler, params, port, id, senderId);
+        }
     }
 
-    sendAck(port, id, senderId) {
+    _invokeHandler(handler, params, port, id, senderId) {
+        try {
+            const result = handler(params);
+            this._sendResult(port, id, senderId, {result});
+        } catch (error) {
+            this._sendResult(port, id, senderId, {error: errorToJson(error)});
+        }
+    }
+
+    async _invokeHandlerAsync(handler, params, port, id, senderId) {
+        try {
+            const result = await handler(params);
+            this._sendResult(port, id, senderId, {result});
+        } catch (error) {
+            this._sendResult(port, id, senderId, {error: errorToJson(error)});
+        }
+    }
+
+    _sendAck(port, id, senderId) {
         port.postMessage({type: 'ack', id, senderId});
     }
 
-    sendResult(port, id, senderId, data) {
+    _sendResult(port, id, senderId, data) {
         port.postMessage({type: 'result', id, senderId, data});
     }
 }

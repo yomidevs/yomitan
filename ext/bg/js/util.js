@@ -58,79 +58,12 @@ function utilBackgroundFunctionIsolate(func) {
     return backgroundPage.utilFunctionIsolate(func);
 }
 
-function utilStringHashCode(string) {
-    let hashCode = 0;
-
-    if (typeof string !== 'string') { return hashCode; }
-
-    for (let i = 0, charCode = string.charCodeAt(i); i < string.length; charCode = string.charCodeAt(++i)) {
-        hashCode = ((hashCode << 5) - hashCode) + charCode;
-        hashCode |= 0;
-    }
-
-    return hashCode;
-}
-
 function utilBackend() {
     const backend = chrome.extension.getBackgroundPage().yomichanBackend;
-    if (!backend.isPrepared) {
+    if (!backend.isPrepared()) {
         throw new Error('Backend not ready yet');
     }
     return backend;
-}
-
-async function utilAnkiGetModelNames() {
-    return utilIsolate(await utilBackend().anki.getModelNames());
-}
-
-async function utilAnkiGetDeckNames() {
-    return utilIsolate(await utilBackend().anki.getDeckNames());
-}
-
-async function utilDatabaseGetDictionaryInfo() {
-    return utilIsolate(await utilBackend().translator.database.getDictionaryInfo());
-}
-
-async function utilDatabaseGetDictionaryCounts(dictionaryNames, getTotal) {
-    return utilIsolate(await utilBackend().translator.database.getDictionaryCounts(
-        utilBackgroundIsolate(dictionaryNames),
-        utilBackgroundIsolate(getTotal)
-    ));
-}
-
-async function utilAnkiGetModelFieldNames(modelName) {
-    return utilIsolate(await utilBackend().anki.getModelFieldNames(
-        utilBackgroundIsolate(modelName)
-    ));
-}
-
-async function utilDatabasePurge() {
-    return utilIsolate(await utilBackend().translator.purgeDatabase());
-}
-
-async function utilDatabaseDeleteDictionary(dictionaryName, onProgress) {
-    return utilIsolate(await utilBackend().translator.database.deleteDictionary(
-        utilBackgroundIsolate(dictionaryName),
-        utilBackgroundFunctionIsolate(onProgress)
-    ));
-}
-
-async function utilDatabaseImport(data, onProgress, details) {
-    data = await utilReadFile(data);
-    return utilIsolate(await utilBackend().importDictionary(
-        utilBackgroundIsolate(data),
-        utilBackgroundFunctionIsolate(onProgress),
-        utilBackgroundIsolate(details)
-    ));
-}
-
-function utilReadFile(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = () => reject(reader.error);
-        reader.readAsBinaryString(file);
-    });
 }
 
 function utilReadFileArrayBuffer(file) {

@@ -17,11 +17,13 @@
 
 /* global
  * ClipboardMonitor
+ * DOM
  * Display
  * QueryParser
  * apiClipboardGet
- * apiOptionsSet
+ * apiModifySettings
  * apiTermsFind
+ * wanakana
  */
 
 class DisplaySearch extends Display {
@@ -72,15 +74,11 @@ class DisplaySearch extends Display {
         ]);
     }
 
-    static create() {
-        const instance = new DisplaySearch();
-        instance.prepare();
-        return instance;
-    }
-
     async prepare() {
         try {
             await super.prepare();
+            await this.updateOptions();
+            yomichan.on('optionsUpdated', () => this.updateOptions());
             await this.queryParser.prepare();
 
             const {queryParams: {query='', mode=''}} = parseUrl(window.location.href);
@@ -89,7 +87,7 @@ class DisplaySearch extends Display {
 
             if (this.options.general.enableWanakana === true) {
                 this.wanakanaEnable.checked = true;
-                window.wanakana.bind(this.query);
+                wanakana.bind(this.query);
             } else {
                 this.wanakanaEnable.checked = false;
             }
@@ -125,10 +123,10 @@ class DisplaySearch extends Display {
     }
 
     onError(error) {
-        logError(error, true);
+        yomichan.logError(error);
     }
 
-    onSearchClear() {
+    onEscape() {
         if (this.query === null) {
             return;
         }
@@ -181,7 +179,7 @@ class DisplaySearch extends Display {
     }
 
     onKeyDown(e) {
-        const key = Display.getKeyFromEvent(e);
+        const key = DOM.getKeyFromEvent(e);
         const ignoreKeys = this._onKeyDownIgnoreKeys;
 
         const activeModifierMap = new Map([
@@ -236,7 +234,7 @@ class DisplaySearch extends Display {
             this.setIntroVisible(!valid, animate);
             this.updateSearchButton();
             if (valid) {
-                const {definitions} = await apiTermsFind(query, details, this.optionsContext);
+                const {definitions} = await apiTermsFind(query, details, this.getOptionsContext());
                 this.setContent('terms', {definitions, context: {
                     focus: false,
                     disableHistory: true,
@@ -254,13 +252,19 @@ class DisplaySearch extends Display {
     }
 
     onWanakanaEnableChange(e) {
-        const enableWanakana = e.target.checked;
-        if (enableWanakana) {
-            window.wanakana.bind(this.query);
+        const value = e.target.checked;
+        if (value) {
+            wanakana.bind(this.query);
         } else {
-            window.wanakana.unbind(this.query);
+            wanakana.unbind(this.query);
         }
-        apiOptionsSet({general: {enableWanakana}}, this.getOptionsContext());
+        apiModifySettings([{
+            action: 'set',
+            path: 'general.enableWanakana',
+            value,
+            scope: 'profile',
+            optionsContext: this.getOptionsContext()
+        }], 'search');
     }
 
     onClipboardMonitorEnableChange(e) {
@@ -270,7 +274,13 @@ class DisplaySearch extends Display {
                 (granted) => {
                     if (granted) {
                         this.clipboardMonitor.start();
-                        apiOptionsSet({general: {enableClipboardMonitor: true}}, this.getOptionsContext());
+                        apiModifySettings([{
+                            action: 'set',
+                            path: 'general.enableClipboardMonitor',
+                            value: true,
+                            scope: 'profile',
+                            optionsContext: this.getOptionsContext()
+                        }], 'search');
                     } else {
                         e.target.checked = false;
                     }
@@ -278,7 +288,13 @@ class DisplaySearch extends Display {
             );
         } else {
             this.clipboardMonitor.stop();
-            apiOptionsSet({general: {enableClipboardMonitor: false}}, this.getOptionsContext());
+            apiModifySettings([{
+                action: 'set',
+                path: 'general.enableClipboardMonitor',
+                value: false,
+                scope: 'profile',
+                optionsContext: this.getOptionsContext()
+            }], 'search');
         }
     }
 
@@ -298,9 +314,14 @@ class DisplaySearch extends Display {
     }
 
     setQuery(query) {
-        const interpretedQuery = this.isWanakanaEnabled() ? window.wanakana.toKana(query) : query;
+        const interpretedQuery = this.isWanakanaEnabled() ? wanakana.toKana(query) : query;
         this.query.value = interpretedQuery;
         this.queryParser.setText(interpretedQuery);
+    }
+
+    async setContent(type, details) {
+        this.query.blur();
+        await super.setContent(type, details);
     }
 
     setIntroVisible(visible, animate) {
@@ -376,5 +397,3 @@ class DisplaySearch extends Display {
         }
     }
 }
-
-DisplaySearch.instance = DisplaySearch.create();

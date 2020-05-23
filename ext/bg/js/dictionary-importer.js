@@ -18,6 +18,7 @@
 /* global
  * JSZip
  * JsonSchema
+ * mediaUtility
  * requestJson
  */
 
@@ -26,7 +27,7 @@ class DictionaryImporter {
         this._schemas = new Map();
     }
 
-    async import(database, archiveSource, onProgress, details) {
+    async import(database, archiveSource, details, onProgress) {
         if (!database) {
             throw new Error('Invalid database');
         }
@@ -148,6 +149,22 @@ class DictionaryImporter {
             }
         }
 
+        // Extended data support
+        const extendedDataContext = {
+            archive,
+            media: new Map()
+        };
+        for (const entry of termList) {
+            const glossaryList = entry.glossary;
+            for (let i = 0, ii = glossaryList.length; i < ii; ++i) {
+                const glossary = glossaryList[i];
+                if (typeof glossary !== 'object' || glossary === null) { continue; }
+                glossaryList[i] = await this._formatDictionaryTermGlossaryObject(glossary, extendedDataContext, entry);
+            }
+        }
+
+        const media = [...extendedDataContext.media.values()];
+
         // Add dictionary
         const summary = this._createSummary(dictionaryTitle, version, index, {prefixWildcardsSupported});
 
@@ -188,6 +205,7 @@ class DictionaryImporter {
         await bulkAdd('kanji', kanjiList);
         await bulkAdd('kanjiMeta', kanjiMetaList);
         await bulkAdd('tagMeta', tagList);
+        await bulkAdd('media', media);
 
         return {result: summary, errors};
     }
@@ -274,5 +292,77 @@ class DictionaryImporter {
         const tagBank = '/bg/data/dictionary-tag-bank-v3-schema.json';
 
         return [termBank, termMetaBank, kanjiBank, kanjiMetaBank, tagBank];
+    }
+
+    async _formatDictionaryTermGlossaryObject(data, context, entry) {
+        switch (data.type) {
+            case 'text':
+                return data.text;
+            case 'image':
+                return await this._formatDictionaryTermGlossaryImage(data, context, entry);
+            default:
+                throw new Error(`Unhandled data type: ${data.type}`);
+        }
+    }
+
+    async _formatDictionaryTermGlossaryImage(data, context, entry) {
+        const dictionary = entry.dictionary;
+        const {path, width: preferredWidth, height: preferredHeight, title, description, pixelated} = data;
+        if (context.media.has(path)) {
+            // Already exists
+            return data;
+        }
+
+        let errorSource = entry.expression;
+        if (entry.reading.length > 0) {
+            errorSource += ` (${entry.reading});`;
+        }
+
+        const file = context.archive.file(path);
+        if (file === null) {
+            throw new Error(`Could not find image at path ${JSON.stringify(path)} for ${errorSource}`);
+        }
+
+        const content = await file.async('base64');
+        const mediaType = mediaUtility.getImageMediaTypeFromFileName(path);
+        if (mediaType === null) {
+            throw new Error(`Could not determine media type for image at path ${JSON.stringify(path)} for ${errorSource}`);
+        }
+
+        let image;
+        try {
+            image = await mediaUtility.loadImageBase64(mediaType, content);
+        } catch (e) {
+            throw new Error(`Could not load image at path ${JSON.stringify(path)} for ${errorSource}`);
+        }
+
+        const width = image.naturalWidth;
+        const height = image.naturalHeight;
+
+        // Create image data
+        const mediaData = {
+            dictionary,
+            path,
+            mediaType,
+            width,
+            height,
+            content
+        };
+        context.media.set(path, mediaData);
+
+        // Create new data
+        const newData = {
+            type: 'image',
+            path,
+            width,
+            height
+        };
+        if (typeof preferredWidth === 'number') { newData.preferredWidth = preferredWidth; }
+        if (typeof preferredHeight === 'number') { newData.preferredHeight = preferredHeight; }
+        if (typeof title === 'string') { newData.title = title; }
+        if (typeof description === 'string') { newData.description = description; }
+        if (typeof pixelated === 'boolean') { newData.pixelated = pixelated; }
+
+        return newData;
     }
 }

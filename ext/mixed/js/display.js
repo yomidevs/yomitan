@@ -20,6 +20,7 @@
  * DOM
  * DisplayContext
  * DisplayGenerator
+ * MediaLoader
  * WindowScroll
  * apiAudioGetUri
  * apiBroadcastTab
@@ -45,7 +46,14 @@ class Display {
         this.index = 0;
         this.audioPlaying = null;
         this.audioFallback = null;
-        this.audioSystem = new AudioSystem({getAudioUri: this._getAudioUri.bind(this)});
+        this.audioSystem = new AudioSystem({
+            audioUriBuilder: {
+                getUri: async (definition, source, details) => {
+                    return await apiAudioGetUri(definition, source, details);
+                }
+            },
+            useCache: true
+        });
         this.styleNode = null;
 
         this.eventListeners = new EventListenerCollection();
@@ -55,12 +63,13 @@ class Display {
         this.clickScanPrevent = false;
         this.setContentToken = null;
 
-        this.displayGenerator = new DisplayGenerator();
+        this.mediaLoader = new MediaLoader();
+        this.displayGenerator = new DisplayGenerator({mediaLoader: this.mediaLoader});
         this.windowScroll = new WindowScroll();
 
         this._onKeyDownHandlers = new Map([
             ['Escape', () => {
-                this.onSearchClear();
+                this.onEscape();
                 return true;
             }],
             ['PageUp', (e) => {
@@ -168,15 +177,13 @@ class Display {
     async prepare() {
         await yomichan.prepare();
         await this.displayGenerator.prepare();
-        await this.updateOptions();
-        yomichan.on('optionsUpdated', () => this.updateOptions());
     }
 
     onError(_error) {
         throw new Error('Override me');
     }
 
-    onSearchClear() {
+    onEscape() {
         throw new Error('Override me');
     }
 
@@ -331,7 +338,7 @@ class Display {
     }
 
     onKeyDown(e) {
-        const key = Display.getKeyFromEvent(e);
+        const key = DOM.getKeyFromEvent(e);
         const handler = this._onKeyDownHandlers.get(key);
         if (typeof handler === 'function') {
             if (handler(e)) {
@@ -392,12 +399,6 @@ class Display {
 
     updateTheme(themeName) {
         document.documentElement.dataset.yomichanTheme = themeName;
-
-        const stylesheets = document.querySelectorAll('link[data-yomichan-theme-name]');
-        for (const stylesheet of stylesheets) {
-            const match = (stylesheet.dataset.yomichanThemeName === themeName);
-            stylesheet.rel = (match ? 'stylesheet' : 'stylesheet alternate');
-        }
     }
 
     setCustomCss(css) {
@@ -472,6 +473,8 @@ class Display {
         const token = {}; // Unique identifier token
         this.setContentToken = token;
         try {
+            this.mediaLoader.unloadAll();
+
             switch (type) {
                 case 'terms':
                     await this.setContentTerms(details.definitions, details.context, token);
@@ -784,16 +787,14 @@ class Display {
 
             const expression = expressionIndex === -1 ? definition : definition.expressions[expressionIndex];
 
-            if (this.audioPlaying !== null) {
-                this.audioPlaying.pause();
-                this.audioPlaying = null;
-            }
+            this._stopPlayingAudio();
 
-            const sources = this.options.audio.sources;
-            let audio, source, info;
+            let audio, info;
             try {
-                ({audio, source} = await this.audioSystem.getDefinitionAudio(expression, sources));
-                info = `From source ${1 + sources.indexOf(source)}: ${source}`;
+                const {sources, textToSpeechVoice, customSourceUrl} = this.options.audio;
+                let index;
+                ({audio, index} = await this.audioSystem.getDefinitionAudio(expression, sources, {textToSpeechVoice, customSourceUrl}));
+                info = `From source ${1 + index}: ${sources[index]}`;
             } catch (e) {
                 if (this.audioFallback === null) {
                     this.audioFallback = new Audio('/mixed/mp3/button.mp3');
@@ -802,7 +803,7 @@ class Display {
                 info = 'Could not find audio';
             }
 
-            const button = this.audioButtonFindImage(entryIndex);
+            const button = this.audioButtonFindImage(entryIndex, expressionIndex);
             if (button !== null) {
                 let titleDefault = button.dataset.titleDefault;
                 if (!titleDefault) {
@@ -812,14 +813,30 @@ class Display {
                 button.title = `${titleDefault}\n${info}`;
             }
 
+            this._stopPlayingAudio();
+
             this.audioPlaying = audio;
             audio.currentTime = 0;
             audio.volume = this.options.audio.volume / 100.0;
-            audio.play();
+            const playPromise = audio.play();
+            if (typeof playPromise !== 'undefined') {
+                try {
+                    await playPromise;
+                } catch (e2) {
+                    // NOP
+                }
+            }
         } catch (e) {
             this.onError(e);
         } finally {
             this.setSpinnerVisible(false);
+        }
+    }
+
+    _stopPlayingAudio() {
+        if (this.audioPlaying !== null) {
+            this.audioPlaying.pause();
+            this.audioPlaying = null;
         }
     }
 
@@ -901,9 +918,16 @@ class Display {
         viewerButton.dataset.noteId = noteId;
     }
 
-    audioButtonFindImage(index) {
+    audioButtonFindImage(index, expressionIndex) {
         const entry = this.getEntry(index);
-        return entry !== null ? entry.querySelector('.action-play-audio>img') : null;
+        if (entry === null) { return null; }
+
+        const container = (
+            expressionIndex >= 0 ?
+            entry.querySelector(`.term-expression:nth-of-type(${expressionIndex + 1})`) :
+            entry
+        );
+        return container !== null ? container.querySelector('.action-play-audio>img') : null;
     }
 
     async getDefinitionsAddable(definitions, modes) {
@@ -934,11 +958,6 @@ class Display {
         return elementRect.top - documentRect.top;
     }
 
-    static getKeyFromEvent(event) {
-        const key = event.key;
-        return (typeof key === 'string' ? (key.length === 1 ? key.toUpperCase() : key) : '');
-    }
-
     async _getNoteContext() {
         const documentTitle = await this.getDocumentTitle();
         return {
@@ -946,10 +965,5 @@ class Display {
                 title: documentTitle
             }
         };
-    }
-
-    async _getAudioUri(definition, source) {
-        const optionsContext = this.getOptionsContext();
-        return await apiAudioGetUri(definition, source, optionsContext);
     }
 }

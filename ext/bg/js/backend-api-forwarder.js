@@ -17,11 +17,11 @@
 
 
 class BackendApiForwarder {
-    constructor() {
-        chrome.runtime.onConnect.addListener(this.onConnect.bind(this));
+    prepare() {
+        chrome.runtime.onConnect.addListener(this._onConnect.bind(this));
     }
 
-    onConnect(port) {
+    _onConnect(port) {
         if (port.name !== 'backend-api-forwarder') { return; }
 
         let tabId;

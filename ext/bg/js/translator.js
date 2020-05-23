@@ -45,14 +45,8 @@ class Translator {
         this.deinflector = new Deinflector(reasons);
     }
 
-    async purgeDatabase() {
+    clearDatabaseCaches() {
         this.tagCache.clear();
-        await this.database.purge();
-    }
-
-    async deleteDictionary(dictionaryName) {
-        this.tagCache.clear();
-        await this.database.deleteDictionary(dictionaryName);
     }
 
     async getSequencedDefinitions(definitions, mainDictionary) {
@@ -482,7 +476,9 @@ class Translator {
             switch (mode) {
                 case 'freq':
                     for (const term of termsUnique[index]) {
-                        term.frequencies.push({expression, frequency: data, dictionary});
+                        const frequencyData = this.getFrequencyData(expression, data, dictionary, term);
+                        if (frequencyData === null) { continue; }
+                        term.frequencies.push(frequencyData);
                     }
                     break;
                 case 'pitch':
@@ -573,6 +569,18 @@ class Translator {
         }
 
         return tagMetaList;
+    }
+
+    getFrequencyData(expression, data, dictionary, term) {
+        if (data !== null && typeof data === 'object') {
+            const {frequency, reading} = data;
+
+            const termReading = term.reading || expression;
+            if (reading !== termReading) { return null; }
+
+            return {expression, frequency, dictionary};
+        }
+        return {expression, frequency: data, dictionary};
     }
 
     async getPitchData(expression, data, dictionary, term) {

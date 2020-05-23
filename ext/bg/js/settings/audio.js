@@ -18,7 +18,6 @@
 /* global
  * AudioSourceUI
  * AudioSystem
- * apiAudioGetUri
  * getOptionsContext
  * getOptionsMutable
  * settingsSaveOptions
@@ -29,10 +28,8 @@ let audioSystem = null;
 
 async function audioSettingsInitialize() {
     audioSystem = new AudioSystem({
-        getAudioUri: async (definition, source) => {
-            const optionsContext = getOptionsContext();
-            return await apiAudioGetUri(definition, source, optionsContext);
-        }
+        audioUriBuilder: null,
+        useCache: true
     });
 
     const optionsContext = getOptionsContext();
@@ -115,7 +112,7 @@ function textToSpeechTest() {
         const text = document.querySelector('#text-to-speech-voice-test').dataset.speechText || '';
         const voiceUri = document.querySelector('#text-to-speech-voice').value;
 
-        const audio = audioSystem.createTextToSpeechAudio({text, voiceUri});
+        const audio = audioSystem.createTextToSpeechAudio(text, voiceUri);
         audio.volume = 1.0;
         audio.play();
     } catch (e) {

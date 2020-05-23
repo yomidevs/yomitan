@@ -11,71 +11,78 @@
 <body>
 
     <h1>Yomichan Manual Tests</h1>
-    <p class="description">Manual tests involving fullscreen elements, &lt;iframe&gt;s, and shadow DOMs.</p>
+    <y-description>Manual tests involving fullscreen elements, &lt;iframe&gt;s, and shadow DOMs.</y-description>
 
-    <div class="test">
-        <div class="description">Standard content.</div>
-        <div id="fullscreen-element1" style="width: 100%; height: 200px; border: 1px solid #d8d8d8; position: relative;"><div style="background-color: #f8f8f8; padding: 0.5em; position: absolute; left: 0; top: 0; bottom: 0; right: 0;">
+    <y-test>
+        <y-description>Standard content.</y-description>
+        <div class="fullscreen-element" style="width: 100%; height: 200px; border: 1px solid #d8d8d8; position: relative;"><div style="background-color: #f8f8f8; padding: 0.5em; position: absolute; left: 0; top: 0; bottom: 0; right: 0;">
             <div>
                 ありがとう
             </div>
             <div>
-                <a href="#" id="fullscreen-link1">Toggle fullscreen</a>
+                <a href="#" class="fullscreen-link">Toggle fullscreen</a>
             </div>
         </div></div>
-        <script>
-document.querySelector('#fullscreen-link1').addEventListener('click', () => toggleFullscreen(document.querySelector('#fullscreen-element1')), false);
-        </script>
-    </div>
+    </y-test>
 
-    <div class="test">
-        <div class="description">Content inside of a shadow DOM.</div>
-        <div id="shadow-content-container"></div>
-        <template id="shadow-content-container-content-template">
+    <y-test data-shadow-mode="open">
+        <y-description>Content inside of an open shadow DOM.</y-description>
+        <div class="template-content-container"></div>
+        <template>
             <link rel="stylesheet" href="test-stylesheet.css" />
-            <div id="fullscreen-element2" style="width: 100%; height: 200px; border: 1px solid #d8d8d8; position: relative;"><div style="background-color: #f8f8f8; padding: 0.5em; position: absolute; left: 0; top: 0; bottom: 0; right: 0;">
+            <div class="fullscreen-element" style="width: 100%; height: 200px; border: 1px solid #d8d8d8; position: relative;"><div style="background-color: #f8f8f8; padding: 0.5em; position: absolute; left: 0; top: 0; bottom: 0; right: 0;">
                 <div>
                     ありがとう
                 </div>
                 <div>
-                    <a href="#" id="fullscreen-link2">Toggle fullscreen</a>
+                    <a href="#" class="fullscreen-link">Toggle fullscreen</a>
                 </div>
             </div></div>
         </template>
-        <script>
-(() => {
-    const shadowIframeContainer = document.querySelector('#shadow-content-container');
-    const shadow = shadowIframeContainer.attachShadow({mode: 'closed'});
-    const template = document.querySelector('#shadow-content-container-content-template').content;
-    const content = document.importNode(template, true);
-    const fullscreenElement = content.querySelector('#fullscreen-element2');
-    content.querySelector('#fullscreen-link2').addEventListener('click', () => toggleFullscreen(fullscreenElement), false);
-    shadow.appendChild(content);
-})();
-        </script>
-    </div>
+    </y-test>
 
-    <div class="test">
-        <div class="description">&lt;iframe&gt; element.</div>
+    <y-test data-shadow-mode="closed">
+        <y-description>Content inside of a closed shadow DOM.</y-description>
+        <div class="template-content-container"></div>
+        <template>
+            <link rel="stylesheet" href="test-stylesheet.css" />
+            <div class="fullscreen-element" style="width: 100%; height: 200px; border: 1px solid #d8d8d8; position: relative;"><div style="background-color: #f8f8f8; padding: 0.5em; position: absolute; left: 0; top: 0; bottom: 0; right: 0;">
+                <div>
+                    ありがとう
+                </div>
+                <div>
+                    <a href="#" class="fullscreen-link">Toggle fullscreen</a>
+                </div>
+            </div></div>
+        </template>
+    </y-test>
+
+    <y-test>
+        <y-description>&lt;iframe&gt; element.</y-description>
         <iframe src="test-document2-frame1.html" allowfullscreen="true" style="width: 100%; height: 200px; border: 1px solid #d8d8d8;"></iframe>
-    </div>
+    </y-test>
 
-    <div class="test">
-        <div class="description">&lt;iframe&gt; element inside of a shadow DOM.</div>
-        <div id="shadow-iframe-container"></div>
-        <template id="shadow-iframe-container-content-template">
+    <y-test data-shadow-mode="open">
+        <y-description>&lt;iframe&gt; element inside of an open shadow DOM.</y-description>
+        <div class="template-content-container"></div>
+        <template>
             <iframe src="test-document2-frame1.html" allowfullscreen="true" style="width: 100%; height: 200px; border: 1px solid #d8d8d8;"></iframe>
         </template>
-        <script>
-(() => {
-    const shadowIframeContainer = document.querySelector('#shadow-iframe-container');
-    const shadow = shadowIframeContainer.attachShadow({mode: 'closed'});
-    const template = document.querySelector('#shadow-iframe-container-content-template').content;
-    const content = document.importNode(template, true);
-    shadow.appendChild(content);
-})();
-        </script>
-    </div>
+    </y-test>
+
+    <y-test data-shadow-mode="closed">
+        <y-description>&lt;iframe&gt; element inside of a closed shadow DOM.</y-description>
+        <div class="template-content-container"></div>
+        <template>
+            <iframe src="test-document2-frame1.html" allowfullscreen="true" style="width: 100%; height: 200px; border: 1px solid #d8d8d8;"></iframe>
+        </template>
+    </y-test>
+
+    <script>
+for (const element of document.querySelectorAll('y-test')) {
+    setup(element);
+}
+    </script>
 
 </body>
 </html>

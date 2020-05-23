@@ -16,6 +16,7 @@
  */
 
 /* global
+ * DOM
  * conditionsNormalizeOptionValue
  */
 
@@ -103,11 +104,11 @@ ConditionsUI.Container = class Container {
             if (hasOwn(conditionDescriptor.operators, operator)) {
                 const operatorDescriptor = conditionDescriptor.operators[operator];
                 if (hasOwn(operatorDescriptor, 'defaultValue')) {
-                    return {value: operatorDescriptor.defaultValue, fromOperator: true};
+                    return {value: this.isolate(operatorDescriptor.defaultValue), fromOperator: true};
                 }
             }
             if (hasOwn(conditionDescriptor, 'defaultValue')) {
-                return {value: conditionDescriptor.defaultValue, fromOperator: false};
+                return {value: this.isolate(conditionDescriptor.defaultValue), fromOperator: false};
             }
         }
         return {fromOperator: false};
@@ -177,7 +178,8 @@ ConditionsUI.Condition = class Condition {
         this.parent = parent;
         this.condition = condition;
         this.container = ConditionsUI.instantiateTemplate('#condition-template').appendTo(parent.container);
-        this.input = this.container.find('input');
+        this.input = this.container.find('.condition-input');
+        this.inputInner = null;
         this.typeSelect = this.container.find('.condition-type');
         this.operatorSelect = this.container.find('.condition-operator');
         this.removeButton = this.container.find('.condition-remove');
@@ -186,14 +188,13 @@ ConditionsUI.Condition = class Condition {
         this.updateOperators();
         this.updateInput();
 
-        this.input.on('change', this.onInputChanged.bind(this));
         this.typeSelect.on('change', this.onConditionTypeChanged.bind(this));
         this.operatorSelect.on('change', this.onConditionOperatorChanged.bind(this));
         this.removeButton.on('click', this.onRemoveClicked.bind(this));
     }
 
     cleanup() {
-        this.input.off('change');
+        this.inputInner.off('change');
         this.typeSelect.off('change');
         this.operatorSelect.off('change');
         this.removeButton.off('click');
@@ -202,6 +203,10 @@ ConditionsUI.Condition = class Condition {
 
     save() {
         this.parent.save();
+    }
+
+    isolate(object) {
+        return this.parent.isolate(object);
     }
 
     updateTypes() {
@@ -236,20 +241,47 @@ ConditionsUI.Condition = class Condition {
     updateInput() {
         const conditionDescriptors = this.parent.parent.conditionDescriptors;
         const {type, operator} = this.condition;
+
+        const objects = [];
+        let inputType = null;
+        if (hasOwn(conditionDescriptors, type)) {
+            const conditionDescriptor = conditionDescriptors[type];
+            objects.push(conditionDescriptor);
+            if (hasOwn(conditionDescriptor, 'type')) {
+                inputType = conditionDescriptor.type;
+            }
+            if (hasOwn(conditionDescriptor.operators, operator)) {
+                const operatorDescriptor = conditionDescriptor.operators[operator];
+                objects.push(operatorDescriptor);
+                if (hasOwn(operatorDescriptor, 'type')) {
+                    inputType = operatorDescriptor.type;
+                }
+            }
+        }
+
+        this.input.empty();
+        if (inputType === 'select') {
+            this.inputInner = this.createSelectElement(objects);
+        } else if (inputType === 'keyMulti') {
+            this.inputInner = this.createInputKeyMultiElement(objects);
+        } else {
+            this.inputInner = this.createInputElement(objects);
+        }
+        this.inputInner.appendTo(this.input);
+        this.inputInner.on('change', this.onInputChanged.bind(this));
+
+        const {valid, value} = this.validateValue(this.condition.value);
+        this.inputInner.toggleClass('is-invalid', !valid);
+        this.inputInner.val(value);
+    }
+
+    createInputElement(objects) {
+        const inputInner = ConditionsUI.instantiateTemplate('#condition-input-text-template');
+
         const props = new Map([
             ['placeholder', ''],
             ['type', 'text']
         ]);
-
-        const objects = [];
-        if (hasOwn(conditionDescriptors, type)) {
-            const conditionDescriptor = conditionDescriptors[type];
-            objects.push(conditionDescriptor);
-            if (hasOwn(conditionDescriptor.operators, operator)) {
-                const operatorDescriptor = conditionDescriptor.operators[operator];
-                objects.push(operatorDescriptor);
-            }
-        }
 
         for (const object of objects) {
             if (hasOwn(object, 'placeholder')) {
@@ -266,35 +298,124 @@ ConditionsUI.Condition = class Condition {
         }
 
         for (const [prop, value] of props.entries()) {
-            this.input.prop(prop, value);
+            inputInner.prop(prop, value);
         }
 
-        const {valid} = this.validateValue(this.condition.value);
-        this.input.toggleClass('is-invalid', !valid);
-        this.input.val(this.condition.value);
+        return inputInner;
     }
 
-    validateValue(value) {
+    createInputKeyMultiElement(objects) {
+        const inputInner = this.createInputElement(objects);
+
+        inputInner.prop('readonly', true);
+
+        let values = [];
+        let keySeparator = ' + ';
+        for (const object of objects) {
+            if (hasOwn(object, 'values')) {
+                values = object.values;
+            }
+            if (hasOwn(object, 'keySeparator')) {
+                keySeparator = object.keySeparator;
+            }
+        }
+
+        const pressedKeyIndices = new Set();
+
+        const onKeyDown = ({originalEvent}) => {
+            const pressedKeyEventName = DOM.getKeyFromEvent(originalEvent);
+            if (pressedKeyEventName === 'Escape' || pressedKeyEventName === 'Backspace') {
+                pressedKeyIndices.clear();
+                inputInner.val('');
+                inputInner.change();
+                return;
+            }
+
+            const pressedModifiers = DOM.getActiveModifiers(originalEvent);
+            // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey
+            // https://askubuntu.com/questions/567731/why-is-shift-alt-being-mapped-to-meta
+            // It works with mouse events on some platforms, so try to determine if metaKey is pressed
+            // hack; only works when Shift and Alt are not pressed
+            const isMetaKeyChrome = (
+                pressedKeyEventName === 'Meta' &&
+                getSetDifference(new Set(['shift', 'alt']), pressedModifiers).size !== 0
+            );
+            if (isMetaKeyChrome) {
+                pressedModifiers.add('meta');
+            }
+
+            for (const modifier of pressedModifiers) {
+                const foundIndex = values.findIndex(({optionValue}) => optionValue === modifier);
+                if (foundIndex !== -1) {
+                    pressedKeyIndices.add(foundIndex);
+                }
+            }
+
+            const inputValue = [...pressedKeyIndices].map((i) => values[i].name).join(keySeparator);
+            inputInner.val(inputValue);
+            inputInner.change();
+        };
+
+        inputInner.on('keydown', onKeyDown);
+
+        return inputInner;
+    }
+
+    createSelectElement(objects) {
+        const inputInner = ConditionsUI.instantiateTemplate('#condition-input-select-template');
+
+        const data = new Map([
+            ['values', []],
+            ['defaultValue', null]
+        ]);
+
+        for (const object of objects) {
+            if (hasOwn(object, 'values')) {
+                data.set('values', object.values);
+            }
+            if (hasOwn(object, 'defaultValue')) {
+                data.set('defaultValue', this.isolate(object.defaultValue));
+            }
+        }
+
+        for (const {optionValue, name} of data.get('values')) {
+            const option = ConditionsUI.instantiateTemplate('#condition-input-option-template');
+            option.attr('value', optionValue);
+            option.text(name);
+            option.appendTo(inputInner);
+        }
+
+        const defaultValue = data.get('defaultValue');
+        if (defaultValue !== null) {
+            inputInner.val(this.isolate(defaultValue));
+        }
+
+        return inputInner;
+    }
+
+    validateValue(value, isInput=false) {
         const conditionDescriptors = this.parent.parent.conditionDescriptors;
         let valid = true;
+        let inputTransformedValue = null;
         try {
-            value = conditionsNormalizeOptionValue(
+            [value, inputTransformedValue] = conditionsNormalizeOptionValue(
                 conditionDescriptors,
                 this.condition.type,
                 this.condition.operator,
-                value
+                value,
+                isInput
             );
         } catch (e) {
             valid = false;
         }
-        return {valid, value};
+        return {valid, value, inputTransformedValue};
     }
 
     onInputChanged() {
-        const {valid, value} = this.validateValue(this.input.val());
-        this.input.toggleClass('is-invalid', !valid);
-        this.input.val(value);
-        this.condition.value = value;
+        const {valid, value, inputTransformedValue} = this.validateValue(this.inputInner.val(), true);
+        this.inputInner.toggleClass('is-invalid', !valid);
+        this.inputInner.val(value);
+        this.condition.value = inputTransformedValue !== null ? inputTransformedValue : value;
         this.save();
     }
 

@@ -6,6 +6,7 @@
         <title>Yomichan Options</title>
         <link rel="icon" type="image/png" href="/mixed/img/icon16.png" sizes="16x16">
         <link rel="icon" type="image/png" href="/mixed/img/icon19.png" sizes="19x19">
+        <link rel="icon" type="image/png" href="/mixed/img/icon32.png" sizes="32x32">
         <link rel="icon" type="image/png" href="/mixed/img/icon38.png" sizes="38x38">
         <link rel="icon" type="image/png" href="/mixed/img/icon48.png" sizes="48x48">
         <link rel="icon" type="image/png" href="/mixed/img/icon64.png" sizes="64x64">
@@ -116,7 +117,7 @@
                     <div class="input-group-btn"><select class="form-control btn btn-default condition-type"><optgroup label="Type"></optgroup></select></div>
                     <div class="input-group-btn"><select class="form-control btn btn-default condition-operator"><optgroup label="Operator"></optgroup></select></div>
                     <div class="condition-line-break"></div>
-                    <div class="condition-input"><input type="text" class="form-control" /></div>
+                    <div class="condition-input"></div>
                     <div class="input-group-btn"><button class="btn btn-danger condition-remove" title="Remove"><span class="glyphicon glyphicon-remove"></span></button></div>
                 </div></template>
                 <template id="condition-group-separator-template"><div class="input-group">
@@ -125,6 +126,9 @@
                 <template id="condition-group-options-template"><div class="condition-group-options">
                     <button class="btn btn-default condition-add"><span class="glyphicon glyphicon-plus"></span></button>
                 </div></template>
+                <template id="condition-input-text-template"><input type="text" class="form-control condition-input-inner" /></template>
+                <template id="condition-input-select-template"><select class="form-control condition-input-inner"></select></template>
+                <template id="condition-input-option-template"><option></option></template>
             </div>
 
             <div>
@@ -408,12 +412,7 @@
 
                 <div class="form-group">
                     <label for="scan-modifier-key">Scan modifier key</label>
-                    <select class="form-control" id="scan-modifier-key">
-                        <option value="none">None</option>
-                        <option value="alt">Alt</option>
-                        <option value="ctrl">Ctrl</option>
-                        <option value="shift">Shift</option>
-                    </select>
+                    <select class="form-control" id="scan-modifier-key"></select>
                 </div>
             </div>
 
@@ -820,6 +819,14 @@
                     </div>
 
                     <div class="form-group options-advanced">
+                        <label for="duplicate-scope">Duplicate scope</label>
+                        <select class="form-control" id="duplicate-scope">
+                            <option value="collection">Collection</option>
+                            <option value="deck">Deck</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group options-advanced">
                         <label for="screenshot-format">Screenshot format</label>
                         <select class="form-control" id="screenshot-format">
                             <option value="png">PNG</option>
@@ -838,6 +845,8 @@
                             As Anki requires the first field in the model to be unique, it is recommended
                             that you set it to <code>{expression}</code> for term flashcards and <code>{character}</code> for
                             Kanji flashcards. You can use multiple markers per field by typing them in directly.
+                            See <a href="https://foosoft.net/projects/yomichan#flashcard-configuration" target="_blank" rel="noopener">Flashcard Configuration</a>
+                            on the Yomichan homepage for descriptions of the available markers.
                         </p>
 
                         <ul class="nav nav-tabs">
@@ -1116,6 +1125,7 @@
 
         <script src="/mixed/js/core.js"></script>
         <script src="/mixed/js/dom.js"></script>
+        <script src="/mixed/js/environment.js"></script>
         <script src="/mixed/js/api.js"></script>
         <script src="/mixed/js/japanese.js"></script>
 
@@ -1124,7 +1134,6 @@
         <script src="/bg/js/conditions.js"></script>
         <script src="/bg/js/dictionary.js"></script>
         <script src="/bg/js/handlebars.js"></script>
-        <script src="/bg/js/japanese.js"></script>
         <script src="/bg/js/options.js"></script>
         <script src="/bg/js/page-exit-prevention.js"></script>
         <script src="/bg/js/profile-conditions.js"></script>

@@ -16,64 +16,46 @@
  */
 
 /* global
+ * DisplaySearch
+ * apiForwardLogsToBackend
  * apiOptionsGet
+ * dynamicLoader
  */
 
-function injectSearchFrontend() {
-    const scriptSrcs = [
+async function injectSearchFrontend() {
+    await dynamicLoader.loadScripts([
         '/mixed/js/text-scanner.js',
         '/fg/js/frontend-api-receiver.js',
         '/fg/js/frame-offset-forwarder.js',
         '/fg/js/popup.js',
-        '/fg/js/popup-proxy-host.js',
+        '/fg/js/popup-factory.js',
         '/fg/js/frontend.js',
-        '/fg/js/frontend-initialize.js'
-    ];
-    for (const src of scriptSrcs) {
-        const node = document.querySelector(`script[src='${src}']`);
-        if (node !== null) { continue; }
-
-        const script = document.createElement('script');
-        script.async = false;
-        script.src = src;
-        document.body.appendChild(script);
-    }
-
-    const styleSrcs = [
-        '/fg/css/client.css'
-    ];
-    for (const src of styleSrcs) {
-        const style = document.createElement('link');
-        style.rel = 'stylesheet';
-        style.type = 'text/css';
-        style.href = src;
-        document.head.appendChild(style);
-    }
+        '/fg/js/content-script-main.js'
+    ]);
 }
 
-async function main() {
+(async () => {
+    apiForwardLogsToBackend();
     await yomichan.prepare();
+
+    const displaySearch = new DisplaySearch();
+    await displaySearch.prepare();
 
     let optionsApplied = false;
 
     const applyOptions = async () => {
-        const optionsContext = {
-            depth: 0,
-            url: window.location.href
-        };
+        const optionsContext = {depth: 0, url: window.location.href};
         const options = await apiOptionsGet(optionsContext);
         if (!options.scanning.enableOnSearchPage || optionsApplied) { return; }
+
         optionsApplied = true;
+        yomichan.off('optionsUpdated', applyOptions);
 
         window.frontendInitializationData = {depth: 1, proxy: false, isSearchPage: true};
-        injectSearchFrontend();
-
-        yomichan.off('optionsUpdated', applyOptions);
+        await injectSearchFrontend();
     };
 
     yomichan.on('optionsUpdated', applyOptions);
 
     await applyOptions();
-}
-
-main();
+})();

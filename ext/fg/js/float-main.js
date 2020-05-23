@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Yomichan Authors
+ * Copyright (C) 2020  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,24 +16,21 @@
  */
 
 /* global
+ * DisplayFloat
+ * apiForwardLogsToBackend
  * apiOptionsGet
+ * dynamicLoader
  */
 
-function injectPopupNested() {
-    const scriptSrcs = [
+async function injectPopupNested() {
+    await dynamicLoader.loadScripts([
         '/mixed/js/text-scanner.js',
         '/fg/js/frontend-api-sender.js',
         '/fg/js/popup.js',
         '/fg/js/popup-proxy.js',
         '/fg/js/frontend.js',
-        '/fg/js/frontend-initialize.js'
-    ];
-    for (const src of scriptSrcs) {
-        const script = document.createElement('script');
-        script.async = false;
-        script.src = src;
-        document.body.appendChild(script);
-    }
+        '/fg/js/content-script-main.js'
+    ]);
 }
 
 async function popupNestedInitialize(id, depth, parentFrameId, url) {
@@ -42,26 +39,23 @@ async function popupNestedInitialize(id, depth, parentFrameId, url) {
     const applyOptions = async () => {
         const optionsContext = {depth, url};
         const options = await apiOptionsGet(optionsContext);
-        const popupNestingMaxDepth = options.scanning.popupNestingMaxDepth;
-
-        const maxPopupDepthExceeded = !(
-            typeof popupNestingMaxDepth === 'number' &&
-            typeof depth === 'number' &&
-            depth < popupNestingMaxDepth
-        );
-        if (maxPopupDepthExceeded || optionsApplied) {
-            return;
-        }
+        const maxPopupDepthExceeded = !(typeof depth === 'number' && depth < options.scanning.popupNestingMaxDepth);
+        if (maxPopupDepthExceeded || optionsApplied) { return; }
 
         optionsApplied = true;
+        yomichan.off('optionsUpdated', applyOptions);
 
         window.frontendInitializationData = {id, depth, parentFrameId, url, proxy: true};
-        injectPopupNested();
-
-        yomichan.off('optionsUpdated', applyOptions);
+        await injectPopupNested();
     };
 
     yomichan.on('optionsUpdated', applyOptions);
 
     await applyOptions();
 }
+
+(async () => {
+    apiForwardLogsToBackend();
+    const display = new DisplayFloat();
+    await display.prepare();
+})();

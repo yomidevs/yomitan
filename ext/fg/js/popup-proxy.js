@@ -20,14 +20,13 @@
  */
 
 class PopupProxy {
-    constructor(id, depth, parentId, parentFrameId, url, getFrameOffset=null) {
-        this._parentId = parentId;
-        this._parentFrameId = parentFrameId;
+    constructor(id, depth, parentPopupId, parentFrameId, getFrameOffset=null, setDisabled=null) {
         this._id = id;
         this._depth = depth;
-        this._url = url;
-        this._apiSender = new FrontendApiSender();
+        this._parentPopupId = parentPopupId;
+        this._apiSender = new FrontendApiSender(`popup-factory#${parentFrameId}`);
         this._getFrameOffset = getFrameOffset;
+        this._setDisabled = setDisabled;
 
         this._frameOffset = null;
         this._frameOffsetPromise = null;
@@ -48,14 +47,10 @@ class PopupProxy {
         return this._depth;
     }
 
-    get url() {
-        return this._url;
-    }
-
     // Public functions
 
     async prepare() {
-        const {id} = await this._invokeHostApi('getOrCreatePopup', {id: this._id, parentId: this._parentId});
+        const {id} = await this._invoke('getOrCreatePopup', {id: this._id, parentId: this._parentPopupId});
         this._id = id;
     }
 
@@ -63,20 +58,20 @@ class PopupProxy {
         return true;
     }
 
-    async setOptions(options) {
-        return await this._invokeHostApi('setOptions', {id: this._id, options});
+    async setOptionsContext(optionsContext, source) {
+        return await this._invoke('setOptionsContext', {id: this._id, optionsContext, source});
     }
 
     hide(changeFocus) {
-        this._invokeHostApi('hide', {id: this._id, changeFocus});
+        this._invoke('hide', {id: this._id, changeFocus});
     }
 
     async isVisible() {
-        return await this._invokeHostApi('isVisible', {id: this._id});
+        return await this._invoke('isVisible', {id: this._id});
     }
 
     setVisibleOverride(visible) {
-        this._invokeHostApi('setVisibleOverride', {id: this._id, visible});
+        this._invoke('setVisibleOverride', {id: this._id, visible});
     }
 
     async containsPoint(x, y) {
@@ -84,38 +79,39 @@ class PopupProxy {
             await this._updateFrameOffset();
             [x, y] = this._applyFrameOffset(x, y);
         }
-        return await this._invokeHostApi('containsPoint', {id: this._id, x, y});
+        return await this._invoke('containsPoint', {id: this._id, x, y});
     }
 
-    async showContent(elementRect, writingMode, type=null, details=null) {
+    async showContent(elementRect, writingMode, type, details, context) {
         let {x, y, width, height} = elementRect;
         if (this._getFrameOffset !== null) {
             await this._updateFrameOffset();
             [x, y] = this._applyFrameOffset(x, y);
         }
         elementRect = {x, y, width, height};
-        return await this._invokeHostApi('showContent', {id: this._id, elementRect, writingMode, type, details});
+        return await this._invoke('showContent', {id: this._id, elementRect, writingMode, type, details, context});
     }
 
-    async setCustomCss(css) {
-        return await this._invokeHostApi('setCustomCss', {id: this._id, css});
+    setCustomCss(css) {
+        this._invoke('setCustomCss', {id: this._id, css});
     }
 
     clearAutoPlayTimer() {
-        this._invokeHostApi('clearAutoPlayTimer', {id: this._id});
+        this._invoke('clearAutoPlayTimer', {id: this._id});
     }
 
-    async setContentScale(scale) {
-        this._invokeHostApi('setContentScale', {id: this._id, scale});
+    setContentScale(scale) {
+        this._invoke('setContentScale', {id: this._id, scale});
+    }
+
+    async getUrl() {
+        return await this._invoke('getUrl', {});
     }
 
     // Private
 
-    _invokeHostApi(action, params={}) {
-        if (typeof this._parentFrameId !== 'number') {
-            return Promise.reject(new Error('Invalid frame'));
-        }
-        return this._apiSender.invoke(action, params, `popup-proxy-host#${this._parentFrameId}`);
+    _invoke(action, params={}) {
+        return this._apiSender.invoke(action, params);
     }
 
     async _updateFrameOffset() {
@@ -142,9 +138,13 @@ class PopupProxy {
         try {
             const offset = await this._frameOffsetPromise;
             this._frameOffset = offset !== null ? offset : [0, 0];
+            if (offset === null && this._setDisabled !== null) {
+                this._setDisabled();
+                return;
+            }
             this._frameOffsetUpdatedAt = now;
         } catch (e) {
-            logError(e);
+            yomichan.logError(e);
         } finally {
             this._frameOffsetPromise = null;
         }

@@ -38,12 +38,17 @@ function createTestDictionaryArchive(dictionary, dictionaryName) {
     const archive = new (getJSZip())();
 
     for (const fileName of fileNames) {
-        const source = fs.readFileSync(path.join(dictionaryDirectory, fileName), {encoding: 'utf8'});
-        const json = JSON.parse(source);
-        if (fileName === 'index.json' && typeof dictionaryName === 'string') {
-            json.title = dictionaryName;
+        if (/\.json$/.test(fileName)) {
+            const content = fs.readFileSync(path.join(dictionaryDirectory, fileName), {encoding: 'utf8'});
+            const json = JSON.parse(content);
+            if (fileName === 'index.json' && typeof dictionaryName === 'string') {
+                json.title = dictionaryName;
+            }
+            archive.file(fileName, JSON.stringify(json, null, 0));
+        } else {
+            const content = fs.readFileSync(path.join(dictionaryDirectory, fileName), {encoding: null});
+            archive.file(fileName, content);
         }
-        archive.file(fileName, JSON.stringify(json, null, 0));
     }
 
     return archive;

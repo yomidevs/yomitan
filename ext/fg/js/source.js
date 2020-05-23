@@ -46,10 +46,14 @@ class TextSourceRange {
         return this.content;
     }
 
-    setEndOffset(length) {
-        const state = TextSourceRange.seekForward(this.range.startContainer, this.range.startOffset, length);
+    setEndOffset(length, fromEnd=false) {
+        const state = (
+            fromEnd ?
+            TextSourceRange.seekForward(this.range.endContainer, this.range.endOffset, length) :
+            TextSourceRange.seekForward(this.range.startContainer, this.range.startOffset, length)
+        );
         this.range.setEnd(state.node, state.offset);
-        this.content = state.content;
+        this.content = (fromEnd ? this.content + state.content : state.content);
         return length - state.remainder;
     }
 
@@ -57,7 +61,7 @@ class TextSourceRange {
         const state = TextSourceRange.seekBackward(this.range.startContainer, this.range.startOffset, length);
         this.range.setStart(state.node, state.offset);
         this.rangeStartOffset = this.range.startOffset;
-        this.content = state.content;
+        this.content = state.content + this.content;
         return length - state.remainder;
     }
 
@@ -94,7 +98,15 @@ class TextSourceRange {
                 this.rangeStartOffset === other.rangeStartOffset
             );
         } else {
-            return this.range.compareBoundaryPoints(Range.START_TO_START, other.range) === 0;
+            try {
+                return this.range.compareBoundaryPoints(Range.START_TO_START, other.range) === 0;
+            } catch (e) {
+                if (e.name === 'WrongDocumentError') {
+                    // This can happen with shadow DOMs if the ranges are in different documents.
+                    return false;
+                }
+                throw e;
+            }
         }
     }
 
@@ -110,7 +122,8 @@ class TextSourceRange {
         return !(
             style.visibility === 'hidden' ||
             style.display === 'none' ||
-            parseFloat(style.fontSize) === 0);
+            parseFloat(style.fontSize) === 0
+        );
     }
 
     static getRubyElement(node) {
@@ -345,13 +358,32 @@ class TextSourceRange {
  */
 
 class TextSourceElement {
-    constructor(element, content='') {
-        this.element = element;
-        this.content = content;
+    constructor(element, fullContent=null, startOffset=0, endOffset=0) {
+        this._element = element;
+        this._fullContent = (typeof fullContent === 'string' ? fullContent : TextSourceElement.getElementContent(element));
+        this._startOffset = startOffset;
+        this._endOffset = endOffset;
+        this._content = this._fullContent.substring(this._startOffset, this._endOffset);
+    }
+
+    get element() {
+        return this._element;
+    }
+
+    get fullContent() {
+        return this._fullContent;
+    }
+
+    get startOffset() {
+        return this._startOffset;
+    }
+
+    get endOffset() {
+        return this._endOffset;
     }
 
     clone() {
-        return new TextSourceElement(this.element, this.content);
+        return new TextSourceElement(this._element, this._fullContent, this._startOffset, this._endOffset);
     }
 
     cleanup() {
@@ -359,44 +391,32 @@ class TextSourceElement {
     }
 
     text() {
-        return this.content;
+        return this._content;
     }
 
-    setEndOffset(length) {
-        switch (this.element.nodeName.toUpperCase()) {
-            case 'BUTTON':
-                this.content = this.element.textContent;
-                break;
-            case 'IMG':
-                this.content = this.element.getAttribute('alt');
-                break;
-            default:
-                this.content = this.element.value;
-                break;
+    setEndOffset(length, fromEnd=false) {
+        if (fromEnd) {
+            const delta = Math.min(this._fullContent.length - this._endOffset, length);
+            this._endOffset += delta;
+            this._content = this._fullContent.substring(this._startOffset, this._endOffset);
+            return delta;
+        } else {
+            const delta = Math.min(this._fullContent.length - this._startOffset, length);
+            this._endOffset = this._startOffset + delta;
+            this._content = this._fullContent.substring(this._startOffset, this._endOffset);
+            return delta;
         }
-
-        let consumed = 0;
-        let content = '';
-        for (const currentChar of this.content || '') {
-            if (consumed >= length) {
-                break;
-            } else if (!currentChar.match(IGNORE_TEXT_PATTERN)) {
-                consumed++;
-                content += currentChar;
-            }
-        }
-
-        this.content = content;
-
-        return this.content.length;
     }
 
-    setStartOffset() {
-        return 0;
+    setStartOffset(length) {
+        const delta = Math.min(this._startOffset, length);
+        this._startOffset -= delta;
+        this._content = this._fullContent.substring(this._startOffset, this._endOffset);
+        return delta;
     }
 
     getRect() {
-        return this.element.getBoundingClientRect();
+        return this._element.getBoundingClientRect();
     }
 
     getWritingMode() {
@@ -416,8 +436,30 @@ class TextSourceElement {
             typeof other === 'object' &&
             other !== null &&
             other instanceof TextSourceElement &&
-            other.element === this.element &&
-            other.content === this.content
+            this._element === other.element &&
+            this._fullContent === other.fullContent &&
+            this._startOffset === other.startOffset &&
+            this._endOffset === other.endOffset
         );
+    }
+
+    static getElementContent(element) {
+        let content;
+        switch (element.nodeName.toUpperCase()) {
+            case 'BUTTON':
+                content = element.textContent;
+                break;
+            case 'IMG':
+                content = element.getAttribute('alt') || '';
+                break;
+            default:
+                content = `${element.value}`;
+                break;
+        }
+
+        // Remove zero-width non-joiner
+        content = content.replace(/\u200c/g, '');
+
+        return content;
     }
 }

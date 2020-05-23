@@ -16,8 +16,9 @@
  */
 
 /* global
- * apiGetMessageToken
- * apiInjectStylesheet
+ * DOM
+ * apiOptionsGet
+ * dynamicLoader
  */
 
 class Popup {
@@ -29,24 +30,24 @@ class Popup {
         this._child = null;
         this._childrenSupported = true;
         this._injectPromise = null;
+        this._injectPromiseComplete = false;
         this._visible = false;
         this._visibleOverride = null;
         this._options = null;
+        this._optionsContext = null;
         this._contentScale = 1.0;
-        this._containerSizeContentScale = null;
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
-        this._messageToken = null;
+        this._previousOptionsContextSource = null;
 
-        this._container = document.createElement('iframe');
-        this._container.className = 'yomichan-float';
-        this._container.addEventListener('mousedown', (e) => e.stopPropagation());
-        this._container.addEventListener('scroll', (e) => e.stopPropagation());
-        this._container.style.width = '0px';
-        this._container.style.height = '0px';
+        this._frameSizeContentScale = null;
+        this._frameSecret = null;
+        this._frameToken = null;
+        this._frame = document.createElement('iframe');
+        this._frame.className = 'yomichan-float';
+        this._frame.style.width = '0';
+        this._frame.style.height = '0';
 
         this._fullscreenEventListeners = new EventListenerCollection();
-
-        this._updateVisibility();
     }
 
     // Public properties
@@ -71,19 +72,27 @@ class Popup {
         return this._frameId;
     }
 
-    get url() {
-        return window.location.href;
-    }
-
     // Public functions
+
+    prepare() {
+        this._updateVisibility();
+        this._frame.addEventListener('mousedown', (e) => e.stopPropagation());
+        this._frame.addEventListener('scroll', (e) => e.stopPropagation());
+        this._frame.addEventListener('load', this._onFrameLoad.bind(this));
+    }
 
     isProxy() {
         return false;
     }
 
-    async setOptions(options) {
-        this._options = options;
+    async setOptionsContext(optionsContext, source) {
+        this._optionsContext = optionsContext;
+        this._previousOptionsContextSource = source;
+
+        this._options = await apiOptionsGet(optionsContext);
         this.updateTheme();
+
+        this._invokeApi('setOptionsContext', {optionsContext});
     }
 
     hide(changeFocus) {
@@ -111,7 +120,7 @@ class Popup {
 
     async containsPoint(x, y) {
         for (let popup = this; popup !== null && popup.isVisibleSync(); popup = popup._child) {
-            const rect = popup._container.getBoundingClientRect();
+            const rect = popup._frame.getBoundingClientRect();
             if (x >= rect.left && y >= rect.top && x < rect.right && y < rect.bottom) {
                 return true;
             }
@@ -119,14 +128,20 @@ class Popup {
         return false;
     }
 
-    async showContent(elementRect, writingMode, type=null, details=null) {
+    async showContent(elementRect, writingMode, type, details, context) {
         if (this._options === null) { throw new Error('Options not assigned'); }
+
+        const {optionsContext, source} = context;
+        if (source !== this._previousOptionsContextSource) {
+            await this.setOptionsContext(optionsContext, source);
+        }
+
         await this._show(elementRect, writingMode);
         if (type === null) { return; }
         this._invokeApi('setContent', {type, details});
     }
 
-    async setCustomCss(css) {
+    setCustomCss(css) {
         this._invokeApi('setCustomCss', {css});
     }
 
@@ -160,82 +175,218 @@ class Popup {
     }
 
     updateTheme() {
-        this._container.dataset.yomichanTheme = this._options.general.popupOuterTheme;
-        this._container.dataset.yomichanSiteColor = this._getSiteColor();
+        this._frame.dataset.yomichanTheme = this._options.general.popupOuterTheme;
+        this._frame.dataset.yomichanSiteColor = this._getSiteColor();
     }
 
     async setCustomOuterCss(css, useWebExtensionApi) {
-        return await Popup._injectStylesheet(
-            'yomichan-popup-outer-user-stylesheet',
-            'code',
-            css,
-            useWebExtensionApi
-        );
+        return await dynamicLoader.loadStyle('yomichan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi);
     }
 
     setChildrenSupported(value) {
         this._childrenSupported = value;
     }
 
-    getContainer() {
-        return this._container;
+    getFrame() {
+        return this._frame;
     }
 
-    getContainerRect() {
-        return this._container.getBoundingClientRect();
+    getFrameRect() {
+        return this._frame.getBoundingClientRect();
     }
 
     // Private functions
 
     _inject() {
-        if (this._injectPromise === null) {
-            this._injectPromise = this._createInjectPromise();
+        let injectPromise = this._injectPromise;
+        if (injectPromise === null) {
+            injectPromise = this._createInjectPromise();
+            this._injectPromise = injectPromise;
+            injectPromise.then(
+                () => {
+                    if (injectPromise !== this._injectPromise) { return; }
+                    this._injectPromiseComplete = true;
+                },
+                () => { this._resetFrame(); }
+            );
         }
-        return this._injectPromise;
+        return injectPromise;
+    }
+
+    _initializeFrame(frame, targetOrigin, frameId, setupFrame, timeout=10000) {
+        return new Promise((resolve, reject) => {
+            const tokenMap = new Map();
+            let timer = null;
+            let frameLoadedResolve = null;
+            let frameLoadedReject = null;
+            const frameLoaded = new Promise((resolve2, reject2) => {
+                frameLoadedResolve = resolve2;
+                frameLoadedReject = reject2;
+            });
+
+            const postMessage = (action, params) => {
+                const contentWindow = frame.contentWindow;
+                if (contentWindow === null) { throw new Error('Frame missing content window'); }
+
+                let validOrigin = true;
+                try {
+                    validOrigin = (contentWindow.location.origin === targetOrigin);
+                } catch (e) {
+                    // NOP
+                }
+                if (!validOrigin) { throw new Error('Unexpected frame origin'); }
+
+                contentWindow.postMessage({action, params}, targetOrigin);
+            };
+
+            const onMessage = (message) => {
+                onMessageInner(message);
+                return false;
+            };
+
+            const onMessageInner = async (message) => {
+                try {
+                    if (!isObject(message)) { return; }
+                    const {action, params} = message;
+                    if (!isObject(params)) { return; }
+                    await frameLoaded;
+                    if (timer === null) { return; } // Done
+
+                    switch (action) {
+                        case 'popupPrepared':
+                            {
+                                const {secret} = params;
+                                const token = yomichan.generateId(16);
+                                tokenMap.set(secret, token);
+                                postMessage('initialize', {secret, token, frameId});
+                            }
+                            break;
+                        case 'popupInitialized':
+                            {
+                                const {secret, token} = params;
+                                const token2 = tokenMap.get(secret);
+                                if (typeof token2 !== 'undefined' && token === token2) {
+                                    cleanup();
+                                    resolve({secret, token});
+                                }
+                            }
+                            break;
+                    }
+                } catch (e) {
+                    cleanup();
+                    reject(e);
+                }
+            };
+
+            const onLoad = () => {
+                if (frameLoadedResolve === null) {
+                    cleanup();
+                    reject(new Error('Unexpected load event'));
+                    return;
+                }
+
+                if (Popup.isFrameAboutBlank(frame)) {
+                    return;
+                }
+
+                frameLoadedResolve();
+                frameLoadedResolve = null;
+                frameLoadedReject = null;
+            };
+
+            const cleanup = () => {
+                if (timer === null) { return; } // Done
+                clearTimeout(timer);
+                timer = null;
+
+                frameLoadedResolve = null;
+                if (frameLoadedReject !== null) {
+                    frameLoadedReject(new Error('Terminated'));
+                    frameLoadedReject = null;
+                }
+
+                chrome.runtime.onMessage.removeListener(onMessage);
+                frame.removeEventListener('load', onLoad);
+            };
+
+            // Start
+            timer = setTimeout(() => {
+                cleanup();
+                reject(new Error('Timeout'));
+            }, timeout);
+
+            chrome.runtime.onMessage.addListener(onMessage);
+            frame.addEventListener('load', onLoad);
+
+            // Prevent unhandled rejections
+            frameLoaded.catch(() => {}); // NOP
+
+            setupFrame(frame);
+        });
     }
 
     async _createInjectPromise() {
-        if (this._messageToken === null) {
-            this._messageToken = await apiGetMessageToken();
-        }
+        this._injectStyles();
 
+        const {secret, token} = await this._initializeFrame(this._frame, this._targetOrigin, this._frameId, (frame) => {
+            frame.removeAttribute('src');
+            frame.removeAttribute('srcdoc');
+            this._observeFullscreen(true);
+            this._onFullscreenChanged();
+            frame.contentDocument.location.href = chrome.runtime.getURL('/fg/float.html');
+        });
+        this._frameSecret = secret;
+        this._frameToken = token;
+
+        // Configure
+        const messageId = yomichan.generateId(16);
         const popupPreparedPromise = yomichan.getTemporaryListenerResult(
             chrome.runtime.onMessage,
-            ({action, params}, {resolve}) => {
+            (message, {resolve}) => {
                 if (
-                    action === 'popupPrepareCompleted' &&
-                    isObject(params) &&
-                    params.targetPopupId === this._id
+                    isObject(message) &&
+                    message.action === 'popupConfigured' &&
+                    isObject(message.params) &&
+                    message.params.messageId === messageId
                 ) {
                     resolve();
                 }
             }
         );
-
-        const parentFrameId = (typeof this._frameId === 'number' ? this._frameId : null);
-        this._container.setAttribute('src', chrome.runtime.getURL('/fg/float.html'));
-        this._container.addEventListener('load', () => {
-            this._invokeApi('prepare', {
-                popupInfo: {
-                    id: this._id,
-                    depth: this._depth,
-                    parentFrameId
-                },
-                url: this.url,
-                childrenSupported: this._childrenSupported,
-                scale: this._contentScale
-            });
+        this._invokeApi('configure', {
+            messageId,
+            frameId: this._frameId,
+            popupId: this._id,
+            optionsContext: this._optionsContext,
+            childrenSupported: this._childrenSupported,
+            scale: this._contentScale
         });
-        this._observeFullscreen(true);
-        this._onFullscreenChanged();
-        this._injectStyles();
 
         return popupPreparedPromise;
     }
 
+    _onFrameLoad() {
+        if (!this._injectPromiseComplete) { return; }
+        this._resetFrame();
+    }
+
+    _resetFrame() {
+        const parent = this._frame.parentNode;
+        if (parent !== null) {
+            parent.removeChild(this._frame);
+        }
+        this._frame.removeAttribute('src');
+        this._frame.removeAttribute('srcdoc');
+
+        this._frameSecret = null;
+        this._frameToken = null;
+        this._injectPromise = null;
+        this._injectPromiseComplete = false;
+    }
+
     async _injectStyles() {
         try {
-            await Popup._injectStylesheet('yomichan-popup-outer-stylesheet', 'file', '/fg/css/client.css', true);
+            await dynamicLoader.loadStyle('yomichan-popup-outer-stylesheet', 'file', '/fg/css/client.css', true);
         } catch (e) {
             // NOP
         }
@@ -271,9 +422,9 @@ class Popup {
     }
 
     _onFullscreenChanged() {
-        const parent = (Popup._getFullscreenElement() || document.body || null);
-        if (parent !== null && this._container.parentNode !== parent) {
-            parent.appendChild(this._container);
+        const parent = this._getFrameParentElement();
+        if (parent !== null && this._frame.parentNode !== parent) {
+            parent.appendChild(this._frame);
         }
     }
 
@@ -281,31 +432,31 @@ class Popup {
         await this._inject();
 
         const optionsGeneral = this._options.general;
-        const container = this._container;
-        const containerRect = container.getBoundingClientRect();
-        const getPosition = (
-            writingMode === 'horizontal-tb' || optionsGeneral.popupVerticalTextPosition === 'default' ?
-            Popup._getPositionForHorizontalText :
-            Popup._getPositionForVerticalText
-        );
+        const frame = this._frame;
+        const frameRect = frame.getBoundingClientRect();
 
-        const viewport = Popup._getViewport(optionsGeneral.popupScaleRelativeToVisualViewport);
+        const viewport = this._getViewport(optionsGeneral.popupScaleRelativeToVisualViewport);
         const scale = this._contentScale;
-        const scaleRatio = this._containerSizeContentScale === null ? 1.0 : scale / this._containerSizeContentScale;
-        this._containerSizeContentScale = scale;
-        let [x, y, width, height, below] = getPosition(
+        const scaleRatio = this._frameSizeContentScale === null ? 1.0 : scale / this._frameSizeContentScale;
+        this._frameSizeContentScale = scale;
+        const getPositionArgs = [
             elementRect,
-            Math.max(containerRect.width * scaleRatio, optionsGeneral.popupWidth * scale),
-            Math.max(containerRect.height * scaleRatio, optionsGeneral.popupHeight * scale),
+            Math.max(frameRect.width * scaleRatio, optionsGeneral.popupWidth * scale),
+            Math.max(frameRect.height * scaleRatio, optionsGeneral.popupHeight * scale),
             viewport,
             scale,
             optionsGeneral,
             writingMode
+        ];
+        let [x, y, width, height, below] = (
+            writingMode === 'horizontal-tb' || optionsGeneral.popupVerticalTextPosition === 'default' ?
+            this._getPositionForHorizontalText(...getPositionArgs) :
+            this._getPositionForVerticalText(...getPositionArgs)
         );
 
         const fullWidth = (optionsGeneral.popupDisplayMode === 'full-width');
-        container.classList.toggle('yomichan-float-full-width', fullWidth);
-        container.classList.toggle('yomichan-float-above', !below);
+        frame.classList.toggle('yomichan-float-full-width', fullWidth);
+        frame.classList.toggle('yomichan-float-above', !below);
 
         if (optionsGeneral.popupDisplayMode === 'full-width') {
             x = viewport.left;
@@ -313,10 +464,10 @@ class Popup {
             width = viewport.right - viewport.left;
         }
 
-        container.style.left = `${x}px`;
-        container.style.top = `${y}px`;
-        container.style.width = `${width}px`;
-        container.style.height = `${height}px`;
+        frame.style.left = `${x}px`;
+        frame.style.top = `${y}px`;
+        frame.style.width = `${width}px`;
+        frame.style.height = `${height}px`;
 
         this._setVisible(true);
         if (this._child !== null) {
@@ -330,20 +481,20 @@ class Popup {
     }
 
     _updateVisibility() {
-        this._container.style.setProperty('visibility', this.isVisibleSync() ? 'visible' : 'hidden', 'important');
+        this._frame.style.setProperty('visibility', this.isVisibleSync() ? 'visible' : 'hidden', 'important');
     }
 
     _focusParent() {
         if (this._parent !== null) {
             // Chrome doesn't like focusing iframe without contentWindow.
-            const contentWindow = this._parent._container.contentWindow;
+            const contentWindow = this._parent.getFrame().contentWindow;
             if (contentWindow !== null) {
                 contentWindow.focus();
             }
         } else {
             // Firefox doesn't like focusing window without first blurring the iframe.
-            // this.container.contentWindow.blur() doesn't work on Firefox for some reason.
-            this._container.blur();
+            // this._frame.contentWindow.blur() doesn't work on Firefox for some reason.
+            this._frame.blur();
             // This is needed for Chrome.
             window.focus();
         }
@@ -351,36 +502,52 @@ class Popup {
 
     _getSiteColor() {
         const color = [255, 255, 255];
-        Popup._addColor(color, Popup._getColorInfo(window.getComputedStyle(document.documentElement).backgroundColor));
-        Popup._addColor(color, Popup._getColorInfo(window.getComputedStyle(document.body).backgroundColor));
+        const {documentElement, body} = document;
+        if (documentElement !== null) {
+            this._addColor(color, window.getComputedStyle(documentElement).backgroundColor);
+        }
+        if (body !== null) {
+            this._addColor(color, window.getComputedStyle(body).backgroundColor);
+        }
         const dark = (color[0] < 128 && color[1] < 128 && color[2] < 128);
         return dark ? 'dark' : 'light';
     }
 
     _invokeApi(action, params={}) {
-        const token = this._messageToken;
-        const contentWindow = this._container.contentWindow;
-        if (token === null || contentWindow === null) { return; }
+        const secret = this._frameSecret;
+        const token = this._frameToken;
+        const contentWindow = this._frame.contentWindow;
+        if (secret === null || token === null || contentWindow === null) { return; }
 
-        contentWindow.postMessage({action, params, token}, this._targetOrigin);
+        contentWindow.postMessage({action, params, secret, token}, this._targetOrigin);
     }
 
-    static _getFullscreenElement() {
-        return (
-            document.fullscreenElement ||
-            document.msFullscreenElement ||
-            document.mozFullScreenElement ||
-            document.webkitFullscreenElement ||
-            null
-        );
+    _getFrameParentElement() {
+        const defaultParent = document.body;
+        const fullscreenElement = DOM.getFullscreenElement();
+        if (
+            fullscreenElement === null ||
+            fullscreenElement.shadowRoot ||
+            fullscreenElement.openOrClosedShadowRoot // Available to Firefox 63+ for WebExtensions
+        ) {
+            return defaultParent;
+        }
+
+        switch (fullscreenElement.nodeName.toUpperCase()) {
+            case 'IFRAME':
+            case 'FRAME':
+                return defaultParent;
+        }
+
+        return fullscreenElement;
     }
 
-    static _getPositionForHorizontalText(elementRect, width, height, viewport, offsetScale, optionsGeneral) {
+    _getPositionForHorizontalText(elementRect, width, height, viewport, offsetScale, optionsGeneral) {
         const preferBelow = (optionsGeneral.popupHorizontalTextPosition === 'below');
         const horizontalOffset = optionsGeneral.popupHorizontalOffset * offsetScale;
         const verticalOffset = optionsGeneral.popupVerticalOffset * offsetScale;
 
-        const [x, w] = Popup._getConstrainedPosition(
+        const [x, w] = this._getConstrainedPosition(
             elementRect.right - horizontalOffset,
             elementRect.left + horizontalOffset,
             width,
@@ -388,7 +555,7 @@ class Popup {
             viewport.right,
             true
         );
-        const [y, h, below] = Popup._getConstrainedPositionBinary(
+        const [y, h, below] = this._getConstrainedPositionBinary(
             elementRect.top - verticalOffset,
             elementRect.bottom + verticalOffset,
             height,
@@ -399,12 +566,12 @@ class Popup {
         return [x, y, w, h, below];
     }
 
-    static _getPositionForVerticalText(elementRect, width, height, viewport, offsetScale, optionsGeneral, writingMode) {
-        const preferRight = Popup._isVerticalTextPopupOnRight(optionsGeneral.popupVerticalTextPosition, writingMode);
+    _getPositionForVerticalText(elementRect, width, height, viewport, offsetScale, optionsGeneral, writingMode) {
+        const preferRight = this._isVerticalTextPopupOnRight(optionsGeneral.popupVerticalTextPosition, writingMode);
         const horizontalOffset = optionsGeneral.popupHorizontalOffset2 * offsetScale;
         const verticalOffset = optionsGeneral.popupVerticalOffset2 * offsetScale;
 
-        const [x, w] = Popup._getConstrainedPositionBinary(
+        const [x, w] = this._getConstrainedPositionBinary(
             elementRect.left - horizontalOffset,
             elementRect.right + horizontalOffset,
             width,
@@ -412,7 +579,7 @@ class Popup {
             viewport.right,
             preferRight
         );
-        const [y, h, below] = Popup._getConstrainedPosition(
+        const [y, h, below] = this._getConstrainedPosition(
             elementRect.bottom - verticalOffset,
             elementRect.top + verticalOffset,
             height,
@@ -423,20 +590,22 @@ class Popup {
         return [x, y, w, h, below];
     }
 
-    static _isVerticalTextPopupOnRight(positionPreference, writingMode) {
+    _isVerticalTextPopupOnRight(positionPreference, writingMode) {
         switch (positionPreference) {
             case 'before':
-                return !Popup._isWritingModeLeftToRight(writingMode);
+                return !this._isWritingModeLeftToRight(writingMode);
             case 'after':
-                return Popup._isWritingModeLeftToRight(writingMode);
+                return this._isWritingModeLeftToRight(writingMode);
             case 'left':
                 return false;
             case 'right':
                 return true;
+            default:
+                return false;
         }
     }
 
-    static _isWritingModeLeftToRight(writingMode) {
+    _isWritingModeLeftToRight(writingMode) {
         switch (writingMode) {
             case 'vertical-lr':
             case 'sideways-lr':
@@ -446,7 +615,7 @@ class Popup {
         }
     }
 
-    static _getConstrainedPosition(positionBefore, positionAfter, size, minLimit, maxLimit, after) {
+    _getConstrainedPosition(positionBefore, positionAfter, size, minLimit, maxLimit, after) {
         size = Math.min(size, maxLimit - minLimit);
 
         let position;
@@ -461,7 +630,7 @@ class Popup {
         return [position, size, after];
     }
 
-    static _getConstrainedPositionBinary(positionBefore, positionAfter, size, minLimit, maxLimit, after) {
+    _getConstrainedPositionBinary(positionBefore, positionAfter, size, minLimit, maxLimit, after) {
         const overflowBefore = minLimit - (positionBefore - size);
         const overflowAfter = (positionAfter + size) - maxLimit;
 
@@ -481,7 +650,10 @@ class Popup {
         return [position, size, after];
     }
 
-    static _addColor(target, color) {
+    _addColor(target, cssColor) {
+        if (typeof cssColor !== 'string') { return; }
+
+        const color = this._getColorInfo(cssColor);
         if (color === null) { return; }
 
         const a = color[3];
@@ -493,7 +665,7 @@ class Popup {
         }
     }
 
-    static _getColorInfo(cssColor) {
+    _getColorInfo(cssColor) {
         const m = /^\s*rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)\s*$/.exec(cssColor);
         if (m === null) { return null; }
 
@@ -506,7 +678,7 @@ class Popup {
         ];
     }
 
-    static _getViewport(useVisualViewport) {
+    _getViewport(useVisualViewport) {
         const visualViewport = window.visualViewport;
         if (visualViewport !== null && typeof visualViewport === 'object') {
             const left = visualViewport.offsetLeft;
@@ -531,87 +703,23 @@ class Popup {
             }
         }
 
+        const body = document.body;
         return {
             left: 0,
             top: 0,
-            right: document.body.clientWidth,
+            right: (body !== null ? body.clientWidth : 0),
             bottom: window.innerHeight
         };
     }
 
-    static _isOnExtensionPage() {
+    static isFrameAboutBlank(frame) {
         try {
-            const url = chrome.runtime.getURL('/');
-            return window.location.href.substring(0, url.length) === url;
+            const contentDocument = frame.contentDocument;
+            if (contentDocument === null) { return false; }
+            const url = contentDocument.location.href;
+            return /^about:blank(?:[#?]|$)/.test(url);
         } catch (e) {
-            // NOP
+            return false;
         }
-    }
-
-    static async _injectStylesheet(id, type, value, useWebExtensionApi) {
-        const injectedStylesheets = Popup._injectedStylesheets;
-
-        if (Popup._isOnExtensionPage()) {
-            // Permissions error will occur if trying to use the WebExtension API to inject
-            // into an extension page.
-            useWebExtensionApi = false;
-        }
-
-        let styleNode = injectedStylesheets.get(id);
-        if (typeof styleNode !== 'undefined') {
-            if (styleNode === null) {
-                // Previously injected via WebExtension API
-                throw new Error(`Stylesheet with id ${id} has already been injected using the WebExtension API`);
-            }
-        } else {
-            styleNode = null;
-        }
-
-        if (useWebExtensionApi) {
-            // Inject via WebExtension API
-            if (styleNode !== null && styleNode.parentNode !== null) {
-                styleNode.parentNode.removeChild(styleNode);
-            }
-
-            await apiInjectStylesheet(type, value);
-
-            injectedStylesheets.set(id, null);
-            return null;
-        }
-
-        // Create node in document
-        const parentNode = document.head;
-        if (parentNode === null) {
-            throw new Error('No parent node');
-        }
-
-        // Create or reuse node
-        const isFile = (type === 'file');
-        const tagName = isFile ? 'link' : 'style';
-        if (styleNode === null || styleNode.nodeName.toLowerCase() !== tagName) {
-            if (styleNode !== null && styleNode.parentNode !== null) {
-                styleNode.parentNode.removeChild(styleNode);
-            }
-            styleNode = document.createElement(tagName);
-            styleNode.id = id;
-        }
-
-        // Update node style
-        if (isFile) {
-            styleNode.rel = value;
-        } else {
-            styleNode.textContent = value;
-        }
-
-        // Update parent
-        if (styleNode.parentNode !== parentNode) {
-            parentNode.appendChild(styleNode);
-        }
-
-        // Add to map
-        injectedStylesheets.set(id, styleNode);
-        return styleNode;
     }
 }
-
-Popup._injectedStylesheets = new Map();

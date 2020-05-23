@@ -21,47 +21,172 @@
  * docRangeFromPoint
  */
 
-class TextScanner {
-    constructor(node, ignoreElements, ignorePoints) {
-        this.node = node;
-        this.ignoreElements = ignoreElements;
-        this.ignorePoints = ignorePoints;
+class TextScanner extends EventDispatcher {
+    constructor({node, ignoreElements, ignorePoint, search}) {
+        super();
+        this._node = node;
+        this._ignoreElements = ignoreElements;
+        this._ignorePoint = ignorePoint;
+        this._search = search;
 
-        this.ignoreNodes = null;
+        this._ignoreNodes = null;
 
-        this.scanTimerPromise = null;
-        this.causeCurrent = null;
-        this.textSourceCurrent = null;
-        this.pendingLookup = false;
-        this.options = null;
+        this._causeCurrent = null;
+        this._scanTimerPromise = null;
+        this._textSourceCurrent = null;
+        this._textSourceCurrentSelected = false;
+        this._pendingLookup = false;
+        this._options = null;
 
-        this.enabled = false;
-        this.eventListeners = new EventListenerCollection();
+        this._enabled = false;
+        this._eventListeners = new EventListenerCollection();
 
-        this.primaryTouchIdentifier = null;
-        this.preventNextContextMenu = false;
-        this.preventNextMouseDown = false;
-        this.preventNextClick = false;
-        this.preventScroll = false;
+        this._primaryTouchIdentifier = null;
+        this._preventNextContextMenu = false;
+        this._preventNextMouseDown = false;
+        this._preventNextClick = false;
+        this._preventScroll = false;
+
+        this._canClearSelection = true;
     }
 
-    onMouseOver(e) {
-        if (this.ignoreElements().includes(e.target)) {
-            this.scanTimerClear();
+    get canClearSelection() {
+        return this._canClearSelection;
+    }
+
+    set canClearSelection(value) {
+        this._canClearSelection = value;
+    }
+
+    get ignoreNodes() {
+        return this._ignoreNodes;
+    }
+
+    set ignoreNodes(value) {
+        this._ignoreNodes = value;
+    }
+
+    get causeCurrent() {
+        return this._causeCurrent;
+    }
+
+    setEnabled(enabled) {
+        this._eventListeners.removeAllEventListeners();
+        this._enabled = enabled;
+        if (this._enabled) {
+            this._hookEvents();
+        } else {
+            this.clearSelection(true);
         }
     }
 
-    onMouseMove(e) {
-        this.scanTimerClear();
+    setOptions(options) {
+        this._options = options;
+    }
 
-        if (this.pendingLookup || DOM.isMouseButtonDown(e, 'primary')) {
+    async searchAt(x, y, cause) {
+        try {
+            this._scanTimerClear();
+
+            if (this._pendingLookup) {
+                return;
+            }
+
+            if (typeof this._ignorePoint === 'function' && await this._ignorePoint(x, y)) {
+                return;
+            }
+
+            const textSource = docRangeFromPoint(x, y, this._options.scanning.deepDomScan);
+            try {
+                if (this._textSourceCurrent !== null && this._textSourceCurrent.equals(textSource)) {
+                    return;
+                }
+
+                this._pendingLookup = true;
+                const result = await this._search(textSource, cause);
+                if (result !== null) {
+                    this._causeCurrent = cause;
+                    this.setCurrentTextSource(textSource);
+                }
+                this._pendingLookup = false;
+            } finally {
+                if (textSource !== null) {
+                    textSource.cleanup();
+                }
+            }
+        } catch (e) {
+            yomichan.logError(e);
+        }
+    }
+
+    getTextSourceContent(textSource, length) {
+        const clonedTextSource = textSource.clone();
+
+        clonedTextSource.setEndOffset(length);
+
+        if (this._ignoreNodes !== null && clonedTextSource.range) {
+            length = clonedTextSource.text().length;
+            while (clonedTextSource.range && length > 0) {
+                const nodes = TextSourceRange.getNodesInRange(clonedTextSource.range);
+                if (!TextSourceRange.anyNodeMatchesSelector(nodes, this._ignoreNodes)) {
+                    break;
+                }
+                --length;
+                clonedTextSource.setEndOffset(length);
+            }
+        }
+
+        return clonedTextSource.text();
+    }
+
+    clearSelection(passive) {
+        if (!this._canClearSelection) { return; }
+        if (this._textSourceCurrent !== null) {
+            if (this._textSourceCurrentSelected) {
+                this._textSourceCurrent.deselect();
+            }
+            this._textSourceCurrent = null;
+            this._textSourceCurrentSelected = false;
+        }
+        this.trigger('clearSelection', {passive});
+    }
+
+    getCurrentTextSource() {
+        return this._textSourceCurrent;
+    }
+
+    setCurrentTextSource(textSource) {
+        this._textSourceCurrent = textSource;
+        if (this._options.scanning.selectText) {
+            this._textSourceCurrent.select();
+            this._textSourceCurrentSelected = true;
+        } else {
+            this._textSourceCurrentSelected = false;
+        }
+    }
+
+    // Private
+
+    _onMouseOver(e) {
+        if (this._ignoreElements().includes(e.target)) {
+            this._scanTimerClear();
+        }
+    }
+
+    _onMouseMove(e) {
+        this._scanTimerClear();
+
+        if (this._pendingLookup || DOM.isMouseButtonDown(e, 'primary')) {
             return;
         }
 
-        const scanningOptions = this.options.scanning;
+        const modifiers = DOM.getActiveModifiers(e);
+        this.trigger('activeModifiersChanged', {modifiers});
+
+        const scanningOptions = this._options.scanning;
         const scanningModifier = scanningOptions.modifier;
         if (!(
-            TextScanner.isScanningModifierPressed(scanningModifier, e) ||
+            this._isScanningModifierPressed(scanningModifier, e) ||
             (scanningOptions.middleMouse && DOM.isMouseButtonDown(e, 'auxiliary'))
         )) {
             return;
@@ -69,7 +194,7 @@ class TextScanner {
 
         const search = async () => {
             if (scanningModifier === 'none') {
-                if (!await this.scanTimerWait()) {
+                if (!await this._scanTimerWait()) {
                     // Aborted
                     return;
                 }
@@ -81,112 +206,110 @@ class TextScanner {
         search();
     }
 
-    onMouseDown(e) {
-        if (this.preventNextMouseDown) {
-            this.preventNextMouseDown = false;
-            this.preventNextClick = true;
+    _onMouseDown(e) {
+        if (this._preventNextMouseDown) {
+            this._preventNextMouseDown = false;
+            this._preventNextClick = true;
             e.preventDefault();
             e.stopPropagation();
             return false;
         }
 
         if (DOM.isMouseButtonDown(e, 'primary')) {
-            this.scanTimerClear();
-            this.onSearchClear(true);
+            this._scanTimerClear();
+            this.clearSelection(false);
         }
     }
 
-    onMouseOut() {
-        this.scanTimerClear();
+    _onMouseOut() {
+        this._scanTimerClear();
     }
 
-    onClick(e) {
-        if (this.preventNextClick) {
-            this.preventNextClick = false;
+    _onClick(e) {
+        if (this._preventNextClick) {
+            this._preventNextClick = false;
             e.preventDefault();
             e.stopPropagation();
             return false;
         }
     }
 
-    onAuxClick() {
-        this.preventNextContextMenu = false;
+    _onAuxClick() {
+        this._preventNextContextMenu = false;
     }
 
-    onContextMenu(e) {
-        if (this.preventNextContextMenu) {
-            this.preventNextContextMenu = false;
+    _onContextMenu(e) {
+        if (this._preventNextContextMenu) {
+            this._preventNextContextMenu = false;
             e.preventDefault();
             e.stopPropagation();
             return false;
         }
     }
 
-    onTouchStart(e) {
-        if (this.primaryTouchIdentifier !== null || e.changedTouches.length === 0) {
+    _onTouchStart(e) {
+        if (this._primaryTouchIdentifier !== null || e.changedTouches.length === 0) {
             return;
         }
 
-        this.preventScroll = false;
-        this.preventNextContextMenu = false;
-        this.preventNextMouseDown = false;
-        this.preventNextClick = false;
+        this._preventScroll = false;
+        this._preventNextContextMenu = false;
+        this._preventNextMouseDown = false;
+        this._preventNextClick = false;
 
         const primaryTouch = e.changedTouches[0];
         if (DOM.isPointInSelection(primaryTouch.clientX, primaryTouch.clientY, window.getSelection())) {
             return;
         }
 
-        this.primaryTouchIdentifier = primaryTouch.identifier;
+        this._primaryTouchIdentifier = primaryTouch.identifier;
 
-        if (this.pendingLookup) {
+        if (this._pendingLookup) {
             return;
         }
 
-        const textSourceCurrentPrevious = this.textSourceCurrent !== null ? this.textSourceCurrent.clone() : null;
+        const textSourceCurrentPrevious = this._textSourceCurrent !== null ? this._textSourceCurrent.clone() : null;
 
         this.searchAt(primaryTouch.clientX, primaryTouch.clientY, 'touchStart')
             .then(() => {
                 if (
-                    this.textSourceCurrent === null ||
-                    this.textSourceCurrent.equals(textSourceCurrentPrevious)
+                    this._textSourceCurrent === null ||
+                    this._textSourceCurrent.equals(textSourceCurrentPrevious)
                 ) {
                     return;
                 }
 
-                this.preventScroll = true;
-                this.preventNextContextMenu = true;
-                this.preventNextMouseDown = true;
+                this._preventScroll = true;
+                this._preventNextContextMenu = true;
+                this._preventNextMouseDown = true;
             });
     }
 
-    onTouchEnd(e) {
+    _onTouchEnd(e) {
         if (
-            this.primaryTouchIdentifier === null ||
-            TextScanner.getTouch(e.changedTouches, this.primaryTouchIdentifier) === null
+            this._primaryTouchIdentifier === null ||
+            this._getTouch(e.changedTouches, this._primaryTouchIdentifier) === null
         ) {
             return;
         }
 
-        this.primaryTouchIdentifier = null;
-        this.preventScroll = false;
-        this.preventNextClick = false;
-        // Don't revert context menu and mouse down prevention,
-        // since these events can occur after the touch has ended.
-        // this.preventNextContextMenu = false;
-        // this.preventNextMouseDown = false;
+        this._primaryTouchIdentifier = null;
+        this._preventScroll = false;
+        this._preventNextClick = false;
+        // Don't revert context menu and mouse down prevention, since these events can occur after the touch has ended.
+        // I.e. this._preventNextContextMenu and this._preventNextMouseDown should not be assigned to false.
     }
 
-    onTouchCancel(e) {
-        this.onTouchEnd(e);
+    _onTouchCancel(e) {
+        this._onTouchEnd(e);
     }
 
-    onTouchMove(e) {
-        if (!this.preventScroll || !e.cancelable || this.primaryTouchIdentifier === null) {
+    _onTouchMove(e) {
+        if (!this._preventScroll || !e.cancelable || this._primaryTouchIdentifier === null) {
             return;
         }
 
-        const primaryTouch = TextScanner.getTouch(e.changedTouches, this.primaryTouchIdentifier);
+        const primaryTouch = this._getTouch(e.changedTouches, this._primaryTouchIdentifier);
         if (primaryTouch === null) {
             return;
         }
@@ -196,171 +319,70 @@ class TextScanner {
         e.preventDefault(); // Disable scroll
     }
 
-    async onSearchSource(_textSource, _cause) {
-        throw new Error('Override me');
-    }
-
-    onError(error) {
-        logError(error, false);
-    }
-
-    async scanTimerWait() {
-        const delay = this.options.scanning.delay;
+    async _scanTimerWait() {
+        const delay = this._options.scanning.delay;
         const promise = promiseTimeout(delay, true);
-        this.scanTimerPromise = promise;
+        this._scanTimerPromise = promise;
         try {
             return await promise;
         } finally {
-            if (this.scanTimerPromise === promise) {
-                this.scanTimerPromise = null;
+            if (this._scanTimerPromise === promise) {
+                this._scanTimerPromise = null;
             }
         }
     }
 
-    scanTimerClear() {
-        if (this.scanTimerPromise !== null) {
-            this.scanTimerPromise.resolve(false);
-            this.scanTimerPromise = null;
+    _scanTimerClear() {
+        if (this._scanTimerPromise !== null) {
+            this._scanTimerPromise.resolve(false);
+            this._scanTimerPromise = null;
         }
     }
 
-    setEnabled(enabled, canEnable) {
-        if (enabled && canEnable) {
-            if (!this.enabled) {
-                this.hookEvents();
-                this.enabled = true;
-            }
-        } else {
-            if (this.enabled) {
-                this.eventListeners.removeAllEventListeners();
-                this.enabled = false;
-            }
-            this.onSearchClear(false);
-        }
-    }
-
-    hookEvents() {
-        let eventListenerInfos = this.getMouseEventListeners();
-        if (this.options.scanning.touchInputEnabled) {
-            eventListenerInfos = eventListenerInfos.concat(this.getTouchEventListeners());
+    _hookEvents() {
+        const eventListenerInfos = this._getMouseEventListeners();
+        if (this._options.scanning.touchInputEnabled) {
+            eventListenerInfos.push(...this._getTouchEventListeners());
         }
 
         for (const [node, type, listener, options] of eventListenerInfos) {
-            this.eventListeners.addEventListener(node, type, listener, options);
+            this._eventListeners.addEventListener(node, type, listener, options);
         }
     }
 
-    getMouseEventListeners() {
+    _getMouseEventListeners() {
         return [
-            [this.node, 'mousedown', this.onMouseDown.bind(this)],
-            [this.node, 'mousemove', this.onMouseMove.bind(this)],
-            [this.node, 'mouseover', this.onMouseOver.bind(this)],
-            [this.node, 'mouseout', this.onMouseOut.bind(this)]
+            [this._node, 'mousedown', this._onMouseDown.bind(this)],
+            [this._node, 'mousemove', this._onMouseMove.bind(this)],
+            [this._node, 'mouseover', this._onMouseOver.bind(this)],
+            [this._node, 'mouseout', this._onMouseOut.bind(this)]
         ];
     }
 
-    getTouchEventListeners() {
+    _getTouchEventListeners() {
         return [
-            [this.node, 'click', this.onClick.bind(this)],
-            [this.node, 'auxclick', this.onAuxClick.bind(this)],
-            [this.node, 'touchstart', this.onTouchStart.bind(this)],
-            [this.node, 'touchend', this.onTouchEnd.bind(this)],
-            [this.node, 'touchcancel', this.onTouchCancel.bind(this)],
-            [this.node, 'touchmove', this.onTouchMove.bind(this), {passive: false}],
-            [this.node, 'contextmenu', this.onContextMenu.bind(this)]
+            [this._node, 'click', this._onClick.bind(this)],
+            [this._node, 'auxclick', this._onAuxClick.bind(this)],
+            [this._node, 'touchstart', this._onTouchStart.bind(this)],
+            [this._node, 'touchend', this._onTouchEnd.bind(this)],
+            [this._node, 'touchcancel', this._onTouchCancel.bind(this)],
+            [this._node, 'touchmove', this._onTouchMove.bind(this), {passive: false}],
+            [this._node, 'contextmenu', this._onContextMenu.bind(this)]
         ];
     }
 
-    setOptions(options, canEnable=true) {
-        this.options = options;
-        this.setEnabled(this.options.general.enable, canEnable);
-    }
-
-    async searchAt(x, y, cause) {
-        try {
-            this.scanTimerClear();
-
-            if (this.pendingLookup) {
-                return;
-            }
-
-            for (const ignorePointFn of this.ignorePoints) {
-                if (await ignorePointFn(x, y)) {
-                    return;
-                }
-            }
-
-            const textSource = docRangeFromPoint(x, y, this.options.scanning.deepDomScan);
-            try {
-                if (this.textSourceCurrent !== null && this.textSourceCurrent.equals(textSource)) {
-                    return;
-                }
-
-                this.pendingLookup = true;
-                const result = await this.onSearchSource(textSource, cause);
-                if (result !== null) {
-                    this.causeCurrent = cause;
-                    this.textSourceCurrent = textSource;
-                    if (this.options.scanning.selectText) {
-                        textSource.select();
-                    }
-                }
-                this.pendingLookup = false;
-            } finally {
-                if (textSource !== null) {
-                    textSource.cleanup();
-                }
-            }
-        } catch (e) {
-            this.onError(e);
-        }
-    }
-
-    setTextSourceScanLength(textSource, length) {
-        textSource.setEndOffset(length);
-        if (this.ignoreNodes === null || !textSource.range) {
-            return;
-        }
-
-        length = textSource.text().length;
-        while (textSource.range && length > 0) {
-            const nodes = TextSourceRange.getNodesInRange(textSource.range);
-            if (!TextSourceRange.anyNodeMatchesSelector(nodes, this.ignoreNodes)) {
-                break;
-            }
-            --length;
-            textSource.setEndOffset(length);
-        }
-    }
-
-    onSearchClear(_) {
-        if (this.textSourceCurrent !== null) {
-            if (this.options.scanning.selectText) {
-                this.textSourceCurrent.deselect();
-            }
-            this.textSourceCurrent = null;
-        }
-    }
-
-    getCurrentTextSource() {
-        return this.textSourceCurrent;
-    }
-
-    setCurrentTextSource(textSource) {
-        return this.textSourceCurrent = textSource;
-    }
-
-    static isScanningModifierPressed(scanningModifier, mouseEvent) {
+    _isScanningModifierPressed(scanningModifier, mouseEvent) {
         switch (scanningModifier) {
             case 'alt': return mouseEvent.altKey;
             case 'ctrl': return mouseEvent.ctrlKey;
             case 'shift': return mouseEvent.shiftKey;
+            case 'meta': return mouseEvent.metaKey;
             case 'none': return true;
             default: return false;
         }
     }
 
-    static getTouch(touchList, identifier) {
+    _getTouch(touchList, identifier) {
         for (const touch of touchList) {
             if (touch.identifier === identifier) {
                 return touch;

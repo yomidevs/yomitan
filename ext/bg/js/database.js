@@ -33,7 +33,7 @@ class Database {
         }
 
         try {
-            this.db = await Database._open('dict', 5, (db, transaction, oldVersion) => {
+            this.db = await Database._open('dict', 6, (db, transaction, oldVersion) => {
                 Database._upgrade(db, transaction, oldVersion, [
                     {
                         version: 2,
@@ -90,12 +90,21 @@ class Database {
                                 indices: ['dictionary', 'expression', 'reading', 'sequence', 'expressionReverse', 'readingReverse']
                             }
                         }
+                    },
+                    {
+                        version: 6,
+                        stores: {
+                            media: {
+                                primaryKey: {keyPath: 'id', autoIncrement: true},
+                                indices: ['dictionary', 'path']
+                            }
+                        }
                     }
                 ]);
             });
             return true;
         } catch (e) {
-            logError(e);
+            yomichan.logError(e);
             return false;
         }
     }
@@ -120,7 +129,7 @@ class Database {
         await this.prepare();
     }
 
-    async deleteDictionary(dictionaryName, onProgress, progressSettings) {
+    async deleteDictionary(dictionaryName, progressSettings, onProgress) {
         this._validate();
 
         const targets = [
@@ -266,6 +275,34 @@ class Database {
         });
 
         return result;
+    }
+
+    async getMedia(targets) {
+        this._validate();
+
+        const count = targets.length;
+        const promises = [];
+        const results = new Array(count).fill(null);
+        const createResult = Database._createMedia;
+        const processRow = (row, [index, dictionaryName]) => {
+            if (row.dictionary === dictionaryName) {
+                results[index] = createResult(row, index);
+            }
+        };
+
+        const transaction = this.db.transaction(['media'], 'readonly');
+        const objectStore = transaction.objectStore('media');
+        const index = objectStore.index('path');
+
+        for (let i = 0; i < count; ++i) {
+            const {path, dictionaryName} = targets[i];
+            const only = IDBKeyRange.only(path);
+            promises.push(Database._getAll(index, only, [i, dictionaryName], processRow));
+        }
+
+        await Promise.all(promises);
+
+        return results;
     }
 
     async getDictionaryInfo() {
@@ -430,6 +467,10 @@ class Database {
 
     static _createKanjiMeta({character, mode, data, dictionary}, index) {
         return {character, mode, data, dictionary, index};
+    }
+
+    static _createMedia(row, index) {
+        return Object.assign({}, row, {index});
     }
 
     static _getAll(dbIndex, query, context, processRow) {

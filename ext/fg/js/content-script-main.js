@@ -16,15 +16,18 @@
  */
 
 /* global
+ * DOM
  * FrameOffsetForwarder
  * Frontend
+ * PopupFactory
  * PopupProxy
- * PopupProxyHost
  * apiBroadcastTab
+ * apiForwardLogsToBackend
+ * apiFrameInformationGet
  * apiOptionsGet
  */
 
-async function createIframePopupProxy(url, frameOffsetForwarder) {
+async function createIframePopupProxy(frameOffsetForwarder, setDisabled) {
     const rootPopupInformationPromise = yomichan.getTemporaryListenerResult(
         chrome.runtime.onMessage,
         ({action, params}, {resolve}) => {
@@ -34,33 +37,41 @@ async function createIframePopupProxy(url, frameOffsetForwarder) {
         }
     );
     apiBroadcastTab('rootPopupRequestInformationBroadcast');
-    const {popupId, frameId} = await rootPopupInformationPromise;
+    const {popupId, frameId: parentFrameId} = await rootPopupInformationPromise;
 
     const getFrameOffset = frameOffsetForwarder.getOffset.bind(frameOffsetForwarder);
 
-    const popup = new PopupProxy(popupId, 0, null, frameId, url, getFrameOffset);
+    const popup = new PopupProxy(popupId, 0, null, parentFrameId, getFrameOffset, setDisabled);
     await popup.prepare();
 
     return popup;
 }
 
 async function getOrCreatePopup(depth) {
-    const popupHost = new PopupProxyHost();
-    await popupHost.prepare();
+    const {frameId} = await apiFrameInformationGet();
+    if (typeof frameId !== 'number') {
+        const error = new Error('Failed to get frameId');
+        yomichan.logError(error);
+        throw error;
+    }
 
-    const popup = popupHost.getOrCreatePopup(null, null, depth);
+    const popupFactory = new PopupFactory(frameId);
+    await popupFactory.prepare();
+
+    const popup = popupFactory.getOrCreatePopup(null, null, depth);
 
     return popup;
 }
 
-async function createPopupProxy(depth, id, parentFrameId, url) {
-    const popup = new PopupProxy(null, depth + 1, id, parentFrameId, url);
+async function createPopupProxy(depth, id, parentFrameId) {
+    const popup = new PopupProxy(null, depth + 1, id, parentFrameId);
     await popup.prepare();
 
     return popup;
 }
 
-async function main() {
+(async () => {
+    apiForwardLogsToBackend();
     await yomichan.prepare();
 
     const data = window.frontendInitializationData || {};
@@ -78,8 +89,29 @@ async function main() {
     let frontendPreparePromise = null;
     let frameOffsetForwarder = null;
 
+    let iframePopupsInRootFrameAvailable = true;
+
+    const disableIframePopupsInRootFrame = () => {
+        iframePopupsInRootFrameAvailable = false;
+        applyOptions();
+    };
+
+    let urlUpdatedAt = 0;
+    let popupProxyUrlCached = url;
+    const getPopupProxyUrl = async () => {
+        const now = Date.now();
+        if (popups.proxy !== null && now - urlUpdatedAt > 500) {
+            popupProxyUrlCached = await popups.proxy.getUrl();
+            urlUpdatedAt = now;
+        }
+        return popupProxyUrlCached;
+    };
+
     const applyOptions = async () => {
-        const optionsContext = {depth: isSearchPage ? 0 : depth, url};
+        const optionsContext = {
+            depth: isSearchPage ? 0 : depth,
+            url: proxy ? await getPopupProxyUrl() : window.location.href
+        };
         const options = await apiOptionsGet(optionsContext);
 
         if (!proxy && frameOffsetForwarder === null) {
@@ -88,11 +120,11 @@ async function main() {
         }
 
         let popup;
-        if (isIframe && options.general.showIframePopupsInRootFrame) {
-            popup = popups.iframe || await createIframePopupProxy(url, frameOffsetForwarder);
+        if (isIframe && options.general.showIframePopupsInRootFrame && DOM.getFullscreenElement() === null && iframePopupsInRootFrameAvailable) {
+            popup = popups.iframe || await createIframePopupProxy(frameOffsetForwarder, disableIframePopupsInRootFrame);
             popups.iframe = popup;
         } else if (proxy) {
-            popup = popups.proxy || await createPopupProxy(depth, id, parentFrameId, url);
+            popup = popups.proxy || await createPopupProxy(depth, id, parentFrameId);
             popups.proxy = popup;
         } else {
             popup = popups.normal || await getOrCreatePopup(depth);
@@ -100,7 +132,8 @@ async function main() {
         }
 
         if (frontend === null) {
-            frontend = new Frontend(popup);
+            const getUrl = proxy ? getPopupProxyUrl : null;
+            frontend = new Frontend(popup, getUrl);
             frontendPreparePromise = frontend.prepare();
             await frontendPreparePromise;
         } else {
@@ -117,8 +150,7 @@ async function main() {
     };
 
     yomichan.on('optionsUpdated', applyOptions);
+    window.addEventListener('fullscreenchange', applyOptions, false);
 
     await applyOptions();
-}
-
-main();
+})();

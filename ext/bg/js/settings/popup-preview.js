@@ -15,6 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global
+ * getOptionsContext
+ * wanakana
+ */
 
 function appearanceInitialize() {
     let previewVisible = false;
@@ -37,7 +41,7 @@ function showAppearancePreview() {
     frame.src = '/bg/settings-popup-preview.html';
     frame.id = 'settings-popup-preview-frame';
 
-    window.wanakana.bind(text[0]);
+    wanakana.bind(text[0]);
 
     const targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
 
@@ -54,6 +58,23 @@ function showAppearancePreview() {
     customOuterCss.on('input', () => {
         const action = 'setCustomOuterCss';
         const params = {css: customOuterCss.val()};
+        frame.contentWindow.postMessage({action, params}, targetOrigin);
+    });
+
+    const updateOptionsContext = () => {
+        const action = 'updateOptionsContext';
+        const params = {
+            optionsContext: getOptionsContext()
+        };
+        frame.contentWindow.postMessage({action, params}, targetOrigin);
+    };
+    yomichan.on('modifyingProfileChange', updateOptionsContext);
+
+    frame.addEventListener('load', () => {
+        const action = 'prepare';
+        const params = {
+            optionsContext: getOptionsContext()
+        };
         frame.contentWindow.postMessage({action, params}, targetOrigin);
     });
 

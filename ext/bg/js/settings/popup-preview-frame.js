@@ -18,8 +18,9 @@
 /* global
  * Frontend
  * Popup
- * PopupProxyHost
+ * PopupFactory
  * TextSourceRange
+ * apiFrameInformationGet
  * apiOptionsGet
  */
 
@@ -32,46 +33,46 @@ class SettingsPopupPreview {
         this.popupShown = false;
         this.themeChangeTimeout = null;
         this.textSource = null;
+        this.optionsContext = null;
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
 
         this._windowMessageHandlers = new Map([
+            ['prepare', ({optionsContext}) => this.prepare(optionsContext)],
             ['setText', ({text}) => this.setText(text)],
             ['setCustomCss', ({css}) => this.setCustomCss(css)],
-            ['setCustomOuterCss', ({css}) => this.setCustomOuterCss(css)]
+            ['setCustomOuterCss', ({css}) => this.setCustomOuterCss(css)],
+            ['updateOptionsContext', ({optionsContext}) => this.updateOptionsContext(optionsContext)]
         ]);
-    }
 
-    static create() {
-        const instance = new SettingsPopupPreview();
-        instance.prepare();
-        return instance;
-    }
-
-    async prepare() {
-        // Setup events
         window.addEventListener('message', this.onMessage.bind(this), false);
+    }
 
+    async prepare(optionsContext) {
+        this.optionsContext = optionsContext;
+
+        // Setup events
         document.querySelector('#theme-dark-checkbox').addEventListener('change', this.onThemeDarkCheckboxChanged.bind(this), false);
 
         // Overwrite API functions
         window.apiOptionsGet = this.apiOptionsGet.bind(this);
 
         // Overwrite frontend
-        const popupHost = new PopupProxyHost();
-        await popupHost.prepare();
+        const {frameId} = await apiFrameInformationGet();
 
-        this.popup = popupHost.getOrCreatePopup();
+        const popupFactory = new PopupFactory(frameId);
+        await popupFactory.prepare();
+
+        this.popup = popupFactory.getOrCreatePopup();
         this.popup.setChildrenSupported(false);
 
         this.popupSetCustomOuterCssOld = this.popup.setCustomOuterCss;
         this.popup.setCustomOuterCss = this.popupSetCustomOuterCss.bind(this);
 
         this.frontend = new Frontend(this.popup);
-
-        this.frontend.setEnabled = () => {};
-        this.frontend.searchClear = () => {};
-
+        this.frontend.getOptionsContext = async () => this.optionsContext;
         await this.frontend.prepare();
+        this.frontend.setDisabledOverride(true);
+        this.frontend.canClearSelection = false;
 
         // Update search
         this.updateSearch();
@@ -122,7 +123,7 @@ class SettingsPopupPreview {
         }
         this.themeChangeTimeout = setTimeout(() => {
             this.themeChangeTimeout = null;
-            this.frontend.popup.updateTheme();
+            this.popup.updateTheme();
         }, 300);
     }
 
@@ -143,12 +144,18 @@ class SettingsPopupPreview {
 
     setCustomCss(css) {
         if (this.frontend === null) { return; }
-        this.frontend.popup.setCustomCss(css);
+        this.popup.setCustomCss(css);
     }
 
     setCustomOuterCss(css) {
         if (this.frontend === null) { return; }
-        this.frontend.popup.setCustomOuterCss(css, false);
+        this.popup.setCustomOuterCss(css, false);
+    }
+
+    async updateOptionsContext(optionsContext) {
+        this.optionsContext = optionsContext;
+        await this.frontend.updateOptions();
+        await this.updateSearch();
     }
 
     async updateSearch() {
@@ -163,23 +170,17 @@ class SettingsPopupPreview {
         const source = new TextSourceRange(range, range.toString(), null, null);
 
         try {
-            await this.frontend.onSearchSource(source, 'script');
-            this.frontend.setCurrentTextSource(source);
+            await this.frontend.setTextSource(source);
         } finally {
             source.cleanup();
         }
         this.textSource = source;
         await this.frontend.showContentCompleted();
 
-        if (this.frontend.popup.isVisibleSync()) {
+        if (this.popup.isVisibleSync()) {
             this.popupShown = true;
         }
 
         this.setInfoVisible(!this.popupShown);
     }
 }
-
-SettingsPopupPreview.instance = SettingsPopupPreview.create();
-
-
-

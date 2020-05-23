@@ -16,15 +16,27 @@
  */
 
 /**
- * Class used to get and set generic properties of an object by using path strings.
+ * Class used to get and mutate generic properties of an object by using path strings.
  */
 class ObjectPropertyAccessor {
-    constructor(target, setter=null) {
+    /**
+     * Create a new accessor for a specific object.
+     * @param target The object which the getter and mutation methods are applied to.
+     * @returns A new ObjectPropertyAccessor instance.
+     */
+    constructor(target) {
         this._target = target;
-        this._setter = (typeof setter === 'function' ? setter : null);
     }
 
-    getProperty(pathArray, pathLength) {
+    /**
+     * Gets the value at the specified path.
+     * @param pathArray The path to the property on the target object.
+     * @param pathLength How many parts of the pathArray to use.
+     *   This parameter is optional and defaults to the length of pathArray.
+     * @returns The value found at the path.
+     * @throws An error is thrown if pathArray is not valid for the target object.
+     */
+    get(pathArray, pathLength) {
         let target = this._target;
         const ii = typeof pathLength === 'number' ? Math.min(pathArray.length, pathLength) : pathArray.length;
         for (let i = 0; i < ii; ++i) {
@@ -37,24 +49,89 @@ class ObjectPropertyAccessor {
         return target;
     }
 
-    setProperty(pathArray, value) {
-        if (pathArray.length === 0) {
-            throw new Error('Invalid path');
-        }
+    /**
+     * Sets the value at the specified path.
+     * @param pathArray The path to the property on the target object.
+     * @param value The value to assign to the property.
+     * @throws An error is thrown if pathArray is not valid for the target object.
+     */
+    set(pathArray, value) {
+        const ii = pathArray.length - 1;
+        if (ii < 0) { throw new Error('Invalid path'); }
 
-        const target = this.getProperty(pathArray, pathArray.length - 1);
-        const key = pathArray[pathArray.length - 1];
+        const target = this.get(pathArray, ii);
+        const key = pathArray[ii];
         if (!ObjectPropertyAccessor.isValidPropertyType(target, key)) {
             throw new Error(`Invalid path: ${ObjectPropertyAccessor.getPathString(pathArray)}`);
         }
 
-        if (this._setter !== null) {
-            this._setter(target, key, value, pathArray);
-        } else {
-            target[key] = value;
+        target[key] = value;
+    }
+
+    /**
+     * Deletes the property of the target object at the specified path.
+     * @param pathArray The path to the property on the target object.
+     * @throws An error is thrown if pathArray is not valid for the target object.
+     */
+    delete(pathArray) {
+        const ii = pathArray.length - 1;
+        if (ii < 0) { throw new Error('Invalid path'); }
+
+        const target = this.get(pathArray, ii);
+        const key = pathArray[ii];
+        if (!ObjectPropertyAccessor.isValidPropertyType(target, key)) {
+            throw new Error(`Invalid path: ${ObjectPropertyAccessor.getPathString(pathArray)}`);
+        }
+
+        if (Array.isArray(target)) {
+            throw new Error('Invalid type');
+        }
+
+        delete target[key];
+    }
+
+    /**
+     * Swaps two properties of an object or array.
+     * @param pathArray1 The path to the first property on the target object.
+     * @param pathArray2 The path to the second property on the target object.
+     * @throws An error is thrown if pathArray1 or pathArray2 is not valid for the target object,
+     *   or if the swap cannot be performed.
+     */
+    swap(pathArray1, pathArray2) {
+        const ii1 = pathArray1.length - 1;
+        if (ii1 < 0) { throw new Error('Invalid path 1'); }
+        const target1 = this.get(pathArray1, ii1);
+        const key1 = pathArray1[ii1];
+        if (!ObjectPropertyAccessor.isValidPropertyType(target1, key1)) { throw new Error(`Invalid path 1: ${ObjectPropertyAccessor.getPathString(pathArray1)}`); }
+
+        const ii2 = pathArray2.length - 1;
+        if (ii2 < 0) { throw new Error('Invalid path 2'); }
+        const target2 = this.get(pathArray2, ii2);
+        const key2 = pathArray2[ii2];
+        if (!ObjectPropertyAccessor.isValidPropertyType(target2, key2)) { throw new Error(`Invalid path 2: ${ObjectPropertyAccessor.getPathString(pathArray2)}`); }
+
+        const value1 = target1[key1];
+        const value2 = target2[key2];
+
+        target1[key1] = value2;
+        try {
+            target2[key2] = value1;
+        } catch (e) {
+            // Revert
+            try {
+                target1[key1] = value1;
+            } catch (e2) {
+                // NOP
+            }
+            throw e;
         }
     }
 
+    /**
+     * Converts a path string to a path array.
+     * @param pathArray The path array to convert.
+     * @returns A string representation of pathArray.
+     */
     static getPathString(pathArray) {
         const regexShort = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
         let pathString = '';
@@ -86,6 +163,12 @@ class ObjectPropertyAccessor {
         return pathString;
     }
 
+    /**
+     * Converts a path array to a path string. For the most part, the format of this string
+     * matches Javascript's notation for property access.
+     * @param pathString The path string to convert.
+     * @returns An array representation of pathString.
+     */
     static getPathArray(pathString) {
         const pathArray = [];
         let state = 'empty';
@@ -201,6 +284,14 @@ class ObjectPropertyAccessor {
         return pathArray;
     }
 
+    /**
+     * Checks whether an object or array has the specified property.
+     * @param object The object to test.
+     * @param property The property to check for existence.
+     *   This value should be a string if the object is a non-array object.
+     *   For arrays, it should be an integer.
+     * @returns true if the property exists, otherwise false.
+     */
     static hasProperty(object, property) {
         switch (typeof property) {
             case 'string':
@@ -222,6 +313,14 @@ class ObjectPropertyAccessor {
         }
     }
 
+    /**
+     * Checks whether a property is valid for the given object
+     * @param object The object to test.
+     * @param property The property to check for existence.
+     * @returns true if the property is correct for the given object type, otherwise false.
+     *   For arrays, this means that the property should be a positive integer.
+     *   For non-array objects, the property should be a string.
+     */
     static isValidPropertyType(object, property) {
         switch (typeof property) {
             case 'string':

@@ -18,35 +18,31 @@
 /* global
  * FrontendApiReceiver
  * Popup
- * apiFrameInformationGet
  */
 
-class PopupProxyHost {
-    constructor() {
+class PopupFactory {
+    constructor(frameId) {
         this._popups = new Map();
-        this._apiReceiver = null;
-        this._frameId = null;
+        this._frameId = frameId;
     }
 
     // Public functions
 
     async prepare() {
-        const {frameId} = await apiFrameInformationGet();
-        if (typeof frameId !== 'number') { return; }
-        this._frameId = frameId;
-
-        this._apiReceiver = new FrontendApiReceiver(`popup-proxy-host#${this._frameId}`, new Map([
-            ['getOrCreatePopup', this._onApiGetOrCreatePopup.bind(this)],
-            ['setOptions', this._onApiSetOptions.bind(this)],
-            ['hide', this._onApiHide.bind(this)],
-            ['isVisible', this._onApiIsVisibleAsync.bind(this)],
-            ['setVisibleOverride', this._onApiSetVisibleOverride.bind(this)],
-            ['containsPoint', this._onApiContainsPoint.bind(this)],
-            ['showContent', this._onApiShowContent.bind(this)],
-            ['setCustomCss', this._onApiSetCustomCss.bind(this)],
-            ['clearAutoPlayTimer', this._onApiClearAutoPlayTimer.bind(this)],
-            ['setContentScale', this._onApiSetContentScale.bind(this)]
+        const apiReceiver = new FrontendApiReceiver(`popup-factory#${this._frameId}`, new Map([
+            ['getOrCreatePopup',   {async: false, handler: this._onApiGetOrCreatePopup.bind(this)}],
+            ['setOptionsContext',  {async: true,  handler: this._onApiSetOptionsContext.bind(this)}],
+            ['hide',               {async: false, handler: this._onApiHide.bind(this)}],
+            ['isVisible',          {async: true,  handler: this._onApiIsVisibleAsync.bind(this)}],
+            ['setVisibleOverride', {async: true,  handler: this._onApiSetVisibleOverride.bind(this)}],
+            ['containsPoint',      {async: true,  handler: this._onApiContainsPoint.bind(this)}],
+            ['showContent',        {async: true,  handler: this._onApiShowContent.bind(this)}],
+            ['setCustomCss',       {async: false, handler: this._onApiSetCustomCss.bind(this)}],
+            ['clearAutoPlayTimer', {async: false, handler: this._onApiClearAutoPlayTimer.bind(this)}],
+            ['setContentScale',    {async: false, handler: this._onApiSetContentScale.bind(this)}],
+            ['getUrl',             {async: false, handler: this._onApiGetUrl.bind(this)}]
         ]));
+        apiReceiver.prepare();
     }
 
     getOrCreatePopup(id=null, parentId=null, depth=null) {
@@ -91,24 +87,25 @@ class PopupProxyHost {
             popup.setParent(parent);
         }
         this._popups.set(id, popup);
+        popup.prepare();
         return popup;
     }
 
     // API message handlers
 
-    async _onApiGetOrCreatePopup({id, parentId}) {
+    _onApiGetOrCreatePopup({id, parentId}) {
         const popup = this.getOrCreatePopup(id, parentId);
         return {
             id: popup.id
         };
     }
 
-    async _onApiSetOptions({id, options}) {
+    async _onApiSetOptionsContext({id, optionsContext, source}) {
         const popup = this._getPopup(id);
-        return await popup.setOptions(options);
+        return await popup.setOptionsContext(optionsContext, source);
     }
 
-    async _onApiHide({id, changeFocus}) {
+    _onApiHide({id, changeFocus}) {
         const popup = this._getPopup(id);
         return popup.hide(changeFocus);
     }
@@ -125,30 +122,34 @@ class PopupProxyHost {
 
     async _onApiContainsPoint({id, x, y}) {
         const popup = this._getPopup(id);
-        [x, y] = PopupProxyHost._convertPopupPointToRootPagePoint(popup, x, y);
+        [x, y] = this._convertPopupPointToRootPagePoint(popup, x, y);
         return await popup.containsPoint(x, y);
     }
 
-    async _onApiShowContent({id, elementRect, writingMode, type, details}) {
+    async _onApiShowContent({id, elementRect, writingMode, type, details, context}) {
         const popup = this._getPopup(id);
-        elementRect = PopupProxyHost._convertJsonRectToDOMRect(popup, elementRect);
-        if (!PopupProxyHost._popupCanShow(popup)) { return; }
-        return await popup.showContent(elementRect, writingMode, type, details);
+        elementRect = this._convertJsonRectToDOMRect(popup, elementRect);
+        if (!this._popupCanShow(popup)) { return; }
+        return await popup.showContent(elementRect, writingMode, type, details, context);
     }
 
-    async _onApiSetCustomCss({id, css}) {
+    _onApiSetCustomCss({id, css}) {
         const popup = this._getPopup(id);
         return popup.setCustomCss(css);
     }
 
-    async _onApiClearAutoPlayTimer({id}) {
+    _onApiClearAutoPlayTimer({id}) {
         const popup = this._getPopup(id);
         return popup.clearAutoPlayTimer();
     }
 
-    async _onApiSetContentScale({id, scale}) {
+    _onApiSetContentScale({id, scale}) {
         const popup = this._getPopup(id);
         return popup.setContentScale(scale);
+    }
+
+    _onApiGetUrl() {
+        return window.location.href;
     }
 
     // Private functions
@@ -161,21 +162,21 @@ class PopupProxyHost {
         return popup;
     }
 
-    static _convertJsonRectToDOMRect(popup, jsonRect) {
-        const [x, y] = PopupProxyHost._convertPopupPointToRootPagePoint(popup, jsonRect.x, jsonRect.y);
+    _convertJsonRectToDOMRect(popup, jsonRect) {
+        const [x, y] = this._convertPopupPointToRootPagePoint(popup, jsonRect.x, jsonRect.y);
         return new DOMRect(x, y, jsonRect.width, jsonRect.height);
     }
 
-    static _convertPopupPointToRootPagePoint(popup, x, y) {
+    _convertPopupPointToRootPagePoint(popup, x, y) {
         if (popup.parent !== null) {
-            const popupRect = popup.parent.getContainerRect();
+            const popupRect = popup.parent.getFrameRect();
             x += popupRect.x;
             y += popupRect.y;
         }
         return [x, y];
     }
 
-    static _popupCanShow(popup) {
+    _popupCanShow(popup) {
         return popup.parent === null || popup.parent.isVisibleSync();
     }
 }

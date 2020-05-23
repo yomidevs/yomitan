@@ -40,7 +40,7 @@ class TextToSpeechAudio {
         }
     }
 
-    play() {
+    async play() {
         try {
             if (this._utterance === null) {
                 this._utterance = new SpeechSynthesisUtterance(this.text || '');
@@ -66,10 +66,10 @@ class TextToSpeechAudio {
 }
 
 class AudioSystem {
-    constructor({getAudioUri}) {
-        this._cache = new Map();
+    constructor({audioUriBuilder, useCache}) {
+        this._cache = useCache ? new Map() : null;
         this._cacheSizeMaximum = 32;
-        this._getAudioUri = getAudioUri;
+        this._audioUriBuilder = audioUriBuilder;
 
         if (typeof speechSynthesis !== 'undefined') {
             // speechSynthesis.getVoices() will not be populated unless some API call is made.
@@ -79,21 +79,35 @@ class AudioSystem {
 
     async getDefinitionAudio(definition, sources, details) {
         const key = `${definition.expression}:${definition.reading}`;
-        const cacheValue = this._cache.get(definition);
-        if (typeof cacheValue !== 'undefined') {
-            const {audio, uri, source} = cacheValue;
-            return {audio, uri, source};
+        const hasCache = (this._cache !== null && !details.disableCache);
+
+        if (hasCache) {
+            const cacheValue = this._cache.get(key);
+            if (typeof cacheValue !== 'undefined') {
+                const {audio, uri, source} = cacheValue;
+                const index = sources.indexOf(source);
+                if (index >= 0) {
+                    return {audio, uri, index};
+                }
+            }
         }
 
-        for (const source of sources) {
+        for (let i = 0, ii = sources.length; i < ii; ++i) {
+            const source = sources[i];
             const uri = await this._getAudioUri(definition, source, details);
             if (uri === null) { continue; }
 
             try {
-                const audio = await this._createAudio(uri, details);
-                this._cacheCheck();
-                this._cache.set(key, {audio, uri, source});
-                return {audio, uri, source};
+                const audio = (
+                    details.binary ?
+                    await this._createAudioBinary(uri) :
+                    await this._createAudio(uri)
+                );
+                if (hasCache) {
+                    this._cacheCheck();
+                    this._cache.set(key, {audio, uri, source});
+                }
+                return {audio, uri, index: i};
             } catch (e) {
                 // NOP
             }
@@ -102,7 +116,7 @@ class AudioSystem {
         throw new Error('Could not create audio');
     }
 
-    createTextToSpeechAudio({text, voiceUri}) {
+    createTextToSpeechAudio(text, voiceUri) {
         const voice = this._getTextToSpeechVoiceFromVoiceUri(voiceUri);
         if (voice === null) {
             throw new Error('Invalid text-to-speech voice');
@@ -114,27 +128,38 @@ class AudioSystem {
         // NOP
     }
 
-    async _createAudio(uri, details) {
+    _getAudioUri(definition, source, details) {
+        return (
+            this._audioUriBuilder !== null ?
+            this._audioUriBuilder.getUri(definition, source, details) :
+            null
+        );
+    }
+
+    async _createAudio(uri) {
         const ttsParameters = this._getTextToSpeechParameters(uri);
         if (ttsParameters !== null) {
-            if (typeof details === 'object' && details !== null) {
-                if (details.tts === false) {
-                    throw new Error('Text-to-speech not permitted');
-                }
-            }
-            return this.createTextToSpeechAudio(ttsParameters);
+            const {text, voiceUri} = ttsParameters;
+            return this.createTextToSpeechAudio(text, voiceUri);
         }
 
         return await this._createAudioFromUrl(uri);
+    }
+
+    async _createAudioBinary(uri) {
+        const ttsParameters = this._getTextToSpeechParameters(uri);
+        if (ttsParameters !== null) {
+            throw new Error('Cannot create audio from text-to-speech');
+        }
+
+        return await this._createAudioBinaryFromUrl(uri);
     }
 
     _createAudioFromUrl(url) {
         return new Promise((resolve, reject) => {
             const audio = new Audio(url);
             audio.addEventListener('loadeddata', () => {
-                const duration = audio.duration;
-                if (duration === 5.694694 || duration === 5.720718) {
-                    // Hardcoded values for invalid audio
+                if (!this._isAudioValid(audio)) {
                     reject(new Error('Could not retrieve audio'));
                 } else {
                     resolve(audio);
@@ -142,6 +167,42 @@ class AudioSystem {
             });
             audio.addEventListener('error', () => reject(audio.error));
         });
+    }
+
+    _createAudioBinaryFromUrl(url) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.responseType = 'arraybuffer';
+            xhr.addEventListener('load', async () => {
+                const arrayBuffer = xhr.response;
+                if (!await this._isAudioBinaryValid(arrayBuffer)) {
+                    reject(new Error('Could not retrieve audio'));
+                } else {
+                    resolve(arrayBuffer);
+                }
+            });
+            xhr.addEventListener('error', () => reject(new Error('Failed to connect')));
+            xhr.open('GET', url);
+            xhr.send();
+        });
+    }
+
+    _isAudioValid(audio) {
+        const duration = audio.duration;
+        return (
+            duration !== 5.694694 && // jpod101 invalid audio (Chrome)
+            duration !== 5.720718 // jpod101 invalid audio (Firefox)
+        );
+    }
+
+    async _isAudioBinaryValid(arrayBuffer) {
+        const digest = await AudioSystem.arrayBufferDigest(arrayBuffer);
+        switch (digest) {
+            case 'ae6398b5a27bc8c0a771df6c907ade794be15518174773c58c7c7ddd17098906': // jpod101 invalid audio
+                return false;
+            default:
+                return true;
+        }
     }
 
     _getTextToSpeechVoiceFromVoiceUri(voiceUri) {
@@ -180,5 +241,14 @@ class AudioSystem {
         for (const key of removeKeys) {
             this._cache.delete(key);
         }
+    }
+
+    static async arrayBufferDigest(arrayBuffer) {
+        const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', new Uint8Array(arrayBuffer)));
+        let digest = '';
+        for (const byte of hash) {
+            digest += byte.toString(16).padStart(2, '0');
+        }
+        return digest;
     }
 }

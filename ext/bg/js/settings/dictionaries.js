@@ -17,8 +17,13 @@
 
 /* global
  * PageExitPrevention
+ * apiDeleteDictionary
+ * apiGetDictionaryCounts
+ * apiGetDictionaryInfo
+ * apiImportDictionaryArchive
  * apiOptionsGet
  * apiOptionsGetFull
+ * apiPurgeDatabase
  * getOptionsContext
  * getOptionsFullMutable
  * getOptionsMutable
@@ -26,11 +31,6 @@
  * storageEstimate
  * storageUpdateStats
  * utilBackgroundIsolate
- * utilDatabaseDeleteDictionary
- * utilDatabaseGetDictionaryCounts
- * utilDatabaseGetDictionaryInfo
- * utilDatabaseImport
- * utilDatabasePurge
  */
 
 let dictionaryUI = null;
@@ -312,7 +312,7 @@ class SettingsDictionaryEntryUI {
                 progressBar.style.width = `${percent}%`;
             };
 
-            await utilDatabaseDeleteDictionary(this.dictionaryInfo.title, onProgress, {rate: 1000});
+            await apiDeleteDictionary(this.dictionaryInfo.title, onProgress);
         } catch (e) {
             dictionaryErrorsShow([e]);
         } finally {
@@ -431,7 +431,7 @@ async function onDictionaryOptionsChanged() {
 
 async function onDatabaseUpdated() {
     try {
-        const dictionaries = await utilDatabaseGetDictionaryInfo();
+        const dictionaries = await apiGetDictionaryInfo();
         dictionaryUI.setDictionaries(dictionaries);
 
         document.querySelector('#dict-warning').hidden = (dictionaries.length > 0);
@@ -439,7 +439,7 @@ async function onDatabaseUpdated() {
         updateMainDictionarySelectOptions(dictionaries);
         await updateMainDictionarySelectValue();
 
-        const {counts, total} = await utilDatabaseGetDictionaryCounts(dictionaries.map((v) => v.title), true);
+        const {counts, total} = await apiGetDictionaryCounts(dictionaries.map((v) => v.title), true);
         dictionaryUI.setCounts(counts, total);
     } catch (e) {
         dictionaryErrorsShow([e]);
@@ -554,7 +554,7 @@ function dictionaryErrorsShow(errors) {
     if (errors !== null && errors.length > 0) {
         const uniqueErrors = new Map();
         for (let e of errors) {
-            logError(e);
+            yomichan.logError(e);
             e = dictionaryErrorToString(e);
             let count = uniqueErrors.get(e);
             if (typeof count === 'undefined') {
@@ -618,7 +618,7 @@ async function onDictionaryPurge(e) {
         dictionaryErrorsShow(null);
         dictionarySpinnerShow(true);
 
-        await utilDatabasePurge();
+        await apiPurgeDatabase();
         for (const {options} of toIterable((await getOptionsFullMutable()).profiles)) {
             options.dictionaries = utilBackgroundIsolate({});
             options.general.mainDictionary = '';
@@ -679,7 +679,8 @@ async function onDictionaryImport(e) {
                 dictImportInfo.textContent = `(${i + 1} of ${ii})`;
             }
 
-            const {result, errors} = await utilDatabaseImport(files[i], updateProgress, importDetails);
+            const archiveContent = await dictReadFile(files[i]);
+            const {result, errors} = await apiImportDictionaryArchive(archiveContent, importDetails, updateProgress);
             for (const {options} of toIterable((await getOptionsFullMutable()).profiles)) {
                 const dictionaryOptions = SettingsDictionaryListUI.createDictionaryOptions();
                 dictionaryOptions.enabled = true;
@@ -711,6 +712,15 @@ async function onDictionaryImport(e) {
         dictControls.show();
         dictProgress.hide();
     }
+}
+
+function dictReadFile(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsBinaryString(file);
+    });
 }
 
 

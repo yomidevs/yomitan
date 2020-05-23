@@ -15,6 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global
+ * Environment
+ */
 
 function _profileConditionTestDomain(urlDomain, domain) {
     return (
@@ -36,69 +39,140 @@ function _profileConditionTestDomainList(url, domainList) {
     return false;
 }
 
-const profileConditionsDescriptor = {
-    popupLevel: {
-        name: 'Popup Level',
-        description: 'Use profile depending on the level of the popup.',
-        placeholder: 'Number',
-        type: 'number',
-        step: 1,
-        defaultValue: 0,
-        defaultOperator: 'equal',
-        transform: (optionValue) => parseInt(optionValue, 10),
-        transformReverse: (transformedOptionValue) => `${transformedOptionValue}`,
-        validateTransformed: (transformedOptionValue) => Number.isFinite(transformedOptionValue),
-        operators: {
-            equal: {
-                name: '=',
-                test: ({depth}, optionValue) => (depth === optionValue)
-            },
-            notEqual: {
-                name: '\u2260',
-                test: ({depth}, optionValue) => (depth !== optionValue)
-            },
-            lessThan: {
-                name: '<',
-                test: ({depth}, optionValue) => (depth < optionValue)
-            },
-            greaterThan: {
-                name: '>',
-                test: ({depth}, optionValue) => (depth > optionValue)
-            },
-            lessThanOrEqual: {
-                name: '\u2264',
-                test: ({depth}, optionValue) => (depth <= optionValue)
-            },
-            greaterThanOrEqual: {
-                name: '\u2265',
-                test: ({depth}, optionValue) => (depth >= optionValue)
+let profileConditionsDescriptor = null;
+
+const profileConditionsDescriptorPromise = (async () => {
+    const environment = new Environment();
+    await environment.prepare();
+
+    const modifiers = environment.getInfo().modifiers;
+    const modifierSeparator = modifiers.separator;
+    const modifierKeyValues = modifiers.keys.map(
+        ({value, name}) => ({optionValue: value, name})
+    );
+
+    const modifierValueToName = new Map(
+        modifierKeyValues.map(({optionValue, name}) => [optionValue, name])
+    );
+
+    const modifierNameToValue = new Map(
+        modifierKeyValues.map(({optionValue, name}) => [name, optionValue])
+    );
+
+    profileConditionsDescriptor = {
+        popupLevel: {
+            name: 'Popup Level',
+            description: 'Use profile depending on the level of the popup.',
+            placeholder: 'Number',
+            type: 'number',
+            step: 1,
+            defaultValue: 0,
+            defaultOperator: 'equal',
+            transform: (optionValue) => parseInt(optionValue, 10),
+            transformReverse: (transformedOptionValue) => `${transformedOptionValue}`,
+            validateTransformed: (transformedOptionValue) => Number.isFinite(transformedOptionValue),
+            operators: {
+                equal: {
+                    name: '=',
+                    test: ({depth}, optionValue) => (depth === optionValue)
+                },
+                notEqual: {
+                    name: '\u2260',
+                    test: ({depth}, optionValue) => (depth !== optionValue)
+                },
+                lessThan: {
+                    name: '<',
+                    test: ({depth}, optionValue) => (depth < optionValue)
+                },
+                greaterThan: {
+                    name: '>',
+                    test: ({depth}, optionValue) => (depth > optionValue)
+                },
+                lessThanOrEqual: {
+                    name: '\u2264',
+                    test: ({depth}, optionValue) => (depth <= optionValue)
+                },
+                greaterThanOrEqual: {
+                    name: '\u2265',
+                    test: ({depth}, optionValue) => (depth >= optionValue)
+                }
+            }
+        },
+        url: {
+            name: 'URL',
+            description: 'Use profile depending on the URL of the current website.',
+            defaultOperator: 'matchDomain',
+            operators: {
+                matchDomain: {
+                    name: 'Matches Domain',
+                    placeholder: 'Comma separated list of domains',
+                    defaultValue: 'example.com',
+                    transformCache: {},
+                    transform: (optionValue) => optionValue.split(/[,;\s]+/).map((v) => v.trim().toLowerCase()).filter((v) => v.length > 0),
+                    transformReverse: (transformedOptionValue) => transformedOptionValue.join(', '),
+                    validateTransformed: (transformedOptionValue) => (transformedOptionValue.length > 0),
+                    test: ({url}, transformedOptionValue) => _profileConditionTestDomainList(url, transformedOptionValue)
+                },
+                matchRegExp: {
+                    name: 'Matches RegExp',
+                    placeholder: 'Regular expression',
+                    defaultValue: 'example\\.com',
+                    transformCache: {},
+                    transform: (optionValue) => new RegExp(optionValue, 'i'),
+                    transformReverse: (transformedOptionValue) => transformedOptionValue.source,
+                    test: ({url}, transformedOptionValue) => (transformedOptionValue !== null && transformedOptionValue.test(url))
+                }
+            }
+        },
+        modifierKeys: {
+            name: 'Modifier Keys',
+            description: 'Use profile depending on the active modifier keys.',
+            values: modifierKeyValues,
+            defaultOperator: 'are',
+            operators: {
+                are: {
+                    name: 'are',
+                    placeholder: 'Press one or more modifier keys here',
+                    defaultValue: [],
+                    type: 'keyMulti',
+                    keySeparator: modifierSeparator,
+                    transformInput: (optionValue) => optionValue
+                        .split(modifierSeparator)
+                        .filter((v) => v.length > 0)
+                        .map((v) => modifierNameToValue.get(v)),
+                    transformReverse: (transformedOptionValue) => transformedOptionValue
+                        .map((v) => modifierValueToName.get(v))
+                        .join(modifierSeparator),
+                    test: ({modifierKeys}, optionValue) => areSetsEqual(new Set(modifierKeys), new Set(optionValue))
+                },
+                areNot: {
+                    name: 'are not',
+                    placeholder: 'Press one or more modifier keys here',
+                    defaultValue: [],
+                    type: 'keyMulti',
+                    keySeparator: modifierSeparator,
+                    transformInput: (optionValue) => optionValue
+                        .split(modifierSeparator)
+                        .filter((v) => v.length > 0)
+                        .map((v) => modifierNameToValue.get(v)),
+                    transformReverse: (transformedOptionValue) => transformedOptionValue
+                        .map((v) => modifierValueToName.get(v))
+                        .join(modifierSeparator),
+                    test: ({modifierKeys}, optionValue) => !areSetsEqual(new Set(modifierKeys), new Set(optionValue))
+                },
+                include: {
+                    name: 'include',
+                    type: 'select',
+                    defaultValue: 'alt',
+                    test: ({modifierKeys}, optionValue) => modifierKeys.includes(optionValue)
+                },
+                notInclude: {
+                    name: 'don\'t include',
+                    type: 'select',
+                    defaultValue: 'alt',
+                    test: ({modifierKeys}, optionValue) => !modifierKeys.includes(optionValue)
+                }
             }
         }
-    },
-    url: {
-        name: 'URL',
-        description: 'Use profile depending on the URL of the current website.',
-        defaultOperator: 'matchDomain',
-        operators: {
-            matchDomain: {
-                name: 'Matches Domain',
-                placeholder: 'Comma separated list of domains',
-                defaultValue: 'example.com',
-                transformCache: {},
-                transform: (optionValue) => optionValue.split(/[,;\s]+/).map((v) => v.trim().toLowerCase()).filter((v) => v.length > 0),
-                transformReverse: (transformedOptionValue) => transformedOptionValue.join(', '),
-                validateTransformed: (transformedOptionValue) => (transformedOptionValue.length > 0),
-                test: ({url}, transformedOptionValue) => _profileConditionTestDomainList(url, transformedOptionValue)
-            },
-            matchRegExp: {
-                name: 'Matches RegExp',
-                placeholder: 'Regular expression',
-                defaultValue: 'example\\.com',
-                transformCache: {},
-                transform: (optionValue) => new RegExp(optionValue, 'i'),
-                transformReverse: (transformedOptionValue) => transformedOptionValue.source,
-                test: ({url}, transformedOptionValue) => (transformedOptionValue !== null && transformedOptionValue.test(url))
-            }
-        }
-    }
-};
+    };
+})();

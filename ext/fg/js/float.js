@@ -18,7 +18,7 @@
 /* global
  * Display
  * apiBroadcastTab
- * apiGetMessageToken
+ * apiSendMessageToFrame
  * popupNestedInitialize
  */
 
@@ -27,17 +27,11 @@ class DisplayFloat extends Display {
         super(document.querySelector('#spinner'), document.querySelector('#definitions'));
         this.autoPlayAudioTimer = null;
 
-        this._popupId = null;
-
-        this.optionsContext = {
-            depth: 0,
-            url: window.location.href
-        };
+        this._secret = yomichan.generateId(16);
+        this._token = null;
 
         this._orphaned = false;
-        this._prepareInvoked = false;
-        this._messageToken = null;
-        this._messageTokenPromise = null;
+        this._initializedNestedPopups = false;
 
         this._onKeyDownHandlers = new Map([
             ['C', (e) => {
@@ -51,42 +45,30 @@ class DisplayFloat extends Display {
         ]);
 
         this._windowMessageHandlers = new Map([
-            ['setContent', ({type, details}) => this.setContent(type, details)],
-            ['clearAutoPlayTimer', () => this.clearAutoPlayTimer()],
-            ['setCustomCss', ({css}) => this.setCustomCss(css)],
-            ['prepare', ({popupInfo, url, childrenSupported, scale}) => this.prepare(popupInfo, url, childrenSupported, scale)],
-            ['setContentScale', ({scale}) => this.setContentScale(scale)]
+            ['initialize', {handler: this._initialize.bind(this), authenticate: false}],
+            ['configure', {handler: this._configure.bind(this)}],
+            ['setOptionsContext', {handler: ({optionsContext}) => this.setOptionsContext(optionsContext)}],
+            ['setContent', {handler: ({type, details}) => this.setContent(type, details)}],
+            ['clearAutoPlayTimer', {handler: () => this.clearAutoPlayTimer()}],
+            ['setCustomCss', {handler: ({css}) => this.setCustomCss(css)}],
+            ['setContentScale', {handler: ({scale}) => this.setContentScale(scale)}]
         ]);
+    }
+
+    async prepare() {
+        await super.prepare();
 
         yomichan.on('orphaned', this.onOrphaned.bind(this));
         window.addEventListener('message', this.onMessage.bind(this), false);
-    }
 
-    async prepare(popupInfo, url, childrenSupported, scale) {
-        if (this._prepareInvoked) { return; }
-        this._prepareInvoked = true;
-
-        const {id, depth, parentFrameId} = popupInfo;
-        this._popupId = id;
-        this.optionsContext.depth = depth;
-        this.optionsContext.url = url;
-
-        await super.prepare();
-
-        if (childrenSupported) {
-            popupNestedInitialize(id, depth, parentFrameId, url);
-        }
-
-        this.setContentScale(scale);
-
-        apiBroadcastTab('popupPrepareCompleted', {targetPopupId: this._popupId});
+        apiBroadcastTab('popupPrepared', {secret: this._secret});
     }
 
     onError(error) {
         if (this._orphaned) {
             this.setContent('orphaned');
         } else {
-            logError(error, true);
+            yomichan.logError(error);
         }
     }
 
@@ -94,7 +76,7 @@ class DisplayFloat extends Display {
         this._orphaned = true;
     }
 
-    onSearchClear() {
+    onEscape() {
         window.parent.postMessage('popupClose', '*');
     }
 
@@ -104,46 +86,30 @@ class DisplayFloat extends Display {
 
     onMessage(e) {
         const data = e.data;
-        if (typeof data !== 'object' || data === null) { return; } // Invalid data
-
-        const token = data.token;
-        if (typeof token !== 'string') { return; } // Invalid data
-
-        if (this._messageToken === null) {
-            // Async
-            this.getMessageToken()
-                .then(
-                    () => { this.handleAction(token, data); },
-                    () => {}
-                );
-        } else {
-            // Sync
-            this.handleAction(token, data);
-        }
-    }
-
-    async getMessageToken() {
-        // this._messageTokenPromise is used to ensure that only one call to apiGetMessageToken is made.
-        if (this._messageTokenPromise === null) {
-            this._messageTokenPromise = apiGetMessageToken();
-        }
-        const messageToken = await this._messageTokenPromise;
-        if (this._messageToken === null) {
-            this._messageToken = messageToken;
-        }
-        this._messageTokenPromise = null;
-    }
-
-    handleAction(token, {action, params}) {
-        if (token !== this._messageToken) {
-            // Invalid token
+        if (typeof data !== 'object' || data === null) {
+            this._logMessageError(e, 'Invalid data');
             return;
         }
 
-        const handler = this._windowMessageHandlers.get(action);
-        if (typeof handler !== 'function') { return; }
+        const action = data.action;
+        if (typeof action !== 'string') {
+            this._logMessageError(e, 'Invalid data');
+            return;
+        }
 
-        handler(params);
+        const handlerInfo = this._windowMessageHandlers.get(action);
+        if (typeof handlerInfo === 'undefined') {
+            this._logMessageError(e, `Invalid action: ${JSON.stringify(action)}`);
+            return;
+        }
+
+        if (handlerInfo.authenticate !== false && !this._isMessageAuthenticated(data)) {
+            this._logMessageError(e, 'Invalid authentication');
+            return;
+        }
+
+        const handler = handlerInfo.handler;
+        handler(data.params);
     }
 
     autoPlayAudio() {
@@ -158,8 +124,15 @@ class DisplayFloat extends Display {
         }
     }
 
+    async setOptionsContext(optionsContext) {
+        this.optionsContext = optionsContext;
+        await this.updateOptions();
+    }
+
     setContentScale(scale) {
-        document.body.style.fontSize = `${scale}em`;
+        const body = document.body;
+        if (body === null) { return; }
+        body.style.fontSize = `${scale}em`;
     }
 
     async getDocumentTitle() {
@@ -188,6 +161,45 @@ class DisplayFloat extends Display {
             return '';
         }
     }
-}
 
-DisplayFloat.instance = new DisplayFloat();
+    _logMessageError(event, type) {
+        yomichan.logWarning(new Error(`Popup received invalid message from origin ${JSON.stringify(event.origin)}: ${type}`));
+    }
+
+    _initialize(params) {
+        if (this._token !== null) { return; } // Already initialized
+        if (!isObject(params)) { return; } // Invalid data
+
+        const secret = params.secret;
+        if (secret !== this._secret) { return; } // Invalid authentication
+
+        const {token, frameId} = params;
+        this._token = token;
+
+        apiSendMessageToFrame(frameId, 'popupInitialized', {secret, token});
+    }
+
+    async _configure({messageId, frameId, popupId, optionsContext, childrenSupported, scale}) {
+        this.optionsContext = optionsContext;
+
+        await this.updateOptions();
+
+        if (childrenSupported && !this._initializedNestedPopups) {
+            const {depth, url} = optionsContext;
+            popupNestedInitialize(popupId, depth, frameId, url);
+            this._initializedNestedPopups = true;
+        }
+
+        this.setContentScale(scale);
+
+        apiSendMessageToFrame(frameId, 'popupConfigured', {messageId});
+    }
+
+    _isMessageAuthenticated(message) {
+        return (
+            this._token !== null &&
+            this._token === message.token &&
+            this._secret === message.secret
+        );
+    }
+}

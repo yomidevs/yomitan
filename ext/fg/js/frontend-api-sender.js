@@ -17,97 +17,97 @@
 
 
 class FrontendApiSender {
-    constructor() {
-        this.senderId = yomichan.generateId(16);
-        this.ackTimeout = 3000; // 3 seconds
-        this.responseTimeout = 10000; // 10 seconds
-        this.callbacks = new Map();
-        this.disconnected = false;
-        this.nextId = 0;
-
-        this.port = null;
+    constructor(target) {
+        this._target = target;
+        this._senderId = yomichan.generateId(16);
+        this._ackTimeout = 3000; // 3 seconds
+        this._responseTimeout = 10000; // 10 seconds
+        this._callbacks = new Map();
+        this._disconnected = false;
+        this._nextId = 0;
+        this._port = null;
     }
 
-    invoke(action, params, target) {
-        if (this.disconnected) {
+    invoke(action, params) {
+        if (this._disconnected) {
             // attempt to reconnect the next time
-            this.disconnected = false;
+            this._disconnected = false;
             return Promise.reject(new Error('Disconnected'));
         }
 
-        if (this.port === null) {
-            this.createPort();
+        if (this._port === null) {
+            this._createPort();
         }
 
-        const id = `${this.nextId}`;
-        ++this.nextId;
+        const id = `${this._nextId}`;
+        ++this._nextId;
 
         return new Promise((resolve, reject) => {
             const info = {id, resolve, reject, ack: false, timer: null};
-            this.callbacks.set(id, info);
-            info.timer = setTimeout(() => this.onError(id, 'Timeout (ack)'), this.ackTimeout);
+            this._callbacks.set(id, info);
+            info.timer = setTimeout(() => this._onError(id, 'Timeout (ack)'), this._ackTimeout);
 
-            this.port.postMessage({id, action, params, target, senderId: this.senderId});
+            this._port.postMessage({id, action, params, target: this._target, senderId: this._senderId});
         });
     }
 
-    createPort() {
-        this.port = chrome.runtime.connect(null, {name: 'backend-api-forwarder'});
-        this.port.onDisconnect.addListener(this.onDisconnect.bind(this));
-        this.port.onMessage.addListener(this.onMessage.bind(this));
+    _createPort() {
+        this._port = chrome.runtime.connect(null, {name: 'backend-api-forwarder'});
+        this._port.onDisconnect.addListener(this._onDisconnect.bind(this));
+        this._port.onMessage.addListener(this._onMessage.bind(this));
     }
 
-    onMessage({type, id, data, senderId}) {
-        if (senderId !== this.senderId) { return; }
+    _onMessage({type, id, data, senderId}) {
+        if (senderId !== this._senderId) { return; }
         switch (type) {
             case 'ack':
-                this.onAck(id);
+                this._onAck(id);
                 break;
             case 'result':
-                this.onResult(id, data);
+                this._onResult(id, data);
                 break;
         }
     }
 
-    onDisconnect() {
-        this.disconnected = true;
-        this.port = null;
+    _onDisconnect() {
+        this._disconnected = true;
+        this._port = null;
 
-        for (const id of this.callbacks.keys()) {
-            this.onError(id, 'Disconnected');
+        for (const id of this._callbacks.keys()) {
+            this._onError(id, 'Disconnected');
         }
     }
 
-    onAck(id) {
-        const info = this.callbacks.get(id);
+    _onAck(id) {
+        const info = this._callbacks.get(id);
         if (typeof info === 'undefined') {
-            console.warn(`ID ${id} not found for ack`);
+            yomichan.logWarning(new Error(`ID ${id} not found for ack`));
             return;
         }
 
         if (info.ack) {
-            console.warn(`Request ${id} already ack'd`);
+            yomichan.logWarning(new Error(`Request ${id} already ack'd`));
             return;
         }
 
         info.ack = true;
         clearTimeout(info.timer);
-        info.timer = setTimeout(() => this.onError(id, 'Timeout (response)'), this.responseTimeout);
+        info.timer = setTimeout(() => this._onError(id, 'Timeout (response)'), this._responseTimeout);
     }
 
-    onResult(id, data) {
-        const info = this.callbacks.get(id);
+    _onResult(id, data) {
+        const info = this._callbacks.get(id);
         if (typeof info === 'undefined') {
-            console.warn(`ID ${id} not found`);
+            yomichan.logWarning(new Error(`ID ${id} not found`));
             return;
         }
 
         if (!info.ack) {
-            console.warn(`Request ${id} not ack'd`);
+            yomichan.logWarning(new Error(`Request ${id} not ack'd`));
             return;
         }
 
-        this.callbacks.delete(id);
+        this._callbacks.delete(id);
         clearTimeout(info.timer);
         info.timer = null;
 
@@ -118,10 +118,10 @@ class FrontendApiSender {
         }
     }
 
-    onError(id, reason) {
-        const info = this.callbacks.get(id);
+    _onError(id, reason) {
+        const info = this._callbacks.get(id);
         if (typeof info === 'undefined') { return; }
-        this.callbacks.delete(id);
+        this._callbacks.delete(id);
         info.timer = null;
         info.reject(new Error(reason));
     }

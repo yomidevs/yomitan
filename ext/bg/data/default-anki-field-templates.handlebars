@@ -14,7 +14,11 @@
     {{~/if~}}
 {{/inline}}
 
-{{#*inline "audio"}}{{/inline}}
+{{#*inline "audio"}}
+    {{~#if definition.audioFileName~}}
+        [sound:{{definition.audioFileName}}]
+    {{~/if~}}
+{{/inline}}
 
 {{#*inline "character"}}
     {{~definition.character~}}
@@ -147,7 +151,7 @@
 {{/inline}}
 
 {{#*inline "tags"}}
-    {{~#each definition.definitionTags}}{{name}}{{#unless @last}}, {{/unless}}{{/each~}}
+    {{~#mergeTags definition group merge}}{{this}}{{/mergeTags~}}
 {{/inline}}
 
 {{#*inline "url"}}

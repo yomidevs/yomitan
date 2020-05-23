@@ -123,6 +123,26 @@ function handlebarsRegexMatch(...args) {
     return value;
 }
 
+function handlebarsMergeTags(object, isGroupMode, isMergeMode) {
+    const tagSources = [];
+    if (isGroupMode || isMergeMode) {
+        for (const definition of object.definitions) {
+            tagSources.push(definition.definitionTags);
+        }
+    } else {
+        tagSources.push(object.definitionTags);
+    }
+
+    const tags = new Set();
+    for (const tagSource of tagSources) {
+        for (const tag of tagSource) {
+            tags.add(tag.name);
+        }
+    }
+
+    return [...tags].join(', ');
+}
+
 function handlebarsRegisterHelpers() {
     if (Handlebars.partials !== Handlebars.templates) {
         Handlebars.partials = Handlebars.templates;
@@ -134,6 +154,7 @@ function handlebarsRegisterHelpers() {
         Handlebars.registerHelper('sanitizeCssClass', handlebarsSanitizeCssClass);
         Handlebars.registerHelper('regexReplace', handlebarsRegexReplace);
         Handlebars.registerHelper('regexMatch', handlebarsRegexMatch);
+        Handlebars.registerHelper('mergeTags', handlebarsMergeTags);
     }
 }
 

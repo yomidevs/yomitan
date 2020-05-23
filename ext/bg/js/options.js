@@ -15,13 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * utilStringHashCode
- */
-
 /*
  * Generic options functions
  */
+
+function optionsGetStringHashCode(string) {
+    let hashCode = 0;
+
+    if (typeof string !== 'string') { return hashCode; }
+
+    for (let i = 0, charCode = string.charCodeAt(i); i < string.length; charCode = string.charCodeAt(++i)) {
+        hashCode = ((hashCode << 5) - hashCode) + charCode;
+        hashCode |= 0;
+    }
+
+    return hashCode;
+}
 
 function optionsGenericApplyUpdates(options, updates) {
     const targetVersion = updates.length;
@@ -63,12 +72,12 @@ const profileOptionsVersionUpdates = [
         options.anki.fieldTemplates = null;
     },
     (options) => {
-        if (utilStringHashCode(options.anki.fieldTemplates) === 1285806040) {
+        if (optionsGetStringHashCode(options.anki.fieldTemplates) === 1285806040) {
             options.anki.fieldTemplates = null;
         }
     },
     (options) => {
-        if (utilStringHashCode(options.anki.fieldTemplates) === -250091611) {
+        if (optionsGetStringHashCode(options.anki.fieldTemplates) === -250091611) {
             options.anki.fieldTemplates = null;
         }
     },
@@ -87,7 +96,7 @@ const profileOptionsVersionUpdates = [
     (options) => {
         // Version 12 changes:
         //  The preferred default value of options.anki.fieldTemplates has been changed to null.
-        if (utilStringHashCode(options.anki.fieldTemplates) === 1444379824) {
+        if (optionsGetStringHashCode(options.anki.fieldTemplates) === 1444379824) {
             options.anki.fieldTemplates = null;
         }
     },
@@ -99,6 +108,37 @@ const profileOptionsVersionUpdates = [
             fieldTemplates += '\n\n{{#*inline "document-title"}}\n    {{~context.document.title~}}\n{{/inline}}';
             options.anki.fieldTemplates = fieldTemplates;
         }
+    },
+    (options) => {
+        // Version 14 changes:
+        //  Changed template for Anki audio and tags.
+        let fieldTemplates = options.anki.fieldTemplates;
+        if (typeof fieldTemplates !== 'string') { return; }
+
+        const replacements = [
+            [
+                '{{#*inline "audio"}}{{/inline}}',
+                '{{#*inline "audio"}}\n    {{~#if definition.audioFileName~}}\n        [sound:{{definition.audioFileName}}]\n    {{~/if~}}\n{{/inline}}'
+            ],
+            [
+                '{{#*inline "tags"}}\n    {{~#each definition.definitionTags}}{{name}}{{#unless @last}}, {{/unless}}{{/each~}}\n{{/inline}}',
+                '{{#*inline "tags"}}\n    {{~#mergeTags definition group merge}}{{this}}{{/mergeTags~}}\n{{/inline}}'
+            ]
+        ];
+
+        for (const [pattern, replacement] of replacements) {
+            let replaced = false;
+            fieldTemplates = fieldTemplates.replace(new RegExp(escapeRegExp(pattern), 'g'), () => {
+                replaced = true;
+                return replacement;
+            });
+
+            if (!replaced) {
+                fieldTemplates += '\n\n' + replacement;
+            }
+        }
+
+        options.anki.fieldTemplates = fieldTemplates;
     }
 ];
 
@@ -192,6 +232,7 @@ function profileOptionsCreateDefaults() {
             screenshot: {format: 'png', quality: 92},
             terms: {deck: '', model: '', fields: {}},
             kanji: {deck: '', model: '', fields: {}},
+            duplicateScope: 'collection',
             fieldTemplates: null
         }
     };

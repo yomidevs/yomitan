@@ -351,7 +351,7 @@
                                     },
                                     "modifier": {
                                         "type": "string",
-                                        "enum": ["none", "alt", "ctrl", "shift"],
+                                        "enum": ["none", "alt", "ctrl", "shift", "meta"],
                                         "default": "shift"
                                     },
                                     "deepDomScan": {
@@ -492,6 +492,7 @@
                                     "screenshot",
                                     "terms",
                                     "kanji",
+                                    "duplicateScope",
                                     "fieldTemplates"
                                 ],
                                 "properties": {
@@ -586,6 +587,11 @@
                                                 }
                                             }
                                         }
+                                    },
+                                    "duplicateScope": {
+                                        "type": "string",
+                                        "default": "collection",
+                                        "enum": ["collection", "deck"]
                                     },
                                     "fieldTemplates": {
                                         "type": ["string", "null"],
