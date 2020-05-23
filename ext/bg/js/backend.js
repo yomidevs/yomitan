@@ -163,6 +163,7 @@ class Backend {
                 chrome.tabs.onZoomChange.addListener(this._onZoomChange.bind(this));
             }
             chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
+            chrome.runtime.onConnect.addListener(this._onConnect.bind(this));
 
             const options = this.getOptions(this.optionsContext);
             if (options.general.showGuide) {
@@ -233,6 +234,45 @@ class Backend {
         } catch (error) {
             callback({error: errorToJson(error)});
             return false;
+        }
+    }
+
+    _onConnect(port) {
+        try {
+            const match = /^background-cross-frame-communication-port-(\d+)$/.exec(`${port.name}`);
+            if (match === null) { return; }
+
+            const tabId = (port.sender && port.sender.tab ? port.sender.tab.id : null);
+            if (typeof tabId !== 'number') {
+                throw new Error('Port does not have an associated tab ID');
+            }
+            const senderFrameId = port.sender.frameId;
+            if (typeof tabId !== 'number') {
+                throw new Error('Port does not have an associated frame ID');
+            }
+            const targetFrameId = parseInt(match[1], 10);
+
+            let forwardPort = chrome.tabs.connect(tabId, {frameId: targetFrameId, name: `cross-frame-communication-port-${senderFrameId}`});
+
+            const cleanup = () => {
+                this.checkLastError(chrome.runtime.lastError);
+                if (forwardPort !== null) {
+                    forwardPort.disconnect();
+                    forwardPort = null;
+                }
+                if (port !== null) {
+                    port.disconnect();
+                    port = null;
+                }
+            };
+
+            port.onMessage.addListener((message) => { forwardPort.postMessage(message); });
+            forwardPort.onMessage.addListener((message) => { port.postMessage(message); });
+            port.onDisconnect.addListener(cleanup);
+            forwardPort.onDisconnect.addListener(cleanup);
+        } catch (e) {
+            port.disconnect();
+            yomichan.logError(e);
         }
     }
 
