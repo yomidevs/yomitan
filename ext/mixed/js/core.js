@@ -261,12 +261,12 @@ class EventListenerCollection {
     }
 
     addListener(object, ...args) {
-        object.addListener(args);
+        object.addListener(...args);
         this._eventListeners.push(['removeListener', object, ...args]);
     }
 
     on(object, ...args) {
-        object.on(args);
+        object.on(...args);
         this._eventListeners.push(['off', object, ...args]);
     }
 
