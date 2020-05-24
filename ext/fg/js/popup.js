@@ -17,7 +17,7 @@
 
 /* global
  * DOM
- * apiOptionsGet
+ * api
  * dynamicLoader
  */
 
@@ -89,7 +89,7 @@ class Popup {
         this._optionsContext = optionsContext;
         this._previousOptionsContextSource = source;
 
-        this._options = await apiOptionsGet(optionsContext);
+        this._options = await api.optionsGet(optionsContext);
         this.updateTheme();
 
         this._invokeApi('setOptionsContext', {optionsContext});

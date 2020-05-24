@@ -21,10 +21,7 @@
  * Frontend
  * PopupFactory
  * PopupProxy
- * apiBroadcastTab
- * apiForwardLogsToBackend
- * apiFrameInformationGet
- * apiOptionsGet
+ * api
  */
 
 async function createIframePopupProxy(frameOffsetForwarder, setDisabled) {
@@ -36,7 +33,7 @@ async function createIframePopupProxy(frameOffsetForwarder, setDisabled) {
             }
         }
     );
-    apiBroadcastTab('rootPopupRequestInformationBroadcast');
+    api.broadcastTab('rootPopupRequestInformationBroadcast');
     const {popupId, frameId: parentFrameId} = await rootPopupInformationPromise;
 
     const getFrameOffset = frameOffsetForwarder.getOffset.bind(frameOffsetForwarder);
@@ -48,7 +45,7 @@ async function createIframePopupProxy(frameOffsetForwarder, setDisabled) {
 }
 
 async function getOrCreatePopup(depth) {
-    const {frameId} = await apiFrameInformationGet();
+    const {frameId} = await api.frameInformationGet();
     if (typeof frameId !== 'number') {
         const error = new Error('Failed to get frameId');
         yomichan.logError(error);
@@ -71,7 +68,7 @@ async function createPopupProxy(depth, id, parentFrameId) {
 }
 
 (async () => {
-    apiForwardLogsToBackend();
+    api.forwardLogsToBackend();
     await yomichan.prepare();
 
     const data = window.frontendInitializationData || {};
@@ -112,7 +109,7 @@ async function createPopupProxy(depth, id, parentFrameId) {
             depth: isSearchPage ? 0 : depth,
             url: proxy ? await getPopupProxyUrl() : window.location.href
         };
-        const options = await apiOptionsGet(optionsContext);
+        const options = await api.optionsGet(optionsContext);
 
         if (!proxy && frameOffsetForwarder === null) {
             frameOffsetForwarder = new FrameOffsetForwarder();

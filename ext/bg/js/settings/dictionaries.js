@@ -17,13 +17,7 @@
 
 /* global
  * PageExitPrevention
- * apiDeleteDictionary
- * apiGetDictionaryCounts
- * apiGetDictionaryInfo
- * apiImportDictionaryArchive
- * apiOptionsGet
- * apiOptionsGetFull
- * apiPurgeDatabase
+ * api
  * getOptionsContext
  * getOptionsFullMutable
  * getOptionsMutable
@@ -312,7 +306,7 @@ class SettingsDictionaryEntryUI {
                 progressBar.style.width = `${percent}%`;
             };
 
-            await apiDeleteDictionary(this.dictionaryInfo.title, onProgress);
+            await api.deleteDictionary(this.dictionaryInfo.title, onProgress);
         } catch (e) {
             dictionaryErrorsShow([e]);
         } finally {
@@ -423,7 +417,7 @@ async function onDictionaryOptionsChanged() {
 
     dictionaryUI.setOptionsDictionaries(options.dictionaries);
 
-    const optionsFull = await apiOptionsGetFull();
+    const optionsFull = await api.optionsGetFull();
     document.querySelector('#database-enable-prefix-wildcard-searches').checked = optionsFull.global.database.prefixWildcardsSupported;
 
     await updateMainDictionarySelectValue();
@@ -431,7 +425,7 @@ async function onDictionaryOptionsChanged() {
 
 async function onDatabaseUpdated() {
     try {
-        const dictionaries = await apiGetDictionaryInfo();
+        const dictionaries = await api.getDictionaryInfo();
         dictionaryUI.setDictionaries(dictionaries);
 
         document.querySelector('#dict-warning').hidden = (dictionaries.length > 0);
@@ -439,7 +433,7 @@ async function onDatabaseUpdated() {
         updateMainDictionarySelectOptions(dictionaries);
         await updateMainDictionarySelectValue();
 
-        const {counts, total} = await apiGetDictionaryCounts(dictionaries.map((v) => v.title), true);
+        const {counts, total} = await api.getDictionaryCounts(dictionaries.map((v) => v.title), true);
         dictionaryUI.setCounts(counts, total);
     } catch (e) {
         dictionaryErrorsShow([e]);
@@ -468,7 +462,7 @@ function updateMainDictionarySelectOptions(dictionaries) {
 
 async function updateMainDictionarySelectValue() {
     const optionsContext = getOptionsContext();
-    const options = await apiOptionsGet(optionsContext);
+    const options = await api.optionsGet(optionsContext);
 
     const value = options.general.mainDictionary;
 
@@ -618,7 +612,7 @@ async function onDictionaryPurge(e) {
         dictionaryErrorsShow(null);
         dictionarySpinnerShow(true);
 
-        await apiPurgeDatabase();
+        await api.purgeDatabase();
         for (const {options} of toIterable((await getOptionsFullMutable()).profiles)) {
             options.dictionaries = utilBackgroundIsolate({});
             options.general.mainDictionary = '';
@@ -666,7 +660,7 @@ async function onDictionaryImport(e) {
             }
         };
 
-        const optionsFull = await apiOptionsGetFull();
+        const optionsFull = await api.optionsGetFull();
 
         const importDetails = {
             prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported
@@ -680,7 +674,7 @@ async function onDictionaryImport(e) {
             }
 
             const archiveContent = await dictReadFile(files[i]);
-            const {result, errors} = await apiImportDictionaryArchive(archiveContent, importDetails, updateProgress);
+            const {result, errors} = await api.importDictionaryArchive(archiveContent, importDetails, updateProgress);
             for (const {options} of toIterable((await getOptionsFullMutable()).profiles)) {
                 const dictionaryOptions = SettingsDictionaryListUI.createDictionaryOptions();
                 dictionaryOptions.enabled = true;

@@ -17,8 +17,7 @@
 
 /* global
  * Display
- * apiBroadcastTab
- * apiSendMessageToFrame
+ * api
  * popupNestedInitialize
  */
 
@@ -61,7 +60,7 @@ class DisplayFloat extends Display {
         yomichan.on('orphaned', this.onOrphaned.bind(this));
         window.addEventListener('message', this.onMessage.bind(this), false);
 
-        apiBroadcastTab('popupPrepared', {secret: this._secret});
+        api.broadcastTab('popupPrepared', {secret: this._secret});
     }
 
     onError(error) {
@@ -153,7 +152,7 @@ class DisplayFloat extends Display {
                 },
                 2000
             );
-            apiBroadcastTab('requestDocumentInformationBroadcast', {uniqueId});
+            api.broadcastTab('requestDocumentInformationBroadcast', {uniqueId});
 
             const {title} = await promise;
             return title;
@@ -176,7 +175,7 @@ class DisplayFloat extends Display {
         const {token, frameId} = params;
         this._token = token;
 
-        apiSendMessageToFrame(frameId, 'popupInitialized', {secret, token});
+        api.sendMessageToFrame(frameId, 'popupInitialized', {secret, token});
     }
 
     async _configure({messageId, frameId, popupId, optionsContext, childrenSupported, scale}) {
@@ -192,7 +191,7 @@ class DisplayFloat extends Display {
 
         this.setContentScale(scale);
 
-        apiSendMessageToFrame(frameId, 'popupConfigured', {messageId});
+        api.sendMessageToFrame(frameId, 'popupConfigured', {messageId});
     }
 
     _isMessageAuthenticated(message) {

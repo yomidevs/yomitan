@@ -17,10 +17,10 @@
 
 /* global
  * SettingsPopupPreview
- * apiForwardLogsToBackend
+ * api
  */
 
 (() => {
-    apiForwardLogsToBackend();
+    api.forwardLogsToBackend();
     new SettingsPopupPreview();
 })();

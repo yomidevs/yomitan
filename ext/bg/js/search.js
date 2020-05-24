@@ -20,9 +20,7 @@
  * DOM
  * Display
  * QueryParser
- * apiClipboardGet
- * apiModifySettings
- * apiTermsFind
+ * api
  * wanakana
  */
 
@@ -52,7 +50,7 @@ class DisplaySearch extends Display {
         this.introVisible = true;
         this.introAnimationTimer = null;
 
-        this.clipboardMonitor = new ClipboardMonitor({getClipboard: apiClipboardGet});
+        this.clipboardMonitor = new ClipboardMonitor({getClipboard: api.clipboardGet.bind(api)});
 
         this._onKeyDownIgnoreKeys = new Map([
             ['ANY_MOD', new Set([
@@ -234,7 +232,7 @@ class DisplaySearch extends Display {
             this.setIntroVisible(!valid, animate);
             this.updateSearchButton();
             if (valid) {
-                const {definitions} = await apiTermsFind(query, details, this.getOptionsContext());
+                const {definitions} = await api.termsFind(query, details, this.getOptionsContext());
                 this.setContent('terms', {definitions, context: {
                     focus: false,
                     disableHistory: true,
@@ -258,7 +256,7 @@ class DisplaySearch extends Display {
         } else {
             wanakana.unbind(this.query);
         }
-        apiModifySettings([{
+        api.modifySettings([{
             action: 'set',
             path: 'general.enableWanakana',
             value,
@@ -274,7 +272,7 @@ class DisplaySearch extends Display {
                 (granted) => {
                     if (granted) {
                         this.clipboardMonitor.start();
-                        apiModifySettings([{
+                        api.modifySettings([{
                             action: 'set',
                             path: 'general.enableClipboardMonitor',
                             value: true,
@@ -288,7 +286,7 @@ class DisplaySearch extends Display {
             );
         } else {
             this.clipboardMonitor.stop();
-            apiModifySettings([{
+            api.modifySettings([{
                 action: 'set',
                 path: 'general.enableClipboardMonitor',
                 value: false,

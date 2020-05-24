@@ -16,7 +16,7 @@
  */
 
 /* global
- * apiGetEnvironmentInfo
+ * api
  */
 
 function storageBytesToLabeledString(size) {
@@ -52,7 +52,7 @@ async function isStoragePeristent() {
 
 async function storageInfoInitialize() {
     storagePersistInitialize();
-    const {browser, platform} = await apiGetEnvironmentInfo();
+    const {browser, platform} = await api.getEnvironmentInfo();
     document.documentElement.dataset.browser = browser;
     document.documentElement.dataset.operatingSystem = platform.os;
 

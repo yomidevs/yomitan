@@ -16,9 +16,7 @@
  */
 
 /* global
- * apiGetDefaultAnkiFieldTemplates
- * apiGetEnvironmentInfo
- * apiOptionsGetFull
+ * api
  * optionsGetDefault
  * optionsUpdateVersion
  * utilBackend
@@ -51,9 +49,9 @@ function _getSettingsExportDateString(date, dateSeparator, dateTimeSeparator, ti
 }
 
 async function _getSettingsExportData(date) {
-    const optionsFull = await apiOptionsGetFull();
-    const environment = await apiGetEnvironmentInfo();
-    const fieldTemplatesDefault = await apiGetDefaultAnkiFieldTemplates();
+    const optionsFull = await api.optionsGetFull();
+    const environment = await api.getEnvironmentInfo();
+    const fieldTemplatesDefault = await api.getDefaultAnkiFieldTemplates();
 
     // Format options
     for (const {options} of optionsFull.profiles) {

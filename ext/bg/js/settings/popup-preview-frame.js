@@ -20,14 +20,13 @@
  * Popup
  * PopupFactory
  * TextSourceRange
- * apiFrameInformationGet
- * apiOptionsGet
+ * api
  */
 
 class SettingsPopupPreview {
     constructor() {
         this.frontend = null;
-        this.apiOptionsGetOld = apiOptionsGet;
+        this.apiOptionsGetOld = api.optionsGet.bind(api);
         this.popup = null;
         this.popupSetCustomOuterCssOld = null;
         this.popupShown = false;
@@ -54,10 +53,10 @@ class SettingsPopupPreview {
         document.querySelector('#theme-dark-checkbox').addEventListener('change', this.onThemeDarkCheckboxChanged.bind(this), false);
 
         // Overwrite API functions
-        window.apiOptionsGet = this.apiOptionsGet.bind(this);
+        api.optionsGet = this.apiOptionsGet.bind(this);
 
         // Overwrite frontend
-        const {frameId} = await apiFrameInformationGet();
+        const {frameId} = await api.frameInformationGet();
 
         const popupFactory = new PopupFactory(frameId);
         await popupFactory.prepare();

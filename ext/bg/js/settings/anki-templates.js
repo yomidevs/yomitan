@@ -19,10 +19,7 @@
  * AnkiNoteBuilder
  * ankiGetFieldMarkers
  * ankiGetFieldMarkersHtml
- * apiGetDefaultAnkiFieldTemplates
- * apiOptionsGet
- * apiTemplateRender
- * apiTermsFind
+ * api
  * getOptionsContext
  * getOptionsMutable
  * settingsSaveOptions
@@ -38,7 +35,7 @@ async function onAnkiFieldTemplatesResetConfirm(e) {
 
     $('#field-template-reset-modal').modal('hide');
 
-    const value = await apiGetDefaultAnkiFieldTemplates();
+    const value = await api.getDefaultAnkiFieldTemplates();
 
     const element = document.querySelector('#field-templates');
     element.value = value;
@@ -65,9 +62,9 @@ function ankiTemplatesInitialize() {
 
 async function ankiTemplatesUpdateValue() {
     const optionsContext = getOptionsContext();
-    const options = await apiOptionsGet(optionsContext);
+    const options = await api.optionsGet(optionsContext);
     let templates = options.anki.fieldTemplates;
-    if (typeof templates !== 'string') { templates = await apiGetDefaultAnkiFieldTemplates(); }
+    if (typeof templates !== 'string') { templates = await api.getDefaultAnkiFieldTemplates(); }
     $('#field-templates').val(templates);
 
     onAnkiTemplatesValidateCompile();
@@ -79,7 +76,7 @@ const ankiTemplatesValidateGetDefinition = (() => {
 
     return async (text, optionsContext) => {
         if (cachedText !== text) {
-            const {definitions} = await apiTermsFind(text, {}, optionsContext);
+            const {definitions} = await api.termsFind(text, {}, optionsContext);
             if (definitions.length === 0) { return null; }
 
             cachedValue = definitions[0];
@@ -97,15 +94,15 @@ async function ankiTemplatesValidate(infoNode, field, mode, showSuccessResult, i
         const optionsContext = getOptionsContext();
         const definition = await ankiTemplatesValidateGetDefinition(text, optionsContext);
         if (definition !== null) {
-            const options = await apiOptionsGet(optionsContext);
+            const options = await api.optionsGet(optionsContext);
             const context = {
                 document: {
                     title: document.title
                 }
             };
             let templates = options.anki.fieldTemplates;
-            if (typeof templates !== 'string') { templates = await apiGetDefaultAnkiFieldTemplates(); }
-            const ankiNoteBuilder = new AnkiNoteBuilder({renderTemplate: apiTemplateRender});
+            if (typeof templates !== 'string') { templates = await api.getDefaultAnkiFieldTemplates(); }
+            const ankiNoteBuilder = new AnkiNoteBuilder({renderTemplate: api.templateRender.bind(api)});
             result = await ankiNoteBuilder.formatField(field, definition, mode, context, options, templates, exceptions);
         }
     } catch (e) {
@@ -125,7 +122,7 @@ async function ankiTemplatesValidate(infoNode, field, mode, showSuccessResult, i
 async function onAnkiFieldTemplatesChanged(e) {
     // Get value
     let templates = e.currentTarget.value;
-    if (templates === await apiGetDefaultAnkiFieldTemplates()) {
+    if (templates === await api.getDefaultAnkiFieldTemplates()) {
         // Default
         templates = null;
     }

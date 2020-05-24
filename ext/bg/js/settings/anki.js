@@ -16,9 +16,7 @@
  */
 
 /* global
- * apiGetAnkiDeckNames
- * apiGetAnkiModelFieldNames
- * apiGetAnkiModelNames
+ * api
  * getOptionsContext
  * getOptionsMutable
  * onFormOptionsChanged
@@ -107,7 +105,7 @@ async function _ankiDeckAndModelPopulate(options) {
     const kanjiModel = {value: options.anki.kanji.model, selector: '#anki-kanji-model'};
     try {
         _ankiSpinnerShow(true);
-        const [deckNames, modelNames] = await Promise.all([apiGetAnkiDeckNames(), apiGetAnkiModelNames()]);
+        const [deckNames, modelNames] = await Promise.all([api.getAnkiDeckNames(), api.getAnkiModelNames()]);
         deckNames.sort();
         modelNames.sort();
         termsDeck.values = deckNames;
@@ -180,7 +178,7 @@ async function _onAnkiModelChanged(e) {
     let fieldNames;
     try {
         const modelName = node.value;
-        fieldNames = await apiGetAnkiModelFieldNames(modelName);
+        fieldNames = await api.getAnkiModelFieldNames(modelName);
         _ankiSetError(null);
     } catch (error) {
         _ankiSetError(error);

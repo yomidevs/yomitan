@@ -18,9 +18,7 @@
 /* global
  * QueryParserGenerator
  * TextScanner
- * apiModifySettings
- * apiTermsFind
- * apiTextParse
+ * api
  * docSentenceExtract
  */
 
@@ -59,7 +57,7 @@ class QueryParser {
 
         this._setPreview(text);
 
-        this._parseResults = await apiTextParse(text, this._getOptionsContext());
+        this._parseResults = await api.textParse(text, this._getOptionsContext());
         this._refreshSelectedParser();
 
         this._renderParserSelect();
@@ -80,7 +78,7 @@ class QueryParser {
         const searchText = this._textScanner.getTextSourceContent(textSource, this._options.scanning.length);
         if (searchText.length === 0) { return null; }
 
-        const {definitions, length} = await apiTermsFind(searchText, {}, this._getOptionsContext());
+        const {definitions, length} = await api.termsFind(searchText, {}, this._getOptionsContext());
         if (definitions.length === 0) { return null; }
 
         const sentence = docSentenceExtract(textSource, this._options.anki.sentenceExt);
@@ -99,7 +97,7 @@ class QueryParser {
 
     _onParserChange(e) {
         const value = e.target.value;
-        apiModifySettings([{
+        api.modifySettings([{
             action: 'set',
             path: 'parsing.selectedParser',
             value,
@@ -112,7 +110,7 @@ class QueryParser {
         if (this._parseResults.length > 0) {
             if (!this._getParseResult()) {
                 const value = this._parseResults[0].id;
-                apiModifySettings([{
+                api.modifySettings([{
                     action: 'set',
                     path: 'parsing.selectedParser',
                     value,

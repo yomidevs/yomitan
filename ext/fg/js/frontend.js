@@ -17,11 +17,7 @@
 
 /* global
  * TextScanner
- * apiBroadcastTab
- * apiGetZoom
- * apiKanjiFind
- * apiOptionsGet
- * apiTermsFind
+ * api
  * docSentenceExtract
  */
 
@@ -69,7 +65,7 @@ class Frontend {
     async prepare() {
         try {
             await this.updateOptions();
-            const {zoomFactor} = await apiGetZoom();
+            const {zoomFactor} = await api.getZoom();
             this._pageZoomFactor = zoomFactor;
 
             window.addEventListener('resize', this._onResize.bind(this), false);
@@ -120,7 +116,7 @@ class Frontend {
 
     async updateOptions() {
         const optionsContext = await this.getOptionsContext();
-        this._options = await apiOptionsGet(optionsContext);
+        this._options = await api.optionsGet(optionsContext);
         this._textScanner.setOptions(this._options);
         this._updateTextScannerEnabled();
 
@@ -261,7 +257,7 @@ class Frontend {
         const searchText = this._textScanner.getTextSourceContent(textSource, this._options.scanning.length);
         if (searchText.length === 0) { return null; }
 
-        const {definitions, length} = await apiTermsFind(searchText, {}, optionsContext);
+        const {definitions, length} = await api.termsFind(searchText, {}, optionsContext);
         if (definitions.length === 0) { return null; }
 
         textSource.setEndOffset(length);
@@ -273,7 +269,7 @@ class Frontend {
         const searchText = this._textScanner.getTextSourceContent(textSource, 1);
         if (searchText.length === 0) { return null; }
 
-        const definitions = await apiKanjiFind(searchText, optionsContext);
+        const definitions = await api.kanjiFind(searchText, optionsContext);
         if (definitions.length === 0) { return null; }
 
         textSource.setEndOffset(1);
@@ -351,12 +347,12 @@ class Frontend {
 
     _broadcastRootPopupInformation() {
         if (!this._popup.isProxy() && this._popup.depth === 0 && this._popup.frameId === 0) {
-            apiBroadcastTab('rootPopupInformation', {popupId: this._popup.id, frameId: this._popup.frameId});
+            api.broadcastTab('rootPopupInformation', {popupId: this._popup.id, frameId: this._popup.frameId});
         }
     }
 
     _broadcastDocumentInformation(uniqueId) {
-        apiBroadcastTab('documentInformationBroadcast', {
+        api.broadcastTab('documentInformationBroadcast', {
             uniqueId,
             frameId: this._popup.frameId,
             title: document.title

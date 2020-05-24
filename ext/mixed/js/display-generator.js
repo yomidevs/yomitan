@@ -17,7 +17,7 @@
 
 /* global
  * TemplateHandler
- * apiGetDisplayTemplatesHtml
+ * api
  * jp
  */
 
@@ -29,7 +29,7 @@ class DisplayGenerator {
     }
 
     async prepare() {
-        const html = await apiGetDisplayTemplatesHtml();
+        const html = await api.getDisplayTemplatesHtml();
         this._templateHandler = new TemplateHandler(html);
     }
 

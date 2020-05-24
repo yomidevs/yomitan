@@ -16,11 +16,7 @@
  */
 
 /* global
- * apiCommandExec
- * apiForwardLogsToBackend
- * apiGetEnvironmentInfo
- * apiLogIndicatorClear
- * apiOptionsGet
+ * api
  */
 
 function showExtensionInfo() {
@@ -36,12 +32,12 @@ function setupButtonEvents(selector, command, url) {
     for (const node of nodes) {
         node.addEventListener('click', (e) => {
             if (e.button !== 0) { return; }
-            apiCommandExec(command, {mode: e.ctrlKey ? 'newTab' : 'existingOrNewTab'});
+            api.commandExec(command, {mode: e.ctrlKey ? 'newTab' : 'existingOrNewTab'});
             e.preventDefault();
         }, false);
         node.addEventListener('auxclick', (e) => {
             if (e.button !== 1) { return; }
-            apiCommandExec(command, {mode: 'newTab'});
+            api.commandExec(command, {mode: 'newTab'});
             e.preventDefault();
         }, false);
 
@@ -54,14 +50,14 @@ function setupButtonEvents(selector, command, url) {
 }
 
 async function mainInner() {
-    apiForwardLogsToBackend();
+    api.forwardLogsToBackend();
     await yomichan.prepare();
 
-    await apiLogIndicatorClear();
+    await api.logIndicatorClear();
 
     showExtensionInfo();
 
-    apiGetEnvironmentInfo().then(({browser}) => {
+    api.getEnvironmentInfo().then(({browser}) => {
         // Firefox mobile opens this page as a full webpage.
         document.documentElement.dataset.mode = (browser === 'firefox-mobile' ? 'full' : 'mini');
     });
@@ -76,14 +72,14 @@ async function mainInner() {
         depth: 0,
         url: window.location.href
     };
-    apiOptionsGet(optionsContext).then((options) => {
+    api.optionsGet(optionsContext).then((options) => {
         const toggle = document.querySelector('#enable-search');
         toggle.checked = options.general.enable;
-        toggle.addEventListener('change', () => apiCommandExec('toggle'), false);
+        toggle.addEventListener('change', () => api.commandExec('toggle'), false);
 
         const toggle2 = document.querySelector('#enable-search2');
         toggle2.checked = options.general.enable;
-        toggle2.addEventListener('change', () => apiCommandExec('toggle'), false);
+        toggle2.addEventListener('change', () => api.commandExec('toggle'), false);
 
         setTimeout(() => {
             for (const n of document.querySelectorAll('.toggle-group')) {

@@ -17,8 +17,7 @@
 
 /* global
  * DisplayFloat
- * apiForwardLogsToBackend
- * apiOptionsGet
+ * api
  * dynamicLoader
  */
 
@@ -38,7 +37,7 @@ async function popupNestedInitialize(id, depth, parentFrameId, url) {
 
     const applyOptions = async () => {
         const optionsContext = {depth, url};
-        const options = await apiOptionsGet(optionsContext);
+        const options = await api.optionsGet(optionsContext);
         const maxPopupDepthExceeded = !(typeof depth === 'number' && depth < options.scanning.popupNestingMaxDepth);
         if (maxPopupDepthExceeded || optionsApplied) { return; }
 
@@ -55,7 +54,7 @@ async function popupNestedInitialize(id, depth, parentFrameId, url) {
 }
 
 (async () => {
-    apiForwardLogsToBackend();
+    api.forwardLogsToBackend();
     const display = new DisplayFloat();
     await display.prepare();
 })();

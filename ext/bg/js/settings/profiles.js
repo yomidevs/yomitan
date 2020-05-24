@@ -17,7 +17,7 @@
 
 /* global
  * ConditionsUI
- * apiOptionsGetFull
+ * api
  * conditionsClearCaches
  * formWrite
  * getOptionsFullMutable
@@ -215,7 +215,7 @@ async function onProfileRemove(e) {
         return await onProfileRemoveConfirm();
     }
 
-    const optionsFull = await apiOptionsGetFull();
+    const optionsFull = await api.optionsGetFull();
     if (optionsFull.profiles.length <= 1) {
         return;
     }
@@ -278,7 +278,7 @@ async function onProfileMove(offset) {
 }
 
 async function onProfileCopy() {
-    const optionsFull = await apiOptionsGetFull();
+    const optionsFull = await api.optionsGetFull();
     if (optionsFull.profiles.length <= 1) {
         return;
     }

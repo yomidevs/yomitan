@@ -17,8 +17,7 @@
 
 /* global
  * DisplaySearch
- * apiForwardLogsToBackend
- * apiOptionsGet
+ * api
  * dynamicLoader
  */
 
@@ -35,7 +34,7 @@ async function injectSearchFrontend() {
 }
 
 (async () => {
-    apiForwardLogsToBackend();
+    api.forwardLogsToBackend();
     await yomichan.prepare();
 
     const displaySearch = new DisplaySearch();
@@ -45,7 +44,7 @@ async function injectSearchFrontend() {
 
     const applyOptions = async () => {
         const optionsContext = {depth: 0, url: window.location.href};
-        const options = await apiOptionsGet(optionsContext);
+        const options = await api.optionsGet(optionsContext);
         if (!options.scanning.enableOnSearchPage || optionsApplied) { return; }
 
         optionsApplied = true;

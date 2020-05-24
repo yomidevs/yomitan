@@ -21,9 +21,7 @@
  * ankiInitialize
  * ankiTemplatesInitialize
  * ankiTemplatesUpdateValue
- * apiForwardLogsToBackend
- * apiGetEnvironmentInfo
- * apiOptionsSave
+ * api
  * appearanceInitialize
  * audioSettingsInitialize
  * backupInitialize
@@ -265,7 +263,7 @@ function settingsGetSource() {
 
 async function settingsSaveOptions() {
     const source = await settingsGetSource();
-    await apiOptionsSave(source);
+    await api.optionsSave(source);
 }
 
 async function onOptionsUpdated({source}) {
@@ -290,7 +288,7 @@ async function settingsPopulateModifierKeys() {
     const scanModifierKeySelect = document.querySelector('#scan-modifier-key');
     scanModifierKeySelect.textContent = '';
 
-    const environment = await apiGetEnvironmentInfo();
+    const environment = await api.getEnvironmentInfo();
     const modifierKeys = [
         {value: 'none', name: 'None'},
         ...environment.modifiers.keys
@@ -305,7 +303,7 @@ async function settingsPopulateModifierKeys() {
 
 
 async function onReady() {
-    apiForwardLogsToBackend();
+    api.forwardLogsToBackend();
     await yomichan.prepare();
 
     showExtensionInformation();

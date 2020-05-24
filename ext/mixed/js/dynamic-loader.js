@@ -16,7 +16,7 @@
  */
 
 /* global
- * apiInjectStylesheet
+ * api
  */
 
 const dynamicLoader = (() => {
@@ -45,7 +45,7 @@ const dynamicLoader = (() => {
             }
 
             injectedStylesheets.set(id, null);
-            await apiInjectStylesheet(type, value);
+            await api.injectStylesheet(type, value);
             return null;
         }
 
