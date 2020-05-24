@@ -164,7 +164,10 @@ function getSetDifference(set1, set2) {
 
 function promiseTimeout(delay, resolveValue) {
     if (delay <= 0) {
-        return Promise.resolve(resolveValue);
+        const promise = Promise.resolve(resolveValue);
+        promise.resolve = () => {}; // NOP
+        promise.reject = () => {}; // NOP
+        return promise;
     }
 
     let timer = null;
