@@ -16,13 +16,13 @@
  */
 
 /* global
+ * SettingsBackup
  * ankiInitialize
  * ankiTemplatesInitialize
  * ankiTemplatesUpdateValue
  * api
  * appearanceInitialize
  * audioSettingsInitialize
- * backupInitialize
  * dictSettingsInitialize
  * getOptionsContext
  * onAnkiOptionsChanged
@@ -302,7 +302,7 @@ async function onReady() {
     await dictSettingsInitialize();
     ankiInitialize();
     ankiTemplatesInitialize();
-    backupInitialize();
+    new SettingsBackup().prepare();
 
     storageInfoInitialize();
 
