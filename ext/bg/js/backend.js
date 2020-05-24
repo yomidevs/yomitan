@@ -65,12 +65,14 @@ class Backend {
             renderTemplate: this._renderTemplate.bind(this)
         });
 
-        this.optionsContext = {
-            depth: 0,
-            url: window.location.href
-        };
+        const url = (typeof window === 'object' && window !== null ? window.location.href : '');
+        this.optionsContext = {depth: 0, url};
 
-        this.clipboardPasteTarget = document.querySelector('#clipboard-paste-target');
+        this.clipboardPasteTarget = (
+            typeof document === 'object' && document !== null ?
+            document.querySelector('#clipboard-paste-target') :
+            null
+        );
 
         this.popupWindow = null;
 
@@ -704,6 +706,9 @@ class Backend {
             return await navigator.clipboard.readText();
         } else {
             const clipboardPasteTarget = this.clipboardPasteTarget;
+            if (clipboardPasteTarget === null) {
+                throw new Error('Reading the clipboard is not supported in this context');
+            }
             clipboardPasteTarget.value = '';
             clipboardPasteTarget.focus();
             document.execCommand('paste');
@@ -1005,13 +1010,8 @@ class Backend {
     }
 
     async _onCommandToggle() {
-        const optionsContext = {
-            depth: 0,
-            url: window.location.href
-        };
         const source = 'popup';
-
-        const options = this.getOptions(optionsContext);
+        const options = this.getOptions(this.optionsContext);
         options.general.enable = !options.general.enable;
         await this._onApiOptionsSave({source});
     }

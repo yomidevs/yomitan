@@ -20,6 +20,9 @@
  */
 
 (async () => {
-    window.yomichanBackend = new Backend();
-    await window.yomichanBackend.prepare();
+    const backend = new Backend();
+    if (typeof window === 'object' && window !== null) {
+        window.yomichanBackend = backend;
+    }
+    await backend.prepare();
 })();

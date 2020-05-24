@@ -596,7 +596,7 @@ class Database {
 
     static _open(name, version, onUpgradeNeeded) {
         return new Promise((resolve, reject) => {
-            const request = window.indexedDB.open(name, version * 10);
+            const request = indexedDB.open(name, version * 10);
 
             request.onupgradeneeded = (event) => {
                 try {

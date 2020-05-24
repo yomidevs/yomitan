@@ -155,7 +155,7 @@ class AnkiNoteBuilder {
     }
 
     static arrayBufferToBase64(arrayBuffer) {
-        return window.btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+        return btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
     }
 
     static stringReplaceAsync(str, regex, replacer) {

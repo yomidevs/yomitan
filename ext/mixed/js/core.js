@@ -177,7 +177,7 @@ function promiseTimeout(delay, resolveValue) {
     const complete = (callback, value) => {
         if (callback === null) { return; }
         if (timer !== null) {
-            window.clearTimeout(timer);
+            clearTimeout(timer);
             timer = null;
         }
         promiseResolve = null;
@@ -192,7 +192,7 @@ function promiseTimeout(delay, resolveValue) {
         promiseResolve = resolve2;
         promiseReject = reject2;
     });
-    timer = window.setTimeout(() => {
+    timer = setTimeout(() => {
         timer = null;
         resolve(resolveValue);
     }, delay);
@@ -331,7 +331,7 @@ const yomichan = (() => {
 
         generateId(length) {
             const array = new Uint8Array(length);
-            window.crypto.getRandomValues(array);
+            crypto.getRandomValues(array);
             let id = '';
             for (const value of array) {
                 id += value.toString(16).padStart(2, '0');
@@ -364,7 +364,7 @@ const yomichan = (() => {
                 const runtimeMessageCallback = ({action, params}, sender, sendResponse) => {
                     let timeoutId = null;
                     if (timeout !== null) {
-                        timeoutId = window.setTimeout(() => {
+                        timeoutId = setTimeout(() => {
                             timeoutId = null;
                             eventHandler.removeListener(runtimeMessageCallback);
                             reject(new Error(`Listener timed out in ${timeout} ms`));
@@ -373,7 +373,7 @@ const yomichan = (() => {
 
                     const cleanupResolve = (value) => {
                         if (timeoutId !== null) {
-                            window.clearTimeout(timeoutId);
+                            clearTimeout(timeoutId);
                             timeoutId = null;
                         }
                         eventHandler.removeListener(runtimeMessageCallback);
@@ -453,10 +453,12 @@ const yomichan = (() => {
 
         // Private
 
+        _getUrl() {
+            return (typeof window === 'object' && window !== null ? window.location.href : '');
+        }
+
         _getLogContext() {
-            return {
-                url: window.location.href
-            };
+            return {url: this._getUrl()};
         }
 
         _onMessage({action, params}, sender, callback) {
@@ -469,7 +471,7 @@ const yomichan = (() => {
         }
 
         _onMessageGetUrl() {
-            return {url: window.location.href};
+            return {url: this._getUrl()};
         }
 
         _onMessageOptionsUpdated({source}) {
