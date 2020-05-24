@@ -16,8 +16,6 @@
  */
 
 /* global
- * ankiErrorShown
- * ankiFieldsToDict
  * ankiInitialize
  * ankiTemplatesInitialize
  * ankiTemplatesUpdateValue
@@ -33,7 +31,6 @@
  * storageInfoInitialize
  * utilBackend
  * utilBackgroundIsolate
- * utilIsolate
  */
 
 function getOptionsMutable(optionsContext) {
@@ -48,22 +45,6 @@ function getOptionsFullMutable() {
 
 async function formRead(options) {
     options.general.enable = $('#enable').prop('checked');
-    const enableClipboardPopups = $('#enable-clipboard-popups').prop('checked');
-    if (enableClipboardPopups) {
-        options.general.enableClipboardPopups = await new Promise((resolve, _reject) => {
-            chrome.permissions.request(
-                {permissions: ['clipboardRead']},
-                (granted) => {
-                    if (!granted) {
-                        $('#enable-clipboard-popups').prop('checked', false);
-                    }
-                    resolve(granted);
-                }
-            );
-        });
-    } else {
-        options.general.enableClipboardPopups = false;
-    }
     options.general.showGuide = $('#show-usage-guide').prop('checked');
     options.general.compactTags = $('#compact-tags').prop('checked');
     options.general.compactGlossaries = $('#compact-glossaries').prop('checked');
@@ -125,7 +106,6 @@ async function formRead(options) {
     options.parsing.termSpacing = $('#parsing-term-spacing').prop('checked');
     options.parsing.readingMode = $('#parsing-reading-mode').val();
 
-    const optionsAnkiEnableOld = options.anki.enable;
     options.anki.enable = $('#anki-enable').prop('checked');
     options.anki.tags = utilBackgroundIsolate($('#card-tags').val().split(/[,; ]+/));
     options.anki.sentenceExt = parseInt($('#sentence-detection-extent').val(), 10);
@@ -133,20 +113,10 @@ async function formRead(options) {
     options.anki.duplicateScope = $('#duplicate-scope').val();
     options.anki.screenshot.format = $('#screenshot-format').val();
     options.anki.screenshot.quality = parseInt($('#screenshot-quality').val(), 10);
-
-    if (optionsAnkiEnableOld && !ankiErrorShown()) {
-        options.anki.terms.deck = $('#anki-terms-deck').val();
-        options.anki.terms.model = $('#anki-terms-model').val();
-        options.anki.terms.fields = utilBackgroundIsolate(ankiFieldsToDict(document.querySelectorAll('#terms .anki-field-value')));
-        options.anki.kanji.deck = $('#anki-kanji-deck').val();
-        options.anki.kanji.model = $('#anki-kanji-model').val();
-        options.anki.kanji.fields = utilBackgroundIsolate(ankiFieldsToDict(document.querySelectorAll('#kanji .anki-field-value')));
-    }
 }
 
 async function formWrite(options) {
     $('#enable').prop('checked', options.general.enable);
-    $('#enable-clipboard-popups').prop('checked', options.general.enableClipboardPopups);
     $('#show-usage-guide').prop('checked', options.general.showGuide);
     $('#compact-tags').prop('checked', options.general.compactTags);
     $('#compact-glossaries').prop('checked', options.general.compactGlossaries);
@@ -216,14 +186,11 @@ async function formWrite(options) {
     $('#screenshot-format').val(options.anki.screenshot.format);
     $('#screenshot-quality').val(options.anki.screenshot.quality);
 
-    await ankiTemplatesUpdateValue();
-    await onAnkiOptionsChanged(options);
-    await onDictionaryOptionsChanged();
-
     formUpdateVisibility(options);
 }
 
 function formSetupEventListeners() {
+    document.querySelector('#enable-clipboard-popups').addEventListener('change', onEnableClipboardPopupsChanged, false);
     $('input, select, textarea').not('.anki-model').not('.ignore-form-changes *').change(onFormOptionsChanged);
 }
 
@@ -232,15 +199,6 @@ function formUpdateVisibility(options) {
     document.documentElement.dataset.optionsGeneralDebugInfo = `${!!options.general.debugInfo}`;
     document.documentElement.dataset.optionsGeneralShowAdvanced = `${!!options.general.showAdvanced}`;
     document.documentElement.dataset.optionsGeneralResultOutputMode = `${options.general.resultOutputMode}`;
-
-    if (options.general.debugInfo) {
-        const temp = utilIsolate(options);
-        if (typeof temp.anki.fieldTemplates === 'string') {
-            temp.anki.fieldTemplates = '...';
-        }
-        const text = JSON.stringify(temp, null, 4);
-        $('#debug').text(text);
-    }
 }
 
 async function onFormOptionsChanged() {
@@ -250,8 +208,30 @@ async function onFormOptionsChanged() {
     await formRead(options);
     await settingsSaveOptions();
     formUpdateVisibility(options);
+}
 
-    await onAnkiOptionsChanged(options);
+async function onEnableClipboardPopupsChanged(e) {
+    const optionsContext = getOptionsContext();
+    const options = await getOptionsMutable(optionsContext);
+
+    const enableClipboardPopups = e.target.checked;
+    if (enableClipboardPopups) {
+        options.general.enableClipboardPopups = await new Promise((resolve) => {
+            chrome.permissions.request(
+                {permissions: ['clipboardRead']},
+                (granted) => {
+                    if (!granted) {
+                        $('#enable-clipboard-popups').prop('checked', false);
+                    }
+                    resolve(granted);
+                }
+            );
+        });
+    } else {
+        options.general.enableClipboardPopups = false;
+    }
+
+    await settingsSaveOptions();
 }
 
 
@@ -272,6 +252,12 @@ async function onOptionsUpdated({source}) {
 
     const optionsContext = getOptionsContext();
     const options = await getOptionsMutable(optionsContext);
+
+    document.querySelector('#enable-clipboard-popups').checked = options.general.enableClipboardPopups;
+    ankiTemplatesUpdateValue();
+    onDictionaryOptionsChanged();
+    onAnkiOptionsChanged();
+
     await formWrite(options);
 }
 

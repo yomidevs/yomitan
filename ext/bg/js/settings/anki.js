@@ -19,15 +19,11 @@
  * api
  * getOptionsContext
  * getOptionsMutable
- * onFormOptionsChanged
  * settingsSaveOptions
  * utilBackgroundIsolate
  */
 
 // Private
-
-let _ankiDataPopulated = false;
-
 
 function _ankiSpinnerShow(show) {
     const spinner = $('#anki-spinner');
@@ -158,7 +154,7 @@ async function _ankiFieldsPopulate(tabId, options) {
     container.appendChild(fragment);
 
     for (const node of container.querySelectorAll('.anki-field-value')) {
-        node.addEventListener('change', onFormOptionsChanged, false);
+        node.addEventListener('change', _onAnkiFieldsChanged, false);
     }
     for (const node of container.querySelectorAll('.marker-link')) {
         node.addEventListener('click', _onAnkiMarkerClicked, false);
@@ -202,6 +198,23 @@ async function _onAnkiModelChanged(e) {
 
     await _ankiFieldsPopulate(tabId, options);
 }
+
+async function _onAnkiFieldsChanged() {
+    const optionsContext = getOptionsContext();
+    const options = await getOptionsMutable(optionsContext);
+
+    options.anki.terms.deck = $('#anki-terms-deck').val();
+    options.anki.terms.model = $('#anki-terms-model').val();
+    options.anki.terms.fields = utilBackgroundIsolate(ankiFieldsToDict(document.querySelectorAll('#terms .anki-field-value')));
+    options.anki.kanji.deck = $('#anki-kanji-deck').val();
+    options.anki.kanji.model = $('#anki-kanji-model').val();
+    options.anki.kanji.fields = utilBackgroundIsolate(ankiFieldsToDict(document.querySelectorAll('#kanji .anki-field-value')));
+
+    await settingsSaveOptions();
+
+    await onAnkiOptionsChanged(options);
+}
+
 
 
 // Public
@@ -272,20 +285,25 @@ function ankiGetFieldMarkers(type) {
 
 
 function ankiInitialize() {
+    $('#anki-fields-container input,#anki-fields-container select,#anki-fields-container textarea').change(_onAnkiFieldsChanged);
+
     for (const node of document.querySelectorAll('#anki-terms-model,#anki-kanji-model')) {
         node.addEventListener('change', _onAnkiModelChanged, false);
     }
+
+    onAnkiOptionsChanged();
 }
 
-async function onAnkiOptionsChanged(options) {
+async function onAnkiOptionsChanged(options=null) {
+    if (options === null) {
+        const optionsContext = getOptionsContext();
+        options = await getOptionsMutable(optionsContext);
+    }
+
     if (!options.anki.enable) {
-        _ankiDataPopulated = false;
         return;
     }
 
-    if (_ankiDataPopulated) { return; }
-
     await _ankiDeckAndModelPopulate(options);
-    _ankiDataPopulated = true;
     await Promise.all([_ankiFieldsPopulate('terms', options), _ankiFieldsPopulate('kanji', options)]);
 }

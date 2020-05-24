@@ -19,9 +19,8 @@
  * ConditionsUI
  * api
  * conditionsClearCaches
- * formWrite
  * getOptionsFullMutable
- * getOptionsMutable
+ * onOptionsUpdated
  * profileConditionsDescriptor
  * profileConditionsDescriptorPromise
  * settingsSaveOptions
@@ -131,10 +130,7 @@ function profileOptionsPopulateSelect(select, profiles, currentValue, ignoreIndi
 
 async function profileOptionsUpdateTarget(optionsFull) {
     await profileFormWrite(optionsFull);
-
-    const optionsContext = getOptionsContext();
-    const options = await getOptionsMutable(optionsContext);
-    await formWrite(options);
+    await onOptionsUpdated({source: null});
 }
 
 function profileOptionsCreateCopyName(name, profiles, maxUniqueAttempts) {
