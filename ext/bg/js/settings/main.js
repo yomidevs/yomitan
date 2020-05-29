@@ -16,6 +16,7 @@
  */
 
 /* global
+ * ProfileController
  * SettingsBackup
  * SettingsController
  * ankiInitialize
@@ -25,14 +26,27 @@
  * appearanceInitialize
  * audioSettingsInitialize
  * dictSettingsInitialize
- * getOptionsContext
  * onAnkiOptionsChanged
  * onDictionaryOptionsChanged
- * profileOptionsSetup
  * storageInfoInitialize
  * utilBackend
  * utilBackgroundIsolate
  */
+
+let profileIndex = 0;
+
+function getOptionsContext() {
+    return {index: getProfileIndex()};
+}
+
+function getProfileIndex() {
+    return profileIndex;
+}
+
+function setProfileIndex(value) {
+    profileIndex = value;
+}
+
 
 function getOptionsMutable(optionsContext) {
     return utilBackend().getOptions(
@@ -302,7 +316,7 @@ async function onReady() {
     formSetupEventListeners();
     appearanceInitialize();
     await audioSettingsInitialize();
-    await profileOptionsSetup();
+    await (new ProfileController()).prepare();
     await dictSettingsInitialize();
     ankiInitialize();
     ankiTemplatesInitialize();
