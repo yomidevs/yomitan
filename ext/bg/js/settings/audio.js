@@ -16,110 +16,207 @@
  */
 
 /* global
- * AudioSourceUI
  * AudioSystem
  * getOptionsContext
  * getOptionsMutable
  * settingsSaveOptions
  */
 
-let audioSourceUI = null;
-let audioSystem = null;
+class AudioController {
+    constructor() {
+        this._audioSystem = null;
+        this._settingsAudioSources = null;
+        this._audioSourceContainer = null;
+        this._audioSourceAddButton = null;
+        this._audioSourceEntries = [];
+    }
 
-async function audioSettingsInitialize() {
-    audioSystem = new AudioSystem({
-        audioUriBuilder: null,
-        useCache: true
-    });
+    async prepare() {
+        this._audioSystem = new AudioSystem({
+            audioUriBuilder: null,
+            useCache: true
+        });
 
-    const optionsContext = getOptionsContext();
-    const options = await getOptionsMutable(optionsContext);
-    audioSourceUI = new AudioSourceUI.Container(
-        options.audio.sources,
-        document.querySelector('.audio-source-list'),
-        document.querySelector('.audio-source-add')
-    );
-    audioSourceUI.save = settingsSaveOptions;
+        const optionsContext = getOptionsContext();
+        const options = await getOptionsMutable(optionsContext);
 
-    textToSpeechInitialize();
-}
+        this._settingsAudioSources = options.audio.sources;
+        this._audioSourceContainer = document.querySelector('.audio-source-list');
+        this._audioSourceAddButton = document.querySelector('.audio-source-add');
+        this._audioSourceContainer.textContent = '';
 
-function textToSpeechInitialize() {
-    if (typeof speechSynthesis === 'undefined') { return; }
+        this._audioSourceAddButton.addEventListener('click', this._onAddAudioSource.bind(this), false);
 
-    speechSynthesis.addEventListener('voiceschanged', updateTextToSpeechVoices, false);
-    updateTextToSpeechVoices();
+        for (const audioSource of toIterable(this._settingsAudioSources)) {
+            this._createAudioSourceEntry(audioSource);
+        }
 
-    document.querySelector('#text-to-speech-voice').addEventListener('change', onTextToSpeechVoiceChange, false);
-    document.querySelector('#text-to-speech-voice-test').addEventListener('click', textToSpeechTest, false);
-}
+        this._prepareTextToSpeech();
+    }
 
-function updateTextToSpeechVoices() {
-    const voices = Array.prototype.map.call(speechSynthesis.getVoices(), (voice, index) => ({voice, index}));
-    voices.sort(textToSpeechVoiceCompare);
+    // Private
 
-    document.querySelector('#text-to-speech-voice-container').hidden = (voices.length === 0);
+    async _save() {
+        await settingsSaveOptions();
+    }
 
-    const fragment = document.createDocumentFragment();
+    _prepareTextToSpeech() {
+        if (typeof speechSynthesis === 'undefined') { return; }
 
-    let option = document.createElement('option');
-    option.value = '';
-    option.textContent = 'None';
-    fragment.appendChild(option);
+        speechSynthesis.addEventListener('voiceschanged', this._updateTextToSpeechVoices.bind(this), false);
+        this._updateTextToSpeechVoices();
 
-    for (const {voice} of voices) {
-        option = document.createElement('option');
-        option.value = voice.voiceURI;
-        option.textContent = `${voice.name} (${voice.lang})`;
+        document.querySelector('#text-to-speech-voice').addEventListener('change', this._onTextToSpeechVoiceChange.bind(this), false);
+        document.querySelector('#text-to-speech-voice-test').addEventListener('click', this._testTextToSpeech.bind(this), false);
+    }
+
+    _updateTextToSpeechVoices() {
+        const voices = Array.prototype.map.call(speechSynthesis.getVoices(), (voice, index) => ({voice, index}));
+        voices.sort(this._textToSpeechVoiceCompare.bind(this));
+
+        document.querySelector('#text-to-speech-voice-container').hidden = (voices.length === 0);
+
+        const fragment = document.createDocumentFragment();
+
+        let option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'None';
         fragment.appendChild(option);
+
+        for (const {voice} of voices) {
+            option = document.createElement('option');
+            option.value = voice.voiceURI;
+            option.textContent = `${voice.name} (${voice.lang})`;
+            fragment.appendChild(option);
+        }
+
+        const select = document.querySelector('#text-to-speech-voice');
+        select.textContent = '';
+        select.appendChild(fragment);
+        select.value = select.dataset.value;
     }
 
-    const select = document.querySelector('#text-to-speech-voice');
-    select.textContent = '';
-    select.appendChild(fragment);
-    select.value = select.dataset.value;
-}
+    _textToSpeechVoiceCompare(a, b) {
+        const aIsJapanese = this._languageTagIsJapanese(a.voice.lang);
+        const bIsJapanese = this._languageTagIsJapanese(b.voice.lang);
+        if (aIsJapanese) {
+            if (!bIsJapanese) { return -1; }
+        } else {
+            if (bIsJapanese) { return 1; }
+        }
 
-function languageTagIsJapanese(languageTag) {
-    return (
-        languageTag.startsWith('ja-') ||
-        languageTag.startsWith('jpn-')
-    );
-}
+        const aIsDefault = a.voice.default;
+        const bIsDefault = b.voice.default;
+        if (aIsDefault) {
+            if (!bIsDefault) { return -1; }
+        } else {
+            if (bIsDefault) { return 1; }
+        }
 
-function textToSpeechVoiceCompare(a, b) {
-    const aIsJapanese = languageTagIsJapanese(a.voice.lang);
-    const bIsJapanese = languageTagIsJapanese(b.voice.lang);
-    if (aIsJapanese) {
-        if (!bIsJapanese) { return -1; }
-    } else {
-        if (bIsJapanese) { return 1; }
+        return a.index - b.index;
     }
 
-    const aIsDefault = a.voice.default;
-    const bIsDefault = b.voice.default;
-    if (aIsDefault) {
-        if (!bIsDefault) { return -1; }
-    } else {
-        if (bIsDefault) { return 1; }
+    _languageTagIsJapanese(languageTag) {
+        return (
+            languageTag.startsWith('ja-') ||
+            languageTag.startsWith('jpn-')
+        );
     }
 
-    return a.index - b.index;
-}
+    _testTextToSpeech() {
+        try {
+            const text = document.querySelector('#text-to-speech-voice-test').dataset.speechText || '';
+            const voiceUri = document.querySelector('#text-to-speech-voice').value;
 
-function textToSpeechTest() {
-    try {
-        const text = document.querySelector('#text-to-speech-voice-test').dataset.speechText || '';
-        const voiceUri = document.querySelector('#text-to-speech-voice').value;
-
-        const audio = audioSystem.createTextToSpeechAudio(text, voiceUri);
-        audio.volume = 1.0;
-        audio.play();
-    } catch (e) {
-        // NOP
+            const audio = this._audioSystem.createTextToSpeechAudio(text, voiceUri);
+            audio.volume = 1.0;
+            audio.play();
+        } catch (e) {
+            // NOP
+        }
     }
-}
 
-function onTextToSpeechVoiceChange(e) {
-    e.currentTarget.dataset.value = e.currentTarget.value;
+    _instantiateTemplate(templateSelector) {
+        const template = document.querySelector(templateSelector);
+        const content = document.importNode(template.content, true);
+        return content.firstChild;
+    }
+
+    _getUnusedAudioSource() {
+        const audioSourcesAvailable = [
+            'jpod101',
+            'jpod101-alternate',
+            'jisho',
+            'custom'
+        ];
+        for (const source of audioSourcesAvailable) {
+            if (this._settingsAudioSources.indexOf(source) < 0) {
+                return source;
+            }
+        }
+        return audioSourcesAvailable[0];
+    }
+
+    _createAudioSourceEntry(value) {
+        const eventListeners = new EventListenerCollection();
+        const container = this._instantiateTemplate('#audio-source-template');
+        const select = container.querySelector('.audio-source-select');
+        const removeButton = container.querySelector('.audio-source-remove');
+
+        select.value = value;
+
+        const entry = {
+            container,
+            eventListeners
+        };
+
+        eventListeners.addEventListener(select, 'change', this._onAudioSourceSelectChange.bind(this, entry), false);
+        eventListeners.addEventListener(removeButton, 'click', this._onAudioSourceRemoveClicked.bind(this, entry), false);
+
+        this._audioSourceContainer.appendChild(container);
+        this._audioSourceEntries.push(entry);
+    }
+
+    _removeAudioSourceEntry(entry) {
+        const index = this._audioSourceEntries.indexOf(entry);
+        if (index < 0) { return; }
+
+        const {container, eventListeners} = entry;
+        if (container.parentNode !== null) {
+            container.parentNode.removeChild(container);
+        }
+        eventListeners.removeAllEventListeners();
+
+        this._audioSourceEntries.splice(index, 1);
+        this._settingsAudioSources.splice(index, 1);
+
+        for (let i = index, ii = this._audioSourceEntries.length; i < ii; ++i) {
+            this._audioSourceEntries[i].index = i;
+        }
+    }
+
+    _onTextToSpeechVoiceChange(e) {
+        e.currentTarget.dataset.value = e.currentTarget.value;
+    }
+
+    _onAddAudioSource() {
+        const audioSource = this._getUnusedAudioSource();
+        this._settingsAudioSources.push(audioSource);
+        this._createAudioSourceEntry(audioSource);
+        this._save();
+    }
+
+    _onAudioSourceSelectChange(entry, event) {
+        const index = this._audioSourceEntries.indexOf(entry);
+        if (index < 0) { return; }
+
+        const value = event.currentTarget.value;
+        this._settingsAudioSources[index] = value;
+        this._save();
+    }
+
+    _onAudioSourceRemoveClicked(entry) {
+        this._removeAudioSourceEntry(entry);
+        this._save();
+    }
 }

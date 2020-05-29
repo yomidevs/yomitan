@@ -18,12 +18,12 @@
 /* global
  * AnkiController
  * AnkiTemplatesController
+ * AudioController
  * ProfileController
  * SettingsBackup
  * SettingsController
  * api
  * appearanceInitialize
- * audioSettingsInitialize
  * dictSettingsInitialize
  * onDictionaryOptionsChanged
  * storageInfoInitialize
@@ -319,7 +319,7 @@ async function onReady() {
     await settingsPopulateModifierKeys();
     formSetupEventListeners();
     appearanceInitialize();
-    await audioSettingsInitialize();
+    new AudioController().prepare();
     await (new ProfileController()).prepare();
     await dictSettingsInitialize();
     ankiController = new AnkiController();
