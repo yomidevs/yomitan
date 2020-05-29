@@ -108,8 +108,8 @@ class DOMDataBinder {
 
         if (addedNodes.length !== 0 || addedNodes.length !== 0) {
             const observer = this._elementMap.get(target);
-            if (typeof observer !== 'undefined') {
-                observer.updateValue();
+            if (typeof observer !== 'undefined' && observer.hasValue) {
+                this._setElementValue(observer.element, observer.value);
             }
         }
     }

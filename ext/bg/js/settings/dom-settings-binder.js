@@ -22,8 +22,9 @@
  */
 
 class DOMSettingsBinder {
-    constructor({getOptionsContext, transforms=null}) {
+    constructor({getOptionsContext, source=null, transforms=null}) {
         this._getOptionsContext = getOptionsContext;
+        this._source = source;
         this._defaultScope = 'profile';
         this._dataBinder = new DOMDataBinder({
             selector: '[data-setting]',
@@ -97,7 +98,7 @@ class DOMSettingsBinder {
             }
             settingsTargets.push(target);
         }
-        return this._transformResults(await api.modifySettings(settingsTargets), targets);
+        return this._transformResults(await api.modifySettings(settingsTargets, this._source), targets);
     }
 
     _transform(value, transform, metadata, element) {
