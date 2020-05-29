@@ -16,17 +16,15 @@
  */
 
 /* global
+ * AnkiController
+ * AnkiTemplatesController
  * ProfileController
  * SettingsBackup
  * SettingsController
- * ankiInitialize
- * ankiTemplatesInitialize
- * ankiTemplatesUpdateValue
  * api
  * appearanceInitialize
  * audioSettingsInitialize
  * dictSettingsInitialize
- * onAnkiOptionsChanged
  * onDictionaryOptionsChanged
  * storageInfoInitialize
  * utilBackend
@@ -269,9 +267,13 @@ async function onOptionsUpdated({source}) {
     const options = await getOptionsMutable(optionsContext);
 
     document.querySelector('#enable-clipboard-popups').checked = options.general.enableClipboardPopups;
-    ankiTemplatesUpdateValue();
+    if (ankiTemplatesController !== null) {
+        ankiTemplatesController.updateValue();
+    }
     onDictionaryOptionsChanged();
-    onAnkiOptionsChanged();
+    if (ankiController !== null) {
+        ankiController.optionsChanged();
+    }
 
     await formWrite(options);
 }
@@ -302,6 +304,8 @@ async function settingsPopulateModifierKeys() {
     }
 }
 
+let ankiController = null;
+let ankiTemplatesController = null;
 
 async function onReady() {
     api.forwardLogsToBackend();
@@ -318,8 +322,10 @@ async function onReady() {
     await audioSettingsInitialize();
     await (new ProfileController()).prepare();
     await dictSettingsInitialize();
-    ankiInitialize();
-    ankiTemplatesInitialize();
+    ankiController = new AnkiController();
+    ankiController.prepare();
+    ankiTemplatesController = new AnkiTemplatesController(ankiController);
+    ankiTemplatesController.prepare();
     new SettingsBackup().prepare();
 
     storageInfoInitialize();
