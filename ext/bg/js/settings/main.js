@@ -17,6 +17,7 @@
 
 /* global
  * SettingsBackup
+ * SettingsController
  * ankiInitialize
  * ankiTemplatesInitialize
  * ankiTemplatesUpdateValue
@@ -291,6 +292,9 @@ async function settingsPopulateModifierKeys() {
 async function onReady() {
     api.forwardLogsToBackend();
     await yomichan.prepare();
+
+    const settingsController = new SettingsController();
+    settingsController.prepare();
 
     showExtensionInformation();
 
