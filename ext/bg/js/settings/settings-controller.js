@@ -65,6 +65,11 @@ class SettingsController extends EventDispatcher {
         return utilBackend().getFullOptions();
     }
 
+    async setOptionsFull(optionsFull) {
+        utilBackend().setFullOptions(utilBackgroundIsolate(optionsFull));
+        await this.save();
+    }
+
     getOptionsContext() {
         return {index: this._profileIndex};
     }

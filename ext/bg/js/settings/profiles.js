@@ -17,34 +17,19 @@
 
 /* global
  * ConditionsUI
- * api
  * conditionsClearCaches
- * getOptionsFullMutable
- * getProfileIndex
- * onOptionsUpdated
  * profileConditionsDescriptor
  * profileConditionsDescriptorPromise
- * setProfileIndex
- * settingsSaveOptions
  * utilBackgroundIsolate
  */
 
 class ProfileController {
-    constructor() {
+    constructor(settingsController) {
+        this._settingsController = settingsController;
         this._conditionsContainer = null;
     }
 
     async prepare() {
-        const optionsFull = await getOptionsFullMutable();
-        setProfileIndex(optionsFull.profileCurrent);
-
-        this._setupEventListeners();
-        await this._updateTarget(optionsFull);
-    }
-
-    // Private
-
-    _setupEventListeners() {
         $('#profile-target').change(this._onTargetProfileChanged.bind(this));
         $('#profile-name').change(this._onNameChanged.bind(this));
         $('#profile-add').click(this._onAdd.bind(this));
@@ -55,6 +40,17 @@ class ProfileController {
         $('#profile-move-up').click(() => this._onMove(-1));
         $('#profile-move-down').click(() => this._onMove(1));
         $('.profile-form').find('input, select, textarea').not('.profile-form-manual').change(this._onInputChanged.bind(this));
+
+        this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
+
+        this._onOptionsChanged();
+    }
+
+    // Private
+
+    async _onOptionsChanged() {
+        const optionsFull = await this._settingsController.getOptionsFullMutable();
+        await this._formWrite(optionsFull);
     }
 
     _tryGetIntegerValue(selector, min, max) {
@@ -69,7 +65,7 @@ class ProfileController {
     }
 
     async _formRead(optionsFull) {
-        const currentProfileIndex = getProfileIndex();
+        const currentProfileIndex = this._settingsController.profileIndex;
         const profile = optionsFull.profiles[currentProfileIndex];
 
         // Current profile
@@ -83,7 +79,7 @@ class ProfileController {
     }
 
     async _formWrite(optionsFull) {
-        const currentProfileIndex = getProfileIndex();
+        const currentProfileIndex = this._settingsController.profileIndex;
         const profile = optionsFull.profiles[currentProfileIndex];
 
         this._populateSelect($('#profile-active'), optionsFull.profiles, optionsFull.profileCurrent, null);
@@ -108,7 +104,7 @@ class ProfileController {
             $('#profile-add-condition-group')
         );
         this._conditionsContainer.save = () => {
-            settingsSaveOptions();
+            this._settingsController.save();
             conditionsClearCaches(profileConditionsDescriptor);
         };
         this._conditionsContainer.isolate = utilBackgroundIsolate;
@@ -127,11 +123,6 @@ class ProfileController {
         }
 
         select.val(`${currentValue}`);
-    }
-
-    async _updateTarget(optionsFull) {
-        await this._formWrite(optionsFull);
-        await onOptionsUpdated({source: null});
     }
 
     _createCopyName(name, profiles, maxUniqueAttempts) {
@@ -174,39 +165,32 @@ class ProfileController {
             return;
         }
 
-        const optionsFull = await getOptionsFullMutable();
+        const optionsFull = await this._settingsController.getOptionsFullMutable();
         await this._formRead(optionsFull);
-        await settingsSaveOptions();
+        await this._settingsController.save();
     }
 
     async _onTargetProfileChanged() {
-        const optionsFull = await getOptionsFullMutable();
-        const currentProfileIndex = getProfileIndex();
+        const optionsFull = await this._settingsController.getOptionsFullMutable();
+        const currentProfileIndex = this._settingsController.profileIndex;
         const index = this._tryGetIntegerValue('#profile-target', 0, optionsFull.profiles.length);
         if (index === null || currentProfileIndex === index) {
             return;
         }
 
-        setProfileIndex(index);
-
-        await this._updateTarget(optionsFull);
-
-        yomichan.trigger('modifyingProfileChange');
+        this._settingsController.profileIndex = index;
     }
 
     async _onAdd() {
-        const optionsFull = await getOptionsFullMutable();
-        const currentProfileIndex = getProfileIndex();
+        const optionsFull = await this._settingsController.getOptionsFullMutable();
+        const currentProfileIndex = this._settingsController.profileIndex;
         const profile = utilBackgroundIsolate(optionsFull.profiles[currentProfileIndex]);
         profile.name = this._createCopyName(profile.name, optionsFull.profiles, 100);
         optionsFull.profiles.push(profile);
 
-        setProfileIndex(optionsFull.profiles.length - 1);
+        this._settingsController.profileIndex = optionsFull.profiles.length - 1;
 
-        await this._updateTarget(optionsFull);
-        await settingsSaveOptions();
-
-        yomichan.trigger('modifyingProfileChange');
+        await this._settingsController.save();
     }
 
     async _onRemove(e) {
@@ -214,12 +198,12 @@ class ProfileController {
             return await this._onRemoveConfirm();
         }
 
-        const optionsFull = await api.optionsGetFull();
+        const optionsFull = await this._settingsController.getOptionsFull();
         if (optionsFull.profiles.length <= 1) {
             return;
         }
 
-        const currentProfileIndex = getProfileIndex();
+        const currentProfileIndex = this._settingsController.profileIndex;
         const profile = optionsFull.profiles[currentProfileIndex];
 
         $('#profile-remove-modal-profile-name').text(profile.name);
@@ -229,36 +213,33 @@ class ProfileController {
     async _onRemoveConfirm() {
         $('#profile-remove-modal').modal('hide');
 
-        const optionsFull = await getOptionsFullMutable();
+        const optionsFull = await this._settingsController.getOptionsFullMutable();
         if (optionsFull.profiles.length <= 1) {
             return;
         }
 
-        const currentProfileIndex = getProfileIndex();
+        const currentProfileIndex = this._settingsController.profileIndex;
         optionsFull.profiles.splice(currentProfileIndex, 1);
 
         if (currentProfileIndex >= optionsFull.profiles.length) {
-            setProfileIndex(optionsFull.profiles.length - 1);
+            this._settingsController.profileIndex = optionsFull.profiles.length - 1;
         }
 
         if (optionsFull.profileCurrent >= optionsFull.profiles.length) {
             optionsFull.profileCurrent = optionsFull.profiles.length - 1;
         }
 
-        await this._updateTarget(optionsFull);
-        await settingsSaveOptions();
-
-        yomichan.trigger('modifyingProfileChange');
+        await this._settingsController.save();
     }
 
     _onNameChanged() {
-        const currentProfileIndex = getProfileIndex();
+        const currentProfileIndex = this._settingsController.profileIndex;
         $('#profile-active, #profile-target').find(`[value="${currentProfileIndex}"]`).text(this.value);
     }
 
     async _onMove(offset) {
-        const optionsFull = await getOptionsFullMutable();
-        const currentProfileIndex = getProfileIndex();
+        const optionsFull = await this._settingsController.getOptionsFullMutable();
+        const currentProfileIndex = this._settingsController.profileIndex;
         const index = currentProfileIndex + offset;
         if (index < 0 || index >= optionsFull.profiles.length) {
             return;
@@ -272,21 +253,18 @@ class ProfileController {
             optionsFull.profileCurrent = index;
         }
 
-        setProfileIndex(index);
+        this._settingsController.profileIndex = index;
 
-        await this._updateTarget(optionsFull);
-        await settingsSaveOptions();
-
-        yomichan.trigger('modifyingProfileChange');
+        await this._settingsController.save();
     }
 
     async _onCopy() {
-        const optionsFull = await api.optionsGetFull();
+        const optionsFull = await this._settingsController.getOptionsFullMutable();
         if (optionsFull.profiles.length <= 1) {
             return;
         }
 
-        const currentProfileIndex = getProfileIndex();
+        const currentProfileIndex = this._settingsController.profileIndex;
         this._populateSelect($('#profile-copy-source'), optionsFull.profiles, currentProfileIndex === 0 ? 1 : 0, [currentProfileIndex]);
         $('#profile-copy-modal').modal('show');
     }
@@ -294,9 +272,9 @@ class ProfileController {
     async _onCopyConfirm() {
         $('#profile-copy-modal').modal('hide');
 
-        const optionsFull = await getOptionsFullMutable();
+        const optionsFull = await this._settingsController.getOptionsFullMutable();
         const index = this._tryGetIntegerValue('#profile-copy-source', 0, optionsFull.profiles.length);
-        const currentProfileIndex = getProfileIndex();
+        const currentProfileIndex = this._settingsController.profileIndex;
         if (index === null || index === currentProfileIndex) {
             return;
         }
@@ -304,7 +282,6 @@ class ProfileController {
         const profileOptions = utilBackgroundIsolate(optionsFull.profiles[index].options);
         optionsFull.profiles[currentProfileIndex].options = profileOptions;
 
-        await this._updateTarget(optionsFull);
-        await settingsSaveOptions();
+        await this._settingsController.save();
     }
 }

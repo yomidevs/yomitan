@@ -28,70 +28,7 @@
  * SettingsController
  * StorageController
  * api
- * utilBackend
- * utilBackgroundIsolate
  */
-
-let profileIndex = 0;
-
-function getOptionsContext() {
-    return {index: getProfileIndex()};
-}
-
-function getProfileIndex() {
-    return profileIndex;
-}
-
-function setProfileIndex(value) {
-    profileIndex = value;
-}
-
-
-function getOptionsMutable(optionsContext) {
-    return utilBackend().getOptions(
-        utilBackgroundIsolate(optionsContext)
-    );
-}
-
-function getOptionsFullMutable() {
-    return utilBackend().getFullOptions();
-}
-
-
-function settingsGetSource() {
-    return new Promise((resolve) => {
-        chrome.tabs.getCurrent((tab) => resolve(`settings${tab ? tab.id : ''}`));
-    });
-}
-
-async function settingsSaveOptions() {
-    const source = await settingsGetSource();
-    await api.optionsSave(source);
-}
-
-async function onOptionsUpdated({source}) {
-    const thisSource = await settingsGetSource();
-    if (source === thisSource) { return; }
-
-    const optionsContext = getOptionsContext();
-    const options = await getOptionsMutable(optionsContext);
-
-    document.querySelector('#enable-clipboard-popups').checked = options.general.enableClipboardPopups;
-    if (ankiTemplatesController !== null) {
-        ankiTemplatesController.updateValue();
-    }
-    if (dictionaryController !== null) {
-        dictionaryController.optionsChanged();
-    }
-    if (ankiController !== null) {
-        ankiController.optionsChanged();
-    }
-
-    if (genericSettingController !== null) {
-        genericSettingController.optionsChanged(options);
-    }
-}
-
 
 function showExtensionInformation() {
     const node = document.getElementById('extension-info');
@@ -124,40 +61,34 @@ async function setupEnvironmentInfo() {
     document.documentElement.dataset.operatingSystem = platform.os;
 }
 
-let ankiController = null;
-let ankiTemplatesController = null;
-let dictionaryController = null;
-let genericSettingController = null;
 
 async function onReady() {
     api.forwardLogsToBackend();
     await yomichan.prepare();
 
-    const settingsController = new SettingsController();
-    settingsController.prepare();
-
     setupEnvironmentInfo();
     showExtensionInformation();
+    settingsPopulateModifierKeys();
+
+    const optionsFull = await api.optionsGetFull();
+    const settingsController = new SettingsController(optionsFull.profileCurrent);
+    settingsController.prepare();
 
     const storageController = new StorageController();
     storageController.prepare();
 
-    await settingsPopulateModifierKeys();
-    genericSettingController = new GenericSettingController();
+    const genericSettingController = new GenericSettingController(settingsController);
     genericSettingController.prepare();
-    new ClipboardPopupsController().prepare();
-    new PopupPreviewController().prepare();
-    new AudioController().prepare();
-    await (new ProfileController()).prepare();
-    dictionaryController = new DictionaryController(storageController);
+    new ClipboardPopupsController(settingsController).prepare();
+    new PopupPreviewController(settingsController).prepare();
+    new AudioController(settingsController).prepare();
+    new ProfileController(settingsController).prepare();
+    const dictionaryController = new DictionaryController(settingsController, storageController);
     dictionaryController.prepare();
-    ankiController = new AnkiController();
+    const ankiController = new AnkiController(settingsController);
     ankiController.prepare();
-    ankiTemplatesController = new AnkiTemplatesController(ankiController);
-    ankiTemplatesController.prepare();
-    new SettingsBackup().prepare();
-
-    yomichan.on('optionsUpdated', onOptionsUpdated);
+    new AnkiTemplatesController(settingsController, ankiController).prepare();
+    new SettingsBackup(settingsController).prepare();
 }
 
 $(document).ready(() => onReady());

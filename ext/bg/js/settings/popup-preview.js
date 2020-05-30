@@ -16,12 +16,12 @@
  */
 
 /* global
- * getOptionsContext
  * wanakana
  */
 
 class PopupPreviewController {
-    constructor() {
+    constructor(settingsController) {
+        this._settingsController = settingsController;
         this._previewVisible = false;
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
         this._frame = null;
@@ -58,7 +58,7 @@ class PopupPreviewController {
         text.addEventListener('input', this._onTextChange.bind(this), false);
         customCss.addEventListener('input', this._onCustomCssChange.bind(this), false);
         customOuterCss.addEventListener('input', this._onCustomOuterCssChange.bind(this), false);
-        yomichan.on('modifyingProfileChange', this._onOptionsContextChange.bind(this));
+        this._settingsController.on('optionsContextChanged', this._onOptionsContextChange.bind(this));
 
         frame.src = '/bg/settings-popup-preview.html';
         frame.id = 'settings-popup-preview-frame';
@@ -88,7 +88,8 @@ class PopupPreviewController {
     }
 
     _onOptionsContextChange() {
-        this._invoke('updateOptionsContext', {optionsContext: getOptionsContext()});
+        const optionsContext = this._settingsController.getOptionsContext();
+        this._invoke('updateOptionsContext', {optionsContext});
     }
 
     _setText(text) {

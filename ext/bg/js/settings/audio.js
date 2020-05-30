@@ -17,13 +17,11 @@
 
 /* global
  * AudioSystem
- * getOptionsContext
- * getOptionsMutable
- * settingsSaveOptions
  */
 
 class AudioController {
-    constructor() {
+    constructor(settingsController) {
+        this._settingsController = settingsController;
         this._audioSystem = null;
         this._settingsAudioSources = null;
         this._audioSourceContainer = null;
@@ -37,27 +35,36 @@ class AudioController {
             useCache: true
         });
 
-        const optionsContext = getOptionsContext();
-        const options = await getOptionsMutable(optionsContext);
-
-        this._settingsAudioSources = options.audio.sources;
         this._audioSourceContainer = document.querySelector('.audio-source-list');
         this._audioSourceAddButton = document.querySelector('.audio-source-add');
         this._audioSourceContainer.textContent = '';
 
         this._audioSourceAddButton.addEventListener('click', this._onAddAudioSource.bind(this), false);
 
-        for (const audioSource of toIterable(this._settingsAudioSources)) {
-            this._createAudioSourceEntry(audioSource);
-        }
-
         this._prepareTextToSpeech();
+
+        this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
+
+        this._onOptionsChanged();
     }
 
     // Private
 
+    async _onOptionsChanged() {
+        const options = await this._settingsController.getOptionsMutable();
+
+        for (const entry of [...this._audioSourceEntries]) {
+            this._removeAudioSourceEntry(entry);
+        }
+
+        this._settingsAudioSources = options.audio.sources;
+        for (const audioSource of toIterable(this._settingsAudioSources)) {
+            this._createAudioSourceEntry(audioSource);
+        }
+    }
+
     async _save() {
-        await settingsSaveOptions();
+        await this._settingsController.save();
     }
 
     _prepareTextToSpeech() {

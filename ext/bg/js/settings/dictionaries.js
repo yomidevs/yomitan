@@ -18,15 +18,12 @@
 /* global
  * PageExitPrevention
  * api
- * getOptionsContext
- * getOptionsFullMutable
- * getOptionsMutable
- * settingsSaveOptions
  * utilBackgroundIsolate
  */
 
-class SettingsDictionaryListUI {
+class SettingsDictionaryListUI extends EventDispatcher {
     constructor(container, template, extraContainer, extraTemplate) {
+        super();
         this.container = container;
         this.template = template;
         this.extraContainer = extraContainer;
@@ -309,7 +306,7 @@ class SettingsDictionaryEntryUI {
             this.isDeleting = false;
             progress.hidden = true;
 
-            this.onDatabaseUpdated();
+            this.parent.trigger('databaseUpdated');
         }
     }
 
@@ -384,7 +381,8 @@ class SettingsDictionaryExtraUI {
 }
 
 class DictionaryController {
-    constructor(storageController) {
+    constructor(settingsController, storageController) {
+        this._settingsController = settingsController;
         this._storageController = storageController;
         this._dictionaryUI = null;
         this._dictionaryErrorToStringOverrides = [
@@ -410,7 +408,8 @@ class DictionaryController {
             document.querySelector('#dict-groups-extra'),
             document.querySelector('#dict-extra-template')
         );
-        this._dictionaryUI.save = settingsSaveOptions;
+        this._dictionaryUI.save = () => this._settingsController.save();
+        this._dictionaryUI.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
 
         document.querySelector('#dict-purge-button').addEventListener('click', this._onPurgeButtonClick.bind(this), false);
         document.querySelector('#dict-purge-confirm').addEventListener('click', this._onPurgeConfirmButtonClick.bind(this), false);
@@ -419,25 +418,24 @@ class DictionaryController {
         document.querySelector('#dict-main').addEventListener('change', this._onDictionaryMainChanged.bind(this), false);
         document.querySelector('#database-enable-prefix-wildcard-searches').addEventListener('change', this._onDatabaseEnablePrefixWildcardSearchesChanged.bind(this), false);
 
-        await this.optionsChanged();
+        this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
+
+        await this._onOptionsChanged();
         await this._onDatabaseUpdated();
     }
 
-    async optionsChanged() {
-        if (this._dictionaryUI === null) { return; }
+    // Private
 
-        const optionsContext = getOptionsContext();
-        const options = await getOptionsMutable(optionsContext);
+    async _onOptionsChanged() {
+        const options = await this._settingsController.getOptionsMutable();
 
         this._dictionaryUI.setOptionsDictionaries(options.dictionaries);
 
-        const optionsFull = await api.optionsGetFull();
+        const optionsFull = await this._settingsController.getOptionsFull();
         document.querySelector('#database-enable-prefix-wildcard-searches').checked = optionsFull.global.database.prefixWildcardsSupported;
 
         await this._updateMainDictionarySelectValue();
     }
-
-    // Private
 
     _updateMainDictionarySelectOptions(dictionaries) {
         const select = document.querySelector('#dict-main');
@@ -460,8 +458,7 @@ class DictionaryController {
     }
 
     async _updateMainDictionarySelectValue() {
-        const optionsContext = getOptionsContext();
-        const options = await api.optionsGet(optionsContext);
+        const options = await this._settingsController.getOptions();
 
         const value = options.general.mainDictionary;
 
@@ -589,10 +586,9 @@ class DictionaryController {
             missingNodeOption.parentNode.removeChild(missingNodeOption);
         }
 
-        const optionsContext = getOptionsContext();
-        const options = await getOptionsMutable(optionsContext);
+        const options = await this._settingsController.getOptionsMutable();
         options.general.mainDictionary = value;
-        await settingsSaveOptions();
+        await this._settingsController.save();
     }
 
     _onImportButtonClick() {
@@ -622,11 +618,12 @@ class DictionaryController {
             this._dictionarySpinnerShow(true);
 
             await api.purgeDatabase();
-            for (const {options} of toIterable((await getOptionsFullMutable()).profiles)) {
+            const optionsFull = await this._settingsController.getOptionsFullMutable();
+            for (const {options} of toIterable(optionsFull.profiles)) {
                 options.dictionaries = utilBackgroundIsolate({});
                 options.general.mainDictionary = '';
             }
-            await settingsSaveOptions();
+            await this._settingsController.save();
 
             this._onDatabaseUpdated();
         } catch (err) {
@@ -665,7 +662,7 @@ class DictionaryController {
                 this._storageController.updateStats();
             };
 
-            const optionsFull = await api.optionsGetFull();
+            const optionsFull = await this._settingsController.getOptionsFull();
 
             const importDetails = {
                 prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported
@@ -680,7 +677,8 @@ class DictionaryController {
 
                 const archiveContent = await this._dictReadFile(files[i]);
                 const {result, errors} = await api.importDictionaryArchive(archiveContent, importDetails, updateProgress);
-                for (const {options} of toIterable((await getOptionsFullMutable()).profiles)) {
+                const optionsFull2 = await this._settingsController.getOptionsFullMutable();
+                for (const {options} of toIterable(optionsFull2.profiles)) {
                     const dictionaryOptions = SettingsDictionaryListUI.createDictionaryOptions();
                     dictionaryOptions.enabled = true;
                     options.dictionaries[result.title] = dictionaryOptions;
@@ -689,7 +687,7 @@ class DictionaryController {
                     }
                 }
 
-                await settingsSaveOptions();
+                await this._settingsController.save();
 
                 if (errors.length > 0) {
                     const errors2 = errors.map((error) => jsonToError(error));
@@ -714,10 +712,10 @@ class DictionaryController {
     }
 
     async _onDatabaseEnablePrefixWildcardSearchesChanged(e) {
-        const optionsFull = await getOptionsFullMutable();
+        const optionsFull = await this._settingsController.getOptionsFullMutable();
         const v = !!e.target.checked;
         if (optionsFull.global.database.prefixWildcardsSupported === v) { return; }
         optionsFull.global.database.prefixWildcardsSupported = !!e.target.checked;
-        await settingsSaveOptions();
+        await this._settingsController.save();
     }
 }

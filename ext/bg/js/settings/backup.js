@@ -19,13 +19,11 @@
  * api
  * optionsGetDefault
  * optionsUpdateVersion
- * utilBackend
- * utilBackgroundIsolate
- * utilIsolate
  */
 
 class SettingsBackup {
-    constructor() {
+    constructor(settingsController) {
+        this._settingsController = settingsController;
         this._settingsExportToken = null;
         this._settingsExportRevoke = null;
         this._currentVersion = 0;
@@ -59,7 +57,7 @@ class SettingsBackup {
     }
 
     async _getSettingsExportData(date) {
-        const optionsFull = await api.optionsGetFull();
+        const optionsFull = await this._settingsController.getOptionsFull();
         const environment = await api.getEnvironmentInfo();
         const fieldTemplatesDefault = await api.getDefaultAnkiFieldTemplates();
 
@@ -143,9 +141,7 @@ class SettingsBackup {
     // Importing
 
     async _settingsImportSetOptionsFull(optionsFull) {
-        return utilIsolate(utilBackend().setFullOptions(
-            utilBackgroundIsolate(optionsFull)
-        ));
+        await this._settingsController.setOptionsFull(optionsFull);
     }
 
     _showSettingsImportError(error) {

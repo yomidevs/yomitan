@@ -18,7 +18,6 @@
 /* global
  * DOMDataBinder
  * api
- * getOptionsContext
  */
 
 class DOMSettingsBinder {

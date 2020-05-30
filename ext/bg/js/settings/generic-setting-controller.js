@@ -16,24 +16,26 @@
  */
 
 /* globals
- * getOptionsContext
- * getOptionsMutable
- * settingsSaveOptions
  * utilBackgroundIsolate
  */
 
 class GenericSettingController {
-    prepare() {
-        $('input, select, textarea').not('.anki-model').not('.ignore-form-changes *').change(this._onFormOptionsChanged.bind(this));
+    constructor(settingsController) {
+        this._settingsController = settingsController;
     }
 
-    optionsChanged(options) {
-        this._formWrite(options);
+    async prepare() {
+        $('input, select, textarea').not('.anki-model').not('.ignore-form-changes *').change(this._onFormOptionsChanged.bind(this));
+
+        this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
+
+        const options = await this._settingsController.getOptions();
+        this._onOptionsChanged({options});
     }
 
     // Private
 
-    async _formWrite(options) {
+    _onOptionsChanged({options}) {
         $('#enable').prop('checked', options.general.enable);
         $('#show-usage-guide').prop('checked', options.general.showGuide);
         $('#compact-tags').prop('checked', options.general.compactTags);
@@ -107,7 +109,7 @@ class GenericSettingController {
         this._formUpdateVisibility(options);
     }
 
-    async _formRead(options) {
+    _formRead(options) {
         options.general.enable = $('#enable').prop('checked');
         options.general.showGuide = $('#show-usage-guide').prop('checked');
         options.general.compactTags = $('#compact-tags').prop('checked');
@@ -180,12 +182,10 @@ class GenericSettingController {
     }
 
     async _onFormOptionsChanged() {
-        const optionsContext = getOptionsContext();
-        const options = await getOptionsMutable(optionsContext);
-
-        await this._formRead(options);
-        await settingsSaveOptions();
+        const options = await this._settingsController.getOptionsMutable();
+        this._formRead(options);
         this._formUpdateVisibility(options);
+        await this._settingsController.save();
     }
 
     _formUpdateVisibility(options) {

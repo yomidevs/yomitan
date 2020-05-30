@@ -15,29 +15,37 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* globals
- * getOptionsContext
- * getOptionsMutable
- * settingsSaveOptions
- */
-
 class ClipboardPopupsController {
-    prepare() {
-        document.querySelector('#enable-clipboard-popups').addEventListener('change', this._onEnableClipboardPopupsChanged.bind(this), false);
+    constructor(settingsController) {
+        this._settingsController = settingsController;
+        this._checkbox = document.querySelector('#enable-clipboard-popups');
+    }
+
+    async prepare() {
+        this._checkbox.addEventListener('change', this._onEnableClipboardPopupsChanged.bind(this), false);
+        this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
+
+        const options = await this._settingsController.getOptions();
+        this._onOptionsChanged({options});
+    }
+
+    // Private
+
+    _onOptionsChanged({options}) {
+        this._checkbox.checked = options.general.enableClipboardPopups;
     }
 
     async _onEnableClipboardPopupsChanged(e) {
-        const optionsContext = getOptionsContext();
-        const options = await getOptionsMutable(optionsContext);
-
         const enableClipboardPopups = e.target.checked;
+        const options = await this._settingsController.getOptionsMutable();
+
         if (enableClipboardPopups) {
             options.general.enableClipboardPopups = await new Promise((resolve) => {
                 chrome.permissions.request(
                     {permissions: ['clipboardRead']},
                     (granted) => {
                         if (!granted) {
-                            $('#enable-clipboard-popups').prop('checked', false);
+                            this._checkbox.checked = false;
                         }
                         resolve(granted);
                     }
@@ -47,6 +55,6 @@ class ClipboardPopupsController {
             options.general.enableClipboardPopups = false;
         }
 
-        await settingsSaveOptions();
+        await this._settingsController.save();
     }
 }

@@ -17,38 +17,25 @@
 
 /* global
  * api
- * getOptionsContext
- * getOptionsMutable
- * settingsSaveOptions
  * utilBackgroundIsolate
  */
 
 class AnkiController {
-    prepare() {
+    constructor(settingsController) {
+        this._settingsController = settingsController;
+    }
+
+    async prepare() {
         $('#anki-fields-container input,#anki-fields-container select,#anki-fields-container textarea').change(this._onFieldsChanged.bind(this));
 
         for (const node of document.querySelectorAll('#anki-terms-model,#anki-kanji-model')) {
             node.addEventListener('change', this._onModelChanged.bind(this), false);
         }
 
-        this.optionsChanged();
-    }
+        this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
 
-    async optionsChanged(options=null) {
-        if (options === null) {
-            const optionsContext = getOptionsContext();
-            options = await getOptionsMutable(optionsContext);
-        }
-
-        if (!options.anki.enable) {
-            return;
-        }
-
-        await this._deckAndModelPopulate(options);
-        await Promise.all([
-            this._fieldsPopulate('terms', options),
-            this._fieldsPopulate('kanji', options)
-        ]);
+        const options = await this._settingsController.getOptions();
+        this._onOptionsChanged({options});
     }
 
     getFieldMarkers(type) {
@@ -102,6 +89,18 @@ class AnkiController {
     }
 
     // Private
+
+    async _onOptionsChanged({options}) {
+        if (!options.anki.enable) {
+            return;
+        }
+
+        await this._deckAndModelPopulate(options);
+        await Promise.all([
+            this._fieldsPopulate('terms', options),
+            this._fieldsPopulate('kanji', options)
+        ]);
+    }
 
     _fieldsToDict(elements) {
         const result = {};
@@ -277,17 +276,15 @@ class AnkiController {
             fields[name] = '';
         }
 
-        const optionsContext = getOptionsContext();
-        const options = await getOptionsMutable(optionsContext);
+        const options = await this._settingsController.getOptionsMutable();
         options.anki[tabId].fields = utilBackgroundIsolate(fields);
-        await settingsSaveOptions();
+        await this._settingsController.save();
 
         await this._fieldsPopulate(tabId, options);
     }
 
     async _onFieldsChanged() {
-        const optionsContext = getOptionsContext();
-        const options = await getOptionsMutable(optionsContext);
+        const options = await this._settingsController.getOptionsMutable();
 
         options.anki.terms.deck = $('#anki-terms-deck').val();
         options.anki.terms.model = $('#anki-terms-model').val();
@@ -296,8 +293,6 @@ class AnkiController {
         options.anki.kanji.model = $('#anki-kanji-model').val();
         options.anki.kanji.fields = utilBackgroundIsolate(this._fieldsToDict(document.querySelectorAll('#kanji .anki-field-value')));
 
-        await settingsSaveOptions();
-
-        await this.optionsChanged(options);
+        await this._settingsController.save();
     }
 }
