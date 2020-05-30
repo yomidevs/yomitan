@@ -19,14 +19,13 @@
  * AnkiController
  * AnkiTemplatesController
  * AudioController
+ * DictionaryController
  * ProfileController
  * SettingsBackup
  * SettingsController
+ * StorageController
  * api
  * appearanceInitialize
- * dictSettingsInitialize
- * onDictionaryOptionsChanged
- * storageInfoInitialize
  * utilBackend
  * utilBackgroundIsolate
  */
@@ -270,7 +269,9 @@ async function onOptionsUpdated({source}) {
     if (ankiTemplatesController !== null) {
         ankiTemplatesController.updateValue();
     }
-    onDictionaryOptionsChanged();
+    if (dictionaryController !== null) {
+        dictionaryController.optionsChanged();
+    }
     if (ankiController !== null) {
         ankiController.optionsChanged();
     }
@@ -304,8 +305,15 @@ async function settingsPopulateModifierKeys() {
     }
 }
 
+async function setupEnvironmentInfo() {
+    const {browser, platform} = await api.getEnvironmentInfo();
+    document.documentElement.dataset.browser = browser;
+    document.documentElement.dataset.operatingSystem = platform.os;
+}
+
 let ankiController = null;
 let ankiTemplatesController = null;
+let dictionaryController = null;
 
 async function onReady() {
     api.forwardLogsToBackend();
@@ -314,21 +322,24 @@ async function onReady() {
     const settingsController = new SettingsController();
     settingsController.prepare();
 
+    setupEnvironmentInfo();
     showExtensionInformation();
+
+    const storageController = new StorageController();
+    storageController.prepare();
 
     await settingsPopulateModifierKeys();
     formSetupEventListeners();
     appearanceInitialize();
     new AudioController().prepare();
     await (new ProfileController()).prepare();
-    await dictSettingsInitialize();
+    dictionaryController = new DictionaryController(storageController);
+    dictionaryController.prepare();
     ankiController = new AnkiController();
     ankiController.prepare();
     ankiTemplatesController = new AnkiTemplatesController(ankiController);
     ankiTemplatesController.prepare();
     new SettingsBackup().prepare();
-
-    storageInfoInitialize();
 
     yomichan.on('optionsUpdated', onOptionsUpdated);
 }

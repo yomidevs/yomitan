@@ -22,13 +22,8 @@
  * getOptionsFullMutable
  * getOptionsMutable
  * settingsSaveOptions
- * storageEstimate
- * storageUpdateStats
  * utilBackgroundIsolate
  */
-
-let dictionaryUI = null;
-
 
 class SettingsDictionaryListUI {
     constructor(container, template, extraContainer, extraTemplate) {
@@ -308,13 +303,13 @@ class SettingsDictionaryEntryUI {
 
             await api.deleteDictionary(this.dictionaryInfo.title, onProgress);
         } catch (e) {
-            dictionaryErrorsShow([e]);
+            this.dictionaryErrorsShow([e]);
         } finally {
             prevention.end();
             this.isDeleting = false;
             progress.hidden = true;
 
-            onDatabaseUpdated();
+            this.onDatabaseUpdated();
         }
     }
 
@@ -388,340 +383,341 @@ class SettingsDictionaryExtraUI {
     }
 }
 
-
-async function dictSettingsInitialize() {
-    dictionaryUI = new SettingsDictionaryListUI(
-        document.querySelector('#dict-groups'),
-        document.querySelector('#dict-template'),
-        document.querySelector('#dict-groups-extra'),
-        document.querySelector('#dict-extra-template')
-    );
-    dictionaryUI.save = settingsSaveOptions;
-
-    document.querySelector('#dict-purge-button').addEventListener('click', onDictionaryPurgeButtonClick, false);
-    document.querySelector('#dict-purge-confirm').addEventListener('click', onDictionaryPurge, false);
-    document.querySelector('#dict-file-button').addEventListener('click', onDictionaryImportButtonClick, false);
-    document.querySelector('#dict-file').addEventListener('change', onDictionaryImport, false);
-    document.querySelector('#dict-main').addEventListener('change', onDictionaryMainChanged, false);
-    document.querySelector('#database-enable-prefix-wildcard-searches').addEventListener('change', onDatabaseEnablePrefixWildcardSearchesChanged, false);
-
-    await onDictionaryOptionsChanged();
-    await onDatabaseUpdated();
-}
-
-async function onDictionaryOptionsChanged() {
-    if (dictionaryUI === null) { return; }
-
-    const optionsContext = getOptionsContext();
-    const options = await getOptionsMutable(optionsContext);
-
-    dictionaryUI.setOptionsDictionaries(options.dictionaries);
-
-    const optionsFull = await api.optionsGetFull();
-    document.querySelector('#database-enable-prefix-wildcard-searches').checked = optionsFull.global.database.prefixWildcardsSupported;
-
-    await updateMainDictionarySelectValue();
-}
-
-async function onDatabaseUpdated() {
-    try {
-        const dictionaries = await api.getDictionaryInfo();
-        dictionaryUI.setDictionaries(dictionaries);
-
-        document.querySelector('#dict-warning').hidden = (dictionaries.length > 0);
-
-        updateMainDictionarySelectOptions(dictionaries);
-        await updateMainDictionarySelectValue();
-
-        const {counts, total} = await api.getDictionaryCounts(dictionaries.map((v) => v.title), true);
-        dictionaryUI.setCounts(counts, total);
-    } catch (e) {
-        dictionaryErrorsShow([e]);
-    }
-}
-
-function updateMainDictionarySelectOptions(dictionaries) {
-    const select = document.querySelector('#dict-main');
-    select.textContent = ''; // Empty
-
-    let option = document.createElement('option');
-    option.className = 'text-muted';
-    option.value = '';
-    option.textContent = 'Not selected';
-    select.appendChild(option);
-
-    for (const {title, sequenced} of toIterable(dictionaries)) {
-        if (!sequenced) { continue; }
-
-        option = document.createElement('option');
-        option.value = title;
-        option.textContent = title;
-        select.appendChild(option);
-    }
-}
-
-async function updateMainDictionarySelectValue() {
-    const optionsContext = getOptionsContext();
-    const options = await api.optionsGet(optionsContext);
-
-    const value = options.general.mainDictionary;
-
-    const select = document.querySelector('#dict-main');
-    let selectValue = null;
-    for (const child of select.children) {
-        if (child.nodeName.toUpperCase() === 'OPTION' && child.value === value) {
-            selectValue = value;
-            break;
-        }
+class DictionaryController {
+    constructor(storageController) {
+        this._storageController = storageController;
+        this._dictionaryUI = null;
+        this._dictionaryErrorToStringOverrides = [
+            [
+                'A mutation operation was attempted on a database that did not allow mutations.',
+                'Access to IndexedDB appears to be restricted. Firefox seems to require that the history preference is set to "Remember history" before IndexedDB use of any kind is allowed.'
+            ],
+            [
+                'The operation failed for reasons unrelated to the database itself and not covered by any other error code.',
+                'Unable to access IndexedDB due to a possibly corrupt user profile. Try using the "Refresh Firefox" feature to reset your user profile.'
+            ],
+            [
+                'BulkError',
+                'Unable to finish importing dictionary data into IndexedDB. This may indicate that you do not have sufficient disk space available to complete this operation.'
+            ]
+        ];
     }
 
-    let missingNodeOption = select.querySelector('option[data-not-installed=true]');
-    if (selectValue === null) {
-        if (missingNodeOption === null) {
-            missingNodeOption = document.createElement('option');
-            missingNodeOption.className = 'text-muted';
-            missingNodeOption.value = value;
-            missingNodeOption.textContent = `${value} (Not installed)`;
-            missingNodeOption.dataset.notInstalled = 'true';
-            select.appendChild(missingNodeOption);
-        }
-    } else {
-        if (missingNodeOption !== null) {
-            missingNodeOption.parentNode.removeChild(missingNodeOption);
-        }
+    async prepare() {
+        this._dictionaryUI = new SettingsDictionaryListUI(
+            document.querySelector('#dict-groups'),
+            document.querySelector('#dict-template'),
+            document.querySelector('#dict-groups-extra'),
+            document.querySelector('#dict-extra-template')
+        );
+        this._dictionaryUI.save = settingsSaveOptions;
+
+        document.querySelector('#dict-purge-button').addEventListener('click', this._onPurgeButtonClick.bind(this), false);
+        document.querySelector('#dict-purge-confirm').addEventListener('click', this._onPurgeConfirmButtonClick.bind(this), false);
+        document.querySelector('#dict-file-button').addEventListener('click', this._onImportButtonClick.bind(this), false);
+        document.querySelector('#dict-file').addEventListener('change', this._onImportFileChange.bind(this), false);
+        document.querySelector('#dict-main').addEventListener('change', this._onDictionaryMainChanged.bind(this), false);
+        document.querySelector('#database-enable-prefix-wildcard-searches').addEventListener('change', this._onDatabaseEnablePrefixWildcardSearchesChanged.bind(this), false);
+
+        await this.optionsChanged();
+        await this._onDatabaseUpdated();
     }
 
-    select.value = value;
-}
+    async optionsChanged() {
+        if (this._dictionaryUI === null) { return; }
 
-async function onDictionaryMainChanged(e) {
-    const select = e.target;
-    const value = select.value;
+        const optionsContext = getOptionsContext();
+        const options = await getOptionsMutable(optionsContext);
 
-    const missingNodeOption = select.querySelector('option[data-not-installed=true]');
-    if (missingNodeOption !== null && missingNodeOption.value !== value) {
-        missingNodeOption.parentNode.removeChild(missingNodeOption);
-    }
-
-    const optionsContext = getOptionsContext();
-    const options = await getOptionsMutable(optionsContext);
-    options.general.mainDictionary = value;
-    await settingsSaveOptions();
-}
-
-
-function dictionaryErrorToString(error) {
-    if (error.toString) {
-        error = error.toString();
-    } else {
-        error = `${error}`;
-    }
-
-    for (const [match, subst] of dictionaryErrorToString.overrides) {
-        if (error.includes(match)) {
-            error = subst;
-            break;
-        }
-    }
-
-    return error;
-}
-dictionaryErrorToString.overrides = [
-    [
-        'A mutation operation was attempted on a database that did not allow mutations.',
-        'Access to IndexedDB appears to be restricted. Firefox seems to require that the history preference is set to "Remember history" before IndexedDB use of any kind is allowed.'
-    ],
-    [
-        'The operation failed for reasons unrelated to the database itself and not covered by any other error code.',
-        'Unable to access IndexedDB due to a possibly corrupt user profile. Try using the "Refresh Firefox" feature to reset your user profile.'
-    ],
-    [
-        'BulkError',
-        'Unable to finish importing dictionary data into IndexedDB. This may indicate that you do not have sufficient disk space available to complete this operation.'
-    ]
-];
-
-function dictionaryErrorsShow(errors) {
-    const dialog = document.querySelector('#dict-error');
-    dialog.textContent = '';
-
-    if (errors !== null && errors.length > 0) {
-        const uniqueErrors = new Map();
-        for (let e of errors) {
-            yomichan.logError(e);
-            e = dictionaryErrorToString(e);
-            let count = uniqueErrors.get(e);
-            if (typeof count === 'undefined') {
-                count = 0;
-            }
-            uniqueErrors.set(e, count + 1);
-        }
-
-        for (const [e, count] of uniqueErrors.entries()) {
-            const div = document.createElement('p');
-            if (count > 1) {
-                div.textContent = `${e} `;
-                const em = document.createElement('em');
-                em.textContent = `(${count})`;
-                div.appendChild(em);
-            } else {
-                div.textContent = `${e}`;
-            }
-            dialog.appendChild(div);
-        }
-
-        dialog.hidden = false;
-    } else {
-        dialog.hidden = true;
-    }
-}
-
-
-function dictionarySpinnerShow(show) {
-    const spinner = $('#dict-spinner');
-    if (show) {
-        spinner.show();
-    } else {
-        spinner.hide();
-    }
-}
-
-function onDictionaryImportButtonClick() {
-    const dictFile = document.querySelector('#dict-file');
-    dictFile.click();
-}
-
-function onDictionaryPurgeButtonClick(e) {
-    e.preventDefault();
-    $('#dict-purge-modal').modal('show');
-}
-
-async function onDictionaryPurge(e) {
-    e.preventDefault();
-
-    $('#dict-purge-modal').modal('hide');
-
-    const dictControls = $('#dict-importer, #dict-groups, #dict-groups-extra, #dict-main-group').hide();
-    const dictProgress = document.querySelector('#dict-purge');
-    dictProgress.hidden = false;
-
-    const prevention = new PageExitPrevention();
-
-    try {
-        prevention.start();
-        dictionaryErrorsShow(null);
-        dictionarySpinnerShow(true);
-
-        await api.purgeDatabase();
-        for (const {options} of toIterable((await getOptionsFullMutable()).profiles)) {
-            options.dictionaries = utilBackgroundIsolate({});
-            options.general.mainDictionary = '';
-        }
-        await settingsSaveOptions();
-
-        onDatabaseUpdated();
-    } catch (err) {
-        dictionaryErrorsShow([err]);
-    } finally {
-        prevention.end();
-
-        dictionarySpinnerShow(false);
-
-        dictControls.show();
-        dictProgress.hidden = true;
-
-        if (storageEstimate.mostRecent !== null) {
-            storageUpdateStats();
-        }
-    }
-}
-
-async function onDictionaryImport(e) {
-    const files = [...e.target.files];
-    e.target.value = null;
-
-    const dictFile = $('#dict-file');
-    const dictControls = $('#dict-importer').hide();
-    const dictProgress = $('#dict-import-progress').show();
-    const dictImportInfo = document.querySelector('#dict-import-info');
-
-    const prevention = new PageExitPrevention();
-
-    try {
-        prevention.start();
-        dictionaryErrorsShow(null);
-        dictionarySpinnerShow(true);
-
-        const setProgress = (percent) => dictProgress.find('.progress-bar').css('width', `${percent}%`);
-        const updateProgress = (total, current) => {
-            setProgress(current / total * 100.0);
-            if (storageEstimate.mostRecent !== null && !storageUpdateStats.isUpdating) {
-                storageUpdateStats();
-            }
-        };
+        this._dictionaryUI.setOptionsDictionaries(options.dictionaries);
 
         const optionsFull = await api.optionsGetFull();
+        document.querySelector('#database-enable-prefix-wildcard-searches').checked = optionsFull.global.database.prefixWildcardsSupported;
 
-        const importDetails = {
-            prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported
-        };
+        await this._updateMainDictionarySelectValue();
+    }
 
-        for (let i = 0, ii = files.length; i < ii; ++i) {
-            setProgress(0.0);
-            if (ii > 1) {
-                dictImportInfo.hidden = false;
-                dictImportInfo.textContent = `(${i + 1} of ${ii})`;
+    // Private
+
+    _updateMainDictionarySelectOptions(dictionaries) {
+        const select = document.querySelector('#dict-main');
+        select.textContent = ''; // Empty
+
+        let option = document.createElement('option');
+        option.className = 'text-muted';
+        option.value = '';
+        option.textContent = 'Not selected';
+        select.appendChild(option);
+
+        for (const {title, sequenced} of toIterable(dictionaries)) {
+            if (!sequenced) { continue; }
+
+            option = document.createElement('option');
+            option.value = title;
+            option.textContent = title;
+            select.appendChild(option);
+        }
+    }
+
+    async _updateMainDictionarySelectValue() {
+        const optionsContext = getOptionsContext();
+        const options = await api.optionsGet(optionsContext);
+
+        const value = options.general.mainDictionary;
+
+        const select = document.querySelector('#dict-main');
+        let selectValue = null;
+        for (const child of select.children) {
+            if (child.nodeName.toUpperCase() === 'OPTION' && child.value === value) {
+                selectValue = value;
+                break;
             }
+        }
 
-            const archiveContent = await dictReadFile(files[i]);
-            const {result, errors} = await api.importDictionaryArchive(archiveContent, importDetails, updateProgress);
-            for (const {options} of toIterable((await getOptionsFullMutable()).profiles)) {
-                const dictionaryOptions = SettingsDictionaryListUI.createDictionaryOptions();
-                dictionaryOptions.enabled = true;
-                options.dictionaries[result.title] = dictionaryOptions;
-                if (result.sequenced && options.general.mainDictionary === '') {
-                    options.general.mainDictionary = result.title;
+        let missingNodeOption = select.querySelector('option[data-not-installed=true]');
+        if (selectValue === null) {
+            if (missingNodeOption === null) {
+                missingNodeOption = document.createElement('option');
+                missingNodeOption.className = 'text-muted';
+                missingNodeOption.value = value;
+                missingNodeOption.textContent = `${value} (Not installed)`;
+                missingNodeOption.dataset.notInstalled = 'true';
+                select.appendChild(missingNodeOption);
+            }
+        } else {
+            if (missingNodeOption !== null) {
+                missingNodeOption.parentNode.removeChild(missingNodeOption);
+            }
+        }
+
+        select.value = value;
+    }
+
+    _dictionaryErrorToString(error) {
+        if (error.toString) {
+            error = error.toString();
+        } else {
+            error = `${error}`;
+        }
+
+        for (const [match, subst] of this._dictionaryErrorToStringOverrides) {
+            if (error.includes(match)) {
+                error = subst;
+                break;
+            }
+        }
+
+        return error;
+    }
+
+    _dictionaryErrorsShow(errors) {
+        const dialog = document.querySelector('#dict-error');
+        dialog.textContent = '';
+
+        if (errors !== null && errors.length > 0) {
+            const uniqueErrors = new Map();
+            for (let e of errors) {
+                yomichan.logError(e);
+                e = this._dictionaryErrorToString(e);
+                let count = uniqueErrors.get(e);
+                if (typeof count === 'undefined') {
+                    count = 0;
                 }
+                uniqueErrors.set(e, count + 1);
             }
 
+            for (const [e, count] of uniqueErrors.entries()) {
+                const div = document.createElement('p');
+                if (count > 1) {
+                    div.textContent = `${e} `;
+                    const em = document.createElement('em');
+                    em.textContent = `(${count})`;
+                    div.appendChild(em);
+                } else {
+                    div.textContent = `${e}`;
+                }
+                dialog.appendChild(div);
+            }
+
+            dialog.hidden = false;
+        } else {
+            dialog.hidden = true;
+        }
+    }
+
+    _dictionarySpinnerShow(show) {
+        const spinner = $('#dict-spinner');
+        if (show) {
+            spinner.show();
+        } else {
+            spinner.hide();
+        }
+    }
+
+    _dictReadFile(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(reader.error);
+            reader.readAsBinaryString(file);
+        });
+    }
+
+    async _onDatabaseUpdated() {
+        try {
+            const dictionaries = await api.getDictionaryInfo();
+            this._dictionaryUI.setDictionaries(dictionaries);
+
+            document.querySelector('#dict-warning').hidden = (dictionaries.length > 0);
+
+            this._updateMainDictionarySelectOptions(dictionaries);
+            await this._updateMainDictionarySelectValue();
+
+            const {counts, total} = await api.getDictionaryCounts(dictionaries.map((v) => v.title), true);
+            this._dictionaryUI.setCounts(counts, total);
+        } catch (e) {
+            this._dictionaryErrorsShow([e]);
+        }
+    }
+
+    async _onDictionaryMainChanged(e) {
+        const select = e.target;
+        const value = select.value;
+
+        const missingNodeOption = select.querySelector('option[data-not-installed=true]');
+        if (missingNodeOption !== null && missingNodeOption.value !== value) {
+            missingNodeOption.parentNode.removeChild(missingNodeOption);
+        }
+
+        const optionsContext = getOptionsContext();
+        const options = await getOptionsMutable(optionsContext);
+        options.general.mainDictionary = value;
+        await settingsSaveOptions();
+    }
+
+    _onImportButtonClick() {
+        const dictFile = document.querySelector('#dict-file');
+        dictFile.click();
+    }
+
+    _onPurgeButtonClick(e) {
+        e.preventDefault();
+        $('#dict-purge-modal').modal('show');
+    }
+
+    async _onPurgeConfirmButtonClick(e) {
+        e.preventDefault();
+
+        $('#dict-purge-modal').modal('hide');
+
+        const dictControls = $('#dict-importer, #dict-groups, #dict-groups-extra, #dict-main-group').hide();
+        const dictProgress = document.querySelector('#dict-purge');
+        dictProgress.hidden = false;
+
+        const prevention = new PageExitPrevention();
+
+        try {
+            prevention.start();
+            this._dictionaryErrorsShow(null);
+            this._dictionarySpinnerShow(true);
+
+            await api.purgeDatabase();
+            for (const {options} of toIterable((await getOptionsFullMutable()).profiles)) {
+                options.dictionaries = utilBackgroundIsolate({});
+                options.general.mainDictionary = '';
+            }
             await settingsSaveOptions();
 
-            if (errors.length > 0) {
-                const errors2 = errors.map((error) => jsonToError(error));
-                errors2.push(`Dictionary may not have been imported properly: ${errors2.length} error${errors2.length === 1 ? '' : 's'} reported.`);
-                dictionaryErrorsShow(errors2);
-            }
+            this._onDatabaseUpdated();
+        } catch (err) {
+            this._dictionaryErrorsShow([err]);
+        } finally {
+            prevention.end();
 
-            onDatabaseUpdated();
+            this._dictionarySpinnerShow(false);
+
+            dictControls.show();
+            dictProgress.hidden = true;
+
+            this._storageController.updateStats();
         }
-    } catch (err) {
-        dictionaryErrorsShow([err]);
-    } finally {
-        prevention.end();
-        dictionarySpinnerShow(false);
-
-        dictImportInfo.hidden = false;
-        dictImportInfo.textContent = '';
-        dictFile.val('');
-        dictControls.show();
-        dictProgress.hide();
     }
-}
 
-function dictReadFile(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = () => reject(reader.error);
-        reader.readAsBinaryString(file);
-    });
-}
+    async _onImportFileChange(e) {
+        const files = [...e.target.files];
+        e.target.value = null;
 
+        const dictFile = $('#dict-file');
+        const dictControls = $('#dict-importer').hide();
+        const dictProgress = $('#dict-import-progress').show();
+        const dictImportInfo = document.querySelector('#dict-import-info');
 
-async function onDatabaseEnablePrefixWildcardSearchesChanged(e) {
-    const optionsFull = await getOptionsFullMutable();
-    const v = !!e.target.checked;
-    if (optionsFull.global.database.prefixWildcardsSupported === v) { return; }
-    optionsFull.global.database.prefixWildcardsSupported = !!e.target.checked;
-    await settingsSaveOptions();
+        const prevention = new PageExitPrevention();
+
+        try {
+            prevention.start();
+            this._dictionaryErrorsShow(null);
+            this._dictionarySpinnerShow(true);
+
+            const setProgress = (percent) => dictProgress.find('.progress-bar').css('width', `${percent}%`);
+            const updateProgress = (total, current) => {
+                setProgress(current / total * 100.0);
+                this._storageController.updateStats();
+            };
+
+            const optionsFull = await api.optionsGetFull();
+
+            const importDetails = {
+                prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported
+            };
+
+            for (let i = 0, ii = files.length; i < ii; ++i) {
+                setProgress(0.0);
+                if (ii > 1) {
+                    dictImportInfo.hidden = false;
+                    dictImportInfo.textContent = `(${i + 1} of ${ii})`;
+                }
+
+                const archiveContent = await this._dictReadFile(files[i]);
+                const {result, errors} = await api.importDictionaryArchive(archiveContent, importDetails, updateProgress);
+                for (const {options} of toIterable((await getOptionsFullMutable()).profiles)) {
+                    const dictionaryOptions = SettingsDictionaryListUI.createDictionaryOptions();
+                    dictionaryOptions.enabled = true;
+                    options.dictionaries[result.title] = dictionaryOptions;
+                    if (result.sequenced && options.general.mainDictionary === '') {
+                        options.general.mainDictionary = result.title;
+                    }
+                }
+
+                await settingsSaveOptions();
+
+                if (errors.length > 0) {
+                    const errors2 = errors.map((error) => jsonToError(error));
+                    errors2.push(`Dictionary may not have been imported properly: ${errors2.length} error${errors2.length === 1 ? '' : 's'} reported.`);
+                    this._dictionaryErrorsShow(errors2);
+                }
+
+                this._onDatabaseUpdated();
+            }
+        } catch (err) {
+            this._dictionaryErrorsShow([err]);
+        } finally {
+            prevention.end();
+            this._dictionarySpinnerShow(false);
+
+            dictImportInfo.hidden = false;
+            dictImportInfo.textContent = '';
+            dictFile.val('');
+            dictControls.show();
+            dictProgress.hide();
+        }
+    }
+
+    async _onDatabaseEnablePrefixWildcardSearchesChanged(e) {
+        const optionsFull = await getOptionsFullMutable();
+        const v = !!e.target.checked;
+        if (optionsFull.global.database.prefixWildcardsSupported === v) { return; }
+        optionsFull.global.database.prefixWildcardsSupported = !!e.target.checked;
+        await settingsSaveOptions();
+    }
 }
