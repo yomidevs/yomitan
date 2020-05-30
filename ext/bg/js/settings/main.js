@@ -20,12 +20,12 @@
  * AnkiTemplatesController
  * AudioController
  * DictionaryController
+ * PopupPreviewController
  * ProfileController
  * SettingsBackup
  * SettingsController
  * StorageController
  * api
- * appearanceInitialize
  * utilBackend
  * utilBackgroundIsolate
  */
@@ -330,7 +330,7 @@ async function onReady() {
 
     await settingsPopulateModifierKeys();
     formSetupEventListeners();
-    appearanceInitialize();
+    new PopupPreviewController().prepare();
     new AudioController().prepare();
     await (new ProfileController()).prepare();
     dictionaryController = new DictionaryController(storageController);
