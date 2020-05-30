@@ -28,6 +28,10 @@ class SettingsController extends EventDispatcher {
         this._source = yomichan.generateId(16);
     }
 
+    get source() {
+        return this._source;
+    }
+
     get profileIndex() {
         return this._profileIndex;
     }

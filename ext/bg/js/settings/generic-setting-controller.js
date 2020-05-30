@@ -16,182 +16,47 @@
  */
 
 /* globals
+ * DOMSettingsBinder
  * utilBackgroundIsolate
  */
 
 class GenericSettingController {
     constructor(settingsController) {
         this._settingsController = settingsController;
+        this._settingsBinder = null;
     }
 
     async prepare() {
-        $('input, select, textarea').not('.anki-model').not('.ignore-form-changes *').change(this._onFormOptionsChanged.bind(this));
+        this._settingsBinder = new DOMSettingsBinder({
+            getOptionsContext: () => this._settingsController.getOptionsContext(),
+            source: this._settingsController.source,
+            transforms: [
+                ['setDocumentAttribute', this._setDocumentAttribute.bind(this)],
+                ['splitTags', this._splitTags.bind(this)],
+                ['joinTags', this._joinTags.bind(this)]
+            ]
+        });
+        this._settingsBinder.observe(document.body);
 
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
-
-        const options = await this._settingsController.getOptions();
-        this._onOptionsChanged({options});
     }
 
     // Private
 
-    _onOptionsChanged({options}) {
-        $('#enable').prop('checked', options.general.enable);
-        $('#show-usage-guide').prop('checked', options.general.showGuide);
-        $('#compact-tags').prop('checked', options.general.compactTags);
-        $('#compact-glossaries').prop('checked', options.general.compactGlossaries);
-        $('#result-output-mode').val(options.general.resultOutputMode);
-        $('#show-debug-info').prop('checked', options.general.debugInfo);
-        $('#show-advanced-options').prop('checked', options.general.showAdvanced);
-        $('#max-displayed-results').val(options.general.maxResults);
-        $('#popup-display-mode').val(options.general.popupDisplayMode);
-        $('#popup-horizontal-text-position').val(options.general.popupHorizontalTextPosition);
-        $('#popup-vertical-text-position').val(options.general.popupVerticalTextPosition);
-        $('#popup-width').val(options.general.popupWidth);
-        $('#popup-height').val(options.general.popupHeight);
-        $('#popup-horizontal-offset').val(options.general.popupHorizontalOffset);
-        $('#popup-vertical-offset').val(options.general.popupVerticalOffset);
-        $('#popup-horizontal-offset2').val(options.general.popupHorizontalOffset2);
-        $('#popup-vertical-offset2').val(options.general.popupVerticalOffset2);
-        $('#popup-scaling-factor').val(options.general.popupScalingFactor);
-        $('#popup-scale-relative-to-page-zoom').prop('checked', options.general.popupScaleRelativeToPageZoom);
-        $('#popup-scale-relative-to-visual-viewport').prop('checked', options.general.popupScaleRelativeToVisualViewport);
-        $('#show-pitch-accent-downstep-notation').prop('checked', options.general.showPitchAccentDownstepNotation);
-        $('#show-pitch-accent-position-notation').prop('checked', options.general.showPitchAccentPositionNotation);
-        $('#show-pitch-accent-graph').prop('checked', options.general.showPitchAccentGraph);
-        $('#show-iframe-popups-in-root-frame').prop('checked', options.general.showIframePopupsInRootFrame);
-        $('#popup-theme').val(options.general.popupTheme);
-        $('#popup-outer-theme').val(options.general.popupOuterTheme);
-        $('#custom-popup-css').val(options.general.customPopupCss);
-        $('#custom-popup-outer-css').val(options.general.customPopupOuterCss);
-
-        $('#audio-playback-enabled').prop('checked', options.audio.enabled);
-        $('#auto-play-audio').prop('checked', options.audio.autoPlay);
-        $('#audio-playback-volume').val(options.audio.volume);
-        $('#audio-custom-source').val(options.audio.customSourceUrl);
-        $('#text-to-speech-voice').val(options.audio.textToSpeechVoice).attr('data-value', options.audio.textToSpeechVoice);
-
-        $('#middle-mouse-button-scan').prop('checked', options.scanning.middleMouse);
-        $('#touch-input-enabled').prop('checked', options.scanning.touchInputEnabled);
-        $('#select-matched-text').prop('checked', options.scanning.selectText);
-        $('#search-alphanumeric').prop('checked', options.scanning.alphanumeric);
-        $('#auto-hide-results').prop('checked', options.scanning.autoHideResults);
-        $('#deep-dom-scan').prop('checked', options.scanning.deepDomScan);
-        $('#enable-search-within-first-popup').prop('checked', options.scanning.enablePopupSearch);
-        $('#enable-scanning-of-popup-expressions').prop('checked', options.scanning.enableOnPopupExpressions);
-        $('#enable-scanning-on-search-page').prop('checked', options.scanning.enableOnSearchPage);
-        $('#enable-search-tags').prop('checked', options.scanning.enableSearchTags);
-        $('#scan-delay').val(options.scanning.delay);
-        $('#scan-length').val(options.scanning.length);
-        $('#scan-modifier-key').val(options.scanning.modifier);
-        $('#popup-nesting-max-depth').val(options.scanning.popupNestingMaxDepth);
-
-        $('#translation-convert-half-width-characters').val(options.translation.convertHalfWidthCharacters);
-        $('#translation-convert-numeric-characters').val(options.translation.convertNumericCharacters);
-        $('#translation-convert-alphabetic-characters').val(options.translation.convertAlphabeticCharacters);
-        $('#translation-convert-hiragana-to-katakana').val(options.translation.convertHiraganaToKatakana);
-        $('#translation-convert-katakana-to-hiragana').val(options.translation.convertKatakanaToHiragana);
-        $('#translation-collapse-emphatic-sequences').val(options.translation.collapseEmphaticSequences);
-
-        $('#parsing-scan-enable').prop('checked', options.parsing.enableScanningParser);
-        $('#parsing-mecab-enable').prop('checked', options.parsing.enableMecabParser);
-        $('#parsing-term-spacing').prop('checked', options.parsing.termSpacing);
-        $('#parsing-reading-mode').val(options.parsing.readingMode);
-
-        $('#anki-enable').prop('checked', options.anki.enable);
-        $('#card-tags').val(options.anki.tags.join(' '));
-        $('#sentence-detection-extent').val(options.anki.sentenceExt);
-        $('#interface-server').val(options.anki.server);
-        $('#duplicate-scope').val(options.anki.duplicateScope);
-        $('#screenshot-format').val(options.anki.screenshot.format);
-        $('#screenshot-quality').val(options.anki.screenshot.quality);
-
-        this._formUpdateVisibility(options);
+    _onOptionsChanged() {
+        this._settingsBinder.refresh();
     }
 
-    _formRead(options) {
-        options.general.enable = $('#enable').prop('checked');
-        options.general.showGuide = $('#show-usage-guide').prop('checked');
-        options.general.compactTags = $('#compact-tags').prop('checked');
-        options.general.compactGlossaries = $('#compact-glossaries').prop('checked');
-        options.general.resultOutputMode = $('#result-output-mode').val();
-        options.general.debugInfo = $('#show-debug-info').prop('checked');
-        options.general.showAdvanced = $('#show-advanced-options').prop('checked');
-        options.general.maxResults = parseInt($('#max-displayed-results').val(), 10);
-        options.general.popupDisplayMode = $('#popup-display-mode').val();
-        options.general.popupHorizontalTextPosition = $('#popup-horizontal-text-position').val();
-        options.general.popupVerticalTextPosition = $('#popup-vertical-text-position').val();
-        options.general.popupWidth = parseInt($('#popup-width').val(), 10);
-        options.general.popupHeight = parseInt($('#popup-height').val(), 10);
-        options.general.popupHorizontalOffset = parseInt($('#popup-horizontal-offset').val(), 0);
-        options.general.popupVerticalOffset = parseInt($('#popup-vertical-offset').val(), 10);
-        options.general.popupHorizontalOffset2 = parseInt($('#popup-horizontal-offset2').val(), 0);
-        options.general.popupVerticalOffset2 = parseInt($('#popup-vertical-offset2').val(), 10);
-        options.general.popupScalingFactor = parseFloat($('#popup-scaling-factor').val());
-        options.general.popupScaleRelativeToPageZoom = $('#popup-scale-relative-to-page-zoom').prop('checked');
-        options.general.popupScaleRelativeToVisualViewport = $('#popup-scale-relative-to-visual-viewport').prop('checked');
-        options.general.showPitchAccentDownstepNotation = $('#show-pitch-accent-downstep-notation').prop('checked');
-        options.general.showPitchAccentPositionNotation = $('#show-pitch-accent-position-notation').prop('checked');
-        options.general.showPitchAccentGraph = $('#show-pitch-accent-graph').prop('checked');
-        options.general.showIframePopupsInRootFrame = $('#show-iframe-popups-in-root-frame').prop('checked');
-        options.general.popupTheme = $('#popup-theme').val();
-        options.general.popupOuterTheme = $('#popup-outer-theme').val();
-        options.general.customPopupCss = $('#custom-popup-css').val();
-        options.general.customPopupOuterCss = $('#custom-popup-outer-css').val();
-
-        options.audio.enabled = $('#audio-playback-enabled').prop('checked');
-        options.audio.autoPlay = $('#auto-play-audio').prop('checked');
-        options.audio.volume = parseFloat($('#audio-playback-volume').val());
-        options.audio.customSourceUrl = $('#audio-custom-source').val();
-        options.audio.textToSpeechVoice = $('#text-to-speech-voice').val();
-
-        options.scanning.middleMouse = $('#middle-mouse-button-scan').prop('checked');
-        options.scanning.touchInputEnabled = $('#touch-input-enabled').prop('checked');
-        options.scanning.selectText = $('#select-matched-text').prop('checked');
-        options.scanning.alphanumeric = $('#search-alphanumeric').prop('checked');
-        options.scanning.autoHideResults = $('#auto-hide-results').prop('checked');
-        options.scanning.deepDomScan = $('#deep-dom-scan').prop('checked');
-        options.scanning.enablePopupSearch = $('#enable-search-within-first-popup').prop('checked');
-        options.scanning.enableOnPopupExpressions = $('#enable-scanning-of-popup-expressions').prop('checked');
-        options.scanning.enableOnSearchPage = $('#enable-scanning-on-search-page').prop('checked');
-        options.scanning.enableSearchTags = $('#enable-search-tags').prop('checked');
-        options.scanning.delay = parseInt($('#scan-delay').val(), 10);
-        options.scanning.length = parseInt($('#scan-length').val(), 10);
-        options.scanning.modifier = $('#scan-modifier-key').val();
-        options.scanning.popupNestingMaxDepth = parseInt($('#popup-nesting-max-depth').val(), 10);
-
-        options.translation.convertHalfWidthCharacters = $('#translation-convert-half-width-characters').val();
-        options.translation.convertNumericCharacters = $('#translation-convert-numeric-characters').val();
-        options.translation.convertAlphabeticCharacters = $('#translation-convert-alphabetic-characters').val();
-        options.translation.convertHiraganaToKatakana = $('#translation-convert-hiragana-to-katakana').val();
-        options.translation.convertKatakanaToHiragana = $('#translation-convert-katakana-to-hiragana').val();
-        options.translation.collapseEmphaticSequences = $('#translation-collapse-emphatic-sequences').val();
-
-        options.parsing.enableScanningParser = $('#parsing-scan-enable').prop('checked');
-        options.parsing.enableMecabParser = $('#parsing-mecab-enable').prop('checked');
-        options.parsing.termSpacing = $('#parsing-term-spacing').prop('checked');
-        options.parsing.readingMode = $('#parsing-reading-mode').val();
-
-        options.anki.enable = $('#anki-enable').prop('checked');
-        options.anki.tags = utilBackgroundIsolate($('#card-tags').val().split(/[,; ]+/));
-        options.anki.sentenceExt = parseInt($('#sentence-detection-extent').val(), 10);
-        options.anki.server = $('#interface-server').val();
-        options.anki.duplicateScope = $('#duplicate-scope').val();
-        options.anki.screenshot.format = $('#screenshot-format').val();
-        options.anki.screenshot.quality = parseInt($('#screenshot-quality').val(), 10);
+    _setDocumentAttribute(value, metadata, element) {
+        document.documentElement.setAttribute(element.dataset.documentAttribute, `${value}`);
+        return value;
     }
 
-    async _onFormOptionsChanged() {
-        const options = await this._settingsController.getOptionsMutable();
-        this._formRead(options);
-        this._formUpdateVisibility(options);
-        await this._settingsController.save();
+    _splitTags(value) {
+        return `${value}`.split(/[,; ]+/).filter((v) => !!v);
     }
 
-    _formUpdateVisibility(options) {
-        document.documentElement.dataset.optionsAnkiEnable = `${!!options.anki.enable}`;
-        document.documentElement.dataset.optionsGeneralDebugInfo = `${!!options.general.debugInfo}`;
-        document.documentElement.dataset.optionsGeneralShowAdvanced = `${!!options.general.showAdvanced}`;
-        document.documentElement.dataset.optionsGeneralResultOutputMode = `${options.general.resultOutputMode}`;
+    _joinTags(value) {
+        return value.join(' ');
     }
 }
