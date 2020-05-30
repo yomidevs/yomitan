@@ -36,25 +36,16 @@ class ClipboardPopupsController {
     }
 
     async _onEnableClipboardPopupsChanged(e) {
-        const enableClipboardPopups = e.target.checked;
-        const options = await this._settingsController.getOptionsMutable();
+        const checkbox = e.currentTarget;
+        let value = checkbox.checked;
 
-        if (enableClipboardPopups) {
-            options.general.enableClipboardPopups = await new Promise((resolve) => {
-                chrome.permissions.request(
-                    {permissions: ['clipboardRead']},
-                    (granted) => {
-                        if (!granted) {
-                            this._checkbox.checked = false;
-                        }
-                        resolve(granted);
-                    }
-                );
+        if (value) {
+            value = await new Promise((resolve) => {
+                chrome.permissions.request({permissions: ['clipboardRead']}, resolve);
             });
-        } else {
-            options.general.enableClipboardPopups = false;
+            checkbox.checked = value;
         }
 
-        await this._settingsController.save();
+        await this._settingsController.setProfileSetting('general.enableClipboardPopups', value);
     }
 }
