@@ -62,7 +62,7 @@ async function setupEnvironmentInfo() {
 }
 
 
-async function onReady() {
+(async () => {
     api.forwardLogsToBackend();
     await yomichan.prepare();
 
@@ -71,6 +71,7 @@ async function onReady() {
     settingsPopulateModifierKeys();
 
     const optionsFull = await api.optionsGetFull();
+
     const settingsController = new SettingsController(optionsFull.profileCurrent);
     settingsController.prepare();
 
@@ -79,16 +80,28 @@ async function onReady() {
 
     const genericSettingController = new GenericSettingController(settingsController);
     genericSettingController.prepare();
-    new ClipboardPopupsController(settingsController).prepare();
-    new PopupPreviewController(settingsController).prepare();
-    new AudioController(settingsController).prepare();
-    new ProfileController(settingsController).prepare();
+
+    const clipboardPopupsController = new ClipboardPopupsController(settingsController);
+    clipboardPopupsController.prepare();
+
+    const popupPreviewController = new PopupPreviewController(settingsController);
+    popupPreviewController.prepare();
+
+    const audioController = new AudioController(settingsController);
+    audioController.prepare();
+
+    const profileController = new ProfileController(settingsController);
+    profileController.prepare();
+
     const dictionaryController = new DictionaryController(settingsController, storageController);
     dictionaryController.prepare();
+
     const ankiController = new AnkiController(settingsController);
     ankiController.prepare();
-    new AnkiTemplatesController(settingsController, ankiController).prepare();
-    new SettingsBackup(settingsController).prepare();
-}
 
-$(document).ready(() => onReady());
+    const ankiTemplatesController = new AnkiTemplatesController(settingsController, ankiController);
+    ankiTemplatesController.prepare();
+
+    const settingsBackup = new SettingsBackup(settingsController);
+    settingsBackup.prepare();
+})();
