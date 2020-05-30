@@ -44,10 +44,10 @@ class AnkiTemplatesController {
             node.addEventListener('click', this._onMarkerClicked.bind(this), false);
         }
 
-        $('#field-templates').on('change', this._onChanged.bind(this));
-        $('#field-template-render').on('click', this._onRender.bind(this));
-        $('#field-templates-reset').on('click', this._onReset.bind(this));
-        $('#field-templates-reset-confirm').on('click', this._onResetConfirm.bind(this));
+        document.querySelector('#field-templates').addEventListener('change', this._onChanged.bind(this), false);
+        document.querySelector('#field-template-render').addEventListener('click', this._onRender.bind(this), false);
+        document.querySelector('#field-templates-reset').addEventListener('click', this._onReset.bind(this), false);
+        document.querySelector('#field-templates-reset-confirm').addEventListener('click', this._onResetConfirm.bind(this), false);
 
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
 
@@ -60,7 +60,7 @@ class AnkiTemplatesController {
     _onOptionsChanged({options}) {
         let templates = options.anki.fieldTemplates;
         if (typeof templates !== 'string') { templates = this._defaultFieldTemplates; }
-        $('#field-templates').val(templates);
+        document.querySelector('#field-templates').value = templates;
 
         this._onValidateCompile();
     }
@@ -70,12 +70,12 @@ class AnkiTemplatesController {
         $('#field-template-reset-modal').modal('show');
     }
 
-    async _onResetConfirm(e) {
+    _onResetConfirm(e) {
         e.preventDefault();
 
         $('#field-template-reset-modal').modal('hide');
 
-        const value = await api.getDefaultAnkiFieldTemplates();
+        const value = this._defaultFieldTemplates;
 
         const element = document.querySelector('#field-templates');
         element.value = value;
@@ -85,15 +85,13 @@ class AnkiTemplatesController {
     async _onChanged(e) {
         // Get value
         let templates = e.currentTarget.value;
-        if (templates === await api.getDefaultAnkiFieldTemplates()) {
+        if (templates === this._defaultFieldTemplates) {
             // Default
             templates = null;
         }
 
         // Overwrite
-        const options = await this._settingsController.getOptionsMutable();
-        options.anki.fieldTemplates = templates;
-        await this._settingsController.save();
+        await this._settingsController.setProfileSetting('anki.fieldTemplates', templates);
 
         // Compile
         this._onValidateCompile();
@@ -144,7 +142,7 @@ class AnkiTemplatesController {
                     }
                 };
                 let templates = options.anki.fieldTemplates;
-                if (typeof templates !== 'string') { templates = await api.getDefaultAnkiFieldTemplates(); }
+                if (typeof templates !== 'string') { templates = this._defaultFieldTemplates; }
                 const ankiNoteBuilder = new AnkiNoteBuilder({renderTemplate: api.templateRender.bind(api)});
                 result = await ankiNoteBuilder.formatField(field, definition, mode, context, options, templates, exceptions);
             }
