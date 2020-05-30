@@ -141,7 +141,7 @@ class SettingsBackup {
     // Importing
 
     async _settingsImportSetOptionsFull(optionsFull) {
-        await this._settingsController.setOptionsFull(optionsFull);
+        await this._settingsController.setAllSettings(optionsFull);
     }
 
     _showSettingsImportError(error) {
@@ -340,9 +340,6 @@ class SettingsBackup {
 
         // Assign options
         await this._settingsImportSetOptionsFull(optionsFull);
-
-        // Reload settings page
-        window.location.reload();
     }
 
     _onSettingsImportClick() {
@@ -376,8 +373,5 @@ class SettingsBackup {
 
         // Assign options
         await this._settingsImportSetOptionsFull(optionsFull);
-
-        // Reload settings page
-        window.location.reload();
     }
 }

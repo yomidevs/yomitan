@@ -122,7 +122,8 @@ class Backend {
             ['logIndicatorClear',            {async: false, contentScript: true,  handler: this._onApiLogIndicatorClear.bind(this)}],
             ['createActionPort',             {async: false, contentScript: true,  handler: this._onApiCreateActionPort.bind(this)}],
             ['modifySettings',               {async: true,  contentScript: true,  handler: this._onApiModifySettings.bind(this)}],
-            ['getSettings',                  {async: false, contentScript: true,  handler: this._onApiGetSettings.bind(this)}]
+            ['getSettings',                  {async: false, contentScript: true,  handler: this._onApiGetSettings.bind(this)}],
+            ['setAllSettings',               {async: true,  contentScript: false, handler: this._onApiSetAllSettings.bind(this)}]
         ]);
         this._messageHandlersWithProgress = new Map([
             ['importDictionaryArchive', {async: true,  contentScript: false, handler: this._onApiImportDictionaryArchive.bind(this)}],
@@ -315,15 +316,6 @@ class Backend {
     getFullOptions(useSchema=false) {
         const options = this.options;
         return useSchema ? JsonSchema.createProxy(options, this.optionsSchema) : options;
-    }
-
-    setFullOptions(options) {
-        try {
-            this.options = JsonSchema.getValidValueOrDefault(this.optionsSchema, utilIsolate(options));
-        } catch (e) {
-            // This shouldn't happen, but catch errors just in case of bugs
-            yomichan.logError(e);
-        }
     }
 
     getOptions(optionsContext, useSchema=false) {
@@ -858,6 +850,11 @@ class Backend {
             }
         }
         return results;
+    }
+
+    async _onApiSetAllSettings({value, source}) {
+        this.options = JsonSchema.getValidValueOrDefault(this.optionsSchema, value);
+        await this._onApiOptionsSave({source});
     }
 
     // Command handlers

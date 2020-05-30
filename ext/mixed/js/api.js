@@ -176,6 +176,10 @@ const api = (() => {
             return this._invoke('getSettings', {targets});
         }
 
+        setAllSettings(value, source) {
+            return this._invoke('setAllSettings', {value, source});
+        }
+
         // Invoke functions with progress
 
         importDictionaryArchive(archiveContent, details, onProgress) {

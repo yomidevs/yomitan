@@ -38,9 +38,7 @@ class SettingsController extends EventDispatcher {
 
     set profileIndex(value) {
         if (this._profileIndex === value) { return; }
-        this._profileIndex = value;
-        this.trigger('optionsContextChanged');
-        this._onOptionsUpdatedInternal();
+        this._setProfileIndex(value);
     }
 
     prepare() {
@@ -69,9 +67,10 @@ class SettingsController extends EventDispatcher {
         return utilBackend().getFullOptions();
     }
 
-    async setOptionsFull(optionsFull) {
-        utilBackend().setFullOptions(utilBackgroundIsolate(optionsFull));
-        await this.save();
+    async setAllSettings(value) {
+        const profileIndex = value.profileCurrent;
+        await api.setAllSettings(value, this._source);
+        this._setProfileIndex(profileIndex);
     }
 
     async getGlobalSettings(targets) {
@@ -103,6 +102,12 @@ class SettingsController extends EventDispatcher {
     }
 
     // Private
+
+    _setProfileIndex(value) {
+        this._profileIndex = value;
+        this.trigger('optionsContextChanged');
+        this._onOptionsUpdatedInternal();
+    }
 
     _onOptionsUpdated({source}) {
         if (source === this._source) { return; }
