@@ -70,6 +70,30 @@ class SettingsController extends EventDispatcher {
         await this.save();
     }
 
+    async getGlobalSettings(targets) {
+        return await this._getSettings(targets, {scope: 'global'});
+    }
+
+    async getProfileSettings(targets) {
+        return await this._getSettings(targets, {scope: 'profile', optionsContext: this.getOptionsContext()});
+    }
+
+    async modifyGlobalSettings(targets) {
+        return await this._modifySettings(targets, {scope: 'global'});
+    }
+
+    async modifyProfileSettings(targets) {
+        return await this._modifySettings(targets, {scope: 'profile', optionsContext: this.getOptionsContext()});
+    }
+
+    async setGlobalSetting(path, value) {
+        return await this.modifyGlobalSettings([{action: 'set', path, value}]);
+    }
+
+    async setProfileSetting(path, value) {
+        return await this.modifyProfileSettings([{action: 'set', path, value}]);
+    }
+
     getOptionsContext() {
         return {index: this._profileIndex};
     }
@@ -82,7 +106,18 @@ class SettingsController extends EventDispatcher {
     }
 
     async _onOptionsUpdatedInternal() {
+        const optionsContext = this.getOptionsContext();
         const options = await this.getOptions();
-        this.trigger('optionsChanged', {options});
+        this.trigger('optionsChanged', {options, optionsContext});
+    }
+
+    async _getSettings(targets, extraFields) {
+        targets = targets.map((target) => Object.assign({}, target, extraFields));
+        return await api.getSettings(targets);
+    }
+
+    async _modifySettings(targets, extraFields) {
+        targets = targets.map((target) => Object.assign({}, target, extraFields));
+        return await api.modifySettings(targets, this._source);
     }
 }
