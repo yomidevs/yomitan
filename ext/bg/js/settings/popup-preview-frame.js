@@ -141,6 +141,7 @@ class PopupPreviewFrame {
         if (exampleText === null) { return; }
 
         exampleText.textContent = text;
+        if (this._frontend === null) { return; }
         this._updateSearch();
     }
 
@@ -163,6 +164,7 @@ class PopupPreviewFrame {
 
     async _updateOptionsContext({optionsContext}) {
         this._optionsContext = optionsContext;
+        if (this._frontend === null) { return; }
         await this._frontend.updateOptions();
         await this._updateSearch();
     }
