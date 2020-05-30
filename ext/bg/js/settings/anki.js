@@ -17,7 +17,6 @@
 
 /* global
  * api
- * utilBackgroundIsolate
  */
 
 class AnkiController {
@@ -26,10 +25,12 @@ class AnkiController {
     }
 
     async prepare() {
-        $('#anki-fields-container input,#anki-fields-container select,#anki-fields-container textarea').change(this._onFieldsChanged.bind(this));
+        for (const element of document.querySelectorAll('#anki-fields-container input,#anki-fields-container select')) {
+            element.addEventListener('change', this._onFieldsChanged.bind(this), false);
+        }
 
-        for (const node of document.querySelectorAll('#anki-terms-model,#anki-kanji-model')) {
-            node.addEventListener('change', this._onModelChanged.bind(this), false);
+        for (const element of document.querySelectorAll('#anki-terms-model,#anki-kanji-model')) {
+            element.addEventListener('change', this._onModelChanged.bind(this), false);
         }
 
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
@@ -97,8 +98,8 @@ class AnkiController {
 
         await this._deckAndModelPopulate(options);
         await Promise.all([
-            this._fieldsPopulate('terms', options),
-            this._fieldsPopulate('kanji', options)
+            this._populateFields('terms', options.anki.terms.fields),
+            this._populateFields('kanji', options.anki.kanji.fields)
         ]);
     }
 
@@ -111,12 +112,8 @@ class AnkiController {
     }
 
     _spinnerShow(show) {
-        const spinner = $('#anki-spinner');
-        if (show) {
-            spinner.show();
-        } else {
-            spinner.hide();
-        }
+        const spinner = document.querySelector('#anki-spinner');
+        spinner.hidden = !show;
     }
 
     _setError(error) {
@@ -222,15 +219,13 @@ class AnkiController {
         return content;
     }
 
-    async _fieldsPopulate(tabId, options) {
+    async _populateFields(tabId, fields) {
         const tab = document.querySelector(`.tab-pane[data-anki-card-type=${tabId}]`);
         const container = tab.querySelector('tbody');
         const markers = this.getFieldMarkers(tabId);
 
         const fragment = document.createDocumentFragment();
-        const fields = options.anki[tabId].fields;
-        for (const name of Object.keys(fields)) {
-            const value = fields[name];
+        for (const [name, value] of Object.entries(fields)) {
             const html = this._createFieldTemplate(name, value, markers);
             fragment.appendChild(html);
         }
@@ -249,7 +244,7 @@ class AnkiController {
     _onMarkerClicked(e) {
         e.preventDefault();
         const link = e.currentTarget;
-        const input = $(link).closest('.input-group').find('.anki-field-value')[0];
+        const input = link.closest('.input-group').querySelector('.anki-field-value');
         input.value = `{${link.textContent}}`;
         input.dispatchEvent(new Event('change'));
     }
@@ -276,23 +271,27 @@ class AnkiController {
             fields[name] = '';
         }
 
-        const options = await this._settingsController.getOptionsMutable();
-        options.anki[tabId].fields = utilBackgroundIsolate(fields);
-        await this._settingsController.save();
-
-        await this._fieldsPopulate(tabId, options);
+        await this._settingsController.setProfileSetting(`anki["${tabId}"].fields`, fields);
+        await this._populateFields(tabId, fields);
     }
 
     async _onFieldsChanged() {
-        const options = await this._settingsController.getOptionsMutable();
+        const termsDeck = document.querySelector('#anki-terms-deck').value;
+        const termsModel = document.querySelector('#anki-terms-model').value;
+        const termsFields = this._fieldsToDict(document.querySelectorAll('#terms .anki-field-value'));
+        const kanjiDeck = document.querySelector('#anki-kanji-deck').value;
+        const kanjiModel = document.querySelector('#anki-kanji-model').value;
+        const kanjiFields = this._fieldsToDict(document.querySelectorAll('#kanji .anki-field-value'));
 
-        options.anki.terms.deck = $('#anki-terms-deck').val();
-        options.anki.terms.model = $('#anki-terms-model').val();
-        options.anki.terms.fields = utilBackgroundIsolate(this._fieldsToDict(document.querySelectorAll('#terms .anki-field-value')));
-        options.anki.kanji.deck = $('#anki-kanji-deck').val();
-        options.anki.kanji.model = $('#anki-kanji-model').val();
-        options.anki.kanji.fields = utilBackgroundIsolate(this._fieldsToDict(document.querySelectorAll('#kanji .anki-field-value')));
+        const targets = [
+            {action: 'set', path: 'anki.terms.deck',   value: termsDeck},
+            {action: 'set', path: 'anki.terms.model',  value: termsModel},
+            {action: 'set', path: 'anki.terms.fields', value: termsFields},
+            {action: 'set', path: 'anki.kanji.deck',   value: kanjiDeck},
+            {action: 'set', path: 'anki.kanji.model',  value: kanjiModel},
+            {action: 'set', path: 'anki.kanji.fields', value: kanjiFields}
+        ];
 
-        await this._settingsController.save();
+        await this._settingsController.modifyProfileSettings(targets);
     }
 }
