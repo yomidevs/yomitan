@@ -73,12 +73,20 @@ class SettingsController extends EventDispatcher {
         this._setProfileIndex(profileIndex);
     }
 
+    async getSettings(targets) {
+        return await this._getSettings(targets, {});
+    }
+
     async getGlobalSettings(targets) {
         return await this._getSettings(targets, {scope: 'global'});
     }
 
     async getProfileSettings(targets) {
-        return await this._getSettings(targets, {scope: 'profile', optionsContext: this.getOptionsContext()});
+        return await this._getSettings(targets, {scope: 'profile'});
+    }
+
+    async modifySettings(targets) {
+        return await this._modifySettings(targets, {});
     }
 
     async modifyGlobalSettings(targets) {
@@ -86,7 +94,7 @@ class SettingsController extends EventDispatcher {
     }
 
     async modifyProfileSettings(targets) {
-        return await this._modifySettings(targets, {scope: 'profile', optionsContext: this.getOptionsContext()});
+        return await this._modifySettings(targets, {scope: 'profile'});
     }
 
     async setGlobalSetting(path, value) {
@@ -120,13 +128,23 @@ class SettingsController extends EventDispatcher {
         this.trigger('optionsChanged', {options, optionsContext});
     }
 
+    _setupTargets(targets, extraFields) {
+        return targets.map((target) => {
+            target = Object.assign({}, extraFields, target);
+            if (target.scope === 'profile') {
+                target.optionsContext = this.getOptionsContext();
+            }
+            return target;
+        });
+    }
+
     async _getSettings(targets, extraFields) {
-        targets = targets.map((target) => Object.assign({}, target, extraFields));
+        targets = this._setupTargets(targets, extraFields);
         return await api.getSettings(targets);
     }
 
     async _modifySettings(targets, extraFields) {
-        targets = targets.map((target) => Object.assign({}, target, extraFields));
+        targets = this._setupTargets(targets, extraFields);
         return await api.modifySettings(targets, this._source);
     }
 }
