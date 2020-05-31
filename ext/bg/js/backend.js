@@ -805,6 +805,7 @@ class Backend {
 
     _createActionListenerPort(port, sender, handlers) {
         let hasStarted = false;
+        let messageString = '';
 
         const onProgress = (...data) => {
             try {
@@ -815,12 +816,34 @@ class Backend {
             }
         };
 
-        const onMessage = async ({action, params}) => {
+        const onMessage = (message) => {
             if (hasStarted) { return; }
-            hasStarted = true;
-            port.onMessage.removeListener(onMessage);
 
             try {
+                const {action, data} = message;
+                switch (action) {
+                    case 'fragment':
+                        messageString += data;
+                        break;
+                    case 'invoke':
+                        {
+                            hasStarted = true;
+                            port.onMessage.removeListener(onMessage);
+
+                            const messageData = JSON.parse(messageString);
+                            messageString = null;
+                            onMessageComplete(messageData);
+                        }
+                        break;
+                }
+            } catch (e) {
+                cleanup(e);
+            }
+        };
+
+        const onMessageComplete = async (message) => {
+            try {
+                const {action, params} = message;
                 port.postMessage({type: 'ack'});
 
                 const messageHandler = handlers.get(action);
@@ -837,25 +860,29 @@ class Backend {
                 const result = async ? await promiseOrResult : promiseOrResult;
                 port.postMessage({type: 'complete', data: result});
             } catch (e) {
-                if (port !== null) {
-                    port.postMessage({type: 'error', data: errorToJson(e)});
-                }
-                cleanup();
+                cleanup(e);
             }
         };
 
-        const cleanup = () => {
+        const onDisconnect = () => {
+            cleanup(null);
+        };
+
+        const cleanup = (error) => {
             if (port === null) { return; }
+            if (error !== null) {
+                port.postMessage({type: 'error', data: errorToJson(error)});
+            }
             if (!hasStarted) {
                 port.onMessage.removeListener(onMessage);
             }
-            port.onDisconnect.removeListener(cleanup);
+            port.onDisconnect.removeListener(onDisconnect);
             port = null;
             handlers = null;
         };
 
         port.onMessage.addListener(onMessage);
-        port.onDisconnect.addListener(cleanup);
+        port.onDisconnect.addListener(onDisconnect);
     }
 
     _getErrorLevelValue(errorLevel) {
