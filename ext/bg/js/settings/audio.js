@@ -23,7 +23,6 @@ class AudioController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._audioSystem = null;
-        this._settingsAudioSources = null;
         this._audioSourceContainer = null;
         this._audioSourceAddButton = null;
         this._audioSourceEntries = [];
@@ -45,26 +44,20 @@ class AudioController {
 
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
 
-        this._onOptionsChanged();
+        const options = await this._settingsController.getOptions();
+        this._onOptionsChanged({options});
     }
 
     // Private
 
-    async _onOptionsChanged() {
-        const options = await this._settingsController.getOptionsMutable();
-
-        for (const entry of [...this._audioSourceEntries]) {
-            this._removeAudioSourceEntry(entry);
+    _onOptionsChanged({options}) {
+        for (let i = this._audioSourceEntries.length - 1; i >= 0; --i) {
+            this._cleanupAudioSourceEntry(i);
         }
 
-        this._settingsAudioSources = options.audio.sources;
-        for (const audioSource of toIterable(this._settingsAudioSources)) {
+        for (const audioSource of options.audio.sources) {
             this._createAudioSourceEntry(audioSource);
         }
-    }
-
-    async _save() {
-        await this._settingsController.save();
     }
 
     _prepareTextToSpeech() {
@@ -157,7 +150,7 @@ class AudioController {
             'custom'
         ];
         for (const source of audioSourcesAvailable) {
-            if (this._settingsAudioSources.indexOf(source) < 0) {
+            if (!this._audioSourceEntries.some((metadata) => metadata.value === source)) {
                 return source;
             }
         }
@@ -174,7 +167,8 @@ class AudioController {
 
         const entry = {
             container,
-            eventListeners
+            eventListeners,
+            value
         };
 
         eventListeners.addEventListener(select, 'change', this._onAudioSourceSelectChange.bind(this, entry), false);
@@ -184,46 +178,56 @@ class AudioController {
         this._audioSourceEntries.push(entry);
     }
 
-    _removeAudioSourceEntry(entry) {
+    async _removeAudioSourceEntry(entry) {
         const index = this._audioSourceEntries.indexOf(entry);
         if (index < 0) { return; }
 
-        const {container, eventListeners} = entry;
+        this._cleanupAudioSourceEntry(index);
+        await this._settingsController.modifyProfileSettings([{
+            action: 'splice',
+            path: 'audio.sources',
+            start: index,
+            deleteCount: 1,
+            items: []
+        }]);
+    }
+
+    _cleanupAudioSourceEntry(index) {
+        const {container, eventListeners} = this._audioSourceEntries[index];
         if (container.parentNode !== null) {
             container.parentNode.removeChild(container);
         }
         eventListeners.removeAllEventListeners();
-
         this._audioSourceEntries.splice(index, 1);
-        this._settingsAudioSources.splice(index, 1);
-
-        for (let i = index, ii = this._audioSourceEntries.length; i < ii; ++i) {
-            this._audioSourceEntries[i].index = i;
-        }
     }
 
     _onTextToSpeechVoiceChange(e) {
         e.currentTarget.dataset.value = e.currentTarget.value;
     }
 
-    _onAddAudioSource() {
+    async _onAddAudioSource() {
         const audioSource = this._getUnusedAudioSource();
-        this._settingsAudioSources.push(audioSource);
+        const index = this._audioSourceEntries.length;
         this._createAudioSourceEntry(audioSource);
-        this._save();
+        await this._settingsController.modifyProfileSettings([{
+            action: 'splice',
+            path: 'audio.sources',
+            start: index,
+            deleteCount: 0,
+            items: [audioSource]
+        }]);
     }
 
-    _onAudioSourceSelectChange(entry, event) {
+    async _onAudioSourceSelectChange(entry, event) {
         const index = this._audioSourceEntries.indexOf(entry);
         if (index < 0) { return; }
 
         const value = event.currentTarget.value;
-        this._settingsAudioSources[index] = value;
-        this._save();
+        entry.value = value;
+        await this._settingsController.setProfileSetting(`audio.sources[${index}]`, value);
     }
 
-    _onAudioSourceRemoveClicked(entry) {
-        this._removeAudioSourceEntry(entry);
-        this._save();
+    async _onAudioSourceRemoveClicked(entry) {
+        await this._removeAudioSourceEntry(entry);
     }
 }
