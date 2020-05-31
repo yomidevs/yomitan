@@ -236,7 +236,6 @@ const api = (() => {
 
         _invokeWithProgress(action, params, onProgress, timeout=5000) {
             return new Promise((resolve, reject) => {
-                let timer = null;
                 let port = null;
 
                 if (typeof onProgress !== 'function') {
@@ -245,12 +244,6 @@ const api = (() => {
 
                 const onMessage = (message) => {
                     switch (message.type) {
-                        case 'ack':
-                            if (timer !== null) {
-                                clearTimeout(timer);
-                                timer = null;
-                            }
-                            break;
                         case 'progress':
                             try {
                                 onProgress(...message.data);
@@ -275,10 +268,6 @@ const api = (() => {
                 };
 
                 const cleanup = () => {
-                    if (timer !== null) {
-                        clearTimeout(timer);
-                        timer = null;
-                    }
                     if (port !== null) {
                         port.onMessage.removeListener(onMessage);
                         port.onDisconnect.removeListener(onDisconnect);
@@ -288,17 +277,20 @@ const api = (() => {
                     onProgress = null;
                 };
 
-                timer = setTimeout(() => {
-                    cleanup();
-                    reject(new Error('Timeout'));
-                }, timeout);
-
                 (async () => {
                     try {
                         port = await this._createActionPort(timeout);
                         port.onMessage.addListener(onMessage);
                         port.onDisconnect.addListener(onDisconnect);
-                        port.postMessage({action, params});
+
+                        // Chrome has a maximum message size that can be sent, so longer messages must be fragmented.
+                        const messageString = JSON.stringify({action, params});
+                        const fragmentSize = 1e7; // 10 MB
+                        for (let i = 0, ii = messageString.length; i < ii; i += fragmentSize) {
+                            const data = messageString.substring(i, i + fragmentSize);
+                            port.postMessage({action: 'fragment', data});
+                        }
+                        port.postMessage({action: 'invoke'});
                     } catch (e) {
                         cleanup();
                         reject(e);
