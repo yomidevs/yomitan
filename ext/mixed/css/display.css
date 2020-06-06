@@ -317,7 +317,7 @@ button.action-button {
     color: var(--very-light-text-color);
 }
 
-.entry:not(.entry-current) .current {
+.entry:not(.entry-current) .action-current-indicator {
     display: none;
 }
 
