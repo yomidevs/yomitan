@@ -279,6 +279,7 @@ button.action-button {
     display: block;
     background-color: transparent;
     background-repeat: no-repeat;
+    background-size: contain;
 }
 
 .action-button[data-icon=entry-current]:before {
