@@ -24,7 +24,6 @@
 async function injectPopupNested() {
     await dynamicLoader.loadScripts([
         '/mixed/js/text-scanner.js',
-        '/fg/js/frontend-api-sender.js',
         '/fg/js/popup.js',
         '/fg/js/popup-proxy.js',
         '/fg/js/frontend.js',

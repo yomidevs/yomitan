@@ -16,7 +16,7 @@
  */
 
 /* global
- * FrontendApiSender
+ * api
  */
 
 class PopupProxy {
@@ -24,7 +24,7 @@ class PopupProxy {
         this._id = id;
         this._depth = depth;
         this._parentPopupId = parentPopupId;
-        this._apiSender = new FrontendApiSender(`popup-factory#${parentFrameId}`);
+        this._parentFrameId = parentFrameId;
         this._getFrameOffset = getFrameOffset;
         this._setDisabled = setDisabled;
 
@@ -111,7 +111,7 @@ class PopupProxy {
     // Private
 
     _invoke(action, params={}) {
-        return this._apiSender.invoke(action, params);
+        return api.crossFrame.invoke(this._parentFrameId, action, params);
     }
 
     async _updateFrameOffset() {

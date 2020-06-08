@@ -15,10 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global
+ * CrossFrameAPI
+ */
+
 const api = (() => {
     class API {
         constructor() {
             this._forwardLogsToBackendEnabled = false;
+            this._crossFrame = new CrossFrameAPI();
+        }
+
+        get crossFrame() {
+            return this._crossFrame;
+        }
+
+        prepare() {
+            this._crossFrame.prepare();
         }
 
         forwardLogsToBackend() {
@@ -331,5 +344,8 @@ const api = (() => {
         }
     }
 
-    return new API();
+    // eslint-disable-next-line no-shadow
+    const api = new API();
+    api.prepare();
+    return api;
 })();

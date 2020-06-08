@@ -20,7 +20,6 @@
  * AnkiNoteBuilder
  * AudioSystem
  * AudioUriBuilder
- * BackendApiForwarder
  * ClipboardMonitor
  * Database
  * DictionaryImporter
@@ -75,9 +74,6 @@ class Backend {
         );
 
         this.popupWindow = null;
-
-        const apiForwarder = new BackendApiForwarder();
-        apiForwarder.prepare();
 
         this._defaultBrowserActionTitle = null;
         this._isPrepared = false;

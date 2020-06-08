@@ -16,8 +16,8 @@
  */
 
 /* global
- * FrontendApiReceiver
  * Popup
+ * api
  */
 
 class PopupFactory {
@@ -29,7 +29,7 @@ class PopupFactory {
     // Public functions
 
     async prepare() {
-        const apiReceiver = new FrontendApiReceiver(`popup-factory#${this._frameId}`, new Map([
+        api.crossFrame.registerHandlers([
             ['getOrCreatePopup',   {async: false, handler: this._onApiGetOrCreatePopup.bind(this)}],
             ['setOptionsContext',  {async: true,  handler: this._onApiSetOptionsContext.bind(this)}],
             ['hide',               {async: false, handler: this._onApiHide.bind(this)}],
@@ -41,8 +41,7 @@ class PopupFactory {
             ['clearAutoPlayTimer', {async: false, handler: this._onApiClearAutoPlayTimer.bind(this)}],
             ['setContentScale',    {async: false, handler: this._onApiSetContentScale.bind(this)}],
             ['getUrl',             {async: false, handler: this._onApiGetUrl.bind(this)}]
-        ]));
-        apiReceiver.prepare();
+        ]);
     }
 
     getOrCreatePopup(id=null, parentId=null, depth=null) {
