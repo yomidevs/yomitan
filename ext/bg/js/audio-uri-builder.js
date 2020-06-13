@@ -82,16 +82,24 @@ class AudioUriBuilder {
     }
 
     async _getUriJpod101Alternate(definition) {
-        const response = await new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post');
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.addEventListener('error', () => reject(new Error('Failed to scrape audio data')));
-            xhr.addEventListener('load', () => resolve(xhr.responseText));
-            xhr.send(`post=dictionary_reference&match_type=exact&search_query=${encodeURIComponent(definition.expression)}`);
+        const fetchUrl = 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post';
+        const data = `post=dictionary_reference&match_type=exact&search_query=${encodeURIComponent(definition.expression)}`;
+        const response = await fetch(fetchUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            cache: 'default',
+            credentials: 'omit',
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: data
         });
+        const responseText = await response.text();
+        console.log(responseText);
 
-        const dom = new DOMParser().parseFromString(response, 'text/html');
+        const dom = new DOMParser().parseFromString(responseText, 'text/html');
         for (const row of dom.getElementsByClassName('dc-result-row')) {
             try {
                 const url = row.querySelector('audio>source[src]').getAttribute('src');
@@ -108,15 +116,18 @@ class AudioUriBuilder {
     }
 
     async _getUriJisho(definition) {
-        const response = await new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', `https://jisho.org/search/${definition.expression}`);
-            xhr.addEventListener('error', () => reject(new Error('Failed to scrape audio data')));
-            xhr.addEventListener('load', () => resolve(xhr.responseText));
-            xhr.send();
+        const fetchUrl = `https://jisho.org/search/${definition.expression}`;
+        const response = await fetch(fetchUrl, {
+            method: 'GET',
+            mode: 'no-cors',
+            cache: 'default',
+            credentials: 'omit',
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer'
         });
+        const responseText = await response.text();
 
-        const dom = new DOMParser().parseFromString(response, 'text/html');
+        const dom = new DOMParser().parseFromString(responseText, 'text/html');
         try {
             const audio = dom.getElementById(`audio_${definition.expression}:${definition.reading}`);
             if (audio !== null) {

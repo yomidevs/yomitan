@@ -16,28 +16,28 @@
  */
 
 
-function requestText(url, action, params) {
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.overrideMimeType('text/plain');
-        xhr.addEventListener('load', () => resolve(xhr.responseText));
-        xhr.addEventListener('error', () => reject(new Error('Failed to connect')));
-        xhr.open(action, url);
-        if (params) {
-            xhr.send(JSON.stringify(params));
-        } else {
-            xhr.send();
-        }
+async function requestText(url, method, data) {
+    const response = await fetch(url, {
+        method,
+        mode: 'no-cors',
+        cache: 'default',
+        credentials: 'omit',
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        body: (data ? JSON.stringify(data) : void 0)
     });
+    return await response.text();
 }
 
-async function requestJson(url, action, params) {
-    const responseText = await requestText(url, action, params);
-    try {
-        return JSON.parse(responseText);
-    } catch (e) {
-        const error = new Error(`Invalid response (${e.message || e})`);
-        error.data = {url, action, params, responseText};
-        throw error;
-    }
+async function requestJson(url, method, data) {
+    const response = await fetch(url, {
+        method,
+        mode: 'no-cors',
+        cache: 'default',
+        credentials: 'omit',
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        body: (data ? JSON.stringify(data) : void 0)
+    });
+    return await response.json();
 }

@@ -38,60 +38,6 @@ const chrome = {
     }
 };
 
-class XMLHttpRequest {
-    constructor() {
-        this._eventCallbacks = new Map();
-        this._url = '';
-        this._responseText = null;
-    }
-
-    overrideMimeType() {
-        // NOP
-    }
-
-    addEventListener(eventName, callback) {
-        let callbacks = this._eventCallbacks.get(eventName);
-        if (typeof callbacks === 'undefined') {
-            callbacks = [];
-            this._eventCallbacks.set(eventName, callbacks);
-        }
-        callbacks.push(callback);
-    }
-
-    open(action, url2) {
-        this._url = url2;
-    }
-
-    send() {
-        const filePath = url.fileURLToPath(this._url);
-        Promise.resolve()
-            .then(() => {
-                let source;
-                try {
-                    source = fs.readFileSync(filePath, {encoding: 'utf8'});
-                } catch (e) {
-                    this._trigger('error');
-                    return;
-                }
-                this._responseText = source;
-                this._trigger('load');
-            });
-    }
-
-    get responseText() {
-        return this._responseText;
-    }
-
-    _trigger(eventName, ...args) {
-        const callbacks = this._eventCallbacks.get(eventName);
-        if (typeof callbacks === 'undefined') { return; }
-
-        for (let i = 0, ii = callbacks.length; i < ii; ++i) {
-            callbacks[i](...args);
-        }
-    }
-}
-
 class Image {
     constructor() {
         this._src = '';
@@ -138,11 +84,21 @@ class Image {
     }
 }
 
+async function fetch(url2) {
+    const filePath = url.fileURLToPath(url2);
+    await Promise.resolve();
+    const content = fs.readFileSync(filePath, {encoding: null});
+    return {
+        text: async () => Promise.resolve(content.toString('utf8')),
+        json: async () => Promise.resolve(JSON.parse(content.toString('utf8')))
+    };
+}
+
 
 const vm = new VM({
     chrome,
     Image,
-    XMLHttpRequest,
+    fetch,
     indexedDB: global.indexedDB,
     IDBKeyRange: global.IDBKeyRange,
     JSZip: yomichanTest.JSZip,

@@ -169,22 +169,22 @@ class AudioSystem {
         });
     }
 
-    _createAudioBinaryFromUrl(url) {
-        return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.responseType = 'arraybuffer';
-            xhr.addEventListener('load', async () => {
-                const arrayBuffer = xhr.response;
-                if (!await this._isAudioBinaryValid(arrayBuffer)) {
-                    reject(new Error('Could not retrieve audio'));
-                } else {
-                    resolve(arrayBuffer);
-                }
-            });
-            xhr.addEventListener('error', () => reject(new Error('Failed to connect')));
-            xhr.open('GET', url);
-            xhr.send();
+    async _createAudioBinaryFromUrl(url) {
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'no-cors',
+            cache: 'default',
+            credentials: 'omit',
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer'
         });
+        const arrayBuffer = await response.arrayBuffer();
+
+        if (!await this._isAudioBinaryValid(arrayBuffer)) {
+            throw new Error('Could not retrieve audio');
+        }
+
+        return arrayBuffer;
     }
 
     _isAudioValid(audio) {
