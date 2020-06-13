@@ -97,7 +97,6 @@ class AudioUriBuilder {
             body: data
         });
         const responseText = await response.text();
-        console.log(responseText);
 
         const dom = new DOMParser().parseFromString(responseText, 'text/html');
         for (const row of dom.getElementsByClassName('dc-result-row')) {
