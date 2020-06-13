@@ -118,6 +118,7 @@ class AudioController {
 
     _languageTagIsJapanese(languageTag) {
         return (
+            languageTag.startsWith('ja_') ||
             languageTag.startsWith('ja-') ||
             languageTag.startsWith('jpn-')
         );
