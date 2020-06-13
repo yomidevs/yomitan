@@ -168,6 +168,8 @@ class Backend {
             }, 1000);
             this._updateBadge();
 
+            yomichan.on('log', this._onLog.bind(this));
+
             await this.environment.prepare();
             await this.database.prepare();
             await this.translator.prepare();
@@ -314,6 +316,14 @@ class Backend {
     _onZoomChange({tabId, oldZoomFactor, newZoomFactor}) {
         const callback = () => this.checkLastError(chrome.runtime.lastError);
         chrome.tabs.sendMessage(tabId, {action: 'zoomChanged', params: {oldZoomFactor, newZoomFactor}}, callback);
+    }
+
+    _onLog({level}) {
+        const levelValue = this._getErrorLevelValue(level);
+        if (levelValue <= this._getErrorLevelValue(this._logErrorLevel)) { return; }
+
+        this._logErrorLevel = level;
+        this._updateBadge();
     }
 
     applyOptions() {
@@ -809,12 +819,6 @@ class Backend {
 
     _onApiLog({error, level, context}) {
         yomichan.log(jsonToError(error), level, context);
-
-        const levelValue = this._getErrorLevelValue(level);
-        if (levelValue <= this._getErrorLevelValue(this._logErrorLevel)) { return; }
-
-        this._logErrorLevel = level;
-        this._updateBadge();
     }
 
     _onApiLogIndicatorClear() {
