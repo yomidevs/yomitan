@@ -65,8 +65,12 @@ class Frontend {
     async prepare() {
         try {
             await this.updateOptions();
-            const {zoomFactor} = await api.getZoom();
-            this._pageZoomFactor = zoomFactor;
+            try {
+                const {zoomFactor} = await api.getZoom();
+                this._pageZoomFactor = zoomFactor;
+            } catch (e) {
+                // Ignore exceptions which may occur due to being on an unsupported page (e.g. about:blank)
+            }
 
             window.addEventListener('resize', this._onResize.bind(this), false);
 
