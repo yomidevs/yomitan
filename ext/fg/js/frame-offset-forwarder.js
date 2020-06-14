@@ -21,8 +21,7 @@
 
 class FrameOffsetForwarder {
     constructor() {
-        this._started = false;
-
+        this._isPrepared = false;
         this._cacheMaxSize = 1000;
         this._frameCache = new Set();
         this._unreachableContentWindowCache = new Set();
@@ -38,10 +37,10 @@ class FrameOffsetForwarder {
         ]);
     }
 
-    start() {
-        if (this._started) { return; }
-        window.addEventListener('message', this.onMessage.bind(this), false);
-        this._started = true;
+    prepare() {
+        if (this._isPrepared) { return; }
+        window.addEventListener('message', this._onMessage.bind(this), false);
+        this._isPrepared = true;
     }
 
     async getOffset() {
@@ -69,11 +68,20 @@ class FrameOffsetForwarder {
         return offset;
     }
 
-    onMessage(e) {
-        const {action, params} = e.data;
-        const handler = this._windowMessageHandlers.get(action);
-        if (typeof handler !== 'function') { return; }
-        handler(params, e);
+    // Private
+
+    _onMessage(event) {
+        const data = event.data;
+        if (data === null || typeof data !== 'object') { return; }
+
+        try {
+            const {action, params} = event.data;
+            const handler = this._windowMessageHandlers.get(action);
+            if (typeof handler !== 'function') { return; }
+            handler(params, event);
+        } catch (e) {
+            // NOP
+        }
     }
 
     _onGetFrameOffset(offset, uniqueId, e) {
