@@ -27,10 +27,10 @@
  * JsonSchema
  * Mecab
  * ObjectPropertyAccessor
+ * TemplateRenderer
  * Translator
  * conditionsTestValue
  * dictTermsSort
- * handlebarsRenderDynamic
  * jp
  * optionsLoad
  * optionsSave
@@ -63,6 +63,7 @@ class Backend {
             audioSystem: this.audioSystem,
             renderTemplate: this._renderTemplate.bind(this)
         });
+        this._templateRenderer = new TemplateRenderer();
 
         const url = (typeof window === 'object' && window !== null ? window.location.href : '');
         this.optionsContext = {depth: 0, url};
@@ -1230,7 +1231,7 @@ class Backend {
     }
 
     async _renderTemplate(template, data) {
-        return handlebarsRenderDynamic(template, data);
+        return await this._templateRenderer.render(template, data);
     }
 
     _getTemplates(options) {
