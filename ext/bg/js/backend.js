@@ -579,13 +579,14 @@ class Backend {
         const states = [];
 
         try {
-            const notes = [];
+            const notePromises = [];
             for (const definition of definitions) {
                 for (const mode of modes) {
-                    const note = await this.ankiNoteBuilder.createNote(definition, mode, context, options, templates);
-                    notes.push(note);
+                    const notePromise = this.ankiNoteBuilder.createNote(definition, mode, context, options, templates);
+                    notePromises.push(notePromise);
                 }
             }
+            const notes = await Promise.all(notePromises);
 
             const cannotAdd = [];
             const results = await this.anki.canAddNotes(notes);
