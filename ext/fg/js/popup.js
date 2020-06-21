@@ -328,12 +328,18 @@ class Popup {
     async _createInjectPromise() {
         this._injectStyles();
 
+        const unsecurePopupFrameUrl = (this._options !== null && this._options.general.unsecurePopupFrameUrl);
         const {secret, token} = await this._initializeFrame(this._frame, this._targetOrigin, this._frameId, (frame) => {
             frame.removeAttribute('src');
             frame.removeAttribute('srcdoc');
             this._observeFullscreen(true);
             this._onFullscreenChanged();
-            frame.contentDocument.location.href = chrome.runtime.getURL('/fg/float.html');
+            const url = chrome.runtime.getURL('/fg/float.html');
+            if (unsecurePopupFrameUrl) {
+                frame.setAttribute('src', url);
+            } else {
+                frame.contentDocument.location.href = url;
+            }
         });
         this._frameSecret = secret;
         this._frameToken = token;
