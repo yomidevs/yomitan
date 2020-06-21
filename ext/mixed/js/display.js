@@ -807,9 +807,10 @@ class Display {
 
             this._stopPlayingAudio();
 
+            const volume = Math.max(0.0, Math.min(1.0, this.options.audio.volume / 100.0));
             this.audioPlaying = audio;
             audio.currentTime = 0;
-            audio.volume = this.options.audio.volume / 100.0;
+            audio.volume = Number.isFinite(volume) ? volume : 1.0;
             const playPromise = audio.play();
             if (typeof playPromise !== 'undefined') {
                 try {
