@@ -312,7 +312,14 @@ class DisplaySearch extends Display {
     }
 
     setQuery(query) {
-        const interpretedQuery = this.isWanakanaEnabled() ? wanakana.toKana(query) : query;
+        let interpretedQuery = query;
+        if (this.isWanakanaEnabled()) {
+            try {
+                interpretedQuery = wanakana.toKana(query);
+            } catch (e) {
+                // NOP
+            }
+        }
         this.query.value = interpretedQuery;
         this.queryParser.setText(interpretedQuery);
     }
