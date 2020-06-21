@@ -172,7 +172,11 @@ class Backend {
             yomichan.on('log', this._onLog.bind(this));
 
             await this.environment.prepare();
-            await this.database.prepare();
+            try {
+                await this.database.prepare();
+            } catch (e) {
+                yomichan.logError(e);
+            }
             await this.translator.prepare();
 
             await profileConditionsDescriptorPromise;
