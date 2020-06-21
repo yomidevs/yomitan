@@ -236,7 +236,9 @@ class Display {
             const {textSource, definitions} = termLookupResults;
 
             const scannedElement = e.target;
-            const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
+            const sentenceExtent = this.options.anki.sentenceExt;
+            const layoutAwareScan = this.options.scanning.layoutAwareScan;
+            const sentence = docSentenceExtract(textSource, sentenceExtent, layoutAwareScan);
 
             this.context.update({
                 index: this.entryIndexFind(scannedElement),
@@ -273,21 +275,22 @@ class Display {
         try {
             e.preventDefault();
 
-            const textSource = docRangeFromPoint(e.clientX, e.clientY, this.options.scanning.deepDomScan);
+            const {length: scanLength, deepDomScan: deepScan, layoutAwareScan} = this.options.scanning;
+            const textSource = docRangeFromPoint(e.clientX, e.clientY, deepScan);
             if (textSource === null) {
                 return false;
             }
 
             let definitions, length;
             try {
-                textSource.setEndOffset(this.options.scanning.length);
+                textSource.setEndOffset(scanLength, layoutAwareScan);
 
                 ({definitions, length} = await api.termsFind(textSource.text(), {}, this.getOptionsContext()));
                 if (definitions.length === 0) {
                     return false;
                 }
 
-                textSource.setEndOffset(length);
+                textSource.setEndOffset(length, layoutAwareScan);
             } finally {
                 textSource.cleanup();
             }

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// \u200c (Zero-width non-joiner) appears on Google Docs from Chrome 76 onwards
-const IGNORE_TEXT_PATTERN = /\u200c/;
-
+/* global
+ * DOMTextScanner
+ */
 
 /*
  * TextSourceRange
@@ -46,19 +46,19 @@ class TextSourceRange {
         return this.content;
     }
 
-    setEndOffset(length, fromEnd=false) {
+    setEndOffset(length, layoutAwareScan, fromEnd=false) {
         const state = (
             fromEnd ?
-            TextSourceRange.seekForward(this.range.endContainer, this.range.endOffset, length) :
-            TextSourceRange.seekForward(this.range.startContainer, this.range.startOffset, length)
+            new DOMTextScanner(this.range.endContainer, this.range.endOffset, !layoutAwareScan, layoutAwareScan).seek(length) :
+            new DOMTextScanner(this.range.startContainer, this.range.startOffset, !layoutAwareScan, layoutAwareScan).seek(length)
         );
         this.range.setEnd(state.node, state.offset);
         this.content = (fromEnd ? this.content + state.content : state.content);
         return length - state.remainder;
     }
 
-    setStartOffset(length) {
-        const state = TextSourceRange.seekBackward(this.range.startContainer, this.range.startOffset, length);
+    setStartOffset(length, layoutAwareScan) {
+        const state = new DOMTextScanner(this.range.startContainer, this.range.startOffset, !layoutAwareScan, layoutAwareScan).seek(-length);
         this.range.setStart(state.node, state.offset);
         this.rangeStartOffset = this.range.startOffset;
         this.content = state.content + this.content;
@@ -110,154 +110,6 @@ class TextSourceRange {
         }
     }
 
-    static shouldEnter(node) {
-        switch (node.nodeName.toUpperCase()) {
-            case 'RT':
-            case 'SCRIPT':
-            case 'STYLE':
-                return false;
-        }
-
-        const style = window.getComputedStyle(node);
-        return !(
-            style.visibility === 'hidden' ||
-            style.display === 'none' ||
-            parseFloat(style.fontSize) === 0
-        );
-    }
-
-    static getRubyElement(node) {
-        node = TextSourceRange.getParentElement(node);
-        if (node !== null && node.nodeName.toUpperCase() === 'RT') {
-            node = node.parentNode;
-            return (node !== null && node.nodeName.toUpperCase() === 'RUBY') ? node : null;
-        }
-        return null;
-    }
-
-    static seekForward(node, offset, length) {
-        const state = {node, offset, remainder: length, content: ''};
-        if (length <= 0) {
-            return state;
-        }
-
-        const TEXT_NODE = Node.TEXT_NODE;
-        const ELEMENT_NODE = Node.ELEMENT_NODE;
-        let resetOffset = false;
-
-        const ruby = TextSourceRange.getRubyElement(node);
-        if (ruby !== null) {
-            node = ruby;
-            resetOffset = true;
-        }
-
-        while (node !== null) {
-            let visitChildren = true;
-            const nodeType = node.nodeType;
-
-            if (nodeType === TEXT_NODE) {
-                state.node = node;
-                if (TextSourceRange.seekForwardTextNode(state, resetOffset)) {
-                    break;
-                }
-                resetOffset = true;
-            } else if (nodeType === ELEMENT_NODE) {
-                visitChildren = TextSourceRange.shouldEnter(node);
-            }
-
-            node = TextSourceRange.getNextNode(node, visitChildren);
-        }
-
-        return state;
-    }
-
-    static seekForwardTextNode(state, resetOffset) {
-        const nodeValue = state.node.nodeValue;
-        const nodeValueLength = nodeValue.length;
-        let content = state.content;
-        let offset = resetOffset ? 0 : state.offset;
-        let remainder = state.remainder;
-        let result = false;
-
-        for (; offset < nodeValueLength; ++offset) {
-            const c = nodeValue[offset];
-            if (!IGNORE_TEXT_PATTERN.test(c)) {
-                content += c;
-                if (--remainder <= 0) {
-                    result = true;
-                    ++offset;
-                    break;
-                }
-            }
-        }
-
-        state.offset = offset;
-        state.content = content;
-        state.remainder = remainder;
-        return result;
-    }
-
-    static seekBackward(node, offset, length) {
-        const state = {node, offset, remainder: length, content: ''};
-        if (length <= 0) {
-            return state;
-        }
-
-        const TEXT_NODE = Node.TEXT_NODE;
-        const ELEMENT_NODE = Node.ELEMENT_NODE;
-        let resetOffset = false;
-
-        const ruby = TextSourceRange.getRubyElement(node);
-        if (ruby !== null) {
-            node = ruby;
-            resetOffset = true;
-        }
-
-        while (node !== null) {
-            let visitChildren = true;
-            const nodeType = node.nodeType;
-
-            if (nodeType === TEXT_NODE) {
-                state.node = node;
-                if (TextSourceRange.seekBackwardTextNode(state, resetOffset)) {
-                    break;
-                }
-                resetOffset = true;
-            } else if (nodeType === ELEMENT_NODE) {
-                visitChildren = TextSourceRange.shouldEnter(node);
-            }
-
-            node = TextSourceRange.getPreviousNode(node, visitChildren);
-        }
-
-        return state;
-    }
-
-    static seekBackwardTextNode(state, resetOffset) {
-        const nodeValue = state.node.nodeValue;
-        let content = state.content;
-        let offset = resetOffset ? nodeValue.length : state.offset;
-        let remainder = state.remainder;
-        let result = false;
-
-        for (; offset > 0; --offset) {
-            const c = nodeValue[offset - 1];
-            if (!IGNORE_TEXT_PATTERN.test(c)) {
-                content = c + content;
-                if (--remainder <= 0) {
-                    result = true;
-                    --offset;
-                    break;
-                }
-            }
-        }
-
-        state.offset = offset;
-        state.content = content;
-        state.remainder = remainder;
-        return result;
-    }
-
     static getParentElement(node) {
         while (node !== null && node.nodeType !== Node.ELEMENT_NODE) {
             node = node.parentNode;
@@ -289,66 +141,6 @@ class TextSourceRange {
             default:
                 return writingMode;
         }
-    }
-
-    static getNodesInRange(range) {
-        const end = range.endContainer;
-        const nodes = [];
-        for (let node = range.startContainer; node !== null; node = TextSourceRange.getNextNode(node, true)) {
-            nodes.push(node);
-            if (node === end) { break; }
-        }
-        return nodes;
-    }
-
-    static getNextNode(node, visitChildren) {
-        let next = visitChildren ? node.firstChild : null;
-        if (next === null) {
-            while (true) {
-                next = node.nextSibling;
-                if (next !== null) { break; }
-
-                next = node.parentNode;
-                if (next === null) { break; }
-
-                node = next;
-            }
-        }
-        return next;
-    }
-
-    static getPreviousNode(node, visitChildren) {
-        let next = visitChildren ? node.lastChild : null;
-        if (next === null) {
-            while (true) {
-                next = node.previousSibling;
-                if (next !== null) { break; }
-
-                next = node.parentNode;
-                if (next === null) { break; }
-
-                node = next;
-            }
-        }
-        return next;
-    }
-
-    static anyNodeMatchesSelector(nodeList, selector) {
-        for (const node of nodeList) {
-            if (TextSourceRange.nodeMatchesSelector(node, selector)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    static nodeMatchesSelector(node, selector) {
-        for (; node !== null; node = node.parentNode) {
-            if (node.nodeType === Node.ELEMENT_NODE) {
-                return node.matches(selector);
-            }
-        }
-        return false;
     }
 }
 

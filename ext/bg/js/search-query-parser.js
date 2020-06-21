@@ -75,15 +75,17 @@ class QueryParser {
     async _search(textSource, cause) {
         if (textSource === null) { return null; }
 
-        const searchText = this._textScanner.getTextSourceContent(textSource, this._options.scanning.length);
+        const {length: scanLength, layoutAwareScan} = this._options.scanning;
+        const searchText = this._textScanner.getTextSourceContent(textSource, scanLength, layoutAwareScan);
         if (searchText.length === 0) { return null; }
 
         const {definitions, length} = await api.termsFind(searchText, {}, this._getOptionsContext());
         if (definitions.length === 0) { return null; }
 
-        const sentence = docSentenceExtract(textSource, this._options.anki.sentenceExt);
+        const sentenceExtent = this._options.anki.sentenceExt;
+        const sentence = docSentenceExtract(textSource, sentenceExtent, layoutAwareScan);
 
-        textSource.setEndOffset(length);
+        textSource.setEndOffset(length, layoutAwareScan);
 
         this._setContent('terms', {definitions, context: {
             focus: false,

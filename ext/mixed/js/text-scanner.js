@@ -17,7 +17,6 @@
 
 /* global
  * DOM
- * TextSourceRange
  * docRangeFromPoint
  */
 
@@ -119,20 +118,20 @@ class TextScanner extends EventDispatcher {
         }
     }
 
-    getTextSourceContent(textSource, length) {
+    getTextSourceContent(textSource, length, layoutAwareScan) {
         const clonedTextSource = textSource.clone();
 
-        clonedTextSource.setEndOffset(length);
+        clonedTextSource.setEndOffset(length, layoutAwareScan);
 
         if (this._ignoreNodes !== null && clonedTextSource.range) {
             length = clonedTextSource.text().length;
             while (clonedTextSource.range && length > 0) {
-                const nodes = TextSourceRange.getNodesInRange(clonedTextSource.range);
-                if (!TextSourceRange.anyNodeMatchesSelector(nodes, this._ignoreNodes)) {
+                const nodes = DOM.getNodesInRange(clonedTextSource.range);
+                if (!DOM.anyNodeMatchesSelector(nodes, this._ignoreNodes)) {
                     break;
                 }
                 --length;
-                clonedTextSource.setEndOffset(length);
+                clonedTextSource.setEndOffset(length, layoutAwareScan);
             }
         }
 

@@ -42,6 +42,7 @@
             "mixed/js/dynamic-loader.js",
             "mixed/js/text-scanner.js",
             "fg/js/document.js",
+            "fg/js/dom-text-scanner.js",
             "fg/js/popup.js",
             "fg/js/source.js",
             "fg/js/popup-factory.js",

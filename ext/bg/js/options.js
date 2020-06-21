@@ -203,7 +203,8 @@ function profileOptionsCreateDefaults() {
             enablePopupSearch: false,
             enableOnPopupExpressions: false,
             enableOnSearchPage: true,
-            enableSearchTags: false
+            enableSearchTags: false,
+            layoutAwareScan: false
         },
 
         translation: {

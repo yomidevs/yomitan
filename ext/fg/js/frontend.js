@@ -258,32 +258,36 @@ class Frontend {
     }
 
     async _findTerms(textSource, optionsContext) {
-        const searchText = this._textScanner.getTextSourceContent(textSource, this._options.scanning.length);
+        const {length: scanLength, layoutAwareScan} = this._options.scanning;
+        const searchText = this._textScanner.getTextSourceContent(textSource, scanLength, layoutAwareScan);
         if (searchText.length === 0) { return null; }
 
         const {definitions, length} = await api.termsFind(searchText, {}, optionsContext);
         if (definitions.length === 0) { return null; }
 
-        textSource.setEndOffset(length);
+        textSource.setEndOffset(length, layoutAwareScan);
 
         return {definitions, type: 'terms'};
     }
 
     async _findKanji(textSource, optionsContext) {
-        const searchText = this._textScanner.getTextSourceContent(textSource, 1);
+        const layoutAwareScan = this._options.scanning.layoutAwareScan;
+        const searchText = this._textScanner.getTextSourceContent(textSource, 1, layoutAwareScan);
         if (searchText.length === 0) { return null; }
 
         const definitions = await api.kanjiFind(searchText, optionsContext);
         if (definitions.length === 0) { return null; }
 
-        textSource.setEndOffset(1);
+        textSource.setEndOffset(1, layoutAwareScan);
 
         return {definitions, type: 'kanji'};
     }
 
     _showContent(textSource, focus, definitions, type, optionsContext) {
         const {url} = optionsContext;
-        const sentence = docSentenceExtract(textSource, this._options.anki.sentenceExt);
+        const sentenceExtent = this._options.anki.sentenceExt;
+        const layoutAwareScan = this._options.scanning.layoutAwareScan;
+        const sentence = docSentenceExtract(textSource, sentenceExtent, layoutAwareScan);
         this._showPopupContent(
             textSource,
             optionsContext,
