@@ -90,7 +90,7 @@ primary language is not English, you may consider also importing the English ver
 
     [![](https://foosoft.net/projects/yomichan/img/ui-actions-thumb.png)](https://foosoft.net/projects/yomichan/img/ui-actions.png)
 
-2.  Click on the *spanner/monkey wrench* icon in the middle to open the options page.
+2.  Click on the *spanner/cog* icon in the middle to open the options page.
 
 3.  Import the dictionaries you wish to use for term and kanji searches. If you do not have any dictionaries installed
     (or enabled), Yomichan will warn you that it is not ready for use by displaying an orange exclamation mark over its
