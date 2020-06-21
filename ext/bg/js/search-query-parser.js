@@ -42,6 +42,7 @@ class QueryParser {
 
     async prepare() {
         await this._queryParserGenerator.prepare();
+        this._textScanner.prepare();
         this._queryParser.addEventListener('click', this._onClick.bind(this));
     }
 

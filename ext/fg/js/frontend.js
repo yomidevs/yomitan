@@ -16,16 +16,18 @@
  */
 
 /* global
+ * DOM
+ * FrameOffsetForwarder
+ * PopupProxy
  * TextScanner
  * api
  * docSentenceExtract
  */
 
 class Frontend {
-    constructor(popup, getUrl=null) {
+    constructor(frameId, popupFactory, frontendInitializationData) {
         this._id = yomichan.generateId(16);
-        this._popup = popup;
-        this._getUrl = getUrl;
+        this._popup = null;
         this._disabledOverride = false;
         this._options = null;
         this._pageZoomFactor = 1.0;
@@ -37,10 +39,30 @@ class Frontend {
         this._optionsUpdatePending = false;
         this._textScanner = new TextScanner({
             node: window,
-            ignoreElements: () => this._popup.isProxy() ? [] : [this._popup.getFrame()],
-            ignorePoint: (x, y) => this._popup.containsPoint(x, y),
+            ignoreElements: this._ignoreElements.bind(this),
+            ignorePoint: this._ignorePoint.bind(this),
             search: this._search.bind(this)
         });
+
+        const {
+            depth=0,
+            id: proxyPopupId,
+            parentFrameId,
+            proxy: useProxyPopup=false,
+            isSearchPage=false,
+            allowRootFramePopupProxy=true
+        } = frontendInitializationData;
+        this._proxyPopupId = proxyPopupId;
+        this._parentFrameId = parentFrameId;
+        this._useProxyPopup = useProxyPopup;
+        this._isSearchPage = isSearchPage;
+        this._depth = depth;
+        this._frameId = frameId;
+        this._frameOffsetForwarder = new FrameOffsetForwarder();
+        this._popupFactory = popupFactory;
+        this._allowRootFramePopupProxy = allowRootFramePopupProxy;
+        this._popupCache = new Map();
+        this._updatePopupToken = null;
 
         this._windowMessageHandlers = new Map([
             ['popupClose', this._onMessagePopupClose.bind(this)],
@@ -62,43 +84,46 @@ class Frontend {
         this._textScanner.canClearSelection = value;
     }
 
-    async prepare() {
-        try {
-            await this.updateOptions();
-            try {
-                const {zoomFactor} = await api.getZoom();
-                this._pageZoomFactor = zoomFactor;
-            } catch (e) {
-                // Ignore exceptions which may occur due to being on an unsupported page (e.g. about:blank)
-            }
-
-            window.addEventListener('resize', this._onResize.bind(this), false);
-
-            const visualViewport = window.visualViewport;
-            if (visualViewport !== null && typeof visualViewport === 'object') {
-                window.visualViewport.addEventListener('scroll', this._onVisualViewportScroll.bind(this));
-                window.visualViewport.addEventListener('resize', this._onVisualViewportResize.bind(this));
-            }
-
-            yomichan.on('orphaned', this._onOrphaned.bind(this));
-            yomichan.on('optionsUpdated', this.updateOptions.bind(this));
-            yomichan.on('zoomChanged', this._onZoomChanged.bind(this));
-            chrome.runtime.onMessage.addListener(this._onRuntimeMessage.bind(this));
-
-            this._textScanner.on('clearSelection', this._onClearSelection.bind(this));
-            this._textScanner.on('activeModifiersChanged', this._onActiveModifiersChanged.bind(this));
-
-            this._updateContentScale();
-            this._broadcastRootPopupInformation();
-        } catch (e) {
-            yomichan.logError(e);
-        }
+    get popup() {
+        return this._popup;
     }
 
-    async setPopup(popup) {
-        this._textScanner.clearSelection(true);
-        this._popup = popup;
-        await popup.setOptionsContext(await this.getOptionsContext(), this._id);
+    async prepare() {
+        this._frameOffsetForwarder.prepare();
+
+        await this.updateOptions();
+        try {
+            const {zoomFactor} = await api.getZoom();
+            this._pageZoomFactor = zoomFactor;
+        } catch (e) {
+            // Ignore exceptions which may occur due to being on an unsupported page (e.g. about:blank)
+        }
+
+        this._textScanner.prepare();
+
+        window.addEventListener('resize', this._onResize.bind(this), false);
+        DOM.addFullscreenChangeEventListener(this._updatePopup.bind(this));
+
+        const visualViewport = window.visualViewport;
+        if (visualViewport !== null && typeof visualViewport === 'object') {
+            window.visualViewport.addEventListener('scroll', this._onVisualViewportScroll.bind(this));
+            window.visualViewport.addEventListener('resize', this._onVisualViewportResize.bind(this));
+        }
+
+        yomichan.on('orphaned', this._onOrphaned.bind(this));
+        yomichan.on('optionsUpdated', this.updateOptions.bind(this));
+        yomichan.on('zoomChanged', this._onZoomChanged.bind(this));
+        chrome.runtime.onMessage.addListener(this._onRuntimeMessage.bind(this));
+
+        this._textScanner.on('clearSelection', this._onClearSelection.bind(this));
+        this._textScanner.on('activeModifiersChanged', this._onActiveModifiersChanged.bind(this));
+
+        api.crossFrame.registerHandlers([
+            ['getUrl', {async: false, handler: this._onApiGetUrl.bind(this)}]
+        ]);
+
+        this._updateContentScale();
+        this._broadcastRootPopupInformation();
     }
 
     setDisabledOverride(disabled) {
@@ -112,8 +137,16 @@ class Frontend {
     }
 
     async getOptionsContext() {
-        const url = this._getUrl !== null ? await this._getUrl() : window.location.href;
-        const depth = this._popup.depth;
+        let url = window.location.href;
+        if (this._useProxyPopup) {
+            try {
+                url = await api.crossFrame.invoke(this._parentFrameId, 'getUrl', {});
+            } catch (e) {
+                // NOP
+            }
+        }
+
+        const depth = this._depth;
         const modifierKeys = [...this._activeModifiers];
         return {depth, url, modifierKeys};
     }
@@ -121,6 +154,9 @@ class Frontend {
     async updateOptions() {
         const optionsContext = await this.getOptionsContext();
         this._options = await api.optionsGet(optionsContext);
+
+        await this._updatePopup();
+
         this._textScanner.setOptions(this._options);
         this._updateTextScannerEnabled();
 
@@ -129,8 +165,6 @@ class Frontend {
             ignoreNodes.push('.source-text', '.source-text *');
         }
         this._textScanner.ignoreNodes = ignoreNodes.join(',');
-
-        await this._popup.setOptionsContext(optionsContext, this._id);
 
         this._updateContentScale();
 
@@ -165,6 +199,12 @@ class Frontend {
 
     _onMessageRequestDocumentInformationBroadcast({uniqueId}) {
         this._broadcastDocumentInformation(uniqueId);
+    }
+
+    // API message handlers
+
+    _onApiGetUrl() {
+        return window.location.href;
     }
 
     // Private
@@ -221,6 +261,95 @@ class Frontend {
             return;
         }
         await this.updateOptions();
+    }
+
+    async _updatePopup() {
+        const showIframePopupsInRootFrame = this._options.general.showIframePopupsInRootFrame;
+        const isIframe = !this._useProxyPopup && (window !== window.parent);
+
+        let popupPromise;
+        if (
+            isIframe &&
+            showIframePopupsInRootFrame &&
+            DOM.getFullscreenElement() === null &&
+            this._allowRootFramePopupProxy
+        ) {
+            popupPromise = this._popupCache.get('iframe');
+            if (typeof popupPromise === 'undefined') {
+                popupPromise = this._getIframeProxyPopup();
+                this._popupCache.set('iframe', popupPromise);
+            }
+        } else if (this._useProxyPopup) {
+            popupPromise = this._popupCache.get('proxy');
+            if (typeof popupPromise === 'undefined') {
+                popupPromise = this._getProxyPopup();
+                this._popupCache.set('proxy', popupPromise);
+            }
+        } else {
+            popupPromise = this._popupCache.get('default');
+            if (typeof popupPromise === 'undefined') {
+                popupPromise = this._getDefaultPopup();
+                this._popupCache.set('default', popupPromise);
+            }
+        }
+
+        // The token below is used as a unique identifier to ensure that a new _updatePopup call
+        // hasn't been started during the await.
+        const token = {};
+        this._updatePopupToken = token;
+        const popup = await popupPromise;
+        const optionsContext = await this.getOptionsContext();
+        if (this._updatePopupToken !== token) { return; }
+        await popup.setOptionsContext(optionsContext, this._id);
+        if (this._updatePopupToken !== token) { return; }
+
+        if (this._isSearchPage) {
+            this.setDisabledOverride(!this._options.scanning.enableOnSearchPage);
+        }
+
+        this._textScanner.clearSelection(true);
+        this._popup = popup;
+        this._depth = popup.depth;
+    }
+
+    async _getDefaultPopup() {
+        return this._popupFactory.getOrCreatePopup(null, null, this._depth);
+    }
+
+    async _getProxyPopup() {
+        const popup = new PopupProxy(null, this._depth + 1, this._proxyPopupId, this._parentFrameId);
+        await popup.prepare();
+        return popup;
+    }
+
+    async _getIframeProxyPopup() {
+        const rootPopupInformationPromise = yomichan.getTemporaryListenerResult(
+            chrome.runtime.onMessage,
+            ({action, params}, {resolve}) => {
+                if (action === 'rootPopupInformation') {
+                    resolve(params);
+                }
+            }
+        );
+        api.broadcastTab('rootPopupRequestInformationBroadcast');
+        const {popupId, frameId: parentFrameId} = await rootPopupInformationPromise;
+
+        const popup = new PopupProxy(popupId, 0, null, parentFrameId, this._frameOffsetForwarder);
+        popup.on('offsetNotFound', () => {
+            this._allowRootFramePopupProxy = false;
+            this._updatePopup();
+        });
+        await popup.prepare();
+
+        return popup;
+    }
+
+    _ignoreElements() {
+        return this._popup === null || this._popup.isProxy() ? [] : [this._popup.getFrame()];
+    }
+
+    _ignorePoint(x, y) {
+        return this._popup !== null && this._popup.containsPoint(x, y);
     }
 
     async _search(textSource, cause) {
@@ -318,7 +447,7 @@ class Frontend {
     _updateTextScannerEnabled() {
         const enabled = (
             this._options.general.enable &&
-            this._popup.depth <= this._options.scanning.popupNestingMaxDepth &&
+            this._depth <= this._options.scanning.popupNestingMaxDepth &&
             !this._disabledOverride
         );
         this._enabledEventListeners.removeAllEventListeners();
@@ -342,27 +471,41 @@ class Frontend {
         if (contentScale === this._contentScale) { return; }
 
         this._contentScale = contentScale;
-        this._popup.setContentScale(this._contentScale);
+        if (this._popup !== null) {
+            this._popup.setContentScale(this._contentScale);
+        }
         this._updatePopupPosition();
     }
 
     async _updatePopupPosition() {
         const textSource = this._textScanner.getCurrentTextSource();
-        if (textSource !== null && await this._popup.isVisible()) {
+        if (
+            textSource !== null &&
+            this._popup !== null &&
+            await this._popup.isVisible()
+        ) {
             this._showPopupContent(textSource, await this.getOptionsContext());
         }
     }
 
     _broadcastRootPopupInformation() {
-        if (!this._popup.isProxy() && this._popup.depth === 0 && this._popup.frameId === 0) {
-            api.broadcastTab('rootPopupInformation', {popupId: this._popup.id, frameId: this._popup.frameId});
+        if (
+            this._popup !== null &&
+            !this._popup.isProxy() &&
+            this._depth === 0 &&
+            this._frameId === 0
+        ) {
+            api.broadcastTab('rootPopupInformation', {
+                popupId: this._popup.id,
+                frameId: this._frameId
+            });
         }
     }
 
     _broadcastDocumentInformation(uniqueId) {
         api.broadcastTab('documentInformationBroadcast', {
             uniqueId,
-            frameId: this._popup.frameId,
+            frameId: this._frameId,
             title: document.title
         });
     }

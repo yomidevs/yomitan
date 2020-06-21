@@ -18,42 +18,15 @@
 /* global
  * DisplayFloat
  * api
- * dynamicLoader
  */
 
-async function injectPopupNested() {
-    await dynamicLoader.loadScripts([
-        '/mixed/js/text-scanner.js',
-        '/fg/js/popup.js',
-        '/fg/js/popup-proxy.js',
-        '/fg/js/frontend.js',
-        '/fg/js/content-script-main.js'
-    ]);
-}
-
-async function popupNestedInitialize(id, depth, parentFrameId, url) {
-    let optionsApplied = false;
-
-    const applyOptions = async () => {
-        const optionsContext = {depth, url};
-        const options = await api.optionsGet(optionsContext);
-        const maxPopupDepthExceeded = !(typeof depth === 'number' && depth < options.scanning.popupNestingMaxDepth);
-        if (maxPopupDepthExceeded || optionsApplied) { return; }
-
-        optionsApplied = true;
-        yomichan.off('optionsUpdated', applyOptions);
-
-        window.frontendInitializationData = {id, depth, parentFrameId, url, proxy: true};
-        await injectPopupNested();
-    };
-
-    yomichan.on('optionsUpdated', applyOptions);
-
-    await applyOptions();
-}
-
 (async () => {
-    api.forwardLogsToBackend();
-    const display = new DisplayFloat();
-    await display.prepare();
+    try {
+        api.forwardLogsToBackend();
+
+        const display = new DisplayFloat();
+        await display.prepare();
+    } catch (e) {
+        yomichan.logError(e);
+    }
 })();

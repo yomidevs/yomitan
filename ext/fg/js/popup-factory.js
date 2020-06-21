@@ -39,8 +39,7 @@ class PopupFactory {
             ['showContent',        {async: true,  handler: this._onApiShowContent.bind(this)}],
             ['setCustomCss',       {async: false, handler: this._onApiSetCustomCss.bind(this)}],
             ['clearAutoPlayTimer', {async: false, handler: this._onApiClearAutoPlayTimer.bind(this)}],
-            ['setContentScale',    {async: false, handler: this._onApiSetContentScale.bind(this)}],
-            ['getUrl',             {async: false, handler: this._onApiGetUrl.bind(this)}]
+            ['setContentScale',    {async: false, handler: this._onApiSetContentScale.bind(this)}]
         ]);
     }
 
@@ -145,10 +144,6 @@ class PopupFactory {
     _onApiSetContentScale({id, scale}) {
         const popup = this._getPopup(id);
         return popup.setContentScale(scale);
-    }
-
-    _onApiGetUrl() {
-        return window.location.href;
     }
 
     // Private functions

@@ -104,10 +104,6 @@ class PopupProxy extends EventDispatcher {
         this._invoke('setContentScale', {id: this._id, scale});
     }
 
-    async getUrl() {
-        return await this._invoke('getUrl', {});
-    }
-
     // Private
 
     _invoke(action, params={}) {

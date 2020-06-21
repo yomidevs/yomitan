@@ -77,6 +77,24 @@ class DOM {
         return (typeof key === 'string' ? (key.length === 1 ? key.toUpperCase() : key) : '');
     }
 
+    static addFullscreenChangeEventListener(onFullscreenChanged, eventListenerCollection=null) {
+        const target = document;
+        const options = false;
+        const fullscreenEventNames = [
+            'fullscreenchange',
+            'MSFullscreenChange',
+            'mozfullscreenchange',
+            'webkitfullscreenchange'
+        ];
+        for (const eventName of fullscreenEventNames) {
+            if (eventListenerCollection === null) {
+                target.addEventListener(eventName, onFullscreenChanged, options);
+            } else {
+                eventListenerCollection.addEventListener(target, eventName, onFullscreenChanged, options);
+            }
+        }
+    }
+
     static getFullscreenElement() {
         return (
             document.fullscreenElement ||

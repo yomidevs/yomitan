@@ -415,16 +415,7 @@ class Popup {
             return;
         }
 
-        const fullscreenEvents = [
-            'fullscreenchange',
-            'MSFullscreenChange',
-            'mozfullscreenchange',
-            'webkitfullscreenchange'
-        ];
-        const onFullscreenChanged = this._onFullscreenChanged.bind(this);
-        for (const eventName of fullscreenEvents) {
-            this._fullscreenEventListeners.addEventListener(document, eventName, onFullscreenChanged, false);
-        }
+        DOM.addFullscreenChangeEventListener(this._onFullscreenChanged.bind(this), this._fullscreenEventListeners);
     }
 
     _onFullscreenChanged() {

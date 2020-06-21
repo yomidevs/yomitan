@@ -19,8 +19,11 @@
  * ClipboardMonitor
  * DOM
  * Display
+ * Frontend
+ * PopupFactory
  * QueryParser
  * api
+ * dynamicLoader
  * wanakana
  */
 
@@ -73,51 +76,49 @@ class DisplaySearch extends Display {
     }
 
     async prepare() {
-        try {
-            await super.prepare();
-            await this.updateOptions();
-            yomichan.on('optionsUpdated', () => this.updateOptions());
-            await this.queryParser.prepare();
+        await super.prepare();
+        await this.updateOptions();
+        yomichan.on('optionsUpdated', () => this.updateOptions());
+        await this.queryParser.prepare();
 
-            const {queryParams: {query='', mode=''}} = parseUrl(window.location.href);
+        const {queryParams: {query='', mode=''}} = parseUrl(window.location.href);
 
-            document.documentElement.dataset.searchMode = mode;
+        document.documentElement.dataset.searchMode = mode;
 
-            if (this.options.general.enableWanakana === true) {
-                this.wanakanaEnable.checked = true;
-                wanakana.bind(this.query);
-            } else {
-                this.wanakanaEnable.checked = false;
-            }
-
-            this.setQuery(query);
-            this.onSearchQueryUpdated(this.query.value, false);
-
-            if (mode !== 'popup') {
-                if (this.options.general.enableClipboardMonitor === true) {
-                    this.clipboardMonitorEnable.checked = true;
-                    this.clipboardMonitor.start();
-                } else {
-                    this.clipboardMonitorEnable.checked = false;
-                }
-                this.clipboardMonitorEnable.addEventListener('change', this.onClipboardMonitorEnableChange.bind(this));
-            }
-
-            chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
-
-            this.search.addEventListener('click', this.onSearch.bind(this), false);
-            this.query.addEventListener('input', this.onSearchInput.bind(this), false);
-            this.wanakanaEnable.addEventListener('change', this.onWanakanaEnableChange.bind(this));
-            window.addEventListener('popstate', this.onPopState.bind(this));
-            window.addEventListener('copy', this.onCopy.bind(this));
-            this.clipboardMonitor.on('change', this.onExternalSearchUpdate.bind(this));
-
-            this.updateSearchButton();
-
-            this._isPrepared = true;
-        } catch (e) {
-            this.onError(e);
+        if (this.options.general.enableWanakana === true) {
+            this.wanakanaEnable.checked = true;
+            wanakana.bind(this.query);
+        } else {
+            this.wanakanaEnable.checked = false;
         }
+
+        this.setQuery(query);
+        this.onSearchQueryUpdated(this.query.value, false);
+
+        if (mode !== 'popup') {
+            if (this.options.general.enableClipboardMonitor === true) {
+                this.clipboardMonitorEnable.checked = true;
+                this.clipboardMonitor.start();
+            } else {
+                this.clipboardMonitorEnable.checked = false;
+            }
+            this.clipboardMonitorEnable.addEventListener('change', this.onClipboardMonitorEnableChange.bind(this));
+        }
+
+        chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
+
+        this.search.addEventListener('click', this.onSearch.bind(this), false);
+        this.query.addEventListener('input', this.onSearchInput.bind(this), false);
+        this.wanakanaEnable.addEventListener('change', this.onWanakanaEnableChange.bind(this));
+        window.addEventListener('popstate', this.onPopState.bind(this));
+        window.addEventListener('copy', this.onCopy.bind(this));
+        this.clipboardMonitor.on('change', this.onExternalSearchUpdate.bind(this));
+
+        this.updateSearchButton();
+
+        await this._prepareNestedPopups();
+
+        this._isPrepared = true;
     }
 
     onError(error) {
@@ -400,5 +401,54 @@ class DisplaySearch extends Display {
         } else {
             document.title = `${text} - Yomichan Search`;
         }
+    }
+
+    async _prepareNestedPopups() {
+        let complete = false;
+
+        const onOptionsUpdated = async () => {
+            const optionsContext = this.getOptionsContext();
+            const options = await api.optionsGet(optionsContext);
+            if (!options.scanning.enableOnSearchPage || complete) { return; }
+
+            complete = true;
+            yomichan.off('optionsUpdated', onOptionsUpdated);
+
+            try {
+                await this._setupNestedPopups();
+            } catch (e) {
+                yomichan.logError(e);
+            }
+        };
+
+        yomichan.on('optionsUpdated', onOptionsUpdated);
+
+        await onOptionsUpdated();
+    }
+
+    async _setupNestedPopups() {
+        await dynamicLoader.loadScripts([
+            '/mixed/js/text-scanner.js',
+            '/fg/js/frame-offset-forwarder.js',
+            '/fg/js/popup.js',
+            '/fg/js/popup-factory.js',
+            '/fg/js/frontend.js'
+        ]);
+
+        const {frameId} = await api.frameInformationGet();
+
+        const popupFactory = new PopupFactory(frameId);
+        await popupFactory.prepare();
+
+        const frontend = new Frontend(
+            frameId,
+            popupFactory,
+            {
+                depth: 1,
+                proxy: false,
+                isSearchPage: true
+            }
+        );
+        await frontend.prepare();
     }
 }

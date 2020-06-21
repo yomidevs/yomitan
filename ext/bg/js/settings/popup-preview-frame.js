@@ -18,17 +18,17 @@
 /* global
  * Frontend
  * Popup
- * PopupFactory
  * TextSourceRange
  * api
  */
 
 class PopupPreviewFrame {
-    constructor() {
+    constructor(frameId, popupFactory) {
+        this._frameId = frameId;
+        this._popupFactory = popupFactory;
         this._frontend = null;
         this._frontendGetOptionsContextOld = null;
         this._apiOptionsGetOld = null;
-        this._popup = null;
         this._popupSetCustomOuterCssOld = null;
         this._popupShown = false;
         this._themeChangeTimeout = null;
@@ -55,23 +55,24 @@ class PopupPreviewFrame {
         api.optionsGet = this._apiOptionsGet.bind(this);
 
         // Overwrite frontend
-        const {frameId} = await api.frameInformationGet();
-
-        const popupFactory = new PopupFactory(frameId);
-        await popupFactory.prepare();
-
-        this._popup = popupFactory.getOrCreatePopup();
-        this._popup.setChildrenSupported(false);
-
-        this._popupSetCustomOuterCssOld = this._popup.setCustomOuterCss.bind(this._popup);
-        this._popup.setCustomOuterCss = this._popupSetCustomOuterCss.bind(this);
-
-        this._frontend = new Frontend(this._popup);
+        this._frontend = new Frontend(
+            this._frameId,
+            this._popupFactory,
+            {
+                allowRootFramePopupProxy: false
+            }
+        );
         this._frontendGetOptionsContextOld = this._frontend.getOptionsContext.bind(this._frontend);
         this._frontend.getOptionsContext = this._getOptionsContext.bind(this);
         await this._frontend.prepare();
         this._frontend.setDisabledOverride(true);
         this._frontend.canClearSelection = false;
+
+        const popup = this._frontend.popup;
+        popup.setChildrenSupported(false);
+
+        this._popupSetCustomOuterCssOld = popup.setCustomOuterCss.bind(popup);
+        popup.setCustomOuterCss = this._popupSetCustomOuterCss.bind(this);
 
         // Update search
         this._updateSearch();
@@ -132,7 +133,9 @@ class PopupPreviewFrame {
         }
         this._themeChangeTimeout = setTimeout(() => {
             this._themeChangeTimeout = null;
-            this._popup.updateTheme();
+            const popup = this._frontend.popup;
+            if (popup === null) { return; }
+            popup.updateTheme();
         }, 300);
     }
 
@@ -154,12 +157,16 @@ class PopupPreviewFrame {
 
     _setCustomCss({css}) {
         if (this._frontend === null) { return; }
-        this._popup.setCustomCss(css);
+        const popup = this._frontend.popup;
+        if (popup === null) { return; }
+        popup.setCustomCss(css);
     }
 
     _setCustomOuterCss({css}) {
         if (this._frontend === null) { return; }
-        this._popup.setCustomOuterCss(css, false);
+        const popup = this._frontend.popup;
+        if (popup === null) { return; }
+        popup.setCustomOuterCss(css, false);
     }
 
     async _updateOptionsContext({optionsContext}) {
@@ -188,7 +195,8 @@ class PopupPreviewFrame {
         this._textSource = source;
         await this._frontend.showContentCompleted();
 
-        if (this._popup.isVisibleSync()) {
+        const popup = this._frontend.popup;
+        if (popup !== null && popup.isVisibleSync()) {
             this._popupShown = true;
         }
 
