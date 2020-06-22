@@ -106,8 +106,8 @@ class Frontend {
 
         const visualViewport = window.visualViewport;
         if (visualViewport !== null && typeof visualViewport === 'object') {
-            window.visualViewport.addEventListener('scroll', this._onVisualViewportScroll.bind(this));
-            window.visualViewport.addEventListener('resize', this._onVisualViewportResize.bind(this));
+            visualViewport.addEventListener('scroll', this._onVisualViewportScroll.bind(this));
+            visualViewport.addEventListener('resize', this._onVisualViewportResize.bind(this));
         }
 
         yomichan.on('orphaned', this._onOrphaned.bind(this));
