@@ -108,6 +108,7 @@ class Backend {
             ['broadcastTab',                 {async: false, contentScript: true,  handler: this._onApiBroadcastTab.bind(this)}],
             ['frameInformationGet',          {async: true,  contentScript: true,  handler: this._onApiFrameInformationGet.bind(this)}],
             ['injectStylesheet',             {async: true,  contentScript: true,  handler: this._onApiInjectStylesheet.bind(this)}],
+            ['getStylesheetContent',         {async: true,  contentScript: true,  handler: this._onApiGetStylesheetContent.bind(this)}],
             ['getEnvironmentInfo',           {async: false, contentScript: true,  handler: this._onApiGetEnvironmentInfo.bind(this)}],
             ['clipboardGet',                 {async: true,  contentScript: true,  handler: this._onApiClipboardGet.bind(this)}],
             ['getDisplayTemplatesHtml',      {async: true,  contentScript: true,  handler: this._onApiGetDisplayTemplatesHtml.bind(this)}],
@@ -717,6 +718,13 @@ class Backend {
                 }
             });
         });
+    }
+
+    async _onApiGetStylesheetContent({url}) {
+        if (!url.startsWith('/') || url.startsWith('//') || !url.endsWith('.css')) {
+            throw new Error('Invalid URL');
+        }
+        return await requestText(url, 'GET');
     }
 
     _onApiGetEnvironmentInfo() {

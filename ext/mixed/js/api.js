@@ -121,6 +121,10 @@ const api = (() => {
             return this._invoke('injectStylesheet', {type, value});
         }
 
+        getStylesheetContent(url) {
+            return this._invoke('getStylesheetContent', {url});
+        }
+
         getEnvironmentInfo() {
             return this._invoke('getEnvironmentInfo');
         }

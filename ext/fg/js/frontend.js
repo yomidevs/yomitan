@@ -345,7 +345,7 @@ class Frontend {
     }
 
     _ignoreElements() {
-        return this._popup === null || this._popup.isProxy() ? [] : [this._popup.getFrame()];
+        return this._popup === null || this._popup.isProxy() ? [] : [this._popup.getContainer()];
     }
 
     _ignorePoint(x, y) {

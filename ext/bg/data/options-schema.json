@@ -110,7 +110,8 @@
                                     "showPitchAccentPositionNotation",
                                     "showPitchAccentGraph",
                                     "showIframePopupsInRootFrame",
-                                    "useSecurePopupFrameUrl"
+                                    "useSecurePopupFrameUrl",
+                                    "usePopupShadowDom"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -250,6 +251,10 @@
                                         "default": false
                                     },
                                     "useSecurePopupFrameUrl": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
+                                    "usePopupShadowDom": {
                                         "type": "boolean",
                                         "default": true
                                     }
