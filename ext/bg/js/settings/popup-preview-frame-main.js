@@ -28,7 +28,7 @@
         const {frameId} = await api.frameInformationGet();
 
         const popupFactory = new PopupFactory(frameId);
-        await popupFactory.prepare();
+        popupFactory.prepare();
 
         const preview = new PopupPreviewFrame(frameId, popupFactory);
         await preview.prepare();

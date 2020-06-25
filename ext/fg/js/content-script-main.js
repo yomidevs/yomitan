@@ -32,7 +32,7 @@
         }
 
         const popupFactory = new PopupFactory(frameId);
-        await popupFactory.prepare();
+        popupFactory.prepare();
 
         const frontend = new Frontend(
             frameId,

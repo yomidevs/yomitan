@@ -241,7 +241,7 @@ class DisplayFloat extends Display {
         const {frameId} = await api.frameInformationGet();
 
         const popupFactory = new PopupFactory(frameId);
-        await popupFactory.prepare();
+        popupFactory.prepare();
 
         const frontend = new Frontend(
             frameId,

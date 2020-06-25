@@ -28,7 +28,7 @@ class PopupFactory {
 
     // Public functions
 
-    async prepare() {
+    prepare() {
         api.crossFrame.registerHandlers([
             ['getOrCreatePopup',   {async: false, handler: this._onApiGetOrCreatePopup.bind(this)}],
             ['setOptionsContext',  {async: true,  handler: this._onApiSetOptionsContext.bind(this)}],
