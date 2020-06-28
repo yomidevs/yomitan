@@ -160,8 +160,28 @@ class Backend {
         return this._prepareCompletePromise;
     }
 
+    _prepareInternalSync() {
+        if (isObject(chrome.commands) && isObject(chrome.commands.onCommand)) {
+            const onCommand = this._onWebExtensionEventWrapper(this._onCommand.bind(this));
+            chrome.commands.onCommand.addListener(onCommand);
+        }
+
+        if (isObject(chrome.tabs) && isObject(chrome.tabs.onZoomChange)) {
+            const onZoomChange = this._onWebExtensionEventWrapper(this._onZoomChange.bind(this));
+            chrome.tabs.onZoomChange.addListener(onZoomChange);
+        }
+
+        const onConnect = this._onWebExtensionEventWrapper(this._onConnect.bind(this));
+        chrome.runtime.onConnect.addListener(onConnect);
+
+        const onMessage = this._onMessageWrapper.bind(this);
+        chrome.runtime.onMessage.addListener(onMessage);
+    }
+
     async _prepareInternal() {
         try {
+            this._prepareInternalSync();
+
             this._defaultBrowserActionTitle = await this._getBrowserIconTitle();
             this._badgePrepareDelayTimer = setTimeout(() => {
                 this._badgePrepareDelayTimer = null;
@@ -209,28 +229,8 @@ class Backend {
         }
     }
 
-    prepareComplete() {
-        return this._prepareCompletePromise;
-    }
-
     isPrepared() {
         return this._isPrepared;
-    }
-
-    handleCommand(...args) {
-        return this._onCommand(...args);
-    }
-
-    handleZoomChange(...args) {
-        return this._onZoomChange(...args);
-    }
-
-    handleConnect(...args) {
-        return this._onConnect(...args);
-    }
-
-    handleMessage(...args) {
-        return this._onMessage(...args);
     }
 
     getFullOptions(useSchema=false) {
@@ -254,6 +254,34 @@ class Backend {
 
         this._logErrorLevel = level;
         this._updateBadge();
+    }
+
+    // WebExtension event handlers (with prepared checks)
+
+    _onWebExtensionEventWrapper(handler) {
+        return (...args) => {
+            if (this._isPrepared) {
+                handler(...args);
+                return;
+            }
+
+            this._prepareCompletePromise.then(
+                () => { handler(...args); },
+                () => {} // NOP
+            );
+        };
+    }
+
+    _onMessageWrapper(message, sender, sendResponse) {
+        if (this._isPrepared) {
+            return this._onMessage(message, sender, sendResponse);
+        }
+
+        this._prepareCompletePromise.then(
+            () => { this._onMessage(message, sender, sendResponse); },
+            () => { sendResponse(); }
+        );
+        return true;
     }
 
     // WebExtension event handlers
@@ -1339,59 +1367,5 @@ class Backend {
         } catch (e) {
             // Edge throws exception for no reason here.
         }
-    }
-}
-
-class BackendEventHandler {
-    constructor(backend) {
-        this._backend = backend;
-    }
-
-    prepare() {
-        if (isObject(chrome.commands) && isObject(chrome.commands.onCommand)) {
-            const onCommand = this._createGenericEventHandler((...args) => this._backend.handleCommand(...args));
-            chrome.commands.onCommand.addListener(onCommand);
-        }
-
-        if (isObject(chrome.tabs) && isObject(chrome.tabs.onZoomChange)) {
-            const onZoomChange = this._createGenericEventHandler((...args) => this._backend.handleZoomChange(...args));
-            chrome.tabs.onZoomChange.addListener(onZoomChange);
-        }
-
-        const onConnect = this._createGenericEventHandler((...args) => this._backend.handleConnect(...args));
-        chrome.runtime.onConnect.addListener(onConnect);
-
-        const onMessage = this._onMessage.bind(this);
-        chrome.runtime.onMessage.addListener(onMessage);
-    }
-
-    // Event handlers
-
-    _createGenericEventHandler(handler) {
-        return this._onGenericEvent.bind(this, handler);
-    }
-
-    _onGenericEvent(handler, ...args) {
-        if (this._backend.isPrepared()) {
-            handler(...args);
-            return;
-        }
-
-        this._backend.prepareComplete().then(
-            () => { handler(...args); },
-            () => {} // NOP
-        );
-    }
-
-    _onMessage(message, sender, sendResponse) {
-        if (this._backend.isPrepared()) {
-            return this._backend.handleMessage(message, sender, sendResponse);
-        }
-
-        this._backend.prepareComplete().then(
-            () => { this._backend.handleMessage(message, sender, sendResponse); },
-            () => { sendResponse(); } // NOP
-        );
-        return true;
     }
 }

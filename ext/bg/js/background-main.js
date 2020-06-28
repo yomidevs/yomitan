@@ -17,13 +17,10 @@
 
 /* global
  * Backend
- * BackendEventHandler
  */
 
 (() => {
     const backend = new Backend();
-    const backendEventHandler = new BackendEventHandler(backend);
-    backendEventHandler.prepare();
     if (typeof window === 'object' && window !== null) {
         window.yomichanBackend = backend;
     }
