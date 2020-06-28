@@ -229,12 +229,11 @@ class Popup {
         return new Promise((resolve, reject) => {
             const tokenMap = new Map();
             let timer = null;
-            let frameLoadedResolve = null;
-            let frameLoadedReject = null;
-            const frameLoaded = new Promise((resolve2, reject2) => {
-                frameLoadedResolve = resolve2;
-                frameLoadedReject = reject2;
-            });
+            let {
+                promise: frameLoadedPromise,
+                resolve: frameLoadedResolve,
+                reject: frameLoadedReject
+            } = deferPromise();
 
             const postMessage = (action, params) => {
                 const contentWindow = frame.contentWindow;
@@ -261,7 +260,7 @@ class Popup {
                     if (!isObject(message)) { return; }
                     const {action, params} = message;
                     if (!isObject(params)) { return; }
-                    await frameLoaded;
+                    await frameLoadedPromise;
                     if (timer === null) { return; } // Done
 
                     switch (action) {
@@ -331,7 +330,7 @@ class Popup {
             frame.addEventListener('load', onLoad);
 
             // Prevent unhandled rejections
-            frameLoaded.catch(() => {}); // NOP
+            frameLoadedPromise.catch(() => {}); // NOP
 
             setupFrame(frame);
         });

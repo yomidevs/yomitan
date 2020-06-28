@@ -212,12 +212,11 @@ const api = (() => {
         _createActionPort(timeout=5000) {
             return new Promise((resolve, reject) => {
                 let timer = null;
-                let portNameResolve;
-                let portNameReject;
-                const portNamePromise = new Promise((resolve2, reject2) => {
-                    portNameResolve = resolve2;
-                    portNameReject = reject2;
-                });
+                const {
+                    promise: portNamePromise,
+                    resolve: portNameResolve,
+                    reject: portNameReject
+                } = deferPromise();
 
                 const onConnect = async (port) => {
                     try {

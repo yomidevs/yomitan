@@ -197,6 +197,16 @@ const clone = (() => {
  * Async utilities
  */
 
+function deferPromise() {
+    let resolve;
+    let reject;
+    const promise = new Promise((resolve2, reject2) => {
+        resolve = resolve2;
+        reject = reject2;
+    });
+    return {promise, resolve, reject};
+}
+
 function promiseTimeout(delay, resolveValue) {
     if (delay <= 0) {
         const promise = Promise.resolve(resolveValue);
@@ -206,8 +216,7 @@ function promiseTimeout(delay, resolveValue) {
     }
 
     let timer = null;
-    let promiseResolve = null;
-    let promiseReject = null;
+    let {promise, resolve, reject} = deferPromise();
 
     const complete = (callback, value) => {
         if (callback === null) { return; }
@@ -215,37 +224,23 @@ function promiseTimeout(delay, resolveValue) {
             clearTimeout(timer);
             timer = null;
         }
-        promiseResolve = null;
-        promiseReject = null;
+        resolve = null;
+        reject = null;
         callback(value);
     };
 
-    const resolve = (value) => complete(promiseResolve, value);
-    const reject = (value) => complete(promiseReject, value);
+    const resolveWrapper = (value) => complete(resolve, value);
+    const rejectWrapper = (value) => complete(reject, value);
 
-    const promise = new Promise((resolve2, reject2) => {
-        promiseResolve = resolve2;
-        promiseReject = reject2;
-    });
     timer = setTimeout(() => {
         timer = null;
-        resolve(resolveValue);
+        resolveWrapper(resolveValue);
     }, delay);
 
-    promise.resolve = resolve;
-    promise.reject = reject;
+    promise.resolve = resolveWrapper;
+    promise.reject = rejectWrapper;
 
     return promise;
-}
-
-function deferPromise() {
-    let resolve;
-    let reject;
-    const promise = new Promise((resolve2, reject2) => {
-        resolve = resolve2;
-        reject = reject2;
-    });
-    return {promise, resolve, reject};
 }
 
 

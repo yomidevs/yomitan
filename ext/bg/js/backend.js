@@ -78,10 +78,10 @@ class Backend {
         this._isPrepared = false;
         this._prepareError = false;
         this._preparePromise = null;
-        this._prepareCompletePromise = new Promise((resolve, reject) => {
-            this._prepareCompleteResolve = resolve;
-            this._prepareCompleteReject = reject;
-        });
+        const {promise, resolve, reject} = deferPromise();
+        this._prepareCompletePromise = promise;
+        this._prepareCompleteResolve = resolve;
+        this._prepareCompleteReject = reject;
 
         this._defaultBrowserActionTitle = null;
         this._badgePrepareDelayTimer = null;
@@ -1269,8 +1269,7 @@ class Backend {
     static async _findTab(timeout, checkUrl) {
         // This function works around the need to have the "tabs" permission to access tab.url.
         const tabs = await new Promise((resolve) => chrome.tabs.query({}, resolve));
-        let matchPromiseResolve = null;
-        const matchPromise = new Promise((resolve) => { matchPromiseResolve = resolve; });
+        const {promise: matchPromise, resolve: matchPromiseResolve} = deferPromise();
 
         const checkTabUrl = ({tab, url}) => {
             if (checkUrl(url, tab)) {
