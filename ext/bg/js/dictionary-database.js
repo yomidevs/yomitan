@@ -16,13 +16,13 @@
  */
 
 /* global
- * GenericDatabase
+ * Database
  * dictFieldSplit
  */
 
 class DictionaryDatabase {
     constructor() {
-        this._db = new GenericDatabase();
+        this._db = new Database();
         this._dbName = 'dict';
         this._schemas = new Map();
     }
@@ -118,7 +118,7 @@ class DictionaryDatabase {
         if (this._db.isOpen()) {
             this._db.close();
         }
-        await GenericDatabase.deleteDatabase(this._dbName);
+        await Database.deleteDatabase(this._dbName);
         await this.prepare();
     }
 

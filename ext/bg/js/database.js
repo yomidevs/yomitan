@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class GenericDatabase {
+class Database {
     constructor() {
         this._db = null;
         this._isOpening = false;

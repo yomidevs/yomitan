@@ -115,7 +115,7 @@ vm.execute([
     'bg/js/media-utility.js',
     'bg/js/request.js',
     'bg/js/dictionary-importer.js',
-    'bg/js/generic-database.js',
+    'bg/js/database.js',
     'bg/js/dictionary-database.js'
 ]);
 const DictionaryImporter = vm.get('DictionaryImporter');
