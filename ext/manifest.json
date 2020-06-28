@@ -3,7 +3,7 @@
     "name": "Yomichan (development build)",
     "version": "20.6.27.0",
 
-    "description": "Japanese dictionary with Anki integration. This extension is a pre-developmental build for testing purposes. The latest stable build can be found here: https://chrome.google.com/webstore/detail/yomichan/ogmnaimimemjmbakcfefmnahgdfhfami",
+    "description": "Japanese dictionary with Anki integration. This is a development build; get the stable version here: https://tinyurl.com/yaatdjmp",
     "icons": {
         "16": "mixed/img/icon16.png",
         "19": "mixed/img/icon19.png",
