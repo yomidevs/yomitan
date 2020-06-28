@@ -27,11 +27,11 @@ class DictionaryImporter {
         this._schemas = new Map();
     }
 
-    async import(database, archiveSource, details, onProgress) {
-        if (!database) {
+    async import(dictionaryDatabase, archiveSource, details, onProgress) {
+        if (!dictionaryDatabase) {
             throw new Error('Invalid database');
         }
-        if (!database.isPrepared()) {
+        if (!dictionaryDatabase.isPrepared()) {
             throw new Error('Database is not ready');
         }
 
@@ -60,7 +60,7 @@ class DictionaryImporter {
         }
 
         // Verify database is not already imported
-        if (await database.dictionaryExists(dictionaryTitle)) {
+        if (await dictionaryDatabase.dictionaryExists(dictionaryTitle)) {
             throw new Error('Dictionary is already imported');
         }
 
@@ -168,7 +168,7 @@ class DictionaryImporter {
         // Add dictionary
         const summary = this._createSummary(dictionaryTitle, version, index, {prefixWildcardsSupported});
 
-        database.bulkAdd('dictionaries', [summary], 0, 1);
+        dictionaryDatabase.bulkAdd('dictionaries', [summary], 0, 1);
 
         // Add data
         const errors = [];
@@ -188,7 +188,7 @@ class DictionaryImporter {
                 const count = Math.min(maxTransactionLength, ii - i);
 
                 try {
-                    await database.bulkAdd(objectStoreName, entries, i, count);
+                    await dictionaryDatabase.bulkAdd(objectStoreName, entries, i, count);
                 } catch (e) {
                     errors.push(errorToJson(e));
                 }

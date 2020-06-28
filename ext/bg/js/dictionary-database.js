@@ -20,7 +20,7 @@
  * dictFieldSplit
  */
 
-class Database {
+class DictionaryDatabase {
     constructor() {
         this._db = new GenericDatabase();
         this._dbName = 'dict';
