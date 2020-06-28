@@ -208,6 +208,7 @@ input[type=checkbox].storage-button-checkbox {
 }
 
 html:root[data-browser=edge] [data-show-for-browser~=edge],
+html:root[data-browser=edge-legacy] [data-show-for-browser~=edge-legacy],
 html:root[data-browser=chrome] [data-show-for-browser~=chrome],
 html:root[data-browser=firefox] [data-show-for-browser~=firefox],
 html:root[data-browser=firefox-mobile] [data-show-for-browser~=firefox-mobile],
@@ -221,6 +222,7 @@ html:root[data-operating-system=openbsd] [data-show-for-operating-system~=openbs
 }
 
 html:root[data-browser=edge] [data-hide-for-browser~=edge],
+html:root[data-browser=edge-legacy] [data-hide-for-browser~=edge-legacy],
 html:root[data-browser=chrome] [data-hide-for-browser~=chrome],
 html:root[data-browser=firefox] [data-hide-for-browser~=firefox],
 html:root[data-browser=firefox-mobile] [data-hide-for-browser~=firefox-mobile],

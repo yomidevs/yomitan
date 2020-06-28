@@ -15,38 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-/*
- * Extension information
- */
-
-function _extensionHasChrome() {
-    try {
-        return typeof chrome === 'object' && chrome !== null;
-    } catch (e) {
-        return false;
-    }
-}
-
-function _extensionHasBrowser() {
-    try {
-        return typeof browser === 'object' && browser !== null;
-    } catch (e) {
-        return false;
-    }
-}
-
-const EXTENSION_IS_BROWSER_EDGE = (
-    _extensionHasBrowser() &&
-    (!_extensionHasChrome() || (typeof chrome.runtime === 'undefined' && typeof browser.runtime !== 'undefined'))
-);
-
-if (EXTENSION_IS_BROWSER_EDGE) {
-    // Edge does not have chrome defined.
-    chrome = browser;
-}
-
-
 /*
  * Error handling
  */

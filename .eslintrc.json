@@ -83,6 +83,12 @@
     },
     "overrides": [
         {
+            "files": ["ext/mixed/js/core.js"],
+            "env": {
+                "webextensions": false
+            }
+        },
+        {
             "files": ["ext/**/*.js"],
             "excludedFiles": ["ext/mixed/js/core.js"],
             "globals": {
@@ -101,8 +107,7 @@
                 "deferPromise": "readonly",
                 "clone": "readonly",
                 "EventDispatcher": "readonly",
-                "EventListenerCollection": "readonly",
-                "EXTENSION_IS_BROWSER_EDGE": "readonly"
+                "EventListenerCollection": "readonly"
             }
         },
         {
@@ -116,7 +121,7 @@
             }
         },
         {
-            "files": ["ext/mixed/js/core.js"],
+            "files": ["ext/mixed/js/yomichan.js"],
             "globals": {
                 "chrome": "writable"
             }

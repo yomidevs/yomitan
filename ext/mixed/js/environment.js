@@ -67,8 +67,15 @@ class Environment {
     }
 
     async _getBrowser() {
-        if (EXTENSION_IS_BROWSER_EDGE) {
-            return 'edge';
+        try {
+            if (chrome.runtime.getURL('/').startsWith('ms-browser-extension://')) {
+                return 'edge-legacy';
+            }
+            if (/\bEdge?\//.test(navigator.userAgent)) {
+                return 'edge';
+            }
+        } catch (e) {
+            // NOP
         }
         if (typeof browser !== 'undefined') {
             try {

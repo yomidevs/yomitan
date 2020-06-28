@@ -15,6 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// Set up chrome alias if it's not available (Edge Legacy)
+if ((() => {
+    let hasChrome = false;
+    let hasBrowser = false;
+    try {
+        hasChrome = (typeof chrome === 'object' && chrome !== null && typeof chrome.runtime !== 'undefined');
+    } catch (e) {
+        // NOP
+    }
+    try {
+        hasBrowser = (typeof browser === 'object' && browser !== null && typeof browser.runtime !== 'undefined');
+    } catch (e) {
+        // NOP
+    }
+    return (hasBrowser && !hasChrome);
+})()) {
+    chrome = browser;
+}
+
 const yomichan = (() => {
     class Yomichan extends EventDispatcher {
         constructor() {
