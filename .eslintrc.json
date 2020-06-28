@@ -99,6 +99,7 @@
                 "getSetDifference": "readonly",
                 "escapeRegExp": "readonly",
                 "deferPromise": "readonly",
+                "clone": "readonly",
                 "EventDispatcher": "readonly",
                 "EventListenerCollection": "readonly",
                 "EXTENSION_IS_BROWSER_EDGE": "readonly"

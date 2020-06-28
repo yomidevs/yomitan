@@ -90,7 +90,7 @@ class JsonSchemaProxyHandler {
             throw new Error(`Property ${property} not supported`);
         }
 
-        value = JsonSchema.isolate(value);
+        value = JsonSchema.clone(value);
 
         JsonSchemaProxyHandler.validate(value, propertySchema, new JsonSchemaTraversalInfo(value, propertySchema));
 
@@ -515,7 +515,7 @@ class JsonSchemaProxyHandler {
 
             const schemaDefault = schema.default;
             if (typeof schemaDefault !== 'undefined') {
-                value = JsonSchema.isolate(schemaDefault);
+                value = JsonSchema.clone(schemaDefault);
                 type = JsonSchemaProxyHandler.getValueType(value);
                 assignDefault = !JsonSchemaProxyHandler.isValueTypeAny(value, type, schemaType);
             }
@@ -628,19 +628,7 @@ class JsonSchema {
         return JsonSchemaProxyHandler.getValidValueOrDefault(schema, value);
     }
 
-    static isolate(value) {
-        if (value === null) { return null; }
-
-        switch (typeof value) {
-            case 'boolean':
-            case 'number':
-            case 'string':
-            case 'bigint':
-            case 'symbol':
-                return value;
-        }
-
-        const stringValue = JSON.stringify(value);
-        return typeof stringValue === 'string' ? JSON.parse(stringValue) : null;
+    static clone(value) {
+        return clone(value);
     }
 }

@@ -15,26 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-function utilIsolate(value) {
-    if (value === null) { return null; }
-
-    switch (typeof value) {
-        case 'boolean':
-        case 'number':
-        case 'string':
-        case 'bigint':
-        case 'symbol':
-            return value;
-    }
-
-    const stringValue = JSON.stringify(value);
-    return typeof stringValue === 'string' ? JSON.parse(stringValue) : null;
-}
-
 function utilFunctionIsolate(func) {
     return function isolatedFunction(...args) {
         try {
-            args = args.map((v) => utilIsolate(v));
+            args = args.map((v) => clone(v));
             return func.call(this, ...args);
         } catch (e) {
             try {
@@ -50,7 +34,7 @@ function utilFunctionIsolate(func) {
 
 function utilBackgroundIsolate(data) {
     const backgroundPage = chrome.extension.getBackgroundPage();
-    return backgroundPage.utilIsolate(data);
+    return backgroundPage.clone(data);
 }
 
 function utilBackgroundFunctionIsolate(func) {

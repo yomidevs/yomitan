@@ -38,7 +38,6 @@
  * profileConditionsDescriptorPromise
  * requestJson
  * requestText
- * utilIsolate
  */
 
 class Backend {
@@ -875,7 +874,7 @@ class Backend {
         for (const target of targets) {
             try {
                 const result = this._modifySetting(target);
-                results.push({result: utilIsolate(result)});
+                results.push({result: clone(result)});
             } catch (e) {
                 results.push({error: errorToJson(e)});
             }
@@ -889,7 +888,7 @@ class Backend {
         for (const target of targets) {
             try {
                 const result = this._getSetting(target);
-                results.push({result: utilIsolate(result)});
+                results.push({result: clone(result)});
             } catch (e) {
                 results.push({error: errorToJson(e)});
             }

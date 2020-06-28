@@ -19,7 +19,10 @@ const fs = require('fs');
 const {VM} = require('./yomichan-vm');
 
 const vm = new VM();
-vm.execute('bg/js/json-schema.js');
+vm.execute([
+    'mixed/js/core.js',
+    'bg/js/json-schema.js'
+]);
 const JsonSchema = vm.get('JsonSchema');
 
 

@@ -157,6 +157,73 @@ function getSetDifference(set1, set2) {
     );
 }
 
+const clone = (() => {
+    // eslint-disable-next-line no-shadow
+    function clone(value) {
+        if (value === null) { return null; }
+        switch (typeof value) {
+            case 'boolean':
+            case 'number':
+            case 'string':
+            case 'bigint':
+            case 'symbol':
+            case 'undefined':
+                return value;
+            default:
+                return cloneInternal(value, new Set());
+        }
+    }
+
+    function cloneInternal(value, visited) {
+        if (value === null) { return null; }
+        switch (typeof value) {
+            case 'boolean':
+            case 'number':
+            case 'string':
+            case 'bigint':
+            case 'symbol':
+            case 'undefined':
+                return value;
+            case 'function':
+                return cloneObject(value, visited);
+            case 'object':
+                return Array.isArray(value) ? cloneArray(value, visited) : cloneObject(value, visited);
+        }
+    }
+
+    function cloneArray(value, visited) {
+        if (visited.has(value)) { throw new Error('Circular'); }
+        try {
+            visited.add(value);
+            const result = [];
+            for (const item of value) {
+                result.push(cloneInternal(item, visited));
+            }
+            return result;
+        } finally {
+            visited.delete(value);
+        }
+    }
+
+    function cloneObject(value, visited) {
+        if (visited.has(value)) { throw new Error('Circular'); }
+        try {
+            visited.add(value);
+            const result = {};
+            for (const key in value) {
+                if (Object.prototype.hasOwnProperty.call(value, key)) {
+                    result[key] = cloneInternal(value[key], visited);
+                }
+            }
+            return result;
+        } finally {
+            visited.delete(value);
+        }
+    }
+
+    return clone;
+})();
+
 
 /*
  * Async utilities
