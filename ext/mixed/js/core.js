@@ -203,6 +203,16 @@ function promiseTimeout(delay, resolveValue) {
     return promise;
 }
 
+function deferPromise() {
+    let resolve;
+    let reject;
+    const promise = new Promise((resolve2, reject2) => {
+        resolve = resolve2;
+        reject = reject2;
+    });
+    return {promise, resolve, reject};
+}
+
 
 /*
  * Common events

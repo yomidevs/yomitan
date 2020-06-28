@@ -99,6 +99,7 @@
                 "getSetIntersection": "readonly",
                 "getSetDifference": "readonly",
                 "escapeRegExp": "readonly",
+                "deferPromise": "readonly",
                 "EventDispatcher": "readonly",
                 "EventListenerCollection": "readonly",
                 "EXTENSION_IS_BROWSER_EDGE": "readonly"
