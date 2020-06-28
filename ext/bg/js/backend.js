@@ -42,38 +42,38 @@
 
 class Backend {
     constructor() {
-        this.environment = new Environment();
-        this.database = new Database();
-        this.dictionaryImporter = new DictionaryImporter();
-        this.translator = new Translator(this.database);
-        this.anki = new AnkiConnect();
-        this.mecab = new Mecab();
-        this.clipboardMonitor = new ClipboardMonitor({getClipboard: this._onApiClipboardGet.bind(this)});
-        this.options = null;
-        this.optionsSchema = null;
-        this.defaultAnkiFieldTemplates = null;
-        this.audioUriBuilder = new AudioUriBuilder();
-        this.audioSystem = new AudioSystem({
-            audioUriBuilder: this.audioUriBuilder,
+        this._environment = new Environment();
+        this._database = new Database();
+        this._dictionaryImporter = new DictionaryImporter();
+        this._translator = new Translator(this._database);
+        this._anki = new AnkiConnect();
+        this._mecab = new Mecab();
+        this._clipboardMonitor = new ClipboardMonitor({getClipboard: this._onApiClipboardGet.bind(this)});
+        this._options = null;
+        this._optionsSchema = null;
+        this._defaultAnkiFieldTemplates = null;
+        this._audioUriBuilder = new AudioUriBuilder();
+        this._audioSystem = new AudioSystem({
+            audioUriBuilder: this._audioUriBuilder,
             useCache: false
         });
-        this.ankiNoteBuilder = new AnkiNoteBuilder({
-            anki: this.anki,
-            audioSystem: this.audioSystem,
+        this._ankiNoteBuilder = new AnkiNoteBuilder({
+            anki: this._anki,
+            audioSystem: this._audioSystem,
             renderTemplate: this._renderTemplate.bind(this)
         });
         this._templateRenderer = new TemplateRenderer();
 
         const url = (typeof window === 'object' && window !== null ? window.location.href : '');
-        this.optionsContext = {depth: 0, url};
+        this._optionsContext = {depth: 0, url};
 
-        this.clipboardPasteTarget = (
+        this._clipboardPasteTarget = (
             typeof document === 'object' && document !== null ?
             document.querySelector('#clipboard-paste-target') :
             null
         );
 
-        this.popupWindow = null;
+        this._popupWindow = null;
 
         this._isPrepared = false;
         this._prepareError = false;
@@ -171,32 +171,32 @@ class Backend {
 
             yomichan.on('log', this._onLog.bind(this));
 
-            await this.environment.prepare();
+            await this._environment.prepare();
             try {
-                await this.database.prepare();
+                await this._database.prepare();
             } catch (e) {
                 yomichan.logError(e);
             }
-            await this.translator.prepare();
+            await this._translator.prepare();
 
             await profileConditionsDescriptorPromise;
 
-            this.optionsSchema = await requestJson(chrome.runtime.getURL('/bg/data/options-schema.json'), 'GET');
-            this.defaultAnkiFieldTemplates = (await requestText(chrome.runtime.getURL('/bg/data/default-anki-field-templates.handlebars'), 'GET')).trim();
-            this.options = await optionsLoad();
-            this.options = JsonSchema.getValidValueOrDefault(this.optionsSchema, this.options);
+            this._optionsSchema = await requestJson(chrome.runtime.getURL('/bg/data/options-schema.json'), 'GET');
+            this._defaultAnkiFieldTemplates = (await requestText(chrome.runtime.getURL('/bg/data/default-anki-field-templates.handlebars'), 'GET')).trim();
+            this._options = await optionsLoad();
+            this._options = JsonSchema.getValidValueOrDefault(this._optionsSchema, this._options);
 
-            this.onOptionsUpdated('background');
+            this._applyOptions('background');
 
-            const options = this.getOptions(this.optionsContext);
+            const options = this.getOptions(this._optionsContext);
             if (options.general.showGuide) {
                 chrome.tabs.create({url: chrome.runtime.getURL('/bg/guide.html')});
             }
 
-            this.clipboardMonitor.on('change', this._onClipboardText.bind(this));
+            this._clipboardMonitor.on('change', this._onClipboardTextChange.bind(this));
 
             this._sendMessageAllTabs('backendPrepared');
-            const callback = () => this.checkLastError(chrome.runtime.lastError);
+            const callback = () => this._checkLastError(chrome.runtime.lastError);
             chrome.runtime.sendMessage({action: 'backendPrepared'}, callback);
         } catch (e) {
             yomichan.logError(e);
@@ -218,7 +218,7 @@ class Backend {
     }
 
     handleCommand(...args) {
-        return this._runCommand(...args);
+        return this._onCommand(...args);
     }
 
     handleZoomChange(...args) {
@@ -230,24 +230,39 @@ class Backend {
     }
 
     handleMessage(...args) {
-        return this.onMessage(...args);
+        return this._onMessage(...args);
     }
 
-    _sendMessageAllTabs(action, params={}) {
-        const callback = () => this.checkLastError(chrome.runtime.lastError);
-        chrome.tabs.query({}, (tabs) => {
-            for (const tab of tabs) {
-                chrome.tabs.sendMessage(tab.id, {action, params}, callback);
-            }
-        });
+    getFullOptions(useSchema=false) {
+        const options = this._options;
+        return useSchema ? JsonSchema.createProxy(options, this._optionsSchema) : options;
     }
 
-    onOptionsUpdated(source) {
-        this.applyOptions();
-        this._sendMessageAllTabs('optionsUpdated', {source});
+    getOptions(optionsContext, useSchema=false) {
+        return this._getProfile(optionsContext, useSchema).options;
     }
 
-    onMessage({action, params}, sender, callback) {
+    // Event handlers
+
+    _onClipboardTextChange({text}) {
+        this._onCommandSearch({mode: 'popup', query: text});
+    }
+
+    _onLog({level}) {
+        const levelValue = this._getErrorLevelValue(level);
+        if (levelValue <= this._getErrorLevelValue(this._logErrorLevel)) { return; }
+
+        this._logErrorLevel = level;
+        this._updateBadge();
+    }
+
+    // WebExtension event handlers
+
+    _onCommand(command) {
+        this._runCommand(command);
+    }
+
+    _onMessage({action, params}, sender, callback) {
         const messageHandler = this._messageHandlers.get(action);
         if (typeof messageHandler === 'undefined') { return false; }
 
@@ -293,7 +308,7 @@ class Backend {
             let forwardPort = chrome.tabs.connect(tabId, {frameId: targetFrameId, name: `cross-frame-communication-port-${senderFrameId}`});
 
             const cleanup = () => {
-                this.checkLastError(chrome.runtime.lastError);
+                this._checkLastError(chrome.runtime.lastError);
                 if (forwardPort !== null) {
                     forwardPort.disconnect();
                     forwardPort = null;
@@ -314,173 +329,16 @@ class Backend {
         }
     }
 
-    _onClipboardText({text}) {
-        this._onCommandSearch({mode: 'popup', query: text});
-    }
-
     _onZoomChange({tabId, oldZoomFactor, newZoomFactor}) {
-        const callback = () => this.checkLastError(chrome.runtime.lastError);
+        const callback = () => this._checkLastError(chrome.runtime.lastError);
         chrome.tabs.sendMessage(tabId, {action: 'zoomChanged', params: {oldZoomFactor, newZoomFactor}}, callback);
-    }
-
-    _onLog({level}) {
-        const levelValue = this._getErrorLevelValue(level);
-        if (levelValue <= this._getErrorLevelValue(this._logErrorLevel)) { return; }
-
-        this._logErrorLevel = level;
-        this._updateBadge();
-    }
-
-    applyOptions() {
-        const options = this.getOptions(this.optionsContext);
-        this._updateBadge();
-
-        this.anki.setServer(options.anki.server);
-        this.anki.setEnabled(options.anki.enable);
-
-        if (options.parsing.enableMecabParser) {
-            this.mecab.startListener();
-        } else {
-            this.mecab.stopListener();
-        }
-
-        if (options.general.enableClipboardPopups) {
-            this.clipboardMonitor.start();
-        } else {
-            this.clipboardMonitor.stop();
-        }
-    }
-
-    getOptionsSchema() {
-        return this.optionsSchema;
-    }
-
-    getFullOptions(useSchema=false) {
-        const options = this.options;
-        return useSchema ? JsonSchema.createProxy(options, this.optionsSchema) : options;
-    }
-
-    getOptions(optionsContext, useSchema=false) {
-        return this.getProfile(optionsContext, useSchema).options;
-    }
-
-    getProfile(optionsContext, useSchema=false) {
-        const options = this.getFullOptions(useSchema);
-        const profiles = options.profiles;
-        if (typeof optionsContext.index === 'number') {
-            return profiles[optionsContext.index];
-        }
-        const profile = this.getProfileFromContext(options, optionsContext);
-        return profile !== null ? profile : options.profiles[options.profileCurrent];
-    }
-
-    getProfileFromContext(options, optionsContext) {
-        for (const profile of options.profiles) {
-            const conditionGroups = profile.conditionGroups;
-            if (conditionGroups.length > 0 && Backend.testConditionGroups(conditionGroups, optionsContext)) {
-                return profile;
-            }
-        }
-        return null;
-    }
-
-    static testConditionGroups(conditionGroups, data) {
-        if (conditionGroups.length === 0) { return false; }
-
-        for (const conditionGroup of conditionGroups) {
-            const conditions = conditionGroup.conditions;
-            if (conditions.length > 0 && Backend.testConditions(conditions, data)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    static testConditions(conditions, data) {
-        for (const condition of conditions) {
-            if (!conditionsTestValue(profileConditionsDescriptor, condition.type, condition.operator, condition.value, data)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    checkLastError() {
-        // NOP
-    }
-
-    _runCommand(command, params) {
-        const handler = this._commandHandlers.get(command);
-        if (typeof handler !== 'function') { return false; }
-
-        handler(params);
-        return true;
-    }
-
-    async importDictionary(archiveSource, onProgress, details) {
-        return await this.dictionaryImporter.import(this.database, archiveSource, onProgress, details);
-    }
-
-    async _textParseScanning(text, options) {
-        const results = [];
-        while (text.length > 0) {
-            const term = [];
-            const [definitions, sourceLength] = await this.translator.findTerms(
-                'simple',
-                text.substring(0, options.scanning.length),
-                {},
-                options
-            );
-            if (definitions.length > 0 && sourceLength > 0) {
-                dictTermsSort(definitions);
-                const {expression, reading} = definitions[0];
-                const source = text.substring(0, sourceLength);
-                for (const {text: text2, furigana} of jp.distributeFuriganaInflected(expression, reading, source)) {
-                    const reading2 = jp.convertReading(text2, furigana, options.parsing.readingMode);
-                    term.push({text: text2, reading: reading2});
-                }
-                text = text.substring(source.length);
-            } else {
-                const reading = jp.convertReading(text[0], '', options.parsing.readingMode);
-                term.push({text: text[0], reading});
-                text = text.substring(1);
-            }
-            results.push(term);
-        }
-        return results;
-    }
-
-    async _textParseMecab(text, options) {
-        const results = [];
-        const rawResults = await this.mecab.parseText(text);
-        for (const [mecabName, parsedLines] of Object.entries(rawResults)) {
-            const result = [];
-            for (const parsedLine of parsedLines) {
-                for (const {expression, reading, source} of parsedLine) {
-                    const term = [];
-                    for (const {text: text2, furigana} of jp.distributeFuriganaInflected(
-                        expression.length > 0 ? expression : source,
-                        jp.convertKatakanaToHiragana(reading),
-                        source
-                    )) {
-                        const reading2 = jp.convertReading(text2, furigana, options.parsing.readingMode);
-                        term.push({text: text2, reading: reading2});
-                    }
-                    result.push(term);
-                }
-                result.push([{text: '\n', reading: ''}]);
-            }
-            results.push([mecabName, result]);
-        }
-        return results;
     }
 
     // Message handlers
 
     _onApiYomichanCoreReady(_params, sender) {
         // tab ID isn't set in background (e.g. browser_action)
-        const callback = () => this.checkLastError(chrome.runtime.lastError);
+        const callback = () => this._checkLastError(chrome.runtime.lastError);
         const data = {action: 'backendPrepared'};
         if (typeof sender.tab === 'undefined') {
             chrome.runtime.sendMessage(data, callback);
@@ -492,7 +350,7 @@ class Backend {
     }
 
     _onApiOptionsSchemaGet() {
-        return this.getOptionsSchema();
+        return this._optionsSchema;
     }
 
     _onApiOptionsGet({optionsContext}) {
@@ -506,12 +364,12 @@ class Backend {
     async _onApiOptionsSave({source}) {
         const options = this.getFullOptions();
         await optionsSave(options);
-        this.onOptionsUpdated(source);
+        this._applyOptions(source);
     }
 
     async _onApiKanjiFind({text, optionsContext}) {
         const options = this.getOptions(optionsContext);
-        const definitions = await this.translator.findKanji(text, options);
+        const definitions = await this._translator.findKanji(text, options);
         definitions.splice(options.general.maxResults);
         return definitions;
     }
@@ -519,7 +377,7 @@ class Backend {
     async _onApiTermsFind({text, details, optionsContext}) {
         const options = this.getOptions(optionsContext);
         const mode = options.general.resultOutputMode;
-        const [definitions, length] = await this.translator.findTerms(mode, text, details, options);
+        const [definitions, length] = await this._translator.findTerms(mode, text, details, options);
         definitions.splice(options.general.maxResults);
         return {length, definitions};
     }
@@ -557,7 +415,7 @@ class Backend {
 
         if (mode !== 'kanji') {
             const {customSourceUrl} = options.audio;
-            await this.ankiNoteBuilder.injectAudio(
+            await this._ankiNoteBuilder.injectAudio(
                 definition,
                 options.anki.terms.fields,
                 options.audio.sources,
@@ -566,15 +424,15 @@ class Backend {
         }
 
         if (details && details.screenshot) {
-            await this.ankiNoteBuilder.injectScreenshot(
+            await this._ankiNoteBuilder.injectScreenshot(
                 definition,
                 options.anki.terms.fields,
                 details.screenshot
             );
         }
 
-        const note = await this.ankiNoteBuilder.createNote(definition, mode, context, options, templates);
-        return this.anki.addNote(note);
+        const note = await this._ankiNoteBuilder.createNote(definition, mode, context, options, templates);
+        return this._anki.addNote(note);
     }
 
     async _onApiDefinitionsAddable({definitions, modes, context, optionsContext}) {
@@ -586,14 +444,14 @@ class Backend {
             const notePromises = [];
             for (const definition of definitions) {
                 for (const mode of modes) {
-                    const notePromise = this.ankiNoteBuilder.createNote(definition, mode, context, options, templates);
+                    const notePromise = this._ankiNoteBuilder.createNote(definition, mode, context, options, templates);
                     notePromises.push(notePromise);
                 }
             }
             const notes = await Promise.all(notePromises);
 
             const cannotAdd = [];
-            const results = await this.anki.canAddNotes(notes);
+            const results = await this._anki.canAddNotes(notes);
             for (let resultBase = 0; resultBase < results.length; resultBase += modes.length) {
                 const state = {};
                 for (let modeOffset = 0; modeOffset < modes.length; ++modeOffset) {
@@ -610,7 +468,7 @@ class Backend {
             }
 
             if (cannotAdd.length > 0) {
-                const noteIdsArray = await this.anki.findNoteIds(cannotAdd.map((e) => e[0]), options.anki.duplicateScope);
+                const noteIdsArray = await this._anki.findNoteIds(cannotAdd.map((e) => e[0]), options.anki.duplicateScope);
                 for (let i = 0, ii = Math.min(cannotAdd.length, noteIdsArray.length); i < ii; ++i) {
                     const noteIds = noteIdsArray[i];
                     if (noteIds.length > 0) {
@@ -626,7 +484,7 @@ class Backend {
     }
 
     async _onApiNoteView({noteId}) {
-        return await this.anki.guiBrowse(`nid:${noteId}`);
+        return await this._anki.guiBrowse(`nid:${noteId}`);
     }
 
     async _onApiTemplateRender({template, data}) {
@@ -638,7 +496,7 @@ class Backend {
     }
 
     async _onApiAudioGetUri({definition, source, details}) {
-        return await this.audioUriBuilder.getUri(definition, source, details);
+        return await this._audioUriBuilder.getUri(definition, source, details);
     }
 
     _onApiScreenshotGet({options}, sender) {
@@ -658,7 +516,7 @@ class Backend {
         }
 
         const tabId = sender.tab.id;
-        const callback = () => this.checkLastError(chrome.runtime.lastError);
+        const callback = () => this._checkLastError(chrome.runtime.lastError);
         chrome.tabs.sendMessage(tabId, {action, params}, {frameId}, callback);
         return true;
     }
@@ -669,7 +527,7 @@ class Backend {
         }
 
         const tabId = sender.tab.id;
-        const callback = () => this.checkLastError(chrome.runtime.lastError);
+        const callback = () => this._checkLastError(chrome.runtime.lastError);
         chrome.tabs.sendMessage(tabId, {action, params}, callback);
         return true;
     }
@@ -727,7 +585,7 @@ class Backend {
     }
 
     _onApiGetEnvironmentInfo() {
-        return this.environment.getInfo();
+        return this._environment.getInfo();
     }
 
     async _onApiClipboardGet() {
@@ -743,11 +601,11 @@ class Backend {
               being an extension with clipboard permissions. It effectively asks for the
               non-extension permission for clipboard access.
         */
-        const {browser} = this.environment.getInfo();
+        const {browser} = this._environment.getInfo();
         if (browser === 'firefox' || browser === 'firefox-mobile') {
             return await navigator.clipboard.readText();
         } else {
-            const clipboardPasteTarget = this.clipboardPasteTarget;
+            const clipboardPasteTarget = this._clipboardPasteTarget;
             if (clipboardPasteTarget === null) {
                 throw new Error('Reading the clipboard is not supported in this context');
             }
@@ -798,36 +656,36 @@ class Backend {
     }
 
     _onApiGetDefaultAnkiFieldTemplates() {
-        return this.defaultAnkiFieldTemplates;
+        return this._defaultAnkiFieldTemplates;
     }
 
     async _onApiGetAnkiDeckNames() {
-        return await this.anki.getDeckNames();
+        return await this._anki.getDeckNames();
     }
 
     async _onApiGetAnkiModelNames() {
-        return await this.anki.getModelNames();
+        return await this._anki.getModelNames();
     }
 
     async _onApiGetAnkiModelFieldNames({modelName}) {
-        return await this.anki.getModelFieldNames(modelName);
+        return await this._anki.getModelFieldNames(modelName);
     }
 
     async _onApiGetDictionaryInfo() {
-        return await this.translator.database.getDictionaryInfo();
+        return await this._translator.database.getDictionaryInfo();
     }
 
     async _onApiGetDictionaryCounts({dictionaryNames, getTotal}) {
-        return await this.translator.database.getDictionaryCounts(dictionaryNames, getTotal);
+        return await this._translator.database.getDictionaryCounts(dictionaryNames, getTotal);
     }
 
     async _onApiPurgeDatabase() {
-        this.translator.clearDatabaseCaches();
-        await this.database.purge();
+        this._translator.clearDatabaseCaches();
+        await this._database.purge();
     }
 
     async _onApiGetMedia({targets}) {
-        return await this.database.getMedia(targets);
+        return await this._database.getMedia(targets);
     }
 
     _onApiLog({error, level, context}) {
@@ -861,12 +719,12 @@ class Backend {
     }
 
     async _onApiImportDictionaryArchive({archiveContent, details}, sender, onProgress) {
-        return await this.dictionaryImporter.import(this.database, archiveContent, details, onProgress);
+        return await this._dictionaryImporter.import(this._database, archiveContent, details, onProgress);
     }
 
     async _onApiDeleteDictionary({dictionaryName}, sender, onProgress) {
-        this.translator.clearDatabaseCaches();
-        await this.database.deleteDictionary(dictionaryName, {rate: 1000}, onProgress);
+        this._translator.clearDatabaseCaches();
+        await this._database.deleteDictionary(dictionaryName, {rate: 1000}, onProgress);
     }
 
     async _onApiModifySettings({targets, source}) {
@@ -897,11 +755,245 @@ class Backend {
     }
 
     async _onApiSetAllSettings({value, source}) {
-        this.options = JsonSchema.getValidValueOrDefault(this.optionsSchema, value);
+        this._options = JsonSchema.getValidValueOrDefault(this._optionsSchema, value);
         await this._onApiOptionsSave({source});
     }
 
     // Command handlers
+
+    async _onCommandSearch(params) {
+        const {mode='existingOrNewTab', query} = params || {};
+
+        const options = this.getOptions(this._optionsContext);
+        const {popupWidth, popupHeight} = options.general;
+
+        const baseUrl = chrome.runtime.getURL('/bg/search.html');
+        const queryParams = {mode};
+        if (query && query.length > 0) { queryParams.query = query; }
+        const queryString = new URLSearchParams(queryParams).toString();
+        const url = `${baseUrl}?${queryString}`;
+
+        const isTabMatch = (url2) => {
+            if (url2 === null || !url2.startsWith(baseUrl)) { return false; }
+            const {baseUrl: baseUrl2, queryParams: queryParams2} = parseUrl(url2);
+            return baseUrl2 === baseUrl && (queryParams2.mode === mode || (!queryParams2.mode && mode === 'existingOrNewTab'));
+        };
+
+        const openInTab = async () => {
+            const tab = await this._findTab(1000, isTabMatch);
+            if (tab !== null) {
+                await this._focusTab(tab);
+                if (queryParams.query) {
+                    await new Promise((resolve) => chrome.tabs.sendMessage(
+                        tab.id,
+                        {action: 'searchQueryUpdate', params: {text: queryParams.query}},
+                        resolve
+                    ));
+                }
+                return true;
+            }
+        };
+
+        switch (mode) {
+            case 'existingOrNewTab':
+                try {
+                    if (await openInTab()) { return; }
+                } catch (e) {
+                    // NOP
+                }
+                chrome.tabs.create({url});
+                return;
+            case 'newTab':
+                chrome.tabs.create({url});
+                return;
+            case 'popup':
+                try {
+                    // chrome.windows not supported (e.g. on Firefox mobile)
+                    if (!isObject(chrome.windows)) { return; }
+                    if (await openInTab()) { return; }
+                    // if the previous popup is open in an invalid state, close it
+                    if (this._popupWindow !== null) {
+                        const callback = () => this._checkLastError(chrome.runtime.lastError);
+                        chrome.windows.remove(this._popupWindow.id, callback);
+                    }
+                    // open new popup
+                    this._popupWindow = await new Promise((resolve) => chrome.windows.create(
+                        {url, width: popupWidth, height: popupHeight, type: 'popup'},
+                        resolve
+                    ));
+                } catch (e) {
+                    // NOP
+                }
+                return;
+        }
+    }
+
+    _onCommandHelp() {
+        chrome.tabs.create({url: 'https://foosoft.net/projects/yomichan/'});
+    }
+
+    _onCommandOptions(params) {
+        const {mode='existingOrNewTab'} = params || {};
+        if (mode === 'existingOrNewTab') {
+            chrome.runtime.openOptionsPage();
+        } else if (mode === 'newTab') {
+            const manifest = chrome.runtime.getManifest();
+            const url = chrome.runtime.getURL(manifest.options_ui.page);
+            chrome.tabs.create({url});
+        }
+    }
+
+    async _onCommandToggle() {
+        const source = 'popup';
+        const options = this.getOptions(this._optionsContext);
+        options.general.enable = !options.general.enable;
+        await this._onApiOptionsSave({source});
+    }
+
+    // Utilities
+
+    _sendMessageAllTabs(action, params={}) {
+        const callback = () => this._checkLastError(chrome.runtime.lastError);
+        chrome.tabs.query({}, (tabs) => {
+            for (const tab of tabs) {
+                chrome.tabs.sendMessage(tab.id, {action, params}, callback);
+            }
+        });
+    }
+
+    _applyOptions(source) {
+        const options = this.getOptions(this._optionsContext);
+        this._updateBadge();
+
+        this._anki.setServer(options.anki.server);
+        this._anki.setEnabled(options.anki.enable);
+
+        if (options.parsing.enableMecabParser) {
+            this._mecab.startListener();
+        } else {
+            this._mecab.stopListener();
+        }
+
+        if (options.general.enableClipboardPopups) {
+            this._clipboardMonitor.start();
+        } else {
+            this._clipboardMonitor.stop();
+        }
+
+        this._sendMessageAllTabs('optionsUpdated', {source});
+    }
+
+    _getProfile(optionsContext, useSchema=false) {
+        const options = this.getFullOptions(useSchema);
+        const profiles = options.profiles;
+        if (typeof optionsContext.index === 'number') {
+            return profiles[optionsContext.index];
+        }
+        const profile = this._getProfileFromContext(options, optionsContext);
+        return profile !== null ? profile : options.profiles[options.profileCurrent];
+    }
+
+    _getProfileFromContext(options, optionsContext) {
+        for (const profile of options.profiles) {
+            const conditionGroups = profile.conditionGroups;
+            if (conditionGroups.length > 0 && this._testConditionGroups(conditionGroups, optionsContext)) {
+                return profile;
+            }
+        }
+        return null;
+    }
+
+    _testConditionGroups(conditionGroups, data) {
+        if (conditionGroups.length === 0) { return false; }
+
+        for (const conditionGroup of conditionGroups) {
+            const conditions = conditionGroup.conditions;
+            if (conditions.length > 0 && this._testConditions(conditions, data)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    _testConditions(conditions, data) {
+        for (const condition of conditions) {
+            if (!conditionsTestValue(profileConditionsDescriptor, condition.type, condition.operator, condition.value, data)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    _checkLastError() {
+        // NOP
+    }
+
+    _runCommand(command, params) {
+        const handler = this._commandHandlers.get(command);
+        if (typeof handler !== 'function') { return false; }
+
+        handler(params);
+        return true;
+    }
+
+    async _importDictionary(archiveSource, onProgress, details) {
+        return await this._dictionaryImporter.import(this._database, archiveSource, onProgress, details);
+    }
+
+    async _textParseScanning(text, options) {
+        const results = [];
+        while (text.length > 0) {
+            const term = [];
+            const [definitions, sourceLength] = await this._translator.findTerms(
+                'simple',
+                text.substring(0, options.scanning.length),
+                {},
+                options
+            );
+            if (definitions.length > 0 && sourceLength > 0) {
+                dictTermsSort(definitions);
+                const {expression, reading} = definitions[0];
+                const source = text.substring(0, sourceLength);
+                for (const {text: text2, furigana} of jp.distributeFuriganaInflected(expression, reading, source)) {
+                    const reading2 = jp.convertReading(text2, furigana, options.parsing.readingMode);
+                    term.push({text: text2, reading: reading2});
+                }
+                text = text.substring(source.length);
+            } else {
+                const reading = jp.convertReading(text[0], '', options.parsing.readingMode);
+                term.push({text: text[0], reading});
+                text = text.substring(1);
+            }
+            results.push(term);
+        }
+        return results;
+    }
+
+    async _textParseMecab(text, options) {
+        const results = [];
+        const rawResults = await this._mecab.parseText(text);
+        for (const [mecabName, parsedLines] of Object.entries(rawResults)) {
+            const result = [];
+            for (const parsedLine of parsedLines) {
+                for (const {expression, reading, source} of parsedLine) {
+                    const term = [];
+                    for (const {text: text2, furigana} of jp.distributeFuriganaInflected(
+                        expression.length > 0 ? expression : source,
+                        jp.convertKatakanaToHiragana(reading),
+                        source
+                    )) {
+                        const reading2 = jp.convertReading(text2, furigana, options.parsing.readingMode);
+                        term.push({text: text2, reading: reading2});
+                    }
+                    result.push(term);
+                }
+                result.push([{text: '\n', reading: ''}]);
+            }
+            results.push([mecabName, result]);
+        }
+        return results;
+    }
 
     _createActionListenerPort(port, sender, handlers) {
         let hasStarted = false;
@@ -994,97 +1086,6 @@ class Backend {
             default: return 0;
         }
     }
-
-    async _onCommandSearch(params) {
-        const {mode='existingOrNewTab', query} = params || {};
-
-        const options = this.getOptions(this.optionsContext);
-        const {popupWidth, popupHeight} = options.general;
-
-        const baseUrl = chrome.runtime.getURL('/bg/search.html');
-        const queryParams = {mode};
-        if (query && query.length > 0) { queryParams.query = query; }
-        const queryString = new URLSearchParams(queryParams).toString();
-        const url = `${baseUrl}?${queryString}`;
-
-        const isTabMatch = (url2) => {
-            if (url2 === null || !url2.startsWith(baseUrl)) { return false; }
-            const {baseUrl: baseUrl2, queryParams: queryParams2} = parseUrl(url2);
-            return baseUrl2 === baseUrl && (queryParams2.mode === mode || (!queryParams2.mode && mode === 'existingOrNewTab'));
-        };
-
-        const openInTab = async () => {
-            const tab = await Backend._findTab(1000, isTabMatch);
-            if (tab !== null) {
-                await Backend._focusTab(tab);
-                if (queryParams.query) {
-                    await new Promise((resolve) => chrome.tabs.sendMessage(
-                        tab.id,
-                        {action: 'searchQueryUpdate', params: {text: queryParams.query}},
-                        resolve
-                    ));
-                }
-                return true;
-            }
-        };
-
-        switch (mode) {
-            case 'existingOrNewTab':
-                try {
-                    if (await openInTab()) { return; }
-                } catch (e) {
-                    // NOP
-                }
-                chrome.tabs.create({url});
-                return;
-            case 'newTab':
-                chrome.tabs.create({url});
-                return;
-            case 'popup':
-                try {
-                    // chrome.windows not supported (e.g. on Firefox mobile)
-                    if (!isObject(chrome.windows)) { return; }
-                    if (await openInTab()) { return; }
-                    // if the previous popup is open in an invalid state, close it
-                    if (this.popupWindow !== null) {
-                        const callback = () => this.checkLastError(chrome.runtime.lastError);
-                        chrome.windows.remove(this.popupWindow.id, callback);
-                    }
-                    // open new popup
-                    this.popupWindow = await new Promise((resolve) => chrome.windows.create(
-                        {url, width: popupWidth, height: popupHeight, type: 'popup'},
-                        resolve
-                    ));
-                } catch (e) {
-                    // NOP
-                }
-                return;
-        }
-    }
-
-    _onCommandHelp() {
-        chrome.tabs.create({url: 'https://foosoft.net/projects/yomichan/'});
-    }
-
-    _onCommandOptions(params) {
-        const {mode='existingOrNewTab'} = params || {};
-        if (mode === 'existingOrNewTab') {
-            chrome.runtime.openOptionsPage();
-        } else if (mode === 'newTab') {
-            const manifest = chrome.runtime.getManifest();
-            const url = chrome.runtime.getURL(manifest.options_ui.page);
-            chrome.tabs.create({url});
-        }
-    }
-
-    async _onCommandToggle() {
-        const source = 'popup';
-        const options = this.getOptions(this.optionsContext);
-        options.general.enable = !options.general.enable;
-        await this._onApiOptionsSave({source});
-    }
-
-    // Utilities
 
     _getModifySettingObject(target) {
         const scope = target.scope;
@@ -1235,7 +1236,7 @@ class Backend {
     }
 
     _anyOptionsMatches(predicate) {
-        for (const {options} of this.options.profiles) {
+        for (const {options} of this._options.profiles) {
             const value = predicate(options);
             if (value) { return value; }
         }
@@ -1248,10 +1249,10 @@ class Backend {
 
     _getTemplates(options) {
         const templates = options.anki.fieldTemplates;
-        return typeof templates === 'string' ? templates : this.defaultAnkiFieldTemplates;
+        return typeof templates === 'string' ? templates : this._defaultAnkiFieldTemplates;
     }
 
-    static _getTabUrl(tab) {
+    _getTabUrl(tab) {
         return new Promise((resolve) => {
             chrome.tabs.sendMessage(tab.id, {action: 'getUrl'}, {frameId: 0}, (response) => {
                 let url = null;
@@ -1266,7 +1267,7 @@ class Backend {
         });
     }
 
-    static async _findTab(timeout, checkUrl) {
+    async _findTab(timeout, checkUrl) {
         // This function works around the need to have the "tabs" permission to access tab.url.
         const tabs = await new Promise((resolve) => chrome.tabs.query({}, resolve));
         const {promise: matchPromise, resolve: matchPromiseResolve} = deferPromise();
@@ -1279,7 +1280,7 @@ class Backend {
 
         const promises = [];
         for (const tab of tabs) {
-            const promise = Backend._getTabUrl(tab);
+            const promise = this._getTabUrl(tab);
             promise.then(checkTabUrl);
             promises.push(promise);
         }
@@ -1295,7 +1296,7 @@ class Backend {
         return await Promise.race(racePromises);
     }
 
-    static async _focusTab(tab) {
+    async _focusTab(tab) {
         await new Promise((resolve, reject) => {
             chrome.tabs.update(tab.id, {active: true}, () => {
                 const e = chrome.runtime.lastError;
