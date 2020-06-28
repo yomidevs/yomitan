@@ -109,9 +109,9 @@ const vm = new VM({
 vm.context.window = vm.context;
 
 vm.execute([
+    'mixed/js/core.js',
     'bg/js/json-schema.js',
     'bg/js/dictionary.js',
-    'mixed/js/core.js',
     'bg/js/media-utility.js',
     'bg/js/request.js',
     'bg/js/dictionary-importer.js',

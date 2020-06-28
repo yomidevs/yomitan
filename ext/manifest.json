@@ -36,6 +36,7 @@
         "matches": ["http://*/*", "https://*/*", "file://*/*"],
         "js": [
             "mixed/js/core.js",
+            "mixed/js/yomichan.js",
             "mixed/js/comm.js",
             "mixed/js/dom.js",
             "mixed/js/api.js",

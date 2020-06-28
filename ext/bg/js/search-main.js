@@ -23,7 +23,7 @@
 (async () => {
     try {
         api.forwardLogsToBackend();
-        await yomichan.prepare();
+        await yomichan.ready();
 
         const displaySearch = new DisplaySearch();
         await displaySearch.prepare();

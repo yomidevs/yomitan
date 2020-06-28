@@ -167,7 +167,7 @@ class Display {
     }
 
     async prepare() {
-        await yomichan.prepare();
+        await yomichan.ready();
         await this.displayGenerator.prepare();
     }
 

@@ -86,7 +86,6 @@
             "files": ["ext/**/*.js"],
             "excludedFiles": ["ext/mixed/js/core.js"],
             "globals": {
-                "yomichan": "readonly",
                 "errorToJson": "readonly",
                 "jsonToError": "readonly",
                 "isObject": "readonly",
@@ -103,6 +102,16 @@
                 "EventDispatcher": "readonly",
                 "EventListenerCollection": "readonly",
                 "EXTENSION_IS_BROWSER_EDGE": "readonly"
+            }
+        },
+        {
+            "files": ["ext/**/*.js"],
+            "excludedFiles": [
+                "ext/mixed/js/core.js",
+                "ext/mixed/js/yomichan.js"
+            ],
+            "globals": {
+                "yomichan": "readonly"
             }
         },
         {

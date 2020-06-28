@@ -51,7 +51,7 @@ function setupButtonEvents(selector, command, url) {
 
 async function mainInner() {
     api.forwardLogsToBackend();
-    await yomichan.prepare();
+    await yomichan.ready();
 
     await api.logIndicatorClear();
 
