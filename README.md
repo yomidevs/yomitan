@@ -60,7 +60,7 @@ Import](https://foosoft.net/projects/yomichan-import) page to learn how to conve
 Be aware that the non-English dictionaries contain fewer entries than their English counterparts. Even if your
 primary language is not English, you may consider also importing the English version for better coverage.
 
-*   **[JMdict](https://www.edrdg.org/enamdict/enamdict_doc.html)** (Japanese vocabulary)
+*   **[JMdict](https://www.edrdg.org/jmdict/edict_doc.html)** (Japanese vocabulary)
     *   [jmdict\_dutch.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_dutch.zip)
     *   [jmdict\_english.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_english.zip)
     *   [jmdict\_french.zip](https://foosoft.net/projects/yomichan/dl/dict/jmdict_french.zip)
@@ -90,7 +90,7 @@ primary language is not English, you may consider also importing the English ver
 
     [![](https://foosoft.net/projects/yomichan/img/ui-actions-thumb.png)](https://foosoft.net/projects/yomichan/img/ui-actions.png)
 
-2.  Click on the *spanner/monkey wrench* icon in the middle to open the options page.
+2.  Click on the *spanner/cog* icon in the middle to open the options page.
 
 3.  Import the dictionaries you wish to use for term and kanji searches. If you do not have any dictionaries installed
     (or enabled), Yomichan will warn you that it is not ready for use by displaying an orange exclamation mark over its

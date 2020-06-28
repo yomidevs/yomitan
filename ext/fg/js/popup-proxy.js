@@ -16,17 +16,17 @@
  */
 
 /* global
- * FrontendApiSender
+ * api
  */
 
-class PopupProxy {
-    constructor(id, depth, parentPopupId, parentFrameId, getFrameOffset=null, setDisabled=null) {
+class PopupProxy extends EventDispatcher {
+    constructor(id, depth, parentPopupId, parentFrameId, frameOffsetForwarder=null) {
+        super();
         this._id = id;
         this._depth = depth;
         this._parentPopupId = parentPopupId;
-        this._apiSender = new FrontendApiSender(`popup-factory#${parentFrameId}`);
-        this._getFrameOffset = getFrameOffset;
-        this._setDisabled = setDisabled;
+        this._parentFrameId = parentFrameId;
+        this._frameOffsetForwarder = frameOffsetForwarder;
 
         this._frameOffset = null;
         this._frameOffsetPromise = null;
@@ -75,7 +75,7 @@ class PopupProxy {
     }
 
     async containsPoint(x, y) {
-        if (this._getFrameOffset !== null) {
+        if (this._frameOffsetForwarder !== null) {
             await this._updateFrameOffset();
             [x, y] = this._applyFrameOffset(x, y);
         }
@@ -84,7 +84,7 @@ class PopupProxy {
 
     async showContent(elementRect, writingMode, type, details, context) {
         let {x, y, width, height} = elementRect;
-        if (this._getFrameOffset !== null) {
+        if (this._frameOffsetForwarder !== null) {
             await this._updateFrameOffset();
             [x, y] = this._applyFrameOffset(x, y);
         }
@@ -104,14 +104,10 @@ class PopupProxy {
         this._invoke('setContentScale', {id: this._id, scale});
     }
 
-    async getUrl() {
-        return await this._invoke('getUrl', {});
-    }
-
     // Private
 
     _invoke(action, params={}) {
-        return this._apiSender.invoke(action, params);
+        return api.crossFrame.invoke(this._parentFrameId, action, params);
     }
 
     async _updateFrameOffset() {
@@ -134,12 +130,12 @@ class PopupProxy {
     }
 
     async _updateFrameOffsetInner(now) {
-        this._frameOffsetPromise = this._getFrameOffset();
+        this._frameOffsetPromise = this._frameOffsetForwarder.getOffset();
         try {
             const offset = await this._frameOffsetPromise;
             this._frameOffset = offset !== null ? offset : [0, 0];
-            if (offset === null && this._setDisabled !== null) {
-                this._setDisabled();
+            if (offset === null) {
+                this.trigger('offsetNotFound');
                 return;
             }
             this._frameOffsetUpdatedAt = now;

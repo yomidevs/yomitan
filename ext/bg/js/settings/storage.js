@@ -15,126 +15,117 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * apiGetEnvironmentInfo
- */
-
-function storageBytesToLabeledString(size) {
-    const base = 1000;
-    const labels = [' bytes', 'KB', 'MB', 'GB'];
-    let labelIndex = 0;
-    while (size >= base) {
-        size /= base;
-        ++labelIndex;
+class StorageController {
+    constructor() {
+        this._mostRecentStorageEstimate = null;
+        this._storageEstimateFailed = false;
+        this._isUpdating = false;
     }
-    const label = labelIndex === 0 ? `${size}` : size.toFixed(1);
-    return `${label}${labels[labelIndex]}`;
-}
 
-async function storageEstimate() {
-    try {
-        return (storageEstimate.mostRecent = await navigator.storage.estimate());
-    } catch (e) {
-        // NOP
+    prepare() {
+        this._preparePersistentStorage();
+        this.updateStats();
+        document.querySelector('#storage-refresh').addEventListener('click', this.updateStats.bind(this), false);
     }
-    return null;
-}
-storageEstimate.mostRecent = null;
 
-async function isStoragePeristent() {
-    try {
-        return await navigator.storage.persisted();
-    } catch (e) {
-        // NOP
-    }
-    return false;
-}
+    async updateStats() {
+        try {
+            this._isUpdating = true;
 
-async function storageInfoInitialize() {
-    storagePersistInitialize();
-    const {browser, platform} = await apiGetEnvironmentInfo();
-    document.documentElement.dataset.browser = browser;
-    document.documentElement.dataset.operatingSystem = platform.os;
+            const estimate = await this._storageEstimate();
+            const valid = (estimate !== null);
 
-    await storageShowInfo();
+            if (valid) {
+                // Firefox reports usage as 0 when persistent storage is enabled.
+                const finite = (estimate.usage > 0 || !(await this._isStoragePeristent()));
+                if (finite) {
+                    document.querySelector('#storage-usage').textContent = this._bytesToLabeledString(estimate.usage);
+                    document.querySelector('#storage-quota').textContent = this._bytesToLabeledString(estimate.quota);
+                }
+                document.querySelector('#storage-use-finite').classList.toggle('storage-hidden', !finite);
+                document.querySelector('#storage-use-infinite').classList.toggle('storage-hidden', finite);
+            }
 
-    document.querySelector('#storage-refresh').addEventListener('click', storageShowInfo, false);
-}
+            document.querySelector('#storage-use').classList.toggle('storage-hidden', !valid);
+            document.querySelector('#storage-error').classList.toggle('storage-hidden', valid);
 
-async function storageUpdateStats() {
-    storageUpdateStats.isUpdating = true;
-
-    const estimate = await storageEstimate();
-    const valid = (estimate !== null);
-
-    if (valid) {
-        // Firefox reports usage as 0 when persistent storage is enabled.
-        const finite = (estimate.usage > 0 || !(await isStoragePeristent()));
-        if (finite) {
-            document.querySelector('#storage-usage').textContent = storageBytesToLabeledString(estimate.usage);
-            document.querySelector('#storage-quota').textContent = storageBytesToLabeledString(estimate.quota);
+            return valid;
+        } finally {
+            this._isUpdating = false;
         }
-        document.querySelector('#storage-use-finite').classList.toggle('storage-hidden', !finite);
-        document.querySelector('#storage-use-infinite').classList.toggle('storage-hidden', finite);
     }
 
-    storageUpdateStats.isUpdating = false;
-    return valid;
-}
-storageUpdateStats.isUpdating = false;
+    // Private
 
-async function storageShowInfo() {
-    storageSpinnerShow(true);
-
-    const valid = await storageUpdateStats();
-    document.querySelector('#storage-use').classList.toggle('storage-hidden', !valid);
-    document.querySelector('#storage-error').classList.toggle('storage-hidden', valid);
-
-    storageSpinnerShow(false);
-}
-
-function storageSpinnerShow(show) {
-    const spinner = $('#storage-spinner');
-    if (show) {
-        spinner.show();
-    } else {
-        spinner.hide();
-    }
-}
-
-async function storagePersistInitialize() {
-    if (!(navigator.storage && navigator.storage.persist)) {
-        // Not supported
-        return;
-    }
-
-    const info = document.querySelector('#storage-persist-info');
-    const button = document.querySelector('#storage-persist-button');
-    const checkbox = document.querySelector('#storage-persist-button-checkbox');
-
-    info.classList.remove('storage-hidden');
-    button.classList.remove('storage-hidden');
-
-    let persisted = await isStoragePeristent();
-    checkbox.checked = persisted;
-
-    button.addEventListener('click', async () => {
-        if (persisted) {
+    async _preparePersistentStorage() {
+        if (!(navigator.storage && navigator.storage.persist)) {
+            // Not supported
             return;
         }
-        let result = false;
+
+        const info = document.querySelector('#storage-persist-info');
+        const button = document.querySelector('#storage-persist-button');
+        const checkbox = document.querySelector('#storage-persist-button-checkbox');
+
+        info.classList.remove('storage-hidden');
+        button.classList.remove('storage-hidden');
+
+        let persisted = await this._isStoragePeristent();
+        checkbox.checked = persisted;
+
+        button.addEventListener('click', async () => {
+            if (persisted) {
+                return;
+            }
+            let result = false;
+            try {
+                result = await navigator.storage.persist();
+            } catch (e) {
+                // NOP
+            }
+
+            if (result) {
+                persisted = true;
+                checkbox.checked = true;
+                this.updateStats();
+            } else {
+                document.querySelector('.storage-persist-fail-warning').classList.remove('storage-hidden');
+            }
+        }, false);
+    }
+
+    async _storageEstimate() {
+        if (this._storageEstimateFailed && this._mostRecentStorageEstimate === null) {
+            return null;
+        }
         try {
-            result = await navigator.storage.persist();
+            const value = await navigator.storage.estimate();
+            this._mostRecentStorageEstimate = value;
+            return value;
+        } catch (e) {
+            this._storageEstimateFailed = true;
+        }
+        return null;
+    }
+
+    _bytesToLabeledString(size) {
+        const base = 1000;
+        const labels = [' bytes', 'KB', 'MB', 'GB'];
+        let labelIndex = 0;
+        while (size >= base) {
+            size /= base;
+            ++labelIndex;
+        }
+        const label = labelIndex === 0 ? `${size}` : size.toFixed(1);
+        return `${label}${labels[labelIndex]}`;
+    }
+
+    async _isStoragePeristent() {
+        try {
+            return await navigator.storage.persisted();
         } catch (e) {
             // NOP
         }
-
-        if (result) {
-            persisted = true;
-            checkbox.checked = true;
-            storageShowInfo();
-        } else {
-            $('.storage-persist-fail-warning').removeClass('storage-hidden');
-        }
-    }, false);
+        return false;
+    }
 }

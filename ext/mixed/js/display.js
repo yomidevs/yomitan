@@ -22,15 +22,7 @@
  * DisplayGenerator
  * MediaLoader
  * WindowScroll
- * apiAudioGetUri
- * apiBroadcastTab
- * apiDefinitionAdd
- * apiDefinitionsAddable
- * apiKanjiFind
- * apiNoteView
- * apiOptionsGet
- * apiScreenshotGet
- * apiTermsFind
+ * api
  * docRangeFromPoint
  * docSentenceExtract
  */
@@ -49,7 +41,7 @@ class Display {
         this.audioSystem = new AudioSystem({
             audioUriBuilder: {
                 getUri: async (definition, source, details) => {
-                    return await apiAudioGetUri(definition, source, details);
+                    return await api.audioGetUri(definition, source, details);
                 }
             },
             useCache: true
@@ -212,7 +204,7 @@ class Display {
                 url: this.context.get('url')
             };
 
-            const definitions = await apiKanjiFind(link.textContent, this.getOptionsContext());
+            const definitions = await api.kanjiFind(link.textContent, this.getOptionsContext());
             this.setContent('kanji', {definitions, context});
         } catch (error) {
             this.onError(error);
@@ -244,7 +236,9 @@ class Display {
             const {textSource, definitions} = termLookupResults;
 
             const scannedElement = e.target;
-            const sentence = docSentenceExtract(textSource, this.options.anki.sentenceExt);
+            const sentenceExtent = this.options.anki.sentenceExt;
+            const layoutAwareScan = this.options.scanning.layoutAwareScan;
+            const sentence = docSentenceExtract(textSource, sentenceExtent, layoutAwareScan);
 
             this.context.update({
                 index: this.entryIndexFind(scannedElement),
@@ -281,21 +275,22 @@ class Display {
         try {
             e.preventDefault();
 
-            const textSource = docRangeFromPoint(e.clientX, e.clientY, this.options.scanning.deepDomScan);
+            const {length: scanLength, deepDomScan: deepScan, layoutAwareScan} = this.options.scanning;
+            const textSource = docRangeFromPoint(e.clientX, e.clientY, deepScan);
             if (textSource === null) {
                 return false;
             }
 
             let definitions, length;
             try {
-                textSource.setEndOffset(this.options.scanning.length);
+                textSource.setEndOffset(scanLength, layoutAwareScan);
 
-                ({definitions, length} = await apiTermsFind(textSource.text(), {}, this.getOptionsContext()));
+                ({definitions, length} = await api.termsFind(textSource.text(), {}, this.getOptionsContext()));
                 if (definitions.length === 0) {
                     return false;
                 }
 
-                textSource.setEndOffset(length);
+                textSource.setEndOffset(length, layoutAwareScan);
             } finally {
                 textSource.cleanup();
             }
@@ -334,7 +329,7 @@ class Display {
     onNoteView(e) {
         e.preventDefault();
         const link = e.currentTarget;
-        apiNoteView(link.dataset.noteId);
+        api.noteView(link.dataset.noteId);
     }
 
     onKeyDown(e) {
@@ -379,7 +374,7 @@ class Display {
     }
 
     async updateOptions() {
-        this.options = await apiOptionsGet(this.getOptionsContext());
+        this.options = await api.optionsGet(this.getOptionsContext());
         this.updateDocumentOptions(this.options);
         this.updateTheme(this.options.general.popupTheme);
         this.setCustomCss(this.options.general.customPopupCss);
@@ -746,7 +741,7 @@ class Display {
     noteTryView() {
         const button = this.viewerButtonFind(this.index);
         if (button !== null && !button.classList.contains('disabled')) {
-            apiNoteView(button.dataset.noteId);
+            api.noteView(button.dataset.noteId);
         }
     }
 
@@ -763,7 +758,7 @@ class Display {
             }
 
             const context = await this._getNoteContext();
-            const noteId = await apiDefinitionAdd(definition, mode, context, details, this.getOptionsContext());
+            const noteId = await api.definitionAdd(definition, mode, context, details, this.getOptionsContext());
             if (noteId) {
                 const index = this.definitions.indexOf(definition);
                 const adderButton = this.adderButtonFind(index, mode);
@@ -815,9 +810,10 @@ class Display {
 
             this._stopPlayingAudio();
 
+            const volume = Math.max(0.0, Math.min(1.0, this.options.audio.volume / 100.0));
             this.audioPlaying = audio;
             audio.currentTime = 0;
-            audio.volume = this.options.audio.volume / 100.0;
+            audio.volume = Number.isFinite(volume) ? volume : 1.0;
             const playPromise = audio.play();
             if (typeof playPromise !== 'undefined') {
                 try {
@@ -857,7 +853,7 @@ class Display {
             await promiseTimeout(1); // Wait for popup to be hidden.
 
             const {format, quality} = this.options.anki.screenshot;
-            const dataUrl = await apiScreenshotGet({format, quality});
+            const dataUrl = await api.screenshotGet({format, quality});
             if (!dataUrl || dataUrl.error) { return; }
 
             return {dataUrl, format};
@@ -871,7 +867,7 @@ class Display {
     }
 
     setPopupVisibleOverride(visible) {
-        return apiBroadcastTab('popupSetVisibleOverride', {visible});
+        return api.broadcastTab('popupSetVisibleOverride', {visible});
     }
 
     setSpinnerVisible(visible) {
@@ -933,7 +929,7 @@ class Display {
     async getDefinitionsAddable(definitions, modes) {
         try {
             const context = await this._getNoteContext();
-            return await apiDefinitionsAddable(definitions, modes, context, this.getOptionsContext());
+            return await api.definitionsAddable(definitions, modes, context, this.getOptionsContext());
         } catch (e) {
             return [];
         }

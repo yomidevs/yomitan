@@ -17,7 +17,7 @@
 
 /* global
  * DOM
- * apiOptionsGet
+ * api
  * dynamicLoader
  */
 
@@ -46,6 +46,9 @@ class Popup {
         this._frame.className = 'yomichan-float';
         this._frame.style.width = '0';
         this._frame.style.height = '0';
+
+        this._container = this._frame;
+        this._shadow = null;
 
         this._fullscreenEventListeners = new EventListenerCollection();
     }
@@ -89,7 +92,7 @@ class Popup {
         this._optionsContext = optionsContext;
         this._previousOptionsContextSource = source;
 
-        this._options = await apiOptionsGet(optionsContext);
+        this._options = await api.optionsGet(optionsContext);
         this.updateTheme();
 
         this._invokeApi('setOptionsContext', {optionsContext});
@@ -180,7 +183,12 @@ class Popup {
     }
 
     async setCustomOuterCss(css, useWebExtensionApi) {
-        return await dynamicLoader.loadStyle('yomichan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi);
+        let parentNode = null;
+        if (this._shadow !== null) {
+            useWebExtensionApi = false;
+            parentNode = this._shadow;
+        }
+        return await dynamicLoader.loadStyle('yomichan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi, parentNode);
     }
 
     setChildrenSupported(value) {
@@ -193,6 +201,10 @@ class Popup {
 
     getFrameRect() {
         return this._frame.getBoundingClientRect();
+    }
+
+    getContainer() {
+        return this._container;
     }
 
     // Private functions
@@ -326,14 +338,25 @@ class Popup {
     }
 
     async _createInjectPromise() {
-        this._injectStyles();
+        if (this._options === null) {
+            throw new Error('Options not initialized');
+        }
+
+        const {useSecurePopupFrameUrl, usePopupShadowDom} = this._options.general;
+
+        await this._setUpContainer(usePopupShadowDom);
 
         const {secret, token} = await this._initializeFrame(this._frame, this._targetOrigin, this._frameId, (frame) => {
             frame.removeAttribute('src');
             frame.removeAttribute('srcdoc');
             this._observeFullscreen(true);
             this._onFullscreenChanged();
-            frame.contentDocument.location.href = chrome.runtime.getURL('/fg/float.html');
+            const url = chrome.runtime.getURL('/fg/float.html');
+            if (useSecurePopupFrameUrl) {
+                frame.contentDocument.location.href = url;
+            } else {
+                frame.setAttribute('src', url);
+            }
         });
         this._frameSecret = secret;
         this._frameToken = token;
@@ -371,9 +394,9 @@ class Popup {
     }
 
     _resetFrame() {
-        const parent = this._frame.parentNode;
+        const parent = this._container.parentNode;
         if (parent !== null) {
-            parent.removeChild(this._frame);
+            parent.removeChild(this._container);
         }
         this._frame.removeAttribute('src');
         this._frame.removeAttribute('srcdoc');
@@ -384,9 +407,31 @@ class Popup {
         this._injectPromiseComplete = false;
     }
 
+    async _setUpContainer(usePopupShadowDom) {
+        if (usePopupShadowDom && typeof this._frame.attachShadow === 'function') {
+            const container = document.createElement('div');
+            container.style.setProperty('all', 'initial', 'important');
+            const shadow = container.attachShadow({mode: 'closed', delegatesFocus: true});
+            shadow.appendChild(this._frame);
+
+            this._container = container;
+            this._shadow = shadow;
+        } else {
+            const frameParentNode = this._frame.parentNode;
+            if (frameParentNode !== null) {
+                frameParentNode.removeChild(this._frame);
+            }
+
+            this._container = this._frame;
+            this._shadow = null;
+        }
+
+        await this._injectStyles();
+    }
+
     async _injectStyles() {
         try {
-            await dynamicLoader.loadStyle('yomichan-popup-outer-stylesheet', 'file', '/fg/css/client.css', true);
+            await this._injectPopupOuterStylesheet();
         } catch (e) {
             // NOP
         }
@@ -396,6 +441,18 @@ class Popup {
         } catch (e) {
             // NOP
         }
+    }
+
+    async _injectPopupOuterStylesheet() {
+        let fileType = 'file';
+        let useWebExtensionApi = true;
+        let parentNode = null;
+        if (this._shadow !== null) {
+            fileType = 'file-content';
+            useWebExtensionApi = false;
+            parentNode = this._shadow;
+        }
+        await dynamicLoader.loadStyle('yomichan-popup-outer-stylesheet', fileType, '/fg/css/client.css', useWebExtensionApi, parentNode);
     }
 
     _observeFullscreen(observe) {
@@ -409,22 +466,13 @@ class Popup {
             return;
         }
 
-        const fullscreenEvents = [
-            'fullscreenchange',
-            'MSFullscreenChange',
-            'mozfullscreenchange',
-            'webkitfullscreenchange'
-        ];
-        const onFullscreenChanged = this._onFullscreenChanged.bind(this);
-        for (const eventName of fullscreenEvents) {
-            this._fullscreenEventListeners.addEventListener(document, eventName, onFullscreenChanged, false);
-        }
+        DOM.addFullscreenChangeEventListener(this._onFullscreenChanged.bind(this), this._fullscreenEventListeners);
     }
 
     _onFullscreenChanged() {
         const parent = this._getFrameParentElement();
-        if (parent !== null && this._frame.parentNode !== parent) {
-            parent.appendChild(this._frame);
+        if (parent !== null && this._container.parentNode !== parent) {
+            parent.appendChild(this._container);
         }
     }
 

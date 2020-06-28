@@ -1,0 +1,282 @@
+/*
+ * Copyright (C) 2020  Yomichan Authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+body {
+    padding: 10px;
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    font-size: 14px;
+}
+
+h3 {
+    margin: 10px 0;
+    font-family: inherit;
+    font-weight: 500;
+    line-height: 1.1;
+    font-size: 24px;
+    color: inherit;
+}
+label {
+    font-weight: normal;
+}
+
+#mini {
+    text-align: center;
+}
+#full {
+    display: none;
+}
+:root[data-mode=full] #mini {
+    display: none;
+}
+:root[data-mode=full] #full {
+    display: initial;
+}
+
+
+.link-group {
+    display: block;
+    line-height: 1.5em;
+    margin: 0 -10px;
+    padding: 0.5em 10px;
+    cursor: pointer;
+    color: #333;
+    text-decoration: none;
+    background-color: transparent;
+    transition: background-color 0.125s linear 0s;
+    max-width: none;
+}
+.link-group:hover,
+.link-group:active {
+    color: #333;
+    text-decoration: none;
+}
+.link-group:hover>.link-group-label,
+.link-group:active>.link-group-label {
+    text-decoration: underline;
+}
+.link-group:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+.link-group:active {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+.link-group-icon {
+    width: 16px;
+    height: 16px;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+    margin-right: 0.25em;
+}
+.link-group-icon>input {
+    margin: 0;
+    padding: 0;
+}
+.link-group-icon[data-icon=chevron]::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-image: url(/mixed/img/right-chevron.svg);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+}
+.link-group-label {
+    vertical-align: middle;
+}
+
+/* Toggle */
+.toggle>input[type=checkbox] {
+    display: none;
+}
+.toggle>input[type=checkbox]:not(:checked)~.toggle-group {
+    transform: translateX(-50%);
+}
+.toggle {
+    box-sizing: border-box;
+    width: 60px;
+    height: 34px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #245580;
+    border-radius: 4px;
+    display: inline-block;
+    padding: 6px 12px;
+}
+.toggle-group {
+    position: absolute;
+    width: 200%;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    user-select: none;
+}
+body[data-loaded=true] .toggle-group {
+    transition: transform 0.35s;
+}
+
+.toggle-on,
+.toggle-off,
+.toggle-handle {
+    display: block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.toggle-on,
+.toggle-off {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: 0;
+    border: 0;
+}
+
+.toggle-on {
+    padding-right: 24px;
+    left: 0;
+    right: 50%;
+    color: #ffffff;
+    background-color: #337ab7;
+    border-color: #2e6da4;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 3px 5px rgba(0, 0, 0, 0);
+    background-image: linear-gradient(#337ab7, #265a88);
+    background-repeat: repeat-x;
+}
+.toggle-on:focus,
+.toggle-on:hover {
+    background-color: #265a88;
+    background-image: linear-gradient(#2d65a0, #265a88 50%);
+}
+.toggle-on:active {
+    background-color: #204d74;
+    background-image: none;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
+
+.toggle-off {
+    padding-left: 24px;
+    left: 50%;
+    right: 0;
+}
+
+.toggle-handle {
+    position: relative;
+    margin: 0 auto;
+    padding-top: 0;
+    padding-bottom: 0;
+    height: 100%;
+    width: 0;
+    border-style: solid;
+    border-width: 0 1px;
+    border-radius: 4px;
+    border-color: #cccccc;
+}
+
+.toggle-off,
+.toggle-handle {
+    color: #333333;
+    text-shadow: 0 1px 0 #ffffff;
+    background-color: #ffffff;
+    background-image: linear-gradient(#ffffff, #e0e0e0);
+    background-repeat: repeat-x;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 1px 1px rgba(0,0,0,.075);
+}
+.toggle-off:focus,
+.toggle-off:hover,
+.toggle-handle:focus,
+.toggle-handle:hover {
+    background-color: #e6e6e6;
+    background-image: linear-gradient(#e0e0e0, #e6e6e6 50%);
+    border-color: #adadad;
+}
+.toggle-off:active,
+.toggle-handle:active {
+    background-color:#d4d4d4;
+    background-image: none;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    border-color: #8c8c8c;
+}
+
+
+/* Navigation buttons and icons */
+.nav-button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    white-space: nowrap;
+}
+.nav-button {
+    background-image: linear-gradient(#f8f8f8, #e0e0e0);
+    border: 1px solid #cccccc;
+    margin: 0;
+    padding: 2px 3px;
+    margin: 0;
+    cursor: pointer;
+}
+.nav-button+.nav-button {
+    margin-left: -1px;
+}
+.nav-button::after {
+    content: "";
+    display: block;
+    width: 16px;
+    height: 16px;
+    background-position: center center;
+    background-size: 16px 16px;
+    background-repeat: no-repeat;
+    box-sizing: content-box;
+}
+.nav-button:hover {
+    z-index: 1;
+    border-color: #aaaaaa;
+    background-image: linear-gradient(#e8e8e8, #d0d0d0);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+}
+.nav-button:active {
+    z-index: 1;
+    border-color: #808080;
+    background-image: linear-gradient(#c8c8c8, #e0e0e0);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+}
+.nav-button:focus {
+    outline: none;
+}
+.nav-button[data-icon=magnifying-glass]::after {
+    background-image: url(/mixed/img/magnifying-glass.svg);
+}
+.nav-button[data-icon=cog]::after {
+    background-image: url(/mixed/img/cog.svg);
+}
+.nav-button[data-icon=question-mark]::after {
+    background-image: url(/mixed/img/question-mark-circle.svg);
+}
+.nav-button:first-of-type {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+.nav-button:last-of-type {
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}

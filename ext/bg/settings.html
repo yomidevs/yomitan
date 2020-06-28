@@ -135,60 +135,68 @@
                 <h3>General Options</h3>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="enable"> Enable content scanning</label>
+                    <label><input type="checkbox" id="enable" data-setting="general.enable"> Enable content scanning</label>
                 </div>
 
-                <div class="checkbox" data-hide-for-browser="firefox-mobile">
+                <div class="checkbox ignore-form-changes" data-hide-for-browser="firefox-mobile">
                     <label><input type="checkbox" id="enable-clipboard-popups"> Enable native popups when copying Japanese text</label>
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="show-usage-guide"> Show usage guide on startup</label>
+                    <label><input type="checkbox" id="show-usage-guide" data-setting="general.showGuide"> Show usage guide on startup</label>
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="compact-tags"> Compact tags</label>
+                    <label><input type="checkbox" id="compact-tags" data-setting="general.compactTags"> Compact tags</label>
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="compact-glossaries"> Compact glossaries</label>
+                    <label><input type="checkbox" id="compact-glossaries" data-setting="general.compactGlossaries"> Compact glossaries</label>
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="show-advanced-options"> Show advanced options</label>
+                    <label><input type="checkbox" id="show-advanced-options" data-setting="general.showAdvanced" data-transform-pre="setDocumentAttribute" data-transform-post="setDocumentAttribute" data-document-attribute="data-options-general-show-advanced"> Show advanced options</label>
                 </div>
 
                 <div class="checkbox options-advanced">
-                    <label><input type="checkbox" id="popup-scale-relative-to-page-zoom"> Change popup size relative to page zoom level</label>
+                    <label><input type="checkbox" id="popup-scale-relative-to-page-zoom" data-setting="general.popupScaleRelativeToPageZoom"> Change popup size relative to page zoom level</label>
                 </div>
 
                 <div class="checkbox options-advanced">
-                    <label><input type="checkbox" id="popup-scale-relative-to-visual-viewport"> Change popup size relative to page viewport</label>
+                    <label><input type="checkbox" id="popup-scale-relative-to-visual-viewport" data-setting="general.popupScaleRelativeToVisualViewport"> Change popup size relative to page viewport</label>
                 </div>
 
                 <div class="checkbox options-advanced">
-                    <label><input type="checkbox" id="show-pitch-accent-downstep-notation"> Show downstep notation for pitch accents</label>
+                    <label><input type="checkbox" id="show-pitch-accent-downstep-notation" data-setting="general.showPitchAccentDownstepNotation"> Show downstep notation for pitch accents</label>
                 </div>
 
                 <div class="checkbox options-position">
-                    <label><input type="checkbox" id="show-pitch-accent-position-notation"> Show position notation for pitch accents</label>
+                    <label><input type="checkbox" id="show-pitch-accent-position-notation" data-setting="general.showPitchAccentPositionNotation"> Show position notation for pitch accents</label>
                 </div>
 
                 <div class="checkbox options-advanced">
-                    <label><input type="checkbox" id="show-pitch-accent-graph"> Show graph for pitch accents</label>
+                    <label><input type="checkbox" id="show-pitch-accent-graph" data-setting="general.showPitchAccentGraph"> Show graph for pitch accents</label>
                 </div>
 
                 <div class="checkbox options-advanced">
-                    <label><input type="checkbox" id="show-iframe-popups-in-root-frame"> Show iframe popups in root frame</label>
+                    <label><input type="checkbox" id="show-iframe-popups-in-root-frame" data-setting="general.showIframePopupsInRootFrame"> Show iframe popups in root frame</label>
                 </div>
 
                 <div class="checkbox options-advanced">
-                    <label><input type="checkbox" id="show-debug-info"> Show debug information</label>
+                    <label><input type="checkbox" data-setting="general.useSecurePopupFrameUrl"> Use secure popup frame URL</label>
+                </div>
+
+                <div class="checkbox options-advanced">
+                    <label><input type="checkbox" data-setting="general.usePopupShadowDom"> Use shadow DOM container for popup</label>
+                </div>
+
+                <div class="checkbox options-advanced">
+                    <label><input type="checkbox" id="show-debug-info" data-setting="general.debugInfo" data-transform-pre="setDocumentAttribute" data-transform-post="setDocumentAttribute" data-document-attribute="data-options-general-debug-info"> Show debug information</label>
                 </div>
 
                 <div class="form-group">
                     <label for="result-output-mode">Result grouping</label>
-                    <select class="form-control" id="result-output-mode">
+                    <select class="form-control" id="result-output-mode" data-setting="general.resultOutputMode" data-transform-pre="setDocumentAttribute" data-transform-post="setDocumentAttribute" data-document-attribute="data-options-general-result-output-mode">
                         <option value="group">Group results by term-reading pairs</option>
                         <option value="merge">Group results by main dictionary entry</option>
                         <option value="split">Split definitions to their own results</option>
@@ -197,7 +205,7 @@
 
                 <div class="form-group">
                     <label for="popup-display-mode">Popup display mode</label>
-                    <select class="form-control" id="popup-display-mode">
+                    <select class="form-control" id="popup-display-mode" data-setting="general.popupDisplayMode">
                         <option value="default">Default</option>
                         <option value="full-width">Full width</option>
                     </select>
@@ -205,26 +213,26 @@
 
                 <div class="form-group">
                     <label for="popup-scaling-factor">Popup size multiplier</label>
-                    <input type="number" min="0" id="popup-scaling-factor" class="form-control">
+                    <input type="number" min="0" id="popup-scaling-factor" data-setting="general.popupScalingFactor" class="form-control">
                 </div>
 
                 <div class="form-group options-advanced">
                     <label for="max-displayed-results">Maximum displayed results</label>
-                    <input type="number" min="1" id="max-displayed-results" class="form-control">
+                    <input type="number" min="1" id="max-displayed-results" class="form-control" data-setting="general.maxResults">
                 </div>
 
                 <div class="form-group">
                     <div class="row">
                         <div class="col-xs-6">
                             <label for="popup-horizontal-text-position">Popup position for horizontal text</label>
-                            <select class="form-control" id="popup-horizontal-text-position">
+                            <select class="form-control" id="popup-horizontal-text-position" data-setting="general.popupHorizontalTextPosition">
                                 <option value="below">Below text</option>
                                 <option value="above">Above text</option>
                             </select>
                         </div>
                         <div class="col-xs-6">
                             <label for="popup-vertical-text-position">Popup position for vertical text</label>
-                            <select class="form-control" id="popup-vertical-text-position">
+                            <select class="form-control" id="popup-vertical-text-position" data-setting="general.popupVerticalTextPosition">
                                 <option value="default">Same as for horizontal text</option>
                                 <option value="before">Before text reading direction</option>
                                 <option value="after">After text reading direction</option>
@@ -239,11 +247,11 @@
                     <div class="row">
                         <div class="col-xs-6">
                             <label for="popup-width">Popup width <span class="label-light">(in pixels)</span></label>
-                            <input type="number" min="1" id="popup-width" class="form-control">
+                            <input type="number" min="1" id="popup-width" class="form-control" data-setting="general.popupWidth">
                         </div>
                         <div class="col-xs-6">
                             <label for="popup-height">Popup height <span class="label-light">(in pixels)</span></label>
-                            <input type="number" min="1" id="popup-height" class="form-control">
+                            <input type="number" min="1" id="popup-height" class="form-control" data-setting="general.popupHeight">
                         </div>
                     </div>
                 </div>
@@ -252,11 +260,11 @@
                     <div class="row">
                         <div class="col-xs-6">
                             <label for="popup-horizontal-offset">Horizontal popup offset <span class="label-light">(in pixels)</span></label>
-                            <input type="number" min="0" id="popup-horizontal-offset" class="form-control">
+                            <input type="number" min="0" id="popup-horizontal-offset" class="form-control" data-setting="general.popupHorizontalOffset">
                         </div>
                         <div class="col-xs-6">
                             <label for="popup-vertical-offset">Vertical popup offset <span class="label-light">(in pixels)</span></label>
-                            <input type="number" min="0" id="popup-vertical-offset" class="form-control">
+                            <input type="number" min="0" id="popup-vertical-offset" class="form-control" data-setting="general.popupVerticalOffset">
                         </div>
                     </div>
                 </div>
@@ -265,11 +273,11 @@
                     <div class="row">
                         <div class="col-xs-6">
                             <label for="popup-horizontal-offset2">Horizontal popup offset for vertical text <span class="label-light">(in pixels)</span></label>
-                            <input type="number" min="0" id="popup-horizontal-offset2" class="form-control">
+                            <input type="number" min="0" id="popup-horizontal-offset2" class="form-control" data-setting="general.popupHorizontalOffset2">
                         </div>
                         <div class="col-xs-6">
                             <label for="popup-vertical-offset2">Vertical popup offset for vertical text <span class="label-light">(in pixels)</span></label>
-                            <input type="number" min="0" id="popup-vertical-offset2" class="form-control">
+                            <input type="number" min="0" id="popup-vertical-offset2" class="form-control" data-setting="general.popupVerticalOffset2">
                         </div>
                     </div>
                 </div>
@@ -278,14 +286,14 @@
                     <div class="row">
                         <div class="col-xs-6">
                             <label for="popup-theme">Popup theme</label>
-                            <select class="form-control" id="popup-theme">
+                            <select class="form-control" id="popup-theme" data-setting="general.popupTheme">
                                 <option value="default">Light</option>
                                 <option value="dark">Dark</option>
                             </select>
                         </div>
                         <div class="col-xs-6">
                             <label for="popup-outer-theme">Popup shadow theme</label>
-                            <select class="form-control" id="popup-outer-theme">
+                            <select class="form-control" id="popup-outer-theme" data-setting="general.popupOuterTheme">
                                 <option value="auto">Auto-detect</option>
                                 <option value="default">Light</option>
                                 <option value="dark">Dark</option>
@@ -298,11 +306,11 @@
                     <div class="row">
                         <div class="col-xs-6">
                             <label for="custom-popup-css">Custom popup CSS</label>
-                            <div><textarea autocomplete="off" spellcheck="false" wrap="soft" id="custom-popup-css" class="form-control"></textarea></div>
+                            <div><textarea autocomplete="off" spellcheck="false" wrap="soft" id="custom-popup-css" class="form-control" data-setting="general.customPopupCss"></textarea></div>
                         </div>
                         <div class="col-xs-6">
                             <label for="custom-popup-outer-css">Custom popup outer CSS</label>
-                            <div><textarea autocomplete="off" spellcheck="false" wrap="soft" id="custom-popup-outer-css" class="form-control" placeholder="iframe.yomichan-float { /*styles*/ }"></textarea></div>
+                            <div><textarea autocomplete="off" spellcheck="false" wrap="soft" id="custom-popup-outer-css" class="form-control" data-setting="general.customPopupOuterCss" placeholder="iframe.yomichan-float { /*styles*/ }"></textarea></div>
                         </div>
                     </div>
                 </div>
@@ -324,22 +332,22 @@
                 <h3>Audio Options</h3>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="audio-playback-enabled"> Enable audio playback in search results</label>
+                    <label><input type="checkbox" id="audio-playback-enabled" data-setting="audio.enabled"> Enable audio playback in search results</label>
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="auto-play-audio"> Play audio automatically</label>
+                    <label><input type="checkbox" id="auto-play-audio" data-setting="audio.autoPlay"> Play audio automatically</label>
                 </div>
 
                 <div class="form-group">
                     <label for="audio-playback-volume">Audio playback volume <span class="label-light">(percent)</span></label>
-                    <input type="number" min="0" max="100" id="audio-playback-volume" class="form-control">
+                    <input type="number" min="0" max="100" id="audio-playback-volume" class="form-control" data-setting="audio.volume">
                 </div>
 
                 <div class="form-group" id="text-to-speech-voice-container" hidden>
                     <label for="text-to-speech-voice">Text-to-speech voice</label>
                     <div class="input-group">
-                        <select class="form-control" id="text-to-speech-voice"></select>
+                        <select class="form-control" id="text-to-speech-voice" data-setting="audio.textToSpeechVoice"></select>
                         <div class="input-group-btn">
                             <button class="btn btn-default" id="text-to-speech-voice-test" title="Test voice" data-speech-text="よみちゃん"><span class="glyphicon glyphicon-volume-up"></span></button>
                         </div>
@@ -348,7 +356,7 @@
 
                 <div class="form-group options-advanced">
                     <label for="audio-custom-source">Custom audio source <span class="label-light">(URL)</span></label>
-                    <input type="text" id="audio-custom-source" class="form-control" placeholder="Example: http://localhost/audio.mp3?expression={expression}&reading={reading}">
+                    <input type="text" id="audio-custom-source" class="form-control" data-setting="audio.customSourceUrl" placeholder="Example: http://localhost/audio.mp3?expression={expression}&reading={reading}">
                 </div>
 
                 <div class="form-group ignore-form-changes">
@@ -377,42 +385,46 @@
                 <h3>Scanning Options</h3>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="middle-mouse-button-scan"> Middle mouse button scans</label>
+                    <label><input type="checkbox" id="middle-mouse-button-scan" data-setting="scanning.middleMouse"> Middle mouse button scans</label>
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="touch-input-enabled"> Touch input enabled</label>
+                    <label><input type="checkbox" id="touch-input-enabled" data-setting="scanning.touchInputEnabled"> Touch input enabled</label>
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="select-matched-text"> Select matched text</label>
+                    <label><input type="checkbox" id="select-matched-text" data-setting="scanning.selectText"> Select matched text</label>
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="search-alphanumeric"> Search alphanumeric text</label>
+                    <label><input type="checkbox" id="search-alphanumeric" data-setting="scanning.alphanumeric"> Search alphanumeric text</label>
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="auto-hide-results"> Automatically hide results</label>
+                    <label><input type="checkbox" id="auto-hide-results" data-setting="scanning.autoHideResults"> Automatically hide results</label>
+                </div>
+
+                <div class="checkbox">
+                    <label><input type="checkbox" id="layout-aware-scan" data-setting="scanning.layoutAwareScan"> Layout-aware scan</label>
                 </div>
 
                 <div class="checkbox options-advanced">
-                    <label><input type="checkbox" id="deep-dom-scan"> Deep DOM scan</label>
+                    <label><input type="checkbox" id="deep-dom-scan" data-setting="scanning.deepDomScan"> Deep DOM scan</label>
                 </div>
 
                 <div class="form-group options-advanced">
                     <label for="scan-delay">Scan delay <span class="label-light">(in milliseconds)</span></label>
-                    <input type="number" min="0" id="scan-delay" class="form-control">
+                    <input type="number" min="0" id="scan-delay" class="form-control" data-setting="scanning.delay">
                 </div>
 
                 <div class="form-group options-advanced">
                     <label for="scan-length">Scan length <span class="label-light">(in characters)</span></label>
-                    <input type="number" min="1" step="1" id="scan-length" class="form-control">
+                    <input type="number" min="1" step="1" id="scan-length" class="form-control" data-setting="scanning.length">
                 </div>
 
                 <div class="form-group">
                     <label for="scan-modifier-key">Scan modifier key</label>
-                    <select class="form-control" id="scan-modifier-key"></select>
+                    <select class="form-control" id="scan-modifier-key" data-setting="scanning.modifier"></select>
                 </div>
             </div>
 
@@ -447,7 +459,7 @@
 
                 <div class="form-group">
                     <label for="translation-convert-half-width-characters">Convert half width characters to full width <span class="label-light">(ﾖﾐﾁｬﾝ &rarr; ヨミチャン)</span></label>
-                    <select class="form-control" id="translation-convert-half-width-characters">
+                    <select class="form-control" id="translation-convert-half-width-characters" data-setting="translation.convertHalfWidthCharacters">
                         <option value="false">Disabled</option>
                         <option value="true">Enabled</option>
                         <option value="variant">Use both variants</option>
@@ -456,7 +468,7 @@
 
                 <div class="form-group">
                     <label for="translation-convert-numeric-characters">Convert numeric characters to full width <span class="label-light">(1234 &rarr; １２３４)</span></label>
-                    <select class="form-control" id="translation-convert-numeric-characters">
+                    <select class="form-control" id="translation-convert-numeric-characters" data-setting="translation.convertNumericCharacters">
                         <option value="false">Disabled</option>
                         <option value="true">Enabled</option>
                         <option value="variant">Use both variants</option>
@@ -465,7 +477,7 @@
 
                 <div class="form-group">
                     <label for="translation-convert-alphabetic-characters">Convert alphabetic characters to hiragana <span class="label-light">(yomichan &rarr; よみちゃん)</span></label>
-                    <select class="form-control" id="translation-convert-alphabetic-characters">
+                    <select class="form-control" id="translation-convert-alphabetic-characters" data-setting="translation.convertAlphabeticCharacters">
                         <option value="false">Disabled</option>
                         <option value="true">Enabled</option>
                         <option value="variant">Use both variants</option>
@@ -474,7 +486,7 @@
 
                 <div class="form-group">
                     <label for="translation-convert-hiragana-to-katakana">Convert hiragana to katakana <span class="label-light">(よみちゃん &rarr; ヨミチャン)</span></label>
-                    <select class="form-control" id="translation-convert-hiragana-to-katakana">
+                    <select class="form-control" id="translation-convert-hiragana-to-katakana" data-setting="translation.convertHiraganaToKatakana">
                         <option value="false">Disabled</option>
                         <option value="true">Enabled</option>
                         <option value="variant">Use both variants</option>
@@ -483,7 +495,7 @@
 
                 <div class="form-group">
                     <label for="translation-convert-katakana-to-hiragana">Convert katakana to hiragana <span class="label-light">(ヨミチャン &rarr; よみちゃん)</span></label>
-                    <select class="form-control" id="translation-convert-katakana-to-hiragana">
+                    <select class="form-control" id="translation-convert-katakana-to-hiragana" data-setting="translation.convertKatakanaToHiragana">
                         <option value="false">Disabled</option>
                         <option value="true">Enabled</option>
                         <option value="variant">Use both variants</option>
@@ -492,7 +504,7 @@
 
                 <div class="form-group">
                     <label for="translation-collapse-emphatic-sequences">Collapse emphatic character sequences <span class="label-light">(すっっごーーい &rarr; すっごーい / すごい)</span></label>
-                    <select class="form-control" id="translation-collapse-emphatic-sequences">
+                    <select class="form-control" id="translation-collapse-emphatic-sequences" data-setting="translation.collapseEmphaticSequences">
                         <option value="false">Disabled</option>
                         <option value="true">Collapse into single character</option>
                         <option value="full">Remove all characters</option>
@@ -509,24 +521,24 @@
                 </p>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="enable-search-within-first-popup"> Enable search when clicking glossary entries and tags</label>
+                    <label><input type="checkbox" id="enable-search-within-first-popup" data-setting="scanning.enablePopupSearch"> Enable search when clicking glossary entries and tags</label>
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="enable-scanning-on-search-page"> Enable scanning on search page</label>
+                    <label><input type="checkbox" id="enable-scanning-on-search-page" data-setting="scanning.enableOnSearchPage"> Enable scanning on search page</label>
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="enable-scanning-of-popup-expressions"> Enable scanning of expressions in search results</label>
+                    <label><input type="checkbox" id="enable-scanning-of-popup-expressions" data-setting="scanning.enableOnPopupExpressions"> Enable scanning of expressions in search results</label>
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="enable-search-tags"> Enable clickable and scannable tags for searching expressions and their readings</label>
+                    <label><input type="checkbox" id="enable-search-tags" data-setting="scanning.enableSearchTags"> Enable clickable and scannable tags for searching expressions and their readings</label>
                 </div>
 
                 <div class="form-group">
                     <label for="popup-nesting-max-depth">Maximum number of additional popups</label>
-                    <input type="number" min="0" step="1" id="popup-nesting-max-depth" class="form-control">
+                    <input type="number" min="0" step="1" id="popup-nesting-max-depth" class="form-control" data-setting="scanning.popupNestingMaxDepth">
                 </div>
             </div>
 
@@ -551,20 +563,20 @@
                 </p>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="parsing-scan-enable"> Enable text parsing using installed dictionaries</label>
+                    <label><input type="checkbox" id="parsing-scan-enable" data-setting="parsing.enableScanningParser"> Enable text parsing using installed dictionaries</label>
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="parsing-mecab-enable"> Enable text parsing using MeCab</label>
+                    <label><input type="checkbox" id="parsing-mecab-enable" data-setting="parsing.enableMecabParser"> Enable text parsing using MeCab</label>
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="parsing-term-spacing"> Enable small spaces between parsed words</label>
+                    <label><input type="checkbox" id="parsing-term-spacing" data-setting="parsing.termSpacing"> Enable small spaces between parsed words</label>
                 </div>
 
                 <div class="form-group">
                     <label for="parsing-reading-mode">Reading mode</label>
-                    <select class="form-control" id="parsing-reading-mode">
+                    <select class="form-control" id="parsing-reading-mode" data-setting="parsing.readingMode">
                         <option value="hiragana">ひらがな</option>
                         <option value="katakana">カタカナ</option>
                         <option value="romaji">Romaji</option>
@@ -621,7 +633,7 @@
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="database-enable-prefix-wildcard-searches"> Enable prefix wildcard searches</label>
+                    <label><input type="checkbox" id="database-enable-prefix-wildcard-searches" data-setting="global.database.prefixWildcardsSupported" data-scope="global"> Enable prefix wildcard searches</label>
                     <p class="help-block">
                         This option only applies to newly imported dictionaries.
                         Enabling this option will also cause dictionary data to take up slightly more storage space.
@@ -711,7 +723,6 @@
 
             <div id="storage-info">
                 <div>
-                    <img src="/mixed/img/spinner.gif" class="pull-right" id="storage-spinner" />
                     <h3>Storage</h3>
                 </div>
 
@@ -771,7 +782,7 @@
 
             <div>
                 <div>
-                    <img src="/mixed/img/spinner.gif" class="pull-right" id="anki-spinner" alt>
+                    <img src="/mixed/img/spinner.gif" class="pull-right" id="anki-spinner" alt hidden>
                     <h3>Anki Options</h3>
                 </div>
 
@@ -782,7 +793,7 @@
                 </p>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="anki-enable"> Enable Anki integration</label>
+                    <label><input type="checkbox" id="anki-enable" data-setting="anki.enable"  data-transform-pre="setDocumentAttribute" data-transform-post="setDocumentAttribute" data-document-attribute="data-options-anki-enable"> Enable Anki integration</label>
                 </div>
 
                 <div id="anki-general">
@@ -805,22 +816,22 @@
 
                     <div class="form-group">
                         <label for="card-tags">Card tags <span class="label-light">(comma or space separated)</span></label>
-                        <input type="text" id="card-tags" class="form-control">
+                        <input type="text" id="card-tags" class="form-control" data-setting="anki.tags" data-transform-pre="splitTags" data-transform-post="joinTags">
                     </div>
 
                     <div class="form-group options-advanced">
                         <label for="sentence-detection-extent">Sentence detection extent <span class="label-light">(in characters)</span></label>
-                        <input type="number" min="1" step="1" id="sentence-detection-extent" class="form-control">
+                        <input type="number" min="1" step="1" id="sentence-detection-extent" class="form-control" data-setting="anki.sentenceExt">
                     </div>
 
                     <div class="form-group options-advanced">
                         <label for="interface-server">Interface server <span class="label-light">(Default: http://127.0.0.1:8765)</span></label>
-                        <input type="text" id="interface-server" class="form-control">
+                        <input type="text" id="interface-server" class="form-control" data-setting="anki.server">
                     </div>
 
                     <div class="form-group options-advanced">
                         <label for="duplicate-scope">Duplicate scope</label>
-                        <select class="form-control" id="duplicate-scope">
+                        <select class="form-control" id="duplicate-scope" data-setting="anki.duplicateScope">
                             <option value="collection">Collection</option>
                             <option value="deck">Deck</option>
                         </select>
@@ -828,7 +839,7 @@
 
                     <div class="form-group options-advanced">
                         <label for="screenshot-format">Screenshot format</label>
-                        <select class="form-control" id="screenshot-format">
+                        <select class="form-control" id="screenshot-format" data-setting="anki.screenshot.format">
                             <option value="png">PNG</option>
                             <option value="jpeg">JPEG</option>
                         </select>
@@ -836,7 +847,7 @@
 
                     <div class="form-group options-advanced">
                         <label for="screenshot-quality">Screenshot quality <span class="label-light">(JPEG only)</span></label>
-                        <input type="number" min="0" max="100" step="1" id="screenshot-quality" class="form-control">
+                        <input type="number" min="0" max="100" step="1" id="screenshot-quality" class="form-control" data-setting="anki.screenshot.quality">
                     </div>
 
                     <div id="anki-format">
@@ -854,7 +865,7 @@
                             <li><a href="#kanji" data-toggle="tab">Kanji</a></li>
                         </ul>
 
-                        <div class="tab-content">
+                        <div class="tab-content ignore-form-changes" id="anki-fields-container">
                             <div id="terms" class="tab-pane fade in active" data-anki-card-type="terms">
                                 <div class="row">
                                     <div class="form-group col-xs-6">
@@ -1111,8 +1122,6 @@
                 </p>
             </div>
 
-            <pre id="debug" class="debug"></pre>
-
             <div class="pull-right bottom-links">
                 <small><span id="extension-info"></span> &bull; <a href="search.html">Search</a> &bull; <a href="https://foosoft.net/projects/yomichan/" target="_blank" rel="noopener">Homepage</a> &bull; <a href="legal.html">Legal</a></small>
             </div>
@@ -1124,6 +1133,7 @@
         <script src="/mixed/lib/wanakana.min.js"></script>
 
         <script src="/mixed/js/core.js"></script>
+        <script src="/mixed/js/comm.js"></script>
         <script src="/mixed/js/dom.js"></script>
         <script src="/mixed/js/environment.js"></script>
         <script src="/mixed/js/api.js"></script>
@@ -1143,13 +1153,18 @@
         <script src="/bg/js/settings/anki.js"></script>
         <script src="/bg/js/settings/anki-templates.js"></script>
         <script src="/bg/js/settings/audio.js"></script>
-        <script src="/bg/js/settings/audio-ui.js"></script>
         <script src="/bg/js/settings/backup.js"></script>
+        <script src="/bg/js/settings/clipboard-popups-controller.js"></script>
         <script src="/bg/js/settings/conditions-ui.js"></script>
         <script src="/bg/js/settings/dictionaries.js"></script>
+        <script src="/bg/js/settings/generic-setting-controller.js"></script>
         <script src="/bg/js/settings/popup-preview.js"></script>
         <script src="/bg/js/settings/profiles.js"></script>
+        <script src="/bg/js/settings/settings-controller.js"></script>
         <script src="/bg/js/settings/storage.js"></script>
+        <script src="/mixed/js/object-property-accessor.js"></script>
+        <script src="/mixed/js/task-accumulator.js"></script>
+        <script src="/mixed/js/dom-data-binder.js"></script>
 
         <script src="/bg/js/settings/main.js"></script>
     </body>

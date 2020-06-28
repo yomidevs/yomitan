@@ -32,15 +32,38 @@ class Environment {
 
     async _loadEnvironmentInfo() {
         const browser = await this._getBrowser();
-        const platform = await new Promise((resolve) => chrome.runtime.getPlatformInfo(resolve));
-        const modifierInfo = this._getModifierInfo(browser, platform.os);
+        const os = await this._getOperatingSystem();
+        const modifierInfo = this._getModifierInfo(browser, os);
         return {
             browser,
-            platform: {
-                os: platform.os
-            },
+            platform: {os},
             modifiers: modifierInfo
         };
+    }
+
+    async _getOperatingSystem() {
+        try {
+            const {os} = await this._getPlatformInfo();
+            if (typeof os === 'string') {
+                return os;
+            }
+        } catch (e) {
+            // NOP
+        }
+        return 'unknown';
+    }
+
+    _getPlatformInfo() {
+        return new Promise((resolve, reject) => {
+            chrome.runtime.getPlatformInfo((result) => {
+                const error = chrome.runtime.lastError;
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            });
+        });
     }
 
     async _getBrowser() {
@@ -96,8 +119,15 @@ class Environment {
                     ['meta', 'Super']
                 ];
                 break;
-            default:
-                throw new Error(`Invalid OS: ${os}`);
+            default: // 'unknown', etc
+                separator = ' + ';
+                osKeys = [
+                    ['alt', 'Alt'],
+                    ['ctrl', 'Ctrl'],
+                    ['shift', 'Shift'],
+                    ['meta', 'Meta']
+                ];
+                break;
         }
 
         const isFirefox = (browser === 'firefox' || browser === 'firefox-mobile');

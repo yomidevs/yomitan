@@ -176,7 +176,9 @@ function profileOptionsCreateDefaults() {
             showPitchAccentDownstepNotation: true,
             showPitchAccentPositionNotation: true,
             showPitchAccentGraph: false,
-            showIframePopupsInRootFrame: false
+            showIframePopupsInRootFrame: false,
+            useSecurePopupFrameUrl: true,
+            usePopupShadowDom: true
         },
 
         audio: {
@@ -202,7 +204,8 @@ function profileOptionsCreateDefaults() {
             enablePopupSearch: false,
             enableOnPopupExpressions: false,
             enableOnSearchPage: true,
-            enableSearchTags: false
+            enableSearchTags: false,
+            layoutAwareScan: false
         },
 
         translation: {

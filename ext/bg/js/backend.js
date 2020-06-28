@@ -20,7 +20,6 @@
  * AnkiNoteBuilder
  * AudioSystem
  * AudioUriBuilder
- * BackendApiForwarder
  * ClipboardMonitor
  * Database
  * DictionaryImporter
@@ -28,10 +27,10 @@
  * JsonSchema
  * Mecab
  * ObjectPropertyAccessor
+ * TemplateRenderer
  * Translator
  * conditionsTestValue
  * dictTermsSort
- * handlebarsRenderDynamic
  * jp
  * optionsLoad
  * optionsSave
@@ -64,22 +63,28 @@ class Backend {
             audioSystem: this.audioSystem,
             renderTemplate: this._renderTemplate.bind(this)
         });
+        this._templateRenderer = new TemplateRenderer();
 
-        this.optionsContext = {
-            depth: 0,
-            url: window.location.href
-        };
+        const url = (typeof window === 'object' && window !== null ? window.location.href : '');
+        this.optionsContext = {depth: 0, url};
 
-        this.clipboardPasteTarget = document.querySelector('#clipboard-paste-target');
+        this.clipboardPasteTarget = (
+            typeof document === 'object' && document !== null ?
+            document.querySelector('#clipboard-paste-target') :
+            null
+        );
 
         this.popupWindow = null;
 
-        const apiForwarder = new BackendApiForwarder();
-        apiForwarder.prepare();
-
-        this._defaultBrowserActionTitle = null;
         this._isPrepared = false;
         this._prepareError = false;
+        this._preparePromise = null;
+        this._prepareCompletePromise = new Promise((resolve, reject) => {
+            this._prepareCompleteResolve = resolve;
+            this._prepareCompleteReject = reject;
+        });
+
+        this._defaultBrowserActionTitle = null;
         this._badgePrepareDelayTimer = null;
         this._logErrorLevel = null;
 
@@ -103,6 +108,7 @@ class Backend {
             ['broadcastTab',                 {async: false, contentScript: true,  handler: this._onApiBroadcastTab.bind(this)}],
             ['frameInformationGet',          {async: true,  contentScript: true,  handler: this._onApiFrameInformationGet.bind(this)}],
             ['injectStylesheet',             {async: true,  contentScript: true,  handler: this._onApiInjectStylesheet.bind(this)}],
+            ['getStylesheetContent',         {async: true,  contentScript: true,  handler: this._onApiGetStylesheetContent.bind(this)}],
             ['getEnvironmentInfo',           {async: false, contentScript: true,  handler: this._onApiGetEnvironmentInfo.bind(this)}],
             ['clipboardGet',                 {async: true,  contentScript: true,  handler: this._onApiClipboardGet.bind(this)}],
             ['getDisplayTemplatesHtml',      {async: true,  contentScript: true,  handler: this._onApiGetDisplayTemplatesHtml.bind(this)}],
@@ -119,7 +125,9 @@ class Backend {
             ['log',                          {async: false, contentScript: true,  handler: this._onApiLog.bind(this)}],
             ['logIndicatorClear',            {async: false, contentScript: true,  handler: this._onApiLogIndicatorClear.bind(this)}],
             ['createActionPort',             {async: false, contentScript: true,  handler: this._onApiCreateActionPort.bind(this)}],
-            ['modifySettings',               {async: true,  contentScript: true,  handler: this._onApiModifySettings.bind(this)}]
+            ['modifySettings',               {async: true,  contentScript: true,  handler: this._onApiModifySettings.bind(this)}],
+            ['getSettings',                  {async: false, contentScript: true,  handler: this._onApiGetSettings.bind(this)}],
+            ['setAllSettings',               {async: true,  contentScript: false, handler: this._onApiSetAllSettings.bind(this)}]
         ]);
         this._messageHandlersWithProgress = new Map([
             ['importDictionaryArchive', {async: true,  contentScript: false, handler: this._onApiImportDictionaryArchive.bind(this)}],
@@ -134,7 +142,26 @@ class Backend {
         ]);
     }
 
-    async prepare() {
+    prepare() {
+        if (this._preparePromise === null) {
+            const promise = this._prepareInternal();
+            promise.then(
+                (value) => {
+                    this._isPrepared = true;
+                    this._prepareCompleteResolve(value);
+                },
+                (error) => {
+                    this._prepareError = true;
+                    this._prepareCompleteReject(error);
+                }
+            );
+            promise.finally(() => this._updateBadge());
+            this._preparePromise = promise;
+        }
+        return this._prepareCompletePromise;
+    }
+
+    async _prepareInternal() {
         try {
             this._defaultBrowserActionTitle = await this._getBrowserIconTitle();
             this._badgePrepareDelayTimer = setTimeout(() => {
@@ -143,8 +170,14 @@ class Backend {
             }, 1000);
             this._updateBadge();
 
+            yomichan.on('log', this._onLog.bind(this));
+
             await this.environment.prepare();
-            await this.database.prepare();
+            try {
+                await this.database.prepare();
+            } catch (e) {
+                yomichan.logError(e);
+            }
             await this.translator.prepare();
 
             await profileConditionsDescriptorPromise;
@@ -156,14 +189,6 @@ class Backend {
 
             this.onOptionsUpdated('background');
 
-            if (isObject(chrome.commands) && isObject(chrome.commands.onCommand)) {
-                chrome.commands.onCommand.addListener(this._runCommand.bind(this));
-            }
-            if (isObject(chrome.tabs) && isObject(chrome.tabs.onZoomChange)) {
-                chrome.tabs.onZoomChange.addListener(this._onZoomChange.bind(this));
-            }
-            chrome.runtime.onMessage.addListener(this.onMessage.bind(this));
-
             const options = this.getOptions(this.optionsContext);
             if (options.general.showGuide) {
                 chrome.tabs.create({url: chrome.runtime.getURL('/bg/guide.html')});
@@ -174,10 +199,7 @@ class Backend {
             this._sendMessageAllTabs('backendPrepared');
             const callback = () => this.checkLastError(chrome.runtime.lastError);
             chrome.runtime.sendMessage({action: 'backendPrepared'}, callback);
-
-            this._isPrepared = true;
         } catch (e) {
-            this._prepareError = true;
             yomichan.logError(e);
             throw e;
         } finally {
@@ -185,13 +207,31 @@ class Backend {
                 clearTimeout(this._badgePrepareDelayTimer);
                 this._badgePrepareDelayTimer = null;
             }
-
-            this._updateBadge();
         }
+    }
+
+    prepareComplete() {
+        return this._prepareCompletePromise;
     }
 
     isPrepared() {
         return this._isPrepared;
+    }
+
+    handleCommand(...args) {
+        return this._runCommand(...args);
+    }
+
+    handleZoomChange(...args) {
+        return this._onZoomChange(...args);
+    }
+
+    handleConnect(...args) {
+        return this._onConnect(...args);
+    }
+
+    handleMessage(...args) {
+        return this.onMessage(...args);
     }
 
     _sendMessageAllTabs(action, params={}) {
@@ -236,6 +276,45 @@ class Backend {
         }
     }
 
+    _onConnect(port) {
+        try {
+            const match = /^background-cross-frame-communication-port-(\d+)$/.exec(`${port.name}`);
+            if (match === null) { return; }
+
+            const tabId = (port.sender && port.sender.tab ? port.sender.tab.id : null);
+            if (typeof tabId !== 'number') {
+                throw new Error('Port does not have an associated tab ID');
+            }
+            const senderFrameId = port.sender.frameId;
+            if (typeof tabId !== 'number') {
+                throw new Error('Port does not have an associated frame ID');
+            }
+            const targetFrameId = parseInt(match[1], 10);
+
+            let forwardPort = chrome.tabs.connect(tabId, {frameId: targetFrameId, name: `cross-frame-communication-port-${senderFrameId}`});
+
+            const cleanup = () => {
+                this.checkLastError(chrome.runtime.lastError);
+                if (forwardPort !== null) {
+                    forwardPort.disconnect();
+                    forwardPort = null;
+                }
+                if (port !== null) {
+                    port.disconnect();
+                    port = null;
+                }
+            };
+
+            port.onMessage.addListener((message) => { forwardPort.postMessage(message); });
+            forwardPort.onMessage.addListener((message) => { port.postMessage(message); });
+            port.onDisconnect.addListener(cleanup);
+            forwardPort.onDisconnect.addListener(cleanup);
+        } catch (e) {
+            port.disconnect();
+            yomichan.logError(e);
+        }
+    }
+
     _onClipboardText({text}) {
         this._onCommandSearch({mode: 'popup', query: text});
     }
@@ -243,6 +322,14 @@ class Backend {
     _onZoomChange({tabId, oldZoomFactor, newZoomFactor}) {
         const callback = () => this.checkLastError(chrome.runtime.lastError);
         chrome.tabs.sendMessage(tabId, {action: 'zoomChanged', params: {oldZoomFactor, newZoomFactor}}, callback);
+    }
+
+    _onLog({level}) {
+        const levelValue = this._getErrorLevelValue(level);
+        if (levelValue <= this._getErrorLevelValue(this._logErrorLevel)) { return; }
+
+        this._logErrorLevel = level;
+        this._updateBadge();
     }
 
     applyOptions() {
@@ -272,15 +359,6 @@ class Backend {
     getFullOptions(useSchema=false) {
         const options = this.options;
         return useSchema ? JsonSchema.createProxy(options, this.optionsSchema) : options;
-    }
-
-    setFullOptions(options) {
-        try {
-            this.options = JsonSchema.getValidValueOrDefault(this.optionsSchema, utilIsolate(options));
-        } catch (e) {
-            // This shouldn't happen, but catch errors just in case of bugs
-            yomichan.logError(e);
-        }
     }
 
     getOptions(optionsContext, useSchema=false) {
@@ -506,13 +584,14 @@ class Backend {
         const states = [];
 
         try {
-            const notes = [];
+            const notePromises = [];
             for (const definition of definitions) {
                 for (const mode of modes) {
-                    const note = await this.ankiNoteBuilder.createNote(definition, mode, context, options, templates);
-                    notes.push(note);
+                    const notePromise = this.ankiNoteBuilder.createNote(definition, mode, context, options, templates);
+                    notePromises.push(notePromise);
                 }
             }
+            const notes = await Promise.all(notePromises);
 
             const cannotAdd = [];
             const results = await this.anki.canAddNotes(notes);
@@ -641,6 +720,13 @@ class Backend {
         });
     }
 
+    async _onApiGetStylesheetContent({url}) {
+        if (!url.startsWith('/') || url.startsWith('//') || !url.endsWith('.css')) {
+            throw new Error('Invalid URL');
+        }
+        return await requestText(url, 'GET');
+    }
+
     _onApiGetEnvironmentInfo() {
         return this.environment.getInfo();
     }
@@ -663,6 +749,9 @@ class Backend {
             return await navigator.clipboard.readText();
         } else {
             const clipboardPasteTarget = this.clipboardPasteTarget;
+            if (clipboardPasteTarget === null) {
+                throw new Error('Reading the clipboard is not supported in this context');
+            }
             clipboardPasteTarget.value = '';
             clipboardPasteTarget.focus();
             document.execCommand('paste');
@@ -744,12 +833,6 @@ class Backend {
 
     _onApiLog({error, level, context}) {
         yomichan.log(jsonToError(error), level, context);
-
-        const levelValue = this._getErrorLevelValue(level);
-        if (levelValue <= this._getErrorLevelValue(this._logErrorLevel)) { return; }
-
-        this._logErrorLevel = level;
-        this._updateBadge();
     }
 
     _onApiLogIndicatorClear() {
@@ -791,8 +874,8 @@ class Backend {
         const results = [];
         for (const target of targets) {
             try {
-                this._modifySetting(target);
-                results.push({result: true});
+                const result = this._modifySetting(target);
+                results.push({result: utilIsolate(result)});
             } catch (e) {
                 results.push({error: errorToJson(e)});
             }
@@ -801,10 +884,29 @@ class Backend {
         return results;
     }
 
+    _onApiGetSettings({targets}) {
+        const results = [];
+        for (const target of targets) {
+            try {
+                const result = this._getSetting(target);
+                results.push({result: utilIsolate(result)});
+            } catch (e) {
+                results.push({error: errorToJson(e)});
+            }
+        }
+        return results;
+    }
+
+    async _onApiSetAllSettings({value, source}) {
+        this.options = JsonSchema.getValidValueOrDefault(this.optionsSchema, value);
+        await this._onApiOptionsSave({source});
+    }
+
     // Command handlers
 
     _createActionListenerPort(port, sender, handlers) {
         let hasStarted = false;
+        let messageString = '';
 
         const onProgress = (...data) => {
             try {
@@ -815,12 +917,34 @@ class Backend {
             }
         };
 
-        const onMessage = async ({action, params}) => {
+        const onMessage = (message) => {
             if (hasStarted) { return; }
-            hasStarted = true;
-            port.onMessage.removeListener(onMessage);
 
             try {
+                const {action, data} = message;
+                switch (action) {
+                    case 'fragment':
+                        messageString += data;
+                        break;
+                    case 'invoke':
+                        {
+                            hasStarted = true;
+                            port.onMessage.removeListener(onMessage);
+
+                            const messageData = JSON.parse(messageString);
+                            messageString = null;
+                            onMessageComplete(messageData);
+                        }
+                        break;
+                }
+            } catch (e) {
+                cleanup(e);
+            }
+        };
+
+        const onMessageComplete = async (message) => {
+            try {
+                const {action, params} = message;
                 port.postMessage({type: 'ack'});
 
                 const messageHandler = handlers.get(action);
@@ -837,25 +961,29 @@ class Backend {
                 const result = async ? await promiseOrResult : promiseOrResult;
                 port.postMessage({type: 'complete', data: result});
             } catch (e) {
-                if (port !== null) {
-                    port.postMessage({type: 'error', data: errorToJson(e)});
-                }
-                cleanup();
+                cleanup(e);
             }
         };
 
-        const cleanup = () => {
+        const onDisconnect = () => {
+            cleanup(null);
+        };
+
+        const cleanup = (error) => {
             if (port === null) { return; }
+            if (error !== null) {
+                port.postMessage({type: 'error', data: errorToJson(error)});
+            }
             if (!hasStarted) {
                 port.onMessage.removeListener(onMessage);
             }
-            port.onDisconnect.removeListener(cleanup);
+            port.onDisconnect.removeListener(onDisconnect);
             port = null;
             handlers = null;
         };
 
         port.onMessage.addListener(onMessage);
-        port.onDisconnect.addListener(cleanup);
+        port.onDisconnect.addListener(onDisconnect);
     }
 
     _getErrorLevelValue(errorLevel) {
@@ -951,13 +1079,8 @@ class Backend {
     }
 
     async _onCommandToggle() {
-        const optionsContext = {
-            depth: 0,
-            url: window.location.href
-        };
         const source = 'popup';
-
-        const options = this.getOptions(optionsContext);
+        const options = this.getOptions(this.optionsContext);
         options.general.enable = !options.general.enable;
         await this._onApiOptionsSave({source});
     }
@@ -977,45 +1100,53 @@ class Backend {
         }
     }
 
-    async _modifySetting(target) {
+    _getSetting(target) {
+        const options = this._getModifySettingObject(target);
+        const accessor = new ObjectPropertyAccessor(options);
+        const {path} = target;
+        if (typeof path !== 'string') { throw new Error('Invalid path'); }
+        return accessor.get(ObjectPropertyAccessor.getPathArray(path));
+    }
+
+    _modifySetting(target) {
         const options = this._getModifySettingObject(target);
         const accessor = new ObjectPropertyAccessor(options);
         const action = target.action;
         switch (action) {
             case 'set':
-                {
-                    const {path, value} = target;
-                    if (typeof path !== 'string') { throw new Error('Invalid path'); }
-                    accessor.set(ObjectPropertyAccessor.getPathArray(path), value);
-                }
-                break;
+            {
+                const {path, value} = target;
+                if (typeof path !== 'string') { throw new Error('Invalid path'); }
+                const pathArray = ObjectPropertyAccessor.getPathArray(path);
+                accessor.set(pathArray, value);
+                return accessor.get(pathArray);
+            }
             case 'delete':
-                {
-                    const {path} = target;
-                    if (typeof path !== 'string') { throw new Error('Invalid path'); }
-                    accessor.delete(ObjectPropertyAccessor.getPathArray(path));
-                }
-                break;
+            {
+                const {path} = target;
+                if (typeof path !== 'string') { throw new Error('Invalid path'); }
+                accessor.delete(ObjectPropertyAccessor.getPathArray(path));
+                return true;
+            }
             case 'swap':
-                {
-                    const {path1, path2} = target;
-                    if (typeof path1 !== 'string') { throw new Error('Invalid path1'); }
-                    if (typeof path2 !== 'string') { throw new Error('Invalid path2'); }
-                    accessor.swap(ObjectPropertyAccessor.getPathArray(path1), ObjectPropertyAccessor.getPathArray(path2));
-                }
-                break;
+            {
+                const {path1, path2} = target;
+                if (typeof path1 !== 'string') { throw new Error('Invalid path1'); }
+                if (typeof path2 !== 'string') { throw new Error('Invalid path2'); }
+                accessor.swap(ObjectPropertyAccessor.getPathArray(path1), ObjectPropertyAccessor.getPathArray(path2));
+                return true;
+            }
             case 'splice':
-                {
-                    const {path, start, deleteCount, items} = target;
-                    if (typeof path !== 'string') { throw new Error('Invalid path'); }
-                    if (typeof start !== 'number' || Math.floor(start) !== start) { throw new Error('Invalid start'); }
-                    if (typeof deleteCount !== 'number' || Math.floor(deleteCount) !== deleteCount) { throw new Error('Invalid deleteCount'); }
-                    if (!Array.isArray(items)) { throw new Error('Invalid items'); }
-                    const array = accessor.get(ObjectPropertyAccessor.getPathArray(path));
-                    if (!Array.isArray(array)) { throw new Error('Invalid target type'); }
-                    array.splice(start, deleteCount, ...items);
-                }
-                break;
+            {
+                const {path, start, deleteCount, items} = target;
+                if (typeof path !== 'string') { throw new Error('Invalid path'); }
+                if (typeof start !== 'number' || Math.floor(start) !== start) { throw new Error('Invalid start'); }
+                if (typeof deleteCount !== 'number' || Math.floor(deleteCount) !== deleteCount) { throw new Error('Invalid deleteCount'); }
+                if (!Array.isArray(items)) { throw new Error('Invalid items'); }
+                const array = accessor.get(ObjectPropertyAccessor.getPathArray(path));
+                if (!Array.isArray(array)) { throw new Error('Invalid target type'); }
+                return array.splice(start, deleteCount, ...items);
+            }
             default:
                 throw new Error(`Unknown action: ${action}`);
         }
@@ -1113,7 +1244,7 @@ class Backend {
     }
 
     async _renderTemplate(template, data) {
-        return handlebarsRenderDynamic(template, data);
+        return await this._templateRenderer.render(template, data);
     }
 
     _getTemplates(options) {
@@ -1209,5 +1340,59 @@ class Backend {
         } catch (e) {
             // Edge throws exception for no reason here.
         }
+    }
+}
+
+class BackendEventHandler {
+    constructor(backend) {
+        this._backend = backend;
+    }
+
+    prepare() {
+        if (isObject(chrome.commands) && isObject(chrome.commands.onCommand)) {
+            const onCommand = this._createGenericEventHandler((...args) => this._backend.handleCommand(...args));
+            chrome.commands.onCommand.addListener(onCommand);
+        }
+
+        if (isObject(chrome.tabs) && isObject(chrome.tabs.onZoomChange)) {
+            const onZoomChange = this._createGenericEventHandler((...args) => this._backend.handleZoomChange(...args));
+            chrome.tabs.onZoomChange.addListener(onZoomChange);
+        }
+
+        const onConnect = this._createGenericEventHandler((...args) => this._backend.handleConnect(...args));
+        chrome.runtime.onConnect.addListener(onConnect);
+
+        const onMessage = this._onMessage.bind(this);
+        chrome.runtime.onMessage.addListener(onMessage);
+    }
+
+    // Event handlers
+
+    _createGenericEventHandler(handler) {
+        return this._onGenericEvent.bind(this, handler);
+    }
+
+    _onGenericEvent(handler, ...args) {
+        if (this._backend.isPrepared()) {
+            handler(...args);
+            return;
+        }
+
+        this._backend.prepareComplete().then(
+            () => { handler(...args); },
+            () => {} // NOP
+        );
+    }
+
+    _onMessage(message, sender, sendResponse) {
+        if (this._backend.isPrepared()) {
+            return this._backend.handleMessage(message, sender, sendResponse);
+        }
+
+        this._backend.prepareComplete().then(
+            () => { this._backend.handleMessage(message, sender, sendResponse); },
+            () => { sendResponse(); } // NOP
+        );
+        return true;
     }
 }

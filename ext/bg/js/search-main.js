@@ -17,45 +17,17 @@
 
 /* global
  * DisplaySearch
- * apiForwardLogsToBackend
- * apiOptionsGet
- * dynamicLoader
+ * api
  */
 
-async function injectSearchFrontend() {
-    await dynamicLoader.loadScripts([
-        '/mixed/js/text-scanner.js',
-        '/fg/js/frontend-api-receiver.js',
-        '/fg/js/frame-offset-forwarder.js',
-        '/fg/js/popup.js',
-        '/fg/js/popup-factory.js',
-        '/fg/js/frontend.js',
-        '/fg/js/content-script-main.js'
-    ]);
-}
-
 (async () => {
-    apiForwardLogsToBackend();
-    await yomichan.prepare();
+    try {
+        api.forwardLogsToBackend();
+        await yomichan.prepare();
 
-    const displaySearch = new DisplaySearch();
-    await displaySearch.prepare();
-
-    let optionsApplied = false;
-
-    const applyOptions = async () => {
-        const optionsContext = {depth: 0, url: window.location.href};
-        const options = await apiOptionsGet(optionsContext);
-        if (!options.scanning.enableOnSearchPage || optionsApplied) { return; }
-
-        optionsApplied = true;
-        yomichan.off('optionsUpdated', applyOptions);
-
-        window.frontendInitializationData = {depth: 1, proxy: false, isSearchPage: true};
-        await injectSearchFrontend();
-    };
-
-    yomichan.on('optionsUpdated', applyOptions);
-
-    await applyOptions();
+        const displaySearch = new DisplaySearch();
+        await displaySearch.prepare();
+    } catch (e) {
+        yomichan.logError(e);
+    }
 })();

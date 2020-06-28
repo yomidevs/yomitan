@@ -77,6 +77,24 @@ class DOM {
         return (typeof key === 'string' ? (key.length === 1 ? key.toUpperCase() : key) : '');
     }
 
+    static addFullscreenChangeEventListener(onFullscreenChanged, eventListenerCollection=null) {
+        const target = document;
+        const options = false;
+        const fullscreenEventNames = [
+            'fullscreenchange',
+            'MSFullscreenChange',
+            'mozfullscreenchange',
+            'webkitfullscreenchange'
+        ];
+        for (const eventName of fullscreenEventNames) {
+            if (eventListenerCollection === null) {
+                target.addEventListener(eventName, onFullscreenChanged, options);
+            } else {
+                eventListenerCollection.addEventListener(target, eventName, onFullscreenChanged, options);
+            }
+        }
+    }
+
     static getFullscreenElement() {
         return (
             document.fullscreenElement ||
@@ -85,5 +103,43 @@ class DOM {
             document.webkitFullscreenElement ||
             null
         );
+    }
+
+    static getNodesInRange(range) {
+        const end = range.endContainer;
+        const nodes = [];
+        for (let node = range.startContainer; node !== null; node = DOM.getNextNode(node)) {
+            nodes.push(node);
+            if (node === end) { break; }
+        }
+        return nodes;
+    }
+
+    static getNextNode(node) {
+        let next = node.firstChild;
+        if (next === null) {
+            while (true) {
+                next = node.nextSibling;
+                if (next !== null) { break; }
+
+                next = node.parentNode;
+                if (next === null) { break; }
+
+                node = next;
+            }
+        }
+        return next;
+    }
+
+    static anyNodeMatchesSelector(nodes, selector) {
+        const ELEMENT_NODE = Node.ELEMENT_NODE;
+        for (let node of nodes) {
+            for (; node !== null; node = node.parentNode) {
+                if (node.nodeType !== ELEMENT_NODE) { continue; }
+                if (node.matches(selector)) { return true; }
+                break;
+            }
+        }
+        return false;
     }
 }

@@ -1,191 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <link rel="icon" type="image/png" href="/mixed/img/icon16.png" sizes="16x16">
-        <link rel="icon" type="image/png" href="/mixed/img/icon19.png" sizes="19x19">
-        <link rel="icon" type="image/png" href="/mixed/img/icon32.png" sizes="32x32">
-        <link rel="icon" type="image/png" href="/mixed/img/icon38.png" sizes="38x38">
-        <link rel="icon" type="image/png" href="/mixed/img/icon48.png" sizes="48x48">
-        <link rel="icon" type="image/png" href="/mixed/img/icon64.png" sizes="64x64">
-        <link rel="icon" type="image/png" href="/mixed/img/icon128.png" sizes="128x128">
-        <link rel="stylesheet" type="text/css" href="/mixed/lib/bootstrap/css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="/mixed/lib/bootstrap/css/bootstrap-theme.min.css">
-        <style type="text/css">
-            body {
-                padding: 10px;
-            }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="icon" type="image/png" href="/mixed/img/icon16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="/mixed/img/icon19.png" sizes="19x19">
+    <link rel="icon" type="image/png" href="/mixed/img/icon32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/mixed/img/icon38.png" sizes="38x38">
+    <link rel="icon" type="image/png" href="/mixed/img/icon48.png" sizes="48x48">
+    <link rel="icon" type="image/png" href="/mixed/img/icon64.png" sizes="64x64">
+    <link rel="icon" type="image/png" href="/mixed/img/icon128.png" sizes="128x128">
+    <link rel="stylesheet" type="text/css" href="/bg/css/context.css">
+</head>
+<body>
 
-            h3 {
-                margin-top: 10px;
-            }
-            label {
-                font-weight: normal;
-            }
-
-            #mini {
-                text-align: center;
-            }
-            #full {
-                display: none;
-            }
-            .btn-group {
-                display: flex;
-                justify-content: center;
-                margin-top: 10px;
-                white-space: nowrap;
-            }
-
-            html:root[data-mode=full] #mini {
-                display: none;
-            }
-            html:root[data-mode=full] #full {
-                display: initial;
-            }
-
-            .link-group {
-                display: block;
-                line-height: 1.5em;
-                margin: 0 -10px;
-                padding: 0.5em 10px;
-                cursor: pointer;
-                color: #333;
-                text-decoration: none;
-                background-color: transparent;
-                transition: background-color 0.125s linear 0s;
-                max-width: none;
-            }
-            .link-group:hover,
-            .link-group:active {
-                color: #333;
-                text-decoration: none;
-            }
-            .link-group:hover>.link-group-label,
-            .link-group:active>.link-group-label {
-                text-decoration: underline;
-            }
-            .link-group:hover {
-                background-color: rgba(0, 0, 0, 0.05);
-            }
-            .link-group:active {
-                background-color: rgba(0, 0, 0, 0.1);
-            }
-            .link-group-icon {
-                width: 16px;
-                height: 16px;
-                text-align: center;
-                vertical-align: middle;
-                display: inline-block;
-                margin-right: 0.25em;
-            }
-            .link-group-icon>input {
-                margin: 0;
-                padding: 0;
-            }
-            .link-group-icon>.glyphicon {
-                top: 0;
-            }
-            .link-group-label {
-                vertical-align: middle;
-            }
-
-
-            .toggle {
-                width: 60px;
-                height: 34px;
-                position: relative;
-                overflow: hidden;
-            }
-            .toggle-group {
-                position: absolute;
-                width: 200%;
-                left: 0;
-                top: 0;
-                bottom: 0;
-                user-select: none;
-            }
-            .toggle-group.toggle-group-animated {
-                transition: transform 0.35s;
-            }
-            .toggle-on,
-            .toggle-off {
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                margin: 0;
-                border: 0;
-                border-radius: 0;
-            }
-            .toggle-on {
-                padding-right: 24px;
-                left: 0;
-                right: 50%;
-            }
-            .toggle-off {
-                padding-left: 24px;
-                left: 50%;
-                right: 0;
-            }
-            .toggle-handle {
-                position: relative;
-                margin: 0 auto;
-                padding-top: 0;
-                padding-bottom: 0;
-                height: 100%;
-                width: 0;
-                border-width: 0 1px;
-            }
-
-            .toggle>input[type=checkbox] {
-                display: none;
-            }
-            .toggle>input[type=checkbox]:not(:checked)~.toggle-group {
-                transform: translateX(-50%);
-            }
-        </style>
-    </head>
-    <body>
-        <div id="mini">
-            <div>
-                <label class="btn btn-primary toggle">
-                    <input type="checkbox" id="enable-search" />
-                    <div class="toggle-group">
-                        <span class="btn btn-primary toggle-on">On</span>
-                        <span class="btn btn-default active toggle-off">Off</span>
-                        <span class="btn btn-default toggle-handle"></span>
-                    </div>
-                </label>
-            </div>
-            <div class="btn-group">
-                <a title="Search (Alt + Insert)&#10;(Middle click to open in new tab)" class="btn btn-default btn-xs action-open-search"><span class="glyphicon glyphicon-search"></span></a>
-                <a title="Options&#10;(Middle click to open in new tab)" class="btn btn-default btn-xs action-open-options"><span class="glyphicon glyphicon-wrench"></span></a>
-                <a title="Help" class="btn btn-default btn-xs action-open-help"><span class="glyphicon glyphicon-question-sign"></span></a>
-            </div>
+<div id="mini">
+    <label class="toggle">
+        <input type="checkbox" id="enable-search">
+        <div class="toggle-group">
+            <span class="toggle-on">On</span>
+            <span class="btnx btn-defaulxt toggle-off">Off</span>
+            <span class="btnx xbtn-default toggle-handle"></span>
         </div>
-        <div id="full">
-            <h3 id="extension-info">Yomichan</h3>
-            <label class="link-group">
-                <span class="link-group-icon"><input type="checkbox" id="enable-search2" /></span><span class="link-group-label">Enable content scanning</span>
-            </label>
-            <a class="link-group action-open-options">
-                <span class="link-group-icon"><span class="glyphicon glyphicon-chevron-right"></span></span><span class="link-group-label">Options</span>
-            </a>
-            <a class="link-group action-open-search">
-                <span class="link-group-icon"><span class="glyphicon glyphicon-chevron-right"></span></span><span class="link-group-label">Search</span>
-            </a>
-            <a class="link-group action-open-help">
-                <span class="link-group-icon"><span class="glyphicon glyphicon-chevron-right"></span></span><span class="link-group-label">Help</span>
-            </a>
-        </div>
+    </label>
+    <div class="nav-button-container">
+        <a class="nav-button action-open-search" data-icon="magnifying-glass" title="Search (Alt + Insert)&#10;(Middle click to open in new tab)"></a>
+        <a class="nav-button action-open-options" data-icon="cog" title="Options&#10;(Middle click to open in new tab)"></a>
+        <a class="nav-button action-open-help" data-icon="question-mark" title="Help"></a>
+    </div>
+</div>
 
-        <script src="/mixed/js/core.js"></script>
-        <script src="/mixed/js/dom.js"></script>
-        <script src="/mixed/js/api.js"></script>
+<div id="full">
+    <h3 id="extension-info">Yomichan</h3>
+    <label class="link-group">
+        <span class="link-group-icon"><input type="checkbox" id="enable-search2" /></span><span class="link-group-label">Enable content scanning</span>
+    </label>
+    <a class="link-group action-open-options">
+        <span class="link-group-icon" data-icon="chevron"></span><span class="link-group-label">Options</span>
+    </a>
+    <a class="link-group action-open-search">
+        <span class="link-group-icon" data-icon="chevron"></span><span class="link-group-label">Search</span>
+    </a>
+    <a class="link-group action-open-help">
+        <span class="link-group-icon" data-icon="chevron"></span><span class="link-group-label">Help</span>
+    </a>
+</div>
 
-        <script src="/bg/js/options.js"></script>
-        <script src="/bg/js/util.js"></script>
+<script src="/mixed/js/core.js"></script>
+<script src="/mixed/js/comm.js"></script>
+<script src="/mixed/js/dom.js"></script>
+<script src="/mixed/js/api.js"></script>
 
-        <script src="/bg/js/context-main.js"></script>
-    </body>
+<script src="/bg/js/options.js"></script>
+<script src="/bg/js/util.js"></script>
+
+<script src="/bg/js/context-main.js"></script>
+
+</body>
 </html>

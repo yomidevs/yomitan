@@ -16,363 +16,362 @@
  */
 
 /* global
- * apiGetDefaultAnkiFieldTemplates
- * apiGetEnvironmentInfo
- * apiOptionsGetFull
+ * api
  * optionsGetDefault
  * optionsUpdateVersion
- * utilBackend
- * utilBackgroundIsolate
- * utilIsolate
- * utilReadFileArrayBuffer
  */
 
-// Exporting
-
-let _settingsExportToken = null;
-let _settingsExportRevoke = null;
-const SETTINGS_EXPORT_CURRENT_VERSION = 0;
-
-function _getSettingsExportDateString(date, dateSeparator, dateTimeSeparator, timeSeparator, resolution) {
-    const values = [
-        date.getUTCFullYear().toString(),
-        dateSeparator,
-        (date.getUTCMonth() + 1).toString().padStart(2, '0'),
-        dateSeparator,
-        date.getUTCDate().toString().padStart(2, '0'),
-        dateTimeSeparator,
-        date.getUTCHours().toString().padStart(2, '0'),
-        timeSeparator,
-        date.getUTCMinutes().toString().padStart(2, '0'),
-        timeSeparator,
-        date.getUTCSeconds().toString().padStart(2, '0')
-    ];
-    return values.slice(0, resolution * 2 - 1).join('');
-}
-
-async function _getSettingsExportData(date) {
-    const optionsFull = await apiOptionsGetFull();
-    const environment = await apiGetEnvironmentInfo();
-    const fieldTemplatesDefault = await apiGetDefaultAnkiFieldTemplates();
-
-    // Format options
-    for (const {options} of optionsFull.profiles) {
-        if (options.anki.fieldTemplates === fieldTemplatesDefault || !options.anki.fieldTemplates) {
-            delete options.anki.fieldTemplates; // Default
-        }
+class SettingsBackup {
+    constructor(settingsController) {
+        this._settingsController = settingsController;
+        this._settingsExportToken = null;
+        this._settingsExportRevoke = null;
+        this._currentVersion = 0;
     }
 
-    const data = {
-        version: SETTINGS_EXPORT_CURRENT_VERSION,
-        date: _getSettingsExportDateString(date, '-', ' ', ':', 6),
-        url: chrome.runtime.getURL('/'),
-        manifest: chrome.runtime.getManifest(),
-        environment,
-        userAgent: navigator.userAgent,
-        options: optionsFull
-    };
+    prepare() {
+        document.querySelector('#settings-export').addEventListener('click', this._onSettingsExportClick.bind(this), false);
+        document.querySelector('#settings-import').addEventListener('click', this._onSettingsImportClick.bind(this), false);
+        document.querySelector('#settings-import-file').addEventListener('change', this._onSettingsImportFileChange.bind(this), false);
+        document.querySelector('#settings-reset').addEventListener('click', this._onSettingsResetClick.bind(this), false);
+        document.querySelector('#settings-reset-modal-confirm').addEventListener('click', this._onSettingsResetConfirmClick.bind(this), false);
+    }
 
-    return data;
-}
+    // Private
 
-function _saveBlob(blob, fileName) {
-    if (typeof navigator === 'object' && typeof navigator.msSaveBlob === 'function') {
-        if (navigator.msSaveBlob(blob)) {
+    _getSettingsExportDateString(date, dateSeparator, dateTimeSeparator, timeSeparator, resolution) {
+        const values = [
+            date.getUTCFullYear().toString(),
+            dateSeparator,
+            (date.getUTCMonth() + 1).toString().padStart(2, '0'),
+            dateSeparator,
+            date.getUTCDate().toString().padStart(2, '0'),
+            dateTimeSeparator,
+            date.getUTCHours().toString().padStart(2, '0'),
+            timeSeparator,
+            date.getUTCMinutes().toString().padStart(2, '0'),
+            timeSeparator,
+            date.getUTCSeconds().toString().padStart(2, '0')
+        ];
+        return values.slice(0, resolution * 2 - 1).join('');
+    }
+
+    async _getSettingsExportData(date) {
+        const optionsFull = await this._settingsController.getOptionsFull();
+        const environment = await api.getEnvironmentInfo();
+        const fieldTemplatesDefault = await api.getDefaultAnkiFieldTemplates();
+
+        // Format options
+        for (const {options} of optionsFull.profiles) {
+            if (options.anki.fieldTemplates === fieldTemplatesDefault || !options.anki.fieldTemplates) {
+                delete options.anki.fieldTemplates; // Default
+            }
+        }
+
+        const data = {
+            version: this._currentVersion,
+            date: this._getSettingsExportDateString(date, '-', ' ', ':', 6),
+            url: chrome.runtime.getURL('/'),
+            manifest: chrome.runtime.getManifest(),
+            environment,
+            userAgent: navigator.userAgent,
+            options: optionsFull
+        };
+
+        return data;
+    }
+
+    _saveBlob(blob, fileName) {
+        if (typeof navigator === 'object' && typeof navigator.msSaveBlob === 'function') {
+            if (navigator.msSaveBlob(blob)) {
+                return;
+            }
+        }
+
+        const blobUrl = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = fileName;
+        a.rel = 'noopener';
+        a.target = '_blank';
+
+        const revoke = () => {
+            URL.revokeObjectURL(blobUrl);
+            a.href = '';
+            this._settingsExportRevoke = null;
+        };
+        this._settingsExportRevoke = revoke;
+
+        a.dispatchEvent(new MouseEvent('click'));
+        setTimeout(revoke, 60000);
+    }
+
+    async _onSettingsExportClick() {
+        if (this._settingsExportRevoke !== null) {
+            this._settingsExportRevoke();
+            this._settingsExportRevoke = null;
+        }
+
+        const date = new Date(Date.now());
+
+        const token = {};
+        this._settingsExportToken = token;
+        const data = await this._getSettingsExportData(date);
+        if (this._settingsExportToken !== token) {
+            // A new export has been started
             return;
         }
+        this._settingsExportToken = null;
+
+        const fileName = `yomichan-settings-${this._getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
+        const blob = new Blob([JSON.stringify(data, null, 4)], {type: 'application/json'});
+        this._saveBlob(blob, fileName);
     }
 
-    const blobUrl = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = blobUrl;
-    a.download = fileName;
-    a.rel = 'noopener';
-    a.target = '_blank';
-
-    const revoke = () => {
-        URL.revokeObjectURL(blobUrl);
-        a.href = '';
-        _settingsExportRevoke = null;
-    };
-    _settingsExportRevoke = revoke;
-
-    a.dispatchEvent(new MouseEvent('click'));
-    setTimeout(revoke, 60000);
-}
-
-async function _onSettingsExportClick() {
-    if (_settingsExportRevoke !== null) {
-        _settingsExportRevoke();
-        _settingsExportRevoke = null;
+    _readFileArrayBuffer(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(reader.error);
+            reader.readAsArrayBuffer(file);
+        });
     }
 
-    const date = new Date(Date.now());
+    // Importing
 
-    const token = {};
-    _settingsExportToken = token;
-    const data = await _getSettingsExportData(date);
-    if (_settingsExportToken !== token) {
-        // A new export has been started
-        return;
-    }
-    _settingsExportToken = null;
-
-    const fileName = `yomichan-settings-${_getSettingsExportDateString(date, '-', '-', '-', 6)}.json`;
-    const blob = new Blob([JSON.stringify(data, null, 4)], {type: 'application/json'});
-    _saveBlob(blob, fileName);
-}
-
-
-// Importing
-
-async function _settingsImportSetOptionsFull(optionsFull) {
-    return utilIsolate(utilBackend().setFullOptions(
-        utilBackgroundIsolate(optionsFull)
-    ));
-}
-
-function _showSettingsImportError(error) {
-    yomichan.logError(error);
-    document.querySelector('#settings-import-error-modal-message').textContent = `${error}`;
-    $('#settings-import-error-modal').modal('show');
-}
-
-async function _showSettingsImportWarnings(warnings) {
-    const modalNode = $('#settings-import-warning-modal');
-    const buttons = document.querySelectorAll('.settings-import-warning-modal-import-button');
-    const messageContainer = document.querySelector('#settings-import-warning-modal-message');
-    if (modalNode.length === 0 || buttons.length === 0 || messageContainer === null) {
-        return {result: false};
+    async _settingsImportSetOptionsFull(optionsFull) {
+        await this._settingsController.setAllSettings(optionsFull);
     }
 
-    // Set message
-    const fragment = document.createDocumentFragment();
-    for (const warning of warnings) {
-        const node = document.createElement('li');
-        node.textContent = `${warning}`;
-        fragment.appendChild(node);
+    _showSettingsImportError(error) {
+        yomichan.logError(error);
+        document.querySelector('#settings-import-error-modal-message').textContent = `${error}`;
+        $('#settings-import-error-modal').modal('show');
     }
-    messageContainer.textContent = '';
-    messageContainer.appendChild(fragment);
 
-    // Show modal
-    modalNode.modal('show');
-
-    // Wait for modal to close
-    return new Promise((resolve) => {
-        const onButtonClick = (e) => {
-            e.preventDefault();
-            complete({
-                result: true,
-                sanitize: e.currentTarget.dataset.importSanitize === 'true'
-            });
-            modalNode.modal('hide');
-        };
-        const onModalHide = () => {
-            complete({result: false});
-        };
-
-        let completed = false;
-        const complete = (result) => {
-            if (completed) { return; }
-            completed = true;
-
-            modalNode.off('hide.bs.modal', onModalHide);
-            for (const button of buttons) {
-                button.removeEventListener('click', onButtonClick, false);
-            }
-
-            resolve(result);
-        };
-
-        // Hook events
-        modalNode.on('hide.bs.modal', onModalHide);
-        for (const button of buttons) {
-            button.addEventListener('click', onButtonClick, false);
+    async _showSettingsImportWarnings(warnings) {
+        const modalNode = $('#settings-import-warning-modal');
+        const buttons = document.querySelectorAll('.settings-import-warning-modal-import-button');
+        const messageContainer = document.querySelector('#settings-import-warning-modal-message');
+        if (modalNode.length === 0 || buttons.length === 0 || messageContainer === null) {
+            return {result: false};
         }
-    });
-}
 
-function _isLocalhostUrl(urlString) {
-    try {
-        const url = new URL(urlString);
-        switch (url.hostname.toLowerCase()) {
-            case 'localhost':
-            case '127.0.0.1':
-            case '[::1]':
-                switch (url.protocol.toLowerCase()) {
-                    case 'http:':
-                    case 'https:':
-                        return true;
+        // Set message
+        const fragment = document.createDocumentFragment();
+        for (const warning of warnings) {
+            const node = document.createElement('li');
+            node.textContent = `${warning}`;
+            fragment.appendChild(node);
+        }
+        messageContainer.textContent = '';
+        messageContainer.appendChild(fragment);
+
+        // Show modal
+        modalNode.modal('show');
+
+        // Wait for modal to close
+        return new Promise((resolve) => {
+            const onButtonClick = (e) => {
+                e.preventDefault();
+                complete({
+                    result: true,
+                    sanitize: e.currentTarget.dataset.importSanitize === 'true'
+                });
+                modalNode.modal('hide');
+            };
+            const onModalHide = () => {
+                complete({result: false});
+            };
+
+            let completed = false;
+            const complete = (result) => {
+                if (completed) { return; }
+                completed = true;
+
+                modalNode.off('hide.bs.modal', onModalHide);
+                for (const button of buttons) {
+                    button.removeEventListener('click', onButtonClick, false);
                 }
-                break;
-        }
-    } catch (e) {
-        // NOP
+
+                resolve(result);
+            };
+
+            // Hook events
+            modalNode.on('hide.bs.modal', onModalHide);
+            for (const button of buttons) {
+                button.addEventListener('click', onButtonClick, false);
+            }
+        });
     }
-    return false;
-}
 
-function _settingsImportSanitizeProfileOptions(options, dryRun) {
-    const warnings = [];
+    _isLocalhostUrl(urlString) {
+        try {
+            const url = new URL(urlString);
+            switch (url.hostname.toLowerCase()) {
+                case 'localhost':
+                case '127.0.0.1':
+                case '[::1]':
+                    switch (url.protocol.toLowerCase()) {
+                        case 'http:':
+                        case 'https:':
+                            return true;
+                    }
+                    break;
+            }
+        } catch (e) {
+            // NOP
+        }
+        return false;
+    }
 
-    const anki = options.anki;
-    if (isObject(anki)) {
-        const fieldTemplates = anki.fieldTemplates;
-        if (typeof fieldTemplates === 'string') {
-            warnings.push('anki.fieldTemplates contains a non-default value');
-            if (!dryRun) {
-                delete anki.fieldTemplates;
+    _settingsImportSanitizeProfileOptions(options, dryRun) {
+        const warnings = [];
+
+        const anki = options.anki;
+        if (isObject(anki)) {
+            const fieldTemplates = anki.fieldTemplates;
+            if (typeof fieldTemplates === 'string') {
+                warnings.push('anki.fieldTemplates contains a non-default value');
+                if (!dryRun) {
+                    delete anki.fieldTemplates;
+                }
+            }
+            const server = anki.server;
+            if (typeof server === 'string' && server.length > 0 && !this._isLocalhostUrl(server)) {
+                warnings.push('anki.server uses a non-localhost URL');
+                if (!dryRun) {
+                    delete anki.server;
+                }
             }
         }
-        const server = anki.server;
-        if (typeof server === 'string' && server.length > 0 && !_isLocalhostUrl(server)) {
-            warnings.push('anki.server uses a non-localhost URL');
-            if (!dryRun) {
-                delete anki.server;
+
+        const audio = options.audio;
+        if (isObject(audio)) {
+            const customSourceUrl = audio.customSourceUrl;
+            if (typeof customSourceUrl === 'string' && customSourceUrl.length > 0 && !this._isLocalhostUrl(customSourceUrl)) {
+                warnings.push('audio.customSourceUrl uses a non-localhost URL');
+                if (!dryRun) {
+                    delete audio.customSourceUrl;
+                }
             }
         }
+
+        return warnings;
     }
 
-    const audio = options.audio;
-    if (isObject(audio)) {
-        const customSourceUrl = audio.customSourceUrl;
-        if (typeof customSourceUrl === 'string' && customSourceUrl.length > 0 && !_isLocalhostUrl(customSourceUrl)) {
-            warnings.push('audio.customSourceUrl uses a non-localhost URL');
-            if (!dryRun) {
-                delete audio.customSourceUrl;
+    _settingsImportSanitizeOptions(optionsFull, dryRun) {
+        const warnings = new Set();
+
+        const profiles = optionsFull.profiles;
+        if (Array.isArray(profiles)) {
+            for (const profile of profiles) {
+                if (!isObject(profile)) { continue; }
+                const options = profile.options;
+                if (!isObject(options)) { continue; }
+
+                const warnings2 = this._settingsImportSanitizeProfileOptions(options, dryRun);
+                for (const warning of warnings2) {
+                    warnings.add(warning);
+                }
             }
         }
+
+        return warnings;
     }
 
-    return warnings;
-}
+    _utf8Decode(arrayBuffer) {
+        try {
+            return new TextDecoder('utf-8').decode(arrayBuffer);
+        } catch (e) {
+            const binaryString = String.fromCharCode.apply(null, new Uint8Array(arrayBuffer));
+            return decodeURIComponent(escape(binaryString));
+        }
+    }
 
-function _settingsImportSanitizeOptions(optionsFull, dryRun) {
-    const warnings = new Set();
+    async _importSettingsFile(file) {
+        const dataString = this._utf8Decode(await this._readFileArrayBuffer(file));
+        const data = JSON.parse(dataString);
 
-    const profiles = optionsFull.profiles;
-    if (Array.isArray(profiles)) {
-        for (const profile of profiles) {
-            if (!isObject(profile)) { continue; }
-            const options = profile.options;
-            if (!isObject(options)) { continue; }
+        // Type check
+        if (!isObject(data)) {
+            throw new Error(`Invalid data type: ${typeof data}`);
+        }
 
-            const warnings2 = _settingsImportSanitizeProfileOptions(options, dryRun);
-            for (const warning of warnings2) {
-                warnings.add(warning);
+        // Version check
+        const version = data.version;
+        if (!(
+            typeof version === 'number' &&
+            Number.isFinite(version) &&
+            version === Math.floor(version)
+        )) {
+            throw new Error(`Invalid version: ${version}`);
+        }
+
+        if (!(
+            version >= 0 &&
+            version <= this._currentVersion
+        )) {
+            throw new Error(`Unsupported version: ${version}`);
+        }
+
+        // Verify options exists
+        let optionsFull = data.options;
+        if (!isObject(optionsFull)) {
+            throw new Error(`Invalid options type: ${typeof optionsFull}`);
+        }
+
+        // Upgrade options
+        optionsFull = optionsUpdateVersion(optionsFull, {});
+
+        // Check for warnings
+        const sanitizationWarnings = this._settingsImportSanitizeOptions(optionsFull, true);
+
+        // Show sanitization warnings
+        if (sanitizationWarnings.size > 0) {
+            const {result, sanitize} = await this._showSettingsImportWarnings(sanitizationWarnings);
+            if (!result) { return; }
+
+            if (sanitize !== false) {
+                this._settingsImportSanitizeOptions(optionsFull, false);
             }
         }
+
+        // Assign options
+        await this._settingsImportSetOptionsFull(optionsFull);
     }
 
-    return warnings;
-}
-
-function _utf8Decode(arrayBuffer) {
-    try {
-        return new TextDecoder('utf-8').decode(arrayBuffer);
-    } catch (e) {
-        const binaryString = String.fromCharCode.apply(null, new Uint8Array(arrayBuffer));
-        return decodeURIComponent(escape(binaryString));
-    }
-}
-
-async function _importSettingsFile(file) {
-    const dataString = _utf8Decode(await utilReadFileArrayBuffer(file));
-    const data = JSON.parse(dataString);
-
-    // Type check
-    if (!isObject(data)) {
-        throw new Error(`Invalid data type: ${typeof data}`);
+    _onSettingsImportClick() {
+        document.querySelector('#settings-import-file').click();
     }
 
-    // Version check
-    const version = data.version;
-    if (!(
-        typeof version === 'number' &&
-        Number.isFinite(version) &&
-        version === Math.floor(version)
-    )) {
-        throw new Error(`Invalid version: ${version}`);
-    }
+    async _onSettingsImportFileChange(e) {
+        const files = e.target.files;
+        if (files.length === 0) { return; }
 
-    if (!(
-        version >= 0 &&
-        version <= SETTINGS_EXPORT_CURRENT_VERSION
-    )) {
-        throw new Error(`Unsupported version: ${version}`);
-    }
-
-    // Verify options exists
-    let optionsFull = data.options;
-    if (!isObject(optionsFull)) {
-        throw new Error(`Invalid options type: ${typeof optionsFull}`);
-    }
-
-    // Upgrade options
-    optionsFull = optionsUpdateVersion(optionsFull, {});
-
-    // Check for warnings
-    const sanitizationWarnings = _settingsImportSanitizeOptions(optionsFull, true);
-
-    // Show sanitization warnings
-    if (sanitizationWarnings.size > 0) {
-        const {result, sanitize} = await _showSettingsImportWarnings(sanitizationWarnings);
-        if (!result) { return; }
-
-        if (sanitize !== false) {
-            _settingsImportSanitizeOptions(optionsFull, false);
+        const file = files[0];
+        e.target.value = null;
+        try {
+            await this._importSettingsFile(file);
+        } catch (error) {
+            this._showSettingsImportError(error);
         }
     }
 
-    // Assign options
-    await _settingsImportSetOptionsFull(optionsFull);
+    // Resetting
 
-    // Reload settings page
-    window.location.reload();
-}
+    _onSettingsResetClick() {
+        $('#settings-reset-modal').modal('show');
+    }
 
-function _onSettingsImportClick() {
-    document.querySelector('#settings-import-file').click();
-}
+    async _onSettingsResetConfirmClick() {
+        $('#settings-reset-modal').modal('hide');
 
-function _onSettingsImportFileChange(e) {
-    const files = e.target.files;
-    if (files.length === 0) { return; }
+        // Get default options
+        const optionsFull = optionsGetDefault();
 
-    const file = files[0];
-    e.target.value = null;
-    _importSettingsFile(file).catch(_showSettingsImportError);
-}
-
-
-// Resetting
-
-function _onSettingsResetClick() {
-    $('#settings-reset-modal').modal('show');
-}
-
-async function _onSettingsResetConfirmClick() {
-    $('#settings-reset-modal').modal('hide');
-
-    // Get default options
-    const optionsFull = optionsGetDefault();
-
-    // Assign options
-    await _settingsImportSetOptionsFull(optionsFull);
-
-    // Reload settings page
-    window.location.reload();
-}
-
-
-// Setup
-
-function backupInitialize() {
-    document.querySelector('#settings-export').addEventListener('click', _onSettingsExportClick, false);
-    document.querySelector('#settings-import').addEventListener('click', _onSettingsImportClick, false);
-    document.querySelector('#settings-import-file').addEventListener('change', _onSettingsImportFileChange, false);
-    document.querySelector('#settings-reset').addEventListener('click', _onSettingsResetClick, false);
-    document.querySelector('#settings-reset-modal-confirm').addEventListener('click', _onSettingsResetConfirmClick, false);
+        // Assign options
+        await this._settingsImportSetOptionsFull(optionsFull);
+    }
 }

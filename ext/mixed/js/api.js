@@ -15,307 +15,341 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global
+ * CrossFrameAPI
+ */
 
-function apiOptionsSchemaGet() {
-    return _apiInvoke('optionsSchemaGet');
-}
-
-function apiOptionsGet(optionsContext) {
-    return _apiInvoke('optionsGet', {optionsContext});
-}
-
-function apiOptionsGetFull() {
-    return _apiInvoke('optionsGetFull');
-}
-
-function apiOptionsSave(source) {
-    return _apiInvoke('optionsSave', {source});
-}
-
-function apiTermsFind(text, details, optionsContext) {
-    return _apiInvoke('termsFind', {text, details, optionsContext});
-}
-
-function apiTextParse(text, optionsContext) {
-    return _apiInvoke('textParse', {text, optionsContext});
-}
-
-function apiKanjiFind(text, optionsContext) {
-    return _apiInvoke('kanjiFind', {text, optionsContext});
-}
-
-function apiDefinitionAdd(definition, mode, context, details, optionsContext) {
-    return _apiInvoke('definitionAdd', {definition, mode, context, details, optionsContext});
-}
-
-function apiDefinitionsAddable(definitions, modes, context, optionsContext) {
-    return _apiInvoke('definitionsAddable', {definitions, modes, context, optionsContext});
-}
-
-function apiNoteView(noteId) {
-    return _apiInvoke('noteView', {noteId});
-}
-
-function apiTemplateRender(template, data) {
-    return _apiInvoke('templateRender', {data, template});
-}
-
-function apiAudioGetUri(definition, source, details) {
-    return _apiInvoke('audioGetUri', {definition, source, details});
-}
-
-function apiCommandExec(command, params) {
-    return _apiInvoke('commandExec', {command, params});
-}
-
-function apiScreenshotGet(options) {
-    return _apiInvoke('screenshotGet', {options});
-}
-
-function apiSendMessageToFrame(frameId, action, params) {
-    return _apiInvoke('sendMessageToFrame', {frameId, action, params});
-}
-
-function apiBroadcastTab(action, params) {
-    return _apiInvoke('broadcastTab', {action, params});
-}
-
-function apiFrameInformationGet() {
-    return _apiInvoke('frameInformationGet');
-}
-
-function apiInjectStylesheet(type, value) {
-    return _apiInvoke('injectStylesheet', {type, value});
-}
-
-function apiGetEnvironmentInfo() {
-    return _apiInvoke('getEnvironmentInfo');
-}
-
-function apiClipboardGet() {
-    return _apiInvoke('clipboardGet');
-}
-
-function apiGetDisplayTemplatesHtml() {
-    return _apiInvoke('getDisplayTemplatesHtml');
-}
-
-function apiGetQueryParserTemplatesHtml() {
-    return _apiInvoke('getQueryParserTemplatesHtml');
-}
-
-function apiGetZoom() {
-    return _apiInvoke('getZoom');
-}
-
-function apiGetDefaultAnkiFieldTemplates() {
-    return _apiInvoke('getDefaultAnkiFieldTemplates');
-}
-
-function apiGetAnkiDeckNames() {
-    return _apiInvoke('getAnkiDeckNames');
-}
-
-function apiGetAnkiModelNames() {
-    return _apiInvoke('getAnkiModelNames');
-}
-
-function apiGetAnkiModelFieldNames(modelName) {
-    return _apiInvoke('getAnkiModelFieldNames', {modelName});
-}
-
-function apiGetDictionaryInfo() {
-    return _apiInvoke('getDictionaryInfo');
-}
-
-function apiGetDictionaryCounts(dictionaryNames, getTotal) {
-    return _apiInvoke('getDictionaryCounts', {dictionaryNames, getTotal});
-}
-
-function apiPurgeDatabase() {
-    return _apiInvoke('purgeDatabase');
-}
-
-function apiGetMedia(targets) {
-    return _apiInvoke('getMedia', {targets});
-}
-
-function apiLog(error, level, context) {
-    return _apiInvoke('log', {error, level, context});
-}
-
-function apiLogIndicatorClear() {
-    return _apiInvoke('logIndicatorClear');
-}
-
-function apiImportDictionaryArchive(archiveContent, details, onProgress) {
-    return _apiInvokeWithProgress('importDictionaryArchive', {archiveContent, details}, onProgress);
-}
-
-function apiDeleteDictionary(dictionaryName, onProgress) {
-    return _apiInvokeWithProgress('deleteDictionary', {dictionaryName}, onProgress);
-}
-
-function apiModifySettings(targets, source) {
-    return _apiInvoke('modifySettings', {targets, source});
-}
-
-function _apiCreateActionPort(timeout=5000) {
-    return new Promise((resolve, reject) => {
-        let timer = null;
-        let portNameResolve;
-        let portNameReject;
-        const portNamePromise = new Promise((resolve2, reject2) => {
-            portNameResolve = resolve2;
-            portNameReject = reject2;
-        });
-
-        const onConnect = async (port) => {
-            try {
-                const portName = await portNamePromise;
-                if (port.name !== portName || timer === null) { return; }
-            } catch (e) {
-                return;
-            }
-
-            clearTimeout(timer);
-            timer = null;
-
-            chrome.runtime.onConnect.removeListener(onConnect);
-            resolve(port);
-        };
-
-        const onError = (e) => {
-            if (timer !== null) {
-                clearTimeout(timer);
-                timer = null;
-            }
-            chrome.runtime.onConnect.removeListener(onConnect);
-            portNameReject(e);
-            reject(e);
-        };
-
-        timer = setTimeout(() => onError(new Error('Timeout')), timeout);
-
-        chrome.runtime.onConnect.addListener(onConnect);
-        _apiInvoke('createActionPort').then(portNameResolve, onError);
-    });
-}
-
-function _apiInvokeWithProgress(action, params, onProgress, timeout=5000) {
-    return new Promise((resolve, reject) => {
-        let timer = null;
-        let port = null;
-
-        if (typeof onProgress !== 'function') {
-            onProgress = () => {};
+const api = (() => {
+    class API {
+        constructor() {
+            this._forwardLogsToBackendEnabled = false;
+            this._crossFrame = new CrossFrameAPI();
         }
 
-        const onMessage = (message) => {
-            switch (message.type) {
-                case 'ack':
+        get crossFrame() {
+            return this._crossFrame;
+        }
+
+        prepare() {
+            this._crossFrame.prepare();
+        }
+
+        forwardLogsToBackend() {
+            if (this._forwardLogsToBackendEnabled) { return; }
+            this._forwardLogsToBackendEnabled = true;
+
+            yomichan.on('log', async ({error, level, context}) => {
+                try {
+                    await this.log(errorToJson(error), level, context);
+                } catch (e) {
+                    // NOP
+                }
+            });
+        }
+
+        // Invoke functions
+
+        optionsSchemaGet() {
+            return this._invoke('optionsSchemaGet');
+        }
+
+        optionsGet(optionsContext) {
+            return this._invoke('optionsGet', {optionsContext});
+        }
+
+        optionsGetFull() {
+            return this._invoke('optionsGetFull');
+        }
+
+        optionsSave(source) {
+            return this._invoke('optionsSave', {source});
+        }
+
+        termsFind(text, details, optionsContext) {
+            return this._invoke('termsFind', {text, details, optionsContext});
+        }
+
+        textParse(text, optionsContext) {
+            return this._invoke('textParse', {text, optionsContext});
+        }
+
+        kanjiFind(text, optionsContext) {
+            return this._invoke('kanjiFind', {text, optionsContext});
+        }
+
+        definitionAdd(definition, mode, context, details, optionsContext) {
+            return this._invoke('definitionAdd', {definition, mode, context, details, optionsContext});
+        }
+
+        definitionsAddable(definitions, modes, context, optionsContext) {
+            return this._invoke('definitionsAddable', {definitions, modes, context, optionsContext});
+        }
+
+        noteView(noteId) {
+            return this._invoke('noteView', {noteId});
+        }
+
+        templateRender(template, data) {
+            return this._invoke('templateRender', {data, template});
+        }
+
+        audioGetUri(definition, source, details) {
+            return this._invoke('audioGetUri', {definition, source, details});
+        }
+
+        commandExec(command, params) {
+            return this._invoke('commandExec', {command, params});
+        }
+
+        screenshotGet(options) {
+            return this._invoke('screenshotGet', {options});
+        }
+
+        sendMessageToFrame(frameId, action, params) {
+            return this._invoke('sendMessageToFrame', {frameId, action, params});
+        }
+
+        broadcastTab(action, params) {
+            return this._invoke('broadcastTab', {action, params});
+        }
+
+        frameInformationGet() {
+            return this._invoke('frameInformationGet');
+        }
+
+        injectStylesheet(type, value) {
+            return this._invoke('injectStylesheet', {type, value});
+        }
+
+        getStylesheetContent(url) {
+            return this._invoke('getStylesheetContent', {url});
+        }
+
+        getEnvironmentInfo() {
+            return this._invoke('getEnvironmentInfo');
+        }
+
+        clipboardGet() {
+            return this._invoke('clipboardGet');
+        }
+
+        getDisplayTemplatesHtml() {
+            return this._invoke('getDisplayTemplatesHtml');
+        }
+
+        getQueryParserTemplatesHtml() {
+            return this._invoke('getQueryParserTemplatesHtml');
+        }
+
+        getZoom() {
+            return this._invoke('getZoom');
+        }
+
+        getDefaultAnkiFieldTemplates() {
+            return this._invoke('getDefaultAnkiFieldTemplates');
+        }
+
+        getAnkiDeckNames() {
+            return this._invoke('getAnkiDeckNames');
+        }
+
+        getAnkiModelNames() {
+            return this._invoke('getAnkiModelNames');
+        }
+
+        getAnkiModelFieldNames(modelName) {
+            return this._invoke('getAnkiModelFieldNames', {modelName});
+        }
+
+        getDictionaryInfo() {
+            return this._invoke('getDictionaryInfo');
+        }
+
+        getDictionaryCounts(dictionaryNames, getTotal) {
+            return this._invoke('getDictionaryCounts', {dictionaryNames, getTotal});
+        }
+
+        purgeDatabase() {
+            return this._invoke('purgeDatabase');
+        }
+
+        getMedia(targets) {
+            return this._invoke('getMedia', {targets});
+        }
+
+        log(error, level, context) {
+            return this._invoke('log', {error, level, context});
+        }
+
+        logIndicatorClear() {
+            return this._invoke('logIndicatorClear');
+        }
+
+        modifySettings(targets, source) {
+            return this._invoke('modifySettings', {targets, source});
+        }
+
+        getSettings(targets) {
+            return this._invoke('getSettings', {targets});
+        }
+
+        setAllSettings(value, source) {
+            return this._invoke('setAllSettings', {value, source});
+        }
+
+        // Invoke functions with progress
+
+        importDictionaryArchive(archiveContent, details, onProgress) {
+            return this._invokeWithProgress('importDictionaryArchive', {archiveContent, details}, onProgress);
+        }
+
+        deleteDictionary(dictionaryName, onProgress) {
+            return this._invokeWithProgress('deleteDictionary', {dictionaryName}, onProgress);
+        }
+
+        // Utilities
+
+        _createActionPort(timeout=5000) {
+            return new Promise((resolve, reject) => {
+                let timer = null;
+                let portNameResolve;
+                let portNameReject;
+                const portNamePromise = new Promise((resolve2, reject2) => {
+                    portNameResolve = resolve2;
+                    portNameReject = reject2;
+                });
+
+                const onConnect = async (port) => {
+                    try {
+                        const portName = await portNamePromise;
+                        if (port.name !== portName || timer === null) { return; }
+                    } catch (e) {
+                        return;
+                    }
+
+                    clearTimeout(timer);
+                    timer = null;
+
+                    chrome.runtime.onConnect.removeListener(onConnect);
+                    resolve(port);
+                };
+
+                const onError = (e) => {
                     if (timer !== null) {
                         clearTimeout(timer);
                         timer = null;
                     }
-                    break;
-                case 'progress':
+                    chrome.runtime.onConnect.removeListener(onConnect);
+                    portNameReject(e);
+                    reject(e);
+                };
+
+                timer = setTimeout(() => onError(new Error('Timeout')), timeout);
+
+                chrome.runtime.onConnect.addListener(onConnect);
+                this._invoke('createActionPort').then(portNameResolve, onError);
+            });
+        }
+
+        _invokeWithProgress(action, params, onProgress, timeout=5000) {
+            return new Promise((resolve, reject) => {
+                let port = null;
+
+                if (typeof onProgress !== 'function') {
+                    onProgress = () => {};
+                }
+
+                const onMessage = (message) => {
+                    switch (message.type) {
+                        case 'progress':
+                            try {
+                                onProgress(...message.data);
+                            } catch (e) {
+                                // NOP
+                            }
+                            break;
+                        case 'complete':
+                            cleanup();
+                            resolve(message.data);
+                            break;
+                        case 'error':
+                            cleanup();
+                            reject(jsonToError(message.data));
+                            break;
+                    }
+                };
+
+                const onDisconnect = () => {
+                    cleanup();
+                    reject(new Error('Disconnected'));
+                };
+
+                const cleanup = () => {
+                    if (port !== null) {
+                        port.onMessage.removeListener(onMessage);
+                        port.onDisconnect.removeListener(onDisconnect);
+                        port.disconnect();
+                        port = null;
+                    }
+                    onProgress = null;
+                };
+
+                (async () => {
                     try {
-                        onProgress(...message.data);
+                        port = await this._createActionPort(timeout);
+                        port.onMessage.addListener(onMessage);
+                        port.onDisconnect.addListener(onDisconnect);
+
+                        // Chrome has a maximum message size that can be sent, so longer messages must be fragmented.
+                        const messageString = JSON.stringify({action, params});
+                        const fragmentSize = 1e7; // 10 MB
+                        for (let i = 0, ii = messageString.length; i < ii; i += fragmentSize) {
+                            const data = messageString.substring(i, i + fragmentSize);
+                            port.postMessage({action: 'fragment', data});
+                        }
+                        port.postMessage({action: 'invoke'});
                     } catch (e) {
-                        // NOP
+                        cleanup();
+                        reject(e);
+                    } finally {
+                        action = null;
+                        params = null;
                     }
-                    break;
-                case 'complete':
-                    cleanup();
-                    resolve(message.data);
-                    break;
-                case 'error':
-                    cleanup();
-                    reject(jsonToError(message.data));
-                    break;
-            }
-        };
+                })();
+            });
+        }
 
-        const onDisconnect = () => {
-            cleanup();
-            reject(new Error('Disconnected'));
-        };
-
-        const cleanup = () => {
-            if (timer !== null) {
-                clearTimeout(timer);
-                timer = null;
-            }
-            if (port !== null) {
-                port.onMessage.removeListener(onMessage);
-                port.onDisconnect.removeListener(onDisconnect);
-                port.disconnect();
-                port = null;
-            }
-            onProgress = null;
-        };
-
-        timer = setTimeout(() => {
-            cleanup();
-            reject(new Error('Timeout'));
-        }, timeout);
-
-        (async () => {
-            try {
-                port = await _apiCreateActionPort(timeout);
-                port.onMessage.addListener(onMessage);
-                port.onDisconnect.addListener(onDisconnect);
-                port.postMessage({action, params});
-            } catch (e) {
-                cleanup();
-                reject(e);
-            } finally {
-                action = null;
-                params = null;
-            }
-        })();
-    });
-}
-
-function _apiInvoke(action, params={}) {
-    const data = {action, params};
-    return new Promise((resolve, reject) => {
-        try {
-            chrome.runtime.sendMessage(data, (response) => {
-                _apiCheckLastError(chrome.runtime.lastError);
-                if (response !== null && typeof response === 'object') {
-                    if (typeof response.error !== 'undefined') {
-                        reject(jsonToError(response.error));
-                    } else {
-                        resolve(response.result);
-                    }
-                } else {
-                    const message = response === null ? 'Unexpected null response' : `Unexpected response of type ${typeof response}`;
-                    reject(new Error(`${message} (${JSON.stringify(data)})`));
+        _invoke(action, params={}) {
+            const data = {action, params};
+            return new Promise((resolve, reject) => {
+                try {
+                    chrome.runtime.sendMessage(data, (response) => {
+                        this._checkLastError(chrome.runtime.lastError);
+                        if (response !== null && typeof response === 'object') {
+                            if (typeof response.error !== 'undefined') {
+                                reject(jsonToError(response.error));
+                            } else {
+                                resolve(response.result);
+                            }
+                        } else {
+                            const message = response === null ? 'Unexpected null response' : `Unexpected response of type ${typeof response}`;
+                            reject(new Error(`${message} (${JSON.stringify(data)})`));
+                        }
+                    });
+                } catch (e) {
+                    reject(e);
+                    yomichan.triggerOrphaned(e);
                 }
             });
-        } catch (e) {
-            reject(e);
-            yomichan.triggerOrphaned(e);
         }
-    });
-}
 
-function _apiCheckLastError() {
-    // NOP
-}
-
-let _apiForwardLogsToBackendEnabled = false;
-function apiForwardLogsToBackend() {
-    if (_apiForwardLogsToBackendEnabled) { return; }
-    _apiForwardLogsToBackendEnabled = true;
-
-    yomichan.on('log', async ({error, level, context}) => {
-        try {
-            await apiLog(errorToJson(error), level, context);
-        } catch (e) {
+        _checkLastError() {
             // NOP
         }
-    });
-}
+    }
+
+    // eslint-disable-next-line no-shadow
+    const api = new API();
+    api.prepare();
+    return api;
+})();

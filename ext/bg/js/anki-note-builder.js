@@ -28,8 +28,9 @@ class AnkiNoteBuilder {
         const modeOptions = isKanji ? options.anki.kanji : options.anki.terms;
         const modeOptionsFieldEntries = Object.entries(modeOptions.fields);
 
+        const fields = {};
         const note = {
-            fields: {},
+            fields,
             tags,
             deckName: modeOptions.deck,
             modelName: modeOptions.model,
@@ -38,8 +39,17 @@ class AnkiNoteBuilder {
             }
         };
 
-        for (const [fieldName, fieldValue] of modeOptionsFieldEntries) {
-            note.fields[fieldName] = await this.formatField(fieldValue, definition, mode, context, options, templates, null);
+        const formattedFieldValuePromises = [];
+        for (const [, fieldValue] of modeOptionsFieldEntries) {
+            const formattedFieldValuePromise = this.formatField(fieldValue, definition, mode, context, options, templates, null);
+            formattedFieldValuePromises.push(formattedFieldValuePromise);
+        }
+
+        const formattedFieldValues = await Promise.all(formattedFieldValuePromises);
+        for (let i = 0, ii = modeOptionsFieldEntries.length; i < ii; ++i) {
+            const fieldName = modeOptionsFieldEntries[i][0];
+            const formattedFieldValue = formattedFieldValues[i];
+            fields[fieldName] = formattedFieldValue;
         }
 
         return note;
@@ -155,7 +165,7 @@ class AnkiNoteBuilder {
     }
 
     static arrayBufferToBase64(arrayBuffer) {
-        return window.btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+        return btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
     }
 
     static stringReplaceAsync(str, regex, replacer) {

@@ -17,8 +17,8 @@
         <div id="spinner" hidden><img src="/mixed/img/spinner.gif"></div>
 
         <div id="navigation-header" class="navigation-header" hidden><div class="navigation-header-actions">
-            <button class="action-button action-previous"><img src="/mixed/img/source-term.svg" class="icon-image" title="Source term (Alt + B)" alt></button>
-            <button class="action-button action-next"><img src="/mixed/img/source-term.svg" class="icon-image" title="Next term (Alt + F)" alt></button>
+            <button class="action-button action-previous" data-icon="source-term" title="Source term (Alt + B)"></button>
+            <button class="action-button action-next" data-icon="source-term" title="Next term (Alt + F)"></button>
         </div></div><div class="navigation-header-spacer"></div>
 
         <div id="definitions"></div>
@@ -40,11 +40,13 @@
         </div>
 
         <script src="/mixed/js/core.js"></script>
+        <script src="/mixed/js/comm.js"></script>
         <script src="/mixed/js/dom.js"></script>
         <script src="/mixed/js/api.js"></script>
         <script src="/mixed/js/japanese.js"></script>
 
         <script src="/fg/js/document.js"></script>
+        <script src="/fg/js/dom-text-scanner.js"></script>
         <script src="/fg/js/source.js"></script>
         <script src="/mixed/js/audio-system.js"></script>
         <script src="/mixed/js/display-context.js"></script>

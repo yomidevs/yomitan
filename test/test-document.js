@@ -94,10 +94,12 @@ async function testDocument1() {
     const vm = new VM({document, window, Range, Node});
     vm.execute([
         'mixed/js/dom.js',
+        'fg/js/dom-text-scanner.js',
         'fg/js/source.js',
         'fg/js/document.js'
     ]);
-    const [TextSourceRange, TextSourceElement, docRangeFromPoint, docSentenceExtract] = vm.get([
+    const [DOMTextScanner, TextSourceRange, TextSourceElement, docRangeFromPoint, docSentenceExtract] = vm.get([
+        'DOMTextScanner',
         'TextSourceRange',
         'TextSourceElement',
         'docRangeFromPoint',
@@ -106,7 +108,7 @@ async function testDocument1() {
 
     try {
         await testDocumentTextScanningFunctions(dom, {docRangeFromPoint, docSentenceExtract, TextSourceRange, TextSourceElement});
-        await testTextSourceRangeSeekFunctions(dom, {TextSourceRange});
+        await testTextSourceRangeSeekFunctions(dom, {DOMTextScanner});
     } finally {
         window.close();
     }
@@ -179,7 +181,7 @@ async function testDocumentTextScanningFunctions(dom, {docRangeFromPoint, docSen
         if (source === null) { continue; }
 
         // Test docSentenceExtract
-        const sentenceActual = docSentenceExtract(source, sentenceExtent).text;
+        const sentenceActual = docSentenceExtract(source, sentenceExtent, false).text;
         assert.strictEqual(sentenceActual, sentence);
 
         // Clean
@@ -187,7 +189,7 @@ async function testDocumentTextScanningFunctions(dom, {docRangeFromPoint, docSen
     }
 }
 
-async function testTextSourceRangeSeekFunctions(dom, {TextSourceRange}) {
+async function testTextSourceRangeSeekFunctions(dom, {DOMTextScanner}) {
     const document = dom.window.document;
 
     for (const testElement of document.querySelectorAll('.test[data-test-type=text-source-range-seek]')) {
@@ -220,8 +222,8 @@ async function testTextSourceRangeSeekFunctions(dom, {TextSourceRange}) {
 
         const {node, offset, content} = (
             seekDirection === 'forward' ?
-            TextSourceRange.seekForward(seekNode, seekOffset, seekLength) :
-            TextSourceRange.seekBackward(seekNode, seekOffset, seekLength)
+            new DOMTextScanner(seekNode, seekOffset, true, false).seek(seekLength) :
+            new DOMTextScanner(seekNode, seekOffset, true, false).seek(-seekLength)
         );
 
         assert.strictEqual(node, expectedResultNode);

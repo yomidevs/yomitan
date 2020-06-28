@@ -109,7 +109,9 @@
                                     "showPitchAccentDownstepNotation",
                                     "showPitchAccentPositionNotation",
                                     "showPitchAccentGraph",
-                                    "showIframePopupsInRootFrame"
+                                    "showIframePopupsInRootFrame",
+                                    "useSecurePopupFrameUrl",
+                                    "usePopupShadowDom"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -247,6 +249,14 @@
                                     "showIframePopupsInRootFrame": {
                                         "type": "boolean",
                                         "default": false
+                                    },
+                                    "useSecurePopupFrameUrl": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
+                                    "usePopupShadowDom": {
+                                        "type": "boolean",
+                                        "default": true
                                     }
                                 }
                             },
@@ -316,7 +326,8 @@
                                     "enablePopupSearch",
                                     "enableOnPopupExpressions",
                                     "enableOnSearchPage",
-                                    "enableSearchTags"
+                                    "enableSearchTags",
+                                    "layoutAwareScan"
                                 ],
                                 "properties": {
                                     "middleMouse": {
@@ -376,6 +387,10 @@
                                         "default": true
                                     },
                                     "enableSearchTags": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "layoutAwareScan": {
                                         "type": "boolean",
                                         "default": false
                                     }

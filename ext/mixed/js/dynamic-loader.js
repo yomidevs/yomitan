@@ -16,19 +16,41 @@
  */
 
 /* global
- * apiInjectStylesheet
+ * api
  */
 
 const dynamicLoader = (() => {
     const injectedStylesheets = new Map();
+    const injectedStylesheetsWithParent = new WeakMap();
 
-    async function loadStyle(id, type, value, useWebExtensionApi=false) {
+    function getInjectedStylesheet(id, parentNode) {
+        if (parentNode === null) {
+            return injectedStylesheets.get(id);
+        }
+        const map = injectedStylesheetsWithParent.get(parentNode);
+        return typeof map !== 'undefined' ? map.get(id) : void 0;
+    }
+
+    function setInjectedStylesheet(id, parentNode, value) {
+        if (parentNode === null) {
+            injectedStylesheets.set(id, value);
+            return;
+        }
+        let map = injectedStylesheetsWithParent.get(parentNode);
+        if (typeof map === 'undefined') {
+            map = new Map();
+            injectedStylesheetsWithParent.set(parentNode, map);
+        }
+        map.set(id, value);
+    }
+
+    async function loadStyle(id, type, value, useWebExtensionApi=false, parentNode=null) {
         if (useWebExtensionApi && yomichan.isExtensionUrl(window.location.href)) {
             // Permissions error will occur if trying to use the WebExtension API to inject into an extension page
             useWebExtensionApi = false;
         }
 
-        let styleNode = injectedStylesheets.get(id);
+        let styleNode = getInjectedStylesheet(id, parentNode);
         if (typeof styleNode !== 'undefined') {
             if (styleNode === null) {
                 // Previously injected via WebExtension API
@@ -38,21 +60,30 @@ const dynamicLoader = (() => {
             styleNode = null;
         }
 
+        if (type === 'file-content') {
+            value = await api.getStylesheetContent(value);
+            type = 'code';
+            useWebExtensionApi = false;
+        }
+
         if (useWebExtensionApi) {
             // Inject via WebExtension API
             if (styleNode !== null && styleNode.parentNode !== null) {
                 styleNode.parentNode.removeChild(styleNode);
             }
 
-            injectedStylesheets.set(id, null);
-            await apiInjectStylesheet(type, value);
+            setInjectedStylesheet(id, parentNode, null);
+            await api.injectStylesheet(type, value);
             return null;
         }
 
         // Create node in document
-        const parentNode = document.head;
-        if (parentNode === null) {
-            throw new Error('No parent node');
+        let parentNode2 = parentNode;
+        if (parentNode2 === null) {
+            parentNode2 = document.head;
+            if (parentNode2 === null) {
+                throw new Error('No parent node');
+            }
         }
 
         // Create or reuse node
@@ -74,12 +105,12 @@ const dynamicLoader = (() => {
         }
 
         // Update parent
-        if (styleNode.parentNode !== parentNode) {
-            parentNode.appendChild(styleNode);
+        if (styleNode.parentNode !== parentNode2) {
+            parentNode2.appendChild(styleNode);
         }
 
         // Add to map
-        injectedStylesheets.set(id, styleNode);
+        setInjectedStylesheet(id, parentNode, styleNode);
         return styleNode;
     }
 

@@ -38,60 +38,6 @@ const chrome = {
     }
 };
 
-class XMLHttpRequest {
-    constructor() {
-        this._eventCallbacks = new Map();
-        this._url = '';
-        this._responseText = null;
-    }
-
-    overrideMimeType() {
-        // NOP
-    }
-
-    addEventListener(eventName, callback) {
-        let callbacks = this._eventCallbacks.get(eventName);
-        if (typeof callbacks === 'undefined') {
-            callbacks = [];
-            this._eventCallbacks.set(eventName, callbacks);
-        }
-        callbacks.push(callback);
-    }
-
-    open(action, url2) {
-        this._url = url2;
-    }
-
-    send() {
-        const filePath = url.fileURLToPath(this._url);
-        Promise.resolve()
-            .then(() => {
-                let source;
-                try {
-                    source = fs.readFileSync(filePath, {encoding: 'utf8'});
-                } catch (e) {
-                    this._trigger('error');
-                    return;
-                }
-                this._responseText = source;
-                this._trigger('load');
-            });
-    }
-
-    get responseText() {
-        return this._responseText;
-    }
-
-    _trigger(eventName, ...args) {
-        const callbacks = this._eventCallbacks.get(eventName);
-        if (typeof callbacks === 'undefined') { return; }
-
-        for (let i = 0, ii = callbacks.length; i < ii; ++i) {
-            callbacks[i](...args);
-        }
-    }
-}
-
 class Image {
     constructor() {
         this._src = '';
@@ -138,11 +84,21 @@ class Image {
     }
 }
 
+async function fetch(url2) {
+    const filePath = url.fileURLToPath(url2);
+    await Promise.resolve();
+    const content = fs.readFileSync(filePath, {encoding: null});
+    return {
+        text: async () => Promise.resolve(content.toString('utf8')),
+        json: async () => Promise.resolve(JSON.parse(content.toString('utf8')))
+    };
+}
+
 
 const vm = new VM({
     chrome,
     Image,
-    XMLHttpRequest,
+    fetch,
     indexedDB: global.indexedDB,
     IDBKeyRange: global.IDBKeyRange,
     JSZip: yomichanTest.JSZip,
@@ -159,6 +115,7 @@ vm.execute([
     'bg/js/media-utility.js',
     'bg/js/request.js',
     'bg/js/dictionary-importer.js',
+    'bg/js/generic-database.js',
     'bg/js/database.js'
 ]);
 const DictionaryImporter = vm.get('DictionaryImporter');
@@ -286,8 +243,8 @@ async function testDatabase1() {
             true
         );
         vm.assert.deepStrictEqual(counts, {
-            counts: [{kanji: 2, kanjiMeta: 2, terms: 33, termMeta: 12, tagMeta: 14}],
-            total: {kanji: 2, kanjiMeta: 2, terms: 33, termMeta: 12, tagMeta: 14}
+            counts: [{kanji: 2, kanjiMeta: 2, terms: 33, termMeta: 12, tagMeta: 14, media: 1}],
+            total: {kanji: 2, kanjiMeta: 2, terms: 33, termMeta: 12, tagMeta: 14, media: 1}
         });
 
         // Test find* functions
@@ -313,7 +270,7 @@ async function testDatabaseEmpty1(database) {
     const counts = await database.getDictionaryCounts([], true);
     vm.assert.deepStrictEqual(counts, {
         counts: [],
-        total: {kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0}
+        total: {kanji: 0, kanjiMeta: 0, terms: 0, termMeta: 0, tagMeta: 0, media: 0}
     });
 }
 
@@ -907,8 +864,7 @@ async function testDatabase2() {
     const database = new Database();
 
     // Error: not prepared
-    await assert.rejects(async () => await database.purge());
-    await assert.rejects(async () => await database.deleteDictionary(title, {}, () => {}));
+    await assert.rejects(async () => await database.deleteDictionary(title, {rate: 1000}, () => {}));
     await assert.rejects(async () => await database.findTermsBulk(['?'], titles, null));
     await assert.rejects(async () => await database.findTermsExactBulk(['?'], ['?'], titles));
     await assert.rejects(async () => await database.findTermsBySequenceBulk([1], title));

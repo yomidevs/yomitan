@@ -17,7 +17,6 @@
 
 /* global
  * DOM
- * TextSourceRange
  * docRangeFromPoint
  */
 
@@ -29,6 +28,7 @@ class TextScanner extends EventDispatcher {
         this._ignorePoint = ignorePoint;
         this._search = search;
 
+        this._isPrepared = false;
         this._ignoreNodes = null;
 
         this._causeCurrent = null;
@@ -70,10 +70,15 @@ class TextScanner extends EventDispatcher {
         return this._causeCurrent;
     }
 
+    prepare() {
+        this._isPrepared = true;
+        this.setEnabled(this._enabled);
+    }
+
     setEnabled(enabled) {
         this._eventListeners.removeAllEventListeners();
         this._enabled = enabled;
-        if (this._enabled) {
+        if (this._enabled && this._isPrepared) {
             this._hookEvents();
         } else {
             this.clearSelection(true);
@@ -119,20 +124,20 @@ class TextScanner extends EventDispatcher {
         }
     }
 
-    getTextSourceContent(textSource, length) {
+    getTextSourceContent(textSource, length, layoutAwareScan) {
         const clonedTextSource = textSource.clone();
 
-        clonedTextSource.setEndOffset(length);
+        clonedTextSource.setEndOffset(length, layoutAwareScan);
 
         if (this._ignoreNodes !== null && clonedTextSource.range) {
             length = clonedTextSource.text().length;
             while (clonedTextSource.range && length > 0) {
-                const nodes = TextSourceRange.getNodesInRange(clonedTextSource.range);
-                if (!TextSourceRange.anyNodeMatchesSelector(nodes, this._ignoreNodes)) {
+                const nodes = DOM.getNodesInRange(clonedTextSource.range);
+                if (!DOM.anyNodeMatchesSelector(nodes, this._ignoreNodes)) {
                     break;
                 }
                 --length;
-                clonedTextSource.setEndOffset(length);
+                clonedTextSource.setEndOffset(length, layoutAwareScan);
             }
         }
 

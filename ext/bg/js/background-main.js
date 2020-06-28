@@ -17,9 +17,15 @@
 
 /* global
  * Backend
+ * BackendEventHandler
  */
 
-(async () => {
-    window.yomichanBackend = new Backend();
-    await window.yomichanBackend.prepare();
+(() => {
+    const backend = new Backend();
+    const backendEventHandler = new BackendEventHandler(backend);
+    backendEventHandler.prepare();
+    if (typeof window === 'object' && window !== null) {
+        window.yomichanBackend = backend;
+    }
+    backend.prepare();
 })();
