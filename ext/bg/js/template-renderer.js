@@ -73,21 +73,28 @@ class TemplateRenderer {
         ];
 
         for (const [name, helper] of helpers) {
-            Handlebars.registerHelper(name, helper);
+            this._registerHelper(name, helper);
         }
+    }
+
+    _registerHelper(name, helper) {
+        function wrapper(...args) {
+            return helper(this, ...args);
+        }
+        Handlebars.registerHelper(name, wrapper);
     }
 
     _escape(text) {
         return Handlebars.Utils.escapeExpression(text);
     }
 
-    _dumpObject(options) {
-        const dump = JSON.stringify(options.fn(this), null, 4);
+    _dumpObject(context, options) {
+        const dump = JSON.stringify(options.fn(context), null, 4);
         return this._escape(dump);
     }
 
-    _furigana(options) {
-        const definition = options.fn(this);
+    _furigana(context, options) {
+        const definition = options.fn(context);
         const segs = jp.distributeFurigana(definition.expression, definition.reading);
 
         let result = '';
@@ -102,8 +109,8 @@ class TemplateRenderer {
         return result;
     }
 
-    _furiganaPlain(options) {
-        const definition = options.fn(this);
+    _furiganaPlain(context, options) {
+        const definition = options.fn(context);
         const segs = jp.distributeFurigana(definition.expression, definition.reading);
 
         let result = '';
@@ -118,9 +125,9 @@ class TemplateRenderer {
         return result.trimLeft();
     }
 
-    _kanjiLinks(options) {
+    _kanjiLinks(context, options) {
         let result = '';
-        for (const c of options.fn(this)) {
+        for (const c of options.fn(context)) {
             if (jp.isCodePointKanji(c.codePointAt(0))) {
                 result += `<a href="#" class="kanji-link">${c}</a>`;
             } else {
@@ -131,22 +138,22 @@ class TemplateRenderer {
         return result;
     }
 
-    _multiLine(options) {
-        return options.fn(this).split('\n').join('<br>');
+    _multiLine(context, options) {
+        return options.fn(context).split('\n').join('<br>');
     }
 
-    _sanitizeCssClass(options) {
-        return options.fn(this).replace(/[^_a-z0-9\u00a0-\uffff]/ig, '_');
+    _sanitizeCssClass(context, options) {
+        return options.fn(context).replace(/[^_a-z0-9\u00a0-\uffff]/ig, '_');
     }
 
-    _regexReplace(...args) {
+    _regexReplace(context, ...args) {
         // Usage:
         // {{#regexReplace regex string [flags]}}content{{/regexReplace}}
         // regex: regular expression string
         // string: string to replace
         // flags: optional flags for regular expression
         //   e.g. "i" for case-insensitive, "g" for replace all
-        let value = args[args.length - 1].fn(this);
+        let value = args[args.length - 1].fn(context);
         if (args.length >= 3) {
             try {
                 const flags = args.length > 3 ? args[2] : 'g';
@@ -159,13 +166,13 @@ class TemplateRenderer {
         return value;
     }
 
-    _regexMatch(...args) {
+    _regexMatch(context, ...args) {
         // Usage:
         // {{#regexMatch regex [flags]}}content{{/regexMatch}}
         // regex: regular expression string
         // flags: optional flags for regular expression
         //   e.g. "i" for case-insensitive, "g" for match all
-        let value = args[args.length - 1].fn(this);
+        let value = args[args.length - 1].fn(context);
         if (args.length >= 2) {
             try {
                 const flags = args.length > 2 ? args[1] : '';
@@ -180,7 +187,7 @@ class TemplateRenderer {
         return value;
     }
 
-    _mergeTags(object, isGroupMode, isMergeMode) {
+    _mergeTags(context, object, isGroupMode, isMergeMode) {
         const tagSources = [];
         if (isGroupMode || isMergeMode) {
             for (const definition of object.definitions) {
