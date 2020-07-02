@@ -39,6 +39,14 @@ const yomichan = (() => {
         constructor() {
             super();
 
+            this._extensionName = 'Yomichan';
+            try {
+                const manifest = chrome.runtime.getManifest();
+                this._extensionName = `${manifest.name} v${manifest.version}`;
+            } catch (e) {
+                // NOP
+            }
+
             const {promise, resolve} = deferPromise();
             this._isBackendPreparedPromise = promise;
             this._isBackendPreparedPromiseResolve = resolve;
@@ -163,8 +171,7 @@ const yomichan = (() => {
                 errorString += `\n${errorStack}`;
             }
 
-            const manifest = chrome.runtime.getManifest();
-            let message = `${manifest.name} v${manifest.version} has encountered a problem.`;
+            let message = `${this._extensionName} has encountered a problem.`;
             message += `\nOriginating URL: ${context.url}\n`;
             message += errorString;
             if (typeof errorData !== 'undefined') {
