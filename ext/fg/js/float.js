@@ -26,39 +26,35 @@
 class DisplayFloat extends Display {
     constructor() {
         super(document.querySelector('#spinner'), document.querySelector('#definitions'));
-        this.autoPlayAudioTimer = null;
-
+        this._autoPlayAudioTimer = null;
         this._secret = yomichan.generateId(16);
         this._token = null;
-
         this._nestedPopupsPrepared = false;
+        this._windowMessageHandlers = new Map([
+            ['initialize',         {handler: this._onMessageInitialize.bind(this), authenticate: false}],
+            ['configure',          {handler: this._onMessageConfigure.bind(this)}],
+            ['setOptionsContext',  {handler: this._onMessageSetOptionsContext.bind(this)}],
+            ['setContent',         {handler: this._onMessageSetContent.bind(this)}],
+            ['clearAutoPlayTimer', {handler: this._onMessageClearAutoPlayTimer.bind(this)}],
+            ['setCustomCss',       {handler: this._onMessageSetCustomCss.bind(this)}],
+            ['setContentScale',    {handler: this._onMessageSetContentScale.bind(this)}]
+        ]);
 
-        this._onKeyDownHandlers = new Map([
+        this.setOnKeyDownHandlers([
             ['C', (e) => {
                 if (e.ctrlKey && !window.getSelection().toString()) {
-                    this.onSelectionCopy();
+                    this._copySelection();
                     return true;
                 }
                 return false;
-            }],
-            ...this._onKeyDownHandlers
-        ]);
-
-        this._windowMessageHandlers = new Map([
-            ['initialize', {handler: this._initialize.bind(this), authenticate: false}],
-            ['configure', {handler: this._configure.bind(this)}],
-            ['setOptionsContext', {handler: ({optionsContext}) => this.setOptionsContext(optionsContext)}],
-            ['setContent', {handler: ({type, details}) => this.setContent(type, details)}],
-            ['clearAutoPlayTimer', {handler: () => this.clearAutoPlayTimer()}],
-            ['setCustomCss', {handler: ({css}) => this.setCustomCss(css)}],
-            ['setContentScale', {handler: ({scale}) => this.setContentScale(scale)}]
+            }]
         ]);
     }
 
     async prepare() {
         await super.prepare();
 
-        window.addEventListener('message', this.onMessage.bind(this), false);
+        window.addEventListener('message', this._onMessage.bind(this), false);
 
         api.broadcastTab('popupPrepared', {secret: this._secret});
     }
@@ -67,59 +63,9 @@ class DisplayFloat extends Display {
         window.parent.postMessage('popupClose', '*');
     }
 
-    onSelectionCopy() {
-        window.parent.postMessage('selectionCopy', '*');
-    }
-
-    onMessage(e) {
-        const data = e.data;
-        if (typeof data !== 'object' || data === null) {
-            this._logMessageError(e, 'Invalid data');
-            return;
-        }
-
-        const action = data.action;
-        if (typeof action !== 'string') {
-            this._logMessageError(e, 'Invalid data');
-            return;
-        }
-
-        const handlerInfo = this._windowMessageHandlers.get(action);
-        if (typeof handlerInfo === 'undefined') {
-            this._logMessageError(e, `Invalid action: ${JSON.stringify(action)}`);
-            return;
-        }
-
-        if (handlerInfo.authenticate !== false && !this._isMessageAuthenticated(data)) {
-            this._logMessageError(e, 'Invalid authentication');
-            return;
-        }
-
-        const handler = handlerInfo.handler;
-        handler(data.params);
-    }
-
-    autoPlayAudio() {
-        this.clearAutoPlayTimer();
-        this.autoPlayAudioTimer = window.setTimeout(() => super.autoPlayAudio(), 400);
-    }
-
-    clearAutoPlayTimer() {
-        if (this.autoPlayAudioTimer) {
-            window.clearTimeout(this.autoPlayAudioTimer);
-            this.autoPlayAudioTimer = null;
-        }
-    }
-
     async setOptionsContext(optionsContext) {
         super.setOptionsContext(optionsContext);
         await this.updateOptions();
-    }
-
-    setContentScale(scale) {
-        const body = document.body;
-        if (body === null) { return; }
-        body.style.fontSize = `${scale}em`;
     }
 
     async getDocumentTitle() {
@@ -149,6 +95,100 @@ class DisplayFloat extends Display {
         }
     }
 
+    autoPlayAudio() {
+        this._clearAutoPlayTimer();
+        this._autoPlayAudioTimer = window.setTimeout(() => super.autoPlayAudio(), 400);
+    }
+
+    // Message handling
+
+    _onMessage(e) {
+        const data = e.data;
+        if (typeof data !== 'object' || data === null) {
+            this._logMessageError(e, 'Invalid data');
+            return;
+        }
+
+        const action = data.action;
+        if (typeof action !== 'string') {
+            this._logMessageError(e, 'Invalid data');
+            return;
+        }
+
+        const handlerInfo = this._windowMessageHandlers.get(action);
+        if (typeof handlerInfo === 'undefined') {
+            this._logMessageError(e, `Invalid action: ${JSON.stringify(action)}`);
+            return;
+        }
+
+        if (handlerInfo.authenticate !== false && !this._isMessageAuthenticated(data)) {
+            this._logMessageError(e, 'Invalid authentication');
+            return;
+        }
+
+        const handler = handlerInfo.handler;
+        handler(data.params);
+    }
+
+    _onMessageInitialize(params) {
+        this._initialize(params);
+    }
+
+    async _onMessageConfigure({messageId, frameId, popupId, optionsContext, childrenSupported, scale}) {
+        this.setOptionsContext(optionsContext);
+
+        await this.updateOptions();
+
+        if (childrenSupported && !this._nestedPopupsPrepared) {
+            const {depth, url} = optionsContext;
+            this._prepareNestedPopups(popupId, depth, frameId, url);
+            this._nestedPopupsPrepared = true;
+        }
+
+        this._setContentScale(scale);
+
+        api.sendMessageToFrame(frameId, 'popupConfigured', {messageId});
+    }
+
+    _onMessageSetOptionsContext({optionsContext}) {
+        this.setOptionsContext(optionsContext);
+    }
+
+    _onMessageSetContent({type, details}) {
+        this.setContent(type, details);
+    }
+
+    _onMessageClearAutoPlayTimer() {
+        this._clearAutoPlayTimer.bind(this);
+    }
+
+    _onMessageSetCustomCss({css}) {
+        this.setCustomCss(css);
+    }
+
+    _onMessageSetContentScale({scale}) {
+        this._setContentScale(scale);
+    }
+
+    // Private
+
+    _copySelection() {
+        window.parent.postMessage('selectionCopy', '*');
+    }
+
+    _clearAutoPlayTimer() {
+        if (this._autoPlayAudioTimer) {
+            window.clearTimeout(this._autoPlayAudioTimer);
+            this._autoPlayAudioTimer = null;
+        }
+    }
+
+    _setContentScale(scale) {
+        const body = document.body;
+        if (body === null) { return; }
+        body.style.fontSize = `${scale}em`;
+    }
+
     _logMessageError(event, type) {
         yomichan.logWarning(new Error(`Popup received invalid message from origin ${JSON.stringify(event.origin)}: ${type}`));
     }
@@ -164,22 +204,6 @@ class DisplayFloat extends Display {
         this._token = token;
 
         api.sendMessageToFrame(frameId, 'popupInitialized', {secret, token});
-    }
-
-    async _configure({messageId, frameId, popupId, optionsContext, childrenSupported, scale}) {
-        this.setOptionsContext(optionsContext);
-
-        await this.updateOptions();
-
-        if (childrenSupported && !this._nestedPopupsPrepared) {
-            const {depth, url} = optionsContext;
-            this._prepareNestedPopups(popupId, depth, frameId, url);
-            this._nestedPopupsPrepared = true;
-        }
-
-        this.setContentScale(scale);
-
-        api.sendMessageToFrame(frameId, 'popupConfigured', {messageId});
     }
 
     _isMessageAuthenticated(message) {

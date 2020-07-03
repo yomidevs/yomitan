@@ -30,31 +30,22 @@
 class DisplaySearch extends Display {
     constructor() {
         super(document.querySelector('#spinner'), document.querySelector('#content'));
-
         this._isPrepared = false;
-
-        this.setOptionsContext({
-            depth: 0,
-            url: window.location.href
+        this._search = document.querySelector('#search');
+        this._query = document.querySelector('#query');
+        this._intro = document.querySelector('#intro');
+        this._clipboardMonitorEnable = document.querySelector('#clipboard-monitor-enable');
+        this._wanakanaEnable = document.querySelector('#wanakana-enable');
+        this._introVisible = true;
+        this._introAnimationTimer = null;
+        this._clipboardMonitor = new ClipboardMonitor({
+            getClipboard: api.clipboardGet.bind(api)
         });
-
-        this.queryParser = new QueryParser({
+        this._queryParser = new QueryParser({
             getOptionsContext: this.getOptionsContext.bind(this),
             setContent: this.setContent.bind(this),
             setSpinnerVisible: this.setSpinnerVisible.bind(this)
         });
-
-        this.search = document.querySelector('#search');
-        this.query = document.querySelector('#query');
-        this.intro = document.querySelector('#intro');
-        this.clipboardMonitorEnable = document.querySelector('#clipboard-monitor-enable');
-        this.wanakanaEnable = document.querySelector('#wanakana-enable');
-
-        this.introVisible = true;
-        this.introAnimationTimer = null;
-
-        this.clipboardMonitor = new ClipboardMonitor({getClipboard: api.clipboardGet.bind(api)});
-
         this._onKeyDownIgnoreKeys = new Map([
             ['ANY_MOD', new Set([
                 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageDown', 'PageUp', 'Home', 'End',
@@ -69,17 +60,21 @@ class DisplaySearch extends Display {
             ['AltGraph', new Set()],
             ['Shift', new Set()]
         ]);
-
         this._runtimeMessageHandlers = new Map([
-            ['searchQueryUpdate', this.onExternalSearchUpdate.bind(this)]
+            ['searchQueryUpdate', this._onExternalSearchUpdate.bind(this)]
         ]);
+
+        this.setOptionsContext({
+            depth: 0,
+            url: window.location.href
+        });
     }
 
     async prepare() {
         await super.prepare();
         await this.updateOptions();
         yomichan.on('optionsUpdated', () => this.updateOptions());
-        await this.queryParser.prepare();
+        await this._queryParser.prepare();
         const options = this.getOptions();
 
         const {queryParams: {query='', mode=''}} = parseUrl(window.location.href);
@@ -87,35 +82,35 @@ class DisplaySearch extends Display {
         document.documentElement.dataset.searchMode = mode;
 
         if (options.general.enableWanakana === true) {
-            this.wanakanaEnable.checked = true;
-            wanakana.bind(this.query);
+            this._wanakanaEnable.checked = true;
+            wanakana.bind(this._query);
         } else {
-            this.wanakanaEnable.checked = false;
+            this._wanakanaEnable.checked = false;
         }
 
-        this.setQuery(query);
-        this.onSearchQueryUpdated(this.query.value, false);
+        this._setQuery(query);
+        this._onSearchQueryUpdated(this._query.value, false);
 
         if (mode !== 'popup') {
             if (options.general.enableClipboardMonitor === true) {
-                this.clipboardMonitorEnable.checked = true;
-                this.clipboardMonitor.start();
+                this._clipboardMonitorEnable.checked = true;
+                this._clipboardMonitor.start();
             } else {
-                this.clipboardMonitorEnable.checked = false;
+                this._clipboardMonitorEnable.checked = false;
             }
-            this.clipboardMonitorEnable.addEventListener('change', this.onClipboardMonitorEnableChange.bind(this));
+            this._clipboardMonitorEnable.addEventListener('change', this._onClipboardMonitorEnableChange.bind(this));
         }
 
-        chrome.runtime.onMessage.addListener(this.onRuntimeMessage.bind(this));
+        chrome.runtime.onMessage.addListener(this._onRuntimeMessage.bind(this));
 
-        this.search.addEventListener('click', this.onSearch.bind(this), false);
-        this.query.addEventListener('input', this.onSearchInput.bind(this), false);
-        this.wanakanaEnable.addEventListener('change', this.onWanakanaEnableChange.bind(this));
-        window.addEventListener('popstate', this.onPopState.bind(this));
-        window.addEventListener('copy', this.onCopy.bind(this));
-        this.clipboardMonitor.on('change', this.onExternalSearchUpdate.bind(this));
+        this._search.addEventListener('click', this._onSearch.bind(this), false);
+        this._query.addEventListener('input', this._onSearchInput.bind(this), false);
+        this._wanakanaEnable.addEventListener('change', this._onWanakanaEnableChange.bind(this));
+        window.addEventListener('popstate', this._onPopState.bind(this));
+        window.addEventListener('copy', this._onCopy.bind(this));
+        this._clipboardMonitor.on('change', this._onExternalSearchUpdate.bind(this));
 
-        this.updateSearchButton();
+        this._updateSearchButton();
 
         await this._prepareNestedPopups();
 
@@ -123,55 +118,12 @@ class DisplaySearch extends Display {
     }
 
     onEscape() {
-        if (this.query === null) {
+        if (this._query === null) {
             return;
         }
 
-        this.query.focus();
-        this.query.select();
-    }
-
-    onSearchInput() {
-        this.updateSearchButton();
-
-        const queryElementRect = this.query.getBoundingClientRect();
-        if (queryElementRect.top < 0 || queryElementRect.bottom > window.innerHeight) {
-            this.query.scrollIntoView();
-        }
-    }
-
-    onSearch(e) {
-        if (this.query === null) {
-            return;
-        }
-
-        e.preventDefault();
-
-        const query = this.query.value;
-
-        this.queryParser.setText(query);
-
-        const url = new URL(window.location.href);
-        url.searchParams.set('query', query);
-        window.history.pushState(null, '', url.toString());
-
-        this.onSearchQueryUpdated(query, true);
-    }
-
-    onPopState() {
-        const {queryParams: {query='', mode=''}} = parseUrl(window.location.href);
-        document.documentElement.dataset.searchMode = mode;
-        this.setQuery(query);
-        this.onSearchQueryUpdated(this.query.value, false);
-    }
-
-    onRuntimeMessage({action, params}, sender, callback) {
-        const handler = this._runtimeMessageHandlers.get(action);
-        if (typeof handler !== 'function') { return false; }
-
-        const result = handler(params, sender);
-        callback(result);
-        return false;
+        this._query.focus();
+        this._query.select();
     }
 
     onKeyDown(e) {
@@ -195,25 +147,87 @@ class DisplaySearch extends Display {
             }
         }
 
-        if (!super.onKeyDown(e) && !preventFocus && document.activeElement !== this.query) {
-            this.query.focus({preventScroll: true});
+        if (!super.onKeyDown(e) && !preventFocus && document.activeElement !== this._query) {
+            this._query.focus({preventScroll: true});
         }
     }
 
-    onCopy() {
-        // ignore copy from search page
-        this.clipboardMonitor.setPreviousText(window.getSelection().toString().trim());
+    async updateOptions() {
+        await super.updateOptions();
+        const options = this.getOptions();
+        this._queryParser.setOptions(options);
+        if (!this._isPrepared) { return; }
+        const query = this._query.value;
+        if (query) {
+            this._setQuery(query);
+            this._onSearchQueryUpdated(query, false);
+        }
     }
 
-    onExternalSearchUpdate({text}) {
-        this.setQuery(text);
+    async setContent(type, details) {
+        this._query.blur();
+        await super.setContent(type, details);
+    }
+
+    // Private
+
+    _onSearchInput() {
+        this._updateSearchButton();
+
+        const queryElementRect = this._query.getBoundingClientRect();
+        if (queryElementRect.top < 0 || queryElementRect.bottom > window.innerHeight) {
+            this._query.scrollIntoView();
+        }
+    }
+
+    _onSearch(e) {
+        if (this._query === null) {
+            return;
+        }
+
+        e.preventDefault();
+
+        const query = this._query.value;
+
+        this._queryParser.setText(query);
+
+        const url = new URL(window.location.href);
+        url.searchParams.set('query', query);
+        window.history.pushState(null, '', url.toString());
+
+        this._onSearchQueryUpdated(query, true);
+    }
+
+    _onPopState() {
+        const {queryParams: {query='', mode=''}} = parseUrl(window.location.href);
+        document.documentElement.dataset.searchMode = mode;
+        this._setQuery(query);
+        this._onSearchQueryUpdated(this._query.value, false);
+    }
+
+    _onRuntimeMessage({action, params}, sender, callback) {
+        const handler = this._runtimeMessageHandlers.get(action);
+        if (typeof handler !== 'function') { return false; }
+
+        const result = handler(params, sender);
+        callback(result);
+        return false;
+    }
+
+    _onCopy() {
+        // ignore copy from search page
+        this._clipboardMonitor.setPreviousText(window.getSelection().toString().trim());
+    }
+
+    _onExternalSearchUpdate({text}) {
+        this._setQuery(text);
         const url = new URL(window.location.href);
         url.searchParams.set('query', text);
         window.history.pushState(null, '', url.toString());
-        this.onSearchQueryUpdated(this.query.value, true);
+        this._onSearchQueryUpdated(this._query.value, true);
     }
 
-    async onSearchQueryUpdated(query, animate) {
+    async _onSearchQueryUpdated(query, animate) {
         try {
             const details = {};
             const match = /^([*\uff0a]*)([\w\W]*?)([*\uff0a]*)$/.exec(query);
@@ -227,8 +241,8 @@ class DisplaySearch extends Display {
             }
 
             const valid = (query.length > 0);
-            this.setIntroVisible(!valid, animate);
-            this.updateSearchButton();
+            this._setIntroVisible(!valid, animate);
+            this._updateSearchButton();
             if (valid) {
                 const {definitions} = await api.termsFind(query, details, this.getOptionsContext());
                 this.setContent('terms', {definitions, context: {
@@ -240,19 +254,19 @@ class DisplaySearch extends Display {
             } else {
                 this.clearContent();
             }
-            this.setTitleText(query);
+            this._setTitleText(query);
             window.parent.postMessage('popupClose', '*');
         } catch (e) {
             this.onError(e);
         }
     }
 
-    onWanakanaEnableChange(e) {
+    _onWanakanaEnableChange(e) {
         const value = e.target.checked;
         if (value) {
-            wanakana.bind(this.query);
+            wanakana.bind(this._query);
         } else {
-            wanakana.unbind(this.query);
+            wanakana.unbind(this._query);
         }
         api.modifySettings([{
             action: 'set',
@@ -263,13 +277,13 @@ class DisplaySearch extends Display {
         }], 'search');
     }
 
-    onClipboardMonitorEnableChange(e) {
+    _onClipboardMonitorEnableChange(e) {
         if (e.target.checked) {
             chrome.permissions.request(
                 {permissions: ['clipboardRead']},
                 (granted) => {
                     if (granted) {
-                        this.clipboardMonitor.start();
+                        this._clipboardMonitor.start();
                         api.modifySettings([{
                             action: 'set',
                             path: 'general.enableClipboardMonitor',
@@ -283,7 +297,7 @@ class DisplaySearch extends Display {
                 }
             );
         } else {
-            this.clipboardMonitor.stop();
+            this._clipboardMonitor.stop();
             api.modifySettings([{
                 action: 'set',
                 path: 'general.enableClipboardMonitor',
@@ -294,101 +308,84 @@ class DisplaySearch extends Display {
         }
     }
 
-    async updateOptions() {
-        await super.updateOptions();
-        const options = this.getOptions();
-        this.queryParser.setOptions(options);
-        if (!this._isPrepared) { return; }
-        const query = this.query.value;
-        if (query) {
-            this.setQuery(query);
-            this.onSearchQueryUpdated(query, false);
-        }
+    _isWanakanaEnabled() {
+        return this._wanakanaEnable !== null && this._wanakanaEnable.checked;
     }
 
-    isWanakanaEnabled() {
-        return this.wanakanaEnable !== null && this.wanakanaEnable.checked;
-    }
-
-    setQuery(query) {
+    _setQuery(query) {
         let interpretedQuery = query;
-        if (this.isWanakanaEnabled()) {
+        if (this._isWanakanaEnabled()) {
             try {
                 interpretedQuery = wanakana.toKana(query);
             } catch (e) {
                 // NOP
             }
         }
-        this.query.value = interpretedQuery;
-        this.queryParser.setText(interpretedQuery);
+        this._query.value = interpretedQuery;
+        this._queryParser.setText(interpretedQuery);
     }
 
-    async setContent(type, details) {
-        this.query.blur();
-        await super.setContent(type, details);
-    }
-
-    setIntroVisible(visible, animate) {
-        if (this.introVisible === visible) {
+    _setIntroVisible(visible, animate) {
+        if (this._introVisible === visible) {
             return;
         }
 
-        this.introVisible = visible;
+        this._introVisible = visible;
 
-        if (this.intro === null) {
+        if (this._intro === null) {
             return;
         }
 
-        if (this.introAnimationTimer !== null) {
-            clearTimeout(this.introAnimationTimer);
-            this.introAnimationTimer = null;
+        if (this._introAnimationTimer !== null) {
+            clearTimeout(this._introAnimationTimer);
+            this._introAnimationTimer = null;
         }
 
         if (visible) {
-            this.showIntro(animate);
+            this._showIntro(animate);
         } else {
-            this.hideIntro(animate);
+            this._hideIntro(animate);
         }
     }
 
-    showIntro(animate) {
+    _showIntro(animate) {
         if (animate) {
             const duration = 0.4;
-            this.intro.style.transition = '';
-            this.intro.style.height = '';
-            const size = this.intro.getBoundingClientRect();
-            this.intro.style.height = '0px';
-            this.intro.style.transition = `height ${duration}s ease-in-out 0s`;
-            window.getComputedStyle(this.intro).getPropertyValue('height'); // Commits height so next line can start animation
-            this.intro.style.height = `${size.height}px`;
-            this.introAnimationTimer = setTimeout(() => {
-                this.intro.style.height = '';
-                this.introAnimationTimer = null;
+            this._intro.style.transition = '';
+            this._intro.style.height = '';
+            const size = this._intro.getBoundingClientRect();
+            this._intro.style.height = '0px';
+            this._intro.style.transition = `height ${duration}s ease-in-out 0s`;
+            window.getComputedStyle(this._intro).getPropertyValue('height'); // Commits height so next line can start animation
+            this._intro.style.height = `${size.height}px`;
+            this._introAnimationTimer = setTimeout(() => {
+                this._intro.style.height = '';
+                this._introAnimationTimer = null;
             }, duration * 1000);
         } else {
-            this.intro.style.transition = '';
-            this.intro.style.height = '';
+            this._intro.style.transition = '';
+            this._intro.style.height = '';
         }
     }
 
-    hideIntro(animate) {
+    _hideIntro(animate) {
         if (animate) {
             const duration = 0.4;
-            const size = this.intro.getBoundingClientRect();
-            this.intro.style.height = `${size.height}px`;
-            this.intro.style.transition = `height ${duration}s ease-in-out 0s`;
-            window.getComputedStyle(this.intro).getPropertyValue('height'); // Commits height so next line can start animation
+            const size = this._intro.getBoundingClientRect();
+            this._intro.style.height = `${size.height}px`;
+            this._intro.style.transition = `height ${duration}s ease-in-out 0s`;
+            window.getComputedStyle(this._intro).getPropertyValue('height'); // Commits height so next line can start animation
         } else {
-            this.intro.style.transition = '';
+            this._intro.style.transition = '';
         }
-        this.intro.style.height = '0';
+        this._intro.style.height = '0';
     }
 
-    updateSearchButton() {
-        this.search.disabled = this.introVisible && (this.query === null || this.query.value.length === 0);
+    _updateSearchButton() {
+        this._search.disabled = this._introVisible && (this._query === null || this._query.value.length === 0);
     }
 
-    setTitleText(text) {
+    _setTitleText(text) {
         // Chrome limits title to 1024 characters
         if (text.length > 1000) {
             text = text.substring(0, 1000) + '...';

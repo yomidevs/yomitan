@@ -47,18 +47,15 @@ class Display {
             useCache: true
         });
         this._styleNode = null;
-
         this._eventListeners = new EventListenerCollection();
         this._persistentEventListeners = new EventListenerCollection();
         this._interactive = false;
         this._eventListenersActive = false;
         this._clickScanPrevent = false;
         this._setContentToken = null;
-
         this._mediaLoader = new MediaLoader();
         this._displayGenerator = new DisplayGenerator({mediaLoader: this._mediaLoader});
         this._windowScroll = new WindowScroll();
-
         this._onKeyDownHandlers = new Map([
             ['Escape', () => {
                 this.onEscape();
@@ -181,6 +178,111 @@ class Display {
     onEscape() {
         throw new Error('Override me');
     }
+
+    onKeyDown(e) {
+        const key = DOM.getKeyFromEvent(e);
+        const handler = this._onKeyDownHandlers.get(key);
+        if (typeof handler === 'function') {
+            if (handler(e)) {
+                e.preventDefault();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    getOptions() {
+        return this._options;
+    }
+
+    getOptionsContext() {
+        return this._optionsContext;
+    }
+
+    setOptionsContext(optionsContext) {
+        this._optionsContext = optionsContext;
+    }
+
+    async updateOptions() {
+        this._options = await api.optionsGet(this.getOptionsContext());
+        this._updateDocumentOptions(this._options);
+        this._updateTheme(this._options.general.popupTheme);
+        this.setCustomCss(this._options.general.customPopupCss);
+    }
+
+    addMultipleEventListeners(selector, type, listener, options) {
+        for (const node of this._container.querySelectorAll(selector)) {
+            this._eventListeners.addEventListener(node, type, listener, options);
+        }
+    }
+
+    autoPlayAudio() {
+        if (this._definitions.length === 0) { return; }
+
+        this._audioPlay(this._definitions[0], this._getFirstExpressionIndex(), 0);
+    }
+
+    async setContent(type, details) {
+        const token = {}; // Unique identifier token
+        this._setContentToken = token;
+        try {
+            this._mediaLoader.unloadAll();
+
+            switch (type) {
+                case 'terms':
+                    await this._setContentTerms(details.definitions, details.context, token);
+                    break;
+                case 'kanji':
+                    await this._setContentKanji(details.definitions, details.context, token);
+                    break;
+                case 'extensionUnloaded':
+                    this._setContentExtensionUnloaded();
+                    break;
+            }
+        } catch (e) {
+            this.onError(e);
+        } finally {
+            if (this._setContentToken === token) {
+                this._setContentToken = null;
+            }
+        }
+    }
+
+    clearContent() {
+        this._container.textContent = '';
+    }
+
+    setCustomCss(css) {
+        if (this._styleNode === null) {
+            if (css.length === 0) { return; }
+            this._styleNode = document.createElement('style');
+        }
+
+        this._styleNode.textContent = css;
+
+        const parent = document.head;
+        if (this._styleNode.parentNode !== parent) {
+            parent.appendChild(this._styleNode);
+        }
+    }
+
+    async getDocumentTitle() {
+        return document.title;
+    }
+
+    setSpinnerVisible(visible) {
+        if (this._spinner !== null) {
+            this._spinner.hidden = !visible;
+        }
+    }
+
+    setOnKeyDownHandlers(handlers) {
+        for (const [key, handler] of handlers) {
+            this._onKeyDownHandlers.set(key, handler);
+        }
+    }
+
+    // Private
 
     _onSourceTermView(e) {
         e.preventDefault();
@@ -335,18 +437,6 @@ class Display {
         api.noteView(link.dataset.noteId);
     }
 
-    onKeyDown(e) {
-        const key = DOM.getKeyFromEvent(e);
-        const handler = this._onKeyDownHandlers.get(key);
-        if (typeof handler === 'function') {
-            if (handler(e)) {
-                e.preventDefault();
-                return true;
-            }
-        }
-        return false;
-    }
-
     _onWheel(e) {
         if (e.altKey) {
             if (e.deltaY !== 0) {
@@ -372,25 +462,6 @@ class Display {
         }
     }
 
-    getOptions() {
-        return this._options;
-    }
-
-    getOptionsContext() {
-        return this._optionsContext;
-    }
-
-    setOptionsContext(optionsContext) {
-        this._optionsContext = optionsContext;
-    }
-
-    async updateOptions() {
-        this._options = await api.optionsGet(this.getOptionsContext());
-        this._updateDocumentOptions(this._options);
-        this._updateTheme(this._options.general.popupTheme);
-        this.setCustomCss(this._options.general.customPopupCss);
-    }
-
     _updateDocumentOptions(options) {
         const data = document.documentElement.dataset;
         data.ankiEnabled = `${options.anki.enable}`;
@@ -405,20 +476,6 @@ class Display {
 
     _updateTheme(themeName) {
         document.documentElement.dataset.yomichanTheme = themeName;
-    }
-
-    setCustomCss(css) {
-        if (this._styleNode === null) {
-            if (css.length === 0) { return; }
-            this._styleNode = document.createElement('style');
-        }
-
-        this._styleNode.textContent = css;
-
-        const parent = document.head;
-        if (this._styleNode.parentNode !== parent) {
-            parent.appendChild(this._styleNode);
-        }
     }
 
     _setInteractive(interactive) {
@@ -466,38 +523,6 @@ class Display {
             }
         } else {
             this._eventListeners.removeAllEventListeners();
-        }
-    }
-
-    addMultipleEventListeners(selector, type, listener, options) {
-        for (const node of this._container.querySelectorAll(selector)) {
-            this._eventListeners.addEventListener(node, type, listener, options);
-        }
-    }
-
-    async setContent(type, details) {
-        const token = {}; // Unique identifier token
-        this._setContentToken = token;
-        try {
-            this._mediaLoader.unloadAll();
-
-            switch (type) {
-                case 'terms':
-                    await this._setContentTerms(details.definitions, details.context, token);
-                    break;
-                case 'kanji':
-                    await this._setContentKanji(details.definitions, details.context, token);
-                    break;
-                case 'extensionUnloaded':
-                    this._setContentExtensionUnloaded();
-                    break;
-            }
-        } catch (e) {
-            this.onError(e);
-        } finally {
-            if (this._setContentToken === token) {
-                this._setContentToken = null;
-            }
         }
     }
 
@@ -631,10 +656,6 @@ class Display {
         }
     }
 
-    clearContent() {
-        this._container.textContent = '';
-    }
-
     _updateNavigation(previous, next) {
         const navigation = document.querySelector('#navigation-header');
         if (navigation !== null) {
@@ -642,12 +663,6 @@ class Display {
             navigation.dataset.hasPrevious = `${!!previous}`;
             navigation.dataset.hasNext = `${!!next}`;
         }
-    }
-
-    autoPlayAudio() {
-        if (this._definitions.length === 0) { return; }
-
-        this._audioPlay(this._definitions[0], this._getFirstExpressionIndex(), 0);
     }
 
     _updateAdderButtons(states) {
@@ -885,12 +900,6 @@ class Display {
         return api.broadcastTab('popupSetVisibleOverride', {visible});
     }
 
-    setSpinnerVisible(visible) {
-        if (this._spinner !== null) {
-            this._spinner.hidden = !visible;
-        }
-    }
-
     _getEntry(index) {
         const entries = this._container.querySelectorAll('.entry');
         return index >= 0 && index < entries.length ? entries[index] : null;
@@ -948,10 +957,6 @@ class Display {
         } catch (e) {
             return [];
         }
-    }
-
-    async getDocumentTitle() {
-        return document.title;
     }
 
     _indexOf(nodeList, node) {
