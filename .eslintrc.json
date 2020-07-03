@@ -32,6 +32,7 @@
         "no-prototype-builtins": "error",
         "no-shadow": ["error", {"builtinGlobals": false}],
         "no-undef": "error",
+        "no-underscore-dangle": ["error", {"allowAfterThis": true, "allowAfterSuper": false, "allowAfterThisConstructor": false}],
         "no-unexpected-multiline": "error",
         "no-unneeded-ternary": "error",
         "no-unused-vars": ["error", {"vars": "local", "args": "after-used", "argsIgnorePattern": "^_", "caughtErrors": "none"}],
