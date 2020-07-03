@@ -33,10 +33,10 @@ class DisplaySearch extends Display {
 
         this._isPrepared = false;
 
-        this.optionsContext = {
+        this.setOptionsContext({
             depth: 0,
             url: window.location.href
-        };
+        });
 
         this.queryParser = new QueryParser({
             getOptionsContext: this.getOptionsContext.bind(this),
@@ -80,12 +80,13 @@ class DisplaySearch extends Display {
         await this.updateOptions();
         yomichan.on('optionsUpdated', () => this.updateOptions());
         await this.queryParser.prepare();
+        const options = this.getOptions();
 
         const {queryParams: {query='', mode=''}} = parseUrl(window.location.href);
 
         document.documentElement.dataset.searchMode = mode;
 
-        if (this.options.general.enableWanakana === true) {
+        if (options.general.enableWanakana === true) {
             this.wanakanaEnable.checked = true;
             wanakana.bind(this.query);
         } else {
@@ -96,7 +97,7 @@ class DisplaySearch extends Display {
         this.onSearchQueryUpdated(this.query.value, false);
 
         if (mode !== 'popup') {
-            if (this.options.general.enableClipboardMonitor === true) {
+            if (options.general.enableClipboardMonitor === true) {
                 this.clipboardMonitorEnable.checked = true;
                 this.clipboardMonitor.start();
             } else {
@@ -119,10 +120,6 @@ class DisplaySearch extends Display {
         await this._prepareNestedPopups();
 
         this._isPrepared = true;
-    }
-
-    onError(error) {
-        yomichan.logError(error);
     }
 
     onEscape() {
@@ -241,7 +238,7 @@ class DisplaySearch extends Display {
                     url: window.location.href
                 }});
             } else {
-                this.container.textContent = '';
+                this.clearContent();
             }
             this.setTitleText(query);
             window.parent.postMessage('popupClose', '*');
@@ -299,7 +296,8 @@ class DisplaySearch extends Display {
 
     async updateOptions() {
         await super.updateOptions();
-        this.queryParser.setOptions(this.options);
+        const options = this.getOptions();
+        this.queryParser.setOptions(options);
         if (!this._isPrepared) { return; }
         const query = this.query.value;
         if (query) {

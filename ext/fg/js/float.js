@@ -31,7 +31,6 @@ class DisplayFloat extends Display {
         this._secret = yomichan.generateId(16);
         this._token = null;
 
-        this._orphaned = false;
         this._nestedPopupsPrepared = false;
 
         this._onKeyDownHandlers = new Map([
@@ -59,22 +58,9 @@ class DisplayFloat extends Display {
     async prepare() {
         await super.prepare();
 
-        yomichan.on('orphaned', this.onOrphaned.bind(this));
         window.addEventListener('message', this.onMessage.bind(this), false);
 
         api.broadcastTab('popupPrepared', {secret: this._secret});
-    }
-
-    onError(error) {
-        if (this._orphaned) {
-            this.setContent('orphaned');
-        } else {
-            yomichan.logError(error);
-        }
-    }
-
-    onOrphaned() {
-        this._orphaned = true;
     }
 
     onEscape() {
@@ -126,7 +112,7 @@ class DisplayFloat extends Display {
     }
 
     async setOptionsContext(optionsContext) {
-        this.optionsContext = optionsContext;
+        super.setOptionsContext(optionsContext);
         await this.updateOptions();
     }
 
@@ -181,7 +167,7 @@ class DisplayFloat extends Display {
     }
 
     async _configure({messageId, frameId, popupId, optionsContext, childrenSupported, scale}) {
-        this.optionsContext = optionsContext;
+        this.setOptionsContext(optionsContext);
 
         await this.updateOptions();
 
@@ -208,7 +194,7 @@ class DisplayFloat extends Display {
         let complete = false;
 
         const onOptionsUpdated = async () => {
-            const optionsContext = this.optionsContext;
+            const optionsContext = this.getOptionsContext();
             const options = await api.optionsGet(optionsContext);
             const maxPopupDepthExceeded = !(typeof depth === 'number' && depth < options.scanning.popupNestingMaxDepth);
             if (maxPopupDepthExceeded || complete) { return; }
