@@ -32,7 +32,6 @@ class Frontend {
         this._options = null;
         this._pageZoomFactor = 1.0;
         this._contentScale = 1.0;
-        this._orphaned = false;
         this._lastShowPromise = Promise.resolve();
         this._enabledEventListeners = new EventListenerCollection();
         this._activeModifiers = new Set();
@@ -110,7 +109,6 @@ class Frontend {
             visualViewport.addEventListener('resize', this._onVisualViewportResize.bind(this));
         }
 
-        yomichan.on('orphaned', this._onOrphaned.bind(this));
         yomichan.on('optionsUpdated', this.updateOptions.bind(this));
         yomichan.on('zoomChanged', this._onZoomChanged.bind(this));
         chrome.runtime.onMessage.addListener(this._onRuntimeMessage.bind(this));
@@ -228,10 +226,6 @@ class Frontend {
         const result = handler(params, sender);
         callback(result);
         return false;
-    }
-
-    _onOrphaned() {
-        this._orphaned = true;
     }
 
     _onZoomChanged({newZoomFactor}) {
@@ -370,9 +364,9 @@ class Frontend {
                 }
             }
         } catch (e) {
-            if (this._orphaned) {
+            if (yomichan.isExtensionUnloaded) {
                 if (textSource !== null && this._options.scanning.modifier !== 'none') {
-                    this._showPopupContent(textSource, await this.getOptionsContext(), 'orphaned');
+                    this._showPopupContent(textSource, await this.getOptionsContext(), 'extensionUnloaded');
                 }
             } else {
                 yomichan.logError(e);

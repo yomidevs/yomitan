@@ -322,7 +322,7 @@ const api = (() => {
             const data = {action, params};
             return new Promise((resolve, reject) => {
                 try {
-                    chrome.runtime.sendMessage(data, (response) => {
+                    yomichan.sendMessage(data, (response) => {
                         this._checkLastError(chrome.runtime.lastError);
                         if (response !== null && typeof response === 'object') {
                             if (typeof response.error !== 'undefined') {
@@ -337,7 +337,6 @@ const api = (() => {
                     });
                 } catch (e) {
                     reject(e);
-                    yomichan.triggerOrphaned(e);
                 }
             });
         }

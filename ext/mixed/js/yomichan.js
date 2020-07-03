@@ -47,6 +47,8 @@ const yomichan = (() => {
                 // NOP
             }
 
+            this._isExtensionUnloaded = false;
+
             const {promise, resolve} = deferPromise();
             this._isBackendPreparedPromise = promise;
             this._isBackendPreparedPromiseResolve = resolve;
@@ -61,12 +63,16 @@ const yomichan = (() => {
 
         // Public
 
+        get isExtensionUnloaded() {
+            return this._isExtensionUnloaded;
+        }
+
         prepare() {
             chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
         }
 
         ready() {
-            chrome.runtime.sendMessage({action: 'yomichanCoreReady'});
+            this.sendMessage({action: 'yomichanCoreReady'});
             return this._isBackendPreparedPromise;
         }
 
@@ -78,10 +84,6 @@ const yomichan = (() => {
                 id += value.toString(16).padStart(2, '0');
             }
             return id;
-        }
-
-        triggerOrphaned(error) {
-            this.trigger('orphaned', {error});
         }
 
         isExtensionUrl(url) {
@@ -190,7 +192,30 @@ const yomichan = (() => {
             this.trigger('log', {error, level, context});
         }
 
+        sendMessage(...args) {
+            try {
+                return chrome.runtime.sendMessage(...args);
+            } catch (e) {
+                this._onExtensionUnloaded(e);
+                throw e;
+            }
+        }
+
+        connect(...args) {
+            try {
+                return chrome.runtime.connect(...args);
+            } catch (e) {
+                this._onExtensionUnloaded(e);
+                throw e;
+            }
+        }
+
         // Private
+
+        _onExtensionUnloaded(error) {
+            this._isExtensionUnloaded = true;
+            this.trigger('extensionUnloaded', {error});
+        }
 
         _getUrl() {
             return (typeof window === 'object' && window !== null ? window.location.href : '');

@@ -47,7 +47,6 @@ class Display {
             useCache: true
         });
         this._styleNode = null;
-        this._orphaned = false;
 
         this._eventListeners = new EventListenerCollection();
         this._persistentEventListeners = new EventListenerCollection();
@@ -169,16 +168,11 @@ class Display {
         this._setInteractive(true);
         await yomichan.ready();
         await this._displayGenerator.prepare();
-        yomichan.on('orphaned', this._onOrphaned.bind(this));
-    }
-
-    _onOrphaned() {
-        this._orphaned = true;
     }
 
     onError(error) {
-        if (this._orphaned) {
-            this.setContent('orphaned');
+        if (yomichan.isExtensionUnloaded) {
+            this.setContent('extensionUnloaded');
         } else {
             yomichan.logError(error);
         }
@@ -494,8 +488,8 @@ class Display {
                 case 'kanji':
                     await this._setContentKanji(details.definitions, details.context, token);
                     break;
-                case 'orphaned':
-                    this._setContentOrphaned();
+                case 'extensionUnloaded':
+                    this._setContentExtensionUnloaded();
                     break;
             }
         } catch (e) {
@@ -614,15 +608,15 @@ class Display {
         this._updateAdderButtons(states);
     }
 
-    _setContentOrphaned() {
-        const errorOrphaned = document.querySelector('#error-orphaned');
+    _setContentExtensionUnloaded() {
+        const errorExtensionUnloaded = document.querySelector('#error-extension-unloaded');
 
         if (this._container !== null) {
             this._container.hidden = true;
         }
 
-        if (errorOrphaned !== null) {
-            errorOrphaned.hidden = false;
+        if (errorExtensionUnloaded !== null) {
+            errorExtensionUnloaded.hidden = false;
         }
 
         this._updateNavigation(null, null);

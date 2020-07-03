@@ -268,7 +268,7 @@ class CrossFrameAPI {
     }
 
     _createCommPort(otherFrameId) {
-        const port = chrome.runtime.connect(null, {name: `background-cross-frame-communication-port-${otherFrameId}`});
+        const port = yomichan.connect(null, {name: `background-cross-frame-communication-port-${otherFrameId}`});
         return this._setupCommPort(otherFrameId, port);
     }
 
