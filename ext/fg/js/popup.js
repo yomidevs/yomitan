@@ -122,8 +122,8 @@ class Popup {
     }
 
     async containsPoint(x, y) {
-        for (let popup = this; popup !== null && popup.isVisibleSync(); popup = popup._child) {
-            const rect = popup._frame.getBoundingClientRect();
+        for (let popup = this; popup !== null && popup.isVisibleSync(); popup = popup.child) {
+            const rect = popup.getFrameRect();
             if (x >= rect.left && y >= rect.top && x < rect.right && y < rect.bottom) {
                 return true;
             }
@@ -166,11 +166,15 @@ class Popup {
         if (this._parent !== null) {
             throw new Error('Popup already has a parent');
         }
-        if (parent._child !== null) {
-            throw new Error('Cannot parent popup to another popup which already has a child');
-        }
+        parent.setChild(this);
         this._parent = parent;
-        parent._child = this;
+    }
+
+    setChild(popup) {
+        if (this._child !== null) {
+            throw new Error('Popup already has a child');
+        }
+        this._child = popup;
     }
 
     isVisibleSync() {
