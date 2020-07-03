@@ -26,6 +26,8 @@ class SettingsController extends EventDispatcher {
         super();
         this._profileIndex = profileIndex;
         this._source = yomichan.generateId(16);
+        this._pageExitPreventions = new Set();
+        this._pageExitPreventionEventListeners = new EventListenerCollection();
     }
 
     get source() {
@@ -109,6 +111,16 @@ class SettingsController extends EventDispatcher {
         return {index: this._profileIndex};
     }
 
+    preventPageExit() {
+        const obj = {end: null};
+        obj.end = this._endPreventPageExit.bind(this, obj);
+        if (this._pageExitPreventionEventListeners.size === 0) {
+            this._pageExitPreventionEventListeners.addEventListener(window, 'beforeunload', this._onBeforeUnload.bind(this), false);
+        }
+        this._pageExitPreventions.add(obj);
+        return obj;
+    }
+
     // Private
 
     _setProfileIndex(value) {
@@ -146,5 +158,22 @@ class SettingsController extends EventDispatcher {
     async _modifySettings(targets, extraFields) {
         targets = this._setupTargets(targets, extraFields);
         return await api.modifySettings(targets, this._source);
+    }
+
+    _onBeforeUnload(e) {
+        if (this._pageExitPreventions.size === 0) {
+            return;
+        }
+
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+    }
+
+    _endPreventPageExit(obj) {
+        this._pageExitPreventions.delete(obj);
+        if (this._pageExitPreventions.size === 0) {
+            this._pageExitPreventionEventListeners.removeAllEventListeners();
+        }
     }
 }

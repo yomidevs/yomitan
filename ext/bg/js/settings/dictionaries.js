@@ -16,7 +16,6 @@
  */
 
 /* global
- * PageExitPrevention
  * api
  * utilBackgroundIsolate
  */
@@ -156,6 +155,11 @@ class SettingsDictionaryListUI extends EventDispatcher {
         // Overwrite
     }
 
+    preventPageExit() {
+        // Overwrite
+        return {end: () => {}};
+    }
+
     onDictionaryConfirmDelete(e) {
         e.preventDefault();
         const n = document.querySelector('#dict-delete-modal');
@@ -286,10 +290,8 @@ class SettingsDictionaryEntryUI {
         const progressBar = this.content.querySelector('.progress-bar');
         this.isDeleting = true;
 
-        const prevention = new PageExitPrevention();
+        const prevention = this.parent.preventPageExit();
         try {
-            prevention.start();
-
             const onProgress = ({processed, count, storeCount, storesProcesed}) => {
                 let percent = 0.0;
                 if (count > 0 && storesProcesed > 0) {
@@ -409,6 +411,7 @@ class DictionaryController {
             document.querySelector('#dict-extra-template')
         );
         this._dictionaryUI.save = () => this._settingsController.save();
+        this._dictionaryUI.preventPageExit = this._preventPageExit.bind(this);
         this._dictionaryUI.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
 
         document.querySelector('#dict-purge-button').addEventListener('click', this._onPurgeButtonClick.bind(this), false);
@@ -610,10 +613,9 @@ class DictionaryController {
         const dictProgress = document.querySelector('#dict-purge');
         dictProgress.hidden = false;
 
-        const prevention = new PageExitPrevention();
+        const prevention = this._preventPageExit();
 
         try {
-            prevention.start();
             this._dictionaryErrorsShow(null);
             this._dictionarySpinnerShow(true);
 
@@ -649,10 +651,9 @@ class DictionaryController {
         const dictProgress = $('#dict-import-progress').show();
         const dictImportInfo = document.querySelector('#dict-import-info');
 
-        const prevention = new PageExitPrevention();
+        const prevention = this._preventPageExit();
 
         try {
-            prevention.start();
             this._dictionaryErrorsShow(null);
             this._dictionarySpinnerShow(true);
 
@@ -717,5 +718,9 @@ class DictionaryController {
         if (optionsFull.global.database.prefixWildcardsSupported === v) { return; }
         optionsFull.global.database.prefixWildcardsSupported = !!e.target.checked;
         await this._settingsController.save();
+    }
+
+    _preventPageExit() {
+        return this.settingsController.preventPageExit();
     }
 }
