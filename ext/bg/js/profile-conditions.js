@@ -19,29 +19,29 @@
  * Environment
  */
 
-function _profileConditionTestDomain(urlDomain, domain) {
-    return (
-        urlDomain.endsWith(domain) &&
-        (
-            domain.length === urlDomain.length ||
-            urlDomain[urlDomain.length - domain.length - 1] === '.'
-        )
-    );
-}
-
-function _profileConditionTestDomainList(url, domainList) {
-    const urlDomain = new URL(url).hostname.toLowerCase();
-    for (const domain of domainList) {
-        if (_profileConditionTestDomain(urlDomain, domain)) {
-            return true;
-        }
-    }
-    return false;
-}
-
 let profileConditionsDescriptor = null;
 
 const profileConditionsDescriptorPromise = (async () => {
+    function profileConditionTestDomain(urlDomain, domain) {
+        return (
+            urlDomain.endsWith(domain) &&
+            (
+                domain.length === urlDomain.length ||
+                urlDomain[urlDomain.length - domain.length - 1] === '.'
+            )
+        );
+    }
+
+    function profileConditionTestDomainList(url, domainList) {
+        const urlDomain = new URL(url).hostname.toLowerCase();
+        for (const domain of domainList) {
+            if (profileConditionTestDomain(urlDomain, domain)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     const environment = new Environment();
     await environment.prepare();
 
@@ -111,7 +111,7 @@ const profileConditionsDescriptorPromise = (async () => {
                     transform: (optionValue) => optionValue.split(/[,;\s]+/).map((v) => v.trim().toLowerCase()).filter((v) => v.length > 0),
                     transformReverse: (transformedOptionValue) => transformedOptionValue.join(', '),
                     validateTransformed: (transformedOptionValue) => (transformedOptionValue.length > 0),
-                    test: ({url}, transformedOptionValue) => _profileConditionTestDomainList(url, transformedOptionValue)
+                    test: ({url}, transformedOptionValue) => profileConditionTestDomainList(url, transformedOptionValue)
                 },
                 matchRegExp: {
                     name: 'Matches RegExp',
