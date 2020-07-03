@@ -18,7 +18,7 @@
 class TextSourceMap {
     constructor(source, mapping=null) {
         this._source = source;
-        this._mapping = (Array.isArray(mapping) ? TextSourceMap._normalizeMapping(mapping) : null);
+        this._mapping = (mapping !== null ? TextSourceMap.normalizeMapping(mapping) : null);
     }
 
     get source() {
@@ -31,19 +31,19 @@ class TextSourceMap {
         }
 
         const source = this._source;
-        if (!(other instanceof TextSourceMap && source === other._source)) {
+        if (!(other instanceof TextSourceMap && source === other.source)) {
             return false;
         }
 
         let mapping = this._mapping;
-        let otherMapping = other._mapping;
+        let otherMapping = other.getMappingCopy();
         if (mapping === null) {
             if (otherMapping === null) {
                 return true;
             }
-            mapping = TextSourceMap._createMapping(source);
+            mapping = TextSourceMap.createMapping(source);
         } else if (otherMapping === null) {
-            otherMapping = TextSourceMap._createMapping(source);
+            otherMapping = TextSourceMap.createMapping(source);
         }
 
         const mappingLength = mapping.length;
@@ -77,7 +77,7 @@ class TextSourceMap {
         if (count <= 0) { return; }
 
         if (this._mapping === null) {
-            this._mapping = TextSourceMap._createMapping(this._source);
+            this._mapping = TextSourceMap.createMapping(this._source);
         }
 
         let sum = this._mapping[index];
@@ -90,17 +90,21 @@ class TextSourceMap {
 
     insert(index, ...items) {
         if (this._mapping === null) {
-            this._mapping = TextSourceMap._createMapping(this._source);
+            this._mapping = TextSourceMap.createMapping(this._source);
         }
 
         this._mapping.splice(index, 0, ...items);
     }
 
-    static _createMapping(text) {
+    getMappingCopy() {
+        return this._mapping !== null ? [...this._mapping] : null;
+    }
+
+    static createMapping(text) {
         return new Array(text.length).fill(1);
     }
 
-    static _normalizeMapping(mapping) {
+    static normalizeMapping(mapping) {
         const result = [];
         for (const value of mapping) {
             result.push(
