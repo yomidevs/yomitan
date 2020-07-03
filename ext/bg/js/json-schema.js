@@ -139,7 +139,7 @@ class JsonSchemaProxyHandler {
                     if (path !== null) { path.push(['additionalProperties', additionalProperties]); }
                     return additionalProperties;
                 } else {
-                    const result = JsonSchemaProxyHandler._unconstrainedSchema;
+                    const result = JsonSchemaProxyHandler.unconstrainedSchema;
                     if (path !== null) { path.push([null, result]); }
                     return result;
                 }
@@ -167,7 +167,7 @@ class JsonSchemaProxyHandler {
                     if (path !== null) { path.push(['additionalItems', additionalItems]); }
                     return additionalItems;
                 } else {
-                    const result = JsonSchemaProxyHandler._unconstrainedSchema;
+                    const result = JsonSchemaProxyHandler.unconstrainedSchema;
                     if (path !== null) { path.push([null, result]); }
                     return result;
                 }
@@ -579,7 +579,12 @@ class JsonSchemaProxyHandler {
     }
 }
 
-JsonSchemaProxyHandler._unconstrainedSchema = {};
+Object.defineProperty(JsonSchemaProxyHandler, 'unconstrainedSchema', {
+    value: Object.freeze({}),
+    configurable: false,
+    enumerable: true,
+    writable: false
+});
 
 class JsonSchemaTraversalInfo {
     constructor(value, schema) {
