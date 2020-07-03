@@ -192,6 +192,11 @@ const clone = (() => {
     return clone;
 })();
 
+// Expose clone function on the global object, since util.js's utilBackgroundIsolate needs access to it.
+if (typeof window === 'object' && window !== null) {
+    window.clone = clone;
+}
+
 
 /*
  * Async utilities

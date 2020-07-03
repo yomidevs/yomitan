@@ -15,31 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-function utilFunctionIsolate(func) {
-    return function isolatedFunction(...args) {
-        try {
-            args = args.map((v) => clone(v));
-            return func.call(this, ...args);
-        } catch (e) {
-            try {
-                String(func);
-            } catch (e2) {
-                // Dead object
-                return;
-            }
-            throw e;
-        }
-    };
-}
-
 function utilBackgroundIsolate(data) {
     const backgroundPage = chrome.extension.getBackgroundPage();
     return backgroundPage.clone(data);
-}
-
-function utilBackgroundFunctionIsolate(func) {
-    const backgroundPage = chrome.extension.getBackgroundPage();
-    return backgroundPage.utilFunctionIsolate(func);
 }
 
 function utilBackend() {
