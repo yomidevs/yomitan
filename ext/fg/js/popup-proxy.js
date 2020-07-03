@@ -31,6 +31,7 @@ class PopupProxy extends EventDispatcher {
         this._frameOffset = null;
         this._frameOffsetPromise = null;
         this._frameOffsetUpdatedAt = null;
+        this._frameOffsetExpireTimeout = 1000;
     }
 
     // Public properties
@@ -113,7 +114,7 @@ class PopupProxy extends EventDispatcher {
     async _updateFrameOffset() {
         const now = Date.now();
         const firstRun = this._frameOffsetUpdatedAt === null;
-        const expired = firstRun || this._frameOffsetUpdatedAt < now - PopupProxy._frameOffsetExpireTimeout;
+        const expired = firstRun || this._frameOffsetUpdatedAt < now - this._frameOffsetExpireTimeout;
         if (this._frameOffsetPromise === null && !expired) { return; }
 
         if (this._frameOffsetPromise !== null) {
@@ -151,5 +152,3 @@ class PopupProxy extends EventDispatcher {
         return [x + offsetX, y + offsetY];
     }
 }
-
-PopupProxy._frameOffsetExpireTimeout = 1000;
