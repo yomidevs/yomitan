@@ -22,12 +22,12 @@ class Timer {
         this.parent = null;
 
         this.sample(name);
-        const current = Timer._current;
+        const current = Timer.current;
         if (current !== null) {
             current.samples[current.samples.length - 1].children.push(this);
             this.parent = current;
         }
-        Timer._current = this;
+        Timer.current = this;
     }
 
     sample(name) {
@@ -42,7 +42,7 @@ class Timer {
     complete(skip) {
         this.sample('complete');
 
-        Timer._current = this.parent;
+        Timer.current = this.parent;
         if (this.parent === null) {
             if (!skip) {
                 console.log(this.toString());
@@ -67,7 +67,7 @@ class Timer {
         const name = this.samples[0].name;
         const duration = this.samples[this.samples.length - 1].time - this.samples[0].time;
         const extensionName = chrome.runtime.getManifest().name;
-        return `${name} took ${duration.toFixed(8)}ms  [${extensionName}]` + Timer._indentString(this.getSampleString(), indent);
+        return `${name} took ${duration.toFixed(8)}ms  [${extensionName}]` + this._indentString(this.getSampleString(), indent);
     }
 
     getSampleString() {
@@ -80,16 +80,16 @@ class Timer {
             const sampleDuration = this.samples[i + 1].time - sample.time;
             message += `\nSample[${i}] took ${sampleDuration.toFixed(8)}ms (${((sampleDuration / duration) * 100.0).toFixed(1)}%)  [${sample.name}]`;
             for (const child of sample.children) {
-                message += Timer._indentString(child.getSampleString(), indent);
+                message += this._indentString(child.getSampleString(), indent);
             }
         }
 
         return message;
     }
 
-    static _indentString(message, indent) {
+    _indentString(message, indent) {
         return message.replace(/\n/g, `\n${indent}`);
     }
 }
 
-Timer._current = null;
+Timer.current = null;
