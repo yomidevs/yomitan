@@ -33,7 +33,6 @@ class Frontend {
         this._pageZoomFactor = 1.0;
         this._contentScale = 1.0;
         this._lastShowPromise = Promise.resolve();
-        this._enabledEventListeners = new EventListenerCollection();
         this._activeModifiers = new Set();
         this._optionsUpdatePending = false;
         this._textScanner = new TextScanner({
@@ -62,11 +61,6 @@ class Frontend {
         this._allowRootFramePopupProxy = allowRootFramePopupProxy;
         this._popupCache = new Map();
         this._updatePopupToken = null;
-
-        this._windowMessageHandlers = new Map([
-            ['popupClose', this._onMessagePopupClose.bind(this)],
-            ['selectionCopy', this._onMessageSelectionCopy.bind()]
-        ]);
 
         this._runtimeMessageHandlers = new Map([
             ['popupSetVisibleOverride', this._onMessagePopupSetVisibleOverride.bind(this)],
@@ -111,13 +105,16 @@ class Frontend {
 
         yomichan.on('optionsUpdated', this.updateOptions.bind(this));
         yomichan.on('zoomChanged', this._onZoomChanged.bind(this));
+        yomichan.on('closePopups', this._onApiClosePopup.bind(this));
         chrome.runtime.onMessage.addListener(this._onRuntimeMessage.bind(this));
 
         this._textScanner.on('clearSelection', this._onClearSelection.bind(this));
         this._textScanner.on('activeModifiersChanged', this._onActiveModifiersChanged.bind(this));
 
         api.crossFrame.registerHandlers([
-            ['getUrl', {async: false, handler: this._onApiGetUrl.bind(this)}]
+            ['getUrl',        {async: false, handler: this._onApiGetUrl.bind(this)}],
+            ['closePopup',    {async: false, handler: this._onApiClosePopup.bind(this)}],
+            ['copySelection', {async: false, handler: this._onApiCopySelection.bind(this)}]
         ]);
 
         this._updateContentScale();
@@ -179,14 +176,6 @@ class Frontend {
 
     // Message handlers
 
-    _onMessagePopupClose() {
-        this._textScanner.clearSelection(false);
-    }
-
-    _onMessageSelectionCopy() {
-        document.execCommand('copy');
-    }
-
     _onMessagePopupSetVisibleOverride({visible}) {
         this._popup.setVisibleOverride(visible);
     }
@@ -205,18 +194,18 @@ class Frontend {
         return window.location.href;
     }
 
+    _onApiClosePopup() {
+        this._textScanner.clearSelection(false);
+    }
+
+    _onApiCopySelection() {
+        document.execCommand('copy');
+    }
+
     // Private
 
     _onResize() {
         this._updatePopupPosition();
-    }
-
-    _onWindowMessage(e) {
-        const action = e.data;
-        const handler = this._windowMessageHandlers.get(action);
-        if (typeof handler !== 'function') { return false; }
-
-        handler();
     }
 
     _onRuntimeMessage({action, params}, sender, callback) {
@@ -307,11 +296,11 @@ class Frontend {
     }
 
     async _getDefaultPopup() {
-        return this._popupFactory.getOrCreatePopup(null, null, this._depth);
+        return this._popupFactory.getOrCreatePopup({depth: this._depth, ownerFrameId: this._frameId});
     }
 
     async _getProxyPopup() {
-        const popup = new PopupProxy(null, this._depth + 1, this._proxyPopupId, this._parentFrameId);
+        const popup = new PopupProxy(null, this._depth + 1, this._proxyPopupId, this._parentFrameId, this._frameId);
         await popup.prepare();
         return popup;
     }
@@ -328,7 +317,7 @@ class Frontend {
         api.broadcastTab('rootPopupRequestInformationBroadcast');
         const {popupId, frameId: parentFrameId} = await rootPopupInformationPromise;
 
-        const popup = new PopupProxy(popupId, 0, null, parentFrameId, this._frameOffsetForwarder);
+        const popup = new PopupProxy(popupId, 0, null, parentFrameId, this._frameId, this._frameOffsetForwarder);
         popup.on('offsetNotFound', () => {
             this._allowRootFramePopupProxy = false;
             this._updatePopup();
@@ -444,11 +433,7 @@ class Frontend {
             this._depth <= this._options.scanning.popupNestingMaxDepth &&
             !this._disabledOverride
         );
-        this._enabledEventListeners.removeAllEventListeners();
         this._textScanner.setEnabled(enabled);
-        if (enabled) {
-            this._enabledEventListeners.addEventListener(window, 'message', this._onWindowMessage.bind(this));
-        }
     }
 
     _updateContentScale() {

@@ -255,7 +255,7 @@ class DisplaySearch extends Display {
                 this.clearContent();
             }
             this._setTitleText(query);
-            window.parent.postMessage('popupClose', '*');
+            yomichan.trigger('closePopups');
         } catch (e) {
             this.onError(e);
         }

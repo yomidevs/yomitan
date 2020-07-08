@@ -20,12 +20,13 @@
  */
 
 class PopupProxy extends EventDispatcher {
-    constructor(id, depth, parentPopupId, parentFrameId, frameOffsetForwarder=null) {
+    constructor(id, depth, parentPopupId, parentFrameId, ownerFrameId, frameOffsetForwarder=null) {
         super();
         this._id = id;
         this._depth = depth;
         this._parentPopupId = parentPopupId;
         this._parentFrameId = parentFrameId;
+        this._ownerFrameId = ownerFrameId;
         this._frameOffsetForwarder = frameOffsetForwarder;
 
         this._frameOffset = null;
@@ -51,7 +52,7 @@ class PopupProxy extends EventDispatcher {
     // Public functions
 
     async prepare() {
-        const {id} = await this._invoke('getOrCreatePopup', {id: this._id, parentId: this._parentPopupId});
+        const {id} = await this._invoke('getOrCreatePopup', {id: this._id, parentId: this._parentPopupId, ownerFrameId: this._ownerFrameId});
         this._id = id;
     }
 

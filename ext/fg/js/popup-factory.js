@@ -43,7 +43,7 @@ class PopupFactory {
         ]);
     }
 
-    getOrCreatePopup(id=null, parentId=null, depth=null) {
+    getOrCreatePopup({id=null, parentId=null, ownerFrameId=null, depth=null}) {
         // Find by existing id
         if (id !== null) {
             const popup = this._popups.get(id);
@@ -80,7 +80,7 @@ class PopupFactory {
         } else if (depth === null) {
             depth = 0;
         }
-        const popup = new Popup(id, depth, this._frameId);
+        const popup = new Popup(id, depth, this._frameId, ownerFrameId);
         if (parent !== null) {
             popup.setParent(parent);
         }
@@ -91,8 +91,8 @@ class PopupFactory {
 
     // API message handlers
 
-    _onApiGetOrCreatePopup({id, parentId}) {
-        const popup = this.getOrCreatePopup(id, parentId);
+    _onApiGetOrCreatePopup({id, parentId, ownerFrameId}) {
+        const popup = this.getOrCreatePopup({id, parentId, ownerFrameId});
         return {
             id: popup.id
         };

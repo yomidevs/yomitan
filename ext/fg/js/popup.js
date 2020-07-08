@@ -22,10 +22,11 @@
  */
 
 class Popup {
-    constructor(id, depth, frameId) {
+    constructor(id, depth, frameId, ownerFrameId) {
         this._id = id;
         this._depth = depth;
         this._frameId = frameId;
+        this._ownerFrameId = ownerFrameId;
         this._parent = null;
         this._child = null;
         this._childrenSupported = true;
@@ -382,6 +383,7 @@ class Popup {
         this._invokeApi('configure', {
             messageId,
             frameId: this._frameId,
+            ownerFrameId: this._ownerFrameId,
             popupId: this._id,
             optionsContext: this._optionsContext,
             childrenSupported: this._childrenSupported,
