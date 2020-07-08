@@ -41,6 +41,7 @@
             "mixed/js/dom.js",
             "mixed/js/api.js",
             "mixed/js/dynamic-loader.js",
+            "mixed/js/frame-client.js",
             "mixed/js/text-scanner.js",
             "fg/js/document.js",
             "fg/js/dom-text-scanner.js",

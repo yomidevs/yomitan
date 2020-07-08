@@ -17,6 +17,7 @@
 
 /* global
  * Display
+ * FrameEndpoint
  * Frontend
  * PopupFactory
  * api
@@ -27,12 +28,10 @@ class DisplayFloat extends Display {
     constructor() {
         super(document.querySelector('#spinner'), document.querySelector('#definitions'));
         this._autoPlayAudioTimer = null;
-        this._secret = yomichan.generateId(16);
-        this._token = null;
         this._nestedPopupsPrepared = false;
         this._ownerFrameId = null;
+        this._frameEndpoint = new FrameEndpoint();
         this._windowMessageHandlers = new Map([
-            ['initialize',         {handler: this._onMessageInitialize.bind(this), authenticate: false}],
             ['configure',          {handler: this._onMessageConfigure.bind(this)}],
             ['setOptionsContext',  {handler: this._onMessageSetOptionsContext.bind(this)}],
             ['setContent',         {handler: this._onMessageSetContent.bind(this)}],
@@ -57,7 +56,7 @@ class DisplayFloat extends Display {
 
         window.addEventListener('message', this._onMessage.bind(this), false);
 
-        api.broadcastTab('popupPrepared', {secret: this._secret});
+        this._frameEndpoint.signal();
     }
 
     onEscape() {
@@ -104,7 +103,10 @@ class DisplayFloat extends Display {
     // Message handling
 
     _onMessage(e) {
-        const data = e.data;
+        let data = e.data;
+        if (!this._frameEndpoint.authenticate(data)) { return; }
+        data = data.data;
+
         if (typeof data !== 'object' || data === null) {
             this._logMessageError(e, 'Invalid data');
             return;
@@ -122,17 +124,8 @@ class DisplayFloat extends Display {
             return;
         }
 
-        if (handlerInfo.authenticate !== false && !this._isMessageAuthenticated(data)) {
-            this._logMessageError(e, 'Invalid authentication');
-            return;
-        }
-
         const handler = handlerInfo.handler;
         handler(data.params);
-    }
-
-    _onMessageInitialize(params) {
-        this._initialize(params);
     }
 
     async _onMessageConfigure({messageId, frameId, ownerFrameId, popupId, optionsContext, childrenSupported, scale}) {
@@ -195,27 +188,6 @@ class DisplayFloat extends Display {
         yomichan.logWarning(new Error(`Popup received invalid message from origin ${JSON.stringify(event.origin)}: ${type}`));
     }
 
-    _initialize(params) {
-        if (this._token !== null) { return; } // Already initialized
-        if (!isObject(params)) { return; } // Invalid data
-
-        const secret = params.secret;
-        if (secret !== this._secret) { return; } // Invalid authentication
-
-        const {token, frameId} = params;
-        this._token = token;
-
-        api.sendMessageToFrame(frameId, 'popupInitialized', {secret, token});
-    }
-
-    _isMessageAuthenticated(message) {
-        return (
-            this._token !== null &&
-            this._token === message.token &&
-            this._secret === message.secret
-        );
-    }
-
     async _prepareNestedPopups(id, depth, parentFrameId, url) {
         let complete = false;
 
@@ -243,6 +215,7 @@ class DisplayFloat extends Display {
     async _setupNestedPopups(id, depth, parentFrameId, url) {
         await dynamicLoader.loadScripts([
             '/mixed/js/text-scanner.js',
+            '/mixed/js/frame-client.js',
             '/fg/js/popup.js',
             '/fg/js/popup-proxy.js',
             '/fg/js/popup-factory.js',

@@ -424,6 +424,7 @@ class DisplaySearch extends Display {
     async _setupNestedPopups() {
         await dynamicLoader.loadScripts([
             '/mixed/js/text-scanner.js',
+            '/mixed/js/frame-client.js',
             '/fg/js/frame-offset-forwarder.js',
             '/fg/js/popup.js',
             '/fg/js/popup-factory.js',

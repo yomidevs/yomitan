@@ -538,14 +538,15 @@ class Backend {
         });
     }
 
-    _onApiSendMessageToFrame({frameId, action, params}, sender) {
+    _onApiSendMessageToFrame({frameId: targetFrameId, action, params}, sender) {
         if (!(sender && sender.tab)) {
             return false;
         }
 
         const tabId = sender.tab.id;
+        const frameId = sender.frameId;
         const callback = () => this._checkLastError(chrome.runtime.lastError);
-        chrome.tabs.sendMessage(tabId, {action, params}, {frameId}, callback);
+        chrome.tabs.sendMessage(tabId, {action, params, frameId}, {frameId: targetFrameId}, callback);
         return true;
     }
 
@@ -555,8 +556,9 @@ class Backend {
         }
 
         const tabId = sender.tab.id;
+        const frameId = sender.frameId;
         const callback = () => this._checkLastError(chrome.runtime.lastError);
-        chrome.tabs.sendMessage(tabId, {action, params}, callback);
+        chrome.tabs.sendMessage(tabId, {action, params, frameId}, callback);
         return true;
     }
 

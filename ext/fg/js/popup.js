@@ -17,6 +17,7 @@
 
 /* global
  * DOM
+ * FrameClient
  * api
  * dynamicLoader
  */
@@ -41,8 +42,7 @@ class Popup {
         this._previousOptionsContextSource = null;
 
         this._frameSizeContentScale = null;
-        this._frameSecret = null;
-        this._frameToken = null;
+        this._frameClient = null;
         this._frame = document.createElement('iframe');
         this._frame.className = 'yomichan-float';
         this._frame.style.width = '0';
@@ -230,117 +230,6 @@ class Popup {
         return injectPromise;
     }
 
-    _initializeFrame(frame, targetOrigin, frameId, setupFrame, timeout=10000) {
-        return new Promise((resolve, reject) => {
-            const tokenMap = new Map();
-            let timer = null;
-            let {
-                promise: frameLoadedPromise,
-                resolve: frameLoadedResolve,
-                reject: frameLoadedReject
-            } = deferPromise();
-
-            const postMessage = (action, params) => {
-                const contentWindow = frame.contentWindow;
-                if (contentWindow === null) { throw new Error('Frame missing content window'); }
-
-                let validOrigin = true;
-                try {
-                    validOrigin = (contentWindow.location.origin === targetOrigin);
-                } catch (e) {
-                    // NOP
-                }
-                if (!validOrigin) { throw new Error('Unexpected frame origin'); }
-
-                contentWindow.postMessage({action, params}, targetOrigin);
-            };
-
-            const onMessage = (message) => {
-                onMessageInner(message);
-                return false;
-            };
-
-            const onMessageInner = async (message) => {
-                try {
-                    if (!isObject(message)) { return; }
-                    const {action, params} = message;
-                    if (!isObject(params)) { return; }
-                    await frameLoadedPromise;
-                    if (timer === null) { return; } // Done
-
-                    switch (action) {
-                        case 'popupPrepared':
-                            {
-                                const {secret} = params;
-                                const token = yomichan.generateId(16);
-                                tokenMap.set(secret, token);
-                                postMessage('initialize', {secret, token, frameId});
-                            }
-                            break;
-                        case 'popupInitialized':
-                            {
-                                const {secret, token} = params;
-                                const token2 = tokenMap.get(secret);
-                                if (typeof token2 !== 'undefined' && token === token2) {
-                                    cleanup();
-                                    resolve({secret, token});
-                                }
-                            }
-                            break;
-                    }
-                } catch (e) {
-                    cleanup();
-                    reject(e);
-                }
-            };
-
-            const onLoad = () => {
-                if (frameLoadedResolve === null) {
-                    cleanup();
-                    reject(new Error('Unexpected load event'));
-                    return;
-                }
-
-                if (Popup.isFrameAboutBlank(frame)) {
-                    return;
-                }
-
-                frameLoadedResolve();
-                frameLoadedResolve = null;
-                frameLoadedReject = null;
-            };
-
-            const cleanup = () => {
-                if (timer === null) { return; } // Done
-                clearTimeout(timer);
-                timer = null;
-
-                frameLoadedResolve = null;
-                if (frameLoadedReject !== null) {
-                    frameLoadedReject(new Error('Terminated'));
-                    frameLoadedReject = null;
-                }
-
-                chrome.runtime.onMessage.removeListener(onMessage);
-                frame.removeEventListener('load', onLoad);
-            };
-
-            // Start
-            timer = setTimeout(() => {
-                cleanup();
-                reject(new Error('Timeout'));
-            }, timeout);
-
-            chrome.runtime.onMessage.addListener(onMessage);
-            frame.addEventListener('load', onLoad);
-
-            // Prevent unhandled rejections
-            frameLoadedPromise.catch(() => {}); // NOP
-
-            setupFrame(frame);
-        });
-    }
-
     async _createInjectPromise() {
         if (this._options === null) {
             throw new Error('Options not initialized');
@@ -350,7 +239,7 @@ class Popup {
 
         await this._setUpContainer(usePopupShadowDom);
 
-        const {secret, token} = await this._initializeFrame(this._frame, this._targetOrigin, this._frameId, (frame) => {
+        const setupFrame = (frame) => {
             frame.removeAttribute('src');
             frame.removeAttribute('srcdoc');
             this._observeFullscreen(true);
@@ -361,9 +250,11 @@ class Popup {
             } else {
                 frame.setAttribute('src', url);
             }
-        });
-        this._frameSecret = secret;
-        this._frameToken = token;
+        };
+
+        const frameClient = new FrameClient();
+        this._frameClient = frameClient;
+        await frameClient.connect(this._frame, this._targetOrigin, this._frameId, setupFrame);
 
         // Configure
         const messageId = yomichan.generateId(16);
@@ -406,8 +297,7 @@ class Popup {
         this._frame.removeAttribute('src');
         this._frame.removeAttribute('srcdoc');
 
-        this._frameSecret = null;
-        this._frameToken = null;
+        this._frameClient = null;
         this._injectPromise = null;
         this._injectPromiseComplete = false;
     }
@@ -567,12 +457,11 @@ class Popup {
     }
 
     _invokeApi(action, params={}) {
-        const secret = this._frameSecret;
-        const token = this._frameToken;
         const contentWindow = this._frame.contentWindow;
-        if (secret === null || token === null || contentWindow === null) { return; }
+        if (this._frameClient === null || !this._frameClient.isConnected() || contentWindow === null) { return; }
 
-        contentWindow.postMessage({action, params, secret, token}, this._targetOrigin);
+        const message = this._frameClient.createMessage({action, params});
+        contentWindow.postMessage(message, this._targetOrigin);
     }
 
     _getFrameParentElement() {
