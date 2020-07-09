@@ -40,14 +40,11 @@ class DisplayFloat extends Display {
             ['setContentScale',    {handler: this._onMessageSetContentScale.bind(this)}]
         ]);
 
-        this.setOnKeyDownHandlers([
-            ['C', (e) => {
-                if (e.ctrlKey && !window.getSelection().toString()) {
-                    this._copySelection();
-                    return true;
-                }
-                return false;
-            }]
+        this.registerActions([
+            ['copy-host-selection', () => this._copySelection()]
+        ]);
+        this.registerHotkeys([
+            {key: 'C', modifiers: ['ctrl'], action: 'copy-host-selection'}
         ]);
     }
 
@@ -168,7 +165,9 @@ class DisplayFloat extends Display {
     // Private
 
     _copySelection() {
+        if (window.getSelection().toString()) { return false; }
         this._invoke('copySelection');
+        return true;
     }
 
     _clearAutoPlayTimer() {

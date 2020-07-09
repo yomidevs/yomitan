@@ -56,108 +56,40 @@ class Display {
         this._mediaLoader = new MediaLoader();
         this._displayGenerator = new DisplayGenerator({mediaLoader: this._mediaLoader});
         this._windowScroll = new WindowScroll();
-        this._onKeyDownHandlers = new Map([
-            ['Escape', () => {
-                this.onEscape();
-                return true;
-            }],
-            ['PageUp', (e) => {
-                if (e.altKey) {
-                    this._entryScrollIntoView(this._index - 3, null, true);
-                    return true;
-                }
-                return false;
-            }],
-            ['PageDown', (e) => {
-                if (e.altKey) {
-                    this._entryScrollIntoView(this._index + 3, null, true);
-                    return true;
-                }
-                return false;
-            }],
-            ['End', (e) => {
-                if (e.altKey) {
-                    this._entryScrollIntoView(this._definitions.length - 1, null, true);
-                    return true;
-                }
-                return false;
-            }],
-            ['Home', (e) => {
-                if (e.altKey) {
-                    this._entryScrollIntoView(0, null, true);
-                    return true;
-                }
-                return false;
-            }],
-            ['ArrowUp', (e) => {
-                if (e.altKey) {
-                    this._entryScrollIntoView(this._index - 1, null, true);
-                    return true;
-                }
-                return false;
-            }],
-            ['ArrowDown', (e) => {
-                if (e.altKey) {
-                    this._entryScrollIntoView(this._index + 1, null, true);
-                    return true;
-                }
-                return false;
-            }],
-            ['B', (e) => {
-                if (e.altKey) {
-                    this._sourceTermView();
-                    return true;
-                }
-                return false;
-            }],
-            ['F', (e) => {
-                if (e.altKey) {
-                    this._nextTermView();
-                    return true;
-                }
-                return false;
-            }],
-            ['E', (e) => {
-                if (e.altKey) {
-                    this._noteTryAdd('term-kanji');
-                    return true;
-                }
-                return false;
-            }],
-            ['K', (e) => {
-                if (e.altKey) {
-                    this._noteTryAdd('kanji');
-                    return true;
-                }
-                return false;
-            }],
-            ['R', (e) => {
-                if (e.altKey) {
-                    this._noteTryAdd('term-kana');
-                    return true;
-                }
-                return false;
-            }],
-            ['P', (e) => {
-                if (e.altKey) {
-                    const index = this._index;
-                    if (index < 0 || index >= this._definitions.length) { return; }
+        this._hotkeys = new Map();
+        this._actions = new Map();
 
-                    const entry = this._getEntry(index);
-                    if (entry !== null && entry.dataset.type === 'term') {
-                        this._audioPlay(this._definitions[index], this._getFirstExpressionIndex(), index);
-                    }
-                    return true;
-                }
-                return false;
-            }],
-            ['V', (e) => {
-                if (e.altKey) {
-                    this._noteTryView();
-                    return true;
-                }
-                return false;
-            }]
+        this.registerActions([
+            ['close',               () => { this.onEscape(); }],
+            ['next-entry',          () => { this._entryScrollIntoView(this._index + 1, null, true); }],
+            ['next-entry-x3',       () => { this._entryScrollIntoView(this._index + 3, null, true); }],
+            ['previous-entry',      () => { this._entryScrollIntoView(this._index - 1, null, true); }],
+            ['previous-entry-x3',   () => { this._entryScrollIntoView(this._index - 3, null, true); }],
+            ['last-entry',          () => { this._entryScrollIntoView(this._definitions.length - 1, null, true); }],
+            ['first-entry',         () => { this._entryScrollIntoView(0, null, true); }],
+            ['history-backward',    () => { this._sourceTermView(); }],
+            ['history-forward',     () => { this._nextTermView(); }],
+            ['add-note-kanji',      () => { this._noteTryAdd('kanji'); }],
+            ['add-note-term-kanji', () => { this._noteTryAdd('term-kanji'); }],
+            ['add-note-term-kana',  () => { this._noteTryAdd('term-kana'); }],
+            ['view-note',           () => { this._noteTryView(); }],
+            ['play-audio',          () => { this._playAudioCurrent(); }]
+        ]);
+        this.registerHotkeys([
+            {key: 'Escape',    modifiers: [],      action: 'close'},
+            {key: 'PageUp',    modifiers: ['alt'], action: 'previous-entry-x3'},
+            {key: 'PageDown',  modifiers: ['alt'], action: 'next-entry-x3'},
+            {key: 'End',       modifiers: ['alt'], action: 'last-entry'},
+            {key: 'Home',      modifiers: ['alt'], action: 'first-entry'},
+            {key: 'ArrowUp',   modifiers: ['alt'], action: 'previous-entry'},
+            {key: 'ArrowDown', modifiers: ['alt'], action: 'next-entry'},
+            {key: 'B',         modifiers: ['alt'], action: 'history-backward'},
+            {key: 'F',         modifiers: ['alt'], action: 'history-forward'},
+            {key: 'K',         modifiers: ['alt'], action: 'add-note-kanji'},
+            {key: 'E',         modifiers: ['alt'], action: 'add-note-term-kanji'},
+            {key: 'R',         modifiers: ['alt'], action: 'add-note-term-kana'},
+            {key: 'P',         modifiers: ['alt'], action: 'play-audio'},
+            {key: 'V',         modifiers: ['alt'], action: 'view-note'}
         ]);
     }
 
@@ -181,9 +113,18 @@ class Display {
 
     onKeyDown(e) {
         const key = DOM.getKeyFromEvent(e);
-        const handler = this._onKeyDownHandlers.get(key);
-        if (typeof handler === 'function') {
-            if (handler(e)) {
+        const handlers = this._hotkeys.get(key);
+        if (typeof handlers === 'undefined') { return false; }
+
+        const eventModifiers = DOM.getActiveModifiers(e);
+        for (const {modifiers, action} of handlers) {
+            if (getSetDifference(modifiers, eventModifiers).size !== 0) { continue; }
+
+            const actionHandler = this._actions.get(action);
+            if (typeof actionHandler === 'undefined') { continue; }
+
+            const result = actionHandler(e);
+            if (result !== false) {
                 e.preventDefault();
                 return true;
             }
@@ -276,9 +217,20 @@ class Display {
         }
     }
 
-    setOnKeyDownHandlers(handlers) {
-        for (const [key, handler] of handlers) {
-            this._onKeyDownHandlers.set(key, handler);
+    registerActions(actions) {
+        for (const [name, handler] of actions) {
+            this._actions.set(name, handler);
+        }
+    }
+
+    registerHotkeys(hotkeys) {
+        for (const {key, modifiers, action} of hotkeys) {
+            let handlers = this._hotkeys.get(key);
+            if (typeof handlers === 'undefined') {
+                handlers = [];
+                this._hotkeys.set(key, handlers);
+            }
+            handlers.push({modifiers: new Set(modifiers), action});
         }
     }
 
@@ -981,5 +933,15 @@ class Display {
                 title: documentTitle
             }
         };
+    }
+
+    _playAudioCurrent() {
+        const index = this._index;
+        if (index < 0 || index >= this._definitions.length) { return; }
+
+        const entry = this._getEntry(index);
+        if (entry !== null && entry.dataset.type === 'term') {
+            this._audioPlay(this._definitions[index], this._getFirstExpressionIndex(), index);
+        }
     }
 }
