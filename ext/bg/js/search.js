@@ -61,7 +61,7 @@ class DisplaySearch extends Display {
             ['Shift', new Set()]
         ]);
         this._runtimeMessageHandlers = new Map([
-            ['searchQueryUpdate', this._onExternalSearchUpdate.bind(this)]
+            ['updateSearchQuery', {async: false, handler: this._onExternalSearchUpdate.bind(this)}]
         ]);
 
         this.setOptionsContext({
@@ -206,12 +206,9 @@ class DisplaySearch extends Display {
     }
 
     _onRuntimeMessage({action, params}, sender, callback) {
-        const handler = this._runtimeMessageHandlers.get(action);
-        if (typeof handler !== 'function') { return false; }
-
-        const result = handler(params, sender);
-        callback(result);
-        return false;
+        const messageHandler = this._runtimeMessageHandlers.get(action);
+        if (typeof messageHandler === 'undefined') { return false; }
+        return yomichan.invokeMessageHandler(messageHandler, params, callback, sender);
     }
 
     _onCopy() {

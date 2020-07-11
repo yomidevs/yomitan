@@ -54,10 +54,10 @@ const yomichan = (() => {
             this._isBackendPreparedPromiseResolve = resolve;
 
             this._messageHandlers = new Map([
-                ['backendPrepared', this._onMessageBackendPrepared.bind(this)],
-                ['getUrl',          this._onMessageGetUrl.bind(this)],
-                ['optionsUpdated',  this._onMessageOptionsUpdated.bind(this)],
-                ['zoomChanged',     this._onMessageZoomChanged.bind(this)]
+                ['backendPrepared', {async: false, handler: this._onMessageBackendPrepared.bind(this)}],
+                ['getUrl',          {async: false, handler: this._onMessageGetUrl.bind(this)}],
+                ['optionsUpdated',  {async: false, handler: this._onMessageOptionsUpdated.bind(this)}],
+                ['zoomChanged',     {async: false, handler: this._onMessageZoomChanged.bind(this)}]
             ]);
         }
 
@@ -210,6 +210,43 @@ const yomichan = (() => {
             }
         }
 
+        getMessageResponseResult(response) {
+            let error = chrome.runtime.lastError;
+            if (error) {
+                throw new Error(error.message);
+            }
+            if (!isObject(response)) {
+                throw new Error('Tab did not respond');
+            }
+            error = response.error;
+            if (error) {
+                throw jsonToError(error);
+            }
+            return response.result;
+        }
+
+        invokeMessageHandler({handler, async}, params, callback, ...extraArgs) {
+            try {
+                let promiseOrResult = handler(params, ...extraArgs);
+                if (async === 'dynamic') {
+                    ({async, result: promiseOrResult} = promiseOrResult);
+                }
+                if (async) {
+                    promiseOrResult.then(
+                        (result) => { callback({result}); },
+                        (error) => { callback({error: errorToJson(error)}); }
+                    );
+                    return true;
+                } else {
+                    callback({result: promiseOrResult});
+                    return false;
+                }
+            } catch (error) {
+                callback({error: errorToJson(error)});
+                return false;
+            }
+        }
+
         // Private
 
         _onExtensionUnloaded(error) {
@@ -222,16 +259,13 @@ const yomichan = (() => {
         }
 
         _getLogContext() {
-            return {url: this._getUrl()};
+            return this._getUrl();
         }
 
         _onMessage({action, params}, sender, callback) {
-            const handler = this._messageHandlers.get(action);
-            if (typeof handler !== 'function') { return false; }
-
-            const result = handler(params, sender);
-            callback(result);
-            return false;
+            const messageHandler = this._messageHandlers.get(action);
+            if (typeof messageHandler === 'undefined') { return false; }
+            return this.invokeMessageHandler(messageHandler, params, callback, sender);
         }
 
         _onMessageBackendPrepared() {

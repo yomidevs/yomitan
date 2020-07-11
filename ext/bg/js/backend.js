@@ -294,28 +294,16 @@ class Backend {
         const messageHandler = this._messageHandlers.get(action);
         if (typeof messageHandler === 'undefined') { return false; }
 
-        const {handler, async, contentScript} = messageHandler;
-
-        try {
-            if (!contentScript) {
+        if (!messageHandler.contentScript) {
+            try {
                 this._validatePrivilegedMessageSender(sender);
-            }
-
-            const promiseOrResult = handler(params, sender);
-            if (async) {
-                promiseOrResult.then(
-                    (result) => callback({result}),
-                    (error) => callback({error: errorToJson(error)})
-                );
-                return true;
-            } else {
-                callback({result: promiseOrResult});
+            } catch (error) {
+                callback({error: errorToJson(error)});
                 return false;
             }
-        } catch (error) {
-            callback({error: errorToJson(error)});
-            return false;
         }
+
+        return yomichan.invokeMessageHandler(messageHandler, params, callback, sender);
     }
 
     _onConnect(port) {
@@ -814,11 +802,7 @@ class Backend {
             if (tab !== null) {
                 await this._focusTab(tab);
                 if (queryParams.query) {
-                    await new Promise((resolve) => chrome.tabs.sendMessage(
-                        tab.id,
-                        {action: 'searchQueryUpdate', params: {text: queryParams.query}},
-                        resolve
-                    ));
+                    await this._updateSearchQuery(tab.id, queryParams.query);
                 }
                 return true;
             }
@@ -881,6 +865,21 @@ class Backend {
     }
 
     // Utilities
+
+    _updateSearchQuery(tabId, text) {
+        new Promise((resolve, reject) => {
+            const callback = (response) => {
+                try {
+                    resolve(yomichan.getMessageResponseResult(response));
+                } catch (error) {
+                    reject(error);
+                }
+            };
+
+            const message = {action: 'updateSearchQuery', params: {text}};
+            chrome.tabs.sendMessage(tabId, message, callback);
+        });
+    }
 
     _sendMessageAllTabs(action, params={}) {
         const callback = () => this._checkLastError(chrome.runtime.lastError);
@@ -1286,11 +1285,10 @@ class Backend {
         return new Promise((resolve) => {
             chrome.tabs.sendMessage(tab.id, {action: 'getUrl'}, {frameId: 0}, (response) => {
                 let url = null;
-                if (!chrome.runtime.lastError) {
-                    url = (response !== null && typeof response === 'object' && !Array.isArray(response) ? response.url : null);
-                    if (url !== null && typeof url !== 'string') {
-                        url = null;
-                    }
+                try {
+                    url = yomichan.getMessageResponseResult(response);
+                } catch (error) {
+                    // NOP
                 }
                 resolve({tab, url});
             });
