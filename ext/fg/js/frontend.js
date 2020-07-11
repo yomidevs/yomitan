@@ -63,9 +63,9 @@ class Frontend {
         this._updatePopupToken = null;
 
         this._runtimeMessageHandlers = new Map([
-            ['popupSetVisibleOverride', this._onMessagePopupSetVisibleOverride.bind(this)],
-            ['rootPopupRequestInformationBroadcast', this._onMessageRootPopupRequestInformationBroadcast.bind(this)],
-            ['requestDocumentInformationBroadcast', this._onMessageRequestDocumentInformationBroadcast.bind(this)]
+            ['popupSetVisibleOverride',              {async: false, handler: this._onMessagePopupSetVisibleOverride.bind(this)}],
+            ['rootPopupRequestInformationBroadcast', {async: false, handler: this._onMessageRootPopupRequestInformationBroadcast.bind(this)}],
+            ['requestDocumentInformationBroadcast',  {async: false, handler: this._onMessageRequestDocumentInformationBroadcast.bind(this)}]
         ]);
     }
 
@@ -209,12 +209,27 @@ class Frontend {
     }
 
     _onRuntimeMessage({action, params}, sender, callback) {
-        const handler = this._runtimeMessageHandlers.get(action);
-        if (typeof handler !== 'function') { return false; }
+        const messageHandler = this._runtimeMessageHandlers.get(action);
+        if (typeof messageHandler === 'undefined') { return false; }
 
-        const result = handler(params, sender);
-        callback(result);
-        return false;
+        const {handler, async} = messageHandler;
+
+        try {
+            const promiseOrResult = handler(params, sender);
+            if (async) {
+                promiseOrResult.then(
+                    (result) => callback({result}),
+                    (error) => callback({error: errorToJson(error)})
+                );
+                return true;
+            } else {
+                callback({result: promiseOrResult});
+                return false;
+            }
+        } catch (error) {
+            callback({error: errorToJson(error)});
+            return false;
+        }
     }
 
     _onZoomChanged({newZoomFactor}) {
