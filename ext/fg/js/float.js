@@ -32,12 +32,12 @@ class DisplayFloat extends Display {
         this._ownerFrameId = null;
         this._frameEndpoint = new FrameEndpoint();
         this._windowMessageHandlers = new Map([
-            ['configure',          {handler: this._onMessageConfigure.bind(this)}],
-            ['setOptionsContext',  {handler: this._onMessageSetOptionsContext.bind(this)}],
-            ['setContent',         {handler: this._onMessageSetContent.bind(this)}],
-            ['clearAutoPlayTimer', {handler: this._onMessageClearAutoPlayTimer.bind(this)}],
-            ['setCustomCss',       {handler: this._onMessageSetCustomCss.bind(this)}],
-            ['setContentScale',    {handler: this._onMessageSetContentScale.bind(this)}]
+            ['configure',          {async: true,  handler: this._onMessageConfigure.bind(this)}],
+            ['setOptionsContext',  {async: false, handler: this._onMessageSetOptionsContext.bind(this)}],
+            ['setContent',         {async: false, handler: this._onMessageSetContent.bind(this)}],
+            ['clearAutoPlayTimer', {async: false, handler: this._onMessageClearAutoPlayTimer.bind(this)}],
+            ['setCustomCss',       {async: false, handler: this._onMessageSetCustomCss.bind(this)}],
+            ['setContentScale',    {async: false, handler: this._onMessageSetContentScale.bind(this)}]
         ]);
 
         this.registerActions([
@@ -51,7 +51,9 @@ class DisplayFloat extends Display {
     async prepare() {
         await super.prepare();
 
-        window.addEventListener('message', this._onMessage.bind(this), false);
+        api.crossFrame.registerHandlers([
+            ['popupMessage', {async: 'dynamic', handler: this._onMessage.bind(this)}]
+        ]);
 
         this._frameEndpoint.signal();
     }
@@ -99,33 +101,23 @@ class DisplayFloat extends Display {
 
     // Message handling
 
-    _onMessage(e) {
-        let data = e.data;
-        if (!this._frameEndpoint.authenticate(data)) { return; }
-        data = data.data;
-
-        if (typeof data !== 'object' || data === null) {
-            this._logMessageError(e, 'Invalid data');
-            return;
+    _onMessage(data) {
+        if (!this._frameEndpoint.authenticate(data)) {
+            throw new Error('Invalid authentication');
         }
 
-        const action = data.action;
-        if (typeof action !== 'string') {
-            this._logMessageError(e, 'Invalid data');
-            return;
-        }
-
+        const {action, params} = data.data;
         const handlerInfo = this._windowMessageHandlers.get(action);
         if (typeof handlerInfo === 'undefined') {
-            this._logMessageError(e, `Invalid action: ${JSON.stringify(action)}`);
-            return;
+            throw new Error(`Invalid action: ${action}`);
         }
 
-        const handler = handlerInfo.handler;
-        handler(data.params);
+        const {async, handler} = handlerInfo;
+        const result = handler(params);
+        return {async, result};
     }
 
-    async _onMessageConfigure({messageId, frameId, ownerFrameId, popupId, optionsContext, childrenSupported, scale}) {
+    async _onMessageConfigure({frameId, ownerFrameId, popupId, optionsContext, childrenSupported, scale}) {
         this._ownerFrameId = ownerFrameId;
         this.setOptionsContext(optionsContext);
 
@@ -138,8 +130,6 @@ class DisplayFloat extends Display {
         }
 
         this._setContentScale(scale);
-
-        api.sendMessageToFrame(frameId, 'popupConfigured', {messageId});
     }
 
     _onMessageSetOptionsContext({optionsContext}) {
@@ -181,10 +171,6 @@ class DisplayFloat extends Display {
         const body = document.body;
         if (body === null) { return; }
         body.style.fontSize = `${scale}em`;
-    }
-
-    _logMessageError(event, type) {
-        yomichan.logWarning(new Error(`Popup received invalid message from origin ${JSON.stringify(event.origin)}: ${type}`));
     }
 
     async _prepareNestedPopups(id, depth, parentFrameId, url) {

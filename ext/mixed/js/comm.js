@@ -172,29 +172,22 @@ class CrossFrameAPIPort extends EventDispatcher {
             return;
         }
 
-        const {handler, async} = messageHandler;
+        let {handler, async} = messageHandler;
 
         this._sendAck(id);
-        if (async) {
-            this._invokeHandlerAsync(id, handler, params);
-        } else {
-            this._invokeHandler(id, handler, params);
-        }
-    }
-
-    _invokeHandler(id, handler, params) {
         try {
-            const result = handler(params);
-            this._sendResult(id, result);
-        } catch (error) {
-            this._sendError(id, error);
-        }
-    }
-
-    async _invokeHandlerAsync(id, handler, params) {
-        try {
-            const result = await handler(params);
-            this._sendResult(id, result);
+            let result = handler(params);
+            if (async === 'dynamic') {
+                ({async, result} = result);
+            }
+            if (async) {
+                result.then(
+                    (result2) => this._sendResult(id, result2),
+                    (error2) => this._sendError(id, error2)
+                );
+            } else {
+                this._sendResult(id, result);
+            }
         } catch (error) {
             this._sendError(id, error);
         }

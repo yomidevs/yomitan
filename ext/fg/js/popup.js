@@ -257,22 +257,7 @@ class Popup {
         await frameClient.connect(this._frame, this._targetOrigin, this._frameId, setupFrame);
 
         // Configure
-        const messageId = yomichan.generateId(16);
-        const popupPreparedPromise = yomichan.getTemporaryListenerResult(
-            chrome.runtime.onMessage,
-            (message, {resolve}) => {
-                if (
-                    isObject(message) &&
-                    message.action === 'popupConfigured' &&
-                    isObject(message.params) &&
-                    message.params.messageId === messageId
-                ) {
-                    resolve();
-                }
-            }
-        );
-        this._invokeApi('configure', {
-            messageId,
+        await this._invokeApi('configure', {
             frameId: this._frameId,
             ownerFrameId: this._ownerFrameId,
             popupId: this._id,
@@ -280,8 +265,6 @@ class Popup {
             childrenSupported: this._childrenSupported,
             scale: this._contentScale
         });
-
-        return popupPreparedPromise;
     }
 
     _onFrameLoad() {
@@ -456,12 +439,12 @@ class Popup {
         return dark ? 'dark' : 'light';
     }
 
-    _invokeApi(action, params={}) {
+    async _invokeApi(action, params={}) {
         const contentWindow = this._frame.contentWindow;
         if (this._frameClient === null || !this._frameClient.isConnected() || contentWindow === null) { return; }
 
         const message = this._frameClient.createMessage({action, params});
-        contentWindow.postMessage(message, this._targetOrigin);
+        return await api.crossFrame.invoke(this._frameClient.frameId, 'popupMessage', message);
     }
 
     _getFrameParentElement() {
