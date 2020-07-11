@@ -56,7 +56,7 @@ class Frontend {
         this._isSearchPage = isSearchPage;
         this._depth = depth;
         this._frameId = frameId;
-        this._frameOffsetForwarder = new FrameOffsetForwarder();
+        this._frameOffsetForwarder = new FrameOffsetForwarder(frameId);
         this._popupFactory = popupFactory;
         this._allowRootFramePopupProxy = allowRootFramePopupProxy;
         this._popupCache = new Map();
