@@ -64,9 +64,6 @@ class Backend {
         });
         this._templateRenderer = new TemplateRenderer();
 
-        const url = (typeof window === 'object' && window !== null ? window.location.href : '');
-        this._optionsContext = {depth: 0, url};
-
         this._clipboardPasteTarget = (
             typeof document === 'object' && document !== null ?
             document.querySelector('#clipboard-paste-target') :
@@ -208,7 +205,7 @@ class Backend {
 
             this._applyOptions('background');
 
-            const options = this.getOptions(this._optionsContext);
+            const options = this.getOptions({current: true});
             if (options.general.showGuide) {
                 chrome.tabs.create({url: chrome.runtime.getURL('/bg/guide.html')});
             }
@@ -782,7 +779,7 @@ class Backend {
     async _onCommandSearch(params) {
         const {mode='existingOrNewTab', query} = params || {};
 
-        const options = this.getOptions(this._optionsContext);
+        const options = this.getOptions({current: true});
         const {popupWidth, popupHeight} = options.general;
 
         const baseUrl = chrome.runtime.getURL('/bg/search.html');
@@ -859,7 +856,7 @@ class Backend {
 
     async _onCommandToggle() {
         const source = 'popup';
-        const options = this.getOptions(this._optionsContext);
+        const options = this.getOptions({current: true});
         options.general.enable = !options.general.enable;
         await this._onApiOptionsSave({source});
     }
@@ -891,7 +888,7 @@ class Backend {
     }
 
     _applyOptions(source) {
-        const options = this.getOptions(this._optionsContext);
+        const options = this.getOptions({current: true});
         this._updateBadge();
 
         this._anki.setServer(options.anki.server);
@@ -915,11 +912,14 @@ class Backend {
     _getProfile(optionsContext, useSchema=false) {
         const options = this.getFullOptions(useSchema);
         const profiles = options.profiles;
+        if (optionsContext.current) {
+            return profiles[options.profileCurrent];
+        }
         if (typeof optionsContext.index === 'number') {
             return profiles[optionsContext.index];
         }
         const profile = this._getProfileFromContext(options, optionsContext);
-        return profile !== null ? profile : options.profiles[options.profileCurrent];
+        return profile !== null ? profile : profiles[options.profileCurrent];
     }
 
     _getProfileFromContext(options, optionsContext) {
