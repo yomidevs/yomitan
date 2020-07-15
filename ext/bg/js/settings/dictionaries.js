@@ -721,6 +721,6 @@ class DictionaryController {
     }
 
     _preventPageExit() {
-        return this.settingsController.preventPageExit();
+        return this._settingsController.preventPageExit();
     }
 }
