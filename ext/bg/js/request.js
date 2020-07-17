@@ -16,10 +16,10 @@
  */
 
 
-async function requestText(url, method, data) {
+async function requestText(url, method, data, cors=false) {
     const response = await fetch(url, {
         method,
-        mode: 'no-cors',
+        mode: (cors ? 'cors' : 'no-cors'),
         cache: 'default',
         credentials: 'omit',
         redirect: 'follow',
@@ -29,10 +29,10 @@ async function requestText(url, method, data) {
     return await response.text();
 }
 
-async function requestJson(url, method, data) {
+async function requestJson(url, method, data, cors=false) {
     const response = await fetch(url, {
         method,
-        mode: 'no-cors',
+        mode: (cors ? 'cors' : 'no-cors'),
         cache: 'default',
         credentials: 'omit',
         redirect: 'follow',
