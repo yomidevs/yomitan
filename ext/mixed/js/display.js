@@ -95,7 +95,6 @@ class Display {
 
     async prepare() {
         this._setInteractive(true);
-        await yomichan.ready();
         await this._displayGenerator.prepare();
         yomichan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
     }

@@ -23,6 +23,7 @@
 (async () => {
     try {
         api.forwardLogsToBackend();
+        await yomichan.ready();
 
         const display = new DisplayFloat();
         await display.prepare();

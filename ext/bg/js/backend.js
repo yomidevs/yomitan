@@ -1383,4 +1383,59 @@ class Backend {
             // Edge throws exception for no reason here.
         }
     }
+
+    _waitUntilTabFrameIsReady(tabId, frameId, timeout=null) {
+        return new Promise((resolve, reject) => {
+            let timer = null;
+            let onMessage = (message, sender) => {
+                if (
+                    !sender.tab ||
+                    sender.tab.id !== tabId ||
+                    sender.frameId !== frameId ||
+                    !isObject(message) ||
+                    message.action !== 'yomichanCoreReady'
+                ) {
+                    return;
+                }
+
+                cleanup();
+                resolve();
+            };
+            const cleanup = () => {
+                if (timer !== null) {
+                    clearTimeout(timer);
+                    timer = null;
+                }
+                if (onMessage !== null) {
+                    chrome.runtime.onMessage.removeListener(onMessage);
+                    onMessage = null;
+                }
+            };
+
+            chrome.runtime.onMessage.addListener(onMessage);
+
+            chrome.tabs.sendMessage(tabId, {action: 'isReady'}, {frameId}, (response) => {
+                const error = chrome.runtime.lastError;
+                if (error) { return; }
+
+                try {
+                    const value = yomichan.getMessageResponseResult(response);
+                    if (!value) { return; }
+
+                    cleanup();
+                    resolve();
+                } catch (e) {
+                    // NOP
+                }
+            });
+
+            if (timeout !== null) {
+                timer = setTimeout(() => {
+                    timer = null;
+                    cleanup();
+                    reject(new Error('Timeout'));
+                }, timeout);
+            }
+        });
+    }
 }

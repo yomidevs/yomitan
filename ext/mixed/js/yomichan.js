@@ -48,12 +48,14 @@ const yomichan = (() => {
             }
 
             this._isExtensionUnloaded = false;
+            this._isReady = false;
 
             const {promise, resolve} = deferPromise();
             this._isBackendPreparedPromise = promise;
             this._isBackendPreparedPromiseResolve = resolve;
 
             this._messageHandlers = new Map([
+                ['isReady',         {async: false, handler: this._onMessageIsReady.bind(this)}],
                 ['backendPrepared', {async: false, handler: this._onMessageBackendPrepared.bind(this)}],
                 ['getUrl',          {async: false, handler: this._onMessageGetUrl.bind(this)}],
                 ['optionsUpdated',  {async: false, handler: this._onMessageOptionsUpdated.bind(this)}],
@@ -72,6 +74,7 @@ const yomichan = (() => {
         }
 
         ready() {
+            this._isReady = true;
             this.sendMessage({action: 'yomichanCoreReady'});
             return this._isBackendPreparedPromise;
         }
@@ -266,6 +269,10 @@ const yomichan = (() => {
             const messageHandler = this._messageHandlers.get(action);
             if (typeof messageHandler === 'undefined') { return false; }
             return this.invokeMessageHandler(messageHandler, params, callback, sender);
+        }
+
+        _onMessageIsReady() {
+            return this._isReady;
         }
 
         _onMessageBackendPrepared() {
