@@ -19,11 +19,10 @@
  * api
  */
 
-function showExtensionInfo() {
+function showExtensionInfo(manifest) {
     const node = document.getElementById('extension-info');
     if (node === null) { return; }
 
-    const manifest = chrome.runtime.getManifest();
     node.textContent = `${manifest.name} v${manifest.version}`;
 }
 
@@ -49,44 +48,43 @@ function setupButtonEvents(selector, command, url) {
     }
 }
 
-async function mainInner() {
-    api.forwardLogsToBackend();
-    await yomichan.ready();
+async function setupEnvironment() {
+    // Firefox mobile opens this page as a full webpage.
+    const {browser} = await api.getEnvironmentInfo();
+    document.documentElement.dataset.mode = (browser === 'firefox-mobile' ? 'full' : 'mini');
+}
 
-    await api.logIndicatorClear();
-
-    showExtensionInfo();
-
-    api.getEnvironmentInfo().then(({browser}) => {
-        // Firefox mobile opens this page as a full webpage.
-        document.documentElement.dataset.mode = (browser === 'firefox-mobile' ? 'full' : 'mini');
-    });
-
-    const manifest = chrome.runtime.getManifest();
-
-    setupButtonEvents('.action-open-search', 'search', chrome.runtime.getURL('/bg/search.html'));
-    setupButtonEvents('.action-open-options', 'options', chrome.runtime.getURL(manifest.options_ui.page));
-    setupButtonEvents('.action-open-help', 'help', 'https://foosoft.net/projects/yomichan/');
-
+async function setupOptions() {
     const optionsContext = {
         depth: 0,
         url: window.location.href
     };
-    api.optionsGet(optionsContext).then((options) => {
-        const toggle = document.querySelector('#enable-search');
-        toggle.checked = options.general.enable;
-        toggle.addEventListener('change', () => api.commandExec('toggle'), false);
+    const options = await api.optionsGet(optionsContext);
 
-        const toggle2 = document.querySelector('#enable-search2');
-        toggle2.checked = options.general.enable;
-        toggle2.addEventListener('change', () => api.commandExec('toggle'), false);
+    const toggle = document.querySelector('#enable-search');
+    toggle.checked = options.general.enable;
+    toggle.addEventListener('change', () => api.commandExec('toggle'), false);
 
-        setTimeout(() => {
-            document.body.dataset.loaded = 'true';
-        }, 10);
-    });
+    const toggle2 = document.querySelector('#enable-search2');
+    toggle2.checked = options.general.enable;
+    toggle2.addEventListener('change', () => api.commandExec('toggle'), false);
+
+    setTimeout(() => {
+        document.body.dataset.loaded = 'true';
+    }, 10);
 }
 
 (async () => {
-    window.addEventListener('DOMContentLoaded', mainInner, false);
+    api.forwardLogsToBackend();
+    await yomichan.ready();
+
+    const manifest = chrome.runtime.getManifest();
+
+    api.logIndicatorClear();
+    showExtensionInfo(manifest);
+    setupEnvironment();
+    setupOptions();
+    setupButtonEvents('.action-open-search', 'search', chrome.runtime.getURL('/bg/search.html'));
+    setupButtonEvents('.action-open-options', 'options', chrome.runtime.getURL(manifest.options_ui.page));
+    setupButtonEvents('.action-open-help', 'help', 'https://foosoft.net/projects/yomichan/');
 })();
