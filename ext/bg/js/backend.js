@@ -1301,7 +1301,7 @@ class Backend {
             chrome.tabs.sendMessage(tab.id, {action: 'getUrl'}, {frameId: 0}, (response) => {
                 let url = null;
                 try {
-                    url = yomichan.getMessageResponseResult(response);
+                    ({url} = yomichan.getMessageResponseResult(response));
                 } catch (error) {
                     // NOP
                 }
