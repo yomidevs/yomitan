@@ -147,26 +147,13 @@ class Frontend {
     }
 
     async updateOptions() {
-        const optionsContext = await this.getOptionsContext();
-        this._options = await api.optionsGet(optionsContext);
-
-        await this._updatePopup();
-
-        this._textScanner.setOptions(this._options);
-        this._updateTextScannerEnabled();
-
-        const ignoreNodes = ['.scan-disable', '.scan-disable *'];
-        if (!this._options.scanning.enableOnPopupExpressions) {
-            ignoreNodes.push('.source-text', '.source-text *');
-        }
-        this._textScanner.ignoreNodes = ignoreNodes.join(',');
-
-        this._updateContentScale();
-
-        const textSourceCurrent = this._textScanner.getCurrentTextSource();
-        const causeCurrent = this._textScanner.causeCurrent;
-        if (textSourceCurrent !== null && causeCurrent !== null) {
-            await this._search(textSourceCurrent, causeCurrent);
+        try {
+            await this._updateOptionsInternal();
+        } catch (e) {
+            if (!yomichan.isExtensionUnloaded) {
+                throw e;
+            }
+            this._showExtensionUnloaded(null);
         }
     }
 
@@ -241,6 +228,30 @@ class Frontend {
             return;
         }
         await this.updateOptions();
+    }
+
+    async _updateOptionsInternal() {
+        const optionsContext = await this.getOptionsContext();
+        this._options = await api.optionsGet(optionsContext);
+
+        await this._updatePopup();
+
+        this._textScanner.setOptions(this._options);
+        this._updateTextScannerEnabled();
+
+        const ignoreNodes = ['.scan-disable', '.scan-disable *'];
+        if (!this._options.scanning.enableOnPopupExpressions) {
+            ignoreNodes.push('.source-text', '.source-text *');
+        }
+        this._textScanner.ignoreNodes = ignoreNodes.join(',');
+
+        this._updateContentScale();
+
+        const textSourceCurrent = this._textScanner.getCurrentTextSource();
+        const causeCurrent = this._textScanner.causeCurrent;
+        if (textSourceCurrent !== null && causeCurrent !== null) {
+            await this._search(textSourceCurrent, causeCurrent);
+        }
     }
 
     async _updatePopup() {
@@ -328,8 +339,15 @@ class Frontend {
         return this._popup === null || this._popup.isProxy() ? [] : [this._popup.getContainer()];
     }
 
-    _ignorePoint(x, y) {
-        return this._popup !== null && this._popup.containsPoint(x, y);
+    async _ignorePoint(x, y) {
+        try {
+            return this._popup !== null && await this._popup.containsPoint(x, y);
+        } catch (e) {
+            if (!yomichan.isExtensionUnloaded) {
+                throw e;
+            }
+            return false;
+        }
     }
 
     async _search(textSource, cause) {
@@ -352,7 +370,7 @@ class Frontend {
         } catch (e) {
             if (yomichan.isExtensionUnloaded) {
                 if (textSource !== null && this._options.scanning.modifier !== 'none') {
-                    this._showPopupContent(textSource, await this.getOptionsContext(), 'extensionUnloaded');
+                    this._showExtensionUnloaded(textSource);
                 }
             } else {
                 yomichan.logError(e);
@@ -392,6 +410,14 @@ class Frontend {
         return {definitions, type: 'kanji'};
     }
 
+    async _showExtensionUnloaded(textSource) {
+        if (textSource === null) {
+            textSource = this._textScanner.getCurrentTextSource();
+            if (textSource === null) { return; }
+        }
+        this._showPopupContent(textSource, await this.getOptionsContext());
+    }
+
     _showContent(textSource, focus, definitions, type, optionsContext) {
         const {url} = optionsContext;
         const sentenceExtent = this._options.anki.sentenceExt;
@@ -414,6 +440,10 @@ class Frontend {
             details,
             context
         );
+        this._lastShowPromise.catch((error) => {
+            if (yomichan.isExtensionUnloaded) { return; }
+            yomichan.logError(error);
+        });
         return this._lastShowPromise;
     }
 

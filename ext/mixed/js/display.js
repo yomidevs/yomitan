@@ -97,14 +97,12 @@ class Display {
         this._setInteractive(true);
         await yomichan.ready();
         await this._displayGenerator.prepare();
+        yomichan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
     }
 
     onError(error) {
-        if (yomichan.isExtensionUnloaded) {
-            this.setContent('extensionUnloaded');
-        } else {
-            yomichan.logError(error);
-        }
+        if (yomichan.isExtensionUnloaded) { return; }
+        yomichan.logError(error);
     }
 
     onEscape() {
@@ -176,9 +174,6 @@ class Display {
                 case 'kanji':
                     await this._setContentKanji(details.definitions, details.context, token);
                     break;
-                case 'extensionUnloaded':
-                    this._setContentExtensionUnloaded();
-                    break;
             }
         } catch (e) {
             this.onError(e);
@@ -235,6 +230,10 @@ class Display {
     }
 
     // Private
+
+    _onExtensionUnloaded() {
+        this._setContentExtensionUnloaded();
+    }
 
     _onSourceTermView(e) {
         e.preventDefault();

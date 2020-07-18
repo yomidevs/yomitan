@@ -83,6 +83,7 @@ class Popup {
         this._frame.addEventListener('mousedown', (e) => e.stopPropagation());
         this._frame.addEventListener('scroll', (e) => e.stopPropagation());
         this._frame.addEventListener('load', this._onFrameLoad.bind(this));
+        yomichan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
     }
 
     isProxy() {
@@ -149,8 +150,12 @@ class Popup {
         this._invokeApi('setCustomCss', {css});
     }
 
-    clearAutoPlayTimer() {
-        this._invokeApi('clearAutoPlayTimer');
+    async clearAutoPlayTimer() {
+        try {
+            await this._invokeApi('clearAutoPlayTimer');
+        } catch (e) {
+            // NOP
+        }
     }
 
     setContentScale(scale) {
@@ -447,6 +452,18 @@ class Popup {
         return await api.crossFrame.invoke(this._frameClient.frameId, 'popupMessage', message);
     }
 
+    _invokeWindowApi(action, params={}) {
+        const contentWindow = this._frame.contentWindow;
+        if (this._frameClient === null || !this._frameClient.isConnected() || contentWindow === null) { return; }
+
+        const message = this._frameClient.createMessage({action, params});
+        contentWindow.postMessage(message, this._targetOrigin);
+    }
+
+    _onExtensionUnloaded() {
+        this._invokeWindowApi('extensionUnloaded');
+    }
+
     _getFrameParentElement() {
         const defaultParent = document.body;
         const fullscreenElement = DOM.getFullscreenElement();
@@ -635,16 +652,5 @@ class Popup {
             right: (body !== null ? body.clientWidth : 0),
             bottom: window.innerHeight
         };
-    }
-
-    static isFrameAboutBlank(frame) {
-        try {
-            const contentDocument = frame.contentDocument;
-            if (contentDocument === null) { return false; }
-            const url = contentDocument.location.href;
-            return /^about:blank(?:[#?]|$)/.test(url);
-        } catch (e) {
-            return false;
-        }
     }
 }

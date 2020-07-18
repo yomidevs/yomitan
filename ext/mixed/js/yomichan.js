@@ -196,7 +196,7 @@ const yomichan = (() => {
             try {
                 return chrome.runtime.sendMessage(...args);
             } catch (e) {
-                this._onExtensionUnloaded(e);
+                this.triggerExtensionUnloaded();
                 throw e;
             }
         }
@@ -205,7 +205,7 @@ const yomichan = (() => {
             try {
                 return chrome.runtime.connect(...args);
             } catch (e) {
-                this._onExtensionUnloaded(e);
+                this.triggerExtensionUnloaded();
                 throw e;
             }
         }
@@ -247,12 +247,12 @@ const yomichan = (() => {
             }
         }
 
-        // Private
-
-        _onExtensionUnloaded(error) {
+        triggerExtensionUnloaded() {
             this._isExtensionUnloaded = true;
-            this.trigger('extensionUnloaded', {error});
+            this.trigger('extensionUnloaded');
         }
+
+        // Private
 
         _getUrl() {
             return (typeof window === 'object' && window !== null ? window.location.href : '');

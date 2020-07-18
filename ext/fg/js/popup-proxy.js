@@ -69,7 +69,11 @@ class PopupProxy extends EventDispatcher {
     }
 
     async isVisible() {
-        return await this._invoke('isVisible', {id: this._id});
+        try {
+            return await this._invoke('isVisible', {id: this._id});
+        } catch (e) {
+            return false;
+        }
     }
 
     setVisibleOverride(visible) {
@@ -98,8 +102,12 @@ class PopupProxy extends EventDispatcher {
         this._invoke('setCustomCss', {id: this._id, css});
     }
 
-    clearAutoPlayTimer() {
-        this._invoke('clearAutoPlayTimer', {id: this._id});
+    async clearAutoPlayTimer() {
+        try {
+            await this._invoke('clearAutoPlayTimer', {id: this._id});
+        } catch (e) {
+            // NOP
+        }
     }
 
     setContentScale(scale) {

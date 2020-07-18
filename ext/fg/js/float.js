@@ -31,13 +31,16 @@ class DisplayFloat extends Display {
         this._nestedPopupsPrepared = false;
         this._ownerFrameId = null;
         this._frameEndpoint = new FrameEndpoint();
-        this._windowMessageHandlers = new Map([
+        this._messageHandlers = new Map([
             ['configure',          {async: true,  handler: this._onMessageConfigure.bind(this)}],
             ['setOptionsContext',  {async: false, handler: this._onMessageSetOptionsContext.bind(this)}],
             ['setContent',         {async: false, handler: this._onMessageSetContent.bind(this)}],
             ['clearAutoPlayTimer', {async: false, handler: this._onMessageClearAutoPlayTimer.bind(this)}],
             ['setCustomCss',       {async: false, handler: this._onMessageSetCustomCss.bind(this)}],
             ['setContentScale',    {async: false, handler: this._onMessageSetContentScale.bind(this)}]
+        ]);
+        this._windowMessageHandlers = new Map([
+            ['extensionUnloaded', {async: false, handler: this._onMessageExtensionUnloaded.bind(this)}]
         ]);
 
         this.registerActions([
@@ -54,6 +57,7 @@ class DisplayFloat extends Display {
         api.crossFrame.registerHandlers([
             ['popupMessage', {async: 'dynamic', handler: this._onMessage.bind(this)}]
         ]);
+        window.addEventListener('message', this._onWindowMessage.bind(this), false);
 
         this._frameEndpoint.signal();
     }
@@ -107,7 +111,7 @@ class DisplayFloat extends Display {
         }
 
         const {action, params} = data.data;
-        const handlerInfo = this._windowMessageHandlers.get(action);
+        const handlerInfo = this._messageHandlers.get(action);
         if (typeof handlerInfo === 'undefined') {
             throw new Error(`Invalid action: ${action}`);
         }
@@ -115,6 +119,18 @@ class DisplayFloat extends Display {
         const {async, handler} = handlerInfo;
         const result = handler(params);
         return {async, result};
+    }
+
+    _onWindowMessage(e) {
+        const data = e.data;
+        if (!this._frameEndpoint.authenticate(data)) { return; }
+
+        const {action, params} = data.data;
+        const messageHandler = this._windowMessageHandlers.get(action);
+        if (typeof messageHandler === 'undefined') { return; }
+
+        const callback = () => {}; // NOP
+        yomichan.invokeMessageHandler(messageHandler, params, callback);
     }
 
     async _onMessageConfigure({frameId, ownerFrameId, popupId, optionsContext, childrenSupported, scale}) {
@@ -150,6 +166,11 @@ class DisplayFloat extends Display {
 
     _onMessageSetContentScale({scale}) {
         this._setContentScale(scale);
+    }
+
+    _onMessageExtensionUnloaded() {
+        if (yomichan.isExtensionUnloaded) { return; }
+        yomichan.triggerExtensionUnloaded();
     }
 
     // Private
