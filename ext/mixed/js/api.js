@@ -212,16 +212,13 @@ const api = (() => {
         _createActionPort(timeout=5000) {
             return new Promise((resolve, reject) => {
                 let timer = null;
-                const {
-                    promise: portNamePromise,
-                    resolve: portNameResolve,
-                    reject: portNameReject
-                } = deferPromise();
+                const portDetails = deferPromise();
 
                 const onConnect = async (port) => {
                     try {
-                        const portName = await portNamePromise;
-                        if (port.name !== portName || timer === null) { return; }
+                        const {name: expectedName, id: expectedId} = await portDetails.promise;
+                        const {name, id} = JSON.parse(port.name);
+                        if (name !== expectedName || id !== expectedId || timer === null) { return; }
                     } catch (e) {
                         return;
                     }
@@ -239,14 +236,14 @@ const api = (() => {
                         timer = null;
                     }
                     chrome.runtime.onConnect.removeListener(onConnect);
-                    portNameReject(e);
+                    portDetails.reject(e);
                     reject(e);
                 };
 
                 timer = setTimeout(() => onError(new Error('Timeout')), timeout);
 
                 chrome.runtime.onConnect.addListener(onConnect);
-                this._invoke('createActionPort').then(portNameResolve, onError);
+                this._invoke('createActionPort').then(portDetails.resolve, onError);
             });
         }
 

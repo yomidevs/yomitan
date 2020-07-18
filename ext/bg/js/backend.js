@@ -305,20 +305,32 @@ class Backend {
 
     _onConnect(port) {
         try {
-            const match = /^background-cross-frame-communication-port-(\d+)$/.exec(`${port.name}`);
-            if (match === null) { return; }
+            let details;
+            try {
+                details = JSON.parse(port.name);
+            } catch (e) {
+                return;
+            }
+            if (details.name !== 'background-cross-frame-communication-port') { return; }
 
             const tabId = (port.sender && port.sender.tab ? port.sender.tab.id : null);
             if (typeof tabId !== 'number') {
                 throw new Error('Port does not have an associated tab ID');
             }
             const senderFrameId = port.sender.frameId;
-            if (typeof tabId !== 'number') {
+            if (typeof senderFrameId !== 'number') {
                 throw new Error('Port does not have an associated frame ID');
             }
-            const targetFrameId = parseInt(match[1], 10);
+            let {targetTabId, targetFrameId} = details;
+            if (typeof targetTabId !== 'number') {
+                targetTabId = tabId;
+            }
 
-            let forwardPort = chrome.tabs.connect(tabId, {frameId: targetFrameId, name: `cross-frame-communication-port-${senderFrameId}`});
+            const details2 = {
+                name: 'cross-frame-communication-port',
+                sourceFrameId: senderFrameId
+            };
+            let forwardPort = chrome.tabs.connect(targetTabId, {frameId: targetFrameId, name: JSON.stringify(details2)});
 
             const cleanup = () => {
                 this._checkLastError(chrome.runtime.lastError);
@@ -720,9 +732,12 @@ class Backend {
 
         const frameId = sender.frameId;
         const id = yomichan.generateId(16);
-        const portName = `action-port-${id}`;
+        const details = {
+            name: 'action-port',
+            id
+        };
 
-        const port = chrome.tabs.connect(tabId, {name: portName, frameId});
+        const port = chrome.tabs.connect(tabId, {name: JSON.stringify(details), frameId});
         try {
             this._createActionListenerPort(port, sender, this._messageHandlersWithProgress);
         } catch (e) {
@@ -730,7 +745,7 @@ class Backend {
             throw e;
         }
 
-        return portName;
+        return details;
     }
 
     async _onApiImportDictionaryArchive({archiveContent, details}, sender, onProgress) {

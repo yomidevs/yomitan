@@ -16,14 +16,19 @@
  */
 
 class CrossFrameAPIPort extends EventDispatcher {
-    constructor(otherFrameId, port, messageHandlers) {
+    constructor(otherTabId, otherFrameId, port, messageHandlers) {
         super();
+        this._otherTabId = otherTabId;
         this._otherFrameId = otherFrameId;
         this._port = port;
         this._messageHandlers = messageHandlers;
         this._activeInvocations = new Map();
         this._invocationId = 0;
         this._eventListeners = new EventListenerCollection();
+    }
+
+    get otherTabId() {
+        return this._otherTabId;
     }
 
     get otherFrameId() {
@@ -211,8 +216,12 @@ class CrossFrameAPI {
         chrome.runtime.onConnect.addListener(this._onConnect.bind(this));
     }
 
-    async invoke(targetFrameId, action, params={}) {
-        const commPort = this._getOrCreateCommPort(targetFrameId);
+    invoke(targetFrameId, action, params={}) {
+        return this.invokeTab(null, targetFrameId, action, params);
+    }
+
+    async invokeTab(targetTabId, targetFrameId, action, params={}) {
+        const commPort = this._getOrCreateCommPort(targetTabId, targetFrameId);
         return await commPort.invoke(action, params, this._ackTimeout, this._responseTimeout);
     }
 
@@ -226,31 +235,65 @@ class CrossFrameAPI {
     }
 
     _onConnect(port) {
-        const match = /^cross-frame-communication-port-(\d+)$/.exec(`${port.name}`);
-        if (match === null) { return; }
+        try {
+            let details;
+            try {
+                details = JSON.parse(port.name);
+            } catch (e) {
+                return;
+            }
+            if (details.name !== 'cross-frame-communication-port') { return; }
 
-        const otherFrameId = parseInt(match[1], 10);
-        this._setupCommPort(otherFrameId, port);
+            const otherTabId = details.sourceTabId;
+            const otherFrameId = details.sourceFrameId;
+            this._setupCommPort(otherTabId, otherFrameId, port);
+        } catch (e) {
+            port.disconnect();
+            yomichan.logError(e);
+        }
     }
 
     _onDisconnect(commPort) {
         commPort.off('disconnect', this._onDisconnectBind);
-        this._commPorts.delete(commPort.otherFrameId);
+        const {otherTabId, otherFrameId} = commPort;
+        const tabPorts = this._commPorts.get(otherTabId);
+        if (typeof tabPorts !== 'undefined') {
+            tabPorts.delete(otherFrameId);
+            if (tabPorts.size === 0) {
+                this._commPorts.delete(otherTabId);
+            }
+        }
     }
 
-    _getOrCreateCommPort(otherFrameId) {
-        const commPort = this._commPorts.get(otherFrameId);
-        return (typeof commPort !== 'undefined' ? commPort : this._createCommPort(otherFrameId));
+    _getOrCreateCommPort(otherTabId, otherFrameId) {
+        const tabPorts = this._commPorts.get(otherTabId);
+        if (typeof tabPorts !== 'undefined') {
+            const commPort = tabPorts.get(otherFrameId);
+            if (typeof commPort !== 'undefined') {
+                return commPort;
+            }
+        }
+        return this._createCommPort(otherTabId, otherFrameId);
     }
 
-    _createCommPort(otherFrameId) {
-        const port = yomichan.connect(null, {name: `background-cross-frame-communication-port-${otherFrameId}`});
-        return this._setupCommPort(otherFrameId, port);
+    _createCommPort(otherTabId, otherFrameId) {
+        const details = {
+            name: 'background-cross-frame-communication-port',
+            targetTabId: otherTabId,
+            targetFrameId: otherFrameId
+        };
+        const port = yomichan.connect(null, {name: JSON.stringify(details)});
+        return this._setupCommPort(otherTabId, otherFrameId, port);
     }
 
-    _setupCommPort(otherFrameId, port) {
-        const commPort = new CrossFrameAPIPort(otherFrameId, port, this._messageHandlers);
-        this._commPorts.set(otherFrameId, commPort);
+    _setupCommPort(otherTabId, otherFrameId, port) {
+        const commPort = new CrossFrameAPIPort(otherTabId, otherFrameId, port, this._messageHandlers);
+        let tabPorts = this._commPorts.get(otherTabId);
+        if (typeof tabPorts === 'undefined') {
+            tabPorts = new Map();
+            this._commPorts.set(otherTabId, tabPorts);
+        }
+        tabPorts.set(otherFrameId, commPort);
         commPort.prepare();
         commPort.on('disconnect', this._onDisconnectBind);
         return commPort;
