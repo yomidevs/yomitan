@@ -85,7 +85,7 @@ class Backend {
         this._logErrorLevel = null;
 
         this._messageHandlers = new Map([
-            ['yomichanCoreReady',            {async: false, contentScript: true,  handler: this._onApiYomichanCoreReady.bind(this)}],
+            ['requestBackendReadySignal',    {async: false, contentScript: true,  handler: this._onApiRequestBackendReadySignal.bind(this)}],
             ['optionsSchemaGet',             {async: false, contentScript: true,  handler: this._onApiOptionsSchemaGet.bind(this)}],
             ['optionsGet',                   {async: false, contentScript: true,  handler: this._onApiOptionsGet.bind(this)}],
             ['optionsGetFull',               {async: false, contentScript: true,  handler: this._onApiOptionsGetFull.bind(this)}],
@@ -212,9 +212,9 @@ class Backend {
 
             this._clipboardMonitor.on('change', this._onClipboardTextChange.bind(this));
 
-            this._sendMessageAllTabs('backendPrepared');
+            this._sendMessageAllTabs('backendReady');
             const callback = () => this._checkLastError(chrome.runtime.lastError);
-            chrome.runtime.sendMessage({action: 'backendPrepared'}, callback);
+            chrome.runtime.sendMessage({action: 'backendReady'}, callback);
         } catch (e) {
             yomichan.logError(e);
             throw e;
@@ -361,10 +361,10 @@ class Backend {
 
     // Message handlers
 
-    _onApiYomichanCoreReady(_params, sender) {
+    _onApiRequestBackendReadySignal(_params, sender) {
         // tab ID isn't set in background (e.g. browser_action)
         const callback = () => this._checkLastError(chrome.runtime.lastError);
-        const data = {action: 'backendPrepared'};
+        const data = {action: 'backendReady'};
         if (typeof sender.tab === 'undefined') {
             chrome.runtime.sendMessage(data, callback);
             return false;
@@ -1393,7 +1393,7 @@ class Backend {
                     sender.tab.id !== tabId ||
                     sender.frameId !== frameId ||
                     !isObject(message) ||
-                    message.action !== 'yomichanCoreReady'
+                    message.action !== 'yomichanReady'
                 ) {
                     return;
                 }

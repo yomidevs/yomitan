@@ -51,15 +51,15 @@ const yomichan = (() => {
             this._isReady = false;
 
             const {promise, resolve} = deferPromise();
-            this._isBackendPreparedPromise = promise;
-            this._isBackendPreparedPromiseResolve = resolve;
+            this._isBackendReadyPromise = promise;
+            this._isBackendReadyPromiseResolve = resolve;
 
             this._messageHandlers = new Map([
-                ['isReady',         {async: false, handler: this._onMessageIsReady.bind(this)}],
-                ['backendPrepared', {async: false, handler: this._onMessageBackendPrepared.bind(this)}],
-                ['getUrl',          {async: false, handler: this._onMessageGetUrl.bind(this)}],
-                ['optionsUpdated',  {async: false, handler: this._onMessageOptionsUpdated.bind(this)}],
-                ['zoomChanged',     {async: false, handler: this._onMessageZoomChanged.bind(this)}]
+                ['isReady',        {async: false, handler: this._onMessageIsReady.bind(this)}],
+                ['backendReady',   {async: false, handler: this._onMessageBackendReady.bind(this)}],
+                ['getUrl',         {async: false, handler: this._onMessageGetUrl.bind(this)}],
+                ['optionsUpdated', {async: false, handler: this._onMessageOptionsUpdated.bind(this)}],
+                ['zoomChanged',    {async: false, handler: this._onMessageZoomChanged.bind(this)}]
             ]);
         }
 
@@ -73,10 +73,14 @@ const yomichan = (() => {
             chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
         }
 
+        backendReady() {
+            this.sendMessage({action: 'requestBackendReadySignal'});
+            return this._isBackendReadyPromise;
+        }
+
         ready() {
             this._isReady = true;
-            this.sendMessage({action: 'yomichanCoreReady'});
-            return this._isBackendPreparedPromise;
+            this.sendMessage({action: 'yomichanReady'});
         }
 
         generateId(length) {
@@ -275,10 +279,10 @@ const yomichan = (() => {
             return this._isReady;
         }
 
-        _onMessageBackendPrepared() {
-            if (this._isBackendPreparedPromiseResolve === null) { return; }
-            this._isBackendPreparedPromiseResolve();
-            this._isBackendPreparedPromiseResolve = null;
+        _onMessageBackendReady() {
+            if (this._isBackendReadyPromiseResolve === null) { return; }
+            this._isBackendReadyPromiseResolve();
+            this._isBackendReadyPromiseResolve = null;
         }
 
         _onMessageGetUrl() {

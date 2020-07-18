@@ -76,7 +76,7 @@ async function setupOptions() {
 
 (async () => {
     api.forwardLogsToBackend();
-    await yomichan.ready();
+    await yomichan.backendReady();
 
     const manifest = chrome.runtime.getManifest();
 
@@ -87,4 +87,6 @@ async function setupOptions() {
     setupButtonEvents('.action-open-search', 'search', chrome.runtime.getURL('/bg/search.html'));
     setupButtonEvents('.action-open-options', 'options', chrome.runtime.getURL(manifest.options_ui.page));
     setupButtonEvents('.action-open-help', 'help', 'https://foosoft.net/projects/yomichan/');
+
+    yomichan.ready();
 })();

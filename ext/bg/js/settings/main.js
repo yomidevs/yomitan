@@ -63,45 +63,51 @@ async function setupEnvironmentInfo() {
 
 
 (async () => {
-    api.forwardLogsToBackend();
-    await yomichan.ready();
+    try {
+        api.forwardLogsToBackend();
+        await yomichan.backendReady();
 
-    setupEnvironmentInfo();
-    showExtensionInformation();
-    settingsPopulateModifierKeys();
+        setupEnvironmentInfo();
+        showExtensionInformation();
+        settingsPopulateModifierKeys();
 
-    const optionsFull = await api.optionsGetFull();
+        const optionsFull = await api.optionsGetFull();
 
-    const settingsController = new SettingsController(optionsFull.profileCurrent);
-    settingsController.prepare();
+        const settingsController = new SettingsController(optionsFull.profileCurrent);
+        settingsController.prepare();
 
-    const storageController = new StorageController();
-    storageController.prepare();
+        const storageController = new StorageController();
+        storageController.prepare();
 
-    const genericSettingController = new GenericSettingController(settingsController);
-    genericSettingController.prepare();
+        const genericSettingController = new GenericSettingController(settingsController);
+        genericSettingController.prepare();
 
-    const clipboardPopupsController = new ClipboardPopupsController(settingsController);
-    clipboardPopupsController.prepare();
+        const clipboardPopupsController = new ClipboardPopupsController(settingsController);
+        clipboardPopupsController.prepare();
 
-    const popupPreviewController = new PopupPreviewController(settingsController);
-    popupPreviewController.prepare();
+        const popupPreviewController = new PopupPreviewController(settingsController);
+        popupPreviewController.prepare();
 
-    const audioController = new AudioController(settingsController);
-    audioController.prepare();
+        const audioController = new AudioController(settingsController);
+        audioController.prepare();
 
-    const profileController = new ProfileController(settingsController);
-    profileController.prepare();
+        const profileController = new ProfileController(settingsController);
+        profileController.prepare();
 
-    const dictionaryController = new DictionaryController(settingsController, storageController);
-    dictionaryController.prepare();
+        const dictionaryController = new DictionaryController(settingsController, storageController);
+        dictionaryController.prepare();
 
-    const ankiController = new AnkiController(settingsController);
-    ankiController.prepare();
+        const ankiController = new AnkiController(settingsController);
+        ankiController.prepare();
 
-    const ankiTemplatesController = new AnkiTemplatesController(settingsController, ankiController);
-    ankiTemplatesController.prepare();
+        const ankiTemplatesController = new AnkiTemplatesController(settingsController, ankiController);
+        ankiTemplatesController.prepare();
 
-    const settingsBackup = new SettingsBackup(settingsController);
-    settingsBackup.prepare();
+        const settingsBackup = new SettingsBackup(settingsController);
+        settingsBackup.prepare();
+
+        yomichan.ready();
+    } catch (e) {
+        yomichan.logError(e);
+    }
 })();
