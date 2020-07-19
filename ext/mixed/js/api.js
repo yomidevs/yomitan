@@ -197,6 +197,10 @@ const api = (() => {
             return this._invoke('setAllSettings', {value, source});
         }
 
+        getOrCreateSearchPopup(details) {
+            return this._invoke('getOrCreateSearchPopup', isObject(details) ? details : {});
+        }
+
         // Invoke functions with progress
 
         importDictionaryArchive(archiveContent, details, onProgress) {

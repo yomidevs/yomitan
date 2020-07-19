@@ -216,12 +216,12 @@ class DisplaySearch extends Display {
         this._clipboardMonitor.setPreviousText(window.getSelection().toString().trim());
     }
 
-    _onExternalSearchUpdate({text}) {
+    _onExternalSearchUpdate({text, animate=true}) {
         this._setQuery(text);
         const url = new URL(window.location.href);
         url.searchParams.set('query', text);
         window.history.pushState(null, '', url.toString());
-        this._onSearchQueryUpdated(this._query.value, true);
+        this._onSearchQueryUpdated(this._query.value, animate);
     }
 
     async _onSearchQueryUpdated(query, animate) {
