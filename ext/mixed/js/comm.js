@@ -221,6 +221,7 @@ class CrossFrameAPI {
     }
 
     async invokeTab(targetTabId, targetFrameId, action, params={}) {
+        if (typeof targetTabId !== 'number') { targetTabId = null; }
         const commPort = this._getOrCreateCommPort(targetTabId, targetFrameId);
         return await commPort.invoke(action, params, this._ackTimeout, this._responseTimeout);
     }
