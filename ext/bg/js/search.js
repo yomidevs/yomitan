@@ -19,11 +19,8 @@
  * ClipboardMonitor
  * DOM
  * Display
- * Frontend
- * PopupFactory
  * QueryParser
  * api
- * dynamicLoader
  * wanakana
  */
 
@@ -63,11 +60,6 @@ class DisplaySearch extends Display {
         this._runtimeMessageHandlers = new Map([
             ['updateSearchQuery', {async: false, handler: this._onExternalSearchUpdate.bind(this)}]
         ]);
-
-        this.setOptionsContext({
-            depth: 0,
-            url: window.location.href
-        });
     }
 
     async prepare() {
@@ -407,7 +399,11 @@ class DisplaySearch extends Display {
             yomichan.off('optionsUpdated', onOptionsUpdated);
 
             try {
-                await this._setupNestedPopups();
+                await this.setupNestedPopups({
+                    depth: 1,
+                    proxy: false,
+                    isSearchPage: true
+                });
             } catch (e) {
                 yomichan.logError(e);
             }
@@ -416,32 +412,5 @@ class DisplaySearch extends Display {
         yomichan.on('optionsUpdated', onOptionsUpdated);
 
         await onOptionsUpdated();
-    }
-
-    async _setupNestedPopups() {
-        await dynamicLoader.loadScripts([
-            '/mixed/js/text-scanner.js',
-            '/mixed/js/frame-client.js',
-            '/fg/js/frame-offset-forwarder.js',
-            '/fg/js/popup.js',
-            '/fg/js/popup-factory.js',
-            '/fg/js/frontend.js'
-        ]);
-
-        const {frameId} = await api.frameInformationGet();
-
-        const popupFactory = new PopupFactory(frameId);
-        popupFactory.prepare();
-
-        const frontend = new Frontend(
-            frameId,
-            popupFactory,
-            {
-                depth: 1,
-                proxy: false,
-                isSearchPage: true
-            }
-        );
-        await frontend.prepare();
     }
 }

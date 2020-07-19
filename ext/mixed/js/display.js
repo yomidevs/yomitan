@@ -20,11 +20,14 @@
  * DOM
  * DisplayContext
  * DisplayGenerator
+ * Frontend
  * MediaLoader
+ * PopupFactory
  * WindowScroll
  * api
  * docRangeFromPoint
  * docSentenceExtract
+ * dynamicLoader
  */
 
 class Display {
@@ -32,7 +35,7 @@ class Display {
         this._spinner = spinner;
         this._container = container;
         this._definitions = [];
-        this._optionsContext = null;
+        this._optionsContext = {depth: 0, url: window.location.href};
         this._options = null;
         this._context = null;
         this._index = 0;
@@ -53,11 +56,14 @@ class Display {
         this._eventListenersActive = false;
         this._clickScanPrevent = false;
         this._setContentToken = null;
+        this._autoPlayAudioTimer = null;
+        this._autoPlayAudioDelay = 0;
         this._mediaLoader = new MediaLoader();
         this._displayGenerator = new DisplayGenerator({mediaLoader: this._mediaLoader});
         this._windowScroll = new WindowScroll();
         this._hotkeys = new Map();
         this._actions = new Map();
+        this._messageHandlers = new Map();
 
         this.registerActions([
             ['close',               () => { this.onEscape(); }],
@@ -91,12 +97,29 @@ class Display {
             {key: 'P',         modifiers: ['alt'], action: 'play-audio'},
             {key: 'V',         modifiers: ['alt'], action: 'view-note'}
         ]);
+        this.registerMessageHandlers([
+            ['setOptionsContext',  {async: false, handler: this._onMessageSetOptionsContext.bind(this)}],
+            ['setContent',         {async: false, handler: this._onMessageSetContent.bind(this)}],
+            ['clearAutoPlayTimer', {async: false, handler: this._onMessageClearAutoPlayTimer.bind(this)}],
+            ['setCustomCss',       {async: false, handler: this._onMessageSetCustomCss.bind(this)}]
+        ]);
+    }
+
+    get autoPlayAudioDelay() {
+        return this._autoPlayAudioDelay;
+    }
+
+    set autoPlayAudioDelay(value) {
+        this._autoPlayAudioDelay = value;
     }
 
     async prepare() {
         this._setInteractive(true);
         await this._displayGenerator.prepare();
         yomichan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
+        api.crossFrame.registerHandlers([
+            ['popupMessage', {async: 'dynamic', handler: this._onMessage.bind(this)}]
+        ]);
     }
 
     onError(error) {
@@ -155,9 +178,28 @@ class Display {
     }
 
     autoPlayAudio() {
+        this.clearAutoPlayTimer();
+
         if (this._definitions.length === 0) { return; }
 
-        this._audioPlay(this._definitions[0], this._getFirstExpressionIndex(), 0);
+        const definition = this._definitions[0];
+        const expressionIndex = this._getFirstExpressionIndex();
+        const callback = () => {
+            this._audioPlay(definition, expressionIndex, 0);
+        };
+
+        if (this._autoPlayAudioDelay > 0) {
+            this._autoPlayAudioTimer = setTimeout(callback, this._autoPlayAudioDelay);
+        } else {
+            callback();
+        }
+    }
+
+    clearAutoPlayTimer() {
+        if (this._autoPlayAudioTimer !== null) {
+            clearTimeout(this._autoPlayAudioTimer);
+            this._autoPlayAudioTimer = null;
+        }
     }
 
     async setContent(type, details) {
@@ -226,6 +268,67 @@ class Display {
             }
             handlers.push({modifiers: new Set(modifiers), action});
         }
+    }
+
+    registerMessageHandlers(handlers) {
+        for (const [name, handlerInfo] of handlers) {
+            this._messageHandlers.set(name, handlerInfo);
+        }
+    }
+
+    async setupNestedPopups(frontendInitializationData) {
+        await dynamicLoader.loadScripts([
+            '/mixed/js/text-scanner.js',
+            '/mixed/js/frame-client.js',
+            '/fg/js/popup.js',
+            '/fg/js/popup-proxy.js',
+            '/fg/js/popup-factory.js',
+            '/fg/js/frame-offset-forwarder.js',
+            '/fg/js/frontend.js'
+        ]);
+
+        const {frameId} = await api.frameInformationGet();
+
+        const popupFactory = new PopupFactory(frameId);
+        popupFactory.prepare();
+
+        const frontend = new Frontend(frameId, popupFactory, frontendInitializationData);
+        await frontend.prepare();
+    }
+
+    authenticateMessageData(data) {
+        return data;
+    }
+
+    // Message handlers
+
+    _onMessage(data) {
+        data = this.authenticateMessageData(data);
+        const {action, params} = data;
+        const handlerInfo = this._messageHandlers.get(action);
+        if (typeof handlerInfo === 'undefined') {
+            throw new Error(`Invalid action: ${action}`);
+        }
+
+        const {async, handler} = handlerInfo;
+        const result = handler(params);
+        return {async, result};
+    }
+
+    _onMessageSetOptionsContext({optionsContext}) {
+        this.setOptionsContext(optionsContext);
+    }
+
+    _onMessageSetContent({type, details}) {
+        this.setContent(type, details);
+    }
+
+    _onMessageClearAutoPlayTimer() {
+        this.clearAutoPlayTimer();
+    }
+
+    _onMessageSetCustomCss({css}) {
+        this.setCustomCss(css);
     }
 
     // Private

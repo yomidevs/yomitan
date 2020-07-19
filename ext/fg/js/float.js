@@ -18,27 +18,15 @@
 /* global
  * Display
  * FrameEndpoint
- * Frontend
- * PopupFactory
  * api
- * dynamicLoader
  */
 
 class DisplayFloat extends Display {
     constructor() {
         super(document.querySelector('#spinner'), document.querySelector('#definitions'));
-        this._autoPlayAudioTimer = null;
         this._nestedPopupsPrepared = false;
         this._ownerFrameId = null;
         this._frameEndpoint = new FrameEndpoint();
-        this._messageHandlers = new Map([
-            ['configure',          {async: true,  handler: this._onMessageConfigure.bind(this)}],
-            ['setOptionsContext',  {async: false, handler: this._onMessageSetOptionsContext.bind(this)}],
-            ['setContent',         {async: false, handler: this._onMessageSetContent.bind(this)}],
-            ['clearAutoPlayTimer', {async: false, handler: this._onMessageClearAutoPlayTimer.bind(this)}],
-            ['setCustomCss',       {async: false, handler: this._onMessageSetCustomCss.bind(this)}],
-            ['setContentScale',    {async: false, handler: this._onMessageSetContentScale.bind(this)}]
-        ]);
         this._windowMessageHandlers = new Map([
             ['extensionUnloaded', {async: false, handler: this._onMessageExtensionUnloaded.bind(this)}]
         ]);
@@ -49,13 +37,16 @@ class DisplayFloat extends Display {
         this.registerHotkeys([
             {key: 'C', modifiers: ['ctrl'], action: 'copy-host-selection'}
         ]);
+
+        this.autoPlayAudioDelay = 400;
     }
 
     async prepare() {
         await super.prepare();
 
-        api.crossFrame.registerHandlers([
-            ['popupMessage', {async: 'dynamic', handler: this._onMessage.bind(this)}]
+        this.registerMessageHandlers([
+            ['configure',       {async: true,  handler: this._onMessageConfigure.bind(this)}],
+            ['setContentScale', {async: false, handler: this._onMessageSetContentScale.bind(this)}]
         ]);
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
 
@@ -98,28 +89,14 @@ class DisplayFloat extends Display {
         }
     }
 
-    autoPlayAudio() {
-        this._clearAutoPlayTimer();
-        this._autoPlayAudioTimer = window.setTimeout(() => super.autoPlayAudio(), 400);
-    }
-
-    // Message handling
-
-    _onMessage(data) {
+    authenticateMessageData(data) {
         if (!this._frameEndpoint.authenticate(data)) {
             throw new Error('Invalid authentication');
         }
-
-        const {action, params} = data.data;
-        const handlerInfo = this._messageHandlers.get(action);
-        if (typeof handlerInfo === 'undefined') {
-            throw new Error(`Invalid action: ${action}`);
-        }
-
-        const {async, handler} = handlerInfo;
-        const result = handler(params);
-        return {async, result};
+        return data.data;
     }
+
+    // Message handling
 
     _onWindowMessage(e) {
         const data = e.data;
@@ -148,22 +125,6 @@ class DisplayFloat extends Display {
         this._setContentScale(scale);
     }
 
-    _onMessageSetOptionsContext({optionsContext}) {
-        this.setOptionsContext(optionsContext);
-    }
-
-    _onMessageSetContent({type, details}) {
-        this.setContent(type, details);
-    }
-
-    _onMessageClearAutoPlayTimer() {
-        this._clearAutoPlayTimer.bind(this);
-    }
-
-    _onMessageSetCustomCss({css}) {
-        this.setCustomCss(css);
-    }
-
     _onMessageSetContentScale({scale}) {
         this._setContentScale(scale);
     }
@@ -179,13 +140,6 @@ class DisplayFloat extends Display {
         if (window.getSelection().toString()) { return false; }
         this._invoke('copySelection');
         return true;
-    }
-
-    _clearAutoPlayTimer() {
-        if (this._autoPlayAudioTimer) {
-            window.clearTimeout(this._autoPlayAudioTimer);
-            this._autoPlayAudioTimer = null;
-        }
     }
 
     _setContentScale(scale) {
@@ -207,7 +161,13 @@ class DisplayFloat extends Display {
             yomichan.off('optionsUpdated', onOptionsUpdated);
 
             try {
-                await this._setupNestedPopups(id, depth, parentFrameId, url);
+                await this.setupNestedPopups({
+                    id,
+                    depth,
+                    parentFrameId,
+                    url,
+                    proxy: true
+                });
             } catch (e) {
                 yomichan.logError(e);
             }
@@ -216,36 +176,6 @@ class DisplayFloat extends Display {
         yomichan.on('optionsUpdated', onOptionsUpdated);
 
         await onOptionsUpdated();
-    }
-
-    async _setupNestedPopups(id, depth, parentFrameId, url) {
-        await dynamicLoader.loadScripts([
-            '/mixed/js/text-scanner.js',
-            '/mixed/js/frame-client.js',
-            '/fg/js/popup.js',
-            '/fg/js/popup-proxy.js',
-            '/fg/js/popup-factory.js',
-            '/fg/js/frame-offset-forwarder.js',
-            '/fg/js/frontend.js'
-        ]);
-
-        const {frameId} = await api.frameInformationGet();
-
-        const popupFactory = new PopupFactory(frameId);
-        popupFactory.prepare();
-
-        const frontend = new Frontend(
-            frameId,
-            popupFactory,
-            {
-                id,
-                depth,
-                parentFrameId,
-                url,
-                proxy: true
-            }
-        );
-        await frontend.prepare();
     }
 
     _invoke(action, params={}) {
