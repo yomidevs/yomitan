@@ -221,7 +221,7 @@ async function testDatabase1() {
 
         // Import data
         let progressEvent = false;
-        const {result, errors} = await dictionaryImporter.import(
+        const {result, errors} = await dictionaryImporter.importDictionary(
             dictionaryDatabase,
             testDictionarySource,
             {prefixWildcardsSupported: true},
@@ -875,17 +875,17 @@ async function testDatabase2() {
     await assert.rejects(async () => await dictionaryDatabase.findTagForTitle('tag', title));
     await assert.rejects(async () => await dictionaryDatabase.getDictionaryInfo());
     await assert.rejects(async () => await dictionaryDatabase.getDictionaryCounts(titles, true));
-    await assert.rejects(async () => await dictionaryImporter.import(dictionaryDatabase, testDictionarySource, {}, () => {}));
+    await assert.rejects(async () => await dictionaryImporter.importDictionary(dictionaryDatabase, testDictionarySource, {}, () => {}));
 
     await dictionaryDatabase.prepare();
 
     // Error: already prepared
     await assert.rejects(async () => await dictionaryDatabase.prepare());
 
-    await dictionaryImporter.import(dictionaryDatabase, testDictionarySource, {}, () => {});
+    await dictionaryImporter.importDictionary(dictionaryDatabase, testDictionarySource, {}, () => {});
 
     // Error: dictionary already imported
-    await assert.rejects(async () => await dictionaryImporter.import(dictionaryDatabase, testDictionarySource, {}, () => {}));
+    await assert.rejects(async () => await dictionaryImporter.importDictionary(dictionaryDatabase, testDictionarySource, {}, () => {}));
 
     await dictionaryDatabase.close();
 }
@@ -912,7 +912,7 @@ async function testDatabase3() {
 
         let error = null;
         try {
-            await dictionaryImporter.import(dictionaryDatabase, testDictionarySource, {}, () => {});
+            await dictionaryImporter.importDictionary(dictionaryDatabase, testDictionarySource, {}, () => {});
         } catch (e) {
             error = e;
         }

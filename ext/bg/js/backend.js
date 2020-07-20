@@ -757,7 +757,7 @@ class Backend {
     }
 
     async _onApiImportDictionaryArchive({archiveContent, details}, sender, onProgress) {
-        return await this._dictionaryImporter.import(this._dictionaryDatabase, archiveContent, details, onProgress);
+        return await this._dictionaryImporter.importDictionary(this._dictionaryDatabase, archiveContent, details, onProgress);
     }
 
     async _onApiDeleteDictionary({dictionaryName}, sender, onProgress) {
@@ -1064,7 +1064,7 @@ class Backend {
     }
 
     async _importDictionary(archiveSource, onProgress, details) {
-        return await this._dictionaryImporter.import(this._dictionaryDatabase, archiveSource, onProgress, details);
+        return await this._dictionaryImporter.importDictionary(this._dictionaryDatabase, archiveSource, onProgress, details);
     }
 
     async _textParseScanning(text, options) {

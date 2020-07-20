@@ -27,7 +27,7 @@ class DictionaryImporter {
         this._schemas = new Map();
     }
 
-    async import(dictionaryDatabase, archiveSource, details, onProgress) {
+    async importDictionary(dictionaryDatabase, archiveSource, details, onProgress) {
         if (!dictionaryDatabase) {
             throw new Error('Invalid database');
         }
