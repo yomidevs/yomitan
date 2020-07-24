@@ -432,13 +432,17 @@ class Frontend {
     }
 
     _showPopupContent(textSource, optionsContext, type=null, details=null) {
-        const context = {optionsContext, source: this._id};
         this._lastShowPromise = this._popup.showContent(
-            textSource.getRect(),
-            textSource.getWritingMode(),
-            type,
-            details,
-            context
+            {
+                source: this._id,
+                optionsContext,
+                elementRect: textSource.getRect(),
+                writingMode: textSource.getWritingMode()
+            },
+            {
+                type,
+                details
+            }
         );
         this._lastShowPromise.catch((error) => {
             if (yomichan.isExtensionUnloaded) { return; }

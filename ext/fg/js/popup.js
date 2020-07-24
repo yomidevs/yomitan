@@ -133,17 +133,21 @@ class Popup {
         return false;
     }
 
-    async showContent(elementRect, writingMode, type, details, context) {
+    async showContent(details, displayDetails) {
         if (this._options === null) { throw new Error('Options not assigned'); }
 
-        const {optionsContext, source} = context;
-        if (source !== this._previousOptionsContextSource) {
+        const {source, optionsContext, elementRect, writingMode} = details;
+        if (typeof source !== 'undefined' && source !== this._previousOptionsContextSource) {
             await this.setOptionsContext(optionsContext, source);
         }
 
-        await this._show(elementRect, writingMode);
-        if (type === null) { return; }
-        this._invokeApi('setContent', {type, details});
+        if (typeof elementRect !== 'undefined' && typeof writingMode !== 'undefined') {
+            await this._show(elementRect, writingMode);
+        }
+
+        if (displayDetails !== null) {
+            this._invokeApi('setContent', {type: displayDetails.type, details: displayDetails.details});
+        }
     }
 
     setCustomCss(css) {

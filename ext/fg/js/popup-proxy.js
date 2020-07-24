@@ -88,14 +88,17 @@ class PopupProxy extends EventDispatcher {
         return await this._invoke('containsPoint', {id: this._id, x, y});
     }
 
-    async showContent(elementRect, writingMode, type, details, context) {
-        let {x, y, width, height} = elementRect;
-        if (this._frameOffsetForwarder !== null) {
-            await this._updateFrameOffset();
-            [x, y] = this._applyFrameOffset(x, y);
+    async showContent(details, displayDetails) {
+        const {elementRect} = details;
+        if (typeof elementRect !== 'undefined') {
+            let {x, y, width, height} = elementRect;
+            if (this._frameOffsetForwarder !== null) {
+                await this._updateFrameOffset();
+                [x, y] = this._applyFrameOffset(x, y);
+            }
+            details.elementRect = {x, y, width, height};
         }
-        elementRect = {x, y, width, height};
-        return await this._invoke('showContent', {id: this._id, elementRect, writingMode, type, details, context});
+        return await this._invoke('showContent', {id: this._id, details, displayDetails});
     }
 
     setCustomCss(css) {

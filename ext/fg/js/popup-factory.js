@@ -124,11 +124,16 @@ class PopupFactory {
         return await popup.containsPoint(x, y);
     }
 
-    async _onApiShowContent({id, elementRect, writingMode, type, details, context}) {
+    async _onApiShowContent({id, details, displayDetails}) {
         const popup = this._getPopup(id);
-        elementRect = this._convertJsonRectToDOMRect(popup, elementRect);
         if (!this._popupCanShow(popup)) { return; }
-        return await popup.showContent(elementRect, writingMode, type, details, context);
+
+        const {elementRect} = details;
+        if (typeof elementRect !== 'undefined') {
+            details.elementRect = this._convertJsonRectToDOMRect(popup, elementRect);
+        }
+
+        return await popup.showContent(details, displayDetails);
     }
 
     _onApiSetCustomCss({id, css}) {
