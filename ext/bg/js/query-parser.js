@@ -22,11 +22,11 @@
  * docSentenceExtract
  */
 
-class QueryParser {
-    constructor({getOptionsContext, setContent, setSpinnerVisible}) {
+class QueryParser extends EventDispatcher {
+    constructor({getOptionsContext, setSpinnerVisible}) {
+        super();
         this._options = null;
         this._getOptionsContext = getOptionsContext;
-        this._setContent = setContent;
         this._setSpinnerVisible = setSpinnerVisible;
         this._parseResults = [];
         this._queryParser = document.querySelector('#query-parser-content');
@@ -80,7 +80,8 @@ class QueryParser {
         const searchText = this._textScanner.getTextSourceContent(textSource, scanLength, layoutAwareScan);
         if (searchText.length === 0) { return null; }
 
-        const {definitions, length} = await api.termsFind(searchText, {}, this._getOptionsContext());
+        const optionsContext = this._getOptionsContext();
+        const {definitions, length} = await api.termsFind(searchText, {}, optionsContext);
         if (definitions.length === 0) { return null; }
 
         const sentenceExtent = this._options.anki.sentenceExt;
@@ -88,12 +89,14 @@ class QueryParser {
 
         textSource.setEndOffset(length, layoutAwareScan);
 
-        this._setContent('terms', {definitions, context: {
-            focus: false,
-            disableHistory: cause === 'mouse',
+        this.trigger('searched', {
+            type: 'terms',
+            definitions,
             sentence,
-            url: window.location.href
-        }});
+            cause,
+            textSource,
+            optionsContext
+        });
 
         return {definitions, type: 'terms'};
     }

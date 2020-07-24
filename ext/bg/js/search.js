@@ -40,7 +40,6 @@ class DisplaySearch extends Display {
         });
         this._queryParser = new QueryParser({
             getOptionsContext: this.getOptionsContext.bind(this),
-            setContent: this.setContent.bind(this),
             setSpinnerVisible: this.setSpinnerVisible.bind(this)
         });
         this._onKeyDownIgnoreKeys = new Map([
@@ -67,6 +66,9 @@ class DisplaySearch extends Display {
         await this.updateOptions();
         yomichan.on('optionsUpdated', () => this.updateOptions());
         await this._queryParser.prepare();
+
+        this._queryParser.on('searched', this._onQueryParserSearch.bind(this));
+
         const options = this.getOptions();
 
         const {queryParams: {query='', mode=''}} = parseUrl(window.location.href);
@@ -168,6 +170,18 @@ class DisplaySearch extends Display {
     }
 
     // Private
+
+    _onQueryParserSearch({type, definitions, sentence, cause}) {
+        this.setContent(type, {
+            definitions,
+            context: {
+                focus: false,
+                disableHistory: cause === 'mouse',
+                sentence,
+                url: window.location.href
+            }
+        });
+    }
 
     _onSearchInput() {
         this._updateSearchButton();
