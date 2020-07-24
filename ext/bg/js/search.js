@@ -158,7 +158,13 @@ class DisplaySearch extends Display {
 
     async setContent(type, details) {
         this._query.blur();
-        await super.setContent(type, details);
+        this._closePopups();
+        return await super.setContent(type, details);
+    }
+
+    clearContent() {
+        this._closePopups();
+        return super.clearContent();
     }
 
     // Private
@@ -244,7 +250,6 @@ class DisplaySearch extends Display {
                 this.clearContent();
             }
             this._setTitleText(query);
-            yomichan.trigger('closePopups');
         } catch (e) {
             this.onError(e);
         }
@@ -412,5 +417,9 @@ class DisplaySearch extends Display {
         yomichan.on('optionsUpdated', onOptionsUpdated);
 
         await onOptionsUpdated();
+    }
+
+    _closePopups() {
+        yomichan.trigger('closePopups');
     }
 }
