@@ -202,19 +202,18 @@ class Display {
         }
     }
 
-    async setContent(type, details) {
+    async setContent(details) {
         const token = {}; // Unique identifier token
         this._setContentToken = token;
         try {
             this._mediaLoader.unloadAll();
 
-            const {definitions, context, focus} = details;
+            const {focus, history, type, source, definitions, context} = details;
 
-            if (context.disableHistory) {
-                delete context.disableHistory;
-                this._context = new DisplayContext(type, definitions, context);
+            if (!history) {
+                this._context = new DisplayContext(type, source, definitions, context);
             } else {
-                this._context = DisplayContext.push(this._context, type, definitions, context);
+                this._context = DisplayContext.push(this._context, type, source, definitions, context);
             }
 
             if (focus !== false) {
@@ -226,7 +225,7 @@ class Display {
                 case 'kanji':
                     {
                         const {sentence, url, index=0, scroll=null} = context;
-                        await this._setContentTermsOrKanji(type, definitions, sentence, url, index, scroll, token);
+                        await this._setContentTermsOrKanji((type === 'terms'), definitions, sentence, url, index, scroll, token);
                     }
                     break;
             }
@@ -335,8 +334,8 @@ class Display {
         this.setOptionsContext(optionsContext);
     }
 
-    _onMessageSetContent({type, details}) {
-        this.setContent(type, details);
+    _onMessageSetContent({details}) {
+        this.setContent(details);
     }
 
     _onMessageClearAutoPlayTimer() {
@@ -378,8 +377,16 @@ class Display {
                 url: this._context.get('url')
             };
 
-            const definitions = await api.kanjiFind(link.textContent, this.getOptionsContext());
-            this.setContent('kanji', {definitions, context});
+            const source = link.textContent;
+            const definitions = await api.kanjiFind(source, this.getOptionsContext());
+            this.setContent({
+                focus: false,
+                history: true,
+                type: 'kanji',
+                source,
+                definitions,
+                context
+            });
         } catch (error) {
             this.onError(error);
         }
@@ -419,13 +426,18 @@ class Display {
                 scroll: this._windowScroll.y
             });
             const context = {
-                disableHistory: false,
                 sentence,
-                url: this._context.get('url'),
-                previous: this._context
+                url: this._context.get('url')
             };
 
-            this.setContent('terms', {definitions, context});
+            this.setContent({
+                focus: false,
+                history: true,
+                type: 'terms',
+                source: textSource.text(),
+                definitions,
+                context
+            });
         } catch (error) {
             this.onError(error);
         }
@@ -581,8 +593,7 @@ class Display {
         }
     }
 
-    async _setContentTermsOrKanji(type, definitions, sentence, url, index, scroll, token) {
-        const isTerms = (type === 'terms');
+    async _setContentTermsOrKanji(isTerms, definitions, sentence, url, index, scroll, token) {
         this._setEventListenersActive(false);
 
         this._definitions = definitions;
@@ -727,33 +738,32 @@ class Display {
     }
 
     _sourceTermView() {
-        if (!this._context || !this._context.previous) { return; }
-        this._context.update({
-            index: this._index,
-            scroll: this._windowScroll.y
-        });
-        const previousContext = this._context.previous;
-        previousContext.set('disableHistory', true);
-        const details = {
-            definitions: previousContext.definitions,
-            context: previousContext.context
-        };
-        this.setContent(previousContext.type, details);
+        this._relativeTermView(false);
     }
 
     _nextTermView() {
-        if (!this._context || !this._context.next) { return; }
+        this._relativeTermView(true);
+    }
+
+    _relativeTermView(next) {
+        if (this._context === null) { return false; }
+
+        const relative = next ? this._context.next : this._context.previous;
+        if (!relative) { return false; }
+
         this._context.update({
             index: this._index,
             scroll: this._windowScroll.y
         });
-        const nextContext = this._context.next;
-        nextContext.set('disableHistory', true);
-        const details = {
-            definitions: nextContext.definitions,
-            context: nextContext.context
-        };
-        this.setContent(nextContext.type, details);
+        this.setContent({
+            focus: false,
+            history: false,
+            type: relative.type,
+            source: relative.source,
+            definitions: relative.definitions,
+            context: relative.context
+        });
+        return true;
     }
 
     _noteTryAdd(mode) {

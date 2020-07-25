@@ -146,7 +146,7 @@ class Popup {
         }
 
         if (displayDetails !== null) {
-            this._invokeApi('setContent', {type: displayDetails.type, details: displayDetails.details});
+            this._invokeApi('setContent', {details: displayDetails});
         }
     }
 

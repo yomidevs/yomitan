@@ -158,10 +158,10 @@ class DisplaySearch extends Display {
         }
     }
 
-    async setContent(type, details) {
+    async setContent(...args) {
         this._query.blur();
         this._closePopups();
-        return await super.setContent(type, details);
+        return await super.setContent(...args);
     }
 
     clearContent() {
@@ -171,12 +171,14 @@ class DisplaySearch extends Display {
 
     // Private
 
-    _onQueryParserSearch({type, definitions, sentence, cause}) {
-        this.setContent(type, {
+    _onQueryParserSearch({type, definitions, sentence, cause, textSource}) {
+        this.setContent({
+            focus: false,
+            history: cause !== 'mouse',
+            type,
+            source: textSource.text(),
             definitions,
             context: {
-                focus: false,
-                disableHistory: cause === 'mouse',
                 sentence,
                 url: window.location.href
             }
@@ -254,12 +256,17 @@ class DisplaySearch extends Display {
             this._updateSearchButton();
             if (valid) {
                 const {definitions} = await api.termsFind(query, details, this.getOptionsContext());
-                this.setContent('terms', {definitions, context: {
+                this.setContent({
                     focus: false,
-                    disableHistory: true,
-                    sentence: {text: query, offset: 0},
-                    url: window.location.href
-                }});
+                    history: false,
+                    definitions,
+                    source: query,
+                    type: 'terms',
+                    context: {
+                        sentence: {text: query, offset: 0},
+                        url: window.location.href
+                    }
+                });
             } else {
                 this.clearContent();
             }

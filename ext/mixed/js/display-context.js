@@ -17,8 +17,9 @@
 
 
 class DisplayContext {
-    constructor(type, definitions, context) {
+    constructor(type, source, definitions, context) {
         this.type = type;
+        this.source = source;
         this.definitions = definitions;
         this.context = context;
     }
@@ -43,8 +44,8 @@ class DisplayContext {
         return this.context.next;
     }
 
-    static push(self, type, definitions, context) {
-        const newContext = new DisplayContext(type, definitions, context);
+    static push(self, type, source, definitions, context) {
+        const newContext = new DisplayContext(type, source, definitions, context);
         if (self !== null) {
             newContext.update({previous: self});
             self.update({next: newContext});

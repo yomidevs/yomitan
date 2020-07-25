@@ -426,12 +426,21 @@ class Frontend {
         this._showPopupContent(
             textSource,
             optionsContext,
-            type,
-            {definitions, context: {sentence, url, focus, disableHistory: true}}
+            {
+                focus,
+                history: false,
+                type,
+                source: textSource.text(),
+                definitions,
+                context: {
+                    sentence,
+                    url
+                }
+            }
         );
     }
 
-    _showPopupContent(textSource, optionsContext, type=null, details=null) {
+    _showPopupContent(textSource, optionsContext, details=null) {
         this._lastShowPromise = this._popup.showContent(
             {
                 source: this._id,
@@ -439,10 +448,7 @@ class Frontend {
                 elementRect: textSource.getRect(),
                 writingMode: textSource.getWritingMode()
             },
-            {
-                type,
-                details
-            }
+            details
         );
         this._lastShowPromise.catch((error) => {
             if (yomichan.isExtensionUnloaded) { return; }
