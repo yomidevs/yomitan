@@ -208,12 +208,26 @@ class Display {
         try {
             this._mediaLoader.unloadAll();
 
+            const {definitions, context, focus} = details;
+
+            if (context.disableHistory) {
+                delete context.disableHistory;
+                this._context = new DisplayContext(type, definitions, context);
+            } else {
+                this._context = DisplayContext.push(this._context, type, definitions, context);
+            }
+
+            if (focus !== false) {
+                window.focus();
+            }
+
             switch (type) {
                 case 'terms':
-                    await this._setContentTerms(details.definitions, details.context, token);
-                    break;
                 case 'kanji':
-                    await this._setContentKanji(details.definitions, details.context, token);
+                    {
+                        const {sentence, url, index=0, scroll=null} = context;
+                        await this._setContentTermsOrKanji(type, definitions, sentence, url, index, scroll, token);
+                    }
                     break;
             }
         } catch (e) {
@@ -226,7 +240,9 @@ class Display {
     }
 
     clearContent() {
+        this._setEventListenersActive(false);
         this._container.textContent = '';
+        this._setEventListenersActive(true);
     }
 
     setCustomCss(css) {
@@ -385,7 +401,7 @@ class Display {
         }
     }
 
-    async _onTermLookup(e, {disableScroll, selectText, disableHistory}={}) {
+    async _onTermLookup(e) {
         try {
             if (!this._context) { return; }
 
@@ -403,27 +419,13 @@ class Display {
                 scroll: this._windowScroll.y
             });
             const context = {
-                disableScroll,
-                disableHistory,
+                disableHistory: false,
                 sentence,
-                url: this._context.get('url')
+                url: this._context.get('url'),
+                previous: this._context
             };
-            if (disableHistory) {
-                Object.assign(context, {
-                    previous: this._context.previous,
-                    next: this._context.next
-                });
-            } else {
-                Object.assign(context, {
-                    previous: this._context
-                });
-            }
 
             this.setContent('terms', {definitions, context});
-
-            if (selectText) {
-                textSource.select();
-            }
         } catch (error) {
             this.onError(error);
         }
@@ -579,26 +581,15 @@ class Display {
         }
     }
 
-    async _setContentTerms(definitions, context, token) {
-        if (!context) { throw new Error('Context expected'); }
-
+    async _setContentTermsOrKanji(type, definitions, sentence, url, index, scroll, token) {
+        const isTerms = (type === 'terms');
         this._setEventListenersActive(false);
 
-        if (context.focus !== false) {
-            window.focus();
-        }
-
         this._definitions = definitions;
-        if (context.disableHistory) {
-            delete context.disableHistory;
-            this._context = new DisplayContext('terms', definitions, context);
-        } else {
-            this._context = DisplayContext.push(this._context, 'terms', definitions, context);
-        }
 
         for (const definition of definitions) {
-            definition.cloze = this._clozeBuild(context.sentence, definition.source);
-            definition.url = context.url;
+            definition.cloze = this._clozeBuild(sentence, isTerms ? definition.source : definition.character);
+            definition.url = url;
         }
 
         this._updateNavigation(this._context.previous, this._context.next);
@@ -613,74 +604,28 @@ class Display {
                 if (this._setContentToken !== token) { return; }
             }
 
-            const entry = this._displayGenerator.createTermEntry(definitions[i]);
+            const entry = (
+                isTerms ?
+                this._displayGenerator.createTermEntry(definitions[i]) :
+                this._displayGenerator.createKanjiEntry(definitions[i])
+            );
             container.appendChild(entry);
         }
 
-        const {index, scroll, disableScroll} = context;
-        if (!disableScroll) {
-            this._entryScrollIntoView(index || 0, scroll);
-        } else {
-            delete context.disableScroll;
-            this._entrySetCurrent(index || 0);
-        }
+        this._entryScrollIntoView(index, scroll);
 
-        if (this._options.audio.enabled && this._options.audio.autoPlay) {
+        if (
+            isTerms &&
+            this._options.audio.enabled &&
+            this._options.audio.autoPlay
+        ) {
             this.autoPlayAudio();
         }
 
         this._setEventListenersActive(true);
 
-        const states = await this._getDefinitionsAddable(definitions, ['term-kanji', 'term-kana']);
-        if (this._setContentToken !== token) { return; }
-
-        this._updateAdderButtons(states);
-    }
-
-    async _setContentKanji(definitions, context, token) {
-        if (!context) { throw new Error('Context expected'); }
-
-        this._setEventListenersActive(false);
-
-        if (context.focus !== false) {
-            window.focus();
-        }
-
-        this._definitions = definitions;
-        if (context.disableHistory) {
-            delete context.disableHistory;
-            this._context = new DisplayContext('kanji', definitions, context);
-        } else {
-            this._context = DisplayContext.push(this._context, 'kanji', definitions, context);
-        }
-
-        for (const definition of definitions) {
-            definition.cloze = this._clozeBuild(context.sentence, definition.character);
-            definition.url = context.url;
-        }
-
-        this._updateNavigation(this._context.previous, this._context.next);
-        this._setNoContentVisible(definitions.length === 0);
-
-        const container = this._container;
-        container.textContent = '';
-
-        for (let i = 0, ii = definitions.length; i < ii; ++i) {
-            if (i > 0) {
-                await promiseTimeout(1);
-                if (this._setContentToken !== token) { return; }
-            }
-
-            const entry = this._displayGenerator.createKanjiEntry(definitions[i]);
-            container.appendChild(entry);
-        }
-
-        const {index, scroll} = context;
-        this._entryScrollIntoView(index || 0, scroll);
-
-        this._setEventListenersActive(true);
-
-        const states = await this._getDefinitionsAddable(definitions, ['kanji']);
+        const modes = isTerms ? ['term-kanji', 'term-kana'] : ['kanji'];
+        const states = await this._getDefinitionsAddable(definitions, modes);
         if (this._setContentToken !== token) { return; }
 
         this._updateAdderButtons(states);
@@ -763,7 +708,7 @@ class Display {
 
         const entry = this._entrySetCurrent(index);
         let target;
-        if (scroll !== null) {
+        if (typeof scroll === 'number') {
             target = scroll;
         } else {
             target = this._index === 0 || entry === null ? 0 : this._getElementTop(entry);
@@ -840,8 +785,8 @@ class Display {
                 }
             }
 
-            const context = await this._getNoteContext();
-            const noteId = await api.definitionAdd(definition, mode, context, details, this.getOptionsContext());
+            const noteContext = await this._getNoteContext();
+            const noteId = await api.definitionAdd(definition, mode, noteContext, details, this.getOptionsContext());
             if (noteId) {
                 const index = this._definitions.indexOf(definition);
                 const adderButton = this._adderButtonFind(index, mode);
@@ -1005,8 +950,8 @@ class Display {
 
     async _getDefinitionsAddable(definitions, modes) {
         try {
-            const context = await this._getNoteContext();
-            return await api.definitionsAddable(definitions, modes, context, this.getOptionsContext());
+            const noteContext = await this._getNoteContext();
+            return await api.definitionsAddable(definitions, modes, noteContext, this.getOptionsContext());
         } catch (e) {
             return [];
         }
