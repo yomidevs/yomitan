@@ -213,8 +213,7 @@ class DisplaySearch extends Display {
     }
 
     _onPopState() {
-        const {queryParams: {query='', mode=''}} = parseUrl(window.location.href);
-        document.documentElement.dataset.searchMode = mode;
+        const {queryParams: {query=''}} = parseUrl(window.location.href);
         this._setQuery(query);
         this._onSearchQueryUpdated(this._query.value, false);
     }

@@ -932,7 +932,7 @@ class Backend {
         const popupWindow = await new Promise((resolve, reject) => {
             chrome.windows.create(
                 {
-                    url: baseUrl,
+                    url: `${baseUrl}?mode=popup`,
                     width: popupWidth,
                     height: popupHeight,
                     type: 'popup'
