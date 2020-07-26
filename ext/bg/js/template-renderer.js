@@ -69,7 +69,8 @@ class TemplateRenderer {
             ['sanitizeCssClass', this._sanitizeCssClass.bind(this)],
             ['regexReplace',     this._regexReplace.bind(this)],
             ['regexMatch',       this._regexMatch.bind(this)],
-            ['mergeTags',        this._mergeTags.bind(this)]
+            ['mergeTags',        this._mergeTags.bind(this)],
+            ['eachUpTo',         this._eachUpTo.bind(this)]
         ];
 
         for (const [name, helper] of helpers) {
@@ -205,5 +206,22 @@ class TemplateRenderer {
         }
 
         return [...tags].join(', ');
+    }
+
+    _eachUpTo(context, iterable, maxCount, options) {
+        if (iterable) {
+            const results = [];
+            let any = false;
+            for (const entry of iterable) {
+                any = true;
+                if (results.length >= maxCount) { break; }
+                const processedEntry = options.fn(entry);
+                results.push(processedEntry);
+            }
+            if (any) {
+                return results.join('');
+            }
+        }
+        return options.inverse(context);
     }
 }
