@@ -23,6 +23,7 @@
  * Frontend
  * MediaLoader
  * PopupFactory
+ * QueryParser
  * WindowScroll
  * api
  * docRangeFromPoint
@@ -68,6 +69,11 @@ class Display extends EventDispatcher {
         this._historyChangeIgnore = false;
         this._historyHasChanged = false;
         this._navigationHeader = document.querySelector('#navigation-header');
+        this._fullQuery = '';
+        this._queryParser = new QueryParser({
+            getOptionsContext: this.getOptionsContext.bind(this),
+            setSpinnerVisible: this.setSpinnerVisible.bind(this)
+        });
 
         this.registerActions([
             ['close',               () => { this.onEscape(); }],
@@ -120,8 +126,10 @@ class Display extends EventDispatcher {
     async prepare() {
         this._setInteractive(true);
         await this._displayGenerator.prepare();
+        await this._queryParser.prepare();
         this._history.prepare();
         this._history.on('stateChanged', this._onStateChanged.bind(this));
+        this._queryParser.on('searched', this._onQueryParserSearch.bind(this));
         yomichan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
         api.crossFrame.registerHandlers([
             ['popupMessage', {async: 'dynamic', handler: this._onMessage.bind(this)}]
@@ -188,6 +196,7 @@ class Display extends EventDispatcher {
         this._updateDocumentOptions(this._options);
         this._updateTheme(this._options.general.popupTheme);
         this.setCustomCss(this._options.general.customPopupCss);
+        this._queryParser.setOptions(this._options);
     }
 
     addMultipleEventListeners(selector, type, listener, options) {
@@ -313,6 +322,12 @@ class Display extends EventDispatcher {
         return data;
     }
 
+    setQueryParserText(text) {
+        if (this._fullQuery === text) { return; }
+        this._fullQuery = text;
+        this._queryParser.setText(text);
+    }
+
     // Message handlers
 
     _onMessage(data) {
@@ -427,14 +442,32 @@ class Display extends EventDispatcher {
         }
     }
 
+    _onQueryParserSearch({type, definitions, sentence, cause, textSource}) {
+        const query = textSource.text();
+        const details = {
+            focus: false,
+            history: cause !== 'mouse',
+            params: this._createSearchParams(type, query, false),
+            state: {
+                sentence,
+                url: window.location.href
+            },
+            content: {
+                definitions
+            }
+        };
+        this.setContent(details);
+    }
+
     _onExtensionUnloaded() {
-        this.setContent({
+        const details = {
             focus: false,
             history: false,
             params: {type: 'unloaded'},
             state: {},
             content: {}
-        });
+        };
+        this.setContent(details);
     }
 
     _onSourceTermView(e) {
@@ -462,14 +495,10 @@ class Display extends EventDispatcher {
 
             const query = link.textContent;
             const definitions = await api.kanjiFind(query, this.getOptionsContext());
-            this.setContent({
+            const details = {
                 focus: false,
                 history: true,
-                params: {
-                    type: 'kanji',
-                    query,
-                    wildcards: 'off'
-                },
+                params: this._createSearchParams('kanji', query, false),
                 state: {
                     focusEntry: 0,
                     sentence: state.sentence,
@@ -478,7 +507,8 @@ class Display extends EventDispatcher {
                 content: {
                     definitions
                 }
-            });
+            };
+            this.setContent(details);
         } catch (error) {
             this.onError(error);
         }
@@ -520,14 +550,11 @@ class Display extends EventDispatcher {
             state.scrollY = this._windowScroll.y;
             this._historyStateUpdate(state);
 
-            this.setContent({
+            const query = textSource.text();
+            const details = {
                 focus: false,
                 history: true,
-                params: {
-                    type: 'terms',
-                    query: textSource.text(),
-                    wildcards: 'off'
-                },
+                params: this._createSearchParams('terms', query, false),
                 state: {
                     focusEntry: 0,
                     sentence,
@@ -536,7 +563,8 @@ class Display extends EventDispatcher {
                 content: {
                     definitions
                 }
-            });
+            };
+            this.setContent(details);
         } catch (error) {
             this.onError(error);
         }
@@ -1135,5 +1163,20 @@ class Display extends EventDispatcher {
         } finally {
             this._historyChangeIgnore = historyChangeIgnorePre;
         }
+    }
+
+    _createSearchParams(type, query, wildcards) {
+        const params = {};
+        if (query.length < this._fullQuery.length) {
+            params.full = this._fullQuery;
+        }
+        params.query = query;
+        if (typeof type === 'string') {
+            params.type = type;
+        }
+        if (!wildcards) {
+            params.wildcards = 'off';
+        }
+        return params;
     }
 }

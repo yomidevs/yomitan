@@ -21,6 +21,11 @@
             <button class="action-button action-next" data-icon="source-term" title="Next term (Alt + F)"></button>
         </div></div><div class="navigation-header-spacer"></div>
 
+        <div class="scan-disable" hidden>
+            <div id="query-parser-select-container" class="input-group"></div>
+            <div id="query-parser-content"></div>
+        </div>
+
         <div id="definitions"></div>
 
         <div id="no-results" hidden>
@@ -57,8 +62,11 @@
         <script src="/mixed/js/frame-endpoint.js"></script>
         <script src="/mixed/js/media-loader.js"></script>
         <script src="/mixed/js/scroll.js"></script>
+        <script src="/mixed/js/text-scanner.js"></script>
         <script src="/mixed/js/template-handler.js"></script>
 
+        <script src="/bg/js/query-parser-generator.js"></script>
+        <script src="/bg/js/query-parser.js"></script>
         <script src="/fg/js/float.js"></script>
 
         <script src="/fg/js/float-main.js"></script>
