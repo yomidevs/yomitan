@@ -814,10 +814,13 @@ class Backend {
         const {mode='existingOrNewTab', query} = params || {};
 
         const baseUrl = chrome.runtime.getURL('/bg/search.html');
-        const queryParams = {mode};
+        const queryParams = {};
         if (query && query.length > 0) { queryParams.query = query; }
         const queryString = new URLSearchParams(queryParams).toString();
-        const url = `${baseUrl}?${queryString}`;
+        let url = baseUrl;
+        if (queryString.length > 0) {
+            url += `?${queryString}`;
+        }
 
         const isTabMatch = (url2) => {
             if (url2 === null || !url2.startsWith(baseUrl)) { return false; }
