@@ -61,13 +61,12 @@ async function setupOptions() {
     };
     const options = await api.optionsGet(optionsContext);
 
-    const toggle = document.querySelector('#enable-search');
-    toggle.checked = options.general.enable;
-    toggle.addEventListener('change', () => api.commandExec('toggle'), false);
-
-    const toggle2 = document.querySelector('#enable-search2');
-    toggle2.checked = options.general.enable;
-    toggle2.addEventListener('change', () => api.commandExec('toggle'), false);
+    const extensionEnabled = options.general.enable;
+    const onToggleChanged = () => api.commandExec('toggle');
+    for (const toggle of document.querySelectorAll('#enable-search,#enable-search2')) {
+        toggle.checked = extensionEnabled;
+        toggle.addEventListener('change', onToggleChanged, false);
+    }
 
     setTimeout(() => {
         document.body.dataset.loaded = 'true';
