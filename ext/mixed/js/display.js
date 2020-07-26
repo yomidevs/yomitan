@@ -67,15 +67,16 @@ class Display extends EventDispatcher {
         this._history = new DisplayHistory({clearable: true, useBrowserHistory: false});
         this._historyChangeIgnore = false;
         this._historyHasChanged = false;
+        this._navigationHeader = document.querySelector('#navigation-header');
 
         this.registerActions([
             ['close',               () => { this.onEscape(); }],
-            ['next-entry',          () => { this._entryScrollIntoView(this._index + 1, null, true); }],
-            ['next-entry-x3',       () => { this._entryScrollIntoView(this._index + 3, null, true); }],
-            ['previous-entry',      () => { this._entryScrollIntoView(this._index - 1, null, true); }],
-            ['previous-entry-x3',   () => { this._entryScrollIntoView(this._index - 3, null, true); }],
-            ['last-entry',          () => { this._entryScrollIntoView(this._definitions.length - 1, null, true); }],
-            ['first-entry',         () => { this._entryScrollIntoView(0, null, true); }],
+            ['next-entry',          () => { this._focusEntry(this._index + 1, true); }],
+            ['next-entry-x3',       () => { this._focusEntry(this._index + 3, true); }],
+            ['previous-entry',      () => { this._focusEntry(this._index - 1, true); }],
+            ['previous-entry-x3',   () => { this._focusEntry(this._index - 3, true); }],
+            ['last-entry',          () => { this._focusEntry(this._definitions.length - 1, true); }],
+            ['first-entry',         () => { this._focusEntry(0, true); }],
             ['history-backward',    () => { this._sourceTermView(); }],
             ['history-forward',     () => { this._nextTermView(); }],
             ['add-note-kanji',      () => { this._noteTryAdd('kanji'); }],
@@ -454,8 +455,9 @@ class Display extends EventDispatcher {
             const link = e.target;
             const {state} = this._history;
 
-            state.index = this._entryIndexFind(link);
-            state.scroll = this._windowScroll.y;
+            state.focusEntry = this._entryIndexFind(link);
+            state.scrollX = this._windowScroll.x;
+            state.scrollY = this._windowScroll.y;
             this._historyStateUpdate(state);
 
             const query = link.textContent;
@@ -469,6 +471,7 @@ class Display extends EventDispatcher {
                     wildcards: 'off'
                 },
                 state: {
+                    focusEntry: 0,
                     sentence: state.sentence,
                     url: state.url
                 },
@@ -512,8 +515,9 @@ class Display extends EventDispatcher {
             const layoutAwareScan = this._options.scanning.layoutAwareScan;
             const sentence = docSentenceExtract(textSource, sentenceExtent, layoutAwareScan);
 
-            state.index = this._entryIndexFind(scannedElement);
-            state.scroll = this._windowScroll.y;
+            state.focusEntry = this._entryIndexFind(scannedElement);
+            state.scrollX = this._windowScroll.x;
+            state.scrollY = this._windowScroll.y;
             this._historyStateUpdate(state);
 
             this.setContent({
@@ -525,6 +529,7 @@ class Display extends EventDispatcher {
                     wildcards: 'off'
                 },
                 state: {
+                    focusEntry: 0,
                     sentence,
                     url: state.url
                 },
@@ -601,7 +606,7 @@ class Display extends EventDispatcher {
     _onWheel(e) {
         if (e.altKey) {
             if (e.deltaY !== 0) {
-                this._entryScrollIntoView(this._index + (e.deltaY > 0 ? 1 : -1), null, true);
+                this._focusEntry(this._index + (e.deltaY > 0 ? 1 : -1), true);
                 e.preventDefault();
             }
         } else if (e.shiftKey) {
@@ -647,7 +652,6 @@ class Display extends EventDispatcher {
         if (interactive) {
             const actionPrevious = document.querySelector('.action-previous');
             const actionNext = document.querySelector('.action-next');
-            // const navigationHeader = document.querySelector('.navigation-header');
 
             this._persistentEventListeners.addEventListener(document, 'keydown', this.onKeyDown.bind(this), false);
             this._persistentEventListeners.addEventListener(document, 'wheel', this._onWheel.bind(this), {passive: false});
@@ -657,10 +661,6 @@ class Display extends EventDispatcher {
             if (actionNext !== null) {
                 this._persistentEventListeners.addEventListener(actionNext, 'click', this._onNextTermView.bind(this));
             }
-            // temporarily disabled
-            // if (navigationHeader !== null) {
-            //     this.persistentEventListeners.addEventListener(navigationHeader, 'wheel', this.onHistoryWheel.bind(this), {passive: false});
-            // }
         } else {
             this._persistentEventListeners.removeAllEventListeners();
         }
@@ -711,7 +711,7 @@ class Display extends EventDispatcher {
         }
     }
 
-    async _setContentTermsOrKanji(token, isTerms, definitions, {sentence=null, url=null, index=0, scroll=null}) {
+    async _setContentTermsOrKanji(token, isTerms, definitions, {sentence=null, url=null, focusEntry=null, scrollX=null, scrollY=null}) {
         if (typeof url !== 'string') { url = window.location.href; }
         sentence = this._getValidSentenceData(sentence);
 
@@ -744,7 +744,16 @@ class Display extends EventDispatcher {
             container.appendChild(entry);
         }
 
-        this._entryScrollIntoView(index, scroll);
+        if (typeof focusEntry === 'number') {
+            this._focusEntry(focusEntry, false);
+        }
+        if (typeof scrollX === 'number' || typeof scrollY === 'number') {
+            let {x, y} = this._windowScroll;
+            if (typeof scrollX === 'number') { x = scrollX; }
+            if (typeof scrollY === 'number') { y = scrollY; }
+            this._windowScroll.stop();
+            this._windowScroll.to(x, y);
+        }
 
         if (
             isTerms &&
@@ -792,12 +801,10 @@ class Display extends EventDispatcher {
     }
 
     _updateNavigation(previous, next) {
-        const navigation = document.querySelector('#navigation-header');
-        if (navigation !== null) {
-            navigation.hidden = !(previous || next);
-            navigation.dataset.hasPrevious = `${!!previous}`;
-            navigation.dataset.hasNext = `${!!next}`;
-        }
+        if (this._navigationHeader === null) { return; }
+        this._navigationHeader.hidden = !(previous || next);
+        this._navigationHeader.dataset.hasPrevious = `${!!previous}`;
+        this._navigationHeader.dataset.hasNext = `${!!next}`;
     }
 
     _updateAdderButtons(states) {
@@ -840,22 +847,15 @@ class Display extends EventDispatcher {
         return entry;
     }
 
-    _entryScrollIntoView(index, scroll, smooth) {
-        this._windowScroll.stop();
-
+    _focusEntry(index, smooth) {
         const entry = this._entrySetCurrent(index);
-        let target;
-        if (typeof scroll === 'number') {
-            target = scroll;
-        } else {
-            target = this._index === 0 || entry === null ? 0 : this._getElementTop(entry);
+        let target = index === 0 || entry === null ? 0 : this._getElementTop(entry);
 
-            const header = document.querySelector('#navigation-header');
-            if (header !== null) {
-                target -= header.getBoundingClientRect().height;
-            }
+        if (this._navigationHeader !== null) {
+            target -= this._navigationHeader.getBoundingClientRect().height;
         }
 
+        this._windowScroll.stop();
         if (smooth) {
             this._windowScroll.animate(this._windowScroll.x, target, 200);
         } else {

@@ -250,6 +250,7 @@ class DisplaySearch extends Display {
                 query
             },
             state: {
+                focusEntry: 0,
                 sentence: {text: query, offset: 0},
                 url: window.location.href
             },

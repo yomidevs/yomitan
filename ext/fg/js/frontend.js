@@ -435,6 +435,7 @@ class Frontend {
                     wildcards: 'off'
                 },
                 state: {
+                    focusEntry: 0,
                     sentence,
                     url
                 },
