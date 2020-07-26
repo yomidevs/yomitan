@@ -429,12 +429,17 @@ class Frontend {
             {
                 focus,
                 history: false,
-                type,
-                source: textSource.text(),
-                definitions,
-                context: {
+                params: {
+                    type,
+                    query: textSource.text(),
+                    wildcards: 'off'
+                },
+                state: {
                     sentence,
                     url
+                },
+                content: {
+                    definitions
                 }
             }
         );

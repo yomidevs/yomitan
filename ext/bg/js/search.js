@@ -33,6 +33,7 @@ class DisplaySearch extends Display {
         this._intro = document.querySelector('#intro');
         this._clipboardMonitorEnable = document.querySelector('#clipboard-monitor-enable');
         this._wanakanaEnable = document.querySelector('#wanakana-enable');
+        this._queryText = '';
         this._introVisible = true;
         this._introAnimationTimer = null;
         this._clipboardMonitor = new ClipboardMonitor({
@@ -68,6 +69,9 @@ class DisplaySearch extends Display {
         await this._queryParser.prepare();
 
         this._queryParser.on('searched', this._onQueryParserSearch.bind(this));
+        this.on('contentUpdating', this._onContentUpdating.bind(this));
+
+        this.setHistorySettings({useBrowserHistory: true});
 
         const options = this.getOptions();
 
@@ -83,7 +87,6 @@ class DisplaySearch extends Display {
         }
 
         this._setQuery(query);
-        this._onSearchQueryUpdated(this._query.value, false);
 
         if (mode !== 'popup') {
             if (options.general.enableClipboardMonitor === true) {
@@ -100,13 +103,14 @@ class DisplaySearch extends Display {
         this._search.addEventListener('click', this._onSearch.bind(this), false);
         this._query.addEventListener('input', this._onSearchInput.bind(this), false);
         this._wanakanaEnable.addEventListener('change', this._onWanakanaEnableChange.bind(this));
-        window.addEventListener('popstate', this._onPopState.bind(this));
         window.addEventListener('copy', this._onCopy.bind(this));
         this._clipboardMonitor.on('change', this._onExternalSearchUpdate.bind(this));
 
         this._updateSearchButton();
 
         await this._prepareNestedPopups();
+
+        this.initializeState();
 
         this._isPrepared = true;
     }
@@ -158,29 +162,47 @@ class DisplaySearch extends Display {
         }
     }
 
-    async setContent(...args) {
-        this._query.blur();
-        this._closePopups();
-        return await super.setContent(...args);
-    }
-
-    clearContent() {
-        this._closePopups();
-        return super.clearContent();
-    }
-
     // Private
+
+    _onContentUpdating({type, source, content}) {
+        let animate = false;
+        let valid = false;
+        switch (type) {
+            case 'terms':
+            case 'kanji':
+                animate = content.animate;
+                valid = content.definitions.length > 0;
+                this._query.blur();
+                break;
+            case 'clear':
+                valid = false;
+                animate = true;
+                source = '';
+                break;
+        }
+        if (typeof source !== 'string') { source = ''; }
+        this._closePopups();
+        this._setQuery(source);
+        this._setIntroVisible(!valid, animate);
+        this._setTitleText(source);
+        this._updateSearchButton();
+    }
 
     _onQueryParserSearch({type, definitions, sentence, cause, textSource}) {
         this.setContent({
             focus: false,
             history: cause !== 'mouse',
-            type,
-            source: textSource.text(),
-            definitions,
-            context: {
+            params: {
+                type,
+                query: textSource.text(),
+                wildcards: 'off'
+            },
+            state: {
                 sentence,
                 url: window.location.href
+            },
+            content: {
+                definitions
             }
         });
     }
@@ -202,20 +224,7 @@ class DisplaySearch extends Display {
         e.preventDefault();
 
         const query = this._query.value;
-
-        this._queryParser.setText(query);
-
-        const url = new URL(window.location.href);
-        url.searchParams.set('query', query);
-        window.history.pushState(null, '', url.toString());
-
         this._onSearchQueryUpdated(query, true);
-    }
-
-    _onPopState() {
-        const {queryParams: {query=''}} = parseUrl(window.location.href);
-        this._setQuery(query);
-        this._onSearchQueryUpdated(this._query.value, false);
     }
 
     _onRuntimeMessage({action, params}, sender, callback) {
@@ -230,49 +239,25 @@ class DisplaySearch extends Display {
     }
 
     _onExternalSearchUpdate({text, animate=true}) {
-        this._setQuery(text);
-        const url = new URL(window.location.href);
-        url.searchParams.set('query', text);
-        window.history.pushState(null, '', url.toString());
-        this._onSearchQueryUpdated(this._query.value, animate);
+        this._onSearchQueryUpdated(text, animate);
     }
 
-    async _onSearchQueryUpdated(query, animate) {
-        try {
-            const details = {};
-            const match = /^([*\uff0a]*)([\w\W]*?)([*\uff0a]*)$/.exec(query);
-            if (match !== null) {
-                if (match[1]) {
-                    details.wildcard = 'prefix';
-                } else if (match[3]) {
-                    details.wildcard = 'suffix';
-                }
-                query = match[2];
+    _onSearchQueryUpdated(query, animate) {
+        this.setContent({
+            focus: false,
+            history: false,
+            params: {
+                query
+            },
+            state: {
+                sentence: {text: query, offset: 0},
+                url: window.location.href
+            },
+            content: {
+                definitions: null,
+                animate
             }
-
-            const valid = (query.length > 0);
-            this._setIntroVisible(!valid, animate);
-            this._updateSearchButton();
-            if (valid) {
-                const {definitions} = await api.termsFind(query, details, this.getOptionsContext());
-                this.setContent({
-                    focus: false,
-                    history: false,
-                    definitions,
-                    source: query,
-                    type: 'terms',
-                    context: {
-                        sentence: {text: query, offset: 0},
-                        url: window.location.href
-                    }
-                });
-            } else {
-                this.clearContent();
-            }
-            this._setTitleText(query);
-        } catch (e) {
-            this.onError(e);
-        }
+        });
     }
 
     _onWanakanaEnableChange(e) {
@@ -335,6 +320,8 @@ class DisplaySearch extends Display {
                 // NOP
             }
         }
+        if (this._queryText === interpretedQuery) { return; }
+        this._queryText = interpretedQuery;
         this._query.value = interpretedQuery;
         this._queryParser.setText(interpretedQuery);
     }

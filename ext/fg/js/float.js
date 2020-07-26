@@ -50,6 +50,8 @@ class DisplayFloat extends Display {
         ]);
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
 
+        this.initializeState();
+
         this._frameEndpoint.signal();
     }
 

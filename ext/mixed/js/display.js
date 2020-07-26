@@ -18,8 +18,8 @@
 /* global
  * AudioSystem
  * DOM
- * DisplayContext
  * DisplayGenerator
+ * DisplayHistory
  * Frontend
  * MediaLoader
  * PopupFactory
@@ -30,14 +30,14 @@
  * dynamicLoader
  */
 
-class Display {
+class Display extends EventDispatcher {
     constructor(spinner, container) {
+        super();
         this._spinner = spinner;
         this._container = container;
         this._definitions = [];
         this._optionsContext = {depth: 0, url: window.location.href};
         this._options = null;
-        this._context = null;
         this._index = 0;
         this._audioPlaying = null;
         this._audioFallback = null;
@@ -64,6 +64,9 @@ class Display {
         this._hotkeys = new Map();
         this._actions = new Map();
         this._messageHandlers = new Map();
+        this._history = new DisplayHistory({clearable: true, useBrowserHistory: false});
+        this._historyChangeIgnore = false;
+        this._historyHasChanged = false;
 
         this.registerActions([
             ['close',               () => { this.onEscape(); }],
@@ -116,10 +119,25 @@ class Display {
     async prepare() {
         this._setInteractive(true);
         await this._displayGenerator.prepare();
+        this._history.prepare();
+        this._history.on('stateChanged', this._onStateChanged.bind(this));
         yomichan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
         api.crossFrame.registerHandlers([
             ['popupMessage', {async: 'dynamic', handler: this._onMessage.bind(this)}]
         ]);
+    }
+
+    initializeState() {
+        this._onStateChanged();
+    }
+
+    setHistorySettings({clearable, useBrowserHistory}) {
+        if (typeof clearable !== 'undefined') {
+            this._history.clearable = clearable;
+        }
+        if (typeof useBrowserHistory !== 'undefined') {
+            this._history.useBrowserHistory = useBrowserHistory;
+        }
     }
 
     onError(error) {
@@ -202,46 +220,25 @@ class Display {
         }
     }
 
-    async setContent(details) {
-        const token = {}; // Unique identifier token
-        this._setContentToken = token;
-        try {
-            this._mediaLoader.unloadAll();
+    setContent(details) {
+        const {focus, history, params, state, content} = details;
 
-            const {focus, history, type, source, definitions, context} = details;
-
-            if (!history) {
-                this._context = new DisplayContext(type, source, definitions, context);
-            } else {
-                this._context = DisplayContext.push(this._context, type, source, definitions, context);
-            }
-
-            if (focus !== false) {
-                window.focus();
-            }
-
-            switch (type) {
-                case 'terms':
-                case 'kanji':
-                    {
-                        const {sentence, url, index=0, scroll=null} = context;
-                        await this._setContentTermsOrKanji((type === 'terms'), definitions, sentence, url, index, scroll, token);
-                    }
-                    break;
-            }
-        } catch (e) {
-            this.onError(e);
-        } finally {
-            if (this._setContentToken === token) {
-                this._setContentToken = null;
-            }
+        if (focus) {
+            window.focus();
         }
-    }
 
-    clearContent() {
-        this._setEventListenersActive(false);
-        this._container.textContent = '';
-        this._setEventListenersActive(true);
+        const urlSearchParams = new URLSearchParams();
+        for (const [key, value] of Object.entries(params)) {
+            urlSearchParams.append(key, value);
+        }
+        const url = `${location.protocol}//${location.host}${location.pathname}?${urlSearchParams.toString()}`;
+
+        if (history && this._historyHasChanged) {
+            this._history.pushState(state, content, url);
+        } else {
+            this._history.clear();
+            this._history.replaceState(state, content, url);
+        }
     }
 
     setCustomCss(css) {
@@ -348,8 +345,95 @@ class Display {
 
     // Private
 
+    async _onStateChanged() {
+        if (this._historyChangeIgnore) { return; }
+
+        const token = {}; // Unique identifier token
+        this._setContentToken = token;
+        try {
+            const urlSearchParams = new URLSearchParams(location.search);
+            let type = urlSearchParams.get('type');
+            if (type === null) { type = 'terms'; }
+
+            let asigned = false;
+            const eventArgs = {type, urlSearchParams, token};
+            this._historyHasChanged = true;
+            this._mediaLoader.unloadAll();
+            switch (type) {
+                case 'terms':
+                case 'kanji':
+                    {
+                        const source = urlSearchParams.get('query');
+                        if (!source) { break; }
+
+                        const isTerms = (type === 'terms');
+                        let {state, content} = this._history;
+                        let changeHistory = false;
+                        if (!isObject(content)) {
+                            content = {};
+                            changeHistory = true;
+                        }
+                        if (!isObject(state)) {
+                            state = {};
+                            changeHistory = true;
+                        }
+
+                        let {definitions} = content;
+                        if (!Array.isArray(definitions)) {
+                            definitions = await this._findDefinitions(isTerms, source, urlSearchParams);
+                            if (this._setContentToken !== token) { return; }
+                            content.definitions = definitions;
+                            changeHistory = true;
+                        }
+
+                        if (changeHistory) {
+                            this._historyStateUpdate(state, content);
+                        }
+
+                        asigned = true;
+                        eventArgs.source = source;
+                        eventArgs.content = content;
+                        this.trigger('contentUpdating', eventArgs);
+                        await this._setContentTermsOrKanji(token, isTerms, definitions, state);
+                    }
+                    break;
+                case 'unloaded':
+                    {
+                        const {content} = this._history;
+                        eventArgs.content = content;
+                        this.trigger('contentUpdating', eventArgs);
+                        this._setContentExtensionUnloaded();
+                    }
+                    break;
+            }
+
+            if (!asigned) {
+                const {content} = this._history;
+                eventArgs.type = 'clear';
+                eventArgs.content = content;
+                this.trigger('contentUpdating', eventArgs);
+                this._clearContent();
+            }
+
+            eventArgs.stale = (this._setContentToken !== token);
+            this.trigger('contentUpdated', eventArgs);
+        } catch (e) {
+            this.onError(e);
+        } finally {
+            if (this._setContentToken === token) {
+                this._setContentToken = null;
+            }
+        }
+    }
+
     _onExtensionUnloaded() {
-        this._setContentExtensionUnloaded();
+        this.setContent({
+            focus: false,
+            history: false,
+            params: {type: 'unloaded'},
+            state: {},
+            content: {}
+        });
     }
 
     _onSourceTermView(e) {
@@ -365,27 +449,32 @@ class Display {
     async _onKanjiLookup(e) {
         try {
             e.preventDefault();
-            if (!this._context) { return; }
+            if (!this._historyHasState()) { return; }
 
             const link = e.target;
-            this._context.update({
-                index: this._entryIndexFind(link),
-                scroll: this._windowScroll.y
-            });
-            const context = {
-                sentence: this._context.get('sentence'),
-                url: this._context.get('url')
-            };
+            const {state} = this._history;
 
-            const source = link.textContent;
-            const definitions = await api.kanjiFind(source, this.getOptionsContext());
+            state.index = this._entryIndexFind(link);
+            state.scroll = this._windowScroll.y;
+            this._historyStateUpdate(state);
+
+            const query = link.textContent;
+            const definitions = await api.kanjiFind(query, this.getOptionsContext());
             this.setContent({
                 focus: false,
                 history: true,
-                type: 'kanji',
-                source,
-                definitions,
-                context
+                params: {
+                    type: 'kanji',
+                    query,
+                    wildcards: 'off'
+                },
+                state: {
+                    sentence: state.sentence,
+                    url: state.url
+                },
+                content: {
+                    definitions
+                }
             });
         } catch (error) {
             this.onError(error);
@@ -410,10 +499,12 @@ class Display {
 
     async _onTermLookup(e) {
         try {
-            if (!this._context) { return; }
+            if (!this._historyHasState()) { return; }
 
             const termLookupResults = await this._termLookup(e);
-            if (!termLookupResults) { return; }
+            if (!termLookupResults || !this._historyHasState()) { return; }
+
+            const {state} = this._history;
             const {textSource, definitions} = termLookupResults;
 
             const scannedElement = e.target;
@@ -421,22 +512,25 @@ class Display {
             const layoutAwareScan = this._options.scanning.layoutAwareScan;
             const sentence = docSentenceExtract(textSource, sentenceExtent, layoutAwareScan);
 
-            this._context.update({
-                index: this._entryIndexFind(scannedElement),
-                scroll: this._windowScroll.y
-            });
-            const context = {
-                sentence,
-                url: this._context.get('url')
-            };
+            state.index = this._entryIndexFind(scannedElement);
+            state.scroll = this._windowScroll.y;
+            this._historyStateUpdate(state);
 
             this.setContent({
                 focus: false,
                 history: true,
-                type: 'terms',
-                source: textSource.text(),
-                definitions,
-                context
+                params: {
+                    type: 'terms',
+                    query: textSource.text(),
+                    wildcards: 'off'
+                },
+                state: {
+                    sentence,
+                    url: state.url
+                },
+                content: {
+                    definitions
+                }
             });
         } catch (error) {
             this.onError(error);
@@ -583,7 +677,7 @@ class Display {
             this.addMultipleEventListeners('.action-view-note', 'click', this._onNoteView.bind(this));
             this.addMultipleEventListeners('.action-play-audio', 'click', this._onAudioPlay.bind(this));
             this.addMultipleEventListeners('.kanji-link', 'click', this._onKanjiLookup.bind(this));
-            if (this._options.scanning.enablePopupSearch) {
+            if (this._options !== null && this._options.scanning.enablePopupSearch) {
                 this.addMultipleEventListeners('.term-glossary-item, .tag', 'mouseup', this._onGlossaryMouseUp.bind(this));
                 this.addMultipleEventListeners('.term-glossary-item, .tag', 'mousedown', this._onGlossaryMouseDown.bind(this));
                 this.addMultipleEventListeners('.term-glossary-item, .tag', 'mousemove', this._onGlossaryMouseMove.bind(this));
@@ -593,7 +687,34 @@ class Display {
         }
     }
 
-    async _setContentTermsOrKanji(isTerms, definitions, sentence, url, index, scroll, token) {
+    async _findDefinitions(isTerms, source, urlSearchParams) {
+        const optionsContext = this.getOptionsContext();
+        if (isTerms) {
+            const findDetails = {};
+            if (urlSearchParams.get('wildcards') !== 'off') {
+                const match = /^([*\uff0a]*)([\w\W]*?)([*\uff0a]*)$/.exec(source);
+                if (match !== null) {
+                    if (match[1]) {
+                        findDetails.wildcard = 'prefix';
+                    } else if (match[3]) {
+                        findDetails.wildcard = 'suffix';
+                    }
+                    source = match[2];
+                }
+            }
+
+            const {definitions} = await api.termsFind(source, findDetails, optionsContext);
+            return definitions;
+        } else {
+            const definitions = await api.kanjiFind(source, optionsContext);
+            return definitions;
+        }
+    }
+
+    async _setContentTermsOrKanji(token, isTerms, definitions, {sentence=null, url=null, index=0, scroll=null}) {
+        if (typeof url !== 'string') { url = window.location.href; }
+        sentence = this._getValidSentenceData(sentence);
+
         this._setEventListenersActive(false);
 
         this._definitions = definitions;
@@ -603,7 +724,7 @@ class Display {
             definition.url = url;
         }
 
-        this._updateNavigation(this._context.previous, this._context.next);
+        this._updateNavigation(this._history.hasPrevious(), this._history.hasNext());
         this._setNoContentVisible(definitions.length === 0);
 
         const container = this._container;
@@ -655,6 +776,11 @@ class Display {
 
         this._updateNavigation(null, null);
         this._setNoContentVisible(false);
+    }
+
+    _clearContent() {
+        this._setEventListenersActive(false);
+        this._container.textContent = '';
     }
 
     _setNoContentVisible(visible) {
@@ -746,24 +872,11 @@ class Display {
     }
 
     _relativeTermView(next) {
-        if (this._context === null) { return false; }
-
-        const relative = next ? this._context.next : this._context.previous;
-        if (!relative) { return false; }
-
-        this._context.update({
-            index: this._index,
-            scroll: this._windowScroll.y
-        });
-        this.setContent({
-            focus: false,
-            history: false,
-            type: relative.type,
-            source: relative.source,
-            definitions: relative.definitions,
-            context: relative.context
-        });
-        return true;
+        if (next) {
+            return this._history.hasNext() && this._history.forward();
+        } else {
+            return this._history.hasPrevious() && this._history.back();
+        }
     }
 
     _noteTryAdd(mode) {
@@ -913,6 +1026,13 @@ class Display {
         return index >= 0 && index < entries.length ? entries[index] : null;
     }
 
+    _getValidSentenceData(sentence) {
+        let {text, offset} = (isObject(sentence) ? sentence : {});
+        if (typeof text !== 'string') { text = ''; }
+        if (typeof offset !== 'number') { offset = 0; }
+        return {text, offset};
+    }
+
     _clozeBuild({text, offset}, source) {
         return {
             sentence: text.trim(),
@@ -998,6 +1118,22 @@ class Display {
         const entry = this._getEntry(index);
         if (entry !== null && entry.dataset.type === 'term') {
             this._audioPlay(this._definitions[index], this._getFirstExpressionIndex(), index);
+        }
+    }
+
+    _historyHasState() {
+        return isObject(this._history.state);
+    }
+
+    _historyStateUpdate(state, content) {
+        const historyChangeIgnorePre = this._historyChangeIgnore;
+        try {
+            this._historyChangeIgnore = true;
+            if (typeof state === 'undefined') { state = this._history.state; }
+            if (typeof content === 'undefined') { content = this._history.content; }
+            this._history.replaceState(state, content);
+        } finally {
+            this._historyChangeIgnore = historyChangeIgnorePre;
         }
     }
 }
