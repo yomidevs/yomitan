@@ -76,36 +76,36 @@ class Display extends EventDispatcher {
         });
 
         this.registerActions([
-            ['close',               () => { this.onEscape(); }],
-            ['next-entry',          () => { this._focusEntry(this._index + 1, true); }],
-            ['next-entry-x3',       () => { this._focusEntry(this._index + 3, true); }],
-            ['previous-entry',      () => { this._focusEntry(this._index - 1, true); }],
-            ['previous-entry-x3',   () => { this._focusEntry(this._index - 3, true); }],
-            ['last-entry',          () => { this._focusEntry(this._definitions.length - 1, true); }],
-            ['first-entry',         () => { this._focusEntry(0, true); }],
-            ['history-backward',    () => { this._sourceTermView(); }],
-            ['history-forward',     () => { this._nextTermView(); }],
-            ['add-note-kanji',      () => { this._noteTryAdd('kanji'); }],
-            ['add-note-term-kanji', () => { this._noteTryAdd('term-kanji'); }],
-            ['add-note-term-kana',  () => { this._noteTryAdd('term-kana'); }],
-            ['view-note',           () => { this._noteTryView(); }],
-            ['play-audio',          () => { this._playAudioCurrent(); }]
+            ['close',            () => { this.onEscape(); }],
+            ['nextEntry',        () => { this._focusEntry(this._index + 1, true); }],
+            ['nextEntry3',       () => { this._focusEntry(this._index + 3, true); }],
+            ['previousEntry',    () => { this._focusEntry(this._index - 1, true); }],
+            ['previousEntry3',   () => { this._focusEntry(this._index - 3, true); }],
+            ['lastEntry',        () => { this._focusEntry(this._definitions.length - 1, true); }],
+            ['firstEntry',       () => { this._focusEntry(0, true); }],
+            ['historyBackward',  () => { this._sourceTermView(); }],
+            ['historyForward',   () => { this._nextTermView(); }],
+            ['addNoteKanji',     () => { this._noteTryAdd('kanji'); }],
+            ['addNoteTermKanji', () => { this._noteTryAdd('term-kanji'); }],
+            ['addNoteTermKana',  () => { this._noteTryAdd('term-kana'); }],
+            ['viewNote',         () => { this._noteTryView(); }],
+            ['playAudio',        () => { this._playAudioCurrent(); }]
         ]);
         this.registerHotkeys([
             {key: 'Escape',    modifiers: [],      action: 'close'},
-            {key: 'PageUp',    modifiers: ['alt'], action: 'previous-entry-x3'},
-            {key: 'PageDown',  modifiers: ['alt'], action: 'next-entry-x3'},
-            {key: 'End',       modifiers: ['alt'], action: 'last-entry'},
-            {key: 'Home',      modifiers: ['alt'], action: 'first-entry'},
-            {key: 'ArrowUp',   modifiers: ['alt'], action: 'previous-entry'},
-            {key: 'ArrowDown', modifiers: ['alt'], action: 'next-entry'},
-            {key: 'B',         modifiers: ['alt'], action: 'history-backward'},
-            {key: 'F',         modifiers: ['alt'], action: 'history-forward'},
-            {key: 'K',         modifiers: ['alt'], action: 'add-note-kanji'},
-            {key: 'E',         modifiers: ['alt'], action: 'add-note-term-kanji'},
-            {key: 'R',         modifiers: ['alt'], action: 'add-note-term-kana'},
-            {key: 'P',         modifiers: ['alt'], action: 'play-audio'},
-            {key: 'V',         modifiers: ['alt'], action: 'view-note'}
+            {key: 'PageUp',    modifiers: ['alt'], action: 'previousEntry3'},
+            {key: 'PageDown',  modifiers: ['alt'], action: 'nextEntry3'},
+            {key: 'End',       modifiers: ['alt'], action: 'lastEntry'},
+            {key: 'Home',      modifiers: ['alt'], action: 'firstEntry'},
+            {key: 'ArrowUp',   modifiers: ['alt'], action: 'previousEntry'},
+            {key: 'ArrowDown', modifiers: ['alt'], action: 'nextEntry'},
+            {key: 'B',         modifiers: ['alt'], action: 'historyBackward'},
+            {key: 'F',         modifiers: ['alt'], action: 'historyForward'},
+            {key: 'K',         modifiers: ['alt'], action: 'addNoteKanji'},
+            {key: 'E',         modifiers: ['alt'], action: 'addNoteTermKanji'},
+            {key: 'R',         modifiers: ['alt'], action: 'addNoteTermKana'},
+            {key: 'P',         modifiers: ['alt'], action: 'playAudio'},
+            {key: 'V',         modifiers: ['alt'], action: 'viewNote'}
         ]);
         this.registerMessageHandlers([
             ['setOptionsContext',  {async: false, handler: this._onMessageSetOptionsContext.bind(this)}],

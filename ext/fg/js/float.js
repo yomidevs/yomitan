@@ -32,10 +32,10 @@ class DisplayFloat extends Display {
         ]);
 
         this.registerActions([
-            ['copy-host-selection', () => this._copySelection()]
+            ['copyHostSelection', () => this._copySelection()]
         ]);
         this.registerHotkeys([
-            {key: 'C', modifiers: ['ctrl'], action: 'copy-host-selection'}
+            {key: 'C', modifiers: ['ctrl'], action: 'copyHostSelection'}
         ]);
 
         this.autoPlayAudioDelay = 400;
