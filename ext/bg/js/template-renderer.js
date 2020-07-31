@@ -25,6 +25,7 @@ class TemplateRenderer {
         this._cache = new Map();
         this._cacheMaxSize = 5;
         this._helpersRegistered = false;
+        this._stateStack = null;
     }
 
     async render(template, data) {
@@ -41,7 +42,12 @@ class TemplateRenderer {
             cache.set(template, instance);
         }
 
-        return instance(data).trim();
+        try {
+            this._stateStack = [new Map()];
+            return instance(data).trim();
+        } finally {
+            this._stateStack = null;
+        }
     }
 
     // Private
@@ -70,7 +76,13 @@ class TemplateRenderer {
             ['regexReplace',     this._regexReplace.bind(this)],
             ['regexMatch',       this._regexMatch.bind(this)],
             ['mergeTags',        this._mergeTags.bind(this)],
-            ['eachUpTo',         this._eachUpTo.bind(this)]
+            ['eachUpTo',         this._eachUpTo.bind(this)],
+            ['spread',           this._spread.bind(this)],
+            ['op',               this._op.bind(this)],
+            ['get',              this._get.bind(this)],
+            ['set',              this._set.bind(this)],
+            ['scope',            this._scope.bind(this)],
+            ['isMoraPitchHigh',  this._isMoraPitchHigh.bind(this)]
         ];
 
         for (const [name, helper] of helpers) {
@@ -223,5 +235,116 @@ class TemplateRenderer {
             }
         }
         return options.inverse(context);
+    }
+
+    _spread(context, ...args) {
+        const result = [];
+        for (let i = 0, ii = args.length - 1; i < ii; ++i) {
+            try {
+                result.push(...args[i]);
+            } catch (e) {
+                // NOP
+            }
+        }
+        return result;
+    }
+
+    _op(context, ...args) {
+        switch (args.length) {
+            case 3: return this._evaluateUnaryExpression(args[0], args[1]);
+            case 4: return this._evaluateBinaryExpression(args[0], args[1], args[2]);
+            case 5: return this._evaluateTernaryExpression(args[0], args[1], args[2], args[3]);
+            default: return void 0;
+        }
+    }
+
+    _evaluateUnaryExpression(operator, operand1) {
+        switch (operator) {
+            case '+': return +operand1;
+            case '-': return -operand1;
+            case '~': return ~operand1;
+            case '!': return !operand1;
+            default: return void 0;
+        }
+    }
+
+    _evaluateBinaryExpression(operator, operand1, operand2) {
+        switch (operator) {
+            case '+': return operand1 + operand2;
+            case '-': return operand1 - operand2;
+            case '/': return operand1 / operand2;
+            case '*': return operand1 * operand2;
+            case '%': return operand1 % operand2;
+            case '**': return operand1 ** operand2;
+            case '==': return operand1 == operand2; // eslint-disable-line eqeqeq
+            case '!=': return operand1 != operand2; // eslint-disable-line eqeqeq
+            case '===': return operand1 === operand2;
+            case '!==': return operand1 !== operand2;
+            case '<':  return operand1 < operand2;
+            case '<=': return operand1 <= operand2;
+            case '>':  return operand1 > operand2;
+            case '>=': return operand1 >= operand2;
+            case '<<': return operand1 << operand2;
+            case '>>': return operand1 >> operand2;
+            case '>>>': return operand1 >>> operand2;
+            case '&': return operand1 & operand2;
+            case '|': return operand1 | operand2;
+            case '^': return operand1 ^ operand2;
+            case '&&': return operand1 && operand2;
+            case '||': return operand1 || operand2;
+            default: return void 0;
+        }
+    }
+
+    _evaluateTernaryExpression(operator, operand1, operand2, operand3) {
+        switch (operator) {
+            case '?:': return operand1 ? operand2 : operand3;
+            default: return void 0;
+        }
+    }
+
+    _get(context, key) {
+        for (let i = this._stateStack.length; --i >= 0;) {
+            const map = this._stateStack[i];
+            if (map.has(key)) {
+                return map.get(key);
+            }
+        }
+        return void 0;
+    }
+
+    _set(context, ...args) {
+        switch (args.length) {
+            case 2:
+            {
+                const [key, options] = args;
+                const value = options.fn(context);
+                this._stateStack[this._stateStack.length - 1].set(key, value);
+                return value;
+            }
+            case 3:
+            {
+                const [key, value] = args;
+                this._stateStack[this._stateStack.length - 1].set(key, value);
+                return value;
+            }
+            default:
+                return void 0;
+        }
+    }
+
+    _scope(context, options) {
+        try {
+            this._stateStack.push(new Map());
+            return options.fn(context);
+        } finally {
+            if (this._stateStack.length > 1) {
+                this._stateStack.pop();
+            }
+        }
+    }
+
+    _isMoraPitchHigh(context, position, index) {
+        return jp.isMoraPitchHigh(index, position);
     }
 }
