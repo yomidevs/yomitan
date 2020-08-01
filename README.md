@@ -163,6 +163,10 @@ Flashcard fields can be configured with the following steps:
     `{furigana}` | Term expressed as kanji with furigana displayed above it (e.g. <ruby>日本語<rt>にほんご</rt></ruby>).
     `{furigana-plain}` | Term expressed as kanji with furigana displayed next to it in brackets (e.g. 日本語[にほんご]).
     `{glossary}` | List of definitions for the term (output format depends on whether running in *grouped* mode).
+    `{glossary-brief}` | List of definitions for the term in a more compact format.
+    `{pitch-accents}` | List of pitch accent downstep notations for the term.
+    `{pitch-accent-graphs}` | List of pitch accent graphs for the term.
+    `{pitch-accent-positions}` | List of accent downstep positions for the term as a number.
     `{reading}` | Kana reading for the term (empty for terms where the expression is the reading).
     `{screenshot}` | Screenshot of the web page taken at the time the term was added.
     `{sentence}` | Sentence, quote, or phrase that the term appears in from the source content.

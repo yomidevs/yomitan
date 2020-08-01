@@ -54,6 +54,9 @@ class AnkiController {
                     'furigana-plain',
                     'glossary',
                     'glossary-brief',
+                    'pitch-accents',
+                    'pitch-accent-graphs',
+                    'pitch-accent-positions',
                     'reading',
                     'screenshot',
                     'sentence',
@@ -63,6 +66,9 @@ class AnkiController {
             case 'kanji':
                 return [
                     'character',
+                    'cloze-body',
+                    'cloze-prefix',
+                    'cloze-suffix',
                     'dictionary',
                     'document-title',
                     'glossary',

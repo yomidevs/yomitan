@@ -82,7 +82,10 @@ class TemplateRenderer {
             ['get',              this._get.bind(this)],
             ['set',              this._set.bind(this)],
             ['scope',            this._scope.bind(this)],
-            ['isMoraPitchHigh',  this._isMoraPitchHigh.bind(this)]
+            ['property',         this._property.bind(this)],
+            ['noop',             this._noop.bind(this)],
+            ['isMoraPitchHigh',  this._isMoraPitchHigh.bind(this)],
+            ['getKanaMorae',     this._getKanaMorae.bind(this)]
         ];
 
         for (const [name, helper] of helpers) {
@@ -316,21 +319,20 @@ class TemplateRenderer {
     _set(context, ...args) {
         switch (args.length) {
             case 2:
-            {
-                const [key, options] = args;
-                const value = options.fn(context);
-                this._stateStack[this._stateStack.length - 1].set(key, value);
-                return value;
-            }
+                {
+                    const [key, options] = args;
+                    const value = options.fn(context);
+                    this._stateStack[this._stateStack.length - 1].set(key, value);
+                }
+                break;
             case 3:
-            {
-                const [key, value] = args;
-                this._stateStack[this._stateStack.length - 1].set(key, value);
-                return value;
-            }
-            default:
-                return void 0;
+                {
+                    const [key, value] = args;
+                    this._stateStack[this._stateStack.length - 1].set(key, value);
+                }
+                break;
         }
+        return '';
     }
 
     _scope(context, options) {
@@ -344,7 +346,30 @@ class TemplateRenderer {
         }
     }
 
-    _isMoraPitchHigh(context, position, index) {
+    _property(context, ...args) {
+        const ii = args.length - 1;
+        if (ii <= 0) { return void 0; }
+
+        try {
+            let value = args[0];
+            for (let i = 1; i < ii; ++i) {
+                value = value[args[i]];
+            }
+            return value;
+        } catch (e) {
+            return void 0;
+        }
+    }
+
+    _noop(context, options) {
+        return options.fn(context);
+    }
+
+    _isMoraPitchHigh(context, index, position) {
         return jp.isMoraPitchHigh(index, position);
+    }
+
+    _getKanaMorae(context, text) {
+        return jp.getKanaMorae(`${text}`);
     }
 }

@@ -380,31 +380,83 @@ class OptionsUtil {
         return [
             {
                 async: false,
-                update: (options) => {
-                    // Version 1 changes:
-                    //  Added options.global.database.prefixWildcardsSupported = false
-                    options.global = {
-                        database: {
-                            prefixWildcardsSupported: false
-                        }
-                    };
-                    return options;
-                }
+                update: this._updateVersion1.bind(this)
             },
             {
                 async: false,
-                update: (options) => {
-                    // Version 2 changes:
-                    //  Legacy profile update process moved into this upgrade function.
-                    for (const profile of options.profiles) {
-                        if (!Array.isArray(profile.conditionGroups)) {
-                            profile.conditionGroups = [];
-                        }
-                        profile.options = this._legacyProfileUpdateUpdateVersion(profile.options);
-                    }
-                    return options;
-                }
+                update: this._updateVersion2.bind(this)
+            },
+            {
+                async: true,
+                update: this._updateVersion3.bind(this)
             }
         ];
+    }
+
+    static _updateVersion1(options) {
+        // Version 1 changes:
+        //  Added options.global.database.prefixWildcardsSupported = false.
+        options.global = {
+            database: {
+                prefixWildcardsSupported: false
+            }
+        };
+        return options;
+    }
+
+    static _updateVersion2(options) {
+        // Version 2 changes:
+        //  Legacy profile update process moved into this upgrade function.
+        for (const profile of options.profiles) {
+            if (!Array.isArray(profile.conditionGroups)) {
+                profile.conditionGroups = [];
+            }
+            profile.options = this._legacyProfileUpdateUpdateVersion(profile.options);
+        }
+        return options;
+    }
+
+    static async _updateVersion3(options) {
+        // Version 3 changes:
+        //  Pitch accent Anki field templates added.
+        let addition = null;
+        for (const {options: profileOptions} of options.profiles) {
+            const fieldTemplates = profileOptions.anki.fieldTemplates;
+            if (fieldTemplates !== null) {
+                if (addition === null) {
+                    addition = await this._updateVersion3GetAnkiFieldTemplates();
+                }
+                profileOptions.anki.fieldTemplates = this._addFieldTemplatesBeforeEnd(fieldTemplates, addition);
+            }
+        }
+        return options;
+    }
+
+    static async _updateVersion3GetAnkiFieldTemplates() {
+        const url = chrome.runtime.getURL('/bg/data/anki-field-templates-upgrade-v2.handlebars');
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'no-cors',
+            cache: 'default',
+            credentials: 'omit',
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer'
+        });
+        return await response.text();
+    }
+
+    static async _addFieldTemplatesBeforeEnd(fieldTemplates, addition) {
+        const pattern = /[ \t]*\{\{~?>\s*\(\s*lookup\s*\.\s*"marker"\s*\)\s*~?\}\}/;
+        const newline = '\n';
+        let replaced = false;
+        fieldTemplates = fieldTemplates.replace(pattern, (g0) => {
+            replaced = true;
+            return `${addition}${newline}${g0}`;
+        });
+        if (!replaced) {
+            fieldTemplates += newline;
+            fieldTemplates += addition;
+        }
+        return fieldTemplates;
     }
 }
