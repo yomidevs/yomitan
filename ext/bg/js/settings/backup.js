@@ -16,9 +16,8 @@
  */
 
 /* global
+ * OptionsUtil
  * api
- * optionsGetDefault
- * optionsUpdateVersion
  */
 
 class SettingsBackup {
@@ -323,7 +322,7 @@ class SettingsBackup {
         }
 
         // Upgrade options
-        optionsFull = optionsUpdateVersion(optionsFull, {});
+        optionsFull = await OptionsUtil.update(optionsFull);
 
         // Check for warnings
         const sanitizationWarnings = this._settingsImportSanitizeOptions(optionsFull, true);
@@ -369,7 +368,7 @@ class SettingsBackup {
         $('#settings-reset-modal').modal('hide');
 
         // Get default options
-        const optionsFull = optionsGetDefault();
+        const optionsFull = await OptionsUtil.getDefault();
 
         // Assign options
         await this._settingsImportSetOptionsFull(optionsFull);
