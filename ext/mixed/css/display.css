@@ -305,6 +305,7 @@ button.action-button {
     border-bottom: 0.03571428em dashed var(--dark-border-color); /* 28px => 1px */
     color: var(--default-text-color);
     text-decoration: none;
+    cursor: pointer;
 }
 
 .term-expression[data-frequency=popular]>.term-expression-text,

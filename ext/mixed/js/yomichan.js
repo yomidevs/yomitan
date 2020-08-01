@@ -48,6 +48,7 @@ const yomichan = (() => {
             }
 
             this._isExtensionUnloaded = false;
+            this._isTriggeringExtensionUnloaded = false;
             this._isReady = false;
 
             const {promise, resolve} = deferPromise();
@@ -256,7 +257,13 @@ const yomichan = (() => {
 
         triggerExtensionUnloaded() {
             this._isExtensionUnloaded = true;
-            this.trigger('extensionUnloaded');
+            if (this._isTriggeringExtensionUnloaded) { return; }
+            try {
+                this._isTriggeringExtensionUnloaded = true;
+                this.trigger('extensionUnloaded');
+            } finally {
+                this._isTriggeringExtensionUnloaded = false;
+            }
         }
 
         // Private

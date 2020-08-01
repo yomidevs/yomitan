@@ -63,11 +63,14 @@ class DisplaySearch extends Display {
 
         this.on('contentUpdating', this._onContentUpdating.bind(this));
 
+        this.queryParserVisible = true;
         this.setHistorySettings({useBrowserHistory: true});
 
         const options = this.getOptions();
 
-        const {queryParams: {query='', mode=''}} = parseUrl(window.location.href);
+        const urlSearchParams = new URLSearchParams(location.search);
+        let mode = urlSearchParams.get('mode');
+        if (mode === null) { mode = ''; }
 
         document.documentElement.dataset.searchMode = mode;
 
@@ -77,8 +80,6 @@ class DisplaySearch extends Display {
         } else {
             this._wanakanaEnable.checked = false;
         }
-
-        this._setQuery(query);
 
         if (mode !== 'popup') {
             if (options.general.enableClipboardMonitor === true) {
@@ -147,14 +148,24 @@ class DisplaySearch extends Display {
         if (!this._isPrepared) { return; }
         const query = this._query.value;
         if (query) {
-            this._setQuery(query);
             this._onSearchQueryUpdated(query, false);
         }
     }
 
+    postProcessQuery(query) {
+        if (this._isWanakanaEnabled()) {
+            try {
+                query = wanakana.toKana(query);
+            } catch (e) {
+                // NOP
+            }
+        }
+        return query;
+    }
+
     // Private
 
-    _onContentUpdating({type, source, content, urlSearchParams}) {
+    _onContentUpdating({type, content, source}) {
         let animate = false;
         let valid = false;
         switch (type) {
@@ -173,13 +184,8 @@ class DisplaySearch extends Display {
 
         if (typeof source !== 'string') { source = ''; }
 
-        let full = urlSearchParams.get('full');
-        if (full === null) { full = source; }
-
-        this._closePopups();
-        this._setQuery(full);
+        this._query.value = source;
         this._setIntroVisible(!valid, animate);
-        this._setTitleText(source);
         this._updateSearchButton();
     }
 
@@ -289,19 +295,6 @@ class DisplaySearch extends Display {
         return this._wanakanaEnable !== null && this._wanakanaEnable.checked;
     }
 
-    _setQuery(query) {
-        let interpretedQuery = query;
-        if (this._isWanakanaEnabled()) {
-            try {
-                interpretedQuery = wanakana.toKana(query);
-            } catch (e) {
-                // NOP
-            }
-        }
-        this._query.value = interpretedQuery;
-        this.setQueryParserText(interpretedQuery);
-    }
-
     _setIntroVisible(visible, animate) {
         if (this._introVisible === visible) {
             return;
@@ -362,19 +355,6 @@ class DisplaySearch extends Display {
         this._search.disabled = this._introVisible && (this._query === null || this._query.value.length === 0);
     }
 
-    _setTitleText(text) {
-        // Chrome limits title to 1024 characters
-        if (text.length > 1000) {
-            text = text.substring(0, 1000) + '...';
-        }
-
-        if (text.length === 0) {
-            document.title = 'Yomichan Search';
-        } else {
-            document.title = `${text} - Yomichan Search`;
-        }
-    }
-
     async _prepareNestedPopups() {
         let complete = false;
 
@@ -400,9 +380,5 @@ class DisplaySearch extends Display {
         yomichan.on('optionsUpdated', onOptionsUpdated);
 
         await onOptionsUpdated();
-    }
-
-    _closePopups() {
-        yomichan.trigger('closePopups');
     }
 }
