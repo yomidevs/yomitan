@@ -35,8 +35,6 @@
  * jp
  * profileConditionsDescriptor
  * profileConditionsDescriptorPromise
- * requestJson
- * requestText
  */
 
 class Backend {
@@ -199,8 +197,8 @@ class Backend {
 
             await profileConditionsDescriptorPromise;
 
-            this._optionsSchema = await requestJson(chrome.runtime.getURL('/bg/data/options-schema.json'), 'GET');
-            this._defaultAnkiFieldTemplates = (await requestText(chrome.runtime.getURL('/bg/data/default-anki-field-templates.handlebars'), 'GET')).trim();
+            this._optionsSchema = await this._fetchAsset('/bg/data/options-schema.json', true);
+            this._defaultAnkiFieldTemplates = (await this._fetchAsset('/bg/data/default-anki-field-templates.handlebars')).trim();
             this._options = await OptionsUtil.load();
             this._options = JsonSchema.getValidValueOrDefault(this._optionsSchema, this._options);
 
@@ -615,7 +613,7 @@ class Backend {
         if (!url.startsWith('/') || url.startsWith('//') || !url.endsWith('.css')) {
             throw new Error('Invalid URL');
         }
-        return await requestText(url, 'GET');
+        return await this._fetchAsset(url);
     }
 
     _onApiGetEnvironmentInfo() {
@@ -653,13 +651,11 @@ class Backend {
     }
 
     async _onApiGetDisplayTemplatesHtml() {
-        const url = chrome.runtime.getURL('/mixed/display-templates.html');
-        return await requestText(url, 'GET');
+        return await this._fetchAsset('/mixed/display-templates.html');
     }
 
     async _onApiGetQueryParserTemplatesHtml() {
-        const url = chrome.runtime.getURL('/bg/query-parser-templates.html');
-        return await requestText(url, 'GET');
+        return await this._fetchAsset('/bg/query-parser-templates.html');
     }
 
     _onApiGetZoom(params, sender) {
@@ -1521,5 +1517,20 @@ class Backend {
                 }, timeout);
             }
         });
+    }
+
+    async _fetchAsset(url, json=false) {
+        const response = await fetch(chrome.runtime.getURL(url), {
+            method: 'GET',
+            mode: 'no-cors',
+            cache: 'default',
+            credentials: 'omit',
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer'
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to fetch ${url}: ${response.status}`);
+        }
+        return await (json ? response.json() : response.text());
     }
 }

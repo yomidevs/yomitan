@@ -15,10 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * requestJson
- */
-
 class AnkiConnect {
     constructor(server) {
         this._enabled = false;
@@ -110,7 +106,16 @@ class AnkiConnect {
     }
 
     async _invoke(action, params) {
-        const result = await requestJson(this._server, 'POST', {action, params, version: this._localVersion}, true);
+        const response = await fetch(this._server, {
+            method: 'POST',
+            mode: 'cors',
+            cache: 'default',
+            credentials: 'omit',
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer',
+            body: JSON.stringify({action, params, version: this._localVersion})
+        });
+        const result = await response.json();
         if (isObject(result)) {
             const error = result.error;
             if (typeof error !== 'undefined') {

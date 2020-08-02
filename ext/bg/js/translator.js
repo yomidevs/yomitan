@@ -29,7 +29,6 @@
  * dictTermsSort
  * dictTermsUndupe
  * jp
- * requestJson
  */
 
 class Translator {
@@ -40,8 +39,7 @@ class Translator {
     }
 
     async prepare() {
-        const url = chrome.runtime.getURL('/bg/lang/deinflect.json');
-        const reasons = await requestJson(url, 'GET');
+        const reasons = await this._fetchJsonAsset('/bg/lang/deinflect.json');
         this.deinflector = new Deinflector(reasons);
     }
 
@@ -656,5 +654,20 @@ class Translator {
         }
 
         return text;
+    }
+
+    async _fetchJsonAsset(url) {
+        const response = await fetch(chrome.runtime.getURL(url), {
+            method: 'GET',
+            mode: 'no-cors',
+            cache: 'default',
+            credentials: 'omit',
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer'
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to fetch ${url}: ${response.status}`);
+        }
+        return await response.json();
     }
 }

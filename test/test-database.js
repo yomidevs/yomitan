@@ -30,7 +30,7 @@ const chrome = {
             removeListener() { /* NOP */ }
         },
         getURL(path2) {
-            return url.pathToFileURL(path.join(__dirname, '..', 'ext', path2.replace(/^\//, '')));
+            return url.pathToFileURL(path.join(__dirname, '..', 'ext', path2.replace(/^\//, ''))).href;
         },
         sendMessage() {
             // NOP
@@ -89,6 +89,9 @@ async function fetch(url2) {
     await Promise.resolve();
     const content = fs.readFileSync(filePath, {encoding: null});
     return {
+        ok: true,
+        status: 200,
+        statusText: 'OK',
         text: async () => Promise.resolve(content.toString('utf8')),
         json: async () => Promise.resolve(JSON.parse(content.toString('utf8')))
     };
@@ -113,7 +116,6 @@ vm.execute([
     'bg/js/json-schema.js',
     'bg/js/dictionary.js',
     'bg/js/media-utility.js',
-    'bg/js/request.js',
     'bg/js/dictionary-importer.js',
     'bg/js/database.js',
     'bg/js/dictionary-database.js'
