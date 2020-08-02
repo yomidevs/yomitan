@@ -49,6 +49,9 @@ class DisplayFloat extends Display {
             ['setContentScale', {async: false, handler: this._onMessageSetContentScale.bind(this)}]
         ]);
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
+        document.documentElement.addEventListener('mouseup', this._onMouseUp.bind(this), false);
+        document.documentElement.addEventListener('click', this._onClick.bind(this), false);
+        document.documentElement.addEventListener('auxclick', this._onClick.bind(this), false);
 
         this.initializeState();
 
@@ -137,6 +140,38 @@ class DisplayFloat extends Display {
     }
 
     // Private
+
+    _onMouseUp(e) {
+        switch (e.button) {
+            case 3: // Back
+                if (this._history.hasPrevious()) {
+                    e.preventDefault();
+                }
+                break;
+            case 4: // Forward
+                if (this._history.hasNext()) {
+                    e.preventDefault();
+                }
+                break;
+        }
+    }
+
+    _onClick(e) {
+        switch (e.button) {
+            case 3: // Back
+                if (this._history.hasPrevious()) {
+                    e.preventDefault();
+                    this._history.back();
+                }
+                break;
+            case 4: // Forward
+                if (this._history.hasNext()) {
+                    e.preventDefault();
+                    this._history.forward();
+                }
+                break;
+        }
+    }
 
     _copySelection() {
         if (window.getSelection().toString()) { return false; }
