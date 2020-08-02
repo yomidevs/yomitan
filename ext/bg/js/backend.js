@@ -28,6 +28,7 @@
  * Mecab
  * ObjectPropertyAccessor
  * OptionsUtil
+ * RequestBuilder
  * TemplateRenderer
  * Translator
  * conditionsTestValue
@@ -49,9 +50,13 @@ class Backend {
         this._options = null;
         this._optionsSchema = null;
         this._defaultAnkiFieldTemplates = null;
-        this._audioUriBuilder = new AudioUriBuilder();
+        this._requestBuilder = new RequestBuilder();
+        this._audioUriBuilder = new AudioUriBuilder({
+            requestBuilder: this._requestBuilder
+        });
         this._audioSystem = new AudioSystem({
             audioUriBuilder: this._audioUriBuilder,
+            requestBuilder: this._requestBuilder,
             useCache: false
         });
         this._ankiNoteBuilder = new AnkiNoteBuilder({

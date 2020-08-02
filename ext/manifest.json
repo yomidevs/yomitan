@@ -67,7 +67,9 @@
         "storage",
         "clipboardWrite",
         "unlimitedStorage",
-        "nativeMessaging"
+        "nativeMessaging",
+        "webRequest",
+        "webRequestBlocking"
     ],
     "optional_permissions": [
         "clipboardRead"
