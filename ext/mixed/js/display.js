@@ -430,10 +430,6 @@ class Display extends EventDispatcher {
             this.trigger('contentUpdated', eventArgs);
         } catch (e) {
             this.onError(e);
-        } finally {
-            if (this._setContentToken === token) {
-                this._setContentToken = null;
-            }
         }
     }
 
