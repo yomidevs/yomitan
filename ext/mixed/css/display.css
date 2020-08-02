@@ -217,6 +217,12 @@ h2 {
     display: none;
 }
 
+:root[data-yomichan-page=float] #query-parser-container {
+    padding-left: 0.72em;
+    padding-right: 0.72em;
+    border-bottom: 0.07142857142857142em solid var(--light-border-color); /* 14px => 1px */
+}
+
 
 /*
  * Entries

@@ -32,6 +32,14 @@ class TextSourceRange {
         this.imposterSourceElement = imposterSourceElement;
     }
 
+    get startOffset() {
+        return this.range.startOffset;
+    }
+
+    get endOffset() {
+        return this.range.endOffset;
+    }
+
     clone() {
         return new TextSourceRange(this.range.cloneRange(), this.content, this.imposterContainer, this.imposterSourceElement);
     }
@@ -230,8 +238,7 @@ class TextSourceElement {
             other instanceof TextSourceElement &&
             this._element === other.element &&
             this._fullContent === other.fullContent &&
-            this._startOffset === other.startOffset &&
-            this._endOffset === other.endOffset
+            this._startOffset === other.startOffset
         );
     }
 

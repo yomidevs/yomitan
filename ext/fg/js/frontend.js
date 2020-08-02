@@ -20,6 +20,7 @@
  * FrameOffsetForwarder
  * PopupProxy
  * TextScanner
+ * TextSourceElement
  * api
  * docSentenceExtract
  */
@@ -423,27 +424,29 @@ class Frontend {
         const sentenceExtent = this._options.anki.sentenceExt;
         const layoutAwareScan = this._options.scanning.layoutAwareScan;
         const sentence = docSentenceExtract(textSource, sentenceExtent, layoutAwareScan);
-        this._showPopupContent(
-            textSource,
-            optionsContext,
-            {
-                focus,
-                history: false,
-                params: {
-                    type,
-                    query: textSource.text(),
-                    wildcards: 'off'
-                },
-                state: {
-                    focusEntry: 0,
-                    sentence,
-                    url
-                },
-                content: {
-                    definitions
-                }
+        const query = textSource.text();
+        const details = {
+            focus,
+            history: false,
+            params: {
+                type,
+                query,
+                wildcards: 'off'
+            },
+            state: {
+                focusEntry: 0,
+                sentence,
+                url
+            },
+            content: {
+                definitions
             }
-        );
+        };
+        if (textSource instanceof TextSourceElement && textSource.fullContent !== query) {
+            details.params.full = textSource.fullContent;
+            details.params['full-visible'] = 'true';
+        }
+        this._showPopupContent(textSource, optionsContext, details);
     }
 
     _showPopupContent(textSource, optionsContext, details=null) {
