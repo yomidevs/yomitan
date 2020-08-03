@@ -69,6 +69,7 @@ class Display extends EventDispatcher {
         this._historyChangeIgnore = false;
         this._historyHasChanged = false;
         this._navigationHeader = document.querySelector('#navigation-header');
+        this._contentType = 'clear';
         this._defaultTitle = 'Yomichan Search';
         this._defaultTitleMaxLength = 1000;
         this._fullQuery = '';
@@ -393,6 +394,7 @@ class Display extends EventDispatcher {
             let asigned = false;
             const eventArgs = {type, urlSearchParams, token};
             this._historyHasChanged = true;
+            this._contentType = type;
             this._mediaLoader.unloadAll();
             switch (type) {
                 case 'terms':
@@ -416,8 +418,10 @@ class Display extends EventDispatcher {
             const stale = (this._setContentToken !== token);
             if (!stale) {
                 if (!asigned) {
+                    type = 'clear';
+                    this._contentType = type;
                     const {content} = this._history;
-                    eventArgs.type = 'clear';
+                    eventArgs.type = type;
                     eventArgs.content = content;
                     this.trigger('contentUpdating', eventArgs);
                     this._clearContent();
@@ -451,10 +455,12 @@ class Display extends EventDispatcher {
     }
 
     _onExtensionUnloaded() {
+        const type = 'unloaded';
+        if (this._contentType === type) { return; }
         const details = {
             focus: false,
             history: false,
-            params: {type: 'unloaded'},
+            params: {type},
             state: {},
             content: {}
         };

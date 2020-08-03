@@ -60,24 +60,20 @@ class PopupProxy extends EventDispatcher {
         return true;
     }
 
-    async setOptionsContext(optionsContext, source) {
-        return await this._invoke('setOptionsContext', {id: this._id, optionsContext, source});
+    setOptionsContext(optionsContext, source) {
+        return this._invokeSafe('setOptionsContext', {id: this._id, optionsContext, source});
     }
 
     hide(changeFocus) {
-        this._invoke('hide', {id: this._id, changeFocus});
+        return this._invokeSafe('hide', {id: this._id, changeFocus});
     }
 
-    async isVisible() {
-        try {
-            return await this._invoke('isVisible', {id: this._id});
-        } catch (e) {
-            return false;
-        }
+    isVisible() {
+        return this._invokeSafe('isVisible', {id: this._id}, false);
     }
 
     setVisibleOverride(visible) {
-        this._invoke('setVisibleOverride', {id: this._id, visible});
+        return this._invokeSafe('setVisibleOverride', {id: this._id, visible});
     }
 
     async containsPoint(x, y) {
@@ -85,7 +81,7 @@ class PopupProxy extends EventDispatcher {
             await this._updateFrameOffset();
             [x, y] = this._applyFrameOffset(x, y);
         }
-        return await this._invoke('containsPoint', {id: this._id, x, y});
+        return await this._invokeSafe('containsPoint', {id: this._id, x, y}, false);
     }
 
     async showContent(details, displayDetails) {
@@ -98,29 +94,34 @@ class PopupProxy extends EventDispatcher {
             }
             details.elementRect = {x, y, width, height};
         }
-        return await this._invoke('showContent', {id: this._id, details, displayDetails});
+        return await this._invokeSafe('showContent', {id: this._id, details, displayDetails});
     }
 
     setCustomCss(css) {
-        this._invoke('setCustomCss', {id: this._id, css});
+        return this._invokeSafe('setCustomCss', {id: this._id, css});
     }
 
-    async clearAutoPlayTimer() {
-        try {
-            await this._invoke('clearAutoPlayTimer', {id: this._id});
-        } catch (e) {
-            // NOP
-        }
+    clearAutoPlayTimer() {
+        return this._invokeSafe('clearAutoPlayTimer', {id: this._id});
     }
 
     setContentScale(scale) {
-        this._invoke('setContentScale', {id: this._id, scale});
+        return this._invokeSafe('setContentScale', {id: this._id, scale});
     }
 
     // Private
 
     _invoke(action, params={}) {
         return api.crossFrame.invoke(this._parentFrameId, action, params);
+    }
+
+    async _invokeSafe(action, params={}, defaultReturnValue) {
+        try {
+            return await this._invoke(action, params);
+        } catch (e) {
+            if (!yomichan.isExtensionUnloaded) { throw e; }
+            return defaultReturnValue;
+        }
     }
 
     async _updateFrameOffset() {

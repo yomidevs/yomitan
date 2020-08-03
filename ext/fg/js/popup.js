@@ -97,7 +97,7 @@ class Popup {
         this._options = await api.optionsGet(optionsContext);
         this.updateTheme();
 
-        this._invokeApi('setOptionsContext', {optionsContext});
+        this._invokeSafe('setOptionsContext', {optionsContext});
     }
 
     hide(changeFocus) {
@@ -146,25 +146,21 @@ class Popup {
         }
 
         if (displayDetails !== null) {
-            this._invokeApi('setContent', {details: displayDetails});
+            this._invokeSafe('setContent', {details: displayDetails});
         }
     }
 
     setCustomCss(css) {
-        this._invokeApi('setCustomCss', {css});
+        this._invokeSafe('setCustomCss', {css});
     }
 
-    async clearAutoPlayTimer() {
-        try {
-            await this._invokeApi('clearAutoPlayTimer');
-        } catch (e) {
-            // NOP
-        }
+    clearAutoPlayTimer() {
+        this._invokeSafe('clearAutoPlayTimer');
     }
 
     setContentScale(scale) {
         this._contentScale = scale;
-        this._invokeApi('setContentScale', {scale});
+        this._invokeSafe('setContentScale', {scale});
     }
 
     // Popup-only public functions
@@ -266,7 +262,7 @@ class Popup {
         await frameClient.connect(this._frame, this._targetOrigin, this._frameId, setupFrame);
 
         // Configure
-        await this._invokeApi('configure', {
+        await this._invokeSafe('configure', {
             frameId: this._frameId,
             ownerFrameId: this._ownerFrameId,
             popupId: this._id,
@@ -448,7 +444,7 @@ class Popup {
         return dark ? 'dark' : 'light';
     }
 
-    async _invokeApi(action, params={}) {
+    async _invoke(action, params={}) {
         const contentWindow = this._frame.contentWindow;
         if (this._frameClient === null || !this._frameClient.isConnected() || contentWindow === null) { return; }
 
@@ -456,7 +452,16 @@ class Popup {
         return await api.crossFrame.invoke(this._frameClient.frameId, 'popupMessage', message);
     }
 
-    _invokeWindowApi(action, params={}) {
+    async _invokeSafe(action, params={}, defaultReturnValue) {
+        try {
+            return await this._invoke(action, params);
+        } catch (e) {
+            if (!yomichan.isExtensionUnloaded) { throw e; }
+            return defaultReturnValue;
+        }
+    }
+
+    _invokeWindow(action, params={}) {
         const contentWindow = this._frame.contentWindow;
         if (this._frameClient === null || !this._frameClient.isConnected() || contentWindow === null) { return; }
 
@@ -465,7 +470,7 @@ class Popup {
     }
 
     _onExtensionUnloaded() {
-        this._invokeWindowApi('extensionUnloaded');
+        this._invokeWindow('extensionUnloaded');
     }
 
     _getFrameParentElement() {
