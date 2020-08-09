@@ -101,7 +101,9 @@ class AnkiConnect {
         if (this._remoteVersion < this._localVersion) {
             if (this._versionCheckPromise === null) {
                 const promise = this._invoke('version');
-                promise.finally(() => { this._versionCheckPromise = null; });
+                promise
+                    .catch(() => {})
+                    .finally(() => { this._versionCheckPromise = null; });
                 this._versionCheckPromise = promise;
             }
             this._remoteVersion = await this._versionCheckPromise;
