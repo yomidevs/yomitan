@@ -113,6 +113,7 @@ vm.context.window = vm.context;
 
 vm.execute([
     'mixed/js/core.js',
+    'mixed/js/cache-map.js',
     'bg/js/json-schema.js',
     'bg/js/dictionary.js',
     'bg/js/media-utility.js',

@@ -15,10 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global
+ * CacheMap
+ */
 
 class JsonSchemaProxyHandler {
-    constructor(schema) {
+    constructor(schema, jsonSchemaValidator) {
         this._schema = schema;
+        this._jsonSchemaValidator = jsonSchemaValidator;
     }
 
     getPrototypeOf(target) {
@@ -63,7 +67,7 @@ class JsonSchemaProxyHandler {
             }
         }
 
-        const propertySchema = JsonSchemaProxyHandler.getPropertySchema(this._schema, property, target);
+        const propertySchema = this._jsonSchemaValidator.getPropertySchema(this._schema, property, target);
         if (propertySchema === null) {
             return;
         }
@@ -85,14 +89,14 @@ class JsonSchemaProxyHandler {
             }
         }
 
-        const propertySchema = JsonSchemaProxyHandler.getPropertySchema(this._schema, property, target);
+        const propertySchema = this._jsonSchemaValidator.getPropertySchema(this._schema, property, target);
         if (propertySchema === null) {
             throw new Error(`Property ${property} not supported`);
         }
 
         value = JsonSchema.clone(value);
 
-        JsonSchemaProxyHandler.validate(value, propertySchema, new JsonSchemaTraversalInfo(value, propertySchema));
+        this._jsonSchemaValidator.validate(value, propertySchema, new JsonSchemaTraversalInfo(value, propertySchema));
 
         target[property] = value;
         return true;
@@ -117,16 +121,22 @@ class JsonSchemaProxyHandler {
     construct() {
         throw new Error('construct not supported');
     }
+}
 
-    static getPropertySchema(schema, property, value, path=null) {
-        const type = JsonSchemaProxyHandler.getSchemaOrValueType(schema, value);
+class JsonSchemaValidator {
+    constructor() {
+        this._regexCache = new CacheMap(100, (pattern, flags) => new RegExp(pattern, flags));
+    }
+
+    getPropertySchema(schema, property, value, path=null) {
+        const type = this.getSchemaOrValueType(schema, value);
         switch (type) {
             case 'object':
             {
                 const properties = schema.properties;
-                if (JsonSchemaProxyHandler.isObject(properties)) {
+                if (this.isObject(properties)) {
                     const propertySchema = properties[property];
-                    if (JsonSchemaProxyHandler.isObject(propertySchema)) {
+                    if (this.isObject(propertySchema)) {
                         if (path !== null) { path.push(['properties', properties], [property, propertySchema]); }
                         return propertySchema;
                     }
@@ -135,11 +145,11 @@ class JsonSchemaProxyHandler {
                 const additionalProperties = schema.additionalProperties;
                 if (additionalProperties === false) {
                     return null;
-                } else if (JsonSchemaProxyHandler.isObject(additionalProperties)) {
+                } else if (this.isObject(additionalProperties)) {
                     if (path !== null) { path.push(['additionalProperties', additionalProperties]); }
                     return additionalProperties;
                 } else {
-                    const result = JsonSchemaProxyHandler.unconstrainedSchema;
+                    const result = JsonSchemaValidator.unconstrainedSchema;
                     if (path !== null) { path.push([null, result]); }
                     return result;
                 }
@@ -147,13 +157,13 @@ class JsonSchemaProxyHandler {
             case 'array':
             {
                 const items = schema.items;
-                if (JsonSchemaProxyHandler.isObject(items)) {
+                if (this.isObject(items)) {
                     return items;
                 }
                 if (Array.isArray(items)) {
                     if (property >= 0 && property < items.length) {
                         const propertySchema = items[property];
-                        if (JsonSchemaProxyHandler.isObject(propertySchema)) {
+                        if (this.isObject(propertySchema)) {
                             if (path !== null) { path.push(['items', items], [property, propertySchema]); }
                             return propertySchema;
                         }
@@ -163,11 +173,11 @@ class JsonSchemaProxyHandler {
                 const additionalItems = schema.additionalItems;
                 if (additionalItems === false) {
                     return null;
-                } else if (JsonSchemaProxyHandler.isObject(additionalItems)) {
+                } else if (this.isObject(additionalItems)) {
                     if (path !== null) { path.push(['additionalItems', additionalItems]); }
                     return additionalItems;
                 } else {
-                    const result = JsonSchemaProxyHandler.unconstrainedSchema;
+                    const result = JsonSchemaValidator.unconstrainedSchema;
                     if (path !== null) { path.push([null, result]); }
                     return result;
                 }
@@ -177,12 +187,12 @@ class JsonSchemaProxyHandler {
         }
     }
 
-    static getSchemaOrValueType(schema, value) {
+    getSchemaOrValueType(schema, value) {
         const type = schema.type;
 
         if (Array.isArray(type)) {
             if (typeof value !== 'undefined') {
-                const valueType = JsonSchemaProxyHandler.getValueType(value);
+                const valueType = this.getValueType(value);
                 if (type.indexOf(valueType) >= 0) {
                     return valueType;
                 }
@@ -192,7 +202,7 @@ class JsonSchemaProxyHandler {
 
         if (typeof type === 'undefined') {
             if (typeof value !== 'undefined') {
-                return JsonSchemaProxyHandler.getValueType(value);
+                return this.getValueType(value);
             }
             return null;
         }
@@ -200,37 +210,37 @@ class JsonSchemaProxyHandler {
         return type;
     }
 
-    static validate(value, schema, info) {
-        JsonSchemaProxyHandler.validateSingleSchema(value, schema, info);
-        JsonSchemaProxyHandler.validateConditional(value, schema, info);
-        JsonSchemaProxyHandler.validateAllOf(value, schema, info);
-        JsonSchemaProxyHandler.validateAnyOf(value, schema, info);
-        JsonSchemaProxyHandler.validateOneOf(value, schema, info);
-        JsonSchemaProxyHandler.validateNoneOf(value, schema, info);
+    validate(value, schema, info) {
+        this.validateSingleSchema(value, schema, info);
+        this.validateConditional(value, schema, info);
+        this.validateAllOf(value, schema, info);
+        this.validateAnyOf(value, schema, info);
+        this.validateOneOf(value, schema, info);
+        this.validateNoneOf(value, schema, info);
     }
 
-    static validateConditional(value, schema, info) {
+    validateConditional(value, schema, info) {
         const ifSchema = schema.if;
-        if (!JsonSchemaProxyHandler.isObject(ifSchema)) { return; }
+        if (!this.isObject(ifSchema)) { return; }
 
         let okay = true;
         info.schemaPush('if', ifSchema);
         try {
-            JsonSchemaProxyHandler.validate(value, ifSchema, info);
+            this.validate(value, ifSchema, info);
         } catch (e) {
             okay = false;
         }
         info.schemaPop();
 
         const nextSchema = okay ? schema.then : schema.else;
-        if (JsonSchemaProxyHandler.isObject(nextSchema)) {
+        if (this.isObject(nextSchema)) {
             info.schemaPush(okay ? 'then' : 'else', nextSchema);
-            JsonSchemaProxyHandler.validate(value, nextSchema, info);
+            this.validate(value, nextSchema, info);
             info.schemaPop();
         }
     }
 
-    static validateAllOf(value, schema, info) {
+    validateAllOf(value, schema, info) {
         const subSchemas = schema.allOf;
         if (!Array.isArray(subSchemas)) { return; }
 
@@ -238,13 +248,13 @@ class JsonSchemaProxyHandler {
         for (let i = 0; i < subSchemas.length; ++i) {
             const subSchema = subSchemas[i];
             info.schemaPush(i, subSchema);
-            JsonSchemaProxyHandler.validate(value, subSchema, info);
+            this.validate(value, subSchema, info);
             info.schemaPop();
         }
         info.schemaPop();
     }
 
-    static validateAnyOf(value, schema, info) {
+    validateAnyOf(value, schema, info) {
         const subSchemas = schema.anyOf;
         if (!Array.isArray(subSchemas)) { return; }
 
@@ -253,7 +263,7 @@ class JsonSchemaProxyHandler {
             const subSchema = subSchemas[i];
             info.schemaPush(i, subSchema);
             try {
-                JsonSchemaProxyHandler.validate(value, subSchema, info);
+                this.validate(value, subSchema, info);
                 return;
             } catch (e) {
                 // NOP
@@ -265,7 +275,7 @@ class JsonSchemaProxyHandler {
         // info.schemaPop(); // Unreachable
     }
 
-    static validateOneOf(value, schema, info) {
+    validateOneOf(value, schema, info) {
         const subSchemas = schema.oneOf;
         if (!Array.isArray(subSchemas)) { return; }
 
@@ -275,7 +285,7 @@ class JsonSchemaProxyHandler {
             const subSchema = subSchemas[i];
             info.schemaPush(i, subSchema);
             try {
-                JsonSchemaProxyHandler.validate(value, subSchema, info);
+                this.validate(value, subSchema, info);
                 ++count;
             } catch (e) {
                 // NOP
@@ -290,7 +300,7 @@ class JsonSchemaProxyHandler {
         info.schemaPop();
     }
 
-    static validateNoneOf(value, schema, info) {
+    validateNoneOf(value, schema, info) {
         const subSchemas = schema.not;
         if (!Array.isArray(subSchemas)) { return; }
 
@@ -299,7 +309,7 @@ class JsonSchemaProxyHandler {
             const subSchema = subSchemas[i];
             info.schemaPush(i, subSchema);
             try {
-                JsonSchemaProxyHandler.validate(value, subSchema, info);
+                this.validate(value, subSchema, info);
             } catch (e) {
                 info.schemaPop();
                 continue;
@@ -309,35 +319,35 @@ class JsonSchemaProxyHandler {
         info.schemaPop();
     }
 
-    static validateSingleSchema(value, schema, info) {
-        const type = JsonSchemaProxyHandler.getValueType(value);
+    validateSingleSchema(value, schema, info) {
+        const type = this.getValueType(value);
         const schemaType = schema.type;
-        if (!JsonSchemaProxyHandler.isValueTypeAny(value, type, schemaType)) {
+        if (!this.isValueTypeAny(value, type, schemaType)) {
             throw new JsonSchemaValidationError(`Value type ${type} does not match schema type ${schemaType}`, value, schema, info);
         }
 
         const schemaEnum = schema.enum;
-        if (Array.isArray(schemaEnum) && !JsonSchemaProxyHandler.valuesAreEqualAny(value, schemaEnum)) {
+        if (Array.isArray(schemaEnum) && !this.valuesAreEqualAny(value, schemaEnum)) {
             throw new JsonSchemaValidationError('Invalid enum value', value, schema, info);
         }
 
         switch (type) {
             case 'number':
-                JsonSchemaProxyHandler.validateNumber(value, schema, info);
+                this.validateNumber(value, schema, info);
                 break;
             case 'string':
-                JsonSchemaProxyHandler.validateString(value, schema, info);
+                this.validateString(value, schema, info);
                 break;
             case 'array':
-                JsonSchemaProxyHandler.validateArray(value, schema, info);
+                this.validateArray(value, schema, info);
                 break;
             case 'object':
-                JsonSchemaProxyHandler.validateObject(value, schema, info);
+                this.validateObject(value, schema, info);
                 break;
         }
     }
 
-    static validateNumber(value, schema, info) {
+    validateNumber(value, schema, info) {
         const multipleOf = schema.multipleOf;
         if (typeof multipleOf === 'number' && Math.floor(value / multipleOf) * multipleOf !== value) {
             throw new JsonSchemaValidationError(`Number is not a multiple of ${multipleOf}`, value, schema, info);
@@ -364,7 +374,7 @@ class JsonSchemaProxyHandler {
         }
     }
 
-    static validateString(value, schema, info) {
+    validateString(value, schema, info) {
         const minLength = schema.minLength;
         if (typeof minLength === 'number' && value.length < minLength) {
             throw new JsonSchemaValidationError('String length too short', value, schema, info);
@@ -374,9 +384,26 @@ class JsonSchemaProxyHandler {
         if (typeof maxLength === 'number' && value.length > maxLength) {
             throw new JsonSchemaValidationError('String length too long', value, schema, info);
         }
+
+        const pattern = schema.pattern;
+        if (typeof pattern === 'string') {
+            let patternFlags = schema.patternFlags;
+            if (typeof patternFlags !== 'string') { patternFlags = ''; }
+
+            let regex;
+            try {
+                regex = this._getRegex(pattern, patternFlags);
+            } catch (e) {
+                throw new JsonSchemaValidationError(`Pattern is invalid (${e.message})`, value, schema, info);
+            }
+
+            if (!regex.test(value)) {
+                throw new JsonSchemaValidationError('Pattern match failed', value, schema, info);
+            }
+        }
     }
 
-    static validateArray(value, schema, info) {
+    validateArray(value, schema, info) {
         const minItems = schema.minItems;
         if (typeof minItems === 'number' && value.length < minItems) {
             throw new JsonSchemaValidationError('Array length too short', value, schema, info);
@@ -389,7 +416,7 @@ class JsonSchemaProxyHandler {
 
         for (let i = 0, ii = value.length; i < ii; ++i) {
             const schemaPath = [];
-            const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, i, value, schemaPath);
+            const propertySchema = this.getPropertySchema(schema, i, value, schemaPath);
             if (propertySchema === null) {
                 throw new JsonSchemaValidationError(`No schema found for array[${i}]`, value, schema, info);
             }
@@ -398,13 +425,13 @@ class JsonSchemaProxyHandler {
 
             for (const [p, s] of schemaPath) { info.schemaPush(p, s); }
             info.valuePush(i, propertyValue);
-            JsonSchemaProxyHandler.validate(propertyValue, propertySchema, info);
+            this.validate(propertyValue, propertySchema, info);
             info.valuePop();
             for (let j = 0, jj = schemaPath.length; j < jj; ++j) { info.schemaPop(); }
         }
     }
 
-    static validateObject(value, schema, info) {
+    validateObject(value, schema, info) {
         const properties = new Set(Object.getOwnPropertyNames(value));
 
         const required = schema.required;
@@ -428,7 +455,7 @@ class JsonSchemaProxyHandler {
 
         for (const property of properties) {
             const schemaPath = [];
-            const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, property, value, schemaPath);
+            const propertySchema = this.getPropertySchema(schema, property, value, schemaPath);
             if (propertySchema === null) {
                 throw new JsonSchemaValidationError(`No schema found for ${property}`, value, schema, info);
             }
@@ -437,18 +464,18 @@ class JsonSchemaProxyHandler {
 
             for (const [p, s] of schemaPath) { info.schemaPush(p, s); }
             info.valuePush(property, propertyValue);
-            JsonSchemaProxyHandler.validate(propertyValue, propertySchema, info);
+            this.validate(propertyValue, propertySchema, info);
             info.valuePop();
             for (let i = 0; i < schemaPath.length; ++i) { info.schemaPop(); }
         }
     }
 
-    static isValueTypeAny(value, type, schemaTypes) {
+    isValueTypeAny(value, type, schemaTypes) {
         if (typeof schemaTypes === 'string') {
-            return JsonSchemaProxyHandler.isValueType(value, type, schemaTypes);
+            return this.isValueType(value, type, schemaTypes);
         } else if (Array.isArray(schemaTypes)) {
             for (const schemaType of schemaTypes) {
-                if (JsonSchemaProxyHandler.isValueType(value, type, schemaType)) {
+                if (this.isValueType(value, type, schemaType)) {
                     return true;
                 }
             }
@@ -457,14 +484,14 @@ class JsonSchemaProxyHandler {
         return true;
     }
 
-    static isValueType(value, type, schemaType) {
+    isValueType(value, type, schemaType) {
         return (
             type === schemaType ||
             (schemaType === 'integer' && Math.floor(value) === value)
         );
     }
 
-    static getValueType(value) {
+    getValueType(value) {
         const type = typeof value;
         if (type === 'object') {
             if (value === null) { return 'null'; }
@@ -473,20 +500,20 @@ class JsonSchemaProxyHandler {
         return type;
     }
 
-    static valuesAreEqualAny(value1, valueList) {
+    valuesAreEqualAny(value1, valueList) {
         for (const value2 of valueList) {
-            if (JsonSchemaProxyHandler.valuesAreEqual(value1, value2)) {
+            if (this.valuesAreEqual(value1, value2)) {
                 return true;
             }
         }
         return false;
     }
 
-    static valuesAreEqual(value1, value2) {
+    valuesAreEqual(value1, value2) {
         return value1 === value2;
     }
 
-    static getDefaultTypeValue(type) {
+    getDefaultTypeValue(type) {
         if (typeof type === 'string') {
             switch (type) {
                 case 'null':
@@ -507,38 +534,38 @@ class JsonSchemaProxyHandler {
         return null;
     }
 
-    static getValidValueOrDefault(schema, value) {
-        let type = JsonSchemaProxyHandler.getValueType(value);
+    getValidValueOrDefault(schema, value) {
+        let type = this.getValueType(value);
         const schemaType = schema.type;
-        if (!JsonSchemaProxyHandler.isValueTypeAny(value, type, schemaType)) {
+        if (!this.isValueTypeAny(value, type, schemaType)) {
             let assignDefault = true;
 
             const schemaDefault = schema.default;
             if (typeof schemaDefault !== 'undefined') {
                 value = JsonSchema.clone(schemaDefault);
-                type = JsonSchemaProxyHandler.getValueType(value);
-                assignDefault = !JsonSchemaProxyHandler.isValueTypeAny(value, type, schemaType);
+                type = this.getValueType(value);
+                assignDefault = !this.isValueTypeAny(value, type, schemaType);
             }
 
             if (assignDefault) {
-                value = JsonSchemaProxyHandler.getDefaultTypeValue(schemaType);
-                type = JsonSchemaProxyHandler.getValueType(value);
+                value = this.getDefaultTypeValue(schemaType);
+                type = this.getValueType(value);
             }
         }
 
         switch (type) {
             case 'object':
-                value = JsonSchemaProxyHandler.populateObjectDefaults(value, schema);
+                value = this.populateObjectDefaults(value, schema);
                 break;
             case 'array':
-                value = JsonSchemaProxyHandler.populateArrayDefaults(value, schema);
+                value = this.populateArrayDefaults(value, schema);
                 break;
         }
 
         return value;
     }
 
-    static populateObjectDefaults(value, schema) {
+    populateObjectDefaults(value, schema) {
         const properties = new Set(Object.getOwnPropertyNames(value));
 
         const required = schema.required;
@@ -546,40 +573,46 @@ class JsonSchemaProxyHandler {
             for (const property of required) {
                 properties.delete(property);
 
-                const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, property, value);
+                const propertySchema = this.getPropertySchema(schema, property, value);
                 if (propertySchema === null) { continue; }
-                value[property] = JsonSchemaProxyHandler.getValidValueOrDefault(propertySchema, value[property]);
+                value[property] = this.getValidValueOrDefault(propertySchema, value[property]);
             }
         }
 
         for (const property of properties) {
-            const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, property, value);
+            const propertySchema = this.getPropertySchema(schema, property, value);
             if (propertySchema === null) {
                 Reflect.deleteProperty(value, property);
             } else {
-                value[property] = JsonSchemaProxyHandler.getValidValueOrDefault(propertySchema, value[property]);
+                value[property] = this.getValidValueOrDefault(propertySchema, value[property]);
             }
         }
 
         return value;
     }
 
-    static populateArrayDefaults(value, schema) {
+    populateArrayDefaults(value, schema) {
         for (let i = 0, ii = value.length; i < ii; ++i) {
-            const propertySchema = JsonSchemaProxyHandler.getPropertySchema(schema, i, value);
+            const propertySchema = this.getPropertySchema(schema, i, value);
             if (propertySchema === null) { continue; }
-            value[i] = JsonSchemaProxyHandler.getValidValueOrDefault(propertySchema, value[i]);
+            value[i] = this.getValidValueOrDefault(propertySchema, value[i]);
         }
 
         return value;
     }
 
-    static isObject(value) {
+    isObject(value) {
         return typeof value === 'object' && value !== null && !Array.isArray(value);
+    }
+
+    _getRegex(pattern, flags) {
+        const regex = this._regexCache.get(pattern, flags);
+        regex.lastIndex = 0;
+        return regex;
     }
 }
 
-Object.defineProperty(JsonSchemaProxyHandler, 'unconstrainedSchema', {
+Object.defineProperty(JsonSchemaValidator, 'unconstrainedSchema', {
     value: Object.freeze({}),
     configurable: false,
     enumerable: true,
@@ -622,15 +655,16 @@ class JsonSchemaValidationError extends Error {
 
 class JsonSchema {
     static createProxy(target, schema) {
-        return new Proxy(target, new JsonSchemaProxyHandler(schema));
+        const validator = new JsonSchemaValidator();
+        return new Proxy(target, new JsonSchemaProxyHandler(schema, validator));
     }
 
     static validate(value, schema) {
-        return JsonSchemaProxyHandler.validate(value, schema, new JsonSchemaTraversalInfo(value, schema));
+        return new JsonSchemaValidator().validate(value, schema, new JsonSchemaTraversalInfo(value, schema));
     }
 
     static getValidValueOrDefault(schema, value) {
-        return JsonSchemaProxyHandler.getValidValueOrDefault(schema, value);
+        return new JsonSchemaValidator().getValidValueOrDefault(schema, value);
     }
 
     static clone(value) {
