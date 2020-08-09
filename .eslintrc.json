@@ -134,7 +134,10 @@
             }
         },
         {
-            "files": ["test/**/*.js"],
+            "files": [
+                "test/**/*.js",
+                "dev/**/*.js"
+            ],
             "excludedFiles": ["test/data/html/*.js"],
             "parserOptions": {
                 "ecmaVersion": 8,

@@ -1,1 +1,7 @@
-*.handlebars text eol=lf
+*.sh text eol=lf
+ext/*.handlebars text eol=lf
+ext/*.js text eol=lf
+ext/*.json text eol=lf
+ext/*.css text eol=lf
+ext/*.html text eol=lf
+ext/*.svg text eol=lf

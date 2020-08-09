@@ -2,15 +2,15 @@
     "manifest_version": 2,
     "name": "Yomichan",
     "version": "20.8.3.0",
-
     "description": "Japanese dictionary with Anki integration",
+    "author": "Alex Yatskov",
     "icons": {
         "16": "mixed/img/icon16.png",
         "19": "mixed/img/icon19.png",
         "32": "mixed/img/icon32.png",
         "38": "mixed/img/icon38.png",
         "48": "mixed/img/icon48.png",
-        "64": "mixed/img/icon48.png",
+        "64": "mixed/img/icon64.png",
         "128": "mixed/img/icon128.png"
     },
     "browser_action": {
@@ -20,42 +20,46 @@
             "32": "mixed/img/icon32.png",
             "38": "mixed/img/icon38.png",
             "48": "mixed/img/icon48.png",
-            "64": "mixed/img/icon48.png",
+            "64": "mixed/img/icon64.png",
             "128": "mixed/img/icon128.png"
         },
         "default_title": "Yomichan",
         "default_popup": "bg/context.html"
     },
-
-    "author": "Alex Yatskov",
     "background": {
         "page": "bg/background.html",
         "persistent": true
     },
-    "content_scripts": [{
-        "matches": ["http://*/*", "https://*/*", "file://*/*"],
-        "js": [
-            "mixed/js/core.js",
-            "mixed/js/yomichan.js",
-            "mixed/js/comm.js",
-            "mixed/js/dom.js",
-            "mixed/js/api.js",
-            "mixed/js/dynamic-loader.js",
-            "mixed/js/frame-client.js",
-            "mixed/js/text-scanner.js",
-            "fg/js/document.js",
-            "fg/js/dom-text-scanner.js",
-            "fg/js/popup.js",
-            "fg/js/source.js",
-            "fg/js/popup-factory.js",
-            "fg/js/frame-offset-forwarder.js",
-            "fg/js/popup-proxy.js",
-            "fg/js/frontend.js",
-            "fg/js/content-script-main.js"
-        ],
-        "match_about_blank": true,
-        "all_frames": true
-    }],
+    "content_scripts": [
+        {
+            "matches": [
+                "http://*/*",
+                "https://*/*",
+                "file://*/*"
+            ],
+            "js": [
+                "mixed/js/core.js",
+                "mixed/js/yomichan.js",
+                "mixed/js/comm.js",
+                "mixed/js/dom.js",
+                "mixed/js/api.js",
+                "mixed/js/dynamic-loader.js",
+                "mixed/js/frame-client.js",
+                "mixed/js/text-scanner.js",
+                "fg/js/document.js",
+                "fg/js/dom-text-scanner.js",
+                "fg/js/popup.js",
+                "fg/js/source.js",
+                "fg/js/popup-factory.js",
+                "fg/js/frame-offset-forwarder.js",
+                "fg/js/popup-proxy.js",
+                "fg/js/frontend.js",
+                "fg/js/content-script-main.js"
+            ],
+            "match_about_blank": true,
+            "all_frames": true
+        }
+    ],
     "minimum_chrome_version": "57.0.0.0",
     "options_page": "bg/settings.html",
     "options_ui": {
@@ -88,7 +92,9 @@
             "description": "Open search window"
         }
     },
-    "web_accessible_resources": ["fg/float.html"],
+    "web_accessible_resources": [
+        "fg/float.html"
+    ],
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
     "applications": {
         "gecko": {
