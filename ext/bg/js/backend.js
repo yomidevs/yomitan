@@ -32,7 +32,6 @@
  * TemplateRenderer
  * Translator
  * conditionsTestValue
- * dictTermsSort
  * jp
  * profileConditionsDescriptor
  * profileConditionsDescriptorPromise
@@ -707,11 +706,11 @@ class Backend {
     }
 
     async _onApiGetDictionaryInfo() {
-        return await this._translator.database.getDictionaryInfo();
+        return await this._dictionaryDatabase.getDictionaryInfo();
     }
 
     async _onApiGetDictionaryCounts({dictionaryNames, getTotal}) {
-        return await this._translator.database.getDictionaryCounts(dictionaryNames, getTotal);
+        return await this._dictionaryDatabase.getDictionaryCounts(dictionaryNames, getTotal);
     }
 
     async _onApiPurgeDatabase() {
@@ -1064,7 +1063,6 @@ class Backend {
                 options
             );
             if (definitions.length > 0 && sourceLength > 0) {
-                dictTermsSort(definitions);
                 const {expression, reading} = definitions[0];
                 const source = text.substring(0, sourceLength);
                 for (const {text: text2, furigana} of jp.distributeFuriganaInflected(expression, reading, source)) {

@@ -24,16 +24,6 @@ function dictEnabledSet(options) {
     return enabledDictionaryMap;
 }
 
-function dictConfigured(options) {
-    for (const {enabled} of Object.values(options.dictionaries)) {
-        if (enabled) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 function dictTermsSort(definitions, dictionaries=null) {
     return definitions.sort((v1, v2) => {
         let i;
