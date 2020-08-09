@@ -233,11 +233,20 @@ class Frontend {
 
     async _updateOptionsInternal() {
         const optionsContext = await this.getOptionsContext();
-        this._options = await api.optionsGet(optionsContext);
+        const options = await api.optionsGet(optionsContext);
+        const scanningOptions = options.scanning;
+        this._options = options;
 
         await this._updatePopup();
 
-        this._textScanner.setOptions(this._options);
+        this._textScanner.setOptions({
+            deepContentScan: scanningOptions.deepDomScan,
+            selectText: scanningOptions.selectText,
+            modifier: scanningOptions.modifier,
+            useMiddleMouse: scanningOptions.middleMouse,
+            delay: scanningOptions.delay,
+            touchInputEnabled: scanningOptions.touchInputEnabled
+        });
         this._updateTextScannerEnabled();
 
         const ignoreNodes = ['.scan-disable', '.scan-disable *'];

@@ -25,9 +25,12 @@
 class QueryParser extends EventDispatcher {
     constructor({getOptionsContext, setSpinnerVisible}) {
         super();
-        this._options = null;
         this._getOptionsContext = getOptionsContext;
         this._setSpinnerVisible = setSpinnerVisible;
+        this._selectedParser = null;
+        this._scanLength = 1;
+        this._sentenceExtent = 1;
+        this._layoutAwareScan = false;
         this._parseResults = [];
         this._queryParser = document.querySelector('#query-parser-content');
         this._queryParserSelect = document.querySelector('#query-parser-select-container');
@@ -46,11 +49,26 @@ class QueryParser extends EventDispatcher {
         this._queryParser.addEventListener('click', this._onClick.bind(this));
     }
 
-    setOptions(options) {
-        this._options = options;
-        this._textScanner.setOptions(options);
+    setOptions({selectedParser, scanLength, sentenceExtent, layoutAwareScan, termSpacing, scanning}) {
+        if (selectedParser === null || typeof selectedParser === 'string') {
+            this._selectedParser = selectedParser;
+        }
+        if (typeof scanLength === 'number') {
+            this._scanLength = scanLength;
+        }
+        if (typeof sentenceExtent === 'number') {
+            this._sentenceExtent = sentenceExtent;
+        }
+        if (typeof layoutAwareScan === 'boolean') {
+            this._layoutAwareScan = layoutAwareScan;
+        }
+        if (typeof termSpacing === 'boolean') {
+            this._queryParser.dataset.termSpacing = `${termSpacing}`;
+        }
+        if (scanning !== null && typeof scanning === 'object') {
+            this._textScanner.setOptions(scanning);
+        }
         this._textScanner.setEnabled(true);
-        this._queryParser.dataset.termSpacing = `${options.parsing.termSpacing}`;
     }
 
     async setText(text) {
@@ -76,7 +94,9 @@ class QueryParser extends EventDispatcher {
     async _search(textSource, cause) {
         if (textSource === null) { return null; }
 
-        const {length: scanLength, layoutAwareScan} = this._options.scanning;
+        const scanLength = this._scanLength;
+        const sentenceExtent = this._sentenceExtent;
+        const layoutAwareScan = this._layoutAwareScan;
         const searchText = this._textScanner.getTextSourceContent(textSource, scanLength, layoutAwareScan);
         if (searchText.length === 0) { return null; }
 
@@ -84,7 +104,6 @@ class QueryParser extends EventDispatcher {
         const {definitions, length} = await api.termsFind(searchText, {}, optionsContext);
         if (definitions.length === 0) { return null; }
 
-        const sentenceExtent = this._options.anki.sentenceExt;
         const sentence = docSentenceExtract(textSource, sentenceExtent, layoutAwareScan);
 
         textSource.setEndOffset(length, layoutAwareScan);
@@ -103,32 +122,29 @@ class QueryParser extends EventDispatcher {
 
     _onParserChange(e) {
         const value = e.target.value;
+        this._setSelectedParser(value);
+    }
+
+    _refreshSelectedParser() {
+        if (this._parseResults.length > 0 && !this._getParseResult()) {
+            const value = this._parseResults[0].id;
+            this._setSelectedParser(value);
+        }
+    }
+
+    _setSelectedParser(value) {
+        const optionsContext = this._getOptionsContext();
         api.modifySettings([{
             action: 'set',
             path: 'parsing.selectedParser',
             value,
             scope: 'profile',
-            optionsContext: this._getOptionsContext()
+            optionsContext
         }], 'search');
     }
 
-    _refreshSelectedParser() {
-        if (this._parseResults.length > 0) {
-            if (!this._getParseResult()) {
-                const value = this._parseResults[0].id;
-                api.modifySettings([{
-                    action: 'set',
-                    path: 'parsing.selectedParser',
-                    value,
-                    scope: 'profile',
-                    optionsContext: this._getOptionsContext()
-                }], 'search');
-            }
-        }
-    }
-
     _getParseResult() {
-        const {selectedParser} = this._options.parsing;
+        const selectedParser = this._selectedParser;
         return this._parseResults.find((r) => r.id === selectedParser);
     }
 
@@ -145,7 +161,7 @@ class QueryParser extends EventDispatcher {
     _renderParserSelect() {
         this._queryParserSelect.textContent = '';
         if (this._parseResults.length > 1) {
-            const {selectedParser} = this._options.parsing;
+            const selectedParser = this._selectedParser;
             const select = this._queryParserGenerator.createParserSelect(this._parseResults, selectedParser);
             select.addEventListener('change', this._onParserChange.bind(this));
             this._queryParserSelect.appendChild(select);

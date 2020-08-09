@@ -36,7 +36,13 @@ class TextScanner extends EventDispatcher {
         this._textSourceCurrent = null;
         this._textSourceCurrentSelected = false;
         this._pendingLookup = false;
-        this._options = null;
+
+        this._deepContentScan = false;
+        this._selectText = false;
+        this._modifier = 'none';
+        this._useMiddleMouse = false;
+        this._delay = 0;
+        this._touchInputEnabled = false;
 
         this._enabled = false;
         this._eventListeners = new EventListenerCollection();
@@ -85,8 +91,25 @@ class TextScanner extends EventDispatcher {
         }
     }
 
-    setOptions(options) {
-        this._options = options;
+    setOptions({deepContentScan, selectText, modifier, useMiddleMouse, delay, touchInputEnabled}) {
+        if (typeof deepContentScan === 'boolean') {
+            this._deepContentScan = deepContentScan;
+        }
+        if (typeof selectText === 'boolean') {
+            this._selectText = selectText;
+        }
+        if (typeof modifier === 'string') {
+            this._modifier = modifier;
+        }
+        if (typeof useMiddleMouse === 'boolean') {
+            this._useMiddleMouse = useMiddleMouse;
+        }
+        if (typeof delay === 'number') {
+            this._delay = delay;
+        }
+        if (typeof touchInputEnabled === 'boolean') {
+            this._touchInputEnabled = false;
+        }
     }
 
     async searchAt(x, y, cause) {
@@ -101,7 +124,7 @@ class TextScanner extends EventDispatcher {
                 return;
             }
 
-            const textSource = docRangeFromPoint(x, y, this._options.scanning.deepDomScan);
+            const textSource = docRangeFromPoint(x, y, this._deepContentScan);
             try {
                 if (this._textSourceCurrent !== null && this._textSourceCurrent.equals(textSource)) {
                     return;
@@ -162,7 +185,7 @@ class TextScanner extends EventDispatcher {
 
     setCurrentTextSource(textSource) {
         this._textSourceCurrent = textSource;
-        if (this._options.scanning.selectText) {
+        if (this._selectText) {
             this._textSourceCurrent.select();
             this._textSourceCurrentSelected = true;
         } else {
@@ -188,17 +211,15 @@ class TextScanner extends EventDispatcher {
         const modifiers = DOM.getActiveModifiers(e);
         this.trigger('activeModifiersChanged', {modifiers});
 
-        const scanningOptions = this._options.scanning;
-        const scanningModifier = scanningOptions.modifier;
         if (!(
-            this._isScanningModifierPressed(scanningModifier, e) ||
-            (scanningOptions.middleMouse && DOM.isMouseButtonDown(e, 'auxiliary'))
+            this._isScanningModifierPressed(this._modifier, e) ||
+            (this._useMiddleMouse && DOM.isMouseButtonDown(e, 'auxiliary'))
         )) {
             return;
         }
 
         const search = async () => {
-            if (scanningModifier === 'none') {
+            if (this._modifier === 'none') {
                 if (!await this._scanTimerWait()) {
                     // Aborted
                     return;
@@ -325,7 +346,7 @@ class TextScanner extends EventDispatcher {
     }
 
     async _scanTimerWait() {
-        const delay = this._options.scanning.delay;
+        const delay = this._delay;
         const promise = promiseTimeout(delay, true);
         this._scanTimerPromise = promise;
         try {
@@ -346,7 +367,7 @@ class TextScanner extends EventDispatcher {
 
     _hookEvents() {
         const eventListenerInfos = this._getMouseEventListeners();
-        if (this._options.scanning.touchInputEnabled) {
+        if (this._touchInputEnabled) {
             eventListenerInfos.push(...this._getTouchEventListeners());
         }
 

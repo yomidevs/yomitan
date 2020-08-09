@@ -218,11 +218,29 @@ class Display extends EventDispatcher {
     }
 
     async updateOptions() {
-        this._options = await api.optionsGet(this.getOptionsContext());
-        this._updateDocumentOptions(this._options);
-        this._updateTheme(this._options.general.popupTheme);
-        this.setCustomCss(this._options.general.customPopupCss);
-        this._queryParser.setOptions(this._options);
+        const options = await api.optionsGet(this.getOptionsContext());
+        const scanning = options.scanning;
+        this._options = options;
+
+        this._updateDocumentOptions(options);
+        this._updateTheme(options.general.popupTheme);
+        this.setCustomCss(options.general.customPopupCss);
+
+        this._queryParser.setOptions({
+            selectedParser: options.parsing.selectedParser,
+            scanLength: scanning.length,
+            sentenceExtent: options.anki.sentenceExt,
+            layoutAwareScan: scanning.layoutAwareScan,
+            termSpacing: options.parsing.termSpacing,
+            scanning: {
+                deepContentScan: scanning.deepDomScan,
+                selectText: scanning.selectText,
+                modifier: scanning.modifier,
+                useMiddleMouse: scanning.middleMouse,
+                delay: scanning.delay,
+                touchInputEnabled: scanning.touchInputEnabled
+            }
+        });
     }
 
     addMultipleEventListeners(selector, type, listener, options) {
