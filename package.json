@@ -9,7 +9,7 @@
         "build": "node ./dev/build.js",
         "test": "npm run test-lint && npm run test-code && npm run test-manifest",
         "test-lint": "eslint . && node ./test/lint/global-declarations.js",
-        "test-code": "node ./test/test-schema.js && node ./test/test-dictionary.js && node ./test/test-database.js && node ./test/test-document.js && node ./test/test-object-property-accessor.js && node ./test/test-japanese.js && node ./test/test-text-source-map.js && node ./test/test-dom-text-scanner.js",
+        "test-code": "node ./test/test-schema.js && node ./test/test-dictionary.js && node ./test/test-database.js && node ./test/test-document.js && node ./test/test-object-property-accessor.js && node ./test/test-japanese.js && node ./test/test-text-source-map.js && node ./test/test-dom-text-scanner.js && node ./test/test-cache-map.js",
         "test-manifest": "node ./test/test-manifest.js"
     },
     "repository": {
