@@ -37,6 +37,7 @@ class DisplaySearch extends Display {
         this._clipboardMonitor = new ClipboardMonitor({
             getClipboard: api.clipboardGet.bind(api)
         });
+        this._clipboardMonitorEnabled = false;
         this._onKeyDownIgnoreKeys = new Map([
             ['ANY_MOD', new Set([
                 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageDown', 'PageUp', 'Home', 'End',
@@ -51,9 +52,6 @@ class DisplaySearch extends Display {
             ['AltGraph', new Set()],
             ['Shift', new Set()]
         ]);
-        this._runtimeMessageHandlers = new Map([
-            ['updateSearchQuery', {async: false, handler: this._onExternalSearchUpdate.bind(this)}]
-        ]);
     }
 
     async prepare() {
@@ -62,18 +60,16 @@ class DisplaySearch extends Display {
         yomichan.on('optionsUpdated', () => this.updateOptions());
 
         this.on('contentUpdating', this._onContentUpdating.bind(this));
+        this.on('modeChange', this._onModeChange.bind(this));
+
+        this.registerMessageHandlers([
+            ['updateSearchQuery', {async: false, handler: this._onExternalSearchUpdate.bind(this)}]
+        ]);
 
         this.queryParserVisible = true;
         this.setHistorySettings({useBrowserHistory: true});
 
         const options = this.getOptions();
-
-        const urlSearchParams = new URLSearchParams(location.search);
-        let mode = urlSearchParams.get('mode');
-        if (mode === null) { mode = ''; }
-
-        document.documentElement.dataset.searchMode = mode;
-
         if (options.general.enableWanakana === true) {
             this._wanakanaEnable.checked = true;
             wanakana.bind(this._query);
@@ -81,25 +77,15 @@ class DisplaySearch extends Display {
             this._wanakanaEnable.checked = false;
         }
 
-        if (mode !== 'popup') {
-            if (options.general.enableClipboardMonitor === true) {
-                this._clipboardMonitorEnable.checked = true;
-                this._clipboardMonitor.start();
-            } else {
-                this._clipboardMonitorEnable.checked = false;
-            }
-            this._clipboardMonitorEnable.addEventListener('change', this._onClipboardMonitorEnableChange.bind(this));
-        }
-
-        chrome.runtime.onMessage.addListener(this._onRuntimeMessage.bind(this));
-
         this._search.addEventListener('click', this._onSearch.bind(this), false);
         this._query.addEventListener('input', this._onSearchInput.bind(this), false);
         this._wanakanaEnable.addEventListener('change', this._onWanakanaEnableChange.bind(this));
         window.addEventListener('copy', this._onCopy.bind(this));
         this._clipboardMonitor.on('change', this._onExternalSearchUpdate.bind(this));
+        this._clipboardMonitorEnable.addEventListener('change', this._onClipboardMonitorEnableChange.bind(this));
 
         this._updateSearchButton();
+        this._onModeChange();
 
         await this._prepareNestedPopups();
 
@@ -209,12 +195,6 @@ class DisplaySearch extends Display {
         this._onSearchQueryUpdated(query, true);
     }
 
-    _onRuntimeMessage({action, params}, sender, callback) {
-        const messageHandler = this._runtimeMessageHandlers.get(action);
-        if (typeof messageHandler === 'undefined') { return false; }
-        return yomichan.invokeMessageHandler(messageHandler, params, callback, sender);
-    }
-
     _onCopy() {
         // ignore copy from search page
         this._clipboardMonitor.setPreviousText(window.getSelection().toString().trim());
@@ -261,34 +241,15 @@ class DisplaySearch extends Display {
     }
 
     _onClipboardMonitorEnableChange(e) {
-        if (e.target.checked) {
-            chrome.permissions.request(
-                {permissions: ['clipboardRead']},
-                (granted) => {
-                    if (granted) {
-                        this._clipboardMonitor.start();
-                        api.modifySettings([{
-                            action: 'set',
-                            path: 'general.enableClipboardMonitor',
-                            value: true,
-                            scope: 'profile',
-                            optionsContext: this.getOptionsContext()
-                        }], 'search');
-                    } else {
-                        e.target.checked = false;
-                    }
-                }
-            );
-        } else {
-            this._clipboardMonitor.stop();
-            api.modifySettings([{
-                action: 'set',
-                path: 'general.enableClipboardMonitor',
-                value: false,
-                scope: 'profile',
-                optionsContext: this.getOptionsContext()
-            }], 'search');
-        }
+        const enabled = e.target.checked;
+        this._setClipboardMonitorEnabled(enabled);
+    }
+
+    _onModeChange() {
+        let mode = this.mode;
+        if (mode === null) { mode = ''; }
+        document.documentElement.dataset.searchMode = mode;
+        this._updateClipboardMonitorEnabled();
     }
 
     _isWanakanaEnabled() {
@@ -380,5 +341,49 @@ class DisplaySearch extends Display {
         yomichan.on('optionsUpdated', onOptionsUpdated);
 
         await onOptionsUpdated();
+    }
+
+    async _setClipboardMonitorEnabled(value) {
+        let modify = true;
+        if (value) {
+            value = await this._requestPermissions(['clipboardRead']);
+            modify = value;
+        }
+
+        this._clipboardMonitorEnabled = value;
+        this._updateClipboardMonitorEnabled();
+
+        if (!modify) { return; }
+
+        await api.modifySettings([{
+            action: 'set',
+            path: 'general.enableClipboardMonitor',
+            value,
+            scope: 'profile',
+            optionsContext: this.getOptionsContext()
+        }], 'search');
+    }
+
+    _updateClipboardMonitorEnabled() {
+        const mode = this.mode;
+        const enabled = this._clipboardMonitorEnabled;
+        this._clipboardMonitorEnable.checked = enabled;
+        if (enabled && mode !== 'popup') {
+            this._clipboardMonitor.start();
+        } else {
+            this._clipboardMonitor.stop();
+        }
+    }
+
+    _requestPermissions(permissions) {
+        return new Promise((resolve) => {
+            chrome.permissions.request(
+                {permissions},
+                (granted) => {
+                    const e = chrome.runtime.lastError;
+                    resolve(!e && granted);
+                }
+            );
+        });
     }
 }

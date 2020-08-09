@@ -65,6 +65,7 @@ class Display extends EventDispatcher {
         this._hotkeys = new Map();
         this._actions = new Map();
         this._messageHandlers = new Map();
+        this._directMessageHandlers = new Map();
         this._history = new DisplayHistory({clearable: true, useBrowserHistory: false});
         this._historyChangeIgnore = false;
         this._historyHasChanged = false;
@@ -80,6 +81,7 @@ class Display extends EventDispatcher {
             getOptionsContext: this.getOptionsContext.bind(this),
             setSpinnerVisible: this.setSpinnerVisible.bind(this)
         });
+        this._mode = null;
 
         this.registerActions([
             ['close',            () => { this.onEscape(); }],
@@ -114,6 +116,9 @@ class Display extends EventDispatcher {
             {key: 'V',         modifiers: ['alt'], action: 'viewNote'}
         ]);
         this.registerMessageHandlers([
+            ['setMode', {async: false, handler: this._onMessageSetMode.bind(this)}]
+        ]);
+        this.registerDirectMessageHandlers([
             ['setOptionsContext',  {async: false, handler: this._onMessageSetOptionsContext.bind(this)}],
             ['setContent',         {async: false, handler: this._onMessageSetContent.bind(this)}],
             ['clearAutoPlayTimer', {async: false, handler: this._onMessageClearAutoPlayTimer.bind(this)}],
@@ -138,7 +143,12 @@ class Display extends EventDispatcher {
         this._updateQueryParserVisibility();
     }
 
+    get mode() {
+        return this._mode;
+    }
+
     async prepare() {
+        this._updateMode();
         this._setInteractive(true);
         await this._displayGenerator.prepare();
         await this._queryParser.prepare();
@@ -146,8 +156,9 @@ class Display extends EventDispatcher {
         this._history.on('stateChanged', this._onStateChanged.bind(this));
         this._queryParser.on('searched', this._onQueryParserSearch.bind(this));
         yomichan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
+        chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
         api.crossFrame.registerHandlers([
-            ['popupMessage', {async: 'dynamic', handler: this._onMessage.bind(this)}]
+            ['popupMessage', {async: 'dynamic', handler: this._onDirectMessage.bind(this)}]
         ]);
     }
 
@@ -313,6 +324,12 @@ class Display extends EventDispatcher {
         }
     }
 
+    registerDirectMessageHandlers(handlers) {
+        for (const [name, handlerInfo] of handlers) {
+            this._directMessageHandlers.set(name, handlerInfo);
+        }
+    }
+
     async setupNestedPopups(frontendInitializationData) {
         await dynamicLoader.loadScripts([
             '/mixed/js/text-scanner.js',
@@ -343,10 +360,16 @@ class Display extends EventDispatcher {
 
     // Message handlers
 
-    _onMessage(data) {
+    _onMessage({action, params}, sender, callback) {
+        const messageHandler = this._messageHandlers.get(action);
+        if (typeof messageHandler === 'undefined') { return false; }
+        return yomichan.invokeMessageHandler(messageHandler, params, callback, sender);
+    }
+
+    _onDirectMessage(data) {
         data = this.authenticateMessageData(data);
         const {action, params} = data;
-        const handlerInfo = this._messageHandlers.get(action);
+        const handlerInfo = this._directMessageHandlers.get(action);
         if (typeof handlerInfo === 'undefined') {
             throw new Error(`Invalid action: ${action}`);
         }
@@ -354,6 +377,10 @@ class Display extends EventDispatcher {
         const {async, handler} = handlerInfo;
         const result = handler(params);
         return {async, result};
+    }
+
+    _onMessageSetMode({mode}) {
+        this._setMode(mode, true);
     }
 
     _onMessageSetOptionsContext({optionsContext}) {
@@ -1252,5 +1279,23 @@ class Display extends EventDispatcher {
 
     _closePopups() {
         yomichan.trigger('closePopups');
+    }
+
+    _updateMode() {
+        const mode = sessionStorage.getItem('mode');
+        this._setMode(mode, false);
+    }
+
+    _setMode(mode, save) {
+        if (mode === this._mode) { return; }
+        if (save) {
+            if (mode === null) {
+                sessionStorage.removeItem('mode');
+            } else {
+                sessionStorage.setItem('mode', mode);
+            }
+        }
+        this._mode = mode;
+        this.trigger('modeChange', {mode});
     }
 }

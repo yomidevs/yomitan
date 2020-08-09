@@ -44,7 +44,7 @@ class DisplayFloat extends Display {
     async prepare() {
         await super.prepare();
 
-        this.registerMessageHandlers([
+        this.registerDirectMessageHandlers([
             ['configure',       {async: true,  handler: this._onMessageConfigure.bind(this)}],
             ['setContentScale', {async: false, handler: this._onMessageSetContentScale.bind(this)}]
         ]);
