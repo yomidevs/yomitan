@@ -96,25 +96,24 @@ async function testDocument1() {
         'mixed/js/dom.js',
         'fg/js/dom-text-scanner.js',
         'fg/js/source.js',
-        'fg/js/document.js'
+        'fg/js/document-util.js'
     ]);
-    const [DOMTextScanner, TextSourceRange, TextSourceElement, docRangeFromPoint, docSentenceExtract] = vm.get([
+    const [DOMTextScanner, TextSourceRange, TextSourceElement, DocumentUtil] = vm.get([
         'DOMTextScanner',
         'TextSourceRange',
         'TextSourceElement',
-        'docRangeFromPoint',
-        'docSentenceExtract'
+        'DocumentUtil'
     ]);
 
     try {
-        await testDocumentTextScanningFunctions(dom, {docRangeFromPoint, docSentenceExtract, TextSourceRange, TextSourceElement});
+        await testDocumentTextScanningFunctions(dom, {DocumentUtil, TextSourceRange, TextSourceElement});
         await testTextSourceRangeSeekFunctions(dom, {DOMTextScanner});
     } finally {
         window.close();
     }
 }
 
-async function testDocumentTextScanningFunctions(dom, {docRangeFromPoint, docSentenceExtract, TextSourceRange, TextSourceElement}) {
+async function testDocumentTextScanningFunctions(dom, {DocumentUtil, TextSourceRange, TextSourceElement}) {
     const document = dom.window.document;
 
     for (const testElement of document.querySelectorAll('.test[data-test-type=scan]')) {
@@ -163,7 +162,8 @@ async function testDocumentTextScanningFunctions(dom, {docRangeFromPoint, docSen
         };
 
         // Test docRangeFromPoint
-        const source = docRangeFromPoint(0, 0, false);
+        const documentUtil = new DocumentUtil();
+        const source = documentUtil.getRangeFromPoint(0, 0, false);
         switch (resultType) {
             case 'TextSourceRange':
                 assert.strictEqual(getPrototypeOfOrNull(source), TextSourceRange.prototype);
@@ -181,7 +181,7 @@ async function testDocumentTextScanningFunctions(dom, {docRangeFromPoint, docSen
         if (source === null) { continue; }
 
         // Test docSentenceExtract
-        const sentenceActual = docSentenceExtract(source, sentenceExtent, false).text;
+        const sentenceActual = documentUtil.extractSentence(source, sentenceExtent, false).text;
         assert.strictEqual(sentenceActual, sentence);
 
         // Clean

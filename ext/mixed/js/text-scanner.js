@@ -17,16 +17,16 @@
 
 /* global
  * DOM
- * docRangeFromPoint
  */
 
 class TextScanner extends EventDispatcher {
-    constructor({node, ignoreElements, ignorePoint, search}) {
+    constructor({node, ignoreElements, ignorePoint, search, documentUtil}) {
         super();
         this._node = node;
         this._ignoreElements = ignoreElements;
         this._ignorePoint = ignorePoint;
         this._search = search;
+        this._documentUtil = documentUtil;
 
         this._isPrepared = false;
         this._ignoreNodes = null;
@@ -124,7 +124,7 @@ class TextScanner extends EventDispatcher {
                 return;
             }
 
-            const textSource = docRangeFromPoint(x, y, this._deepContentScan);
+            const textSource = this._documentUtil.getRangeFromPoint(x, y, this._deepContentScan);
             try {
                 if (this._textSourceCurrent !== null && this._textSourceCurrent.equals(textSource)) {
                     return;

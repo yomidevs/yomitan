@@ -20,14 +20,13 @@
  * DOM
  * DisplayGenerator
  * DisplayHistory
+ * DocumentUtil
  * Frontend
  * MediaLoader
  * PopupFactory
  * QueryParser
  * WindowScroll
  * api
- * docRangeFromPoint
- * docSentenceExtract
  * dynamicLoader
  */
 
@@ -74,12 +73,14 @@ class Display extends EventDispatcher {
         this._defaultTitle = 'Yomichan Search';
         this._defaultTitleMaxLength = 1000;
         this._fullQuery = '';
+        this._documentUtil = new DocumentUtil();
         this._queryParserVisible = false;
         this._queryParserVisibleOverride = null;
         this._queryParserContainer = document.querySelector('#query-parser-container');
         this._queryParser = new QueryParser({
             getOptionsContext: this.getOptionsContext.bind(this),
-            setSpinnerVisible: this.setSpinnerVisible.bind(this)
+            setSpinnerVisible: this.setSpinnerVisible.bind(this),
+            documentUtil: this._documentUtil
         });
         this._mode = null;
 
@@ -588,7 +589,7 @@ class Display extends EventDispatcher {
         const scannedElement = e.target;
         const sentenceExtent = this._options.anki.sentenceExt;
         const layoutAwareScan = this._options.scanning.layoutAwareScan;
-        const sentence = docSentenceExtract(textSource, sentenceExtent, layoutAwareScan);
+        const sentence = this._documentUtil.extractSentence(textSource, sentenceExtent, layoutAwareScan);
 
         state.focusEntry = this._entryIndexFind(scannedElement);
         state.scrollX = this._windowScroll.x;
@@ -616,7 +617,7 @@ class Display extends EventDispatcher {
         e.preventDefault();
 
         const {length: scanLength, deepDomScan: deepScan, layoutAwareScan} = this._options.scanning;
-        const textSource = docRangeFromPoint(e.clientX, e.clientY, deepScan);
+        const textSource = this._documentUtil.getRangeFromPoint(e.clientX, e.clientY, deepScan);
         if (textSource === null) {
             return false;
         }

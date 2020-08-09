@@ -17,12 +17,12 @@
 
 /* global
  * DOM
+ * DocumentUtil
  * FrameOffsetForwarder
  * PopupProxy
  * TextScanner
  * TextSourceElement
  * api
- * docSentenceExtract
  */
 
 class Frontend {
@@ -36,11 +36,13 @@ class Frontend {
         this._lastShowPromise = Promise.resolve();
         this._activeModifiers = new Set();
         this._optionsUpdatePending = false;
+        this._documentUtil = new DocumentUtil();
         this._textScanner = new TextScanner({
             node: window,
             ignoreElements: this._ignoreElements.bind(this),
             ignorePoint: this._ignorePoint.bind(this),
-            search: this._search.bind(this)
+            search: this._search.bind(this),
+            documentUtil: this._documentUtil
         });
 
         const {
@@ -432,7 +434,7 @@ class Frontend {
         const {url} = optionsContext;
         const sentenceExtent = this._options.anki.sentenceExt;
         const layoutAwareScan = this._options.scanning.layoutAwareScan;
-        const sentence = docSentenceExtract(textSource, sentenceExtent, layoutAwareScan);
+        const sentence = this._documentUtil.extractSentence(textSource, sentenceExtent, layoutAwareScan);
         const query = textSource.text();
         const details = {
             focus,

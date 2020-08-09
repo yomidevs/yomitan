@@ -19,11 +19,10 @@
  * QueryParserGenerator
  * TextScanner
  * api
- * docSentenceExtract
  */
 
 class QueryParser extends EventDispatcher {
-    constructor({getOptionsContext, setSpinnerVisible}) {
+    constructor({getOptionsContext, setSpinnerVisible, documentUtil}) {
         super();
         this._getOptionsContext = getOptionsContext;
         this._setSpinnerVisible = setSpinnerVisible;
@@ -31,6 +30,7 @@ class QueryParser extends EventDispatcher {
         this._scanLength = 1;
         this._sentenceExtent = 1;
         this._layoutAwareScan = false;
+        this._documentUtil = documentUtil;
         this._parseResults = [];
         this._queryParser = document.querySelector('#query-parser-content');
         this._queryParserSelect = document.querySelector('#query-parser-select-container');
@@ -39,7 +39,8 @@ class QueryParser extends EventDispatcher {
             node: this._queryParser,
             ignoreElements: () => [],
             ignorePoint: null,
-            search: this._search.bind(this)
+            search: this._search.bind(this),
+            documentUtil
         });
     }
 
@@ -104,7 +105,7 @@ class QueryParser extends EventDispatcher {
         const {definitions, length} = await api.termsFind(searchText, {}, optionsContext);
         if (definitions.length === 0) { return null; }
 
-        const sentence = docSentenceExtract(textSource, sentenceExtent, layoutAwareScan);
+        const sentence = this._documentUtil.extractSentence(textSource, sentenceExtent, layoutAwareScan);
 
         textSource.setEndOffset(length, layoutAwareScan);
 
