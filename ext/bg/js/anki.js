@@ -21,6 +21,7 @@ class AnkiConnect {
         this._server = server;
         this._localVersion = 2;
         this._remoteVersion = 0;
+        this._versionCheckPromise = null;
     }
 
     setServer(server) {
@@ -98,7 +99,12 @@ class AnkiConnect {
 
     async _checkVersion() {
         if (this._remoteVersion < this._localVersion) {
-            this._remoteVersion = await this._invoke('version');
+            if (this._versionCheckPromise === null) {
+                const promise = this._invoke('version');
+                promise.finally(() => { this._versionCheckPromise = null; });
+                this._versionCheckPromise = promise;
+            }
+            this._remoteVersion = await this._versionCheckPromise;
             if (this._remoteVersion < this._localVersion) {
                 throw new Error('Extension and plugin versions incompatible');
             }
