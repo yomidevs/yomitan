@@ -17,7 +17,6 @@
 
 /* global
  * Database
- * dictFieldSplit
  */
 
 class DictionaryDatabase {
@@ -436,9 +435,9 @@ class DictionaryDatabase {
             index,
             expression: row.expression,
             reading: row.reading,
-            definitionTags: dictFieldSplit(row.definitionTags || row.tags || ''),
-            termTags: dictFieldSplit(row.termTags || ''),
-            rules: dictFieldSplit(row.rules),
+            definitionTags: this._splitField(row.definitionTags || row.tags || ''),
+            termTags: this._splitField(row.termTags || ''),
+            rules: this._splitField(row.rules),
             glossary: row.glossary,
             score: row.score,
             dictionary: row.dictionary,
@@ -451,9 +450,9 @@ class DictionaryDatabase {
         return {
             index,
             character: row.character,
-            onyomi: dictFieldSplit(row.onyomi),
-            kunyomi: dictFieldSplit(row.kunyomi),
-            tags: dictFieldSplit(row.tags),
+            onyomi: this._splitField(row.onyomi),
+            kunyomi: this._splitField(row.kunyomi),
+            tags: this._splitField(row.tags),
             glossary: row.meanings,
             stats: row.stats,
             dictionary: row.dictionary
@@ -470,5 +469,9 @@ class DictionaryDatabase {
 
     _createMedia(row, index) {
         return Object.assign({}, row, {index});
+    }
+
+    _splitField(field) {
+        return field.length === 0 ? [] : field.split(' ');
     }
 }

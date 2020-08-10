@@ -116,7 +116,6 @@ vm.execute([
     'mixed/js/core.js',
     'mixed/js/cache-map.js',
     'bg/js/json-schema.js',
-    'bg/js/dictionary.js',
     'bg/js/media-utility.js',
     'bg/js/dictionary-importer.js',
     'bg/js/database.js',
