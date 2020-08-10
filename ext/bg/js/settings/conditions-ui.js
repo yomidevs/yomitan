@@ -16,7 +16,7 @@
  */
 
 /* global
- * DOM
+ * DocumentUtil
  * conditionsNormalizeOptionValue
  */
 
@@ -323,7 +323,7 @@ ConditionsUI.Condition = class Condition {
         const pressedKeyIndices = new Set();
 
         const onKeyDown = ({originalEvent}) => {
-            const pressedKeyEventName = DOM.getKeyFromEvent(originalEvent);
+            const pressedKeyEventName = DocumentUtil.getKeyFromEvent(originalEvent);
             if (pressedKeyEventName === 'Escape' || pressedKeyEventName === 'Backspace') {
                 pressedKeyIndices.clear();
                 inputInner.val('');
@@ -331,7 +331,7 @@ ConditionsUI.Condition = class Condition {
                 return;
             }
 
-            const pressedModifiers = DOM.getActiveModifiers(originalEvent);
+            const pressedModifiers = DocumentUtil.getActiveModifiers(originalEvent);
             // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey
             // https://askubuntu.com/questions/567731/why-is-shift-alt-being-mapped-to-meta
             // It works with mouse events on some platforms, so try to determine if metaKey is pressed

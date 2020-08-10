@@ -16,7 +16,7 @@
  */
 
 /* global
- * DOM
+ * DocumentUtil
  */
 
 class TextScanner extends EventDispatcher {
@@ -155,8 +155,8 @@ class TextScanner extends EventDispatcher {
         if (this._ignoreNodes !== null && clonedTextSource.range) {
             length = clonedTextSource.text().length;
             while (clonedTextSource.range && length > 0) {
-                const nodes = DOM.getNodesInRange(clonedTextSource.range);
-                if (!DOM.anyNodeMatchesSelector(nodes, this._ignoreNodes)) {
+                const nodes = DocumentUtil.getNodesInRange(clonedTextSource.range);
+                if (!DocumentUtil.anyNodeMatchesSelector(nodes, this._ignoreNodes)) {
                     break;
                 }
                 --length;
@@ -204,16 +204,16 @@ class TextScanner extends EventDispatcher {
     _onMouseMove(e) {
         this._scanTimerClear();
 
-        if (this._pendingLookup || DOM.isMouseButtonDown(e, 'primary')) {
+        if (this._pendingLookup || DocumentUtil.isMouseButtonDown(e, 'primary')) {
             return;
         }
 
-        const modifiers = DOM.getActiveModifiers(e);
+        const modifiers = DocumentUtil.getActiveModifiers(e);
         this.trigger('activeModifiersChanged', {modifiers});
 
         if (!(
             this._isScanningModifierPressed(this._modifier, e) ||
-            (this._useMiddleMouse && DOM.isMouseButtonDown(e, 'auxiliary'))
+            (this._useMiddleMouse && DocumentUtil.isMouseButtonDown(e, 'auxiliary'))
         )) {
             return;
         }
@@ -241,7 +241,7 @@ class TextScanner extends EventDispatcher {
             return false;
         }
 
-        if (DOM.isMouseButtonDown(e, 'primary')) {
+        if (DocumentUtil.isMouseButtonDown(e, 'primary')) {
             this._scanTimerClear();
             this.clearSelection(false);
         }
@@ -284,7 +284,7 @@ class TextScanner extends EventDispatcher {
         this._preventNextClick = false;
 
         const primaryTouch = e.changedTouches[0];
-        if (DOM.isPointInSelection(primaryTouch.clientX, primaryTouch.clientY, window.getSelection())) {
+        if (DocumentUtil.isPointInSelection(primaryTouch.clientX, primaryTouch.clientY, window.getSelection())) {
             return;
         }
 

@@ -16,7 +16,6 @@
  */
 
 /* global
- * DOM
  * DocumentUtil
  * FrameOffsetForwarder
  * PopupProxy
@@ -98,7 +97,7 @@ class Frontend {
         this._textScanner.prepare();
 
         window.addEventListener('resize', this._onResize.bind(this), false);
-        DOM.addFullscreenChangeEventListener(this._updatePopup.bind(this));
+        DocumentUtil.addFullscreenChangeEventListener(this._updatePopup.bind(this));
 
         const visualViewport = window.visualViewport;
         if (visualViewport !== null && typeof visualViewport === 'object') {
@@ -274,7 +273,7 @@ class Frontend {
         if (
             isIframe &&
             showIframePopupsInRootFrame &&
-            DOM.getFullscreenElement() === null &&
+            DocumentUtil.getFullscreenElement() === null &&
             this._allowRootFramePopupProxy
         ) {
             popupPromise = this._popupCache.get('iframe');

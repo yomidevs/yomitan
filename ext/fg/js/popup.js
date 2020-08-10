@@ -16,7 +16,7 @@
  */
 
 /* global
- * DOM
+ * DocumentUtil
  * FrameClient
  * api
  * dynamicLoader
@@ -349,7 +349,7 @@ class Popup {
             return;
         }
 
-        DOM.addFullscreenChangeEventListener(this._onFullscreenChanged.bind(this), this._fullscreenEventListeners);
+        DocumentUtil.addFullscreenChangeEventListener(this._onFullscreenChanged.bind(this), this._fullscreenEventListeners);
     }
 
     _onFullscreenChanged() {
@@ -475,7 +475,7 @@ class Popup {
 
     _getFrameParentElement() {
         const defaultParent = document.body;
-        const fullscreenElement = DOM.getFullscreenElement();
+        const fullscreenElement = DocumentUtil.getFullscreenElement();
         if (
             fullscreenElement === null ||
             fullscreenElement.shadowRoot ||

@@ -17,8 +17,8 @@
 
 /* global
  * ClipboardMonitor
- * DOM
  * Display
+ * DocumentUtil
  * api
  * wanakana
  */
@@ -104,7 +104,7 @@ class DisplaySearch extends Display {
     }
 
     onKeyDown(e) {
-        const key = DOM.getKeyFromEvent(e);
+        const key = DocumentUtil.getKeyFromEvent(e);
         const ignoreKeys = this._onKeyDownIgnoreKeys;
 
         const activeModifierMap = new Map([

@@ -17,7 +17,6 @@
 
 /* global
  * AudioSystem
- * DOM
  * DisplayGenerator
  * DisplayHistory
  * DocumentUtil
@@ -186,11 +185,11 @@ class Display extends EventDispatcher {
     }
 
     onKeyDown(e) {
-        const key = DOM.getKeyFromEvent(e);
+        const key = DocumentUtil.getKeyFromEvent(e);
         const handlers = this._hotkeys.get(key);
         if (typeof handlers === 'undefined') { return false; }
 
-        const eventModifiers = DOM.getActiveModifiers(e);
+        const eventModifiers = DocumentUtil.getActiveModifiers(e);
         for (const {modifiers, action} of handlers) {
             if (getSetDifference(modifiers, eventModifiers).size !== 0) { continue; }
 
@@ -558,7 +557,7 @@ class Display extends EventDispatcher {
     }
 
     _onGlossaryMouseDown(e) {
-        if (DOM.isMouseButtonPressed(e, 'primary')) {
+        if (DocumentUtil.isMouseButtonPressed(e, 'primary')) {
             this._clickScanPrevent = false;
         }
     }
@@ -568,7 +567,7 @@ class Display extends EventDispatcher {
     }
 
     _onGlossaryMouseUp(e) {
-        if (!this._clickScanPrevent && DOM.isMouseButtonPressed(e, 'primary')) {
+        if (!this._clickScanPrevent && DocumentUtil.isMouseButtonPressed(e, 'primary')) {
             try {
                 this._onTermLookup(e);
             } catch (error) {
