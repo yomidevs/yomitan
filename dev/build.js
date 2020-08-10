@@ -19,27 +19,9 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 const childProcess = require('child_process');
-const yomichanTest = require('../test/yomichan-test');
+const util = require('./yomichan-util');
+const {getAllFiles, getDefaultManifestAndVariants, createManifestString} = util;
 
-
-function getAllFiles(directory, relativeTo) {
-    const results = [];
-    const directories = [directory];
-    for (const dir of directories) {
-        const fileNames = fs.readdirSync(dir);
-        for (const fileName of fileNames) {
-            const fullFileName = path.join(dir, fileName);
-            const relativeFileName = path.relative(relativeTo, fullFileName);
-            const stats = fs.lstatSync(fullFileName);
-            if (stats.isFile()) {
-                results.push(relativeFileName);
-            } else if (stats.isDirectory()) {
-                directories.push(fullFileName);
-            }
-        }
-    }
-    return results;
-}
 
 async function createZip(directory, outputFileName, sevenZipExes=[], onUpdate=null) {
     for (const exe of sevenZipExes) {
@@ -64,7 +46,7 @@ async function createZip(directory, outputFileName, sevenZipExes=[], onUpdate=nu
 }
 
 async function createJSZip(directory, outputFileName, onUpdate) {
-    const JSZip = yomichanTest.JSZip;
+    const JSZip = util.JSZip;
     const files = getAllFiles(directory, directory);
     const zip = new JSZip();
     for (const fileName of files) {
@@ -134,24 +116,9 @@ function getObjectProperties(object, path2, count) {
     return object;
 }
 
-function loadDefaultManifest() {
-    const {manifest} = loadDefaultManifestAndVariants();
-    return manifest;
-}
-
-function loadDefaultManifestAndVariants() {
-    const fileName = path.join(__dirname, 'data', 'manifest-variants.json');
-    const {manifest, variants} = JSON.parse(fs.readFileSync(fileName));
-    return {manifest, variants};
-}
-
-function createManifestString(manifest) {
-    return JSON.stringify(manifest, null, 4) + '\n';
-}
-
 
 async function main() {
-    const {manifest, variants} = loadDefaultManifestAndVariants();
+    const {manifest, variants} = getDefaultManifestAndVariants();
 
     const rootDir = path.join(__dirname, '..');
     const extDir = path.join(rootDir, 'ext');
@@ -202,13 +169,6 @@ async function main() {
         fs.writeFileSync(manifestPath, createManifestString(manifest));
     }
 }
-
-
-module.exports = {
-    loadDefaultManifest,
-    loadDefaultManifestAndVariants,
-    createManifestString
-};
 
 
 if (require.main === module) { main(); }

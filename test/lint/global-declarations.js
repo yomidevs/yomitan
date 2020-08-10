@@ -19,7 +19,7 @@
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
-const {getAllFiles} = require('../yomichan-test');
+const {getAllFiles} = require('../../dev/yomichan-util');
 
 
 function countOccurences(string, pattern) {
@@ -116,7 +116,7 @@ function main() {
     const directory = path.resolve(__dirname, '..', '..', 'ext');
     const pattern = /\.js$/;
     const ignorePattern = /[\\/]ext[\\/]mixed[\\/]lib[\\/]/;
-    const fileNames = getAllFiles(directory, (f) => pattern.test(f) && !ignorePattern.test(f));
+    const fileNames = getAllFiles(directory, null, (f) => pattern.test(f) && !ignorePattern.test(f));
     for (const fileName of fileNames) {
         if (!validateGlobals(fileName, fix)) {
             process.exit(-1);

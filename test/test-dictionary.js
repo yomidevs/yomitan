@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const yomichanTest = require('./yomichan-test');
+const {createTestDictionaryArchive} = require('./yomichan-test');
 const dictionaryValidate = require('./dictionary-validate');
 
 
@@ -33,7 +33,7 @@ async function main() {
     const schemas = dictionaryValidate.getSchemas();
 
     for (const {name, valid} of dictionaries) {
-        const archive = yomichanTest.createTestDictionaryArchive(name);
+        const archive = createTestDictionaryArchive(name);
 
         let error = null;
         try {

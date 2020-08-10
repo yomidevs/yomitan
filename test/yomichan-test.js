@@ -19,23 +19,12 @@ const fs = require('fs');
 const path = require('path');
 
 
-let JSZip = null;
-
-
-function getJSZip() {
-    if (JSZip === null) {
-        process.noDeprecation = true; // Suppress a warning about JSZip
-        JSZip = require(path.join(__dirname, '../ext/mixed/lib/jszip.min.js'));
-        process.noDeprecation = false;
-    }
-    return JSZip;
-}
-
 function createTestDictionaryArchive(dictionary, dictionaryName) {
     const dictionaryDirectory = path.join(__dirname, 'data', 'dictionaries', dictionary);
     const fileNames = fs.readdirSync(dictionaryDirectory);
 
-    const archive = new (getJSZip())();
+    const {JSZip} = require('../dev/yomichan-util');
+    const archive = new JSZip();
 
     for (const fileName of fileNames) {
         if (/\.json$/.test(fileName)) {
@@ -54,29 +43,7 @@ function createTestDictionaryArchive(dictionary, dictionaryName) {
     return archive;
 }
 
-function getAllFiles(baseDirectory, predicate=null) {
-    const results = [];
-    const directories = [path.resolve(baseDirectory)];
-    while (directories.length > 0) {
-        const directory = directories.shift();
-        for (const fileName of fs.readdirSync(directory)) {
-            const fullFileName = path.resolve(directory, fileName);
-            const stats = fs.statSync(fullFileName);
-            if (stats.isFile()) {
-                if (typeof predicate !== 'function' || predicate(fullFileName, directory, baseDirectory)) {
-                    results.push(fullFileName);
-                }
-            } else if (stats.isDirectory()) {
-                directories.push(fullFileName);
-            }
-        }
-    }
-    return results;
-}
-
 
 module.exports = {
-    createTestDictionaryArchive,
-    getAllFiles,
-    get JSZip() { return getJSZip(); }
+    createTestDictionaryArchive
 };

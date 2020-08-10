@@ -19,7 +19,8 @@ const fs = require('fs');
 const url = require('url');
 const path = require('path');
 const assert = require('assert');
-const yomichanTest = require('./yomichan-test');
+const {JSZip} = require('../dev/yomichan-util');
+const {createTestDictionaryArchive} = require('./yomichan-test');
 const {VM} = require('./yomichan-vm');
 require('fake-indexeddb/auto');
 
@@ -104,7 +105,7 @@ const vm = new VM({
     fetch,
     indexedDB: global.indexedDB,
     IDBKeyRange: global.IDBKeyRange,
-    JSZip: yomichanTest.JSZip,
+    JSZip,
     addEventListener() {
         // NOP
     }
@@ -169,7 +170,7 @@ function clearDatabase(timeout) {
 
 async function testDatabase1() {
     // Load dictionary data
-    const testDictionary = yomichanTest.createTestDictionaryArchive('valid-dictionary1');
+    const testDictionary = createTestDictionaryArchive('valid-dictionary1');
     const testDictionarySource = await testDictionary.generateAsync({type: 'string'});
     const testDictionaryIndex = JSON.parse(await testDictionary.files['index.json'].async('string'));
 
@@ -853,7 +854,7 @@ async function testFindTagForTitle1(database, title) {
 
 async function testDatabase2() {
     // Load dictionary data
-    const testDictionary = yomichanTest.createTestDictionaryArchive('valid-dictionary1');
+    const testDictionary = createTestDictionaryArchive('valid-dictionary1');
     const testDictionarySource = await testDictionary.generateAsync({type: 'string'});
     const testDictionaryIndex = JSON.parse(await testDictionary.files['index.json'].async('string'));
 
@@ -910,7 +911,7 @@ async function testDatabase3() {
     await dictionaryDatabase.prepare();
 
     for (const invalidDictionary of invalidDictionaries) {
-        const testDictionary = yomichanTest.createTestDictionaryArchive(invalidDictionary);
+        const testDictionary = createTestDictionaryArchive(invalidDictionary);
         const testDictionarySource = await testDictionary.generateAsync({type: 'string'});
 
         let error = null;
