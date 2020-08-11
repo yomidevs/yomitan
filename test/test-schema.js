@@ -185,6 +185,212 @@ function testValidate2() {
             inputs: [
                 {expected: false, value: ''}
             ]
+        },
+
+        // Const tests
+        {
+            schema: {
+                const: 32
+            },
+            inputs: [
+                {expected: true,  value: 32},
+                {expected: false, value: 0},
+                {expected: false, value: '32'},
+                {expected: false, value: null},
+                {expected: false, value: {a: 'b'}},
+                {expected: false, value: [1, 2, 3]}
+            ]
+        },
+        {
+            schema: {
+                const: '32'
+            },
+            inputs: [
+                {expected: false, value: 32},
+                {expected: false, value: 0},
+                {expected: true,  value: '32'},
+                {expected: false, value: null},
+                {expected: false, value: {a: 'b'}},
+                {expected: false, value: [1, 2, 3]}
+            ]
+        },
+        {
+            schema: {
+                const: null
+            },
+            inputs: [
+                {expected: false, value: 32},
+                {expected: false, value: 0},
+                {expected: false, value: '32'},
+                {expected: true,  value: null},
+                {expected: false, value: {a: 'b'}},
+                {expected: false, value: [1, 2, 3]}
+            ]
+        },
+        {
+            schema: {
+                const: {a: 'b'}
+            },
+            inputs: [
+                {expected: false, value: 32},
+                {expected: false, value: 0},
+                {expected: false, value: '32'},
+                {expected: false, value: null},
+                {expected: false, value: {a: 'b'}},
+                {expected: false, value: [1, 2, 3]}
+            ]
+        },
+        {
+            schema: {
+                const: [1, 2, 3]
+            },
+            inputs: [
+                {expected: false, value: 32},
+                {expected: false, value: 0},
+                {expected: false,  value: '32'},
+                {expected: false, value: null},
+                {expected: false, value: {a: 'b'}},
+                {expected: false, value: [1, 2, 3]}
+            ]
+        },
+
+        // Array contains tests
+        {
+            schema: {
+                type: 'array',
+                contains: {const: 32}
+            },
+            inputs: [
+                {expected: false, value: []},
+                {expected: true,  value: [32]},
+                {expected: true,  value: [1, 32]},
+                {expected: true,  value: [1, 32, 1]},
+                {expected: false, value: [33]},
+                {expected: false, value: [1, 33]},
+                {expected: false, value: [1, 33, 1]}
+            ]
+        },
+
+        // Number limits tests
+        {
+            schema: {
+                type: 'number',
+                minimum: 0
+            },
+            inputs: [
+                {expected: false, value: -1},
+                {expected: true,  value: 0},
+                {expected: true,  value: 1}
+            ]
+        },
+        {
+            schema: {
+                type: 'number',
+                exclusiveMinimum: 0
+            },
+            inputs: [
+                {expected: false, value: -1},
+                {expected: false, value: 0},
+                {expected: true,  value: 1}
+            ]
+        },
+        {
+            schema: {
+                type: 'number',
+                maximum: 0
+            },
+            inputs: [
+                {expected: true,  value: -1},
+                {expected: true,  value: 0},
+                {expected: false, value: 1}
+            ]
+        },
+        {
+            schema: {
+                type: 'number',
+                exclusiveMaximum: 0
+            },
+            inputs: [
+                {expected: true,  value: -1},
+                {expected: false, value: 0},
+                {expected: false, value: 1}
+            ]
+        },
+
+        // Integer limits tests
+        {
+            schema: {
+                type: 'integer',
+                minimum: 0
+            },
+            inputs: [
+                {expected: false, value: -1},
+                {expected: true,  value: 0},
+                {expected: true,  value: 1}
+            ]
+        },
+        {
+            schema: {
+                type: 'integer',
+                exclusiveMinimum: 0
+            },
+            inputs: [
+                {expected: false, value: -1},
+                {expected: false, value: 0},
+                {expected: true,  value: 1}
+            ]
+        },
+        {
+            schema: {
+                type: 'integer',
+                maximum: 0
+            },
+            inputs: [
+                {expected: true,  value: -1},
+                {expected: true,  value: 0},
+                {expected: false, value: 1}
+            ]
+        },
+        {
+            schema: {
+                type: 'integer',
+                exclusiveMaximum: 0
+            },
+            inputs: [
+                {expected: true,  value: -1},
+                {expected: false, value: 0},
+                {expected: false, value: 1}
+            ]
+        },
+
+        // Numeric type tests
+        {
+            schema: {
+                type: 'number'
+            },
+            inputs: [
+                {expected: true,  value: 0},
+                {expected: true,  value: 0.5},
+                {expected: true,  value: 1},
+                {expected: false, value: '0'},
+                {expected: false, value: null},
+                {expected: false, value: []},
+                {expected: false, value: {}}
+            ]
+        },
+        {
+            schema: {
+                type: 'integer'
+            },
+            inputs: [
+                {expected: true,  value: 0},
+                {expected: false, value: 0.5},
+                {expected: true,  value: 1},
+                {expected: false, value: '0'},
+                {expected: false, value: null},
+                {expected: false, value: []},
+                {expected: false, value: {}}
+            ]
         }
     ];
 
@@ -207,158 +413,151 @@ function testValidate2() {
 
 
 function testGetValidValueOrDefault1() {
-    // Test value defaulting on objects with additionalProperties=false
-    const schema = {
-        type: 'object',
-        required: ['test'],
-        properties: {
-            test: {
-                type: 'string',
-                default: 'default'
-            }
+    const data = [
+        // Test value defaulting on objects with additionalProperties=false
+        {
+            schema: {
+                type: 'object',
+                required: ['test'],
+                properties: {
+                    test: {
+                        type: 'string',
+                        default: 'default'
+                    }
+                },
+                additionalProperties: false
+            },
+            inputs: [
+                [
+                    void 0,
+                    {test: 'default'}
+                ],
+                [
+                    null,
+                    {test: 'default'}
+                ],
+                [
+                    0,
+                    {test: 'default'}
+                ],
+                [
+                    '',
+                    {test: 'default'}
+                ],
+                [
+                    [],
+                    {test: 'default'}
+                ],
+                [
+                    {},
+                    {test: 'default'}
+                ],
+                [
+                    {test: 'value'},
+                    {test: 'value'}
+                ],
+                [
+                    {test2: 'value2'},
+                    {test: 'default'}
+                ],
+                [
+                    {test: 'value', test2: 'value2'},
+                    {test: 'value'}
+                ]
+            ]
         },
-        additionalProperties: false
-    };
 
-    const testData = [
-        [
-            void 0,
-            {test: 'default'}
-        ],
-        [
-            null,
-            {test: 'default'}
-        ],
-        [
-            0,
-            {test: 'default'}
-        ],
-        [
-            '',
-            {test: 'default'}
-        ],
-        [
-            [],
-            {test: 'default'}
-        ],
-        [
-            {},
-            {test: 'default'}
-        ],
-        [
-            {test: 'value'},
-            {test: 'value'}
-        ],
-        [
-            {test2: 'value2'},
-            {test: 'default'}
-        ],
-        [
-            {test: 'value', test2: 'value2'},
-            {test: 'value'}
-        ]
-    ];
-
-    for (const [value, expected] of testData) {
-        const actual = JsonSchema.getValidValueOrDefault(schema, value);
-        vm.assert.deepStrictEqual(actual, expected);
-    }
-}
-
-function testGetValidValueOrDefault2() {
-    // Test value defaulting on objects with additionalProperties=true
-    const schema = {
-        type: 'object',
-        required: ['test'],
-        properties: {
-            test: {
-                type: 'string',
-                default: 'default'
-            }
+        // Test value defaulting on objects with additionalProperties=true
+        {
+            schema: {
+                type: 'object',
+                required: ['test'],
+                properties: {
+                    test: {
+                        type: 'string',
+                        default: 'default'
+                    }
+                },
+                additionalProperties: true
+            },
+            inputs: [
+                [
+                    {},
+                    {test: 'default'}
+                ],
+                [
+                    {test: 'value'},
+                    {test: 'value'}
+                ],
+                [
+                    {test2: 'value2'},
+                    {test: 'default', test2: 'value2'}
+                ],
+                [
+                    {test: 'value', test2: 'value2'},
+                    {test: 'value', test2: 'value2'}
+                ]
+            ]
         },
-        additionalProperties: true
-    };
 
-    const testData = [
-        [
-            {},
-            {test: 'default'}
-        ],
-        [
-            {test: 'value'},
-            {test: 'value'}
-        ],
-        [
-            {test2: 'value2'},
-            {test: 'default', test2: 'value2'}
-        ],
-        [
-            {test: 'value', test2: 'value2'},
-            {test: 'value', test2: 'value2'}
-        ]
-    ];
-
-    for (const [value, expected] of testData) {
-        const actual = JsonSchema.getValidValueOrDefault(schema, value);
-        vm.assert.deepStrictEqual(actual, expected);
-    }
-}
-
-function testGetValidValueOrDefault3() {
-    // Test value defaulting on objects with additionalProperties={schema}
-    const schema = {
-        type: 'object',
-        required: ['test'],
-        properties: {
-            test: {
-                type: 'string',
-                default: 'default'
-            }
-        },
-        additionalProperties: {
-            type: 'number',
-            default: 10
+        // Test value defaulting on objects with additionalProperties={schema}
+        {
+            schema: {
+                type: 'object',
+                required: ['test'],
+                properties: {
+                    test: {
+                        type: 'string',
+                        default: 'default'
+                    }
+                },
+                additionalProperties: {
+                    type: 'number',
+                    default: 10
+                }
+            },
+            inputs: [
+                [
+                    {},
+                    {test: 'default'}
+                ],
+                [
+                    {test: 'value'},
+                    {test: 'value'}
+                ],
+                [
+                    {test2: 'value2'},
+                    {test: 'default', test2: 10}
+                ],
+                [
+                    {test: 'value', test2: 'value2'},
+                    {test: 'value', test2: 10}
+                ],
+                [
+                    {test2: 2},
+                    {test: 'default', test2: 2}
+                ],
+                [
+                    {test: 'value', test2: 2},
+                    {test: 'value', test2: 2}
+                ],
+                [
+                    {test: 'value', test2: 2, test3: null},
+                    {test: 'value', test2: 2, test3: 10}
+                ],
+                [
+                    {test: 'value', test2: 2, test3: void 0},
+                    {test: 'value', test2: 2, test3: 10}
+                ]
+            ]
         }
-    };
-
-    const testData = [
-        [
-            {},
-            {test: 'default'}
-        ],
-        [
-            {test: 'value'},
-            {test: 'value'}
-        ],
-        [
-            {test2: 'value2'},
-            {test: 'default', test2: 10}
-        ],
-        [
-            {test: 'value', test2: 'value2'},
-            {test: 'value', test2: 10}
-        ],
-        [
-            {test2: 2},
-            {test: 'default', test2: 2}
-        ],
-        [
-            {test: 'value', test2: 2},
-            {test: 'value', test2: 2}
-        ],
-        [
-            {test: 'value', test2: 2, test3: null},
-            {test: 'value', test2: 2, test3: 10}
-        ],
-        [
-            {test: 'value', test2: 2, test3: void 0},
-            {test: 'value', test2: 2, test3: 10}
-        ]
     ];
 
-    for (const [value, expected] of testData) {
-        const actual = JsonSchema.getValidValueOrDefault(schema, value);
-        vm.assert.deepStrictEqual(actual, expected);
+    for (const {schema, inputs} of data) {
+        for (const [value, expected] of inputs) {
+            const actual = JsonSchema.getValidValueOrDefault(schema, value);
+            vm.assert.deepStrictEqual(actual, expected);
+        }
     }
 }
 
@@ -367,8 +566,6 @@ function main() {
     testValidate1();
     testValidate2();
     testGetValidValueOrDefault1();
-    testGetValidValueOrDefault2();
-    testGetValidValueOrDefault3();
 }
 
 
