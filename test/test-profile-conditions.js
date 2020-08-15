@@ -26,16 +26,11 @@ vm.execute([
     'bg/js/json-schema.js',
     'bg/js/profile-conditions2.js'
 ]);
-const [JsonSchema, ProfileConditions] = vm.get(['JsonSchema', 'ProfileConditions']);
+const [JsonSchemaValidator, ProfileConditions] = vm.get(['JsonSchemaValidator', 'ProfileConditions']);
 
 
 function schemaValidate(value, schema) {
-    try {
-        JsonSchema.validate(value, schema);
-        return true;
-    } catch (e) {
-        return false;
-    }
+    return new JsonSchemaValidator().isValid(value, schema);
 }
 
 
