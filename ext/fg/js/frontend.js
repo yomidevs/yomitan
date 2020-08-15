@@ -66,8 +66,7 @@ class Frontend {
 
         this._runtimeMessageHandlers = new Map([
             ['popupSetVisibleOverride',              {async: false, handler: this._onMessagePopupSetVisibleOverride.bind(this)}],
-            ['rootPopupRequestInformationBroadcast', {async: false, handler: this._onMessageRootPopupRequestInformationBroadcast.bind(this)}],
-            ['requestDocumentInformationBroadcast',  {async: false, handler: this._onMessageRequestDocumentInformationBroadcast.bind(this)}]
+            ['requestFrontendReadyBroadcast',        {async: false, handler: this._onMessageRequestFrontendReadyBroadcast.bind(this)}]
         ]);
     }
 
@@ -114,13 +113,15 @@ class Frontend {
         this._textScanner.on('activeModifiersChanged', this._onActiveModifiersChanged.bind(this));
 
         api.crossFrame.registerHandlers([
-            ['getUrl',        {async: false, handler: this._onApiGetUrl.bind(this)}],
-            ['closePopup',    {async: false, handler: this._onApiClosePopup.bind(this)}],
-            ['copySelection', {async: false, handler: this._onApiCopySelection.bind(this)}]
+            ['getUrl',                 {async: false, handler: this._onApiGetUrl.bind(this)}],
+            ['closePopup',             {async: false, handler: this._onApiClosePopup.bind(this)}],
+            ['copySelection',          {async: false, handler: this._onApiCopySelection.bind(this)}],
+            ['getPopupInfo',           {async: false, handler: this._onApiGetPopupInfo.bind(this)}],
+            ['getDocumentInformation', {async: false, handler: this._onApiGetDocumentInformation.bind(this)}]
         ]);
 
         this._updateContentScale();
-        this._broadcastRootPopupInformation();
+        this._signalFrontendReady();
     }
 
     setDisabledOverride(disabled) {
@@ -169,12 +170,8 @@ class Frontend {
         this._popup.setVisibleOverride(visible);
     }
 
-    _onMessageRootPopupRequestInformationBroadcast() {
-        this._broadcastRootPopupInformation();
-    }
-
-    _onMessageRequestDocumentInformationBroadcast({uniqueId}) {
-        this._broadcastDocumentInformation(uniqueId);
+    _onMessageRequestFrontendReadyBroadcast({frameId}) {
+        this._signalFrontendReady(frameId);
     }
 
     // API message handlers
@@ -189,6 +186,18 @@ class Frontend {
 
     _onApiCopySelection() {
         document.execCommand('copy');
+    }
+
+    _onApiGetPopupInfo() {
+        return {
+            popupId: (this._popup !== null ? this._popup.id : null)
+        };
+    }
+
+    _onApiGetDocumentInformation() {
+        return {
+            title: document.title
+        };
     }
 
     // Private
@@ -325,18 +334,10 @@ class Frontend {
     }
 
     async _getIframeProxyPopup() {
-        const rootPopupInformationPromise = yomichan.getTemporaryListenerResult(
-            chrome.runtime.onMessage,
-            ({action, params}, {resolve}) => {
-                if (action === 'rootPopupInformation') {
-                    resolve(params);
-                }
-            }
-        );
-        api.broadcastTab('rootPopupRequestInformationBroadcast');
-        const {popupId, frameId: parentFrameId} = await rootPopupInformationPromise;
-
-        const popup = new PopupProxy(popupId, 0, null, parentFrameId, this._frameId, this._frameOffsetForwarder);
+        const targetFrameId = 0; // Root frameId
+        await this._waitForFrontendReady(targetFrameId);
+        const {popupId} = await api.crossFrame.invoke(targetFrameId, 'getPopupInfo');
+        const popup = new PopupProxy(popupId, 0, null, targetFrameId, this._frameId, this._frameOffsetForwarder);
         popup.on('offsetNotFound', () => {
             this._allowRootFramePopupProxy = false;
             this._updatePopup();
@@ -529,24 +530,29 @@ class Frontend {
         }
     }
 
-    _broadcastRootPopupInformation() {
-        if (
-            this._popup !== null &&
-            this._depth === 0 &&
-            this._frameId === 0
-        ) {
-            api.broadcastTab('rootPopupInformation', {
-                popupId: this._popup.id,
-                frameId: this._frameId
-            });
+    _signalFrontendReady(targetFrameId=null) {
+        const params = {frameId: this._frameId};
+        if (targetFrameId === null) {
+            api.broadcastTab('frontendReady', params);
+        } else {
+            api.sendMessageToFrame(targetFrameId, 'frontendReady', params);
         }
     }
 
-    _broadcastDocumentInformation(uniqueId) {
-        api.broadcastTab('documentInformationBroadcast', {
-            uniqueId,
-            frameId: this._frameId,
-            title: document.title
-        });
+    async _waitForFrontendReady(frameId) {
+        const promise = yomichan.getTemporaryListenerResult(
+            chrome.runtime.onMessage,
+            ({action, params}, {resolve}) => {
+                if (
+                    action === 'frontendReady' &&
+                    params.frameId === frameId
+                ) {
+                    resolve();
+                }
+            },
+            10000
+        );
+        api.broadcastTab('requestFrontendReadyBroadcast', {frameId: this._frameId});
+        await promise;
     }
 }

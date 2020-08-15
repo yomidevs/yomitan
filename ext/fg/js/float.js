@@ -69,25 +69,8 @@ class DisplayFloat extends Display {
 
     async getDocumentTitle() {
         try {
-            const uniqueId = yomichan.generateId(16);
-
-            const promise = yomichan.getTemporaryListenerResult(
-                chrome.runtime.onMessage,
-                ({action, params}, {resolve}) => {
-                    if (
-                        action === 'documentInformationBroadcast' &&
-                        isObject(params) &&
-                        params.uniqueId === uniqueId &&
-                        params.frameId === 0
-                    ) {
-                        resolve(params);
-                    }
-                },
-                2000
-            );
-            api.broadcastTab('requestDocumentInformationBroadcast', {uniqueId});
-
-            const {title} = await promise;
+            const targetFrameId = 0;
+            const {title} = await api.crossFrame.invoke(targetFrameId, 'getDocumentInformation');
             return title;
         } catch (e) {
             return '';
