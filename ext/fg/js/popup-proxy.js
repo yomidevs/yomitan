@@ -45,8 +45,28 @@ class PopupProxy extends EventDispatcher {
         return null;
     }
 
+    set parent(value) {
+        throw new Error('Not supported on PopupProxy');
+    }
+
+    get child() {
+        return null;
+    }
+
+    set child(value) {
+        throw new Error('Not supported on PopupProxy');
+    }
+
     get depth() {
         return this._depth;
+    }
+
+    get frameContentWindow() {
+        return null;
+    }
+
+    get container() {
+        return null;
     }
 
     // Public functions
@@ -54,10 +74,6 @@ class PopupProxy extends EventDispatcher {
     async prepare() {
         const {id} = await this._invoke('getOrCreatePopup', {id: this._id, parentId: this._parentPopupId, ownerFrameId: this._ownerFrameId});
         this._id = id;
-    }
-
-    isProxy() {
-        return true;
     }
 
     setOptionsContext(optionsContext, source) {
@@ -107,6 +123,26 @@ class PopupProxy extends EventDispatcher {
 
     setContentScale(scale) {
         return this._invokeSafe('setContentScale', {id: this._id, scale});
+    }
+
+    isVisibleSync() {
+        throw new Error('Not supported on PopupProxy');
+    }
+
+    updateTheme() {
+        return this._invokeSafe('updateTheme', {id: this._id});
+    }
+
+    async setCustomOuterCss(css, useWebExtensionApi) {
+        return this._invokeSafe('updateTheme', {id: this._id, css, useWebExtensionApi});
+    }
+
+    setChildrenSupported(value) {
+        return this._invokeSafe('updateTheme', {id: this._id, value});
+    }
+
+    getFrameRect() {
+        return new DOMRect(0, 0, 0, 0);
     }
 
     // Private

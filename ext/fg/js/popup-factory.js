@@ -30,16 +30,19 @@ class PopupFactory {
 
     prepare() {
         api.crossFrame.registerHandlers([
-            ['getOrCreatePopup',   {async: false, handler: this._onApiGetOrCreatePopup.bind(this)}],
-            ['setOptionsContext',  {async: true,  handler: this._onApiSetOptionsContext.bind(this)}],
-            ['hide',               {async: false, handler: this._onApiHide.bind(this)}],
-            ['isVisible',          {async: true,  handler: this._onApiIsVisibleAsync.bind(this)}],
-            ['setVisibleOverride', {async: true,  handler: this._onApiSetVisibleOverride.bind(this)}],
-            ['containsPoint',      {async: true,  handler: this._onApiContainsPoint.bind(this)}],
-            ['showContent',        {async: true,  handler: this._onApiShowContent.bind(this)}],
-            ['setCustomCss',       {async: false, handler: this._onApiSetCustomCss.bind(this)}],
-            ['clearAutoPlayTimer', {async: false, handler: this._onApiClearAutoPlayTimer.bind(this)}],
-            ['setContentScale',    {async: false, handler: this._onApiSetContentScale.bind(this)}]
+            ['getOrCreatePopup',     {async: false, handler: this._onApiGetOrCreatePopup.bind(this)}],
+            ['setOptionsContext',    {async: true,  handler: this._onApiSetOptionsContext.bind(this)}],
+            ['hide',                 {async: false, handler: this._onApiHide.bind(this)}],
+            ['isVisible',            {async: true,  handler: this._onApiIsVisibleAsync.bind(this)}],
+            ['setVisibleOverride',   {async: true,  handler: this._onApiSetVisibleOverride.bind(this)}],
+            ['containsPoint',        {async: true,  handler: this._onApiContainsPoint.bind(this)}],
+            ['showContent',          {async: true,  handler: this._onApiShowContent.bind(this)}],
+            ['setCustomCss',         {async: false, handler: this._onApiSetCustomCss.bind(this)}],
+            ['clearAutoPlayTimer',   {async: false, handler: this._onApiClearAutoPlayTimer.bind(this)}],
+            ['setContentScale',      {async: false, handler: this._onApiSetContentScale.bind(this)}],
+            ['updateTheme',          {async: false, handler: this._onApiUpdateTheme.bind(this)}],
+            ['setCustomOuterCss',    {async: false, handler: this._onApiSetCustomOuterCss.bind(this)}],
+            ['setChildrenSupported', {async: false, handler: this._onApiSetChildrenSupported.bind(this)}]
         ]);
     }
 
@@ -82,7 +85,11 @@ class PopupFactory {
         }
         const popup = new Popup(id, depth, this._frameId, ownerFrameId);
         if (parent !== null) {
-            popup.setParent(parent);
+            if (parent.child !== null) {
+                throw new Error('Parent popup already has a child');
+            }
+            popup.parent = parent;
+            parent.child = popup;
         }
         this._popups.set(id, popup);
         popup.prepare();
@@ -151,6 +158,21 @@ class PopupFactory {
         return popup.setContentScale(scale);
     }
 
+    _onApiUpdateTheme({id}) {
+        const popup = this._getPopup(id);
+        return popup.updateTheme();
+    }
+
+    _onApiSetCustomOuterCss({id, css, useWebExtensionApi}) {
+        const popup = this._getPopup(id);
+        return popup.setCustomOuterCss(css, useWebExtensionApi);
+    }
+
+    _onApiSetChildrenSupported({id, value}) {
+        const popup = this._getPopup(id);
+        return popup.setChildrenSupported(value);
+    }
+
     // Private functions
 
     _getPopup(id) {
@@ -167,8 +189,9 @@ class PopupFactory {
     }
 
     _convertPopupPointToRootPagePoint(popup, x, y) {
-        if (popup.parent !== null) {
-            const popupRect = popup.parent.getFrameRect();
+        const parent = popup.parent;
+        if (parent !== null) {
+            const popupRect = parent.getFrameRect();
             x += popupRect.x;
             y += popupRect.y;
         }
@@ -176,6 +199,7 @@ class PopupFactory {
     }
 
     _popupCanShow(popup) {
-        return popup.parent === null || popup.parent.isVisibleSync();
+        const parent = popup.parent;
+        return parent === null || parent.isVisibleSync();
     }
 }

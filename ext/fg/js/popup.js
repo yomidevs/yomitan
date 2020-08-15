@@ -64,16 +64,28 @@ class Popup {
         return this._parent;
     }
 
+    set parent(value) {
+        this._parent = value;
+    }
+
     get child() {
         return this._child;
+    }
+
+    set child(value) {
+        this._child = value;
     }
 
     get depth() {
         return this._depth;
     }
 
-    get frameId() {
-        return this._frameId;
+    get frameContentWindow() {
+        return this._frame.contentWindow;
+    }
+
+    get container() {
+        return this._container;
     }
 
     // Public functions
@@ -84,10 +96,6 @@ class Popup {
         this._frame.addEventListener('scroll', (e) => e.stopPropagation());
         this._frame.addEventListener('load', this._onFrameLoad.bind(this));
         yomichan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
-    }
-
-    isProxy() {
-        return false;
     }
 
     async setOptionsContext(optionsContext, source) {
@@ -163,26 +171,6 @@ class Popup {
         this._invokeSafe('setContentScale', {scale});
     }
 
-    // Popup-only public functions
-
-    setParent(parent) {
-        if (parent === null) {
-            throw new Error('Cannot set popup parent to null');
-        }
-        if (this._parent !== null) {
-            throw new Error('Popup already has a parent');
-        }
-        parent.setChild(this);
-        this._parent = parent;
-    }
-
-    setChild(popup) {
-        if (this._child !== null) {
-            throw new Error('Popup already has a child');
-        }
-        this._child = popup;
-    }
-
     isVisibleSync() {
         return (this._visibleOverride !== null ? this._visibleOverride : this._visible);
     }
@@ -205,16 +193,8 @@ class Popup {
         this._childrenSupported = value;
     }
 
-    getFrame() {
-        return this._frame;
-    }
-
     getFrameRect() {
         return this._frame.getBoundingClientRect();
-    }
-
-    getContainer() {
-        return this._container;
     }
 
     // Private functions
@@ -418,7 +398,7 @@ class Popup {
     _focusParent() {
         if (this._parent !== null) {
             // Chrome doesn't like focusing iframe without contentWindow.
-            const contentWindow = this._parent.getFrame().contentWindow;
+            const contentWindow = this._parent.frameContentWindow;
             if (contentWindow !== null) {
                 contentWindow.focus();
             }
