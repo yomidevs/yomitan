@@ -115,8 +115,29 @@ function deepStrictEqual(actual, expected) {
 }
 
 
+function createURLClass() {
+    const BaseURL = URL;
+    return function URL(url) {
+        const u = new BaseURL(url);
+        this.hash = u.hash;
+        this.host = u.host;
+        this.hostname = u.hostname;
+        this.href = u.href;
+        this.origin = u.origin;
+        this.password = u.password;
+        this.pathname = u.pathname;
+        this.port = u.port;
+        this.protocol = u.protocol;
+        this.search = u.search;
+        this.searchParams = u.searchParams;
+        this.username = u.username;
+    };
+}
+
+
 class VM {
     constructor(context={}) {
+        context.URL = createURLClass();
         this._context = vm.createContext(context);
         this._assert = {
             deepStrictEqual
