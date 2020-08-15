@@ -26,7 +26,7 @@ vm.execute([
     'mixed/js/cache-map.js',
     'bg/js/json-schema.js'
 ]);
-const JsonSchema = vm.get('JsonSchema');
+const JsonSchemaValidator = vm.get('JsonSchemaValidator');
 
 
 function readSchema(relativeFileName) {
@@ -45,7 +45,7 @@ async function validateDictionaryBanks(zip, fileNameFormat, schema) {
         if (!file) { break; }
 
         const data = JSON.parse(await file.async('string'));
-        JsonSchema.validate(data, schema);
+        new JsonSchemaValidator().validate(data, schema);
 
         ++index;
     }
@@ -60,7 +60,7 @@ async function validateDictionary(archive, schemas) {
     const index = JSON.parse(await indexFile.async('string'));
     const version = index.format || index.version;
 
-    JsonSchema.validate(index, schemas.index);
+    new JsonSchemaValidator().validate(index, schemas.index);
 
     await validateDictionaryBanks(archive, 'term_bank_?.json', version === 1 ? schemas.termBankV1 : schemas.termBankV3);
     await validateDictionaryBanks(archive, 'term_meta_bank_?.json', schemas.termMetaBankV3);

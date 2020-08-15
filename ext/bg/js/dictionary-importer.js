@@ -17,13 +17,14 @@
 
 /* global
  * JSZip
- * JsonSchema
+ * JsonSchemaValidator
  * mediaUtility
  */
 
 class DictionaryImporter {
     constructor() {
         this._schemas = new Map();
+        this._jsonSchemaValidator = new JsonSchemaValidator();
     }
 
     async importDictionary(dictionaryDatabase, archiveSource, details, onProgress) {
@@ -241,7 +242,7 @@ class DictionaryImporter {
 
     _validateJsonSchema(value, schema, fileName) {
         try {
-            JsonSchema.validate(value, schema);
+            this._jsonSchemaValidator.validate(value, schema);
         } catch (e) {
             throw this._formatSchemaError(e, fileName);
         }

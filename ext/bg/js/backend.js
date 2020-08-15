@@ -24,7 +24,7 @@
  * DictionaryDatabase
  * DictionaryImporter
  * Environment
- * JsonSchema
+ * JsonSchemaValidator
  * Mecab
  * ObjectPropertyAccessor
  * OptionsUtil
@@ -48,6 +48,7 @@ class Backend {
         this._clipboardMonitor = new ClipboardMonitor({getClipboard: this._onApiClipboardGet.bind(this)});
         this._options = null;
         this._optionsSchema = null;
+        this._optionsSchemaValidator = new JsonSchemaValidator();
         this._defaultAnkiFieldTemplates = null;
         this._requestBuilder = new RequestBuilder();
         this._audioUriBuilder = new AudioUriBuilder({
@@ -204,7 +205,7 @@ class Backend {
             this._optionsSchema = await this._fetchAsset('/bg/data/options-schema.json', true);
             this._defaultAnkiFieldTemplates = (await this._fetchAsset('/bg/data/default-anki-field-templates.handlebars')).trim();
             this._options = await OptionsUtil.load();
-            this._options = JsonSchema.getValidValueOrDefault(this._optionsSchema, this._options);
+            this._options = this._optionsSchemaValidator.getValidValueOrDefault(this._optionsSchema, this._options);
 
             this._applyOptions('background');
 
@@ -235,7 +236,7 @@ class Backend {
 
     getFullOptions(useSchema=false) {
         const options = this._options;
-        return useSchema ? JsonSchema.createProxy(options, this._optionsSchema) : options;
+        return useSchema ? this._optionsSchemaValidator.createProxy(options, this._optionsSchema) : options;
     }
 
     getOptions(optionsContext, useSchema=false) {
@@ -792,7 +793,7 @@ class Backend {
     }
 
     async _onApiSetAllSettings({value, source}) {
-        this._options = JsonSchema.getValidValueOrDefault(this._optionsSchema, value);
+        this._options = this._optionsSchemaValidator.getValidValueOrDefault(this._optionsSchema, value);
         await this._onApiOptionsSave({source});
     }
 

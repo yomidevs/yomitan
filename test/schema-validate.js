@@ -24,7 +24,7 @@ vm.execute([
     'mixed/js/cache-map.js',
     'bg/js/json-schema.js'
 ]);
-const JsonSchema = vm.get('JsonSchema');
+const JsonSchemaValidator = vm.get('JsonSchemaValidator');
 
 
 function main() {
@@ -45,7 +45,7 @@ function main() {
             console.log(`Validating ${dataFileName}...`);
             const dataSource = fs.readFileSync(dataFileName, {encoding: 'utf8'});
             const data = JSON.parse(dataSource);
-            JsonSchema.validate(data, schema);
+            new JsonSchemaValidator().validate(data, schema);
             console.log('No issues found');
         } catch (e) {
             console.warn(e);

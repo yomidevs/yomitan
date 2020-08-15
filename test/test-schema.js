@@ -24,7 +24,7 @@ vm.execute([
     'mixed/js/cache-map.js',
     'bg/js/json-schema.js'
 ]);
-const JsonSchema = vm.get('JsonSchema');
+const JsonSchemaValidator = vm.get('JsonSchemaValidator');
 
 
 function testValidate1() {
@@ -54,12 +54,7 @@ function testValidate1() {
     };
 
     const schemaValidate = (value) => {
-        try {
-            JsonSchema.validate(value, schema);
-            return true;
-        } catch (e) {
-            return false;
-        }
+        return new JsonSchemaValidator().isValid(value, schema);
     };
 
     const jsValidate = (value) => {
@@ -395,12 +390,7 @@ function testValidate2() {
     ];
 
     const schemaValidate = (value, schema) => {
-        try {
-            JsonSchema.validate(value, schema);
-            return true;
-        } catch (e) {
-            return false;
-        }
+        return new JsonSchemaValidator().isValid(value, schema);
     };
 
     for (const {schema, inputs} of data) {
@@ -555,7 +545,7 @@ function testGetValidValueOrDefault1() {
 
     for (const {schema, inputs} of data) {
         for (const [value, expected] of inputs) {
-            const actual = JsonSchema.getValidValueOrDefault(schema, value);
+            const actual = new JsonSchemaValidator().getValidValueOrDefault(schema, value);
             vm.assert.deepStrictEqual(actual, expected);
         }
     }
