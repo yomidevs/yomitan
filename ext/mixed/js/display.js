@@ -348,7 +348,7 @@ class Display extends EventDispatcher {
         }
     }
 
-    async setupNestedPopups(frontendInitializationData) {
+    async setupNestedPopups({depth, parentPopupId, parentFrameId, useProxyPopup}) {
         await dynamicLoader.loadScripts([
             '/mixed/js/text-scanner.js',
             '/mixed/js/frame-client.js',
@@ -364,7 +364,16 @@ class Display extends EventDispatcher {
         const popupFactory = new PopupFactory(frameId);
         popupFactory.prepare();
 
-        const frontend = new Frontend(frameId, popupFactory, frontendInitializationData);
+        const frontend = new Frontend({
+            frameId,
+            popupFactory,
+            depth,
+            parentPopupId,
+            parentFrameId,
+            useProxyPopup,
+            isSearchPage: false,
+            allowRootFramePopupProxy: true
+        });
         await frontend.prepare();
     }
 

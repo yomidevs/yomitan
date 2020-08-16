@@ -55,13 +55,16 @@ class PopupPreviewFrame {
         api.optionsGet = this._apiOptionsGet.bind(this);
 
         // Overwrite frontend
-        this._frontend = new Frontend(
-            this._frameId,
-            this._popupFactory,
-            {
-                allowRootFramePopupProxy: false
-            }
-        );
+        this._frontend = new Frontend({
+            frameId: this._frameId,
+            popupFactory: this._popupFactory,
+            depth: 0,
+            parentPopupId: null,
+            parentFrameId: null,
+            useProxyPopup: false,
+            isSearchPage: false,
+            allowRootFramePopupProxy: false
+        });
         this._frontendGetOptionsContextOld = this._frontend.getOptionsContext.bind(this._frontend);
         this._frontend.getOptionsContext = this._getOptionsContext.bind(this);
         await this._frontend.prepare();

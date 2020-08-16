@@ -105,8 +105,8 @@ class DisplayFloat extends Display {
         await this.updateOptions();
 
         if (childrenSupported && !this._nestedPopupsPrepared) {
-            const {depth, url} = optionsContext;
-            this._prepareNestedPopups(popupId, depth, frameId, url);
+            const {depth} = optionsContext;
+            this._prepareNestedPopups(depth + 1, popupId, frameId);
             this._nestedPopupsPrepared = true;
         }
 
@@ -168,13 +168,13 @@ class DisplayFloat extends Display {
         body.style.fontSize = `${scale}em`;
     }
 
-    async _prepareNestedPopups(id, depth, parentFrameId, url) {
+    async _prepareNestedPopups(depth, parentPopupId, parentFrameId) {
         let complete = false;
 
         const onOptionsUpdated = async () => {
             const optionsContext = this.getOptionsContext();
             const options = await api.optionsGet(optionsContext);
-            const maxPopupDepthExceeded = !(typeof depth === 'number' && depth < options.scanning.popupNestingMaxDepth);
+            const maxPopupDepthExceeded = !(typeof depth === 'number' && depth <= options.scanning.popupNestingMaxDepth);
             if (maxPopupDepthExceeded || complete) { return; }
 
             complete = true;
@@ -182,11 +182,10 @@ class DisplayFloat extends Display {
 
             try {
                 await this.setupNestedPopups({
-                    id,
                     depth,
+                    parentPopupId,
                     parentFrameId,
-                    url,
-                    proxy: true
+                    useProxyPopup: true
                 });
             } catch (e) {
                 yomichan.logError(e);

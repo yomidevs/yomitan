@@ -25,7 +25,16 @@
  */
 
 class Frontend {
-    constructor(frameId, popupFactory, frontendInitializationData) {
+    constructor({
+        frameId,
+        popupFactory,
+        depth,
+        parentPopupId,
+        parentFrameId,
+        useProxyPopup,
+        isSearchPage,
+        allowRootFramePopupProxy
+    }) {
         this._id = yomichan.generateId(16);
         this._popup = null;
         this._disabledOverride = false;
@@ -43,16 +52,7 @@ class Frontend {
             search: this._search.bind(this),
             documentUtil: this._documentUtil
         });
-
-        const {
-            depth=0,
-            id: proxyPopupId,
-            parentFrameId,
-            proxy: useProxyPopup=false,
-            isSearchPage=false,
-            allowRootFramePopupProxy=true
-        } = frontendInitializationData;
-        this._proxyPopupId = proxyPopupId;
+        this._parentPopupId = parentPopupId;
         this._parentFrameId = parentFrameId;
         this._useProxyPopup = useProxyPopup;
         this._isSearchPage = isSearchPage;
@@ -320,7 +320,6 @@ class Frontend {
 
         this._textScanner.clearSelection(true);
         this._popup = popup;
-        this._depth = popup.depth;
     }
 
     async _getDefaultPopup() {
@@ -328,7 +327,7 @@ class Frontend {
     }
 
     async _getProxyPopup() {
-        const popup = new PopupProxy(null, this._depth + 1, this._proxyPopupId, this._parentFrameId, this._frameId);
+        const popup = new PopupProxy(null, this._depth, this._parentPopupId, this._parentFrameId, this._frameId);
         await popup.prepare();
         return popup;
     }

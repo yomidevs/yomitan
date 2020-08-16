@@ -330,7 +330,7 @@ class DisplaySearch extends Display {
             try {
                 await this.setupNestedPopups({
                     depth: 1,
-                    proxy: false,
+                    useProxyPopup: false,
                     isSearchPage: true
                 });
             } catch (e) {

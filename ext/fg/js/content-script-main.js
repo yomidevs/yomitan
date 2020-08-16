@@ -34,11 +34,16 @@
         const popupFactory = new PopupFactory(frameId);
         popupFactory.prepare();
 
-        const frontend = new Frontend(
+        const frontend = new Frontend({
             frameId,
             popupFactory,
-            {}
-        );
+            depth: 0,
+            parentPopupId: null,
+            parentFrameId: null,
+            useProxyPopup: false,
+            isSearchPage: false,
+            allowRootFramePopupProxy: true
+        });
         await frontend.prepare();
 
         yomichan.ready();
