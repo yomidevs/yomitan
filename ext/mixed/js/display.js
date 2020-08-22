@@ -228,9 +228,6 @@ class Display extends EventDispatcher {
 
         this._queryParser.setOptions({
             selectedParser: options.parsing.selectedParser,
-            scanLength: scanning.length,
-            sentenceExtent: options.anki.sentenceExt,
-            layoutAwareScan: scanning.layoutAwareScan,
             termSpacing: options.parsing.termSpacing,
             scanning: {
                 deepContentScan: scanning.deepDomScan,
@@ -238,7 +235,10 @@ class Display extends EventDispatcher {
                 modifier: scanning.modifier,
                 useMiddleMouse: scanning.middleMouse,
                 delay: scanning.delay,
-                touchInputEnabled: scanning.touchInputEnabled
+                touchInputEnabled: scanning.touchInputEnabled,
+                scanLength: scanning.length,
+                sentenceExtent: options.anki.sentenceExt,
+                layoutAwareScan: scanning.layoutAwareScan
             }
         });
     }

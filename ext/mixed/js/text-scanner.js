@@ -17,6 +17,7 @@
 
 /* global
  * DocumentUtil
+ * api
  */
 
 class TextScanner extends EventDispatcher {
@@ -43,6 +44,9 @@ class TextScanner extends EventDispatcher {
         this._useMiddleMouse = false;
         this._delay = 0;
         this._touchInputEnabled = false;
+        this._scanLength = 1;
+        this._sentenceExtent = 1;
+        this._layoutAwareScan = false;
 
         this._enabled = false;
         this._eventListeners = new EventListenerCollection();
@@ -91,7 +95,7 @@ class TextScanner extends EventDispatcher {
         }
     }
 
-    setOptions({deepContentScan, selectText, modifier, useMiddleMouse, delay, touchInputEnabled}) {
+    setOptions({deepContentScan, selectText, modifier, useMiddleMouse, delay, touchInputEnabled, scanLength, sentenceExtent, layoutAwareScan}) {
         if (typeof deepContentScan === 'boolean') {
             this._deepContentScan = deepContentScan;
         }
@@ -109,6 +113,15 @@ class TextScanner extends EventDispatcher {
         }
         if (typeof touchInputEnabled === 'boolean') {
             this._touchInputEnabled = false;
+        }
+        if (typeof scanLength === 'number') {
+            this._scanLength = scanLength;
+        }
+        if (typeof sentenceExtent === 'number') {
+            this._sentenceExtent = sentenceExtent;
+        }
+        if (typeof layoutAwareScan === 'boolean') {
+            this._layoutAwareScan = layoutAwareScan;
         }
     }
 
@@ -191,6 +204,37 @@ class TextScanner extends EventDispatcher {
         } else {
             this._textSourceCurrentSelected = false;
         }
+    }
+
+    async findTerms(textSource, optionsContext) {
+        const scanLength = this._scanLength;
+        const sentenceExtent = this._sentenceExtent;
+        const layoutAwareScan = this._layoutAwareScan;
+        const searchText = this.getTextSourceContent(textSource, scanLength, layoutAwareScan);
+        if (searchText.length === 0) { return null; }
+
+        const {definitions, length} = await api.termsFind(searchText, {}, optionsContext);
+        if (definitions.length === 0) { return null; }
+
+        textSource.setEndOffset(length, layoutAwareScan);
+        const sentence = this._documentUtil.extractSentence(textSource, sentenceExtent, layoutAwareScan);
+
+        return {definitions, sentence, type: 'terms'};
+    }
+
+    async findKanji(textSource, optionsContext) {
+        const sentenceExtent = this._sentenceExtent;
+        const layoutAwareScan = this._layoutAwareScan;
+        const searchText = this.getTextSourceContent(textSource, 1, layoutAwareScan);
+        if (searchText.length === 0) { return null; }
+
+        const definitions = await api.kanjiFind(searchText, optionsContext);
+        if (definitions.length === 0) { return null; }
+
+        textSource.setEndOffset(1, layoutAwareScan);
+        const sentence = this._documentUtil.extractSentence(textSource, sentenceExtent, layoutAwareScan);
+
+        return {definitions, sentence, type: 'kanji'};
     }
 
     // Private

@@ -253,7 +253,10 @@ class Frontend {
             modifier: scanningOptions.modifier,
             useMiddleMouse: scanningOptions.middleMouse,
             delay: scanningOptions.delay,
-            touchInputEnabled: scanningOptions.touchInputEnabled
+            touchInputEnabled: scanningOptions.touchInputEnabled,
+            scanLength: scanningOptions.length,
+            sentenceExtent: options.anki.sentenceExt,
+            layoutAwareScan: scanningOptions.layoutAwareScan
         });
         this._updateTextScannerEnabled();
 
@@ -399,8 +402,8 @@ class Frontend {
             if (textSource !== null) {
                 const optionsContext = await this.getOptionsContext();
                 results = (
-                    await this._findTerms(textSource, optionsContext) ||
-                    await this._findKanji(textSource, optionsContext)
+                    await this._textScanner.findTerms(textSource, optionsContext) ||
+                    await this._textScanner.findKanji(textSource, optionsContext)
                 );
                 if (results !== null) {
                     const focus = (cause === 'mouse');
@@ -422,32 +425,6 @@ class Frontend {
         }
 
         return results;
-    }
-
-    async _findTerms(textSource, optionsContext) {
-        const {length: scanLength, layoutAwareScan} = this._options.scanning;
-        const searchText = this._textScanner.getTextSourceContent(textSource, scanLength, layoutAwareScan);
-        if (searchText.length === 0) { return null; }
-
-        const {definitions, length} = await api.termsFind(searchText, {}, optionsContext);
-        if (definitions.length === 0) { return null; }
-
-        textSource.setEndOffset(length, layoutAwareScan);
-
-        return {definitions, type: 'terms'};
-    }
-
-    async _findKanji(textSource, optionsContext) {
-        const layoutAwareScan = this._options.scanning.layoutAwareScan;
-        const searchText = this._textScanner.getTextSourceContent(textSource, 1, layoutAwareScan);
-        if (searchText.length === 0) { return null; }
-
-        const definitions = await api.kanjiFind(searchText, optionsContext);
-        if (definitions.length === 0) { return null; }
-
-        textSource.setEndOffset(1, layoutAwareScan);
-
-        return {definitions, type: 'kanji'};
     }
 
     async _showExtensionUnloaded(textSource) {

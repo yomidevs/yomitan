@@ -27,9 +27,6 @@ class QueryParser extends EventDispatcher {
         this._getOptionsContext = getOptionsContext;
         this._setSpinnerVisible = setSpinnerVisible;
         this._selectedParser = null;
-        this._scanLength = 1;
-        this._sentenceExtent = 1;
-        this._layoutAwareScan = false;
         this._documentUtil = documentUtil;
         this._parseResults = [];
         this._queryParser = document.querySelector('#query-parser-content');
@@ -50,18 +47,9 @@ class QueryParser extends EventDispatcher {
         this._queryParser.addEventListener('click', this._onClick.bind(this));
     }
 
-    setOptions({selectedParser, scanLength, sentenceExtent, layoutAwareScan, termSpacing, scanning}) {
+    setOptions({selectedParser, termSpacing, scanning}) {
         if (selectedParser === null || typeof selectedParser === 'string') {
             this._selectedParser = selectedParser;
-        }
-        if (typeof scanLength === 'number') {
-            this._scanLength = scanLength;
-        }
-        if (typeof sentenceExtent === 'number') {
-            this._sentenceExtent = sentenceExtent;
-        }
-        if (typeof layoutAwareScan === 'boolean') {
-            this._layoutAwareScan = layoutAwareScan;
         }
         if (typeof termSpacing === 'boolean') {
             this._queryParser.dataset.termSpacing = `${termSpacing}`;
@@ -95,22 +83,14 @@ class QueryParser extends EventDispatcher {
     async _search(textSource, cause) {
         if (textSource === null) { return null; }
 
-        const scanLength = this._scanLength;
-        const sentenceExtent = this._sentenceExtent;
-        const layoutAwareScan = this._layoutAwareScan;
-        const searchText = this._textScanner.getTextSourceContent(textSource, scanLength, layoutAwareScan);
-        if (searchText.length === 0) { return null; }
-
         const optionsContext = this._getOptionsContext();
-        const {definitions, length} = await api.termsFind(searchText, {}, optionsContext);
-        if (definitions.length === 0) { return null; }
+        const results = await this._textScanner.findTerms(textSource, optionsContext);
+        if (results === null) { return null; }
 
-        const sentence = this._documentUtil.extractSentence(textSource, sentenceExtent, layoutAwareScan);
-
-        textSource.setEndOffset(length, layoutAwareScan);
+        const {definitions, sentence, type} = results;
 
         this.trigger('searched', {
-            type: 'terms',
+            type,
             definitions,
             sentence,
             cause,
@@ -118,7 +98,7 @@ class QueryParser extends EventDispatcher {
             optionsContext
         });
 
-        return {definitions, type: 'terms'};
+        return {definitions, type};
     }
 
     _onParserChange(e) {
