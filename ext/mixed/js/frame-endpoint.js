@@ -21,7 +21,7 @@
 
 class FrameEndpoint {
     constructor() {
-        this._secret = yomichan.generateId(16);
+        this._secret = generateId(16);
         this._token = null;
         this._eventListeners = new EventListenerCollection();
         this._eventListenersSetup = false;

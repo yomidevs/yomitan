@@ -166,7 +166,7 @@ class DisplayHistory extends EventDispatcher {
     }
 
     _generateId() {
-        return yomichan.generateId(16);
+        return generateId(16);
     }
 
     _clear() {

@@ -33,7 +33,7 @@ class Frontend {
         isSearchPage,
         allowRootFramePopupProxy
     }) {
-        this._id = yomichan.generateId(16);
+        this._id = generateId(16);
         this._popup = null;
         this._disabledOverride = false;
         this._options = null;

@@ -739,7 +739,7 @@ class Backend {
         if (typeof tabId !== 'number') { throw new Error('Sender has invalid tab ID'); }
 
         const frameId = sender.frameId;
-        const id = yomichan.generateId(16);
+        const id = generateId(16);
         const details = {
             name: 'action-port',
             id

@@ -86,7 +86,7 @@ class PopupFactory {
         if (frameId === this._frameId) {
             // New unique id
             if (id === null) {
-                id = yomichan.generateId(16);
+                id = generateId(16);
             }
             const popup = new Popup(id, depth, frameId, ownerFrameId);
             if (parent !== null) {

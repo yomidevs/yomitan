@@ -107,6 +107,7 @@
                 "escapeRegExp": "readonly",
                 "deferPromise": "readonly",
                 "clone": "readonly",
+                "generateId": "readonly",
                 "EventDispatcher": "readonly",
                 "EventListenerCollection": "readonly"
             }

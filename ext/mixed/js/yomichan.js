@@ -84,16 +84,6 @@ const yomichan = (() => {
             this.sendMessage({action: 'yomichanReady'});
         }
 
-        generateId(length) {
-            const array = new Uint8Array(length);
-            crypto.getRandomValues(array);
-            let id = '';
-            for (const value of array) {
-                id += value.toString(16).padStart(2, '0');
-            }
-            return id;
-        }
-
         isExtensionUrl(url) {
             try {
                 return url.startsWith(chrome.runtime.getURL('/'));

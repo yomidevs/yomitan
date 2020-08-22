@@ -25,7 +25,7 @@ class SettingsController extends EventDispatcher {
     constructor(profileIndex=0) {
         super();
         this._profileIndex = profileIndex;
-        this._source = yomichan.generateId(16);
+        this._source = generateId(16);
         this._pageExitPreventions = new Set();
         this._pageExitPreventionEventListeners = new EventListenerCollection();
     }

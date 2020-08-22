@@ -197,6 +197,16 @@ if (typeof window === 'object' && window !== null) {
     window.clone = clone;
 }
 
+function generateId(length) {
+    const array = new Uint8Array(length);
+    crypto.getRandomValues(array);
+    let id = '';
+    for (const value of array) {
+        id += value.toString(16).padStart(2, '0');
+    }
+    return id;
+}
+
 
 /*
  * Async utilities

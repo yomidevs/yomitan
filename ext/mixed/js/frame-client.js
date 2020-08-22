@@ -90,7 +90,7 @@ class FrameClient {
                         case 'frameEndpointReady':
                             {
                                 const {secret} = params;
-                                const token = yomichan.generateId(16);
+                                const token = generateId(16);
                                 tokenMap.set(secret, token);
                                 postMessage('frameEndpointConnect', {secret, token, hostFrameId});
                             }

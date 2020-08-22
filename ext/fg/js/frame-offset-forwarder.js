@@ -42,7 +42,7 @@ class FrameOffsetForwarder {
             return [0, 0];
         }
 
-        const uniqueId = yomichan.generateId(16);
+        const uniqueId = generateId(16);
 
         const frameOffsetPromise = yomichan.getTemporaryListenerResult(
             chrome.runtime.onMessage,
