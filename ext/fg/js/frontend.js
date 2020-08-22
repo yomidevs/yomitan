@@ -17,8 +17,6 @@
 
 /* global
  * DocumentUtil
- * FrameOffsetForwarder
- * PopupProxy
  * TextScanner
  * TextSourceElement
  * api
@@ -58,7 +56,6 @@ class Frontend {
         this._isSearchPage = isSearchPage;
         this._depth = depth;
         this._frameId = frameId;
-        this._frameOffsetForwarder = new FrameOffsetForwarder(frameId);
         this._popupFactory = popupFactory;
         this._allowRootFramePopupProxy = allowRootFramePopupProxy;
         this._popupCache = new Map();
@@ -83,8 +80,6 @@ class Frontend {
     }
 
     async prepare() {
-        this._frameOffsetForwarder.prepare();
-
         await this.updateOptions();
         try {
             const {zoomFactor} = await api.getZoom();
@@ -333,13 +328,20 @@ class Frontend {
             return null;
         }
 
-        return this._popupFactory.getOrCreatePopup({depth: this._depth, ownerFrameId: this._frameId});
+        return await this._popupFactory.getOrCreatePopup({
+            frameId: this._frameId,
+            ownerFrameId: this._frameId,
+            depth: this._depth
+        });
     }
 
     async _getProxyPopup() {
-        const popup = new PopupProxy(null, this._depth, this._parentPopupId, this._parentFrameId, this._frameId);
-        await popup.prepare();
-        return popup;
+        return await this._popupFactory.getOrCreatePopup({
+            frameId: this._parentFrameId,
+            ownerFrameId: this._frameId,
+            depth: this._depth,
+            parentPopupId: this._parentPopupId
+        });
     }
 
     async _getIframeProxyPopup() {
@@ -351,13 +353,15 @@ class Frontend {
             return null;
         }
 
-        const popup = new PopupProxy(popupId, 0, null, targetFrameId, this._frameId, this._frameOffsetForwarder);
+        const popup = await this._popupFactory.getOrCreatePopup({
+            frameId: targetFrameId,
+            ownerFrameId: this._frameId,
+            id: popupId
+        });
         popup.on('offsetNotFound', () => {
             this._allowRootFramePopupProxy = false;
             this._updatePopup();
         });
-        await popup.prepare();
-
         return popup;
     }
 

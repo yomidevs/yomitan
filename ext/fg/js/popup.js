@@ -88,6 +88,10 @@ class Popup {
         return this._container;
     }
 
+    get frameId() {
+        return this._frameId;
+    }
+
     // Public functions
 
     prepare() {

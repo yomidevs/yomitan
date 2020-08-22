@@ -16,21 +16,25 @@
  */
 
 /* global
+ * FrameOffsetForwarder
  * Popup
+ * PopupProxy
  * api
  */
 
 class PopupFactory {
     constructor(frameId) {
-        this._popups = new Map();
         this._frameId = frameId;
+        this._frameOffsetForwarder = new FrameOffsetForwarder(frameId);
+        this._popups = new Map();
     }
 
     // Public functions
 
     prepare() {
+        this._frameOffsetForwarder.prepare();
         api.crossFrame.registerHandlers([
-            ['getOrCreatePopup',     {async: false, handler: this._onApiGetOrCreatePopup.bind(this)}],
+            ['getOrCreatePopup',     {async: true,  handler: this._onApiGetOrCreatePopup.bind(this)}],
             ['setOptionsContext',    {async: true,  handler: this._onApiSetOptionsContext.bind(this)}],
             ['hide',                 {async: false, handler: this._onApiHide.bind(this)}],
             ['isVisible',            {async: true,  handler: this._onApiIsVisibleAsync.bind(this)}],
@@ -46,7 +50,7 @@ class PopupFactory {
         ]);
     }
 
-    getOrCreatePopup({id=null, parentId=null, ownerFrameId=null, depth=null}) {
+    async getOrCreatePopup({frameId=null, ownerFrameId=null, id=null, parentPopupId=null, depth=null}) {
         // Find by existing id
         if (id !== null) {
             const popup = this._popups.get(id);
@@ -57,8 +61,8 @@ class PopupFactory {
 
         // Find by existing parent id
         let parent = null;
-        if (parentId !== null) {
-            parent = this._popups.get(parentId);
+        if (parentPopupId !== null) {
+            parent = this._popups.get(parentPopupId);
             if (typeof parent !== 'undefined') {
                 const popup = parent.child;
                 if (popup !== null) {
@@ -69,12 +73,7 @@ class PopupFactory {
             }
         }
 
-        // New unique id
-        if (id === null) {
-            id = yomichan.generateId(16);
-        }
-
-        // Create new popup
+        // Depth
         if (parent !== null) {
             if (depth !== null) {
                 throw new Error('Depth cannot be set when parent exists');
@@ -83,25 +82,40 @@ class PopupFactory {
         } else if (depth === null) {
             depth = 0;
         }
-        const popup = new Popup(id, depth, this._frameId, ownerFrameId);
-        if (parent !== null) {
-            if (parent.child !== null) {
-                throw new Error('Parent popup already has a child');
+
+        if (frameId === this._frameId) {
+            // New unique id
+            if (id === null) {
+                id = yomichan.generateId(16);
             }
-            popup.parent = parent;
-            parent.child = popup;
+            const popup = new Popup(id, depth, frameId, ownerFrameId);
+            if (parent !== null) {
+                if (parent.child !== null) {
+                    throw new Error('Parent popup already has a child');
+                }
+                popup.parent = parent;
+                parent.child = popup;
+            }
+            this._popups.set(id, popup);
+            popup.prepare();
+            return popup;
+        } else {
+            const useFrameOffsetForwarder = (parentPopupId === null);
+            ({id, depth, frameId} = await api.crossFrame.invoke(frameId, 'getOrCreatePopup', {id, parentPopupId, frameId, ownerFrameId}));
+            const popup = new PopupProxy(id, depth, frameId, ownerFrameId, useFrameOffsetForwarder ? this._frameOffsetForwarder : null);
+            this._popups.set(id, popup);
+            return popup;
         }
-        this._popups.set(id, popup);
-        popup.prepare();
-        return popup;
     }
 
     // API message handlers
 
-    _onApiGetOrCreatePopup({id, parentId, ownerFrameId}) {
-        const popup = this.getOrCreatePopup({id, parentId, ownerFrameId});
+    async _onApiGetOrCreatePopup({id, parentPopupId, frameId, ownerFrameId}) {
+        const popup = await this.getOrCreatePopup({id, parentPopupId, frameId, ownerFrameId});
         return {
-            id: popup.id
+            id: popup.id,
+            depth: popup.depth,
+            frameId: popup.frameId
         };
     }
 
