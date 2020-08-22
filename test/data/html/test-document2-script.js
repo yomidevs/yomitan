@@ -58,6 +58,10 @@ function setup(container, fullscreenElement=null) {
     if (template !== null && templateContentContainer !== null) {
         const mode = container.dataset.shadowMode;
         const shadow = templateContentContainer.attachShadow({mode});
+
+        const containerStyles = document.querySelector('#container-styles');
+        shadow.appendChild(containerStyles.cloneNode(true));
+
         const content = document.importNode(template.content, true);
         setup(content);
         shadow.appendChild(content);

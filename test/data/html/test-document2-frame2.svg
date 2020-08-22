@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<style>
+:root {
+    background-color: #f8f8f8;
+}
+text {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    fill: #000000;
+    dominant-baseline: hanging;
+}
+</style>
+<text x="7" y="12">ありがとう</text>
+</svg>
