@@ -22,8 +22,9 @@
  * dynamicLoader
  */
 
-class Popup {
+class Popup extends EventDispatcher {
     constructor(id, depth, frameId, ownerFrameId) {
+        super();
         this._id = id;
         this._depth = depth;
         this._frameId = frameId;
