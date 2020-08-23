@@ -25,7 +25,6 @@ class DisplayFloat extends Display {
     constructor() {
         super(document.querySelector('#spinner'), document.querySelector('#definitions'));
         this._nestedPopupsPrepared = false;
-        this._ownerFrameId = null;
         this._frameEndpoint = new FrameEndpoint();
         this._windowMessageHandlers = new Map([
             ['extensionUnloaded', {async: false, handler: this._onMessageExtensionUnloaded.bind(this)}]
@@ -59,7 +58,7 @@ class DisplayFloat extends Display {
     }
 
     onEscape() {
-        this._invoke('closePopup');
+        this._invokeOwner('closePopup');
     }
 
     async setOptionsContext(optionsContext) {
@@ -99,7 +98,7 @@ class DisplayFloat extends Display {
     }
 
     async _onMessageConfigure({frameId, ownerFrameId, popupId, optionsContext, childrenSupported, scale}) {
-        this._ownerFrameId = ownerFrameId;
+        this.ownerFrameId = ownerFrameId;
         this.setOptionsContext(optionsContext);
 
         await this.updateOptions();
@@ -158,7 +157,7 @@ class DisplayFloat extends Display {
 
     _copySelection() {
         if (window.getSelection().toString()) { return false; }
-        this._invoke('copySelection');
+        this._invokeOwner('copySelection');
         return true;
     }
 
@@ -197,7 +196,7 @@ class DisplayFloat extends Display {
         await onOptionsUpdated();
     }
 
-    _invoke(action, params={}) {
-        return api.crossFrame.invoke(this._ownerFrameId, action, params);
+    _invokeOwner(action, params={}) {
+        return api.crossFrame.invoke(this.ownerFrameId, action, params);
     }
 }

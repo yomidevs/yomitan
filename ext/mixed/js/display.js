@@ -82,6 +82,7 @@ class Display extends EventDispatcher {
             documentUtil: this._documentUtil
         });
         this._mode = null;
+        this._ownerFrameId = null;
 
         this.registerActions([
             ['close',            () => { this.onEscape(); }],
@@ -145,6 +146,14 @@ class Display extends EventDispatcher {
 
     get mode() {
         return this._mode;
+    }
+
+    get ownerFrameId() {
+        return this._ownerFrameId;
+    }
+
+    set ownerFrameId(value) {
+        this._ownerFrameId = value;
     }
 
     async prepare() {
