@@ -258,6 +258,34 @@ function promiseTimeout(delay, resolveValue) {
     return promise;
 }
 
+function promiseAnimationFrame(timeout=null) {
+    return new Promise((resolve) => {
+        let timer = null;
+        let frameRequest = null;
+        const onFrame = (time) => {
+            frameRequest = null;
+            if (timer !== null) {
+                clearTimeout(timer);
+                timer = null;
+            }
+            resolve({time, timeout: false});
+        };
+        const onTimeout = () => {
+            timer = null;
+            if (frameRequest !== null) {
+                cancelAnimationFrame(frameRequest);
+                frameRequest = null;
+            }
+            resolve({time: timeout, timeout: true});
+        };
+
+        frameRequest = requestAnimationFrame(onFrame);
+        if (typeof timeout === 'number') {
+            timer = setTimeout(onTimeout, timeout);
+        }
+    });
+}
+
 
 /*
  * Common classes

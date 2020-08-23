@@ -108,6 +108,7 @@
                 "deferPromise": "readonly",
                 "clone": "readonly",
                 "generateId": "readonly",
+                "promiseAnimationFrame": "readonly",
                 "DynamicProperty": "readonly",
                 "EventDispatcher": "readonly",
                 "EventListenerCollection": "readonly"
