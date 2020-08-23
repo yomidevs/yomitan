@@ -86,8 +86,12 @@ class PopupProxy extends EventDispatcher {
         return this._invokeSafe('isVisible', {id: this._id}, false);
     }
 
-    setVisibleOverride(visible) {
-        return this._invokeSafe('setVisibleOverride', {id: this._id, visible});
+    async setVisibleOverride(value, priority) {
+        return this._invokeSafe('setVisibleOverride', {id: this._id, value, priority});
+    }
+
+    async clearVisibleOverride(token) {
+        return this._invokeSafe('clearVisibleOverride', {id: this._id, token});
     }
 
     async containsPoint(x, y) {

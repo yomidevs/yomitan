@@ -27,6 +27,7 @@ class PopupFactory {
         this._frameId = frameId;
         this._frameOffsetForwarder = new FrameOffsetForwarder(frameId);
         this._popups = new Map();
+        this._allPopupVisibilityTokenMap = new Map();
     }
 
     // Public functions
@@ -39,6 +40,7 @@ class PopupFactory {
             ['hide',                 {async: false, handler: this._onApiHide.bind(this)}],
             ['isVisible',            {async: true,  handler: this._onApiIsVisibleAsync.bind(this)}],
             ['setVisibleOverride',   {async: true,  handler: this._onApiSetVisibleOverride.bind(this)}],
+            ['clearVisibleOverride', {async: true,  handler: this._onApiClearVisibleOverride.bind(this)}],
             ['containsPoint',        {async: true,  handler: this._onApiContainsPoint.bind(this)}],
             ['showContent',          {async: true,  handler: this._onApiShowContent.bind(this)}],
             ['setCustomCss',         {async: false, handler: this._onApiSetCustomCss.bind(this)}],
@@ -108,6 +110,40 @@ class PopupFactory {
         }
     }
 
+    async setAllVisibleOverride(value, priority) {
+        const promises = [];
+        const errors = [];
+        for (const popup of this._popups.values()) {
+            const promise = popup.setVisibleOverride(value, priority)
+                .then(
+                    (token) => ({popup, token}),
+                    (error) => { errors.push(error); return null; }
+                );
+            promises.push(promise);
+        }
+
+        const results = await Promise.all(promises);
+
+        if (errors.length === 0) {
+            const token = generateId(16);
+            this._allPopupVisibilityTokenMap.set(token, results);
+            return token;
+        }
+
+        // Revert on error
+        await this._revertPopupVisibilityOverrides(results);
+        throw errors[0];
+    }
+
+    async clearAllVisibleOverride(token) {
+        const results = this._allPopupVisibilityTokenMap.get(token);
+        if (typeof results === 'undefined') { return false; }
+
+        this._allPopupVisibilityTokenMap.delete(token);
+        await this._revertPopupVisibilityOverrides(results);
+        return true;
+    }
+
     // API message handlers
 
     async _onApiGetOrCreatePopup({id, parentPopupId, frameId, ownerFrameId}) {
@@ -134,9 +170,14 @@ class PopupFactory {
         return await popup.isVisible();
     }
 
-    async _onApiSetVisibleOverride({id, visible}) {
+    async _onApiSetVisibleOverride({id, value, priority}) {
         const popup = this._getPopup(id);
-        return await popup.setVisibleOverride(visible);
+        return await popup.setVisibleOverride(value, priority);
+    }
+
+    async _onApiClearVisibleOverride({id, token}) {
+        const popup = this._getPopup(id);
+        return await popup.clearVisibleOverride(token);
     }
 
     async _onApiContainsPoint({id, x, y}) {
@@ -215,5 +256,20 @@ class PopupFactory {
     _popupCanShow(popup) {
         const parent = popup.parent;
         return parent === null || parent.isVisibleSync();
+    }
+
+    async _revertPopupVisibilityOverrides(overrides) {
+        const promises = [];
+        for (const value of overrides) {
+            if (value === null) { continue; }
+            const {popup, token} = value;
+            const promise = popup.clearVisibleOverride(token)
+                .then(
+                    (v) => v,
+                    () => false
+                );
+            promises.push(promise);
+        }
+        return await Promise.all(promises);
     }
 }

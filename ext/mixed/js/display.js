@@ -1145,9 +1145,12 @@ class Display extends EventDispatcher {
     }
 
     async _getScreenshot() {
+        const ownerFrameId = this._ownerFrameId;
+        let token = null;
         try {
-            await this._setPopupVisibleOverride(false);
-            await promiseTimeout(1); // Wait for popup to be hidden.
+            if (ownerFrameId !== null) {
+                token = await api.crossFrame.invoke(ownerFrameId, 'setAllVisibleOverride', {value: false, priority: 0, awaitFrame: true});
+            }
 
             const {format, quality} = this._options.anki.screenshot;
             const dataUrl = await api.screenshotGet({format, quality});
@@ -1155,16 +1158,14 @@ class Display extends EventDispatcher {
 
             return {dataUrl, format};
         } finally {
-            await this._setPopupVisibleOverride(null);
+            if (token !== null) {
+                await api.crossFrame.invoke(ownerFrameId, 'clearAllVisibleOverride', {token});
+            }
         }
     }
 
     _getFirstExpressionIndex() {
         return this._options.general.resultOutputMode === 'merge' ? 0 : -1;
-    }
-
-    _setPopupVisibleOverride(visible) {
-        return api.broadcastTab('popupSetVisibleOverride', {visible});
     }
 
     _getEntry(index) {

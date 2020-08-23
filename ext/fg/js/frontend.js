@@ -62,7 +62,6 @@ class Frontend {
         this._updatePopupToken = null;
 
         this._runtimeMessageHandlers = new Map([
-            ['popupSetVisibleOverride',              {async: false, handler: this._onMessagePopupSetVisibleOverride.bind(this)}],
             ['requestFrontendReadyBroadcast',        {async: false, handler: this._onMessageRequestFrontendReadyBroadcast.bind(this)}]
         ]);
     }
@@ -108,11 +107,13 @@ class Frontend {
         this._textScanner.on('activeModifiersChanged', this._onActiveModifiersChanged.bind(this));
 
         api.crossFrame.registerHandlers([
-            ['getUrl',                 {async: false, handler: this._onApiGetUrl.bind(this)}],
-            ['closePopup',             {async: false, handler: this._onApiClosePopup.bind(this)}],
-            ['copySelection',          {async: false, handler: this._onApiCopySelection.bind(this)}],
-            ['getPopupInfo',           {async: false, handler: this._onApiGetPopupInfo.bind(this)}],
-            ['getDocumentInformation', {async: false, handler: this._onApiGetDocumentInformation.bind(this)}]
+            ['getUrl',                  {async: false, handler: this._onApiGetUrl.bind(this)}],
+            ['closePopup',              {async: false, handler: this._onApiClosePopup.bind(this)}],
+            ['copySelection',           {async: false, handler: this._onApiCopySelection.bind(this)}],
+            ['getPopupInfo',            {async: false, handler: this._onApiGetPopupInfo.bind(this)}],
+            ['getDocumentInformation',  {async: false, handler: this._onApiGetDocumentInformation.bind(this)}],
+            ['setAllVisibleOverride',   {async: true,  handler: this._onApiSetAllVisibleOverride.bind(this)}],
+            ['clearAllVisibleOverride', {async: true,  handler: this._onApiClearAllVisibleOverride.bind(this)}]
         ]);
 
         this._updateContentScale();
@@ -161,11 +162,6 @@ class Frontend {
 
     // Message handlers
 
-    _onMessagePopupSetVisibleOverride({visible}) {
-        if (this._popup === null) { return; }
-        this._popup.setVisibleOverride(visible);
-    }
-
     _onMessageRequestFrontendReadyBroadcast({frameId}) {
         this._signalFrontendReady(frameId);
     }
@@ -194,6 +190,18 @@ class Frontend {
         return {
             title: document.title
         };
+    }
+
+    async _onApiSetAllVisibleOverride({value, priority, awaitFrame}) {
+        const result = await this._popupFactory.setAllVisibleOverride(value, priority);
+        if (awaitFrame) {
+            await promiseAnimationFrame(100);
+        }
+        return result;
+    }
+
+    async _onApiClearAllVisibleOverride({token}) {
+        return await this._popupFactory.clearAllVisibleOverride(token);
     }
 
     // Private
