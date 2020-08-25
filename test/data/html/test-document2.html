@@ -97,6 +97,16 @@
     </y-test>
 
     <y-test>
+        <y-description>&lt;iframe&gt; element with data URL.</y-description>
+        <iframe id="iframe-with-data-url" src="data:text/html;base64,PCFET0NUWVBFIGh0bWw+DQo8aHRtbD4NCiAgICA8aGVhZD4NCiAgICAgICAgPG1ldGEgY2hhcnNldD0iVVRGLTgiPg0KICAgICAgICA8bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoLGluaXRpYWwtc2NhbGU9MSIgLz4NCiAgICAgICAgPHRpdGxlPllvbWljaGFuIFRlc3RzPC90aXRsZT4NCiAgICAgICAgPHNjcmlwdD4NCmZ1bmN0aW9uIHRvZ2dsZUZ1bGxzY3JlZW4oZWxlbWVudCkgew0KICAgIGlmIChnZXRGdWxsc2NyZWVuRWxlbWVudCgpKSB7DQogICAgICAgIGV4aXRGdWxsc2NyZWVuKCk7DQogICAgfSBlbHNlIHsNCiAgICAgICAgcmVxdWVzdEZ1bGxzY3JlZW4oZWxlbWVudCk7DQogICAgfQ0KfQ0KDQpmdW5jdGlvbiBzZXR1cChjb250YWluZXIsIGZ1bGxzY3JlZW5FbGVtZW50PW51bGwpIHsNCiAgICBjb25zdCBmdWxsc2NyZWVuTGluayA9IGNvbnRhaW5lci5xdWVyeVNlbGVjdG9yKCcuZnVsbHNjcmVlbi1saW5rJyk7DQogICAgaWYgKGZ1bGxzY3JlZW5MaW5rICE9PSBudWxsKSB7DQogICAgICAgIGlmIChmdWxsc2NyZWVuRWxlbWVudCA9PT0gbnVsbCkgew0KICAgICAgICAgICAgZnVsbHNjcmVlbkVsZW1lbnQgPSBjb250YWluZXIucXVlcnlTZWxlY3RvcignLmZ1bGxzY3JlZW4tZWxlbWVudCcpOw0KICAgICAgICB9DQogICAgICAgIGZ1bGxzY3JlZW5MaW5rLmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJywgKGUpID0+IHsNCiAgICAgICAgICAgIHRvZ2dsZUZ1bGxzY3JlZW4oZnVsbHNjcmVlbkVsZW1lbnQpOw0KICAgICAgICAgICAgZS5wcmV2ZW50RGVmYXVsdCgpOw0KICAgICAgICAgICAgcmV0dXJuIGZhbHNlOw0KICAgICAgICB9LCBmYWxzZSk7DQogICAgfQ0KfQ0KICAgICAgICA8L3NjcmlwdD4NCiAgICAgICAgPHN0eWxlPg0KYm9keSB7DQogICAgZm9udC1mYW1pbHk6ICJIZWx2ZXRpY2EgTmV1ZSIsIEhlbHZldGljYSwgQXJpYWwsIHNhbnMtc2VyaWY7DQogICAgZm9udC1zaXplOiAxNHB4Ow0KICAgIHBhZGRpbmc6IDA7DQogICAgbWFyZ2luOiAwOw0KICAgIGJhY2tncm91bmQtY29sb3I6ICNmOGY4Zjg7DQp9DQphLCBhOnZpc2l0ZWQgew0KICAgIGNvbG9yOiAjMTA4MGMwOw0KICAgIHRleHQtZGVjb3JhdGlvbjogdW5kZXJsaW5lOw0KfQ0KLmNvbnRlbnQgew0KICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTsNCiAgICBsZWZ0OiAwOw0KICAgIHRvcDogMDsNCiAgICByaWdodDogMDsNCiAgICBib3R0b206IDA7DQogICAgcGFkZGluZzogMC41ZW07DQogICAgYmFja2dyb3VuZC1jb2xvcjogI2Y4ZjhmODsNCn0NCiAgICAgICAgPC9zdHlsZT4NCiAgICA8L2hlYWQ+DQo8Ym9keT48ZGl2IGNsYXNzPSJjb250ZW50Ij4NCjxkaXY+DQogICAg44GC44KK44GM44Go44GGDQo8L2Rpdj4NCjxkaXY+DQogICAgPGEgaHJlZj0iIyIgY2xhc3M9ImZ1bGxzY3JlZW4tbGluayI+VG9nZ2xlIGZ1bGxzY3JlZW48L2E+DQogICAgPHNjcmlwdD5zZXR1cChkb2N1bWVudC5ib2R5LCBkb2N1bWVudC5ib2R5KTs8L3NjcmlwdD4NCjwvZGl2Pg0KPC9kaXY+PC9ib2R5Pg0KPC9odG1sPg==" allowfullscreen="true" class="container"></iframe>
+    </y-test>
+
+    <y-test>
+        <y-description>&lt;iframe&gt; element with blob URL.</y-description>
+        <iframe id="iframe-with-blob-url" allowfullscreen="true" class="container"></iframe>
+    </y-test>
+
+    <y-test>
         <y-description>SVG &lt;img&gt;.</y-description>
         <img src="test-document2-frame2.svg" class="container">
     </y-test>
@@ -135,9 +145,33 @@
 
 
     <script>
-for (const element of document.querySelectorAll('y-test')) {
-    setup(element);
-}
+(() => {
+    function stringToTypedArray(string) {
+        const array = new Uint8Array(string.length);
+        for (let i = 0; i < string.length; ++i) {
+            array[i] = string.charCodeAt(i);
+        }
+        return array;
+    }
+
+    function dataUrlToBlob(dataUrl) {
+        let [, type, isBase64, data] = /^data:([^;]*);(base64,)?([\w\W]*)$/.exec(dataUrl);
+        data = (
+            isBase64 ?
+            new TextDecoder().decode(stringToTypedArray(atob(data))) :
+            data
+        );
+        return new Blob([data], {type});
+    }
+
+    for (const element of document.querySelectorAll('y-test')) {
+        setup(element);
+    }
+
+    const iframeWithDataUrl = document.querySelector('#iframe-with-data-url');
+    const iframeWithBlobUrl = document.querySelector('#iframe-with-blob-url');
+    iframeWithBlobUrl.src = URL.createObjectURL(dataUrlToBlob(iframeWithDataUrl.src));
+})();
     </script>
 
 </body>
