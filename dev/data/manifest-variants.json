@@ -2,7 +2,7 @@
     "manifest": {
         "manifest_version": 2,
         "name": "Yomichan",
-        "version": "20.8.23.0",
+        "version": "20.8.24.0",
         "description": "Japanese dictionary with Anki integration",
         "author": "Alex Yatskov",
         "icons": {
