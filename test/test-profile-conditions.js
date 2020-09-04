@@ -24,7 +24,7 @@ vm.execute([
     'mixed/js/core.js',
     'mixed/js/cache-map.js',
     'bg/js/json-schema.js',
-    'bg/js/profile-conditions2.js'
+    'bg/js/profile-conditions.js'
 ]);
 const [JsonSchemaValidator, ProfileConditions] = vm.get(['JsonSchemaValidator', 'ProfileConditions']);
 
