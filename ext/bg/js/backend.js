@@ -28,13 +28,11 @@
  * Mecab
  * ObjectPropertyAccessor
  * OptionsUtil
+ * ProfileConditions
  * RequestBuilder
  * TemplateRenderer
  * Translator
- * conditionsTestValue
  * jp
- * profileConditionsDescriptor
- * profileConditionsDescriptorPromise
  */
 
 class Backend {
@@ -49,6 +47,8 @@ class Backend {
         this._options = null;
         this._optionsSchema = null;
         this._optionsSchemaValidator = new JsonSchemaValidator();
+        this._profileConditionsSchemaCache = [];
+        this._profileConditionsUtil = new ProfileConditions();
         this._defaultAnkiFieldTemplates = null;
         this._requestBuilder = new RequestBuilder();
         this._audioUriBuilder = new AudioUriBuilder({
@@ -199,8 +199,6 @@ class Backend {
                 yomichan.logError(e);
             }
             await this._translator.prepare();
-
-            await profileConditionsDescriptorPromise;
 
             this._optionsSchema = await this._fetchAsset('/bg/data/options-schema.json', true);
             this._defaultAnkiFieldTemplates = (await this._fetchAsset('/bg/data/default-anki-field-templates.handlebars')).trim();
@@ -397,6 +395,7 @@ class Backend {
     }
 
     async _onApiOptionsSave({source}) {
+        this._clearProfileConditionsSchemaCache();
         const options = this.getFullOptions();
         await OptionsUtil.save(options);
         this._applyOptions(source);
@@ -1006,35 +1005,32 @@ class Backend {
     }
 
     _getProfileFromContext(options, optionsContext) {
+        optionsContext = this._profileConditionsUtil.normalizeContext(optionsContext);
+
+        let index = 0;
         for (const profile of options.profiles) {
             const conditionGroups = profile.conditionGroups;
-            if (conditionGroups.length > 0 && this._testConditionGroups(conditionGroups, optionsContext)) {
+
+            let schema;
+            if (index < this._profileConditionsSchemaCache.length) {
+                schema = this._profileConditionsSchemaCache[index];
+            } else {
+                schema = this._profileConditionsUtil.createSchema(conditionGroups);
+                this._profileConditionsSchemaCache.push(schema);
+            }
+
+            if (conditionGroups.length > 0 && this._optionsSchemaValidator.isValid(optionsContext, schema)) {
                 return profile;
             }
+            ++index;
         }
+
         return null;
     }
 
-    _testConditionGroups(conditionGroups, data) {
-        if (conditionGroups.length === 0) { return false; }
-
-        for (const conditionGroup of conditionGroups) {
-            const conditions = conditionGroup.conditions;
-            if (conditions.length > 0 && this._testConditions(conditions, data)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    _testConditions(conditions, data) {
-        for (const condition of conditions) {
-            if (!conditionsTestValue(profileConditionsDescriptor, condition.type, condition.operator, condition.value, data)) {
-                return false;
-            }
-        }
-        return true;
+    _clearProfileConditionsSchemaCache() {
+        this._profileConditionsSchemaCache = [];
+        this._optionsSchemaValidator.clearCache();
     }
 
     _checkLastError() {

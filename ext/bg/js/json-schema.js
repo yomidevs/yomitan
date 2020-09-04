@@ -181,6 +181,10 @@ class JsonSchemaValidator {
         return this._getPropertySchema(schema, property, value, null);
     }
 
+    clearCache() {
+        this._regexCache.clear();
+    }
+
     // Private
 
     _getPropertySchema(schema, property, value, path) {

@@ -16,17 +16,15 @@
  */
 
 /* global
- * ConditionsUI
- * conditionsClearCaches
- * profileConditionsDescriptor
- * profileConditionsDescriptorPromise
+ * ProfileConditionsUI
+ * api
  * utilBackgroundIsolate
  */
 
 class ProfileController {
     constructor(settingsController) {
         this._settingsController = settingsController;
-        this._conditionsContainer = null;
+        this._profileConditionsUI = new ProfileConditionsUI(settingsController);
     }
 
     async prepare() {
@@ -49,8 +47,11 @@ class ProfileController {
     // Private
 
     async _onOptionsChanged() {
+        const {modifiers} = await api.getEnvironmentInfo();
+        this._profileConditionsUI.setKeyInfo(modifiers.separator, modifiers.keys);
+
         const optionsFull = await this._settingsController.getOptionsFullMutable();
-        await this._formWrite(optionsFull);
+        this._formWrite(optionsFull);
     }
 
     _tryGetIntegerValue(selector, min, max) {
@@ -78,7 +79,7 @@ class ProfileController {
         profile.name = $('#profile-name').val();
     }
 
-    async _formWrite(optionsFull) {
+    _formWrite(optionsFull) {
         const currentProfileIndex = this._settingsController.profileIndex;
         const profile = optionsFull.profiles[currentProfileIndex];
 
@@ -91,23 +92,17 @@ class ProfileController {
 
         $('#profile-name').val(profile.name);
 
-        if (this._conditionsContainer !== null) {
-            this._conditionsContainer.cleanup();
-        }
+        this._refreshProfileConditions(optionsFull);
+    }
 
-        await profileConditionsDescriptorPromise;
-        this._conditionsContainer = new ConditionsUI.Container(
-            profileConditionsDescriptor,
-            'popupLevel',
-            profile.conditionGroups,
-            $('#profile-condition-groups'),
-            $('#profile-add-condition-group')
-        );
-        this._conditionsContainer.save = () => {
-            this._settingsController.save();
-            conditionsClearCaches(profileConditionsDescriptor);
-        };
-        this._conditionsContainer.isolate = utilBackgroundIsolate;
+    _refreshProfileConditions(optionsFull) {
+        this._profileConditionsUI.cleanup();
+
+        const profileIndex = this._settingsController.profileIndex;
+        if (profileIndex < 0 || profileIndex >= optionsFull.profiles.length) { return; }
+
+        const {conditionGroups} = optionsFull.profiles[profileIndex];
+        this._profileConditionsUI.prepare(conditionGroups);
     }
 
     _populateSelect(select, profiles, currentValue, ignoreIndices) {

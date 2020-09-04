@@ -389,6 +389,10 @@ class OptionsUtil {
             {
                 async: true,
                 update: this._updateVersion3.bind(this)
+            },
+            {
+                async: false,
+                update: this._updateVersion4.bind(this)
             }
         ];
     }
@@ -458,5 +462,23 @@ class OptionsUtil {
             fieldTemplates += addition;
         }
         return fieldTemplates;
+    }
+
+    static _updateVersion4(options) {
+        // Version 4 changes:
+        //  Options conditions converted to string representations.
+        for (const {conditionGroups} of options.profiles) {
+            for (const {conditions} of conditionGroups) {
+                for (const condition of conditions) {
+                    const value = condition.value;
+                    condition.value = (
+                        Array.isArray(value) ?
+                        value.join(', ') :
+                        `${value}`
+                    );
+                }
+            }
+        }
+        return options;
     }
 }
