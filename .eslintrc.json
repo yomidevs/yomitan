@@ -84,14 +84,20 @@
     },
     "overrides": [
         {
-            "files": ["ext/mixed/js/core.js"],
+            "files": [
+                "ext/mixed/js/core.js",
+                "ext/bg/js/template-renderer.js"
+            ],
             "env": {
                 "webextensions": false
             }
         },
         {
             "files": ["ext/**/*.js"],
-            "excludedFiles": ["ext/mixed/js/core.js"],
+            "excludedFiles": [
+                "ext/mixed/js/core.js",
+                "ext/bg/js/template-renderer.js"
+            ],
             "globals": {
                 "errorToJson": "readonly",
                 "jsonToError": "readonly",

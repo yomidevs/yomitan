@@ -43,7 +43,7 @@ class TemplateRenderer {
         }
 
         const markerPre = data.marker;
-        const markerPreHas = hasOwn(data, 'marker');
+        const markerPreHas = Object.prototype.hasOwnProperty.call(data, 'marker');
         try {
             this._stateStack = [new Map()];
             data.marker = marker;
