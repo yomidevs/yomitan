@@ -89,8 +89,8 @@ const api = (() => {
             return this._invoke('noteView', {noteId});
         }
 
-        templateRender(template, data) {
-            return this._invoke('templateRender', {data, template});
+        templateRender(template, data, marker) {
+            return this._invoke('templateRender', {data, template, marker});
         }
 
         audioGetUri(definition, source, details) {

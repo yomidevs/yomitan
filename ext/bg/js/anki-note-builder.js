@@ -81,9 +81,8 @@ class AnkiNoteBuilder {
     async formatField(field, data, templates, errors=null) {
         const pattern = /\{([\w-]+)\}/g;
         return await AnkiNoteBuilder.stringReplaceAsync(field, pattern, async (g0, marker) => {
-            data.marker = marker;
             try {
-                return await this._renderTemplate(templates, data);
+                return await this._renderTemplate(templates, data, marker);
             } catch (e) {
                 if (errors) { errors.push(e); }
                 return `{${marker}-render-error}`;

@@ -28,7 +28,7 @@ class TemplateRenderer {
         this._stateStack = null;
     }
 
-    async render(template, data) {
+    async render(template, data, marker) {
         if (!this._helpersRegistered) {
             this._registerHelpers();
             this._helpersRegistered = true;
@@ -42,11 +42,19 @@ class TemplateRenderer {
             cache.set(template, instance);
         }
 
+        const markerPre = data.marker;
+        const markerPreHas = hasOwn(data, 'marker');
         try {
             this._stateStack = [new Map()];
+            data.marker = marker;
             return instance(data).trim();
         } finally {
             this._stateStack = null;
+            if (markerPreHas) {
+                data.marker = markerPre;
+            } else {
+                delete data.marker;
+            }
         }
     }
 

@@ -518,8 +518,8 @@ class Backend {
         return await this._anki.guiBrowse(`nid:${noteId}`);
     }
 
-    async _onApiTemplateRender({template, data}) {
-        return this._renderTemplate(template, data);
+    async _onApiTemplateRender({template, data, marker}) {
+        return this._renderTemplate(template, data, marker);
     }
 
     _onApiCommandExec({command, params}) {
@@ -1339,8 +1339,8 @@ class Backend {
         return false;
     }
 
-    async _renderTemplate(template, data) {
-        return await this._templateRenderer.render(template, data);
+    async _renderTemplate(template, data, marker) {
+        return await this._templateRenderer.render(template, data, marker);
     }
 
     _getTemplates(options) {
