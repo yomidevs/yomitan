@@ -263,7 +263,7 @@ const yomichan = (() => {
         }
 
         _getLogContext() {
-            return this._getUrl();
+            return {url: this._getUrl()};
         }
 
         _onMessage({action, params}, sender, callback) {
