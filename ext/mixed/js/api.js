@@ -203,10 +203,6 @@ const api = (() => {
 
         // Invoke functions with progress
 
-        importDictionaryArchive(archiveContent, details, onProgress) {
-            return this._invokeWithProgress('importDictionaryArchive', {archiveContent, details}, onProgress);
-        }
-
         deleteDictionary(dictionaryName, onProgress) {
             return this._invokeWithProgress('deleteDictionary', {dictionaryName}, onProgress);
         }

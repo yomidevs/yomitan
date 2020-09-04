@@ -190,7 +190,7 @@ class DictionaryImporter {
                 try {
                     await dictionaryDatabase.bulkAdd(objectStoreName, entries, i, count);
                 } catch (e) {
-                    errors.push(errorToJson(e));
+                    errors.push(e);
                 }
 
                 loadedCount += count;

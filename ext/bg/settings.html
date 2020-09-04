@@ -585,7 +585,7 @@
 
             <div class="ignore-form-changes">
                 <div>
-                    <img src="/mixed/img/spinner.gif" class="pull-right" id="dict-spinner" alt>
+                    <img src="/mixed/img/spinner.gif" class="pull-right" id="dict-spinner" alt hidden>
                     <h3>Dictionaries</h3>
                 </div>
 
@@ -605,7 +605,7 @@
                 <div id="dict-groups"></div>
                 <div id="dict-groups-extra"></div>
 
-                <div id="dict-import-progress">
+                <div id="dict-import-progress" hidden>
                     Dictionary data is being imported, please be patient...
                     <span id="dict-import-info" hidden></span>
                     <div class="progress">
@@ -1128,6 +1128,7 @@
         <script src="/mixed/lib/jquery.min.js"></script>
         <script src="/mixed/lib/bootstrap/js/bootstrap.min.js"></script>
         <script src="/mixed/lib/handlebars.min.js"></script>
+        <script src="/mixed/lib/jszip.min.js"></script>
         <script src="/mixed/lib/wanakana.min.js"></script>
 
         <script src="/mixed/js/core.js"></script>
@@ -1145,12 +1146,20 @@
         <script src="/mixed/js/audio-system.js"></script>
         <script src="/mixed/js/document-util.js"></script>
 
+        <script src="/bg/js/database.js"></script>
+        <script src="/bg/js/dictionary-database.js"></script>
+        <script src="/bg/js/dictionary-importer.js"></script>
+        <script src="/bg/js/json-schema.js"></script>
+        <script src="/bg/js/media-utility.js"></script>
+        <script src="/mixed/js/cache-map.js"></script>
+
         <script src="/bg/js/settings/anki.js"></script>
         <script src="/bg/js/settings/anki-templates.js"></script>
         <script src="/bg/js/settings/audio.js"></script>
         <script src="/bg/js/settings/backup.js"></script>
         <script src="/bg/js/settings/clipboard-popups-controller.js"></script>
         <script src="/bg/js/settings/dictionaries.js"></script>
+        <script src="/bg/js/settings/dictionary-import-controller.js"></script>
         <script src="/bg/js/settings/generic-setting-controller.js"></script>
         <script src="/bg/js/settings/popup-preview.js"></script>
         <script src="/bg/js/settings/profiles.js"></script>

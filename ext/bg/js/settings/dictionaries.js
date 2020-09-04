@@ -383,24 +383,9 @@ class SettingsDictionaryExtraUI {
 }
 
 class DictionaryController {
-    constructor(settingsController, storageController) {
+    constructor(settingsController) {
         this._settingsController = settingsController;
-        this._storageController = storageController;
         this._dictionaryUI = null;
-        this._dictionaryErrorToStringOverrides = [
-            [
-                'A mutation operation was attempted on a database that did not allow mutations.',
-                'Access to IndexedDB appears to be restricted. Firefox seems to require that the history preference is set to "Remember history" before IndexedDB use of any kind is allowed.'
-            ],
-            [
-                'The operation failed for reasons unrelated to the database itself and not covered by any other error code.',
-                'Unable to access IndexedDB due to a possibly corrupt user profile. Try using the "Refresh Firefox" feature to reset your user profile.'
-            ],
-            [
-                'BulkError',
-                'Unable to finish importing dictionary data into IndexedDB. This may indicate that you do not have sufficient disk space available to complete this operation.'
-            ]
-        ];
     }
 
     async prepare() {
@@ -414,14 +399,11 @@ class DictionaryController {
         this._dictionaryUI.preventPageExit = this._preventPageExit.bind(this);
         this._dictionaryUI.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
 
-        document.querySelector('#dict-purge-button').addEventListener('click', this._onPurgeButtonClick.bind(this), false);
-        document.querySelector('#dict-purge-confirm').addEventListener('click', this._onPurgeConfirmButtonClick.bind(this), false);
-        document.querySelector('#dict-file-button').addEventListener('click', this._onImportButtonClick.bind(this), false);
-        document.querySelector('#dict-file').addEventListener('change', this._onImportFileChange.bind(this), false);
         document.querySelector('#dict-main').addEventListener('change', this._onDictionaryMainChanged.bind(this), false);
         document.querySelector('#database-enable-prefix-wildcard-searches').addEventListener('change', this._onDatabaseEnablePrefixWildcardSearchesChanged.bind(this), false);
 
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
+        this._settingsController.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
 
         await this._onOptionsChanged();
         await this._onDatabaseUpdated();
@@ -493,76 +475,6 @@ class DictionaryController {
         select.value = value;
     }
 
-    _dictionaryErrorToString(error) {
-        if (error.toString) {
-            error = error.toString();
-        } else {
-            error = `${error}`;
-        }
-
-        for (const [match, subst] of this._dictionaryErrorToStringOverrides) {
-            if (error.includes(match)) {
-                error = subst;
-                break;
-            }
-        }
-
-        return error;
-    }
-
-    _dictionaryErrorsShow(errors) {
-        const dialog = document.querySelector('#dict-error');
-        dialog.textContent = '';
-
-        if (errors !== null && errors.length > 0) {
-            const uniqueErrors = new Map();
-            for (let e of errors) {
-                yomichan.logError(e);
-                e = this._dictionaryErrorToString(e);
-                let count = uniqueErrors.get(e);
-                if (typeof count === 'undefined') {
-                    count = 0;
-                }
-                uniqueErrors.set(e, count + 1);
-            }
-
-            for (const [e, count] of uniqueErrors.entries()) {
-                const div = document.createElement('p');
-                if (count > 1) {
-                    div.textContent = `${e} `;
-                    const em = document.createElement('em');
-                    em.textContent = `(${count})`;
-                    div.appendChild(em);
-                } else {
-                    div.textContent = `${e}`;
-                }
-                dialog.appendChild(div);
-            }
-
-            dialog.hidden = false;
-        } else {
-            dialog.hidden = true;
-        }
-    }
-
-    _dictionarySpinnerShow(show) {
-        const spinner = $('#dict-spinner');
-        if (show) {
-            spinner.show();
-        } else {
-            spinner.hide();
-        }
-    }
-
-    _dictReadFile(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = () => reject(reader.error);
-            reader.readAsBinaryString(file);
-        });
-    }
-
     async _onDatabaseUpdated() {
         try {
             const dictionaries = await api.getDictionaryInfo();
@@ -576,7 +488,7 @@ class DictionaryController {
             const {counts, total} = await api.getDictionaryCounts(dictionaries.map((v) => v.title), true);
             this._dictionaryUI.setCounts(counts, total);
         } catch (e) {
-            this._dictionaryErrorsShow([e]);
+            yomichan.logError(e);
         }
     }
 
@@ -592,124 +504,6 @@ class DictionaryController {
         const options = await this._settingsController.getOptionsMutable();
         options.general.mainDictionary = value;
         await this._settingsController.save();
-    }
-
-    _onImportButtonClick() {
-        const dictFile = document.querySelector('#dict-file');
-        dictFile.click();
-    }
-
-    _onPurgeButtonClick(e) {
-        e.preventDefault();
-        $('#dict-purge-modal').modal('show');
-    }
-
-    async _onPurgeConfirmButtonClick(e) {
-        e.preventDefault();
-
-        $('#dict-purge-modal').modal('hide');
-
-        const dictControls = $('#dict-importer, #dict-groups, #dict-groups-extra, #dict-main-group').hide();
-        const dictProgress = document.querySelector('#dict-purge');
-        dictProgress.hidden = false;
-
-        const prevention = this._preventPageExit();
-
-        try {
-            this._dictionaryErrorsShow(null);
-            this._dictionarySpinnerShow(true);
-
-            await api.purgeDatabase();
-            const optionsFull = await this._settingsController.getOptionsFullMutable();
-            for (const {options} of toIterable(optionsFull.profiles)) {
-                options.dictionaries = utilBackgroundIsolate({});
-                options.general.mainDictionary = '';
-            }
-            await this._settingsController.save();
-
-            this._onDatabaseUpdated();
-        } catch (err) {
-            this._dictionaryErrorsShow([err]);
-        } finally {
-            prevention.end();
-
-            this._dictionarySpinnerShow(false);
-
-            dictControls.show();
-            dictProgress.hidden = true;
-
-            this._storageController.updateStats();
-        }
-    }
-
-    async _onImportFileChange(e) {
-        const files = [...e.target.files];
-        e.target.value = null;
-
-        const dictFile = $('#dict-file');
-        const dictControls = $('#dict-importer').hide();
-        const dictProgress = $('#dict-import-progress').show();
-        const dictImportInfo = document.querySelector('#dict-import-info');
-
-        const prevention = this._preventPageExit();
-
-        try {
-            this._dictionaryErrorsShow(null);
-            this._dictionarySpinnerShow(true);
-
-            const setProgress = (percent) => dictProgress.find('.progress-bar').css('width', `${percent}%`);
-            const updateProgress = (total, current) => {
-                setProgress(current / total * 100.0);
-                this._storageController.updateStats();
-            };
-
-            const optionsFull = await this._settingsController.getOptionsFull();
-
-            const importDetails = {
-                prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported
-            };
-
-            for (let i = 0, ii = files.length; i < ii; ++i) {
-                setProgress(0.0);
-                if (ii > 1) {
-                    dictImportInfo.hidden = false;
-                    dictImportInfo.textContent = `(${i + 1} of ${ii})`;
-                }
-
-                const archiveContent = await this._dictReadFile(files[i]);
-                const {result, errors} = await api.importDictionaryArchive(archiveContent, importDetails, updateProgress);
-                const optionsFull2 = await this._settingsController.getOptionsFullMutable();
-                for (const {options} of toIterable(optionsFull2.profiles)) {
-                    const dictionaryOptions = SettingsDictionaryListUI.createDictionaryOptions();
-                    dictionaryOptions.enabled = true;
-                    options.dictionaries[result.title] = dictionaryOptions;
-                    if (result.sequenced && options.general.mainDictionary === '') {
-                        options.general.mainDictionary = result.title;
-                    }
-                }
-
-                await this._settingsController.save();
-
-                if (errors.length > 0) {
-                    const errors2 = errors.map((error) => jsonToError(error));
-                    errors2.push(`Dictionary may not have been imported properly: ${errors2.length} error${errors2.length === 1 ? '' : 's'} reported.`);
-                    this._dictionaryErrorsShow(errors2);
-                }
-
-                this._onDatabaseUpdated();
-            }
-        } catch (err) {
-            this._dictionaryErrorsShow([err]);
-        } finally {
-            prevention.end();
-            this._dictionarySpinnerShow(false);
-
-            dictImportInfo.hidden = false;
-            dictImportInfo.textContent = '';
-            dictFile.val('');
-            dictControls.show();
-            dictProgress.hide();
-        }
     }
 
     async _onDatabaseEnablePrefixWildcardSearchesChanged(e) {

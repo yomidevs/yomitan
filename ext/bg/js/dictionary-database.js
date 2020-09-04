@@ -117,8 +117,15 @@ class DictionaryDatabase {
         if (this._db.isOpen()) {
             this._db.close();
         }
-        await Database.deleteDatabase(this._dbName);
+        let result = false;
+        try {
+            await Database.deleteDatabase(this._dbName);
+            result = true;
+        } catch (e) {
+            yomichan.logError(e);
+        }
         await this.prepare();
+        return result;
     }
 
     async deleteDictionary(dictionaryName, progressSettings, onProgress) {

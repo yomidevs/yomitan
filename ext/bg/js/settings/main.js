@@ -21,6 +21,7 @@
  * AudioController
  * ClipboardPopupsController
  * DictionaryController
+ * DictionaryImportController
  * GenericSettingController
  * PopupPreviewController
  * ProfileController
@@ -94,8 +95,11 @@ async function setupEnvironmentInfo() {
         const profileController = new ProfileController(settingsController);
         profileController.prepare();
 
-        const dictionaryController = new DictionaryController(settingsController, storageController);
+        const dictionaryController = new DictionaryController(settingsController);
         dictionaryController.prepare();
+
+        const dictionaryImportController = new DictionaryImportController(settingsController, storageController);
+        dictionaryImportController.prepare();
 
         const ankiController = new AnkiController(settingsController);
         ankiController.prepare();
