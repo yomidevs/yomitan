@@ -357,7 +357,12 @@ class Frontend {
 
     async _getIframeProxyPopup() {
         const targetFrameId = 0; // Root frameId
-        await this._waitForFrontendReady(targetFrameId);
+        try {
+            await this._waitForFrontendReady(targetFrameId);
+        } catch (e) {
+            // Root frame not available
+            return await this._getDefaultPopup();
+        }
 
         const {popupId} = await api.crossFrame.invoke(targetFrameId, 'getPopupInfo');
         if (popupId === null) {
