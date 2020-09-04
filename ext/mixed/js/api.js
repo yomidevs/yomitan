@@ -201,6 +201,10 @@ const api = (() => {
             return this._invoke('getOrCreateSearchPopup', isObject(details) ? details : {});
         }
 
+        isTabSearchPopup(tabId) {
+            return this._invoke('isTabSearchPopup', {tabId});
+        }
+
         // Invoke functions with progress
 
         deleteDictionary(dictionaryName, onProgress) {

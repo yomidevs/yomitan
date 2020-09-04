@@ -125,7 +125,8 @@ class Backend {
             ['modifySettings',               {async: true,  contentScript: true,  handler: this._onApiModifySettings.bind(this)}],
             ['getSettings',                  {async: false, contentScript: true,  handler: this._onApiGetSettings.bind(this)}],
             ['setAllSettings',               {async: true,  contentScript: false, handler: this._onApiSetAllSettings.bind(this)}],
-            ['getOrCreateSearchPopup',       {async: true,  contentScript: true,  handler: this._onApiGetOrCreateSearchPopup.bind(this)}]
+            ['getOrCreateSearchPopup',       {async: true,  contentScript: true,  handler: this._onApiGetOrCreateSearchPopup.bind(this)}],
+            ['isTabSearchPopup',             {async: true,  contentScript: true,  handler: this._onApiIsTabSearchPopup.bind(this)}]
         ]);
         this._messageHandlersWithProgress = new Map([
             ['deleteDictionary',        {async: true,  contentScript: false, handler: this._onApiDeleteDictionary.bind(this)}]
@@ -800,6 +801,12 @@ class Backend {
         return {tabId: tab.id, windowId: tab.windowId};
     }
 
+    async _onApiIsTabSearchPopup({tabId}) {
+        const baseUrl = chrome.runtime.getURL('/bg/search.html');
+        const tab = typeof tabId === 'number' ? await this._checkTabUrl(tabId, (url) => url.startsWith(baseUrl)) : null;
+        return (tab !== null);
+    }
+
     // Command handlers
 
     async _onCommandSearch(params) {
@@ -883,19 +890,9 @@ class Backend {
         // Reuse same tab
         const baseUrl = chrome.runtime.getURL('/bg/search.html');
         if (this._searchPopupTabId !== null) {
-            const tabId = this._searchPopupTabId;
-            const tab = await new Promise((resolve) => {
-                chrome.tabs.get(
-                    tabId,
-                    (result) => { resolve(chrome.runtime.lastError ? null : result); }
-                );
-            });
+            const tab = await this._checkTabUrl(this._searchPopupTabId, (url) => url.startsWith(baseUrl));
             if (tab !== null) {
-                const url = await this._getTabUrl(tabId);
-                const isValidTab = (url !== null && url.startsWith(baseUrl));
-                if (isValidTab) {
-                    return {tab, created: false};
-                }
+                return {tab, created: false};
             }
             this._searchPopupTabId = null;
         }
@@ -1520,5 +1517,19 @@ class Backend {
 
             chrome.tabs.sendMessage(...args, callback);
         });
+    }
+
+    async _checkTabUrl(tabId, urlPredicate) {
+        const tab = await new Promise((resolve) => {
+            chrome.tabs.get(
+                tabId,
+                (result) => { resolve(chrome.runtime.lastError ? null : result); }
+            );
+        });
+        if (tab === null) { return null; }
+
+        const url = await this._getTabUrl(tabId);
+        const isValidTab = urlPredicate(url);
+        return isValidTab ? tab : null;
     }
 }
