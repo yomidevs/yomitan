@@ -122,7 +122,7 @@ class PopupFactory {
             promises.push(promise);
         }
 
-        const results = await Promise.all(promises);
+        const results = (await Promise.all(promises)).filter(({token}) => token !== null);
 
         if (errors.length === 0) {
             const token = generateId(16);

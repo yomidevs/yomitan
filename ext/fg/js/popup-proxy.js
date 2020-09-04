@@ -86,12 +86,12 @@ class PopupProxy extends EventDispatcher {
         return this._invokeSafe('isVisible', {id: this._id}, false);
     }
 
-    async setVisibleOverride(value, priority) {
-        return this._invokeSafe('setVisibleOverride', {id: this._id, value, priority});
+    setVisibleOverride(value, priority) {
+        return this._invokeSafe('setVisibleOverride', {id: this._id, value, priority}, null);
     }
 
-    async clearVisibleOverride(token) {
-        return this._invokeSafe('clearVisibleOverride', {id: this._id, token});
+    clearVisibleOverride(token) {
+        return this._invokeSafe('clearVisibleOverride', {id: this._id, token}, false);
     }
 
     async containsPoint(x, y) {
@@ -135,12 +135,12 @@ class PopupProxy extends EventDispatcher {
         return this._invokeSafe('updateTheme', {id: this._id});
     }
 
-    async setCustomOuterCss(css, useWebExtensionApi) {
-        return this._invokeSafe('updateTheme', {id: this._id, css, useWebExtensionApi});
+    setCustomOuterCss(css, useWebExtensionApi) {
+        return this._invokeSafe('setCustomOuterCss', {id: this._id, css, useWebExtensionApi});
     }
 
     setChildrenSupported(value) {
-        return this._invokeSafe('updateTheme', {id: this._id, value});
+        return this._invokeSafe('setChildrenSupported', {id: this._id, value});
     }
 
     getFrameRect() {
