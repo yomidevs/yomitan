@@ -27,10 +27,12 @@ class RequestBuilder {
             ['cookie', null],
             ['origin', {name: 'Origin', value: originURL}]
         ];
-        return this.fetchModifyHeaders(url, init, modifications);
+        return await this._fetchModifyHeaders(url, init, modifications);
     }
 
-    async fetchModifyHeaders(url, init, modifications) {
+    // Private
+
+    async _fetchModifyHeaders(url, init, modifications) {
         const matchURL = this._getMatchURL(url);
 
         let done = false;
@@ -67,8 +69,6 @@ class RequestBuilder {
             }
         }
     }
-
-    // Private
 
     _onBeforeSendHeadersAddListener(callback, filter) {
         const extraInfoSpec = this._onBeforeSendHeadersExtraInfoSpec;
