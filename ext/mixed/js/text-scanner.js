@@ -21,13 +21,16 @@
  */
 
 class TextScanner extends EventDispatcher {
-    constructor({node, ignoreElements, ignorePoint, search, documentUtil}) {
+    constructor({node, ignoreElements, ignorePoint, documentUtil, getOptionsContext, searchTerms=false, searchKanji=false, searchOnClick=false}) {
         super();
         this._node = node;
         this._ignoreElements = ignoreElements;
         this._ignorePoint = ignorePoint;
-        this._search = search;
         this._documentUtil = documentUtil;
+        this._getOptionsContext = getOptionsContext;
+        this._searchTerms = searchTerms;
+        this._searchKanji = searchKanji;
+        this._searchOnClick = searchOnClick;
 
         this._isPrepared = false;
         this._ignoreNodes = null;
@@ -125,41 +128,6 @@ class TextScanner extends EventDispatcher {
         }
     }
 
-    async searchAt(x, y, cause) {
-        try {
-            this._scanTimerClear();
-
-            if (this._pendingLookup) {
-                return;
-            }
-
-            if (typeof this._ignorePoint === 'function' && await this._ignorePoint(x, y)) {
-                return;
-            }
-
-            const textSource = this._documentUtil.getRangeFromPoint(x, y, this._deepContentScan);
-            try {
-                if (this._textSourceCurrent !== null && this._textSourceCurrent.equals(textSource)) {
-                    return;
-                }
-
-                this._pendingLookup = true;
-                const result = await this._search(textSource, cause);
-                if (result !== null) {
-                    this._causeCurrent = cause;
-                    this.setCurrentTextSource(textSource);
-                }
-                this._pendingLookup = false;
-            } finally {
-                if (textSource !== null) {
-                    textSource.cleanup();
-                }
-            }
-        } catch (e) {
-            yomichan.logError(e);
-        }
-    }
-
     getTextSourceContent(textSource, length, layoutAwareScan) {
         const clonedTextSource = textSource.clone();
 
@@ -206,35 +174,44 @@ class TextScanner extends EventDispatcher {
         }
     }
 
-    async findTerms(textSource, optionsContext) {
-        const scanLength = this._scanLength;
-        const sentenceExtent = this._sentenceExtent;
-        const layoutAwareScan = this._layoutAwareScan;
-        const searchText = this.getTextSourceContent(textSource, scanLength, layoutAwareScan);
-        if (searchText.length === 0) { return null; }
+    async search(textSource, cause) {
+        let definitions = null;
+        let sentence = null;
+        let type = null;
+        let error = null;
+        let searched = false;
+        let optionsContext = null;
 
-        const {definitions, length} = await api.termsFind(searchText, {}, optionsContext);
-        if (definitions.length === 0) { return null; }
+        try {
+            if (this._textSourceCurrent !== null && this._textSourceCurrent.equals(textSource)) {
+                return;
+            }
 
-        textSource.setEndOffset(length, layoutAwareScan);
-        const sentence = this._documentUtil.extractSentence(textSource, sentenceExtent, layoutAwareScan);
+            optionsContext = await this._getOptionsContext();
+            searched = true;
 
-        return {definitions, sentence, type: 'terms'};
-    }
+            const result = await this._findDefinitions(textSource, cause);
+            if (result !== null) {
+                ({definitions, sentence, type} = result);
+                this._causeCurrent = cause;
+                this.setCurrentTextSource(textSource);
+            }
+        } catch (e) {
+            error = e;
+        }
 
-    async findKanji(textSource, optionsContext) {
-        const sentenceExtent = this._sentenceExtent;
-        const layoutAwareScan = this._layoutAwareScan;
-        const searchText = this.getTextSourceContent(textSource, 1, layoutAwareScan);
-        if (searchText.length === 0) { return null; }
+        if (!searched) { return; }
 
-        const definitions = await api.kanjiFind(searchText, optionsContext);
-        if (definitions.length === 0) { return null; }
-
-        textSource.setEndOffset(1, layoutAwareScan);
-        const sentence = this._documentUtil.extractSentence(textSource, sentenceExtent, layoutAwareScan);
-
-        return {definitions, sentence, type: 'kanji'};
+        this.trigger('searched', {
+            textScanner: this,
+            type,
+            definitions,
+            sentence,
+            cause,
+            textSource,
+            optionsContext,
+            error
+        });
     }
 
     // Private
@@ -248,7 +225,7 @@ class TextScanner extends EventDispatcher {
     _onMouseMove(e) {
         this._scanTimerClear();
 
-        if (this._pendingLookup || DocumentUtil.isMouseButtonDown(e, 'primary')) {
+        if (DocumentUtil.isMouseButtonDown(e, 'primary')) {
             return;
         }
 
@@ -262,18 +239,7 @@ class TextScanner extends EventDispatcher {
             return;
         }
 
-        const search = async () => {
-            if (this._modifier === 'none') {
-                if (!await this._scanTimerWait()) {
-                    // Aborted
-                    return;
-                }
-            }
-
-            await this.searchAt(e.clientX, e.clientY, 'mouse');
-        };
-
-        search();
+        this._searchAtFromMouse(e.clientX, e.clientY);
     }
 
     _onMouseDown(e) {
@@ -296,6 +262,10 @@ class TextScanner extends EventDispatcher {
     }
 
     _onClick(e) {
+        if (this._searchOnClick) {
+            this._searchAt(e.clientX, e.clientY, 'click');
+        }
+
         if (this._preventNextClick) {
             this._preventNextClick = false;
             e.preventDefault();
@@ -334,25 +304,7 @@ class TextScanner extends EventDispatcher {
 
         this._primaryTouchIdentifier = primaryTouch.identifier;
 
-        if (this._pendingLookup) {
-            return;
-        }
-
-        const textSourceCurrentPrevious = this._textSourceCurrent !== null ? this._textSourceCurrent.clone() : null;
-
-        this.searchAt(primaryTouch.clientX, primaryTouch.clientY, 'touchStart')
-            .then(() => {
-                if (
-                    this._textSourceCurrent === null ||
-                    this._textSourceCurrent.equals(textSourceCurrentPrevious)
-                ) {
-                    return;
-                }
-
-                this._preventScroll = true;
-                this._preventNextContextMenu = true;
-                this._preventNextMouseDown = true;
-            });
+        this._searchAtFromTouchStart(primaryTouch.clientX, primaryTouch.clientY);
     }
 
     _onTouchEnd(e) {
@@ -384,7 +336,7 @@ class TextScanner extends EventDispatcher {
             return;
         }
 
-        this.searchAt(primaryTouch.clientX, primaryTouch.clientY, 'touchMove');
+        this._searchAt(primaryTouch.clientX, primaryTouch.clientY, 'touchMove');
 
         e.preventDefault(); // Disable scroll
     }
@@ -425,13 +377,13 @@ class TextScanner extends EventDispatcher {
             [this._node, 'mousedown', this._onMouseDown.bind(this)],
             [this._node, 'mousemove', this._onMouseMove.bind(this)],
             [this._node, 'mouseover', this._onMouseOver.bind(this)],
-            [this._node, 'mouseout', this._onMouseOut.bind(this)]
+            [this._node, 'mouseout', this._onMouseOut.bind(this)],
+            [this._node, 'click', this._onClick.bind(this)]
         ];
     }
 
     _getTouchEventListeners() {
         return [
-            [this._node, 'click', this._onClick.bind(this)],
             [this._node, 'auxclick', this._onAuxClick.bind(this)],
             [this._node, 'touchstart', this._onTouchStart.bind(this)],
             [this._node, 'touchend', this._onTouchEnd.bind(this)],
@@ -459,5 +411,107 @@ class TextScanner extends EventDispatcher {
             }
         }
         return null;
+    }
+
+    async _findDefinitions(textSource, optionsContext) {
+        if (textSource === null) {
+            return null;
+        }
+        if (this._searchTerms) {
+            const results = await this._findTerms(textSource, optionsContext);
+            if (results !== null) { return results; }
+        }
+        if (this._searchKanji) {
+            const results = await this._findKanji(textSource, optionsContext);
+            if (results !== null) { return results; }
+        }
+        return null;
+    }
+
+    async _findTerms(textSource, optionsContext) {
+        const scanLength = this._scanLength;
+        const sentenceExtent = this._sentenceExtent;
+        const layoutAwareScan = this._layoutAwareScan;
+        const searchText = this.getTextSourceContent(textSource, scanLength, layoutAwareScan);
+        if (searchText.length === 0) { return null; }
+
+        const {definitions, length} = await api.termsFind(searchText, {}, optionsContext);
+        if (definitions.length === 0) { return null; }
+
+        textSource.setEndOffset(length, layoutAwareScan);
+        const sentence = this._documentUtil.extractSentence(textSource, sentenceExtent, layoutAwareScan);
+
+        return {definitions, sentence, type: 'terms'};
+    }
+
+    async _findKanji(textSource, optionsContext) {
+        const sentenceExtent = this._sentenceExtent;
+        const layoutAwareScan = this._layoutAwareScan;
+        const searchText = this.getTextSourceContent(textSource, 1, layoutAwareScan);
+        if (searchText.length === 0) { return null; }
+
+        const definitions = await api.kanjiFind(searchText, optionsContext);
+        if (definitions.length === 0) { return null; }
+
+        textSource.setEndOffset(1, layoutAwareScan);
+        const sentence = this._documentUtil.extractSentence(textSource, sentenceExtent, layoutAwareScan);
+
+        return {definitions, sentence, type: 'kanji'};
+    }
+
+    async _searchAt(x, y, cause) {
+        if (this._pendingLookup) { return; }
+
+        try {
+            this._pendingLookup = true;
+            this._scanTimerClear();
+
+            if (typeof this._ignorePoint === 'function' && await this._ignorePoint(x, y)) {
+                return;
+            }
+
+            const textSource = this._documentUtil.getRangeFromPoint(x, y, this._deepContentScan);
+            try {
+                await this.search(textSource, cause);
+            } finally {
+                if (textSource !== null) {
+                    textSource.cleanup();
+                }
+            }
+        } catch (e) {
+            yomichan.logError(e);
+        } finally {
+            this._pendingLookup = false;
+        }
+    }
+
+    async _searchAtFromMouse(x, y) {
+        if (this._pendingLookup) { return; }
+
+        if (this._modifier === 'none') {
+            if (!await this._scanTimerWait()) {
+                // Aborted
+                return;
+            }
+        }
+
+        await this._searchAt(x, y, 'mouse');
+    }
+
+    async _searchAtFromTouchStart(x, y) {
+        if (this._pendingLookup) { return; }
+
+        const textSourceCurrentPrevious = this._textSourceCurrent !== null ? this._textSourceCurrent.clone() : null;
+
+        await this._searchAt(x, y, 'touchStart');
+
+        if (
+            this._textSourceCurrent !== null &&
+            !this._textSourceCurrent.equals(textSourceCurrentPrevious)
+        ) {
+            this._preventScroll = true;
+            this._preventNextContextMenu = true;
+            this._preventNextMouseDown = true;
+        }
     }
 }
