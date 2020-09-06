@@ -46,5 +46,12 @@
         <script src="/mixed/js/object-property-accessor.js"></script>
 
         <script src="/bg/js/background-main.js"></script>
+
+        <!--
+            Due to a Firefox bug, this next element is purposefully terminated incorrectly.
+            This element must appear directly inside the <body> element, and it must not be closed properly.
+            https://bugzilla.mozilla.org/show_bug.cgi?id=1603985
+        -->
+        <div id="clipboard-image-paste-target" contenteditable="true">
     </body>
 </html>

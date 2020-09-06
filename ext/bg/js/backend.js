@@ -64,11 +64,10 @@ class Backend {
         });
         this._templateRenderer = new TemplateRenderer();
 
-        this._clipboardPasteTarget = (
-            typeof document === 'object' && document !== null ?
-            document.querySelector('#clipboard-paste-target') :
-            null
-        );
+        this._clipboardPasteTarget = null;
+        this._clipboardPasteTargetInitialized = false;
+        this._clipboardImagePasteTarget = null;
+        this._clipboardImagePasteTargetInitialized = false;
 
         this._searchPopupTabId = null;
         this._searchPopupTabCreatePromise = null;
@@ -108,6 +107,7 @@ class Backend {
             ['getStylesheetContent',         {async: true,  contentScript: true,  handler: this._onApiGetStylesheetContent.bind(this)}],
             ['getEnvironmentInfo',           {async: false, contentScript: true,  handler: this._onApiGetEnvironmentInfo.bind(this)}],
             ['clipboardGet',                 {async: true,  contentScript: true,  handler: this._onApiClipboardGet.bind(this)}],
+            ['clipboardGetImage',            {async: true,  contentScript: true,  handler: this._onApiClipboardImageGet.bind(this)}],
             ['getDisplayTemplatesHtml',      {async: true,  contentScript: true,  handler: this._onApiGetDisplayTemplatesHtml.bind(this)}],
             ['getQueryParserTemplatesHtml',  {async: true,  contentScript: true,  handler: this._onApiGetQueryParserTemplatesHtml.bind(this)}],
             ['getZoom',                      {async: true,  contentScript: true,  handler: this._onApiGetZoom.bind(this)}],
@@ -645,18 +645,63 @@ class Backend {
         const {browser} = this._environment.getInfo();
         if (browser === 'firefox' || browser === 'firefox-mobile') {
             return await navigator.clipboard.readText();
-        } else {
-            const clipboardPasteTarget = this._clipboardPasteTarget;
-            if (clipboardPasteTarget === null) {
-                throw new Error('Reading the clipboard is not supported in this context');
-            }
-            clipboardPasteTarget.value = '';
-            clipboardPasteTarget.focus();
-            document.execCommand('paste');
-            const result = clipboardPasteTarget.value;
-            clipboardPasteTarget.value = '';
-            return result;
         }
+
+        if (!this._environmentHasDocument()) {
+            throw new Error('Reading the clipboard is not supported in this context');
+        }
+
+        if (!this._clipboardPasteTargetInitialized) {
+            this._clipboardPasteTarget = document.querySelector('#clipboard-paste-target');
+            this._clipboardPasteTargetInitialized = true;
+        }
+
+        const target = this._clipboardPasteTarget;
+        if (target === null) {
+            throw new Error('Clipboard paste target does not exist');
+        }
+
+        target.value = '';
+        target.focus();
+        this._executePasteCommand();
+        const result = target.value;
+        target.value = '';
+        return result;
+    }
+
+    async _onApiClipboardImageGet() {
+        // See browser-specific notes in _onApiClipboardGet
+        const {browser} = this._environment.getInfo();
+        if (browser === 'firefox' || browser === 'firefox-mobile') {
+            if (typeof navigator.clipboard !== 'undefined' && typeof navigator.clipboard.read === 'function') {
+                // This function is behind the flag: dom.events.asyncClipboard.dataTransfer
+                const {files} = await navigator.clipboard.read();
+                if (files.length === 0) { return null; }
+                const result = await this._readFileAsDataURL(files[0]);
+                return result;
+            }
+        }
+
+        if (!this._environmentHasDocument()) {
+            throw new Error('Reading the clipboard is not supported in this context');
+        }
+
+        if (!this._clipboardImagePasteTargetInitialized) {
+            this._clipboardImagePasteTarget = document.querySelector('#clipboard-image-paste-target');
+            this._clipboardImagePasteTargetInitialized = true;
+        }
+
+        const target = this._clipboardImagePasteTarget;
+        if (target === null) {
+            throw new Error('Clipboard paste target does not exist');
+        }
+
+        target.focus();
+        this._executePasteCommand();
+        const image = target.querySelector('img[src^="data:"]');
+        const result = (image !== null ? image.getAttribute('src') : null);
+        target.textContent = '';
+        return result;
     }
 
     async _onApiGetDisplayTemplatesHtml() {
@@ -1538,5 +1583,22 @@ class Backend {
         const url = await this._getTabUrl(tabId);
         const isValidTab = urlPredicate(url);
         return isValidTab ? tab : null;
+    }
+
+    _environmentHasDocument() {
+        return (typeof document === 'object' && document !== null);
+    }
+
+    _executePasteCommand() {
+        document.execCommand('paste');
+    }
+
+    _readFileAsDataURL(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(file);
+        });
     }
 }
