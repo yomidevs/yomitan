@@ -1049,9 +1049,11 @@ class Display extends EventDispatcher {
 
             const details = {};
             if (this._noteUsesScreenshot(mode)) {
-                const screenshot = await this._getScreenshot();
-                if (screenshot) {
+                try {
+                    const screenshot = await this._getScreenshot();
                     details.screenshot = screenshot;
+                } catch (e) {
+                    // NOP
                 }
             }
 
@@ -1155,7 +1157,6 @@ class Display extends EventDispatcher {
 
             const {format, quality} = this._options.anki.screenshot;
             const dataUrl = await api.screenshotGet({format, quality});
-            if (!dataUrl || dataUrl.error) { return; }
 
             return {dataUrl, format};
         } finally {

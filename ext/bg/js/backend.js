@@ -537,8 +537,15 @@ class Backend {
         }
 
         const windowId = sender.tab.windowId;
-        return new Promise((resolve) => {
-            chrome.tabs.captureVisibleTab(windowId, options, (dataUrl) => resolve(dataUrl));
+        return new Promise((resolve, reject) => {
+            chrome.tabs.captureVisibleTab(windowId, options, (dataUrl) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve(dataUrl);
+                }
+            });
         });
     }
 
