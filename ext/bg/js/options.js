@@ -467,6 +467,7 @@ class OptionsUtil {
     static _updateVersion4(options) {
         // Version 4 changes:
         //  Options conditions converted to string representations.
+        //  Added usePopupWindow.
         for (const {conditionGroups} of options.profiles) {
             for (const {conditions} of conditionGroups) {
                 for (const condition of conditions) {
@@ -478,6 +479,9 @@ class OptionsUtil {
                     );
                 }
             }
+        }
+        for (const {options: profileOptions} of options.profiles) {
+            profileOptions.general.usePopupWindow = false;
         }
         return options;
     }

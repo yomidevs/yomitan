@@ -19,6 +19,7 @@
  * FrameOffsetForwarder
  * Popup
  * PopupProxy
+ * PopupWindow
  * api
  */
 
@@ -52,7 +53,7 @@ class PopupFactory {
         ]);
     }
 
-    async getOrCreatePopup({frameId=null, ownerFrameId=null, id=null, parentPopupId=null, depth=null}) {
+    async getOrCreatePopup({frameId=null, ownerFrameId=null, id=null, parentPopupId=null, depth=null, popupWindow=false}) {
         // Find by existing id
         if (id !== null) {
             const popup = this._popups.get(id);
@@ -85,7 +86,15 @@ class PopupFactory {
             depth = 0;
         }
 
-        if (frameId === this._frameId) {
+        if (popupWindow) {
+            // New unique id
+            if (id === null) {
+                id = generateId(16);
+            }
+            const popup = new PopupWindow(id, depth, this._frameId, ownerFrameId);
+            this._popups.set(id, popup);
+            return popup;
+        } else if (frameId === this._frameId) {
             // New unique id
             if (id === null) {
                 id = generateId(16);

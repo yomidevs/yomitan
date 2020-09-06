@@ -111,7 +111,8 @@
                                     "showPitchAccentGraph",
                                     "showIframePopupsInRootFrame",
                                     "useSecurePopupFrameUrl",
-                                    "usePopupShadowDom"
+                                    "usePopupShadowDom",
+                                    "usePopupWindow"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -257,6 +258,10 @@
                                     "usePopupShadowDom": {
                                         "type": "boolean",
                                         "default": true
+                                    },
+                                    "usePopupWindow": {
+                                        "type": "boolean",
+                                        "default": false
                                     }
                                 }
                             },

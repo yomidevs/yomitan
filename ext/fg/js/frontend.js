@@ -307,11 +307,17 @@ class Frontend {
     }
 
     async _updatePopup() {
-        const showIframePopupsInRootFrame = this._options.general.showIframePopupsInRootFrame;
+        const {usePopupWindow, showIframePopupsInRootFrame} = this._options.general;
         const isIframe = !this._useProxyPopup && (window !== window.parent);
 
         let popupPromise;
-        if (
+        if (usePopupWindow) {
+            popupPromise = this._popupCache.get('window');
+            if (typeof popupPromise === 'undefined') {
+                popupPromise = this._getPopupWindow();
+                this._popupCache.set('window', popupPromise);
+            }
+        } else if (
             isIframe &&
             showIframePopupsInRootFrame &&
             DocumentUtil.getFullscreenElement() === null &&
@@ -402,6 +408,14 @@ class Frontend {
             this._updatePopup();
         });
         return popup;
+    }
+
+    async _getPopupWindow() {
+        return await this._popupFactory.getOrCreatePopup({
+            ownerFrameId: this._frameId,
+            depth: this._depth,
+            popupWindow: true
+        });
     }
 
     _ignoreElements() {

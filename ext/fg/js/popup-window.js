@@ -1,0 +1,161 @@
+/*
+ * Copyright (C) 2020  Yomichan Authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/* global
+ * api
+ */
+
+class PopupWindow extends EventDispatcher {
+    constructor(id, depth, frameId, ownerFrameId) {
+        super();
+        this._id = id;
+        this._depth = depth;
+        this._frameId = frameId;
+        this._ownerFrameId = ownerFrameId;
+        this._popupTabId = null;
+    }
+
+    // Public properties
+
+    get id() {
+        return this._id;
+    }
+
+    get parent() {
+        return null;
+    }
+
+    set parent(value) {
+        throw new Error('Not supported on PopupProxy');
+    }
+
+    get child() {
+        return null;
+    }
+
+    set child(value) {
+        throw new Error('Not supported on PopupProxy');
+    }
+
+    get depth() {
+        return this._depth;
+    }
+
+    get frameContentWindow() {
+        return null;
+    }
+
+    get container() {
+        return null;
+    }
+
+    get frameId() {
+        return this._frameId;
+    }
+
+
+    // Public functions
+
+    setOptionsContext(optionsContext, source) {
+        return this._invoke(false, 'setOptionsContext', {id: this._id, optionsContext, source});
+    }
+
+    hide(_changeFocus) {
+        // NOP
+    }
+
+    async isVisible() {
+        return (this._popupTabId !== null && await api.isTabSearchPopup(this._popupTabId));
+    }
+
+    setVisibleOverride(_value, _priority) {
+        return null;
+    }
+
+    clearVisibleOverride(_token) {
+        return false;
+    }
+
+    async containsPoint(_x, _y) {
+        return false;
+    }
+
+    showContent(_details, displayDetails) {
+        return this._invoke(true, 'setContent', {id: this._id, details: displayDetails});
+    }
+
+    setCustomCss(css) {
+        return this._invoke(false, 'setCustomCss', {id: this._id, css});
+    }
+
+    clearAutoPlayTimer() {
+        return this._invoke(false, 'clearAutoPlayTimer', {id: this._id});
+    }
+
+    setContentScale(_scale) {
+        // NOP
+    }
+
+    isVisibleSync() {
+        throw new Error('Not supported on PopupWindow');
+    }
+
+    updateTheme() {
+        // NOP
+    }
+
+    async setCustomOuterCss(_css, _useWebExtensionApi) {
+        // NOP
+    }
+
+    async setChildrenSupported(_value) {
+        // NOP
+    }
+
+    getFrameRect() {
+        return new DOMRect(0, 0, 0, 0);
+    }
+
+    // Private
+
+    async _invoke(open, action, params={}, defaultReturnValue) {
+        if (yomichan.isExtensionUnloaded) {
+            return defaultReturnValue;
+        }
+
+        const frameId = 0;
+        if (this._popupTabId !== null) {
+            try {
+                return await api.crossFrame.invokeTab(this._popupTabId, frameId, 'popupMessage', {action, params});
+            } catch (e) {
+                if (yomichan.isExtensionUnloaded) {
+                    open = false;
+                }
+            }
+            this._popupTabId = null;
+        }
+
+        if (!open) {
+            return defaultReturnValue;
+        }
+
+        const {tabId} = await api.getOrCreateSearchPopup({focus: 'ifCreated'});
+        this._popupTabId = tabId;
+
+        return await api.crossFrame.invokeTab(this._popupTabId, frameId, 'popupMessage', {action, params});
+    }
+}

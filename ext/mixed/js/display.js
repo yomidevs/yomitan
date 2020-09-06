@@ -363,6 +363,7 @@ class Display extends EventDispatcher {
             '/mixed/js/frame-client.js',
             '/fg/js/popup.js',
             '/fg/js/popup-proxy.js',
+            '/fg/js/popup-window.js',
             '/fg/js/popup-factory.js',
             '/fg/js/frame-offset-forwarder.js',
             '/fg/js/frontend.js'
