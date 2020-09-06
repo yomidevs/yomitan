@@ -115,7 +115,7 @@ class TextScanner extends EventDispatcher {
             this._delay = delay;
         }
         if (typeof touchInputEnabled === 'boolean') {
-            this._touchInputEnabled = false;
+            this._touchInputEnabled = touchInputEnabled;
         }
         if (typeof scanLength === 'number') {
             this._scanLength = scanLength;
