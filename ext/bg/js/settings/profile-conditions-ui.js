@@ -501,21 +501,29 @@ class ProfileConditionUI {
         const operators = this._getDescriptorOperators(type);
         const operator = operators.length > 0 ? operators[0].name : '';
         const operatorDetails = this._getOperatorDetails(type, operator);
+        const {defaultValue} = operatorDetails;
         this._updateSelect(this._operatorInput, this._operatorOptionContainer, operators, operator);
-        this._updateValueInput(operatorDetails.defaultValue, operatorDetails);
-        this.settingsController.setGlobalSetting(this.getPath('type'), type);
+        this._updateValueInput(defaultValue, operatorDetails);
+        this.settingsController.modifyGlobalSettings([
+            {action: 'set', path: this.getPath('type'), value: type},
+            {action: 'set', path: this.getPath('operator'), value: operator},
+            {action: 'set', path: this.getPath('value'), value: defaultValue}
+        ]);
     }
 
     _onOperatorChange(e) {
         const type = this._typeInput.value;
         const operator = e.currentTarget.value;
         const operatorDetails = this._getOperatorDetails(type, operator);
+        const settingsModifications = [{action: 'set', path: this.getPath('operator'), value: operator}];
         if (operatorDetails.resetDefaultOnChange) {
-            const okay = this._updateValueInput(operatorDetails.defaultValue, operatorDetails);
+            const {defaultValue} = operatorDetails;
+            const okay = this._updateValueInput(defaultValue, operatorDetails);
             if (okay) {
-                this.settingsController.setGlobalSetting(this.getPath('operator'), operator);
+                settingsModifications.push({action: 'set', path: this.getPath('value'), value: defaultValue});
             }
         }
+        this.settingsController.modifyGlobalSettings(settingsModifications);
     }
 
     _onValueInputChange({validate, normalize}, e) {
@@ -560,7 +568,6 @@ class ProfileConditionUI {
         this._value = value;
         if (okay) {
             const normalizedValue = this._normalizeValue(value, normalize);
-            node.value = normalizedValue;
             this.settingsController.setGlobalSetting(this.getPath('value'), normalizedValue);
         }
     }
@@ -617,38 +624,43 @@ class ProfileConditionUI {
     _updateValueInput(value, {type, validate, normalize}) {
         this._inputEventListeners.removeAllEventListeners();
 
+        let inputType = 'text';
+        let inputValue = value;
+        let inputStep = null;
+        const events = [];
         const inputData = {validate, normalize};
         const node = this._valueInput;
-        node.classList.remove('is-invalid');
-        this._value = value;
 
         switch (type) {
             case 'integer':
-                {
-                    node.type = 'number';
-                    node.step = '1';
-                    node.value = value;
-                    this._inputEventListeners.addEventListener(node, 'change', this._onValueInputChange.bind(this, inputData), false);
-                }
+                inputType = 'number';
+                inputStep = '1';
+                events.push([node, 'change', this._onValueInputChange.bind(this, inputData), false]);
                 break;
             case 'modifierKeys':
                 {
                     const modifiers = this._splitValue(value);
                     const {displayValue} = this._getModifierKeyStrings(modifiers);
-                    node.type = 'text';
-                    node.removeAttribute('step');
-                    node.value = displayValue;
-                    this._inputEventListeners.addEventListener(node, 'keydown', this._onModifierKeyDown.bind(this, inputData), false);
+                    inputValue = displayValue;
+                    events.push([node, 'keydown', this._onModifierKeyDown.bind(this, inputData), false]);
                 }
                 break;
             default: // 'string'
-                {
-                    node.type = 'text';
-                    node.removeAttribute('step');
-                    node.value = value;
-                    this._inputEventListeners.addEventListener(node, 'change', this._onValueInputChange.bind(this, inputData), false);
-                }
+                events.push([node, 'change', this._onValueInputChange.bind(this, inputData), false]);
                 break;
+        }
+
+        this._value = value;
+        node.classList.remove('is-invalid');
+        node.type = inputType;
+        node.value = inputValue;
+        if (typeof inputStep === 'string') {
+            node.step = inputStep;
+        } else {
+            node.removeAttribute('step');
+        }
+        for (const args of events) {
+            this._inputEventListeners.addEventListener(...args);
         }
 
         this._validateValue(value, validate);
