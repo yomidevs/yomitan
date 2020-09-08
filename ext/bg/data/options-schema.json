@@ -324,6 +324,7 @@
                                     "alphanumeric",
                                     "autoHideResults",
                                     "delay",
+                                    "hideDelay",
                                     "length",
                                     "modifier",
                                     "deepDomScan",
@@ -359,6 +360,11 @@
                                         "type": "number",
                                         "minimum": 0,
                                         "default": 20
+                                    },
+                                    "hideDelay": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "default": 0
                                     },
                                     "length": {
                                         "type": "integer",

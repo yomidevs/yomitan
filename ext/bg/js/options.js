@@ -473,6 +473,7 @@ class OptionsUtil {
         //  Options conditions converted to string representations.
         //  Added usePopupWindow.
         //  Updated handlebars templates to include "clipboard-image" definition.
+        //  Added hideDelay.
         for (const {conditionGroups} of options.profiles) {
             for (const {conditions} of conditionGroups) {
                 for (const condition of conditions) {
@@ -487,6 +488,7 @@ class OptionsUtil {
         }
         for (const {options: profileOptions} of options.profiles) {
             profileOptions.general.usePopupWindow = false;
+            profileOptions.scanning.hideDelay = 0;
         }
         await this._addFieldTemplatesToOptions(options, '/bg/data/anki-field-templates-upgrade-v4.handlebars');
         return options;

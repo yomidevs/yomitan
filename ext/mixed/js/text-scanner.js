@@ -144,6 +144,10 @@ class TextScanner extends EventDispatcher {
         return clonedTextSource.text();
     }
 
+    hasSelection() {
+        return (this._textSourceCurrent !== null);
+    }
+
     clearSelection(passive) {
         if (!this._canClearSelection) { return; }
         if (this._textSourceCurrent !== null) {

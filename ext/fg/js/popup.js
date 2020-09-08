@@ -95,6 +95,8 @@ class Popup extends EventDispatcher {
     // Public functions
 
     prepare() {
+        this._frame.addEventListener('mouseover', this._onFrameMouseOver.bind(this));
+        this._frame.addEventListener('mouseout', this._onFrameMouseOut.bind(this));
         this._frame.addEventListener('mousedown', (e) => e.stopPropagation());
         this._frame.addEventListener('scroll', (e) => e.stopPropagation());
         this._frame.addEventListener('load', this._onFrameLoad.bind(this));
@@ -206,6 +208,14 @@ class Popup extends EventDispatcher {
     }
 
     // Private functions
+
+    _onFrameMouseOver() {
+        this.trigger('framePointerOver', {});
+    }
+
+    _onFrameMouseOut() {
+        this.trigger('framePointerOut', {});
+    }
 
     _inject() {
         let injectPromise = this._injectPromise;

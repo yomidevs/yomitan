@@ -415,8 +415,16 @@
                 </div>
 
                 <div class="form-group options-advanced">
-                    <label for="scan-delay">Scan delay <span class="label-light">(in milliseconds)</span></label>
-                    <input type="number" min="0" id="scan-delay" class="form-control" data-setting="scanning.delay">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <label for="scan-delay">Scan delay <span class="label-light">(in milliseconds)</span></label>
+                            <input type="number" min="0" id="scan-delay" class="form-control" data-setting="scanning.delay">
+                        </div>
+                        <div class="col-xs-6">
+                            <label for="scan-close-delay">Auto-hide delay <span class="label-light">(in milliseconds)</span></label>
+                            <input type="number" min="0" id="scan-close-delay" class="form-control" data-setting="scanning.hideDelay">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group options-advanced">

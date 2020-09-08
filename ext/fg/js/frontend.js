@@ -61,7 +61,10 @@ class Frontend {
         this._popupFactory = popupFactory;
         this._allowRootFramePopupProxy = allowRootFramePopupProxy;
         this._popupCache = new Map();
+        this._popupEventListeners = new EventListenerCollection();
         this._updatePopupToken = null;
+        this._clearSelectionTimer = null;
+        this._isPointerOverPopup = false;
 
         this._runtimeMessageHandlers = new Map([
             ['requestFrontendReadyBroadcast',        {async: false, handler: this._onMessageRequestFrontendReadyBroadcast.bind(this)}]
@@ -175,7 +178,7 @@ class Frontend {
     }
 
     _onApiClosePopup() {
-        this._textScanner.clearSelection(false);
+        this._clearSelection(false);
     }
 
     _onApiCopySelection() {
@@ -232,9 +235,11 @@ class Frontend {
     }
 
     _onClearSelection({passive}) {
+        this._stopClearSelectionDelayed();
         if (this._popup !== null) {
             this._popup.hide(!passive);
             this._popup.clearAutoPlayTimer();
+            this._isPointerOverPopup = false;
         }
         this._updatePendingOptions();
     }
@@ -249,24 +254,61 @@ class Frontend {
         await this.updateOptions();
     }
 
-    _onSearched({textScanner, type, definitions, sentence, input: {cause}, textSource, optionsContext, error}) {
+    _onSearched({type, definitions, sentence, input: {cause}, textSource, optionsContext, error}) {
+        const scanningOptions = this._options.scanning;
+
         if (error !== null) {
             if (yomichan.isExtensionUnloaded) {
-                if (textSource !== null && this._options.scanning.modifier !== 'none') {
+                if (textSource !== null && scanningOptions.modifier !== 'none') {
                     this._showExtensionUnloaded(textSource);
                 }
             } else {
                 yomichan.logError(error);
             }
+        } if (type !== null) {
+            this._stopClearSelectionDelayed();
+            const focus = (cause === 'mouse');
+            this._showContent(textSource, focus, definitions, type, sentence, optionsContext);
         } else {
-            if (type !== null) {
-                const focus = (cause === 'mouse');
-                this._showContent(textSource, focus, definitions, type, sentence, optionsContext);
+            if (scanningOptions.autoHideResults) {
+                this._clearSelectionDelayed(scanningOptions.hideDelay, false);
             }
         }
+    }
 
-        if (type === null && this._options.scanning.autoHideResults) {
-            textScanner.clearSelection(false);
+    _onPopupFramePointerOver() {
+        this._isPointerOverPopup = true;
+        this._stopClearSelectionDelayed();
+    }
+
+    _onPopupFramePointerOut() {
+        this._isPointerOverPopup = false;
+    }
+
+    _clearSelection(passive) {
+        this._stopClearSelectionDelayed();
+        this._textScanner.clearSelection(passive);
+    }
+
+    _clearSelectionDelayed(delay, restart, passive) {
+        if (!this._textScanner.hasSelection()) { return; }
+        if (delay > 0) {
+            if (this._clearSelectionTimer !== null && !restart) { return; } // Already running
+            this._stopClearSelectionDelayed();
+            this._clearSelectionTimer = setTimeout(() => {
+                this._clearSelectionTimer = null;
+                if (this._isPointerOverPopup) { return; }
+                this._clearSelection(passive);
+            }, delay);
+        } else {
+            this._clearSelection(passive);
+        }
+    }
+
+    _stopClearSelectionDelayed() {
+        if (this._clearSelectionTimer !== null) {
+            clearTimeout(this._clearSelectionTimer);
+            this._clearSelectionTimer = null;
         }
     }
 
@@ -354,8 +396,12 @@ class Frontend {
             this.setDisabledOverride(!this._options.scanning.enableOnSearchPage);
         }
 
-        this._textScanner.clearSelection(true);
+        this._clearSelection(true);
+        this._popupEventListeners.removeAllEventListeners();
         this._popup = popup;
+        this._popupEventListeners.on(popup, 'framePointerOver', this._onPopupFramePointerOver.bind(this));
+        this._popupEventListeners.on(popup, 'framePointerOut', this._onPopupFramePointerOut.bind(this));
+        this._isPointerOverPopup = false;
     }
 
     async _getDefaultPopup() {
