@@ -22,6 +22,7 @@
  * ClipboardPopupsController
  * DictionaryController
  * DictionaryImportController
+ * DocumentUtil
  * GenericSettingController
  * PopupPreviewController
  * ProfileController
@@ -43,12 +44,12 @@ async function settingsPopulateModifierKeys() {
     const scanModifierKeySelect = document.querySelector('#scan-modifier-key');
     scanModifierKeySelect.textContent = '';
 
-    const environment = await api.getEnvironmentInfo();
+    const {platform: {os}} = await api.getEnvironmentInfo();
     const modifierKeys = [
-        {value: 'none', name: 'None'},
-        ...environment.modifiers.keys
+        ['none', 'None'],
+        DocumentUtil.getModifierKeys(os)
     ];
-    for (const {value, name} of modifierKeys) {
+    for (const [value, name] of modifierKeys) {
         const option = document.createElement('option');
         option.value = value;
         option.textContent = name;

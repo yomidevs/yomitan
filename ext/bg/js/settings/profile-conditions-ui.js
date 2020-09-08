@@ -22,8 +22,7 @@
 class ProfileConditionsUI {
     constructor(settingsController) {
         this._settingsController = settingsController;
-        this._keySeparator = '';
-        this._keyNames = new Map();
+        this._os = null;
         this._conditionGroupsContainer = null;
         this._addConditionGroupButton = null;
         this._children = [];
@@ -80,12 +79,12 @@ class ProfileConditionsUI {
         return this._settingsController.profileIndex;
     }
 
-    setKeyInfo(separator, keyNames) {
-        this._keySeparator = separator;
-        this._keyNames.clear();
-        for (const {value, name} of keyNames) {
-            this._keyNames.set(value, name);
-        }
+    get os() {
+        return this._os;
+    }
+
+    set os(value) {
+        this._os = value;
     }
 
     prepare(conditionGroups) {
@@ -209,7 +208,7 @@ class ProfileConditionsUI {
     }
 
     createKeyboardMouseInputField(inputNode, mouseButton) {
-        return new KeyboardMouseInputField(inputNode, mouseButton, this._keyNames, this._keySeparator);
+        return new KeyboardMouseInputField(inputNode, mouseButton, this._os);
     }
 
     // Private

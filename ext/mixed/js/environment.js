@@ -33,11 +33,9 @@ class Environment {
     async _loadEnvironmentInfo() {
         const browser = await this._getBrowser();
         const os = await this._getOperatingSystem();
-        const modifierInfo = this._getModifierInfo(browser, os);
         return {
             browser,
-            platform: {os},
-            modifiers: modifierInfo
+            platform: {os}
         };
     }
 
@@ -90,62 +88,5 @@ class Environment {
         } else {
             return 'chrome';
         }
-    }
-
-    _getModifierInfo(browser, os) {
-        let osKeys;
-        let separator;
-        switch (os) {
-            case 'win':
-                separator = ' + ';
-                osKeys = [
-                    ['alt', 'Alt'],
-                    ['ctrl', 'Ctrl'],
-                    ['shift', 'Shift'],
-                    ['meta', 'Windows']
-                ];
-                break;
-            case 'mac':
-                separator = '';
-                osKeys = [
-                    ['alt', '⌥'],
-                    ['ctrl', '⌃'],
-                    ['shift', '⇧'],
-                    ['meta', '⌘']
-                ];
-                break;
-            case 'linux':
-            case 'openbsd':
-            case 'cros':
-            case 'android':
-                separator = ' + ';
-                osKeys = [
-                    ['alt', 'Alt'],
-                    ['ctrl', 'Ctrl'],
-                    ['shift', 'Shift'],
-                    ['meta', 'Super']
-                ];
-                break;
-            default: // 'unknown', etc
-                separator = ' + ';
-                osKeys = [
-                    ['alt', 'Alt'],
-                    ['ctrl', 'Ctrl'],
-                    ['shift', 'Shift'],
-                    ['meta', 'Meta']
-                ];
-                break;
-        }
-
-        const isFirefox = (browser === 'firefox' || browser === 'firefox-mobile');
-        const keys = [];
-
-        for (const [value, name] of osKeys) {
-            // Firefox doesn't support event.metaKey on platforms other than macOS
-            if (value === 'meta' && isFirefox && os !== 'mac') { continue; }
-            keys.push({value, name});
-        }
-
-        return {keys, separator};
     }
 }

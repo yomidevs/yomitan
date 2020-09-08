@@ -20,18 +20,18 @@
  */
 
 class KeyboardMouseInputField extends EventDispatcher {
-    constructor(inputNode, mouseButton, inputNameMap, keySeparator) {
+    constructor(inputNode, mouseButton, os) {
         super();
         this._inputNode = inputNode;
-        this._keySeparator = keySeparator;
+        this._mouseButton = mouseButton;
+        this._keySeparator = ' + ';
+        this._inputNameMap = new Map(DocumentUtil.getModifierKeys(os));
         this._keyPriorities = new Map([
             ['meta', -4],
             ['ctrl', -3],
             ['alt', -2],
             ['shift', -1]
         ]);
-        this._mouseButton = mouseButton;
-        this._inputNameMap = inputNameMap;
         this._mouseInputNamePattern = /^mouse(\d+)$/;
         this._eventListeners = new EventListenerCollection();
         this._value = '';

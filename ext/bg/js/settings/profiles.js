@@ -47,8 +47,8 @@ class ProfileController {
     // Private
 
     async _onOptionsChanged() {
-        const {modifiers} = await api.getEnvironmentInfo();
-        this._profileConditionsUI.setKeyInfo(modifiers.separator, modifiers.keys);
+        const {platform: {os}} = await api.getEnvironmentInfo();
+        this._profileConditionsUI.os = os;
 
         const optionsFull = await this._settingsController.getOptionsFullMutable();
         this._formWrite(optionsFull);
