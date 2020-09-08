@@ -27,11 +27,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="22.627417"
-     inkscape:cx="12.059712"
-     inkscape:cy="6.3977551"
+     inkscape:zoom="45.254834"
+     inkscape:cx="6.9125714"
+     inkscape:cy="9.2321432"
      inkscape:document-units="px"
-     inkscape:current-layer="g1012"
+     inkscape:current-layer="layer38"
      showgrid="true"
      units="px"
      inkscape:snap-center="true"
@@ -1202,7 +1202,7 @@
        id="rect1210" />
   </g>
   <g
-     style="display:inline"
+     style="display:none"
      inkscape:label="Up Arrow"
      id="g1012"
      inkscape:groupmode="layer">
@@ -1212,5 +1212,20 @@
        id="path1014"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccccccc" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer38"
+     inkscape:label="Mouse">
+    <g
+       id="g1029">
+      <g
+         id="g1033">
+        <path
+           style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+           d="M 7.4882812 1.0273438 C 4.9608765 1.2926885 3 3.4984688 3 6.1992188 L 3 6.5 L 7.5 6.5 L 7.5 1.0273438 C 7.4961497 1.0277387 7.4921289 1.0269398 7.4882812 1.0273438 z M 8.5 1.0273438 L 8.5 6.5 L 13 6.5 L 13 6.1992188 C 13 3.4943573 11.03298 1.2871677 8.5 1.0273438 z M 3 7.5 L 3 9.8007812 C 3 12.681581 5.23 15 8 15 C 10.77 15 13 12.681581 13 9.8007812 L 13 7.5 L 3 7.5 z "
+           id="rect1013" />
+      </g>
+    </g>
   </g>
 </svg>

@@ -113,6 +113,10 @@ html:root:not([data-options-general-result-output-mode=merge]) #dict-main-group 
     display: none;
 }
 
+.condition-mouse-button[hidden] {
+    display: none;
+}
+
 .audio-source-list {
     counter-reset: audio-source-id;
 }

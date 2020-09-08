@@ -341,6 +341,14 @@ class EventListenerCollection {
         return this._eventListeners.length;
     }
 
+    addGeneric(type, object, ...args) {
+        switch (type) {
+            case 'addEventListener': return this.addEventListener(object, ...args);
+            case 'addListener': return this.addListener(object, ...args);
+            case 'on': return this.on(object, ...args);
+        }
+    }
+
     addEventListener(object, ...args) {
         object.addEventListener(...args);
         this._eventListeners.push(['removeEventListener', object, ...args]);

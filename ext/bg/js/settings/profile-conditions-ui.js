@@ -16,7 +16,7 @@
  */
 
 /* global
- * DocumentUtil
+ * KeyboardMouseInputField
  */
 
 class ProfileConditionsUI {
@@ -203,33 +203,13 @@ class ProfileConditionsUI {
         return value.split(/[,;\s]+/).map((v) => v.trim().toLowerCase()).filter((v) => v.length > 0);
     }
 
-    getModifierKeyStrings(modifiers) {
-        let value = '';
-        let displayValue = '';
-        let first = true;
-        for (const modifier of modifiers) {
-            let keyName = this._keyNames.get(modifier);
-            if (typeof keyName === 'undefined') { keyName = modifier; }
-
-            if (first) {
-                first = false;
-            } else {
-                value += ', ';
-                displayValue += this._keySeparator;
-            }
-            value += modifier;
-            displayValue += keyName;
-        }
-        return {value, displayValue};
-    }
-
-    sortModifiers(modifiers) {
-        return modifiers.sort();
-    }
-
     getPath(property) {
         property = (typeof property === 'string' ? `.${property}` : '');
         return `profiles[${this.index}]${property}`;
+    }
+
+    createKeyboardMouseInputField(inputNode, mouseButton) {
+        return new KeyboardMouseInputField(inputNode, mouseButton, this._keyNames, this._keySeparator);
     }
 
     // Private
@@ -425,7 +405,9 @@ class ProfileConditionUI {
         this._operatorInput = null;
         this._valueInputContainer = null;
         this._removeButton = null;
+        this._mouseButton = null;
         this._value = '';
+        this._kbmInputField = null;
         this._eventListeners = new EventListenerCollection();
         this._inputEventListeners = new EventListenerCollection();
     }
@@ -460,6 +442,7 @@ class ProfileConditionUI {
         this._operatorOptionContainer = this._operatorInput.querySelector('optgroup');
         this._valueInput = this._node.querySelector('.condition-input-inner');
         this._removeButton = this._node.querySelector('.condition-remove');
+        this._mouseButton = this._node.querySelector('.condition-mouse-button');
 
         const operatorDetails = this._getOperatorDetails(type, operator);
         this._updateTypes(type);
@@ -538,32 +521,7 @@ class ProfileConditionUI {
         }
     }
 
-    _onModifierKeyDown({validate, normalize}, e) {
-        e.preventDefault();
-        const node = e.currentTarget;
-
-        let modifiers;
-        const key = DocumentUtil.getKeyFromEvent(e);
-        switch (key) {
-            case 'Escape':
-            case 'Backspace':
-                modifiers = [];
-                break;
-            default:
-                {
-                    modifiers = this._getModifiers(e);
-                    const currentModifier = this._splitValue(this._value);
-                    for (const modifier of currentModifier) {
-                        modifiers.add(modifier);
-                    }
-                    modifiers = [...modifiers];
-                    modifiers = this._sortModifiers(modifiers);
-                }
-                break;
-        }
-
-        const {value, displayValue} = this._getModifierKeyStrings(modifiers);
-        node.value = displayValue;
+    _onModifierInputChange({validate, normalize}, {value}) {
         const okay = this._validateValue(value, validate);
         this._value = value;
         if (okay) {
@@ -586,18 +544,6 @@ class ProfileConditionUI {
 
     _getOperatorDetails(type, operator) {
         return this._parent.parent.getOperatorDetails(type, operator);
-    }
-
-    _getModifierKeyStrings(modifiers) {
-        return this._parent.parent.getModifierKeyStrings(modifiers);
-    }
-
-    _sortModifiers(modifiers) {
-        return this._parent.parent.sortModifiers(modifiers);
-    }
-
-    _splitValue(value) {
-        return this._parent.parent.splitValue(value);
     }
 
     _updateTypes(type) {
@@ -623,10 +569,15 @@ class ProfileConditionUI {
 
     _updateValueInput(value, {type, validate, normalize}) {
         this._inputEventListeners.removeAllEventListeners();
+        if (this._kbmInputField !== null) {
+            this._kbmInputField.cleanup();
+            this._kbmInputField = null;
+        }
 
         let inputType = 'text';
         let inputValue = value;
         let inputStep = null;
+        let mouseButtonHidden = true;
         const events = [];
         const inputData = {validate, normalize};
         const node = this._valueInput;
@@ -635,32 +586,35 @@ class ProfileConditionUI {
             case 'integer':
                 inputType = 'number';
                 inputStep = '1';
-                events.push([node, 'change', this._onValueInputChange.bind(this, inputData), false]);
+                events.push(['addEventListener', node, 'change', this._onValueInputChange.bind(this, inputData), false]);
                 break;
             case 'modifierKeys':
-                {
-                    const modifiers = this._splitValue(value);
-                    const {displayValue} = this._getModifierKeyStrings(modifiers);
-                    inputValue = displayValue;
-                    events.push([node, 'keydown', this._onModifierKeyDown.bind(this, inputData), false]);
-                }
+            case 'modifierInputs':
+                inputValue = null;
+                mouseButtonHidden = (type !== 'modifierInputs');
+                this._kbmInputField = this._parent.parent.createKeyboardMouseInputField(node, this._mouseButton);
+                this._kbmInputField.prepare(value, type);
+                events.push(['on', this._kbmInputField, 'change', this._onModifierInputChange.bind(this, inputData), false]);
                 break;
             default: // 'string'
-                events.push([node, 'change', this._onValueInputChange.bind(this, inputData), false]);
+                events.push(['addEventListener', node, 'change', this._onValueInputChange.bind(this, inputData), false]);
                 break;
         }
 
         this._value = value;
         node.classList.remove('is-invalid');
         node.type = inputType;
-        node.value = inputValue;
+        if (inputValue !== null) {
+            node.value = inputValue;
+        }
         if (typeof inputStep === 'string') {
             node.step = inputStep;
         } else {
             node.removeAttribute('step');
         }
+        this._mouseButton.hidden = mouseButtonHidden;
         for (const args of events) {
-            this._inputEventListeners.addEventListener(...args);
+            this._inputEventListeners.addGeneric(...args);
         }
 
         this._validateValue(value, validate);
@@ -674,25 +628,5 @@ class ProfileConditionUI {
 
     _normalizeValue(value, normalize) {
         return (normalize !== null ? normalize(value) : value);
-    }
-
-    _getModifiers(e) {
-        const modifiers = DocumentUtil.getActiveModifiers(e);
-        // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey
-        // https://askubuntu.com/questions/567731/why-is-shift-alt-being-mapped-to-meta
-        // It works with mouse events on some platforms, so try to determine if metaKey is pressed.
-        // This is a hack and only works when both Shift and Alt are not pressed.
-        if (
-            !modifiers.has('meta') &&
-            DocumentUtil.getKeyFromEvent(e) === 'Meta' &&
-            !(
-                modifiers.size === 2 &&
-                modifiers.has('shift') &&
-                modifiers.has('alt')
-            )
-        ) {
-            modifiers.add('meta');
-        }
-        return modifiers;
     }
 }
