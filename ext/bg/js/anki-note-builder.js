@@ -20,10 +20,11 @@
  */
 
 class AnkiNoteBuilder {
-    constructor({anki, audioSystem, renderTemplate}) {
+    constructor({anki, audioSystem, renderTemplate, getClipboardImage=null}) {
         this._anki = anki;
         this._audioSystem = audioSystem;
         this._renderTemplate = renderTemplate;
+        this._getClipboardImage = getClipboardImage;
     }
 
     async createNote(definition, mode, context, options, templates) {
@@ -138,6 +139,31 @@ class AnkiNoteBuilder {
         definition.screenshotFileName = fileName;
     }
 
+    async injectClipboardImage(definition, fields) {
+        if (!this._containsMarker(fields, 'clipboard-image')) { return; }
+
+        const reading = definition.reading;
+        const now = new Date(Date.now());
+
+        try {
+            const dataUrl = await this._getClipboardImage();
+            if (dataUrl === null) { return; }
+
+            const extension = this._getImageExtensionFromDataUrl(dataUrl);
+            if (extension === null) { return; }
+
+            let fileName = `yomichan_clipboard_image_${reading}_${this._dateToString(now)}.${extension}`;
+            fileName = AnkiNoteBuilder.replaceInvalidFileNameCharacters(fileName);
+            const data = dataUrl.replace(/^data:[\w\W]*?,/, '');
+
+            await this._anki.storeMediaFile(fileName, data);
+
+            definition.clipboardImageFileName = fileName;
+        } catch (e) {
+            // NOP
+        }
+    }
+
     _createInjectedAudioFileName(definition) {
         const {reading, expression} = definition;
         if (!reading && !expression) { return null; }
@@ -168,6 +194,16 @@ class AnkiNoteBuilder {
             }
         }
         return false;
+    }
+
+    _getImageExtensionFromDataUrl(dataUrl) {
+        const match = /^data:([^;]*);/.exec(dataUrl);
+        if (match === null) { return null; }
+        switch (match[1].toLowerCase()) {
+            case 'image/png': return 'png';
+            case 'image/jpeg': return 'jpeg';
+            default: return null;
+        }
     }
 
     static replaceInvalidFileNameCharacters(fileName) {

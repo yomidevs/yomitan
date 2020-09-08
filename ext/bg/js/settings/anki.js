@@ -44,6 +44,7 @@ class AnkiController {
             case 'terms':
                 return [
                     'audio',
+                    'clipboard-image',
                     'cloze-body',
                     'cloze-prefix',
                     'cloze-suffix',
@@ -66,6 +67,7 @@ class AnkiController {
             case 'kanji':
                 return [
                     'character',
+                    'clipboard-image',
                     'cloze-body',
                     'cloze-prefix',
                     'cloze-suffix',

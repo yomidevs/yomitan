@@ -60,7 +60,8 @@ class Backend {
         this._ankiNoteBuilder = new AnkiNoteBuilder({
             anki: this._anki,
             audioSystem: this._audioSystem,
-            renderTemplate: this._renderTemplate.bind(this)
+            renderTemplate: this._renderTemplate.bind(this),
+            getClipboardImage: this._onApiClipboardImageGet.bind(this)
         });
         this._templateRenderer = new TemplateRenderer();
 
@@ -444,21 +445,28 @@ class Backend {
     async _onApiDefinitionAdd({definition, mode, context, details, optionsContext}) {
         const options = this.getOptions(optionsContext);
         const templates = this._getTemplates(options);
+        const fields = (
+            mode === 'kanji' ?
+            options.anki.kanji.fields :
+            options.anki.terms.fields
+        );
 
         if (mode !== 'kanji') {
             const {customSourceUrl} = options.audio;
             await this._ankiNoteBuilder.injectAudio(
                 definition,
-                options.anki.terms.fields,
+                fields,
                 options.audio.sources,
                 customSourceUrl
             );
         }
 
+        await this._ankiNoteBuilder.injectClipboardImage(definition, fields);
+
         if (details && details.screenshot) {
             await this._ankiNoteBuilder.injectScreenshot(
                 definition,
-                options.anki.terms.fields,
+                fields,
                 details.screenshot
             );
         }
