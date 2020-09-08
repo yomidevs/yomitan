@@ -47,7 +47,7 @@ async function settingsPopulateModifierKeys() {
     const {platform: {os}} = await api.getEnvironmentInfo();
     const modifierKeys = [
         ['none', 'None'],
-        DocumentUtil.getModifierKeys(os)
+        ...DocumentUtil.getModifierKeys(os)
     ];
     for (const [value, name] of modifierKeys) {
         const option = document.createElement('option');
