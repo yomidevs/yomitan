@@ -79,10 +79,6 @@ class TextScanner extends EventDispatcher {
         this._ignoreNodes = value;
     }
 
-    get causeCurrent() {
-        return this._causeCurrent;
-    }
-
     prepare() {
         this._isPrepared = true;
         this.setEnabled(this._enabled);
@@ -174,7 +170,21 @@ class TextScanner extends EventDispatcher {
         }
     }
 
-    async search(textSource, cause) {
+    async searchLast() {
+        if (this._textSourceCurrent !== null && this._causeCurrent !== null) {
+            await this._search(this._textSourceCurrent, this._causeCurrent);
+            return true;
+        }
+        return false;
+    }
+
+    async search(textSource) {
+        return await this._search(textSource, 'script');
+    }
+
+    // Private
+
+    async _search(textSource, cause) {
         let definitions = null;
         let sentence = null;
         let type = null;
@@ -213,8 +223,6 @@ class TextScanner extends EventDispatcher {
             error
         });
     }
-
-    // Private
 
     _onMouseOver(e) {
         if (this._ignoreElements().includes(e.target)) {
@@ -472,7 +480,7 @@ class TextScanner extends EventDispatcher {
 
             const textSource = this._documentUtil.getRangeFromPoint(x, y, this._deepContentScan);
             try {
-                await this.search(textSource, cause);
+                await this._search(textSource, cause);
             } finally {
                 if (textSource !== null) {
                     textSource.cleanup();

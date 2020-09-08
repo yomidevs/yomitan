@@ -129,7 +129,7 @@ class Frontend {
     }
 
     async setTextSource(textSource) {
-        await this._textScanner.search(textSource, 'script');
+        await this._textScanner.search(textSource);
     }
 
     async getOptionsContext() {
@@ -299,11 +299,7 @@ class Frontend {
 
         this._updateContentScale();
 
-        const textSourceCurrent = this._textScanner.getCurrentTextSource();
-        const causeCurrent = this._textScanner.causeCurrent;
-        if (textSourceCurrent !== null && causeCurrent !== null) {
-            await this._textScanner.search(textSourceCurrent, causeCurrent);
-        }
+        await this._textScanner.searchLast();
     }
 
     async _updatePopup() {
