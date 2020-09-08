@@ -35,7 +35,7 @@ class TextScanner extends EventDispatcher {
         this._isPrepared = false;
         this._ignoreNodes = null;
 
-        this._causeCurrent = null;
+        this._inputCurrent = null;
         this._scanTimerPromise = null;
         this._textSourceCurrent = null;
         this._textSourceCurrentSelected = false;
@@ -152,6 +152,7 @@ class TextScanner extends EventDispatcher {
             }
             this._textSourceCurrent = null;
             this._textSourceCurrentSelected = false;
+            this._inputCurrent = null;
         }
         this.trigger('clearSelection', {passive});
     }
@@ -171,20 +172,20 @@ class TextScanner extends EventDispatcher {
     }
 
     async searchLast() {
-        if (this._textSourceCurrent !== null && this._causeCurrent !== null) {
-            await this._search(this._textSourceCurrent, this._causeCurrent);
+        if (this._textSourceCurrent !== null && this._inputCurrent !== null) {
+            await this._search(this._textSourceCurrent, this._inputCurrent);
             return true;
         }
         return false;
     }
 
     async search(textSource) {
-        return await this._search(textSource, 'script');
+        return await this._search(textSource, {cause: 'script'});
     }
 
     // Private
 
-    async _search(textSource, cause) {
+    async _search(textSource, input) {
         let definitions = null;
         let sentence = null;
         let type = null;
@@ -200,10 +201,10 @@ class TextScanner extends EventDispatcher {
             optionsContext = await this._getOptionsContext();
             searched = true;
 
-            const result = await this._findDefinitions(textSource, cause);
+            const result = await this._findDefinitions(textSource, optionsContext);
             if (result !== null) {
                 ({definitions, sentence, type} = result);
-                this._causeCurrent = cause;
+                this._inputCurrent = input;
                 this.setCurrentTextSource(textSource);
             }
         } catch (e) {
@@ -217,7 +218,7 @@ class TextScanner extends EventDispatcher {
             type,
             definitions,
             sentence,
-            cause,
+            input,
             textSource,
             optionsContext,
             error
@@ -271,7 +272,7 @@ class TextScanner extends EventDispatcher {
 
     _onClick(e) {
         if (this._searchOnClick) {
-            this._searchAt(e.clientX, e.clientY, 'click');
+            this._searchAt(e.clientX, e.clientY, {cause: 'click'});
         }
 
         if (this._preventNextClick) {
@@ -344,7 +345,7 @@ class TextScanner extends EventDispatcher {
             return;
         }
 
-        this._searchAt(primaryTouch.clientX, primaryTouch.clientY, 'touchMove');
+        this._searchAt(primaryTouch.clientX, primaryTouch.clientY, {cause: 'touchMove'});
 
         e.preventDefault(); // Disable scroll
     }
@@ -467,7 +468,7 @@ class TextScanner extends EventDispatcher {
         return {definitions, sentence, type: 'kanji'};
     }
 
-    async _searchAt(x, y, cause) {
+    async _searchAt(x, y, input) {
         if (this._pendingLookup) { return; }
 
         try {
@@ -480,7 +481,7 @@ class TextScanner extends EventDispatcher {
 
             const textSource = this._documentUtil.getRangeFromPoint(x, y, this._deepContentScan);
             try {
-                await this._search(textSource, cause);
+                await this._search(textSource, input);
             } finally {
                 if (textSource !== null) {
                     textSource.cleanup();
@@ -503,7 +504,7 @@ class TextScanner extends EventDispatcher {
             }
         }
 
-        await this._searchAt(x, y, 'mouse');
+        await this._searchAt(x, y, {cause: 'mouse'});
     }
 
     async _searchAtFromTouchStart(x, y) {
@@ -511,7 +512,7 @@ class TextScanner extends EventDispatcher {
 
         const textSourceCurrentPrevious = this._textSourceCurrent !== null ? this._textSourceCurrent.clone() : null;
 
-        await this._searchAt(x, y, 'touchStart');
+        await this._searchAt(x, y, {cause: 'touchStart'});
 
         if (
             this._textSourceCurrent !== null &&

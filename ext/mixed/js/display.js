@@ -501,7 +501,7 @@ class Display extends EventDispatcher {
         }
     }
 
-    _onQueryParserSearch({type, definitions, sentence, cause, textSource}) {
+    _onQueryParserSearch({type, definitions, sentence, input: {cause}, textSource}) {
         const query = textSource.text();
         const details = {
             focus: false,

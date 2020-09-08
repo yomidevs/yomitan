@@ -249,7 +249,7 @@ class Frontend {
         await this.updateOptions();
     }
 
-    _onSearched({textScanner, type, definitions, sentence, cause, textSource, optionsContext, error}) {
+    _onSearched({textScanner, type, definitions, sentence, input: {cause}, textSource, optionsContext, error}) {
         if (error !== null) {
             if (yomichan.isExtensionUnloaded) {
                 if (textSource !== null && this._options.scanning.modifier !== 'none') {
