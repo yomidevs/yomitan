@@ -28,6 +28,9 @@ class ProfileController {
     }
 
     async prepare() {
+        const {platform: {os}} = await api.getEnvironmentInfo();
+        this._profileConditionsUI.os = os;
+
         $('#profile-target').change(this._onTargetProfileChanged.bind(this));
         $('#profile-name').change(this._onNameChanged.bind(this));
         $('#profile-add').click(this._onAdd.bind(this));
@@ -47,9 +50,6 @@ class ProfileController {
     // Private
 
     async _onOptionsChanged() {
-        const {platform: {os}} = await api.getEnvironmentInfo();
-        this._profileConditionsUI.os = os;
-
         const optionsFull = await this._settingsController.getOptionsFullMutable();
         this._formWrite(optionsFull);
     }
