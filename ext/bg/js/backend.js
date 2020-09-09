@@ -471,7 +471,7 @@ class Backend {
             );
         }
 
-        const note = await this._ankiNoteBuilder.createNote(definition, mode, context, options, templates);
+        const note = await this._createNote(definition, mode, context, options, templates);
         return this._anki.addNote(note);
     }
 
@@ -484,7 +484,7 @@ class Backend {
             const notePromises = [];
             for (const definition of definitions) {
                 for (const mode of modes) {
-                    const notePromise = this._ankiNoteBuilder.createNote(definition, mode, context, options, templates);
+                    const notePromise = this._createNote(definition, mode, context, options, templates);
                     notePromises.push(notePromise);
                 }
             }
@@ -524,7 +524,7 @@ class Backend {
     }
 
     async _onApiNoteView({noteId}) {
-        return await this._anki.guiBrowse(`nid:${noteId}`);
+        return await this._anki.guiBrowseNote(noteId);
     }
 
     async _onApiTemplateRender({template, data, marker}) {
@@ -1023,8 +1023,8 @@ class Backend {
         const options = this.getOptions({current: true});
         this._updateBadge();
 
-        this._anki.setServer(options.anki.server);
-        this._anki.setEnabled(options.anki.enable);
+        this._anki.server = options.anki.server;
+        this._anki.enabled = options.anki.enable;
 
         if (options.parsing.enableMecabParser) {
             this._mecab.startListener();
@@ -1607,6 +1607,23 @@ class Backend {
             reader.onload = () => resolve(reader.result);
             reader.onerror = () => reject(reader.error);
             reader.readAsDataURL(file);
+        });
+    }
+
+    async _createNote(definition, mode, context, options, templates) {
+        const {general: {resultOutputMode, compactGlossaries}, anki: ankiOptions} = options;
+        const {tags, duplicateScope} = ankiOptions;
+        const modeOptions = (mode === 'kanji') ? ankiOptions.kanji : ankiOptions.terms;
+        return await this._ankiNoteBuilder.createNote({
+            definition,
+            mode,
+            context,
+            templates,
+            tags,
+            duplicateScope,
+            resultOutputMode,
+            compactGlossaries,
+            modeOptions
         });
     }
 }

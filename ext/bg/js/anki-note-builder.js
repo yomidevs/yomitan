@@ -27,41 +27,46 @@ class AnkiNoteBuilder {
         this._getClipboardImage = getClipboardImage;
     }
 
-    async createNote(definition, mode, context, options, templates) {
-        const isKanji = (mode === 'kanji');
-        const tags = options.anki.tags;
-        const modeOptions = isKanji ? options.anki.kanji : options.anki.terms;
-        const modeOptionsFieldEntries = Object.entries(modeOptions.fields);
-
-        const fields = {};
+    async createNote({
+        definition,
+        mode,
+        context,
+        templates,
+        tags=[],
+        duplicateScope='collection',
+        resultOutputMode='split',
+        compactGlossaries=false,
+        modeOptions: {fields, deck, model},
+        errors=null
+    }) {
+        const fieldEntries = Object.entries(fields);
+        const noteFields = {};
         const note = {
-            fields,
+            fields: noteFields,
             tags,
-            deckName: modeOptions.deck,
-            modelName: modeOptions.model,
-            options: {
-                duplicateScope: options.anki.duplicateScope
-            }
+            deckName: deck,
+            modelName: model,
+            options: {duplicateScope}
         };
 
-        const data = this.createNoteData(definition, mode, context, options);
+        const data = this.createNoteData(definition, mode, context, resultOutputMode, compactGlossaries);
         const formattedFieldValuePromises = [];
-        for (const [, fieldValue] of modeOptionsFieldEntries) {
-            const formattedFieldValuePromise = this.formatField(fieldValue, data, templates, null);
+        for (const [, fieldValue] of fieldEntries) {
+            const formattedFieldValuePromise = this.formatField(fieldValue, data, templates, errors);
             formattedFieldValuePromises.push(formattedFieldValuePromise);
         }
 
         const formattedFieldValues = await Promise.all(formattedFieldValuePromises);
-        for (let i = 0, ii = modeOptionsFieldEntries.length; i < ii; ++i) {
-            const fieldName = modeOptionsFieldEntries[i][0];
+        for (let i = 0, ii = fieldEntries.length; i < ii; ++i) {
+            const fieldName = fieldEntries[i][0];
             const formattedFieldValue = formattedFieldValues[i];
-            fields[fieldName] = formattedFieldValue;
+            noteFields[fieldName] = formattedFieldValue;
         }
 
         return note;
     }
 
-    createNoteData(definition, mode, context, options) {
+    createNoteData(definition, mode, context, resultOutputMode, compactGlossaries) {
         const pitches = DictionaryDataUtil.getPitchAccentInfos(definition);
         const pitchCount = pitches.reduce((i, v) => i + v.pitches.length, 0);
         return {
@@ -69,12 +74,12 @@ class AnkiNoteBuilder {
             definition,
             pitches,
             pitchCount,
-            group: options.general.resultOutputMode === 'group',
-            merge: options.general.resultOutputMode === 'merge',
+            group: resultOutputMode === 'group',
+            merge: resultOutputMode === 'merge',
             modeTermKanji: mode === 'term-kanji',
             modeTermKana: mode === 'term-kana',
             modeKanji: mode === 'kanji',
-            compactGlossaries: options.general.compactGlossaries,
+            compactGlossaries,
             context
         };
     }

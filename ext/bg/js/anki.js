@@ -16,28 +16,28 @@
  */
 
 class AnkiConnect {
-    constructor(server) {
+    constructor() {
         this._enabled = false;
-        this._server = server;
+        this._server = null;
         this._localVersion = 2;
         this._remoteVersion = 0;
         this._versionCheckPromise = null;
     }
 
-    setServer(server) {
-        this._server = server;
-    }
-
-    getServer() {
+    get server() {
         return this._server;
     }
 
-    setEnabled(enabled) {
-        this._enabled = enabled;
+    set server(value) {
+        this._server = value;
     }
 
-    isEnabled() {
+    get enabled() {
         return this._enabled;
+    }
+
+    set enabled(value) {
+        this._enabled = value;
     }
 
     async addNote(note) {
@@ -74,6 +74,10 @@ class AnkiConnect {
         if (!this._enabled) { return []; }
         await this._checkVersion();
         return await this._invoke('guiBrowse', {query});
+    }
+
+    async guiBrowseNote(noteId) {
+        return await this.guiBrowse(`nid:${noteId}`);
     }
 
     async storeMediaFile(fileName, dataBase64) {
