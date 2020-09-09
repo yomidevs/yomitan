@@ -474,6 +474,7 @@ class OptionsUtil {
         //  Added usePopupWindow.
         //  Updated handlebars templates to include "clipboard-image" definition.
         //  Added hideDelay.
+        //  Added inputs to profileOptions.scanning.
         for (const {conditionGroups} of options.profiles) {
             for (const {conditions} of conditionGroups) {
                 for (const condition of conditions) {
@@ -489,6 +490,24 @@ class OptionsUtil {
         for (const {options: profileOptions} of options.profiles) {
             profileOptions.general.usePopupWindow = false;
             profileOptions.scanning.hideDelay = 0;
+
+            const {modifier, middleMouse} = profileOptions.scanning;
+            const scanningInputs = [];
+            switch (modifier) {
+                case 'alt':
+                case 'ctrl':
+                case 'shift':
+                case 'meta':
+                    scanningInputs.push(modifier);
+                    break;
+                case 'none':
+                    scanningInputs.push('');
+                    break;
+            }
+            if (middleMouse) {
+                scanningInputs.push('mouse2');
+            }
+            profileOptions.scanning.inputs = scanningInputs;
         }
         await this._addFieldTemplatesToOptions(options, '/bg/data/anki-field-templates-upgrade-v4.handlebars');
         return options;

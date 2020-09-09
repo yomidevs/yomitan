@@ -318,7 +318,7 @@
                             "scanning": {
                                 "type": "object",
                                 "required": [
-                                    "middleMouse",
+                                    "inputs",
                                     "touchInputEnabled",
                                     "selectText",
                                     "alphanumeric",
@@ -336,9 +336,30 @@
                                     "layoutAwareScan"
                                 ],
                                 "properties": {
-                                    "middleMouse": {
-                                        "type": "boolean",
-                                        "default": true
+                                    "inputs": {
+                                        "type": "array",
+                                        "default": [
+                                            {
+                                                "include": "shift",
+                                                "exclude": ""
+                                            }
+                                        ],
+                                        "items": {
+                                            "required": [
+                                                "include",
+                                                "exclude"
+                                            ],
+                                            "properties": {
+                                                "include": {
+                                                    "type": "string",
+                                                    "default": "shift"
+                                                },
+                                                "exclude": {
+                                                    "type": "string",
+                                                    "default": ""
+                                                }
+                                            }
+                                        }
                                     },
                                     "touchInputEnabled": {
                                         "type": "boolean",
@@ -370,11 +391,6 @@
                                         "type": "integer",
                                         "minimum": 1,
                                         "default": 10
-                                    },
-                                    "modifier": {
-                                        "type": "string",
-                                        "enum": ["none", "alt", "ctrl", "shift", "meta"],
-                                        "default": "shift"
                                     },
                                     "deepDomScan": {
                                         "type": "boolean",

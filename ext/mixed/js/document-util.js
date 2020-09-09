@@ -188,6 +188,18 @@ class DocumentUtil {
         return modifiers;
     }
 
+    static getActiveModifiersAndButtons(event) {
+        const modifiers = this.getActiveModifiers(event);
+        this._getActiveButtons(event, modifiers);
+        return modifiers;
+    }
+
+    static getActiveButtons(event) {
+        const buttons = new Set();
+        this._getActiveButtons(event, buttons);
+        return buttons;
+    }
+
     static getKeyFromEvent(event) {
         const key = event.key;
         return (typeof key === 'string' ? (key.length === 1 ? key.toUpperCase() : key) : '');
@@ -297,6 +309,19 @@ class DocumentUtil {
 
     static isMetaKeySupported(os, browser) {
         return !(browser === 'firefox' || browser === 'firefox-mobile') || os === 'mac';
+    }
+
+    static _getActiveButtons(event, set) {
+        const {buttons} = event;
+        if (typeof buttons === 'number') {
+            for (let i = 0; i < 6; ++i) {
+                const buttonFlag = (1 << i);
+                if ((buttons & buttonFlag) !== 0) {
+                    set.add(`mouse${i}`);
+                }
+            }
+        }
+        return set;
     }
 
     // Private

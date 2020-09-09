@@ -125,7 +125,7 @@
                     <div class="input-group-btn"><select class="form-control btn btn-default condition-operator"><optgroup label="Operator"></optgroup></select></div>
                     <div class="condition-line-break"></div>
                     <div class="condition-input"><input type="text" class="form-control condition-input-inner"></div>
-                    <div class="input-group-btn"><button class="btn btn-default condition-mouse-button" title="Mouse button" style="padding-left: 10px; padding-right: 10px;" hidden><span style="width: 20px; height: 20px; display: block; background: url(/mixed/img/mouse.svg) no-repeat center center; background-size: 20px 20px;"></span></button><button class="btn btn-danger condition-remove" title="Remove"><span class="glyphicon glyphicon-remove"></span></button></div>
+                    <div class="input-group-btn"><button class="btn btn-default mouse-button" title="Mouse button"><span class="mouse-button-icon"></span></button><button class="btn btn-danger condition-remove" title="Remove"><span class="glyphicon glyphicon-remove"></span></button></div>
                 </div></template>
             </div>
 
@@ -363,13 +363,13 @@
 
                 <div class="form-group ignore-form-changes">
                     <label>Audio playback sources</label>
-                    <div class="audio-source-list"></div>
+                    <div class="audio-source-list generic-input-list"></div>
                     <div class="input-group audio-source-options">
                         <button class="btn btn-default audio-source-add" title="Add audio playback source"><span class="glyphicon glyphicon-plus"></span></button>
                     </div>
 
                     <template id="audio-source-template"><div class="input-group audio-source">
-                        <div class="input-group-addon audio-source-prefix"></div>
+                        <div class="input-group-addon generic-input-prefix"></div>
                         <select class="form-control audio-source-select">
                             <option value="jpod101">JapanesePod101</option>
                             <option value="jpod101-alternate">JapanesePod101 (Alternate)</option>
@@ -385,10 +385,6 @@
 
             <div>
                 <h3>Scanning Options</h3>
-
-                <div class="checkbox">
-                    <label><input type="checkbox" id="middle-mouse-button-scan" data-setting="scanning.middleMouse"> Middle mouse button scans</label>
-                </div>
 
                 <div class="checkbox">
                     <label><input type="checkbox" id="touch-input-enabled" data-setting="scanning.touchInputEnabled"> Touch input enabled</label>
@@ -433,8 +429,27 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="scan-modifier-key">Scan modifier key</label>
-                    <select class="form-control" id="scan-modifier-key" data-setting="scanning.modifier"></select>
+                    <label>Scan inputs</label>
+                    <div class="scan-input-list" id="scan-input-list"></div>
+                    <button class="btn btn-default" id="scan-input-add" title="Add scan input"><span class="glyphicon glyphicon-plus"></span></button>
+
+                    <template id="scan-input-template"><div class="scan-input">
+                        <table class="scan-input-table"><tbody>
+                            <tr class="scan-input-include">
+                                <td class="scan-input-index-cell" rowspan="2"><div class="scan-input-index"></div></td>
+                                <td class="scan-input-prefix-cell"><div class="scan-input-prefix">Include</div></td>
+                                <td class="scan-input-input-cell"><input type="text" class="form-control scan-input-field" placeholder="No inputs"></td>
+                                <td class="scan-input-mouse-button-cell"><button class="btn btn-default mouse-button" title="Mouse button"><span class="mouse-button-icon"></span></button></td>
+                                <td class="scan-input-remove-button-cell"><button class="btn btn-danger scan-input-remove" title="Remove"><span class="glyphicon glyphicon-remove"></span></button></td>
+                            </tr>
+                            <tr class="scan-input-exclude">
+                                <td class="scan-input-prefix-cell"><div class="scan-input-prefix">Exclude</div></td>
+                                <td class="scan-input-input-cell"><input type="text" class="form-control scan-input-field" placeholder="No inputs"></td>
+                                <td class="scan-input-mouse-button-cell"><button class="btn btn-default mouse-button" title="Mouse button"><span class="mouse-button-icon"></span></button></td>
+                                <td class="scan-input-empty-cell"></td>
+                            </tr>
+                        </tbody></table>
+                    </div></template>
                 </div>
             </div>
 
@@ -1176,6 +1191,7 @@
         <script src="/bg/js/settings/popup-preview.js"></script>
         <script src="/bg/js/settings/profiles.js"></script>
         <script src="/bg/js/settings/profile-conditions-ui.js"></script>
+        <script src="/bg/js/settings/scan-inputs-controller.js"></script>
         <script src="/bg/js/settings/settings-controller.js"></script>
         <script src="/bg/js/settings/storage.js"></script>
         <script src="/mixed/js/dictionary-data-util.js"></script>

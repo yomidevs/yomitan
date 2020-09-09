@@ -239,10 +239,9 @@ class Display extends EventDispatcher {
             selectedParser: options.parsing.selectedParser,
             termSpacing: options.parsing.termSpacing,
             scanning: {
+                inputs: scanning.inputs,
                 deepContentScan: scanning.deepDomScan,
                 selectText: scanning.selectText,
-                modifier: scanning.modifier,
-                useMiddleMouse: scanning.middleMouse,
                 delay: scanning.delay,
                 touchInputEnabled: scanning.touchInputEnabled,
                 scanLength: scanning.length,

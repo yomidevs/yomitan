@@ -22,10 +22,10 @@
  * ClipboardPopupsController
  * DictionaryController
  * DictionaryImportController
- * DocumentUtil
  * GenericSettingController
  * PopupPreviewController
  * ProfileController
+ * ScanInputsController
  * SettingsBackup
  * SettingsController
  * StorageController
@@ -38,23 +38,6 @@ function showExtensionInformation() {
 
     const manifest = chrome.runtime.getManifest();
     node.textContent = `${manifest.name} v${manifest.version}`;
-}
-
-async function settingsPopulateModifierKeys() {
-    const scanModifierKeySelect = document.querySelector('#scan-modifier-key');
-    scanModifierKeySelect.textContent = '';
-
-    const {platform: {os}} = await api.getEnvironmentInfo();
-    const modifierKeys = [
-        ['none', 'None'],
-        ...DocumentUtil.getModifierKeys(os)
-    ];
-    for (const [value, name] of modifierKeys) {
-        const option = document.createElement('option');
-        option.value = value;
-        option.textContent = name;
-        scanModifierKeySelect.appendChild(option);
-    }
 }
 
 async function setupEnvironmentInfo() {
@@ -71,7 +54,6 @@ async function setupEnvironmentInfo() {
 
         setupEnvironmentInfo();
         showExtensionInformation();
-        settingsPopulateModifierKeys();
 
         const optionsFull = await api.optionsGetFull();
 
@@ -110,6 +92,9 @@ async function setupEnvironmentInfo() {
 
         const settingsBackup = new SettingsBackup(settingsController);
         settingsBackup.prepare();
+
+        const scanInputsController = new ScanInputsController(settingsController);
+        scanInputsController.prepare();
 
         yomichan.ready();
     } catch (e) {

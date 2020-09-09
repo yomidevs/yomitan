@@ -254,12 +254,12 @@ class Frontend {
         await this.updateOptions();
     }
 
-    _onSearched({type, definitions, sentence, input: {cause}, textSource, optionsContext, error}) {
+    _onSearched({type, definitions, sentence, input: {cause, empty}, textSource, optionsContext, error}) {
         const scanningOptions = this._options.scanning;
 
         if (error !== null) {
             if (yomichan.isExtensionUnloaded) {
-                if (textSource !== null && scanningOptions.modifier !== 'none') {
+                if (textSource !== null && !empty) {
                     this._showExtensionUnloaded(textSource);
                 }
             } else {
@@ -321,10 +321,9 @@ class Frontend {
         await this._updatePopup();
 
         this._textScanner.setOptions({
+            inputs: scanningOptions.inputs,
             deepContentScan: scanningOptions.deepDomScan,
             selectText: scanningOptions.selectText,
-            modifier: scanningOptions.modifier,
-            useMiddleMouse: scanningOptions.middleMouse,
             delay: scanningOptions.delay,
             touchInputEnabled: scanningOptions.touchInputEnabled,
             scanLength: scanningOptions.length,

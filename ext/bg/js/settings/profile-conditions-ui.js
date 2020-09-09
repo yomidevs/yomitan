@@ -441,7 +441,7 @@ class ProfileConditionUI {
         this._operatorOptionContainer = this._operatorInput.querySelector('optgroup');
         this._valueInput = this._node.querySelector('.condition-input-inner');
         this._removeButton = this._node.querySelector('.condition-remove');
-        this._mouseButton = this._node.querySelector('.condition-mouse-button');
+        this._mouseButton = this._node.querySelector('.mouse-button');
 
         const operatorDetails = this._getOperatorDetails(type, operator);
         this._updateTypes(type);

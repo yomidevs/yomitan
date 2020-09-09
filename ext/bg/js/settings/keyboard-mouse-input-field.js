@@ -172,7 +172,7 @@ class KeyboardMouseInputField extends EventDispatcher {
 
     _onMouseButtonMouseDown(e) {
         e.preventDefault();
-        this._addInputs([`mouse${e.button}`]);
+        this._addInputs(DocumentUtil.getActiveButtons(e));
     }
 
     _onMouseButtonMouseUp(e) {

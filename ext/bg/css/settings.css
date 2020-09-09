@@ -46,6 +46,21 @@ html:root:not([data-options-general-result-output-mode=merge]) #dict-main-group 
     border-color: #f00000;
 }
 
+.mouse-button {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.mouse-button[hidden] {
+    display: none;
+}
+.mouse-button-icon {
+    width: 20px;
+    height: 20px;
+    display: block;
+    background: url(/mixed/img/mouse.svg) no-repeat center center;
+    background-size: 20px 20px;
+}
+
 .condition {
     display: flex;
     -flex-wrap: wrap;
@@ -113,21 +128,80 @@ html:root:not([data-options-general-result-output-mode=merge]) #dict-main-group 
     display: none;
 }
 
-.condition-mouse-button[hidden] {
-    display: none;
+.scan-input-list {
+    counter-reset: scan-input-id;
+}
+.scan-input-table {
+    width: 100%;
+}
+.scan-input-list:not(:empty)+#scan-input-add {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+.scan-input-index-cell {
+    position: relative;
+    min-width: 40px;
+}
+.scan-input-index {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    font-size: 14px;
+    color: #555;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-top-left-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.scan-input-index:after {
+    display: block;
+    counter-increment: scan-input-id;
+    content: counter(scan-input-id);
+}
+.scan-input-prefix {
+    padding: 6px 12px;
+    font-size: 14px;
+    color: #555;
+    text-align: center;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    width: 100%;
+}
+.scan-input-input-cell {
+    width: 100%;
+}
+.scan-input-input-cell>input {
+    border-radius: 0;
+}
+.scan-input-mouse-button-cell>button {
+    border-radius: 0;
+}
+.scan-input-remove-button-cell>button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.scan-input:nth-child(n+2) .scan-input-index {
+    border-top-left-radius: 0;
+}
+.scan-input:last-child tr:last-of-type .scan-input-mouse-button-cell>button {
+    border-bottom-right-radius: 4px;
 }
 
-.audio-source-list {
-    counter-reset: audio-source-id;
+.generic-input-list {
+    counter-reset: generic-input-id;
 }
-.audio-source-list .audio-source-prefix {
+.generic-input-list .generic-input-prefix {
     flex: 0 0 auto;
     width: 39px;
     text-align: center;
 }
-.audio-source-list .audio-source-prefix:after {
-    counter-increment: audio-source-id;
-    content: counter(audio-source-id);
+.generic-input-list .generic-input-prefix:after {
+    counter-increment: generic-input-id;
+    content: counter(generic-input-id);
 }
 
 #custom-popup-css,
