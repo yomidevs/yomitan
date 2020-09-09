@@ -1047,18 +1047,10 @@ class Display extends EventDispatcher {
         try {
             this.setSpinnerVisible(true);
 
-            const details = {};
-            if (this._noteUsesScreenshot(mode)) {
-                try {
-                    const screenshot = await this._getScreenshot();
-                    details.screenshot = screenshot;
-                } catch (e) {
-                    // NOP
-                }
-            }
-
+            const ownerFrameId = this._ownerFrameId;
+            const optionsContext = this.getOptionsContext();
             const noteContext = await this._getNoteContext();
-            const noteId = await api.definitionAdd(definition, mode, noteContext, details, this.getOptionsContext());
+            const noteId = await api.definitionAdd(definition, mode, noteContext, ownerFrameId, optionsContext);
             if (noteId) {
                 const index = this._definitions.indexOf(definition);
                 const adderButton = this._adderButtonFind(index, mode);
@@ -1133,36 +1125,6 @@ class Display extends EventDispatcher {
         if (this._audioPlaying !== null) {
             this._audioPlaying.pause();
             this._audioPlaying = null;
-        }
-    }
-
-    _noteUsesScreenshot(mode) {
-        const optionsAnki = this._options.anki;
-        const fields = (mode === 'kanji' ? optionsAnki.kanji : optionsAnki.terms).fields;
-        for (const fieldValue of Object.values(fields)) {
-            if (fieldValue.includes('{screenshot}')) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    async _getScreenshot() {
-        const ownerFrameId = this._ownerFrameId;
-        let token = null;
-        try {
-            if (ownerFrameId !== null) {
-                token = await api.crossFrame.invoke(ownerFrameId, 'setAllVisibleOverride', {value: false, priority: 0, awaitFrame: true});
-            }
-
-            const {format, quality} = this._options.anki.screenshot;
-            const dataUrl = await api.screenshotGet({format, quality});
-
-            return {dataUrl, format};
-        } finally {
-            if (token !== null) {
-                await api.crossFrame.invoke(ownerFrameId, 'clearAllVisibleOverride', {token});
-            }
         }
     }
 

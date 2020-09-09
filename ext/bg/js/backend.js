@@ -61,7 +61,8 @@ class Backend {
             anki: this._anki,
             audioSystem: this._audioSystem,
             renderTemplate: this._renderTemplate.bind(this),
-            getClipboardImage: this._onApiClipboardImageGet.bind(this)
+            getClipboardImage: this._onApiClipboardImageGet.bind(this),
+            getScreenshot: this._getScreenshot.bind(this)
         });
         this._templateRenderer = new TemplateRenderer();
 
@@ -442,7 +443,7 @@ class Backend {
         return results;
     }
 
-    async _onApiDefinitionAdd({definition, mode, context, details, optionsContext}) {
+    async _onApiDefinitionAdd({definition, mode, context, ownerFrameId, optionsContext}, sender) {
         const options = this.getOptions(optionsContext);
         const templates = this._getTemplates(options);
         const fields = (
@@ -463,13 +464,13 @@ class Backend {
 
         await this._ankiNoteBuilder.injectClipboardImage(definition, fields);
 
-        if (details && details.screenshot) {
-            await this._ankiNoteBuilder.injectScreenshot(
-                definition,
-                fields,
-                details.screenshot
-            );
-        }
+        const {id: tabId, windowId} = (sender && sender.tab ? sender.tab : {});
+        const {format, quality} = options.anki.screenshot;
+        await this._ankiNoteBuilder.injectScreenshot(
+            definition,
+            fields,
+            {windowId, tabId, ownerFrameId, format, quality}
+        );
 
         const note = await this._createNote(definition, mode, context, options, templates);
         return this._anki.addNote(note);
@@ -1625,5 +1626,41 @@ class Backend {
             compactGlossaries,
             modeOptions
         });
+    }
+
+    async _getScreenshot(windowId, tabId, ownerFrameId, format, quality) {
+        if (typeof windowId !== 'number') {
+            throw new Error('Invalid window ID');
+        }
+
+        let token = null;
+        try {
+            if (typeof tabId === 'number' && typeof ownerFrameId === 'number') {
+                const action = 'setAllVisibleOverride';
+                const params = {value: false, priority: 0, awaitFrame: true};
+                token = await this._sendMessageTab(tabId, {action, params}, {frameId: ownerFrameId});
+            }
+
+            return await new Promise((resolve, reject) => {
+                chrome.tabs.captureVisibleTab(windowId, {format, quality}, (result) => {
+                    const e = chrome.runtime.lastError;
+                    if (e) {
+                        reject(new Error(e.message));
+                    } else {
+                        resolve(result);
+                    }
+                });
+            });
+        } finally {
+            if (token !== null) {
+                const action = 'clearAllVisibleOverride';
+                const params = {token};
+                try {
+                    await this._sendMessageTab(tabId, {action, params}, {frameId: ownerFrameId});
+                } catch (e) {
+                    // NOP
+                }
+            }
+        }
     }
 }

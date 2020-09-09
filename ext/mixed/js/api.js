@@ -77,8 +77,8 @@ const api = (() => {
             return this._invoke('kanjiFind', {text, optionsContext});
         }
 
-        definitionAdd(definition, mode, context, details, optionsContext) {
-            return this._invoke('definitionAdd', {definition, mode, context, details, optionsContext});
+        definitionAdd(definition, mode, context, ownerFrameId, optionsContext) {
+            return this._invoke('definitionAdd', {definition, mode, context, ownerFrameId, optionsContext});
         }
 
         definitionsAddable(definitions, modes, context, optionsContext) {
