@@ -138,9 +138,12 @@ class AnkiNoteBuilder {
             const {windowId, tabId, ownerFrameId, format, quality} = screenshot;
             const dataUrl = await this._getScreenshot(windowId, tabId, ownerFrameId, format, quality);
 
-            let fileName = `yomichan_browser_screenshot_${reading}_${this._dateToString(now)}.${format}`;
+            const {mediaType, data} = this._getDataUrlInfo(dataUrl);
+            const extension = this._getImageExtensionFromMediaType(mediaType);
+            if (extension === null) { return; }
+
+            let fileName = `yomichan_browser_screenshot_${reading}_${this._dateToString(now)}.${extension}`;
             fileName = AnkiNoteBuilder.replaceInvalidFileNameCharacters(fileName);
-            const data = dataUrl.replace(/^data:[\w\W]*?,/, '');
 
             await this._anki.storeMediaFile(fileName, data);
 
@@ -160,12 +163,12 @@ class AnkiNoteBuilder {
             const dataUrl = await this._getClipboardImage();
             if (dataUrl === null) { return; }
 
-            const extension = this._getImageExtensionFromDataUrl(dataUrl);
+            const {mediaType, data} = this._getDataUrlInfo(dataUrl);
+            const extension = this._getImageExtensionFromMediaType(mediaType);
             if (extension === null) { return; }
 
             let fileName = `yomichan_clipboard_image_${reading}_${this._dateToString(now)}.${extension}`;
             fileName = AnkiNoteBuilder.replaceInvalidFileNameCharacters(fileName);
-            const data = dataUrl.replace(/^data:[\w\W]*?,/, '');
 
             await this._anki.storeMediaFile(fileName, data);
 
@@ -207,10 +210,23 @@ class AnkiNoteBuilder {
         return false;
     }
 
-    _getImageExtensionFromDataUrl(dataUrl) {
-        const match = /^data:([^;]*);/.exec(dataUrl);
-        if (match === null) { return null; }
-        switch (match[1].toLowerCase()) {
+    _getDataUrlInfo(dataUrl) {
+        const match = /^data:([^,]*?)(;base64)?,/.exec(dataUrl);
+        if (match === null) {
+            throw new Error('Invalid data URL');
+        }
+
+        let mediaType = match[1];
+        if (mediaType.length === 0) { mediaType = 'text/plain'; }
+
+        let data = dataUrl.substring(match[0].length);
+        if (typeof match[2] === 'undefined') { data = btoa(data); }
+
+        return {mediaType, data};
+    }
+
+    _getImageExtensionFromMediaType(mediaType) {
+        switch (mediaType.toLowerCase()) {
             case 'image/png': return 'png';
             case 'image/jpeg': return 'jpeg';
             default: return null;
