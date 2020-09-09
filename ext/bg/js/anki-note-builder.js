@@ -20,8 +20,7 @@
  */
 
 class AnkiNoteBuilder {
-    constructor({anki, audioSystem, renderTemplate, getClipboardImage=null, getScreenshot=null}) {
-        this._anki = anki;
+    constructor({audioSystem, renderTemplate, getClipboardImage=null, getScreenshot=null}) {
         this._audioSystem = audioSystem;
         this._renderTemplate = renderTemplate;
         this._getClipboardImage = getClipboardImage;
@@ -29,6 +28,7 @@ class AnkiNoteBuilder {
     }
 
     async createNote({
+        anki=null,
         definition,
         mode,
         context,
@@ -38,8 +38,15 @@ class AnkiNoteBuilder {
         resultOutputMode='split',
         compactGlossaries=false,
         modeOptions: {fields, deck, model},
+        audioDetails=null,
+        screenshotDetails=null,
+        clipboardImage=false,
         errors=null
     }) {
+        if (anki !== null) {
+            await this._injectMedia(anki, definition, fields, mode, audioDetails, screenshotDetails, clipboardImage);
+        }
+
         const fieldEntries = Object.entries(fields);
         const noteFields = {};
         const note = {
@@ -50,10 +57,10 @@ class AnkiNoteBuilder {
             options: {duplicateScope}
         };
 
-        const data = this.createNoteData(definition, mode, context, resultOutputMode, compactGlossaries);
+        const data = this._createNoteData(definition, mode, context, resultOutputMode, compactGlossaries);
         const formattedFieldValuePromises = [];
         for (const [, fieldValue] of fieldEntries) {
-            const formattedFieldValuePromise = this.formatField(fieldValue, data, templates, errors);
+            const formattedFieldValuePromise = this._formatField(fieldValue, data, templates, errors);
             formattedFieldValuePromises.push(formattedFieldValuePromise);
         }
 
@@ -67,7 +74,9 @@ class AnkiNoteBuilder {
         return note;
     }
 
-    createNoteData(definition, mode, context, resultOutputMode, compactGlossaries) {
+    // Private
+
+    _createNoteData(definition, mode, context, resultOutputMode, compactGlossaries) {
         const pitches = DictionaryDataUtil.getPitchAccentInfos(definition);
         const pitchCount = pitches.reduce((i, v) => i + v.pitches.length, 0);
         return {
@@ -85,9 +94,9 @@ class AnkiNoteBuilder {
         };
     }
 
-    async formatField(field, data, templates, errors=null) {
+    async _formatField(field, data, templates, errors=null) {
         const pattern = /\{([\w-]+)\}/g;
-        return await AnkiNoteBuilder.stringReplaceAsync(field, pattern, async (g0, marker) => {
+        return await this._stringReplaceAsync(field, pattern, async (g0, marker) => {
             try {
                 return await this._renderTemplate(templates, data, marker);
             } catch (e) {
@@ -97,16 +106,29 @@ class AnkiNoteBuilder {
         });
     }
 
-    async injectAudio(definition, fields, sources, customSourceUrl) {
+    async _injectMedia(anki, definition, fields, mode, audioDetails, screenshotDetails, clipboardImage) {
+        if (screenshotDetails !== null) {
+            await this._injectScreenshot(anki, definition, fields, screenshotDetails);
+        }
+        if (clipboardImage) {
+            await this._injectClipboardImage(anki, definition, fields);
+        }
+        if (mode !== 'kanji' && audioDetails !== null) {
+            await this._injectAudio(anki, definition, fields, audioDetails);
+        }
+    }
+
+    async _injectAudio(anki, definition, fields, details) {
         if (!this._containsMarker(fields, 'audio')) { return; }
 
         try {
+            const {sources, customSourceUrl} = details;
             const expressions = definition.expressions;
             const audioSourceDefinition = Array.isArray(expressions) ? expressions[0] : definition;
 
             let fileName = this._createInjectedAudioFileName(audioSourceDefinition);
             if (fileName === null) { return; }
-            fileName = AnkiNoteBuilder.replaceInvalidFileNameCharacters(fileName);
+            fileName = this._replaceInvalidFileNameCharacters(fileName);
 
             const {audio} = await this._audioSystem.getDefinitionAudio(
                 audioSourceDefinition,
@@ -119,8 +141,8 @@ class AnkiNoteBuilder {
                 }
             );
 
-            const data = AnkiNoteBuilder.arrayBufferToBase64(audio);
-            await this._anki.storeMediaFile(fileName, data);
+            const data = this._arrayBufferToBase64(audio);
+            await anki.storeMediaFile(fileName, data);
 
             definition.audioFileName = fileName;
         } catch (e) {
@@ -128,14 +150,14 @@ class AnkiNoteBuilder {
         }
     }
 
-    async injectScreenshot(definition, fields, screenshot) {
+    async _injectScreenshot(anki, definition, fields, details) {
         if (!this._containsMarker(fields, 'screenshot')) { return; }
 
         const reading = definition.reading;
         const now = new Date(Date.now());
 
         try {
-            const {windowId, tabId, ownerFrameId, format, quality} = screenshot;
+            const {windowId, tabId, ownerFrameId, format, quality} = details;
             const dataUrl = await this._getScreenshot(windowId, tabId, ownerFrameId, format, quality);
 
             const {mediaType, data} = this._getDataUrlInfo(dataUrl);
@@ -143,9 +165,9 @@ class AnkiNoteBuilder {
             if (extension === null) { return; }
 
             let fileName = `yomichan_browser_screenshot_${reading}_${this._dateToString(now)}.${extension}`;
-            fileName = AnkiNoteBuilder.replaceInvalidFileNameCharacters(fileName);
+            fileName = this._replaceInvalidFileNameCharacters(fileName);
 
-            await this._anki.storeMediaFile(fileName, data);
+            await anki.storeMediaFile(fileName, data);
 
             definition.screenshotFileName = fileName;
         } catch (e) {
@@ -153,7 +175,7 @@ class AnkiNoteBuilder {
         }
     }
 
-    async injectClipboardImage(definition, fields) {
+    async _injectClipboardImage(anki, definition, fields) {
         if (!this._containsMarker(fields, 'clipboard-image')) { return; }
 
         const reading = definition.reading;
@@ -168,9 +190,9 @@ class AnkiNoteBuilder {
             if (extension === null) { return; }
 
             let fileName = `yomichan_clipboard_image_${reading}_${this._dateToString(now)}.${extension}`;
-            fileName = AnkiNoteBuilder.replaceInvalidFileNameCharacters(fileName);
+            fileName = this._replaceInvalidFileNameCharacters(fileName);
 
-            await this._anki.storeMediaFile(fileName, data);
+            await anki.storeMediaFile(fileName, data);
 
             definition.clipboardImageFileName = fileName;
         } catch (e) {
@@ -233,16 +255,16 @@ class AnkiNoteBuilder {
         }
     }
 
-    static replaceInvalidFileNameCharacters(fileName) {
+    _replaceInvalidFileNameCharacters(fileName) {
         // eslint-disable-next-line no-control-regex
         return fileName.replace(/[<>:"/\\|?*\x00-\x1F]/g, '-');
     }
 
-    static arrayBufferToBase64(arrayBuffer) {
+    _arrayBufferToBase64(arrayBuffer) {
         return btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
     }
 
-    static stringReplaceAsync(str, regex, replacer) {
+    _stringReplaceAsync(str, regex, replacer) {
         let match;
         let index = 0;
         const parts = [];
