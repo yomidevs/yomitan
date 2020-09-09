@@ -20,7 +20,7 @@
  * api
  */
 
-class SettingsBackup {
+class BackupController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._settingsExportToken = null;

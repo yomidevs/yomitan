@@ -19,6 +19,7 @@
  * AnkiController
  * AnkiTemplatesController
  * AudioController
+ * BackupController
  * ClipboardPopupsController
  * DictionaryController
  * DictionaryImportController
@@ -26,7 +27,6 @@
  * PopupPreviewController
  * ProfileController
  * ScanInputsController
- * SettingsBackup
  * SettingsController
  * StorageController
  * api
@@ -90,7 +90,7 @@ async function setupEnvironmentInfo() {
         const ankiTemplatesController = new AnkiTemplatesController(settingsController, ankiController);
         ankiTemplatesController.prepare();
 
-        const settingsBackup = new SettingsBackup(settingsController);
+        const settingsBackup = new BackupController(settingsController);
         settingsBackup.prepare();
 
         const scanInputsController = new ScanInputsController(settingsController);
