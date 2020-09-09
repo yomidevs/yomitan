@@ -113,9 +113,6 @@ class Backend {
             ['getQueryParserTemplatesHtml',  {async: true,  contentScript: true,  handler: this._onApiGetQueryParserTemplatesHtml.bind(this)}],
             ['getZoom',                      {async: true,  contentScript: true,  handler: this._onApiGetZoom.bind(this)}],
             ['getDefaultAnkiFieldTemplates', {async: false, contentScript: true,  handler: this._onApiGetDefaultAnkiFieldTemplates.bind(this)}],
-            ['getAnkiDeckNames',             {async: true,  contentScript: false, handler: this._onApiGetAnkiDeckNames.bind(this)}],
-            ['getAnkiModelNames',            {async: true,  contentScript: false, handler: this._onApiGetAnkiModelNames.bind(this)}],
-            ['getAnkiModelFieldNames',       {async: true,  contentScript: false, handler: this._onApiGetAnkiModelFieldNames.bind(this)}],
             ['getDictionaryInfo',            {async: true,  contentScript: false, handler: this._onApiGetDictionaryInfo.bind(this)}],
             ['getDictionaryCounts',          {async: true,  contentScript: false, handler: this._onApiGetDictionaryCounts.bind(this)}],
             ['purgeDatabase',                {async: true,  contentScript: false, handler: this._onApiPurgeDatabase.bind(this)}],
@@ -724,18 +721,6 @@ class Backend {
 
     _onApiGetDefaultAnkiFieldTemplates() {
         return this._defaultAnkiFieldTemplates;
-    }
-
-    async _onApiGetAnkiDeckNames() {
-        return await this._anki.getDeckNames();
-    }
-
-    async _onApiGetAnkiModelNames() {
-        return await this._anki.getModelNames();
-    }
-
-    async _onApiGetAnkiModelFieldNames({modelName}) {
-        return await this._anki.getModelFieldNames(modelName);
     }
 
     async _onApiGetDictionaryInfo() {

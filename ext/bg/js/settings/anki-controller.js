@@ -16,11 +16,12 @@
  */
 
 /* global
- * api
+ * AnkiConnect
  */
 
 class AnkiController {
     constructor(settingsController) {
+        this._ankiConnect = new AnkiConnect();
         this._settingsController = settingsController;
     }
 
@@ -100,9 +101,11 @@ class AnkiController {
     // Private
 
     async _onOptionsChanged({options}) {
-        if (!options.anki.enable) {
-            return;
-        }
+        const {server, enable: enabled} = options.anki;
+        this._ankiConnect.server = server;
+        this._ankiConnect.enabled = enabled;
+
+        if (!enabled) { return; }
 
         await this._deckAndModelPopulate(options);
         await Promise.all([
@@ -191,7 +194,10 @@ class AnkiController {
         const kanjiModel = {value: options.anki.kanji.model, selector: '#anki-kanji-model'};
         try {
             this._spinnerShow(true);
-            const [deckNames, modelNames] = await Promise.all([api.getAnkiDeckNames(), api.getAnkiModelNames()]);
+            const [deckNames, modelNames] = await Promise.all([
+                this._ankiConnect.getDeckNames(),
+                this._ankiConnect.getModelNames()
+            ]);
             deckNames.sort();
             modelNames.sort();
             termsDeck.values = deckNames;
@@ -262,7 +268,7 @@ class AnkiController {
         let fieldNames;
         try {
             const modelName = node.value;
-            fieldNames = await api.getAnkiModelFieldNames(modelName);
+            fieldNames = await this._ankiConnect.getModelFieldNames(modelName);
             this._setError(null);
         } catch (error) {
             this._setError(error);

@@ -153,18 +153,6 @@ const api = (() => {
             return this._invoke('getDefaultAnkiFieldTemplates');
         }
 
-        getAnkiDeckNames() {
-            return this._invoke('getAnkiDeckNames');
-        }
-
-        getAnkiModelNames() {
-            return this._invoke('getAnkiModelNames');
-        }
-
-        getAnkiModelFieldNames(modelName) {
-            return this._invoke('getAnkiModelFieldNames', {modelName});
-        }
-
         getDictionaryInfo() {
             return this._invoke('getDictionaryInfo');
         }
