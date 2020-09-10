@@ -58,8 +58,8 @@ class Backend {
             useCache: false
         });
         this._ankiNoteBuilder = new AnkiNoteBuilder({
-            audioSystem: this._audioSystem,
             renderTemplate: this._renderTemplate.bind(this),
+            getDefinitionAudio: this._getDefinitionAudio.bind(this),
             getClipboardImage: this._onApiClipboardImageGet.bind(this),
             getScreenshot: this._getScreenshot.bind(this)
         });
@@ -124,7 +124,8 @@ class Backend {
             ['getSettings',                  {async: false, contentScript: true,  handler: this._onApiGetSettings.bind(this)}],
             ['setAllSettings',               {async: true,  contentScript: false, handler: this._onApiSetAllSettings.bind(this)}],
             ['getOrCreateSearchPopup',       {async: true,  contentScript: true,  handler: this._onApiGetOrCreateSearchPopup.bind(this)}],
-            ['isTabSearchPopup',             {async: true,  contentScript: true,  handler: this._onApiIsTabSearchPopup.bind(this)}]
+            ['isTabSearchPopup',             {async: true,  contentScript: true,  handler: this._onApiIsTabSearchPopup.bind(this)}],
+            ['getDefinitionAudio',           {async: true,  contentScript: true,  handler: this._onApiGetDefinitionAudio.bind(this)}]
         ]);
         this._messageHandlersWithProgress = new Map([
             ['deleteDictionary',        {async: true,  contentScript: false, handler: this._onApiDeleteDictionary.bind(this)}]
@@ -825,6 +826,10 @@ class Backend {
         const baseUrl = chrome.runtime.getURL('/bg/search.html');
         const tab = typeof tabId === 'number' ? await this._checkTabUrl(tabId, (url) => url.startsWith(baseUrl)) : null;
         return (tab !== null);
+    }
+
+    async _onApiGetDefinitionAudio({definition, sources, details}) {
+        return this._getDefinitionAudio(definition, sources, details);
     }
 
     // Command handlers
@@ -1630,5 +1635,9 @@ class Backend {
                 }
             }
         }
+    }
+
+    async _getDefinitionAudio(definition, sources, details) {
+        return await this._audioSystem.getDefinitionAudio(definition, sources, details);
     }
 }

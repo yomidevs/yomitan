@@ -20,9 +20,9 @@
  */
 
 class AnkiNoteBuilder {
-    constructor({audioSystem, renderTemplate, getClipboardImage=null, getScreenshot=null}) {
-        this._audioSystem = audioSystem;
+    constructor({renderTemplate, getDefinitionAudio=null, getClipboardImage=null, getScreenshot=null}) {
         this._renderTemplate = renderTemplate;
+        this._getDefinitionAudio = getDefinitionAudio;
         this._getClipboardImage = getClipboardImage;
         this._getScreenshot = getScreenshot;
     }
@@ -130,7 +130,7 @@ class AnkiNoteBuilder {
             if (fileName === null) { return; }
             fileName = this._replaceInvalidFileNameCharacters(fileName);
 
-            const {audio} = await this._audioSystem.getDefinitionAudio(
+            const {audio: data} = await this._getDefinitionAudio(
                 audioSourceDefinition,
                 sources,
                 {
@@ -141,7 +141,6 @@ class AnkiNoteBuilder {
                 }
             );
 
-            const data = this._arrayBufferToBase64(audio);
             await anki.storeMediaFile(fileName, data);
 
             definition.audioFileName = fileName;
@@ -258,10 +257,6 @@ class AnkiNoteBuilder {
     _replaceInvalidFileNameCharacters(fileName) {
         // eslint-disable-next-line no-control-regex
         return fileName.replace(/[<>:"/\\|?*\x00-\x1F]/g, '-');
-    }
-
-    _arrayBufferToBase64(arrayBuffer) {
-        return btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
     }
 
     _stringReplaceAsync(str, regex, replacer) {

@@ -185,7 +185,11 @@ class AudioSystem {
             throw new Error('Could not retrieve audio');
         }
 
-        return arrayBuffer;
+        return this._arrayBufferToBase64(arrayBuffer);
+    }
+
+    _arrayBufferToBase64(arrayBuffer) {
+        return btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
     }
 
     _isAudioValid(audio) {
