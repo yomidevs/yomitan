@@ -51,11 +51,11 @@ class AudioUriBuilder {
         return url;
     }
 
-    async getUri(definition, source, details) {
+    async getUri(source, expression, reading, details) {
         const handler = this._getUrlHandlers.get(source);
         if (typeof handler === 'function') {
             try {
-                return await handler(definition, details);
+                return await handler(expression, reading, details);
             } catch (e) {
                 // NOP
             }
@@ -63,9 +63,9 @@ class AudioUriBuilder {
         return null;
     }
 
-    async _getUriJpod101(definition) {
-        let kana = definition.reading;
-        let kanji = definition.expression;
+    async _getUriJpod101(expression, reading) {
+        let kana = reading;
+        let kanji = expression;
 
         if (!kana && jp.isStringEntirelyKana(kanji)) {
             kana = kanji;
@@ -83,9 +83,9 @@ class AudioUriBuilder {
         return `https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?${params.join('&')}`;
     }
 
-    async _getUriJpod101Alternate(definition) {
+    async _getUriJpod101Alternate(expression, reading) {
         const fetchUrl = 'https://www.japanesepod101.com/learningcenter/reference/dictionary_post';
-        const data = `post=dictionary_reference&match_type=exact&search_query=${encodeURIComponent(definition.expression)}&vulgar=true`;
+        const data = `post=dictionary_reference&match_type=exact&search_query=${encodeURIComponent(expression)}&vulgar=true`;
         const response = await this._requestBuilder.fetchAnonymous(fetchUrl, {
             method: 'POST',
             mode: 'cors',
@@ -112,11 +112,11 @@ class AudioUriBuilder {
                 const url = dom.getAttribute(source, 'src');
                 if (url === null) { continue; }
 
-                const readings = dom.getElementsByClassName('dc-vocab_kana');
-                if (readings.length === 0) { continue; }
+                const htmlReadings = dom.getElementsByClassName('dc-vocab_kana');
+                if (htmlReadings.length === 0) { continue; }
 
-                const reading = dom.getTextContent(readings[0]);
-                if (reading && (!definition.reading || definition.reading === reading)) {
+                const htmlReading = dom.getTextContent(htmlReadings[0]);
+                if (htmlReading && (!reading || reading === htmlReading)) {
                     return this.normalizeUrl(url, 'https://www.japanesepod101.com', '/learningcenter/reference/');
                 }
             } catch (e) {
@@ -127,8 +127,8 @@ class AudioUriBuilder {
         throw new Error('Failed to find audio URL');
     }
 
-    async _getUriJisho(definition) {
-        const fetchUrl = `https://jisho.org/search/${definition.expression}`;
+    async _getUriJisho(expression, reading) {
+        const fetchUrl = `https://jisho.org/search/${expression}`;
         const response = await this._requestBuilder.fetchAnonymous(fetchUrl, {
             method: 'GET',
             mode: 'cors',
@@ -141,7 +141,7 @@ class AudioUriBuilder {
 
         const dom = new SimpleDOMParser(responseText);
         try {
-            const audio = dom.getElementById(`audio_${definition.expression}:${definition.reading}`);
+            const audio = dom.getElementById(`audio_${expression}:${reading}`);
             if (audio !== null) {
                 const source = dom.getElementByTagName('source', audio);
                 if (source !== null) {
@@ -158,24 +158,25 @@ class AudioUriBuilder {
         throw new Error('Failed to find audio URL');
     }
 
-    async _getUriTextToSpeech(definition, {textToSpeechVoice}) {
+    async _getUriTextToSpeech(expression, reading, {textToSpeechVoice}) {
         if (!textToSpeechVoice) {
             throw new Error('No voice');
         }
-        return `tts:?text=${encodeURIComponent(definition.expression)}&voice=${encodeURIComponent(textToSpeechVoice)}`;
+        return `tts:?text=${encodeURIComponent(expression)}&voice=${encodeURIComponent(textToSpeechVoice)}`;
     }
 
-    async _getUriTextToSpeechReading(definition, {textToSpeechVoice}) {
+    async _getUriTextToSpeechReading(expression, reading, {textToSpeechVoice}) {
         if (!textToSpeechVoice) {
             throw new Error('No voice');
         }
-        return `tts:?text=${encodeURIComponent(definition.reading || definition.expression)}&voice=${encodeURIComponent(textToSpeechVoice)}`;
+        return `tts:?text=${encodeURIComponent(reading || expression)}&voice=${encodeURIComponent(textToSpeechVoice)}`;
     }
 
-    async _getUriCustom(definition, {customSourceUrl}) {
+    async _getUriCustom(expression, reading, {customSourceUrl}) {
         if (typeof customSourceUrl !== 'string') {
             throw new Error('No custom URL defined');
         }
-        return customSourceUrl.replace(/\{([^}]*)\}/g, (m0, m1) => (hasOwn(definition, m1) ? `${definition[m1]}` : m0));
+        const data = {expression, reading};
+        return customSourceUrl.replace(/\{([^}]*)\}/g, (m0, m1) => (hasOwn(data, m1) ? `${data[m1]}` : m0));
     }
 }

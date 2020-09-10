@@ -42,8 +42,8 @@ class Display extends EventDispatcher {
         this._audioFallback = null;
         this._audioSystem = new AudioSystem({
             audioUriBuilder: {
-                getUri: async (definition, source, details) => {
-                    return await api.audioGetUri(definition, source, details);
+                getUri: async (source, expression, reading, details) => {
+                    return await api.audioGetUri(source, expression, reading, details);
                 }
             },
             useCache: true
@@ -1071,7 +1071,7 @@ class Display extends EventDispatcher {
         try {
             this.setSpinnerVisible(true);
 
-            const expression = expressionIndex === -1 ? definition : definition.expressions[expressionIndex];
+            const {expression, reading} = expressionIndex === -1 ? definition : definition.expressions[expressionIndex];
 
             this._stopPlayingAudio();
 
@@ -1079,7 +1079,7 @@ class Display extends EventDispatcher {
             try {
                 const {sources, textToSpeechVoice, customSourceUrl} = this._options.audio;
                 let index;
-                ({audio, index} = await this._audioSystem.getDefinitionAudio(expression, sources, {textToSpeechVoice, customSourceUrl}));
+                ({audio, index} = await this._audioSystem.getDefinitionAudio(sources, expression, reading, {textToSpeechVoice, customSourceUrl}));
                 info = `From source ${1 + index}: ${sources[index]}`;
             } catch (e) {
                 if (this._audioFallback === null) {

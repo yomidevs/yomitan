@@ -124,15 +124,16 @@ class AnkiNoteBuilder {
         try {
             const {sources, customSourceUrl} = details;
             const expressions = definition.expressions;
-            const audioSourceDefinition = Array.isArray(expressions) ? expressions[0] : definition;
+            const {expression, reading} = Array.isArray(expressions) ? expressions[0] : definition;
 
-            let fileName = this._createInjectedAudioFileName(audioSourceDefinition);
+            let fileName = this._createInjectedAudioFileName(expression, reading);
             if (fileName === null) { return; }
             fileName = this._replaceInvalidFileNameCharacters(fileName);
 
             const {audio: data} = await this._getDefinitionAudio(
-                audioSourceDefinition,
                 sources,
+                expression,
+                reading,
                 {
                     textToSpeechVoice: null,
                     customSourceUrl,
@@ -199,8 +200,7 @@ class AnkiNoteBuilder {
         }
     }
 
-    _createInjectedAudioFileName(definition) {
-        const {reading, expression} = definition;
+    _createInjectedAudioFileName(expression, reading) {
         if (!reading && !expression) { return null; }
 
         let fileName = 'yomichan';
