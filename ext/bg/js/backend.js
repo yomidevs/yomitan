@@ -91,6 +91,8 @@ class Backend {
             ['kanjiFind',                    {async: true,  contentScript: true,  handler: this._onApiKanjiFind.bind(this)}],
             ['termsFind',                    {async: true,  contentScript: true,  handler: this._onApiTermsFind.bind(this)}],
             ['textParse',                    {async: true,  contentScript: true,  handler: this._onApiTextParse.bind(this)}],
+            ['addAnkiNote',                  {async: true,  contentScript: true,  handler: this._onApiAddAnkiNote.bind(this)}],
+            ['getAnkiNoteInfo',              {async: true,  contentScript: true,  handler: this._onApiGetAnkiNoteInfo.bind(this)}],
             ['definitionAdd',                {async: true,  contentScript: true,  handler: this._onApiDefinitionAdd.bind(this)}],
             ['definitionsAddable',           {async: true,  contentScript: true,  handler: this._onApiDefinitionsAddable.bind(this)}],
             ['noteView',                     {async: true,  contentScript: true,  handler: this._onApiNoteView.bind(this)}],
@@ -437,60 +439,68 @@ class Backend {
         return results;
     }
 
+    async _onApiAddAnkiNote({note}) {
+        return await this._anki.addNote(note);
+    }
+
+    async _onApiGetAnkiNoteInfo({notes, duplicateScope}) {
+        const results = [];
+        const cannotAdd = [];
+        const canAddArray = await this._anki.canAddNotes(notes);
+
+        for (let i = 0; i < notes.length; ++i) {
+            const note = notes[i];
+            const canAdd = canAddArray[i];
+            const info = {canAdd, noteIds: null};
+            results.push(info);
+            if (!canAdd) {
+                cannotAdd.push({note, info});
+            }
+        }
+
+        if (cannotAdd.length > 0) {
+            const cannotAddNotes = cannotAdd.map(({note}) => note);
+            const noteIdsArray = await this._anki.findNoteIds(cannotAddNotes, duplicateScope);
+            for (let i = 0, ii = Math.min(cannotAdd.length, noteIdsArray.length); i < ii; ++i) {
+                const noteIds = noteIdsArray[i];
+                if (noteIds.length > 0) {
+                    cannotAdd[i].info.noteIds = noteIds;
+                }
+            }
+        }
+
+        return results;
+    }
+
     async _onApiDefinitionAdd({definition, mode, context, ownerFrameId, optionsContext}, sender) {
         const options = this.getOptions(optionsContext);
         const templates = this._getTemplates(options);
         const {id: tabId, windowId} = (sender && sender.tab ? sender.tab : {});
         const note = await this._createNote(definition, mode, context, options, templates, true, {windowId, tabId, ownerFrameId});
-        return this._anki.addNote(note);
+        return await this._onApiAddAnkiNote({note});
     }
 
     async _onApiDefinitionsAddable({definitions, modes, context, optionsContext}) {
         const options = this.getOptions(optionsContext);
         const templates = this._getTemplates(options);
-        const states = [];
 
-        try {
-            const notePromises = [];
-            for (const definition of definitions) {
-                for (const mode of modes) {
-                    const notePromise = this._createNote(definition, mode, context, options, templates, false, null);
-                    notePromises.push(notePromise);
-                }
+        const modeCount = modes.length;
+        const {duplicateScope} = options.anki;
+        const notePromises = [];
+        for (const definition of definitions) {
+            for (const mode of modes) {
+                const notePromise = this._createNote(definition, mode, context, options, templates, false, null);
+                notePromises.push(notePromise);
             }
-            const notes = await Promise.all(notePromises);
-
-            const cannotAdd = [];
-            const results = await this._anki.canAddNotes(notes);
-            for (let resultBase = 0; resultBase < results.length; resultBase += modes.length) {
-                const state = {};
-                for (let modeOffset = 0; modeOffset < modes.length; ++modeOffset) {
-                    const index = resultBase + modeOffset;
-                    const result = results[index];
-                    const info = {canAdd: result};
-                    state[modes[modeOffset]] = info;
-                    if (!result) {
-                        cannotAdd.push([notes[index], info]);
-                    }
-                }
-
-                states.push(state);
-            }
-
-            if (cannotAdd.length > 0) {
-                const noteIdsArray = await this._anki.findNoteIds(cannotAdd.map((e) => e[0]), options.anki.duplicateScope);
-                for (let i = 0, ii = Math.min(cannotAdd.length, noteIdsArray.length); i < ii; ++i) {
-                    const noteIds = noteIdsArray[i];
-                    if (noteIds.length > 0) {
-                        cannotAdd[i][1].noteId = noteIds[0];
-                    }
-                }
-            }
-        } catch (e) {
-            // NOP
         }
+        const notes = await Promise.all(notePromises);
 
-        return states;
+        const infos = await this._onApiGetAnkiNoteInfo({notes, duplicateScope});
+        const results = [];
+        for (let i = 0, ii = infos.length; i < ii; i += modeCount) {
+            results.push(infos.slice(i, i + modeCount));
+        }
+        return results;
     }
 
     async _onApiNoteView({noteId}) {

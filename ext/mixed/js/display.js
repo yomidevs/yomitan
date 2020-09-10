@@ -889,10 +889,15 @@ class Display extends EventDispatcher {
 
     async _setContentTermsOrKanjiUpdateAdderButtons(token, isTerms, definitions) {
         const modes = isTerms ? ['term-kanji', 'term-kana'] : ['kanji'];
-        const states = await this._getDefinitionsAddable(definitions, modes);
+        let states;
+        try {
+            states = await this._getDefinitionsAddable(definitions, modes);
+        } catch (e) {
+            return;
+        }
         if (this._setContentToken !== token) { return; }
 
-        this._updateAdderButtons(states);
+        this._updateAdderButtons(states, modes);
     }
 
     _setContentExtensionUnloaded() {
@@ -953,19 +958,22 @@ class Display extends EventDispatcher {
         this._navigationHeader.dataset.hasNext = `${!!next}`;
     }
 
-    _updateAdderButtons(states) {
-        for (let i = 0; i < states.length; ++i) {
+    _updateAdderButtons(states, modes) {
+        for (let i = 0, ii = states.length; i < ii; ++i) {
+            const infos = states[i];
             let noteId = null;
-            for (const [mode, info] of Object.entries(states[i])) {
+            for (let j = 0, jj = infos.length; j < jj; ++j) {
+                const {canAdd, noteIds} = infos[j];
+                const mode = modes[j];
                 const button = this._adderButtonFind(i, mode);
                 if (button === null) {
                     continue;
                 }
 
-                if (!info.canAdd && noteId === null && info.noteId) {
-                    noteId = info.noteId;
+                if (Array.isArray(noteIds) && noteIds.length > 0) {
+                    noteId = noteIds[0];
                 }
-                button.classList.toggle('disabled', !info.canAdd);
+                button.classList.toggle('disabled', !canAdd);
                 button.classList.remove('pending');
             }
             if (noteId !== null) {
