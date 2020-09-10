@@ -93,6 +93,7 @@ class Backend {
             ['textParse',                    {async: true,  contentScript: true,  handler: this._onApiTextParse.bind(this)}],
             ['addAnkiNote',                  {async: true,  contentScript: true,  handler: this._onApiAddAnkiNote.bind(this)}],
             ['getAnkiNoteInfo',              {async: true,  contentScript: true,  handler: this._onApiGetAnkiNoteInfo.bind(this)}],
+            ['injectAnkiNoteMedia',          {async: true,  contentScript: true,  handler: this._onApiInjectAnkiNoteMedia.bind(this)}],
             ['definitionAdd',                {async: true,  contentScript: true,  handler: this._onApiDefinitionAdd.bind(this)}],
             ['definitionsAddable',           {async: true,  contentScript: true,  handler: this._onApiDefinitionsAddable.bind(this)}],
             ['noteView',                     {async: true,  contentScript: true,  handler: this._onApiNoteView.bind(this)}],
@@ -470,6 +471,18 @@ class Backend {
         }
 
         return results;
+    }
+
+    async _onApiInjectAnkiNoteMedia({expression, reading, timestamp, audioDetails, screenshotDetails, clipboardImage}) {
+        return await this._injectAnkNoteMedia(
+            this._anki,
+            expression,
+            reading,
+            timestamp,
+            audioDetails,
+            screenshotDetails,
+            clipboardImage
+        );
     }
 
     async _onApiDefinitionAdd({definition, mode, context, ownerFrameId, optionsContext}, sender) {
@@ -1599,15 +1612,14 @@ class Backend {
             const audioDetails = (mode !== 'kanji' && this._ankiNoteBuilder.containsMarker(fields, 'audio') ? {sources, customSourceUrl} : null);
             const screenshotDetails = (this._ankiNoteBuilder.containsMarker(fields, 'screenshot') ? {windowId, tabId, ownerFrameId, format, quality} : null);
             const clipboardImage = (this._ankiNoteBuilder.containsMarker(fields, 'clipboard-image'));
-            const {screenshotFileName, clipboardImageFileName, audioFileName} = await this._injectAnkNoteMedia(
-                this._anki,
+            const {screenshotFileName, clipboardImageFileName, audioFileName} = await this._onApiInjectAnkiNoteMedia({
                 expression,
                 reading,
                 timestamp,
                 audioDetails,
                 screenshotDetails,
                 clipboardImage
-            );
+            });
             if (screenshotFileName !== null) { definition.screenshotFileName = screenshotFileName; }
             if (clipboardImageFileName !== null) { definition.clipboardImageFileName = clipboardImageFileName; }
             if (audioFileName !== null) { definition.audioFileName = audioFileName; }
