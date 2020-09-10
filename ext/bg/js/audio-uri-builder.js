@@ -16,6 +16,7 @@
  */
 
 /* global
+ * SimpleDOMParser
  * jp
  */
 
@@ -99,12 +100,23 @@ class AudioUriBuilder {
         });
         const responseText = await response.text();
 
-        const dom = new DOMParser().parseFromString(responseText, 'text/html');
+        const dom = new SimpleDOMParser(responseText);
         for (const row of dom.getElementsByClassName('dc-result-row')) {
             try {
-                const url = row.querySelector('audio>source[src]').getAttribute('src');
-                const reading = row.getElementsByClassName('dc-vocab_kana').item(0).textContent;
-                if (url && reading && (!definition.reading || definition.reading === reading)) {
+                const audio = dom.getElementByTagName('audio', row);
+                if (audio === null) { continue; }
+
+                const source = dom.getElementByTagName('source', audio);
+                if (source === null) { continue; }
+
+                const url = dom.getAttribute(source, 'src');
+                if (url === null) { continue; }
+
+                const readings = dom.getElementsByClassName('dc-vocab_kana');
+                if (readings.length === 0) { continue; }
+
+                const reading = dom.getTextContent(readings[0]);
+                if (reading && (!definition.reading || definition.reading === reading)) {
                     return this.normalizeUrl(url, 'https://www.japanesepod101.com', '/learningcenter/reference/');
                 }
             } catch (e) {
@@ -127,13 +139,16 @@ class AudioUriBuilder {
         });
         const responseText = await response.text();
 
-        const dom = new DOMParser().parseFromString(responseText, 'text/html');
+        const dom = new SimpleDOMParser(responseText);
         try {
             const audio = dom.getElementById(`audio_${definition.expression}:${definition.reading}`);
             if (audio !== null) {
-                const url = audio.getElementsByTagName('source').item(0).getAttribute('src');
-                if (url) {
-                    return this.normalizeUrl(url, 'https://jisho.org', '/search/');
+                const source = dom.getElementByTagName('source', audio);
+                if (source !== null) {
+                    const url = dom.getAttribute(source, 'src');
+                    if (url !== null) {
+                        return this.normalizeUrl(url, 'https://jisho.org', '/search/');
+                    }
                 }
             }
         } catch (e) {
