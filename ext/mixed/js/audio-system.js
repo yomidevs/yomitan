@@ -15,55 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class TextToSpeechAudio {
-    constructor(text, voice) {
-        this.text = text;
-        this.voice = voice;
-        this._utterance = null;
-        this._volume = 1;
-    }
-
-    get currentTime() {
-        return 0;
-    }
-    set currentTime(value) {
-        // NOP
-    }
-
-    get volume() {
-        return this._volume;
-    }
-    set volume(value) {
-        this._volume = value;
-        if (this._utterance !== null) {
-            this._utterance.volume = value;
-        }
-    }
-
-    async play() {
-        try {
-            if (this._utterance === null) {
-                this._utterance = new SpeechSynthesisUtterance(this.text || '');
-                this._utterance.lang = 'ja-JP';
-                this._utterance.volume = this._volume;
-                this._utterance.voice = this.voice;
-            }
-
-            speechSynthesis.cancel();
-            speechSynthesis.speak(this._utterance);
-        } catch (e) {
-            // NOP
-        }
-    }
-
-    pause() {
-        try {
-            speechSynthesis.cancel();
-        } catch (e) {
-            // NOP
-        }
-    }
-}
+/* global
+ * TextToSpeechAudio
+ */
 
 class AudioSystem {
     constructor({audioUriBuilder, requestBuilder=null, useCache}) {
