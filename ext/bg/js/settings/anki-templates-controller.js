@@ -144,8 +144,7 @@ class AnkiTemplatesController {
                 let templates = options.anki.fieldTemplates;
                 if (typeof templates !== 'string') { templates = this._defaultFieldTemplates; }
                 const ankiNoteBuilder = new AnkiNoteBuilder({
-                    renderTemplate: api.templateRender.bind(api),
-                    getClipboardImage: api.clipboardGetImage.bind(api)
+                    renderTemplate: api.templateRender.bind(api)
                 });
                 const {general: {resultOutputMode, compactGlossaries}} = options;
                 const note = await ankiNoteBuilder.createNote({

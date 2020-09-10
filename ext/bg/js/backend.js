@@ -58,10 +58,7 @@ class Backend {
             useCache: false
         });
         this._ankiNoteBuilder = new AnkiNoteBuilder({
-            renderTemplate: this._renderTemplate.bind(this),
-            getDefinitionAudio: this._getDefinitionAudio.bind(this),
-            getClipboardImage: this._onApiClipboardImageGet.bind(this),
-            getScreenshot: this._getScreenshot.bind(this)
+            renderTemplate: this._renderTemplate.bind(this)
         });
         this._templateRenderer = new TemplateRenderer();
 
@@ -1584,8 +1581,29 @@ class Backend {
         const modeOptions = (mode === 'kanji') ? kanji : terms;
         const {windowId, tabId, ownerFrameId} = (isObject(screenshotTarget) ? screenshotTarget : {});
 
+        if (injectMedia) {
+            const fields = modeOptions.fields;
+            const timestamp = Date.now();
+            const definitionExpressions = definition.expressions;
+            const {expression, reading} = Array.isArray(definitionExpressions) ? definitionExpressions[0] : definition;
+            const audioDetails = (mode !== 'kanji' && this._ankiNoteBuilder.containsMarker(fields, 'audio') ? {sources, customSourceUrl} : null);
+            const screenshotDetails = (this._ankiNoteBuilder.containsMarker(fields, 'screenshot') ? {windowId, tabId, ownerFrameId, format, quality} : null);
+            const clipboardImage = (this._ankiNoteBuilder.containsMarker(fields, 'clipboard-image'));
+            const {screenshotFileName, clipboardImageFileName, audioFileName} = await this._injectAnkNoteMedia(
+                this._anki,
+                expression,
+                reading,
+                timestamp,
+                audioDetails,
+                screenshotDetails,
+                clipboardImage
+            );
+            if (screenshotFileName !== null) { definition.screenshotFileName = screenshotFileName; }
+            if (clipboardImageFileName !== null) { definition.clipboardImageFileName = clipboardImageFileName; }
+            if (audioFileName !== null) { definition.audioFileName = audioFileName; }
+        }
+
         return await this._ankiNoteBuilder.createNote({
-            anki: injectMedia ? this._anki : null,
             definition,
             mode,
             context,
@@ -1639,5 +1657,140 @@ class Backend {
 
     async _getDefinitionAudio(sources, expression, reading, details) {
         return await this._audioSystem.getDefinitionAudio(sources, expression, reading, details);
+    }
+
+    async _injectAnkNoteMedia(ankiConnect, expression, reading, timestamp, audioDetails, screenshotDetails, clipboardImage) {
+        const screenshotFileName = (
+            screenshotDetails !== null ?
+            await this._injectAnkNoteScreenshot(ankiConnect, expression, reading, timestamp, screenshotDetails) :
+            null
+        );
+        const clipboardImageFileName = (
+            clipboardImage ?
+            await this._injectAnkNoteClipboardImage(ankiConnect, expression, reading, timestamp) :
+            null
+        );
+        const audioFileName = (
+            audioDetails !== null ?
+            await this._injectAnkNoteAudio(ankiConnect, expression, reading, timestamp, audioDetails) :
+            null
+        );
+        return {screenshotFileName, clipboardImageFileName, audioFileName};
+    }
+
+    async _injectAnkNoteAudio(ankiConnect, expression, reading, timestamp, details) {
+        try {
+            if (!reading && !expression) {
+                throw new Error('Invalid reading and expression');
+            }
+
+            let fileName = 'yomichan';
+            if (reading) { fileName += `_${reading}`; }
+            if (expression) { fileName += `_${expression}`; }
+            fileName += '.mp3';
+            fileName = fileName.replace(/\]/g, '');
+            fileName = this._replaceInvalidFileNameCharacters(fileName);
+
+            const {sources, customSourceUrl} = details;
+            const {audio: data} = await this._getDefinitionAudio(
+                sources,
+                expression,
+                reading,
+                {
+                    textToSpeechVoice: null,
+                    customSourceUrl,
+                    binary: true,
+                    disableCache: true
+                }
+            );
+
+            await ankiConnect.storeMediaFile(fileName, data);
+
+            return fileName;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    async _injectAnkNoteScreenshot(ankiConnect, expression, reading, timestamp, details) {
+        try {
+            const now = new Date(timestamp);
+
+            const {windowId, tabId, ownerFrameId, format, quality} = details;
+            const dataUrl = await this._getScreenshot(windowId, tabId, ownerFrameId, format, quality);
+
+            const {mediaType, data} = this._getDataUrlInfo(dataUrl);
+            const extension = this._getImageExtensionFromMediaType(mediaType);
+
+            let fileName = `yomichan_browser_screenshot_${reading}_${this._ankNoteDateToString(now)}.${extension}`;
+            fileName = this._replaceInvalidFileNameCharacters(fileName);
+
+            await ankiConnect.storeMediaFile(fileName, data);
+
+            return fileName;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    async _injectAnkNoteClipboardImage(ankiConnect, expression, reading, timestamp) {
+        try {
+            const now = new Date(timestamp);
+
+            const dataUrl = await this._onApiClipboardImageGet();
+            if (dataUrl === null) {
+                throw new Error('No clipboard image');
+            }
+
+            const {mediaType, data} = this._getDataUrlInfo(dataUrl);
+            const extension = this._getImageExtensionFromMediaType(mediaType);
+
+            let fileName = `yomichan_clipboard_image_${reading}_${this._ankNoteDateToString(now)}.${extension}`;
+            fileName = this._replaceInvalidFileNameCharacters(fileName);
+
+            await ankiConnect.storeMediaFile(fileName, data);
+
+            return fileName;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    _replaceInvalidFileNameCharacters(fileName) {
+        // eslint-disable-next-line no-control-regex
+        return fileName.replace(/[<>:"/\\|?*\x00-\x1F]/g, '-');
+    }
+
+    _ankNoteDateToString(date) {
+        const year = date.getUTCFullYear();
+        const month = date.getUTCMonth().toString().padStart(2, '0');
+        const day = date.getUTCDate().toString().padStart(2, '0');
+        const hours = date.getUTCHours().toString().padStart(2, '0');
+        const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+        const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+        return `${year}-${month}-${day}-${hours}-${minutes}-${seconds}`;
+    }
+
+    _getDataUrlInfo(dataUrl) {
+        const match = /^data:([^,]*?)(;base64)?,/.exec(dataUrl);
+        if (match === null) {
+            throw new Error('Invalid data URL');
+        }
+
+        let mediaType = match[1];
+        if (mediaType.length === 0) { mediaType = 'text/plain'; }
+
+        let data = dataUrl.substring(match[0].length);
+        if (typeof match[2] === 'undefined') { data = btoa(data); }
+
+        return {mediaType, data};
+    }
+
+    _getImageExtensionFromMediaType(mediaType) {
+        switch (mediaType.toLowerCase()) {
+            case 'image/png': return 'png';
+            case 'image/jpeg': return 'jpeg';
+            default: throw new Error('Unknown image media type');
+        }
     }
 }
