@@ -17,7 +17,6 @@
 
 /* global
  * AnkiConnect
- * AnkiNoteBuilder
  * AudioSystem
  * AudioUriBuilder
  * ClipboardMonitor
@@ -29,7 +28,6 @@
  * OptionsUtil
  * ProfileConditions
  * RequestBuilder
- * TemplateRenderer
  * Translator
  * jp
  */
@@ -57,10 +55,6 @@ class Backend {
             requestBuilder: this._requestBuilder,
             useCache: false
         });
-        this._ankiNoteBuilder = new AnkiNoteBuilder({
-            renderTemplate: this._renderTemplate.bind(this)
-        });
-        this._templateRenderer = new TemplateRenderer();
 
         this._clipboardPasteTarget = null;
         this._clipboardPasteTargetInitialized = false;
@@ -94,10 +88,7 @@ class Backend {
             ['addAnkiNote',                  {async: true,  contentScript: true,  handler: this._onApiAddAnkiNote.bind(this)}],
             ['getAnkiNoteInfo',              {async: true,  contentScript: true,  handler: this._onApiGetAnkiNoteInfo.bind(this)}],
             ['injectAnkiNoteMedia',          {async: true,  contentScript: true,  handler: this._onApiInjectAnkiNoteMedia.bind(this)}],
-            ['definitionAdd',                {async: true,  contentScript: true,  handler: this._onApiDefinitionAdd.bind(this)}],
-            ['definitionsAddable',           {async: true,  contentScript: true,  handler: this._onApiDefinitionsAddable.bind(this)}],
             ['noteView',                     {async: true,  contentScript: true,  handler: this._onApiNoteView.bind(this)}],
-            ['templateRender',               {async: true,  contentScript: true,  handler: this._onApiTemplateRender.bind(this)}],
             ['commandExec',                  {async: false, contentScript: true,  handler: this._onApiCommandExec.bind(this)}],
             ['audioGetUri',                  {async: true,  contentScript: true,  handler: this._onApiAudioGetUri.bind(this)}],
             ['screenshotGet',                {async: true,  contentScript: true,  handler: this._onApiScreenshotGet.bind(this)}],
@@ -473,7 +464,11 @@ class Backend {
         return results;
     }
 
-    async _onApiInjectAnkiNoteMedia({expression, reading, timestamp, audioDetails, screenshotDetails, clipboardImage}) {
+    async _onApiInjectAnkiNoteMedia({expression, reading, timestamp, audioDetails, screenshotDetails, clipboardImage}, sender) {
+        if (isObject(screenshotDetails)) {
+            const {id: tabId, windowId} = (sender && sender.tab ? sender.tab : {});
+            screenshotDetails = Object.assign({}, screenshotDetails, {tabId, windowId});
+        }
         return await this._injectAnkNoteMedia(
             this._anki,
             expression,
@@ -485,43 +480,8 @@ class Backend {
         );
     }
 
-    async _onApiDefinitionAdd({definition, mode, context, ownerFrameId, optionsContext}, sender) {
-        const options = this.getOptions(optionsContext);
-        const templates = this._getTemplates(options);
-        const {id: tabId, windowId} = (sender && sender.tab ? sender.tab : {});
-        const note = await this._createNote(definition, mode, context, options, templates, true, {windowId, tabId, ownerFrameId});
-        return await this._onApiAddAnkiNote({note});
-    }
-
-    async _onApiDefinitionsAddable({definitions, modes, context, optionsContext}) {
-        const options = this.getOptions(optionsContext);
-        const templates = this._getTemplates(options);
-
-        const modeCount = modes.length;
-        const {duplicateScope} = options.anki;
-        const notePromises = [];
-        for (const definition of definitions) {
-            for (const mode of modes) {
-                const notePromise = this._createNote(definition, mode, context, options, templates, false, null);
-                notePromises.push(notePromise);
-            }
-        }
-        const notes = await Promise.all(notePromises);
-
-        const infos = await this._onApiGetAnkiNoteInfo({notes, duplicateScope});
-        const results = [];
-        for (let i = 0, ii = infos.length; i < ii; i += modeCount) {
-            results.push(infos.slice(i, i + modeCount));
-        }
-        return results;
-    }
-
     async _onApiNoteView({noteId}) {
         return await this._anki.guiBrowseNote(noteId);
-    }
-
-    async _onApiTemplateRender({template, data, marker}) {
-        return this._renderTemplate(template, data, marker);
     }
 
     _onApiCommandExec({command, params}) {
@@ -1381,10 +1341,6 @@ class Backend {
         return false;
     }
 
-    async _renderTemplate(template, data, marker) {
-        return await this._templateRenderer.render(template, data, marker);
-    }
-
     _getTemplates(options) {
         const templates = options.anki.fieldTemplates;
         return typeof templates === 'string' ? templates : this._defaultAnkiFieldTemplates;
@@ -1592,52 +1548,6 @@ class Backend {
             reader.onload = () => resolve(reader.result);
             reader.onerror = () => reject(reader.error);
             reader.readAsDataURL(file);
-        });
-    }
-
-    async _createNote(definition, mode, context, options, templates, injectMedia, screenshotTarget) {
-        const {
-            general: {resultOutputMode, compactGlossaries},
-            anki: {tags, duplicateScope, kanji, terms, screenshot: {format, quality}},
-            audio: {sources, customSourceUrl}
-        } = options;
-        const modeOptions = (mode === 'kanji') ? kanji : terms;
-        const {windowId, tabId, ownerFrameId} = (isObject(screenshotTarget) ? screenshotTarget : {});
-
-        if (injectMedia) {
-            const fields = modeOptions.fields;
-            const timestamp = Date.now();
-            const definitionExpressions = definition.expressions;
-            const {expression, reading} = Array.isArray(definitionExpressions) ? definitionExpressions[0] : definition;
-            const audioDetails = (mode !== 'kanji' && this._ankiNoteBuilder.containsMarker(fields, 'audio') ? {sources, customSourceUrl} : null);
-            const screenshotDetails = (this._ankiNoteBuilder.containsMarker(fields, 'screenshot') ? {windowId, tabId, ownerFrameId, format, quality} : null);
-            const clipboardImage = (this._ankiNoteBuilder.containsMarker(fields, 'clipboard-image'));
-            const {screenshotFileName, clipboardImageFileName, audioFileName} = await this._onApiInjectAnkiNoteMedia({
-                expression,
-                reading,
-                timestamp,
-                audioDetails,
-                screenshotDetails,
-                clipboardImage
-            });
-            if (screenshotFileName !== null) { definition.screenshotFileName = screenshotFileName; }
-            if (clipboardImageFileName !== null) { definition.clipboardImageFileName = clipboardImageFileName; }
-            if (audioFileName !== null) { definition.audioFileName = audioFileName; }
-        }
-
-        return await this._ankiNoteBuilder.createNote({
-            definition,
-            mode,
-            context,
-            templates,
-            tags,
-            duplicateScope,
-            resultOutputMode,
-            compactGlossaries,
-            modeOptions,
-            audioDetails: {sources, customSourceUrl},
-            screenshotDetails: {windowId, tabId, ownerFrameId, format, quality},
-            clipboardImage: true
         });
     }
 
