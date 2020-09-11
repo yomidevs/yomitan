@@ -85,7 +85,14 @@ class TextScanner extends EventDispatcher {
 
     setEnabled(enabled) {
         this._eventListeners.removeAllEventListeners();
+        this._primaryTouchIdentifier = null;
+        this._preventNextContextMenu = false;
+        this._preventNextMouseDown = false;
+        this._preventNextClick = false;
+        this._preventScroll = false;
+
         this._enabled = enabled;
+
         if (this._enabled && this._isPrepared) {
             this._hookEvents();
         } else {
