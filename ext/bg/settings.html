@@ -436,16 +436,31 @@
                     <template id="scan-input-template"><div class="scan-input">
                         <table class="scan-input-table"><tbody>
                             <tr class="scan-input-include">
-                                <td class="scan-input-index-cell" rowspan="2"><div class="scan-input-index"></div></td>
+                                <td class="scan-input-index-cell" rowspan="3"><div class="scan-input-index"></div></td>
                                 <td class="scan-input-prefix-cell"><div class="scan-input-prefix">Include</div></td>
-                                <td class="scan-input-input-cell"><input type="text" class="form-control scan-input-field" placeholder="No inputs"></td>
-                                <td class="scan-input-mouse-button-cell"><button class="btn btn-default mouse-button" title="Mouse button"><span class="mouse-button-icon"></span></button></td>
+                                <td class="scan-input-input-cell"><div class="scan-input-input-cell-inner">
+                                    <input type="text" class="form-control scan-input-field" placeholder="No inputs">
+                                    <button class="btn btn-default mouse-button" title="Mouse button"><span class="mouse-button-icon"></span></button>
+                                </div></td>
                                 <td class="scan-input-remove-button-cell"><button class="btn btn-danger scan-input-remove" title="Remove"><span class="glyphicon glyphicon-remove"></span></button></td>
                             </tr>
                             <tr class="scan-input-exclude">
                                 <td class="scan-input-prefix-cell"><div class="scan-input-prefix">Exclude</div></td>
-                                <td class="scan-input-input-cell"><input type="text" class="form-control scan-input-field" placeholder="No inputs"></td>
-                                <td class="scan-input-mouse-button-cell"><button class="btn btn-default mouse-button" title="Mouse button"><span class="mouse-button-icon"></span></button></td>
+                                <td class="scan-input-input-cell"><div class="scan-input-input-cell-inner">
+                                    <input type="text" class="form-control scan-input-field" placeholder="No inputs">
+                                    <button class="btn btn-default mouse-button" title="Mouse button"><span class="mouse-button-icon"></span></button>
+                                </div></td>
+                                <td class="scan-input-empty-cell"></td>
+                            </tr>
+                            <tr class="scan-input-types">
+                                <td class="scan-input-prefix-cell"><div class="scan-input-prefix">Types</div></td>
+                                <td class="scan-input-input-cell"><div class="scan-input-input-cell-inner">
+                                    <div class="form-control scan-input-type-list">
+                                        <label class="scan-input-type"><input type="checkbox" class="scan-input-type-checkbox" data-type="mouse"><span>Mouse</span></label>
+                                        <label class="scan-input-type"><input type="checkbox" class="scan-input-type-checkbox" data-type="touch"><span>Touch</span></label>
+                                        <label class="scan-input-type"><input type="checkbox" class="scan-input-type-checkbox" data-type="pen"><span>Pen</span></label>
+                                    </div>
+                                </div></td>
                                 <td class="scan-input-empty-cell"></td>
                             </tr>
                         </tbody></table>

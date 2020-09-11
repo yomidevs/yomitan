@@ -491,7 +491,7 @@ class OptionsUtil {
             profileOptions.general.usePopupWindow = false;
             profileOptions.scanning.hideDelay = 0;
 
-            const {modifier, middleMouse} = profileOptions.scanning;
+            const {modifier, middleMouse, touchInputEnabled} = profileOptions.scanning;
             const scanningInputs = [];
             let modifierInput = '';
             switch (modifier) {
@@ -507,12 +507,21 @@ class OptionsUtil {
             }
             scanningInputs.push({
                 include: modifierInput,
-                exclude: ''
+                exclude: '',
+                types: {mouse: true, touch: false, pen: false}
             });
             if (middleMouse) {
                 scanningInputs.push({
                     include: 'mouse2',
-                    exclude: ''
+                    exclude: '',
+                    types: {mouse: true, touch: false, pen: false}
+                });
+            }
+            if (touchInputEnabled) {
+                scanningInputs.push({
+                    include: '',
+                    exclude: '',
+                    types: {mouse: false, touch: true, pen: true}
                 });
             }
             profileOptions.scanning.inputs = scanningInputs;

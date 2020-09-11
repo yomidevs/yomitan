@@ -341,13 +341,28 @@
                                         "default": [
                                             {
                                                 "include": "shift",
-                                                "exclude": ""
+                                                "exclude": "",
+                                                "types": {
+                                                    "mouse": true,
+                                                    "touch": false,
+                                                    "pen": false
+                                                }
+                                            },
+                                            {
+                                                "include": "",
+                                                "exclude": "",
+                                                "types": {
+                                                    "mouse": false,
+                                                    "touch": true,
+                                                    "pen": true
+                                                }
                                             }
                                         ],
                                         "items": {
                                             "required": [
                                                 "include",
-                                                "exclude"
+                                                "exclude",
+                                                "types"
                                             ],
                                             "properties": {
                                                 "include": {
@@ -357,6 +372,28 @@
                                                 "exclude": {
                                                     "type": "string",
                                                     "default": ""
+                                                },
+                                                "types": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "mouse",
+                                                        "touch",
+                                                        "pen"
+                                                    ],
+                                                    "properties": {
+                                                        "mouse": {
+                                                            "type": "boolean",
+                                                            "default": true
+                                                        },
+                                                        "touch": {
+                                                            "type": "boolean",
+                                                            "default": true
+                                                        },
+                                                        "pen": {
+                                                            "type": "boolean",
+                                                            "default": true
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }

@@ -95,9 +95,10 @@ class TextScanner extends EventDispatcher {
 
     setOptions({inputs, deepContentScan, selectText, delay, touchInputEnabled, scanLength, sentenceExtent, layoutAwareScan}) {
         if (Array.isArray(inputs)) {
-            this._inputs = inputs.map(({include, exclude}) => ({
+            this._inputs = inputs.map(({include, exclude, types}) => ({
                 include: this._getInputArray(include),
-                exclude: this._getInputArray(exclude)
+                exclude: this._getInputArray(exclude),
+                types: this._getInputTypeSet(types)
             }));
         }
         if (typeof deepContentScan === 'boolean') {
@@ -241,10 +242,7 @@ class TextScanner extends EventDispatcher {
             return;
         }
 
-        const modifiers = DocumentUtil.getActiveModifiersAndButtons(e);
-        this.trigger('activeModifiersChanged', {modifiers});
-
-        const inputInfo = this._getMatchingInputGroup(modifiers);
+        const inputInfo = this._getMatchingInputGroupFromEvent(e, 'mouse');
         if (inputInfo === null) { return; }
 
         const {index, empty} = inputInfo;
@@ -313,7 +311,7 @@ class TextScanner extends EventDispatcher {
 
         this._primaryTouchIdentifier = primaryTouch.identifier;
 
-        this._searchAtFromTouchStart(primaryTouch.clientX, primaryTouch.clientY);
+        this._searchAtFromTouchStart(e, primaryTouch.clientX, primaryTouch.clientY);
     }
 
     _onTouchEnd(e) {
@@ -345,7 +343,11 @@ class TextScanner extends EventDispatcher {
             return;
         }
 
-        this._searchAt(primaryTouch.clientX, primaryTouch.clientY, {cause: 'touchMove', index: -1, empty: false});
+        const inputInfo = this._getMatchingInputGroupFromEvent(e, 'touch');
+        if (inputInfo === null) { return; }
+
+        const {index, empty} = inputInfo;
+        this._searchAt(primaryTouch.clientX, primaryTouch.clientY, {cause: 'touchMove', index, empty});
 
         e.preventDefault(); // Disable scroll
     }
@@ -496,12 +498,16 @@ class TextScanner extends EventDispatcher {
         await this._searchAt(x, y, {cause: 'mouse', index: inputIndex, empty: inputEmpty});
     }
 
-    async _searchAtFromTouchStart(x, y) {
+    async _searchAtFromTouchStart(e, x, y) {
         if (this._pendingLookup) { return; }
 
+        const inputInfo = this._getMatchingInputGroupFromEvent(e, 'touch');
+        if (inputInfo === null) { return; }
+
+        const {index, empty} = inputInfo;
         const textSourceCurrentPrevious = this._textSourceCurrent !== null ? this._textSourceCurrent.clone() : null;
 
-        await this._searchAt(x, y, {cause: 'touchStart', index: -1, empty: false});
+        await this._searchAt(x, y, {cause: 'touchStart', index, empty});
 
         if (
             this._textSourceCurrent !== null &&
@@ -513,11 +519,18 @@ class TextScanner extends EventDispatcher {
         }
     }
 
-    _getMatchingInputGroup(modifiers) {
+    _getMatchingInputGroupFromEvent(event, type) {
+        const modifiers = DocumentUtil.getActiveModifiersAndButtons(event);
+        this.trigger('activeModifiersChanged', {modifiers});
+        return this._getMatchingInputGroup(modifiers, type);
+    }
+
+    _getMatchingInputGroup(modifiers, type) {
         let fallback = null;
         for (let i = 0, ii = this._inputs.length; i < ii; ++i) {
             const input = this._inputs[i];
-            const {include, exclude} = input;
+            const {include, exclude, types} = input;
+            if (!types.has(type)) { continue; }
             if (this._setHasAll(modifiers, include) && (exclude.length === 0 || !this._setHasAll(modifiers, exclude))) {
                 if (include.length > 0) {
                     return {index: i, empty: false, input};
@@ -544,5 +557,13 @@ class TextScanner extends EventDispatcher {
             value.split(/[,;\s]+/).map((v) => v.trim().toLowerCase()).filter((v) => v.length > 0) :
             []
         );
+    }
+
+    _getInputTypeSet({mouse, touch, pen}) {
+        const set = new Set();
+        if (mouse) { set.add('mouse'); }
+        if (touch) { set.add('touch'); }
+        if (pen) { set.add('pen'); }
+        return set;
     }
 }

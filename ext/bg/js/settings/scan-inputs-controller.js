@@ -142,6 +142,11 @@ class ScanInputField {
         this._eventListeners.on(this._includeInputField, 'change', this._onIncludeValueChange.bind(this));
         this._eventListeners.on(this._excludeInputField, 'change', this._onExcludeValueChange.bind(this));
         this._eventListeners.addEventListener(removeButton, 'click', this._onRemoveClick.bind(this));
+
+        for (const typeCheckbox of node.querySelectorAll('.scan-input-type-checkbox')) {
+            const {type} = typeCheckbox.dataset;
+            typeCheckbox.dataset.setting = `scanning.inputs[${this._index}].types.${type}`;
+        }
     }
 
     cleanup() {

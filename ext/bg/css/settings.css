@@ -133,10 +133,7 @@ html:root:not([data-options-general-result-output-mode=merge]) #dict-main-group 
 }
 .scan-input-table {
     width: 100%;
-}
-.scan-input-list:not(:empty)+#scan-input-add {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+    margin-bottom: 8px;
 }
 .scan-input-index-cell {
     position: relative;
@@ -153,6 +150,7 @@ html:root:not([data-options-general-result-output-mode=merge]) #dict-main-group 
     background-color: #eee;
     border: 1px solid #ccc;
     border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -174,21 +172,45 @@ html:root:not([data-options-general-result-output-mode=merge]) #dict-main-group 
 .scan-input-input-cell {
     width: 100%;
 }
-.scan-input-input-cell>input {
+.scan-input-input-cell-inner {
+    display: flex;
+}
+.scan-input-input-cell-inner .form-control,
+.scan-input-input-cell-inner button {
     border-radius: 0;
 }
-.scan-input-mouse-button-cell>button {
-    border-radius: 0;
+.scan-input-input-cell-inner button {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.scan-input-input-cell-inner button>span {
+    width: 20px;
 }
 .scan-input-remove-button-cell>button {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
-.scan-input:nth-child(n+2) .scan-input-index {
-    border-top-left-radius: 0;
-}
-.scan-input:last-child tr:last-of-type .scan-input-mouse-button-cell>button {
+.scan-input tr:last-of-type .scan-input-input-cell-inner button:last-of-type,
+.scan-input tr:last-of-type .scan-input-input-cell-inner .form-control:last-of-type {
     border-bottom-right-radius: 4px;
+}
+.scan-input-type-list {
+    display: flex;
+}
+.scan-input-type {
+    font-weight: normal;
+    margin: 0;
+}
+.scan-input-type+.scan-input-type {
+    margin-left: 1em;
+}
+.scan-input-type>input[type=checkbox] {
+    margin: 0 0.375em 0 0;
+    padding: 0;
+    vertical-align: middle;
+}
+.scan-input-type>span {
+    vertical-align: middle;
 }
 
 .generic-input-list {
