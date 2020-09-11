@@ -20,10 +20,11 @@
  */
 
 class KeyboardMouseInputField extends EventDispatcher {
-    constructor(inputNode, mouseButton, os) {
+    constructor(inputNode, mouseButton, os, isPointerTypeSupported=null) {
         super();
         this._inputNode = inputNode;
         this._mouseButton = mouseButton;
+        this._isPointerTypeSupported = isPointerTypeSupported;
         this._keySeparator = ' + ';
         this._inputNameMap = new Map(DocumentUtil.getModifierKeys(os));
         this._keyPriorities = new Map([
@@ -54,6 +55,7 @@ class KeyboardMouseInputField extends EventDispatcher {
         if (type === 'modifierInputs' && this._mouseButton !== null) {
             events.push(
                 [this._mouseButton, 'mousedown', this._onMouseButtonMouseDown.bind(this), false],
+                [this._mouseButton, 'pointerdown', this._onMouseButtonPointerDown.bind(this), false],
                 [this._mouseButton, 'mouseup', this._onMouseButtonMouseUp.bind(this), false],
                 [this._mouseButton, 'contextmenu', this._onMouseButtonContextMenu.bind(this), false]
             );
@@ -171,6 +173,19 @@ class KeyboardMouseInputField extends EventDispatcher {
     }
 
     _onMouseButtonMouseDown(e) {
+        e.preventDefault();
+        this._addInputs(DocumentUtil.getActiveButtons(e));
+    }
+
+    _onMouseButtonPointerDown(e) {
+        const {isPrimary, pointerType} = e;
+        if (
+            !isPrimary ||
+            typeof this._isPointerTypeSupported !== 'function' ||
+            !this._isPointerTypeSupported(pointerType)
+        ) {
+            return;
+        }
         e.preventDefault();
         this._addInputs(DocumentUtil.getActiveButtons(e));
     }

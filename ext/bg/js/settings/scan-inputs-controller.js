@@ -138,8 +138,9 @@ class ScanInputField {
         this._node = node;
         container.appendChild(node);
 
-        this._includeInputField = new KeyboardMouseInputField(includeInputNode, includeMouseButton, this._os);
-        this._excludeInputField = new KeyboardMouseInputField(excludeInputNode, excludeMouseButton, this._os);
+        const isPointerTypeSupported = this._isPointerTypeSupported.bind(this);
+        this._includeInputField = new KeyboardMouseInputField(includeInputNode, includeMouseButton, this._os, isPointerTypeSupported);
+        this._excludeInputField = new KeyboardMouseInputField(excludeInputNode, excludeMouseButton, this._os, isPointerTypeSupported);
         this._includeInputField.prepare(include, 'modifierInputs');
         this._excludeInputField.prepare(exclude, 'modifierInputs');
 
@@ -183,5 +184,11 @@ class ScanInputField {
         const template = document.querySelector(templateSelector);
         const content = document.importNode(template.content, true);
         return content.firstChild;
+    }
+
+    _isPointerTypeSupported(pointerType) {
+        if (this._node === null) { return false; }
+        const node = this._node.querySelector(`input.scan-input-type-checkbox[data-type=${pointerType}]`);
+        return node !== null && node.checked;
     }
 }
