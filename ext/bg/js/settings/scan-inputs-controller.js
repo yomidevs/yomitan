@@ -93,7 +93,11 @@ class ScanInputsController {
             path: 'scanning.inputs',
             start: index,
             deleteCount: 0,
-            items: [{include, exclude}]
+            items: [{
+                include,
+                exclude,
+                types: {mouse: true, touch: false, pen: false}
+            }]
         }]);
     }
 
