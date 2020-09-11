@@ -26,9 +26,12 @@ class BackupController {
         this._settingsExportToken = null;
         this._settingsExportRevoke = null;
         this._currentVersion = 0;
+        this._optionsUtil = new OptionsUtil();
     }
 
-    prepare() {
+    async prepare() {
+        await this._optionsUtil.prepare();
+
         document.querySelector('#settings-export').addEventListener('click', this._onSettingsExportClick.bind(this), false);
         document.querySelector('#settings-import').addEventListener('click', this._onSettingsImportClick.bind(this), false);
         document.querySelector('#settings-import-file').addEventListener('change', this._onSettingsImportFileChange.bind(this), false);
@@ -140,7 +143,11 @@ class BackupController {
     // Importing
 
     async _settingsImportSetOptionsFull(optionsFull) {
-        await this._settingsController.setAllSettings(optionsFull);
+        try {
+            await this._settingsController.setAllSettings(optionsFull);
+        } catch (e) {
+            yomichan.logError(e);
+        }
     }
 
     _showSettingsImportError(error) {
@@ -322,7 +329,7 @@ class BackupController {
         }
 
         // Upgrade options
-        optionsFull = await OptionsUtil.update(optionsFull);
+        optionsFull = await this._optionsUtil.update(optionsFull);
 
         // Check for warnings
         const sanitizationWarnings = this._settingsImportSanitizeOptions(optionsFull, true);
@@ -368,7 +375,7 @@ class BackupController {
         $('#settings-reset-modal').modal('hide');
 
         // Get default options
-        const optionsFull = await OptionsUtil.getDefault();
+        const optionsFull = this._optionsUtil.getDefault();
 
         // Assign options
         await this._settingsImportSetOptionsFull(optionsFull);

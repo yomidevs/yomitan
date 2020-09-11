@@ -149,7 +149,7 @@ class JsonSchemaValidator {
     getValidValueOrDefault(schema, value) {
         let type = this._getValueType(value);
         const schemaType = schema.type;
-        if (!this._isValueTypeAny(value, type, schemaType)) {
+        if (typeof value === 'undefined' || !this._isValueTypeAny(value, type, schemaType)) {
             let assignDefault = true;
 
             const schemaDefault = schema.default;

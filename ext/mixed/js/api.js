@@ -49,10 +49,6 @@ const api = (() => {
 
         // Invoke functions
 
-        optionsSchemaGet() {
-            return this._invoke('optionsSchemaGet');
-        }
-
         optionsGet(optionsContext) {
             return this._invoke('optionsGet', {optionsContext});
         }

@@ -41,8 +41,7 @@ class Backend {
         this._mecab = new Mecab();
         this._clipboardMonitor = new ClipboardMonitor({getClipboard: this._onApiClipboardGet.bind(this)});
         this._options = null;
-        this._optionsSchema = null;
-        this._optionsSchemaValidator = new JsonSchemaValidator();
+        this._profileConditionsSchemaValidator = new JsonSchemaValidator();
         this._profileConditionsSchemaCache = [];
         this._profileConditionsUtil = new ProfileConditions();
         this._defaultAnkiFieldTemplates = null;
@@ -55,6 +54,7 @@ class Backend {
             requestBuilder: this._requestBuilder,
             useCache: false
         });
+        this._optionsUtil = new OptionsUtil();
 
         this._clipboardPasteTarget = null;
         this._clipboardPasteTargetInitialized = false;
@@ -78,7 +78,6 @@ class Backend {
 
         this._messageHandlers = new Map([
             ['requestBackendReadySignal',    {async: false, contentScript: true,  handler: this._onApiRequestBackendReadySignal.bind(this)}],
-            ['optionsSchemaGet',             {async: false, contentScript: true,  handler: this._onApiOptionsSchemaGet.bind(this)}],
             ['optionsGet',                   {async: false, contentScript: true,  handler: this._onApiOptionsGet.bind(this)}],
             ['optionsGetFull',               {async: false, contentScript: true,  handler: this._onApiOptionsGetFull.bind(this)}],
             ['optionsSave',                  {async: true,  contentScript: true,  handler: this._onApiOptionsSave.bind(this)}],
@@ -188,10 +187,9 @@ class Backend {
             }
             await this._translator.prepare();
 
-            this._optionsSchema = await this._fetchAsset('/bg/data/options-schema.json', true);
+            await this._optionsUtil.prepare();
             this._defaultAnkiFieldTemplates = (await this._fetchAsset('/bg/data/default-anki-field-templates.handlebars')).trim();
-            this._options = await OptionsUtil.load();
-            this._options = this._optionsSchemaValidator.getValidValueOrDefault(this._optionsSchema, this._options);
+            this._options = await this._optionsUtil.load();
 
             this._applyOptions('background');
 
@@ -222,7 +220,7 @@ class Backend {
 
     getFullOptions(useSchema=false) {
         const options = this._options;
-        return useSchema ? this._optionsSchemaValidator.createProxy(options, this._optionsSchema) : options;
+        return useSchema ? this._optionsUtil.createValidatingProxy(options) : options;
     }
 
     getOptions(optionsContext, useSchema=false) {
@@ -370,10 +368,6 @@ class Backend {
         }
     }
 
-    _onApiOptionsSchemaGet() {
-        return this._optionsSchema;
-    }
-
     _onApiOptionsGet({optionsContext}) {
         return this.getOptions(optionsContext);
     }
@@ -385,7 +379,7 @@ class Backend {
     async _onApiOptionsSave({source}) {
         this._clearProfileConditionsSchemaCache();
         const options = this.getFullOptions();
-        await OptionsUtil.save(options);
+        await this._optionsUtil.save(options);
         this._applyOptions(source);
     }
 
@@ -787,7 +781,8 @@ class Backend {
     }
 
     async _onApiSetAllSettings({value, source}) {
-        this._options = this._optionsSchemaValidator.getValidValueOrDefault(this._optionsSchema, value);
+        this._optionsUtil.validate(value);
+        this._options = clone(value);
         await this._onApiOptionsSave({source});
     }
 
@@ -1014,7 +1009,7 @@ class Backend {
                 this._profileConditionsSchemaCache.push(schema);
             }
 
-            if (conditionGroups.length > 0 && this._optionsSchemaValidator.isValid(optionsContext, schema)) {
+            if (conditionGroups.length > 0 && this._profileConditionsSchemaValidator.isValid(optionsContext, schema)) {
                 return profile;
             }
             ++index;
@@ -1025,7 +1020,7 @@ class Backend {
 
     _clearProfileConditionsSchemaCache() {
         this._profileConditionsSchemaCache = [];
-        this._optionsSchemaValidator.clearCache();
+        this._profileConditionsSchemaValidator.clearCache();
     }
 
     _checkLastError() {
