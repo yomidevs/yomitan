@@ -493,19 +493,27 @@ class OptionsUtil {
 
             const {modifier, middleMouse} = profileOptions.scanning;
             const scanningInputs = [];
+            let modifierInput = '';
             switch (modifier) {
                 case 'alt':
                 case 'ctrl':
                 case 'shift':
                 case 'meta':
-                    scanningInputs.push(modifier);
+                    modifierInput = modifier;
                     break;
                 case 'none':
-                    scanningInputs.push('');
+                    modifierInput = '';
                     break;
             }
+            scanningInputs.push({
+                include: modifierInput,
+                exclude: ''
+            });
             if (middleMouse) {
-                scanningInputs.push('mouse2');
+                scanningInputs.push({
+                    include: 'mouse2',
+                    exclude: ''
+                });
             }
             profileOptions.scanning.inputs = scanningInputs;
         }
