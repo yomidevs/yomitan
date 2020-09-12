@@ -96,7 +96,13 @@ class ScanInputsController {
             items: [{
                 include,
                 exclude,
-                types: {mouse: true, touch: false, pen: false}
+                types: {mouse: true, touch: false, pen: false},
+                options: {
+                    showAdvanced: false,
+                    scanOnPenHover: true,
+                    scanOnPenPress: true,
+                    scanOnPenRelease: false
+                }
             }]
         }]);
     }
@@ -148,9 +154,9 @@ class ScanInputField {
         this._eventListeners.on(this._excludeInputField, 'change', this._onExcludeValueChange.bind(this));
         this._eventListeners.addEventListener(removeButton, 'click', this._onRemoveClick.bind(this));
 
-        for (const typeCheckbox of node.querySelectorAll('.scan-input-type-checkbox')) {
+        for (const typeCheckbox of node.querySelectorAll('.scan-input-settings-checkbox')) {
             const {property} = typeCheckbox.dataset;
-            typeCheckbox.dataset.setting = `scanning.inputs[${this._index}].types.${property}`;
+            typeCheckbox.dataset.setting = `scanning.inputs[${this._index}].${property}`;
         }
     }
 
@@ -188,7 +194,7 @@ class ScanInputField {
 
     _isPointerTypeSupported(pointerType) {
         if (this._node === null) { return false; }
-        const node = this._node.querySelector(`input.scan-input-type-checkbox[data-type=${pointerType}]`);
+        const node = this._node.querySelector(`input.scan-input-settings-checkbox[data-property="types.${pointerType}"]`);
         return node !== null && node.checked;
     }
 }

@@ -138,9 +138,6 @@ html:root:not([data-options-general-result-output-mode=merge]) #dict-main-group 
     width: 100%;
     margin-bottom: 8px;
 }
-.scan-input-index-cell {
-    grid-area: 1/1/4/1;
-}
 .scan-input-index {
     height: 100%;
     width: 40px;
@@ -185,6 +182,9 @@ html:root:not([data-options-general-result-output-mode=merge]) #dict-main-group 
 .scan-input-prefix-cell[data-property=types] {
     grid-area: 3/2/3/2;
 }
+.scan-input-prefix-cell[data-property=options] {
+    grid-area: 4/2/4/2;
+}
 .scan-input-content-cell[data-property=include] {
     grid-area: 1/3/1/3;
 }
@@ -194,8 +194,14 @@ html:root:not([data-options-general-result-output-mode=merge]) #dict-main-group 
 .scan-input-content-cell[data-property=types] {
     grid-area: 3/3/3/3;
 }
+.scan-input-content-cell[data-property=options] {
+    grid-area: 4/3/4/3;
+}
 .scan-input-suffix-cell {
     grid-area: 1/4/1/4;
+}
+.scan-input-index-cell {
+    grid-area: 1/1/5/1;
 }
 .scan-input-suffix-cell>button {
     height: 100%;
@@ -221,24 +227,33 @@ html:root:not([data-options-general-result-output-mode=merge]) #dict-main-group 
     padding-top: 5px;
     padding-bottom: 5px;
 }
+.scan-input-toggle {
+    font-weight: normal;
+    margin: 0;
+}
+.scan-input-toggle>input[type=checkbox] {
+    margin: 0 0.375em 0 0;
+    padding: 0;
+    vertical-align: middle;
+}
+.scan-input-toggle>span {
+    vertical-align: middle;
+}
 .scan-input-type-list {
     display: flex;
     flex-flow: row wrap;
     margin-left: -1em;
 }
 .scan-input-type {
-    font-weight: normal;
-    margin: 0;
-    white-space: nowrap;
     margin-left: 1em;
+    white-space: nowrap;
 }
-.scan-input-type>input[type=checkbox] {
-    margin: 0 0.375em 0 0;
-    padding: 0;
-    vertical-align: middle;
+.scan-input:not([data-show-advanced=true]) .scan-input-prefix-cell[data-property=options],
+.scan-input:not([data-show-advanced=true]) .scan-input-content-cell[data-property=options] {
+    display: none;
 }
-.scan-input-type>span {
-    vertical-align: middle;
+.scan-input[data-show-advanced=true] .scan-input-content-cell[data-property=types] .scan-input-input-cell-inner>.scan-input-type-list-container {
+    border-bottom-right-radius: 0;
 }
 
 .generic-input-list {

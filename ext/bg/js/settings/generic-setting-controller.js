@@ -32,6 +32,7 @@ class GenericSettingController {
         });
         this._transforms = new Map([
             ['setDocumentAttribute', this._setDocumentAttribute.bind(this)],
+            ['setRelativeAttribute', this._setRelativeAttribute.bind(this)],
             ['splitTags', this._splitTags.bind(this)],
             ['joinTags', this._joinTags.bind(this)]
         ]);
@@ -122,11 +123,37 @@ class GenericSettingController {
         return value;
     }
 
+    _setRelativeAttribute(value, metadata, element) {
+        const {ancestorDistance, relativeSelector, relativeAttribute} = element.dataset;
+        let relativeElement = this._getAncestor(element, ancestorDistance);
+        if (relativeElement !== null) {
+            if (typeof relativeSelector === 'string') {
+                relativeElement = relativeElement.querySelector(relativeSelector);
+            }
+            if (relativeElement !== null) {
+                relativeElement.setAttribute(relativeAttribute, `${value}`);
+            }
+        }
+        return value;
+    }
+
     _splitTags(value) {
         return `${value}`.split(/[,; ]+/).filter((v) => !!v);
     }
 
     _joinTags(value) {
         return value.join(' ');
+    }
+
+    _getAncestor(node, ancestorDistance) {
+        if (typeof ancestorDistance === 'string') {
+            const ii = Number.parseInt(ancestorDistance, 10);
+            if (Number.isFinite(ii)) {
+                for (let i = 0; i < ii && node !== null; ++i) {
+                    node = node.parentNode;
+                }
+            }
+        }
+        return node;
     }
 }

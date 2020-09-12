@@ -362,7 +362,8 @@
                                             "required": [
                                                 "include",
                                                 "exclude",
-                                                "types"
+                                                "types",
+                                                "options"
                                             ],
                                             "properties": {
                                                 "include": {
@@ -392,6 +393,33 @@
                                                         "pen": {
                                                             "type": "boolean",
                                                             "default": true
+                                                        }
+                                                    }
+                                                },
+                                                "options": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "showAdvanced",
+                                                        "scanOnPenHover",
+                                                        "scanOnPenPress",
+                                                        "scanOnPenRelease"
+                                                    ],
+                                                    "properties": {
+                                                        "showAdvanced": {
+                                                            "type": "boolean",
+                                                            "default": false
+                                                        },
+                                                        "scanOnPenHover": {
+                                                            "type": "boolean",
+                                                            "default": true
+                                                        },
+                                                        "scanOnPenPress": {
+                                                            "type": "boolean",
+                                                            "default": true
+                                                        },
+                                                        "scanOnPenRelease": {
+                                                            "type": "boolean",
+                                                            "default": false
                                                         }
                                                     }
                                                 }

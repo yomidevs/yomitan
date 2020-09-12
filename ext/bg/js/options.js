@@ -517,6 +517,12 @@ class OptionsUtil {
                 }
             }
         }
+        const createInputDefaultOptions = () => ({
+            showAdvanced: false,
+            scanOnPenHover: true,
+            scanOnPenPress: true,
+            scanOnPenRelease: false
+        });
         for (const {options: profileOptions} of options.profiles) {
             profileOptions.general.usePopupWindow = false;
             profileOptions.scanning.hideDelay = 0;
@@ -538,20 +544,23 @@ class OptionsUtil {
             scanningInputs.push({
                 include: modifierInput,
                 exclude: '',
-                types: {mouse: true, touch: false, pen: false}
+                types: {mouse: true, touch: false, pen: false},
+                options: createInputDefaultOptions()
             });
             if (middleMouse) {
                 scanningInputs.push({
                     include: 'mouse2',
                     exclude: '',
-                    types: {mouse: true, touch: false, pen: false}
+                    types: {mouse: true, touch: false, pen: false},
+                    options: createInputDefaultOptions()
                 });
             }
             if (touchInputEnabled) {
                 scanningInputs.push({
                     include: '',
                     exclude: '',
-                    types: {mouse: false, touch: true, pen: true}
+                    types: {mouse: false, touch: true, pen: true},
+                    options: createInputDefaultOptions()
                 });
             }
             profileOptions.scanning.inputs = scanningInputs;

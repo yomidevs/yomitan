@@ -453,9 +453,24 @@
                             <div class="scan-input-prefix-cell" data-property="types"><div class="scan-input-prefix">Types</div></div>
                             <div class="scan-input-content-cell" data-property="types"><div class="scan-input-input-cell-inner">
                                 <div class="scan-input-type-list-container form-control"><div class="scan-input-type-list">
-                                    <label class="scan-input-type"><input type="checkbox" class="scan-input-type-checkbox" data-property="mouse"><span>Mouse</span></label>
-                                    <label class="scan-input-type"><input type="checkbox" class="scan-input-type-checkbox" data-property="touch"><span>Touch</span></label>
-                                    <label class="scan-input-type"><input type="checkbox" class="scan-input-type-checkbox" data-property="pen"><span>Pen</span></label>
+                                    <label class="scan-input-toggle scan-input-type"><input type="checkbox" class="scan-input-settings-checkbox" data-property="types.mouse"><span>Mouse</span></label>
+                                    <label class="scan-input-toggle scan-input-type"><input type="checkbox" class="scan-input-settings-checkbox" data-property="types.touch"><span>Touch</span></label>
+                                    <label class="scan-input-toggle scan-input-type"><input type="checkbox" class="scan-input-settings-checkbox" data-property="types.pen"><span>Pen</span></label>
+                                    <label class="scan-input-toggle scan-input-type"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.showAdvanced"
+                                        data-transform-pre="setRelativeAttribute"
+                                        data-transform-post="setRelativeAttribute"
+                                        data-ancestor-distance="7"
+                                        data-relative-attribute="data-show-advanced"
+                                    ><span>Advanced</span></label>
+                                </div></div>
+                            </div></div>
+
+                            <div class="scan-input-prefix-cell" data-property="options"><div class="scan-input-prefix">Options</div></div>
+                            <div class="scan-input-content-cell" data-property="options"><div class="scan-input-input-cell-inner">
+                                <div class="scan-input-type-list-container form-control"><div>
+                                    <div><label class="scan-input-toggle"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenHover"><span>Scan on pen hover</span></label></div>
+                                    <div><label class="scan-input-toggle"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenPress"><span>Scan on pen press</span></label></div>
+                                    <div><label class="scan-input-toggle"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.scanOnPenRelease"><span>Scan on pen release</span></label></div>
                                 </div></div>
                             </div></div>
                         </div>
