@@ -267,7 +267,7 @@ class Frontend {
             }
         } if (type !== null) {
             this._stopClearSelectionDelayed();
-            const focus = (cause === 'mouse');
+            const focus = (cause === 'mouseMove');
             this._showContent(textSource, focus, definitions, type, sentence, optionsContext);
         } else {
             if (scanningOptions.autoHideResults) {

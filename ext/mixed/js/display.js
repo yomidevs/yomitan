@@ -510,9 +510,10 @@ class Display extends EventDispatcher {
 
     _onQueryParserSearch({type, definitions, sentence, input: {cause}, textSource}) {
         const query = textSource.text();
+        const history = (cause === 'click');
         const details = {
             focus: false,
-            history: cause !== 'mouse',
+            history,
             params: this._createSearchParams(type, query, false),
             state: {
                 sentence,
