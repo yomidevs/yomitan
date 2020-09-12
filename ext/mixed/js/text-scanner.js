@@ -51,6 +51,7 @@ class TextScanner extends EventDispatcher {
         this._inputs = [];
 
         this._enabled = false;
+        this._enabledValue = false;
         this._eventListeners = new EventListenerCollection();
 
         this._primaryTouchIdentifier = null;
@@ -84,6 +85,9 @@ class TextScanner extends EventDispatcher {
     }
 
     setEnabled(enabled) {
+        const value = enabled && this._isPrepared;
+        if (this._enabledValue === value) { return; }
+
         this._eventListeners.removeAllEventListeners();
         this._primaryTouchIdentifier = null;
         this._preventNextContextMenu = false;
@@ -92,8 +96,9 @@ class TextScanner extends EventDispatcher {
         this._preventScroll = false;
 
         this._enabled = enabled;
+        this._enabledValue = value;
 
-        if (this._enabled && this._isPrepared) {
+        if (value) {
             this._hookEvents();
         } else {
             this.clearSelection(true);
