@@ -85,6 +85,8 @@ class TextScanner extends EventDispatcher {
     }
 
     setEnabled(enabled) {
+        this._enabled = enabled;
+
         const value = enabled && this._isPrepared;
         if (this._enabledValue === value) { return; }
 
@@ -95,7 +97,6 @@ class TextScanner extends EventDispatcher {
         this._preventNextClick = false;
         this._preventScroll = false;
 
-        this._enabled = enabled;
         this._enabledValue = value;
 
         if (value) {
