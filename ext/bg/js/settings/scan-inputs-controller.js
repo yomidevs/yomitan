@@ -129,10 +129,10 @@ class ScanInputField {
 
     prepare(container, include, exclude) {
         const node = this._instantiateTemplate('#scan-input-template');
-        const includeInputNode = node.querySelector('.scan-input-include .scan-input-field');
-        const includeMouseButton = node.querySelector('.scan-input-include .mouse-button');
-        const excludeInputNode = node.querySelector('.scan-input-exclude .scan-input-field');
-        const excludeMouseButton = node.querySelector('.scan-input-exclude .mouse-button');
+        const includeInputNode = node.querySelector('.scan-input-field[data-property=include]');
+        const includeMouseButton = node.querySelector('.mouse-button[data-property=include]');
+        const excludeInputNode = node.querySelector('.scan-input-field[data-property=exclude]');
+        const excludeMouseButton = node.querySelector('.mouse-button[data-property=exclude]');
         const removeButton = node.querySelector('.scan-input-remove');
 
         this._node = node;
@@ -149,8 +149,8 @@ class ScanInputField {
         this._eventListeners.addEventListener(removeButton, 'click', this._onRemoveClick.bind(this));
 
         for (const typeCheckbox of node.querySelectorAll('.scan-input-type-checkbox')) {
-            const {type} = typeCheckbox.dataset;
-            typeCheckbox.dataset.setting = `scanning.inputs[${this._index}].types.${type}`;
+            const {property} = typeCheckbox.dataset;
+            typeCheckbox.dataset.setting = `scanning.inputs[${this._index}].types.${property}`;
         }
     }
 

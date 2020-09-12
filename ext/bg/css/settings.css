@@ -131,20 +131,19 @@ html:root:not([data-options-general-result-output-mode=merge]) #dict-main-group 
 .scan-input-list {
     counter-reset: scan-input-id;
 }
-.scan-input-table {
+.scan-input-grid {
+    display: grid;
+    grid-template-columns: auto auto 1fr auto;
+    grid-template-rows: auto;
     width: 100%;
     margin-bottom: 8px;
 }
 .scan-input-index-cell {
-    position: relative;
-    min-width: 40px;
+    grid-area: 1/1/4/1;
 }
 .scan-input-index {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
+    height: 100%;
+    width: 40px;
     font-size: 14px;
     color: #555;
     background-color: #eee;
@@ -168,16 +167,41 @@ html:root:not([data-options-general-result-output-mode=merge]) #dict-main-group 
     background-color: #eee;
     border: 1px solid #ccc;
     width: 100%;
+    height: 100%;
 }
 .scan-input-input-cell {
     width: 100%;
 }
+.scan-input-content-cell .form-control,
+.scan-input-content-cell button {
+    border-radius: 0;
+}
+.scan-input-prefix-cell[data-property=include] {
+    grid-area: 1/2/1/2;
+}
+.scan-input-prefix-cell[data-property=exclude] {
+    grid-area: 2/2/2/2;
+}
+.scan-input-prefix-cell[data-property=types] {
+    grid-area: 3/2/3/2;
+}
+.scan-input-content-cell[data-property=include] {
+    grid-area: 1/3/1/3;
+}
+.scan-input-content-cell[data-property=exclude] {
+    grid-area: 2/3/2/3;
+}
+.scan-input-content-cell[data-property=types] {
+    grid-area: 3/3/3/3;
+}
+.scan-input-suffix-cell {
+    grid-area: 1/4/1/4;
+}
+.scan-input-suffix-cell>button {
+    height: 100%;
+}
 .scan-input-input-cell-inner {
     display: flex;
-}
-.scan-input-input-cell-inner .form-control,
-.scan-input-input-cell-inner button {
-    border-radius: 0;
 }
 .scan-input-input-cell-inner button {
     padding-left: 10px;
@@ -186,22 +210,26 @@ html:root:not([data-options-general-result-output-mode=merge]) #dict-main-group 
 .scan-input-input-cell-inner button>span {
     width: 20px;
 }
-.scan-input-remove-button-cell>button {
+.scan-input-suffix-cell>button {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
-.scan-input tr:last-of-type .scan-input-input-cell-inner button:last-of-type,
-.scan-input tr:last-of-type .scan-input-input-cell-inner .form-control:last-of-type {
+.scan-input-input-cell-inner>.scan-input-type-list-container {
+    height: auto;
+    min-height: 34px;
     border-bottom-right-radius: 4px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 .scan-input-type-list {
     display: flex;
+    flex-flow: row wrap;
+    margin-left: -1em;
 }
 .scan-input-type {
     font-weight: normal;
     margin: 0;
-}
-.scan-input-type+.scan-input-type {
+    white-space: nowrap;
     margin-left: 1em;
 }
 .scan-input-type>input[type=checkbox] {
