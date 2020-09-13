@@ -25,3 +25,7 @@ jobs:
       run: npm run test-code
       env:
         CI: true
+    - name: Manifest
+      run: npm run test-manifest
+      env:
+        CI: true
