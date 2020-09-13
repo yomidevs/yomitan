@@ -110,8 +110,6 @@ class DictionaryImportController {
             if (errors.length > 0) {
                 this._showErrors(errors);
             }
-
-            this._triggerDatabaseUpdated('purge');
         } catch (error) {
             this._showErrors([error]);
         } finally {
@@ -178,6 +176,7 @@ class DictionaryImportController {
             const dictionaryImporter = new DictionaryImporter();
             const archiveContent = await this._readFile(file);
             const {result, errors} = await dictionaryImporter.importDictionary(dictionaryDatabase, archiveContent, importDetails, onProgress);
+            api.triggerDatabaseUpdated('dictionary', 'import');
             const errors2 = await this._addDictionarySettings(result.sequenced, result.title);
 
             if (errors.length > 0) {
@@ -185,8 +184,6 @@ class DictionaryImportController {
                 allErrors.push(new Error(`Dictionary may not have been imported properly: ${allErrors.length} error${allErrors.length === 1 ? '' : 's'} reported.`));
                 this._showErrors(allErrors);
             }
-
-            this._triggerDatabaseUpdated('import');
         } finally {
             dictionaryDatabase.close();
         }
@@ -269,10 +266,6 @@ class DictionaryImportController {
     _hideErrors() {
         this._errorContainer.textContent = '';
         this._errorContainer.hidden = true;
-    }
-
-    _triggerDatabaseUpdated(cause) {
-        this._settingsController.triggerDatabaseUpdated(cause);
     }
 
     _readFile(file) {

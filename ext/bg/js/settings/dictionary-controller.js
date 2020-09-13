@@ -307,8 +307,6 @@ class SettingsDictionaryEntryUI {
             prevention.end();
             this.isDeleting = false;
             progress.hidden = true;
-
-            this.parent.trigger('databaseUpdated');
         }
     }
 
@@ -397,13 +395,13 @@ class DictionaryController {
         );
         this._dictionaryUI.save = () => this._settingsController.save();
         this._dictionaryUI.preventPageExit = this._preventPageExit.bind(this);
-        this._dictionaryUI.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
 
         document.querySelector('#dict-main').addEventListener('change', this._onDictionaryMainChanged.bind(this), false);
         document.querySelector('#database-enable-prefix-wildcard-searches').addEventListener('change', this._onDatabaseEnablePrefixWildcardSearchesChanged.bind(this), false);
 
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
-        this._settingsController.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
+
+        yomichan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
 
         await this._onOptionsChanged();
         await this._onDatabaseUpdated();

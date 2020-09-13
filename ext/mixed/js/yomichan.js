@@ -56,11 +56,12 @@ const yomichan = (() => {
             this._isBackendReadyPromiseResolve = resolve;
 
             this._messageHandlers = new Map([
-                ['isReady',        {async: false, handler: this._onMessageIsReady.bind(this)}],
-                ['backendReady',   {async: false, handler: this._onMessageBackendReady.bind(this)}],
-                ['getUrl',         {async: false, handler: this._onMessageGetUrl.bind(this)}],
-                ['optionsUpdated', {async: false, handler: this._onMessageOptionsUpdated.bind(this)}],
-                ['zoomChanged',    {async: false, handler: this._onMessageZoomChanged.bind(this)}]
+                ['isReady',         {async: false, handler: this._onMessageIsReady.bind(this)}],
+                ['backendReady',    {async: false, handler: this._onMessageBackendReady.bind(this)}],
+                ['getUrl',          {async: false, handler: this._onMessageGetUrl.bind(this)}],
+                ['optionsUpdated',  {async: false, handler: this._onMessageOptionsUpdated.bind(this)}],
+                ['databaseUpdated', {async: false, handler: this._onMessageDatabaseUpdated.bind(this)}],
+                ['zoomChanged',     {async: false, handler: this._onMessageZoomChanged.bind(this)}]
             ]);
         }
 
@@ -288,6 +289,10 @@ const yomichan = (() => {
 
         _onMessageOptionsUpdated({source}) {
             this.trigger('optionsUpdated', {source});
+        }
+
+        _onMessageDatabaseUpdated({type, cause}) {
+            this.trigger('databaseUpdated', {type, cause});
         }
 
         _onMessageZoomChanged({oldZoomFactor, newZoomFactor}) {

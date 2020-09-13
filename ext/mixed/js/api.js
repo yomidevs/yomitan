@@ -197,6 +197,10 @@ const api = (() => {
             return this._invoke('getDefinitionAudio', {sources, expression, reading, details});
         }
 
+        triggerDatabaseUpdated(type, cause) {
+            return this._invoke('triggerDatabaseUpdated', {type, cause});
+        }
+
         // Invoke functions with progress
 
         deleteDictionary(dictionaryName, onProgress) {

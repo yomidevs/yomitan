@@ -125,10 +125,6 @@ class SettingsController extends EventDispatcher {
         return obj;
     }
 
-    triggerDatabaseUpdated(cause) {
-        this.trigger('databaseUpdated', {cause});
-    }
-
     // Private
 
     _setProfileIndex(value) {

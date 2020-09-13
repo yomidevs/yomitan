@@ -115,7 +115,8 @@ class Backend {
             ['setAllSettings',               {async: true,  contentScript: false, handler: this._onApiSetAllSettings.bind(this)}],
             ['getOrCreateSearchPopup',       {async: true,  contentScript: true,  handler: this._onApiGetOrCreateSearchPopup.bind(this)}],
             ['isTabSearchPopup',             {async: true,  contentScript: true,  handler: this._onApiIsTabSearchPopup.bind(this)}],
-            ['getDefinitionAudio',           {async: true,  contentScript: true,  handler: this._onApiGetDefinitionAudio.bind(this)}]
+            ['getDefinitionAudio',           {async: true,  contentScript: true,  handler: this._onApiGetDefinitionAudio.bind(this)}],
+            ['triggerDatabaseUpdated',       {async: false, contentScript: true,  handler: this._onApiTriggerDatabaseUpdated.bind(this)}]
         ]);
         this._messageHandlersWithProgress = new Map([
             ['deleteDictionary',        {async: true,  contentScript: false, handler: this._onApiDeleteDictionary.bind(this)}]
@@ -709,6 +710,7 @@ class Backend {
     async _onApiPurgeDatabase() {
         this._translator.clearDatabaseCaches();
         await this._dictionaryDatabase.purge();
+        this._triggerDatabaseUpdated('dictionary', 'purge');
     }
 
     async _onApiGetMedia({targets}) {
@@ -751,6 +753,7 @@ class Backend {
     async _onApiDeleteDictionary({dictionaryName}, sender, onProgress) {
         this._translator.clearDatabaseCaches();
         await this._dictionaryDatabase.deleteDictionary(dictionaryName, {rate: 1000}, onProgress);
+        this._triggerDatabaseUpdated('dictionary', 'delete');
     }
 
     async _onApiModifySettings({targets, source}) {
@@ -805,6 +808,10 @@ class Backend {
 
     async _onApiGetDefinitionAudio({sources, expression, reading, details}) {
         return this._getDefinitionAudio(sources, expression, reading, details);
+    }
+
+    _onApiTriggerDatabaseUpdated({type, cause}) {
+        this._triggerDatabaseUpdated(type, cause);
     }
 
     // Command handlers
@@ -1719,5 +1726,9 @@ class Backend {
             case 'image/jpeg': return 'jpeg';
             default: throw new Error('Unknown image media type');
         }
+    }
+
+    _triggerDatabaseUpdated(type, cause) {
+        this._sendMessageAllTabs('databaseUpdated', {type, cause});
     }
 }
