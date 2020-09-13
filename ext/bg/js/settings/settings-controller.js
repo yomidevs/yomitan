@@ -47,6 +47,10 @@ class SettingsController extends EventDispatcher {
         yomichan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
     }
 
+    async refresh() {
+        await this._onOptionsUpdatedInternal();
+    }
+
     async save() {
         await api.optionsSave(this._source);
     }
