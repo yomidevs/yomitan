@@ -653,6 +653,21 @@ class JsonSchemaValidator {
             value[i] = this.getValidValueOrDefault(propertySchema, value[i]);
         }
 
+        const minItems = schema.minItems;
+        if (typeof minItems === 'number' && value.length < minItems) {
+            for (let i = value.length; i < minItems; ++i) {
+                const propertySchema = this._getPropertySchema(schema, i, value, null);
+                if (propertySchema === null) { break; }
+                const item = this.getValidValueOrDefault(propertySchema);
+                value.push(item);
+            }
+        }
+
+        const maxItems = schema.maxItems;
+        if (typeof maxItems === 'number' && value.length > maxItems) {
+            value.splice(maxItems, value.length - maxItems);
+        }
+
         return value;
     }
 
