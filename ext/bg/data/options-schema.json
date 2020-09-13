@@ -320,6 +320,7 @@
                                 "required": [
                                     "inputs",
                                     "touchInputEnabled",
+                                    "pointerEventsEnabled",
                                     "selectText",
                                     "alphanumeric",
                                     "autoHideResults",
@@ -429,6 +430,10 @@
                                     "touchInputEnabled": {
                                         "type": "boolean",
                                         "default": true
+                                    },
+                                    "pointerEventsEnabled": {
+                                        "type": "boolean",
+                                        "default": false
                                     },
                                     "selectText": {
                                         "type": "boolean",

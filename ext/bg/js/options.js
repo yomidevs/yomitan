@@ -505,6 +505,7 @@ class OptionsUtil {
         //  Updated handlebars templates to include "clipboard-image" definition.
         //  Added hideDelay.
         //  Added inputs to profileOptions.scanning.
+        //  Added pointerEventsEnabled to profileOptions.scanning.
         for (const {conditionGroups} of options.profiles) {
             for (const {conditions} of conditionGroups) {
                 for (const condition of conditions) {
@@ -526,6 +527,7 @@ class OptionsUtil {
         for (const {options: profileOptions} of options.profiles) {
             profileOptions.general.usePopupWindow = false;
             profileOptions.scanning.hideDelay = 0;
+            profileOptions.scanning.pointerEventsEnabled = false;
 
             const {modifier, middleMouse, touchInputEnabled} = profileOptions.scanning;
             const scanningInputs = [];

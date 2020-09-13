@@ -252,6 +252,7 @@ class Display extends EventDispatcher {
                 selectText: scanning.selectText,
                 delay: scanning.delay,
                 touchInputEnabled: scanning.touchInputEnabled,
+                pointerEventsEnabled: scanning.pointerEventsEnabled,
                 scanLength: scanning.length,
                 sentenceExtent: options.anki.sentenceExt,
                 layoutAwareScan: scanning.layoutAwareScan

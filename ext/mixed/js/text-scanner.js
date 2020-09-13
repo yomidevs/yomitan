@@ -45,6 +45,7 @@ class TextScanner extends EventDispatcher {
         this._selectText = false;
         this._delay = 0;
         this._touchInputEnabled = false;
+        this._pointerEventsEnabled = false;
         this._scanLength = 1;
         this._sentenceExtent = 1;
         this._layoutAwareScan = false;
@@ -59,6 +60,8 @@ class TextScanner extends EventDispatcher {
         this._preventNextMouseDown = false;
         this._preventNextClick = false;
         this._preventScroll = false;
+        this._penPointerPressed = false;
+        this._penPointerReleased = false;
 
         this._canClearSelection = true;
     }
@@ -96,6 +99,8 @@ class TextScanner extends EventDispatcher {
         this._preventNextMouseDown = false;
         this._preventNextClick = false;
         this._preventScroll = false;
+        this._penPointerPressed = false;
+        this._penPointerReleased = false;
 
         this._enabledValue = value;
 
@@ -106,12 +111,18 @@ class TextScanner extends EventDispatcher {
         }
     }
 
-    setOptions({inputs, deepContentScan, selectText, delay, touchInputEnabled, scanLength, sentenceExtent, layoutAwareScan}) {
+    setOptions({inputs, deepContentScan, selectText, delay, touchInputEnabled, pointerEventsEnabled, scanLength, sentenceExtent, layoutAwareScan}) {
         if (Array.isArray(inputs)) {
-            this._inputs = inputs.map(({include, exclude, types}) => ({
+            this._inputs = inputs.map(({
+                include,
+                exclude,
+                types,
+                options: {scanOnPenHover, scanOnPenPress, scanOnPenRelease}
+            }) => ({
                 include: this._getInputArray(include),
                 exclude: this._getInputArray(exclude),
-                types: this._getInputTypeSet(types)
+                types: this._getInputTypeSet(types),
+                options: {scanOnPenHover, scanOnPenPress, scanOnPenRelease}
             }));
         }
         if (typeof deepContentScan === 'boolean') {
@@ -125,6 +136,9 @@ class TextScanner extends EventDispatcher {
         }
         if (typeof touchInputEnabled === 'boolean') {
             this._touchInputEnabled = touchInputEnabled;
+        }
+        if (typeof pointerEventsEnabled === 'boolean') {
+            this._pointerEventsEnabled = pointerEventsEnabled;
         }
         if (typeof scanLength === 'number') {
             this._scanLength = scanLength;
@@ -374,6 +388,162 @@ class TextScanner extends EventDispatcher {
         e.preventDefault(); // Disable scroll
     }
 
+    _onPointerOver(e) {
+        if (!e.isPrimary) { return; }
+        switch (e.pointerType) {
+            case 'mouse': return this._onMousePointerOver(e);
+            case 'touch': return this._onTouchPointerOver(e);
+            case 'pen': return this._onPenPointerOver(e);
+        }
+    }
+
+    _onPointerDown(e) {
+        if (!e.isPrimary) { return; }
+        switch (e.pointerType) {
+            case 'mouse': return this._onMousePointerDown(e);
+            case 'touch': return this._onTouchPointerDown(e);
+            case 'pen': return this._onPenPointerDown(e);
+        }
+    }
+
+    _onPointerMove(e) {
+        if (!e.isPrimary) { return; }
+        switch (e.pointerType) {
+            case 'mouse': return this._onMousePointerMove(e);
+            case 'touch': return this._onTouchPointerMove(e);
+            case 'pen': return this._onPenPointerMove(e);
+        }
+    }
+
+    _onPointerUp(e) {
+        if (!e.isPrimary) { return; }
+        switch (e.pointerType) {
+            case 'mouse': return this._onMousePointerUp(e);
+            case 'touch': return this._onTouchPointerUp(e);
+            case 'pen': return this._onPenPointerUp(e);
+        }
+    }
+
+    _onPointerCancel(e) {
+        if (!e.isPrimary) { return; }
+        switch (e.pointerType) {
+            case 'mouse': return this._onMousePointerCancel(e);
+            case 'touch': return this._onTouchPointerCancel(e);
+            case 'pen': return this._onPenPointerCancel(e);
+        }
+    }
+
+    _onPointerOut(e) {
+        if (!e.isPrimary) { return; }
+        switch (e.pointerType) {
+            case 'mouse': return this._onMousePointerOut(e);
+            case 'touch': return this._onTouchPointerOut(e);
+            case 'pen': return this._onPenPointerOut(e);
+        }
+    }
+
+    _onMousePointerOver(e) {
+        return this._onMouseOver(e);
+    }
+
+    _onMousePointerDown(e) {
+        return this._onMouseDown(e);
+    }
+
+    _onMousePointerMove(e) {
+        return this._onMouseMove(e);
+    }
+
+    _onMousePointerUp() {
+        // NOP
+    }
+
+    _onMousePointerCancel(e) {
+        return this._onMouseOut(e);
+    }
+
+    _onMousePointerOut(e) {
+        return this._onMouseOut(e);
+    }
+
+    _onTouchPointerOver() {
+        // NOP
+    }
+
+    _onTouchPointerDown(e) {
+        const {clientX, clientY, pointerId} = e;
+        return this._onPrimaryTouchStart(e, clientX, clientY, pointerId);
+    }
+
+    _onTouchPointerMove(e) {
+        if (!this._preventScroll || !e.cancelable) {
+            return;
+        }
+
+        const inputInfo = this._getMatchingInputGroupFromEvent(e, 'touch');
+        if (inputInfo === null) { return; }
+
+        const {index, empty} = inputInfo;
+        this._searchAt(e.clientX, e.clientY, {type: 'touch', cause: 'touchMove', index, empty});
+    }
+
+    _onTouchPointerUp() {
+        return this._onPrimaryTouchEnd();
+    }
+
+    _onTouchPointerCancel() {
+        return this._onPrimaryTouchEnd();
+    }
+
+    _onTouchPointerOut() {
+        // NOP
+    }
+
+    _onTouchMovePreventScroll(e) {
+        if (!this._preventScroll) { return; }
+
+        if (e.cancelable) {
+            e.preventDefault();
+        } else {
+            this._preventScroll = false;
+        }
+    }
+
+    _onPenPointerOver(e) {
+        this._penPointerPressed = false;
+        this._penPointerReleased = false;
+        this._searchAtFromPen(e, e.clientX, e.clientY, 'pointerOver', false);
+    }
+
+    _onPenPointerDown(e) {
+        this._penPointerPressed = true;
+        this._searchAtFromPen(e, e.clientX, e.clientY, 'pointerDown', true);
+    }
+
+    _onPenPointerMove(e) {
+        if (this._penPointerPressed && (!this._preventScroll || !e.cancelable)) { return; }
+        this._searchAtFromPen(e, e.clientX, e.clientY, 'pointerMove', true);
+    }
+
+    _onPenPointerUp() {
+        this._penPointerPressed = false;
+        this._penPointerReleased = true;
+        this._preventScroll = false;
+    }
+
+    _onPenPointerCancel(e) {
+        this._onPenPointerOut(e);
+    }
+
+    _onPenPointerOut() {
+        this._penPointerPressed = false;
+        this._penPointerReleased = false;
+        this._preventScroll = false;
+        this._preventNextContextMenu = false;
+        this._preventNextMouseDown = false;
+        this._preventNextClick = false;
+    }
+
     async _scanTimerWait() {
         const delay = this._delay;
         const promise = promiseTimeout(delay, true);
@@ -394,15 +564,39 @@ class TextScanner extends EventDispatcher {
         }
     }
 
+    _arePointerEventsSupported() {
+        return (this._pointerEventsEnabled && typeof PointerEvent !== 'undefined');
+    }
+
     _hookEvents() {
-        const eventListenerInfos = this._getMouseEventListeners();
-        if (this._touchInputEnabled) {
-            eventListenerInfos.push(...this._getTouchEventListeners());
+        let eventListenerInfos;
+        if (this._arePointerEventsSupported()) {
+            eventListenerInfos = this._getPointerEventListeners();
+        } else {
+            eventListenerInfos = this._getMouseEventListeners();
+            if (this._touchInputEnabled) {
+                eventListenerInfos.push(...this._getTouchEventListeners());
+            }
         }
 
         for (const [node, type, listener, options] of eventListenerInfos) {
             this._eventListeners.addEventListener(node, type, listener, options);
         }
+    }
+
+    _getPointerEventListeners() {
+        return [
+            [this._node, 'pointerover', this._onPointerOver.bind(this)],
+            [this._node, 'pointerdown', this._onPointerDown.bind(this)],
+            [this._node, 'pointermove', this._onPointerMove.bind(this)],
+            [this._node, 'pointerup', this._onPointerUp.bind(this)],
+            [this._node, 'pointercancel', this._onPointerCancel.bind(this)],
+            [this._node, 'pointerout', this._onPointerOut.bind(this)],
+            [this._node, 'touchmove', this._onTouchMovePreventScroll.bind(this), {passive: false}],
+            [this._node, 'mousedown', this._onMouseDown.bind(this)],
+            [this._node, 'click', this._onClick.bind(this)],
+            [this._node, 'auxclick', this._onAuxClick.bind(this)]
+        ];
     }
 
     _getMouseEventListeners() {
@@ -540,6 +734,34 @@ class TextScanner extends EventDispatcher {
             this._preventScroll = true;
             this._preventNextContextMenu = true;
             this._preventNextMouseDown = true;
+        }
+    }
+
+    async _searchAtFromPen(e, x, y, cause, prevent) {
+        if (this._pendingLookup) { return; }
+
+        const type = 'pen';
+        const inputInfo = this._getMatchingInputGroupFromEvent(e, type);
+        if (inputInfo === null) { return; }
+
+        const {index, empty, input: {options}} = inputInfo;
+        if (
+            (!options.scanOnPenRelease && this._penPointerReleased) ||
+            !(this._penPointerPressed ? options.scanOnPenPress : options.scanOnPenHover)
+        ) {
+            return;
+        }
+
+        await this._searchAt(x, y, {type, cause, index, empty});
+
+        if (
+            prevent &&
+            this._textSourceCurrent !== null
+        ) {
+            this._preventScroll = true;
+            this._preventNextContextMenu = true;
+            this._preventNextMouseDown = true;
+            this._preventNextClick = true;
         }
     }
 

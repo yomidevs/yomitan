@@ -326,6 +326,7 @@ class Frontend {
             selectText: scanningOptions.selectText,
             delay: scanningOptions.delay,
             touchInputEnabled: scanningOptions.touchInputEnabled,
+            pointerEventsEnabled: scanningOptions.pointerEventsEnabled,
             scanLength: scanningOptions.length,
             sentenceExtent: options.anki.sentenceExt,
             layoutAwareScan: scanningOptions.layoutAwareScan
