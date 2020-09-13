@@ -62,6 +62,7 @@ class TextScanner extends EventDispatcher {
         this._preventScroll = false;
         this._penPointerPressed = false;
         this._penPointerReleased = false;
+        this._pointerIdTypeMap = new Map();
 
         this._canClearSelection = true;
     }
@@ -101,6 +102,7 @@ class TextScanner extends EventDispatcher {
         this._preventScroll = false;
         this._penPointerPressed = false;
         this._penPointerReleased = false;
+        this._pointerIdTypeMap.clear();
 
         this._enabledValue = value;
 
@@ -389,8 +391,13 @@ class TextScanner extends EventDispatcher {
     }
 
     _onPointerOver(e) {
-        if (!e.isPrimary) { return; }
-        switch (e.pointerType) {
+        const {pointerType, pointerId, isPrimary} = e;
+        if (pointerType === 'pen') {
+            this._pointerIdTypeMap.set(pointerId, pointerType);
+        }
+
+        if (!isPrimary) { return; }
+        switch (pointerType) {
             case 'mouse': return this._onMousePointerOver(e);
             case 'touch': return this._onTouchPointerOver(e);
             case 'pen': return this._onPenPointerOver(e);
@@ -399,7 +406,7 @@ class TextScanner extends EventDispatcher {
 
     _onPointerDown(e) {
         if (!e.isPrimary) { return; }
-        switch (e.pointerType) {
+        switch (this._getPointerEventType(e)) {
             case 'mouse': return this._onMousePointerDown(e);
             case 'touch': return this._onTouchPointerDown(e);
             case 'pen': return this._onPenPointerDown(e);
@@ -408,7 +415,7 @@ class TextScanner extends EventDispatcher {
 
     _onPointerMove(e) {
         if (!e.isPrimary) { return; }
-        switch (e.pointerType) {
+        switch (this._getPointerEventType(e)) {
             case 'mouse': return this._onMousePointerMove(e);
             case 'touch': return this._onTouchPointerMove(e);
             case 'pen': return this._onPenPointerMove(e);
@@ -417,7 +424,7 @@ class TextScanner extends EventDispatcher {
 
     _onPointerUp(e) {
         if (!e.isPrimary) { return; }
-        switch (e.pointerType) {
+        switch (this._getPointerEventType(e)) {
             case 'mouse': return this._onMousePointerUp(e);
             case 'touch': return this._onTouchPointerUp(e);
             case 'pen': return this._onPenPointerUp(e);
@@ -425,6 +432,7 @@ class TextScanner extends EventDispatcher {
     }
 
     _onPointerCancel(e) {
+        this._pointerIdTypeMap.delete(e.pointerId);
         if (!e.isPrimary) { return; }
         switch (e.pointerType) {
             case 'mouse': return this._onMousePointerCancel(e);
@@ -434,6 +442,7 @@ class TextScanner extends EventDispatcher {
     }
 
     _onPointerOut(e) {
+        this._pointerIdTypeMap.delete(e.pointerId);
         if (!e.isPrimary) { return; }
         switch (e.pointerType) {
             case 'mouse': return this._onMousePointerOut(e);
@@ -811,5 +820,11 @@ class TextScanner extends EventDispatcher {
         if (touch) { set.add('touch'); }
         if (pen) { set.add('pen'); }
         return set;
+    }
+
+    _getPointerEventType(e) {
+        // Workaround for Firefox bug not detecting certain 'touch' events as 'pen' events.
+        const cachedPointerType = this._pointerIdTypeMap.get(e.pointerId);
+        return (typeof cachedPointerType !== 'undefined' ? cachedPointerType : e.pointerType);
     }
 }
