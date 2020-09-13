@@ -37,6 +37,7 @@ class KeyboardMouseInputField extends EventDispatcher {
         this._eventListeners = new EventListenerCollection();
         this._value = '';
         this._type = null;
+        this._penPointerIds = new Set();
     }
 
     get value() {
@@ -56,6 +57,9 @@ class KeyboardMouseInputField extends EventDispatcher {
             events.push(
                 [this._mouseButton, 'mousedown', this._onMouseButtonMouseDown.bind(this), false],
                 [this._mouseButton, 'pointerdown', this._onMouseButtonPointerDown.bind(this), false],
+                [this._mouseButton, 'pointerover', this._onMouseButtonPointerOver.bind(this), false],
+                [this._mouseButton, 'pointerout', this._onMouseButtonPointerOut.bind(this), false],
+                [this._mouseButton, 'pointercancel', this._onMouseButtonPointerCancel.bind(this), false],
                 [this._mouseButton, 'mouseup', this._onMouseButtonMouseUp.bind(this), false],
                 [this._mouseButton, 'contextmenu', this._onMouseButtonContextMenu.bind(this), false]
             );
@@ -70,6 +74,7 @@ class KeyboardMouseInputField extends EventDispatcher {
         this._eventListeners.removeAllEventListeners();
         this._value = '';
         this._type = null;
+        this._penPointerIds.clear();
     }
 
     // Private
@@ -178,9 +183,13 @@ class KeyboardMouseInputField extends EventDispatcher {
     }
 
     _onMouseButtonPointerDown(e) {
-        const {isPrimary, pointerType} = e;
+        if (!e.isPrimary) { return; }
+
+        let {pointerType, pointerId} = e;
+        // Workaround for Firefox bug not detecting certain 'touch' events as 'pen' events.
+        if (this._penPointerIds.has(pointerId)) { pointerType = 'pen'; }
+
         if (
-            !isPrimary ||
             typeof this._isPointerTypeSupported !== 'function' ||
             !this._isPointerTypeSupported(pointerType)
         ) {
@@ -188,6 +197,22 @@ class KeyboardMouseInputField extends EventDispatcher {
         }
         e.preventDefault();
         this._addInputs(DocumentUtil.getActiveButtons(e));
+    }
+
+    _onMouseButtonPointerOver(e) {
+        const {pointerType, pointerId} = e;
+        if (pointerType === 'pen') {
+            this._penPointerIds.add(pointerId);
+        }
+    }
+
+    _onMouseButtonPointerOut(e) {
+        const {pointerId} = e;
+        this._penPointerIds.delete(pointerId);
+    }
+
+    _onMouseButtonPointerCancel(e) {
+        this._onMouseButtonPointerOut(e);
     }
 
     _onMouseButtonMouseUp(e) {
