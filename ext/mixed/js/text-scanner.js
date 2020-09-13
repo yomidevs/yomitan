@@ -119,12 +119,12 @@ class TextScanner extends EventDispatcher {
                 include,
                 exclude,
                 types,
-                options: {scanOnPenHover, scanOnPenPress, scanOnPenRelease}
+                options: {scanOnPenHover, scanOnPenPress, scanOnPenRelease, searchTerms, searchKanji}
             }) => ({
                 include: this._getInputArray(include),
                 exclude: this._getInputArray(exclude),
                 types: this._getInputTypeSet(types),
-                options: {scanOnPenHover, scanOnPenPress, scanOnPenRelease}
+                options: {scanOnPenHover, scanOnPenPress, scanOnPenRelease, searchTerms, searchKanji}
             }));
         }
         if (typeof deepContentScan === 'boolean') {
@@ -206,19 +206,19 @@ class TextScanner extends EventDispatcher {
 
     async searchLast() {
         if (this._textSourceCurrent !== null && this._inputCurrent !== null) {
-            await this._search(this._textSourceCurrent, this._inputCurrent);
+            await this._search(this._textSourceCurrent, this._searchTerms, this._searchKanji, this._inputCurrent);
             return true;
         }
         return false;
     }
 
     async search(textSource) {
-        return await this._search(textSource, {cause: 'script', index: -1, empty: false});
+        return await this._search(textSource, this._searchTerms, this._searchKanji, {cause: 'script', index: -1, empty: false});
     }
 
     // Private
 
-    async _search(textSource, input) {
+    async _search(textSource, searchTerms, searchKanji, input) {
         let definitions = null;
         let sentence = null;
         let type = null;
@@ -234,7 +234,7 @@ class TextScanner extends EventDispatcher {
             optionsContext = await this._getOptionsContext();
             searched = true;
 
-            const result = await this._findDefinitions(textSource, optionsContext);
+            const result = await this._findDefinitions(textSource, searchTerms, searchKanji, optionsContext);
             if (result !== null) {
                 ({definitions, sentence, type} = result);
                 this._inputCurrent = input;
@@ -274,8 +274,7 @@ class TextScanner extends EventDispatcher {
         const inputInfo = this._getMatchingInputGroupFromEvent(e, 'mouse');
         if (inputInfo === null) { return; }
 
-        const {index, empty} = inputInfo;
-        this._searchAtFromMouseMove(e.clientX, e.clientY, index, empty);
+        this._searchAtFromMouseMove(e.clientX, e.clientY, inputInfo);
     }
 
     _onMouseDown(e) {
@@ -299,7 +298,7 @@ class TextScanner extends EventDispatcher {
 
     _onClick(e) {
         if (this._searchOnClick) {
-            this._searchAt(e.clientX, e.clientY, {type: 'mouse', cause: 'click', index: -1, empty: false});
+            this._searchAt(e.clientX, e.clientY, 'mouse', 'click', {index: -1, empty: false, input: null});
         }
 
         if (this._preventNextClick) {
@@ -384,8 +383,7 @@ class TextScanner extends EventDispatcher {
         const inputInfo = this._getMatchingInputGroupFromEvent(e, type);
         if (inputInfo === null) { return; }
 
-        const {index, empty} = inputInfo;
-        this._searchAt(primaryTouch.clientX, primaryTouch.clientY, {type, cause: 'touchMove', index, empty});
+        this._searchAt(primaryTouch.clientX, primaryTouch.clientY, type, 'touchMove', inputInfo);
 
         e.preventDefault(); // Disable scroll
     }
@@ -492,8 +490,7 @@ class TextScanner extends EventDispatcher {
         const inputInfo = this._getMatchingInputGroupFromEvent(e, 'touch');
         if (inputInfo === null) { return; }
 
-        const {index, empty} = inputInfo;
-        this._searchAt(e.clientX, e.clientY, {type: 'touch', cause: 'touchMove', index, empty});
+        this._searchAt(e.clientX, e.clientY, 'touch', 'touchMove', inputInfo);
     }
 
     _onTouchPointerUp() {
@@ -638,15 +635,15 @@ class TextScanner extends EventDispatcher {
         return null;
     }
 
-    async _findDefinitions(textSource, optionsContext) {
+    async _findDefinitions(textSource, searchTerms, searchKanji, optionsContext) {
         if (textSource === null) {
             return null;
         }
-        if (this._searchTerms) {
+        if (searchTerms) {
             const results = await this._findTerms(textSource, optionsContext);
             if (results !== null) { return results; }
         }
-        if (this._searchKanji) {
+        if (searchKanji) {
             const results = await this._findKanji(textSource, optionsContext);
             if (results !== null) { return results; }
         }
@@ -684,10 +681,20 @@ class TextScanner extends EventDispatcher {
         return {definitions, sentence, type: 'kanji'};
     }
 
-    async _searchAt(x, y, input) {
+    async _searchAt(x, y, type, cause, inputInfo) {
         if (this._pendingLookup) { return; }
 
         try {
+            const {index, empty, input: sourceInput} = inputInfo;
+            let searchTerms = this._searchTerms;
+            let searchKanji = this._searchKanji;
+            if (sourceInput !== null) {
+                if (searchTerms && !sourceInput.options.searchTerms) { searchTerms = false; }
+                if (searchKanji && !sourceInput.options.searchKanji) { searchKanji = false; }
+            }
+
+            const input = {type, cause, index, empty};
+
             this._pendingLookup = true;
             this._scanTimerClear();
 
@@ -697,7 +704,7 @@ class TextScanner extends EventDispatcher {
 
             const textSource = this._documentUtil.getRangeFromPoint(x, y, this._deepContentScan);
             try {
-                await this._search(textSource, input);
+                await this._search(textSource, searchTerms, searchKanji, input);
             } finally {
                 if (textSource !== null) {
                     textSource.cleanup();
@@ -710,17 +717,17 @@ class TextScanner extends EventDispatcher {
         }
     }
 
-    async _searchAtFromMouseMove(x, y, inputIndex, inputEmpty) {
+    async _searchAtFromMouseMove(x, y, inputInfo) {
         if (this._pendingLookup) { return; }
 
-        if (inputEmpty) {
+        if (inputInfo.empty) {
             if (!await this._scanTimerWait()) {
                 // Aborted
                 return;
             }
         }
 
-        await this._searchAt(x, y, {type: 'mouse', cause: 'mouseMove', index: inputIndex, empty: inputEmpty});
+        await this._searchAt(x, y, 'mouse', 'mouseMove', inputInfo);
     }
 
     async _searchAtFromTouchStart(e, x, y) {
@@ -731,10 +738,9 @@ class TextScanner extends EventDispatcher {
         const inputInfo = this._getMatchingInputGroupFromEvent(e, type);
         if (inputInfo === null) { return; }
 
-        const {index, empty} = inputInfo;
         const textSourceCurrentPrevious = this._textSourceCurrent !== null ? this._textSourceCurrent.clone() : null;
 
-        await this._searchAt(x, y, {type, cause, index, empty});
+        await this._searchAt(x, y, type, cause, inputInfo);
 
         if (
             this._textSourceCurrent !== null &&
@@ -753,7 +759,7 @@ class TextScanner extends EventDispatcher {
         const inputInfo = this._getMatchingInputGroupFromEvent(e, type);
         if (inputInfo === null) { return; }
 
-        const {index, empty, input: {options}} = inputInfo;
+        const {input: {options}} = inputInfo;
         if (
             (!options.scanOnPenRelease && this._penPointerReleased) ||
             !(this._penPointerPressed ? options.scanOnPenPress : options.scanOnPenHover)
@@ -761,7 +767,7 @@ class TextScanner extends EventDispatcher {
             return;
         }
 
-        await this._searchAt(x, y, {type, cause, index, empty});
+        await this._searchAt(x, y, type, cause, inputInfo);
 
         if (
             prevent &&

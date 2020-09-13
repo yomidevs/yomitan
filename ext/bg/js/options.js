@@ -522,7 +522,9 @@ class OptionsUtil {
             showAdvanced: false,
             scanOnPenHover: true,
             scanOnPenPress: true,
-            scanOnPenRelease: false
+            scanOnPenRelease: false,
+            searchTerms: true,
+            searchKanji: true
         });
         for (const {options: profileOptions} of options.profiles) {
             profileOptions.general.usePopupWindow = false;

@@ -352,7 +352,9 @@
                                                     "showAdvanced": false,
                                                     "scanOnPenHover": true,
                                                     "scanOnPenPress": true,
-                                                    "scanOnPenRelease": false
+                                                    "scanOnPenRelease": false,
+                                                    "searchTerms": true,
+                                                    "searchKanji": true
                                                 }
                                             },
                                             {
@@ -367,7 +369,9 @@
                                                     "showAdvanced": false,
                                                     "scanOnPenHover": true,
                                                     "scanOnPenPress": true,
-                                                    "scanOnPenRelease": false
+                                                    "scanOnPenRelease": false,
+                                                    "searchTerms": true,
+                                                    "searchKanji": true
                                                 }
                                             }
                                         ],
@@ -415,7 +419,9 @@
                                                         "showAdvanced",
                                                         "scanOnPenHover",
                                                         "scanOnPenPress",
-                                                        "scanOnPenRelease"
+                                                        "scanOnPenRelease",
+                                                        "searchTerms",
+                                                        "searchKanji"
                                                     ],
                                                     "properties": {
                                                         "showAdvanced": {
@@ -433,6 +439,14 @@
                                                         "scanOnPenRelease": {
                                                             "type": "boolean",
                                                             "default": false
+                                                        },
+                                                        "searchTerms": {
+                                                            "type": "boolean",
+                                                            "default": true
+                                                        },
+                                                        "searchKanji": {
+                                                            "type": "boolean",
+                                                            "default": true
                                                         }
                                                     }
                                                 }

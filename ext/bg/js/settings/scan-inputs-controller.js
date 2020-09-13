@@ -101,7 +101,9 @@ class ScanInputsController {
                     showAdvanced: false,
                     scanOnPenHover: true,
                     scanOnPenPress: true,
-                    scanOnPenRelease: false
+                    scanOnPenRelease: false,
+                    searchTerms: true,
+                    searchKanji: true
                 }
             }]
         }]);
