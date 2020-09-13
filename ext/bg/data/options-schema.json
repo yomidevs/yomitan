@@ -347,6 +347,12 @@
                                                     "mouse": true,
                                                     "touch": false,
                                                     "pen": false
+                                                },
+                                                "options": {
+                                                    "showAdvanced": false,
+                                                    "scanOnPenHover": true,
+                                                    "scanOnPenPress": true,
+                                                    "scanOnPenRelease": false
                                                 }
                                             },
                                             {
@@ -356,6 +362,12 @@
                                                     "mouse": false,
                                                     "touch": true,
                                                     "pen": true
+                                                },
+                                                "options": {
+                                                    "showAdvanced": false,
+                                                    "scanOnPenHover": true,
+                                                    "scanOnPenPress": true,
+                                                    "scanOnPenRelease": false
                                                 }
                                             }
                                         ],

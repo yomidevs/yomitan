@@ -529,7 +529,7 @@ class OptionsUtil {
             profileOptions.scanning.hideDelay = 0;
             profileOptions.scanning.pointerEventsEnabled = false;
 
-            const {modifier, middleMouse, touchInputEnabled} = profileOptions.scanning;
+            const {modifier, middleMouse} = profileOptions.scanning;
             const scanningInputs = [];
             let modifierInput = '';
             switch (modifier) {
@@ -557,14 +557,12 @@ class OptionsUtil {
                     options: createInputDefaultOptions()
                 });
             }
-            if (touchInputEnabled) {
-                scanningInputs.push({
-                    include: '',
-                    exclude: '',
-                    types: {mouse: false, touch: true, pen: true},
-                    options: createInputDefaultOptions()
-                });
-            }
+            scanningInputs.push({
+                include: '',
+                exclude: '',
+                types: {mouse: false, touch: true, pen: true},
+                options: createInputDefaultOptions()
+            });
             profileOptions.scanning.inputs = scanningInputs;
         }
         await this._addFieldTemplatesToOptions(options, '/bg/data/anki-field-templates-upgrade-v4.handlebars');
