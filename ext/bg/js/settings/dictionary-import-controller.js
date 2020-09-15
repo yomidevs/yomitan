@@ -304,8 +304,9 @@ class DictionaryImportController {
 
     _setButtonsEnabled(value) {
         value = !value;
-        this._purgeButton.disabled = value;
-        this._importFileButton.disabled = value;
+        for (const node of document.querySelectorAll('.dictionary-modifying-input')) {
+            node.disabled = value;
+        }
     }
 
     async _getPreparedDictionaryDatabase() {

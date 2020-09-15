@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020  Yomichan Authors
+ * Copyright (C) 2020  Yomichan Authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,202 +16,90 @@
  */
 
 /* global
+ * ObjectPropertyAccessor
  * api
- * utilBackgroundIsolate
  */
 
-class SettingsDictionaryListUI extends EventDispatcher {
-    constructor(container, template, extraContainer, extraTemplate) {
-        super();
-        this.container = container;
-        this.template = template;
-        this.extraContainer = extraContainer;
-        this.extraTemplate = extraTemplate;
-        this.optionsDictionaries = null;
-        this.dictionaries = null;
-        this.dictionaryEntries = [];
-        this.extra = null;
-
-        document.querySelector('#dict-delete-confirm').addEventListener('click', this.onDictionaryConfirmDelete.bind(this), false);
+class DictionaryEntry {
+    constructor(dictionaryController, node, dictionaryInfo) {
+        this._dictionaryController = dictionaryController;
+        this._node = node;
+        this._dictionaryInfo = dictionaryInfo;
+        this._dictionaryTitle = dictionaryInfo.title;
+        this._eventListeners = new EventListenerCollection();
+        this._enabledCheckbox = node.querySelector('.dict-enabled');
+        this._allowSecondarySearchesCheckbox = node.querySelector('.dict-allow-secondary-searches');
+        this._priorityInput = node.querySelector('.dict-priority');
+        this._deleteButton = node.querySelector('.dict-delete-button');
+        this._detailsToggleLink = node.querySelector('.dict-details-toggle-link');
+        this._detailsContainer = node.querySelector('.dict-details');
+        this._detailsTable = node.querySelector('.dict-details-table');
     }
 
-    setOptionsDictionaries(optionsDictionaries) {
-        this.optionsDictionaries = optionsDictionaries;
-        if (this.dictionaries !== null) {
-            this.setDictionaries(this.dictionaries);
-        }
+    get node() {
+        return this._node;
     }
 
-    setDictionaries(dictionaries) {
-        for (const dictionaryEntry of this.dictionaryEntries) {
-            dictionaryEntry.cleanup();
-        }
-
-        this.dictionaryEntries = [];
-        this.dictionaries = toIterable(dictionaries);
-
-        if (this.optionsDictionaries === null) {
-            return;
-        }
-
-        let changed = false;
-        for (const dictionaryInfo of this.dictionaries) {
-            if (this.createEntry(dictionaryInfo)) {
-                changed = true;
-            }
-        }
-
-        this.updateDictionaryOrder();
-
-        const titles = this.dictionaryEntries.map((e) => e.dictionaryInfo.title);
-        const removeKeys = Object.keys(this.optionsDictionaries).filter((key) => titles.indexOf(key) < 0);
-        if (removeKeys.length > 0) {
-            for (const key of toIterable(removeKeys)) {
-                delete this.optionsDictionaries[key];
-            }
-            changed = true;
-        }
-
-        if (changed) {
-            this.save();
-        }
+    get dictionaryTitle() {
+        return this._dictionaryTitle;
     }
 
-    createEntry(dictionaryInfo) {
-        const title = dictionaryInfo.title;
-        let changed = false;
-        let optionsDictionary;
-        const optionsDictionaries = this.optionsDictionaries;
-        if (hasOwn(optionsDictionaries, title)) {
-            optionsDictionary = optionsDictionaries[title];
-        } else {
-            optionsDictionary = SettingsDictionaryListUI.createDictionaryOptions();
-            optionsDictionaries[title] = optionsDictionary;
-            changed = true;
+    prepare() {
+        const node = this._node;
+        const dictionaryInfo = this._dictionaryInfo;
+        const {title, revision, prefixWildcardsSupported} = dictionaryInfo;
+
+        if (dictionaryInfo.version < 3) {
+            node.querySelector('.dict-outdated').hidden = false;
         }
 
-        const content = document.importNode(this.template.content, true).firstChild;
+        node.querySelector('.dict-title').textContent = title;
+        node.querySelector('.dict-revision').textContent = `rev.${revision}`;
+        node.querySelector('.dict-prefix-wildcard-searches-supported').checked = !!prefixWildcardsSupported;
 
-        this.dictionaryEntries.push(new SettingsDictionaryEntryUI(this, dictionaryInfo, content, optionsDictionary));
+        this._setupDetails(dictionaryInfo);
 
-        return changed;
+        this._enabledCheckbox.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'enabled']);
+        this._allowSecondarySearchesCheckbox.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'allowSecondarySearches']);
+        this._priorityInput.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'priority']);
+
+        this._eventListeners.addEventListener(this._deleteButton, 'click', this._onDeleteButtonClicked.bind(this), false);
+        this._eventListeners.addEventListener(this._detailsToggleLink, 'click', this._onDetailsToggleLinkClicked.bind(this), false);
+        this._eventListeners.addEventListener(this._priorityInput, 'settingChanged', this._onPriorityChanged.bind(this), false);
     }
 
-    static createDictionaryOptions() {
-        return utilBackgroundIsolate({
-            priority: 0,
-            enabled: false,
-            allowSecondarySearches: false
-        });
-    }
-
-    createExtra(totalCounts, remainders, totalRemainder) {
-        const content = document.importNode(this.extraTemplate.content, true).firstChild;
-        this.extraContainer.appendChild(content);
-        return new SettingsDictionaryExtraUI(this, totalCounts, remainders, totalRemainder, content);
-    }
-
-    setCounts(dictionaryCounts, totalCounts) {
-        const remainders = Object.assign({}, totalCounts);
-        const keys = Object.keys(remainders);
-
-        for (let i = 0, ii = Math.min(this.dictionaryEntries.length, dictionaryCounts.length); i < ii; ++i) {
-            const counts = dictionaryCounts[i];
-            this.dictionaryEntries[i].setCounts(counts);
-
-            for (const key of keys) {
-                remainders[key] -= counts[key];
-            }
-        }
-
-        let totalRemainder = 0;
-        for (const key of keys) {
-            totalRemainder += remainders[key];
-        }
-
-        if (this.extra !== null) {
-            this.extra.cleanup();
-            this.extra = null;
-        }
-
-        if (totalRemainder > 0) {
-            this.extra = this.createExtra(totalCounts, remainders, totalRemainder);
+    cleanup() {
+        this._eventListeners.removeAllEventListeners();
+        const node = this._node;
+        if (node.parentNode !== null) {
+            node.parentNode.removeChild(node);
         }
     }
 
-    updateDictionaryOrder() {
-        const sortInfo = this.dictionaryEntries.map((e, i) => [e, i]);
-        sortInfo.sort((a, b) => {
-            const i = b[0].optionsDictionary.priority - a[0].optionsDictionary.priority;
-            return (i !== 0 ? i : a[1] - b[1]);
-        });
-
-        for (const [e] of sortInfo) {
-            this.container.appendChild(e.content);
-        }
+    setCounts(counts) {
+        const node = this._node.querySelector('.dict-counts');
+        node.textContent = JSON.stringify({info: this._dictionaryInfo, counts}, null, 4);
+        node.hidden = false;
     }
 
-    save() {
-        // Overwrite
-    }
+    // Private
 
-    preventPageExit() {
-        // Overwrite
-        return {end: () => {}};
-    }
-
-    onDictionaryConfirmDelete(e) {
+    _onDeleteButtonClicked(e) {
         e.preventDefault();
-        const n = document.querySelector('#dict-delete-modal');
-        const title = n.dataset.dict;
-        delete n.dataset.dict;
-        $(n).modal('hide');
-
-        const index = this.dictionaryEntries.findIndex((entry) => entry.dictionaryInfo.title === title);
-        if (index >= 0) {
-            this.dictionaryEntries[index].deleteDictionary();
-        }
-    }
-}
-
-class SettingsDictionaryEntryUI {
-    constructor(parent, dictionaryInfo, content, optionsDictionary) {
-        this.parent = parent;
-        this.dictionaryInfo = dictionaryInfo;
-        this.optionsDictionary = optionsDictionary;
-        this.counts = null;
-        this.eventListeners = new EventListenerCollection();
-        this.isDeleting = false;
-
-        this.content = content;
-        this.enabledCheckbox = this.content.querySelector('.dict-enabled');
-        this.allowSecondarySearchesCheckbox = this.content.querySelector('.dict-allow-secondary-searches');
-        this.priorityInput = this.content.querySelector('.dict-priority');
-        this.deleteButton = this.content.querySelector('.dict-delete-button');
-        this.detailsToggleLink = this.content.querySelector('.dict-details-toggle-link');
-        this.detailsContainer = this.content.querySelector('.dict-details');
-        this.detailsTable = this.content.querySelector('.dict-details-table');
-
-        if (this.dictionaryInfo.version < 3) {
-            this.content.querySelector('.dict-outdated').hidden = false;
-        }
-
-        this.setupDetails(dictionaryInfo);
-
-        this.content.querySelector('.dict-title').textContent = this.dictionaryInfo.title;
-        this.content.querySelector('.dict-revision').textContent = `rev.${this.dictionaryInfo.revision}`;
-        this.content.querySelector('.dict-prefix-wildcard-searches-supported').checked = !!this.dictionaryInfo.prefixWildcardsSupported;
-
-        this.applyValues();
-
-        this.eventListeners.addEventListener(this.enabledCheckbox, 'change', this.onEnabledChanged.bind(this), false);
-        this.eventListeners.addEventListener(this.allowSecondarySearchesCheckbox, 'change', this.onAllowSecondarySearchesChanged.bind(this), false);
-        this.eventListeners.addEventListener(this.priorityInput, 'change', this.onPriorityChanged.bind(this), false);
-        this.eventListeners.addEventListener(this.deleteButton, 'click', this.onDeleteButtonClicked.bind(this), false);
-        this.eventListeners.addEventListener(this.detailsToggleLink, 'click', this.onDetailsToggleLinkClicked.bind(this), false);
+        this._dictionaryController.deleteDictionary(this._dictionaryTitle);
     }
 
-    setupDetails(dictionaryInfo) {
+    _onDetailsToggleLinkClicked(e) {
+        e.preventDefault();
+        this._detailsContainer.hidden = !this._detailsContainer.hidden;
+    }
+
+    _onPriorityChanged(e) {
+        const {detail: {value}} = e;
+        this._node.style.order = `${-value}`;
+    }
+
+    _setupDetails(dictionaryInfo) {
         const targets = [
             ['Author', 'author'],
             ['URL', 'url'],
@@ -219,6 +107,7 @@ class SettingsDictionaryEntryUI {
             ['Attribution', 'attribution']
         ];
 
+        const fragment = document.createDocumentFragment();
         let count = 0;
         for (const [label, key] of targets) {
             const info = dictionaryInfo[key];
@@ -238,60 +127,223 @@ class SettingsDictionaryEntryUI {
             n3.textContent = info;
             n1.appendChild(n3);
 
-            this.detailsTable.appendChild(n1);
+            fragment.appendChild(n1);
 
             ++count;
         }
 
-        if (count === 0) {
-            this.detailsContainer.hidden = true;
-            this.detailsToggleLink.hidden = true;
+        if (count > 0) {
+            this._detailsTable.appendChild(fragment);
+        } else {
+            this._detailsContainer.hidden = true;
+            this._detailsToggleLink.hidden = true;
+        }
+    }
+}
+
+class DictionaryController {
+    constructor(settingsController) {
+        this._settingsController = settingsController;
+        this._dictionaries = null;
+        this._dictionaryEntries = [];
+        this._databaseStateToken = null;
+        this._checkingIntegrity = false;
+        this._warningNode = null;
+        this._mainDictionarySelect = null;
+        this._checkIntegrityButton = null;
+        this._dictionaryEntryContainer = null;
+        this._integrityExtraInfoContainer = null;
+        this._deleteDictionaryModal = null;
+        this._integrityExtraInfoNode = null;
+        this._isDeleting = false;
+    }
+
+    async prepare() {
+        this._warningNode = document.querySelector('#dict-warning');
+        this._mainDictionarySelect = document.querySelector('#dict-main');
+        this._checkIntegrityButton = document.querySelector('#dict-check-integrity');
+        this._dictionaryEntryContainer = document.querySelector('#dict-groups');
+        this._integrityExtraInfoContainer = document.querySelector('#dict-groups-extra');
+        this._deleteDictionaryModal = document.querySelector('#dict-delete-modal');
+
+        yomichan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
+
+        document.querySelector('#dict-delete-confirm').addEventListener('click', this._onDictionaryConfirmDelete.bind(this), false);
+        this._checkIntegrityButton.addEventListener('click', this._onCheckIntegrityButtonClick.bind(this), false);
+
+        await this._onDatabaseUpdated();
+    }
+
+    deleteDictionary(dictionaryTitle) {
+        if (this._isDeleting) { return; }
+        const modal = this._deleteDictionaryModal;
+        modal.dataset.dictionaryTitle = dictionaryTitle;
+        modal.querySelector('#dict-remove-modal-dict-name').textContent = dictionaryTitle;
+        this._setModalVisible(modal, true);
+    }
+
+    // Private
+
+    async _onDatabaseUpdated() {
+        const token = {};
+        this._databaseStateToken = token;
+        this._dictionaries = null;
+        const dictionaries = await api.getDictionaryInfo();
+        if (this._databaseStateToken !== token) { return; }
+        this._dictionaries = dictionaries;
+
+        this._warningNode.hidden = (dictionaries.length > 0);
+        this._updateMainDictionarySelectOptions(dictionaries);
+
+        for (const entry of this._dictionaryEntries) {
+            entry.cleanup();
+        }
+        this._dictionaryEntries = [];
+
+        for (const dictionary of dictionaries) {
+            this._createDictionaryEntry(dictionary);
         }
     }
 
-    cleanup() {
-        if (this.content !== null) {
-            if (this.content.parentNode !== null) {
-                this.content.parentNode.removeChild(this.content);
-            }
-            this.content = null;
+    _onDictionaryConfirmDelete(e) {
+        e.preventDefault();
+
+        const modal = this._deleteDictionaryModal;
+        this._setModalVisible(modal, false);
+
+        const title = modal.dataset.dictionaryTitle;
+        if (typeof title !== 'string') { return; }
+        delete modal.dataset.dictionaryTitle;
+
+        this._deleteDictionary(title);
+    }
+
+    _onCheckIntegrityButtonClick(e) {
+        e.preventDefault();
+        this._checkIntegrity();
+    }
+
+    _setModalVisible(node, visible) {
+        $(node).modal(visible ? 'show' : 'hide');
+    }
+
+    _updateMainDictionarySelectOptions(dictionaries) {
+        const fragment = document.createDocumentFragment();
+
+        let option = document.createElement('option');
+        option.className = 'text-muted';
+        option.value = '';
+        option.textContent = 'Not selected';
+        fragment.appendChild(option);
+
+        for (const {title, sequenced} of dictionaries) {
+            if (!sequenced) { continue; }
+            option = document.createElement('option');
+            option.value = title;
+            option.textContent = title;
+            fragment.appendChild(option);
         }
-        this.dictionaryInfo = null;
-        this.eventListeners.removeAllEventListeners();
+
+        const select = this._mainDictionarySelect;
+        select.textContent = ''; // Empty
+        select.appendChild(fragment);
     }
 
-    setCounts(counts) {
-        this.counts = counts;
-        const node = this.content.querySelector('.dict-counts');
-        node.textContent = JSON.stringify({
-            info: this.dictionaryInfo,
-            counts
-        }, null, 4);
-        node.removeAttribute('hidden');
-    }
+    async _checkIntegrity() {
+        if (this._dictionaries === null || this._checkingIntegrity || this._isDeleting) { return; }
 
-    save() {
-        this.parent.save();
-    }
-
-    applyValues() {
-        this.enabledCheckbox.checked = this.optionsDictionary.enabled;
-        this.allowSecondarySearchesCheckbox.checked = this.optionsDictionary.allowSecondarySearches;
-        this.priorityInput.value = `${this.optionsDictionary.priority}`;
-    }
-
-    async deleteDictionary() {
-        if (this.isDeleting) {
-            return;
-        }
-
-        const progress = this.content.querySelector('.progress');
-        progress.hidden = false;
-        const progressBar = this.content.querySelector('.progress-bar');
-        this.isDeleting = true;
-
-        const prevention = this.parent.preventPageExit();
         try {
+            this._checkingIntegrity = true;
+            this._setButtonsEnabled(false);
+
+            const token = this._databaseStateToken;
+            const dictionaryTitles = this._dictionaries.map(({title}) => title);
+            const {counts, total} = await api.getDictionaryCounts(dictionaryTitles, true);
+            if (this._databaseStateToken !== token) { return; }
+
+            for (let i = 0, ii = Math.min(counts.length, this._dictionaryEntries.length); i < ii; ++i) {
+                const entry = this._dictionaryEntries[i];
+                entry.setCounts(counts[i]);
+            }
+
+            this._setCounts(counts, total);
+        } finally {
+            this._setButtonsEnabled(true);
+            this._checkingIntegrity = false;
+        }
+    }
+
+    _setCounts(dictionaryCounts, totalCounts) {
+        const remainders = Object.assign({}, totalCounts);
+        const keys = Object.keys(remainders);
+
+        for (const counts of dictionaryCounts) {
+            for (const key of keys) {
+                remainders[key] -= counts[key];
+            }
+        }
+
+        let totalRemainder = 0;
+        for (const key of keys) {
+            totalRemainder += remainders[key];
+        }
+
+        this._cleanupExtra();
+        if (totalRemainder > 0) {
+            this.extra = this._createExtra(totalCounts, remainders, totalRemainder);
+        }
+    }
+
+    _createExtra(totalCounts, remainders, totalRemainder) {
+        const node = this._instantiateTemplate('#dict-extra-template');
+        this._integrityExtraInfoNode = node;
+
+        node.querySelector('.dict-total-count').textContent = `${totalRemainder} item${totalRemainder !== 1 ? 's' : ''}`;
+
+        const n = node.querySelector('.dict-counts');
+        n.textContent = JSON.stringify({counts: totalCounts, remainders}, null, 4);
+        n.hidden = false;
+
+        this._integrityExtraInfoContainer.appendChild(node);
+    }
+
+    _cleanupExtra() {
+        const node = this._integrityExtraInfoNode;
+        if (node === null) { return; }
+        this._integrityExtraInfoNode = null;
+
+        const parent = node.parentNode;
+        if (parent === null) { return; }
+
+        parent.removeChild(node);
+    }
+
+    _createDictionaryEntry(dictionary) {
+        const node = this._instantiateTemplate('#dict-template');
+        this._dictionaryEntryContainer.appendChild(node);
+
+        const entry = new DictionaryEntry(this, node, dictionary);
+        this._dictionaryEntries.push(entry);
+        entry.prepare();
+    }
+
+    async _deleteDictionary(dictionaryTitle) {
+        if (this._isDeleting || this._checkingIntegrity) { return; }
+
+        const index = this._dictionaryEntries.findIndex((entry) => entry.dictionaryTitle === dictionaryTitle);
+        if (index < 0) { return; }
+
+        const entry = this._dictionaryEntries[index];
+        const node = entry.node;
+        const progress = node.querySelector('.progress');
+        const progressBar = node.querySelector('.progress-bar');
+        const prevention = this._settingsController.preventPageExit();
+        try {
+            this._isDeleting = true;
+            this._setButtonsEnabled(false);
+
+            progress.hidden = false;
+
             const onProgress = ({processed, count, storeCount, storesProcesed}) => {
                 let percent = 0.0;
                 if (count > 0 && storesProcesed > 0) {
@@ -300,219 +352,27 @@ class SettingsDictionaryEntryUI {
                 progressBar.style.width = `${percent}%`;
             };
 
-            await api.deleteDictionary(this.dictionaryInfo.title, onProgress);
-        } catch (e) {
-            this.dictionaryErrorsShow([e]);
-        } finally {
-            prevention.end();
-            this.isDeleting = false;
-            progress.hidden = true;
-        }
-    }
-
-    onEnabledChanged(e) {
-        this.optionsDictionary.enabled = !!e.target.checked;
-        this.save();
-    }
-
-    onAllowSecondarySearchesChanged(e) {
-        this.optionsDictionary.allowSecondarySearches = !!e.target.checked;
-        this.save();
-    }
-
-    onPriorityChanged(e) {
-        let value = Number.parseFloat(e.target.value);
-        if (Number.isNaN(value)) {
-            value = this.optionsDictionary.priority;
-        } else {
-            this.optionsDictionary.priority = value;
-            this.save();
-        }
-
-        e.target.value = `${value}`;
-
-        this.parent.updateDictionaryOrder();
-    }
-
-    onDeleteButtonClicked(e) {
-        e.preventDefault();
-
-        if (this.isDeleting) {
-            return;
-        }
-
-        const title = this.dictionaryInfo.title;
-        const n = document.querySelector('#dict-delete-modal');
-        n.dataset.dict = title;
-        document.querySelector('#dict-remove-modal-dict-name').textContent = title;
-        $(n).modal('show');
-    }
-
-    onDetailsToggleLinkClicked(e) {
-        e.preventDefault();
-
-        this.detailsContainer.hidden = !this.detailsContainer.hidden;
-    }
-}
-
-class SettingsDictionaryExtraUI {
-    constructor(parent, totalCounts, remainders, totalRemainder, content) {
-        this.parent = parent;
-        this.content = content;
-
-        this.content.querySelector('.dict-total-count').textContent = `${totalRemainder} item${totalRemainder !== 1 ? 's' : ''}`;
-
-        const node = this.content.querySelector('.dict-counts');
-        node.textContent = JSON.stringify({
-            counts: totalCounts,
-            remainders: remainders
-        }, null, 4);
-        node.removeAttribute('hidden');
-    }
-
-    cleanup() {
-        if (this.content !== null) {
-            if (this.content.parentNode !== null) {
-                this.content.parentNode.removeChild(this.content);
-            }
-            this.content = null;
-        }
-    }
-}
-
-class DictionaryController {
-    constructor(settingsController) {
-        this._settingsController = settingsController;
-        this._dictionaryUI = null;
-    }
-
-    async prepare() {
-        this._dictionaryUI = new SettingsDictionaryListUI(
-            document.querySelector('#dict-groups'),
-            document.querySelector('#dict-template'),
-            document.querySelector('#dict-groups-extra'),
-            document.querySelector('#dict-extra-template')
-        );
-        this._dictionaryUI.save = () => this._settingsController.save();
-        this._dictionaryUI.preventPageExit = this._preventPageExit.bind(this);
-
-        document.querySelector('#dict-main').addEventListener('change', this._onDictionaryMainChanged.bind(this), false);
-        document.querySelector('#database-enable-prefix-wildcard-searches').addEventListener('change', this._onDatabaseEnablePrefixWildcardSearchesChanged.bind(this), false);
-
-        this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
-
-        yomichan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
-
-        await this._onOptionsChanged();
-        await this._onDatabaseUpdated();
-    }
-
-    // Private
-
-    async _onOptionsChanged() {
-        const options = await this._settingsController.getOptionsMutable();
-
-        this._dictionaryUI.setOptionsDictionaries(options.dictionaries);
-
-        const optionsFull = await this._settingsController.getOptionsFull();
-        document.querySelector('#database-enable-prefix-wildcard-searches').checked = optionsFull.global.database.prefixWildcardsSupported;
-
-        await this._updateMainDictionarySelectValue();
-    }
-
-    _updateMainDictionarySelectOptions(dictionaries) {
-        const select = document.querySelector('#dict-main');
-        select.textContent = ''; // Empty
-
-        let option = document.createElement('option');
-        option.className = 'text-muted';
-        option.value = '';
-        option.textContent = 'Not selected';
-        select.appendChild(option);
-
-        for (const {title, sequenced} of toIterable(dictionaries)) {
-            if (!sequenced) { continue; }
-
-            option = document.createElement('option');
-            option.value = title;
-            option.textContent = title;
-            select.appendChild(option);
-        }
-    }
-
-    async _updateMainDictionarySelectValue() {
-        const options = await this._settingsController.getOptions();
-
-        const value = options.general.mainDictionary;
-
-        const select = document.querySelector('#dict-main');
-        let selectValue = null;
-        for (const child of select.children) {
-            if (child.nodeName.toUpperCase() === 'OPTION' && child.value === value) {
-                selectValue = value;
-                break;
-            }
-        }
-
-        let missingNodeOption = select.querySelector('option[data-not-installed=true]');
-        if (selectValue === null) {
-            if (missingNodeOption === null) {
-                missingNodeOption = document.createElement('option');
-                missingNodeOption.className = 'text-muted';
-                missingNodeOption.value = value;
-                missingNodeOption.textContent = `${value} (Not installed)`;
-                missingNodeOption.dataset.notInstalled = 'true';
-                select.appendChild(missingNodeOption);
-            }
-        } else {
-            if (missingNodeOption !== null) {
-                missingNodeOption.parentNode.removeChild(missingNodeOption);
-            }
-        }
-
-        select.value = value;
-    }
-
-    async _onDatabaseUpdated() {
-        try {
-            const dictionaries = await api.getDictionaryInfo();
-            this._dictionaryUI.setDictionaries(dictionaries);
-
-            document.querySelector('#dict-warning').hidden = (dictionaries.length > 0);
-
-            this._updateMainDictionarySelectOptions(dictionaries);
-            await this._updateMainDictionarySelectValue();
-
-            const {counts, total} = await api.getDictionaryCounts(dictionaries.map((v) => v.title), true);
-            this._dictionaryUI.setCounts(counts, total);
+            await api.deleteDictionary(dictionaryTitle, onProgress);
         } catch (e) {
             yomichan.logError(e);
+        } finally {
+            prevention.end();
+            progress.hidden = true;
+            this._setButtonsEnabled(true);
+            this._isDeleting = false;
         }
     }
 
-    async _onDictionaryMainChanged(e) {
-        const select = e.target;
-        const value = select.value;
-
-        const missingNodeOption = select.querySelector('option[data-not-installed=true]');
-        if (missingNodeOption !== null && missingNodeOption.value !== value) {
-            missingNodeOption.parentNode.removeChild(missingNodeOption);
+    _setButtonsEnabled(value) {
+        value = !value;
+        for (const node of document.querySelectorAll('.dictionary-modifying-input')) {
+            node.disabled = value;
         }
-
-        const options = await this._settingsController.getOptionsMutable();
-        options.general.mainDictionary = value;
-        await this._settingsController.save();
     }
 
-    async _onDatabaseEnablePrefixWildcardSearchesChanged(e) {
-        const optionsFull = await this._settingsController.getOptionsFullMutable();
-        const v = !!e.target.checked;
-        if (optionsFull.global.database.prefixWildcardsSupported === v) { return; }
-        optionsFull.global.database.prefixWildcardsSupported = !!e.target.checked;
-        await this._settingsController.save();
-    }
-
-    _preventPageExit() {
-        return this._settingsController.preventPageExit();
+    _instantiateTemplate(templateSelector) {
+        const template = document.querySelector(templateSelector);
+        const content = document.importNode(template.content, true);
+        return content.firstChild;
     }
 }

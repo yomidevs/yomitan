@@ -303,6 +303,9 @@ class DOMDataBinder {
                 element.value = value;
                 break;
         }
+
+        const event = new CustomEvent('settingChanged', {detail: {value}});
+        element.dispatchEvent(event);
     }
 
     _getElementValue(element) {
