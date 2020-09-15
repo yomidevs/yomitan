@@ -192,11 +192,6 @@ const clone = (() => {
     return clone;
 })();
 
-// Expose clone function on the global object, since util.js's utilBackgroundIsolate needs access to it.
-if (typeof window === 'object' && window !== null) {
-    window.clone = clone;
-}
-
 function generateId(length) {
     const array = new Uint8Array(length);
     crypto.getRandomValues(array);

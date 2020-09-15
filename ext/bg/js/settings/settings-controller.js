@@ -17,8 +17,6 @@
 
 /* global
  * api
- * utilBackend
- * utilBackgroundIsolate
  */
 
 class SettingsController extends EventDispatcher {
@@ -51,10 +49,6 @@ class SettingsController extends EventDispatcher {
         await this._onOptionsUpdatedInternal();
     }
 
-    async save() {
-        await api.optionsSave(this._source);
-    }
-
     async getOptions() {
         const optionsContext = this.getOptionsContext();
         return await api.optionsGet(optionsContext);
@@ -62,15 +56,6 @@ class SettingsController extends EventDispatcher {
 
     async getOptionsFull() {
         return await api.optionsGetFull();
-    }
-
-    async getOptionsMutable() {
-        const optionsContext = this.getOptionsContext();
-        return utilBackend().getOptions(utilBackgroundIsolate(optionsContext));
-    }
-
-    async getOptionsFullMutable() {
-        return utilBackend().getFullOptions();
     }
 
     async setAllSettings(value) {

@@ -80,7 +80,6 @@ class Backend {
             ['requestBackendReadySignal',    {async: false, contentScript: true,  handler: this._onApiRequestBackendReadySignal.bind(this)}],
             ['optionsGet',                   {async: false, contentScript: true,  handler: this._onApiOptionsGet.bind(this)}],
             ['optionsGetFull',               {async: false, contentScript: true,  handler: this._onApiOptionsGetFull.bind(this)}],
-            ['optionsSave',                  {async: true,  contentScript: true,  handler: this._onApiOptionsSave.bind(this)}],
             ['kanjiFind',                    {async: true,  contentScript: true,  handler: this._onApiKanjiFind.bind(this)}],
             ['termsFind',                    {async: true,  contentScript: true,  handler: this._onApiTermsFind.bind(this)}],
             ['textParse',                    {async: true,  contentScript: true,  handler: this._onApiTextParse.bind(this)}],
@@ -375,13 +374,6 @@ class Backend {
 
     _onApiOptionsGetFull() {
         return this.getFullOptions();
-    }
-
-    async _onApiOptionsSave({source}) {
-        this._clearProfileConditionsSchemaCache();
-        const options = this.getFullOptions();
-        await this._optionsUtil.save(options);
-        this._applyOptions(source);
     }
 
     async _onApiKanjiFind({text, optionsContext}) {
@@ -766,7 +758,7 @@ class Backend {
                 results.push({error: errorToJson(e)});
             }
         }
-        await this._onApiOptionsSave({source});
+        await this._saveOptions(source);
         return results;
     }
 
@@ -786,7 +778,7 @@ class Backend {
     async _onApiSetAllSettings({value, source}) {
         this._optionsUtil.validate(value);
         this._options = clone(value);
-        await this._onApiOptionsSave({source});
+        await this._saveOptions(source);
     }
 
     async _onApiGetOrCreateSearchPopup({focus=false, text=null}) {
@@ -879,7 +871,7 @@ class Backend {
         const source = 'popup';
         const options = this.getOptions({current: true});
         options.general.enable = !options.general.enable;
-        await this._onApiOptionsSave({source});
+        await this._saveOptions(source);
     }
 
     // Utilities
@@ -1730,5 +1722,12 @@ class Backend {
 
     _triggerDatabaseUpdated(type, cause) {
         this._sendMessageAllTabs('databaseUpdated', {type, cause});
+    }
+
+    async _saveOptions(source) {
+        this._clearProfileConditionsSchemaCache();
+        const options = this.getFullOptions();
+        await this._optionsUtil.save(options);
+        this._applyOptions(source);
     }
 }

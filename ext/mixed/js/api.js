@@ -57,10 +57,6 @@ const api = (() => {
             return this._invoke('optionsGetFull');
         }
 
-        optionsSave(source) {
-            return this._invoke('optionsSave', {source});
-        }
-
         termsFind(text, details, optionsContext) {
             return this._invoke('termsFind', {text, details, optionsContext});
         }

@@ -21,8 +21,5 @@
 
 (() => {
     const backend = new Backend();
-    if (typeof window === 'object' && window !== null) {
-        window.yomichanBackend = backend;
-    }
     backend.prepare();
 })();
