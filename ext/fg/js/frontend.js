@@ -399,8 +399,10 @@ class Frontend {
         this._clearSelection(true);
         this._popupEventListeners.removeAllEventListeners();
         this._popup = popup;
-        this._popupEventListeners.on(popup, 'framePointerOver', this._onPopupFramePointerOver.bind(this));
-        this._popupEventListeners.on(popup, 'framePointerOut', this._onPopupFramePointerOut.bind(this));
+        if (popup !== null) {
+            this._popupEventListeners.on(popup, 'framePointerOver', this._onPopupFramePointerOver.bind(this));
+            this._popupEventListeners.on(popup, 'framePointerOut', this._onPopupFramePointerOut.bind(this));
+        }
         this._isPointerOverPopup = false;
     }
 
