@@ -16,6 +16,7 @@
  */
 
 /* global
+ * Modal
  * OptionsUtil
  * api
  */
@@ -26,11 +27,18 @@ class BackupController {
         this._settingsExportToken = null;
         this._settingsExportRevoke = null;
         this._currentVersion = 0;
+        this._settingsResetModal = null;
+        this._settingsImportErrorModal = null;
+        this._settingsImportWarningModal = null;
         this._optionsUtil = new OptionsUtil();
     }
 
     async prepare() {
         await this._optionsUtil.prepare();
+
+        this._settingsResetModal = new Modal(document.querySelector('#settings-reset-modal'));
+        this._settingsImportErrorModal = new Modal(document.querySelector('#settings-import-error-modal'));
+        this._settingsImportWarningModal = new Modal(document.querySelector('#settings-import-warning-modal'));
 
         document.querySelector('#settings-export').addEventListener('click', this._onSettingsExportClick.bind(this), false);
         document.querySelector('#settings-import').addEventListener('click', this._onSettingsImportClick.bind(this), false);
@@ -153,14 +161,14 @@ class BackupController {
     _showSettingsImportError(error) {
         yomichan.logError(error);
         document.querySelector('#settings-import-error-modal-message').textContent = `${error}`;
-        $('#settings-import-error-modal').modal('show');
+        this._settingsImportErrorModal.setVisible(true);
     }
 
     async _showSettingsImportWarnings(warnings) {
-        const modalNode = $('#settings-import-warning-modal');
+        const modal = this._settingsImportWarningModal;
         const buttons = document.querySelectorAll('.settings-import-warning-modal-import-button');
         const messageContainer = document.querySelector('#settings-import-warning-modal-message');
-        if (modalNode.length === 0 || buttons.length === 0 || messageContainer === null) {
+        if (buttons.length === 0 || messageContainer === null) {
             return {result: false};
         }
 
@@ -175,7 +183,7 @@ class BackupController {
         messageContainer.appendChild(fragment);
 
         // Show modal
-        modalNode.modal('show');
+        modal.setVisible(true);
 
         // Wait for modal to close
         return new Promise((resolve) => {
@@ -185,9 +193,10 @@ class BackupController {
                     result: true,
                     sanitize: e.currentTarget.dataset.importSanitize === 'true'
                 });
-                modalNode.modal('hide');
+                modal.setVisible(false);
             };
-            const onModalHide = () => {
+            const onModalVisibilityChanged = ({visible}) => {
+                if (visible) { return; }
                 complete({result: false});
             };
 
@@ -196,7 +205,7 @@ class BackupController {
                 if (completed) { return; }
                 completed = true;
 
-                modalNode.off('hide.bs.modal', onModalHide);
+                modal.off('visibilityChanged', onModalVisibilityChanged);
                 for (const button of buttons) {
                     button.removeEventListener('click', onButtonClick, false);
                 }
@@ -205,7 +214,7 @@ class BackupController {
             };
 
             // Hook events
-            modalNode.on('hide.bs.modal', onModalHide);
+            modal.on('visibilityChanged', onModalVisibilityChanged);
             for (const button of buttons) {
                 button.addEventListener('click', onButtonClick, false);
             }
@@ -368,11 +377,11 @@ class BackupController {
     // Resetting
 
     _onSettingsResetClick() {
-        $('#settings-reset-modal').modal('show');
+        this._settingsResetModal.setVisible(true);
     }
 
     async _onSettingsResetConfirmClick() {
-        $('#settings-reset-modal').modal('hide');
+        this._settingsResetModal.setVisible(false);
 
         // Get default options
         const optionsFull = this._optionsUtil.getDefault();

@@ -17,6 +17,7 @@
 
 /* global
  * AnkiNoteBuilder
+ * Modal
  * TemplateRendererProxy
  * api
  */
@@ -28,11 +29,14 @@ class AnkiTemplatesController {
         this._cachedDefinitionValue = null;
         this._cachedDefinitionText = null;
         this._defaultFieldTemplates = null;
+        this._fieldTemplateResetModal = null;
         this._templateRenderer = new TemplateRendererProxy();
     }
 
     async prepare() {
         this._defaultFieldTemplates = await api.getDefaultAnkiFieldTemplates();
+
+        this._fieldTemplateResetModal = new Modal(document.querySelector('#field-template-reset-modal'));
 
         const markers = new Set([
             ...this._ankiController.getFieldMarkers('terms'),
@@ -69,13 +73,13 @@ class AnkiTemplatesController {
 
     _onReset(e) {
         e.preventDefault();
-        $('#field-template-reset-modal').modal('show');
+        this._fieldTemplateResetModal.setVisible(true);
     }
 
     _onResetConfirm(e) {
         e.preventDefault();
 
-        $('#field-template-reset-modal').modal('hide');
+        this._fieldTemplateResetModal.setVisible(false);
 
         const value = this._defaultFieldTemplates;
 

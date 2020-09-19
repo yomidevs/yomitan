@@ -16,6 +16,7 @@
  */
 
 /* global
+ * Modal
  * ObjectPropertyAccessor
  * api
  */
@@ -164,7 +165,7 @@ class DictionaryController {
         this._checkIntegrityButton = document.querySelector('#dict-check-integrity');
         this._dictionaryEntryContainer = document.querySelector('#dict-groups');
         this._integrityExtraInfoContainer = document.querySelector('#dict-groups-extra');
-        this._deleteDictionaryModal = document.querySelector('#dict-delete-modal');
+        this._deleteDictionaryModal = new Modal(document.querySelector('#dict-delete-modal'));
 
         yomichan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
 
@@ -177,9 +178,9 @@ class DictionaryController {
     deleteDictionary(dictionaryTitle) {
         if (this._isDeleting) { return; }
         const modal = this._deleteDictionaryModal;
-        modal.dataset.dictionaryTitle = dictionaryTitle;
-        modal.querySelector('#dict-remove-modal-dict-name').textContent = dictionaryTitle;
-        this._setModalVisible(modal, true);
+        modal.node.dataset.dictionaryTitle = dictionaryTitle;
+        modal.node.querySelector('#dict-remove-modal-dict-name').textContent = dictionaryTitle;
+        modal.setVisible(true);
     }
 
     // Private
@@ -209,11 +210,11 @@ class DictionaryController {
         e.preventDefault();
 
         const modal = this._deleteDictionaryModal;
-        this._setModalVisible(modal, false);
+        modal.setVisible(false);
 
-        const title = modal.dataset.dictionaryTitle;
+        const title = modal.node.dataset.dictionaryTitle;
         if (typeof title !== 'string') { return; }
-        delete modal.dataset.dictionaryTitle;
+        delete modal.node.dataset.dictionaryTitle;
 
         this._deleteDictionary(title);
     }
@@ -221,10 +222,6 @@ class DictionaryController {
     _onCheckIntegrityButtonClick(e) {
         e.preventDefault();
         this._checkIntegrity();
-    }
-
-    _setModalVisible(node, visible) {
-        $(node).modal(visible ? 'show' : 'hide');
     }
 
     _updateMainDictionarySelectOptions(dictionaries) {

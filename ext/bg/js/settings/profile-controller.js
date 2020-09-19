@@ -16,6 +16,7 @@
  */
 
 /* global
+ * Modal
  * ProfileConditionsUI
  * api
  */
@@ -51,8 +52,8 @@ class ProfileController {
         this._profileCopyButton = document.querySelector('#profile-copy');
         this._profileMoveUpButton = document.querySelector('#profile-move-up');
         this._profileMoveDownButton = document.querySelector('#profile-move-down');
-        this._profileRemoveModal = document.querySelector('#profile-remove-modal');
-        this._profileCopyModal = document.querySelector('#profile-copy-modal');
+        this._profileRemoveModal = new Modal(document.querySelector('#profile-remove-modal'));
+        this._profileCopyModal = new Modal(document.querySelector('#profile-copy-modal'));
 
         this._profileActiveSelect.addEventListener('change', this._onProfileActiveChange.bind(this), false);
         this._profileTargetSelect.addEventListener('change', this._onProfileTargetChange.bind(this), false);
@@ -135,11 +136,11 @@ class ProfileController {
         const profileIndex = this._settingsController.profileIndex;
         const profile = this._optionsFull.profiles[profileIndex];
         this._removeProfileNameElement.textContent = profile.name;
-        this._setModalVisible(this._profileRemoveModal, true);
+        this._profileRemoveModal.setVisible(true);
     }
 
     _onRemoveConfirm() {
-        this._setModalVisible(this._profileRemoveModal, false);
+        this._profileRemoveModal.setVisible(false);
         if (this._optionsFull.profiles.length <= 1) { return; }
         const profileIndex = this._settingsController.profileIndex;
         this._removeProfile(profileIndex);
@@ -160,11 +161,11 @@ class ProfileController {
         }
         this._profileCopySourceSelect.value = `${copyFromIndex}`;
 
-        this._setModalVisible(this._profileCopyModal, true);
+        this._profileCopyModal.setVisible(true);
     }
 
     _onCopyConfirm() {
-        this._setModalVisible(this._profileCopyModal, false);
+        this._profileCopyModal.setVisible(false);
 
         const profileIndex = this._settingsController.profileIndex;
         const max = this._optionsFull.profiles.length;
@@ -263,10 +264,6 @@ class ProfileController {
         if (currentValue === value1) { return value2; }
         if (currentValue === value2) { return value1; }
         return null;
-    }
-
-    _setModalVisible(node, visible) {
-        $(node).modal(visible ? 'show' : 'hide');
     }
 
     async _addProfile() {

@@ -18,6 +18,7 @@
 /* global
  * DictionaryDatabase
  * DictionaryImporter
+ * Modal
  * ObjectPropertyAccessor
  * api
  */
@@ -53,7 +54,7 @@ class DictionaryImportController {
         this._purgeConfirmButton = document.querySelector('#dict-purge-confirm');
         this._importFileButton = document.querySelector('#dict-file-button');
         this._importFileInput = document.querySelector('#dict-file');
-        this._purgeConfirmModal = document.querySelector('#dict-purge-modal');
+        this._purgeConfirmModal = new Modal(document.querySelector('#dict-purge-modal'));
         this._errorContainer = document.querySelector('#dict-error');
         this._spinner = document.querySelector('#dict-spinner');
         this._progressContainer = document.querySelector('#dict-import-progress');
@@ -75,12 +76,12 @@ class DictionaryImportController {
 
     _onPurgeButtonClick(e) {
         e.preventDefault();
-        this._setPurgeModalVisible(true);
+        this._purgeConfirmModal.setVisible(true);
     }
 
     _onPurgeConfirmButtonClick(e) {
         e.preventDefault();
-        this._setPurgeModalVisible(false);
+        this._purgeConfirmModal.setVisible(false);
         this._purgeDatabase();
     }
 
@@ -218,11 +219,6 @@ class DictionaryImportController {
             targets.push({action: 'set', path: path2, value: ''});
         }
         return await this._modifyGlobalSettings(targets);
-    }
-
-    _setPurgeModalVisible(visible) {
-        const node = $(this._purgeConfirmModal);
-        node.modal(visible ? 'show' : 'hide');
     }
 
     _setSpinnerVisible(visible) {

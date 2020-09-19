@@ -325,6 +325,11 @@ class EventDispatcher {
         }
         return false;
     }
+
+    hasListeners(eventName) {
+        const callbacks = this._eventMap.get(eventName);
+        return (typeof callbacks !== 'undefined' && callbacks.length > 0);
+    }
 }
 
 class EventListenerCollection {
