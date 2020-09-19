@@ -250,14 +250,14 @@ class BackupController {
             if (typeof fieldTemplates === 'string') {
                 warnings.push('anki.fieldTemplates contains a non-default value');
                 if (!dryRun) {
-                    delete anki.fieldTemplates;
+                    anki.fieldTemplates = null;
                 }
             }
             const server = anki.server;
             if (typeof server === 'string' && server.length > 0 && !this._isLocalhostUrl(server)) {
                 warnings.push('anki.server uses a non-localhost URL');
                 if (!dryRun) {
-                    delete anki.server;
+                    anki.server = 'http://127.0.0.1:8765';
                 }
             }
         }
@@ -268,7 +268,7 @@ class BackupController {
             if (typeof customSourceUrl === 'string' && customSourceUrl.length > 0 && !this._isLocalhostUrl(customSourceUrl)) {
                 warnings.push('audio.customSourceUrl uses a non-localhost URL');
                 if (!dryRun) {
-                    delete audio.customSourceUrl;
+                    audio.customSourceUrl = '';
                 }
             }
         }
