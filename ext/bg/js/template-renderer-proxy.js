@@ -41,6 +41,10 @@ class TemplateRendererProxy {
             style.width = '0';
             style.height = '0';
             style.position = 'absolute';
+            style.border = '0';
+            style.margin = '0';
+            style.padding = '0';
+            style.pointerEvents = 'none';
         }
         if (this._frameNeedsLoad) {
             this._frameNeedsLoad = false;
