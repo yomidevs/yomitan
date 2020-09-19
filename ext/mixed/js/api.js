@@ -197,12 +197,6 @@ const api = (() => {
             return this._invoke('triggerDatabaseUpdated', {type, cause});
         }
 
-        // Invoke functions with progress
-
-        deleteDictionary(dictionaryName, onProgress) {
-            return this._invokeWithProgress('deleteDictionary', {dictionaryName}, onProgress);
-        }
-
         // Utilities
 
         _createActionPort(timeout=5000) {

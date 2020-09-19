@@ -118,7 +118,6 @@ class Backend {
             ['triggerDatabaseUpdated',       {async: false, contentScript: true,  handler: this._onApiTriggerDatabaseUpdated.bind(this)}]
         ]);
         this._messageHandlersWithProgress = new Map([
-            ['deleteDictionary',        {async: true,  contentScript: false, handler: this._onApiDeleteDictionary.bind(this)}]
         ]);
 
         this._commandHandlers = new Map([
@@ -700,7 +699,6 @@ class Backend {
     }
 
     async _onApiPurgeDatabase() {
-        this._translator.clearDatabaseCaches();
         await this._dictionaryDatabase.purge();
         this._triggerDatabaseUpdated('dictionary', 'purge');
     }
@@ -740,12 +738,6 @@ class Backend {
         }
 
         return details;
-    }
-
-    async _onApiDeleteDictionary({dictionaryName}, sender, onProgress) {
-        this._translator.clearDatabaseCaches();
-        await this._dictionaryDatabase.deleteDictionary(dictionaryName, {rate: 1000}, onProgress);
-        this._triggerDatabaseUpdated('dictionary', 'delete');
     }
 
     async _onApiModifySettings({targets, source}) {
@@ -1721,6 +1713,7 @@ class Backend {
     }
 
     _triggerDatabaseUpdated(type, cause) {
+        this._translator.clearDatabaseCaches();
         this._sendMessageAllTabs('databaseUpdated', {type, cause});
     }
 

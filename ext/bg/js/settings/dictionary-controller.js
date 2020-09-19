@@ -16,6 +16,7 @@
  */
 
 /* global
+ * DictionaryDatabase
  * Modal
  * ObjectPropertyAccessor
  * api
@@ -349,7 +350,7 @@ class DictionaryController {
                 progressBar.style.width = `${percent}%`;
             };
 
-            await api.deleteDictionary(dictionaryTitle, onProgress);
+            await this._deleteDictionaryInternal(dictionaryTitle, onProgress);
         } catch (e) {
             yomichan.logError(e);
         } finally {
@@ -371,5 +372,21 @@ class DictionaryController {
         const template = document.querySelector(templateSelector);
         const content = document.importNode(template.content, true);
         return content.firstChild;
+    }
+
+    async _deleteDictionaryInternal(dictionaryTitle, onProgress) {
+        const dictionaryDatabase = await this._getPreparedDictionaryDatabase();
+        try {
+            await dictionaryDatabase.deleteDictionary(dictionaryTitle, {rate: 1000}, onProgress);
+            api.triggerDatabaseUpdated('dictionary', 'delete');
+        } finally {
+            dictionaryDatabase.close();
+        }
+    }
+
+    async _getPreparedDictionaryDatabase() {
+        const dictionaryDatabase = new DictionaryDatabase();
+        await dictionaryDatabase.prepare();
+        return dictionaryDatabase;
     }
 }
