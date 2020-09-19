@@ -15,8 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const {createTestDictionaryArchive} = require('./yomichan-test');
-const dictionaryValidate = require('./dictionary-validate');
+const path = require('path');
+const {createDictionaryArchive} = require('../dev/util');
+const dictionaryValidate = require('../dev/dictionary-validate');
+
+
+function createTestDictionaryArchive(dictionary, dictionaryName) {
+    const dictionaryDirectory = path.join(__dirname, 'data', 'dictionaries', dictionary);
+    return createDictionaryArchive(dictionaryDirectory, dictionaryName);
+}
 
 
 async function main() {

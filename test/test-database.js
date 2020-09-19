@@ -19,9 +19,8 @@ const fs = require('fs');
 const url = require('url');
 const path = require('path');
 const assert = require('assert');
-const {JSZip} = require('../dev/yomichan-util');
-const {createTestDictionaryArchive} = require('./yomichan-test');
-const {VM} = require('./yomichan-vm');
+const {JSZip, createDictionaryArchive} = require('../dev/util');
+const {VM} = require('../dev/vm');
 require('fake-indexeddb/auto');
 
 const chrome = {
@@ -123,6 +122,12 @@ vm.execute([
 ]);
 const DictionaryImporter = vm.get('DictionaryImporter');
 const DictionaryDatabase = vm.get('DictionaryDatabase');
+
+
+function createTestDictionaryArchive(dictionary, dictionaryName) {
+    const dictionaryDirectory = path.join(__dirname, 'data', 'dictionaries', dictionary);
+    return createDictionaryArchive(dictionaryDirectory, dictionaryName);
+}
 
 
 function countTermsWithExpression(terms, expression) {

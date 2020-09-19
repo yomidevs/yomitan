@@ -19,8 +19,8 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 const childProcess = require('child_process');
-const util = require('./yomichan-util');
-const {getAllFiles, getDefaultManifestAndVariants, createManifestString} = util;
+const util = require('./util');
+const {getAllFiles, getDefaultManifestAndVariants, createManifestString, getArgs} = util;
 
 
 function clone(value) {
@@ -208,54 +208,10 @@ async function build(manifest, buildDir, extDir, manifestPath, variantMap, varia
     }
 }
 
-function getArs(args, argMap) {
-    let key = null;
-    let canKey = true;
-    let onKey = false;
-    for (const arg of args) {
-        onKey = false;
-
-        if (canKey && arg.startsWith('--')) {
-            if (arg.length === 2) {
-                canKey = false;
-                key = null;
-                onKey = false;
-            } else {
-                key = arg.substring(2);
-                onKey = true;
-            }
-        }
-
-        const target = argMap.get(key);
-        if (typeof target === 'boolean') {
-            argMap.set(key, true);
-            key = null;
-        } else if (typeof target === 'number') {
-            argMap.set(key, target + 1);
-            key = null;
-        } else if (target === null || typeof target === 'string') {
-            if (!onKey) {
-                argMap.set(key, arg);
-                key = null;
-            }
-        } else if (Array.isArray(target)) {
-            if (!onKey) {
-                target.push(arg);
-                key = null;
-            }
-        } else {
-            console.error(`Unknown argument: ${arg}`);
-            key = null;
-        }
-    }
-
-    return argMap;
-}
-
 
 async function main() {
     const argv = process.argv.slice(2);
-    const args = getArs(argv, new Map([
+    const args = getArgs(argv, new Map([
         ['all', false],
         ['default', false],
         ['manifest', null],

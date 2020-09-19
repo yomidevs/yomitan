@@ -16,7 +16,7 @@
  */
 
 const assert = require('assert');
-const {VM} = require('./yomichan-vm');
+const {VM} = require('../dev/vm');
 
 const vm = new VM();
 vm.execute(['bg/js/text-source-map.js']);

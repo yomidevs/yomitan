@@ -18,7 +18,7 @@
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
-const {getDefaultManifest, createManifestString} = require('../dev/yomichan-util');
+const {getDefaultManifest, createManifestString} = require('../dev/util');
 
 
 function loadManifestString() {

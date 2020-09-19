@@ -32,6 +32,50 @@ function getJSZip() {
 }
 
 
+function getArgs(args, argMap) {
+    let key = null;
+    let canKey = true;
+    let onKey = false;
+    for (const arg of args) {
+        onKey = false;
+
+        if (canKey && arg.startsWith('--')) {
+            if (arg.length === 2) {
+                canKey = false;
+                key = null;
+                onKey = false;
+            } else {
+                key = arg.substring(2);
+                onKey = true;
+            }
+        }
+
+        const target = argMap.get(key);
+        if (typeof target === 'boolean') {
+            argMap.set(key, true);
+            key = null;
+        } else if (typeof target === 'number') {
+            argMap.set(key, target + 1);
+            key = null;
+        } else if (target === null || typeof target === 'string') {
+            if (!onKey) {
+                argMap.set(key, arg);
+                key = null;
+            }
+        } else if (Array.isArray(target)) {
+            if (!onKey) {
+                target.push(arg);
+                key = null;
+            }
+        } else {
+            console.error(`Unknown argument: ${arg}`);
+            key = null;
+        }
+    }
+
+    return argMap;
+}
+
 function getAllFiles(baseDirectory, relativeTo=null, predicate=null) {
     const results = [];
     const directories = [baseDirectory];
@@ -69,11 +113,36 @@ function createManifestString(manifest) {
     return JSON.stringify(manifest, null, 4) + '\n';
 }
 
+function createDictionaryArchive(dictionaryDirectory, dictionaryName) {
+    const fileNames = fs.readdirSync(dictionaryDirectory);
+
+    const JSZip2 = getJSZip();
+    const archive = new JSZip2();
+
+    for (const fileName of fileNames) {
+        if (/\.json$/.test(fileName)) {
+            const content = fs.readFileSync(path.join(dictionaryDirectory, fileName), {encoding: 'utf8'});
+            const json = JSON.parse(content);
+            if (fileName === 'index.json' && typeof dictionaryName === 'string') {
+                json.title = dictionaryName;
+            }
+            archive.file(fileName, JSON.stringify(json, null, 0));
+        } else {
+            const content = fs.readFileSync(path.join(dictionaryDirectory, fileName), {encoding: null});
+            archive.file(fileName, content);
+        }
+    }
+
+    return archive;
+}
+
 
 module.exports = {
     get JSZip() { return getJSZip(); },
+    getArgs,
     getAllFiles,
     getDefaultManifest,
     getDefaultManifestAndVariants,
-    createManifestString
+    createManifestString,
+    createDictionaryArchive
 };

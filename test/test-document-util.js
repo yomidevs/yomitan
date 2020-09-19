@@ -19,7 +19,7 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 const {JSDOM} = require('jsdom');
-const {VM} = require('./yomichan-vm');
+const {VM} = require('../dev/vm');
 
 
 // DOMRect class definition

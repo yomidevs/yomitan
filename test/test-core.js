@@ -17,7 +17,7 @@
 
 const assert = require('assert');
 const crypto = require('crypto');
-const {VM} = require('./yomichan-vm');
+const {VM} = require('../dev/vm');
 
 const vm = new VM({
     crypto: {
