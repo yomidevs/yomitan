@@ -31,7 +31,7 @@ class Timer {
     }
 
     sample(name) {
-        const time = window.performance.now();
+        const time = performance.now();
         this.samples.push({
             name,
             time,
