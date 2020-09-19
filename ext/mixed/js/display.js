@@ -25,7 +25,7 @@
  * MediaLoader
  * PopupFactory
  * QueryParser
- * TemplateRenderer
+ * TemplateRendererProxy
  * WindowScroll
  * api
  * dynamicLoader
@@ -87,7 +87,7 @@ class Display extends EventDispatcher {
         this._ownerFrameId = null;
         this._defaultAnkiFieldTemplates = null;
         this._defaultAnkiFieldTemplatesPromise = null;
-        this._templateRenderer = new TemplateRenderer();
+        this._templateRenderer = new TemplateRendererProxy();
         this._ankiNoteBuilder = new AnkiNoteBuilder({
             renderTemplate: this._renderTemplate.bind(this)
         });

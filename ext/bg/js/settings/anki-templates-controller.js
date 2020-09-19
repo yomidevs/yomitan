@@ -17,7 +17,7 @@
 
 /* global
  * AnkiNoteBuilder
- * TemplateRenderer
+ * TemplateRendererProxy
  * api
  */
 
@@ -28,7 +28,7 @@ class AnkiTemplatesController {
         this._cachedDefinitionValue = null;
         this._cachedDefinitionText = null;
         this._defaultFieldTemplates = null;
-        this._templateRenderer = new TemplateRenderer();
+        this._templateRenderer = new TemplateRendererProxy();
     }
 
     async prepare() {
