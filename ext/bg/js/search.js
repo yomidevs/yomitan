@@ -36,7 +36,9 @@ class DisplaySearch extends Display {
         this._introAnimationTimer = null;
         this._clipboardMonitorEnabled = false;
         this._clipboardMonitor = new ClipboardMonitor({
-            getClipboard: api.clipboardGet.bind(api)
+            clipboardReader: {
+                getText: async () => (await api.clipboardGet())
+            }
         });
         this._onKeyDownIgnoreKeys = new Map([
             ['ANY_MOD', new Set([

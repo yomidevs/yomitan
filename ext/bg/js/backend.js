@@ -20,6 +20,7 @@
  * AudioSystem
  * AudioUriBuilder
  * ClipboardMonitor
+ * ClipboardReader
  * DictionaryDatabase
  * Environment
  * JsonSchemaValidator
@@ -39,7 +40,14 @@ class Backend {
         this._translator = new Translator(this._dictionaryDatabase);
         this._anki = new AnkiConnect();
         this._mecab = new Mecab();
-        this._clipboardMonitor = new ClipboardMonitor({getClipboard: this._onApiClipboardGet.bind(this)});
+        this._clipboardReader = new ClipboardReader({
+            document: (typeof document === 'object' && document !== null ? document : null),
+            pasteTargetSelector: '#clipboard-paste-target',
+            imagePasteTargetSelector: '#clipboard-image-paste-target'
+        });
+        this._clipboardMonitor = new ClipboardMonitor({
+            clipboardReader: this._clipboardReader
+        });
         this._options = null;
         this._profileConditionsSchemaValidator = new JsonSchemaValidator();
         this._profileConditionsSchemaCache = [];
@@ -55,11 +63,6 @@ class Backend {
             useCache: false
         });
         this._optionsUtil = new OptionsUtil();
-
-        this._clipboardPasteTarget = null;
-        this._clipboardPasteTargetInitialized = false;
-        this._clipboardImagePasteTarget = null;
-        this._clipboardImagePasteTargetInitialized = false;
 
         this._searchPopupTabId = null;
         this._searchPopupTabCreatePromise = null;
@@ -179,6 +182,8 @@ class Backend {
             yomichan.on('log', this._onLog.bind(this));
 
             await this._environment.prepare();
+            this._clipboardReader.browser = this._environment.getInfo().browser;
+
             try {
                 await this._dictionaryDatabase.prepare();
             } catch (e) {
@@ -577,78 +582,11 @@ class Backend {
     }
 
     async _onApiClipboardGet() {
-        /*
-        Notes:
-            document.execCommand('paste') doesn't work on Firefox.
-            This may be a bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1603985
-            Therefore, navigator.clipboard.readText() is used on Firefox.
-
-            navigator.clipboard.readText() can't be used in Chrome for two reasons:
-            * Requires page to be focused, else it rejects with an exception.
-            * When the page is focused, Chrome will request clipboard permission, despite already
-              being an extension with clipboard permissions. It effectively asks for the
-              non-extension permission for clipboard access.
-        */
-        const {browser} = this._environment.getInfo();
-        if (browser === 'firefox' || browser === 'firefox-mobile') {
-            return await navigator.clipboard.readText();
-        }
-
-        if (!this._environmentHasDocument()) {
-            throw new Error('Reading the clipboard is not supported in this context');
-        }
-
-        if (!this._clipboardPasteTargetInitialized) {
-            this._clipboardPasteTarget = document.querySelector('#clipboard-paste-target');
-            this._clipboardPasteTargetInitialized = true;
-        }
-
-        const target = this._clipboardPasteTarget;
-        if (target === null) {
-            throw new Error('Clipboard paste target does not exist');
-        }
-
-        target.value = '';
-        target.focus();
-        this._executePasteCommand();
-        const result = target.value;
-        target.value = '';
-        return result;
+        return this._clipboardReader.getText();
     }
 
     async _onApiClipboardImageGet() {
-        // See browser-specific notes in _onApiClipboardGet
-        const {browser} = this._environment.getInfo();
-        if (browser === 'firefox' || browser === 'firefox-mobile') {
-            if (typeof navigator.clipboard !== 'undefined' && typeof navigator.clipboard.read === 'function') {
-                // This function is behind the flag: dom.events.asyncClipboard.dataTransfer
-                const {files} = await navigator.clipboard.read();
-                if (files.length === 0) { return null; }
-                const result = await this._readFileAsDataURL(files[0]);
-                return result;
-            }
-        }
-
-        if (!this._environmentHasDocument()) {
-            throw new Error('Reading the clipboard is not supported in this context');
-        }
-
-        if (!this._clipboardImagePasteTargetInitialized) {
-            this._clipboardImagePasteTarget = document.querySelector('#clipboard-image-paste-target');
-            this._clipboardImagePasteTargetInitialized = true;
-        }
-
-        const target = this._clipboardImagePasteTarget;
-        if (target === null) {
-            throw new Error('Clipboard paste target does not exist');
-        }
-
-        target.focus();
-        this._executePasteCommand();
-        const image = target.querySelector('img[src^="data:"]');
-        const result = (image !== null ? image.getAttribute('src') : null);
-        target.textContent = '';
-        return result;
+        return this._clipboardReader.getImage();
     }
 
     async _onApiGetDisplayTemplatesHtml() {
@@ -1655,7 +1593,7 @@ class Backend {
         try {
             const now = new Date(timestamp);
 
-            const dataUrl = await this._onApiClipboardImageGet();
+            const dataUrl = await this._clipboardReader.getImage();
             if (dataUrl === null) {
                 throw new Error('No clipboard image');
             }

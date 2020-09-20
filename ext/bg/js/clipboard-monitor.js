@@ -20,28 +20,28 @@
  */
 
 class ClipboardMonitor extends EventDispatcher {
-    constructor({getClipboard}) {
+    constructor({clipboardReader}) {
         super();
         this._timerId = null;
         this._timerToken = null;
         this._interval = 250;
         this._previousText = null;
-        this._getClipboard = getClipboard;
+        this._clipboardReader = clipboardReader;
     }
 
     start() {
         this.stop();
 
         // The token below is used as a unique identifier to ensure that a new clipboard monitor
-        // hasn't been started during the await call. The check below the await this._getClipboard()
-        // call will exit early if the reference has changed.
+        // hasn't been started during the await call. The check below the await call
+        // will exit early if the reference has changed.
         const token = {};
         const intervalCallback = async () => {
             this._timerId = null;
 
             let text = null;
             try {
-                text = await this._getClipboard();
+                text = await this._clipboardReader.getText();
             } catch (e) {
                 // NOP
             }
