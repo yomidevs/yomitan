@@ -8,7 +8,7 @@
     "scripts": {
         "build": "node ./dev/build.js",
         "test": "npm run test-lint && npm run test-code && npm run test-manifest",
-        "test-lint": "eslint . && node ./dev/lint/global-declarations.js",
+        "test-lint": "eslint . && node ./dev/lint/global-declarations.js && node ./dev/lint/html-scripts.js",
         "test-code": "node ./test/test-all.js ./test --skip ./test/test-manifest.js",
         "test-manifest": "node ./test/test-manifest.js"
     },
