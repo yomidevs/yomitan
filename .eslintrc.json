@@ -45,7 +45,6 @@
         "semi": "error",
         "wrap-iife": ["error", "inside"],
 
-        // Whitespace rules
         "brace-style": ["error", "1tbs", {"allowSingleLine": true}],
         "indent": ["error", 4, {"SwitchCase": 1, "MemberExpression": 1, "flatTernaryExpressions": true, "ignoredNodes": ["ConditionalExpression"]}],
         "object-curly-newline": "error",
@@ -78,7 +77,6 @@
         "template-curly-spacing": ["error", "never"],
         "template-tag-spacing": ["error", "never"],
 
-        // Extensions
         "no-unsanitized/method": "error",
         "no-unsanitized/property": "error"
     },
