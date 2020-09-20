@@ -47,7 +47,7 @@ class TemplateRendererFrameApi {
             response = {error: this._errorToJson(error)};
         }
 
-        if (typeof id === undefined) { return; }
+        if (typeof id === 'undefined') { return; }
         source.postMessage({action: `${action}.response`, params: response, id}, '*');
     }
 
