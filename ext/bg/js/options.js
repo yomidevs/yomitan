@@ -380,7 +380,7 @@ class OptionsUtil {
                 if (addition === null) {
                     addition = await this._fetchAsset(additionSourceUrl);
                 }
-                profileOptions.anki.fieldTemplates = this._addFieldTemplatesBeforeEnd(fieldTemplates, addition);
+                profileOptions.anki.fieldTemplates = await this._addFieldTemplatesBeforeEnd(fieldTemplates, addition);
             }
         }
     }
