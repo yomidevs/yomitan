@@ -532,6 +532,8 @@ class OptionsUtil {
             profileOptions.scanning.pointerEventsEnabled = false;
 
             const {modifier, middleMouse} = profileOptions.scanning;
+            delete profileOptions.scanning.modifier;
+            delete profileOptions.scanning.middleMouse;
             const scanningInputs = [];
             let modifierInput = '';
             switch (modifier) {
