@@ -125,7 +125,7 @@ class JsonSchemaProxyHandler {
 
 class JsonSchemaValidator {
     constructor() {
-        this._regexCache = new CacheMap(100, (pattern, flags) => new RegExp(pattern, flags));
+        this._regexCache = new CacheMap(100, ([pattern, flags]) => new RegExp(pattern, flags));
     }
 
     createProxy(target, schema) {
@@ -676,7 +676,7 @@ class JsonSchemaValidator {
     }
 
     _getRegex(pattern, flags) {
-        const regex = this._regexCache.get(pattern, flags);
+        const regex = this._regexCache.getOrCreate([pattern, flags]);
         regex.lastIndex = 0;
         return regex;
     }

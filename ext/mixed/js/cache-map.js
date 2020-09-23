@@ -24,7 +24,7 @@ class CacheMap {
      * Creates a new CacheMap.
      * @param maxCount The maximum number of entries able to be stored in the cache.
      * @param create A function to create a value for the corresponding path.
-     *   The signature is: create(...path)
+     *   The signature is: create(path)
      */
     constructor(maxCount, create) {
         if (!(
@@ -60,11 +60,56 @@ class CacheMap {
     }
 
     /**
+     * Returns whether or not an item exists at the given path.
+     * @param path Array corresponding to the key of the cache.
+     * @returns A boolean indicating whether ot not the item exists.
+     */
+    has(path) {
+        const node = this._accessNode(false, false, null, false, path);
+        return (node !== null);
+    }
+
+    /**
+     * Gets an item at the given path, if it exists. Otherwise, returns undefined.
+     * @param path Array corresponding to the key of the cache.
+     * @returns The existing value at the path, if any; otherwise, undefined.
+     */
+    get(path) {
+        const node = this._accessNode(false, false, null, true, path);
+        return (node !== null ? node.value : void 0);
+    }
+
+    /**
      * Gets an item at the given path, if it exists. Otherwise, creates a new item
      * and adds it to the cache. If the count exceeds the maximum count, items will be removed.
-     * @param path Arguments corresponding to the key of the cache.
+     * @param path Array corresponding to the key of the cache.
+     * @returns The existing value at the path, if any; otherwise, a newly created value.
      */
-    get(...path) {
+    getOrCreate(path) {
+        return this._accessNode(true, false, null, true, path).value;
+    }
+
+    /**
+     * Sets a value at a given path.
+     * @param path Array corresponding to the key of the cache.
+     * @param value The value to store in the cache.
+     */
+    set(path, value) {
+        this._accessNode(false, true, value, true, path);
+    }
+
+    /**
+     * Clears the cache.
+     */
+    clear() {
+        this._map.clear();
+        this._count = 0;
+        this._resetEndNodes();
+    }
+
+    // Private
+
+    _accessNode(create, set, value, updateRecency, path) {
         let ii = path.length;
         if (ii === 0) { throw new Error('Invalid path'); }
 
@@ -77,13 +122,18 @@ class CacheMap {
         }
 
         if (i === ii) {
-            // Found (map is now a node)
-            this._updateRecency(map);
-            return map.value;
+            // Found (map should now be a node)
+            if (updateRecency) { this._updateRecency(map); }
+            if (set) { map.value = value; }
+            return map;
         }
 
         // Create new
-        const value = this._create(...path);
+        if (create) {
+            value = this._create(path);
+        } else if (!set) {
+            return null;
+        }
 
         // Create mapping
         --ii;
@@ -101,19 +151,8 @@ class CacheMap {
 
         this._updateCount();
 
-        return value;
+        return node;
     }
-
-    /**
-     * Clears the cache.
-     */
-    clear() {
-        this._map.clear();
-        this._count = 0;
-        this._resetEndNodes();
-    }
-
-    // Private
 
     _updateRecency(node) {
         this._removeNode(node);
