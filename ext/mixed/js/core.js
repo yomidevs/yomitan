@@ -67,22 +67,6 @@ function escapeRegExp(string) {
     return string.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&');
 }
 
-// toIterable is required on Edge for cross-window origin objects.
-function toIterable(value) {
-    if (typeof Symbol !== 'undefined' && typeof value[Symbol.iterator] !== 'undefined') {
-        return value;
-    }
-
-    if (value !== null && typeof value === 'object') {
-        const length = value.length;
-        if (typeof length === 'number' && Number.isFinite(length)) {
-            return Array.from(value);
-        }
-    }
-
-    throw new Error('Could not convert to iterable');
-}
-
 function stringReverse(string) {
     return string.split('').reverse().join('').replace(/([\uDC00-\uDFFF])([\uD800-\uDBFF])/g, '$2$1');
 }

@@ -101,7 +101,6 @@
                 "jsonToError": "readonly",
                 "isObject": "readonly",
                 "hasOwn": "readonly",
-                "toIterable": "readonly",
                 "stringReverse": "readonly",
                 "promiseTimeout": "readonly",
                 "parseUrl": "readonly",
