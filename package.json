@@ -9,6 +9,7 @@
         "build": "node ./dev/build.js",
         "test": "npm run test-lint && npm run test-code && npm run test-manifest",
         "test-lint": "eslint . && node ./dev/lint/global-declarations.js && node ./dev/lint/html-scripts.js",
+        "test-lint-web-ext": "npx web-ext lint",
         "test-code": "node ./test/test-all.js ./test --skip ./test/test-manifest.js",
         "test-manifest": "node ./test/test-manifest.js"
     },
@@ -28,10 +29,14 @@
         "url": "https://github.com/FooSoft/yomichan/issues"
     },
     "homepage": "https://foosoft.net/projects/yomichan/",
+    "webExt": {
+        "sourceDir": "ext"
+    },
     "devDependencies": {
         "eslint": "^7.5.0",
         "eslint-plugin-no-unsanitized": "^3.1.2",
         "fake-indexeddb": "^3.1.1",
-        "jsdom": "^16.2.2"
+        "jsdom": "^16.2.2",
+        "web-ext": "^5.1.0"
     }
 }
