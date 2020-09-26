@@ -61,7 +61,6 @@
         }
     ],
     "minimum_chrome_version": "57.0.0.0",
-    "options_page": "bg/settings.html",
     "options_ui": {
         "page": "bg/settings.html",
         "open_in_tab": true
@@ -102,11 +101,5 @@
         "fg/float.html",
         "bg/template-renderer.html"
     ],
-    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
-    "applications": {
-        "gecko": {
-            "id": "alex@foosoft.net",
-            "strict_min_version": "55.0"
-        }
-    }
+    "content_security_policy": "script-src 'self'; object-src 'self'"
 }
