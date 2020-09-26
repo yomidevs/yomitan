@@ -17,8 +17,7 @@
 
 /* global
  * AnkiConnect
- * AudioSystem
- * AudioUriBuilder
+ * AudioDownloader
  * ClipboardMonitor
  * ClipboardReader
  * DictionaryDatabase
@@ -54,13 +53,8 @@ class Backend {
         this._profileConditionsUtil = new ProfileConditions();
         this._defaultAnkiFieldTemplates = null;
         this._requestBuilder = new RequestBuilder();
-        this._audioUriBuilder = new AudioUriBuilder({
+        this._audioDownloader = new AudioDownloader({
             requestBuilder: this._requestBuilder
-        });
-        this._audioSystem = new AudioSystem({
-            audioUriBuilder: this._audioUriBuilder,
-            requestBuilder: this._requestBuilder,
-            useCache: false
         });
         this._optionsUtil = new OptionsUtil();
 
@@ -91,7 +85,8 @@ class Backend {
             ['injectAnkiNoteMedia',          {async: true,  contentScript: true,  handler: this._onApiInjectAnkiNoteMedia.bind(this)}],
             ['noteView',                     {async: true,  contentScript: true,  handler: this._onApiNoteView.bind(this)}],
             ['commandExec',                  {async: false, contentScript: true,  handler: this._onApiCommandExec.bind(this)}],
-            ['audioGetUri',                  {async: true,  contentScript: true,  handler: this._onApiAudioGetUri.bind(this)}],
+            ['getDefinitionAudioInfo',       {async: true,  contentScript: true,  handler: this._onApiGetDefinitionAudioInfo.bind(this)}],
+            ['downloadDefinitionAudio',      {async: true,  contentScript: true,  handler: this._onApiDownloadDefinitionAudio.bind(this)}],
             ['screenshotGet',                {async: true,  contentScript: true,  handler: this._onApiScreenshotGet.bind(this)}],
             ['sendMessageToFrame',           {async: false, contentScript: true,  handler: this._onApiSendMessageToFrame.bind(this)}],
             ['broadcastTab',                 {async: false, contentScript: true,  handler: this._onApiBroadcastTab.bind(this)}],
@@ -117,7 +112,6 @@ class Backend {
             ['setAllSettings',               {async: true,  contentScript: false, handler: this._onApiSetAllSettings.bind(this)}],
             ['getOrCreateSearchPopup',       {async: true,  contentScript: true,  handler: this._onApiGetOrCreateSearchPopup.bind(this)}],
             ['isTabSearchPopup',             {async: true,  contentScript: true,  handler: this._onApiIsTabSearchPopup.bind(this)}],
-            ['getDefinitionAudio',           {async: true,  contentScript: true,  handler: this._onApiGetDefinitionAudio.bind(this)}],
             ['triggerDatabaseUpdated',       {async: false, contentScript: true,  handler: this._onApiTriggerDatabaseUpdated.bind(this)}]
         ]);
         this._messageHandlersWithProgress = new Map([
@@ -479,8 +473,12 @@ class Backend {
         return this._runCommand(command, params);
     }
 
-    async _onApiAudioGetUri({source, expression, reading, details}) {
-        return await this._audioUriBuilder.getUri(source, expression, reading, details);
+    async _onApiGetDefinitionAudioInfo({source, expression, reading, details}) {
+        return await this._audioDownloader.getInfo(source, expression, reading, details);
+    }
+
+    async _onApiDownloadDefinitionAudio({sources, expression, reading, details}) {
+        return await this._downloadDefinitionAudio(sources, expression, reading, details);
     }
 
     _onApiScreenshotGet({options}, sender) {
@@ -726,10 +724,6 @@ class Backend {
         const baseUrl = chrome.runtime.getURL('/bg/search.html');
         const tab = typeof tabId === 'number' ? await this._checkTabUrl(tabId, (url) => url.startsWith(baseUrl)) : null;
         return (tab !== null);
-    }
-
-    async _onApiGetDefinitionAudio({sources, expression, reading, details}) {
-        return this._getDefinitionAudio(sources, expression, reading, details);
     }
 
     _onApiTriggerDatabaseUpdated({type, cause}) {
@@ -1511,8 +1505,8 @@ class Backend {
         }
     }
 
-    async _getDefinitionAudio(sources, expression, reading, details) {
-        return await this._audioSystem.getDefinitionAudio(sources, expression, reading, details);
+    async _downloadDefinitionAudio(sources, expression, reading, details) {
+        return await this._audioDownloader.downloadAudio(sources, expression, reading, details);
     }
 
     async _injectAnkNoteMedia(ankiConnect, expression, reading, timestamp, audioDetails, screenshotDetails, clipboardImage) {
@@ -1548,7 +1542,7 @@ class Backend {
             fileName = this._replaceInvalidFileNameCharacters(fileName);
 
             const {sources, customSourceUrl} = details;
-            const {audio: data} = await this._getDefinitionAudio(
+            const data = await this._downloadDefinitionAudio(
                 sources,
                 expression,
                 reading,

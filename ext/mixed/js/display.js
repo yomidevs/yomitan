@@ -43,12 +43,7 @@ class Display extends EventDispatcher {
         this._audioPlaying = null;
         this._audioFallback = null;
         this._audioSystem = new AudioSystem({
-            audioUriBuilder: {
-                getUri: async (source, expression, reading, details) => {
-                    return await api.audioGetUri(source, expression, reading, details);
-                }
-            },
-            useCache: true
+            getAudioInfo: this._getAudioInfo.bind(this)
         });
         this._styleNode = null;
         this._eventListeners = new EventListenerCollection();
@@ -165,6 +160,7 @@ class Display extends EventDispatcher {
     }
 
     async prepare() {
+        this._audioSystem.prepare();
         this._updateMode();
         this._setInteractive(true);
         await this._displayGenerator.prepare();
@@ -1096,7 +1092,7 @@ class Display extends EventDispatcher {
             try {
                 const {sources, textToSpeechVoice, customSourceUrl} = this._options.audio;
                 let index;
-                ({audio, index} = await this._audioSystem.getDefinitionAudio(sources, expression, reading, {textToSpeechVoice, customSourceUrl}));
+                ({audio, index} = await this._audioSystem.createDefinitionAudio(sources, expression, reading, {textToSpeechVoice, customSourceUrl}));
                 info = `From source ${1 + index}: ${sources[index]}`;
             } catch (e) {
                 if (this._audioFallback === null) {
@@ -1418,5 +1414,9 @@ class Display extends EventDispatcher {
             compactGlossaries,
             modeOptions
         });
+    }
+
+    async _getAudioInfo(source, expression, reading, details) {
+        return await api.getDefinitionAudioInfo(source, expression, reading, details);
     }
 }

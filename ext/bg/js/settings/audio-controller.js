@@ -22,17 +22,16 @@
 class AudioController {
     constructor(settingsController) {
         this._settingsController = settingsController;
-        this._audioSystem = null;
+        this._audioSystem = new AudioSystem({
+            cacheSize: 0
+        });
         this._audioSourceContainer = null;
         this._audioSourceAddButton = null;
         this._audioSourceEntries = [];
     }
 
     async prepare() {
-        this._audioSystem = new AudioSystem({
-            audioUriBuilder: null,
-            useCache: true
-        });
+        this._audioSystem.prepare();
 
         this._audioSourceContainer = document.querySelector('.audio-source-list');
         this._audioSourceAddButton = document.querySelector('.audio-source-add');

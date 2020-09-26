@@ -85,8 +85,12 @@ const api = (() => {
             return this._invoke('noteView', {noteId});
         }
 
-        audioGetUri(source, expression, reading, details) {
-            return this._invoke('audioGetUri', {source, expression, reading, details});
+        getDefinitionAudioInfo(source, expression, reading, details) {
+            return this._invoke('getDefinitionAudioInfo', {source, expression, reading, details});
+        }
+
+        downloadDefinitionAudio(sources, expression, reading, details) {
+            return this._invoke('downloadDefinitionAudio', {sources, expression, reading, details});
         }
 
         commandExec(command, params) {
@@ -187,10 +191,6 @@ const api = (() => {
 
         isTabSearchPopup(tabId) {
             return this._invoke('isTabSearchPopup', {tabId});
-        }
-
-        getDefinitionAudio(sources, expression, reading, details) {
-            return this._invoke('getDefinitionAudio', {sources, expression, reading, details});
         }
 
         triggerDatabaseUpdated(type, cause) {
