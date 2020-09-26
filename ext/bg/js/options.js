@@ -550,7 +550,7 @@ class OptionsUtil {
             }
             scanningInputs.push({
                 include: modifierInput,
-                exclude: '',
+                exclude: 'mouse0',
                 types: {mouse: true, touch: false, pen: false},
                 options: createInputDefaultOptions()
             });

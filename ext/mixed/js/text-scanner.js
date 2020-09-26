@@ -267,10 +267,6 @@ class TextScanner extends EventDispatcher {
     _onMouseMove(e) {
         this._scanTimerClear();
 
-        if (DocumentUtil.isMouseButtonDown(e, 'primary')) {
-            return;
-        }
-
         const inputInfo = this._getMatchingInputGroupFromEvent(e, 'mouse');
         if (inputInfo === null) { return; }
 
@@ -286,7 +282,7 @@ class TextScanner extends EventDispatcher {
             return false;
         }
 
-        if (DocumentUtil.isMouseButtonDown(e, 'primary')) {
+        if (e.button === 0) { // Primary
             this._scanTimerClear();
             this.clearSelection(false);
         }

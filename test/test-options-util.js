@@ -319,7 +319,7 @@ function createProfileOptionsUpdatedTestData1() {
             inputs: [
                 {
                     include: 'shift',
-                    exclude: '',
+                    exclude: 'mouse0',
                     types: {
                         mouse: true,
                         touch: false,

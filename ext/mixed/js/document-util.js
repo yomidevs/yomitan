@@ -169,16 +169,6 @@ class DocumentUtil {
         }
     }
 
-    static isMouseButtonDown(mouseEvent, button) {
-        const mouseEventButtons = mouseEvent.buttons;
-        switch (button) {
-            case 'primary': return (mouseEventButtons & 0x1) !== 0x0;
-            case 'secondary': return (mouseEventButtons & 0x2) !== 0x0;
-            case 'auxiliary': return (mouseEventButtons & 0x4) !== 0x0;
-            default: return false;
-        }
-    }
-
     static getActiveModifiers(event) {
         const modifiers = new Set();
         if (event.altKey) { modifiers.add('alt'); }
