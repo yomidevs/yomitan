@@ -41,7 +41,7 @@
             parentPopupId: null,
             parentFrameId: null,
             useProxyPopup: false,
-            isSearchPage: false,
+            pageType: 'web',
             allowRootFramePopupProxy: true
         });
         await frontend.prepare();

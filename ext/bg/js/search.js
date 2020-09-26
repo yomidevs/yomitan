@@ -333,7 +333,7 @@ class DisplaySearch extends Display {
                 await this.setupNestedPopups({
                     depth: 1,
                     useProxyPopup: false,
-                    isSearchPage: true
+                    pageType: 'search'
                 });
             } catch (e) {
                 yomichan.logError(e);

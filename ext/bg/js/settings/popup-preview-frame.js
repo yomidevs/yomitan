@@ -62,7 +62,7 @@ class PopupPreviewFrame {
             parentPopupId: null,
             parentFrameId: null,
             useProxyPopup: false,
-            isSearchPage: false,
+            pageType: 'web',
             allowRootFramePopupProxy: false
         });
         this._frontendGetOptionsContextOld = this._frontend.getOptionsContext.bind(this._frontend);

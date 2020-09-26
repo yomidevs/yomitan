@@ -30,7 +30,7 @@ class Frontend {
         parentPopupId,
         parentFrameId,
         useProxyPopup,
-        isSearchPage,
+        pageType,
         allowRootFramePopupProxy
     }) {
         this._id = generateId(16);
@@ -55,7 +55,7 @@ class Frontend {
         this._parentPopupId = parentPopupId;
         this._parentFrameId = parentFrameId;
         this._useProxyPopup = useProxyPopup;
-        this._isSearchPage = isSearchPage;
+        this._pageType = pageType;
         this._depth = depth;
         this._frameId = frameId;
         this._popupFactory = popupFactory;
@@ -392,7 +392,7 @@ class Frontend {
         }
         if (this._updatePopupToken !== token) { return; }
 
-        if (this._isSearchPage) {
+        if (this._pageType === 'search') {
             this.setDisabledOverride(!this._options.scanning.enableOnSearchPage);
         }
 
