@@ -503,6 +503,7 @@ class OptionsUtil {
         //  Options conditions converted to string representations.
         //  Added usePopupWindow.
         //  Updated handlebars templates to include "clipboard-image" definition.
+        //  Updated handlebars templates to include "clipboard-text" definition.
         //  Added hideDelay.
         //  Added inputs to profileOptions.scanning.
         //  Added pointerEventsEnabled to profileOptions.scanning.

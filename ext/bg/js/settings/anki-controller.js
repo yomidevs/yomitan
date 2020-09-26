@@ -46,6 +46,7 @@ class AnkiController {
                 return [
                     'audio',
                     'clipboard-image',
+                    'clipboard-text',
                     'cloze-body',
                     'cloze-prefix',
                     'cloze-suffix',
@@ -69,6 +70,7 @@ class AnkiController {
                 return [
                     'character',
                     'clipboard-image',
+                    'clipboard-text',
                     'cloze-body',
                     'cloze-prefix',
                     'cloze-suffix',

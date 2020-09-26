@@ -155,6 +155,7 @@ Flashcard fields can be configured with the following steps:
     -------|------------
     `{audio}` | Audio sample of a native speaker's pronunciation in MP3 format (if available).
     `{clipboard-image}` | An image which is stored in the system clipboard, if present.
+    `{clipboard-text}` | Text which is stored in the system clipboard, if present.
     `{cloze-body}` | Raw, inflected term as it appeared before being reduced to dictionary form by Yomichan.
     `{cloze-prefix}` | Fragment of the containing `{sentence}` starting at the beginning of `{sentence}` until the beginning of `{cloze-body}`.
     `{cloze-suffix}` | Fragment of the containing `{sentence}` starting at the end of `{cloze-body}` until the end of `{sentence}`.
@@ -180,6 +181,7 @@ Flashcard fields can be configured with the following steps:
     -------|------------
     `{character}` | Unicode glyph representing the current kanji.
     `{clipboard-image}` | An image which is stored in the system clipboard, if present.
+    `{clipboard-text}` | Text which is stored in the system clipboard, if present.
     `{cloze-body}` | Raw, inflected parent term as it appeared before being reduced to dictionary form by Yomichan.
     `{cloze-prefix}` | Fragment of the containing `{sentence}` starting at the beginning of `{sentence}` until the beginning of `{cloze-body}`.
     `{cloze-suffix}` | Fragment of the containing `{sentence}` starting at the end of `{cloze-body}` until the end of `{sentence}`.

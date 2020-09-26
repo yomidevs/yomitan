@@ -1389,18 +1389,22 @@ class Display extends EventDispatcher {
             const {expression, reading} = Array.isArray(definitionExpressions) ? definitionExpressions[0] : definition;
             const audioDetails = (mode !== 'kanji' && this._ankiNoteBuilder.containsMarker(fields, 'audio') ? {sources, customSourceUrl} : null);
             const screenshotDetails = (this._ankiNoteBuilder.containsMarker(fields, 'screenshot') ? {ownerFrameId, format, quality} : null);
-            const clipboardImage = (this._ankiNoteBuilder.containsMarker(fields, 'clipboard-image'));
-            const {screenshotFileName, clipboardImageFileName, audioFileName} = await api.injectAnkiNoteMedia(
+            const clipboardDetails = {
+                image: this._ankiNoteBuilder.containsMarker(fields, 'clipboard-image'),
+                text: this._ankiNoteBuilder.containsMarker(fields, 'clipboard-text')
+            };
+            const {screenshotFileName, clipboardImageFileName, clipboardText, audioFileName} = await api.injectAnkiNoteMedia(
                 expression,
                 reading,
                 timestamp,
                 audioDetails,
                 screenshotDetails,
-                clipboardImage
+                clipboardDetails
             );
             if (screenshotFileName !== null) { definition.screenshotFileName = screenshotFileName; }
             if (clipboardImageFileName !== null) { definition.clipboardImageFileName = clipboardImageFileName; }
             if (audioFileName !== null) { definition.audioFileName = audioFileName; }
+            if (clipboardText !== null) { definition.clipboardText = clipboardText; }
         }
 
         return await this._ankiNoteBuilder.createNote({

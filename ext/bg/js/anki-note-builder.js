@@ -37,11 +37,11 @@ class AnkiNoteBuilder {
         modeOptions: {fields, deck, model},
         audioDetails=null,
         screenshotDetails=null,
-        clipboardImage=false,
+        clipboardDetails=null,
         errors=null
     }) {
         if (anki !== null) {
-            await this._injectMedia(anki, definition, fields, mode, audioDetails, screenshotDetails, clipboardImage);
+            await this._injectMedia(anki, definition, fields, mode, audioDetails, screenshotDetails, clipboardDetails);
         }
 
         const fieldEntries = Object.entries(fields);
