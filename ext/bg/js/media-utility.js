@@ -16,9 +16,9 @@
  */
 
 /**
- * mediaUtility is an object containing helper methods related to media processing.
+ * MediaUtility is a class containing helper methods related to media processing.
  */
-const mediaUtility = (() => {
+class MediaUtility {
     /**
      * Gets the file extension of a file path. URL search queries and hash
      * fragments are not handled.
@@ -26,7 +26,7 @@ const mediaUtility = (() => {
      * @returns The file extension, including the '.', or an empty string
      *   if there is no file extension.
      */
-    function getFileNameExtension(path) {
+    getFileNameExtension(path) {
         const match = /\.[^./\\]*$/.exec(path);
         return match !== null ? match[0] : '';
     }
@@ -37,8 +37,8 @@ const mediaUtility = (() => {
      * @returns The media type string if it can be determined from the file path,
      *   otherwise null.
      */
-    function getImageMediaTypeFromFileName(path) {
-        switch (getFileNameExtension(path).toLowerCase()) {
+    getImageMediaTypeFromFileName(path) {
+        switch (this.getFileNameExtension(path).toLowerCase()) {
             case '.apng':
                 return 'image/apng';
             case '.bmp':
@@ -69,30 +69,33 @@ const mediaUtility = (() => {
     }
 
     /**
-     * Attempts to load an image using a base64 encoded content and a media type.
-     * @param mediaType The media type for the image content.
-     * @param content The binary content for the image, encoded in base64.
-     * @returns A Promise which resolves with an HTMLImageElement instance on
-     *   successful load, otherwise an error is thrown.
+     * Gets the file extension for a corresponding media type.
+     * @param mediaType The media type to use.
+     * @returns A file extension including the dot for the media type,
+     *   otherwise null.
      */
-    function loadImageBase64(mediaType, content) {
-        return new Promise((resolve, reject) => {
-            const image = new Image();
-            const eventListeners = new EventListenerCollection();
-            eventListeners.addEventListener(image, 'load', () => {
-                eventListeners.removeAllEventListeners();
-                resolve(image);
-            }, false);
-            eventListeners.addEventListener(image, 'error', () => {
-                eventListeners.removeAllEventListeners();
-                reject(new Error('Image failed to load'));
-            }, false);
-            image.src = `data:${mediaType};base64,${content}`;
-        });
+    getFileExtensionFromImageMediaType(mediaType) {
+        switch (mediaType) {
+            case 'image/apng':
+                return '.apng';
+            case 'image/bmp':
+                return '.bmp';
+            case 'image/gif':
+                return '.gif';
+            case 'image/x-icon':
+                return '.ico';
+            case 'image/jpeg':
+                return '.jpeg';
+            case 'image/png':
+                return '.png';
+            case 'image/svg+xml':
+                return '.svg';
+            case 'image/tiff':
+                return '.tiff';
+            case 'image/webp':
+                return '.webp';
+            default:
+                return null;
+        }
     }
-
-    return {
-        getImageMediaTypeFromFileName,
-        loadImageBase64
-    };
-})();
+}

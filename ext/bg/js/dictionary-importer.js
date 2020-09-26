@@ -18,13 +18,14 @@
 /* global
  * JSZip
  * JsonSchemaValidator
- * mediaUtility
+ * MediaUtility
  */
 
 class DictionaryImporter {
     constructor() {
         this._schemas = new Map();
         this._jsonSchemaValidator = new JsonSchemaValidator();
+        this._mediaUtility = new MediaUtility();
     }
 
     async importDictionary(dictionaryDatabase, archiveSource, details, onProgress) {
@@ -324,14 +325,14 @@ class DictionaryImporter {
         }
 
         const content = await file.async('base64');
-        const mediaType = mediaUtility.getImageMediaTypeFromFileName(path);
+        const mediaType = this._mediaUtility.getImageMediaTypeFromFileName(path);
         if (mediaType === null) {
             throw new Error(`Could not determine media type for image at path ${JSON.stringify(path)} for ${errorSource}`);
         }
 
         let image;
         try {
-            image = await mediaUtility.loadImageBase64(mediaType, content);
+            image = await this._loadImageBase64(mediaType, content);
         } catch (e) {
             throw new Error(`Could not load image at path ${JSON.stringify(path)} for ${errorSource}`);
         }
@@ -379,5 +380,28 @@ class DictionaryImporter {
             throw new Error(`Failed to fetch ${url}: ${response.status}`);
         }
         return await response.json();
+    }
+
+    /**
+     * Attempts to load an image using a base64 encoded content and a media type.
+     * @param mediaType The media type for the image content.
+     * @param content The binary content for the image, encoded in base64.
+     * @returns A Promise which resolves with an HTMLImageElement instance on
+     *   successful load, otherwise an error is thrown.
+     */
+    _loadImageBase64(mediaType, content) {
+        return new Promise((resolve, reject) => {
+            const image = new Image();
+            const eventListeners = new EventListenerCollection();
+            eventListeners.addEventListener(image, 'load', () => {
+                eventListeners.removeAllEventListeners();
+                resolve(image);
+            }, false);
+            eventListeners.addEventListener(image, 'error', () => {
+                eventListeners.removeAllEventListeners();
+                reject(new Error('Image failed to load'));
+            }, false);
+            image.src = `data:${mediaType};base64,${content}`;
+        });
     }
 }

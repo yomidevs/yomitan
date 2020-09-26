@@ -25,13 +25,14 @@ class ClipboardReader {
      * @param pasteTargetSelector The selector for the paste target element.
      * @param imagePasteTargetSelector The selector for the image paste target element.
      */
-    constructor({document=null, pasteTargetSelector=null, imagePasteTargetSelector=null}) {
+    constructor({document=null, pasteTargetSelector=null, imagePasteTargetSelector=null, mediaUtility=null}) {
         this._document = document;
         this._browser = null;
         this._pasteTarget = null;
         this._pasteTargetSelector = pasteTargetSelector;
         this._imagePasteTarget = null;
         this._imagePasteTargetSelector = imagePasteTargetSelector;
+        this._mediaUtility = mediaUtility;
     }
 
     /**
@@ -99,14 +100,20 @@ class ClipboardReader {
      */
     async getImage() {
         // See browser-specific notes in getText
-        if (this._isFirefox()) {
-            if (typeof navigator.clipboard !== 'undefined' && typeof navigator.clipboard.read === 'function') {
-                // This function is behind the flag: dom.events.asyncClipboard.dataTransfer
-                const {files} = await navigator.clipboard.read();
-                if (files.length === 0) { return null; }
-                const result = await this._readFileAsDataURL(files[0]);
-                return result;
+        if (
+            this._isFirefox() &&
+            this._mediaUtility !== null &&
+            typeof navigator.clipboard !== 'undefined' &&
+            typeof navigator.clipboard.read === 'function'
+        ) {
+            // This function is behind the Firefox flag: dom.events.asyncClipboard.dataTransfer
+            const {files} = await navigator.clipboard.read();
+            for (const file of files) {
+                if (this._mediaUtility.getFileExtensionFromImageMediaType(file.type) !== null) {
+                    return await this._readFileAsDataURL(file);
+                }
             }
+            return null;
         }
 
         const document = this._document;

@@ -24,6 +24,7 @@
  * Environment
  * JsonSchemaValidator
  * Mecab
+ * MediaUtility
  * ObjectPropertyAccessor
  * OptionsUtil
  * ProfileConditions
@@ -39,10 +40,12 @@ class Backend {
         this._translator = new Translator(this._dictionaryDatabase);
         this._anki = new AnkiConnect();
         this._mecab = new Mecab();
+        this._mediaUtility = new MediaUtility();
         this._clipboardReader = new ClipboardReader({
             document: (typeof document === 'object' && document !== null ? document : null),
             pasteTargetSelector: '#clipboard-paste-target',
-            imagePasteTargetSelector: '#clipboard-image-paste-target'
+            imagePasteTargetSelector: '#clipboard-image-paste-target',
+            mediaUtility: this._mediaUtility
         });
         this._clipboardMonitor = new ClipboardMonitor({
             clipboardReader: this._clipboardReader
@@ -1570,7 +1573,8 @@ class Backend {
             const dataUrl = await this._getScreenshot(windowId, tabId, ownerFrameId, format, quality);
 
             const {mediaType, data} = this._getDataUrlInfo(dataUrl);
-            const extension = this._getImageExtensionFromMediaType(mediaType);
+            const extension = this._mediaUtility.getFileExtensionFromImageMediaType(mediaType);
+            if (extension === null) { throw new Error('Unknown image media type'); }
 
             let fileName = `yomichan_browser_screenshot_${reading}_${this._ankNoteDateToString(now)}.${extension}`;
             fileName = this._replaceInvalidFileNameCharacters(fileName);
@@ -1593,7 +1597,8 @@ class Backend {
             }
 
             const {mediaType, data} = this._getDataUrlInfo(dataUrl);
-            const extension = this._getImageExtensionFromMediaType(mediaType);
+            const extension = this._mediaUtility.getFileExtensionFromImageMediaType(mediaType);
+            if (extension === null) { throw new Error('Unknown image media type'); }
 
             let fileName = `yomichan_clipboard_image_${reading}_${this._ankNoteDateToString(now)}.${extension}`;
             fileName = this._replaceInvalidFileNameCharacters(fileName);
@@ -1634,14 +1639,6 @@ class Backend {
         if (typeof match[2] === 'undefined') { data = btoa(data); }
 
         return {mediaType, data};
-    }
-
-    _getImageExtensionFromMediaType(mediaType) {
-        switch (mediaType.toLowerCase()) {
-            case 'image/png': return 'png';
-            case 'image/jpeg': return 'jpeg';
-            default: throw new Error('Unknown image media type');
-        }
     }
 
     _triggerDatabaseUpdated(type, cause) {
