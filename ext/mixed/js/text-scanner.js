@@ -49,6 +49,7 @@ class TextScanner extends EventDispatcher {
         this._scanLength = 1;
         this._sentenceExtent = 1;
         this._layoutAwareScan = false;
+        this._preventMiddleMouse = false;
         this._inputs = [];
 
         this._enabled = false;
@@ -113,7 +114,7 @@ class TextScanner extends EventDispatcher {
         }
     }
 
-    setOptions({inputs, deepContentScan, selectText, delay, touchInputEnabled, pointerEventsEnabled, scanLength, sentenceExtent, layoutAwareScan}) {
+    setOptions({inputs, deepContentScan, selectText, delay, touchInputEnabled, pointerEventsEnabled, scanLength, sentenceExtent, layoutAwareScan, preventMiddleMouse}) {
         if (Array.isArray(inputs)) {
             this._inputs = inputs.map(({
                 include,
@@ -150,6 +151,9 @@ class TextScanner extends EventDispatcher {
         }
         if (typeof layoutAwareScan === 'boolean') {
             this._layoutAwareScan = layoutAwareScan;
+        }
+        if (typeof preventMiddleMouse === 'boolean') {
+            this._preventMiddleMouse = preventMiddleMouse;
         }
     }
 
@@ -282,9 +286,18 @@ class TextScanner extends EventDispatcher {
             return false;
         }
 
-        if (e.button === 0) { // Primary
-            this._scanTimerClear();
-            this.clearSelection(false);
+        switch (e.button) {
+            case 0: // Primary
+                this._scanTimerClear();
+                this.clearSelection(false);
+                break;
+            case 1: // Middle
+                if (this._preventMiddleMouse) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+                break;
         }
     }
 

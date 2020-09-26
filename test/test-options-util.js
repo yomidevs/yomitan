@@ -316,6 +316,12 @@ function createProfileOptionsUpdatedTestData1() {
             layoutAwareScan: false,
             hideDelay: 0,
             pointerEventsEnabled: false,
+            preventMiddleMouse: {
+                onWebPages: false,
+                onPopupPages: false,
+                onSearchPages: false,
+                onSearchQuery: false
+            },
             inputs: [
                 {
                     include: 'shift',

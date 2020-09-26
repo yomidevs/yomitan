@@ -507,6 +507,7 @@ class OptionsUtil {
         //  Added hideDelay.
         //  Added inputs to profileOptions.scanning.
         //  Added pointerEventsEnabled to profileOptions.scanning.
+        //  Added preventMiddleMouse to profileOptions.scanning.
         for (const {conditionGroups} of options.profiles) {
             for (const {conditions} of conditionGroups) {
                 for (const condition of conditions) {
@@ -531,6 +532,12 @@ class OptionsUtil {
             profileOptions.general.usePopupWindow = false;
             profileOptions.scanning.hideDelay = 0;
             profileOptions.scanning.pointerEventsEnabled = false;
+            profileOptions.scanning.preventMiddleMouse = {
+                onWebPages: false,
+                onPopupPages: false,
+                onSearchPages: false,
+                onSearchQuery: false
+            };
 
             const {modifier, middleMouse} = profileOptions.scanning;
             delete profileOptions.scanning.modifier;

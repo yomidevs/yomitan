@@ -320,6 +320,7 @@
                                 "type": "object",
                                 "required": [
                                     "inputs",
+                                    "preventMiddleMouse",
                                     "touchInputEnabled",
                                     "pointerEventsEnabled",
                                     "selectText",
@@ -451,6 +452,33 @@
                                                         }
                                                     }
                                                 }
+                                            }
+                                        }
+                                    },
+                                    "preventMiddleMouse": {
+                                        "type": "object",
+                                        "required": [
+                                            "onWebPages",
+                                            "onPopupPages",
+                                            "onSearchPages",
+                                            "onSearchQuery"
+                                        ],
+                                        "properties": {
+                                            "onWebPages": {
+                                                "type": "boolean",
+                                                "default": false
+                                            },
+                                            "onPopupPages": {
+                                                "type": "boolean",
+                                                "default": false
+                                            },
+                                            "onSearchPages": {
+                                                "type": "boolean",
+                                                "default": false
+                                            },
+                                            "onSearchQuery": {
+                                                "type": "boolean",
+                                                "default": false
                                             }
                                         }
                                     },

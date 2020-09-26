@@ -320,6 +320,7 @@ class Frontend {
 
         await this._updatePopup();
 
+        const preventMiddleMouse = this._getPreventMiddleMouseValueForPageType(scanningOptions.preventMiddleMouse);
         this._textScanner.setOptions({
             inputs: scanningOptions.inputs,
             deepContentScan: scanningOptions.deepDomScan,
@@ -329,7 +330,8 @@ class Frontend {
             pointerEventsEnabled: scanningOptions.pointerEventsEnabled,
             scanLength: scanningOptions.length,
             sentenceExtent: options.anki.sentenceExt,
-            layoutAwareScan: scanningOptions.layoutAwareScan
+            layoutAwareScan: scanningOptions.layoutAwareScan,
+            preventMiddleMouse
         });
         this._updateTextScannerEnabled();
 
@@ -615,5 +617,14 @@ class Frontend {
     async _getUpToDateOptionsContext() {
         await this._updatePendingOptions();
         return await this.getOptionsContext();
+    }
+
+    _getPreventMiddleMouseValueForPageType(preventMiddleMouseOptions) {
+        switch (this._pageType) {
+            case 'web': return preventMiddleMouseOptions.onWebPages;
+            case 'popup': return preventMiddleMouseOptions.onPopupPages;
+            case 'search': return preventMiddleMouseOptions.onSearchPages;
+            default: return false;
+        }
     }
 }

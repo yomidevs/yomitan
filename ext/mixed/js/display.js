@@ -251,7 +251,8 @@ class Display extends EventDispatcher {
                 pointerEventsEnabled: scanning.pointerEventsEnabled,
                 scanLength: scanning.length,
                 sentenceExtent: options.anki.sentenceExt,
-                layoutAwareScan: scanning.layoutAwareScan
+                layoutAwareScan: scanning.layoutAwareScan,
+                preventMiddleMouse: scanning.preventMiddleMouse.onSearchQuery
             }
         });
     }
