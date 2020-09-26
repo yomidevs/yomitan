@@ -94,8 +94,9 @@ class PopupWindow extends EventDispatcher {
         return false;
     }
 
-    showContent(_details, displayDetails) {
-        return this._invoke(true, 'setContent', {id: this._id, details: displayDetails});
+    async showContent(_details, displayDetails) {
+        if (displayDetails === null) { return; }
+        await this._invoke(true, 'setContent', {id: this._id, details: displayDetails});
     }
 
     setCustomCss(css) {
