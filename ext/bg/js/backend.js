@@ -201,9 +201,8 @@ class Backend {
 
             this._clipboardMonitor.on('change', this._onClipboardTextChange.bind(this));
 
-            this._sendMessageAllTabs('backendReady');
-            const callback = () => this._checkLastError(chrome.runtime.lastError);
-            chrome.runtime.sendMessage({action: 'backendReady'}, callback);
+            this._sendMessageAllTabsIgnoreResponse('backendReady', {});
+            this._sendMessageIgnoreResponse({action: 'backendReady', params: {}});
         } catch (e) {
             yomichan.logError(e);
             throw e;
@@ -350,21 +349,19 @@ class Backend {
     }
 
     _onZoomChange({tabId, oldZoomFactor, newZoomFactor}) {
-        const callback = () => this._checkLastError(chrome.runtime.lastError);
-        chrome.tabs.sendMessage(tabId, {action: 'zoomChanged', params: {oldZoomFactor, newZoomFactor}}, callback);
+        this._sendMessageTabIgnoreResponse(tabId, {action: 'zoomChanged', params: {oldZoomFactor, newZoomFactor}});
     }
 
     // Message handlers
 
     _onApiRequestBackendReadySignal(_params, sender) {
         // tab ID isn't set in background (e.g. browser_action)
-        const callback = () => this._checkLastError(chrome.runtime.lastError);
-        const data = {action: 'backendReady'};
+        const data = {action: 'backendReady', params: {}};
         if (typeof sender.tab === 'undefined') {
-            chrome.runtime.sendMessage(data, callback);
+            this._sendMessageIgnoreResponse(data);
             return false;
         } else {
-            chrome.tabs.sendMessage(sender.tab.id, data, callback);
+            this._sendMessageTabIgnoreResponse(sender.tab.id, data);
             return true;
         }
     }
@@ -509,8 +506,7 @@ class Backend {
 
         const tabId = sender.tab.id;
         const frameId = sender.frameId;
-        const callback = () => this._checkLastError(chrome.runtime.lastError);
-        chrome.tabs.sendMessage(tabId, {action, params, frameId}, {frameId: targetFrameId}, callback);
+        this._sendMessageTabIgnoreResponse(tabId, {action, params, frameId}, {frameId: targetFrameId});
         return true;
     }
 
@@ -521,8 +517,7 @@ class Backend {
 
         const tabId = sender.tab.id;
         const frameId = sender.frameId;
-        const callback = () => this._checkLastError(chrome.runtime.lastError);
-        chrome.tabs.sendMessage(tabId, {action, params, frameId}, callback);
+        this._sendMessageTabIgnoreResponse(tabId, {action, params, frameId});
         return true;
     }
 
@@ -858,7 +853,7 @@ class Backend {
         const tab = tabs[0];
         await this._waitUntilTabFrameIsReady(tab.id, 0, 2000);
 
-        await this._sendMessageTab(
+        await this._sendMessageTabPromise(
             tab.id,
             {action: 'setMode', params: {mode: 'popup'}},
             {frameId: 0}
@@ -869,20 +864,11 @@ class Backend {
     }
 
     _updateSearchQuery(tabId, text, animate) {
-        return this._sendMessageTab(
+        return this._sendMessageTabPromise(
             tabId,
             {action: 'updateSearchQuery', params: {text, animate}},
             {frameId: 0}
         );
-    }
-
-    _sendMessageAllTabs(action, params={}) {
-        const callback = () => this._checkLastError(chrome.runtime.lastError);
-        chrome.tabs.query({}, (tabs) => {
-            for (const tab of tabs) {
-                chrome.tabs.sendMessage(tab.id, {action, params}, callback);
-            }
-        });
     }
 
     _applyOptions(source) {
@@ -904,7 +890,7 @@ class Backend {
             this._clipboardMonitor.stop();
         }
 
-        this._sendMessageAllTabs('optionsUpdated', {source});
+        this._sendMessageAllTabsIgnoreResponse('optionsUpdated', {source});
     }
 
     _getProfile(optionsContext, useSchema=false) {
@@ -1269,7 +1255,7 @@ class Backend {
 
     async _getTabUrl(tabId) {
         try {
-            const {url} = await this._sendMessageTab(
+            const {url} = await this._sendMessageTabPromise(
                 tabId,
                 {action: 'getUrl', params: {}},
                 {frameId: 0}
@@ -1387,20 +1373,15 @@ class Backend {
 
             chrome.runtime.onMessage.addListener(onMessage);
 
-            chrome.tabs.sendMessage(tabId, {action: 'isReady'}, {frameId}, (response) => {
-                const error = chrome.runtime.lastError;
-                if (error) { return; }
-
-                try {
-                    const value = yomichan.getMessageResponseResult(response);
-                    if (!value) { return; }
-
-                    cleanup();
-                    resolve();
-                } catch (e) {
-                    // NOP
-                }
-            });
+            this._sendMessageTabPromise(tabId, {action: 'isReady'}, {frameId})
+                .then(
+                    (value) => {
+                        if (!value) { return; }
+                        cleanup();
+                        resolve();
+                    },
+                    () => {} // NOP
+                );
 
             if (timeout !== null) {
                 timer = setTimeout(() => {
@@ -1427,7 +1408,26 @@ class Backend {
         return await (json ? response.json() : response.text());
     }
 
-    _sendMessageTab(...args) {
+    _sendMessageIgnoreResponse(...args) {
+        const callback = () => this._checkLastError(chrome.runtime.lastError);
+        chrome.runtime.sendMessage(...args, callback);
+    }
+
+    _sendMessageTabIgnoreResponse(...args) {
+        const callback = () => this._checkLastError(chrome.runtime.lastError);
+        chrome.tabs.sendMessage(...args, callback);
+    }
+
+    _sendMessageAllTabsIgnoreResponse(action, params) {
+        const callback = () => this._checkLastError(chrome.runtime.lastError);
+        chrome.tabs.query({}, (tabs) => {
+            for (const tab of tabs) {
+                chrome.tabs.sendMessage(tab.id, {action, params}, callback);
+            }
+        });
+    }
+
+    _sendMessageTabPromise(...args) {
         return new Promise((resolve, reject) => {
             const callback = (response) => {
                 try {
@@ -1482,7 +1482,7 @@ class Backend {
             if (typeof tabId === 'number' && typeof ownerFrameId === 'number') {
                 const action = 'setAllVisibleOverride';
                 const params = {value: false, priority: 0, awaitFrame: true};
-                token = await this._sendMessageTab(tabId, {action, params}, {frameId: ownerFrameId});
+                token = await this._sendMessageTabPromise(tabId, {action, params}, {frameId: ownerFrameId});
             }
 
             return await new Promise((resolve, reject) => {
@@ -1500,7 +1500,7 @@ class Backend {
                 const action = 'clearAllVisibleOverride';
                 const params = {token};
                 try {
-                    await this._sendMessageTab(tabId, {action, params}, {frameId: ownerFrameId});
+                    await this._sendMessageTabPromise(tabId, {action, params}, {frameId: ownerFrameId});
                 } catch (e) {
                     // NOP
                 }
@@ -1651,7 +1651,7 @@ class Backend {
 
     _triggerDatabaseUpdated(type, cause) {
         this._translator.clearDatabaseCaches();
-        this._sendMessageAllTabs('databaseUpdated', {type, cause});
+        this._sendMessageAllTabsIgnoreResponse('databaseUpdated', {type, cause});
     }
 
     async _saveOptions(source) {
