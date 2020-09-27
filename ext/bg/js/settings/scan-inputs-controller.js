@@ -135,6 +135,7 @@ class ScanInputField {
 
     set index(value) {
         this._index = value;
+        this._updateDataSettingTargets();
     }
 
     prepare(container, include, exclude) {
@@ -158,10 +159,7 @@ class ScanInputField {
         this._eventListeners.on(this._excludeInputField, 'change', this._onExcludeValueChange.bind(this));
         this._eventListeners.addEventListener(removeButton, 'click', this._onRemoveClick.bind(this));
 
-        for (const typeCheckbox of node.querySelectorAll('.scan-input-settings-checkbox')) {
-            const {property} = typeCheckbox.dataset;
-            typeCheckbox.dataset.setting = `scanning.inputs[${this._index}].${property}`;
-        }
+        this._updateDataSettingTargets();
     }
 
     cleanup() {
@@ -200,5 +198,13 @@ class ScanInputField {
         if (this._node === null) { return false; }
         const node = this._node.querySelector(`input.scan-input-settings-checkbox[data-property="types.${pointerType}"]`);
         return node !== null && node.checked;
+    }
+
+    _updateDataSettingTargets() {
+        const index = this._index;
+        for (const typeCheckbox of this._node.querySelectorAll('.scan-input-settings-checkbox')) {
+            const {property} = typeCheckbox.dataset;
+            typeCheckbox.dataset.setting = `scanning.inputs[${index}].${property}`;
+        }
     }
 }
