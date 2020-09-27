@@ -333,11 +333,13 @@ function createProfileOptionsUpdatedTestData1() {
                     },
                     options: {
                         showAdvanced: false,
+                        scanOnTouchMove: true,
                         scanOnPenHover: true,
                         scanOnPenPress: true,
                         scanOnPenRelease: false,
                         searchTerms: true,
-                        searchKanji: true
+                        searchKanji: true,
+                        preventTouchScrolling: true
                     }
                 },
                 {
@@ -350,11 +352,13 @@ function createProfileOptionsUpdatedTestData1() {
                     },
                     options: {
                         showAdvanced: false,
+                        scanOnTouchMove: true,
                         scanOnPenHover: true,
                         scanOnPenPress: true,
                         scanOnPenRelease: false,
                         searchTerms: true,
-                        searchKanji: true
+                        searchKanji: true,
+                        preventTouchScrolling: true
                     }
                 },
                 {
@@ -367,11 +371,13 @@ function createProfileOptionsUpdatedTestData1() {
                     },
                     options: {
                         showAdvanced: false,
+                        scanOnTouchMove: true,
                         scanOnPenHover: true,
                         scanOnPenPress: true,
                         scanOnPenRelease: false,
                         searchTerms: true,
-                        searchKanji: true
+                        searchKanji: true,
+                        preventTouchScrolling: true
                     }
                 }
             ]

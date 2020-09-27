@@ -120,12 +120,12 @@ class TextScanner extends EventDispatcher {
                 include,
                 exclude,
                 types,
-                options: {scanOnPenHover, scanOnPenPress, scanOnPenRelease, searchTerms, searchKanji}
+                options: {scanOnTouchMove, scanOnPenHover, scanOnPenPress, scanOnPenRelease, searchTerms, searchKanji, preventTouchScrolling}
             }) => ({
                 include: this._getInputArray(include),
                 exclude: this._getInputArray(exclude),
                 types: this._getInputTypeSet(types),
-                options: {scanOnPenHover, scanOnPenPress, scanOnPenRelease, searchTerms, searchKanji}
+                options: {scanOnTouchMove, scanOnPenHover, scanOnPenPress, scanOnPenRelease, searchTerms, searchKanji, preventTouchScrolling}
             }));
         }
         if (typeof deepContentScan === 'boolean') {
@@ -392,7 +392,9 @@ class TextScanner extends EventDispatcher {
         const inputInfo = this._getMatchingInputGroupFromEvent(e, type);
         if (inputInfo === null) { return; }
 
-        this._searchAt(primaryTouch.clientX, primaryTouch.clientY, type, 'touchMove', inputInfo);
+        if (inputInfo.input.options.scanOnTouchMove) {
+            this._searchAt(primaryTouch.clientX, primaryTouch.clientY, type, 'touchMove', inputInfo);
+        }
 
         e.preventDefault(); // Disable scroll
     }
@@ -497,7 +499,7 @@ class TextScanner extends EventDispatcher {
         }
 
         const inputInfo = this._getMatchingInputGroupFromEvent(e, 'touch');
-        if (inputInfo === null) { return; }
+        if (inputInfo === null || !inputInfo.input.options.scanOnTouchMove) { return; }
 
         this._searchAt(e.clientX, e.clientY, 'touch', 'touchMove', inputInfo);
     }
@@ -748,6 +750,7 @@ class TextScanner extends EventDispatcher {
         if (inputInfo === null) { return; }
 
         const textSourceCurrentPrevious = this._textSourceCurrent !== null ? this._textSourceCurrent.clone() : null;
+        const preventScroll = inputInfo.input.options.preventTouchScrolling;
 
         await this._searchAt(x, y, type, cause, inputInfo);
 
@@ -755,7 +758,7 @@ class TextScanner extends EventDispatcher {
             this._textSourceCurrent !== null &&
             !this._textSourceCurrent.equals(textSourceCurrentPrevious)
         ) {
-            this._preventScroll = true;
+            this._preventScroll = preventScroll;
             this._preventNextContextMenu = true;
             this._preventNextMouseDown = true;
         }
@@ -776,13 +779,15 @@ class TextScanner extends EventDispatcher {
             return;
         }
 
+        const preventScroll = inputInfo.input.options.preventTouchScrolling;
+
         await this._searchAt(x, y, type, cause, inputInfo);
 
         if (
             prevent &&
             this._textSourceCurrent !== null
         ) {
-            this._preventScroll = true;
+            this._preventScroll = preventScroll;
             this._preventNextContextMenu = true;
             this._preventNextMouseDown = true;
             this._preventNextClick = true;
