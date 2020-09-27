@@ -352,12 +352,12 @@
                                                 },
                                                 "options": {
                                                     "showAdvanced": false,
+                                                    "searchTerms": true,
+                                                    "searchKanji": true,
                                                     "scanOnTouchMove": true,
                                                     "scanOnPenHover": true,
                                                     "scanOnPenPress": true,
                                                     "scanOnPenRelease": false,
-                                                    "searchTerms": true,
-                                                    "searchKanji": true,
                                                     "preventTouchScrolling": false
                                                 }
                                             },
@@ -371,12 +371,12 @@
                                                 },
                                                 "options": {
                                                     "showAdvanced": false,
+                                                    "searchTerms": true,
+                                                    "searchKanji": true,
                                                     "scanOnTouchMove": true,
                                                     "scanOnPenHover": true,
                                                     "scanOnPenPress": true,
                                                     "scanOnPenRelease": false,
-                                                    "searchTerms": true,
-                                                    "searchKanji": true,
                                                     "preventTouchScrolling": true
                                                 }
                                             }
@@ -423,18 +423,26 @@
                                                     "type": "object",
                                                     "required": [
                                                         "showAdvanced",
+                                                        "searchTerms",
+                                                        "searchKanji",
                                                         "scanOnTouchMove",
                                                         "scanOnPenHover",
                                                         "scanOnPenPress",
                                                         "scanOnPenRelease",
-                                                        "searchTerms",
-                                                        "searchKanji",
                                                         "preventTouchScrolling"
                                                     ],
                                                     "properties": {
                                                         "showAdvanced": {
                                                             "type": "boolean",
                                                             "default": false
+                                                        },
+                                                        "searchTerms": {
+                                                            "type": "boolean",
+                                                            "default": true
+                                                        },
+                                                        "searchKanji": {
+                                                            "type": "boolean",
+                                                            "default": true
                                                         },
                                                         "scanOnTouchMove": {
                                                             "type": "boolean",
@@ -451,14 +459,6 @@
                                                         "scanOnPenRelease": {
                                                             "type": "boolean",
                                                             "default": false
-                                                        },
-                                                        "searchTerms": {
-                                                            "type": "boolean",
-                                                            "default": true
-                                                        },
-                                                        "searchKanji": {
-                                                            "type": "boolean",
-                                                            "default": true
                                                         },
                                                         "preventTouchScrolling": {
                                                             "type": "boolean",

@@ -522,12 +522,12 @@ class OptionsUtil {
         }
         const createInputDefaultOptions = () => ({
             showAdvanced: false,
+            searchTerms: true,
+            searchKanji: true,
             scanOnTouchMove: true,
             scanOnPenHover: true,
             scanOnPenPress: true,
             scanOnPenRelease: false,
-            searchTerms: true,
-            searchKanji: true,
             preventTouchScrolling: true
         });
         for (const {options: profileOptions} of options.profiles) {
