@@ -21,13 +21,14 @@ class Deinflector {
         this.reasons = Deinflector.normalizeReasons(reasons);
     }
 
-    deinflect(source) {
+    deinflect(source, rawSource) {
         const results = [{
             source,
+            rawSource,
             term: source,
             rules: 0,
-            definitions: [],
-            reasons: []
+            reasons: [],
+            databaseDefinitions: []
         }];
         for (let i = 0; i < results.length; ++i) {
             const {rules, term, reasons} = results[i];
@@ -43,10 +44,11 @@ class Deinflector {
 
                     results.push({
                         source,
+                        rawSource,
                         term: term.substring(0, term.length - kanaIn.length) + kanaOut,
                         rules: rulesOut,
-                        definitions: [],
-                        reasons: [reason, ...reasons]
+                        reasons: [reason, ...reasons],
+                        databaseDefinitions: []
                     });
                 }
             }
