@@ -21,7 +21,14 @@
  * jp
  */
 
+/**
+ * Class which finds term and kanji definitions for text.
+ */
 class Translator {
+    /**
+     * Creates a new Translator instance.
+     * @param database An instance of DictionaryDatabase.
+     */
     constructor(database) {
         this._database = database;
         this._deinflector = null;
@@ -29,32 +36,82 @@ class Translator {
         this._stringComparer = new Intl.Collator('en-US'); // Invariant locale
     }
 
+    /**
+     * Initializes the instance for use. The public API should not be used until
+     * this function has been called and await'd.
+     */
     async prepare() {
         const reasons = await this._fetchJsonAsset('/bg/lang/deinflect.json');
         this._deinflector = new Deinflector(reasons);
     }
 
+    /**
+     * Clears the database tag cache. This should be executed if the database is changed.
+     */
     clearDatabaseCaches() {
         this._tagCache.clear();
     }
 
-    async findTerms(mode, text, details, options) {
+    /**
+     * Finds term definitions for the given text.
+     * @param mode The mode to use for finding terms, which determines the format of the resulting array.
+     * @param text The text to find terms for.
+     * @param options An object using the following structure:
+     *   {
+     *     wildcard: (null or string),
+     *     compactTags: (boolean),
+     *     mainDictionary: (string),
+     *     alphanumeric: (boolean),
+     *     convertHalfWidthCharacters: (boolean),
+     *     convertNumericCharacters: (boolean),
+     *     convertAlphabeticCharacters: (boolean),
+     *     convertHiraganaToKatakana: (boolean),
+     *     convertKatakanaToHiragana: (boolean),
+     *     collapseEmphaticSequences: (boolean),
+     *     enabledDictionaryMap: (Map of [
+     *       (string),
+     *       {
+     *         priority: (number),
+     *         allowSecondarySearches: (boolean)
+     *       }
+     *     ])
+     *   }
+     * @returns An array of [definitions, textLength]. The structure of each definition depends on the
+     *   mode parameter, see the _create?TermDefinition?() functions for structure details.
+     */
+    async findTerms(mode, text, options) {
         switch (mode) {
             case 'group':
-                return await this._findTermsGrouped(text, details, options);
+                return await this._findTermsGrouped(text, options);
             case 'merge':
-                return await this._findTermsMerged(text, details, options);
+                return await this._findTermsMerged(text, options);
             case 'split':
-                return await this._findTermsSplit(text, details, options);
+                return await this._findTermsSplit(text, options);
             case 'simple':
-                return await this._findTermsSimple(text, details, options);
+                return await this._findTermsSimple(text, options);
             default:
                 return [[], 0];
         }
     }
 
+    /**
+     * Finds kanji definitions for the given text.
+     * @param text The text to find kanji definitions for. This string can be of any length,
+     *   but is typically just one character, which is a single kanji. If the string is multiple
+     *   characters long, each character will be searched in the database.
+     * @param options An object using the following structure:
+     *   {
+     *     enabledDictionaryMap: (Map of [
+     *       (string),
+     *       {
+     *         priority: (number)
+     *       }
+     *     ])
+     *   }
+     * @returns An array of definitions. See the _createKanjiDefinition() function for structure details.
+     */
     async findKanji(text, options) {
-        const enabledDictionaryMap = this._getEnabledDictionaryMap(options);
+        const {enabledDictionaryMap} = options;
         const kanjiUnique = new Set();
         for (const c of text) {
             kanjiUnique.add(c);
@@ -250,10 +307,9 @@ class Translator {
         return result;
     }
 
-    async _findTermsGrouped(text, details, options) {
-        const {general: {compactTags}} = options;
-        const enabledDictionaryMap = this._getEnabledDictionaryMap(options);
-        const [definitions, length] = await this._findTermsInternal(text, enabledDictionaryMap, details, options);
+    async _findTermsGrouped(text, options) {
+        const {compactTags, enabledDictionaryMap} = options;
+        const [definitions, length] = await this._findTermsInternal(text, enabledDictionaryMap, options);
 
         const groupedDefinitions = this._groupTerms(definitions, enabledDictionaryMap);
         await this._buildTermMeta(groupedDefinitions, enabledDictionaryMap);
@@ -268,12 +324,11 @@ class Translator {
         return [groupedDefinitions, length];
     }
 
-    async _findTermsMerged(text, details, options) {
-        const {general: {compactTags, mainDictionary}} = options;
-        const enabledDictionaryMap = this._getEnabledDictionaryMap(options);
+    async _findTermsMerged(text, options) {
+        const {compactTags, mainDictionary, enabledDictionaryMap} = options;
         const secondarySearchDictionaryMap = this._getSecondarySearchDictionaryMap(enabledDictionaryMap);
 
-        const [definitions, length] = await this._findTermsInternal(text, enabledDictionaryMap, details, options);
+        const [definitions, length] = await this._findTermsInternal(text, enabledDictionaryMap, options);
         const {sequencedDefinitions, unsequencedDefinitions} = await this._getSequencedDefinitions(definitions, mainDictionary, enabledDictionaryMap);
         const definitionsMerged = [];
         const usedDefinitions = new Set();
@@ -318,30 +373,31 @@ class Translator {
         return [definitionsMerged, length];
     }
 
-    async _findTermsSplit(text, details, options) {
-        const enabledDictionaryMap = this._getEnabledDictionaryMap(options);
-        const [definitions, length] = await this._findTermsInternal(text, enabledDictionaryMap, details, options);
+    async _findTermsSplit(text, options) {
+        const {enabledDictionaryMap} = options;
+        const [definitions, length] = await this._findTermsInternal(text, enabledDictionaryMap, options);
         await this._buildTermMeta(definitions, enabledDictionaryMap);
         this._sortDefinitions(definitions, true);
         return [definitions, length];
     }
 
-    async _findTermsSimple(text, details, options) {
-        const enabledDictionaryMap = this._getEnabledDictionaryMap(options);
-        const [definitions, length] = await this._findTermsInternal(text, enabledDictionaryMap, details, options);
+    async _findTermsSimple(text, options) {
+        const {enabledDictionaryMap} = options;
+        const [definitions, length] = await this._findTermsInternal(text, enabledDictionaryMap, options);
         this._sortDefinitions(definitions, false);
         return [definitions, length];
     }
 
-    async _findTermsInternal(text, enabledDictionaryMap, details, options) {
-        text = this._getSearchableText(text, options.scanning.alphanumeric);
+    async _findTermsInternal(text, enabledDictionaryMap, options) {
+        const {alphanumeric, wildcard} = options;
+        text = this._getSearchableText(text, alphanumeric);
         if (text.length === 0) {
             return [[], 0];
         }
 
         const deinflections = (
-            details.wildcard ?
-            await this._findTermWildcard(text, enabledDictionaryMap, details.wildcard) :
+            wildcard ?
+            await this._findTermWildcard(text, enabledDictionaryMap, wildcard) :
             await this._findTermDeinflections(text, enabledDictionaryMap, options)
         );
 
@@ -414,9 +470,8 @@ class Translator {
     }
 
     _getAllDeinflections(text, options) {
-        const translationOptions = options.translation;
         const collapseEmphaticOptions = [[false, false]];
-        switch (translationOptions.collapseEmphaticSequences) {
+        switch (options.collapseEmphaticSequences) {
             case 'true':
                 collapseEmphaticOptions.push([true, false]);
                 break;
@@ -425,11 +480,11 @@ class Translator {
                 break;
         }
         const textOptionVariantArray = [
-            this._getTextOptionEntryVariants(translationOptions.convertHalfWidthCharacters),
-            this._getTextOptionEntryVariants(translationOptions.convertNumericCharacters),
-            this._getTextOptionEntryVariants(translationOptions.convertAlphabeticCharacters),
-            this._getTextOptionEntryVariants(translationOptions.convertHiraganaToKatakana),
-            this._getTextOptionEntryVariants(translationOptions.convertKatakanaToHiragana),
+            this._getTextOptionEntryVariants(options.convertHalfWidthCharacters),
+            this._getTextOptionEntryVariants(options.convertNumericCharacters),
+            this._getTextOptionEntryVariants(options.convertAlphabeticCharacters),
+            this._getTextOptionEntryVariants(options.convertHiraganaToKatakana),
+            this._getTextOptionEntryVariants(options.convertKatakanaToHiragana),
             collapseEmphaticOptions
         ];
 
@@ -705,15 +760,6 @@ class Translator {
             throw new Error(`Failed to fetch ${url}: ${response.status}`);
         }
         return await response.json();
-    }
-
-    _getEnabledDictionaryMap(options) {
-        const enabledDictionaryMap = new Map();
-        for (const [title, {enabled, priority, allowSecondarySearches}] of Object.entries(options.dictionaries)) {
-            if (!enabled) { continue; }
-            enabledDictionaryMap.set(title, {priority, allowSecondarySearches});
-        }
-        return enabledDictionaryMap;
     }
 
     _getSecondarySearchDictionaryMap(enabledDictionaryMap) {
@@ -999,7 +1045,7 @@ class Translator {
             // glossary
             // definitionTags
             termTags: this._cloneTags(termTags),
-            definitions,
+            definitions, // type: 'term'
             frequencies: [],
             pitches: []
             // only
@@ -1025,7 +1071,7 @@ class Translator {
             // glossary
             // definitionTags
             // termTags
-            definitions,
+            definitions, // type: 'termMergedByGlossary'
             frequencies: [],
             pitches: []
             // only
@@ -1064,7 +1110,7 @@ class Translator {
             glossary: [...glossary],
             definitionTags,
             // termTags
-            definitions, // Contains duplicate data
+            definitions, // type: 'term'; contains duplicate data
             frequencies: [],
             pitches: [],
             only
