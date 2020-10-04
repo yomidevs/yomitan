@@ -54,45 +54,36 @@ class Translator {
     }
 
     async findKanji(text, options) {
-        const dictionaries = this._getEnabledDictionaryMap(options);
+        const enabledDictionaryMap = this._getEnabledDictionaryMap(options);
         const kanjiUnique = new Set();
         for (const c of text) {
             kanjiUnique.add(c);
         }
 
-        const databaseDefinitions = await this._database.findKanjiBulk([...kanjiUnique], dictionaries);
+        const databaseDefinitions = await this._database.findKanjiBulk([...kanjiUnique], enabledDictionaryMap);
         if (databaseDefinitions.length === 0) { return []; }
 
         this._sortDatabaseDefinitionsByIndex(databaseDefinitions);
 
         const definitions = [];
-        for (const {index, character, onyomi, kunyomi, tags, glossary, stats, dictionary} of databaseDefinitions) {
+        for (const {character, onyomi, kunyomi, tags, glossary, stats, dictionary} of databaseDefinitions) {
             const expandedStats = await this._expandStats(stats, dictionary);
             const expandedTags = await this._expandTags(tags, dictionary);
             expandedTags.push(this._createDictionaryTag(dictionary));
             this._sortTags(expandedTags);
 
-            definitions.push({
-                index,
-                character,
-                onyomi,
-                kunyomi,
-                tags: expandedTags,
-                glossary,
-                stats: expandedStats,
-                dictionary,
-                frequencies: []
-            });
+            const definition = this._createKanjiDefinition(character, dictionary, onyomi, kunyomi, glossary, expandedTags, expandedStats);
+            definitions.push(definition);
         }
 
-        await this._buildKanjiMeta(definitions, dictionaries);
+        await this._buildKanjiMeta(definitions, enabledDictionaryMap);
 
         return definitions;
     }
 
     // Private
 
-    async _getSequencedDefinitions(definitions, mainDictionary) {
+    async _getSequencedDefinitions(definitions, mainDictionary, enabledDictionaryMap) {
         const sequenceList = [];
         const sequencedDefinitionMap = new Map();
         const sequencedDefinitions = [];
@@ -103,13 +94,14 @@ class Translator {
                 const {score} = definition;
                 let sequencedDefinition = sequencedDefinitionMap.get(sequence);
                 if (typeof sequencedDefinition === 'undefined') {
-                    const {reasons, source} = definition;
+                    const {reasons, source, rawSource} = definition;
                     sequencedDefinition = {
                         reasons,
                         score,
                         source,
+                        rawSource,
                         dictionary,
-                        databaseDefinitions: []
+                        definitions: []
                     };
                     sequencedDefinitionMap.set(sequence, sequencedDefinition);
                     sequencedDefinitions.push(sequencedDefinition);
@@ -122,155 +114,202 @@ class Translator {
             }
         }
 
-        const databaseDefinitions = await this._database.findTermsBySequenceBulk(sequenceList, mainDictionary);
-        for (const databaseDefinition of databaseDefinitions) {
-            sequencedDefinitions[databaseDefinition.index].databaseDefinitions.push(databaseDefinition);
+        if (sequenceList.length > 0) {
+            const databaseDefinitions = await this._database.findTermsBySequenceBulk(sequenceList, mainDictionary);
+            for (const databaseDefinition of databaseDefinitions) {
+                const {definitions: definitions2, source, rawSource, reasons} = sequencedDefinitions[databaseDefinition.index];
+                const definition = await this._createTermDefinitionFromDatabaseDefinition(databaseDefinition, source, rawSource, reasons, enabledDictionaryMap);
+                definitions2.push(definition);
+            }
         }
 
         return {sequencedDefinitions, unsequencedDefinitions};
     }
 
-    async _getMergedSecondarySearchResults(text, expressionsMap, secondarySearchDictionaries) {
-        if (secondarySearchDictionaries.size === 0) {
+    async _getMergedSecondarySearchResults(expressionsMap, secondarySearchDictionaryMap) {
+        if (secondarySearchDictionaryMap.size === 0) {
             return [];
         }
 
         const expressionList = [];
         const readingList = [];
         for (const [expression, readingMap] of expressionsMap.entries()) {
-            if (expression === text) { continue; }
             for (const reading of readingMap.keys()) {
                 expressionList.push(expression);
                 readingList.push(reading);
             }
         }
 
-        const databaseDefinitions = await this._database.findTermsExactBulk(expressionList, readingList, secondarySearchDictionaries);
+        const databaseDefinitions = await this._database.findTermsExactBulk(expressionList, readingList, secondarySearchDictionaryMap);
         this._sortDatabaseDefinitionsByIndex(databaseDefinitions);
 
         const definitions = [];
         for (const databaseDefinition of databaseDefinitions) {
             const source = expressionList[databaseDefinition.index];
-            const definition = await this._createTermDefinitionFromDatabaseDefinition(databaseDefinition, source, source, []);
+            const definition = await this._createTermDefinitionFromDatabaseDefinition(databaseDefinition, source, source, [], secondarySearchDictionaryMap);
             definitions.push(definition);
         }
 
         return definitions;
     }
 
-    async _getMergedDefinition(text, dictionaries, sequencedDefinition, defaultDefinitions, secondarySearchDictionaries, mergedByTermIndices) {
-        const {reasons, score, source, dictionary, databaseDefinitions} = sequencedDefinition;
-        const result = {
-            reasons,
-            score,
-            expression: new Set(),
-            reading: new Set(),
-            expressions: new Map(),
-            source,
-            dictionary,
-            definitions: []
-        };
+    async _getMergedDefinition(sequencedDefinition, unsequencedDefinitions, secondarySearchDictionaryMap, usedDefinitions) {
+        const {reasons, score, source, rawSource, dictionary, definitions} = sequencedDefinition;
+        const definitionDetailsMap = new Map();
+        const glossaryDefinitions = [];
+        const glossaryDefinitionGroupMap = new Map();
 
-        for (const definition of databaseDefinitions) {
-            const definitionTags = await this._expandTags(definition.definitionTags, definition.dictionary);
-            definitionTags.push(this._createDictionaryTag(definition.dictionary));
-            definition.definitionTags = definitionTags;
-            const termTags = await this._expandTags(definition.termTags, definition.dictionary);
-            definition.termTags = termTags;
+        this._mergeByGlossary(definitions, glossaryDefinitionGroupMap);
+        this._addDefinitionDetails(definitions, definitionDetailsMap);
+
+        let secondaryDefinitions = await this._getMergedSecondarySearchResults(definitionDetailsMap, secondarySearchDictionaryMap);
+        secondaryDefinitions = [unsequencedDefinitions, ...secondaryDefinitions];
+
+        this._removeUsedDefinitions(secondaryDefinitions, definitionDetailsMap, usedDefinitions);
+        this._removeDuplicateDefinitions(secondaryDefinitions);
+
+        this._mergeByGlossary(secondaryDefinitions, glossaryDefinitionGroupMap);
+
+        const allExpressions = new Set();
+        const allReadings = new Set();
+        for (const {expressions, readings} of glossaryDefinitionGroupMap.values()) {
+            for (const expression of expressions) { allExpressions.add(expression); }
+            for (const reading of readings) { allReadings.add(reading); }
         }
 
-        const definitionsByGloss = this._mergeByGlossary(result, databaseDefinitions);
-        const secondarySearchResults = await this._getMergedSecondarySearchResults(text, result.expressions, secondarySearchDictionaries);
-
-        this._mergeByGlossary(result, defaultDefinitions.concat(secondarySearchResults), definitionsByGloss, mergedByTermIndices);
-
-        for (const definition of definitionsByGloss.values()) {
-            this._sortTags(definition.definitionTags);
-            result.definitions.push(definition);
+        for (const {expressions, readings, definitions: definitions2} of glossaryDefinitionGroupMap.values()) {
+            const glossaryDefinition = this._createMergedGlossaryTermDefinition(
+                source,
+                rawSource,
+                definitions2,
+                expressions,
+                readings,
+                allExpressions,
+                allReadings
+            );
+            glossaryDefinitions.push(glossaryDefinition);
         }
 
-        this._sortDefinitions(result.definitions, dictionaries);
+        this._sortDefinitions(glossaryDefinitions, true);
 
-        const expressions = [];
-        for (const [expression, readingMap] of result.expressions.entries()) {
+        const expressionDetailsList = [];
+        for (const [expression, readingMap] of definitionDetailsMap.entries()) {
             for (const [reading, termTagsMap] of readingMap.entries()) {
                 const termTags = [...termTagsMap.values()];
-                const score2 = termTags.map((tag) => tag.score).reduce((p, v) => p + v, 0);
                 this._sortTags(termTags);
-                expressions.push(this._createExpression(expression, reading, termTags, this._scoreToTermFrequency(score2)));
+                expressionDetailsList.push(this._createExpressionDetails(expression, reading, termTags));
             }
         }
 
-        result.expressions = expressions;
-        result.expression = Array.from(result.expression);
-        result.reading = Array.from(result.reading);
+        return this._createMergedTermDefinition(
+            source,
+            rawSource,
+            glossaryDefinitions,
+            [...allExpressions],
+            [...allReadings],
+            expressionDetailsList,
+            reasons,
+            dictionary,
+            score
+        );
+    }
 
+    _removeUsedDefinitions(definitions, definitionDetailsMap, usedDefinitions) {
+        for (let i = 0, ii = definitions.length; i < ii; ++i) {
+            const definition = definitions[i];
+            const {expression, reading} = definition;
+            const expressionMap = definitionDetailsMap.get(expression);
+            if (
+                typeof expressionMap !== 'undefined' &&
+                typeof expressionMap.get(reading) !== 'undefined'
+            ) {
+                usedDefinitions.add(definition);
+            } else {
+                definitions.splice(i, 1);
+                --i;
+                --ii;
+            }
+        }
+    }
+
+    _getUniqueDefinitionTags(definitions) {
+        const definitionTagsMap = new Map();
+        for (const {definitionTags} of definitions) {
+            for (const tag of definitionTags) {
+                const {name} = tag;
+                if (definitionTagsMap.has(name)) { continue; }
+                definitionTagsMap.set(name, this._cloneTag(tag));
+            }
+        }
+        return [...definitionTagsMap.values()];
+    }
+
+    _getTermTagsScoreSum(termTags) {
+        let result = 0;
+        for (const {score} of termTags) { result += score; }
         return result;
     }
 
     async _findTermsGrouped(text, details, options) {
-        const dictionaries = this._getEnabledDictionaryMap(options);
-        const [definitions, length] = await this._findTermsInternal(text, dictionaries, details, options);
+        const {general: {compactTags}} = options;
+        const enabledDictionaryMap = this._getEnabledDictionaryMap(options);
+        const [definitions, length] = await this._findTermsInternal(text, enabledDictionaryMap, details, options);
 
-        const definitionsGrouped = this._groupTerms(definitions, dictionaries);
-        await this._buildTermMeta(definitionsGrouped, dictionaries);
-        this._sortDefinitions(definitionsGrouped, null);
+        const groupedDefinitions = this._groupTerms(definitions, enabledDictionaryMap);
+        await this._buildTermMeta(groupedDefinitions, enabledDictionaryMap);
+        this._sortDefinitions(groupedDefinitions, false);
 
-        if (options.general.compactTags) {
-            for (const definition of definitionsGrouped) {
+        if (compactTags) {
+            for (const definition of groupedDefinitions) {
                 this._compressDefinitionTags(definition.definitions);
             }
         }
 
-        return [definitionsGrouped, length];
+        return [groupedDefinitions, length];
     }
 
     async _findTermsMerged(text, details, options) {
-        const dictionaries = this._getEnabledDictionaryMap(options);
-        const secondarySearchDictionaries = new Map();
-        for (const [title, dictionary] of dictionaries.entries()) {
-            if (!dictionary.allowSecondarySearches) { continue; }
-            secondarySearchDictionaries.set(title, dictionary);
-        }
+        const {general: {compactTags, mainDictionary}} = options;
+        const enabledDictionaryMap = this._getEnabledDictionaryMap(options);
+        const secondarySearchDictionaryMap = this._getSecondarySearchDictionaryMap(enabledDictionaryMap);
 
-        const [definitions, length] = await this._findTermsInternal(text, dictionaries, details, options);
-        const {sequencedDefinitions, unsequencedDefinitions} = await this._getSequencedDefinitions(definitions, options.general.mainDictionary);
+        const [definitions, length] = await this._findTermsInternal(text, enabledDictionaryMap, details, options);
+        const {sequencedDefinitions, unsequencedDefinitions} = await this._getSequencedDefinitions(definitions, mainDictionary, enabledDictionaryMap);
         const definitionsMerged = [];
-        const mergedByTermIndices = new Set();
+        const usedDefinitions = new Set();
 
         for (const sequencedDefinition of sequencedDefinitions) {
             const result = await this._getMergedDefinition(
-                text,
-                dictionaries,
                 sequencedDefinition,
                 unsequencedDefinitions,
-                secondarySearchDictionaries,
-                mergedByTermIndices
+                secondarySearchDictionaryMap,
+                usedDefinitions
             );
             definitionsMerged.push(result);
         }
 
-        const strayDefinitions = unsequencedDefinitions.filter((definition, index) => !mergedByTermIndices.has(index));
-        for (const groupedDefinition of this._groupTerms(strayDefinitions, dictionaries)) {
-            // from dictTermsMergeBySequence
-            const {reasons, score, expression, reading, source, dictionary} = groupedDefinition;
-            const compatibilityDefinition = {
-                reasons,
-                score,
-                expression: [expression],
-                reading: [reading],
-                expressions: [this._createExpression(groupedDefinition.expression, groupedDefinition.reading)],
+        const unusedDefinitions = unsequencedDefinitions.filter((definition) => !usedDefinitions.has(definition));
+        for (const groupedDefinition of this._groupTerms(unusedDefinitions, enabledDictionaryMap)) {
+            const {reasons, score, expression, reading, source, rawSource, dictionary, termTags} = groupedDefinition;
+            const expressionDetails = this._createExpressionDetails(expression, reading, termTags);
+            const compatibilityDefinition = this._createMergedTermDefinition(
                 source,
+                rawSource,
+                definitions,
+                [expression],
+                [reading],
+                [expressionDetails],
+                reasons,
                 dictionary,
-                definitions: groupedDefinition.definitions
-            };
+                score
+            );
             definitionsMerged.push(compatibilityDefinition);
         }
 
-        await this._buildTermMeta(definitionsMerged, dictionaries);
-        this._sortDefinitions(definitionsMerged, null);
+        await this._buildTermMeta(definitionsMerged, enabledDictionaryMap);
+        this._sortDefinitions(definitionsMerged, false);
 
-        if (options.general.compactTags) {
+        if (compactTags) {
             for (const definition of definitionsMerged) {
                 this._compressDefinitionTags(definition.definitions);
             }
@@ -280,38 +319,39 @@ class Translator {
     }
 
     async _findTermsSplit(text, details, options) {
-        const dictionaries = this._getEnabledDictionaryMap(options);
-        const [definitions, length] = await this._findTermsInternal(text, dictionaries, details, options);
-        await this._buildTermMeta(definitions, dictionaries);
-        this._sortDefinitions(definitions, dictionaries);
+        const enabledDictionaryMap = this._getEnabledDictionaryMap(options);
+        const [definitions, length] = await this._findTermsInternal(text, enabledDictionaryMap, details, options);
+        await this._buildTermMeta(definitions, enabledDictionaryMap);
+        this._sortDefinitions(definitions, true);
         return [definitions, length];
     }
 
     async _findTermsSimple(text, details, options) {
-        const dictionaries = this._getEnabledDictionaryMap(options);
-        const [definitions, length] = await this._findTermsInternal(text, dictionaries, details, options);
-        this._sortDefinitions(definitions, null);
+        const enabledDictionaryMap = this._getEnabledDictionaryMap(options);
+        const [definitions, length] = await this._findTermsInternal(text, enabledDictionaryMap, details, options);
+        this._sortDefinitions(definitions, false);
         return [definitions, length];
     }
 
-    async _findTermsInternal(text, dictionaries, details, options) {
-        text = this._getSearchableText(text, options);
+    async _findTermsInternal(text, enabledDictionaryMap, details, options) {
+        text = this._getSearchableText(text, options.scanning.alphanumeric);
         if (text.length === 0) {
             return [[], 0];
         }
 
         const deinflections = (
             details.wildcard ?
-            await this._findTermWildcard(text, dictionaries, details.wildcard) :
-            await this._findTermDeinflections(text, dictionaries, options)
+            await this._findTermWildcard(text, enabledDictionaryMap, details.wildcard) :
+            await this._findTermDeinflections(text, enabledDictionaryMap, options)
         );
 
         let maxLength = 0;
         const definitions = [];
         for (const {databaseDefinitions, source, rawSource, reasons} of deinflections) {
+            if (databaseDefinitions.length === 0) { continue; }
             maxLength = Math.max(maxLength, rawSource.length);
             for (const databaseDefinition of databaseDefinitions) {
-                const definition = await this._createTermDefinitionFromDatabaseDefinition(databaseDefinition, source, rawSource, reasons);
+                const definition = await this._createTermDefinitionFromDatabaseDefinition(databaseDefinition, source, rawSource, reasons, enabledDictionaryMap);
                 definitions.push(definition);
             }
         }
@@ -320,8 +360,8 @@ class Translator {
         return [definitions, maxLength];
     }
 
-    async _findTermWildcard(text, dictionaries, wildcard) {
-        const databaseDefinitions = await this._database.findTermsBulk([text], dictionaries, wildcard);
+    async _findTermWildcard(text, enabledDictionaryMap, wildcard) {
+        const databaseDefinitions = await this._database.findTermsBulk([text], enabledDictionaryMap, wildcard);
         if (databaseDefinitions.length === 0) {
             return [];
         }
@@ -336,7 +376,7 @@ class Translator {
         }];
     }
 
-    async _findTermDeinflections(text, dictionaries, options) {
+    async _findTermDeinflections(text, enabledDictionaryMap, options) {
         const deinflections = this._getAllDeinflections(text, options);
 
         if (deinflections.length === 0) {
@@ -358,7 +398,7 @@ class Translator {
             deinflectionArray.push(deinflection);
         }
 
-        const databaseDefinitions = await this._database.findTermsBulk(uniqueDeinflectionTerms, dictionaries, null);
+        const databaseDefinitions = await this._database.findTermsBulk(uniqueDeinflectionTerms, enabledDictionaryMap, null);
 
         for (const databaseDefinition of databaseDefinitions) {
             const definitionRules = Deinflector.rulesToRuleFlags(databaseDefinition.rules);
@@ -370,7 +410,7 @@ class Translator {
             }
         }
 
-        return deinflections.filter((e) => e.databaseDefinitions.length > 0);
+        return deinflections;
     }
 
     _getAllDeinflections(text, options) {
@@ -438,13 +478,17 @@ class Translator {
         }
     }
 
-    async _buildTermMeta(definitions, dictionaries) {
+    async _buildTermMeta(definitions, enabledDictionaryMap) {
         const terms = [];
         for (const definition of definitions) {
-            if (definition.expressions) {
-                terms.push(...definition.expressions);
-            } else {
-                terms.push(definition);
+            switch (definition.type) {
+                case 'term':
+                case 'termGrouped':
+                    terms.push(definition);
+                    break;
+                case 'termMerged':
+                    terms.push(...definition.expressions);
+                    break;
             }
         }
 
@@ -456,9 +500,8 @@ class Translator {
         const expressionsUnique = [];
         const termsUnique = [];
         const termsUniqueMap = new Map();
-        for (let i = 0, ii = terms.length; i < ii; ++i) {
-            const term = terms[i];
-            const expression = term.expression;
+        for (const term of terms) {
+            const {expression} = term;
             let termList = termsUniqueMap.get(expression);
             if (typeof termList === 'undefined') {
                 termList = [];
@@ -467,13 +510,9 @@ class Translator {
                 termsUniqueMap.set(expression, termList);
             }
             termList.push(term);
-
-            // New data
-            term.frequencies = [];
-            term.pitches = [];
         }
 
-        const metas = await this._database.findTermMetaBulk(expressionsUnique, dictionaries);
+        const metas = await this._database.findTermMetaBulk(expressionsUnique, enabledDictionaryMap);
         for (const {expression, mode, data, dictionary, index} of metas) {
             switch (mode) {
                 case 'freq':
@@ -494,13 +533,13 @@ class Translator {
         }
     }
 
-    async _buildKanjiMeta(definitions, dictionaries) {
+    async _buildKanjiMeta(definitions, enabledDictionaryMap) {
         const kanjiList = [];
         for (const {character} of definitions) {
             kanjiList.push(character);
         }
 
-        const metas = await this._database.findKanjiMetaBulk(kanjiList, dictionaries);
+        const metas = await this._database.findKanjiMetaBulk(kanjiList, enabledDictionaryMap);
         for (const {character, mode, data, dictionary, index} of metas) {
             switch (mode) {
                 case 'freq':
@@ -638,19 +677,19 @@ class Translator {
         }
     }
 
-    _getSearchableText(text, options) {
-        if (!options.scanning.alphanumeric) {
-            let newText = '';
-            for (const c of text) {
-                if (!jp.isCodePointJapanese(c.codePointAt(0))) {
-                    break;
-                }
-                newText += c;
-            }
-            text = newText;
+    _getSearchableText(text, allowAlphanumericCharacters) {
+        if (allowAlphanumericCharacters) {
+            return text;
         }
 
-        return text;
+        let newText = '';
+        for (const c of text) {
+            if (!jp.isCodePointJapanese(c.codePointAt(0))) {
+                break;
+            }
+            newText += c;
+        }
+        return newText;
     }
 
     async _fetchJsonAsset(url) {
@@ -675,6 +714,20 @@ class Translator {
             enabledDictionaryMap.set(title, {priority, allowSecondarySearches});
         }
         return enabledDictionaryMap;
+    }
+
+    _getSecondarySearchDictionaryMap(enabledDictionaryMap) {
+        const secondarySearchDictionaryMap = new Map();
+        for (const [title, dictionary] of enabledDictionaryMap.entries()) {
+            if (!dictionary.allowSecondarySearches) { continue; }
+            secondarySearchDictionaryMap.set(title, dictionary);
+        }
+        return secondarySearchDictionaryMap;
+    }
+
+    _getDictionaryPriority(dictionary, enabledDictionaryMap) {
+        const info = enabledDictionaryMap.get(dictionary);
+        return typeof info !== 'undefined' ? info.priority : 0;
     }
 
     _removeDuplicateDefinitions(definitions) {
@@ -703,43 +756,60 @@ class Translator {
     _compressDefinitionTags(definitions) {
         let lastDictionary = '';
         let lastPartOfSpeech = '';
+        const removeCategoriesSet = new Set();
 
-        for (const definition of definitions) {
-            const dictionary = JSON.stringify(definition.definitionTags.filter((tag) => tag.category === 'dictionary').map((tag) => tag.name).sort());
-            const partOfSpeech = JSON.stringify(definition.definitionTags.filter((tag) => tag.category === 'partOfSpeech').map((tag) => tag.name).sort());
-
-            const filterOutCategories = [];
+        for (const {definitionTags} of definitions) {
+            const dictionary = this._createMapKey(this._getTagNamesWithCategory(definitionTags, 'dictionary'));
+            const partOfSpeech = this._createMapKey(this._getTagNamesWithCategory(definitionTags, 'partOfSpeech'));
 
             if (lastDictionary === dictionary) {
-                filterOutCategories.push('dictionary');
+                removeCategoriesSet.add('dictionary');
             } else {
                 lastDictionary = dictionary;
                 lastPartOfSpeech = '';
             }
 
             if (lastPartOfSpeech === partOfSpeech) {
-                filterOutCategories.push('partOfSpeech');
+                removeCategoriesSet.add('partOfSpeech');
             } else {
                 lastPartOfSpeech = partOfSpeech;
             }
 
-            definition.definitionTags = definition.definitionTags.filter((tag) => !filterOutCategories.includes(tag.category));
+            if (removeCategoriesSet.size > 0) {
+                this._removeTagsWithCategory(definitionTags, removeCategoriesSet);
+                removeCategoriesSet.clear();
+            }
         }
     }
 
-    _groupTerms(definitions, dictionaries) {
+    _getTagNamesWithCategory(tags, category) {
+        const results = [];
+        for (const tag of tags) {
+            if (tag.category !== category) { continue; }
+            results.push(tag.name);
+        }
+        results.sort();
+        return results;
+    }
+
+    _removeTagsWithCategory(tags, removeCategoriesSet) {
+        for (let i = 0, ii = tags.length; i < ii; ++i) {
+            const {category} = tags[i];
+            if (!removeCategoriesSet.has(category)) { continue; }
+            tags.splice(i, 1);
+            --i;
+            --ii;
+        }
+    }
+
+    _groupTerms(definitions) {
         const groups = new Map();
         for (const definition of definitions) {
-            const key = [definition.source, definition.expression, ...definition.reasons];
-            if (definition.reading) {
-                key.push(definition.reading);
-            }
-
-            const keyString = key.toString();
-            let groupDefinitions = groups.get(keyString);
+            const key = this._createMapKey([definition.source, definition.expression, definition.reading, ...definition.reasons]);
+            let groupDefinitions = groups.get(key);
             if (typeof groupDefinitions === 'undefined') {
                 groupDefinitions = [];
-                groups.set(keyString, groupDefinitions);
+                groups.set(key, groupDefinitions);
             }
 
             groupDefinitions.push(definition);
@@ -747,124 +817,88 @@ class Translator {
 
         const results = [];
         for (const groupDefinitions of groups.values()) {
-            const firstDef = groupDefinitions[0];
-            this._sortDefinitions(groupDefinitions, dictionaries);
-            results.push({
-                definitions: groupDefinitions,
-                expression: firstDef.expression,
-                reading: firstDef.reading,
-                furiganaSegments: firstDef.furiganaSegments,
-                reasons: firstDef.reasons,
-                termTags: firstDef.termTags,
-                score: groupDefinitions.reduce((p, v) => v.score > p ? v.score : p, Number.MIN_SAFE_INTEGER),
-                source: firstDef.source
-            });
+            this._sortDefinitions(groupDefinitions, true);
+            const definition = this._createGroupedTermDefinition(groupDefinitions);
+            results.push(definition);
         }
 
         return results;
     }
 
-    _mergeByGlossary(result, definitions, appendTo=null, mergedIndices=null) {
-        const definitionsByGlossary = appendTo !== null ? appendTo : new Map();
+    _mergeByGlossary(definitions, glossaryDefinitionGroupMap) {
+        for (const definition of definitions) {
+            const {expression, reading, dictionary, glossary} = definition;
 
-        const resultExpressionsMap = result.expressions;
-        const resultExpressionSet = result.expression;
-        const resultReadingSet = result.reading;
-        const resultSource = result.source;
-
-        for (let i = 0, ii = definitions.length; i < ii; ++i) {
-            const definition = definitions[i];
-            const {expression, reading} = definition;
-
-            if (mergedIndices !== null) {
-                const expressionMap = resultExpressionsMap.get(expression);
-                if (
-                    typeof expressionMap !== 'undefined' &&
-                    typeof expressionMap.get(reading) !== 'undefined'
-                ) {
-                    mergedIndices.add(i);
-                } else {
-                    continue;
-                }
-            }
-
-            const gloss = JSON.stringify(definition.glossary.concat(definition.dictionary));
-            let glossDefinition = definitionsByGlossary.get(gloss);
-            if (typeof glossDefinition === 'undefined') {
-                glossDefinition = {
-                    expression: new Set(),
-                    reading: new Set(),
-                    definitionTags: [],
-                    glossary: definition.glossary,
-                    source: resultSource,
-                    reasons: [],
-                    score: definition.score,
-                    id: definition.id,
-                    dictionary: definition.dictionary
+            const key = this._createMapKey([dictionary, ...glossary]);
+            let group = glossaryDefinitionGroupMap.get(key);
+            if (typeof group === 'undefined') {
+                group = {
+                    expressions: new Set(),
+                    readings: new Set(),
+                    definitions: []
                 };
-                definitionsByGlossary.set(gloss, glossDefinition);
+                glossaryDefinitionGroupMap.set(key, group);
             }
 
-            glossDefinition.expression.add(expression);
-            glossDefinition.reading.add(reading);
+            group.expressions.add(expression);
+            group.readings.add(reading);
+            group.definitions.push(definition);
+        }
+    }
 
-            resultExpressionSet.add(expression);
-            resultReadingSet.add(reading);
-
-            for (const tag of definition.definitionTags) {
-                if (!glossDefinition.definitionTags.find((existingTag) => existingTag.name === tag.name)) {
-                    glossDefinition.definitionTags.push(tag);
-                }
+    _addDefinitionDetails(definitions, definitionDetailsMap) {
+        for (const {expression, reading, termTags} of definitions) {
+            let readingMap = definitionDetailsMap.get(expression);
+            if (typeof readingMap === 'undefined') {
+                readingMap = new Map();
+                definitionDetailsMap.set(expression, readingMap);
             }
 
-            if (appendTo === null) {
-                /*
-                    Data layout:
-                    resultExpressionsMap = new Map([
-                        [expression, new Map([
-                            [reading, new Map([
-                                [tagName, tagInfo],
-                                ...
-                            ])],
-                            ...
-                        ])],
-                        ...
-                    ]);
-                */
-                let readingMap = resultExpressionsMap.get(expression);
-                if (typeof readingMap === 'undefined') {
-                    readingMap = new Map();
-                    resultExpressionsMap.set(expression, readingMap);
-                }
+            let termTagsMap = readingMap.get(reading);
+            if (typeof termTagsMap === 'undefined') {
+                termTagsMap = new Map();
+                readingMap.set(reading, termTagsMap);
+            }
 
-                let termTagsMap = readingMap.get(reading);
-                if (typeof termTagsMap === 'undefined') {
-                    termTagsMap = new Map();
-                    readingMap.set(reading, termTagsMap);
-                }
-
-                for (const tag of definition.termTags) {
-                    if (!termTagsMap.has(tag.name)) {
-                        termTagsMap.set(tag.name, tag);
-                    }
-                }
+            for (const tag of termTags) {
+                const {name} = tag;
+                if (termTagsMap.has(name)) { continue; }
+                termTagsMap.set(name, this._cloneTag(tag));
             }
         }
+    }
 
-        for (const definition of definitionsByGlossary.values()) {
-            const only = [];
-            const expressionSet = definition.expression;
-            const readingSet = definition.reading;
-            if (!areSetsEqual(expressionSet, resultExpressionSet)) {
-                only.push(...getSetIntersection(expressionSet, resultExpressionSet));
-            }
-            if (!areSetsEqual(readingSet, resultReadingSet)) {
-                only.push(...getSetIntersection(readingSet, resultReadingSet));
-            }
-            definition.only = only;
+    _getMaxDefinitionScore(definitions) {
+        let result = Number.MIN_SAFE_INTEGER;
+        for (const {score} of definitions) {
+            if (score > result) { result = score; }
         }
+        return result;
+    }
 
-        return definitionsByGlossary;
+    _getMaxDictionaryPriority(definitions) {
+        let result = Number.MIN_SAFE_INTEGER;
+        for (const {dictionaryPriority} of definitions) {
+            if (dictionaryPriority > result) { result = dictionaryPriority; }
+        }
+        return result;
+    }
+
+    _cloneTag(tag) {
+        const {name, category, notes, order, score, dictionary} = tag;
+        return this._createTag(name, category, notes, order, score, dictionary);
+    }
+
+    _cloneTags(tags) {
+        const results = [];
+        for (const tag of tags) {
+            results.push(this._cloneTag(tag));
+        }
+        return results;
+    }
+
+    _createMapKey(array) {
+        return JSON.stringify(array);
     }
 
     _createDictionaryTag(name) {
@@ -894,8 +928,23 @@ class Translator {
         };
     }
 
-    async _createTermDefinitionFromDatabaseDefinition(databaseDefinition, source, rawSource, reasons) {
+    _createKanjiDefinition(character, dictionary, onyomi, kunyomi, glossary, tags, stats) {
+        return {
+            type: 'kanji',
+            character,
+            dictionary,
+            onyomi,
+            kunyomi,
+            glossary,
+            tags,
+            stats,
+            frequencies: []
+        };
+    }
+
+    async _createTermDefinitionFromDatabaseDefinition(databaseDefinition, source, rawSource, reasons, enabledDictionaryMap) {
         const {expression, reading, definitionTags, termTags, glossary, score, dictionary, id, sequence} = databaseDefinition;
+        const dictionaryPriority = this._getDictionaryPriority(dictionary, enabledDictionaryMap);
         const termTagsExpanded = await this._expandTags(termTags, dictionary);
         const definitionTagsExpanded = await this._expandTags(definitionTags, dictionary);
         definitionTagsExpanded.push(this._createDictionaryTag(dictionary));
@@ -906,30 +955,133 @@ class Translator {
         const furiganaSegments = jp.distributeFurigana(expression, reading);
 
         return {
+            type: 'term',
+            id,
             source,
             rawSource,
             reasons,
             score,
-            id,
+            sequence,
             dictionary,
+            dictionaryPriority,
             expression,
             reading,
+            // expressions
             furiganaSegments,
             glossary,
             definitionTags: definitionTagsExpanded,
             termTags: termTagsExpanded,
-            sequence
+            // definitions
+            frequencies: [],
+            pitches: []
+            // only
         };
     }
 
-    _createExpression(expression, reading, termTags=null, termFrequency=null) {
+    _createGroupedTermDefinition(definitions) {
+        const {expression, reading, furiganaSegments, reasons, termTags, source, rawSource} = definitions[0];
+        const score = this._getMaxDefinitionScore(definitions);
+        const dictionaryPriority = this._getMaxDictionaryPriority(definitions);
+        return {
+            type: 'termGrouped',
+            // id
+            source,
+            rawSource,
+            reasons: [...reasons],
+            score,
+            // sequence
+            // dictionary
+            dictionaryPriority,
+            expression,
+            reading,
+            // expressions
+            furiganaSegments, // Contains duplicate data
+            // glossary
+            // definitionTags
+            termTags: this._cloneTags(termTags),
+            definitions,
+            frequencies: [],
+            pitches: []
+            // only
+        };
+    }
+
+    _createMergedTermDefinition(source, rawSource, definitions, expressions, readings, expressionDetailsList, reasons, dictionary, score) {
+        const dictionaryPriority = this._getMaxDictionaryPriority(definitions);
+        return {
+            type: 'termMerged',
+            // id
+            source,
+            rawSource,
+            reasons,
+            score,
+            // sequence
+            dictionary,
+            dictionaryPriority,
+            expression: expressions,
+            reading: readings,
+            expressions: expressionDetailsList,
+            // furiganaSegments
+            // glossary
+            // definitionTags
+            // termTags
+            definitions,
+            frequencies: [],
+            pitches: []
+            // only
+        };
+    }
+
+    _createMergedGlossaryTermDefinition(source, rawSource, definitions, expressions, readings, allExpressions, allReadings) {
+        const only = [];
+        if (!areSetsEqual(expressions, allExpressions)) {
+            only.push(...getSetIntersection(expressions, allExpressions));
+        }
+        if (!areSetsEqual(readings, allReadings)) {
+            only.push(...getSetIntersection(readings, allReadings));
+        }
+
+        const definitionTags = this._getUniqueDefinitionTags(definitions);
+        this._sortTags(definitionTags);
+
+        const {glossary, dictionary} = definitions[0];
+        const score = this._getMaxDefinitionScore(definitions);
+        const dictionaryPriority = this._getMaxDictionaryPriority(definitions);
+        return {
+            type: 'termMergedByGlossary',
+            // id
+            source,
+            rawSource,
+            reasons: [],
+            score,
+            // sequence
+            dictionary,
+            dictionaryPriority,
+            expression: [...expressions],
+            reading: [...readings],
+            // expressions
+            // furiganaSegments
+            glossary: [...glossary],
+            definitionTags,
+            // termTags
+            definitions, // Contains duplicate data
+            frequencies: [],
+            pitches: [],
+            only
+        };
+    }
+
+    _createExpressionDetails(expression, reading, termTags) {
+        const termFrequency = this._scoreToTermFrequency(this._getTermTagsScoreSum(termTags));
         const furiganaSegments = jp.distributeFurigana(expression, reading);
         return {
             expression,
             reading,
             furiganaSegments,
             termTags,
-            termFrequency
+            termFrequency,
+            frequencies: [],
+            pitches: []
         };
     }
 
@@ -944,21 +1096,11 @@ class Translator {
         });
     }
 
-    _sortDefinitions(definitions, dictionaries) {
+    _sortDefinitions(definitions, useDictionaryPriority) {
         if (definitions.length <= 1) { return; }
         const stringComparer = this._stringComparer;
-        definitions.sort((v1, v2) => {
-            let i;
-            if (dictionaries !== null) {
-                const dictionaryInfo1 = dictionaries.get(v1.dictionary);
-                const dictionaryInfo2 = dictionaries.get(v2.dictionary);
-                const priority1 = typeof dictionaryInfo1 !== 'undefined' ? dictionaryInfo1.priority : 0;
-                const priority2 = typeof dictionaryInfo2 !== 'undefined' ? dictionaryInfo2.priority : 0;
-                i = priority2 - priority1;
-                if (i !== 0) { return i; }
-            }
-
-            i = v2.source.length - v1.source.length;
+        const compareFunction1 = (v1, v2) => {
+            let i = v2.source.length - v1.source.length;
             if (i !== 0) { return i; }
 
             i = v1.reasons.length - v2.reasons.length;
@@ -973,7 +1115,12 @@ class Translator {
             if (i !== 0) { return i; }
 
             return stringComparer.compare(expression1, expression2);
-        });
+        };
+        const compareFunction2 = (v1, v2) => {
+            const i = v2.dictionaryPriority - v1.dictionaryPriority;
+            return (i !== 0) ? i : compareFunction1(v1, v2);
+        };
+        definitions.sort(useDictionaryPriority ? compareFunction2 : compareFunction1);
     }
 
     _sortDatabaseDefinitionsByIndex(definitions) {
