@@ -62,12 +62,12 @@ class Translator {
      *     compactTags: (boolean),
      *     mainDictionary: (string),
      *     alphanumeric: (boolean),
-     *     convertHalfWidthCharacters: (boolean),
-     *     convertNumericCharacters: (boolean),
-     *     convertAlphabeticCharacters: (boolean),
-     *     convertHiraganaToKatakana: (boolean),
-     *     convertKatakanaToHiragana: (boolean),
-     *     collapseEmphaticSequences: (boolean),
+     *     convertHalfWidthCharacters: (enum: 'false', 'true', 'variant'),
+     *     convertNumericCharacters: (enum: 'false', 'true', 'variant'),
+     *     convertAlphabeticCharacters: (enum: 'false', 'true', 'variant'),
+     *     convertHiraganaToKatakana: (enum: 'false', 'true', 'variant'),
+     *     convertKatakanaToHiragana: (enum: 'false', 'true', 'variant'),
+     *     collapseEmphaticSequences: (enum: 'false', 'true', 'full'),
      *     enabledDictionaryMap: (Map of [
      *       (string),
      *       {
