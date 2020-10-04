@@ -38,11 +38,11 @@ class Translator {
 
     /**
      * Initializes the instance for use. The public API should not be used until
-     * this function has been called and await'd.
+     * this function has been called.
+     * @param deinflectionReasons The raw deinflections reasons data that the Deinflector uses.
      */
-    async prepare() {
-        const reasons = await this._fetchJsonAsset('/bg/lang/deinflect.json');
-        this._deinflector = new Deinflector(reasons);
+    prepare(deinflectionReasons) {
+        this._deinflector = new Deinflector(deinflectionReasons);
     }
 
     /**
@@ -745,21 +745,6 @@ class Translator {
             newText += c;
         }
         return newText;
-    }
-
-    async _fetchJsonAsset(url) {
-        const response = await fetch(chrome.runtime.getURL(url), {
-            method: 'GET',
-            mode: 'no-cors',
-            cache: 'default',
-            credentials: 'omit',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer'
-        });
-        if (!response.ok) {
-            throw new Error(`Failed to fetch ${url}: ${response.status}`);
-        }
-        return await response.json();
     }
 
     _getSecondarySearchDictionaryMap(enabledDictionaryMap) {

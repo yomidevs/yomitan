@@ -186,7 +186,9 @@ class Backend {
             } catch (e) {
                 yomichan.logError(e);
             }
-            await this._translator.prepare();
+
+            const deinflectionReasions = await this._fetchAsset('/bg/lang/deinflect.json', true);
+            this._translator.prepare(deinflectionReasions);
 
             await this._optionsUtil.prepare();
             this._defaultAnkiFieldTemplates = (await this._fetchAsset('/bg/data/default-anki-field-templates.handlebars')).trim();
