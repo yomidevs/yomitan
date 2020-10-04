@@ -1176,6 +1176,8 @@ class Translator {
 
             const expression1 = v1.expression;
             const expression2 = v2.expression;
+            if (typeof expression1 !== 'string' || typeof expression2 !== 'string') { return 0; } // Skip if either is not a string (array)
+
             i = expression2.length - expression1.length;
             if (i !== 0) { return i; }
 
