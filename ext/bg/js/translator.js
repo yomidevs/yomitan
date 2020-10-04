@@ -295,6 +295,12 @@ class Translator {
         return result;
     }
 
+    _getSourceTermMatchCountSum(definitions) {
+        let result = 0;
+        for (const {sourceTermExactMatchCount} of definitions) { result += sourceTermExactMatchCount; }
+        return result;
+    }
+
     async _findTermsGrouped(text, options) {
         const {compactTags, enabledDictionaryMap} = options;
         const [definitions, length] = await this._findTermsInternal(text, enabledDictionaryMap, options);
@@ -979,6 +985,7 @@ class Translator {
 
         const furiganaSegments = jp.distributeFurigana(expression, reading);
         const termDetailsList = [this._createTermDetails(sourceTerm, expression, reading, furiganaSegments, termTags)];
+        const sourceTermExactMatchCount = (sourceTerm === expression ? 1 : 0);
 
         return {
             type: 'term',
@@ -1000,8 +1007,9 @@ class Translator {
             termTags: termTagsExpanded,
             // definitions
             frequencies: [],
-            pitches: []
+            pitches: [],
             // only
+            sourceTermExactMatchCount
         };
     }
 
@@ -1010,6 +1018,7 @@ class Translator {
         const score = this._getMaxDefinitionScore(definitions);
         const dictionaryPriority = this._getMaxDictionaryPriority(definitions);
         const termDetailsList = [this._createTermDetails(sourceTerm, expression, reading, furiganaSegments, termTags)];
+        const sourceTermExactMatchCount = (sourceTerm === expression ? 1 : 0);
         return {
             type: 'termGrouped',
             // id
@@ -1030,13 +1039,15 @@ class Translator {
             termTags: this._cloneTags(termTags),
             definitions, // type: 'term'
             frequencies: [],
-            pitches: []
+            pitches: [],
             // only
+            sourceTermExactMatchCount
         };
     }
 
     _createMergedTermDefinition(source, rawSource, definitions, expressions, readings, termDetailsList, reasons, dictionary, score) {
         const dictionaryPriority = this._getMaxDictionaryPriority(definitions);
+        const sourceTermExactMatchCount = this._getSourceTermMatchCountSum(definitions);
         return {
             type: 'termMerged',
             // id
@@ -1057,8 +1068,9 @@ class Translator {
             // termTags
             definitions, // type: 'termMergedByGlossary'
             frequencies: [],
-            pitches: []
+            pitches: [],
             // only
+            sourceTermExactMatchCount
         };
     }
 
@@ -1070,6 +1082,8 @@ class Translator {
         if (!areSetsEqual(readings, allReadings)) {
             only.push(...getSetIntersection(readings, allReadings));
         }
+
+        const sourceTermExactMatchCount = this._getSourceTermMatchCountSum(definitions);
 
         const termInfoMap = new Map();
         this._addUniqueTermInfos(definitions, termInfoMap);
@@ -1102,7 +1116,8 @@ class Translator {
             definitions, // type: 'term'; contains duplicate data
             frequencies: [],
             pitches: [],
-            only
+            only,
+            sourceTermExactMatchCount
         };
     }
 
@@ -1151,6 +1166,9 @@ class Translator {
             if (i !== 0) { return i; }
 
             i = v1.reasons.length - v2.reasons.length;
+            if (i !== 0) { return i; }
+
+            i = v2.sourceTermExactMatchCount - v1.sourceTermExactMatchCount;
             if (i !== 0) { return i; }
 
             i = v2.score - v1.score;
