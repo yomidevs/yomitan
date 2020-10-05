@@ -194,12 +194,12 @@ class Translator {
 
         const unusedDefinitions = unsequencedDefinitions.filter((definition) => !usedDefinitions.has(definition));
         for (const groupedDefinition of this._groupTerms(unusedDefinitions, enabledDictionaryMap)) {
-            const {reasons, score, expression, reading, source, rawSource, sourceTerm, dictionary, furiganaSegments, termTags} = groupedDefinition;
+            const {reasons, score, expression, reading, source, rawSource, sourceTerm, dictionary, furiganaSegments, termTags, definitions: definitions2} = groupedDefinition;
             const termDetailsList = [this._createTermDetails(sourceTerm, expression, reading, furiganaSegments, termTags)];
             const compatibilityDefinition = this._createMergedTermDefinition(
                 source,
                 rawSource,
-                definitions,
+                definitions2,
                 [expression],
                 [reading],
                 termDetailsList,
