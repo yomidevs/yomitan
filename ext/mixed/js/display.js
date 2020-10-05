@@ -1386,8 +1386,7 @@ class Display extends EventDispatcher {
             const timestamp = Date.now();
             const ownerFrameId = this._ownerFrameId;
             const {fields} = modeOptions;
-            const definitionExpressions = definition.expressions;
-            const {expression, reading} = Array.isArray(definitionExpressions) ? definitionExpressions[0] : definition;
+            const {expression, reading} = this._getDefinitionPrimaryExpressionAndReading(definition);
             const audioDetails = (mode !== 'kanji' && this._ankiNoteBuilder.containsMarker(fields, 'audio') ? {sources, customSourceUrl} : null);
             const screenshotDetails = (this._ankiNoteBuilder.containsMarker(fields, 'screenshot') ? {ownerFrameId, format, quality} : null);
             const clipboardDetails = {
@@ -1423,5 +1422,21 @@ class Display extends EventDispatcher {
 
     async _getAudioInfo(source, expression, reading, details) {
         return await api.getDefinitionAudioInfo(source, expression, reading, details);
+    }
+
+    _getDefinitionPrimaryExpressionAndReading(definition) {
+        const termDetailsList = definition.expressions;
+        let bestIndex = -1;
+        for (let i = 0, ii = termDetailsList.length; i < ii; ++i) {
+            const {sourceTerm, expression, reading} = termDetailsList[i];
+            if (expression === sourceTerm) {
+                bestIndex = i;
+                break;
+            } else if (reading === sourceTerm && bestIndex < 0) {
+                bestIndex = i;
+            }
+        }
+        const {expression, reading} = termDetailsList[Math.max(0, bestIndex)];
+        return {expression, reading};
     }
 }

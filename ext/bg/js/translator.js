@@ -373,13 +373,16 @@ class Translator {
                 if (typeof sequencedDefinition === 'undefined') {
                     sequencedDefinition = {
                         sourceDefinitions: [],
-                        relatedDefinitions: []
+                        relatedDefinitions: [],
+                        relatedDefinitionIds: new Set()
                     };
                     sequencedDefinitionMap.set(sequence, sequencedDefinition);
                     sequencedDefinitions.push(sequencedDefinition);
                     sequenceList.push(sequence);
                 }
                 sequencedDefinition.sourceDefinitions.push(definition);
+                sequencedDefinition.relatedDefinitions.push(definition);
+                sequencedDefinition.relatedDefinitionIds.add(definition.id);
             } else {
                 unsequencedDefinitions.push(definition);
             }
@@ -388,11 +391,18 @@ class Translator {
         if (sequenceList.length > 0) {
             const databaseDefinitions = await this._database.findTermsBySequenceBulk(sequenceList, mainDictionary);
             for (const databaseDefinition of databaseDefinitions) {
-                const {relatedDefinitions} = sequencedDefinitions[databaseDefinition.index];
-                const {expression} = databaseDefinition;
-                const definition = await this._createTermDefinitionFromDatabaseDefinition(databaseDefinition, expression, expression, expression, [], enabledDictionaryMap);
+                const {relatedDefinitions, relatedDefinitionIds} = sequencedDefinitions[databaseDefinition.index];
+                const {id} = databaseDefinition;
+                if (relatedDefinitionIds.has(id)) { continue; }
+
+                const {source, rawSource, sourceTerm} = relatedDefinitions[0];
+                const definition = await this._createTermDefinitionFromDatabaseDefinition(databaseDefinition, source, rawSource, sourceTerm, [], enabledDictionaryMap);
                 relatedDefinitions.push(definition);
             }
+        }
+
+        for (const {relatedDefinitions} of sequencedDefinitions) {
+            this._sortDefinitionsById(relatedDefinitions);
         }
 
         return {sequencedDefinitions, unsequencedDefinitions};
@@ -1209,6 +1219,11 @@ class Translator {
     _sortDatabaseDefinitionsByIndex(definitions) {
         if (definitions.length <= 1) { return; }
         definitions.sort((a, b) => a.index - b.index);
+    }
+
+    _sortDefinitionsById(definitions) {
+        if (definitions.length <= 1) { return; }
+        definitions.sort((a, b) => a.id - b.id);
     }
 
     _sortKanjiStats(stats) {
