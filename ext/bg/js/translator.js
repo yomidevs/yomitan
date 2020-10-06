@@ -199,7 +199,7 @@ class Translator {
             const compatibilityDefinition = this._createMergedTermDefinition(
                 source,
                 rawSource,
-                definitions2,
+                this._convertTermDefinitionsToMergedGlossaryTermDefinitions(definitions2),
                 [expression],
                 [reading],
                 termDetailsList,
@@ -645,6 +645,18 @@ class Translator {
                 termTagsMap.set(name, this._cloneTag(tag));
             }
         }
+    }
+
+    _convertTermDefinitionsToMergedGlossaryTermDefinitions(definitions) {
+        const convertedDefinitions = [];
+        for (const definition of definitions) {
+            const {source, rawSource, expression, reading} = definition;
+            const expressions = new Set([expression]);
+            const readings = new Set([reading]);
+            const convertedDefinition = this._createMergedGlossaryTermDefinition(source, rawSource, [definition], expressions, readings, expressions, readings);
+            convertedDefinitions.push(convertedDefinition);
+        }
+        return convertedDefinitions;
     }
 
     // Metadata building
