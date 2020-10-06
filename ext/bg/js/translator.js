@@ -446,7 +446,7 @@ class Translator {
         this._addUniqueTermInfos(relatedDefinitions, termInfoMap);
 
         let secondaryDefinitions = await this._getMergedSecondarySearchResults(termInfoMap, secondarySearchDictionaryMap);
-        secondaryDefinitions = [unsequencedDefinitions, ...secondaryDefinitions];
+        secondaryDefinitions = [...unsequencedDefinitions, ...secondaryDefinitions];
 
         this._removeUsedDefinitions(secondaryDefinitions, termInfoMap, usedDefinitions);
         this._removeDuplicateDefinitions(secondaryDefinitions);
@@ -721,9 +721,8 @@ class Translator {
         const results = [];
         for (let i = 0, ii = tagMetaList.length; i < ii; ++i) {
             const meta = tagMetaList[i];
-            if (meta === null) { continue; }
             const name = names[i];
-            const {category, notes, order, score, dictionary} = meta;
+            const {category, notes, order, score, dictionary} = (meta !== null ? meta : {dictionary: title});
             const tag = this._createTag(name, category, notes, order, score, dictionary);
             results.push(tag);
         }
