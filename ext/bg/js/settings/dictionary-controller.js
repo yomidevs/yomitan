@@ -351,6 +351,7 @@ class DictionaryController {
             };
 
             await this._deleteDictionaryInternal(dictionaryTitle, onProgress);
+            await this._deleteDictionarySettings(dictionaryTitle);
         } catch (e) {
             yomichan.logError(e);
         } finally {
@@ -388,5 +389,19 @@ class DictionaryController {
         const dictionaryDatabase = new DictionaryDatabase();
         await dictionaryDatabase.prepare();
         return dictionaryDatabase;
+    }
+
+    async _deleteDictionarySettings(dictionaryTitle) {
+        const optionsFull = await this._settingsController.getOptionsFull();
+        const {profiles} = optionsFull;
+        const targets = [];
+        for (let i = 0, ii = profiles.length; i < ii; ++i) {
+            const {options: {dictionaries}} = profiles[i];
+            if (Object.prototype.hasOwnProperty.call(dictionaries, dictionaryTitle)) {
+                const path = ObjectPropertyAccessor.getPathString(['profiles', i, 'options', 'dictionaries', dictionaryTitle]);
+                targets.push({action: 'delete', path});
+            }
+        }
+        await this._settingsController.modifyGlobalSettings(targets);
     }
 }
