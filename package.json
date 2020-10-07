@@ -33,10 +33,12 @@
         "sourceDir": "ext"
     },
     "devDependencies": {
-        "eslint": "^7.5.0",
-        "eslint-plugin-no-unsanitized": "^3.1.2",
-        "fake-indexeddb": "^3.1.1",
-        "jsdom": "^16.2.2",
-        "web-ext": "^5.1.0"
+        "browserify": "^16.5.2",
+        "eslint": "^7.10.0",
+        "eslint-plugin-no-unsanitized": "^3.1.4",
+        "fake-indexeddb": "^3.1.2",
+        "jsdom": "^16.4.0",
+        "parse5": "^6.0.1",
+        "web-ext": "^5.2.0"
     }
 }
