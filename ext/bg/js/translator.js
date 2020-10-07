@@ -194,7 +194,7 @@ class Translator {
 
         const unusedDefinitions = unsequencedDefinitions.filter((definition) => !usedDefinitions.has(definition));
         for (const groupedDefinition of this._groupTerms(unusedDefinitions, enabledDictionaryMap)) {
-            const {reasons, score, expression, reading, source, rawSource, sourceTerm, dictionary, furiganaSegments, termTags, definitions: definitions2} = groupedDefinition;
+            const {reasons, score, expression, reading, source, rawSource, sourceTerm, furiganaSegments, termTags, definitions: definitions2} = groupedDefinition;
             const termDetailsList = [this._createTermDetails(sourceTerm, expression, reading, furiganaSegments, termTags)];
             const compatibilityDefinition = this._createMergedTermDefinition(
                 source,
@@ -204,7 +204,6 @@ class Translator {
                 [reading],
                 termDetailsList,
                 reasons,
-                dictionary,
                 score
             );
             definitionsMerged.push(compatibilityDefinition);
@@ -436,7 +435,7 @@ class Translator {
     }
 
     async _getMergedDefinition(sourceDefinitions, relatedDefinitions, unsequencedDefinitions, secondarySearchDictionaryMap, usedDefinitions) {
-        const {reasons, source, rawSource, dictionary} = sourceDefinitions[0];
+        const {reasons, source, rawSource} = sourceDefinitions[0];
         const score = this._getMaxDefinitionScore(sourceDefinitions);
         const termInfoMap = new Map();
         const glossaryDefinitions = [];
@@ -460,11 +459,11 @@ class Translator {
             for (const reading of readings) { allReadings.add(reading); }
         }
 
-        for (const {expressions, readings, definitions: definitions2} of glossaryDefinitionGroupMap.values()) {
+        for (const {expressions, readings, definitions} of glossaryDefinitionGroupMap.values()) {
             const glossaryDefinition = this._createMergedGlossaryTermDefinition(
                 source,
                 rawSource,
-                definitions2,
+                definitions,
                 expressions,
                 readings,
                 allExpressions,
@@ -485,7 +484,6 @@ class Translator {
             [...allReadings],
             termDetailsList,
             reasons,
-            dictionary,
             score
         );
     }
@@ -732,22 +730,22 @@ class Translator {
         }
     }
 
-    async _expandTags(names, title) {
-        const tagMetaList = await this._getTagMetaList(names, title);
+    async _expandTags(names, dictionary) {
+        const tagMetaList = await this._getTagMetaList(names, dictionary);
         const results = [];
         for (let i = 0, ii = tagMetaList.length; i < ii; ++i) {
             const meta = tagMetaList[i];
             const name = names[i];
-            const {category, notes, order, score, dictionary} = (meta !== null ? meta : {dictionary: title});
+            const {category, notes, order, score} = (meta !== null ? meta : {});
             const tag = this._createTag(name, category, notes, order, score, dictionary);
             results.push(tag);
         }
         return results;
     }
 
-    async _expandStats(items, title) {
+    async _expandStats(items, dictionary) {
         const names = Object.keys(items);
-        const tagMetaList = await this._getTagMetaList(names, title);
+        const tagMetaList = await this._getTagMetaList(names, dictionary);
 
         const statsGroups = new Map();
         for (let i = 0; i < names.length; ++i) {
@@ -755,7 +753,7 @@ class Translator {
             const meta = tagMetaList[i];
             if (meta === null) { continue; }
 
-            const {category, notes, order, score, dictionary} = meta;
+            const {category, notes, order, score} = meta;
             let group = statsGroups.get(category);
             if (typeof group === 'undefined') {
                 group = [];
@@ -775,12 +773,12 @@ class Translator {
         return stats;
     }
 
-    async _getTagMetaList(names, title) {
+    async _getTagMetaList(names, dictionary) {
         const tagMetaList = [];
-        let cache = this._tagCache.get(title);
+        let cache = this._tagCache.get(dictionary);
         if (typeof cache === 'undefined') {
             cache = new Map();
-            this._tagCache.set(title, cache);
+            this._tagCache.set(dictionary, cache);
         }
 
         for (const name of names) {
@@ -788,7 +786,7 @@ class Translator {
 
             let tagMeta = cache.get(base);
             if (typeof tagMeta === 'undefined') {
-                tagMeta = await this._database.findTagForTitle(base, title);
+                tagMeta = await this._database.findTagForTitle(base, dictionary);
                 cache.set(base, tagMeta);
             }
 
@@ -817,7 +815,7 @@ class Translator {
 
         const pitches = [];
         for (let {position, tags} of data.pitches) {
-            tags = Array.isArray(tags) ? await this._getTagMetaList(tags, dictionary) : [];
+            tags = Array.isArray(tags) ? await this._expandTags(tags, dictionary) : [];
             pitches.push({position, tags});
         }
 
@@ -866,9 +864,9 @@ class Translator {
 
     _getSecondarySearchDictionaryMap(enabledDictionaryMap) {
         const secondarySearchDictionaryMap = new Map();
-        for (const [title, dictionary] of enabledDictionaryMap.entries()) {
-            if (!dictionary.allowSecondarySearches) { continue; }
-            secondarySearchDictionaryMap.set(title, dictionary);
+        for (const [dictionary, details] of enabledDictionaryMap.entries()) {
+            if (!details.allowSecondarySearches) { continue; }
+            secondarySearchDictionaryMap.set(dictionary, details);
         }
         return secondarySearchDictionaryMap;
     }
@@ -896,6 +894,16 @@ class Translator {
             --i;
             --ii;
         }
+    }
+
+    _getUniqueDictionaryNames(definitions) {
+        const uniqueDictionaryNames = new Set();
+        for (const {dictionaryNames} of definitions) {
+            for (const dictionaryName of dictionaryNames) {
+                uniqueDictionaryNames.add(dictionaryName);
+            }
+        }
+        return [...uniqueDictionaryNames];
     }
 
     *_getArrayVariants(arrayVariants) {
@@ -1037,6 +1045,7 @@ class Translator {
             sequence,
             dictionary,
             dictionaryPriority,
+            dictionaryNames: [dictionary],
             expression,
             reading,
             expressions: termDetailsList,
@@ -1056,6 +1065,7 @@ class Translator {
         const {expression, reading, furiganaSegments, reasons, termTags, source, rawSource, sourceTerm} = definitions[0];
         const score = this._getMaxDefinitionScore(definitions);
         const dictionaryPriority = this._getMaxDictionaryPriority(definitions);
+        const dictionaryNames = this._getUniqueDictionaryNames(definitions);
         const termDetailsList = [this._createTermDetails(sourceTerm, expression, reading, furiganaSegments, termTags)];
         const sourceTermExactMatchCount = (sourceTerm === expression ? 1 : 0);
         return {
@@ -1067,8 +1077,9 @@ class Translator {
             reasons: [...reasons],
             score,
             // sequence
-            // dictionary
+            dictionary: dictionaryNames[0],
             dictionaryPriority,
+            dictionaryNames,
             expression,
             reading,
             expressions: termDetailsList,
@@ -1084,9 +1095,10 @@ class Translator {
         };
     }
 
-    _createMergedTermDefinition(source, rawSource, definitions, expressions, readings, termDetailsList, reasons, dictionary, score) {
+    _createMergedTermDefinition(source, rawSource, definitions, expressions, readings, termDetailsList, reasons, score) {
         const dictionaryPriority = this._getMaxDictionaryPriority(definitions);
         const sourceTermExactMatchCount = this._getSourceTermMatchCountSum(definitions);
+        const dictionaryNames = this._getUniqueDictionaryNames(definitions);
         return {
             type: 'termMerged',
             // id
@@ -1096,8 +1108,9 @@ class Translator {
             reasons,
             score,
             // sequence
-            dictionary,
+            dictionary: dictionaryNames[0],
             dictionaryPriority,
+            dictionaryNames,
             expression: expressions,
             reading: readings,
             expressions: termDetailsList,
@@ -1123,6 +1136,7 @@ class Translator {
         }
 
         const sourceTermExactMatchCount = this._getSourceTermMatchCountSum(definitions);
+        const dictionaryNames = this._getUniqueDictionaryNames(definitions);
 
         const termInfoMap = new Map();
         this._addUniqueTermInfos(definitions, termInfoMap);
@@ -1131,7 +1145,7 @@ class Translator {
         const definitionTags = this._getUniqueDefinitionTags(definitions);
         this._sortTags(definitionTags);
 
-        const {glossary, dictionary} = definitions[0];
+        const {glossary} = definitions[0];
         const score = this._getMaxDefinitionScore(definitions);
         const dictionaryPriority = this._getMaxDictionaryPriority(definitions);
         return {
@@ -1143,8 +1157,9 @@ class Translator {
             reasons: [],
             score,
             // sequence
-            dictionary,
+            dictionary: dictionaryNames[0],
             dictionaryPriority,
+            dictionaryNames,
             expression: [...expressions],
             reading: [...readings],
             expressions: termDetailsList,
