@@ -293,7 +293,7 @@ class DictionaryController {
     }
 
     _createExtra(totalCounts, remainders, totalRemainder) {
-        const node = this._instantiateTemplate('#dict-extra-template');
+        const node = this._settingsController.instantiateTemplate('dict-extra');
         this._integrityExtraInfoNode = node;
 
         node.querySelector('.dict-total-count').textContent = `${totalRemainder} item${totalRemainder !== 1 ? 's' : ''}`;
@@ -317,7 +317,7 @@ class DictionaryController {
     }
 
     _createDictionaryEntry(dictionary) {
-        const node = this._instantiateTemplate('#dict-template');
+        const node = this._settingsController.instantiateTemplate('dict');
         this._dictionaryEntryContainer.appendChild(node);
 
         const entry = new DictionaryEntry(this, node, dictionary);
@@ -367,12 +367,6 @@ class DictionaryController {
         for (const node of document.querySelectorAll('.dictionary-modifying-input')) {
             node.disabled = value;
         }
-    }
-
-    _instantiateTemplate(templateSelector) {
-        const template = document.querySelector(templateSelector);
-        const content = document.importNode(template.content, true);
-        return content.firstChild;
     }
 
     async _deleteDictionaryInternal(dictionaryTitle, onProgress) {

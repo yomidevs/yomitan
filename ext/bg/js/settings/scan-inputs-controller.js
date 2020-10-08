@@ -65,6 +65,10 @@ class ScanInputsController {
         this._settingsController.setProfileSetting(path, value);
     }
 
+    instantiateTemplate(name) {
+        return this._settingsController.instantiateTemplate(name);
+    }
+
     // Private
 
     _onOptionsChanged({options}) {
@@ -139,7 +143,7 @@ class ScanInputField {
     }
 
     prepare(container, include, exclude) {
-        const node = this._instantiateTemplate('#scan-input-template');
+        const node = this._parent.instantiateTemplate('scan-input');
         const includeInputNode = node.querySelector('.scan-input-field[data-property=include]');
         const includeMouseButton = node.querySelector('.mouse-button[data-property=include]');
         const excludeInputNode = node.querySelector('.scan-input-field[data-property=exclude]');
@@ -186,12 +190,6 @@ class ScanInputField {
     _onRemoveClick(e) {
         e.preventDefault();
         this._parent.removeInput(this._index);
-    }
-
-    _instantiateTemplate(templateSelector) {
-        const template = document.querySelector(templateSelector);
-        const content = document.importNode(template.content, true);
-        return content.firstChild;
     }
 
     _isPointerTypeSupported(pointerType) {

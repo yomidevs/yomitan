@@ -90,10 +90,9 @@ class AnkiController {
     }
 
     getFieldMarkersHtml(markers) {
-        const template = document.querySelector('#anki-field-marker-template').content;
         const fragment = document.createDocumentFragment();
         for (const marker of markers) {
-            const markerNode = document.importNode(template, true).firstChild;
+            const markerNode = this._settingsController.instantiateTemplate('anki-field-marker');
             markerNode.querySelector('.marker-link').textContent = marker;
             fragment.appendChild(markerNode);
         }
@@ -221,8 +220,7 @@ class AnkiController {
     }
 
     _createFieldTemplate(name, value, markers) {
-        const template = document.querySelector('#anki-field-template').content;
-        const content = document.importNode(template, true).firstChild;
+        const content = this._settingsController.instantiateTemplate('anki-field');
 
         content.querySelector('.anki-field-name').textContent = name;
 

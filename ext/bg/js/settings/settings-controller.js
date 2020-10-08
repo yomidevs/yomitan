@@ -16,6 +16,7 @@
  */
 
 /* global
+ * HtmlTemplateCollection
  * api
  */
 
@@ -26,6 +27,7 @@ class SettingsController extends EventDispatcher {
         this._source = generateId(16);
         this._pageExitPreventions = new Set();
         this._pageExitPreventionEventListeners = new EventListenerCollection();
+        this._templates = new HtmlTemplateCollection(document);
     }
 
     get source() {
@@ -108,6 +110,14 @@ class SettingsController extends EventDispatcher {
         }
         this._pageExitPreventions.add(obj);
         return obj;
+    }
+
+    instantiateTemplate(name) {
+        return this._templates.instantiate(name);
+    }
+
+    instantiateTemplateFragment(name) {
+        return this._templates.instantiateFragment(name);
     }
 
     // Private

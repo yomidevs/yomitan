@@ -136,12 +136,6 @@ class AudioController {
         }
     }
 
-    _instantiateTemplate(templateSelector) {
-        const template = document.querySelector(templateSelector);
-        const content = document.importNode(template.content, true);
-        return content.firstChild;
-    }
-
     _getUnusedAudioSource() {
         const audioSourcesAvailable = [
             'jpod101',
@@ -159,7 +153,7 @@ class AudioController {
 
     _createAudioSourceEntry(value) {
         const eventListeners = new EventListenerCollection();
-        const container = this._instantiateTemplate('#audio-source-template');
+        const container = this._settingsController.instantiateTemplate('audio-source');
         const select = container.querySelector('.audio-source-select');
         const removeButton = container.querySelector('.audio-source-remove');
 

@@ -110,10 +110,8 @@ class ProfileConditionsUI {
         this._addConditionGroupButton = null;
     }
 
-    instantiateTemplate(templateSelector) {
-        const template = document.querySelector(templateSelector);
-        const content = document.importNode(template.content, true);
-        return content.firstChild;
+    instantiateTemplate(names) {
+        return this._settingsController.instantiateTemplate(names);
     }
 
     getDescriptorTypes() {
@@ -303,7 +301,7 @@ class ProfileConditionGroupUI {
     }
 
     prepare(conditionGroup) {
-        this._node = this._parent.instantiateTemplate('#condition-group-template');
+        this._node = this._parent.instantiateTemplate('condition-group');
         this._conditionContainer = this._node.querySelector('.condition-list');
         this._addConditionButton = this._node.querySelector('.condition-add');
 
@@ -434,7 +432,7 @@ class ProfileConditionUI {
     prepare(condition) {
         const {type, operator, value} = condition;
 
-        this._node = this._parent.parent.instantiateTemplate('#condition-template');
+        this._node = this._parent.parent.instantiateTemplate('condition');
         this._typeInput = this._node.querySelector('.condition-type');
         this._typeOptionContainer = this._typeInput.querySelector('optgroup');
         this._operatorInput = this._node.querySelector('.condition-operator');
