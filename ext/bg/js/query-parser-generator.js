@@ -16,24 +16,24 @@
  */
 
 /* global
- * TemplateHandler
+ * HtmlTemplateCollection
  * api
  */
 
 class QueryParserGenerator {
     constructor() {
-        this._templateHandler = null;
+        this._templates = null;
     }
 
     async prepare() {
         const html = await api.getQueryParserTemplatesHtml();
-        this._templateHandler = new TemplateHandler(html);
+        this._templates = new HtmlTemplateCollection(html);
     }
 
     createParseResult(terms, preview=false) {
         const fragment = document.createDocumentFragment();
         for (const term of terms) {
-            const termContainer = this._templateHandler.instantiate(preview ? 'term-preview' : 'term');
+            const termContainer = this._templates.instantiate(preview ? 'term-preview' : 'term');
             for (const segment of term) {
                 if (!segment.text.trim()) { continue; }
                 if (!segment.reading.trim()) {
@@ -48,7 +48,7 @@ class QueryParserGenerator {
     }
 
     createSegment(segment) {
-        const segmentContainer = this._templateHandler.instantiate('segment');
+        const segmentContainer = this._templates.instantiate('segment');
         const segmentTextContainer = segmentContainer.querySelector('.query-parser-segment-text');
         const segmentReadingContainer = segmentContainer.querySelector('.query-parser-segment-reading');
         segmentTextContainer.appendChild(this.createSegmentText(segment.text));
@@ -59,7 +59,7 @@ class QueryParserGenerator {
     createSegmentText(text) {
         const fragment = document.createDocumentFragment();
         for (const chr of text) {
-            const charContainer = this._templateHandler.instantiate('char');
+            const charContainer = this._templates.instantiate('char');
             charContainer.textContent = chr;
             fragment.appendChild(charContainer);
         }
@@ -67,9 +67,9 @@ class QueryParserGenerator {
     }
 
     createParserSelect(parseResults, selectedParser) {
-        const selectContainer = this._templateHandler.instantiate('select');
+        const selectContainer = this._templates.instantiate('select');
         for (const parseResult of parseResults) {
-            const optionContainer = this._templateHandler.instantiate('select-option');
+            const optionContainer = this._templates.instantiate('select-option');
             optionContainer.value = parseResult.id;
             switch (parseResult.source) {
                 case 'scanning-parser':

@@ -15,23 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-class TemplateHandler {
-    constructor(html) {
+class HtmlTemplateCollection {
+    constructor(source) {
         this._templates = new Map();
 
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        for (const template of doc.querySelectorAll('template')) {
-            this._setTemplate(template);
-        }
-    }
+        const sourceNode = (
+            typeof source === 'string' ?
+            new DOMParser().parseFromString(source, 'text/html') :
+            source
+        );
 
-    _setTemplate(template) {
-        const idMatch = template.id.match(/^([a-z-]+)-template$/);
-        if (!idMatch) {
-            throw new Error(`Invalid template ID: ${template.id}`);
+        const pattern = /^([\w\W]+)-template$/;
+        for (const template of sourceNode.querySelectorAll('template')) {
+            const match = pattern.exec(template.id);
+            if (match === null) { continue; }
+            this._templates.set(match[1], template);
         }
-        this._templates.set(idMatch[1], template);
     }
 
     instantiate(name) {
