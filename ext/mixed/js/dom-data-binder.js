@@ -317,7 +317,7 @@ class DOMDataBinder {
                     case 'text':
                         return `${element.value}`;
                     case 'number':
-                        return this._getInputNumberValue(element);
+                        return DOMDataBinder.convertToNumber(element.value, element);
                 }
                 break;
             case 'TEXTAREA':
@@ -327,26 +327,29 @@ class DOMDataBinder {
         return null;
     }
 
-    _getInputNumberValue(element) {
-        let value = parseFloat(element.value);
+    // Utilities
+
+    static convertToNumber(value, constraints) {
+        value = parseFloat(value);
         if (!Number.isFinite(value)) { return 0; }
 
-        let {min, max, step} = element;
-        min = this._stringValueToNumberOrNull(min);
-        max = this._stringValueToNumberOrNull(max);
-        step = this._stringValueToNumberOrNull(step);
+        let {min, max, step} = constraints;
+        min = DOMDataBinder.convertToNumberOrNull(min);
+        max = DOMDataBinder.convertToNumberOrNull(max);
+        step = DOMDataBinder.convertToNumberOrNull(step);
         if (typeof min === 'number') { value = Math.max(value, min); }
         if (typeof max === 'number') { value = Math.min(value, max); }
         if (typeof step === 'number' && step !== 0) { value = Math.round(value / step) * step; }
         return value;
     }
 
-    _stringValueToNumberOrNull(value) {
-        if (typeof value !== 'string' || value.length === 0) {
-            return null;
+    static convertToNumberOrNull(value) {
+        if (typeof value !== 'number') {
+            if (typeof value !== 'string' || value.length === 0) {
+                return null;
+            }
+            value = parseFloat(value);
         }
-
-        const number = parseFloat(value);
-        return !Number.isNaN(number) ? number : null;
+        return !Number.isNaN(value) ? value : null;
     }
 }

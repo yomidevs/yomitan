@@ -34,7 +34,9 @@ class GenericSettingController {
             ['setDocumentAttribute', this._setDocumentAttribute.bind(this)],
             ['setRelativeAttribute', this._setRelativeAttribute.bind(this)],
             ['splitTags', this._splitTags.bind(this)],
-            ['joinTags', this._joinTags.bind(this)]
+            ['joinTags', this._joinTags.bind(this)],
+            ['toNumber', this._toNumber.bind(this)],
+            ['toString', this._toString.bind(this)]
         ]);
     }
 
@@ -155,5 +157,13 @@ class GenericSettingController {
             }
         }
         return node;
+    }
+
+    _toNumber(value, metadata, element) {
+        return DOMDataBinder.convertToNumber(value, element.dataset);
+    }
+
+    _toString(value) {
+        return `${value}`;
     }
 }
