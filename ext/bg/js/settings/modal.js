@@ -20,6 +20,9 @@ class Modal extends EventDispatcher {
         super();
         this._node = node;
         this._eventListeners = new EventListenerCollection();
+        this._mutationObserver = null;
+        this._visible = false;
+        this._visibleClassName = 'modal-container-open';
     }
 
     get node() {
@@ -27,15 +30,31 @@ class Modal extends EventDispatcher {
     }
 
     setVisible(value) {
-        this._getWrappedNode().modal(value ? 'show' : 'hide');
+        if (this._useJqueryModal()) {
+            this._getWrappedNode().modal(value ? 'show' : 'hide');
+        } else {
+            this._node.classList.toggle(this._visibleClassName, value);
+        }
     }
 
     on(eventName, callback) {
         if (eventName === 'visibilityChanged') {
-            if (this._eventListeners.size === 0) {
-                const wrappedNode = this._getWrappedNode();
-                this._eventListeners.on(wrappedNode, 'hidden.bs.modal', this._onModalHide.bind(this));
-                this._eventListeners.on(wrappedNode, 'shown.bs.modal', this._onModalShow.bind(this));
+            if (this._useJqueryModal()) {
+                if (this._eventListeners.size === 0) {
+                    const wrappedNode = this._getWrappedNode();
+                    this._eventListeners.on(wrappedNode, 'hidden.bs.modal', this._onModalHide.bind(this));
+                    this._eventListeners.on(wrappedNode, 'shown.bs.modal', this._onModalShow.bind(this));
+                }
+            } else {
+                if (this._mutationObserver === null) {
+                    this._visible = this._node.classList.contains(this._visibleClassName);
+                    this._mutationObserver = new MutationObserver(this._onMutation.bind(this));
+                    this._mutationObserver.observe(this._node, {
+                        attributes: true,
+                        attributeFilter: ['class'],
+                        attributeOldValue: true
+                    });
+                }
             }
         }
         return super.on(eventName, callback);
@@ -44,6 +63,10 @@ class Modal extends EventDispatcher {
     off(eventName, callback) {
         const result = super.off(eventName, callback);
         if (eventName === 'visibilityChanged' && !this.hasListeners(eventName)) {
+            if (this._mutationObserver !== null) {
+                this._mutationObserver.disconnect();
+                this._mutationObserver = null;
+            }
             this._eventListeners.removeAllEventListeners();
         }
         return result;
@@ -57,6 +80,17 @@ class Modal extends EventDispatcher {
 
     _onModalShow() {
         this.trigger('visibilityChanged', {visible: true});
+    }
+
+    _onMutation() {
+        const visible = this._node.classList.contains(this._visibleClassName);
+        if (this._visible === visible) { return; }
+        this._visible = visible;
+        this.trigger('visibilityChanged', {visible: false});
+    }
+
+    _useJqueryModal() {
+        return (typeof jQuery !== 'undefined');
     }
 
     _getWrappedNode() {
