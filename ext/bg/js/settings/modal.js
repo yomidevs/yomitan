@@ -29,11 +29,23 @@ class Modal extends EventDispatcher {
         return this._node;
     }
 
+    isVisible() {
+        if (this._useJqueryModal()) {
+            return !!(this._getWrappedNode().data('bs.modal') || {}).isShown;
+        } else {
+            return this._node.classList.contains(this._visibleClassName);
+        }
+    }
+
     setVisible(value) {
+        value = !!value;
         if (this._useJqueryModal()) {
             this._getWrappedNode().modal(value ? 'show' : 'hide');
         } else {
-            this._node.classList.toggle(this._visibleClassName, value);
+            const {classList} = this._node;
+            if (classList.contains(this._visibleClassName) === value) { return; }
+            classList.toggle(this._visibleClassName, value);
+            if (value) { this._node.focus(); }
         }
     }
 
@@ -86,7 +98,7 @@ class Modal extends EventDispatcher {
         const visible = this._node.classList.contains(this._visibleClassName);
         if (this._visible === visible) { return; }
         this._visible = visible;
-        this.trigger('visibilityChanged', {visible: false});
+        this.trigger('visibilityChanged', {visible});
     }
 
     _useJqueryModal() {
