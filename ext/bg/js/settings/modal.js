@@ -41,7 +41,7 @@ class Modal extends EventDispatcher {
         }
     }
 
-    setVisible(value) {
+    setVisible(value, animate=true) {
         value = !!value;
         if (this._useJqueryModal()) {
             this._getWrappedNode().modal(value ? 'show' : 'hide');
@@ -55,19 +55,21 @@ class Modal extends EventDispatcher {
             }
 
             if (value) {
-                classList.add(this._openingClassName);
+                if (animate) { classList.add(this._openingClassName); }
+                classList.remove(this._closingClassName);
                 getComputedStyle(this._node).getPropertyValue('display'); // Force update of CSS display property, allowing animation
                 classList.add(this._visibleClassName);
-                classList.remove(this._closingClassName);
-                classList.remove(this._openingClassName);
+                if (animate) { classList.remove(this._openingClassName); }
                 this._node.focus();
             } else {
-                classList.add(this._closingClassName);
+                if (animate) { classList.add(this._closingClassName); }
                 classList.remove(this._visibleClassName);
-                this._closeTimer = setTimeout(() => {
-                    this._closeTimer = null;
-                    classList.remove(this._closingClassName);
-                }, this._closingAnimationDuration);
+                if (animate) {
+                    this._closeTimer = setTimeout(() => {
+                        this._closeTimer = null;
+                        classList.remove(this._closingClassName);
+                    }, this._closingAnimationDuration);
+                }
             }
         }
     }
