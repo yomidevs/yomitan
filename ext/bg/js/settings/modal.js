@@ -23,6 +23,10 @@ class Modal extends EventDispatcher {
         this._mutationObserver = null;
         this._visible = false;
         this._visibleClassName = 'modal-container-open';
+        this._openingClassName = 'modal-container-opening';
+        this._closingClassName = 'modal-container-closing';
+        this._closingAnimationDuration = 375; // Milliseconds; includes buffer
+        this._closeTimer = null;
     }
 
     get node() {
@@ -44,8 +48,27 @@ class Modal extends EventDispatcher {
         } else {
             const {classList} = this._node;
             if (classList.contains(this._visibleClassName) === value) { return; }
-            classList.toggle(this._visibleClassName, value);
-            if (value) { this._node.focus(); }
+
+            if (this._closeTimer !== null) {
+                clearTimeout(this._closeTimer);
+                this._closeTimer = null;
+            }
+
+            if (value) {
+                classList.add(this._openingClassName);
+                getComputedStyle(this._node).getPropertyValue('display'); // Force update of CSS display property, allowing animation
+                classList.add(this._visibleClassName);
+                classList.remove(this._closingClassName);
+                classList.remove(this._openingClassName);
+                this._node.focus();
+            } else {
+                classList.add(this._closingClassName);
+                classList.remove(this._visibleClassName);
+                this._closeTimer = setTimeout(() => {
+                    this._closeTimer = null;
+                    classList.remove(this._closingClassName);
+                }, this._closingAnimationDuration);
+            }
         }
     }
 
