@@ -23,22 +23,20 @@ class StorageController {
         this._persistentStorageCheckbox = false;
         this._storageUsageNode = null;
         this._storageQuotaNode = null;
-        this._storageUseFiniteNode = null;
-        this._storageUseInfiniteNode = null;
-        this._storageUseUndefinedNode = null;
-        this._storageUseNode = null;
-        this._storageErrorNode = null;
+        this._storageUseFiniteNodes = null;
+        this._storageUseInfiniteNodes = null;
+        this._storageUseValidNodes = null;
+        this._storageUseInvalidNodes = null;
     }
 
     prepare() {
         this._persistentStorageCheckbox = document.querySelector('#storage-persistent-checkbox');
         this._storageUsageNode = document.querySelector('#storage-usage');
         this._storageQuotaNode = document.querySelector('#storage-quota');
-        this._storageUseFiniteNode = document.querySelector('#storage-use-finite');
-        this._storageUseInfiniteNode = document.querySelector('#storage-use-infinite');
-        this._storageUseUndefinedNode = document.querySelector('#storage-use-undefined');
-        this._storageUseNode = document.querySelector('#storage-use');
-        this._storageErrorNode = document.querySelector('#storage-error');
+        this._storageUseFiniteNodes = document.querySelectorAll('#storage-use-finite');
+        this._storageUseInfiniteNodes = document.querySelectorAll('#storage-use-infinite');
+        this._storageUseValidNodes = document.querySelectorAll('#storage-use-valid');
+        this._storageUseInvalidNodes = document.querySelectorAll('#storage-use-invalid');
 
         this._preparePersistentStorage();
         this.updateStats();
@@ -55,20 +53,17 @@ class StorageController {
             const estimate = await this._storageEstimate();
             const valid = (estimate !== null);
 
-            if (valid) {
-                // Firefox reports usage as 0 when persistent storage is enabled.
-                const finite = (estimate.usage > 0 || !(await this._isStoragePeristent()));
-                if (finite) {
-                    this._storageUsageNode.textContent = this._bytesToLabeledString(estimate.usage);
-                    this._storageQuotaNode.textContent = this._bytesToLabeledString(estimate.quota);
-                }
-                this._storageUseFiniteNode.hidden = !finite;
-                this._storageUseInfiniteNode.hidden = finite;
+            // Firefox reports usage as 0 when persistent storage is enabled.
+            const finite = valid && (estimate.usage > 0 || !(await this._isStoragePeristent()));
+            if (finite) {
+                this._storageUsageNode.textContent = this._bytesToLabeledString(estimate.usage);
+                this._storageQuotaNode.textContent = this._bytesToLabeledString(estimate.quota);
             }
 
-            if (this._storageUseUndefinedNode !== null) { this._storageUseUndefinedNode.hidden = !valid; }
-            if (this._storageUseNode !== null) { this._storageUseNode.hidden = !valid; }
-            if (this._storageErrorNode !== null) { this._storageErrorNode.hidden = valid; }
+            this._setElementsVisible(this._storageUseFiniteNodes, valid && finite);
+            this._setElementsVisible(this._storageUseInfiniteNodes, valid && !finite);
+            this._setElementsVisible(this._storageUseValidNodes, valid);
+            this._setElementsVisible(this._storageUseInvalidNodes, !valid);
 
             return valid;
         } finally {
@@ -172,5 +167,12 @@ class StorageController {
         const checkbox = this._persistentStorageCheckbox;
         checkbox.checked = isStoragePeristent;
         checkbox.readOnly = isStoragePeristent;
+    }
+
+    _setElementsVisible(elements, visible) {
+        visible = !visible;
+        for (const element of elements) {
+            element.hidden = visible;
+        }
     }
 }
