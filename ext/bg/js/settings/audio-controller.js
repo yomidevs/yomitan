@@ -28,18 +28,25 @@ class AudioController {
         this._audioSourceContainer = null;
         this._audioSourceAddButton = null;
         this._audioSourceEntries = [];
+        this._ttsVoiceTestTextInput = null;
     }
 
     async prepare() {
         this._audioSystem.prepare();
 
-        this._audioSourceContainer = document.querySelector('.audio-source-list');
-        this._audioSourceAddButton = document.querySelector('.audio-source-add');
+        this._ttsVoiceTestTextInput = document.querySelector('#text-to-speech-voice-test-text');
+        this._audioSourceContainer = document.querySelector('#audio-source-list');
+        this._audioSourceAddButton = document.querySelector('#audio-source-add');
         this._audioSourceContainer.textContent = '';
 
         this._audioSourceAddButton.addEventListener('click', this._onAddAudioSource.bind(this), false);
 
-        this._prepareTextToSpeech();
+        if (typeof speechSynthesis !== 'undefined') {
+            speechSynthesis.addEventListener('voiceschanged', this._updateTextToSpeechVoices.bind(this), false);
+        }
+        this._updateTextToSpeechVoices();
+
+        document.querySelector('#text-to-speech-voice-test').addEventListener('click', this._onTestTextToSpeech.bind(this), false);
 
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
 
@@ -59,57 +66,62 @@ class AudioController {
         }
     }
 
-    _prepareTextToSpeech() {
-        if (typeof speechSynthesis === 'undefined') { return; }
+    _onTestTextToSpeech() {
+        try {
+            const text = this._ttsVoiceTestTextInput.value || '';
+            const voiceUri = document.querySelector('[data-setting="audio.textToSpeechVoice"]').value;
 
-        speechSynthesis.addEventListener('voiceschanged', this._updateTextToSpeechVoices.bind(this), false);
-        this._updateTextToSpeechVoices();
-
-        document.querySelector('#text-to-speech-voice').addEventListener('change', this._onTextToSpeechVoiceChange.bind(this), false);
-        document.querySelector('#text-to-speech-voice-test').addEventListener('click', this._testTextToSpeech.bind(this), false);
+            const audio = this._audioSystem.createTextToSpeechAudio(text, voiceUri);
+            audio.volume = 1.0;
+            audio.play();
+        } catch (e) {
+            // NOP
+        }
     }
 
     _updateTextToSpeechVoices() {
-        const voices = Array.prototype.map.call(speechSynthesis.getVoices(), (voice, index) => ({voice, index}));
+        const voices = (
+            typeof speechSynthesis !== 'undefined' ?
+            [...speechSynthesis.getVoices()].map((voice, index) => ({
+                voice,
+                isJapanese: this._languageTagIsJapanese(voice.lang),
+                index
+            })) :
+            []
+        );
         voices.sort(this._textToSpeechVoiceCompare.bind(this));
 
-        document.querySelector('#text-to-speech-voice-container').hidden = (voices.length === 0);
+        for (const select of document.querySelectorAll('[data-setting="audio.textToSpeechVoice"]')) {
+            const fragment = document.createDocumentFragment();
 
-        const fragment = document.createDocumentFragment();
-
-        let option = document.createElement('option');
-        option.value = '';
-        option.textContent = 'None';
-        fragment.appendChild(option);
-
-        for (const {voice} of voices) {
-            option = document.createElement('option');
-            option.value = voice.voiceURI;
-            option.textContent = `${voice.name} (${voice.lang})`;
+            let option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'None';
             fragment.appendChild(option);
-        }
 
-        const select = document.querySelector('#text-to-speech-voice');
-        select.textContent = '';
-        select.appendChild(fragment);
-        select.value = select.dataset.value;
+            for (const {voice} of voices) {
+                option = document.createElement('option');
+                option.value = voice.voiceURI;
+                option.textContent = `${voice.name} (${voice.lang})`;
+                fragment.appendChild(option);
+            }
+
+            select.textContent = '';
+            select.appendChild(fragment);
+        }
     }
 
     _textToSpeechVoiceCompare(a, b) {
-        const aIsJapanese = this._languageTagIsJapanese(a.voice.lang);
-        const bIsJapanese = this._languageTagIsJapanese(b.voice.lang);
-        if (aIsJapanese) {
-            if (!bIsJapanese) { return -1; }
+        if (a.isJapanese) {
+            if (!b.isJapanese) { return -1; }
         } else {
-            if (bIsJapanese) { return 1; }
+            if (b.isJapanese) { return 1; }
         }
 
-        const aIsDefault = a.voice.default;
-        const bIsDefault = b.voice.default;
-        if (aIsDefault) {
-            if (!bIsDefault) { return -1; }
+        if (a.voice.default) {
+            if (!b.voice.default) { return -1; }
         } else {
-            if (bIsDefault) { return 1; }
+            if (b.voice.default) { return 1; }
         }
 
         return a.index - b.index;
@@ -121,19 +133,6 @@ class AudioController {
             languageTag.startsWith('ja-') ||
             languageTag.startsWith('jpn-')
         );
-    }
-
-    _testTextToSpeech() {
-        try {
-            const text = document.querySelector('#text-to-speech-voice-test').dataset.speechText || '';
-            const voiceUri = document.querySelector('#text-to-speech-voice').value;
-
-            const audio = this._audioSystem.createTextToSpeechAudio(text, voiceUri);
-            audio.volume = 1.0;
-            audio.play();
-        } catch (e) {
-            // NOP
-        }
     }
 
     _getUnusedAudioSource() {
@@ -193,10 +192,6 @@ class AudioController {
         }
         eventListeners.removeAllEventListeners();
         this._audioSourceEntries.splice(index, 1);
-    }
-
-    _onTextToSpeechVoiceChange(e) {
-        e.currentTarget.dataset.value = e.currentTarget.value;
     }
 
     async _onAddAudioSource() {

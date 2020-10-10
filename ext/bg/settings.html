@@ -346,14 +346,15 @@
                     <input type="number" min="0" max="100" id="audio-playback-volume" class="form-control" data-setting="audio.volume">
                 </div>
 
-                <div class="form-group" id="text-to-speech-voice-container" hidden>
+                <div class="form-group" id="text-to-speech-voice-container">
                     <label for="text-to-speech-voice">Text-to-speech voice</label>
                     <div class="input-group">
                         <select class="form-control" id="text-to-speech-voice" data-setting="audio.textToSpeechVoice"></select>
                         <div class="input-group-btn">
-                            <button class="btn btn-default" id="text-to-speech-voice-test" title="Test voice" data-speech-text="よみちゃん"><span class="glyphicon glyphicon-volume-up"></span></button>
+                            <button class="btn btn-default" id="text-to-speech-voice-test" title="Test voice"><span class="glyphicon glyphicon-volume-up"></span></button>
                         </div>
                     </div>
+                    <input type="text" value="よみちゃん" id="text-to-speech-voice-test-text" hidden>
                 </div>
 
                 <div class="form-group options-advanced">
@@ -363,9 +364,9 @@
 
                 <div class="form-group ignore-form-changes">
                     <label>Audio playback sources</label>
-                    <div class="audio-source-list generic-input-list"></div>
+                    <div class="audio-source-list generic-input-list" id="audio-source-list"></div>
                     <div class="input-group audio-source-options">
-                        <button class="btn btn-default audio-source-add" title="Add audio playback source"><span class="glyphicon glyphicon-plus"></span></button>
+                        <button class="btn btn-default audio-source-add" title="Add audio playback source" id="audio-source-add"><span class="glyphicon glyphicon-plus"></span></button>
                     </div>
 
                     <template id="audio-source-template"><div class="input-group audio-source">
