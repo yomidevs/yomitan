@@ -20,15 +20,35 @@ class StorageController {
         this._mostRecentStorageEstimate = null;
         this._storageEstimateFailed = false;
         this._isUpdating = false;
+        this._persistentStorageCheckbox = false;
+        this._storageUsageNode = null;
+        this._storageQuotaNode = null;
+        this._storageUseFiniteNode = null;
+        this._storageUseInfiniteNode = null;
+        this._storageUseUndefinedNode = null;
+        this._storageUseNode = null;
+        this._storageErrorNode = null;
     }
 
     prepare() {
+        this._persistentStorageCheckbox = document.querySelector('#storage-persistent-checkbox');
+        this._storageUsageNode = document.querySelector('#storage-usage');
+        this._storageQuotaNode = document.querySelector('#storage-quota');
+        this._storageUseFiniteNode = document.querySelector('#storage-use-finite');
+        this._storageUseInfiniteNode = document.querySelector('#storage-use-infinite');
+        this._storageUseUndefinedNode = document.querySelector('#storage-use-undefined');
+        this._storageUseNode = document.querySelector('#storage-use');
+        this._storageErrorNode = document.querySelector('#storage-error');
+
         this._preparePersistentStorage();
         this.updateStats();
+        this._persistentStorageCheckbox.addEventListener('change', this._onPersistentStorageCheckboxChange.bind(this), false);
         document.querySelector('#storage-refresh').addEventListener('click', this.updateStats.bind(this), false);
     }
 
     async updateStats() {
+        if (this._isUpdating) { return; }
+
         try {
             this._isUpdating = true;
 
@@ -39,15 +59,16 @@ class StorageController {
                 // Firefox reports usage as 0 when persistent storage is enabled.
                 const finite = (estimate.usage > 0 || !(await this._isStoragePeristent()));
                 if (finite) {
-                    document.querySelector('#storage-usage').textContent = this._bytesToLabeledString(estimate.usage);
-                    document.querySelector('#storage-quota').textContent = this._bytesToLabeledString(estimate.quota);
+                    this._storageUsageNode.textContent = this._bytesToLabeledString(estimate.usage);
+                    this._storageQuotaNode.textContent = this._bytesToLabeledString(estimate.quota);
                 }
-                document.querySelector('#storage-use-finite').classList.toggle('storage-hidden', !finite);
-                document.querySelector('#storage-use-infinite').classList.toggle('storage-hidden', finite);
+                this._storageUseFiniteNode.hidden = !finite;
+                this._storageUseInfiniteNode.hidden = finite;
             }
 
-            document.querySelector('#storage-use').classList.toggle('storage-hidden', !valid);
-            document.querySelector('#storage-error').classList.toggle('storage-hidden', valid);
+            if (this._storageUseUndefinedNode !== null) { this._storageUseUndefinedNode.hidden = !valid; }
+            if (this._storageUseNode !== null) { this._storageUseNode.hidden = !valid; }
+            if (this._storageErrorNode !== null) { this._storageErrorNode.hidden = valid; }
 
             return valid;
         } finally {
@@ -63,35 +84,53 @@ class StorageController {
             return;
         }
 
-        const info = document.querySelector('#storage-persist-info');
-        const button = document.querySelector('#storage-persist-button');
-        const checkbox = document.querySelector('#storage-persist-button-checkbox');
+        const info = document.querySelector('#storage-persistent-info');
+        if (info !== null) { info.hidden = false; }
 
-        info.classList.remove('storage-hidden');
-        button.classList.remove('storage-hidden');
+        const isStoragePeristent = await this._isStoragePeristent();
+        this._updateCheckbox(isStoragePeristent);
 
-        let persisted = await this._isStoragePeristent();
-        checkbox.checked = persisted;
+        const button = document.querySelector('#storage-persistent-button');
+        if (button !== null) {
+            button.hidden = false;
+            button.addEventListener('click', this._onPersistStorageButtonClick.bind(this), false);
+        }
+    }
 
-        button.addEventListener('click', async () => {
-            if (persisted) {
-                return;
-            }
-            let result = false;
-            try {
-                result = await navigator.storage.persist();
-            } catch (e) {
-                // NOP
-            }
+    _onPersistentStorageCheckboxChange(e) {
+        const node = e.currentTarget;
+        if (!node.checked) {
+            node.checked = true;
+            return;
+        }
+        this._attemptPersistStorage();
+    }
 
-            if (result) {
-                persisted = true;
-                checkbox.checked = true;
-                this.updateStats();
-            } else {
-                document.querySelector('.storage-persist-fail-warning').classList.remove('storage-hidden');
-            }
-        }, false);
+    _onPersistStorageButtonClick() {
+        const {checked} = this._persistentStorageCheckbox;
+        if (checked) { return; }
+        this._persistentStorageCheckbox.checked = !checked;
+        this._persistentStorageCheckbox.dispatchEvent(new Event('change'));
+    }
+
+    async _attemptPersistStorage() {
+        if (await this._isStoragePeristent()) { return; }
+
+        let isStoragePeristent = false;
+        try {
+            isStoragePeristent = await navigator.storage.persist();
+        } catch (e) {
+            // NOP
+        }
+
+        this._updateCheckbox(isStoragePeristent);
+
+        if (isStoragePeristent) {
+            this.updateStats();
+        } else {
+            const node = document.querySelector('#storage-persistent-fail-warning');
+            if (node !== null) { node.hidden = false; }
+        }
     }
 
     async _storageEstimate() {
@@ -127,5 +166,11 @@ class StorageController {
             // NOP
         }
         return false;
+    }
+
+    _updateCheckbox(isStoragePeristent) {
+        const checkbox = this._persistentStorageCheckbox;
+        checkbox.checked = isStoragePeristent;
+        checkbox.readOnly = isStoragePeristent;
     }
 }

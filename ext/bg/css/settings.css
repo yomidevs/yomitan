@@ -16,7 +16,7 @@
  */
 
 
-.storage-hidden {
+.help-block[hidden] {
     display: none;
 }
 

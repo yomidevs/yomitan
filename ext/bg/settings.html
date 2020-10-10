@@ -796,7 +796,7 @@
                     <h3>Storage</h3>
                 </div>
 
-                <div id="storage-persist-info" class="storage-hidden">
+                <div id="storage-persistent-info" hidden>
                     <p class="help-block">
                         Web browsers may sometimes clear stored data if the device is running low on storage space.
                         This can result in the stored dictionary data being deleted unexpectedly, causing Yomichan to stop working for no apparent reason.
@@ -804,16 +804,19 @@
                     </p>
                 </div>
 
-                <div id="storage-use" class="storage-hidden">
-                    <p class="help-block storage-hidden" id="storage-use-finite">
+                <div id="storage-use" hidden>
+                    <p class="help-block" id="storage-use-undefined">
+                        Yomichan is using an indeterminate amount of storage.
+                    </p>
+                    <p class="help-block" id="storage-use-finite" hidden>
                         Yomichan is using approximately <strong id="storage-usage"></strong> of <strong id="storage-quota"></strong>.
                     </p>
-                    <p class="help-block storage-hidden" id="storage-use-infinite">
+                    <p class="help-block" id="storage-use-infinite" hidden>
                         Yomichan is permitted <strong>unlimited storage</strong>.
                     </p>
                 </div>
 
-                <div id="storage-error" class="storage-hidden">
+                <div id="storage-error" hidden>
                     <p class="help-block">
                         Could not detect how much storage Yomichan is using.
                     </p>
@@ -832,22 +835,24 @@
 
                 <div>
                     <button class="btn btn-default" id="storage-refresh"><span class="btn-inner-middle">Refresh</span></button>
-                    <button class="btn btn-default storage-hidden ignore-form-changes" id="storage-persist-button"><span class="storage-button-inner"><input type="checkbox" class="btn-inner-middle storage-button-checkbox" id="storage-persist-button-checkbox" readonly /><span class="btn-inner-middle">Persistent Storage</span></span></button>
+                    <button class="btn btn-default ignore-form-changes" id="storage-persistent-button" hidden><span class="storage-button-inner"><input type="checkbox" class="btn-inner-middle storage-button-checkbox" id="storage-persistent-checkbox" readonly /><span class="btn-inner-middle">Persistent Storage</span></span></button>
                 </div>
 
                 <p></p>
 
-                <div data-show-for-browser="firefox-mobile"><div class="alert alert-warning storage-persist-fail-warning storage-hidden">
-                    <p>It may not be possible to enable Persistent Storage on Firefox for Android.</p>
-                </div></div>
+                <div id="storage-persistent-fail-warning" hidden>
+                    <div data-show-for-browser="firefox-mobile"><div class="alert alert-warning">
+                        <p>It may not be possible to enable Persistent Storage on Firefox for Android.</p>
+                    </div></div>
 
-                <div data-show-for-browser="chrome"><div class="alert alert-warning storage-persist-fail-warning storage-hidden">
-                    <p>
-                        It may not be possible to enable Persistent Storage on Chrome-based browsers.
-                        However, the Yomichan extension has permission for unlimited storage which should
-                        prevent Chrome from deleting data.<sup><a href="https://bugs.chromium.org/p/chromium/issues/detail?id=680392#c15" target="_blank" rel="noopener">[1]</a></sup>
-                    </p>
-                </div></div>
+                    <div data-show-for-browser="chrome"><div class="alert alert-warning">
+                        <p>
+                            It may not be possible to enable Persistent Storage on Chrome-based browsers.
+                            However, the Yomichan extension has permission for unlimited storage which should
+                            prevent Chrome from deleting data.<sup><a href="https://bugs.chromium.org/p/chromium/issues/detail?id=680392#c15" target="_blank" rel="noopener">[1]</a></sup>
+                        </p>
+                    </div></div>
+                </div>
             </div>
 
             <div>
