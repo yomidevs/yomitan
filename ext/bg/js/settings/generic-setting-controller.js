@@ -33,6 +33,7 @@ class GenericSettingController {
         this._transforms = new Map([
             ['setDocumentAttribute', this._setDocumentAttribute.bind(this)],
             ['setRelativeAttribute', this._setRelativeAttribute.bind(this)],
+            ['setVisibility', this._setVisibility.bind(this)],
             ['splitTags', this._splitTags.bind(this)],
             ['joinTags', this._joinTags.bind(this)],
             ['toNumber', this._toNumber.bind(this)],
@@ -52,11 +53,12 @@ class GenericSettingController {
     }
 
     _createElementMetadata(element) {
+        const {dataset: {setting: path, scope, transform, transformPre, transformPost}} = element;
         return {
-            path: element.dataset.setting,
-            scope: element.dataset.scope,
-            transformPre: element.dataset.transformPre,
-            transformPost: element.dataset.transformPost
+            path,
+            scope,
+            transformPre: typeof transformPre === 'string' ? transformPre : transform,
+            transformPost: typeof transformPost === 'string' ? transformPost : transform
         };
     }
 
@@ -118,6 +120,62 @@ class GenericSettingController {
         return value;
     }
 
+    _getAncestor(node, ancestorDistance) {
+        if (typeof ancestorDistance === 'string') {
+            const ii = Number.parseInt(ancestorDistance, 10);
+            if (Number.isFinite(ii)) {
+                if (ii < 0) {
+                    node = document.documentElement;
+                } else {
+                    for (let i = 0; i < ii && node !== null; ++i) {
+                        node = node.parentNode;
+                    }
+                }
+            }
+        }
+        return node;
+    }
+
+    _getElementRelativeToAncestor(node, ancestorDistance, relativeSelector) {
+        const relativeElement = this._getAncestor(node, ancestorDistance);
+        if (relativeElement === null) { return null; }
+
+        return (
+            typeof relativeSelector === 'string' ?
+            relativeElement.querySelector(relativeSelector) :
+            relativeElement
+        );
+    }
+
+    _getConditionalResult(value, conditionString) {
+        let op = '!!';
+        let rhsOperand = null;
+        try {
+            if (typeof conditionString === 'string') {
+                const {op: op2, value: value2} = JSON.parse(conditionString);
+                op = (typeof op2 === 'string' ? op2 : '===');
+                rhsOperand = value2;
+            }
+        } catch (e) {
+            // NOP
+        }
+        return this._evaluateSimpleOperation(op, value, rhsOperand);
+    }
+
+    _evaluateSimpleOperation(operation, lhs, rhs) {
+        switch (operation) {
+            case '!': return !lhs;
+            case '!!': return !!lhs;
+            case '===': return lhs === rhs;
+            case '!==': return lhs !== rhs;
+            case '>=': return lhs >= rhs;
+            case '<=': return lhs <= rhs;
+            case '>': return lhs > rhs;
+            case '<': return lhs < rhs;
+            default: return false;
+        }
+    }
+
     // Transforms
 
     _setDocumentAttribute(value, metadata, element) {
@@ -127,14 +185,18 @@ class GenericSettingController {
 
     _setRelativeAttribute(value, metadata, element) {
         const {ancestorDistance, relativeSelector, relativeAttribute} = element.dataset;
-        let relativeElement = this._getAncestor(element, ancestorDistance);
+        const relativeElement = this._getElementRelativeToAncestor(element, ancestorDistance, relativeSelector);
         if (relativeElement !== null) {
-            if (typeof relativeSelector === 'string') {
-                relativeElement = relativeElement.querySelector(relativeSelector);
-            }
-            if (relativeElement !== null) {
-                relativeElement.setAttribute(relativeAttribute, `${value}`);
-            }
+            relativeElement.setAttribute(relativeAttribute, `${value}`);
+        }
+        return value;
+    }
+
+    _setVisibility(value, metadata, element) {
+        const {ancestorDistance, relativeSelector, visbilityCondition} = element.dataset;
+        const relativeElement = this._getElementRelativeToAncestor(element, ancestorDistance, relativeSelector);
+        if (relativeElement !== null) {
+            relativeElement.hidden = !this._getConditionalResult(value, visbilityCondition);
         }
         return value;
     }
@@ -145,18 +207,6 @@ class GenericSettingController {
 
     _joinTags(value) {
         return value.join(' ');
-    }
-
-    _getAncestor(node, ancestorDistance) {
-        if (typeof ancestorDistance === 'string') {
-            const ii = Number.parseInt(ancestorDistance, 10);
-            if (Number.isFinite(ii)) {
-                for (let i = 0; i < ii && node !== null; ++i) {
-                    node = node.parentNode;
-                }
-            }
-        }
-        return node;
     }
 
     _toNumber(value, metadata, element) {
