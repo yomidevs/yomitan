@@ -23,7 +23,7 @@
 html:root:not([data-options-anki-enable=true]) #anki-general,
 html:root:not([data-options-general-debug-info=true]) .debug,
 html:root:not([data-options-general-show-advanced=true]) .options-advanced,
-html:root:not([data-options-general-result-output-mode=merge]) #dict-main-group {
+html:root:not([data-options-general-result-output-mode=merge]) #dictionary-main-group {
     display: none;
 }
 
@@ -309,22 +309,25 @@ input[type=checkbox].storage-button-checkbox {
     height: 320px;
 }
 
-.dict-delete-table {
+.dictionary-delete-table {
     display: table;
     width: 100%;
 }
-.dict-delete-table>*:first-child {
+.dictionary-delete-table>*:first-child {
     display: table-cell;
     vertical-align: middle;
     padding-right: 1em;
 }
-.dict-delete-table>*:nth-child(n+2) {
+.dictionary-delete-table>*:nth-child(n+2) {
     display: table-cell;
     width: 100%;
     vertical-align: middle;
 }
-.dict-delete-table .progress {
+.dictionary-delete-table .progress {
     margin: 0;
+}
+.dictionary-delete-table>*[hidden] {
+    display: none;
 }
 
 .error-data-show-button {
@@ -377,44 +380,44 @@ html:root[data-operating-system=openbsd] [data-hide-for-operating-system~=openbs
     display: none;
 }
 
-#dict-groups {
+#dictionary-list {
     display: flex;
     flex-flow: column;
 }
 
-.dict-details-container {
+.dictionary-details-container {
     margin: 0.5em 0;
 }
 
-.dict-details-toggle-link {
+.dictionary-details-toggle-link {
     cursor: pointer;
 }
 
-.dict-details {
+.dictionary-details {
     margin-left: 1em;
 }
 
-.dict-details-table {
+.dictionary-details-table {
     display: table;
     width: 100%
 }
 
-.dict-details-entry {
+.dictionary-details-entry {
     display: table-row;
 }
 
-.dict-details-entry+.dict-details-entry>* {
+.dictionary-details-entry+.dictionary-details-entry>* {
     padding-top: 0.25em;
 }
 
-.dict-details-entry-label {
+.dictionary-details-entry-label {
     display: table-cell;
     font-weight: bold;
     white-space: nowrap;
     padding-right: 0.5em;
 }
 
-.dict-details-entry-info {
+.dictionary-details-entry-info {
     display: table-cell;
     white-space: pre-line;
 }

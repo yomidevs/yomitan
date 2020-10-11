@@ -51,17 +51,17 @@ class DictionaryImportController {
     }
 
     async prepare() {
-        this._purgeButton = document.querySelector('#dict-purge-button');
-        this._purgeConfirmButton = document.querySelector('#dict-purge-confirm');
-        this._importFileButton = document.querySelector('#dict-file-button');
-        this._importFileInput = document.querySelector('#dict-file');
-        this._purgeConfirmModal = this._modalController.getModal('dict-purge-modal');
-        this._errorContainer = document.querySelector('#dict-error');
-        this._spinner = document.querySelector('#dict-spinner');
-        this._progressContainer = document.querySelector('#dict-import-progress');
+        this._purgeButton = document.querySelector('#dictionary-delete-all-button');
+        this._purgeConfirmButton = document.querySelector('#dictionary-confirm-delete-all-button');
+        this._importFileButton = document.querySelector('#dictionary-import-file-button');
+        this._importFileInput = document.querySelector('#dictionary-import-file-input');
+        this._purgeConfirmModal = this._modalController.getModal('dictionary-confirm-delete-all');
+        this._errorContainer = document.querySelector('#dictionary-error');
+        this._spinner = document.querySelector('#dictionary-spinner');
+        this._progressContainer = document.querySelector('#dictionary-import-progress-container');
         this._progressBar = this._progressContainer.querySelector('.progress-bar');
-        this._purgeNotification = document.querySelector('#dict-purge');
-        this._importInfo = document.querySelector('#dict-import-info');
+        this._purgeNotification = document.querySelector('#dictionary-delete-all-status');
+        this._importInfo = document.querySelector('#dictionary-import-info');
 
         this._purgeButton.addEventListener('click', this._onPurgeButtonClick.bind(this), false);
         this._purgeConfirmButton.addEventListener('click', this._onPurgeConfirmButtonClick.bind(this), false);
@@ -301,7 +301,7 @@ class DictionaryImportController {
 
     _setButtonsEnabled(value) {
         value = !value;
-        for (const node of document.querySelectorAll('.dictionary-modifying-input')) {
+        for (const node of document.querySelectorAll('.dictionary-database-mutating-input')) {
             node.disabled = value;
         }
     }

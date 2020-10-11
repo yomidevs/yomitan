@@ -27,15 +27,8 @@ class DictionaryEntry {
         this._dictionaryController = dictionaryController;
         this._node = node;
         this._dictionaryInfo = dictionaryInfo;
-        this._dictionaryTitle = dictionaryInfo.title;
         this._eventListeners = new EventListenerCollection();
-        this._enabledCheckbox = node.querySelector('.dict-enabled');
-        this._allowSecondarySearchesCheckbox = node.querySelector('.dict-allow-secondary-searches');
-        this._priorityInput = node.querySelector('.dict-priority');
-        this._deleteButton = node.querySelector('.dict-delete-button');
-        this._detailsToggleLink = node.querySelector('.dict-details-toggle-link');
-        this._detailsContainer = node.querySelector('.dict-details');
-        this._detailsTable = node.querySelector('.dict-details-table');
+        this._detailsContainer = null;
     }
 
     get node() {
@@ -43,31 +36,42 @@ class DictionaryEntry {
     }
 
     get dictionaryTitle() {
-        return this._dictionaryTitle;
+        return this._dictionaryInfo.title;
     }
 
     prepare() {
         const node = this._node;
-        const dictionaryInfo = this._dictionaryInfo;
-        const {title, revision, prefixWildcardsSupported} = dictionaryInfo;
+        const {title, revision, prefixWildcardsSupported, version} = this._dictionaryInfo;
 
-        if (dictionaryInfo.version < 3) {
-            node.querySelector('.dict-outdated').hidden = false;
-        }
+        this._detailsContainer = node.querySelector('.dictionary-details');
 
-        node.querySelector('.dict-title').textContent = title;
-        node.querySelector('.dict-revision').textContent = `rev.${revision}`;
-        node.querySelector('.dict-prefix-wildcard-searches-supported').checked = !!prefixWildcardsSupported;
+        const enabledCheckbox = node.querySelector('.dictionary-enabled');
+        const allowSecondarySearchesCheckbox = node.querySelector('.dictionary-allow-secondary-searches');
+        const priorityInput = node.querySelector('.dictionary-priority');
+        const deleteButton = node.querySelector('.dictionary-delete-button');
+        const detailsTable = node.querySelector('.dictionary-details-table');
+        const detailsToggleLink = node.querySelector('.dictionary-details-toggle-link');
+        const outdatedContainer = node.querySelector('.dictionary-outdated-notification');
+        const titleNode = node.querySelector('.dictionary-title');
+        const versionNode = node.querySelector('.dictionary-version');
+        const wildcardSupportedCheckbox = node.querySelector('.dictionary-prefix-wildcard-searches-supported');
 
-        this._setupDetails(dictionaryInfo);
+        const hasDetails = this._setupDetails(detailsTable);
 
-        this._enabledCheckbox.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'enabled']);
-        this._allowSecondarySearchesCheckbox.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'allowSecondarySearches']);
-        this._priorityInput.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'priority']);
+        titleNode.textContent = title;
+        versionNode.textContent = `rev.${revision}`;
+        wildcardSupportedCheckbox.checked = !!prefixWildcardsSupported;
 
-        this._eventListeners.addEventListener(this._deleteButton, 'click', this._onDeleteButtonClicked.bind(this), false);
-        this._eventListeners.addEventListener(this._detailsToggleLink, 'click', this._onDetailsToggleLinkClicked.bind(this), false);
-        this._eventListeners.addEventListener(this._priorityInput, 'settingChanged', this._onPriorityChanged.bind(this), false);
+        outdatedContainer.hidden = (version >= 3);
+        detailsToggleLink.hidden = !hasDetails;
+
+        enabledCheckbox.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'enabled']);
+        allowSecondarySearchesCheckbox.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'allowSecondarySearches']);
+        priorityInput.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'priority']);
+
+        this._eventListeners.addEventListener(deleteButton, 'click', this._onDeleteButtonClicked.bind(this), false);
+        this._eventListeners.addEventListener(detailsToggleLink, 'click', this._onDetailsToggleLinkClicked.bind(this), false);
+        this._eventListeners.addEventListener(priorityInput, 'settingChanged', this._onPriorityChanged.bind(this), false);
     }
 
     cleanup() {
@@ -79,7 +83,7 @@ class DictionaryEntry {
     }
 
     setCounts(counts) {
-        const node = this._node.querySelector('.dict-counts');
+        const node = this._node.querySelector('.dictionary-counts');
         node.textContent = JSON.stringify({info: this._dictionaryInfo, counts}, null, 4);
         node.hidden = false;
     }
@@ -88,7 +92,7 @@ class DictionaryEntry {
 
     _onDeleteButtonClicked(e) {
         e.preventDefault();
-        this._dictionaryController.deleteDictionary(this._dictionaryTitle);
+        this._dictionaryController.deleteDictionary(this.dictionaryTitle);
     }
 
     _onDetailsToggleLinkClicked(e) {
@@ -101,7 +105,7 @@ class DictionaryEntry {
         this._node.style.order = `${-value}`;
     }
 
-    _setupDetails(dictionaryInfo) {
+    _setupDetails(detailsTable) {
         const targets = [
             ['Author', 'author'],
             ['URL', 'url'],
@@ -109,37 +113,24 @@ class DictionaryEntry {
             ['Attribution', 'attribution']
         ];
 
+        const dictionaryInfo = this._dictionaryInfo;
         const fragment = document.createDocumentFragment();
-        let count = 0;
+        let any = false;
         for (const [label, key] of targets) {
             const info = dictionaryInfo[key];
             if (typeof info !== 'string') { continue; }
 
-            const n1 = document.createElement('div');
-            n1.className = 'dict-details-entry';
-            n1.dataset.type = key;
+            const details = this._dictionaryController.instantiateTemplate('dictionary-details-entry');
+            details.dataset.type = key;
+            details.querySelector('.dictionary-details-entry-label').textContent = `${label}:`;
+            details.querySelector('.dictionary-details-entry-info').textContent = info;
+            fragment.appendChild(details);
 
-            const n2 = document.createElement('span');
-            n2.className = 'dict-details-entry-label';
-            n2.textContent = `${label}:`;
-            n1.appendChild(n2);
-
-            const n3 = document.createElement('span');
-            n3.className = 'dict-details-entry-info';
-            n3.textContent = info;
-            n1.appendChild(n3);
-
-            fragment.appendChild(n1);
-
-            ++count;
+            any = true;
         }
 
-        if (count > 0) {
-            this._detailsTable.appendChild(fragment);
-        } else {
-            this._detailsContainer.hidden = true;
-            this._detailsToggleLink.hidden = true;
-        }
+        detailsTable.appendChild(fragment);
+        return any;
     }
 }
 
@@ -152,7 +143,6 @@ class DictionaryController {
         this._databaseStateToken = null;
         this._checkingIntegrity = false;
         this._warningNode = null;
-        this._mainDictionarySelect = null;
         this._checkIntegrityButton = null;
         this._dictionaryEntryContainer = null;
         this._integrityExtraInfoContainer = null;
@@ -162,16 +152,15 @@ class DictionaryController {
     }
 
     async prepare() {
-        this._warningNode = document.querySelector('#dict-warning');
-        this._mainDictionarySelect = document.querySelector('#dict-main');
-        this._checkIntegrityButton = document.querySelector('#dict-check-integrity');
-        this._dictionaryEntryContainer = document.querySelector('#dict-groups');
-        this._integrityExtraInfoContainer = document.querySelector('#dict-groups-extra');
-        this._deleteDictionaryModal = this._modalController.getModal('dict-delete-modal');
+        this._warningNode = document.querySelector('#dictionary-warning');
+        this._checkIntegrityButton = document.querySelector('#dictionary-check-integrity');
+        this._dictionaryEntryContainer = document.querySelector('#dictionary-list');
+        this._integrityExtraInfoContainer = document.querySelector('#dictionary-list-extra');
+        this._deleteDictionaryModal = this._modalController.getModal('dictionary-confirm-delete');
 
         yomichan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
 
-        document.querySelector('#dict-delete-confirm').addEventListener('click', this._onDictionaryConfirmDelete.bind(this), false);
+        document.querySelector('#dictionary-confirm-delete-button').addEventListener('click', this._onDictionaryConfirmDelete.bind(this), false);
         this._checkIntegrityButton.addEventListener('click', this._onCheckIntegrityButtonClick.bind(this), false);
 
         await this._onDatabaseUpdated();
@@ -181,8 +170,12 @@ class DictionaryController {
         if (this._isDeleting) { return; }
         const modal = this._deleteDictionaryModal;
         modal.node.dataset.dictionaryTitle = dictionaryTitle;
-        modal.node.querySelector('#dict-remove-modal-dict-name').textContent = dictionaryTitle;
+        modal.node.querySelector('#dictionary-confirm-delete-name').textContent = dictionaryTitle;
         modal.setVisible(true);
+    }
+
+    instantiateTemplate(name) {
+        return this._settingsController.instantiateTemplate(name);
     }
 
     // Private
@@ -227,25 +220,26 @@ class DictionaryController {
     }
 
     _updateMainDictionarySelectOptions(dictionaries) {
-        const fragment = document.createDocumentFragment();
+        for (const select of document.querySelectorAll('[data-setting="general.mainDictionary"]')) {
+            const fragment = document.createDocumentFragment();
 
-        let option = document.createElement('option');
-        option.className = 'text-muted';
-        option.value = '';
-        option.textContent = 'Not selected';
-        fragment.appendChild(option);
-
-        for (const {title, sequenced} of dictionaries) {
-            if (!sequenced) { continue; }
-            option = document.createElement('option');
-            option.value = title;
-            option.textContent = title;
+            let option = document.createElement('option');
+            option.className = 'text-muted';
+            option.value = '';
+            option.textContent = 'Not selected';
             fragment.appendChild(option);
-        }
 
-        const select = this._mainDictionarySelect;
-        select.textContent = ''; // Empty
-        select.appendChild(fragment);
+            for (const {title, sequenced} of dictionaries) {
+                if (!sequenced) { continue; }
+                option = document.createElement('option');
+                option.value = title;
+                option.textContent = title;
+                fragment.appendChild(option);
+            }
+
+            select.textContent = ''; // Empty
+            select.appendChild(fragment);
+        }
     }
 
     async _checkIntegrity() {
@@ -294,12 +288,12 @@ class DictionaryController {
     }
 
     _createExtra(totalCounts, remainders, totalRemainder) {
-        const node = this._settingsController.instantiateTemplate('dict-extra');
+        const node = this.instantiateTemplate('dictionary-extra');
         this._integrityExtraInfoNode = node;
 
-        node.querySelector('.dict-total-count').textContent = `${totalRemainder} item${totalRemainder !== 1 ? 's' : ''}`;
+        node.querySelector('.dictionary-total-count').textContent = `${totalRemainder} item${totalRemainder !== 1 ? 's' : ''}`;
 
-        const n = node.querySelector('.dict-counts');
+        const n = node.querySelector('.dictionary-counts');
         n.textContent = JSON.stringify({counts: totalCounts, remainders}, null, 4);
         n.hidden = false;
 
@@ -318,7 +312,7 @@ class DictionaryController {
     }
 
     _createDictionaryEntry(dictionary) {
-        const node = this._settingsController.instantiateTemplate('dict');
+        const node = this.instantiateTemplate('dictionary');
         this._dictionaryEntryContainer.appendChild(node);
 
         const entry = new DictionaryEntry(this, node, dictionary);
@@ -334,7 +328,7 @@ class DictionaryController {
 
         const entry = this._dictionaryEntries[index];
         const node = entry.node;
-        const progress = node.querySelector('.progress');
+        const progress = node.querySelector('.progress-container');
         const progressBar = node.querySelector('.progress-bar');
         const prevention = this._settingsController.preventPageExit();
         try {
@@ -365,7 +359,7 @@ class DictionaryController {
 
     _setButtonsEnabled(value) {
         value = !value;
-        for (const node of document.querySelectorAll('.dictionary-modifying-input')) {
+        for (const node of document.querySelectorAll('.dictionary-database-mutating-input')) {
             node.disabled = value;
         }
     }

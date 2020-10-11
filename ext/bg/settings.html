@@ -656,7 +656,7 @@
 
             <div class="ignore-form-changes">
                 <div>
-                    <img src="/mixed/img/spinner.gif" class="pull-right" id="dict-spinner" alt hidden>
+                    <img src="/mixed/img/spinner.gif" class="pull-right" id="dictionary-spinner" alt hidden>
                     <h3>Dictionaries</h3>
                 </div>
 
@@ -664,38 +664,38 @@
                     Yomichan can import and use a variety of dictionary formats. Unneeded dictionaries can be disabled.
                 </p>
 
-                <div class="form-group" id="dict-main-group">
-                    <label for="dict-main">Main dictionary for merged mode</label>
-                    <select class="form-control" id="dict-main" data-setting="general.mainDictionary"></select>
+                <div class="form-group" id="dictionary-main-group">
+                    <label for="dictionary-main">Main dictionary for merged mode</label>
+                    <select class="form-control" id="dictionary-main" data-setting="general.mainDictionary"></select>
                 </div>
 
-                <div class="text-danger" id="dict-purge" hidden>Dictionary data is being purged, please be patient...</div>
-                <div class="alert alert-warning" id="dict-warning" hidden>No dictionaries have been installed</div>
-                <div class="alert alert-danger" id="dict-error" hidden></div>
+                <div class="text-danger" id="dictionary-delete-all-status" hidden>Dictionary data is being purged, please be patient...</div>
+                <div class="alert alert-warning" id="dictionary-warning" hidden>No dictionaries have been installed</div>
+                <div class="alert alert-danger" id="dictionary-error" hidden></div>
 
-                <div id="dict-groups"></div>
-                <div id="dict-groups-extra"></div>
+                <div id="dictionary-list"></div>
+                <div id="dictionary-list-extra"></div>
 
-                <div id="dict-import-progress" hidden>
+                <div id="dictionary-import-progress-container" hidden>
                     Dictionary data is being imported, please be patient...
-                    <span id="dict-import-info" hidden></span>
+                    <span id="dictionary-import-info" hidden></span>
                     <div class="progress">
                         <div class="progress-bar progress-bar-striped" style="width: 0%"></div>
                     </div>
                 </div>
 
-                <div id="dict-importer">
+                <div>
                     <p class="help-block">
                         Select a dictionary to import for use below. Please visit the Yomichan homepage to
                         <a href="https://foosoft.net/projects/yomichan" target="_blank" rel="noopener">download free dictionaries</a>
                         for use with this extension and to learn about importing proprietary EPWING dictionaries.
                     </p>
                     <div>
-                        <button class="btn btn-primary dictionary-modifying-input" id="dict-file-button">Import Dictionary</button>
-                        <button class="btn btn-danger dictionary-modifying-input" id="dict-purge-button">Purge Database</button>
-                        <button class="btn btn-default dictionary-modifying-input" id="dict-check-integrity">Check integrity</button>
+                        <button class="btn btn-primary dictionary-database-mutating-input" id="dictionary-import-file-button">Import Dictionary</button>
+                        <button class="btn btn-danger dictionary-database-mutating-input" id="dictionary-delete-all-button">Purge Database</button>
+                        <button class="btn btn-default dictionary-database-mutating-input" id="dictionary-check-integrity">Check integrity</button>
                     </div>
-                    <div hidden><input type="file" id="dict-file" accept=".zip,application/zip" multiple></div>
+                    <div hidden><input type="file" id="dictionary-import-file-input" accept=".zip,application/zip" multiple></div>
                 </div>
 
                 <div>
@@ -710,7 +710,7 @@
                     </p>
                 </div>
 
-                <div class="modal fade" tabindex="-1" role="dialog" id="dict-purge-modal">
+                <div class="modal fade" tabindex="-1" role="dialog" id="dictionary-confirm-delete-all">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -722,13 +722,13 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-danger" id="dict-purge-confirm">Purge Database</button>
+                                <button type="button" class="btn btn-danger" id="dictionary-confirm-delete-all-button">Purge Database</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="modal fade" tabindex="-1" role="dialog" id="dict-delete-modal">
+                <div class="modal fade" tabindex="-1" role="dialog" id="dictionary-confirm-delete">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -736,58 +736,63 @@
                                 <h4 class="modal-title">Confirm dictionary deletion</h4>
                             </div>
                             <div class="modal-body">
-                                Are you sure you want to delete the dictionary <em id="dict-remove-modal-dict-name"></em>?
+                                Are you sure you want to delete the dictionary <em id="dictionary-confirm-delete-name"></em>?
                                 This operation may take some time and the responsiveness of this browser tab may be reduced.
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-danger dictionary-modifying-input" id="dict-delete-confirm">Delete Dictionary</button>
+                                <button type="button" class="btn btn-danger dictionary-database-mutating-input" id="dictionary-confirm-delete-button">Delete Dictionary</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <template id="dict-template"><div class="dict-group well well-sm">
-                    <h4><span class="text-muted glyphicon glyphicon-book"></span> <span class="dict-title"></span> <small class="dict-revision"></small></h4>
-                    <p class="text-warning dict-outdated" hidden>This dictionary is outdated and may not support new extension features; please import the latest version.</p>
+                <template id="dictionary-template"><div class="well well-sm">
+                    <h4><span class="text-muted glyphicon glyphicon-book"></span> <span class="dictionary-title"></span> <small class="dictionary-version"></small></h4>
+                    <p class="text-warning dictionary-outdated-notification" hidden>This dictionary is outdated and may not support new extension features; please import the latest version.</p>
 
                     <div class="checkbox">
-                        <label><input type="checkbox" class="dict-enabled"> Enable search</label>
+                        <label><input type="checkbox" class="dictionary-enabled"> Enable search</label>
                     </div>
                     <div class="checkbox options-advanced">
-                        <label><input type="checkbox" class="dict-allow-secondary-searches"> Allow secondary searches</label>
+                        <label><input type="checkbox" class="dictionary-allow-secondary-searches"> Allow secondary searches</label>
                     </div>
-                    <div class="checkbox dict-prefix-wildcard-searches-supported-container">
-                        <label><input type="checkbox" class="dict-prefix-wildcard-searches-supported" disabled> Prefix wildcard searches supported</label>
+                    <div class="checkbox">
+                        <label><input type="checkbox" class="dictionary-prefix-wildcard-searches-supported" disabled> Prefix wildcard searches supported</label>
                     </div>
                     <div class="form-group options-advanced">
-                        <label class="dict-result-priority-label">Result priority</label>
-                        <input type="number" class="form-control dict-priority">
+                        <label>Result priority</label>
+                        <input type="number" class="form-control dictionary-priority">
                     </div>
-                    <div class="dict-details-container">
-                        <a class="dict-details-toggle-link">Details...</a>
-                        <div class="dict-details" hidden><div class="dict-details-table"></div></div>
+                    <div class="dictionary-details-container">
+                        <a class="dictionary-details-toggle-link">Details...</a>
+                        <div class="dictionary-details" hidden><div class="dictionary-details-table"></div></div>
                     </div>
-                    <div class="dict-delete-table">
+                    <div class="dictionary-delete-table">
                         <div>
-                            <button class="btn btn-default dict-delete-button dictionary-modifying-input">Delete Dictionary</button>
+                            <button class="btn btn-default dictionary-delete-button dictionary-database-mutating-input">Delete Dictionary</button>
                         </div>
-                        <div>
-                            <div class="progress" hidden>
+                        <div class="progress-container" hidden>
+                            <div class="progress">
                                 <div class="progress-bar progress-bar-striped" style="width: 0%"></div>
                             </div>
                         </div>
                     </div>
-                    <pre class="debug dict-counts" hidden></pre>
+                    <pre class="debug dictionary-counts" hidden></pre>
                 </div></template>
 
-                <template id="dict-extra-template"><div class="well well-sm">
-                    <h4><span class="text-muted glyphicon glyphicon-alert"></span> <span class="dict-title">Unassociated Data</span> <small class="dict-total-count"></small></h4>
+                <template id="dictionary-details-entry-template"><div class="dictionary-details-entry">
+                    <span class="dictionary-details-entry-label"></span>
+                    <span class="dictionary-details-entry-info"></span>
+                </div></template>
+
+                <template id="dictionary-extra-template"><div class="well well-sm">
+                    <h4><span class="text-muted glyphicon glyphicon-alert"></span> <span class="dictionary-title">Unassociated Data</span> <small class="dictionary-total-count"></small></h4>
                     <p class="text-warning">
                         The database contains extra data which is not associated with any installed dictionary.
                         Purging the database can fix this issue.
                     </p>
-                    <pre class="debug dict-counts" hidden></pre>
+                    <pre class="debug dictionary-counts" hidden></pre>
                 </div></template>
             </div>
 
