@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+<style>
+#container {
+    transform: translate(10px, 10px);
+}
+
+#rotate-container {
+    transform: rotate(0deg);
+    animation: rotate 1.5s linear infinite;
+}
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#path {
+    fill: none;
+    stroke: #000;
+    stroke-width: 2;
+    stroke-linecap: butt;
+    stroke-dasharray: 33 44;
+    stroke-dashoffset: 0;
+    animation: path-dash 3s linear infinite;
+}
+@keyframes path-dash {
+    0% { stroke-dashoffset: 110; }
+    42% { stroke-dashoffset: 77; }
+    100% { stroke-dashoffset: 33; }
+}
+</style>
+<g id="container"><g id="rotate-container"><circle id="path" cx="0" cy="0" r="7"></circle></g></g>
+</svg>
