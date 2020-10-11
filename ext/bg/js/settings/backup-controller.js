@@ -22,8 +22,9 @@
  */
 
 class BackupController {
-    constructor(settingsController) {
+    constructor(settingsController, modalController) {
         this._settingsController = settingsController;
+        this._modalController = modalController;
         this._settingsExportToken = null;
         this._settingsExportRevoke = null;
         this._currentVersion = 0;
@@ -36,9 +37,9 @@ class BackupController {
     async prepare() {
         await this._optionsUtil.prepare();
 
-        this._settingsResetModal = new Modal(document.querySelector('#settings-reset-modal'));
-        this._settingsImportErrorModal = new Modal(document.querySelector('#settings-import-error-modal'));
-        this._settingsImportWarningModal = new Modal(document.querySelector('#settings-import-warning-modal'));
+        this._settingsResetModal = this._modalController.getModal('settings-reset-modal');
+        this._settingsImportErrorModal = this._modalController.getModal('settings-import-error-modal');
+        this._settingsImportWarningModal = this._modalController.getModal('settings-import-warning-modal');
 
         document.querySelector('#settings-export').addEventListener('click', this._onSettingsExportClick.bind(this), false);
         document.querySelector('#settings-import').addEventListener('click', this._onSettingsImportClick.bind(this), false);

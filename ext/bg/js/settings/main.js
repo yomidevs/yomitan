@@ -24,6 +24,7 @@
  * DictionaryController
  * DictionaryImportController
  * GenericSettingController
+ * ModalController
  * PopupPreviewController
  * ProfileController
  * ScanInputsController
@@ -57,6 +58,9 @@ async function setupEnvironmentInfo() {
 
         const optionsFull = await api.optionsGetFull();
 
+        const modalController = new ModalController();
+        modalController.prepare();
+
         const settingsController = new SettingsController(optionsFull.profileCurrent);
         settingsController.prepare();
 
@@ -75,22 +79,22 @@ async function setupEnvironmentInfo() {
         const audioController = new AudioController(settingsController);
         audioController.prepare();
 
-        const profileController = new ProfileController(settingsController);
+        const profileController = new ProfileController(settingsController, modalController);
         profileController.prepare();
 
-        const dictionaryController = new DictionaryController(settingsController);
+        const dictionaryController = new DictionaryController(settingsController, modalController);
         dictionaryController.prepare();
 
-        const dictionaryImportController = new DictionaryImportController(settingsController, storageController);
+        const dictionaryImportController = new DictionaryImportController(settingsController, modalController, storageController);
         dictionaryImportController.prepare();
 
         const ankiController = new AnkiController(settingsController);
         ankiController.prepare();
 
-        const ankiTemplatesController = new AnkiTemplatesController(settingsController, ankiController);
+        const ankiTemplatesController = new AnkiTemplatesController(settingsController, modalController, ankiController);
         ankiTemplatesController.prepare();
 
-        const settingsBackup = new BackupController(settingsController);
+        const settingsBackup = new BackupController(settingsController, modalController);
         settingsBackup.prepare();
 
         const scanInputsController = new ScanInputsController(settingsController);

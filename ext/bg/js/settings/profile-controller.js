@@ -22,8 +22,9 @@
  */
 
 class ProfileController {
-    constructor(settingsController) {
+    constructor(settingsController, modalController) {
         this._settingsController = settingsController;
+        this._modalController = modalController;
         this._profileConditionsUI = new ProfileConditionsUI(settingsController);
         this._profileActiveSelect = null;
         this._profileTargetSelect = null;
@@ -52,8 +53,8 @@ class ProfileController {
         this._profileCopyButton = document.querySelector('#profile-copy');
         this._profileMoveUpButton = document.querySelector('#profile-move-up');
         this._profileMoveDownButton = document.querySelector('#profile-move-down');
-        this._profileRemoveModal = new Modal(document.querySelector('#profile-remove-modal'));
-        this._profileCopyModal = new Modal(document.querySelector('#profile-copy-modal'));
+        this._profileRemoveModal = this._modalController.getModal('profile-remove-modal');
+        this._profileCopyModal = this._modalController.getModal('profile-copy-modal');
 
         this._profileActiveSelect.addEventListener('change', this._onProfileActiveChange.bind(this), false);
         this._profileTargetSelect.addEventListener('change', this._onProfileTargetChange.bind(this), false);

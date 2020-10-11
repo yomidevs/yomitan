@@ -144,8 +144,9 @@ class DictionaryEntry {
 }
 
 class DictionaryController {
-    constructor(settingsController) {
+    constructor(settingsController, modalController) {
         this._settingsController = settingsController;
+        this._modalController = modalController;
         this._dictionaries = null;
         this._dictionaryEntries = [];
         this._databaseStateToken = null;
@@ -166,7 +167,7 @@ class DictionaryController {
         this._checkIntegrityButton = document.querySelector('#dict-check-integrity');
         this._dictionaryEntryContainer = document.querySelector('#dict-groups');
         this._integrityExtraInfoContainer = document.querySelector('#dict-groups-extra');
-        this._deleteDictionaryModal = new Modal(document.querySelector('#dict-delete-modal'));
+        this._deleteDictionaryModal = this._modalController.getModal('dict-delete-modal');
 
         yomichan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
 

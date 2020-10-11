@@ -24,8 +24,9 @@
  */
 
 class DictionaryImportController {
-    constructor(settingsController, storageController) {
+    constructor(settingsController, modalController, storageController) {
         this._settingsController = settingsController;
+        this._modalController = modalController;
         this._storageController = storageController;
         this._modifying = false;
         this._purgeButton = null;
@@ -54,7 +55,7 @@ class DictionaryImportController {
         this._purgeConfirmButton = document.querySelector('#dict-purge-confirm');
         this._importFileButton = document.querySelector('#dict-file-button');
         this._importFileInput = document.querySelector('#dict-file');
-        this._purgeConfirmModal = new Modal(document.querySelector('#dict-purge-modal'));
+        this._purgeConfirmModal = this._modalController.getModal('dict-purge-modal');
         this._errorContainer = document.querySelector('#dict-error');
         this._spinner = document.querySelector('#dict-spinner');
         this._progressContainer = document.querySelector('#dict-import-progress');

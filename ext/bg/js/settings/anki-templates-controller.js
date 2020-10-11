@@ -23,8 +23,9 @@
  */
 
 class AnkiTemplatesController {
-    constructor(settingsController, ankiController) {
+    constructor(settingsController, modalController, ankiController) {
         this._settingsController = settingsController;
+        this._modalController = modalController;
         this._ankiController = ankiController;
         this._cachedDefinitionValue = null;
         this._cachedDefinitionText = null;
@@ -36,7 +37,7 @@ class AnkiTemplatesController {
     async prepare() {
         this._defaultFieldTemplates = await api.getDefaultAnkiFieldTemplates();
 
-        this._fieldTemplateResetModal = new Modal(document.querySelector('#field-template-reset-modal'));
+        this._fieldTemplateResetModal = this._modalController.getModal('field-template-reset-modal');
 
         const markers = new Set([
             ...this._ankiController.getFieldMarkers('terms'),
