@@ -294,7 +294,10 @@
                                                 "custom"
                                             ],
                                             "default": "jpod101"
-                                        }
+                                        },
+                                        "default": [
+                                            "jpod101"
+                                        ]
                                     },
                                     "volume": {
                                         "type": "number",
