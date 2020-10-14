@@ -380,13 +380,13 @@ class OptionsUtil {
                 if (addition === null) {
                     addition = await this._fetchAsset(additionSourceUrl);
                 }
-                profileOptions.anki.fieldTemplates = await this._addFieldTemplatesBeforeEnd(fieldTemplates, addition);
+                profileOptions.anki.fieldTemplates = this._addFieldTemplatesBeforeEnd(fieldTemplates, addition);
             }
         }
     }
 
-    async _addFieldTemplatesBeforeEnd(fieldTemplates, addition) {
-        const pattern = /[ \t]*\{\{~?>\s*\(\s*lookup\s*\.\s*"marker"\s*\)\s*~?\}\}/;
+    _addFieldTemplatesBeforeEnd(fieldTemplates, addition) {
+        const pattern = /[ \t]*\{\{~?>\s*\(\s*lookup\s*\.\s*"marker"\s*\)\s*~?\}\}/g;
         const newline = '\n';
         let replaced = false;
         fieldTemplates = fieldTemplates.replace(pattern, (g0) => {
