@@ -19,10 +19,16 @@ const jp = (() => {
     const ITERATION_MARK_CODE_POINT = 0x3005;
     const HIRAGANA_SMALL_TSU_CODE_POINT = 0x3063;
     const KATAKANA_SMALL_TSU_CODE_POINT = 0x30c3;
+    const KATAKANA_SMALL_KA_CODE_POINT = 0x30f5;
+    const KATAKANA_SMALL_KE_CODE_POINT = 0x30f6;
     const KANA_PROLONGED_SOUND_MARK_CODE_POINT = 0x30fc;
 
     const HIRAGANA_RANGE = [0x3040, 0x309f];
     const KATAKANA_RANGE = [0x30a0, 0x30ff];
+
+    const HIRAGANA_CONVERSION_RANGE = [0x3041, 0x3096];
+    const KATAKANA_CONVERSION_RANGE = [0x30a1, 0x30f6];
+
     const KANA_RANGES = [HIRAGANA_RANGE, KATAKANA_RANGE];
 
     const CJK_UNIFIED_IDEOGRAPHS_RANGE = [0x4e00, 0x9fff];
@@ -129,6 +135,29 @@ const jp = (() => {
         ['ﾝ', 'ン--']
     ]);
 
+    const VOWEL_TO_KANA_MAPPING = new Map([
+        ['a', 'ぁあかがさざただなはばぱまゃやらゎわヵァアカガサザタダナハバパマャヤラヮワヵヷ'],
+        ['i', 'ぃいきぎしじちぢにひびぴみりゐィイキギシジチヂニヒビピミリヰヸ'],
+        ['u', 'ぅうくぐすずっつづぬふぶぷむゅゆるゥウクグスズッツヅヌフブプムュユルヴ'],
+        ['e', 'ぇえけげせぜてでねへべぺめれゑヶェエケゲセゼテデネヘベペメレヱヶヹ'],
+        ['o', 'ぉおこごそぞとどのほぼぽもょよろをォオコゴソゾトドノホボポモョヨロヲヺ'],
+        ['', 'のノ']
+    ]);
+
+    const KANA_TO_VOWEL_MAPPING = (() => {
+        const map = new Map();
+        for (const [vowel, characters] of VOWEL_TO_KANA_MAPPING) {
+            for (const character of characters) {
+                map.set(character, vowel);
+            }
+        }
+        return map;
+    })();
+
+
+    function isCodePointInRange(codePoint, [min, max]) {
+        return (codePoint >= min && codePoint <= max);
+    }
 
     function isCodePointInRanges(codePoint, ranges) {
         for (const [min, max] of ranges) {
@@ -137,6 +166,17 @@ const jp = (() => {
             }
         }
         return false;
+    }
+
+    function getProlongedHiragana(previousCharacter) {
+        switch (KANA_TO_VOWEL_MAPPING.get(previousCharacter)) {
+            case 'a': return 'あ';
+            case 'i': return 'い';
+            case 'u': return 'う';
+            case 'e': return 'え';
+            case 'o': return 'う';
+            default: return null;
+        }
     }
 
     function getWanakana() {
@@ -219,30 +259,35 @@ const jp = (() => {
         // Conversion functions
 
         convertKatakanaToHiragana(text) {
-            const wanakana = this._getWanakana();
             let result = '';
-            for (const c of text) {
-                if (wanakana.isKatakana(c)) {
-                    result += wanakana.toHiragana(c);
-                } else {
-                    result += c;
+            const offset = (HIRAGANA_CONVERSION_RANGE[0] - KATAKANA_CONVERSION_RANGE[0]);
+            for (let char of text) {
+                const codePoint = char.codePointAt(0);
+                if (codePoint === KATAKANA_SMALL_KA_CODE_POINT || codePoint === KATAKANA_SMALL_KE_CODE_POINT) {
+                    // No change
+                } else if (codePoint === KANA_PROLONGED_SOUND_MARK_CODE_POINT) {
+                    if (result.length > 0) {
+                        const char2 = getProlongedHiragana(result[result.length - 1]);
+                        if (char2 !== null) { char = char2; }
+                    }
+                } else if (isCodePointInRange(codePoint, KATAKANA_CONVERSION_RANGE)) {
+                    char = String.fromCodePoint(codePoint + offset);
                 }
+                result += char;
             }
-
             return result;
         }
 
         convertHiraganaToKatakana(text) {
-            const wanakana = this._getWanakana();
             let result = '';
-            for (const c of text) {
-                if (wanakana.isHiragana(c)) {
-                    result += wanakana.toKatakana(c);
-                } else {
-                    result += c;
+            const offset = (KATAKANA_CONVERSION_RANGE[0] - HIRAGANA_CONVERSION_RANGE[0]);
+            for (let char of text) {
+                const codePoint = char.codePointAt(0);
+                if (isCodePointInRange(codePoint, HIRAGANA_CONVERSION_RANGE)) {
+                    char = String.fromCodePoint(codePoint + offset);
                 }
+                result += char;
             }
-
             return result;
         }
 
