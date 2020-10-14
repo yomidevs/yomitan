@@ -196,6 +196,7 @@ class DictionaryController {
         }
         this._dictionaryEntries = [];
 
+        await this._ensureDictionarySettings(dictionaries);
         for (const dictionary of dictionaries) {
             this._createDictionaryEntry(dictionary);
         }
@@ -392,5 +393,33 @@ class DictionaryController {
             }
         }
         await this._settingsController.modifyGlobalSettings(targets);
+    }
+
+    async _ensureDictionarySettings(dictionaries2) {
+        const optionsFull = await this._settingsController.getOptionsFull();
+        const {profiles} = optionsFull;
+        const targets = [];
+        for (const {title} of dictionaries2) {
+            for (let i = 0, ii = profiles.length; i < ii; ++i) {
+                const {options: {dictionaries: dictionaryOptions}} = profiles[i];
+                if (Object.prototype.hasOwnProperty.call(dictionaryOptions, title)) { continue; }
+
+                const path = ObjectPropertyAccessor.getPathString(['profiles', i, 'options', 'dictionaries', title]);
+                targets.push({
+                    action: 'set',
+                    path,
+                    value: {
+                        enabled: false,
+                        allowSecondarySearches: false,
+                        priority: 0
+                    }
+                });
+            }
+        }
+
+        if (targets.length > 0) {
+            const r = await this._settingsController.modifyGlobalSettings(targets);
+            console.log(r);
+        }
     }
 }
