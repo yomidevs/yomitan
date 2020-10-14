@@ -332,7 +332,6 @@
                                     "delay",
                                     "hideDelay",
                                     "length",
-                                    "modifier",
                                     "deepDomScan",
                                     "popupNestingMaxDepth",
                                     "enablePopupSearch",
