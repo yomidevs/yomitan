@@ -37,10 +37,10 @@ class ScanInputsController {
         this._addButton = document.querySelector('#scan-input-add');
 
         this._addButton.addEventListener('click', this._onAddButtonClick.bind(this), false);
+        this._settingsController.on('scanInputsChanged', this._onScanInputsChanged.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
 
-        const options = await this._settingsController.getOptions();
-        this._onOptionsChanged({options});
+        this.refresh();
     }
 
     removeInput(index) {
@@ -51,13 +51,14 @@ class ScanInputsController {
         for (let i = index, ii = this._entries.length; i < ii; ++i) {
             this._entries[i].index = i;
         }
-        this._settingsController.modifyProfileSettings([{
+        this._modifyProfileSettings([{
             action: 'splice',
             path: 'scanning.inputs',
             start: index,
             deleteCount: 1,
             items: []
         }]);
+        return true;
     }
 
     setProperty(index, property, value) {
@@ -69,7 +70,17 @@ class ScanInputsController {
         return this._settingsController.instantiateTemplate(name);
     }
 
+    async refresh() {
+        const options = await this._settingsController.getOptions();
+        this._onOptionsChanged({options});
+    }
+
     // Private
+
+    _onScanInputsChanged({source}) {
+        if (source === this) { return; }
+        this.refresh();
+    }
 
     _onOptionsChanged({options}) {
         const {inputs} = options.scanning;
@@ -92,26 +103,12 @@ class ScanInputsController {
         const include = '';
         const exclude = '';
         this._addOption(index, include, exclude);
-        this._settingsController.modifyProfileSettings([{
+        this._modifyProfileSettings([{
             action: 'splice',
             path: 'scanning.inputs',
             start: index,
             deleteCount: 0,
-            items: [{
-                include,
-                exclude,
-                types: {mouse: true, touch: false, pen: false},
-                options: {
-                    showAdvanced: false,
-                    searchTerms: true,
-                    searchKanji: true,
-                    scanOnTouchMove: true,
-                    scanOnPenHover: true,
-                    scanOnPenPress: true,
-                    scanOnPenRelease: false,
-                    preventTouchScrolling: true
-                }
-            }]
+            items: [ScanInputsController.createDefaultMouseInput(include, exclude)]
         }]);
     }
 
@@ -119,6 +116,29 @@ class ScanInputsController {
         const field = new ScanInputField(this, index, this._os);
         this._entries.push(field);
         field.prepare(this._container, include, exclude);
+    }
+
+    async _modifyProfileSettings(targets) {
+        await this._settingsController.modifyProfileSettings(targets);
+        this._settingsController.trigger('scanInputsChanged', {source: this});
+    }
+
+    static createDefaultMouseInput(include, exclude) {
+        return {
+            include,
+            exclude,
+            types: {mouse: true, touch: false, pen: false},
+            options: {
+                showAdvanced: false,
+                searchTerms: true,
+                searchKanji: true,
+                scanOnTouchMove: true,
+                scanOnPenHover: true,
+                scanOnPenPress: true,
+                scanOnPenRelease: false,
+                preventTouchScrolling: true
+            }
+        };
     }
 }
 
