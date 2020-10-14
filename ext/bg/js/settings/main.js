@@ -27,6 +27,7 @@
  * PopupPreviewController
  * ProfileController
  * ScanInputsController
+ * ScanInputsSimpleController
  * SettingsController
  * StorageController
  * api
@@ -95,6 +96,9 @@ async function setupEnvironmentInfo() {
 
         const scanInputsController = new ScanInputsController(settingsController);
         scanInputsController.prepare();
+
+        const simpleScanningInputController = new ScanInputsSimpleController(settingsController);
+        simpleScanningInputController.prepare();
 
         yomichan.ready();
     } catch (e) {

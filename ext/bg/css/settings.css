@@ -23,6 +23,7 @@
 html:root:not([data-options-anki-enable=true]) #anki-general,
 html:root:not([data-options-general-debug-info=true]) .debug,
 html:root:not([data-options-general-show-advanced=true]) .options-advanced,
+html:root[data-options-general-show-advanced=true] .options-non-advanced,
 html:root:not([data-options-general-result-output-mode=merge]) #dict-main-group {
     display: none;
 }

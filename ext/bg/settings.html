@@ -386,6 +386,10 @@
             <div>
                 <h3>Scanning Options</h3>
 
+                <div class="checkbox options-non-advanced">
+                    <label><input type="checkbox" id="middle-mouse-button-scan"> Middle mouse button scans</label>
+                </div>
+
                 <div class="checkbox">
                     <label><input type="checkbox" id="select-matched-text" data-setting="scanning.selectText"> Select matched text</label>
                 </div>
@@ -442,7 +446,12 @@
                     <input type="number" min="1" step="1" id="scan-length" class="form-control" data-setting="scanning.length">
                 </div>
 
-                <div class="form-group">
+                <div class="form-group options-non-advanced">
+                    <label for="main-scan-modifier-key">Scan modifier key</label>
+                    <select class="form-control" id="main-scan-modifier-key"></select>
+                </div>
+
+                <div class="form-group options-advanced">
                     <label>Scan inputs</label>
                     <div class="scan-input-list" id="scan-input-list"></div>
                     <button class="btn btn-default" id="scan-input-add" title="Add scan input"><span class="glyphicon glyphicon-plus"></span></button>
@@ -1242,6 +1251,7 @@
         <script src="/bg/js/settings/popup-preview-controller.js"></script>
         <script src="/bg/js/settings/profile-controller.js"></script>
         <script src="/bg/js/settings/scan-inputs-controller.js"></script>
+        <script src="/bg/js/settings/scan-inputs-simple-controller.js"></script>
         <script src="/bg/js/settings/settings-controller.js"></script>
         <script src="/bg/js/settings/storage-controller.js"></script>
 
