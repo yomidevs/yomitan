@@ -418,8 +418,7 @@ class DictionaryController {
         }
 
         if (targets.length > 0) {
-            const r = await this._settingsController.modifyGlobalSettings(targets);
-            console.log(r);
+            await this._settingsController.modifyGlobalSettings(targets);
         }
     }
 }
