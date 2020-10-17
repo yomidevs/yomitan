@@ -16,6 +16,7 @@
  */
 
 /* global
+ * SelectorObserver
  * TaskAccumulator
  */
 
@@ -30,39 +31,22 @@ class DOMDataBinder {
         this._onError = onError;
         this._updateTasks = new TaskAccumulator(this._onBulkUpdate.bind(this));
         this._assignTasks = new TaskAccumulator(this._onBulkAssign.bind(this));
-        this._mutationObserver = new MutationObserver(this._onMutation.bind(this));
-        this._observingElement = null;
-        this._elementMap = new Map(); // Map([element => observer]...)
-        this._elementAncestorMap = new Map(); // Map([element => Set([observer]...))
+        this._selectorObserver = new SelectorObserver({
+            selector,
+            ignoreSelector: (ignoreSelectors.length > 0 ? ignoreSelectors.join(',') : null),
+            onAdded: this._createObserver.bind(this),
+            onRemoved: this._removeObserver.bind(this),
+            onChildrenUpdated: this._onObserverChildrenUpdated.bind(this),
+            isStale: this._isObserverStale.bind(this)
+        });
     }
 
     observe(element) {
-        if (this._isObserving) { return; }
-
-        this._observingElement = element;
-        this._mutationObserver.observe(element, {
-            attributes: true,
-            attributeOldValue: true,
-            childList: true,
-            subtree: true
-        });
-        this._onMutation([{
-            type: 'childList',
-            target: element.parentNode,
-            addedNodes: [element],
-            removedNodes: []
-        }]);
+        this._selectorObserver.observe(element, true);
     }
 
     disconnect() {
-        if (!this._isObserving) { return; }
-
-        this._mutationObserver.disconnect();
-        this._observingElement = null;
-
-        for (const observer of this._elementMap.values()) {
-            this._removeObserver(observer);
-        }
+        this._selectorObserver.disconnect();
     }
 
     async refresh() {
@@ -70,70 +54,6 @@ class DOMDataBinder {
     }
 
     // Private
-
-    _onMutation(mutationList) {
-        for (const mutation of mutationList) {
-            switch (mutation.type) {
-                case 'childList':
-                    this._onChildListMutation(mutation);
-                    break;
-                case 'attributes':
-                    this._onAttributeMutation(mutation);
-                    break;
-            }
-        }
-    }
-
-    _onChildListMutation({addedNodes, removedNodes, target}) {
-        const selector = this._selector;
-        const ELEMENT_NODE = Node.ELEMENT_NODE;
-
-        for (const node of removedNodes) {
-            const observers = this._elementAncestorMap.get(node);
-            if (typeof observers === 'undefined') { continue; }
-            for (const observer of observers) {
-                this._removeObserver(observer);
-            }
-        }
-
-        for (const node of addedNodes) {
-            if (node.nodeType !== ELEMENT_NODE) { continue; }
-            if (node.matches(selector)) {
-                this._createObserver(node);
-            }
-            for (const childNode of node.querySelectorAll(selector)) {
-                this._createObserver(childNode);
-            }
-        }
-
-        if (addedNodes.length !== 0 || addedNodes.length !== 0) {
-            const observer = this._elementMap.get(target);
-            if (typeof observer !== 'undefined' && observer.hasValue) {
-                this._setElementValue(observer.element, observer.value);
-            }
-        }
-    }
-
-    _onAttributeMutation({target}) {
-        const selector = this._selector;
-        const observers = this._elementAncestorMap.get(target);
-        if (typeof observers !== 'undefined') {
-            for (const observer of observers) {
-                const element = observer.element;
-                if (
-                    !element.matches(selector) ||
-                    this._shouldIgnoreElement(element) ||
-                    this._isObserverStale(observer)
-                ) {
-                    this._removeObserver(observer);
-                }
-            }
-        }
-
-        if (target.matches(selector)) {
-            this._createObserver(target);
-        }
-    }
 
     async _onBulkUpdate(tasks) {
         let all = false;
@@ -150,7 +70,7 @@ class DOMDataBinder {
         }
         if (all) {
             targets.length = 0;
-            for (const observer of this._elementMap.values()) {
+            for (const observer of this._selectorObserver.datas()) {
                 targets.push([observer, null]);
             }
         }
@@ -205,14 +125,10 @@ class DOMDataBinder {
     }
 
     _createObserver(element) {
-        if (this._elementMap.has(element) || this._shouldIgnoreElement(element)) { return; }
-
         const metadata = this._createElementMetadata(element);
         const nodeName = element.nodeName.toUpperCase();
-        const ancestors = this._getAncestors(element);
         const observer = {
             element,
-            ancestors,
             type: (nodeName === 'INPUT' ? element.type : null),
             value: null,
             hasValue: false,
@@ -220,69 +136,32 @@ class DOMDataBinder {
             metadata
         };
         observer.onChange = this._onElementChange.bind(this, observer);
-        this._elementMap.set(element, observer);
 
         element.addEventListener('change', observer.onChange, false);
 
-        for (const ancestor of ancestors) {
-            let observers = this._elementAncestorMap.get(ancestor);
-            if (typeof observers === 'undefined') {
-                observers = new Set();
-                this._elementAncestorMap.set(ancestor, observers);
-            }
-            observers.add(observer);
-        }
-
         this._updateTasks.enqueue(observer);
+
+        return observer;
     }
 
-    _removeObserver(observer) {
-        const {element, ancestors} = observer;
-
+    _removeObserver(element, observer) {
         element.removeEventListener('change', observer.onChange, false);
         observer.onChange = null;
+    }
 
-        this._elementMap.delete(element);
-
-        for (const ancestor of ancestors) {
-            const observers = this._elementAncestorMap.get(ancestor);
-            if (typeof observers === 'undefined') { continue; }
-
-            observers.delete(observer);
-            if (observers.size === 0) {
-                this._elementAncestorMap.delete(ancestor);
-            }
+    _onObserverChildrenUpdated(element, observer) {
+        if (observer.hasValue) {
+            this._setElementValue(element, observer.value);
         }
     }
 
-    _isObserverStale(observer) {
-        const {element, type, metadata} = observer;
+    _isObserverStale(element, observer) {
+        const {type, metadata} = observer;
         const nodeName = element.nodeName.toUpperCase();
         return !(
             type === (nodeName === 'INPUT' ? element.type : null) &&
             this._compareElementMetadata(metadata, this._createElementMetadata(element))
         );
-    }
-
-    _shouldIgnoreElement(element) {
-        for (const selector of this._ignoreSelectors) {
-            if (element.matches(selector)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    _getAncestors(node) {
-        const root = this._observingElement;
-        const results = [];
-        while (true) {
-            results.push(node);
-            if (node === root) { break; }
-            node = node.parentNode;
-            if (node === null) { break; }
-        }
-        return results;
     }
 
     _setElementValue(element, value) {
