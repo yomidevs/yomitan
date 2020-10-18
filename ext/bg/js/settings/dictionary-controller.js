@@ -49,6 +49,7 @@ class DictionaryEntry {
         const allowSecondarySearchesCheckbox = node.querySelector('.dictionary-allow-secondary-searches');
         const priorityInput = node.querySelector('.dictionary-priority');
         const deleteButton = node.querySelector('.dictionary-delete-button');
+        const menuButton = node.querySelector('.dictionary-menu-button');
         const detailsTable = node.querySelector('.dictionary-details-table');
         const detailsToggleLink = node.querySelector('.dictionary-details-toggle-link');
         const outdatedContainer = node.querySelector('.dictionary-outdated-notification');
@@ -69,8 +70,15 @@ class DictionaryEntry {
         allowSecondarySearchesCheckbox.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'allowSecondarySearches']);
         priorityInput.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'priority']);
 
-        this._eventListeners.addEventListener(deleteButton, 'click', this._onDeleteButtonClicked.bind(this), false);
-        this._eventListeners.addEventListener(detailsToggleLink, 'click', this._onDetailsToggleLinkClicked.bind(this), false);
+        if (deleteButton !== null) {
+            this._eventListeners.addEventListener(deleteButton, 'click', this._onDeleteButtonClicked.bind(this), false);
+        }
+        if (menuButton !== null) {
+            this._eventListeners.addEventListener(menuButton, 'menuClosed', this._onMenuClosed.bind(this), false);
+        }
+        if (this._detailsContainer !== null) {
+            this._eventListeners.addEventListener(detailsToggleLink, 'click', this._onDetailsToggleLinkClicked.bind(this), false);
+        }
         this._eventListeners.addEventListener(priorityInput, 'settingChanged', this._onPriorityChanged.bind(this), false);
     }
 
@@ -86,13 +94,25 @@ class DictionaryEntry {
         const node = this._node.querySelector('.dictionary-counts');
         node.textContent = JSON.stringify({info: this._dictionaryInfo, counts}, null, 4);
         node.hidden = false;
+
+        const show = this._node.querySelector('.dictionary-details-toggle-link');
+        if (show !== null) { show.hidden = false; }
     }
 
     // Private
 
     _onDeleteButtonClicked(e) {
         e.preventDefault();
-        this._dictionaryController.deleteDictionary(this.dictionaryTitle);
+        this._delete();
+    }
+
+    _onMenuClosed(e) {
+        const {detail: {action}} = e;
+        switch (action) {
+            case 'remove':
+                this._delete();
+                break;
+        }
     }
 
     _onDetailsToggleLinkClicked(e) {
@@ -132,12 +152,18 @@ class DictionaryEntry {
         detailsTable.appendChild(fragment);
         return any;
     }
+
+    _delete() {
+        this._dictionaryController.deleteDictionary(this.dictionaryTitle);
+    }
 }
 
 class DictionaryController {
-    constructor(settingsController, modalController) {
+    constructor(settingsController, modalController, storageController, statusFooter=null) {
         this._settingsController = settingsController;
         this._modalController = modalController;
+        this._storageController = storageController;
+        this._statusFooter = statusFooter;
         this._dictionaries = null;
         this._dictionaryEntries = [];
         this._databaseStateToken = null;
@@ -327,24 +353,42 @@ class DictionaryController {
         const index = this._dictionaryEntries.findIndex((entry) => entry.dictionaryTitle === dictionaryTitle);
         if (index < 0) { return; }
 
-        const entry = this._dictionaryEntries[index];
-        const node = entry.node;
-        const progress = node.querySelector('.progress-container');
-        const progressBar = node.querySelector('.progress-bar');
+        const storageController = this._storageController;
+        const statusFooter = this._statusFooter;
+        const {node} = this._dictionaryEntries[index];
+        const progressSelector = '.dictionary-delete-progress';
+        const progressContainers = [
+            ...node.querySelectorAll('.progress-container'),
+            ...document.querySelectorAll(`#dictionaries ${progressSelector}`)
+        ];
+        const progressBars = [
+            ...node.querySelectorAll('.progress-bar'),
+            ...document.querySelectorAll(`${progressSelector} .progress-bar`)
+        ];
+        const infoLabels = document.querySelectorAll(`${progressSelector} .progress-info`);
+        const statusLabels = document.querySelectorAll(`${progressSelector} .progress-status`);
         const prevention = this._settingsController.preventPageExit();
         try {
             this._isDeleting = true;
             this._setButtonsEnabled(false);
 
-            progress.hidden = false;
-
             const onProgress = ({processed, count, storeCount, storesProcesed}) => {
-                let percent = 0.0;
-                if (count > 0 && storesProcesed > 0) {
-                    percent = (processed / count) * (storesProcesed / storeCount) * 100.0;
-                }
-                progressBar.style.width = `${percent}%`;
+                const percent = (
+                    (count > 0 && storesProcesed > 0) ?
+                    (processed / count) * (storesProcesed / storeCount) * 100.0 :
+                    0.0
+                );
+                const cssString = `${percent}%`;
+                const statusString = `${percent.toFixed(0)}%`;
+                for (const progressBar of progressBars) { progressBar.style.width = cssString; }
+                for (const label of statusLabels) { label.textContent = statusString; }
             };
+
+            onProgress({processed: 0, count: 1, storeCount: 1, storesProcesed: 0});
+
+            for (const progress of progressContainers) { progress.hidden = false; }
+            for (const label of infoLabels) { label.textContent = 'Deleting dictionary...'; }
+            if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, true); }
 
             await this._deleteDictionaryInternal(dictionaryTitle, onProgress);
             await this._deleteDictionarySettings(dictionaryTitle);
@@ -352,8 +396,10 @@ class DictionaryController {
             yomichan.logError(e);
         } finally {
             prevention.end();
-            progress.hidden = true;
+            for (const progress of progressContainers) { progress.hidden = true; }
+            if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, false); }
             this._setButtonsEnabled(true);
+            storageController.updateStats();
             this._isDeleting = false;
         }
     }
