@@ -27,11 +27,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="45.254834"
-     inkscape:cx="6.9125714"
-     inkscape:cy="9.2321432"
+     inkscape:zoom="32"
+     inkscape:cx="11.679145"
+     inkscape:cy="9.907727"
      inkscape:document-units="px"
-     inkscape:current-layer="layer38"
+     inkscape:current-layer="g1027"
      showgrid="true"
      units="px"
      inkscape:snap-center="true"
@@ -1216,22 +1216,24 @@
   <g
      inkscape:groupmode="layer"
      id="layer38"
-     inkscape:label="Mouse">
+     inkscape:label="Mouse"
+     style="display:none">
     <g
        id="g1029">
       <g
          id="g1033">
         <path
            style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
-           d="M 7.4882812 1.0273438 C 4.9608765 1.2926885 3 3.4984688 3 6.1992188 L 3 6.5 L 7.5 6.5 L 7.5 1.0273438 C 7.4961497 1.0277387 7.4921289 1.0269398 7.4882812 1.0273438 z M 8.5 1.0273438 L 8.5 6.5 L 13 6.5 L 13 6.1992188 C 13 3.4943573 11.03298 1.2871677 8.5 1.0273438 z M 3 7.5 L 3 9.8007812 C 3 12.681581 5.23 15 8 15 C 10.77 15 13 12.681581 13 9.8007812 L 13 7.5 L 3 7.5 z "
-           id="rect1013" />
+           d="M 7.4882812,1.0273438 C 4.9608765,1.2926885 3,3.4984688 3,6.1992188 V 6.5 H 7.5 V 1.0273438 c -0.00385,3.949e-4 -0.00787,-4.04e-4 -0.011719,0 z m 1.0117188,0 V 6.5 H 13 V 6.1992188 C 13,3.4943573 11.03298,1.2871677 8.5,1.0273438 Z M 3,7.5 V 9.8007812 C 3,12.681581 5.23,15 8,15 c 2.77,0 5,-2.318419 5,-5.1992188 V 7.5 Z"
+           id="rect1013"
+           inkscape:connector-curvature="0" />
       </g>
     </g>
   </g>
   <g
      style="display:none"
      inkscape:groupmode="layer"
-     id="layer39"
+     id="g1018"
      inkscape:label="Hamburger Menu">
     <path
        style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
@@ -1251,5 +1253,29 @@
        id="path1055"
        d="M 2.25,12 C 2.1119345,12.000014 2.0000138,12.111935 2,12.25 v 1.5 c 1.38e-5,0.138066 0.1119345,0.249986 0.25,0.25 h 11.5 c 0.138065,-1.4e-5 0.249986,-0.111934 0.25,-0.25 v -1.5 C 13.999986,12.111935 13.888065,12.000014 13.75,12 Z"
        style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
+  </g>
+  <g
+     inkscape:label="Kebab Menu"
+     id="g1027"
+     inkscape:groupmode="layer"
+     style="display:inline">
+    <circle
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.15000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       id="path1029"
+       cx="8"
+       cy="13"
+       r="1.5" />
+    <circle
+       style="display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.15000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       id="path1029-3"
+       cx="8"
+       cy="8"
+       r="1.5" />
+    <circle
+       style="display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.15000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       id="path1029-3-7"
+       cx="8"
+       cy="3"
+       r="1.5" />
   </g>
 </svg>
