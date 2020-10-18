@@ -101,7 +101,7 @@ class PopupElement extends EventDispatcher {
     }
 }
 
-class Modal extends EventDispatcher {
+class Modal extends PopupElement {
     constructor(node) {
         super({
             node,
