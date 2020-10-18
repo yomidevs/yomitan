@@ -27,7 +27,7 @@ class PopupMenu {
     prepare() {
         const items = this._menu.querySelectorAll('.popup-menu-item');
         this._setPosition(items);
-        this._menu.focus();
+        this._container.focus();
 
         this._eventListeners.addEventListener(window, 'resize', this._onWindowResize.bind(this), false);
         this._eventListeners.addEventListener(this._container, 'click', this._onMenuContainerClick.bind(this), false);
