@@ -48,14 +48,14 @@ class PopupMenu {
     }
 
     close() {
-        this._close(null);
+        this._close(null, 'close');
     }
 
     // Private
 
     _onMenuContainerClick(e) {
         if (e.currentTarget !== e.target) { return; }
-        this._close(null, 'close');
+        this._close(null, 'outside');
     }
 
     _onMenuItemClick(e) {
