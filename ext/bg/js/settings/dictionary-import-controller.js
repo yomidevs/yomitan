@@ -24,10 +24,11 @@
  */
 
 class DictionaryImportController {
-    constructor(settingsController, modalController, storageController) {
+    constructor(settingsController, modalController, storageController, statusFooter=null) {
         this._settingsController = settingsController;
         this._modalController = modalController;
         this._storageController = storageController;
+        this._statusFooter = statusFooter;
         this._modifying = false;
         this._purgeButton = null;
         this._purgeConfirmButton = null;
@@ -37,7 +38,6 @@ class DictionaryImportController {
         this._errorContainer = null;
         this._spinner = null;
         this._purgeNotification = null;
-        this._importInfo = null;
         this._errorToStringOverrides = [
             [
                 'A mutation operation was attempted on a database that did not allow mutations.',
@@ -58,10 +58,7 @@ class DictionaryImportController {
         this._purgeConfirmModal = this._modalController.getModal('dictionary-confirm-delete-all');
         this._errorContainer = document.querySelector('#dictionary-error');
         this._spinner = document.querySelector('#dictionary-spinner');
-        this._progressContainer = document.querySelector('#dictionary-import-progress-container');
-        this._progressBar = this._progressContainer.querySelector('.progress-bar');
         this._purgeNotification = document.querySelector('#dictionary-delete-all-status');
-        this._importInfo = document.querySelector('#dictionary-import-info');
 
         this._purgeButton.addEventListener('click', this._onPurgeButtonClick.bind(this), false);
         this._purgeConfirmButton.addEventListener('click', this._onPurgeConfirmButtonClick.bind(this), false);
@@ -126,10 +123,20 @@ class DictionaryImportController {
     async _importDictionaries(files) {
         if (this._modifying) { return; }
 
-        const importInfo = this._importInfo;
-        const progressContainer = this._progressContainer;
-        const progressBar = this._progressBar;
+        const statusFooter = this._statusFooter;
         const storageController = this._storageController;
+        const importInfo = document.querySelector('#dictionary-import-info');
+        const progressSelector = '.dictionary-import-progress';
+        const progressContainers = [
+            ...document.querySelectorAll('#dictionary-import-progress-container'),
+            ...document.querySelectorAll(`#dictionaries ${progressSelector}`)
+        ];
+        const progressBars = [
+            ...document.querySelectorAll('#dictionary-import-progress-container .progress-bar'),
+            ...document.querySelectorAll(`${progressSelector} .progress-bar`)
+        ];
+        const infoLabels = document.querySelectorAll(`${progressSelector} .progress-info`);
+        const statusLabels = document.querySelectorAll(`${progressSelector} .progress-status`);
 
         const prevention = this._preventPageExit();
 
@@ -137,36 +144,48 @@ class DictionaryImportController {
             this._setModifying(true);
             this._hideErrors();
             this._setSpinnerVisible(true);
-            progressContainer.hidden = false;
+
+            for (const progress of progressContainers) { progress.hidden = false; }
 
             const optionsFull = await this._settingsController.getOptionsFull();
             const importDetails = {
                 prefixWildcardsSupported: optionsFull.global.database.prefixWildcardsSupported
             };
 
-            const updateProgress = (total, current) => {
+            const onProgress = (total, current) => {
                 const percent = (current / total * 100.0);
-                progressBar.style.width = `${percent}%`;
+                const cssString = `${percent}%`;
+                const statusString = `${percent.toFixed(0)}%`;
+                for (const progressBar of progressBars) { progressBar.style.width = cssString; }
+                for (const label of statusLabels) { label.textContent = statusString; }
                 storageController.updateStats();
             };
 
             const fileCount = files.length;
             for (let i = 0; i < fileCount; ++i) {
-                progressBar.style.width = '0';
-                if (fileCount > 1) {
+                if (importInfo !== null && fileCount > 1) {
                     importInfo.hidden = false;
                     importInfo.textContent = `(${i + 1} of ${fileCount})`;
                 }
 
-                await this._importDictionary(files[i], importDetails, updateProgress);
+                onProgress(1, 0);
+
+                const labelText = `Importing dictionary${fileCount > 1 ? ` (${i + 1} of ${fileCount})` : ''}...`;
+                for (const label of infoLabels) { label.textContent = labelText; }
+                if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, true); }
+
+                await this._importDictionary(files[i], importDetails, onProgress);
             }
         } catch (err) {
             this._showErrors([err]);
         } finally {
             prevention.end();
-            progressContainer.hidden = true;
-            importInfo.textContent = '';
-            importInfo.hidden = true;
+            for (const progress of progressContainers) { progress.hidden = true; }
+            if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, false); }
+            if (importInfo !== null) {
+                importInfo.textContent = '';
+                importInfo.hidden = true;
+            }
             this._setSpinnerVisible(false);
             this._setModifying(false);
         }
