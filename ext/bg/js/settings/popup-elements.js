@@ -15,16 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class Modal extends EventDispatcher {
-    constructor(node) {
+class PopupElement extends EventDispatcher {
+    constructor({node, visibleClassName, openingClassName, closingClassName, closingAnimationDuration}) {
         super();
         this._node = node;
+        this._visibleClassName = visibleClassName;
+        this._openingClassName = openingClassName;
+        this._closingClassName = closingClassName;
+        this._closingAnimationDuration = closingAnimationDuration;
         this._mutationObserver = null;
         this._visible = false;
-        this._visibleClassName = 'modal-container-open';
-        this._openingClassName = 'modal-container-opening';
-        this._closingClassName = 'modal-container-closing';
-        this._closingAnimationDuration = 375; // Milliseconds; includes buffer
         this._closeTimer = null;
     }
 
@@ -93,18 +93,22 @@ class Modal extends EventDispatcher {
 
     // Private
 
-    _onModalHide() {
-        this.trigger('visibilityChanged', {visible: false});
-    }
-
-    _onModalShow() {
-        this.trigger('visibilityChanged', {visible: true});
-    }
-
     _onMutation() {
         const visible = this._node.classList.contains(this._visibleClassName);
         if (this._visible === visible) { return; }
         this._visible = visible;
         this.trigger('visibilityChanged', {visible});
+    }
+}
+
+class Modal extends EventDispatcher {
+    constructor(node) {
+        super({
+            node,
+            visibleClassName: 'modal-container-open',
+            openingClassName: 'modal-container-opening',
+            closingClassName: 'modal-container-closing',
+            closingAnimationDuration: 375 // Milliseconds; includes buffer
+        });
     }
 }
