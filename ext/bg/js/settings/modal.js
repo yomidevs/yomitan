@@ -19,7 +19,6 @@ class Modal extends EventDispatcher {
     constructor(node) {
         super();
         this._node = node;
-        this._eventListeners = new EventListenerCollection();
         this._mutationObserver = null;
         this._visible = false;
         this._visibleClassName = 'modal-container-open';
@@ -34,64 +33,48 @@ class Modal extends EventDispatcher {
     }
 
     isVisible() {
-        if (this._useJqueryModal()) {
-            return !!(this._getWrappedNode().data('bs.modal') || {}).isShown;
-        } else {
-            return this._node.classList.contains(this._visibleClassName);
-        }
+        return this._node.classList.contains(this._visibleClassName);
     }
 
     setVisible(value, animate=true) {
         value = !!value;
-        if (this._useJqueryModal()) {
-            this._getWrappedNode().modal(value ? 'show' : 'hide');
+        const {classList} = this._node;
+        if (classList.contains(this._visibleClassName) === value) { return; }
+
+        if (this._closeTimer !== null) {
+            clearTimeout(this._closeTimer);
+            this._closeTimer = null;
+        }
+
+        if (value) {
+            if (animate) { classList.add(this._openingClassName); }
+            classList.remove(this._closingClassName);
+            getComputedStyle(this._node).getPropertyValue('display'); // Force update of CSS display property, allowing animation
+            classList.add(this._visibleClassName);
+            if (animate) { classList.remove(this._openingClassName); }
+            this._node.focus();
         } else {
-            const {classList} = this._node;
-            if (classList.contains(this._visibleClassName) === value) { return; }
-
-            if (this._closeTimer !== null) {
-                clearTimeout(this._closeTimer);
-                this._closeTimer = null;
-            }
-
-            if (value) {
-                if (animate) { classList.add(this._openingClassName); }
-                classList.remove(this._closingClassName);
-                getComputedStyle(this._node).getPropertyValue('display'); // Force update of CSS display property, allowing animation
-                classList.add(this._visibleClassName);
-                if (animate) { classList.remove(this._openingClassName); }
-                this._node.focus();
-            } else {
-                if (animate) { classList.add(this._closingClassName); }
-                classList.remove(this._visibleClassName);
-                if (animate) {
-                    this._closeTimer = setTimeout(() => {
-                        this._closeTimer = null;
-                        classList.remove(this._closingClassName);
-                    }, this._closingAnimationDuration);
-                }
+            if (animate) { classList.add(this._closingClassName); }
+            classList.remove(this._visibleClassName);
+            if (animate) {
+                this._closeTimer = setTimeout(() => {
+                    this._closeTimer = null;
+                    classList.remove(this._closingClassName);
+                }, this._closingAnimationDuration);
             }
         }
     }
 
     on(eventName, callback) {
         if (eventName === 'visibilityChanged') {
-            if (this._useJqueryModal()) {
-                if (this._eventListeners.size === 0) {
-                    const wrappedNode = this._getWrappedNode();
-                    this._eventListeners.on(wrappedNode, 'hidden.bs.modal', this._onModalHide.bind(this));
-                    this._eventListeners.on(wrappedNode, 'shown.bs.modal', this._onModalShow.bind(this));
-                }
-            } else {
-                if (this._mutationObserver === null) {
-                    this._visible = this._node.classList.contains(this._visibleClassName);
-                    this._mutationObserver = new MutationObserver(this._onMutation.bind(this));
-                    this._mutationObserver.observe(this._node, {
-                        attributes: true,
-                        attributeFilter: ['class'],
-                        attributeOldValue: true
-                    });
-                }
+            if (this._mutationObserver === null) {
+                this._visible = this._node.classList.contains(this._visibleClassName);
+                this._mutationObserver = new MutationObserver(this._onMutation.bind(this));
+                this._mutationObserver.observe(this._node, {
+                    attributes: true,
+                    attributeFilter: ['class'],
+                    attributeOldValue: true
+                });
             }
         }
         return super.on(eventName, callback);
@@ -104,7 +87,6 @@ class Modal extends EventDispatcher {
                 this._mutationObserver.disconnect();
                 this._mutationObserver = null;
             }
-            this._eventListeners.removeAllEventListeners();
         }
         return result;
     }
@@ -124,13 +106,5 @@ class Modal extends EventDispatcher {
         if (this._visible === visible) { return; }
         this._visible = visible;
         this.trigger('visibilityChanged', {visible});
-    }
-
-    _useJqueryModal() {
-        return (typeof jQuery !== 'undefined');
-    }
-
-    _getWrappedNode() {
-        return $(this._node);
     }
 }
