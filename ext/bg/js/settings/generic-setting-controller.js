@@ -46,6 +46,10 @@ class GenericSettingController {
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
     }
 
+    async refresh() {
+        await this._dataBinder.refresh();
+    }
+
     // Private
 
     _onOptionsChanged() {
