@@ -29,6 +29,8 @@ class DictionaryEntry {
         this._dictionaryInfo = dictionaryInfo;
         this._eventListeners = new EventListenerCollection();
         this._detailsContainer = null;
+        this._hasDetails = false;
+        this._hasCounts = false;
     }
 
     get node() {
@@ -58,13 +60,14 @@ class DictionaryEntry {
         const wildcardSupportedCheckbox = node.querySelector('.dictionary-prefix-wildcard-searches-supported');
 
         const hasDetails = this._setupDetails(detailsTable);
+        this._hasDetails = hasDetails;
 
         titleNode.textContent = title;
         versionNode.textContent = `rev.${revision}`;
         wildcardSupportedCheckbox.checked = !!prefixWildcardsSupported;
 
         outdatedContainer.hidden = (version >= 3);
-        detailsToggleLink.hidden = !hasDetails;
+        if (detailsToggleLink !== null) { detailsToggleLink.hidden = !hasDetails; }
 
         enabledCheckbox.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'enabled']);
         allowSecondarySearchesCheckbox.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'allowSecondarySearches']);
@@ -74,9 +77,10 @@ class DictionaryEntry {
             this._eventListeners.addEventListener(deleteButton, 'click', this._onDeleteButtonClicked.bind(this), false);
         }
         if (menuButton !== null) {
+            this._eventListeners.addEventListener(menuButton, 'menuOpened', this._onMenuOpened.bind(this), false);
             this._eventListeners.addEventListener(menuButton, 'menuClosed', this._onMenuClosed.bind(this), false);
         }
-        if (this._detailsContainer !== null) {
+        if (detailsToggleLink !== null && this._detailsContainer !== null) {
             this._eventListeners.addEventListener(detailsToggleLink, 'click', this._onDetailsToggleLinkClicked.bind(this), false);
         }
         this._eventListeners.addEventListener(priorityInput, 'settingChanged', this._onPriorityChanged.bind(this), false);
@@ -94,9 +98,7 @@ class DictionaryEntry {
         const node = this._node.querySelector('.dictionary-counts');
         node.textContent = JSON.stringify({info: this._dictionaryInfo, counts}, null, 4);
         node.hidden = false;
-
-        const show = this._node.querySelector('.dictionary-details-toggle-link');
-        if (show !== null) { show.hidden = false; }
+        this._hasCounts = true;
     }
 
     // Private
@@ -106,11 +108,33 @@ class DictionaryEntry {
         this._delete();
     }
 
+    _onMenuOpened(e) {
+        const {detail: {menu}} = e;
+        const showDetails = menu.querySelector('.popup-menu-item[data-menu-action="showDetails"]');
+        const hideDetails = menu.querySelector('.popup-menu-item[data-menu-action="hideDetails"]');
+        const hasDetails = (this._detailsContainer !== null && (this._hasDetails || this._hasCounts));
+        const detailsVisible = (hasDetails && !this._detailsContainer.hidden);
+        if (showDetails !== null) {
+            showDetails.hidden = detailsVisible;
+            showDetails.disabled = !hasDetails;
+        }
+        if (hideDetails !== null) {
+            hideDetails.hidden = !detailsVisible;
+            hideDetails.disabled = !hasDetails;
+        }
+    }
+
     _onMenuClosed(e) {
         const {detail: {action}} = e;
         switch (action) {
-            case 'remove':
+            case 'delete':
                 this._delete();
+                break;
+            case 'showDetails':
+                if (this._detailsContainer !== null) { this._detailsContainer.hidden = false; }
+                break;
+            case 'hideDetails':
+                if (this._detailsContainer !== null) { this._detailsContainer.hidden = true; }
                 break;
         }
     }
