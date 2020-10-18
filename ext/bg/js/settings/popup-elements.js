@@ -43,12 +43,11 @@ class PopupElement extends EventDispatcher {
 
         if (this._closeTimer !== null) {
             clearTimeout(this._closeTimer);
-            this._closeTimer = null;
+            this._completeClose(classList, true);
         }
 
         if (value) {
             if (animate) { classList.add(this._openingClassName); }
-            classList.remove(this._closingClassName);
             getComputedStyle(this._node).getPropertyValue('display'); // Force update of CSS display property, allowing animation
             classList.add(this._visibleClassName);
             if (animate) { classList.remove(this._openingClassName); }
@@ -57,10 +56,7 @@ class PopupElement extends EventDispatcher {
             if (animate) { classList.add(this._closingClassName); }
             classList.remove(this._visibleClassName);
             if (animate) {
-                this._closeTimer = setTimeout(() => {
-                    this._closeTimer = null;
-                    classList.remove(this._closingClassName);
-                }, this._closingAnimationDuration);
+                this._closeTimer = setTimeout(() => this._completeClose(classList, false), this._closingAnimationDuration);
             }
         }
     }
@@ -99,6 +95,12 @@ class PopupElement extends EventDispatcher {
         this._visible = visible;
         this.trigger('visibilityChanged', {visible});
     }
+
+    _completeClose(classList, reopening) {
+        this._closeTimer = null;
+        classList.remove(this._closingClassName);
+        this.trigger('closeCompleted', {reopening});
+    }
 }
 
 class Modal extends PopupElement {
@@ -110,5 +112,72 @@ class Modal extends PopupElement {
             closingClassName: 'modal-container-closing',
             closingAnimationDuration: 375 // Milliseconds; includes buffer
         });
+    }
+}
+
+class StatusFooter extends PopupElement {
+    constructor(node) {
+        super({
+            node,
+            visibleClassName: 'status-footer-container-open',
+            openingClassName: 'status-footer-container-opening',
+            closingClassName: 'status-footer-container-closing',
+            closingAnimationDuration: 375 // Milliseconds; includes buffer
+        });
+        this._body = node.querySelector('.status-footer');
+    }
+
+    prepare() {
+        this.on('closeCompleted', this._onCloseCompleted.bind(this), false);
+        this._body.querySelector('.status-footer-header-close').addEventListener('click', this._onCloseClick.bind(this), false);
+    }
+
+    getTaskContainer(selector) {
+        return this._body.querySelector(selector);
+    }
+
+    isTaskActive(selector) {
+        const target = this.getTaskContainer(selector);
+        return (target !== null && target.dataset.active);
+    }
+
+    setTaskActive(selector, active) {
+        const target = this.getTaskContainer(selector);
+        if (target === null) { return; }
+
+        const activeElements = new Set();
+        for (const element of this._body.querySelectorAll('.status-footer-item')) {
+            if (element.dataset.active) {
+                activeElements.add(element);
+            }
+        }
+
+        if (active) {
+            target.dataset.active = true;
+            if (!this.isVisible()) {
+                this.setVisible(true);
+            }
+            target.hidden = false;
+        } else {
+            delete target.dataset.active;
+            if (activeElements.size <= 1) {
+                this.setVisible(false);
+            }
+        }
+    }
+
+    // Private
+
+    _onCloseClick(e) {
+        e.preventDefault();
+        this.setVisible(false);
+    }
+
+    _onCloseCompleted() {
+        for (const element of this._body.querySelectorAll('.status-footer-item')) {
+            if (!element.dataset.active) {
+                element.hidden = true;
+            }
+        }
     }
 }
