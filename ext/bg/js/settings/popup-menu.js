@@ -15,13 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-class PopupMenu {
+class PopupMenu extends EventDispatcher {
     constructor(sourceElement, container) {
+        super();
         this._sourceElement = sourceElement;
         this._container = container;
         this._menu = container.querySelector('.popup-menu');
         this._isClosed = false;
         this._eventListeners = new EventListenerCollection();
+    }
+
+    get isClosed() {
+        return this._isClosed;
     }
 
     prepare() {
@@ -41,6 +46,7 @@ class PopupMenu {
             bubbles: false,
             cancelable: false,
             detail: {
+                popupMenu: this,
                 container: this._container,
                 menu: this._menu
             }
@@ -48,7 +54,7 @@ class PopupMenu {
     }
 
     close() {
-        this._close(null, 'close');
+        return this._close(null, 'close');
     }
 
     // Private
@@ -149,13 +155,14 @@ class PopupMenu {
     }
 
     _close(item, cause) {
-        if (this._isClosed) { return; }
+        if (this._isClosed) { return true; }
         const action = (item !== null ? item.dataset.menuAction : null);
 
         const result = this._sourceElement.dispatchEvent(new CustomEvent('menuClosed', {
             bubbles: false,
             cancelable: true,
             detail: {
+                popupMenu: this,
                 container: this._container,
                 menu: this._menu,
                 item,
@@ -163,11 +170,21 @@ class PopupMenu {
                 cause
             }
         }));
-        if (!result) { return; }
+        if (!result) { return false; }
 
         this._eventListeners.removeAllEventListeners();
         if (this._container.parentNode !== null) {
             this._container.parentNode.removeChild(this._container);
         }
+
+        this.trigger('closed', {
+            popupMenu: this,
+            container: this._container,
+            menu: this._menu,
+            item,
+            action,
+            cause
+        });
+        return true;
     }
 }
