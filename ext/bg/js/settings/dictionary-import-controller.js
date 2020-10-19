@@ -242,7 +242,9 @@ class DictionaryImportController {
     }
 
     _setSpinnerVisible(visible) {
-        this._spinner.hidden = !visible;
+        if (this._spinner !== null) {
+            this._spinner.hidden = !visible;
+        }
     }
 
     _preventPageExit() {
