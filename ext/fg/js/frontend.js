@@ -132,6 +132,7 @@ class Frontend {
     }
 
     async setTextSource(textSource) {
+        this._textScanner.setCurrentTextSource(null);
         await this._textScanner.search(textSource);
     }
 

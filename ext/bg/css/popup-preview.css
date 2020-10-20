@@ -1,0 +1,144 @@
+/*
+ * Copyright (C) 2020  Yomichan Authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+html {
+    --text-color: #333333;
+    --background-color: #ffffff;
+    --theme-transition: background-color 0.25s linear 0s, color 0.25s linear 0s;
+    transition: var(--theme-transition);
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+html.dark {
+    --text-color: #d4d4d4;
+    --background-color: #1e1e1e;
+}
+html,
+body {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+}
+
+.content {
+    display: flex;
+    min-width: 100%;
+    min-height: 100%;
+    box-sizing: border-box;
+    padding: 1em;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+}
+.content-body {
+    max-width: 100%;
+    width: 400px;
+}
+.top-options {
+    max-width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+.top-options-left {
+    flex: 1 1 auto;
+    overflow-x: hidden;
+}
+.top-options-right {
+    flex: 0 0 auto;
+}
+
+.example-text-container {
+    position: relative;
+}
+.example-text {
+    display: block;
+    width: 100%;
+    font-size: 24px;
+    line-height: 1.25em;
+    height: 1.25em;
+    box-sizing: border-box;
+    border: 1px solid rgba(221, 221, 221, 0);
+    margin: 0;
+    padding: 0;
+    outline: none;
+    color: inherit;
+    background-color: transparent;
+    white-space: pre;
+    transition: background-color 0.25s linear 0s, border-color 0.25s linear 0s;
+}
+.example-text:hover,
+.example-text-input {
+    border-color: #dddddd;
+}
+.example-text[hidden] {
+    display: none;
+}
+.example-text-input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--background-color);
+}
+
+.popup-placeholder {
+    display: flex;
+    width: 100%;
+    height: 250px;
+    padding-top: 10px;
+    border: 1px solid rgba(0, 0, 0, 0);
+    flex-flow: column nowrap;
+    justify-content: center;
+}
+.placeholder-info {
+    flex: 0 1 auto;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.5s linear 0s, visibility 0s linear 0.5s;
+}
+.placeholder-info.placeholder-info-visible {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.5s linear 0s, visibility 0s linear 0s;
+}
+
+.theme-button {
+    display: inline-block;
+    margin-left: 0.5em;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+    line-height: 0;
+}
+.theme-button>input {
+    vertical-align: middle;
+    margin: 0 0.25em 0 0;
+    padding: 0;
+}
+.theme-button>span {
+    vertical-align: middle;
+}
+.theme-button:hover>span {
+    text-decoration: underline;
+}

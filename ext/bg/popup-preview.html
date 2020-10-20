@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Yomichan Popup Preview</title>
+    <link rel="icon" type="image/png" href="/mixed/img/icon16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="/mixed/img/icon19.png" sizes="19x19">
+    <link rel="icon" type="image/png" href="/mixed/img/icon32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/mixed/img/icon38.png" sizes="38x38">
+    <link rel="icon" type="image/png" href="/mixed/img/icon48.png" sizes="48x48">
+    <link rel="icon" type="image/png" href="/mixed/img/icon64.png" sizes="64x64">
+    <link rel="icon" type="image/png" href="/mixed/img/icon128.png" sizes="128x128">
+    <link rel="stylesheet" type="text/css" href="/bg/css/popup-preview.css">
+    <link rel="stylesheet" type="text/css" href="/fg/css/client.css" id="client-css">
+</head>
+<body>
+
+<div class="content"><div class="content-body">
+    <div class="top-options">
+        <div class="top-options-left">
+            <div class="example-text-container">
+                <input type="text" class="example-text example-text-input" id="example-text-input" value="読め" hidden>
+                <span class="example-text" id="example-text">読め</span>
+            </div>
+        </div>
+        <div class="top-options-right">
+            <label class="theme-button"><input type="checkbox" id="theme-dark-checkbox"><span>dark</span></label>
+        </div>
+    </div>
+    <div class="popup-placeholder"><div class="placeholder-info">
+        This page uses the dictionaries you have installed in order to show a preview.
+        If you see this message, make sure you have a dictionary installed.
+    </div></div>
+</div></div>
+
+<script src="/mixed/lib/wanakana.min.js"></script>
+
+<script src="/mixed/js/core.js"></script>
+<script src="/mixed/js/yomichan.js"></script>
+<script src="/mixed/js/comm.js"></script>
+<script src="/mixed/js/api.js"></script>
+<script src="/mixed/js/dynamic-loader.js"></script>
+<script src="/mixed/js/frame-client.js"></script>
+<script src="/mixed/js/text-scanner.js"></script>
+
+<script src="/mixed/js/document-util.js"></script>
+<script src="/fg/js/dom-text-scanner.js"></script>
+<script src="/fg/js/popup.js"></script>
+<script src="/fg/js/text-source-range.js"></script>
+<script src="/fg/js/text-source-element.js"></script>
+<script src="/fg/js/popup-factory.js"></script>
+<script src="/fg/js/frontend.js"></script>
+<script src="/fg/js/frame-offset-forwarder.js"></script>
+<script src="/bg/js/settings/popup-preview-frame.js"></script>
+
+<script src="/bg/js/settings/popup-preview-frame-main.js"></script>
+
+</body>
+</html>

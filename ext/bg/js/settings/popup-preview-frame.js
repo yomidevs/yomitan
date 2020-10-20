@@ -20,6 +20,7 @@
  * Popup
  * TextSourceRange
  * api
+ * wanakana
  */
 
 class PopupPreviewFrame {
@@ -34,10 +35,12 @@ class PopupPreviewFrame {
         this._themeChangeTimeout = null;
         this._textSource = null;
         this._optionsContext = null;
+        this._exampleText = null;
+        this._exampleTextInput = null;
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
 
         this._windowMessageHandlers = new Map([
-            ['setText',              this._setText.bind(this)],
+            ['setText',              this._onSetText.bind(this)],
             ['setCustomCss',         this._setCustomCss.bind(this)],
             ['setCustomOuterCss',    this._setCustomOuterCss.bind(this)],
             ['updateOptionsContext', this._updateOptionsContext.bind(this)]
@@ -45,10 +48,20 @@ class PopupPreviewFrame {
     }
 
     async prepare() {
+        this._exampleText = document.querySelector('#example-text');
+        this._exampleTextInput = document.querySelector('#example-text-input');
+
+        if (this._exampleTextInput !== null && typeof wanakana !== 'undefined') {
+            wanakana.bind(this._exampleTextInput);
+        }
+
         window.addEventListener('message', this._onMessage.bind(this), false);
 
         // Setup events
         document.querySelector('#theme-dark-checkbox').addEventListener('change', this._onThemeDarkCheckboxChanged.bind(this), false);
+        this._exampleText.addEventListener('click', this._onExampleTextClick.bind(this), false);
+        this._exampleTextInput.addEventListener('blur', this._onExampleTextInputBlur.bind(this), false);
+        this._exampleTextInput.addEventListener('input', this._onExampleTextInputInput.bind(this), false);
 
         // Overwrite API functions
         this._apiOptionsGetOld = api.optionsGet.bind(api);
@@ -142,11 +155,36 @@ class PopupPreviewFrame {
         }, 300);
     }
 
-    _setText({text}) {
-        const exampleText = document.querySelector('#example-text');
-        if (exampleText === null) { return; }
+    _onExampleTextClick() {
+        if (this._exampleTextInput === null) { return; }
+        const visible = this._exampleTextInput.hidden;
+        this._exampleTextInput.hidden = !visible;
+        if (!visible) { return; }
+        this._exampleTextInput.focus();
+        this._exampleTextInput.select();
+    }
 
-        exampleText.textContent = text;
+    _onExampleTextInputBlur() {
+        if (this._exampleTextInput === null) { return; }
+        this._exampleTextInput.hidden = true;
+    }
+
+    _onExampleTextInputInput(e) {
+        this._setText(e.currentTarget.value);
+    }
+
+    _onSetText({text}) {
+        this._setText(text, true);
+    }
+
+    _setText(text, setInput) {
+        if (setInput && this._exampleTextInput !== null) {
+            this._exampleTextInput.value = text;
+        }
+
+        if (this._exampleText === null) { return; }
+
+        this._exampleText.textContent = text;
         if (this._frontend === null) { return; }
         this._updateSearch();
     }
@@ -180,10 +218,9 @@ class PopupPreviewFrame {
     }
 
     async _updateSearch() {
-        const exampleText = document.querySelector('#example-text');
-        if (exampleText === null) { return; }
+        if (this._exampleText === null) { return; }
 
-        const textNode = exampleText.firstChild;
+        const textNode = this._exampleText.firstChild;
         if (textNode === null) { return; }
 
         const range = document.createRange();
