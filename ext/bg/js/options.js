@@ -129,6 +129,10 @@ class OptionsUtil {
         return this._schemaValidator.getValidValueOrDefault(this._optionsSchema);
     }
 
+    getValidValueOrDefault(options) {
+        return this._schemaValidator.getValidValueOrDefault(this._optionsSchema, options);
+    }
+
     createValidatingProxy(options) {
         return this._schemaValidator.createProxy(options, this._optionsSchema);
     }
