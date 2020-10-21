@@ -224,7 +224,7 @@ class PopupPreviewFrame {
         if (textNode === null) { return; }
 
         const range = document.createRange();
-        range.selectNode(textNode);
+        range.selectNodeContents(textNode);
         const source = new TextSourceRange(range, range.toString(), null, null);
 
         try {
