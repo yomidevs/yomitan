@@ -178,13 +178,12 @@ class TextScanner extends EventDispatcher {
 
         clonedTextSource.setEndOffset(length, layoutAwareScan);
 
-        if (this._ignoreNodes !== null && clonedTextSource.range) {
+        if (this._ignoreNodes !== null) {
             length = clonedTextSource.text().length;
-            while (clonedTextSource.range && length > 0) {
-                const nodes = DocumentUtil.getNodesInRange(clonedTextSource.range);
-                if (!DocumentUtil.anyNodeMatchesSelector(nodes, this._ignoreNodes)) {
-                    break;
-                }
+            while (
+                length > 0 &&
+                DocumentUtil.anyNodeMatchesSelector(clonedTextSource.getNodesInRange(), this._ignoreNodes)
+            ) {
                 --length;
                 clonedTextSource.setEndOffset(length, layoutAwareScan);
             }
@@ -247,7 +246,7 @@ class TextScanner extends EventDispatcher {
         let optionsContext = null;
 
         try {
-            if (this._textSourceCurrent !== null && this._textSourceCurrent.equals(textSource)) {
+            if (this._textSourceCurrent !== null && this._textSourceCurrent.hasSameStart(textSource)) {
                 return;
             }
 
@@ -772,7 +771,7 @@ class TextScanner extends EventDispatcher {
 
         if (
             this._textSourceCurrent !== null &&
-            !this._textSourceCurrent.equals(textSourceCurrentPrevious)
+            !this._textSourceCurrent.hasSameStart(textSourceCurrentPrevious)
         ) {
             this._preventScroll = preventScroll;
             this._preventNextContextMenu = true;

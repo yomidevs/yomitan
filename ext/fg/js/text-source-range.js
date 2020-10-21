@@ -17,70 +17,75 @@
 
 /* global
  * DOMTextScanner
+ * DocumentUtil
  */
 
 class TextSourceRange {
     constructor(range, content, imposterContainer, imposterSourceElement) {
-        this.range = range;
-        this.rangeStartOffset = range.startOffset;
-        this.content = content;
-        this.imposterContainer = imposterContainer;
-        this.imposterSourceElement = imposterSourceElement;
+        this._range = range;
+        this._rangeStartOffset = range.startOffset;
+        this._content = content;
+        this._imposterContainer = imposterContainer;
+        this._imposterSourceElement = imposterSourceElement;
     }
 
-    get startOffset() {
-        return this.range.startOffset;
+    get range() {
+        return this._range;
     }
 
-    get endOffset() {
-        return this.range.endOffset;
+    get rangeStartOffset() {
+        return this._rangeStartOffset;
+    }
+
+    get imposterSourceElement() {
+        return this._imposterSourceElement;
     }
 
     clone() {
-        return new TextSourceRange(this.range.cloneRange(), this.content, this.imposterContainer, this.imposterSourceElement);
+        return new TextSourceRange(this._range.cloneRange(), this._content, this._imposterContainer, this._imposterSourceElement);
     }
 
     cleanup() {
-        if (this.imposterContainer !== null && this.imposterContainer.parentNode !== null) {
-            this.imposterContainer.parentNode.removeChild(this.imposterContainer);
+        if (this._imposterContainer !== null && this._imposterContainer.parentNode !== null) {
+            this._imposterContainer.parentNode.removeChild(this._imposterContainer);
         }
     }
 
     text() {
-        return this.content;
+        return this._content;
     }
 
     setEndOffset(length, layoutAwareScan, fromEnd=false) {
         const state = (
             fromEnd ?
-            new DOMTextScanner(this.range.endContainer, this.range.endOffset, !layoutAwareScan, layoutAwareScan).seek(length) :
-            new DOMTextScanner(this.range.startContainer, this.range.startOffset, !layoutAwareScan, layoutAwareScan).seek(length)
+            new DOMTextScanner(this._range.endContainer, this._range.endOffset, !layoutAwareScan, layoutAwareScan).seek(length) :
+            new DOMTextScanner(this._range.startContainer, this._range.startOffset, !layoutAwareScan, layoutAwareScan).seek(length)
         );
-        this.range.setEnd(state.node, state.offset);
-        this.content = (fromEnd ? this.content + state.content : state.content);
+        this._range.setEnd(state.node, state.offset);
+        this._content = (fromEnd ? this._content + state.content : state.content);
         return length - state.remainder;
     }
 
     setStartOffset(length, layoutAwareScan) {
-        const state = new DOMTextScanner(this.range.startContainer, this.range.startOffset, !layoutAwareScan, layoutAwareScan).seek(-length);
-        this.range.setStart(state.node, state.offset);
-        this.rangeStartOffset = this.range.startOffset;
-        this.content = state.content + this.content;
+        const state = new DOMTextScanner(this._range.startContainer, this._range.startOffset, !layoutAwareScan, layoutAwareScan).seek(-length);
+        this._range.setStart(state.node, state.offset);
+        this._rangeStartOffset = this._range.startOffset;
+        this._content = state.content + this._content;
         return length - state.remainder;
     }
 
     getRect() {
-        return this.range.getBoundingClientRect();
+        return this._range.getBoundingClientRect();
     }
 
     getWritingMode() {
-        return TextSourceRange.getElementWritingMode(TextSourceRange.getParentElement(this.range.startContainer));
+        return TextSourceRange.getElementWritingMode(TextSourceRange.getParentElement(this._range.startContainer));
     }
 
     select() {
         const selection = window.getSelection();
         selection.removeAllRanges();
-        selection.addRange(this.range);
+        selection.addRange(this._range);
     }
 
     deselect() {
@@ -88,7 +93,7 @@ class TextSourceRange {
         selection.removeAllRanges();
     }
 
-    equals(other) {
+    hasSameStart(other) {
         if (!(
             typeof other === 'object' &&
             other !== null &&
@@ -96,14 +101,14 @@ class TextSourceRange {
         )) {
             return false;
         }
-        if (this.imposterSourceElement !== null) {
+        if (this._imposterSourceElement !== null) {
             return (
-                this.imposterSourceElement === other.imposterSourceElement &&
-                this.rangeStartOffset === other.rangeStartOffset
+                this._imposterSourceElement === other.imposterSourceElement &&
+                this._rangeStartOffset === other.rangeStartOffset
             );
         } else {
             try {
-                return this.range.compareBoundaryPoints(Range.START_TO_START, other.range) === 0;
+                return this._range.compareBoundaryPoints(Range.START_TO_START, other.range) === 0;
             } catch (e) {
                 if (e.name === 'WrongDocumentError') {
                     // This can happen with shadow DOMs if the ranges are in different documents.
@@ -112,6 +117,10 @@ class TextSourceRange {
                 throw e;
             }
         }
+    }
+
+    getNodesInRange() {
+        return DocumentUtil.getNodesInRange(this._range);
     }
 
     static getParentElement(node) {

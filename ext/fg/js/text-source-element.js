@@ -89,7 +89,7 @@ class TextSourceElement {
         // NOP
     }
 
-    equals(other) {
+    hasSameStart(other) {
         return (
             typeof other === 'object' &&
             other !== null &&
@@ -98,6 +98,10 @@ class TextSourceElement {
             this._fullContent === other.fullContent &&
             this._startOffset === other.startOffset
         );
+    }
+
+    getNodesInRange() {
+        return [];
     }
 
     static getElementContent(element) {
