@@ -75,7 +75,7 @@ class ProfileConditionsUI {
         return this._settingsController;
     }
 
-    get index() {
+    get profileIndex() {
         return this._settingsController.profileIndex;
     }
 
@@ -202,7 +202,7 @@ class ProfileConditionsUI {
 
     getPath(property) {
         property = (typeof property === 'string' ? `.${property}` : '');
-        return `profiles[${this.index}]${property}`;
+        return `profiles[${this.profileIndex}]${property}`;
     }
 
     createKeyboardMouseInputField(inputNode, mouseButton) {
