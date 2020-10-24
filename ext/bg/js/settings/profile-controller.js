@@ -26,6 +26,7 @@ class ProfileController {
         this._settingsController = settingsController;
         this._modalController = modalController;
         this._profileConditionsUI = new ProfileConditionsUI(settingsController);
+        this._profileConditionsIndex = null;
         this._profileActiveSelect = null;
         this._profileTargetSelect = null;
         this._profileCopySourceSelect = null;
@@ -38,9 +39,23 @@ class ProfileController {
         this._profileCopyConfirmButton = null;
         this._profileMoveUpButton = null;
         this._profileMoveDownButton = null;
+        this._profileEntryListContainer = null;
+        this._profileConditionsProfileName = null;
         this._profileRemoveModal = null;
         this._profileCopyModal = null;
-        this._optionsFull = null;
+        this._profileConditionsModal = null;
+        this._profileEntriesSupported = false;
+        this._profileEntryList = [];
+        this._profiles = [];
+        this._profileCurrent = 0;
+    }
+
+    get profileCount() {
+        return this._profiles.length;
+    }
+
+    get profileCurrentIndex() {
+        return this._profileCurrent;
     }
 
     async prepare() {
@@ -59,160 +74,407 @@ class ProfileController {
         this._profileCopyConfirmButton = document.querySelector('#profile-copy-confirm-button');
         this._profileMoveUpButton = document.querySelector('#profile-move-up-button');
         this._profileMoveDownButton = document.querySelector('#profile-move-down-button');
+        this._profileEntryListContainer = document.querySelector('#profile-entry-list');
+        this._profileConditionsProfileName = document.querySelector('#profile-conditions-profile-name');
         this._profileRemoveModal = this._modalController.getModal('profile-remove');
         this._profileCopyModal = this._modalController.getModal('profile-copy');
+        this._profileConditionsModal = this._modalController.getModal('profile-conditions');
 
-        this._profileActiveSelect.addEventListener('change', this._onProfileActiveChange.bind(this), false);
-        this._profileTargetSelect.addEventListener('change', this._onProfileTargetChange.bind(this), false);
-        this._profileNameInput.addEventListener('change', this._onNameChanged.bind(this), false);
-        this._profileAddButton.addEventListener('click', this._onAdd.bind(this), false);
-        this._profileRemoveButton.addEventListener('click', this._onRemove.bind(this), false);
-        this._profileRemoveConfirmButton.addEventListener('click', this._onRemoveConfirm.bind(this), false);
-        this._profileCopyButton.addEventListener('click', this._onCopy.bind(this), false);
-        this._profileCopyConfirmButton.addEventListener('click', this._onCopyConfirm.bind(this), false);
-        this._profileMoveUpButton.addEventListener('click', this._onMove.bind(this, -1), false);
-        this._profileMoveDownButton.addEventListener('click', this._onMove.bind(this, 1), false);
+        this._profileEntriesSupported = (this._profileEntryListContainer !== null);
+
+        if (this._profileActiveSelect !== null) { this._profileActiveSelect.addEventListener('change', this._onProfileActiveChange.bind(this), false); }
+        if (this._profileTargetSelect !== null) { this._profileTargetSelect.addEventListener('change', this._onProfileTargetChange.bind(this), false); }
+        if (this._profileNameInput !== null) { this._profileNameInput.addEventListener('change', this._onNameChanged.bind(this), false); }
+        if (this._profileAddButton !== null) { this._profileAddButton.addEventListener('click', this._onAdd.bind(this), false); }
+        if (this._profileRemoveButton !== null) { this._profileRemoveButton.addEventListener('click', this._onDelete.bind(this), false); }
+        if (this._profileRemoveConfirmButton !== null) { this._profileRemoveConfirmButton.addEventListener('click', this._onDeleteConfirm.bind(this), false); }
+        if (this._profileCopyButton !== null) { this._profileCopyButton.addEventListener('click', this._onCopy.bind(this), false); }
+        if (this._profileCopyConfirmButton !== null) { this._profileCopyConfirmButton.addEventListener('click', this._onCopyConfirm.bind(this), false); }
+        if (this._profileMoveUpButton !== null) { this._profileMoveUpButton.addEventListener('click', this._onMove.bind(this, -1), false); }
+        if (this._profileMoveDownButton !== null) { this._profileMoveDownButton.addEventListener('click', this._onMove.bind(this, 1), false); }
 
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
         this._onOptionsChanged();
     }
 
+    async moveProfile(profileIndex, offset) {
+        if (this._getProfile(profileIndex) === null) { return; }
+
+        const profileIndexNew = Math.max(0, Math.min(this._profiles.length - 1, profileIndex + offset));
+        if (profileIndex === profileIndexNew) { return; }
+
+        await this.swapProfiles(profileIndex, profileIndexNew);
+    }
+
+    async setProfileName(profileIndex, value) {
+        const profile = this._getProfile(profileIndex);
+        if (profile === null) { return; }
+
+        profile.name = value;
+        this._updateSelectName(profileIndex, value);
+
+        const profileEntry = this._getProfileEntry(profileIndex);
+        if (profileEntry !== null) { profileEntry.setName(value); }
+
+        await this._settingsController.setGlobalSetting(`profiles[${profileIndex}].name`, value);
+    }
+
+    async setDefaultProfile(profileIndex) {
+        const profile = this._getProfile(profileIndex);
+        if (profile === null) { return; }
+
+        this._profileActiveSelect.value = `${profileIndex}`;
+        this._profileCurrent = profileIndex;
+
+        const profileEntry = this._getProfileEntry(profileIndex);
+        if (profileEntry !== null) { profileEntry.setIsDefault(true); }
+
+        await this._settingsController.setGlobalSetting('profileCurrent', profileIndex);
+    }
+
+    async copyProfile(sourceProfileIndex, destinationProfileIndex) {
+        const sourceProfile = this._getProfile(sourceProfileIndex);
+        if (sourceProfile === null || !this._getProfile(destinationProfileIndex)) { return; }
+
+        const options = clone(sourceProfile.options);
+        this._profiles[destinationProfileIndex].options = options;
+
+        this._updateProfileSelectOptions();
+
+        const destinationProfileEntry = this._getProfileEntry(destinationProfileIndex);
+        if (destinationProfileEntry !== null) {
+            destinationProfileEntry.updateState();
+        }
+
+        await this._settingsController.modifyGlobalSettings([{
+            action: 'set',
+            path: `profiles[${destinationProfileIndex}].options`,
+            value: options
+        }]);
+
+        await this._settingsController.refresh();
+    }
+
+    async duplicateProfile(profileIndex) {
+        const profile = this._getProfile(profileIndex);
+        if (this.profile === null) { return; }
+
+        // Create new profile
+        const newProfile = clone(profile);
+        newProfile.name = this._createCopyName(profile.name, this._profiles, 100);
+
+        // Update state
+        const index = this._profiles.length;
+        this._profiles.push(newProfile);
+        this._addProfileEntry(index);
+        this._updateProfileSelectOptions();
+
+        // Modify settings
+        await this._settingsController.modifyGlobalSettings([{
+            action: 'splice',
+            path: 'profiles',
+            start: index,
+            deleteCount: 0,
+            items: [newProfile]
+        }]);
+
+        // Update profile index
+        this._settingsController.profileIndex = index;
+    }
+
+    async deleteProfile(profileIndex) {
+        const profile = this._getProfile(profileIndex);
+        if (profile === null || this.profileCount <= 1) { return; }
+
+        // Get indices
+        let profileCurrentNew = this._profileCurrent;
+        const settingsProfileIndex = this._settingsController.profileIndex;
+
+        // Construct settings modifications
+        const modifications = [{
+            action: 'splice',
+            path: 'profiles',
+            start: profileIndex,
+            deleteCount: 1,
+            items: []
+        }];
+        if (profileCurrentNew >= profileIndex) {
+            profileCurrentNew = Math.min(profileCurrentNew - 1, this._profiles.length - 1);
+            modifications.push({
+                action: 'set',
+                path: 'profileCurrent',
+                value: profileCurrentNew
+            });
+        }
+
+        // Update state
+        this._profileCurrent = profileCurrentNew;
+
+        this._profiles.splice(profileIndex, 1);
+
+        if (profileIndex < this._profileEntryList.length) {
+            const profileEntry = this._profileEntryList[profileIndex];
+            profileEntry.cleanup();
+            this._profileEntryList.splice(profileIndex, 1);
+
+            for (let i = profileIndex, ii = this._profileEntryList.length; i < ii; ++i) {
+                this._profileEntryList[i].index = i;
+            }
+        }
+
+        const profileEntry2 = this._getProfileEntry(profileCurrentNew);
+        if (profileEntry2 !== null) {
+            profileEntry2.setIsDefault(true);
+        }
+
+        this._updateProfileSelectOptions();
+
+        // Modify settings
+        await this._settingsController.modifyGlobalSettings(modifications);
+
+        // Update profile index
+        if (settingsProfileIndex === profileIndex) {
+            this._settingsController.profileIndex = profileCurrentNew;
+        }
+    }
+
+    async swapProfiles(index1, index2) {
+        const profile1 = this._getProfile(index1);
+        const profile2 = this._getProfile(index2);
+        if (profile1 === null || profile2 === null || index1 === index2) { return; }
+
+        // Get swapped indices
+        const profileCurrent = this._profileCurrent;
+        const profileCurrentNew = this._getSwappedValue(profileCurrent, index1, index2);
+
+        const settingsProfileIndex = this._settingsController.profileIndex;
+        const settingsProfileIndexNew = this._getSwappedValue(settingsProfileIndex, index1, index2);
+
+        // Construct settings modifications
+        const modifications = [{
+            action: 'swap',
+            path1: `profiles[${index1}]`,
+            path2: `profiles[${index2}]`
+        }];
+        if (profileCurrentNew !== profileCurrent) {
+            modifications.push({
+                action: 'set',
+                path: 'profileCurrent',
+                value: profileCurrentNew
+            });
+        }
+
+        // Update state
+        this._profileCurrent = profileCurrentNew;
+
+        this._profiles[index1] = profile2;
+        this._profiles[index2] = profile1;
+
+        const entry1 = this._getProfileEntry(index1);
+        const entry2 = this._getProfileEntry(index2);
+        if (entry1 !== null && entry2 !== null) {
+            entry1.index = index2;
+            entry2.index = index1;
+            this._swapDomNodes(entry1.node, entry2.node);
+            this._profileEntryList[index1] = entry2;
+            this._profileEntryList[index2] = entry1;
+        }
+
+        this._updateProfileSelectOptions();
+
+        // Modify settings
+        await this._settingsController.modifyGlobalSettings(modifications);
+
+        // Update profile index
+        if (settingsProfileIndex !== settingsProfileIndexNew) {
+            this._settingsController.profileIndex = settingsProfileIndexNew;
+        }
+    }
+
+    openDeleteProfileModal(profileIndex) {
+        const profile = this._getProfile(profileIndex);
+        if (profile === null || this.profileCount <= 1) { return; }
+
+        this._removeProfileNameElement.textContent = profile.name;
+        this._profileRemoveModal.node.dataset.profileIndex = profileIndex;
+        this._profileRemoveModal.setVisible(true);
+    }
+
+    openCopyProfileModal(profileIndex) {
+        const profile = this._getProfile(profileIndex);
+        if (profile === null || this.profileCount <= 1) { return; }
+
+        let copyFromIndex = this._profileCurrent;
+        if (copyFromIndex === profileIndex) {
+            if (profileIndex !== 0) {
+                copyFromIndex = 0;
+            } else if (this.profileCount > 1) {
+                copyFromIndex = 1;
+            }
+        }
+
+        const profileIndexString = `${profileIndex}`;
+        for (const option of this._profileCopySourceSelect.querySelectorAll('option')) {
+            const {value} = option;
+            option.disabled = (value === profileIndexString);
+        }
+        this._profileCopySourceSelect.value = `${copyFromIndex}`;
+
+        this._profileCopyModal.node.dataset.profileIndex = `${profileIndex}`;
+        this._profileCopyModal.setVisible(true);
+    }
+
+    openProfileConditionsModal(profileIndex) {
+        const profile = this._getProfile(profileIndex);
+        if (profile === null) { return; }
+
+        if (this._profileConditionsModal === null) { return; }
+        this._profileConditionsModal.setVisible(true);
+
+        this._profileConditionsUI.cleanup();
+        this._profileConditionsIndex = profileIndex;
+        this._profileConditionsUI.prepare(profileIndex, profile.conditionGroups);
+        if (this._profileConditionsProfileName !== null) {
+            this._profileConditionsProfileName.textContent = profile.name;
+        }
+    }
+
     // Private
 
     async _onOptionsChanged() {
-        this._optionsFull = await this._settingsController.getOptionsFull();
+        // Update state
+        const {profiles, profileCurrent} = await this._settingsController.getOptionsFull();
+        this._profiles = profiles;
+        this._profileCurrent = profileCurrent;
 
-        this._profileConditionsUI.cleanup();
+        const settingsProfileIndex = this._settingsController.profileIndex;
+        const settingsProfile = this._getProfile(settingsProfileIndex);
 
-        const {profiles, profileCurrent} = this._optionsFull;
-        const profileIndex = this._settingsController.profileIndex;
-
-        this._updateSelectOptions(this._profileActiveSelect);
-        this._updateSelectOptions(this._profileTargetSelect);
-        this._updateSelectOptions(this._profileCopySourceSelect, [profileIndex]);
+        // Udpate UI
+        this._updateProfileSelectOptions();
 
         this._profileActiveSelect.value = `${profileCurrent}`;
-        this._profileTargetSelect.value = `${profileIndex}`;
+        this._profileTargetSelect.value = `${settingsProfileIndex}`;
 
-        this._profileRemoveButton.disabled = (profiles.length <= 1);
-        this._profileCopyButton.disabled = (profiles.length <= 1);
-        this._profileMoveUpButton.disabled = (profileIndex <= 0);
-        this._profileMoveDownButton.disabled = (profileIndex >= profiles.length - 1);
+        if (this._profileRemoveButton !== null) { this._profileRemoveButton.disabled = (profiles.length <= 1); }
+        if (this._profileCopyButton !== null) { this._profileCopyButton.disabled = (profiles.length <= 1); }
+        if (this._profileMoveUpButton !== null) { this._profileMoveUpButton.disabled = (settingsProfileIndex <= 0); }
+        if (this._profileMoveDownButton !== null) { this._profileMoveDownButton.disabled = (settingsProfileIndex >= profiles.length - 1); }
 
-        if (profileIndex >= 0 && profileIndex < profiles.length) {
-            const currentProfile = profiles[profileIndex];
-            this._profileNameInput.value = currentProfile.name;
+        if (this._profileNameInput !== null && settingsProfile !== null) { this._profileNameInput.value = settingsProfile.name; }
 
-            const {conditionGroups} = currentProfile;
-            this._profileConditionsUI.prepare(conditionGroups);
+        // Update profile conditions
+        this._profileConditionsUI.cleanup();
+        const conditionsProfile = this._getProfile(this._profileConditionsIndex !== null ? this._profileConditionsIndex : settingsProfileIndex);
+        if (conditionsProfile !== null) {
+            this._profileConditionsUI.prepare(settingsProfileIndex, conditionsProfile.conditionGroups);
+        }
+
+        // Udpate profile entries
+        for (const entry of this._profileEntryList) {
+            entry.cleanup();
+        }
+        this._profileEntryList = [];
+        if (this._profileEntriesSupported) {
+            for (let i = 0, ii = profiles.length; i < ii; ++i) {
+                this._addProfileEntry(i);
+            }
         }
     }
 
     _onProfileActiveChange(e) {
-        const max = this._optionsFull.profiles.length;
-        const value = this._tryGetIntegerValue(e.currentTarget.value, 0, max);
+        const value = this._tryGetValidProfileIndex(e.currentTarget.value);
         if (value === null) { return; }
-        this._settingsController.setGlobalSetting('profileCurrent', value);
+        this.setDefaultProfile(value);
     }
 
     _onProfileTargetChange(e) {
-        const max = this._optionsFull.profiles.length;
-        const value = this._tryGetIntegerValue(e.currentTarget.value, 0, max);
+        const value = this._tryGetValidProfileIndex(e.currentTarget.value);
         if (value === null) { return; }
         this._settingsController.profileIndex = value;
     }
 
     _onNameChanged(e) {
-        const value = e.currentTarget.value;
-        const profileIndex = this._settingsController.profileIndex;
-        this._settingsController.setGlobalSetting(`profiles[${profileIndex}].name`, value);
-        this._updateSelectName(profileIndex, value);
+        this.setProfileName(this._settingsController.profileIndex, e.currentTarget.value);
     }
 
     _onAdd() {
-        this._addProfile();
+        this.duplicateProfile(this._settingsController.profileIndex);
     }
 
-    _onRemove(e) {
+    _onDelete(e) {
+        const profileIndex = this._settingsController.profileIndex;
         if (e.shiftKey) {
-            return this._onRemoveConfirm();
+            this.deleteProfile(profileIndex);
+        } else {
+            this.openDeleteProfileModal(profileIndex);
         }
-
-        if (this._optionsFull.profiles.length <= 1) { return; }
-
-        const profileIndex = this._settingsController.profileIndex;
-        const profile = this._optionsFull.profiles[profileIndex];
-        this._removeProfileNameElement.textContent = profile.name;
-        this._profileRemoveModal.setVisible(true);
     }
 
-    _onRemoveConfirm() {
-        this._profileRemoveModal.setVisible(false);
-        if (this._optionsFull.profiles.length <= 1) { return; }
-        const profileIndex = this._settingsController.profileIndex;
-        this._removeProfile(profileIndex);
+    _onDeleteConfirm() {
+        const modal = this._profileRemoveModal;
+        modal.setVisible(false);
+        const {node} = modal;
+        let profileIndex = node.dataset.profileIndex;
+        delete node.dataset.profileIndex;
+
+        profileIndex = this._tryGetValidProfileIndex(profileIndex);
+        if (profileIndex === null) { return; }
+
+        this.deleteProfile(profileIndex);
     }
 
     _onCopy() {
-        if (this._optionsFull.profiles.length <= 1) { return; }
-
-        const {profiles, profileCurrent} = this._optionsFull;
-        const profileIndex = this._settingsController.profileIndex;
-        let copyFromIndex = profileCurrent;
-        if (copyFromIndex === profileIndex) {
-            if (profileIndex !== 0) {
-                copyFromIndex = 0;
-            } else if (profiles.length > 1) {
-                copyFromIndex = 1;
-            }
-        }
-        this._profileCopySourceSelect.value = `${copyFromIndex}`;
-
-        this._profileCopyModal.setVisible(true);
+        this.openCopyProfileModal(this._settingsController.profileIndex);
     }
 
     _onCopyConfirm() {
-        this._profileCopyModal.setVisible(false);
+        const modal = this._profileCopyModal;
+        modal.setVisible(false);
+        const {node} = modal;
+        let destinationProfileIndex = node.dataset.profileIndex;
+        delete node.dataset.profileIndex;
 
-        const profileIndex = this._settingsController.profileIndex;
-        const max = this._optionsFull.profiles.length;
-        const index = this._tryGetIntegerValue(this._profileCopySourceSelect.value, 0, max);
-        if (index === null || index === profileIndex) { return; }
+        destinationProfileIndex = this._tryGetValidProfileIndex(destinationProfileIndex);
+        if (destinationProfileIndex === null) { return; }
 
-        this._copyProfile(profileIndex, index);
+        const sourceProfileIndex = this._tryGetValidProfileIndex(this._profileCopySourceSelect.value);
+        if (sourceProfileIndex === null) { return; }
+
+        this.copyProfile(sourceProfileIndex, destinationProfileIndex);
     }
 
     _onMove(offset) {
-        const profileIndex = this._settingsController.profileIndex;
-        const max = this._optionsFull.profiles.length;
-        const profileIndexNew = Math.max(0, Math.min(max - 1, profileIndex + offset));
-        if (profileIndex === profileIndexNew) { return; }
-        this._swapProfiles(profileIndex, profileIndexNew);
+        this.moveProfile(this._settingsController.profileIndex, offset);
     }
 
-    _updateSelectOptions(select, disabled) {
-        const {profiles} = this._optionsFull;
-        const fragment = document.createDocumentFragment();
-        for (let i = 0; i < profiles.length; ++i) {
-            const profile = profiles[i];
-            const option = document.createElement('option');
-            option.value = `${i}`;
-            option.textContent = profile.name;
-            option.disabled = (Array.isArray(disabled) && disabled.includes(i));
-            fragment.appendChild(option);
+    _addProfileEntry(profileIndex) {
+        const profile = this._profiles[profileIndex];
+        const node = this._settingsController.instantiateTemplate('profile-entry');
+        const entry = new ProfileEntry(this, node);
+        this._profileEntryList.push(entry);
+        entry.prepare(profile, profileIndex);
+        this._profileEntryListContainer.appendChild(node);
+    }
+
+    _updateProfileSelectOptions() {
+        for (const select of this._getAllProfileSelects()) {
+            const fragment = document.createDocumentFragment();
+            for (let i = 0; i < this._profiles.length; ++i) {
+                const profile = this._profiles[i];
+                const option = document.createElement('option');
+                option.value = `${i}`;
+                option.textContent = profile.name;
+                fragment.appendChild(option);
+            }
+            select.textContent = '';
+            select.appendChild(fragment);
         }
-        select.textContent = '';
-        select.appendChild(fragment);
     }
 
     _updateSelectName(index, name) {
-        const selects = [
-            this._profileActiveSelect,
-            this._profileTargetSelect,
-            this._profileCopySourceSelect
-        ];
         const optionValue = `${index}`;
-        for (const select of selects) {
+        for (const select of this._getAllProfileSelects()) {
             for (const option of select.querySelectorAll('option')) {
                 if (option.value === optionValue) {
                     option.textContent = name;
@@ -221,15 +483,23 @@ class ProfileController {
         }
     }
 
-    _tryGetIntegerValue(value, min, max) {
-        value = parseInt(value, 10);
+    _getAllProfileSelects() {
+        return [
+            this._profileActiveSelect,
+            this._profileTargetSelect,
+            this._profileCopySourceSelect
+        ];
+    }
+
+    _tryGetValidProfileIndex(stringValue) {
+        if (typeof stringValue !== 'string') { return null; }
+        const intValue = parseInt(stringValue, 10);
         return (
-            typeof value === 'number' &&
-            Number.isFinite(value) &&
-            Math.floor(value) === value &&
-            value >= min &&
-            value < max
-        ) ? value : null;
+            Number.isFinite(intValue) &&
+            intValue >= 0 &&
+            intValue < this.profileCount ?
+            intValue : null
+        );
     }
 
     _createCopyName(name, profiles, maxUniqueAttempts) {
@@ -270,98 +540,145 @@ class ProfileController {
     _getSwappedValue(currentValue, value1, value2) {
         if (currentValue === value1) { return value2; }
         if (currentValue === value2) { return value1; }
-        return null;
+        return currentValue;
     }
 
-    async _addProfile() {
-        const profileIndex = this._settingsController.profileIndex;
-        const profiles = this._optionsFull.profiles;
-        const profile = profiles[profileIndex];
-        const newProfile = clone(profile);
-        newProfile.name = this._createCopyName(profile.name, profiles, 100);
-
-        const index = profiles.length;
-        await this._settingsController.modifyGlobalSettings([{
-            action: 'splice',
-            path: 'profiles',
-            start: index,
-            deleteCount: 0,
-            items: [newProfile]
-        }]);
-
-        this._settingsController.profileIndex = index;
+    _getProfile(profileIndex) {
+        return (profileIndex >= 0 && profileIndex < this._profiles.length ? this._profiles[profileIndex] : null);
     }
 
-    async _removeProfile(index) {
-        const {profiles, profileCurrent} = this._optionsFull;
-        let newProfileCurrent = profileCurrent;
-        const modifications = [{
-            action: 'splice',
-            path: 'profiles',
-            start: index,
-            deleteCount: 1,
-            items: []
-        }];
-
-        if (profileCurrent >= index) {
-            newProfileCurrent = Math.min(newProfileCurrent - 1, profiles.length - 1);
-            modifications.push({
-                action: 'set',
-                path: 'profileCurrent',
-                value: newProfileCurrent
-            });
-        }
-
-        const profileIndex = this._settingsController.profileIndex;
-
-        await this._settingsController.modifyGlobalSettings(modifications);
-
-        if (profileIndex === index) {
-            this._settingsController.profileIndex = newProfileCurrent;
-        } else {
-            await this._onOptionsChanged();
-        }
+    _getProfileEntry(profileIndex) {
+        return (profileIndex >= 0 && profileIndex < this._profileEntryList.length ? this._profileEntryList[profileIndex] : null);
     }
 
-    async _swapProfiles(index1, index2) {
-        const {profileCurrent} = this._optionsFull;
+    _swapDomNodes(node1, node2) {
+        const parent1 = node1.parentNode;
+        const parent2 = node2.parentNode;
+        const next1 = node1.nextSibling;
+        const next2 = node2.nextSibling;
+        if (node2 !== next1) { parent1.insertBefore(node2, next1); }
+        if (node1 !== next2) { parent2.insertBefore(node1, next2); }
+    }
+}
 
-        const modifications = [{
-            action: 'swap',
-            path1: `profiles[${index1}]`,
-            path2: `profiles[${index2}]`
-        }];
+class ProfileEntry {
+    constructor(profileController, node) {
+        this._profileController = profileController;
+        this._node = node;
+        this._profile = null;
+        this._index = 0;
+        this._isDefaultRadio = null;
+        this._nameInput = null;
+        this._countLink = null;
+        this._countText = null;
+        this._menuButton = null;
+        this._eventListeners = new EventListenerCollection();
+    }
 
-        const newProfileCurrent = this._getSwappedValue(profileCurrent, index1, index2);
-        if (newProfileCurrent !== profileCurrent) {
-            modifications.push({
-                action: 'set',
-                path: 'profileCurrent',
-                value: newProfileCurrent
-            });
-        }
+    get index() {
+        return this._index;
+    }
 
-        const profileIndex = this._settingsController.profileIndex;
-        const newProfileIndex = this._getSwappedValue(profileIndex, index1, index2);
+    set index(value) {
+        this._index = value;
+    }
 
-        await this._settingsController.modifyGlobalSettings(modifications);
+    get node() {
+        return this._node;
+    }
 
-        if (profileIndex !== newProfileIndex) {
-            this._settingsController.profileIndex = newProfileIndex;
+    prepare(profile, index) {
+        this._profile = profile;
+        this._index = index;
+
+        const node = this._node;
+        this._isDefaultRadio = node.querySelector('.profile-entry-is-default-radio');
+        this._nameInput = node.querySelector('.profile-entry-name-input');
+        this._countLink = node.querySelector('.profile-entry-condition-count-link');
+        this._countText = node.querySelector('.profile-entry-condition-count');
+        this._menuButton = node.querySelector('.profile-entry-menu-button');
+
+        this.updateState();
+
+        this._eventListeners.addEventListener(this._isDefaultRadio, 'change', this._onIsDefaultRadioChange.bind(this), false);
+        this._eventListeners.addEventListener(this._nameInput, 'input', this._onNameInputInput.bind(this), false);
+        this._eventListeners.addEventListener(this._countLink, 'click', this._onConditionsCountLinkClick.bind(this), false);
+        this._eventListeners.addEventListener(this._menuButton, 'menuOpened', this._onMenuOpened.bind(this), false);
+        this._eventListeners.addEventListener(this._menuButton, 'menuClosed', this._onMenuClosed.bind(this), false);
+    }
+
+    cleanup() {
+        this._eventListeners.removeAllEventListeners();
+        if (this._node.parentNode !== null) {
+            this._node.parentNode.removeChild(this._node);
         }
     }
 
-    async _copyProfile(index, copyFromIndex) {
-        const profiles = this._optionsFull.profiles;
-        const copyFromProfile = profiles[copyFromIndex];
-        const options = clone(copyFromProfile.options);
+    setName(value) {
+        if (this._nameInput.value === value) { return; }
+        this._nameInput.value = value;
+    }
 
-        await this._settingsController.modifyGlobalSettings([{
-            action: 'set',
-            path: `profiles[${index}].options`,
-            value: options
-        }]);
+    setIsDefault(value) {
+        this._isDefaultRadio.checked = value;
+    }
 
-        await this._settingsController.refresh();
+    updateState() {
+        this._nameInput.value = this._profile.name;
+        this._countText.textContent = this._profile.conditionGroups.length;
+        this._isDefaultRadio.checked = (this._index === this._profileController.profileCurrentIndex);
+    }
+
+    // Private
+
+    _onIsDefaultRadioChange(e) {
+        if (!e.currentTarget.checked) { return; }
+        this._profileController.setDefaultProfile(this._index);
+    }
+
+    _onNameInputInput(e) {
+        const name = e.currentTarget.value;
+        this._profileController.setProfileName(this._index, name);
+    }
+
+    _onConditionsCountLinkClick() {
+        this._profileController.openProfileConditionsModal(this._index);
+    }
+
+    _onMenuOpened({detail: {menu}}) {
+        const count = this._profileController.profileCount;
+        this._setMenuActionEnabled(menu, 'moveUp', this._index > 0);
+        this._setMenuActionEnabled(menu, 'moveDown', this._index < count - 1);
+        this._setMenuActionEnabled(menu, 'copyFrom', count > 1);
+        this._setMenuActionEnabled(menu, 'delete', count > 1);
+    }
+
+    _onMenuClosed({detail: {action}}) {
+        switch (action) {
+            case 'moveUp':
+                this._profileController.moveProfile(this._index, -1);
+                break;
+            case 'moveDown':
+                this._profileController.moveProfile(this._index, 1);
+                break;
+            case 'copyFrom':
+                this._profileController.openCopyProfileModal(this._index);
+                break;
+            case 'editConditions':
+                this._profileController.openProfileConditionsModal(this._index);
+                break;
+            case 'duplicate':
+                this._profileController.duplicateProfile(this._index);
+                break;
+            case 'delete':
+                this._profileController.openDeleteProfileModal(this._index);
+                break;
+        }
+    }
+
+    _setMenuActionEnabled(menu, action, enabled) {
+        const element = menu.querySelector(`[data-menu-action="${action}"]`);
+        if (element === null) { return; }
+        element.disabled = !enabled;
     }
 }

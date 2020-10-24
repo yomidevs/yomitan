@@ -66,66 +66,66 @@ html:root:not([data-options-general-result-output-mode=merge]) #dictionary-main-
     display: flex;
     -flex-wrap: wrap;
 }
-.condition-input {
+.profile-condition-input-container {
     flex: 1 1 auto;
 }
-.condition-line-break {
+.profile-condition-line-break {
     flex: 1 0 100%;
     display: none;
 }
 .condition>.input-group-btn {
     width: auto;
 }
-.condition>.condition-prefix:after {
+.condition>.profile-condition-prefix:after {
     content: "IF";
 }
-.condition:nth-child(n+2)>.condition-prefix:after {
+.condition:nth-child(n+2)>.profile-condition-prefix:after {
     content: "AND";
 }
 
-.condition-prefix {
+.profile-condition-prefix {
     flex: 0 0 auto;
 }
-.condition-prefix,
-.condition-group-separator-label {
+.profile-condition-prefix,
+.profile-condition-group-separator-label {
     width: 60px;
     text-align: center;
 }
-.condition-group-separator-label {
+.profile-condition-group-separator-label {
     padding: 6px 12px;
     font-weight: bold;
     display: inline-block;
 }
-.condition-type,
-.condition-operator {
+.profile-condition-type,
+.profile-condition-operator {
     width: auto;
     text-align: center;
     text-align-last: center;
 }
 
-.condition-list>.condition>*:first-child,
+.profile-condition-list>.condition>*:first-child,
 .audio-source-list>.audio-source>*:first-child {
     border-bottom-left-radius: 0;
 }
-.condition-list>.condition:nth-child(n+2)>*:first-child,
+.profile-condition-list>.condition:nth-child(n+2)>*:first-child,
 .audio-source-list>.audio-source:nth-child(n+2)>*:first-child {
     border-top-left-radius: 0;
 }
-.condition-list>.condition:nth-child(n+2)>div:last-child>button,
+.profile-condition-list>.condition:nth-child(n+2)>div:last-child>button,
 .audio-source-list>.audio-source:nth-child(n+2)>*:last-child>button {
     border-top-right-radius: 0;
 }
-.condition-list>.condition:nth-last-child(n+2)>div:last-child>button,
+.profile-condition-list>.condition:nth-last-child(n+2)>div:last-child>button,
 .audio-source-list>.audio-source:nth-last-child(n+2)>*:last-child>button {
     border-bottom-right-radius: 0;
 }
-.condition-group-options>.condition-add,
+.profile-condition-group-options>.profile-condition-add-button,
 .audio-source-options>.audio-source-add {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
 
-.condition-groups>.condition-group:last-child>.condition-group-separator-label {
+.profile-condition-groups>.profile-condition-group:last-child>.profile-condition-group-separator-label {
     display: none;
 }
 
@@ -438,10 +438,10 @@ html:root[data-operating-system=openbsd] [data-hide-for-operating-system~=openbs
     .condition {
         flex-wrap: wrap;
     }
-    .condition-input {
+    .profile-condition-input-container {
         order: 2;
     }
-    .condition-line-break {
+    .profile-condition-line-break {
         display: block;
         order: 1;
     }

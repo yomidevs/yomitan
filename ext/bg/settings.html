@@ -69,7 +69,7 @@
                         If no conditions are specified, the profile will only be used if it is selected as the <strong>Active profile</strong>.
                     </p>
 
-                    <div class="condition-groups" id="profile-condition-groups"></div>
+                    <div class="profile-condition-groups" id="profile-condition-groups"></div>
                 </div>
                 <div class="form-group">
                     <button class="btn btn-default" id="profile-add-condition-group">Add Condition Group</button>
@@ -112,20 +112,20 @@
                     </div>
                 </div>
 
-                <template id="condition-group-template"><div class="condition-group">
-                    <div class="condition-list"></div>
-                    <div class="condition-group-options">
-                        <button class="btn btn-default condition-add"><span class="glyphicon glyphicon-plus"></span></button>
+                <template id="profile-condition-group-template"><div class="profile-condition-group">
+                    <div class="profile-condition-list"></div>
+                    <div class="profile-condition-group-options">
+                        <button class="btn btn-default profile-condition-add-button"><span class="glyphicon glyphicon-plus"></span></button>
                     </div>
-                    <div class="condition-group-separator-label">OR</div>
+                    <div class="profile-condition-group-separator-label">OR</div>
                 </div></template>
-                <template id="condition-template"><div class="input-group condition">
-                    <div class="input-group-addon condition-prefix"></div>
-                    <div class="input-group-btn"><select class="form-control btn btn-default condition-type"><optgroup label="Type"></optgroup></select></div>
-                    <div class="input-group-btn"><select class="form-control btn btn-default condition-operator"><optgroup label="Operator"></optgroup></select></div>
-                    <div class="condition-line-break"></div>
-                    <div class="condition-input"><input type="text" class="form-control condition-input-inner"></div>
-                    <div class="input-group-btn"><button class="btn btn-default mouse-button" title="Mouse button"><span class="mouse-button-icon"></span></button><button class="btn btn-danger condition-remove" title="Remove"><span class="glyphicon glyphicon-remove"></span></button></div>
+                <template id="profile-condition-template"><div class="input-group condition">
+                    <div class="input-group-addon profile-condition-prefix"></div>
+                    <div class="input-group-btn"><select class="form-control btn btn-default profile-condition-type"><optgroup label="Type"></optgroup></select></div>
+                    <div class="input-group-btn"><select class="form-control btn btn-default profile-condition-operator"><optgroup label="Operator"></optgroup></select></div>
+                    <div class="profile-condition-line-break"></div>
+                    <div class="profile-condition-input-container"><input type="text" class="form-control profile-condition-input"></div>
+                    <div class="input-group-btn"><button class="btn btn-default mouse-button mouse-button-container" title="Mouse button"><span class="mouse-button-icon"></span></button><button class="btn btn-danger profile-condition-remove" title="Remove"><span class="glyphicon glyphicon-remove"></span></button></div>
                 </div></template>
             </div>
 
