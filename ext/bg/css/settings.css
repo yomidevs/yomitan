@@ -331,17 +331,14 @@ input[type=checkbox].storage-button-checkbox {
     display: none;
 }
 
-.error-data-show-button {
+#anki-error-message-details-toggle {
     display: inline-block;
     margin-left: 0.5em;
     cursor: pointer;
-}
-.error-data-show-button:after {
-    content: "\2026";
     font-weight: bold;
 }
 
-.error-data-container {
+#anki-error-message-details {
     margin-top: 0.25em;
     font-family: 'Courier New', Courier, monospace;
     white-space: pre;

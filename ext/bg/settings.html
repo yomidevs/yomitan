@@ -882,7 +882,7 @@
                 </p>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="anki-enable" data-setting="anki.enable"  data-transform-pre="setDocumentAttribute" data-transform-post="setDocumentAttribute" data-document-attribute="data-options-anki-enable"> Enable Anki integration</label>
+                    <label><input type="checkbox" id="anki-enable" data-setting="anki.enable" data-transform="setDocumentAttribute" data-document-attribute="data-options-anki-enable"> Enable Anki integration</label>
                 </div>
 
                 <div id="anki-general">
@@ -894,9 +894,12 @@
                         </div>
                     </div>
 
-                    <div class="alert alert-danger" id="anki-error" hidden></div>
+                    <div class="alert alert-danger" id="anki-error" hidden>
+                        <span id="anki-error-message"></span><a id="anki-error-message-details-toggle">&hellip;</a>
+                        <div id="anki-error-message-details" hidden></div>
+                    </div>
 
-                    <div class="alert alert-danger" id="anki-invalid-response-error" hidden>
+                    <div class="alert alert-danger" id="anki-error-invalid-response-info" hidden>
                         Attempting to connect to Anki can sometimes return an error message which includes "Invalid response",
                         which may indicate that the value of the <strong>Interface server</strong> option is incorrect.
                         The <strong>Show advanced options</strong> checkbox under General Options must be ticked ticked to show this option.
@@ -955,41 +958,41 @@
                         </ul>
 
                         <div class="tab-content ignore-form-changes" id="anki-fields-container">
-                            <div id="terms" class="tab-pane fade in active" data-anki-card-type="terms">
+                            <div id="terms" class="tab-pane fade in active anki-card" data-anki-card-type="terms">
                                 <div class="row">
                                     <div class="form-group col-xs-6">
                                         <label for="anki-terms-deck">Deck</label>
-                                        <select class="form-control anki-deck" id="anki-terms-deck" data-anki-card-type="terms"></select>
+                                        <select class="form-control anki-card-deck" id="anki-terms-deck" data-anki-card-type="terms"></select>
                                     </div>
 
                                     <div class="form-group col-xs-6">
                                         <label for="anki-terms-model">Model</label>
-                                        <select class="form-control anki-model" id="anki-terms-model" data-anki-card-type="terms"></select>
+                                        <select class="form-control anki-card-model" id="anki-terms-model" data-anki-card-type="terms"></select>
                                     </div>
                                 </div>
 
                                 <table class="table table-bordered anki-fields">
                                     <thead><tr><th>Field</th><th>Value</th></tr></thead>
-                                    <tbody></tbody>
+                                    <tbody class="anki-card-fields"></tbody>
                                 </table>
                             </div>
 
-                            <div id="kanji" class="tab-pane fade" data-anki-card-type="kanji">
+                            <div id="kanji" class="tab-pane fade anki-card" data-anki-card-type="kanji">
                                 <div class="row">
                                     <div class="form-group col-xs-6">
                                         <label for="anki-kanji-deck">Deck</label>
-                                        <select class="form-control anki-deck" id="anki-kanji-deck" data-anki-card-type="kanji"></select>
+                                        <select class="form-control anki-card-deck" id="anki-kanji-deck" data-anki-card-type="kanji"></select>
                                     </div>
 
                                     <div class="form-group col-xs-6">
                                         <label for="anki-kanji-model">Model</label>
-                                        <select class="form-control anki-model" id="anki-kanji-model" data-anki-card-type="kanji"></select>
+                                        <select class="form-control anki-card-model" id="anki-kanji-model" data-anki-card-type="kanji"></select>
                                     </div>
                                 </div>
 
                                 <table class="table table-bordered anki-fields">
                                     <thead><tr><th>Field</th><th>Value</th></tr></thead>
-                                    <tbody></tbody>
+                                    <tbody class="anki-card-fields"></tbody>
                                 </table>
                             </div>
                         </div>
@@ -1056,22 +1059,22 @@
                             </div>
                         </div>
 
-                        <template id="anki-field-template"><tr>
-                            <td class="col-sm-2 anki-field-name"></td>
+                        <template id="anki-card-field-template"><tr>
+                            <td class="col-sm-2 anki-card-field-name"></td>
                             <td class="col-sm-10">
-                                <div class="input-group">
-                                    <input type="text" class="anki-field-value form-control" data-field="" value="">
+                                <div class="input-group anki-card-field-value-container">
+                                    <input type="text" class="anki-card-field-value form-control" data-field="" value="">
                                     <div class="input-group-btn">
                                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                             <span class="caret"></span>
                                         </button>
-                                        <ul class="dropdown-menu dropdown-menu-right anki-field-marker-list"></ul>
+                                        <ul class="dropdown-menu dropdown-menu-right anki-card-field-marker-list"></ul>
                                     </div>
                                 </div>
                             </td>
                         </tr></template>
 
-                        <template id="anki-field-marker-template"><li><a class="marker-link" href="#"></a></li></template>
+                        <template id="anki-card-field-marker-template"><li><a class="marker-link" href="#"></a></li></template>
                     </div>
                 </div>
             </div>
