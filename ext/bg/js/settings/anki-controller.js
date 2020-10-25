@@ -36,6 +36,7 @@ class AnkiController {
             'clipboard-image',
             'clipboard-text'
         ]);
+        this._stringComparer = new Intl.Collator(); // Locale does not matter
         this._ankiOptions = null;
         this._getAnkiDataPromise = null;
         this._ankiErrorContainer = null;
@@ -210,6 +211,7 @@ class AnkiController {
     async _getDeckNames() {
         try {
             const result = await this._ankiConnect.getDeckNames();
+            this._sortStringArray(result);
             return [result, null];
         } catch (e) {
             return [[], e];
@@ -219,6 +221,7 @@ class AnkiController {
     async _getModelNames() {
         try {
             const result = await this._ankiConnect.getModelNames();
+            this._sortStringArray(result);
             return [result, null];
         } catch (e) {
             return [[], e];
@@ -269,6 +272,11 @@ class AnkiController {
             markers.push(match[1]);
         }
         return markers;
+    }
+
+    _sortStringArray(array) {
+        const stringComparer = this._stringComparer;
+        array.sort((a, b) => stringComparer.compare(a, b));
     }
 }
 
