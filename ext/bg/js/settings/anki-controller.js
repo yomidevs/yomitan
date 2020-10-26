@@ -44,6 +44,8 @@ class AnkiController {
         this._ankiErrorMessageDetailsContainer = null;
         this._ankiErrorMessageDetailsToggle = null;
         this._ankiErrorInvalidResponseInfo = null;
+        this._ankiCardPrimary = null;
+        this._ankiCardPrimaryType = null;
     }
 
     async prepare() {
@@ -53,9 +55,14 @@ class AnkiController {
         this._ankiErrorMessageDetailsToggle = document.querySelector('#anki-error-message-details-toggle');
         this._ankiErrorInvalidResponseInfo = document.querySelector('#anki-error-invalid-response-info');
         this._ankiEnableCheckbox = document.querySelector('[data-setting="anki.enable"]');
+        this._ankiCardPrimary = document.querySelector('#anki-card-primary');
+        this._ankiCardPrimaryType = document.querySelector('#anki-card-primary-type');
+
+        this._setupFieldMenus();
 
         this._ankiErrorMessageDetailsToggle.addEventListener('click', this._onAnkiErrorMessageDetailsToggleClick.bind(this), false);
         if (this._ankiEnableCheckbox !== null) { this._ankiEnableCheckbox.addEventListener('settingChanged', this._onAnkiEnableChanged.bind(this), false); }
+        if (this._ankiCardPrimaryType !== null) { this._ankiCardPrimaryType.addEventListener('change', this._onAnkiCardPrimaryTypeChange.bind(this), false); }
 
         const options = await this._settingsController.getOptions();
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
@@ -174,6 +181,23 @@ class AnkiController {
         }
     }
 
+    _onAnkiCardPrimaryTypeChange(e) {
+        if (this._ankiCardPrimary === null) { return; }
+        const node = e.currentTarget;
+        let ankiCardMenu;
+        if (node.selectedIndex >= 0) {
+            const option = node.options[node.selectedIndex];
+            ankiCardMenu = option.dataset.ankiCardMenu;
+        }
+
+        this._ankiCardPrimary.dataset.ankiCardType = node.value;
+        if (typeof ankiCardMenu !== 'undefined') {
+            this._ankiCardPrimary.dataset.ankiCardMenu = ankiCardMenu;
+        } else {
+            delete this._ankiCardPrimary.dataset.ankiCardMenu;
+        }
+    }
+
     _createCardController(node) {
         const cardController = new AnkiCardController(this._settingsController, this, node);
         cardController.prepare(this._ankiOptions);
@@ -186,6 +210,32 @@ class AnkiController {
 
     _isCardControllerStale(node, cardController) {
         return cardController.isStale();
+    }
+
+    _setupFieldMenus() {
+        const fieldMenuTargets = [
+            ['terms', '#anki-card-terms-field-menu-template'],
+            ['kanji', '#anki-card-kanji-field-menu-template']
+        ];
+        for (const [type, selector] of fieldMenuTargets) {
+            const element = document.querySelector(selector);
+            if (element === null) { continue; }
+
+            const markers = this.getFieldMarkers(type);
+            const container = element.content.querySelector('.popup-menu');
+            if (container === null) { return; }
+
+            const fragment = document.createDocumentFragment();
+            for (const marker of markers) {
+                const option = document.createElement('button');
+                option.textContent = marker;
+                option.className = 'popup-menu-item';
+                option.dataset.menuAction = 'setFieldMarker';
+                option.dataset.marker = marker;
+                fragment.appendChild(option);
+            }
+            container.appendChild(fragment);
+        }
     }
 
     async _getAnkiData() {
@@ -286,6 +336,7 @@ class AnkiCardController {
         this._ankiController = ankiController;
         this._node = node;
         this._cardType = node.dataset.ankiCardType;
+        this._cardMenu = node.dataset.ankiCardMenu;
         this._eventListeners = new EventListenerCollection();
         this._fieldEventListeners = new EventListenerCollection();
         this._deck = null;
@@ -346,11 +397,23 @@ class AnkiCardController {
         this._ankiController.validateFieldPermissions(e.currentTarget.value);
     }
 
+    _onFieldMenuClosed({currentTarget: node, detail: {action, item}}) {
+        switch (action) {
+            case 'setFieldMarker':
+                this._setFieldMarker(node, item.dataset.marker);
+                break;
+        }
+    }
+
     _onFieldMarkerLinkClick(e) {
         e.preventDefault();
         const link = e.currentTarget;
-        const input = link.closest('.anki-card-field-value-container').querySelector('.anki-card-field-value');
-        input.value = `{${link.textContent}}`;
+        this._setFieldMarker(link, link.textContent);
+    }
+
+    _setFieldMarker(element, marker) {
+        const input = element.closest('.anki-card-field-value-container').querySelector('.anki-card-field-value');
+        input.value = `{${marker}}`;
         input.dispatchEvent(new Event('change'));
     }
 
@@ -411,10 +474,26 @@ class AnkiCardController {
                 markerList.appendChild(markersFragment);
             }
 
+            const menuButton = content.querySelector('.anki-card-field-value-menu-button');
+            if (menuButton !== null) {
+                if (typeof this._cardMenu !== 'undefined') {
+                    menuButton.dataset.menu = this._cardMenu;
+                } else {
+                    delete menuButton.dataset.menu;
+                }
+                this._fieldEventListeners.addEventListener(menuButton, 'menuClosed', this._onFieldMenuClosed.bind(this), false);
+            }
+
             totalFragment.appendChild(content);
         }
-        this._ankiCardFieldsContainer.textContent = '';
-        this._ankiCardFieldsContainer.appendChild(totalFragment);
+
+        const ELEMENT_NODE = Node.ELEMENT_NODE;
+        const container = this._ankiCardFieldsContainer;
+        for (const node of [...container.childNodes]) {
+            if (node.nodeType === ELEMENT_NODE && node.dataset.persistent === 'true') { continue; }
+            container.removeChild(node);
+        }
+        container.appendChild(totalFragment);
     }
 
     async _setDeck(value) {
