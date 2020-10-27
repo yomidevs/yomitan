@@ -287,7 +287,8 @@ class AnkiController {
     }
 
     _showAnkiError(error) {
-        const errorString = `${error}`;
+        let errorString = typeof error === 'object' && error !== null ? error.message : null;
+        if (!errorString) { errorString = `${error}`; }
         this._ankiErrorMessageContainer.textContent = errorString;
 
         const data = error.data;
