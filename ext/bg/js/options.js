@@ -82,7 +82,13 @@ class OptionsUtil {
         }
 
         // Generic updates
-        return await this._applyUpdates(options, this._getVersionUpdates());
+        options = await this._applyUpdates(options, this._getVersionUpdates());
+
+        // Validation
+        options = this._schemaValidator.getValidValueOrDefault(this._optionsSchema, options);
+
+        // Result
+        return options;
     }
 
     async load() {
@@ -105,9 +111,9 @@ class OptionsUtil {
 
         if (typeof options !== 'undefined') {
             options = await this.update(options);
+        } else {
+            options = this.getDefault();
         }
-
-        options = this._schemaValidator.getValidValueOrDefault(this._optionsSchema, options);
 
         return options;
     }
@@ -126,11 +132,10 @@ class OptionsUtil {
     }
 
     getDefault() {
-        return this._schemaValidator.getValidValueOrDefault(this._optionsSchema);
-    }
-
-    getValidValueOrDefault(options) {
-        return this._schemaValidator.getValidValueOrDefault(this._optionsSchema, options);
+        const optionsVersion = this._getVersionUpdates().length;
+        const options = this._schemaValidator.getValidValueOrDefault(this._optionsSchema);
+        options.version = optionsVersion;
+        return options;
     }
 
     createValidatingProxy(options) {
@@ -468,6 +473,10 @@ class OptionsUtil {
             {
                 async: true,
                 update: this._updateVersion4.bind(this)
+            },
+            {
+                async: false,
+                update: this._updateVersion5.bind(this)
             }
         ];
     }
@@ -584,6 +593,15 @@ class OptionsUtil {
             profileOptions.scanning.inputs = scanningInputs;
         }
         await this._addFieldTemplatesToOptions(options, '/bg/data/anki-field-templates-upgrade-v4.handlebars');
+        return options;
+    }
+
+    _updateVersion5(options) {
+        // Version 5 changes:
+        //  Removed legacy version number from profile options.
+        for (const profile of options.profiles) {
+            delete profile.options.version;
+        }
         return options;
     }
 }

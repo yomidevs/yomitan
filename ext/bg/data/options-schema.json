@@ -62,7 +62,6 @@
                     "options": {
                         "type": "object",
                         "required": [
-                            "version",
                             "general",
                             "audio",
                             "scanning",
@@ -72,10 +71,6 @@
                             "anki"
                         ],
                         "properties": {
-                            "version": {
-                                "type": "integer",
-                                "minimum": 0
-                            },
                             "general": {
                                 "type": "object",
                                 "required": [
