@@ -637,7 +637,8 @@ class JsonSchemaValidator {
                 if (propertySchema === null) { continue; }
                 info.valuePush(property, value);
                 info.schemaPush(property, propertySchema);
-                value[property] = this._getValidValueOrDefault(propertySchema, value[property], info);
+                const hasValue = Object.prototype.hasOwnProperty.call(value, property);
+                value[property] = this._getValidValueOrDefault(propertySchema, hasValue ? value[property] : void 0, info);
                 info.schemaPop();
                 info.valuePop();
             }

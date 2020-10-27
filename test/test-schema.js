@@ -540,6 +540,60 @@ function testGetValidValueOrDefault1() {
                     {test: 'value', test2: 2, test3: 10}
                 ]
             ]
+        },
+
+        // Test value defaulting where hasOwnProperty is false
+        {
+            schema: {
+                type: 'object',
+                required: ['test'],
+                properties: {
+                    test: {
+                        type: 'string',
+                        default: 'default'
+                    }
+                }
+            },
+            inputs: [
+                [
+                    {},
+                    {test: 'default'}
+                ],
+                [
+                    {test: 'value'},
+                    {test: 'value'}
+                ],
+                [
+                    Object.create({test: 'value'}),
+                    {test: 'default'}
+                ]
+            ]
+        },
+        {
+            schema: {
+                type: 'object',
+                required: ['toString'],
+                properties: {
+                    toString: {
+                        type: 'string',
+                        default: 'default'
+                    }
+                }
+            },
+            inputs: [
+                [
+                    {},
+                    {toString: 'default'}
+                ],
+                [
+                    {toString: 'value'},
+                    {toString: 'value'}
+                ],
+                [
+                    Object.create({toString: 'value'}),
+                    {toString: 'default'}
+                ]
+            ]
         }
     ];
 
