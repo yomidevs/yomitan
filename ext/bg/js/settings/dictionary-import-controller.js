@@ -101,7 +101,7 @@ class DictionaryImportController {
             this._setModifying(true);
             this._hideErrors();
             this._setSpinnerVisible(true);
-            purgeNotification.hidden = false;
+            if (purgeNotification !== null) { purgeNotification.hidden = false; }
 
             await api.purgeDatabase();
             const errors = await this._clearDictionarySettings();
@@ -113,7 +113,7 @@ class DictionaryImportController {
             this._showErrors([error]);
         } finally {
             prevention.end();
-            purgeNotification.hidden = true;
+            if (purgeNotification !== null) { purgeNotification.hidden = true; }
             this._setSpinnerVisible(false);
             this._storageController.updateStats();
             this._setModifying(false);

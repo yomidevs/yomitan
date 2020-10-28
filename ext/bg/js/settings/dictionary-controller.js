@@ -192,20 +192,21 @@ class DictionaryController {
         this._dictionaryEntries = [];
         this._databaseStateToken = null;
         this._checkingIntegrity = false;
-        this._warningNode = null;
         this._checkIntegrityButton = null;
         this._dictionaryEntryContainer = null;
         this._integrityExtraInfoContainer = null;
+        this._dictionaryInstallCountNode = null;
         this._deleteDictionaryModal = null;
         this._integrityExtraInfoNode = null;
         this._isDeleting = false;
     }
 
     async prepare() {
-        this._warningNode = document.querySelector('#dictionary-warning');
         this._checkIntegrityButton = document.querySelector('#dictionary-check-integrity');
         this._dictionaryEntryContainer = document.querySelector('#dictionary-list');
         this._integrityExtraInfoContainer = document.querySelector('#dictionary-list-extra');
+        this._dictionaryInstallCountNode = document.querySelector('#dictionary-install-count');
+        this._noDictionariesInstalledWarnings = document.querySelectorAll('.no-dictionaries-installed-warning');
         this._deleteDictionaryModal = this._modalController.getModal('dictionary-confirm-delete');
 
         yomichan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
@@ -238,13 +239,21 @@ class DictionaryController {
         if (this._databaseStateToken !== token) { return; }
         this._dictionaries = dictionaries;
 
-        this._warningNode.hidden = (dictionaries.length > 0);
         this._updateMainDictionarySelectOptions(dictionaries);
 
         for (const entry of this._dictionaryEntries) {
             entry.cleanup();
         }
         this._dictionaryEntries = [];
+
+        if (this._dictionaryInstallCountNode !== null) {
+            this._dictionaryInstallCountNode.textContent = `${dictionaries.length}`;
+        }
+
+        const hasDictionary = (dictionaries.length > 0);
+        for (const node of this._noDictionariesInstalledWarnings) {
+            node.hidden = hasDictionary;
+        }
 
         await this._ensureDictionarySettings(dictionaries);
         for (const dictionary of dictionaries) {
