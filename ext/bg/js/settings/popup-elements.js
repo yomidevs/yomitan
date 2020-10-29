@@ -112,6 +112,32 @@ class Modal extends PopupElement {
             closingClassName: 'modal-container-closing',
             closingAnimationDuration: 375 // Milliseconds; includes buffer
         });
+        this._canCloseOnClick = false;
+    }
+
+    prepare() {
+        const node = this._node;
+        node.addEventListener('mousedown', this._onModalContainerMouseDown.bind(this), false);
+        node.addEventListener('mouseup', this._onModalContainerMouseUp.bind(this), false);
+        node.addEventListener('click', this._onModalContainerClick.bind(this), false);
+    }
+
+    // Private
+
+    _onModalContainerMouseDown(e) {
+        this._canCloseOnClick = (e.currentTarget === e.target);
+    }
+
+    _onModalContainerMouseUp(e) {
+        if (!this._canCloseOnClick) { return; }
+        this._canCloseOnClick = (e.currentTarget === e.target);
+    }
+
+    _onModalContainerClick(e) {
+        if (!this._canCloseOnClick) { return; }
+        this._canCloseOnClick = false;
+        if (e.currentTarget !== e.target) { return; }
+        this.setVisible(false);
     }
 }
 

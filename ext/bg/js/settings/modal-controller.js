@@ -26,19 +26,12 @@ class ModalController {
     }
 
     prepare() {
-        for (const node of document.querySelectorAll('.modal')) {
+        for (const node of document.querySelectorAll('.modal,.modal-container')) {
             const {id} = node;
             const modal = new Modal(node);
+            modal.prepare();
             this._modalMap.set(id, modal);
             this._modals.push(modal);
-        }
-
-        for (const node of document.querySelectorAll('.modal-container')) {
-            const {id} = node;
-            const modal = new Modal(node);
-            this._modalMap.set(id, modal);
-            this._modals.push(modal);
-            node.addEventListener('click', this._onModalContainerClick.bind(this, modal), false);
         }
     }
 
@@ -55,12 +48,5 @@ class ModalController {
             }
         }
         return null;
-    }
-
-    // Private
-
-    _onModalContainerClick(modal, e) {
-        if (e.currentTarget !== e.target) { return; }
-        modal.setVisible(false);
     }
 }

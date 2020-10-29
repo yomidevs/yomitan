@@ -26,6 +26,10 @@ class Modal extends EventDispatcher {
         return this._node;
     }
 
+    prepare() {
+        // NOP
+    }
+
     isVisible() {
         return !!(this._getWrappedNode().data('bs.modal') || {}).isShown;
     }
