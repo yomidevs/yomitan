@@ -166,7 +166,9 @@ class ProfileController {
         // Update state
         const index = this._profiles.length;
         this._profiles.push(newProfile);
-        this._addProfileEntry(index);
+        if (this._profileEntriesSupported) {
+            this._addProfileEntry(index);
+        }
         this._updateProfileSelectOptions();
 
         // Modify settings
