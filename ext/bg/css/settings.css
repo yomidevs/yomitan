@@ -272,7 +272,7 @@ html:root:not([data-options-general-result-output-mode=merge]) #dictionary-main-
 
 #custom-popup-css,
 #custom-popup-outer-css,
-#field-templates {
+#anki-card-templates-textarea {
     width: 100%;
     min-height: 34px;
     line-height: 18px;
@@ -280,12 +280,10 @@ html:root:not([data-options-general-result-output-mode=merge]) #dictionary-main-
     resize: vertical;
     font-family: 'Courier New', Courier, monospace;
     white-space: pre;
-}
-#field-templates {
     height: 240px;
     border-bottom-left-radius: 0;
 }
-#field-templates-reset {
+#anki-card-templates-reset-button {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }

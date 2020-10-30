@@ -214,14 +214,20 @@ class AnkiController {
 
     _setupFieldMenus() {
         const fieldMenuTargets = [
-            ['terms', '#anki-card-terms-field-menu-template'],
-            ['kanji', '#anki-card-kanji-field-menu-template']
+            [['terms'], '#anki-card-terms-field-menu-template'],
+            [['kanji'], '#anki-card-kanji-field-menu-template'],
+            [['terms', 'kanji'], '#anki-card-all-field-menu-template']
         ];
-        for (const [type, selector] of fieldMenuTargets) {
+        for (const [types, selector] of fieldMenuTargets) {
             const element = document.querySelector(selector);
             if (element === null) { continue; }
 
-            const markers = this.getFieldMarkers(type);
+            let markers = [];
+            for (const type of types) {
+                markers.push(...this.getFieldMarkers(type));
+            }
+            markers = [...new Set(markers)];
+
             const container = element.content.querySelector('.popup-menu');
             if (container === null) { return; }
 

@@ -1004,32 +1004,32 @@
                                 their Anki cards. If you encounter problems with your changes, you can always reset to the default template settings.
                             </p>
                             <div class="ignore-form-changes">
-                                <textarea autocomplete="off" spellcheck="false" wrap="soft" class="form-control" rows="10" id="field-templates"></textarea>
+                                <textarea autocomplete="off" spellcheck="false" wrap="soft" class="form-control" rows="10" id="anki-card-templates-textarea"></textarea>
                             </div>
                             <div>
-                                <button class="btn btn-danger" id="field-templates-reset">Reset Templates</button>
+                                <button class="btn btn-danger" id="anki-card-templates-reset-button">Reset Templates</button>
                             </div>
                             <p></p>
-                            <pre id="field-template-compile-result" hidden></pre>
+                            <pre id="anki-card-templates-compile-result" hidden></pre>
 
                             <p>Templates can be tested using the inputs below.</p>
 
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-xs-6">
-                                        <label for="field-templates-preview-text">Preview text</label>
-                                        <input type="text" id="field-templates-preview-text" class="form-control" value="読め" placeholder="Preview text">
+                                        <label for="anki-card-templates-test-text-input">Preview text</label>
+                                        <input type="text" id="anki-card-templates-test-text-input" class="form-control" value="読め" placeholder="Preview text">
                                     </div>
                                     <div class="col-xs-6">
-                                        <label for="field-template-render-text">Test field</label>
+                                        <label for="anki-card-templates-test-field-input">Test field</label>
                                         <div class="input-group">
                                             <div class="input-group-btn">
-                                                <button class="btn btn-default" id="field-template-render" title="Test"><span class="glyphicon glyphicon-play"></span></button>
+                                                <button class="btn btn-default" id="anki-card-templates-test-render-button" title="Test"><span class="glyphicon glyphicon-play"></span></button>
                                             </div>
-                                            <input type="text" class="form-control" id="field-template-render-text" value="{expression}" placeholder="{marker}">
+                                            <input type="text" class="form-control" id="anki-card-templates-test-field-input" value="{expression}" placeholder="{marker}">
                                             <div class="input-group-btn">
-                                                <button class="btn btn-default dropdown-toggle" id="field-templates-dropdown" data-toggle="dropdown"><span class="caret"></span></button>
-                                                <ul class="dropdown-menu dropdown-menu-right" id="field-templates-list"></ul>
+                                                <button class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                                                <ul class="dropdown-menu dropdown-menu-right" id="anki-card-templates-field-list"></ul>
                                             </div>
                                         </div>
                                     </div>
@@ -1037,10 +1037,10 @@
                             </div>
 
                             <p></p>
-                            <pre id="field-template-render-result" hidden></pre>
+                            <pre id="anki-card-templates-render-result" hidden></pre>
                         </div>
 
-                        <div class="modal fade" tabindex="-1" role="dialog" id="field-template-reset-modal">
+                        <div class="modal fade" tabindex="-1" role="dialog" id="anki-card-templates-reset">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -1053,7 +1053,7 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                        <button type="button" class="btn btn-danger" id="field-templates-reset-confirm">Reset Templates</button>
+                                        <button type="button" class="btn btn-danger" id="anki-card-templates-reset-button-confirm">Reset Templates</button>
                                     </div>
                                 </div>
                             </div>

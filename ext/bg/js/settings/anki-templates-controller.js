@@ -30,6 +30,10 @@ class AnkiTemplatesController {
         this._cachedDefinitionValue = null;
         this._cachedDefinitionText = null;
         this._defaultFieldTemplates = null;
+        this._fieldTemplatesTextarea = null;
+        this._compileResultInfo = null;
+        this._renderFieldInput = null;
+        this._renderResult = null;
         this._fieldTemplateResetModal = null;
         this._templateRenderer = new TemplateRendererProxy();
     }
@@ -37,24 +41,38 @@ class AnkiTemplatesController {
     async prepare() {
         this._defaultFieldTemplates = await api.getDefaultAnkiFieldTemplates();
 
-        this._fieldTemplateResetModal = this._modalController.getModal('field-template-reset-modal');
+        this._fieldTemplatesTextarea = document.querySelector('#anki-card-templates-textarea');
+        this._compileResultInfo = document.querySelector('#anki-card-templates-compile-result');
+        this._renderFieldInput = document.querySelector('#anki-card-templates-test-field-input');
+        this._renderTextInput = document.querySelector('#anki-card-templates-test-text-input');
+        this._renderResult = document.querySelector('#anki-card-templates-render-result');
+        const menuButton = document.querySelector('#anki-card-templates-test-field-menu-button');
+        const testRenderButton = document.querySelector('#anki-card-templates-test-render-button');
+        const resetButton = document.querySelector('#anki-card-templates-reset-button');
+        const resetConfirmButton = document.querySelector('#anki-card-templates-reset-button-confirm');
+        const fieldList = document.querySelector('#anki-card-templates-field-list');
+        this._fieldTemplateResetModal = this._modalController.getModal('anki-card-templates-reset');
 
         const markers = new Set([
             ...this._ankiController.getFieldMarkers('terms'),
             ...this._ankiController.getFieldMarkers('kanji')
         ]);
-        const fragment = this._ankiController.getFieldMarkersHtml(markers);
 
-        const list = document.querySelector('#field-templates-list');
-        list.appendChild(fragment);
-        for (const node of list.querySelectorAll('.marker-link')) {
-            node.addEventListener('click', this._onMarkerClicked.bind(this), false);
+        if (fieldList !== null) {
+            const fragment = this._ankiController.getFieldMarkersHtml(markers);
+            fieldList.appendChild(fragment);
+            for (const node of fieldList.querySelectorAll('.marker-link')) {
+                node.addEventListener('click', this._onMarkerClicked.bind(this), false);
+            }
         }
 
-        document.querySelector('#field-templates').addEventListener('change', this._onChanged.bind(this), false);
-        document.querySelector('#field-template-render').addEventListener('click', this._onRender.bind(this), false);
-        document.querySelector('#field-templates-reset').addEventListener('click', this._onReset.bind(this), false);
-        document.querySelector('#field-templates-reset-confirm').addEventListener('click', this._onResetConfirm.bind(this), false);
+        this._fieldTemplatesTextarea.addEventListener('change', this._onChanged.bind(this), false);
+        testRenderButton.addEventListener('click', this._onRender.bind(this), false);
+        resetButton.addEventListener('click', this._onReset.bind(this), false);
+        resetConfirmButton.addEventListener('click', this._onResetConfirm.bind(this), false);
+        if (menuButton !== null) {
+            menuButton.addEventListener('menuClosed', this._onFieldMenuClosed.bind(this), false);
+        }
 
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
 
@@ -67,7 +85,7 @@ class AnkiTemplatesController {
     _onOptionsChanged({options}) {
         let templates = options.anki.fieldTemplates;
         if (typeof templates !== 'string') { templates = this._defaultFieldTemplates; }
-        document.querySelector('#field-templates').value = templates;
+        this._fieldTemplatesTextarea.value = templates;
 
         this._onValidateCompile();
     }
@@ -84,9 +102,8 @@ class AnkiTemplatesController {
 
         const value = this._defaultFieldTemplates;
 
-        const element = document.querySelector('#field-templates');
-        element.value = value;
-        element.dispatchEvent(new Event('change'));
+        this._fieldTemplatesTextarea.value = value;
+        this._fieldTemplatesTextarea.dispatchEvent(new Event('change'));
     }
 
     async _onChanged(e) {
@@ -105,22 +122,35 @@ class AnkiTemplatesController {
     }
 
     _onValidateCompile() {
-        const infoNode = document.querySelector('#field-template-compile-result');
-        this._validate(infoNode, '{expression}', 'term-kanji', false, true);
+        this._validate(this._compileResultInfo, '{expression}', 'term-kanji', false, true);
     }
 
     _onMarkerClicked(e) {
         e.preventDefault();
-        document.querySelector('#field-template-render-text').value = `{${e.target.textContent}}`;
+        this._renderFieldInput.value = `{${e.target.textContent}}`;
     }
 
     _onRender(e) {
         e.preventDefault();
 
-        const field = document.querySelector('#field-template-render-text').value;
-        const infoNode = document.querySelector('#field-template-render-result');
+        const field = this._renderFieldInput.value;
+        const infoNode = this._renderResult;
         infoNode.hidden = true;
         this._validate(infoNode, field, 'term-kanji', true, false);
+    }
+
+    _onFieldMenuClosed({currentTarget: node, detail: {action, item}}) {
+        switch (action) {
+            case 'setFieldMarker':
+                this._setFieldMarker(node, item.dataset.marker);
+                break;
+        }
+    }
+
+    _setFieldMarker(element, marker) {
+        const input = this._renderFieldInput;
+        input.value = `{${marker}}`;
+        input.dispatchEvent(new Event('change'));
     }
 
     async _getDefinition(text, optionsContext) {
@@ -135,7 +165,7 @@ class AnkiTemplatesController {
     }
 
     async _validate(infoNode, field, mode, showSuccessResult, invalidateInput) {
-        const text = document.querySelector('#field-templates-preview-text').value || '';
+        const text = this._renderTextInput.value || '';
         const exceptions = [];
         let result = `No definition found for ${text}`;
         try {
@@ -179,8 +209,7 @@ class AnkiTemplatesController {
         infoNode.textContent = hasException ? exceptions.map((e) => `${e}`).join('\n') : (showSuccessResult ? result : '');
         infoNode.classList.toggle('text-danger', hasException);
         if (invalidateInput) {
-            const input = document.querySelector('#field-templates');
-            input.classList.toggle('is-invalid', hasException);
+            this._fieldTemplatesTextarea.classList.toggle('is-invalid', hasException);
         }
     }
 
