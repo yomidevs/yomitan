@@ -65,7 +65,7 @@ class ScanInputsController {
 
     setProperty(index, property, value) {
         const path = `scanning.inputs[${index}].${property}`;
-        this._settingsController.setProfileSetting(path, value);
+        return this._settingsController.setProfileSetting(path, value);
     }
 
     instantiateTemplate(name) {
@@ -93,8 +93,7 @@ class ScanInputsController {
         this._entries.length = 0;
 
         for (let i = 0, ii = inputs.length; i < ii; ++i) {
-            const {include, exclude} = inputs[i];
-            this._addOption(i, include, exclude);
+            this._addOption(i, inputs[i]);
         }
 
         this._updateCounts();
@@ -104,23 +103,22 @@ class ScanInputsController {
         e.preventDefault();
 
         const index = this._entries.length;
-        const include = '';
-        const exclude = '';
-        this._addOption(index, include, exclude);
+        const scanningInput = ScanInputsController.createDefaultMouseInput('', '');
+        this._addOption(index, scanningInput);
         this._updateCounts();
         this._modifyProfileSettings([{
             action: 'splice',
             path: 'scanning.inputs',
             start: index,
             deleteCount: 0,
-            items: [ScanInputsController.createDefaultMouseInput(include, exclude)]
+            items: [scanningInput]
         }]);
     }
 
-    _addOption(index, include, exclude) {
+    _addOption(index, scanningInput) {
         const field = new ScanInputField(this, index, this._os);
         this._entries.push(field);
-        field.prepare(this._container, include, exclude);
+        field.prepare(this._container, scanningInput);
     }
 
     _updateCounts() {
@@ -174,7 +172,9 @@ class ScanInputField {
         this._updateDataSettingTargets();
     }
 
-    prepare(container, include, exclude) {
+    prepare(container, scanningInput) {
+        const {include, exclude, options: {showAdvanced}} = scanningInput;
+
         const node = this._parent.instantiateTemplate('scan-input');
         const includeInputNode = node.querySelector('.scan-input-field[data-property=include]');
         const includeMouseButton = node.querySelector('.mouse-button[data-property=include]');
@@ -182,6 +182,8 @@ class ScanInputField {
         const excludeMouseButton = node.querySelector('.mouse-button[data-property=exclude]');
         const removeButton = node.querySelector('.scan-input-remove');
         const menuButton = node.querySelector('.scanning-input-menu-button');
+
+        node.dataset.showAdvanced = `${showAdvanced}`;
 
         this._node = node;
         container.appendChild(node);
@@ -198,6 +200,7 @@ class ScanInputField {
             this._eventListeners.addEventListener(removeButton, 'click', this._onRemoveClick.bind(this));
         }
         if (menuButton !== null) {
+            this._eventListeners.addEventListener(menuButton, 'menuOpened', this._onMenuOpened.bind(this));
             this._eventListeners.addEventListener(menuButton, 'menuClosed', this._onMenuClosed.bind(this));
         }
 
@@ -217,6 +220,8 @@ class ScanInputField {
         }
     }
 
+    // Private
+
     _onIncludeValueChange({value}) {
         this._parent.setProperty(this._index, 'include', value);
     }
@@ -230,10 +235,32 @@ class ScanInputField {
         this._removeSelf();
     }
 
+    _onMenuOpened({detail: {menu}}) {
+        const showAdvanced = menu.querySelector('.popup-menu-item[data-menu-action="showAdvanced"]');
+        const hideAdvanced = menu.querySelector('.popup-menu-item[data-menu-action="hideAdvanced"]');
+        const advancedVisible = (this._node.dataset.showAdvanced === 'true');
+        if (showAdvanced !== null) {
+            showAdvanced.hidden = advancedVisible;
+        }
+        if (hideAdvanced !== null) {
+            hideAdvanced.hidden = !advancedVisible;
+        }
+    }
+
     _onMenuClosed({detail: {action}}) {
         switch (action) {
             case 'remove':
                 this._removeSelf();
+                break;
+            case 'showAdvanced':
+                this._setAdvancedOptionsVisible(true);
+                break;
+            case 'hideAdvanced':
+                this._setAdvancedOptionsVisible(false);
+                break;
+            case 'clearInputs':
+                this._includeInputField.clearInputs();
+                this._excludeInputField.clearInputs();
                 break;
         }
     }
@@ -254,5 +281,11 @@ class ScanInputField {
 
     _removeSelf() {
         this._parent.removeInput(this._index);
+    }
+
+    _setAdvancedOptionsVisible(showAdvanced) {
+        showAdvanced = !!showAdvanced;
+        this._node.dataset.showAdvanced = `${showAdvanced}`;
+        this._parent.setProperty(this._index, 'options.showAdvanced', showAdvanced);
     }
 }

@@ -77,6 +77,10 @@ class KeyboardMouseInputField extends EventDispatcher {
         this._penPointerIds.clear();
     }
 
+    clearInputs() {
+        this._updateInputs([]);
+    }
+
     // Private
 
     _splitValue(value) {
@@ -169,7 +173,7 @@ class KeyboardMouseInputField extends EventDispatcher {
         switch (key) {
             case 'Escape':
             case 'Backspace':
-                this._updateInputs([]);
+                this.clearInputs();
                 break;
             default:
                 this._addInputs(this._getModifierKeys(e));
