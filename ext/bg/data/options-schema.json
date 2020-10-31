@@ -769,7 +769,7 @@
                                     "duplicateScope": {
                                         "type": "string",
                                         "default": "collection",
-                                        "enum": ["collection", "deck"]
+                                        "enum": ["collection", "deck", "deck-root"]
                                     },
                                     "fieldTemplates": {
                                         "type": ["string", "null"],

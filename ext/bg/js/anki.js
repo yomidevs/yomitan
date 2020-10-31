@@ -92,11 +92,24 @@ class AnkiConnect {
         if (!this._enabled) { return []; }
         await this._checkVersion();
         const actions = notes.map((note) => {
-            let query = (duplicateScope === 'deck' ? `"deck:${this._escapeQuery(note.deckName)}" ` : '');
+            let query = '';
+            switch (duplicateScope) {
+                case 'deck':
+                    query = `"deck:${this._escapeQuery(note.deckName)}" `;
+                    break;
+                case 'deck-root':
+                    query = `"deck:${this._escapeQuery(this.getRootDeckName(note.deckName))}" `;
+                    break;
+            }
             query += this._fieldsToQuery(note.fields);
             return {action: 'findNotes', params: {query}};
         });
         return await this._invoke('multi', {actions});
+    }
+
+    getRootDeckName(deckName) {
+        const index = deckName.indexOf('::');
+        return index >= 0 ? deckName.substring(0, index) : deckName;
     }
 
     // Private

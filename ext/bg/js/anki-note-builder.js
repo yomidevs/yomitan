@@ -44,6 +44,14 @@ class AnkiNoteBuilder {
             await this._injectMedia(anki, definition, fields, mode, audioDetails, screenshotDetails, clipboardDetails);
         }
 
+        let duplicateScopeDeckName = null;
+        let duplicateScopeCheckChildren = false;
+        if (duplicateScope === 'deck-root') {
+            duplicateScope = 'deck';
+            duplicateScopeDeckName = this.getRootDeckName(deck);
+            duplicateScopeCheckChildren = true;
+        }
+
         const fieldEntries = Object.entries(fields);
         const noteFields = {};
         const note = {
@@ -51,7 +59,13 @@ class AnkiNoteBuilder {
             tags,
             deckName: deck,
             modelName: model,
-            options: {duplicateScope}
+            options: {
+                duplicateScope,
+                duplicateScopeOptions: {
+                    deckName: duplicateScopeDeckName,
+                    checkChildren: duplicateScopeCheckChildren
+                }
+            }
         };
 
         const data = this._createNoteData(definition, mode, context, resultOutputMode, compactGlossaries);
@@ -79,6 +93,11 @@ class AnkiNoteBuilder {
             }
         }
         return false;
+    }
+
+    getRootDeckName(deckName) {
+        const index = deckName.indexOf('::');
+        return index >= 0 ? deckName.substring(0, index) : deckName;
     }
 
     // Private
