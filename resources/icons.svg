@@ -27,11 +27,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="22.627417"
-     inkscape:cx="5.5440719"
-     inkscape:cy="3.5889128"
+     inkscape:zoom="32"
+     inkscape:cx="3.5674943"
+     inkscape:cy="5.174859"
      inkscape:document-units="px"
-     inkscape:current-layer="layer40"
+     inkscape:current-layer="layer44"
      showgrid="true"
      units="px"
      inkscape:snap-center="true"
@@ -1282,12 +1282,34 @@
      inkscape:groupmode="layer"
      id="layer40"
      inkscape:label="Exclamation Point Short"
-     style="display:inline">
+     style="display:none">
     <path
        style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
        d="M 7.25,3 C 7.1119345,3.0000138 7.0000138,3.1119345 7,3.25 v 5.5 C 7.0000138,8.8880655 7.1119345,8.9999862 7.25,9 h 1.5 C 8.8880655,8.9999862 8.9999862,8.8880655 9,8.75 V 3.25 C 8.9999862,3.1119345 8.8880655,3.0000138 8.75,3 Z m 0,8 C 7.1119345,11.000014 7.0000138,11.111935 7,11.25 v 1.5 c 1.38e-5,0.138065 0.1119345,0.249986 0.25,0.25 h 1.5 C 8.8880655,12.999986 8.9999862,12.888065 9,12.75 v -1.5 C 8.9999862,11.111935 8.8880655,11.000014 8.75,11 Z"
        id="rect1025"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccccccccccccccccc" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer43"
+     inkscape:label="Checkbox Border"
+     style="display:none">
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       d="M 2,0 C 0.892,0 0,0.892 0,2 v 12 c 0,1.108 0.892,2 2,2 h 12 c 1.108,0 2,-0.892 2,-2 V 2 C 16,0.892 15.108,0 14,0 Z M 2,2 H 14 V 14 H 2 Z"
+       id="rect1027"
+       inkscape:connector-curvature="0" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer44"
+     inkscape:label="Checkbox Check">
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 6.5,12.5 14,5 12.5,3.5 l -6,6 -3,-3 L 2,8 Z"
+       id="path1035"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccccc" />
   </g>
 </svg>
