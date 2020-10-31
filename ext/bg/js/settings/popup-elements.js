@@ -117,9 +117,11 @@ class Modal extends PopupElement {
 
     prepare() {
         const node = this._node;
-        node.addEventListener('mousedown', this._onModalContainerMouseDown.bind(this), false);
-        node.addEventListener('mouseup', this._onModalContainerMouseUp.bind(this), false);
-        node.addEventListener('click', this._onModalContainerClick.bind(this), false);
+        let dimmerNode = node.querySelector('.modal-content-dimmer');
+        if (dimmerNode === null) { dimmerNode = node; }
+        dimmerNode.addEventListener('mousedown', this._onModalContainerMouseDown.bind(this), false);
+        dimmerNode.addEventListener('mouseup', this._onModalContainerMouseUp.bind(this), false);
+        dimmerNode.addEventListener('click', this._onModalContainerClick.bind(this), false);
     }
 
     // Private
