@@ -206,7 +206,7 @@ class ScanInputsSimpleController {
             const includeValues = this._splitValue(include);
             const excludeValues = this._splitValue(exclude);
             if (
-                (includeValues.length === 0 || (includeValues.length === 1 && includeValues.includes('mouse2'))) &&
+                (includeValues.length === 1 && includeValues[0] === 'mouse2') &&
                 excludeValues.length === 0
             ) {
                 return i;
