@@ -26,10 +26,26 @@ class PopupPreviewController {
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
         this._frame = null;
         this._previewTextInput = null;
+        this._customCss = null;
+        this._customOuterCss = null;
     }
 
     prepare() {
-        document.querySelector('#settings-popup-preview-button').addEventListener('click', this._onShowPopupPreviewButtonClick.bind(this), false);
+        const button = document.querySelector('#settings-popup-preview-button');
+        if (button !== null) {
+            button.addEventListener('click', this._onShowPopupPreviewButtonClick.bind(this), false);
+        } else {
+            this._frame = document.querySelector('#popup-preview-frame');
+            this._customCss = document.querySelector('#custom-popup-css');
+            this._customOuterCss = document.querySelector('#custom-popup-outer-css');
+
+            this._customCss.addEventListener('input', this._onCustomCssChange.bind(this), false);
+            this._customCss.addEventListener('settingChanged', this._onCustomCssChange.bind(this), false);
+            this._customOuterCss.addEventListener('input', this._onCustomOuterCssChange.bind(this), false);
+            this._customOuterCss.addEventListener('settingChanged', this._onCustomOuterCssChange.bind(this), false);
+            this._frame.addEventListener('load', this._onFrameLoad2.bind(this), false);
+            this._settingsController.on('optionsContextChanged', this._onOptionsContextChange.bind(this));
+        }
     }
 
     // Private
@@ -51,6 +67,8 @@ class PopupPreviewController {
 
         this._previewTextInput = text;
         this._frame = frame;
+        this._customCss = customCss;
+        this._customOuterCss = customOuterCss;
 
         wanakana.bind(text);
 
@@ -75,16 +93,22 @@ class PopupPreviewController {
         this._setText(this._previewTextInput.value);
     }
 
+    _onFrameLoad2() {
+        this._onOptionsContextChange();
+        this._onCustomCssChange();
+        this._onCustomOuterCssChange();
+    }
+
     _onTextChange(e) {
         this._setText(e.currentTarget.value);
     }
 
-    _onCustomCssChange(e) {
-        this._invoke('setCustomCss', {css: e.currentTarget.value});
+    _onCustomCssChange() {
+        this._invoke('setCustomCss', {css: this._customCss.value});
     }
 
-    _onCustomOuterCssChange(e) {
-        this._invoke('setCustomOuterCss', {css: e.currentTarget.value});
+    _onCustomOuterCssChange() {
+        this._invoke('setCustomOuterCss', {css: this._customOuterCss.value});
     }
 
     _onOptionsContextChange() {
