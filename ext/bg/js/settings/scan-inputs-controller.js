@@ -53,6 +53,7 @@ class ScanInputsController {
         for (let i = index, ii = this._entries.length; i < ii; ++i) {
             this._entries[i].index = i;
         }
+        this._updateCounts();
         this._modifyProfileSettings([{
             action: 'splice',
             path: 'scanning.inputs',
