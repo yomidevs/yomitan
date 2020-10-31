@@ -26,6 +26,8 @@ class ScanInputsSimpleController {
         this._settingsController = settingsController;
         this._middleMouseButtonScan = null;
         this._mainScanModifierKeyInput = null;
+        this._mainScanModifierKeyInputHasOther = false;
+        this._os = null;
     }
 
     async prepare() {
@@ -33,7 +35,10 @@ class ScanInputsSimpleController {
         this._mainScanModifierKeyInput = document.querySelector('#main-scan-modifier-key');
 
         const {platform: {os}} = await api.getEnvironmentInfo();
-        this._populateSelect(this._mainScanModifierKeyInput, os);
+        this._os = os;
+
+        this._mainScanModifierKeyInputHasOther = false;
+        this._populateSelect(this._mainScanModifierKeyInput, this._mainScanModifierKeyInputHasOther);
 
         const options = await this._settingsController.getOptions();
 
@@ -61,6 +66,7 @@ class ScanInputsSimpleController {
         const {scanning: {inputs}} = options;
         const middleMouseSupportedIndex = this._getIndexOfMiddleMouseButtonScanInput(inputs);
         const mainScanInputIndex = this._getIndexOfMainScanInput(inputs);
+        const hasMainScanInput = (mainScanInputIndex >= 0);
 
         let middleMouseSupported = false;
         if (middleMouseSupportedIndex >= 0) {
@@ -71,12 +77,16 @@ class ScanInputsSimpleController {
         }
 
         let mainScanInput = 'none';
-        if (mainScanInputIndex >= 0) {
+        if (hasMainScanInput) {
             const includeValues = this._splitValue(inputs[mainScanInputIndex].include);
             if (includeValues.length > 0) {
                 mainScanInput = includeValues[0];
             }
+        } else {
+            mainScanInput = 'other';
         }
+
+        this._setHasMainScanInput(hasMainScanInput);
 
         this._middleMouseButtonScan.checked = middleMouseSupported;
         this._mainScanModifierKeyInput.value = mainScanInput;
@@ -89,15 +99,20 @@ class ScanInputsSimpleController {
 
     _onMainScanModifierKeyInputChange(e) {
         const mainScanKey = e.currentTarget.value;
+        if (mainScanKey === 'other') { return; }
         const mainScanInputs = (mainScanKey === 'none' ? [] : [mainScanKey]);
         this._setMainScanInputs(mainScanInputs);
     }
 
-    _populateSelect(select, os) {
+    _populateSelect(select, hasOther) {
         const modifierKeys = [
             {value: 'none', name: 'None'},
-            ...DocumentUtil.getModifierKeys(os).map(([value, name]) => ({value, name}))
+            ...DocumentUtil.getModifierKeys(this._os).map(([value, name]) => ({value, name}))
         ];
+
+        if (hasOther) {
+            modifierKeys.push({value: 'other', name: 'Other'});
+        }
 
         const fragment = document.createDocumentFragment();
         for (const {value, name} of modifierKeys) {
@@ -153,6 +168,8 @@ class ScanInputsSimpleController {
         const options = await this._settingsController.getOptions();
         const {scanning: {inputs}} = options;
         const index = this._getIndexOfMainScanInput(inputs);
+
+        this._setHasMainScanInput(true);
 
         if (index < 0) {
             // Add new
@@ -217,5 +234,11 @@ class ScanInputsSimpleController {
 
     _isMouseInput(input) {
         return /^mouse\d+$/.test(input);
+    }
+
+    _setHasMainScanInput(hasMainScanInput) {
+        if (this._mainScanModifierKeyInputHasOther !== hasMainScanInput) { return; }
+        this._mainScanModifierKeyInputHasOther = !hasMainScanInput;
+        this._populateSelect(this._mainScanModifierKeyInput, this._mainScanModifierKeyInputHasOther);
     }
 }
