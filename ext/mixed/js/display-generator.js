@@ -45,12 +45,12 @@ class DisplayGenerator {
         const debugInfoContainer = node.querySelector('.debug-info');
         const bodyContainer = node.querySelector('.term-entry-body');
 
-        const {termTags, expressions, definitions} = details;
+        const {termTags, expressions, definitions, type} = details;
 
         const pitches = DictionaryDataUtil.getPitchAccentInfos(details);
         const pitchCount = pitches.reduce((i, v) => i + v.pitches.length, 0);
 
-        const expressionMulti = Array.isArray(expressions);
+        const expressionMulti = (type === 'termMerged' || type === 'termMergedByGlossary');
         const definitionMulti = Array.isArray(definitions);
         const expressionCount = expressionMulti ? expressions.length : 1;
         const definitionCount = definitionMulti ? definitions.length : 1;
@@ -567,52 +567,5 @@ class DisplayGenerator {
             container.appendChild(document.createElement('br'));
             container.appendChild(document.createTextNode(parts[i]));
         }
-    }
-
-    _getPitchInfos(definition) {
-        const results = new Map();
-
-        const allExpressions = new Set();
-        const allReadings = new Set();
-        const expressions = definition.expressions;
-        const sources = Array.isArray(expressions) ? expressions : [definition];
-        for (const {pitches: expressionPitches, expression} of sources) {
-            allExpressions.add(expression);
-            for (const {reading, pitches, dictionary} of expressionPitches) {
-                allReadings.add(reading);
-                let dictionaryResults = results.get(dictionary);
-                if (typeof dictionaryResults === 'undefined') {
-                    dictionaryResults = [];
-                    results.set(dictionary, dictionaryResults);
-                }
-
-                for (const {position, tags} of pitches) {
-                    let pitchInfo = this._findExistingPitchInfo(reading, position, tags, dictionaryResults);
-                    if (pitchInfo === null) {
-                        pitchInfo = {expressions: new Set(), reading, position, tags};
-                        dictionaryResults.push(pitchInfo);
-                    }
-                    pitchInfo.expressions.add(expression);
-                }
-            }
-        }
-
-        for (const dictionaryResults of results.values()) {
-            for (const result of dictionaryResults) {
-                const exclusiveExpressions = [];
-                const exclusiveReadings = [];
-                const resultExpressions = result.expressions;
-                if (!areSetsEqual(resultExpressions, allExpressions)) {
-                    exclusiveExpressions.push(...getSetIntersection(resultExpressions, allExpressions));
-                }
-                if (allReadings.size > 1) {
-                    exclusiveReadings.push(result.reading);
-                }
-                result.exclusiveExpressions = exclusiveExpressions;
-                result.exclusiveReadings = exclusiveReadings;
-            }
-        }
-
-        return [...results.entries()];
     }
 }

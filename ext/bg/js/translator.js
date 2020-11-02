@@ -660,56 +660,68 @@ class Translator {
     // Metadata building
 
     async _buildTermMeta(definitions, enabledDictionaryMap) {
-        const terms = [];
-        for (const definition of definitions) {
-            switch (definition.type) {
-                case 'term':
-                case 'termGrouped':
-                    terms.push(definition);
-                    break;
-                case 'termMerged':
-                    terms.push(...definition.expressions);
-                    break;
+        const addMetadataTargetInfo = (targetMap1, target, parents) => {
+            let {expression, reading} = target;
+            if (!reading) { reading = expression; }
+
+            let targetMap2 = targetMap1.get(expression);
+            if (typeof targetMap2 === 'undefined') {
+                targetMap2 = new Map();
+                targetMap1.set(expression, targetMap2);
+            }
+
+            let targets = targetMap2.get(reading);
+            if (typeof targets === 'undefined') {
+                targets = new Set([target, ...parents]);
+                targetMap2.set(reading, targets);
+            } else {
+                targets.add(target);
+                for (const parent of parents) {
+                    targets.add(parent);
+                }
+            }
+        };
+
+        const targetMap = new Map();
+        const definitionsQueue = definitions.map((definition) => ({definition, parents: []}));
+        while (definitionsQueue.length > 0) {
+            const {definition, parents} = definitionsQueue.shift();
+            const childDefinitions = definition.definitions;
+            if (Array.isArray(childDefinitions)) {
+                for (const definition2 of childDefinitions) {
+                    definitionsQueue.push({definition: definition2, parents: [...parents, definition]});
+                }
+            } else {
+                addMetadataTargetInfo(targetMap, definition, parents);
+            }
+
+            for (const target of definition.expressions) {
+                addMetadataTargetInfo(targetMap, target, []);
             }
         }
+        const targetMapEntries = [...targetMap.entries()];
+        const uniqueExpressions = targetMapEntries.map(([expression]) => expression);
 
-        if (terms.length === 0) {
-            return;
-        }
-
-        // Create mapping of unique terms
-        const expressionsUnique = [];
-        const termsUnique = [];
-        const termsUniqueMap = new Map();
-        for (const term of terms) {
-            const {expression} = term;
-            let termList = termsUniqueMap.get(expression);
-            if (typeof termList === 'undefined') {
-                termList = [];
-                expressionsUnique.push(expression);
-                termsUnique.push(termList);
-                termsUniqueMap.set(expression, termList);
-            }
-            termList.push(term);
-        }
-
-        const metas = await this._database.findTermMetaBulk(expressionsUnique, enabledDictionaryMap);
+        const metas = await this._database.findTermMetaBulk(uniqueExpressions, enabledDictionaryMap);
         for (const {expression, mode, data, dictionary, index} of metas) {
-            switch (mode) {
-                case 'freq':
-                    for (const term of termsUnique[index]) {
-                        const frequencyData = this._getFrequencyData(expression, data, dictionary, term);
-                        if (frequencyData === null) { continue; }
-                        term.frequencies.push(frequencyData);
-                    }
-                    break;
-                case 'pitch':
-                    for (const term of termsUnique[index]) {
-                        const pitchData = await this._getPitchData(expression, data, dictionary, term);
-                        if (pitchData === null) { continue; }
-                        term.pitches.push(pitchData);
-                    }
-                    break;
+            const targetMap2 = targetMapEntries[index][1];
+            for (const [reading, targets] of targetMap2) {
+                switch (mode) {
+                    case 'freq':
+                        {
+                            const frequencyData = this._getFrequencyData(expression, reading, dictionary, data);
+                            if (frequencyData === null) { continue; }
+                            for (const {frequencies} of targets) { frequencies.push(frequencyData); }
+                        }
+                        break;
+                    case 'pitch':
+                        {
+                            const pitchData = await this._getPitchData(expression, reading, dictionary, data);
+                            if (pitchData === null) { continue; }
+                            for (const {pitches} of targets) { pitches.push(pitchData); }
+                        }
+                        break;
+                }
             }
         }
     }
@@ -796,22 +808,17 @@ class Translator {
         return tagMetaList;
     }
 
-    _getFrequencyData(expression, data, dictionary, term) {
+    _getFrequencyData(expression, reading, dictionary, data) {
+        let frequency = data;
         if (data !== null && typeof data === 'object') {
-            const {frequency, reading} = data;
-
-            const termReading = term.reading || expression;
-            if (reading !== termReading) { return null; }
-
-            return {expression, frequency, dictionary};
+            if (data.reading !== reading) { return null; }
+            frequency = data.frequency2;
         }
-        return {expression, frequency: data, dictionary};
+        return {expression, reading, dictionary, frequency};
     }
 
-    async _getPitchData(expression, data, dictionary, term) {
-        const reading = data.reading;
-        const termReading = term.reading || expression;
-        if (reading !== termReading) { return null; }
+    async _getPitchData(expression, reading, dictionary, data) {
+        if (data.reading !== reading) { return null; }
 
         const pitches = [];
         for (let {position, tags} of data.pitches) {
@@ -819,7 +826,7 @@ class Translator {
             pitches.push({position, tags});
         }
 
-        return {reading, pitches, dictionary};
+        return {expression, reading, dictionary, pitches};
     }
 
     // Simple helpers

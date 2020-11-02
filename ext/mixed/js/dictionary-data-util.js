@@ -17,16 +17,13 @@
 
 class DictionaryDataUtil {
     static getPitchAccentInfos(definition) {
-        if (typeof definition.character === 'string') {
-            // Kanji
-            return [];
-        }
+        const {type} = definition;
+        if (type === 'kanji') { return []; }
 
         const results = new Map();
         const allExpressions = new Set();
         const allReadings = new Set();
-        const expressions = definition.expressions;
-        const sources = Array.isArray(expressions) ? expressions : [definition];
+        const sources = [definition];
 
         for (const {pitches: expressionPitches, expression} of sources) {
             allExpressions.add(expression);
