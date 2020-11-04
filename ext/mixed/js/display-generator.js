@@ -34,6 +34,13 @@ class DisplayGenerator {
         this._templates = new HtmlTemplateCollection(html);
     }
 
+    preparePitchAccents() {
+        if (this._termPitchAccentStaticTemplateIsSetup) { return; }
+        this._termPitchAccentStaticTemplateIsSetup = true;
+        const t = this._templates.instantiate('term-pitch-accent-static');
+        document.head.appendChild(t);
+    }
+
     createTermEntry(details) {
         const node = this._templates.instantiate('term-entry');
 
@@ -357,11 +364,7 @@ class DisplayGenerator {
     }
 
     _createPitches(details) {
-        if (!this._termPitchAccentStaticTemplateIsSetup) {
-            this._termPitchAccentStaticTemplateIsSetup = true;
-            const t = this._templates.instantiate('term-pitch-accent-static');
-            document.head.appendChild(t);
-        }
+        this.preparePitchAccents();
 
         const {dictionary, pitches} = details;
 
