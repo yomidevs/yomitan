@@ -159,6 +159,7 @@ Flashcard fields can be configured with the following steps:
     `{cloze-body}` | Raw, inflected term as it appeared before being reduced to dictionary form by Yomichan.
     `{cloze-prefix}` | Fragment of the containing `{sentence}` starting at the beginning of `{sentence}` until the beginning of `{cloze-body}`.
     `{cloze-suffix}` | Fragment of the containing `{sentence}` starting at the end of `{cloze-body}` until the end of `{sentence}`.
+    `{conjugation}` | Conjugation path from the raw inflected term to the source term.
     `{dictionary}` | Name of the dictionary from which the card is being created (unavailable in *grouped* mode).
     `{document-title}` | Title of the web page that the term appeared in.
     `{expression}` | Term expressed as kanji (will be displayed in kana if kanji is not available).

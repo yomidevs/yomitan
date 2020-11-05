@@ -477,6 +477,10 @@ class OptionsUtil {
             {
                 async: false,
                 update: this._updateVersion5.bind(this)
+            },
+            {
+                async: true,
+                update: this._updateVersion6.bind(this)
             }
         ];
     }
@@ -602,6 +606,13 @@ class OptionsUtil {
         for (const profile of options.profiles) {
             delete profile.options.version;
         }
+        return options;
+    }
+
+    async _updateVersion6(options) {
+        // Version 6 changes:
+        //  Updated handlebars templates to include "conjugation" definition.
+        await this._addFieldTemplatesToOptions(options, '/bg/data/anki-field-templates-upgrade-v6.handlebars');
         return options;
     }
 }

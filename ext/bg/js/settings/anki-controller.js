@@ -79,6 +79,7 @@ class AnkiController {
                     'cloze-body',
                     'cloze-prefix',
                     'cloze-suffix',
+                    'conjugation',
                     'dictionary',
                     'document-title',
                     'expression',

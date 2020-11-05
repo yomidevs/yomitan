@@ -1,0 +1,8 @@
+{{#*inline "conjugation"}}
+    {{~#if definition.reasons~}}
+        {{~#each definition.reasons~}}
+            {{~#if (op ">" @index 0)}} « {{/if~}}
+            {{.}}
+        {{~/each~}}
+    {{~/if~}}
+{{/inline}}

@@ -496,7 +496,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 5,
+        version: 6,
         global: {
             database: {
                 prefixWildcardsSupported: false
@@ -554,6 +554,7 @@ async function testFieldTemplatesUpdate(extDir) {
     const loadDataFile = (fileName) => fs.readFileSync(path.join(extDir, fileName), {encoding: 'utf8'});
     const update2 = loadDataFile('bg/data/anki-field-templates-upgrade-v2.handlebars');
     const update4 = loadDataFile('bg/data/anki-field-templates-upgrade-v4.handlebars');
+    const update6 = loadDataFile('bg/data/anki-field-templates-upgrade-v6.handlebars');
 
     const data = [
         // Standard format
@@ -572,6 +573,7 @@ async function testFieldTemplatesUpdate(extDir) {
 
 ${update2}
 ${update4}
+${update6}
 {{~> (lookup . "marker") ~}}`.trimStart()
         },
         // Non-standard marker format
@@ -590,7 +592,8 @@ ${update4}
 
 {{~> (lookup . "marker2") ~}}
 ${update2}
-${update4}`.trimStart()
+${update4}
+${update6}`.trimStart()
         },
         // Empty test
         {
@@ -600,6 +603,7 @@ ${update4}`.trimStart()
             expected: `
 ${update2}
 ${update4}
+${update6}
 {{~> (lookup . "marker") ~}}`.trimStart()
         }
     ];
