@@ -98,6 +98,10 @@ class SettingsController extends EventDispatcher {
         return await this.modifyProfileSettings([{action: 'set', path, value}]);
     }
 
+    async getDictionaryInfo() {
+        return await api.getDictionaryInfo();
+    }
+
     getOptionsContext() {
         return {index: this._profileIndex};
     }
