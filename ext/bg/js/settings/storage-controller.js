@@ -148,9 +148,10 @@ class StorageController {
 
     _bytesToLabeledString(size) {
         const base = 1000;
-        const labels = [' bytes', 'KB', 'MB', 'GB'];
+        const labels = [' bytes', 'KB', 'MB', 'GB', 'TB'];
+        const maxLabelIndex = labels.length - 1;
         let labelIndex = 0;
-        while (size >= base) {
+        while (size >= base && labelIndex < maxLabelIndex) {
             size /= base;
             ++labelIndex;
         }
