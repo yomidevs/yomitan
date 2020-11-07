@@ -31,23 +31,28 @@ function lstatSyncSafe(fileName) {
     }
 }
 
+function validatePath(src, fileName, extDir) {
+    assert.ok(typeof src === 'string', `<script> missing src attribute in ${fileName}`);
+    assert.ok(src.startsWith('/'), `<script> src attribute is not absolute in ${fileName} (src=${JSON.stringify(src)})`);
+    const relativeSrc = src.substring(1);
+    assert.ok(!path.isAbsolute(relativeSrc), `<script> src attribute is invalid in ${fileName} (src=${JSON.stringify(src)})`);
+    const fullSrc = path.join(extDir, relativeSrc);
+    const stats = lstatSyncSafe(fullSrc);
+    assert.ok(stats !== null, `<script> src file not found in ${fileName} (src=${JSON.stringify(src)})`);
+    assert.ok(stats.isFile(), `<script> src file invalid in ${fileName} (src=${JSON.stringify(src)})`);
+}
+
 function validateHtmlScripts(fileName, extDir) {
     const domSource = fs.readFileSync(fileName, {encoding: 'utf8'});
     const dom = new JSDOM(domSource);
     const {window} = dom;
     const {document} = window;
     try {
-        const scripts = document.querySelectorAll('script');
-        for (const script of scripts) {
-            const {src} = script;
-            assert.ok(typeof src === 'string', `<script> missing src attribute in ${fileName}`);
-            assert.ok(src.startsWith('/'), `<script> src attribute is not absolute in ${fileName} (src=${JSON.stringify(src)})`);
-            const relativeSrc = src.substring(1);
-            assert.ok(!path.isAbsolute(relativeSrc), `<script> src attribute is invalid in ${fileName} (src=${JSON.stringify(src)})`);
-            const fullSrc = path.join(extDir, relativeSrc);
-            const stats = lstatSyncSafe(fullSrc);
-            assert.ok(stats !== null, `<script> src file not found in ${fileName} (src=${JSON.stringify(src)})`);
-            assert.ok(stats.isFile(), `<script> src file invalid in ${fileName} (src=${JSON.stringify(src)})`);
+        for (const {src} of document.querySelectorAll('script')) {
+            validatePath(src, fileName, extDir);
+        }
+        for (const {href} of document.querySelectorAll('link')) {
+            validatePath(href, fileName, extDir);
         }
     } finally {
         window.close();
