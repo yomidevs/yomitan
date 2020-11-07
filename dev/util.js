@@ -137,6 +137,16 @@ function createDictionaryArchive(dictionaryDirectory, dictionaryName) {
 }
 
 
+async function testMain(func) {
+    try {
+        await func();
+    } catch (e) {
+        console.log(e);
+        process.exit(-1);
+    }
+}
+
+
 module.exports = {
     get JSZip() { return getJSZip(); },
     getArgs,
@@ -144,5 +154,6 @@ module.exports = {
     getDefaultManifest,
     getDefaultManifestAndVariants,
     createManifestString,
-    createDictionaryArchive
+    createDictionaryArchive,
+    testMain
 };

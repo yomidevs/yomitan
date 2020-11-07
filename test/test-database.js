@@ -19,7 +19,7 @@ const fs = require('fs');
 const url = require('url');
 const path = require('path');
 const assert = require('assert');
-const {JSZip, createDictionaryArchive} = require('../dev/util');
+const {JSZip, createDictionaryArchive, testMain} = require('../dev/util');
 const {VM} = require('../dev/vm');
 require('fake-indexeddb/auto');
 
@@ -958,4 +958,4 @@ async function main() {
 }
 
 
-if (require.main === module) { main(); }
+if (require.main === module) { testMain(main); }

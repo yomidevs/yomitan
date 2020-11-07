@@ -16,7 +16,7 @@
  */
 
 const path = require('path');
-const {createDictionaryArchive} = require('../dev/util');
+const {createDictionaryArchive, testMain} = require('../dev/util');
 const dictionaryValidate = require('../dev/dictionary-validate');
 
 
@@ -62,4 +62,4 @@ async function main() {
 }
 
 
-if (require.main === module) { main(); }
+if (require.main === module) { testMain(main); }

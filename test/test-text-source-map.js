@@ -16,6 +16,7 @@
  */
 
 const assert = require('assert');
+const {testMain} = require('../dev/util');
 const {VM} = require('../dev/vm');
 
 const vm = new VM();
@@ -230,4 +231,4 @@ function main() {
 }
 
 
-if (require.main === module) { main(); }
+if (require.main === module) { testMain(main); }
