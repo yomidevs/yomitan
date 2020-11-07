@@ -722,7 +722,7 @@ class Display extends EventDispatcher {
     _updateDocumentOptions(options) {
         const data = document.documentElement.dataset;
         data.ankiEnabled = `${options.anki.enable}`;
-        data.audioEnabled = `${options.audio.enabled}`;
+        data.audioEnabled = `${options.audio.enabled && options.audio.sources.length > 0}`;
         data.compactGlossaries = `${options.general.compactGlossaries}`;
         data.enableSearchTags = `${options.scanning.enableSearchTags}`;
         data.showPitchAccentDownstepNotation = `${options.general.showPitchAccentDownstepNotation}`;
