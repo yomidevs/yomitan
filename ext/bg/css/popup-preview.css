@@ -15,8 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+:root {
+    --animation-duration: 0s;
+}
+:root[data-loaded=true] {
+    --animation-duration: 0.25s;
+}
+
 html {
-    transition: background-color 0.25s linear 0s, color 0.25s linear 0s;
+    transition: background-color var(--animation-duration) linear 0s, color var(--animation-duration) linear 0s;
     background-color: rgba(255, 255, 255, 0);
     color: #333333;
 }
@@ -81,7 +88,7 @@ body {
     color: inherit;
     background-color: transparent;
     white-space: pre;
-    transition: background-color 0.25s linear 0s, border-color 0.25s linear 0s;
+    transition: background-color var(--animation-duration) linear 0s, border-color var(--animation-duration) linear 0s;
 }
 .example-text:hover,
 .example-text-input {
@@ -114,12 +121,12 @@ body {
     flex: 0 1 auto;
     visibility: hidden;
     opacity: 0;
-    transition: opacity 0.5s linear 0s, visibility 0s linear 0.5s;
+    transition: opacity var(--animation-duration) linear 0s, visibility 0s linear var(--animation-duration);
 }
 .placeholder-info.placeholder-info-visible {
     visibility: visible;
     opacity: 1;
-    transition: opacity 0.5s linear 0s, visibility 0s linear 0s;
+    transition: opacity var(--animation-duration) linear 0s, visibility 0s linear 0s;
 }
 
 .theme-button {

@@ -612,7 +612,9 @@ class OptionsUtil {
     async _updateVersion6(options) {
         // Version 6 changes:
         //  Updated handlebars templates to include "conjugation" definition.
+        //  Added global option showPopupPreview.
         await this._addFieldTemplatesToOptions(options, '/bg/data/anki-field-templates-upgrade-v6.handlebars');
+        options.global.showPopupPreview = false;
         return options;
     }
 }

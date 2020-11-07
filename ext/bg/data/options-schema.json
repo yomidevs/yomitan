@@ -790,7 +790,8 @@
         "global": {
             "type": "object",
             "required": [
-                "database"
+                "database",
+                "showPopupPreview"
             ],
             "properties": {
                 "database": {
@@ -804,6 +805,10 @@
                             "default": false
                         }
                     }
+                },
+                "showPopupPreview": {
+                    "type": "boolean",
+                    "default": false
                 }
             }
         }

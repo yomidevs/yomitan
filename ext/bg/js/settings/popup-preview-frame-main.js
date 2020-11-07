@@ -32,6 +32,8 @@
 
         const preview = new PopupPreviewFrame(frameId, popupFactory);
         await preview.prepare();
+
+        document.documentElement.dataset.loaded = 'true';
     } catch (e) {
         yomichan.logError(e);
     }

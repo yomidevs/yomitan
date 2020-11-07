@@ -28,9 +28,11 @@ class PopupPreviewController {
         this._previewTextInput = null;
         this._customCss = null;
         this._customOuterCss = null;
+        this._previewFrameContainer = null;
+        this._showPopupPreviewCheckbox = null;
     }
 
-    prepare() {
+    async prepare() {
         const button = document.querySelector('#settings-popup-preview-button');
         if (button !== null) {
             button.addEventListener('click', this._onShowPopupPreviewButtonClick.bind(this), false);
@@ -38,13 +40,20 @@ class PopupPreviewController {
             this._frame = document.querySelector('#popup-preview-frame');
             this._customCss = document.querySelector('#custom-popup-css');
             this._customOuterCss = document.querySelector('#custom-popup-outer-css');
+            this._previewFrameContainer = document.querySelector('.preview-frame-container');
+            this._showPopupPreviewCheckbox = document.querySelector('#show-preview-checkbox');
 
             this._customCss.addEventListener('input', this._onCustomCssChange.bind(this), false);
             this._customCss.addEventListener('settingChanged', this._onCustomCssChange.bind(this), false);
             this._customOuterCss.addEventListener('input', this._onCustomOuterCssChange.bind(this), false);
             this._customOuterCss.addEventListener('settingChanged', this._onCustomOuterCssChange.bind(this), false);
             this._frame.addEventListener('load', this._onFrameLoad2.bind(this), false);
+            this._showPopupPreviewCheckbox.addEventListener('change', this._onShowPreviewCheckboxChange.bind(this), false);
             this._settingsController.on('optionsContextChanged', this._onOptionsContextChange.bind(this));
+
+            const {global: {showPopupPreview}} = await this._settingsController.getOptionsFull();
+            this._showPopupPreviewCheckbox.checked = showPopupPreview;
+            this._updatePopupPreviewVisibility();
         }
     }
 
@@ -54,6 +63,10 @@ class PopupPreviewController {
         if (this._previewVisible) { return; }
         this._showAppearancePreview();
         this._previewVisible = true;
+    }
+
+    _onShowPreviewCheckboxChange() {
+        this._updatePopupPreviewVisibility();
     }
 
     _showAppearancePreview() {
@@ -123,5 +136,11 @@ class PopupPreviewController {
     _invoke(action, params) {
         if (this._frame === null || this._frame.contentWindow === null) { return; }
         this._frame.contentWindow.postMessage({action, params}, this._targetOrigin);
+    }
+
+    _updatePopupPreviewVisibility() {
+        const value = this._showPopupPreviewCheckbox.checked;
+        this._previewFrameContainer.classList.toggle('preview-frame-container-visible', value);
+        this._settingsController.setGlobalSetting('global.showPopupPreview', value);
     }
 }
