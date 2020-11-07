@@ -500,7 +500,8 @@ function createOptionsUpdatedTestData1() {
         global: {
             database: {
                 prefixWildcardsSupported: false
-            }
+            },
+            showPopupPreview: false
         }
     };
 }
