@@ -69,6 +69,10 @@ const api = (() => {
             return this._invoke('kanjiFind', {text, optionsContext});
         }
 
+        isAnkiConnected() {
+            return this._invoke('isAnkiConnected');
+        }
+
         addAnkiNote(note) {
             return this._invoke('addAnkiNote', {note});
         }

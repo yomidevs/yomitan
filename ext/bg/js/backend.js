@@ -83,6 +83,7 @@ class Backend {
             ['kanjiFind',                    {async: true,  contentScript: true,  handler: this._onApiKanjiFind.bind(this)}],
             ['termsFind',                    {async: true,  contentScript: true,  handler: this._onApiTermsFind.bind(this)}],
             ['textParse',                    {async: true,  contentScript: true,  handler: this._onApiTextParse.bind(this)}],
+            ['isAnkiConnected',              {async: true,  contentScript: true,  handler: this._onApiIsAnkiConnected.bind(this)}],
             ['addAnkiNote',                  {async: true,  contentScript: true,  handler: this._onApiAddAnkiNote.bind(this)}],
             ['getAnkiNoteInfo',              {async: true,  contentScript: true,  handler: this._onApiGetAnkiNoteInfo.bind(this)}],
             ['injectAnkiNoteMedia',          {async: true,  contentScript: true,  handler: this._onApiInjectAnkiNoteMedia.bind(this)}],
@@ -418,6 +419,10 @@ class Backend {
         }
 
         return results;
+    }
+
+    async _onApiIsAnkiConnected() {
+        return await this._anki.isConnected();
     }
 
     async _onApiAddAnkiNote({note}) {

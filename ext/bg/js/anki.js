@@ -40,6 +40,15 @@ class AnkiConnect {
         this._enabled = value;
     }
 
+    async isConnected() {
+        try {
+            await this._invoke('version');
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
     async addNote(note) {
         if (!this._enabled) { return null; }
         await this._checkVersion();
