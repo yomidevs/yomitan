@@ -1289,8 +1289,8 @@ class Backend {
 
         const promises = [];
         for (const tab of tabs) {
-            const promise = this._getTabUrl(tab);
-            promise.then(checkTabUrl);
+            const promise = this._getTabUrl(tab.id);
+            promise.then((url) => checkTabUrl({url, tab}));
             promises.push(promise);
         }
 
