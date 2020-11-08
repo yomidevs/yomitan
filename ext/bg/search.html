@@ -1,105 +1,95 @@
 <!DOCTYPE html>
 <html lang="en" data-yomichan-page="search">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <title>Yomichan Search</title>
-        <link rel="icon" type="image/png" href="/mixed/img/icon16.png" sizes="16x16">
-        <link rel="icon" type="image/png" href="/mixed/img/icon19.png" sizes="19x19">
-        <link rel="icon" type="image/png" href="/mixed/img/icon32.png" sizes="32x32">
-        <link rel="icon" type="image/png" href="/mixed/img/icon38.png" sizes="38x38">
-        <link rel="icon" type="image/png" href="/mixed/img/icon48.png" sizes="48x48">
-        <link rel="icon" type="image/png" href="/mixed/img/icon64.png" sizes="64x64">
-        <link rel="icon" type="image/png" href="/mixed/img/icon128.png" sizes="128x128">
-        <link rel="stylesheet" type="text/css" href="/mixed/lib/bootstrap/css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="/mixed/lib/bootstrap/css/bootstrap-theme.min.css">
-        <link rel="stylesheet" type="text/css" href="/mixed/css/display.css">
-    </head>
-    <body>
-        <div class="container">
-            <div id="intro" style="overflow: hidden;">
-                <div class="page-header">
-                    <h1>Yomichan Search</h1>
-                </div>
-                <p style="margin-bottom: 0;">Search your installed dictionaries by entering a Japanese expression into the field below.</p>
-            </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Yomichan Search</title>
+    <link rel="icon" type="image/png" href="/mixed/img/icon16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="/mixed/img/icon19.png" sizes="19x19">
+    <link rel="icon" type="image/png" href="/mixed/img/icon32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/mixed/img/icon38.png" sizes="38x38">
+    <link rel="icon" type="image/png" href="/mixed/img/icon48.png" sizes="48x48">
+    <link rel="icon" type="image/png" href="/mixed/img/icon64.png" sizes="64x64">
+    <link rel="icon" type="image/png" href="/mixed/img/icon128.png" sizes="128x128">
+    <link rel="stylesheet" type="text/css" href="/mixed/css/search.css">
+    <link rel="stylesheet" type="text/css" href="/mixed/css/display.css">
+</head>
+<body>
 
-            <div class="search-input">
-                <div class="input-group" style="padding-top: 20px;">
-                    <span title="Enable kana input method" class="input-group-text">
-                        <input type="checkbox" id="wanakana-enable" class="icon-checkbox" />
-                        <label for="wanakana-enable" class="scan-disable">あ</label>
-                    </span>
-                    <span title="Enable clipboard monitor" class="input-group-text">
-                        <input type="checkbox" id="clipboard-monitor-enable" class="icon-checkbox" />
-                        <label for="clipboard-monitor-enable"><span class="glyphicon glyphicon-paste"></span></label>
-                    </span>
-                </div>
+<div class="content"><div class="content-center">
 
-                <form class="input-group">
-                    <input type="text" class="form-control" placeholder="Search for..." id="query" autofocus>
-                    <span class="input-group-btn">
-                        <input type="submit" class="btn btn-default form-control" id="search" value="Search">
-                    </span>
-                </form>
-            </div>
+    <div id="intro">
+        <h1>Yomichan Search</h1>
+    </div>
 
-            <div id="spinner" hidden><img src="/mixed/img/spinner.gif"></div>
-
-            <div class="scan-disable" id="query-parser-container">
-                <div id="query-parser-select-container" class="input-group"></div>
-                <div id="query-parser-content"></div>
-            </div>
-
-            <hr>
-
-            <div id="navigation-header" class="navigation-header" hidden><div class="navigation-header-actions">
-                <button class="action-button action-previous" data-icon="source-term" title="Source term (Alt + B)"></button>
-                <button class="action-button action-next" data-icon="source-term" title="Next term (Alt + F)"></button>
-            </div></div><div class="navigation-header-spacer"></div>
-
-            <div id="content"></div>
-
-            <div id="no-results" hidden>
-                <div class="entry">
-                    <p>No results found.</p>
-                </div>
-            </div>
+    <div class="scan-disable">
+        <div class="search-options">
+            <label class="search-option">
+                <label class="toggle"><input type="checkbox" id="wanakana-enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                <span class="search-option-label">Automatic kana conversion</span>
+            </label>
+            <label class="search-option">
+                <label class="toggle"><input type="checkbox" id="clipboard-monitor-enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                <span class="search-option-label">Clipboard monitor</span>
+            </label>
         </div>
+        <div class="search-textbox-container">
+            <textarea id="search-textbox" placeholder="Input a term, expression, sentence, or block of text" autocomplete="false" autofocus></textarea>
+            <button id="search-button"><span class="icon-button-icon" data-icon="magnifying-glass"></span></button>
+        </div>
+    </div>
 
-        <script src="/mixed/lib/wanakana.min.js"></script>
+    <div id="spinner" hidden><img src="/mixed/img/spinner.gif"></div>
 
-        <script src="/mixed/js/core.js"></script>
-        <script src="/mixed/js/yomichan.js"></script>
-        <script src="/mixed/js/comm.js"></script>
-        <script src="/mixed/js/api.js"></script>
-        <script src="/mixed/js/japanese.js"></script>
+    <div class="scan-disable" id="query-parser-container">
+        <div id="query-parser-select-container"></div>
+        <div id="query-parser-content"></div>
+    </div>
 
-        <script src="/mixed/js/cache-map.js"></script>
-        <script src="/mixed/js/document-util.js"></script>
-        <script src="/fg/js/dom-text-scanner.js"></script>
-        <script src="/fg/js/text-source-range.js"></script>
-        <script src="/fg/js/text-source-element.js"></script>
-        <script src="/mixed/js/audio-system.js"></script>
-        <script src="/mixed/js/dictionary-data-util.js"></script>
-        <script src="/mixed/js/display.js"></script>
-        <script src="/mixed/js/display-generator.js"></script>
-        <script src="/mixed/js/display-history.js"></script>
-        <script src="/mixed/js/dynamic-loader.js"></script>
-        <script src="/mixed/js/media-loader.js"></script>
-        <script src="/mixed/js/scroll.js"></script>
-        <script src="/mixed/js/text-scanner.js"></script>
-        <script src="/mixed/js/html-template-collection.js"></script>
-        <script src="/mixed/js/text-to-speech-audio.js"></script>
+    <div id="definitions"></div>
 
-        <script src="/bg/js/anki-note-builder.js"></script>
-        <script src="/bg/js/template-renderer-proxy.js"></script>
+    <div id="no-results" hidden>
+        <div class="entry">
+            <p>No results found.</p>
+        </div>
+    </div>
 
-        <script src="/bg/js/query-parser-generator.js"></script>
-        <script src="/bg/js/query-parser.js"></script>
-        <script src="/bg/js/clipboard-monitor.js"></script>
-        <script src="/bg/js/search.js"></script>
+</div></div>
 
-        <script src="/bg/js/search-main.js"></script>
-    </body>
+<script src="/mixed/lib/wanakana.min.js"></script>
+
+<script src="/mixed/js/core.js"></script>
+<script src="/mixed/js/yomichan.js"></script>
+<script src="/mixed/js/comm.js"></script>
+<script src="/mixed/js/api.js"></script>
+<script src="/mixed/js/japanese.js"></script>
+
+<script src="/mixed/js/cache-map.js"></script>
+<script src="/mixed/js/document-util.js"></script>
+<script src="/fg/js/dom-text-scanner.js"></script>
+<script src="/fg/js/text-source-range.js"></script>
+<script src="/fg/js/text-source-element.js"></script>
+<script src="/mixed/js/audio-system.js"></script>
+<script src="/mixed/js/dictionary-data-util.js"></script>
+<script src="/mixed/js/display.js"></script>
+<script src="/mixed/js/display-generator.js"></script>
+<script src="/mixed/js/display-history.js"></script>
+<script src="/mixed/js/dynamic-loader.js"></script>
+<script src="/mixed/js/media-loader.js"></script>
+<script src="/mixed/js/scroll.js"></script>
+<script src="/mixed/js/text-scanner.js"></script>
+<script src="/mixed/js/html-template-collection.js"></script>
+<script src="/mixed/js/text-to-speech-audio.js"></script>
+
+<script src="/bg/js/anki-note-builder.js"></script>
+<script src="/bg/js/template-renderer-proxy.js"></script>
+
+<script src="/bg/js/query-parser-generator.js"></script>
+<script src="/bg/js/query-parser.js"></script>
+<script src="/bg/js/clipboard-monitor.js"></script>
+<script src="/bg/js/search.js"></script>
+
+<script src="/bg/js/search-main.js"></script>
+
+</body>
 </html>

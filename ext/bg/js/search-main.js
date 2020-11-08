@@ -28,6 +28,7 @@
         const displaySearch = new DisplaySearch();
         await displaySearch.prepare();
 
+        document.documentElement.dataset.loaded = 'true';
         yomichan.ready();
     } catch (e) {
         yomichan.logError(e);

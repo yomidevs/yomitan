@@ -187,23 +187,6 @@ h2 {
  * Search page
  */
 
-.icon-checkbox {
-    display: none;
-}
-
-.icon-checkbox+label {
-    cursor: pointer;
-    font-size: 1.6em;
-    padding: 0.1em;
-    user-select: none;
-}
-
-.icon-checkbox:checked+label {
-    /* Invert colors */
-    background-color: var(--default-text-color);
-    color: var(--background-color);
-}
-
 #query-parser-content {
     margin-top: 0.5em;
     font-size: 2em;

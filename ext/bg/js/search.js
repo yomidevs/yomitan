@@ -25,12 +25,14 @@
 
 class DisplaySearch extends Display {
     constructor() {
-        super(document.querySelector('#spinner'), document.querySelector('#content'));
-        this._searchButton = document.querySelector('#search');
-        this._queryInput = document.querySelector('#query');
+        super();
+        this._searchButton = document.querySelector('#search-button');
+        this._queryInput = document.querySelector('#search-textbox');
         this._introElement = document.querySelector('#intro');
         this._clipboardMonitorEnableCheckbox = document.querySelector('#clipboard-monitor-enable');
         this._wanakanaEnableCheckbox = document.querySelector('#wanakana-enable');
+        this._queryInputEvents = new EventListenerCollection();
+        this._wanakanaEnabled = false;
         this._isPrepared = false;
         this._introVisible = true;
         this._introAnimationTimer = null;
@@ -42,7 +44,7 @@ class DisplaySearch extends Display {
         });
         this._onKeyDownIgnoreKeys = new Map([
             ['ANY_MOD', new Set([
-                'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageDown', 'PageUp', 'Home', 'End',
+                'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageDown', 'PageUp', 'Home', 'End', 'Enter',
                 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10',
                 'F11', 'F12', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19', 'F20',
                 'F21', 'F22', 'F23', 'F24'
@@ -71,22 +73,16 @@ class DisplaySearch extends Display {
         this.queryParserVisible = true;
         this.setHistorySettings({useBrowserHistory: true});
 
-        const options = this.getOptions();
-        if (options.general.enableWanakana === true) {
-            this._wanakanaEnableCheckbox.checked = true;
-            wanakana.bind(this._queryInput);
-        } else {
-            this._wanakanaEnableCheckbox.checked = false;
-        }
+        const enableWanakana = !!this.getOptions().general.enableWanakana;
+        this._wanakanaEnableCheckbox.checked = enableWanakana;
+        this._setWanakanaEnabled(enableWanakana);
 
         this._searchButton.addEventListener('click', this._onSearch.bind(this), false);
-        this._queryInput.addEventListener('input', this._onSearchInput.bind(this), false);
         this._wanakanaEnableCheckbox.addEventListener('change', this._onWanakanaEnableChange.bind(this));
         window.addEventListener('copy', this._onCopy.bind(this));
         this._clipboardMonitor.on('change', this._onExternalSearchUpdate.bind(this));
         this._clipboardMonitorEnableCheckbox.addEventListener('change', this._onClipboardMonitorEnableChange.bind(this));
 
-        this._updateSearchButton();
         this._onModeChange();
 
         await this._prepareNestedPopups();
@@ -141,7 +137,7 @@ class DisplaySearch extends Display {
     }
 
     postProcessQuery(query) {
-        if (this._isWanakanaEnabled()) {
+        if (this._wanakanaEnabled) {
             try {
                 query = wanakana.toKana(query);
             } catch (e) {
@@ -173,28 +169,27 @@ class DisplaySearch extends Display {
         if (typeof source !== 'string') { source = ''; }
 
         this._queryInput.value = source;
+        this._updateSearchHeight();
         this._setIntroVisible(!valid, animate);
-        this._updateSearchButton();
     }
 
     _onSearchInput() {
-        this._updateSearchButton();
+        this._updateSearchHeight();
+    }
 
-        const queryElementRect = this._queryInput.getBoundingClientRect();
-        if (queryElementRect.top < 0 || queryElementRect.bottom > window.innerHeight) {
-            this._queryInput.scrollIntoView();
-        }
+    _onSearchKeydown(e) {
+        if (e.code !== 'Enter' || e.shiftKey) { return; }
+
+        // Search
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        e.currentTarget.blur();
+        this._search();
     }
 
     _onSearch(e) {
-        if (this._queryInput === null) {
-            return;
-        }
-
         e.preventDefault();
-
-        const query = this._queryInput.value;
-        this._onSearchQueryUpdated(query, true);
+        this._search();
     }
 
     _onCopy() {
@@ -228,11 +223,7 @@ class DisplaySearch extends Display {
 
     _onWanakanaEnableChange(e) {
         const value = e.target.checked;
-        if (value) {
-            wanakana.bind(this._queryInput);
-        } else {
-            wanakana.unbind(this._queryInput);
-        }
+        this._setWanakanaEnabled(value);
         api.modifySettings([{
             action: 'set',
             path: 'general.enableWanakana',
@@ -254,8 +245,22 @@ class DisplaySearch extends Display {
         this._updateClipboardMonitorEnabled();
     }
 
-    _isWanakanaEnabled() {
-        return this._wanakanaEnableCheckbox !== null && this._wanakanaEnableCheckbox.checked;
+    _setWanakanaEnabled(enabled) {
+        const input = this._queryInput;
+        this._queryInputEvents.removeAllEventListeners();
+
+        this._queryInputEvents.addEventListener(input, 'keydown', this._onSearchKeydown.bind(this), false);
+
+        if (this._wanakanaEnabled !== enabled) {
+            this._wanakanaEnabled = enabled;
+            if (enabled) {
+                wanakana.bind(input);
+            } else {
+                wanakana.unbind(input);
+            }
+        }
+
+        this._queryInputEvents.addEventListener(input, 'input', this._onSearchInput.bind(this), false);
     }
 
     _setIntroVisible(visible, animate) {
@@ -312,10 +317,6 @@ class DisplaySearch extends Display {
             this._introElement.style.transition = '';
         }
         this._introElement.style.height = '0';
-    }
-
-    _updateSearchButton() {
-        this._searchButton.disabled = this._introVisible && (this._queryInput === null || this._queryInput.value.length === 0);
     }
 
     async _prepareNestedPopups() {
@@ -387,5 +388,19 @@ class DisplaySearch extends Display {
                 }
             );
         });
+    }
+
+    _search() {
+        const query = this._queryInput.value;
+        this._onSearchQueryUpdated(query, true);
+    }
+
+    _updateSearchHeight() {
+        const node = this._queryInput;
+        const {scrollHeight} = node;
+        const currentHeight = node.getBoundingClientRect().height;
+        if (scrollHeight >= currentHeight - 1) {
+            node.style.height = `${scrollHeight}px`;
+        }
     }
 }

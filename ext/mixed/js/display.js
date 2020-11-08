@@ -32,10 +32,10 @@
  */
 
 class Display extends EventDispatcher {
-    constructor(spinner, container) {
+    constructor() {
         super();
-        this._spinner = spinner;
-        this._container = container;
+        this._spinner = document.querySelector('#spinner');
+        this._container = document.querySelector('#definitions');
         this._definitions = [];
         this._optionsContext = {depth: 0, url: window.location.href};
         this._options = null;
@@ -804,7 +804,10 @@ class Display extends EventDispatcher {
 
     async _setContentTermsOrKanji(token, isTerms, urlSearchParams, eventArgs) {
         let source = urlSearchParams.get('query');
-        if (!source) { return false; }
+        if (!source) {
+            this._setQueryParserText('');
+            return false;
+        }
 
         let {state, content} = this._history;
         let changeHistory = false;

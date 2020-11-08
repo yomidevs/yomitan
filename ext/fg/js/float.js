@@ -23,7 +23,7 @@
 
 class DisplayFloat extends Display {
     constructor() {
-        super(document.querySelector('#spinner'), document.querySelector('#definitions'));
+        super();
         this._nestedPopupsPrepared = false;
         this._frameEndpoint = new FrameEndpoint();
         this._windowMessageHandlers = new Map([
