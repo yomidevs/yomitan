@@ -671,6 +671,7 @@
                                     "terms",
                                     "kanji",
                                     "duplicateScope",
+                                    "checkForDuplicates",
                                     "fieldTemplates"
                                 ],
                                 "properties": {
@@ -770,6 +771,10 @@
                                         "type": "string",
                                         "default": "collection",
                                         "enum": ["collection", "deck", "deck-root"]
+                                    },
+                                    "checkForDuplicates": {
+                                        "type": "boolean",
+                                        "default": true
                                     },
                                     "fieldTemplates": {
                                         "type": ["string", "null"],

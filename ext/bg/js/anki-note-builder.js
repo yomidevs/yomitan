@@ -31,6 +31,7 @@ class AnkiNoteBuilder {
         context,
         templates,
         tags=[],
+        checkForDuplicates=true,
         duplicateScope='collection',
         resultOutputMode='split',
         compactGlossaries=false,
@@ -60,6 +61,7 @@ class AnkiNoteBuilder {
             deckName: deck,
             modelName: model,
             options: {
+                allowDuplicate: !checkForDuplicates,
                 duplicateScope,
                 duplicateScopeOptions: {
                     deckName: duplicateScopeDeckName,

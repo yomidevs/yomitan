@@ -901,8 +901,15 @@ class Display extends EventDispatcher {
         const modes = isTerms ? ['term-kanji', 'term-kana'] : ['kanji'];
         let states;
         try {
-            const noteContext = await this._getNoteContext();
-            states = await this._areDefinitionsAddable(definitions, modes, noteContext);
+            if (this._options.anki.checkForDuplicates) {
+                const noteContext = await this._getNoteContext();
+                states = await this._areDefinitionsAddable(definitions, modes, noteContext);
+            } else {
+                if (!await api.isAnkiConnected()) {
+                    throw new Error('Anki not connected');
+                }
+                states = this._areDefinitionsAddableForcedValue(definitions, modes, true);
+            }
         } catch (e) {
             return;
         }
@@ -1377,10 +1384,24 @@ class Display extends EventDispatcher {
         return results;
     }
 
+    _areDefinitionsAddableForcedValue(definitions, modes, canAdd) {
+        const results = [];
+        const definitionCount = definitions.length;
+        const modeCount = modes.length;
+        for (let i = 0; i < definitionCount; ++i) {
+            const modeArray = [];
+            for (let j = 0; j < modeCount; ++j) {
+                modeArray.push({canAdd, noteIds: null});
+            }
+            results.push(modeArray);
+        }
+        return results;
+    }
+
     async _createNote(definition, mode, context, options, templates, injectMedia) {
         const {
             general: {resultOutputMode, compactGlossaries},
-            anki: {tags, duplicateScope, kanji, terms, screenshot: {format, quality}},
+            anki: {tags, checkForDuplicates, duplicateScope, kanji, terms, screenshot: {format, quality}},
             audio: {sources, customSourceUrl}
         } = options;
         const modeOptions = (mode === 'kanji') ? kanji : terms;
@@ -1416,6 +1437,7 @@ class Display extends EventDispatcher {
             context,
             templates,
             tags,
+            checkForDuplicates,
             duplicateScope,
             resultOutputMode,
             compactGlossaries,

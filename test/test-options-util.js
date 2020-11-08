@@ -409,6 +409,7 @@ function createProfileOptionsUpdatedTestData1() {
             terms: {deck: '', model: '', fields: {}},
             kanji: {deck: '', model: '', fields: {}},
             duplicateScope: 'collection',
+            checkForDuplicates: true,
             fieldTemplates: null
         }
     };

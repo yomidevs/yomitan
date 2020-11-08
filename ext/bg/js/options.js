@@ -613,8 +613,12 @@ class OptionsUtil {
         // Version 6 changes:
         //  Updated handlebars templates to include "conjugation" definition.
         //  Added global option showPopupPreview.
+        //  Added anki.checkForDuplicates.
         await this._addFieldTemplatesToOptions(options, '/bg/data/anki-field-templates-upgrade-v6.handlebars');
         options.global.showPopupPreview = false;
+        for (const profile of options.profiles) {
+            profile.options.anki.checkForDuplicates = true;
+        }
         return options;
     }
 }
