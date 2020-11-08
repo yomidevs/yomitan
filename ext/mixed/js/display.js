@@ -164,7 +164,7 @@ class Display extends EventDispatcher {
         this._updateMode();
         this._setInteractive(true);
         await this._displayGenerator.prepare();
-        await this._queryParser.prepare();
+        this._queryParser.prepare();
         this._history.prepare();
         this._history.on('stateChanged', this._onStateChanged.bind(this));
         this._queryParser.on('searched', this._onQueryParserSearch.bind(this));

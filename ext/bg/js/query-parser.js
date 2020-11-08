@@ -44,8 +44,7 @@ class QueryParser extends EventDispatcher {
         });
     }
 
-    async prepare() {
-        await this._queryParserGenerator.prepare();
+    prepare() {
         this._textScanner.prepare();
         this._textScanner.on('searched', this._onSearched.bind(this));
     }
@@ -125,13 +124,9 @@ class QueryParser extends EventDispatcher {
     }
 
     _setPreview(text) {
-        const previewTerms = [];
-        for (let i = 0, ii = text.length; i < ii; i += 2) {
-            const tempText = text.substring(i, i + 2);
-            previewTerms.push([{text: tempText, reading: ''}]);
-        }
+        const terms = [[{text, reading: ''}]];
         this._queryParser.textContent = '';
-        this._queryParser.appendChild(this._queryParserGenerator.createParseResult(previewTerms, true));
+        this._queryParser.appendChild(this._queryParserGenerator.createParseResult(terms, true));
     }
 
     _renderParserSelect() {
@@ -148,6 +143,6 @@ class QueryParser extends EventDispatcher {
         const parseResult = this._getParseResult();
         this._queryParser.textContent = '';
         if (!parseResult) { return; }
-        this._queryParser.appendChild(this._queryParserGenerator.createParseResult(parseResult.content));
+        this._queryParser.appendChild(this._queryParserGenerator.createParseResult(parseResult.content, false));
     }
 }

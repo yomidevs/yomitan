@@ -15,76 +15,78 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * HtmlTemplateCollection
- * api
- */
-
 class QueryParserGenerator {
-    constructor() {
-        this._templates = null;
-    }
-
-    async prepare() {
-        const html = await api.getQueryParserTemplatesHtml();
-        this._templates = new HtmlTemplateCollection(html);
-    }
-
-    createParseResult(terms, preview=false) {
+    createParseResult(terms, preview) {
+        const type = preview ? 'preview' : 'normal';
         const fragment = document.createDocumentFragment();
         for (const term of terms) {
-            const termContainer = this._templates.instantiate(preview ? 'term-preview' : 'term');
+            const termNode = document.createElement('span');
+            termNode.className = 'query-parser-term';
+            termNode.dataset.type = type;
             for (const segment of term) {
                 if (!segment.text.trim()) { continue; }
                 if (!segment.reading.trim()) {
-                    termContainer.appendChild(this.createSegmentText(segment.text));
+                    this._addSegmentText(segment.text, termNode);
                 } else {
-                    termContainer.appendChild(this.createSegment(segment));
+                    termNode.appendChild(this._createSegment(segment));
                 }
             }
-            fragment.appendChild(termContainer);
-        }
-        return fragment;
-    }
-
-    createSegment(segment) {
-        const segmentContainer = this._templates.instantiate('segment');
-        const segmentTextContainer = segmentContainer.querySelector('.query-parser-segment-text');
-        const segmentReadingContainer = segmentContainer.querySelector('.query-parser-segment-reading');
-        segmentTextContainer.appendChild(this.createSegmentText(segment.text));
-        segmentReadingContainer.textContent = segment.reading;
-        return segmentContainer;
-    }
-
-    createSegmentText(text) {
-        const fragment = document.createDocumentFragment();
-        for (const chr of text) {
-            const charContainer = this._templates.instantiate('char');
-            charContainer.textContent = chr;
-            fragment.appendChild(charContainer);
+            fragment.appendChild(termNode);
         }
         return fragment;
     }
 
     createParserSelect(parseResults, selectedParser) {
-        const selectContainer = this._templates.instantiate('select');
+        const select = document.createElement('select');
+        select.className = 'query-parser-select form-control';
         for (const parseResult of parseResults) {
-            const optionContainer = this._templates.instantiate('select-option');
-            optionContainer.value = parseResult.id;
+            const option = document.createElement('option');
+            option.className = 'query-parser-select-option';
+            option.value = parseResult.id;
             switch (parseResult.source) {
                 case 'scanning-parser':
-                    optionContainer.textContent = 'Scanning parser';
+                    option.textContent = 'Scanning parser';
                     break;
                 case 'mecab':
-                    optionContainer.textContent = `MeCab: ${parseResult.dictionary}`;
+                    option.textContent = `MeCab: ${parseResult.dictionary}`;
                     break;
                 default:
-                    optionContainer.textContent = 'Unrecognized dictionary';
+                    option.textContent = 'Unrecognized dictionary';
                     break;
             }
-            optionContainer.defaultSelected = selectedParser === parseResult.id;
-            selectContainer.appendChild(optionContainer);
+            option.defaultSelected = selectedParser === parseResult.id;
+            select.appendChild(option);
         }
-        return selectContainer;
+        return select;
+    }
+
+    // Private
+
+    _createSegment(segment) {
+        const segmentNode = document.createElement('ruby');
+        segmentNode.className = 'query-parser-segment';
+
+        const textNode = document.createElement('span');
+        textNode.className = 'query-parser-segment-text';
+
+        const readingNode = document.createElement('rt');
+        readingNode.className = 'query-parser-segment-reading';
+
+        segmentNode.appendChild(textNode);
+        segmentNode.appendChild(readingNode);
+
+        this._addSegmentText(segment.text, textNode);
+        readingNode.textContent = segment.reading;
+
+        return segmentNode;
+    }
+
+    _addSegmentText(text, container) {
+        for (const character of text) {
+            const node = document.createElement('span');
+            node.className = 'query-parser-char';
+            node.textContent = character;
+            container.appendChild(node);
+        }
     }
 }

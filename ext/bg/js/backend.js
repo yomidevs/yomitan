@@ -100,7 +100,6 @@ class Backend {
             ['clipboardGet',                 {async: true,  contentScript: true,  handler: this._onApiClipboardGet.bind(this)}],
             ['clipboardGetImage',            {async: true,  contentScript: true,  handler: this._onApiClipboardImageGet.bind(this)}],
             ['getDisplayTemplatesHtml',      {async: true,  contentScript: true,  handler: this._onApiGetDisplayTemplatesHtml.bind(this)}],
-            ['getQueryParserTemplatesHtml',  {async: true,  contentScript: true,  handler: this._onApiGetQueryParserTemplatesHtml.bind(this)}],
             ['getZoom',                      {async: true,  contentScript: true,  handler: this._onApiGetZoom.bind(this)}],
             ['getDefaultAnkiFieldTemplates', {async: false, contentScript: true,  handler: this._onApiGetDefaultAnkiFieldTemplates.bind(this)}],
             ['getDictionaryInfo',            {async: true,  contentScript: false, handler: this._onApiGetDictionaryInfo.bind(this)}],
@@ -592,10 +591,6 @@ class Backend {
 
     async _onApiGetDisplayTemplatesHtml() {
         return await this._fetchAsset('/mixed/display-templates.html');
-    }
-
-    async _onApiGetQueryParserTemplatesHtml() {
-        return await this._fetchAsset('/bg/query-parser-templates.html');
     }
 
     _onApiGetZoom(params, sender) {

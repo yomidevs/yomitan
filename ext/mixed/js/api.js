@@ -137,10 +137,6 @@ const api = (() => {
             return this._invoke('getDisplayTemplatesHtml');
         }
 
-        getQueryParserTemplatesHtml() {
-            return this._invoke('getQueryParserTemplatesHtml');
-        }
-
         getZoom() {
             return this._invoke('getZoom');
         }
