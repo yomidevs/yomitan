@@ -1255,11 +1255,6 @@ class Backend {
         return false;
     }
 
-    _getTemplates(options) {
-        const templates = options.anki.fieldTemplates;
-        return typeof templates === 'string' ? templates : this._defaultAnkiFieldTemplates;
-    }
-
     async _getTabUrl(tabId) {
         try {
             const {url} = await this._sendMessageTabPromise(
@@ -1460,23 +1455,6 @@ class Backend {
         const url = await this._getTabUrl(tabId);
         const isValidTab = urlPredicate(url);
         return isValidTab ? tab : null;
-    }
-
-    _environmentHasDocument() {
-        return (typeof document === 'object' && document !== null);
-    }
-
-    _executePasteCommand() {
-        document.execCommand('paste');
-    }
-
-    _readFileAsDataURL(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = () => reject(reader.error);
-            reader.readAsDataURL(file);
-        });
     }
 
     async _getScreenshot(windowId, tabId, ownerFrameId, format, quality) {
