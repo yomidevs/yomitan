@@ -32,6 +32,10 @@
                 <label class="toggle"><input type="checkbox" id="clipboard-monitor-enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
                 <span class="search-option-label">Clipboard monitor</span>
             </label>
+            <div class="search-option" id="query-parser-mode-container" hidden>
+                <span class="search-option-pre-label">Parser:</span>
+                <select id="query-parser-mode-select"></select>
+            </div>
         </div>
         <div class="search-textbox-container">
             <textarea id="search-textbox" placeholder="Input a term, expression, sentence, or block of text" autocomplete="false" autofocus></textarea>
@@ -42,7 +46,6 @@
     <div id="spinner" hidden><img src="/mixed/img/spinner.gif"></div>
 
     <div class="scan-disable" id="query-parser-container">
-        <div id="query-parser-select-container"></div>
         <div id="query-parser-content"></div>
     </div>
 

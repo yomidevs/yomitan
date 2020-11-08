@@ -17,6 +17,7 @@
 
 /* Variables */
 :root {
+    --padding: 10px;
     --main-content-size: 700px;
     --main-content-padding: 10px;
     --shadow-color: rgba(0, 0, 0, 0.185);
@@ -32,6 +33,11 @@
 
     --animation-duration: 0s;
     --animation-duration2: calc(var(--animation-duration) * 2);
+
+    --material-arrow-dimension1: 5px;
+    --material-arrow-dimension2: 10px;
+    --input-height: 32px;
+    --input-width-large: 200px;
 
     --text-color-default: #222222;
     --background-color: #ffffff;
@@ -93,6 +99,30 @@ h1 {
     font-weight: normal;
     box-sizing: border-box;
     border-bottom: var(--thin-border-size) solid var(--separator-color1);
+}
+
+/* Material design select */
+select {
+    width: var(--input-width-large);
+    height: var(--input-height);
+    line-height: var(--input-height);
+    border: 0;
+    border-radius: 0;
+    box-sizing: border-box;
+    padding: 0 0.5em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url(/mixed/img/material-down-arrow.svg);
+    background-repeat: no-repeat;
+    background-position: right var(--padding) center;
+    background-color: var(--input-background-color);
+    background-size: var(--material-arrow-dimension2) var(--material-arrow-dimension1);
+    cursor: pointer;
+    outline: 0;
+}
+select::-ms-expand {
+    display: none;
 }
 
 /* Material design toggle switch */
@@ -302,14 +332,30 @@ label.toggle {
     align-items: center;
 }
 .search-option {
-    display: flex;
     flex: 0 1 auto;
     margin: 0.5em 1em;
     align-items: center;
     cursor: pointer;
 }
+.search-option:not([hidden]) {
+    display: flex;
+}
 .search-option-label {
     padding-left: 0.5em;
+}
+.search-option-pre-label {
+    padding-right: 0.5em;
+}
+#query-parser-mode-container {
+    flex: 1 1 auto;
+}
+#query-parser-mode-container:not([hidden]) {
+    display: flex;
+}
+#query-parser-mode-select {
+    flex: 1 1 auto;
+    max-width: 220px;
+    min-width: 100px;
 }
 
 /* Search styles */

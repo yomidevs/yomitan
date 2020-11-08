@@ -29,7 +29,8 @@ class QueryParser extends EventDispatcher {
         this._documentUtil = documentUtil;
         this._parseResults = [];
         this._queryParser = document.querySelector('#query-parser-content');
-        this._queryParserSelect = document.querySelector('#query-parser-select-container');
+        this._queryParserModeContainer = document.querySelector('#query-parser-mode-container');
+        this._queryParserModeSelect = document.querySelector('#query-parser-mode-select');
         this._textScanner = new TextScanner({
             node: this._queryParser,
             ignoreElements: () => [],
@@ -45,6 +46,7 @@ class QueryParser extends EventDispatcher {
     prepare() {
         this._textScanner.prepare();
         this._textScanner.on('searched', this._onSearched.bind(this));
+        this._queryParserModeSelect.addEventListener('change', this._onParserChange.bind(this), false);
     }
 
     setOptions({selectedParser, termSpacing, scanning}) {
@@ -94,7 +96,7 @@ class QueryParser extends EventDispatcher {
     }
 
     _onParserChange(e) {
-        const value = e.target.value;
+        const value = e.currentTarget.value;
         this._setSelectedParser(value);
     }
 
@@ -128,13 +130,11 @@ class QueryParser extends EventDispatcher {
     }
 
     _renderParserSelect() {
-        this._queryParserSelect.textContent = '';
-        if (this._parseResults.length > 1) {
-            const selectedParser = this._selectedParser;
-            const select = this._createParserSelect(this._parseResults, selectedParser);
-            select.addEventListener('change', this._onParserChange.bind(this));
-            this._queryParserSelect.appendChild(select);
+        const visible = (this._parseResults.length > 1);
+        if (visible) {
+            this._updateParserModeSelect(this._queryParserModeSelect, this._parseResults, this._selectedParser);
         }
+        this._queryParserModeContainer.hidden = !visible;
     }
 
     _renderParseResult() {
@@ -144,12 +144,13 @@ class QueryParser extends EventDispatcher {
         this._queryParser.appendChild(this._createParseResult(parseResult.content, false));
     }
 
-    _createParserSelect(parseResults, selectedParser) {
-        const select = document.createElement('select');
-        select.className = 'query-parser-select form-control';
+    _updateParserModeSelect(select, parseResults, selectedParser) {
+        const fragment = document.createDocumentFragment();
+
+        let index = 0;
+        let selectedIndex = -1;
         for (const parseResult of parseResults) {
             const option = document.createElement('option');
-            option.className = 'query-parser-select-option';
             option.value = parseResult.id;
             switch (parseResult.source) {
                 case 'scanning-parser':
@@ -159,13 +160,21 @@ class QueryParser extends EventDispatcher {
                     option.textContent = `MeCab: ${parseResult.dictionary}`;
                     break;
                 default:
-                    option.textContent = 'Unrecognized dictionary';
+                    option.textContent = `Unknown source: ${parseResult.source}`;
                     break;
             }
             option.defaultSelected = selectedParser === parseResult.id;
-            select.appendChild(option);
+            fragment.appendChild(option);
+
+            if (selectedParser === parseResult.id) {
+                selectedIndex = index;
+            }
+            ++index;
         }
-        return select;
+
+        select.textContent = '';
+        select.appendChild(fragment);
+        select.selectedIndex = selectedIndex;
     }
 
     _createParseResult(terms, preview) {
