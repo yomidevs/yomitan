@@ -16,7 +16,6 @@
  */
 
 /* global
- * QueryParserGenerator
  * TextScanner
  * api
  */
@@ -31,7 +30,6 @@ class QueryParser extends EventDispatcher {
         this._parseResults = [];
         this._queryParser = document.querySelector('#query-parser-content');
         this._queryParserSelect = document.querySelector('#query-parser-select-container');
-        this._queryParserGenerator = new QueryParserGenerator();
         this._textScanner = new TextScanner({
             node: this._queryParser,
             ignoreElements: () => [],
@@ -126,14 +124,14 @@ class QueryParser extends EventDispatcher {
     _setPreview(text) {
         const terms = [[{text, reading: ''}]];
         this._queryParser.textContent = '';
-        this._queryParser.appendChild(this._queryParserGenerator.createParseResult(terms, true));
+        this._queryParser.appendChild(this._createParseResult(terms, true));
     }
 
     _renderParserSelect() {
         this._queryParserSelect.textContent = '';
         if (this._parseResults.length > 1) {
             const selectedParser = this._selectedParser;
-            const select = this._queryParserGenerator.createParserSelect(this._parseResults, selectedParser);
+            const select = this._createParserSelect(this._parseResults, selectedParser);
             select.addEventListener('change', this._onParserChange.bind(this));
             this._queryParserSelect.appendChild(select);
         }
@@ -143,6 +141,77 @@ class QueryParser extends EventDispatcher {
         const parseResult = this._getParseResult();
         this._queryParser.textContent = '';
         if (!parseResult) { return; }
-        this._queryParser.appendChild(this._queryParserGenerator.createParseResult(parseResult.content, false));
+        this._queryParser.appendChild(this._createParseResult(parseResult.content, false));
+    }
+
+    _createParserSelect(parseResults, selectedParser) {
+        const select = document.createElement('select');
+        select.className = 'query-parser-select form-control';
+        for (const parseResult of parseResults) {
+            const option = document.createElement('option');
+            option.className = 'query-parser-select-option';
+            option.value = parseResult.id;
+            switch (parseResult.source) {
+                case 'scanning-parser':
+                    option.textContent = 'Scanning parser';
+                    break;
+                case 'mecab':
+                    option.textContent = `MeCab: ${parseResult.dictionary}`;
+                    break;
+                default:
+                    option.textContent = 'Unrecognized dictionary';
+                    break;
+            }
+            option.defaultSelected = selectedParser === parseResult.id;
+            select.appendChild(option);
+        }
+        return select;
+    }
+
+    _createParseResult(terms, preview) {
+        const type = preview ? 'preview' : 'normal';
+        const fragment = document.createDocumentFragment();
+        for (const term of terms) {
+            const termNode = document.createElement('span');
+            termNode.className = 'query-parser-term';
+            termNode.dataset.type = type;
+            for (const segment of term) {
+                if (segment.reading.trim().length === 0) {
+                    this._addSegmentText(segment.text, termNode);
+                } else {
+                    termNode.appendChild(this._createSegment(segment));
+                }
+            }
+            fragment.appendChild(termNode);
+        }
+        return fragment;
+    }
+
+    _createSegment(segment) {
+        const segmentNode = document.createElement('ruby');
+        segmentNode.className = 'query-parser-segment';
+
+        const textNode = document.createElement('span');
+        textNode.className = 'query-parser-segment-text';
+
+        const readingNode = document.createElement('rt');
+        readingNode.className = 'query-parser-segment-reading';
+
+        segmentNode.appendChild(textNode);
+        segmentNode.appendChild(readingNode);
+
+        this._addSegmentText(segment.text, textNode);
+        readingNode.textContent = segment.reading;
+
+        return segmentNode;
+    }
+
+    _addSegmentText(text, container) {
+        for (const character of text) {
+            const node = document.createElement('span');
+            node.className = 'query-parser-char';
+            node.textContent = character;
+            container.appendChild(node);
+        }
     }
 }
