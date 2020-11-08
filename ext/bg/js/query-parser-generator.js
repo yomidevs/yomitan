@@ -24,8 +24,7 @@ class QueryParserGenerator {
             termNode.className = 'query-parser-term';
             termNode.dataset.type = type;
             for (const segment of term) {
-                if (!segment.text.trim()) { continue; }
-                if (!segment.reading.trim()) {
+                if (segment.reading.trim().length === 0) {
                     this._addSegmentText(segment.text, termNode);
                 } else {
                     termNode.appendChild(this._createSegment(segment));

@@ -190,6 +190,7 @@ h2 {
 #query-parser-content {
     margin-top: 0.5em;
     font-size: 2em;
+    white-space: pre-wrap;
 }
 
 #query-parser-content[data-term-spacing=true] .query-parser-term {
