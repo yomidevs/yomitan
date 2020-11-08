@@ -163,7 +163,6 @@ class QueryParser extends EventDispatcher {
                     option.textContent = `Unknown source: ${parseResult.source}`;
                     break;
             }
-            option.defaultSelected = selectedParser === parseResult.id;
             fragment.appendChild(option);
 
             if (selectedParser === parseResult.id) {
