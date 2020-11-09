@@ -250,7 +250,7 @@ class Frontend {
         await this.updateOptions();
     }
 
-    _onSearched({type, definitions, sentence, input: {cause, empty}, textSource, optionsContext, error}) {
+    _onSearched({type, definitions, sentence, inputInfo: {cause, empty}, textSource, optionsContext, error}) {
         const scanningOptions = this._options.scanning;
 
         if (error !== null) {

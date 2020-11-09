@@ -507,7 +507,7 @@ class Display extends EventDispatcher {
         }
     }
 
-    _onQueryParserSearch({type, definitions, sentence, input: {cause}, textSource}) {
+    _onQueryParserSearch({type, definitions, sentence, inputInfo: {cause}, textSource}) {
         const query = textSource.text();
         const history = (cause === 'click');
         const details = {

@@ -78,7 +78,7 @@ class QueryParser extends EventDispatcher {
 
     // Private
 
-    _onSearched({type, definitions, sentence, input, textSource, optionsContext, error}) {
+    _onSearched({type, definitions, sentence, inputInfo, textSource, optionsContext, error}) {
         if (error !== null) {
             yomichan.logError(error);
             return;
@@ -89,7 +89,7 @@ class QueryParser extends EventDispatcher {
             type,
             definitions,
             sentence,
-            input,
+            inputInfo,
             textSource,
             optionsContext
         });
