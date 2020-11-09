@@ -817,11 +817,12 @@ class TextScanner extends EventDispatcher {
 
     _getMatchingInputGroup(modifiers, type) {
         let fallback = null;
+        const modifiersSet = new Set(modifiers);
         for (let i = 0, ii = this._inputs.length; i < ii; ++i) {
             const input = this._inputs[i];
             const {include, exclude, types} = input;
             if (!types.has(type)) { continue; }
-            if (this._setHasAll(modifiers, include) && (exclude.length === 0 || !this._setHasAll(modifiers, exclude))) {
+            if (this._setHasAll(modifiersSet, include) && (exclude.length === 0 || !this._setHasAll(modifiersSet, exclude))) {
                 if (include.length > 0) {
                     return {index: i, empty: false, input};
                 } else if (fallback === null) {

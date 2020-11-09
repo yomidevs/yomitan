@@ -147,7 +147,7 @@ class KeyboardMouseInputField extends EventDispatcher {
     }
 
     _getModifierKeys(e) {
-        const modifiers = DocumentUtil.getActiveModifiers(e);
+        const modifiers = new Set(DocumentUtil.getActiveModifiers(e));
         // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/metaKey
         // https://askubuntu.com/questions/567731/why-is-shift-alt-being-mapped-to-meta
         // It works with mouse events on some platforms, so try to determine if metaKey is pressed.

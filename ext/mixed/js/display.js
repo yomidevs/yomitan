@@ -205,7 +205,7 @@ class Display extends EventDispatcher {
 
         const eventModifiers = DocumentUtil.getActiveModifiers(e);
         for (const {modifiers, action} of handlers) {
-            if (getSetDifference(modifiers, eventModifiers).size !== 0) { continue; }
+            if (!this._areSame(modifiers, eventModifiers)) { continue; }
 
             const actionHandler = this._actions.get(action);
             if (typeof actionHandler === 'undefined') { continue; }
@@ -1475,5 +1475,15 @@ class Display extends EventDispatcher {
         }
         const {expression, reading} = termDetailsList[Math.max(0, bestIndex)];
         return {expression, reading};
+    }
+
+    _areSame(set, array) {
+        if (set.size !== array.size) { return false; }
+        for (const value of array) {
+            if (!set.has(value)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

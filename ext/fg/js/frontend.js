@@ -250,6 +250,7 @@ class Frontend {
     }
 
     async _onActiveModifiersChanged({modifiers}) {
+        modifiers = new Set(modifiers);
         if (areSetsEqual(modifiers, this._activeModifiers)) { return; }
         this._activeModifiers = modifiers;
         if (this._popup !== null && await this._popup.isVisible()) {

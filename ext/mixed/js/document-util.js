@@ -170,11 +170,11 @@ class DocumentUtil {
     }
 
     static getActiveModifiers(event) {
-        const modifiers = new Set();
-        if (event.altKey) { modifiers.add('alt'); }
-        if (event.ctrlKey) { modifiers.add('ctrl'); }
-        if (event.metaKey) { modifiers.add('meta'); }
-        if (event.shiftKey) { modifiers.add('shift'); }
+        const modifiers = [];
+        if (event.altKey) { modifiers.push('alt'); }
+        if (event.ctrlKey) { modifiers.push('ctrl'); }
+        if (event.metaKey) { modifiers.push('meta'); }
+        if (event.shiftKey) { modifiers.push('shift'); }
         return modifiers;
     }
 
@@ -185,7 +185,7 @@ class DocumentUtil {
     }
 
     static getActiveButtons(event) {
-        const buttons = new Set();
+        const buttons = [];
         this._getActiveButtons(event, buttons);
         return buttons;
     }
@@ -301,19 +301,18 @@ class DocumentUtil {
         return !(browser === 'firefox' || browser === 'firefox-mobile') || os === 'mac';
     }
 
-    static _getActiveButtons(event, set) {
+    static _getActiveButtons(event, array) {
         let {buttons} = event;
         if (typeof buttons === 'number' && buttons > 0) {
             for (let i = 0; i < 6; ++i) {
                 const buttonFlag = (1 << i);
                 if ((buttons & buttonFlag) !== 0) {
-                    set.add(`mouse${i}`);
+                    array.push(`mouse${i}`);
                     buttons &= ~buttonFlag;
                     if (buttons === 0) { break; }
                 }
             }
         }
-        return set;
     }
 
     // Private
