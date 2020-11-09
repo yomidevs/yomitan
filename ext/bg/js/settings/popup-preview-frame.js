@@ -28,7 +28,6 @@ class PopupPreviewFrame {
         this._frameId = frameId;
         this._popupFactory = popupFactory;
         this._frontend = null;
-        this._frontendGetOptionsContextOld = null;
         this._apiOptionsGetOld = null;
         this._popupSetCustomOuterCssOld = null;
         this._popupShown = false;
@@ -78,8 +77,7 @@ class PopupPreviewFrame {
             pageType: 'web',
             allowRootFramePopupProxy: false
         });
-        this._frontendGetOptionsContextOld = this._frontend.getOptionsContext.bind(this._frontend);
-        this._frontend.getOptionsContext = this._getOptionsContext.bind(this);
+        this._frontend.setOptionsContextOverride(this._optionsContext);
         await this._frontend.prepare();
         this._frontend.setDisabledOverride(true);
         this._frontend.canClearSelection = false;
@@ -95,14 +93,6 @@ class PopupPreviewFrame {
     }
 
     // Private
-
-    async _getOptionsContext() {
-        let optionsContext = this._optionsContext;
-        if (optionsContext === null) {
-            optionsContext = this._frontendGetOptionsContextOld();
-        }
-        return optionsContext;
-    }
 
     async _apiOptionsGet(...args) {
         const options = await this._apiOptionsGetOld(...args);
@@ -213,6 +203,7 @@ class PopupPreviewFrame {
     async _updateOptionsContext({optionsContext}) {
         this._optionsContext = optionsContext;
         if (this._frontend === null) { return; }
+        this._frontend.setOptionsContextOverride(optionsContext);
         await this._frontend.updateOptions();
         await this._updateSearch();
     }

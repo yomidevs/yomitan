@@ -65,6 +65,7 @@ class Frontend {
         this._updatePopupToken = null;
         this._clearSelectionTimer = null;
         this._isPointerOverPopup = false;
+        this._optionsContextOverride = null;
 
         this._runtimeMessageHandlers = new Map([
             ['requestFrontendReadyBroadcast', {async: false, handler: this._onMessageRequestFrontendReadyBroadcast.bind(this)}],
@@ -131,24 +132,13 @@ class Frontend {
         this._updateTextScannerEnabled();
     }
 
+    setOptionsContextOverride(optionsContext) {
+        this._optionsContextOverride = optionsContext;
+    }
+
     async setTextSource(textSource) {
         this._textScanner.setCurrentTextSource(null);
         await this._textScanner.search(textSource);
-    }
-
-    async getOptionsContext() {
-        let url = window.location.href;
-        if (this._useProxyPopup) {
-            try {
-                url = await api.crossFrame.invoke(this._parentFrameId, 'getUrl', {});
-            } catch (e) {
-                // NOP
-            }
-        }
-
-        const depth = this._depth;
-        const modifierKeys = [...this._activeModifiers];
-        return {depth, url, modifierKeys};
     }
 
     async updateOptions() {
@@ -319,7 +309,7 @@ class Frontend {
     }
 
     async _updateOptionsInternal() {
-        const optionsContext = await this.getOptionsContext();
+        const optionsContext = await this._getOptionsContext();
         const options = await api.optionsGet(optionsContext);
         const scanningOptions = options.scanning;
         this._options = options;
@@ -393,7 +383,7 @@ class Frontend {
         const token = {};
         this._updatePopupToken = token;
         const popup = await popupPromise;
-        const optionsContext = await this.getOptionsContext();
+        const optionsContext = await this._getOptionsContext();
         if (this._updatePopupToken !== token) { return; }
         if (popup !== null) {
             await popup.setOptionsContext(optionsContext, this._id);
@@ -496,7 +486,7 @@ class Frontend {
             textSource = this._textScanner.getCurrentTextSource();
             if (textSource === null) { return; }
         }
-        this._showPopupContent(textSource, await this.getOptionsContext());
+        this._showPopupContent(textSource, await this._getOptionsContext());
     }
 
     _showContent(textSource, focus, definitions, type, sentence, optionsContext) {
@@ -590,7 +580,7 @@ class Frontend {
             this._popup !== null &&
             await this._popup.isVisible()
         ) {
-            this._showPopupContent(textSource, await this.getOptionsContext());
+            this._showPopupContent(textSource, await this._getOptionsContext());
         }
     }
 
@@ -622,7 +612,7 @@ class Frontend {
 
     async _getUpToDateOptionsContext() {
         await this._updatePendingOptions();
-        return await this.getOptionsContext();
+        return await this._getOptionsContext();
     }
 
     _getPreventMiddleMouseValueForPageType(preventMiddleMouseOptions) {
@@ -632,5 +622,24 @@ class Frontend {
             case 'search': return preventMiddleMouseOptions.onSearchPages;
             default: return false;
         }
+    }
+
+    async _getOptionsContext() {
+        if (this._optionsContextOverride !== null) {
+            return this._optionsContextOverride;
+        }
+
+        let url = window.location.href;
+        if (this._useProxyPopup) {
+            try {
+                url = await api.crossFrame.invoke(this._parentFrameId, 'getUrl', {});
+            } catch (e) {
+                // NOP
+            }
+        }
+
+        const depth = this._depth;
+        const modifierKeys = [...this._activeModifiers];
+        return {depth, url, modifierKeys};
     }
 }
