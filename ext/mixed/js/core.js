@@ -176,6 +176,72 @@ const clone = (() => {
     return clone;
 })();
 
+const deepEqual = (() => {
+    // eslint-disable-next-line no-shadow
+    function deepEqual(value1, value2) {
+        if (value1 === value2) { return true; }
+
+        const type = typeof value1;
+        if (typeof value2 !== type) { return false; }
+
+        switch (type) {
+            case 'object':
+            case 'function':
+                return deepEqualInternal(value1, value2, new Set());
+            default:
+                return false;
+        }
+    }
+
+    function deepEqualInternal(value1, value2, visited1) {
+        if (value1 === value2) { return true; }
+
+        const type = typeof value1;
+        if (typeof value2 !== type) { return false; }
+
+        switch (type) {
+            case 'object':
+            case 'function':
+            {
+                if (value1 === null || value2 === null) { return false; }
+                const array = Array.isArray(value1);
+                if (array !== Array.isArray(value2)) { return false; }
+                if (visited1.has(value1)) { return false; }
+                visited1.add(value1);
+                return array ? areArraysEqual(value1, value2, visited1) : areObjectsEqual(value1, value2, visited1);
+            }
+            default:
+                return false;
+        }
+    }
+
+    function areObjectsEqual(value1, value2, visited1) {
+        const keys1 = Object.keys(value1);
+        const keys2 = Object.keys(value2);
+        if (keys1.length !== keys2.length) { return false; }
+
+        const keys1Set = new Set(keys1);
+        for (const key of keys2) {
+            if (!keys1Set.has(key) || !deepEqualInternal(value1[key], value2[key], visited1)) { return false; }
+        }
+
+        return true;
+    }
+
+    function areArraysEqual(value1, value2, visited1) {
+        const length = value1.length;
+        if (length !== value2.length) { return false; }
+
+        for (let i = 0; i < length; ++i) {
+            if (!deepEqualInternal(value1[i], value2[i], visited1)) { return false; }
+        }
+
+        return true;
+    }
+
+    return deepEqual;
+})();
+
 function generateId(length) {
     const array = new Uint8Array(length);
     crypto.getRandomValues(array);

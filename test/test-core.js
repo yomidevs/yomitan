@@ -32,7 +32,7 @@ const vm = new VM({
 vm.execute([
     'mixed/js/core.js'
 ]);
-const [DynamicProperty] = vm.get(['DynamicProperty']);
+const [DynamicProperty, deepEqual] = vm.get(['DynamicProperty', 'deepEqual']);
 
 
 function testDynamicProperty() {
@@ -161,9 +161,139 @@ function testDynamicProperty() {
     }
 }
 
+function testDeepEqual() {
+    const data = [
+        // Simple tests
+        {
+            value1: 0,
+            value2: 0,
+            expected: true
+        },
+        {
+            value1: null,
+            value2: null,
+            expected: true
+        },
+        {
+            value1: 'test',
+            value2: 'test',
+            expected: true
+        },
+        {
+            value1: true,
+            value2: true,
+            expected: true
+        },
+        {
+            value1: 0,
+            value2: 1,
+            expected: false
+        },
+        {
+            value1: null,
+            value2: false,
+            expected: false
+        },
+        {
+            value1: 'test1',
+            value2: 'test2',
+            expected: false
+        },
+        {
+            value1: true,
+            value2: false,
+            expected: false
+        },
+
+        // Simple object tests
+        {
+            value1: {},
+            value2: {},
+            expected: true
+        },
+        {
+            value1: {},
+            value2: [],
+            expected: false
+        },
+        {
+            value1: [],
+            value2: [],
+            expected: true
+        },
+        {
+            value1: {},
+            value2: null,
+            expected: false
+        },
+
+        // Complex object tests
+        {
+            value1: [1],
+            value2: [],
+            expected: false
+        },
+        {
+            value1: [1],
+            value2: [1],
+            expected: true
+        },
+        {
+            value1: [1],
+            value2: [2],
+            expected: false
+        },
+
+        {
+            value1: {},
+            value2: {test: 1},
+            expected: false
+        },
+        {
+            value1: {test: 1},
+            value2: {test: 1},
+            expected: true
+        },
+        {
+            value1: {test: 1},
+            value2: {test: {test2: false}},
+            expected: false
+        },
+        {
+            value1: {test: {test2: true}},
+            value2: {test: {test2: false}},
+            expected: false
+        },
+        {
+            value1: {test: {test2: [true]}},
+            value2: {test: {test2: [true]}},
+            expected: true
+        },
+
+        // Recursive
+        {
+            value1: (() => { const x = {}; x.x = x; return x; })(),
+            value2: (() => { const x = {}; x.x = x; return x; })(),
+            expected: false
+        }
+    ];
+
+    let index = 0;
+    for (const {value1, value2, expected} of data) {
+        const actual1 = deepEqual(value1, value2);
+        assert.strictEqual(actual1, expected, `Failed for test ${index}`);
+
+        const actual2 = deepEqual(value2, value1);
+        assert.strictEqual(actual2, expected, `Failed for test ${index}`);
+
+        ++index;
+    }
+}
+
 
 function main() {
     testDynamicProperty();
+    testDeepEqual();
 }
 
 

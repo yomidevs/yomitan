@@ -110,6 +110,7 @@
                 "escapeRegExp": "readonly",
                 "deferPromise": "readonly",
                 "clone": "readonly",
+                "deepEqual": "readonly",
                 "generateId": "readonly",
                 "promiseAnimationFrame": "readonly",
                 "DynamicProperty": "readonly",
