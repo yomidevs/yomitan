@@ -136,6 +136,7 @@ class AnkiTemplatesController {
         const field = this._renderFieldInput.value;
         const infoNode = this._renderResult;
         infoNode.hidden = true;
+        this._cachedDefinitionText = null;
         this._validate(infoNode, field, 'term-kanji', true, false);
     }
 
