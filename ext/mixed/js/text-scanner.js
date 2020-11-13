@@ -238,6 +238,14 @@ class TextScanner extends EventDispatcher {
 
     // Private
 
+    async _getOptionsContextForInput(inputInfo) {
+        const optionsContext = clone(await this._getOptionsContext());
+        const {modifiers, modifierKeys} = inputInfo;
+        optionsContext.modifiers = [...modifiers];
+        optionsContext.modifierKeys = [...modifierKeys];
+        return optionsContext;
+    }
+
     async _search(textSource, searchTerms, searchKanji, inputInfo) {
         let definitions = null;
         let sentence = null;
@@ -251,7 +259,7 @@ class TextScanner extends EventDispatcher {
                 return;
             }
 
-            optionsContext = await this._getOptionsContext();
+            optionsContext = await this._getOptionsContextForInput(inputInfo);
             searched = true;
 
             const result = await this._findDefinitions(textSource, searchTerms, searchKanji, optionsContext);
@@ -810,7 +818,6 @@ class TextScanner extends EventDispatcher {
     _getMatchingInputGroupFromEvent(type, cause, event) {
         const modifiers = DocumentUtil.getActiveModifiersAndButtons(event);
         const modifierKeys = DocumentUtil.getActiveModifiers(event);
-        this.trigger('activeModifiersChanged', {modifiers, modifierKeys});
         return this._getMatchingInputGroup(type, cause, modifiers, modifierKeys);
     }
 

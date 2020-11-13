@@ -227,8 +227,9 @@ class Display extends EventDispatcher {
         return this._optionsContext;
     }
 
-    setOptionsContext(optionsContext) {
+    async setOptionsContext(optionsContext) {
         this._optionsContext = optionsContext;
+        await this.updateOptions();
     }
 
     async updateOptions() {
@@ -507,7 +508,7 @@ class Display extends EventDispatcher {
         }
     }
 
-    _onQueryParserSearch({type, definitions, sentence, inputInfo: {cause}, textSource}) {
+    _onQueryParserSearch({type, definitions, sentence, inputInfo: {cause}, textSource, optionsContext}) {
         const query = textSource.text();
         const history = (cause === 'click');
         const details = {
@@ -516,7 +517,7 @@ class Display extends EventDispatcher {
             params: this._createSearchParams(type, query, false),
             state: {
                 sentence,
-                url: window.location.href
+                optionsContext
             },
             content: {
                 definitions
@@ -570,7 +571,7 @@ class Display extends EventDispatcher {
                 state: {
                     focusEntry: 0,
                     sentence: state.sentence,
-                    url: state.url
+                    optionsContext: state.optionsContext
                 },
                 content: {
                     definitions
@@ -629,7 +630,7 @@ class Display extends EventDispatcher {
             state: {
                 focusEntry: 0,
                 sentence,
-                url: state.url
+                optionsContext: state.optionsContext
             },
             content: {
                 definitions
@@ -779,8 +780,7 @@ class Display extends EventDispatcher {
         }
     }
 
-    async _findDefinitions(isTerms, source, urlSearchParams) {
-        const optionsContext = this.getOptionsContext();
+    async _findDefinitions(isTerms, source, urlSearchParams, optionsContext) {
         if (isTerms) {
             const findDetails = {};
             if (urlSearchParams.get('wildcards') !== 'off') {
@@ -821,6 +821,16 @@ class Display extends EventDispatcher {
             changeHistory = true;
         }
 
+        let {sentence=null, optionsContext=null, focusEntry=null, scrollX=null, scrollY=null} = state;
+        if (!(typeof optionsContext === 'object' && optionsContext !== null)) {
+            optionsContext = this.getOptionsContext();
+            state.optionsContext = optionsContext;
+            changeHistory = true;
+        }
+        let {url} = optionsContext;
+        if (typeof url !== 'string') { url = window.location.href; }
+        sentence = this._getValidSentenceData(sentence);
+
         source = this.postProcessQuery(source);
         let full = urlSearchParams.get('full');
         full = (full === null ? source : this.postProcessQuery(full));
@@ -829,11 +839,14 @@ class Display extends EventDispatcher {
 
         let {definitions} = content;
         if (!Array.isArray(definitions)) {
-            definitions = await this._findDefinitions(isTerms, source, urlSearchParams);
+            definitions = await this._findDefinitions(isTerms, source, urlSearchParams, optionsContext);
             if (this._setContentToken !== token) { return true; }
             content.definitions = definitions;
             changeHistory = true;
         }
+
+        await this._setOptionsContextIfDifferent(optionsContext);
+        if (this._setContentToken !== token) { return true; }
 
         if (changeHistory) {
             this._historyStateUpdate(state, content);
@@ -842,10 +855,6 @@ class Display extends EventDispatcher {
         eventArgs.source = source;
         eventArgs.content = content;
         this.trigger('contentUpdating', eventArgs);
-
-        let {sentence=null, url=null, focusEntry=null, scrollX=null, scrollY=null} = state;
-        if (typeof url !== 'string') { url = window.location.href; }
-        sentence = this._getValidSentenceData(sentence);
 
         this._definitions = definitions;
 
@@ -1485,5 +1494,10 @@ class Display extends EventDispatcher {
             }
         }
         return true;
+    }
+
+    async _setOptionsContextIfDifferent(optionsContext) {
+        if (deepEqual(this._optionsContext, optionsContext)) { return; }
+        await this.setOptionsContext(optionsContext);
     }
 }

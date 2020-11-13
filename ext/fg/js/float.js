@@ -61,11 +61,6 @@ class DisplayFloat extends Display {
         this._invokeOwner('closePopup');
     }
 
-    async setOptionsContext(optionsContext) {
-        super.setOptionsContext(optionsContext);
-        await this.updateOptions();
-    }
-
     async getDocumentTitle() {
         try {
             const targetFrameId = 0;
@@ -99,9 +94,7 @@ class DisplayFloat extends Display {
 
     async _onMessageConfigure({frameId, ownerFrameId, popupId, optionsContext, childrenSupported, scale}) {
         this.ownerFrameId = ownerFrameId;
-        this.setOptionsContext(optionsContext);
-
-        await this.updateOptions();
+        await this.setOptionsContext(optionsContext);
 
         if (childrenSupported && !this._nestedPopupsPrepared) {
             const {depth} = optionsContext;

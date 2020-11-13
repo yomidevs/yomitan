@@ -39,7 +39,6 @@ class Popup extends EventDispatcher {
         this._optionsContext = null;
         this._contentScale = 1.0;
         this._targetOrigin = chrome.runtime.getURL('/').replace(/\/$/, '');
-        this._previousOptionsContextSource = null;
 
         this._frameSizeContentScale = null;
         this._frameClient = null;
@@ -105,14 +104,10 @@ class Popup extends EventDispatcher {
         this._onVisibleChange({value: this.isVisibleSync()});
     }
 
-    async setOptionsContext(optionsContext, source) {
+    async setOptionsContext(optionsContext) {
         this._optionsContext = optionsContext;
-        this._previousOptionsContextSource = source;
-
         this._options = await api.optionsGet(optionsContext);
         this.updateTheme();
-
-        this._invokeSafe('setOptionsContext', {optionsContext});
     }
 
     hide(changeFocus) {
@@ -154,9 +149,9 @@ class Popup extends EventDispatcher {
     async showContent(details, displayDetails) {
         if (this._options === null) { throw new Error('Options not assigned'); }
 
-        const {source, optionsContext, elementRect, writingMode} = details;
-        if (typeof source !== 'undefined' && source !== this._previousOptionsContextSource) {
-            await this.setOptionsContext(optionsContext, source);
+        const {optionsContext, elementRect, writingMode} = details;
+        if (optionsContext !== null) {
+            await this._setOptionsContextIfDifferent(optionsContext);
         }
 
         if (typeof elementRect !== 'undefined' && typeof writingMode !== 'undefined') {
@@ -658,5 +653,10 @@ class Popup extends EventDispatcher {
             right: (body !== null ? body.clientWidth : 0),
             bottom: window.innerHeight
         };
+    }
+
+    async _setOptionsContextIfDifferent(optionsContext) {
+        if (deepEqual(this._optionsContext, optionsContext)) { return; }
+        await this.setOptionsContext(optionsContext);
     }
 }
