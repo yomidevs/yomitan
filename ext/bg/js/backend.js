@@ -1650,7 +1650,7 @@ class Backend {
         const {wildcard} = details;
         const enabledDictionaryMap = this._getTranslatorEnabledDictionaryMap(options);
         const {
-            general: {compactTags, mainDictionary},
+            general: {mainDictionary},
             scanning: {alphanumeric},
             translation: {
                 convertHalfWidthCharacters,
@@ -1663,7 +1663,6 @@ class Backend {
         } = options;
         return {
             wildcard,
-            compactTags,
             mainDictionary,
             alphanumeric,
             convertHalfWidthCharacters,

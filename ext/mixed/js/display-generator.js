@@ -349,6 +349,7 @@ class DisplayGenerator {
         node.title = details.notes;
         inner.textContent = details.name;
         node.dataset.category = details.category;
+        if (details.redundant) { node.dataset.redundant = true; }
 
         return node;
     }

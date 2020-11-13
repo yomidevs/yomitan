@@ -562,6 +562,10 @@ button.action-button {
     display: inline;
 }
 
+:root[data-compact-tags=true] .tag[data-redundant=true] {
+    display: none;
+}
+
 .term-glossary-separator,
 .term-reason-separator {
     display: inline;

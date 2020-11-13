@@ -608,6 +608,79 @@ ${update2}
 ${update4}
 ${update6}
 {{~> (lookup . "marker") ~}}`.trimStart()
+        },
+        // Definition tags update
+        {
+            old: `
+{{#*inline "glossary-single"}}
+    {{~#unless brief~}}
+        {{~#if definitionTags~}}<i>({{#each definitionTags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})</i> {{/if~}}
+        {{~#if only~}}({{#each only}}{{{.}}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
+    {{~/unless~}}
+{{/inline}}
+
+{{#*inline "glossary-single2"}}
+    {{~#unless brief~}}
+        {{~#if definitionTags~}}<i>({{#each definitionTags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})</i> {{/if~}}
+        {{~#if only~}}({{#each only}}{{{.}}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
+    {{~/unless~}}
+{{/inline}}
+
+{{#*inline "glossary"}}
+    {{~> glossary-single definition brief=brief compactGlossaries=compactGlossaries~}}
+    {{~> glossary-single definition brief=brief compactGlossaries=../compactGlossaries~}}
+{{/inline}}
+
+{{~> (lookup . "marker") ~}}
+`.trimStart(),
+
+            expected: `
+{{#*inline "glossary-single"}}
+    {{~#unless brief~}}
+        {{~#scope~}}
+            {{~#set "any" false}}{{/set~}}
+            {{~#if definitionTags~}}{{#each definitionTags~}}
+                {{~#if (op "||" (op "!" ../data.compactTags) (op "!" redundant))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{name}}
+                    {{~#set "any" true}}{{/set~}}
+                {{~/if~}}
+            {{~/each~}}
+            {{~#if (get "any")}})</i> {{/if~}}
+            {{~/if~}}
+        {{~/scope~}}
+        {{~#if only~}}({{#each only}}{{{.}}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
+    {{~/unless~}}
+{{/inline}}
+
+{{#*inline "glossary-single2"}}
+    {{~#unless brief~}}
+        {{~#scope~}}
+            {{~#set "any" false}}{{/set~}}
+            {{~#if definitionTags~}}{{#each definitionTags~}}
+                {{~#if (op "||" (op "!" ../data.compactTags) (op "!" redundant))~}}
+                    {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+                    {{name}}
+                    {{~#set "any" true}}{{/set~}}
+                {{~/if~}}
+            {{~/each~}}
+            {{~#if (get "any")}})</i> {{/if~}}
+            {{~/if~}}
+        {{~/scope~}}
+        {{~#if only~}}({{#each only}}{{{.}}}{{#unless @last}}, {{/unless}}{{/each}} only) {{/if~}}
+    {{~/unless~}}
+{{/inline}}
+
+{{#*inline "glossary"}}
+    {{~> glossary-single definition brief=brief compactGlossaries=compactGlossaries data=.~}}
+    {{~> glossary-single definition brief=brief compactGlossaries=../compactGlossaries data=../.~}}
+{{/inline}}
+
+${update2}
+${update4}
+${update6}
+{{~> (lookup . "marker") ~}}
+`.trimStart()
         }
     ];
 

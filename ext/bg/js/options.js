@@ -618,7 +618,35 @@ class OptionsUtil {
         options.global.showPopupPreview = false;
         for (const profile of options.profiles) {
             profile.options.anki.checkForDuplicates = true;
+            const fieldTemplates = profile.options.anki.fieldTemplates;
+            if (typeof fieldTemplates === 'string') {
+                profile.options.anki.fieldTemplates = this._updateVersion6AnkiTemplatesCompactTags(fieldTemplates);
+            }
         }
         return options;
+    }
+
+    _updateVersion6AnkiTemplatesCompactTags(templates) {
+        const rawPattern1 = '{{~#if definitionTags~}}<i>({{#each definitionTags}}{{name}}{{#unless @last}}, {{/unless}}{{/each}})</i> {{/if~}}';
+        const pattern1 = new RegExp(`((\r?\n)?[ \t]*)${escapeRegExp(rawPattern1)}`, 'g');
+        const replacement1 = (
+        // eslint-disable-next-line indent
+`{{~#scope~}}
+    {{~#set "any" false}}{{/set~}}
+    {{~#if definitionTags~}}{{#each definitionTags~}}
+        {{~#if (op "||" (op "!" ../data.compactTags) (op "!" redundant))~}}
+            {{~#if (get "any")}}, {{else}}<i>({{/if~}}
+            {{name}}
+            {{~#set "any" true}}{{/set~}}
+        {{~/if~}}
+    {{~/each~}}
+    {{~#if (get "any")}})</i> {{/if~}}
+    {{~/if~}}
+{{~/scope~}}`
+        );
+        const simpleNewline = /\n/g;
+        templates = templates.replace(pattern1, (g0, space) => (space + replacement1.replace(simpleNewline, space)));
+        templates = templates.replace(/\bcompactGlossaries=((?:\.*\/)*)compactGlossaries\b/g, (g0, g1) => `${g0} data=${g1}.`);
+        return templates;
     }
 }

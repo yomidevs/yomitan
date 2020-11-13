@@ -59,7 +59,6 @@ class Translator {
      * @param options An object using the following structure:
      *   {
      *     wildcard: (null or string),
-     *     compactTags: (boolean),
      *     mainDictionary: (string),
      *     alphanumeric: (boolean),
      *     convertHalfWidthCharacters: (enum: 'false', 'true', 'variant'),
@@ -156,24 +155,22 @@ class Translator {
     }
 
     async _findTermsGrouped(text, options) {
-        const {compactTags, enabledDictionaryMap} = options;
+        const {enabledDictionaryMap} = options;
         const [definitions, length] = await this._findTermsInternal(text, enabledDictionaryMap, options);
 
         const groupedDefinitions = this._groupTerms(definitions, enabledDictionaryMap);
         await this._buildTermMeta(groupedDefinitions, enabledDictionaryMap);
         this._sortDefinitions(groupedDefinitions, false);
 
-        if (compactTags) {
-            for (const definition of groupedDefinitions) {
-                this._compressDefinitionTags(definition.definitions);
-            }
+        for (const definition of groupedDefinitions) {
+            this._flagRedundantDefinitionTags(definition.definitions);
         }
 
         return [groupedDefinitions, length];
     }
 
     async _findTermsMerged(text, options) {
-        const {compactTags, mainDictionary, enabledDictionaryMap} = options;
+        const {mainDictionary, enabledDictionaryMap} = options;
         const secondarySearchDictionaryMap = this._getSecondarySearchDictionaryMap(enabledDictionaryMap);
 
         const [definitions, length] = await this._findTermsInternal(text, enabledDictionaryMap, options);
@@ -212,10 +209,8 @@ class Translator {
         await this._buildTermMeta(definitionsMerged, enabledDictionaryMap);
         this._sortDefinitions(definitionsMerged, false);
 
-        if (compactTags) {
-            for (const definition of definitionsMerged) {
-                this._compressDefinitionTags(definition.definitions);
-            }
+        for (const definition of definitionsMerged) {
+            this._flagRedundantDefinitionTags(definition.definitions);
         }
 
         return [definitionsMerged, length];
@@ -541,7 +536,7 @@ class Translator {
         }
     }
 
-    _compressDefinitionTags(definitions) {
+    _flagRedundantDefinitionTags(definitions) {
         let lastDictionary = '';
         let lastPartOfSpeech = '';
         const removeCategoriesSet = new Set();
@@ -564,7 +559,7 @@ class Translator {
             }
 
             if (removeCategoriesSet.size > 0) {
-                this._removeTagsWithCategory(definitionTags, removeCategoriesSet);
+                this._flagTagsWithCategoryAsRedundant(definitionTags, removeCategoriesSet);
                 removeCategoriesSet.clear();
             }
         }
@@ -749,7 +744,7 @@ class Translator {
             const meta = tagMetaList[i];
             const name = names[i];
             const {category, notes, order, score} = (meta !== null ? meta : {});
-            const tag = this._createTag(name, category, notes, order, score, dictionary);
+            const tag = this._createTag(name, category, notes, order, score, dictionary, false);
             results.push(tag);
         }
         return results;
@@ -893,13 +888,11 @@ class Translator {
         return results;
     }
 
-    _removeTagsWithCategory(tags, removeCategoriesSet) {
-        for (let i = 0, ii = tags.length; i < ii; ++i) {
-            const {category} = tags[i];
-            if (!removeCategoriesSet.has(category)) { continue; }
-            tags.splice(i, 1);
-            --i;
-            --ii;
+    _flagTagsWithCategoryAsRedundant(tags, removeCategoriesSet) {
+        for (const tag of tags) {
+            if (removeCategoriesSet.has(tag.category)) {
+                tag.redundant = true;
+            }
         }
     }
 
@@ -970,8 +963,8 @@ class Translator {
     // Common data creation and cloning functions
 
     _cloneTag(tag) {
-        const {name, category, notes, order, score, dictionary} = tag;
-        return this._createTag(name, category, notes, order, score, dictionary);
+        const {name, category, notes, order, score, dictionary, redundant} = tag;
+        return this._createTag(name, category, notes, order, score, dictionary, redundant);
     }
 
     _cloneTags(tags) {
@@ -987,17 +980,18 @@ class Translator {
     }
 
     _createDictionaryTag(name) {
-        return this._createTag(name, 'dictionary', '', 100, 0, name);
+        return this._createTag(name, 'dictionary', '', 100, 0, name, false);
     }
 
-    _createTag(name, category, notes, order, score, dictionary) {
+    _createTag(name, category, notes, order, score, dictionary, redundant) {
         return {
             name,
             category: (typeof category === 'string' && category.length > 0 ? category : 'default'),
             notes: (typeof notes === 'string' ? notes : ''),
             order: (typeof order === 'number' ? order : 0),
             score: (typeof score === 'number' ? score : 0),
-            dictionary: (typeof dictionary === 'string' ? dictionary : null)
+            dictionary: (typeof dictionary === 'string' ? dictionary : null),
+            redundant
         };
     }
 

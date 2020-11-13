@@ -35,6 +35,7 @@ class AnkiNoteBuilder {
         duplicateScope='collection',
         resultOutputMode='split',
         compactGlossaries=false,
+        compactTags=false,
         modeOptions: {fields, deck, model},
         audioDetails=null,
         screenshotDetails=null,
@@ -70,7 +71,7 @@ class AnkiNoteBuilder {
             }
         };
 
-        const data = this._createNoteData(definition, mode, context, resultOutputMode, compactGlossaries);
+        const data = this._createNoteData(definition, mode, context, resultOutputMode, compactGlossaries, compactTags);
         const formattedFieldValuePromises = [];
         for (const [, fieldValue] of fieldEntries) {
             const formattedFieldValuePromise = this._formatField(fieldValue, data, templates, errors);
@@ -104,7 +105,7 @@ class AnkiNoteBuilder {
 
     // Private
 
-    _createNoteData(definition, mode, context, resultOutputMode, compactGlossaries) {
+    _createNoteData(definition, mode, context, resultOutputMode, compactGlossaries, compactTags) {
         const pitches = DictionaryDataUtil.getPitchAccentInfos(definition);
         const pitchCount = pitches.reduce((i, v) => i + v.pitches.length, 0);
         return {
@@ -118,6 +119,7 @@ class AnkiNoteBuilder {
             modeTermKana: mode === 'term-kana',
             modeKanji: mode === 'kanji',
             compactGlossaries,
+            compactTags,
             context
         };
     }

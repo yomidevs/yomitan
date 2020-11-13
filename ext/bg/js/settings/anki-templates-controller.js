@@ -183,7 +183,7 @@ class AnkiTemplatesController {
                 const ankiNoteBuilder = new AnkiNoteBuilder({
                     renderTemplate: this._renderTemplate.bind(this)
                 });
-                const {general: {resultOutputMode, compactGlossaries}} = options;
+                const {general: {resultOutputMode, compactGlossaries, compactTags}} = options;
                 const note = await ankiNoteBuilder.createNote({
                     definition,
                     mode,
@@ -191,6 +191,7 @@ class AnkiTemplatesController {
                     templates,
                     resultOutputMode,
                     compactGlossaries,
+                    compactTags,
                     modeOptions: {
                         fields: {field},
                         deck: '',
