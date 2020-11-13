@@ -1,7 +1,7 @@
 *.sh text eol=lf
-ext/*.handlebars text eol=lf
-ext/*.js text eol=lf
-ext/*.json text eol=lf
-ext/*.css text eol=lf
-ext/*.html text eol=lf
-ext/*.svg text eol=lf
+*.handlebars text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.svg text eol=lf
