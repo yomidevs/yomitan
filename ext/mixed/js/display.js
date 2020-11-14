@@ -1498,7 +1498,7 @@ class Display extends EventDispatcher {
     }
 
     _areSame(set, array) {
-        if (set.size !== array.size) { return false; }
+        if (set.size !== array.length) { return false; }
         for (const value of array) {
             if (!set.has(value)) {
                 return false;
