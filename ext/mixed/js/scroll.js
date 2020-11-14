@@ -15,17 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 class WindowScroll {
     constructor() {
-        this.animationRequestId = null;
-        this.animationStartTime = 0;
-        this.animationStartX = 0;
-        this.animationStartY = 0;
-        this.animationEndTime = 0;
-        this.animationEndX = 0;
-        this.animationEndY = 0;
-        this.requestAnimationFrameCallback = this.onAnimationFrame.bind(this);
+        this._animationRequestId = null;
+        this._animationStartTime = 0;
+        this._animationStartX = 0;
+        this._animationStartY = 0;
+        this._animationEndTime = 0;
+        this._animationEndX = 0;
+        this._animationEndY = 0;
+        this._requestAnimationFrameCallback = this._onAnimationFrame.bind(this);
+    }
+
+    get x() {
+        return window.scrollX || window.pageXOffset;
+    }
+
+    get y() {
+        return window.scrollY || window.pageYOffset;
     }
 
     toY(y) {
@@ -42,49 +49,43 @@ class WindowScroll {
     }
 
     animate(x, y, time) {
-        this.animationStartX = this.x;
-        this.animationStartY = this.y;
-        this.animationStartTime = window.performance.now();
-        this.animationEndX = x;
-        this.animationEndY = y;
-        this.animationEndTime = this.animationStartTime + time;
-        this.animationRequestId = window.requestAnimationFrame(this.requestAnimationFrameCallback);
+        this._animationStartX = this.x;
+        this._animationStartY = this.y;
+        this._animationStartTime = window.performance.now();
+        this._animationEndX = x;
+        this._animationEndY = y;
+        this._animationEndTime = this._animationStartTime + time;
+        this._animationRequestId = window.requestAnimationFrame(this._requestAnimationFrameCallback);
     }
 
     stop() {
-        if (this.animationRequestId === null) {
+        if (this._animationRequestId === null) {
             return;
         }
 
-        window.cancelAnimationFrame(this.animationRequestId);
-        this.animationRequestId = null;
+        window.cancelAnimationFrame(this._animationRequestId);
+        this._animationRequestId = null;
     }
 
-    onAnimationFrame(time) {
-        if (time >= this.animationEndTime) {
-            window.scroll(this.animationEndX, this.animationEndY);
-            this.animationRequestId = null;
+    // Private
+
+    _onAnimationFrame(time) {
+        if (time >= this._animationEndTime) {
+            window.scroll(this._animationEndX, this._animationEndY);
+            this._animationRequestId = null;
             return;
         }
 
-        const t = WindowScroll.easeInOutCubic((time - this.animationStartTime) / (this.animationEndTime - this.animationStartTime));
+        const t = this._easeInOutCubic((time - this._animationStartTime) / (this._animationEndTime - this._animationStartTime));
         window.scroll(
-            WindowScroll.lerp(this.animationStartX, this.animationEndX, t),
-            WindowScroll.lerp(this.animationStartY, this.animationEndY, t)
+            this._lerp(this._animationStartX, this._animationEndX, t),
+            this._lerp(this._animationStartY, this._animationEndY, t)
         );
 
-        this.animationRequestId = window.requestAnimationFrame(this.requestAnimationFrameCallback);
+        this._animationRequestId = window.requestAnimationFrame(this._requestAnimationFrameCallback);
     }
 
-    get x() {
-        return window.scrollX || window.pageXOffset;
-    }
-
-    get y() {
-        return window.scrollY || window.pageYOffset;
-    }
-
-    static easeInOutCubic(t) {
+    _easeInOutCubic(t) {
         if (t < 0.5) {
             return (4.0 * t * t * t);
         } else {
@@ -93,7 +94,7 @@ class WindowScroll {
         }
     }
 
-    static lerp(start, end, percent) {
+    _lerp(start, end, percent) {
         return (end - start) * percent + start;
     }
 }
