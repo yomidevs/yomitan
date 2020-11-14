@@ -93,7 +93,7 @@ h1 {
     padding: 0.25em 0 0;
     font-weight: normal;
     box-sizing: border-box;
-    border-bottom: var(--thin-border-size) solid var(--separator-color1);
+    border-bottom: calc(1em / (var(--font-size-no-units) * 2)) solid var(--separator-color1);
 }
 
 /* Material design select */
@@ -229,17 +229,7 @@ label.toggle {
 }
 
 /* Content layout */
-.content {
-    flex: 1 0 auto;
-    flex-flow: row nowrap;
-    width: 100%;
-    display: flex;
-    position: relative;
-    align-items: stretch;
-    justify-content: center;
-}
-.content-center {
-    flex: 1 1 auto;
+.content-body {
     width: var(--main-content-size);
     padding: 0 var(--main-content-padding);
     max-width: var(--main-content-size);

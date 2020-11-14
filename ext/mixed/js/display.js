@@ -56,7 +56,6 @@ class Display extends EventDispatcher {
         this._autoPlayAudioDelay = 0;
         this._mediaLoader = new MediaLoader();
         this._displayGenerator = new DisplayGenerator({mediaLoader: this._mediaLoader});
-        this._windowScroll = new WindowScroll();
         this._hotkeys = new Map();
         this._actions = new Map();
         this._messageHandlers = new Map();
@@ -87,6 +86,10 @@ class Display extends EventDispatcher {
             renderTemplate: this._renderTemplate.bind(this)
         });
         this._updateAdderButtonsPromise = Promise.resolve();
+        this._contentScrollElement = document.querySelector('#content');
+        this._contentScrollBodyElement = document.querySelector('#content-body');
+        this._contentScrollFocusElement = document.querySelector('#content-scroll-focus');
+        this._windowScroll = new WindowScroll(this._contentScrollElement);
 
         this.registerActions([
             ['close',            () => { this.onEscape(); }],
@@ -174,6 +177,7 @@ class Display extends EventDispatcher {
         api.crossFrame.registerHandlers([
             ['popupMessage', {async: 'dynamic', handler: this._onDirectMessage.bind(this)}]
         ]);
+        window.addEventListener('focus', this._onWindowFocus.bind(this), false);
     }
 
     initializeState() {
@@ -547,6 +551,19 @@ class Display extends EventDispatcher {
     _onNextTermView(e) {
         e.preventDefault();
         this._nextTermView();
+    }
+
+    _onWindowFocus() {
+        const target = this._contentScrollFocusElement;
+        if (target === null) { return; }
+        const {activeElement} = document;
+        if (
+            activeElement === null ||
+            activeElement === document.documentElement ||
+            activeElement === document.body
+        ) {
+            target.focus();
+        }
     }
 
     async _onKanjiLookup(e) {
@@ -1032,9 +1049,6 @@ class Display extends EventDispatcher {
     }
 
     _entrySetCurrent(index) {
-        index = Math.min(index, this._definitions.length - 1);
-        index = Math.max(index, 0);
-
         const entryPre = this._getEntry(this._index);
         if (entryPre !== null) {
             entryPre.classList.remove('entry-current');
@@ -1051,6 +1065,8 @@ class Display extends EventDispatcher {
     }
 
     _focusEntry(index, smooth) {
+        index = Math.max(Math.min(index, this._definitions.length - 1), 0);
+
         const entry = this._entrySetCurrent(index);
         let target = index === 0 || entry === null ? 0 : this._getElementTop(entry);
 
@@ -1254,7 +1270,7 @@ class Display extends EventDispatcher {
 
     _getElementTop(element) {
         const elementRect = element.getBoundingClientRect();
-        const documentRect = document.documentElement.getBoundingClientRect();
+        const documentRect = this._contentScrollBodyElement.getBoundingClientRect();
         return elementRect.top - documentRect.top;
     }
 

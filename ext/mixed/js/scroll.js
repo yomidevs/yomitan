@@ -16,7 +16,8 @@
  */
 
 class WindowScroll {
-    constructor() {
+    constructor(node) {
+        this._node = node;
         this._animationRequestId = null;
         this._animationStartTime = 0;
         this._animationStartX = 0;
@@ -28,11 +29,11 @@ class WindowScroll {
     }
 
     get x() {
-        return window.scrollX || window.pageXOffset;
+        return this._node !== null ? this._node.scrollLeft : window.scrollX || window.pageXOffset;
     }
 
     get y() {
-        return window.scrollY || window.pageYOffset;
+        return this._node !== null ? this._node.scrollTop : window.scrollY || window.pageYOffset;
     }
 
     toY(y) {
@@ -45,7 +46,7 @@ class WindowScroll {
 
     to(x, y) {
         this.stop();
-        window.scroll(x, y);
+        this._scroll(x, y);
     }
 
     animate(x, y, time) {
@@ -71,13 +72,13 @@ class WindowScroll {
 
     _onAnimationFrame(time) {
         if (time >= this._animationEndTime) {
-            window.scroll(this._animationEndX, this._animationEndY);
+            this._scroll(this._animationEndX, this._animationEndY);
             this._animationRequestId = null;
             return;
         }
 
         const t = this._easeInOutCubic((time - this._animationStartTime) / (this._animationEndTime - this._animationStartTime));
-        window.scroll(
+        this._scroll(
             this._lerp(this._animationStartX, this._animationEndX, t),
             this._lerp(this._animationStartY, this._animationEndY, t)
         );
@@ -96,5 +97,14 @@ class WindowScroll {
 
     _lerp(start, end, percent) {
         return (end - start) * percent + start;
+    }
+
+    _scroll(x, y) {
+        if (this._node !== null) {
+            this._node.scrollLeft = x;
+            this._node.scrollTop = y;
+        } else {
+            window.scroll(x, y);
+        }
     }
 }
