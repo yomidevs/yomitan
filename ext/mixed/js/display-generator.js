@@ -51,7 +51,7 @@ class DisplayGenerator {
         const definitionsContainer = node.querySelector('.term-definition-list');
         const bodyContainer = node.querySelector('.term-entry-body');
 
-        const {termTags, expressions, type, reasons, frequencies} = details;
+        const {expressions, type, reasons, frequencies} = details;
         const definitions = (type === 'term' ? [details] : details.definitions);
         const merged = (type === 'termMerged' || type === 'termMergedByGlossary');
         const pitches = DictionaryDataUtil.getPitchAccentInfos(details);
@@ -69,7 +69,7 @@ class DisplayGenerator {
             (pitches.length > 0 ? 1 : 0)
         }`;
 
-        this._appendMultiple(expressionsContainer, this._createTermExpression.bind(this), expressions, termTags);
+        this._appendMultiple(expressionsContainer, this._createTermExpression.bind(this), expressions);
         this._appendMultiple(reasonsContainer, this._createTermReason.bind(this), reasons);
         this._appendMultiple(frequenciesContainer, this._createFrequencyTag.bind(this), frequencies);
         this._appendMultiple(pitchesContainer, this._createPitches.bind(this), pitches);
@@ -91,11 +91,8 @@ class DisplayGenerator {
         const classificationsContainer = node.querySelector('.kanji-classifications');
         const codepointsContainer = node.querySelector('.kanji-codepoints');
         const dictionaryIndicesContainer = node.querySelector('.kanji-dictionary-indices');
-        const debugInfoContainer = node.querySelector('.debug-info');
 
-        if (glyphContainer !== null) {
-            glyphContainer.textContent = details.character;
-        }
+        glyphContainer.textContent = details.character;
 
         this._appendMultiple(frequenciesContainer, this._createFrequencyTag.bind(this), details.frequencies);
         this._appendMultiple(tagContainer, this._createTag.bind(this), details.tags);
@@ -103,58 +100,36 @@ class DisplayGenerator {
         this._appendMultiple(chineseReadingsContainer, this._createKanjiReading.bind(this), details.onyomi);
         this._appendMultiple(japaneseReadingsContainer, this._createKanjiReading.bind(this), details.kunyomi);
 
-        if (statisticsContainer !== null) {
-            statisticsContainer.appendChild(this._createKanjiInfoTable(details.stats.misc));
-        }
-        if (classificationsContainer !== null) {
-            classificationsContainer.appendChild(this._createKanjiInfoTable(details.stats.class));
-        }
-        if (codepointsContainer !== null) {
-            codepointsContainer.appendChild(this._createKanjiInfoTable(details.stats.code));
-        }
-        if (dictionaryIndicesContainer !== null) {
-            dictionaryIndicesContainer.appendChild(this._createKanjiInfoTable(details.stats.index));
-        }
-
-        if (debugInfoContainer !== null) {
-            debugInfoContainer.textContent = JSON.stringify(details, null, 4);
-        }
+        statisticsContainer.appendChild(this._createKanjiInfoTable(details.stats.misc));
+        classificationsContainer.appendChild(this._createKanjiInfoTable(details.stats.class));
+        codepointsContainer.appendChild(this._createKanjiInfoTable(details.stats.code));
+        dictionaryIndicesContainer.appendChild(this._createKanjiInfoTable(details.stats.index));
 
         return node;
     }
 
     // Private
 
-    _createTermExpression(details, termTags) {
+    _createTermExpression(details) {
+        const {termFrequency, furiganaSegments, expression, reading, termTags, frequencies} = details;
+
+        const searchQueries = [];
+        if (expression) { searchQueries.push(expression); }
+        if (reading) { searchQueries.push(reading); }
+
         const node = this._templates.instantiate('term-expression');
 
         const expressionContainer = node.querySelector('.term-expression-text');
         const tagContainer = node.querySelector('.tags');
         const frequencyContainer = node.querySelector('.frequencies');
 
-        if (details.termFrequency) {
-            node.dataset.frequency = details.termFrequency;
-        }
+        node.dataset.readingIsSame = `${!reading || reading === expression}`;
+        node.dataset.frequency = termFrequency;
 
-        if (expressionContainer !== null) {
-            let furiganaSegments = details.furiganaSegments;
-            if (!Array.isArray(furiganaSegments)) {
-                // This case should not occur
-                furiganaSegments = [{text: details.expression, furigana: details.reading}];
-            }
-            this._appendFurigana(expressionContainer, furiganaSegments, this._appendKanjiLinks.bind(this));
-        }
-
-        if (!Array.isArray(termTags)) {
-            // Fallback
-            termTags = details.termTags;
-        }
-        const searchQueries = [details.expression, details.reading]
-            .filter((x) => !!x)
-            .map((x) => ({query: x}));
+        this._appendFurigana(expressionContainer, furiganaSegments, this._appendKanjiLinks.bind(this));
         this._appendMultiple(tagContainer, this._createTag.bind(this), termTags);
         this._appendMultiple(tagContainer, this._createSearchTag.bind(this), searchQueries);
-        this._appendMultiple(frequencyContainer, this._createFrequencyTag.bind(this), details.frequencies);
+        this._appendMultiple(frequencyContainer, this._createFrequencyTag.bind(this), frequencies);
 
         return node;
     }
@@ -200,9 +175,7 @@ class DisplayGenerator {
     _createTermGlossaryItemText(glossary) {
         const node = this._templates.instantiate('term-glossary-item');
         const container = node.querySelector('.term-glossary');
-        if (container !== null) {
-            this._appendMultilineText(container, glossary);
-        }
+        this._appendMultilineText(container, glossary);
         return node;
     }
 
@@ -285,9 +258,7 @@ class DisplayGenerator {
     _createKanjiGlossaryItem(glossary) {
         const node = this._templates.instantiate('kanji-glossary-item');
         const container = node.querySelector('.kanji-glossary');
-        if (container !== null) {
-            this._appendMultilineText(container, glossary);
-        }
+        this._appendMultilineText(container, glossary);
         return node;
     }
 
@@ -299,15 +270,12 @@ class DisplayGenerator {
 
     _createKanjiInfoTable(details) {
         const node = this._templates.instantiate('kanji-info-table');
-
         const container = node.querySelector('.kanji-info-table-body');
 
-        if (container !== null) {
-            const count = this._appendMultiple(container, this._createKanjiInfoTableItem.bind(this), details);
-            if (count === 0) {
-                const n = this._createKanjiInfoTableItemEmpty();
-                container.appendChild(n);
-            }
+        const count = this._appendMultiple(container, this._createKanjiInfoTableItem.bind(this), details);
+        if (count === 0) {
+            const n = this._createKanjiInfoTableItemEmpty();
+            container.appendChild(n);
         }
 
         return node;
@@ -317,12 +285,8 @@ class DisplayGenerator {
         const node = this._templates.instantiate('kanji-info-table-item');
         const nameNode = node.querySelector('.kanji-info-table-item-header');
         const valueNode = node.querySelector('.kanji-info-table-item-value');
-        if (nameNode !== null) {
-            nameNode.textContent = details.notes || details.name;
-        }
-        if (valueNode !== null) {
-            valueNode.textContent = details.value;
-        }
+        nameNode.textContent = details.notes || details.name;
+        valueNode.textContent = details.value;
         return node;
     }
 
@@ -343,13 +307,10 @@ class DisplayGenerator {
         return node;
     }
 
-    _createSearchTag(details) {
+    _createSearchTag(text) {
         const node = this._templates.instantiate('tag-search');
-
-        node.textContent = details.query;
-
-        node.dataset.query = details.query;
-
+        node.textContent = text;
+        node.dataset.query = text;
         return node;
     }
 
@@ -479,14 +440,10 @@ class DisplayGenerator {
         const node = this._templates.instantiate('tag-frequency');
 
         let n = node.querySelector('.term-frequency-dictionary-name');
-        if (n !== null) {
-            n.textContent = details.dictionary;
-        }
+        n.textContent = details.dictionary;
 
         n = node.querySelector('.term-frequency-value');
-        if (n !== null) {
-            n.textContent = `${details.frequency}`;
-        }
+        n.textContent = `${details.frequency}`;
 
         node.dataset.dictionary = details.dictionary;
         node.dataset.frequency = details.frequency;
@@ -514,18 +471,10 @@ class DisplayGenerator {
         }
     }
 
-    _isIterable(value) {
-        return (
-            value !== null &&
-            typeof value === 'object' &&
-            typeof value[Symbol.iterator] !== 'undefined'
-        );
-    }
-
-    _appendMultiple(container, createItem, detailsIterable, ...args) {
+    _appendMultiple(container, createItem, detailsArray, ...args) {
         let count = 0;
-        if (container !== null && this._isIterable(detailsIterable)) {
-            for (const details of detailsIterable) {
+        if (Array.isArray(detailsArray)) {
+            for (const details of detailsArray) {
                 const item = createItem(details, ...args);
                 if (item === null) { continue; }
                 container.appendChild(item);
