@@ -413,11 +413,11 @@ button.action-button {
 }
 
 .term-expression-list {
-    display: inline-block;
+    display: inline;
 }
 
 .term-expression {
-    display: inline-block;
+    display: inline;
 }
 
 .term-expression-text {
@@ -437,15 +437,8 @@ button.action-button {
     display: none;
 }
 
-.term-expression-list>.term-expression:not(:last-of-type):after {
-    font-size: 2em;
+.term-expression-list>.term-expression:not(:last-of-type)>.term-expression-text::after {
     content: "\3001";
-}
-
-.entry[data-expression-multi=true] .term-expression-list>.term-expression:last-of-type:after {
-    font-size: 2em;
-    content: "\3000";
-    visibility: hidden;
 }
 
 .entry[data-expression-multi=true] .term-expression-list .term-expression-details {
@@ -455,6 +448,10 @@ button.action-button {
     height: 0;
     visibility: hidden;
     z-index: 1;
+}
+
+.entry[data-expression-multi=true] .term-expression-list>.term-expression:not(:last-of-type) .term-expression-details {
+    left: -2em;
 }
 
 .entry[data-expression-multi=true] .term-expression:hover .term-expression-details {
