@@ -105,9 +105,8 @@ class Popup extends EventDispatcher {
     }
 
     async setOptionsContext(optionsContext) {
-        this._optionsContext = optionsContext;
-        this._options = await api.optionsGet(optionsContext);
-        this.updateTheme();
+        await this._setOptionsContext(optionsContext);
+        await this._invokeSafe('setOptionsContext', {optionsContext});
     }
 
     hide(changeFocus) {
@@ -655,8 +654,14 @@ class Popup extends EventDispatcher {
         };
     }
 
+    async _setOptionsContext(optionsContext) {
+        this._optionsContext = optionsContext;
+        this._options = await api.optionsGet(optionsContext);
+        this.updateTheme();
+    }
+
     async _setOptionsContextIfDifferent(optionsContext) {
         if (deepEqual(this._optionsContext, optionsContext)) { return; }
-        await this.setOptionsContext(optionsContext);
+        await this._setOptionsContext(optionsContext);
     }
 }
