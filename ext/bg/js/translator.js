@@ -1032,7 +1032,7 @@ class Translator {
         this._sortTags(termTagsExpanded);
 
         const furiganaSegments = jp.distributeFurigana(expression, reading);
-        const termDetailsList = [this._createTermDetails(sourceTerm, expression, reading, furiganaSegments, termTags)];
+        const termDetailsList = [this._createTermDetails(sourceTerm, expression, reading, furiganaSegments, termTagsExpanded)];
         const sourceTermExactMatchCount = (sourceTerm === expression ? 1 : 0);
 
         return {
