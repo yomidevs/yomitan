@@ -138,6 +138,12 @@ h2 {
     border-bottom: 0.05714285714285714em solid var(--light-border-color); /* 14px * 1.25em => 1px */
 }
 
+a {
+    color: var(--popuplar-kanji-text-color);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 
 /*
  * Navigation
@@ -524,12 +530,8 @@ button.action-button {
     content: ", ";
 }
 
-.debug-info {
+:root:not([data-debug=true]) .debug-info {
     display: none;
-}
-
-:root[data-debug=true] .debug-info {
-    display: block;
 }
 
 :root[data-anki-enabled=false] .action-view-note,

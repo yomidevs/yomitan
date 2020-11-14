@@ -721,6 +721,14 @@ class Display extends EventDispatcher {
         }
     }
 
+    _onDebugLogClick(e) {
+        const link = e.currentTarget;
+        const index = this._entryIndexFind(link);
+        if (index < 0 || index >= this._definitions.length) { return; }
+        const definition = this._definitions[index];
+        console.log(definition);
+    }
+
     _updateDocumentOptions(options) {
         const data = document.documentElement.dataset;
         data.ankiEnabled = `${options.anki.enable}`;
@@ -771,6 +779,7 @@ class Display extends EventDispatcher {
             this.addMultipleEventListeners('.action-view-note', 'click', this._onNoteView.bind(this));
             this.addMultipleEventListeners('.action-play-audio', 'click', this._onAudioPlay.bind(this));
             this.addMultipleEventListeners('.kanji-link', 'click', this._onKanjiLookup.bind(this));
+            this.addMultipleEventListeners('.debug-log-link', 'click', this._onDebugLogClick.bind(this));
             if (this._options !== null && this._options.scanning.enablePopupSearch) {
                 this.addMultipleEventListeners('.term-glossary-item, .tag', 'mouseup', this._onGlossaryMouseUp.bind(this));
                 this.addMultipleEventListeners('.term-glossary-item, .tag', 'mousedown', this._onGlossaryMouseDown.bind(this));

@@ -49,42 +49,31 @@ class DisplayGenerator {
         const pitchesContainer = node.querySelector('.term-pitch-accent-group-list');
         const frequenciesContainer = node.querySelector('.frequencies');
         const definitionsContainer = node.querySelector('.term-definition-list');
-        const debugInfoContainer = node.querySelector('.debug-info');
         const bodyContainer = node.querySelector('.term-entry-body');
 
-        const {termTags, expressions, definitions, type} = details;
-
+        const {termTags, expressions, type, reasons, frequencies} = details;
+        const definitions = (type === 'term' ? [details] : details.definitions);
+        const merged = (type === 'termMerged' || type === 'termMergedByGlossary');
         const pitches = DictionaryDataUtil.getPitchAccentInfos(details);
         const pitchCount = pitches.reduce((i, v) => i + v.pitches.length, 0);
 
-        const expressionMulti = (type === 'termMerged' || type === 'termMergedByGlossary');
-        const definitionMulti = Array.isArray(definitions);
-        const expressionCount = expressionMulti ? expressions.length : 1;
-        const definitionCount = definitionMulti ? definitions.length : 1;
-        const uniqueExpressionCount = Array.isArray(details.expression) ? new Set(details.expression).size : 1;
-
-        node.dataset.expressionMulti = `${expressionMulti}`;
-        node.dataset.definitionMulti = `${definitionMulti}`;
-        node.dataset.expressionCount = `${expressionCount}`;
-        node.dataset.definitionCount = `${definitionCount}`;
-        node.dataset.uniqueExpressionCount = `${uniqueExpressionCount}`;
+        node.dataset.format = type;
+        node.dataset.expressionMulti = `${merged}`;
+        node.dataset.expressionCount = `${expressions.length}`;
+        node.dataset.definitionCount = `${definitions.length}`;
         node.dataset.pitchAccentDictionaryCount = `${pitches.length}`;
         node.dataset.pitchAccentCount = `${pitchCount}`;
 
         bodyContainer.dataset.sectionCount = `${
-            (definitionCount > 0 ? 1 : 0) +
+            (definitions.length > 0 ? 1 : 0) +
             (pitches.length > 0 ? 1 : 0)
         }`;
 
-        this._appendMultiple(expressionsContainer, this._createTermExpression.bind(this), expressionMulti ? expressions : [details], termTags);
-        this._appendMultiple(reasonsContainer, this._createTermReason.bind(this), details.reasons);
-        this._appendMultiple(frequenciesContainer, this._createFrequencyTag.bind(this), details.frequencies);
+        this._appendMultiple(expressionsContainer, this._createTermExpression.bind(this), expressions, termTags);
+        this._appendMultiple(reasonsContainer, this._createTermReason.bind(this), reasons);
+        this._appendMultiple(frequenciesContainer, this._createFrequencyTag.bind(this), frequencies);
         this._appendMultiple(pitchesContainer, this._createPitches.bind(this), pitches);
-        this._appendMultiple(definitionsContainer, this._createTermDefinitionItem.bind(this), definitionMulti ? definitions : [details]);
-
-        if (debugInfoContainer !== null) {
-            debugInfoContainer.textContent = JSON.stringify(details, null, 4);
-        }
+        this._appendMultiple(definitionsContainer, this._createTermDefinitionItem.bind(this), definitions);
 
         return node;
     }
