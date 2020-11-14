@@ -23,9 +23,6 @@
     --shadow-color: rgba(0, 0, 0, 0.185);
     --shadow-vertical: 0 1px 4px 0 var(--shadow-color), 0 2px 2px 0 var(--shadow-color);
 
-    --font-size-default: 14px;
-    --line-height-default: calc(20 / 14);
-    --thin-border-size: 1px;
     --toggle-size: 16px;
 
     --textarea-line-height: 1.25em;
@@ -84,10 +81,8 @@ body {
     margin: 0;
     padding: 0;
     margin: 0;
-    font-size: var(--font-size-default);
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: var(--text-color-default);
-    line-height: var(--line-height-default);
     height: 100%;
     overflow: hidden;
 }
@@ -277,7 +272,7 @@ label.toggle {
     min-height: calc(var(--textarea-line-height) + var(--textarea-padding) * 2);
     max-height: calc(var(--textarea-line-height) * 10 + var(--textarea-padding) * 2);
     resize: vertical;
-    font-size: var(--font-size-default);
+    font-size: var(--font-size);
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: var(--text-color-default);
     white-space: pre-wrap;
@@ -366,7 +361,3 @@ label.toggle {
     margin: 0;
 }
 
-#query-parser-content:not(:empty) {
-    border-bottom: var(--thin-border-size) solid var(--separator-color1);
-    padding-bottom: 0.5em;
-}
