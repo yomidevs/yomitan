@@ -29,6 +29,8 @@ class DisplayFloat extends Display {
         this._windowMessageHandlers = new Map([
             ['extensionUnloaded', {async: false, handler: this._onMessageExtensionUnloaded.bind(this)}]
         ]);
+        this._browser = null;
+        this._copyTextarea = null;
 
         this.registerActions([
             ['copyHostSelection', () => this._copySelection()]
@@ -42,6 +44,9 @@ class DisplayFloat extends Display {
 
     async prepare() {
         await super.prepare();
+
+        const {browser} = await api.getEnvironmentInfo();
+        this._browser = browser;
 
         this.registerDirectMessageHandlers([
             ['configure',       {async: true,  handler: this._onMessageConfigure.bind(this)}],
@@ -150,8 +155,45 @@ class DisplayFloat extends Display {
 
     _copySelection() {
         if (window.getSelection().toString()) { return false; }
-        this._invokeOwner('copySelection');
+        this._copyHostSelection();
         return true;
+    }
+
+    async _copyHostSelection() {
+        switch (this._browser) {
+            case 'firefox':
+            case 'firefox-mobile':
+                {
+                    let text;
+                    try {
+                        text = await this._invokeOwner('getSelectionText');
+                    } catch (e) {
+                        break;
+                    }
+                    this._copyText(text);
+                }
+                break;
+            default:
+                this._invokeOwner('copySelection');
+                break;
+        }
+    }
+
+    _copyText(text) {
+        const parent = document.body;
+        if (parent === null) { return; }
+
+        let textarea = this._copyTextarea;
+        if (textarea === null) {
+            textarea = document.createElement('textarea');
+            this._copyTextarea = textarea;
+        }
+
+        textarea.value = text;
+        parent.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        parent.removeChild(textarea);
     }
 
     _setContentScale(scale) {

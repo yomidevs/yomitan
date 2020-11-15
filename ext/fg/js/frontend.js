@@ -115,6 +115,7 @@ class Frontend {
             ['getUrl',                  {async: false, handler: this._onApiGetUrl.bind(this)}],
             ['closePopup',              {async: false, handler: this._onApiClosePopup.bind(this)}],
             ['copySelection',           {async: false, handler: this._onApiCopySelection.bind(this)}],
+            ['getSelectionText',        {async: false, handler: this._onApiGetSelectionText.bind(this)}],
             ['getPopupInfo',            {async: false, handler: this._onApiGetPopupInfo.bind(this)}],
             ['getDocumentInformation',  {async: false, handler: this._onApiGetDocumentInformation.bind(this)}]
         ]);
@@ -168,7 +169,12 @@ class Frontend {
     }
 
     _onApiCopySelection() {
+        // This will not work on Firefox if a popup has focus, which is usually the case when this function is called.
         document.execCommand('copy');
+    }
+
+    _onApiGetSelectionText() {
+        return document.getSelection().toString();
     }
 
     _onApiGetPopupInfo() {
