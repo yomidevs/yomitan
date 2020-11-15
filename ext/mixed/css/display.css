@@ -85,6 +85,9 @@
     --sidebar-button-icon-color: #333333;
     --sidebar-button-disabled-icon-color: #888888;
     --sidebar-button-danger-icon-color: #ffffff;
+
+    --scrollbar-thumb-color: #c1c1c1;
+    --scrollbar-track-color: #f1f1f1;
 }
 :root[data-yomichan-theme=dark] {
     /* Colors */
@@ -127,6 +130,9 @@
     --sidebar-button-icon-color: #cccccc;
     --sidebar-button-disabled-icon-color: #777777;
     --sidebar-button-danger-icon-color: #ffffff;
+
+    --scrollbar-thumb-color: #444444;
+    --scrollbar-track-color: #2f2f2f;
 }
 
 
@@ -182,6 +188,30 @@ a {
     color: var(--popuplar-kanji-text-color);
     text-decoration: underline;
     cursor: pointer;
+}
+
+
+/* Scrollbars */
+:root[data-yomichan-theme=dark] .scrollbar {
+    scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
+}
+:root[data-yomichan-theme=dark] .scrollbar::-webkit-scrollbar {
+    width: auto;
+}
+:root[data-yomichan-theme=dark] .scrollbar::-webkit-scrollbar-button {
+    height: 0;
+}
+:root[data-yomichan-theme=dark] .scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb-color);
+}
+:root[data-yomichan-theme=dark] .scrollbar::-webkit-scrollbar-track {
+    background-color: var(--scrollbar-thumb-color);
+}
+:root[data-yomichan-theme=dark] .scrollbar::-webkit-scrollbar-track-piece {
+    background-color: var(--scrollbar-track-color);
+}
+:root[data-yomichan-theme=dark] .scrollbar::-webkit-scrollbar-corner {
+    background-color: var(--scrollbar-track-color);
 }
 
 
