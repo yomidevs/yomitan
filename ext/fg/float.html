@@ -15,16 +15,12 @@
 </head>
 <body>
 
+<div class="content-outer">
 <div class="content" id="content"><div class="content-body" id="content-body">
 
     <span tabindex="-1" id="content-scroll-focus"></span>
 
     <div id="spinner" hidden><img src="/mixed/img/spinner.gif"></div>
-
-    <div id="navigation-header" class="navigation-header" hidden><div class="navigation-header-actions">
-        <button class="action-button action-previous" data-icon="source-term" title="Source term (Alt + B)"></button>
-        <button class="action-button action-next" data-icon="source-term" title="Next term (Alt + F)"></button>
-    </div></div><div class="navigation-header-spacer"></div>
 
     <div class="scan-disable" id="query-parser-container" hidden>
         <div class="search-option" id="query-parser-mode-container" hidden>
@@ -52,6 +48,17 @@
     </div>
 
 </div></div>
+<div class="content-sidebar" id="content-sidebar" hidden><div class="content-sidebar-inner">
+    <div class="content-sidebar-top">
+        <button class="sidebar-button danger" id="close-button" title="Close popup"><span class="sidebar-button-icon" data-icon="cross"></span></button>
+        <button class="sidebar-button" disabled id="navigate-previous-button" title="Previous definition (Alt + B)"><span class="sidebar-button-icon" data-icon="left-chevron"></span></button>
+        <button class="sidebar-button" disabled id="navigate-next-button" title="Next definition (Alt + F)"><span class="sidebar-button-icon" data-icon="right-chevron"></span></button>
+    </div>
+    <div class="content-sidebar-bottom">
+        <!--<button class="sidebar-button" id="profile-button"><span class="sidebar-button-icon" data-icon="profile"></span></button>-->
+    </div>
+</div></div>
+</div>
 
 <!-- Scripts -->
 <script src="/mixed/js/core.js"></script>

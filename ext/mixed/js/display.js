@@ -90,6 +90,10 @@ class Display extends EventDispatcher {
         this._contentScrollBodyElement = document.querySelector('#content-body');
         this._contentScrollFocusElement = document.querySelector('#content-scroll-focus');
         this._windowScroll = new WindowScroll(this._contentScrollElement);
+        this._contentSidebar = document.querySelector('#content-sidebar');
+        this._closeButton = document.querySelector('#close-button');
+        this._navigationPreviousButton = document.querySelector('#navigate-previous-button');
+        this._navigationNextButton = document.querySelector('#navigate-next-button');
 
         this.registerActions([
             ['close',            () => { this.onEscape(); }],
@@ -406,6 +410,10 @@ class Display extends EventDispatcher {
         return query;
     }
 
+    close() {
+        // NOP
+    }
+
     // Message handlers
 
     _onMessage({action, params}, sender, callback) {
@@ -541,6 +549,11 @@ class Display extends EventDispatcher {
             content: {}
         };
         this.setContent(details);
+    }
+
+    _onCloseButtonClick(e) {
+        e.preventDefault();
+        this.close();
     }
 
     _onSourceTermView(e) {
@@ -769,16 +782,16 @@ class Display extends EventDispatcher {
         this._interactive = interactive;
 
         if (interactive) {
-            const actionPrevious = document.querySelector('.action-previous');
-            const actionNext = document.querySelector('.action-next');
-
             this._persistentEventListeners.addEventListener(document, 'keydown', this.onKeyDown.bind(this), false);
             this._persistentEventListeners.addEventListener(document, 'wheel', this._onWheel.bind(this), {passive: false});
-            if (actionPrevious !== null) {
-                this._persistentEventListeners.addEventListener(actionPrevious, 'click', this._onSourceTermView.bind(this));
+            if (this._closeButton !== null) {
+                this._persistentEventListeners.addEventListener(this._closeButton, 'click', this._onCloseButtonClick.bind(this));
             }
-            if (actionNext !== null) {
-                this._persistentEventListeners.addEventListener(actionNext, 'click', this._onNextTermView.bind(this));
+            if (this._navigationPreviousButton !== null) {
+                this._persistentEventListeners.addEventListener(this._navigationPreviousButton, 'click', this._onSourceTermView.bind(this));
+            }
+            if (this._navigationNextButton !== null) {
+                this._persistentEventListeners.addEventListener(this._navigationNextButton, 'click', this._onNextTermView.bind(this));
             }
         } else {
             this._persistentEventListeners.removeAllEventListeners();
@@ -943,7 +956,7 @@ class Display extends EventDispatcher {
             errorExtensionUnloaded.hidden = false;
         }
 
-        this._updateNavigation(null, null);
+        this._updateNavigation(false, false);
         this._setNoContentVisible(false);
         this._setTitleText('');
     }
@@ -984,10 +997,16 @@ class Display extends EventDispatcher {
     }
 
     _updateNavigation(previous, next) {
-        if (this._navigationHeader === null) { return; }
-        this._navigationHeader.hidden = !(previous || next);
-        this._navigationHeader.dataset.hasPrevious = `${!!previous}`;
-        this._navigationHeader.dataset.hasNext = `${!!next}`;
+        if (this._contentSidebar !== null) {
+            this._contentSidebar.dataset.hasNavigationPrevious = `${previous}`;
+            this._contentSidebar.dataset.hasNavigationNext = `${next}`;
+        }
+        if (this._navigationPreviousButton !== null) {
+            this._navigationPreviousButton.disabled = !previous;
+        }
+        if (this._navigationNextButton !== null) {
+            this._navigationNextButton.disabled = !next;
+        }
     }
 
     async _updateAdderButtons(token, isTerms, definitions) {

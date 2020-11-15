@@ -63,7 +63,7 @@ class DisplayFloat extends Display {
     }
 
     onEscape() {
-        this._invokeOwner('closePopup');
+        this.close();
     }
 
     async getDocumentTitle() {
@@ -81,6 +81,10 @@ class DisplayFloat extends Display {
             throw new Error('Invalid authentication');
         }
         return data.data;
+    }
+
+    close() {
+        this._invokeOwner('closePopup');
     }
 
     // Message handling
