@@ -489,11 +489,7 @@ class DictionaryController {
                 targets.push({
                     action: 'set',
                     path,
-                    value: {
-                        enabled: false,
-                        allowSecondarySearches: false,
-                        priority: 0
-                    }
+                    value: DictionaryController.createDefaultDictionarySettings()
                 });
             }
         }
@@ -501,5 +497,13 @@ class DictionaryController {
         if (targets.length > 0) {
             await this._settingsController.modifyGlobalSettings(targets);
         }
+    }
+
+    static createDefaultDictionarySettings() {
+        return {
+            enabled: false,
+            allowSecondarySearches: false,
+            priority: 0
+        };
     }
 }

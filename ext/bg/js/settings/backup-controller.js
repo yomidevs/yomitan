@@ -16,6 +16,7 @@
  */
 
 /* global
+ * DictionaryController
  * Modal
  * OptionsUtil
  * api
@@ -382,6 +383,14 @@ class BackupController {
 
         // Get default options
         const optionsFull = this._optionsUtil.getDefault();
+
+        // Update dictionaries
+        const dictionaries = await this._settingsController.getDictionaryInfo();
+        for (const {options: {dictionaries: optionsDictionaries}} of optionsFull.profiles) {
+            for (const {title} of dictionaries) {
+                optionsDictionaries[title] = DictionaryController.createDefaultDictionarySettings();
+            }
+        }
 
         // Assign options
         try {
