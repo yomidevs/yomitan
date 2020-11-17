@@ -17,36 +17,38 @@
 
 <div class="content-outer">
 <div class="content scrollbar" id="content"><div class="content-body" id="content-body">
+    <div class="content-body-inner">
 
-    <span tabindex="-1" id="content-scroll-focus"></span>
+        <span tabindex="-1" id="content-scroll-focus"></span>
 
-    <div id="spinner" hidden><img src="/mixed/img/spinner.gif"></div>
+        <div id="spinner" hidden><img src="/mixed/img/spinner.gif"></div>
 
-    <div class="scan-disable" id="query-parser-container" hidden>
-        <div class="search-option" id="query-parser-mode-container" hidden>
-            <select id="query-parser-mode-select"></select>
+        <div class="scan-disable" id="query-parser-container" hidden>
+            <div class="search-option" id="query-parser-mode-container" hidden>
+                <select id="query-parser-mode-select"></select>
+            </div>
+            <div id="query-parser-content"></div>
         </div>
-        <div id="query-parser-content"></div>
-    </div>
 
-    <div id="definitions"></div>
+        <div id="definitions"></div>
 
-    <div id="no-results" hidden>
-        <div class="entry">
-            <p>No results found.</p>
+        <div id="no-results" hidden>
+            <div class="entry">
+                <p>No results found.</p>
+            </div>
         </div>
-    </div>
 
-    <div id="error-extension-unloaded" hidden>
-        <div class="entry">
-            <h1>Yomichan Updated!</h1>
-            <p>
-                The Yomichan extension has been updated to a new version! In order to continue
-                viewing definitions on this page, you must reload this tab or restart your browser.
-            </p>
+        <div id="error-extension-unloaded" hidden>
+            <div class="entry">
+                <h1>Yomichan Updated!</h1>
+                <p>
+                    The Yomichan extension has been updated to a new version! In order to continue
+                    viewing definitions on this page, you must reload this tab or restart your browser.
+                </p>
+            </div>
         </div>
-    </div>
 
+    </div>
 </div></div>
 <div class="content-sidebar scrollbar" id="content-sidebar" hidden><div class="content-sidebar-inner">
     <div class="content-sidebar-top">

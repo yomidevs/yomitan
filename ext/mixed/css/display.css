@@ -220,16 +220,19 @@ a {
     width: 100%;
     height: 100%;
     display: flex;
-    flex-flow: row nowrap;
+    flex-flow: column nowrap;
     overflow-x: hidden;
     overflow-y: scroll;
     position: relative;
     align-items: stretch;
-    justify-content: center;
+    justify-content: flex-start;
 }
 .content-body {
     flex: 1 1 auto;
-    height: 100%;
+    position: relative;
+}
+.content-body-inner {
+    width: 100%;
 }
 
 

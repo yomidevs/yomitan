@@ -17,48 +17,50 @@
 <body>
 
 <div class="content scrollbar" id="content"><div class="content-body" id="content-body">
+    <div class="content-body-inner">
 
-    <span tabindex="-1" id="content-scroll-focus"></span>
+        <span tabindex="-1" id="content-scroll-focus"></span>
 
-    <div id="intro">
-        <h1>Yomichan Search</h1>
-    </div>
+        <div id="intro">
+            <h1>Yomichan Search</h1>
+        </div>
 
-    <div class="scan-disable">
-        <div class="search-options">
-            <label class="search-option">
-                <label class="toggle"><input type="checkbox" id="wanakana-enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                <span class="search-option-label">Automatic kana conversion</span>
-            </label>
-            <label class="search-option">
-                <label class="toggle"><input type="checkbox" id="clipboard-monitor-enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                <span class="search-option-label">Clipboard monitor</span>
-            </label>
-            <div class="search-option" id="query-parser-mode-container" hidden>
-                <span class="search-option-pre-label">Parser:</span>
-                <select id="query-parser-mode-select"></select>
+        <div class="scan-disable">
+            <div class="search-options">
+                <label class="search-option">
+                    <label class="toggle"><input type="checkbox" id="wanakana-enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                    <span class="search-option-label">Automatic kana conversion</span>
+                </label>
+                <label class="search-option">
+                    <label class="toggle"><input type="checkbox" id="clipboard-monitor-enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                    <span class="search-option-label">Clipboard monitor</span>
+                </label>
+                <div class="search-option" id="query-parser-mode-container" hidden>
+                    <span class="search-option-pre-label">Parser:</span>
+                    <select id="query-parser-mode-select"></select>
+                </div>
+            </div>
+            <div class="search-textbox-container">
+                <textarea id="search-textbox" placeholder="Input a term, expression, sentence, or block of text" autocomplete="false" autofocus></textarea>
+                <button id="search-button"><span class="icon-button-icon" data-icon="magnifying-glass"></span></button>
             </div>
         </div>
-        <div class="search-textbox-container">
-            <textarea id="search-textbox" placeholder="Input a term, expression, sentence, or block of text" autocomplete="false" autofocus></textarea>
-            <button id="search-button"><span class="icon-button-icon" data-icon="magnifying-glass"></span></button>
+
+        <div id="spinner" hidden><img src="/mixed/img/spinner.gif"></div>
+
+        <div class="scan-disable" id="query-parser-container">
+            <div id="query-parser-content"></div>
         </div>
-    </div>
 
-    <div id="spinner" hidden><img src="/mixed/img/spinner.gif"></div>
+        <div id="definitions"></div>
 
-    <div class="scan-disable" id="query-parser-container">
-        <div id="query-parser-content"></div>
-    </div>
-
-    <div id="definitions"></div>
-
-    <div id="no-results" hidden>
-        <div class="entry">
-            <p>No results found.</p>
+        <div id="no-results" hidden>
+            <div class="entry">
+                <p>No results found.</p>
+            </div>
         </div>
-    </div>
 
+    </div>
 </div></div>
 
 <!-- Scripts -->

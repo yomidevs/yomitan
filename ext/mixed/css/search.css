@@ -229,11 +229,12 @@ label.toggle {
 }
 
 /* Content layout */
-.content-body {
+.content-body-inner {
     width: var(--main-content-size);
     padding: 0 var(--main-content-padding);
-    max-width: var(--main-content-size);
+    max-width: 100%;
     box-sizing: border-box;
+    margin: 0 auto;
 }
 
 /* Search bar */
