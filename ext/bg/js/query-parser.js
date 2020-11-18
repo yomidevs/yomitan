@@ -21,10 +21,10 @@
  */
 
 class QueryParser extends EventDispatcher {
-    constructor({getOptionsContext, setSpinnerVisible, documentUtil}) {
+    constructor({getOptionsContext, progressIndicatorVisible, documentUtil}) {
         super();
         this._getOptionsContext = getOptionsContext;
-        this._setSpinnerVisible = setSpinnerVisible;
+        this._progressIndicatorVisible = progressIndicatorVisible;
         this._selectedParser = null;
         this._documentUtil = documentUtil;
         this._parseResults = [];
@@ -63,17 +63,18 @@ class QueryParser extends EventDispatcher {
     }
 
     async setText(text) {
-        this._setSpinnerVisible(true);
+        const overrideToken = this._progressIndicatorVisible.setOverride(true);
+        try {
+            this._setPreview(text);
 
-        this._setPreview(text);
+            this._parseResults = await api.textParse(text, this._getOptionsContext());
+            this._refreshSelectedParser();
 
-        this._parseResults = await api.textParse(text, this._getOptionsContext());
-        this._refreshSelectedParser();
-
-        this._renderParserSelect();
-        this._renderParseResult();
-
-        this._setSpinnerVisible(false);
+            this._renderParserSelect();
+            this._renderParseResult();
+        } finally {
+            this._progressIndicatorVisible.clearOverride(overrideToken);
+        }
     }
 
     // Private

@@ -69,12 +69,13 @@ class Display extends EventDispatcher {
         this._defaultTitleMaxLength = 1000;
         this._fullQuery = '';
         this._documentUtil = new DocumentUtil();
+        this._progressIndicatorVisible = new DynamicProperty(false);
         this._queryParserVisible = false;
         this._queryParserVisibleOverride = null;
         this._queryParserContainer = document.querySelector('#query-parser-container');
         this._queryParser = new QueryParser({
             getOptionsContext: this.getOptionsContext.bind(this),
-            setSpinnerVisible: this.setSpinnerVisible.bind(this),
+            progressIndicatorVisible: this._progressIndicatorVisible,
             documentUtil: this._documentUtil
         });
         this._mode = null;
@@ -182,6 +183,7 @@ class Display extends EventDispatcher {
             ['popupMessage', {async: 'dynamic', handler: this._onDirectMessage.bind(this)}]
         ]);
         window.addEventListener('focus', this._onWindowFocus.bind(this), false);
+        this._progressIndicatorVisible.on('change', this._onProgressIndicatorVisibleChanged.bind(this));
     }
 
     initializeState() {
@@ -335,12 +337,6 @@ class Display extends EventDispatcher {
 
     async getDocumentTitle() {
         return document.title;
-    }
-
-    setSpinnerVisible(visible) {
-        if (this._spinner !== null) {
-            this._spinner.hidden = !visible;
-        }
     }
 
     registerActions(actions) {
@@ -564,6 +560,11 @@ class Display extends EventDispatcher {
     _onNextTermView(e) {
         e.preventDefault();
         this._nextTermView();
+    }
+
+    _onProgressIndicatorVisibleChanged({value}) {
+        if (this._spinner === null) { return; }
+        this._spinner.hidden = !value;
     }
 
     _onWindowFocus() {
@@ -1133,9 +1134,8 @@ class Display extends EventDispatcher {
     }
 
     async _noteAdd(definition, mode) {
+        const overrideToken = this._progressIndicatorVisible.setOverride(true);
         try {
-            this.setSpinnerVisible(true);
-
             const noteContext = await this._getNoteContext();
             const noteId = await this._addDefinition(definition, mode, noteContext);
             if (noteId) {
@@ -1151,14 +1151,13 @@ class Display extends EventDispatcher {
         } catch (e) {
             this.onError(e);
         } finally {
-            this.setSpinnerVisible(false);
+            this._progressIndicatorVisible.clearOverride(overrideToken);
         }
     }
 
     async _audioPlay(definition, expressionIndex, entryIndex) {
+        const overrideToken = this._progressIndicatorVisible.setOverride(true);
         try {
-            this.setSpinnerVisible(true);
-
             const {expression, reading} = expressionIndex === -1 ? definition : definition.expressions[expressionIndex];
 
             this._stopPlayingAudio();
@@ -1204,7 +1203,7 @@ class Display extends EventDispatcher {
         } catch (e) {
             this.onError(e);
         } finally {
-            this.setSpinnerVisible(false);
+            this._progressIndicatorVisible.clearOverride(overrideToken);
         }
     }
 
