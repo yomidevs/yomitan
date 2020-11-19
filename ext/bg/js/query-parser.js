@@ -21,12 +21,13 @@
  */
 
 class QueryParser extends EventDispatcher {
-    constructor({getOptionsContext, progressIndicatorVisible, documentUtil}) {
+    constructor({getOptionsContext, documentUtil}) {
         super();
         this._getOptionsContext = getOptionsContext;
-        this._progressIndicatorVisible = progressIndicatorVisible;
-        this._selectedParser = null;
         this._documentUtil = documentUtil;
+        this._text = '';
+        this._setTextToken = null;
+        this._selectedParser = null;
         this._parseResults = [];
         this._queryParser = document.querySelector('#query-parser-content');
         this._queryParserModeContainer = document.querySelector('#query-parser-mode-container');
@@ -41,6 +42,10 @@ class QueryParser extends EventDispatcher {
             searchKanji: false,
             searchOnClick: true
         });
+    }
+
+    get text() {
+        return this._text;
     }
 
     prepare() {
@@ -63,18 +68,18 @@ class QueryParser extends EventDispatcher {
     }
 
     async setText(text) {
-        const overrideToken = this._progressIndicatorVisible.setOverride(true);
-        try {
-            this._setPreview(text);
+        this._text = text;
+        this._setPreview(text);
 
-            this._parseResults = await api.textParse(text, this._getOptionsContext());
-            this._refreshSelectedParser();
+        const token = {};
+        this._setTextToken = token;
+        this._parseResults = await api.textParse(text, this._getOptionsContext());
+        if (this._setTextToken !== token) { return; }
 
-            this._renderParserSelect();
-            this._renderParseResult();
-        } finally {
-            this._progressIndicatorVisible.clearOverride(overrideToken);
-        }
+        this._refreshSelectedParser();
+
+        this._renderParserSelect();
+        this._renderParseResult();
     }
 
     // Private

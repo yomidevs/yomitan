@@ -17,9 +17,11 @@
 
 /* Variables */
 :root {
+    --main-content-horizontal-padding: 0.72em;
+    --entry-horizontal-padding: 0;
+
     --padding: 10px;
     --main-content-size: 700px;
-    --main-content-padding: 10px;
     --shadow-color: rgba(0, 0, 0, 0.185);
     --shadow-vertical: 0 1px 4px 0 var(--shadow-color), 0 2px 2px 0 var(--shadow-color);
 
@@ -231,7 +233,6 @@ label.toggle {
 /* Content layout */
 .content-body-inner {
     width: var(--main-content-size);
-    padding: 0 var(--main-content-padding);
     max-width: 100%;
     box-sizing: border-box;
     margin: 0 auto;

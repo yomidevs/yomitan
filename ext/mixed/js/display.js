@@ -76,7 +76,6 @@ class Display extends EventDispatcher {
         this._queryParserContainer = document.querySelector('#query-parser-container');
         this._queryParser = new QueryParser({
             getOptionsContext: this.getOptionsContext.bind(this),
-            progressIndicatorVisible: this._progressIndicatorVisible,
             documentUtil: this._documentUtil
         });
         this._mode = null;
@@ -154,7 +153,7 @@ class Display extends EventDispatcher {
 
     set queryParserVisible(value) {
         this._queryParserVisible = value;
-        this._updateQueryParserVisibility();
+        this._updateQueryParser();
     }
 
     get mode() {
@@ -466,7 +465,7 @@ class Display extends EventDispatcher {
 
             const fullVisible = urlSearchParams.get('full-visible');
             this._queryParserVisibleOverride = (fullVisible === null ? null : (fullVisible !== 'false'));
-            this._updateQueryParserVisibility();
+            this._updateQueryParser();
 
             this._closePopups();
             this._setEventListenersActive(false);
@@ -862,7 +861,7 @@ class Display extends EventDispatcher {
     async _setContentTermsOrKanji(token, isTerms, urlSearchParams, eventArgs) {
         let source = urlSearchParams.get('query');
         if (!source) {
-            this._setQueryParserText('');
+            this._setFullQuery('');
             return false;
         }
 
@@ -890,7 +889,7 @@ class Display extends EventDispatcher {
         source = this.postProcessQuery(source);
         let full = urlSearchParams.get('full');
         full = (full === null ? source : this.postProcessQuery(full));
-        this._setQueryParserText(full);
+        this._setFullQuery(full);
         this._setTitleText(source);
 
         let {definitions} = content;
@@ -990,11 +989,27 @@ class Display extends EventDispatcher {
         }
     }
 
-    _setQueryParserText(text) {
-        if (this._fullQuery === text) { return; }
+    _setFullQuery(text) {
         this._fullQuery = text;
-        if (!this._isQueryParserVisible()) { return; }
-        this._queryParser.setText(text);
+        this._updateQueryParser();
+    }
+
+    _updateQueryParser() {
+        const text = this._fullQuery;
+        const visible = this._isQueryParserVisible();
+        this._queryParserContainer.hidden = !visible || text.length === 0;
+        if (visible && this._queryParser.text !== text) {
+            this._setQueryParserText(text);
+        }
+    }
+
+    async _setQueryParserText(text) {
+        const overrideToken = this._progressIndicatorVisible.setOverride(true);
+        try {
+            await this._queryParser.setText(text);
+        } finally {
+            this._progressIndicatorVisible.clearOverride(overrideToken);
+        }
     }
 
     _setTitleText(text) {
@@ -1364,10 +1379,6 @@ class Display extends EventDispatcher {
             this._queryParserVisibleOverride :
             this._queryParserVisible
         );
-    }
-
-    _updateQueryParserVisibility() {
-        this._queryParserContainer.hidden = !this._isQueryParserVisible();
     }
 
     _closePopups() {
