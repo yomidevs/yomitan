@@ -1,6 +1,7 @@
 <!DOCTYPE html><html><head></head><body>
 
 <template id="term-entry-template"><div class="entry" data-type="term">
+    <div class="entry-current-indicator" title="Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)"></div>
     <div class="entry-header1">
         <div class="entry-header2">
             <div class="entry-header3">
@@ -9,7 +10,6 @@
                     <button class="action-button action-add-note pending disabled" data-icon="add-term-kanji" data-mode="term-kanji" title="Add expression (Alt + E)"></button>
                     <button class="action-button action-add-note pending disabled" data-icon="add-term-kana" data-mode="term-kana" title="Add reading (Alt + R)"></button>
                     <button class="action-button action-play-audio" data-icon="play-audio" title="Play audio (Alt + P)"></button>
-                    <span class="action-button action-current-indicator" data-icon="entry-current" title="Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)"></span>
                 </div>
                 <div class="term-expression-list"></div>
             </div>
@@ -47,13 +47,13 @@
 <template id="term-pitch-accent-character-template"><span class="term-pitch-accent-character"><span class="term-pitch-accent-character-inner"></span></span></template>
 
 <template id="kanji-entry-template"><div class="entry" data-type="kanji">
+    <div class="entry-current-indicator" title="Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)"></div>
     <div class="entry-header1">
         <div class="entry-header2">
             <div class="entry-header3">
                 <div class="actions">
                     <button class="action-button action-view-note pending disabled" data-icon="view-note" title="View added note (Alt + V)"></button>
                     <button class="action-button action-add-note pending disabled" data-icon="add-term-kanji" data-mode="kanji" title="Add Kanji (Alt + K)"></button>
-                    <span class="action-button action-current-indicator" data-icon="entry-current" title="Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)"></span>
                 </div>
                 <div class="kanji-glyph source-text"></div>
             </div>
