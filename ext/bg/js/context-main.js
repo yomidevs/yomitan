@@ -42,6 +42,8 @@ class DisplayController {
             this._setupOptions(primaryProfile);
         }
 
+        document.querySelector('.action-select-profile').hidden = (profiles.length <= 1);
+
         this._updateProfileSelect(profiles, profileCurrent);
 
         setTimeout(() => {

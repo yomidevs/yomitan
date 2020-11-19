@@ -288,7 +288,8 @@ body[data-loaded=true] .toggle-group {
     mask-image: url(/mixed/img/profile.svg);
     -webkit-mask-image: url(/mixed/img/profile.svg);
 }
-.nav-button:first-child {
+.nav-button:first-child,
+.nav-button:first-child[hidden]+.nav-button {
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
 }
