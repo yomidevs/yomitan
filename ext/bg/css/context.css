@@ -35,7 +35,9 @@ label {
 }
 
 #mini {
-    text-align: center;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
 }
 #full {
     display: none;
@@ -243,10 +245,17 @@ body[data-loaded=true] .toggle-group {
     display: block;
     width: 16px;
     height: 16px;
-    background-position: center center;
-    background-size: 16px 16px;
-    background-repeat: no-repeat;
     box-sizing: content-box;
+    background-color: #333333;
+    mask-repeat: no-repeat;
+    mask-position: center center;
+    mask-mode: alpha;
+    mask-size: 16px 16px;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center center;
+    -webkit-mask-mode: alpha;
+    -webkit-mask-size: 16px 16px;
+    pointer-events: none;
 }
 .nav-button:hover {
     z-index: 1;
@@ -264,19 +273,67 @@ body[data-loaded=true] .toggle-group {
     outline: none;
 }
 .nav-button[data-icon=magnifying-glass]::after {
-    background-image: url(/mixed/img/magnifying-glass.svg);
+    mask-image: url(/mixed/img/magnifying-glass.svg);
+    -webkit-mask-image: url(/mixed/img/magnifying-glass.svg);
 }
 .nav-button[data-icon=cog]::after {
-    background-image: url(/mixed/img/cog.svg);
+    mask-image: url(/mixed/img/cog.svg);
+    -webkit-mask-image: url(/mixed/img/cog.svg);
 }
 .nav-button[data-icon=question-mark]::after {
-    background-image: url(/mixed/img/question-mark-circle.svg);
+    mask-image: url(/mixed/img/question-mark-circle.svg);
+    -webkit-mask-image: url(/mixed/img/question-mark-circle.svg);
 }
-.nav-button:first-of-type {
+.nav-button[data-icon=profile]::after {
+    mask-image: url(/mixed/img/profile.svg);
+    -webkit-mask-image: url(/mixed/img/profile.svg);
+}
+.nav-button:first-child {
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
 }
-.nav-button:last-of-type {
+.nav-button:last-child {
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
+}
+
+.action-select-profile {
+    position: relative;
+}
+.profile-select-container {
+    position: absolute;
+    left: -1px;
+    top: -1px;
+    right: -1px;
+    bottom: -1px;
+}
+select.profile-select {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    border: 0;
+    margin: 0;
+    padding: 0.375em;
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    opacity: 0;
+    outline: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+.profile-select optgroup {
+    color: #666666;
+    font-weight: normal;
+    font-style: normal;
+    background-color: #f2f2f2;
+}
+.profile-select option {
+    color: #333333;
+    font-weight: normal;
+    font-style: normal;
+    background-color: initial;
 }

@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Yomichan Action Popup</title>
     <link rel="icon" type="image/png" href="/mixed/img/icon16.png" sizes="16x16">
     <link rel="icon" type="image/png" href="/mixed/img/icon19.png" sizes="19x19">
     <link rel="icon" type="image/png" href="/mixed/img/icon32.png" sizes="32x32">
@@ -19,13 +20,18 @@
         <input type="checkbox" id="enable-search">
         <div class="toggle-group">
             <span class="toggle-on">On</span>
-            <span class="btnx btn-defaulxt toggle-off">Off</span>
-            <span class="btnx xbtn-default toggle-handle"></span>
+            <span class="toggle-off">Off</span>
+            <span class="toggle-handle"></span>
         </div>
     </label>
     <div class="nav-button-container">
-        <a class="nav-button action-open-search" data-icon="magnifying-glass" title="Search (Alt + Insert)&#10;(Middle click to open in new tab)"></a>
+        <button class="nav-button action-select-profile" data-icon="profile" title="Change primary profile">
+            <span class="profile-select-container"><select class="profile-select" id="profile-select">
+                <optgroup label="Primary Profile" id="profile-select-option-group"></optgroup>
+            </select></span>
+        </button>
         <a class="nav-button action-open-options" data-icon="cog" title="Options&#10;(Middle click to open in new tab)"></a>
+        <a class="nav-button action-open-search" data-icon="magnifying-glass" title="Search (Alt + Insert)&#10;(Middle click to open in new tab)"></a>
         <a class="nav-button action-open-help" data-icon="question-mark" title="Help"></a>
     </div>
 </div>
@@ -33,7 +39,7 @@
 <div id="full">
     <h3 id="extension-info">Yomichan</h3>
     <label class="link-group">
-        <span class="link-group-icon"><input type="checkbox" id="enable-search2" /></span><span class="link-group-label">Enable content scanning</span>
+        <span class="link-group-icon"><input type="checkbox" id="enable-search2"></span><span class="link-group-label">Enable content scanning</span>
     </label>
     <a class="link-group action-open-options">
         <span class="link-group-icon" data-icon="chevron"></span><span class="link-group-label">Options</span>
