@@ -34,7 +34,6 @@
 class Display extends EventDispatcher {
     constructor() {
         super();
-        this._spinner = document.querySelector('#spinner');
         this._container = document.querySelector('#definitions');
         this._definitions = [];
         this._optionsContext = {depth: 0, url: window.location.href};
@@ -69,6 +68,8 @@ class Display extends EventDispatcher {
         this._defaultTitleMaxLength = 1000;
         this._fullQuery = '';
         this._documentUtil = new DocumentUtil();
+        this._progressIndicator = document.querySelector('#progress-indicator');
+        this._progressIndicatorTimer = null;
         this._progressIndicatorVisible = new DynamicProperty(false);
         this._queryParserVisible = false;
         this._queryParserVisibleOverride = null;
@@ -563,8 +564,22 @@ class Display extends EventDispatcher {
     }
 
     _onProgressIndicatorVisibleChanged({value}) {
-        if (this._spinner === null) { return; }
-        this._spinner.hidden = !value;
+        if (this._progressIndicatorTimer !== null) {
+            clearTimeout(this._progressIndicatorTimer);
+            this._progressIndicatorTimer = null;
+        }
+
+        if (value) {
+            this._progressIndicator.hidden = false;
+            getComputedStyle(this._progressIndicator).getPropertyValue('display'); // Force update of CSS display property, allowing animation
+            this._progressIndicator.dataset.active = 'true';
+        } else {
+            this._progressIndicator.dataset.active = 'false';
+            this._progressIndicatorTimer = setTimeout(() => {
+                this._progressIndicator.hidden = true;
+                this._progressIndicatorTimer = null;
+            }, 250);
+        }
     }
 
     _onWindowFocus() {

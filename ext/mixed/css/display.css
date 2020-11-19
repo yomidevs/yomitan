@@ -45,6 +45,12 @@
     --sidebar-button-icon-size-no-units: 16;
     --sidebar-button-icon-size: calc(1em * (var(--sidebar-button-icon-size-no-units) / var(--font-size-no-units)));
 
+    --progress-bar-height-no-units: 4;
+    --progress-bar-height: calc(1em * (var(--progress-bar-height-no-units) / var(--font-size-no-units)));
+    --progress-bar-active-transition-duration: 0.125s;
+    --progress-bar-active-transition-start-delay: 0.0625s;
+    --progress-bar-animation-duration: 2s;
+
     /* Colors */
     --background-color: #ffffff;
     --glossary-image-background-color: #eeeeee;
@@ -88,6 +94,9 @@
 
     --scrollbar-thumb-color: #c1c1c1;
     --scrollbar-track-color: #f1f1f1;
+
+    --progress-bar-track-color: #cccccc;
+    --progress-bar-indicator-color: #0275d8;
 }
 :root[data-yomichan-theme=dark] {
     /* Colors */
@@ -133,6 +142,9 @@
 
     --scrollbar-thumb-color: #444444;
     --scrollbar-track-color: #2f2f2f;
+
+    --progress-bar-track-color: #3a3a3a;
+    --progress-bar-indicator-color: #0275d8;
 }
 
 
@@ -1003,4 +1015,77 @@ button.action-button {
 }
 .kanji-glossary {
     color: var(--dark-text-color);
+}
+
+
+/* Progress bar */
+@keyframes progress-bar-indeterminant1a {
+    0% { left: 0; }
+    25% { left: 0; }
+    75% { left: 100%; }
+    100% { left: 100%; }
+}
+@keyframes progress-bar-indeterminant1b {
+    0% { right: 100%; }
+    50% { right: 0; }
+    100% { right: 0; }
+}
+@keyframes progress-bar-indeterminant2a {
+    0% { left: 0; }
+    25% { left: 0; }
+    100% { left: 100%; }
+}
+@keyframes progress-bar-indeterminant2b {
+    0% { right: 100%; }
+    75% { right: 0; }
+    100% { right: 0; }
+}
+.progress-bar-indeterminant {
+    display: block;
+    width: 100%;
+    height: 0;
+    background-color: var(--progress-bar-indicator-color);
+    position: relative;
+    transition:
+        height var(--progress-bar-active-transition-duration) linear var(--progress-bar-active-transition-duration),
+        background-color var(--progress-bar-active-transition-duration) linear;
+}
+.progress-bar-indeterminant[data-active=true] {
+    height: var(--progress-bar-height);
+    background-color: var(--progress-bar-track-color);
+    transition:
+        height var(--progress-bar-active-transition-duration) linear var(--progress-bar-active-transition-start-delay),
+        background-color 0s linear;
+}
+.progress-bar-indeterminant[hidden]:not([data-active=true]) {
+    display: none;
+}
+.progress-bar-indeterminant::before,
+.progress-bar-indeterminant::after {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 100%;
+    background-color: var(--progress-bar-indicator-color);
+    animation: none;
+}
+.progress-bar-indeterminant:not([hidden])::before {
+    animation:
+        progress-bar-indeterminant1a var(--progress-bar-animation-duration) infinite ease-in-out var(--progress-bar-active-transition-start-delay),
+        progress-bar-indeterminant1b var(--progress-bar-animation-duration) infinite ease-in-out var(--progress-bar-active-transition-start-delay);
+}
+.progress-bar-indeterminant:not([hidden])::after {
+    animation:
+        progress-bar-indeterminant2a var(--progress-bar-animation-duration) infinite ease-in-out calc(var(--progress-bar-active-transition-start-delay) + 0.375 * var(--progress-bar-animation-duration)),
+        progress-bar-indeterminant2b var(--progress-bar-animation-duration) infinite ease-in-out calc(var(--progress-bar-active-transition-start-delay) + 0.375 * var(--progress-bar-animation-duration));
+}
+.top-progress-bar-container {
+    position: sticky;
+    top: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 10;
 }
