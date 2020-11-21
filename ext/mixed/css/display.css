@@ -242,6 +242,15 @@ a {
     height: 100%;
     display: flex;
     flex-flow: column nowrap;
+    position: relative;
+    align-items: stretch;
+    justify-content: flex-start;
+}
+.content-scroll {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-flow: column nowrap;
     overflow-x: hidden;
     overflow-y: scroll;
     position: relative;

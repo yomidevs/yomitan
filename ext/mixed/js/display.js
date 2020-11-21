@@ -87,7 +87,7 @@ class Display extends EventDispatcher {
             renderTemplate: this._renderTemplate.bind(this)
         });
         this._updateAdderButtonsPromise = Promise.resolve();
-        this._contentScrollElement = document.querySelector('#content');
+        this._contentScrollElement = document.querySelector('#content-scroll');
         this._contentScrollBodyElement = document.querySelector('#content-body');
         this._contentScrollFocusElement = document.querySelector('#content-scroll-focus');
         this._windowScroll = new WindowScroll(this._contentScrollElement);
@@ -183,6 +183,9 @@ class Display extends EventDispatcher {
             ['popupMessage', {async: 'dynamic', handler: this._onDirectMessage.bind(this)}]
         ]);
         window.addEventListener('focus', this._onWindowFocus.bind(this), false);
+        document.documentElement.addEventListener('focusin', this._onDocumentFocusIn.bind(this), false);
+        document.documentElement.addEventListener('focusout', this._onDocumentFocusOut.bind(this), false);
+        this._updateFocusedElement();
         this._progressIndicatorVisible.on('change', this._onProgressIndicatorVisibleChanged.bind(this));
     }
 
@@ -582,16 +585,15 @@ class Display extends EventDispatcher {
     }
 
     _onWindowFocus() {
-        const target = this._contentScrollFocusElement;
-        if (target === null) { return; }
-        const {activeElement} = document;
-        if (
-            activeElement === null ||
-            activeElement === document.documentElement ||
-            activeElement === document.body
-        ) {
-            target.focus();
-        }
+        this._updateFocusedElement();
+    }
+
+    _onDocumentFocusIn() {
+        this._updateFocusedElement();
+    }
+
+    _onDocumentFocusOut() {
+        this._updateFocusedElement();
     }
 
     async _onKanjiLookup(e) {
@@ -1568,5 +1570,18 @@ class Display extends EventDispatcher {
     async _setOptionsContextIfDifferent(optionsContext) {
         if (deepEqual(this._optionsContext, optionsContext)) { return; }
         await this.setOptionsContext(optionsContext);
+    }
+
+    _updateFocusedElement() {
+        const target = this._contentScrollFocusElement;
+        if (target === null) { return; }
+        const {activeElement} = document;
+        if (
+            activeElement === null ||
+            activeElement === document.documentElement ||
+            activeElement === document.body
+        ) {
+            target.focus();
+        }
     }
 }
