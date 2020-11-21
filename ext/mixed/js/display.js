@@ -916,7 +916,7 @@ class Display extends EventDispatcher {
         this._definitions = definitions;
 
         for (const definition of definitions) {
-            definition.cloze = this._clozeBuild(sentence, isTerms ? definition.source : definition.character);
+            definition.cloze = this._clozeBuild(sentence, isTerms ? definition.rawSource : definition.character);
             definition.url = url;
         }
 
