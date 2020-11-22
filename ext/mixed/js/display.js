@@ -32,8 +32,9 @@
  */
 
 class Display extends EventDispatcher {
-    constructor() {
+    constructor(pageType) {
         super();
+        this._pageType = pageType;
         this._container = document.querySelector('#definitions');
         this._definitions = [];
         this._optionsContext = {depth: 0, url: window.location.href};
@@ -79,7 +80,6 @@ class Display extends EventDispatcher {
             documentUtil: this._documentUtil
         });
         this._mode = null;
-        this._ownerFrameId = null;
         this._defaultAnkiFieldTemplates = null;
         this._defaultAnkiFieldTemplatesPromise = null;
         this._templateRenderer = new TemplateRendererProxy();
@@ -95,6 +95,13 @@ class Display extends EventDispatcher {
         this._closeButton = document.querySelector('#close-button');
         this._navigationPreviousButton = document.querySelector('#navigate-previous-button');
         this._navigationNextButton = document.querySelector('#navigate-next-button');
+        this._frontend = null;
+        this._frontendSetupPromise = null;
+        this._depth = 0;
+        this._parentPopupId = null;
+        this._parentFrameId = null;
+        this._ownerFrameId = null;
+        this._childrenSupported = true;
 
         this.registerActions([
             ['close',            () => { this.onEscape(); }],
@@ -135,7 +142,9 @@ class Display extends EventDispatcher {
             ['setOptionsContext',  {async: false, handler: this._onMessageSetOptionsContext.bind(this)}],
             ['setContent',         {async: false, handler: this._onMessageSetContent.bind(this)}],
             ['clearAutoPlayTimer', {async: false, handler: this._onMessageClearAutoPlayTimer.bind(this)}],
-            ['setCustomCss',       {async: false, handler: this._onMessageSetCustomCss.bind(this)}]
+            ['setCustomCss',       {async: false, handler: this._onMessageSetCustomCss.bind(this)}],
+            ['setContentScale',    {async: false, handler: this._onMessageSetContentScale.bind(this)}],
+            ['configure',          {async: true,  handler: this._onMessageConfigure.bind(this)}]
         ]);
     }
 
@@ -162,10 +171,6 @@ class Display extends EventDispatcher {
 
     get ownerFrameId() {
         return this._ownerFrameId;
-    }
-
-    set ownerFrameId(value) {
-        this._ownerFrameId = value;
     }
 
     async prepare() {
@@ -268,6 +273,8 @@ class Display extends EventDispatcher {
                 preventMiddleMouse: scanning.preventMiddleMouse.onSearchQuery
             }
         });
+
+        this._updateNestedFrontend(options);
     }
 
     addMultipleEventListeners(selector, type, listener, options) {
@@ -365,36 +372,6 @@ class Display extends EventDispatcher {
         }
     }
 
-    async setupNestedPopups({depth, parentPopupId, parentFrameId, useProxyPopup, pageType}) {
-        await dynamicLoader.loadScripts([
-            '/mixed/js/text-scanner.js',
-            '/mixed/js/frame-client.js',
-            '/fg/js/popup.js',
-            '/fg/js/popup-proxy.js',
-            '/fg/js/popup-window.js',
-            '/fg/js/popup-factory.js',
-            '/fg/js/frame-offset-forwarder.js',
-            '/fg/js/frontend.js'
-        ]);
-
-        const {frameId} = await api.frameInformationGet();
-
-        const popupFactory = new PopupFactory(frameId);
-        popupFactory.prepare();
-
-        const frontend = new Frontend({
-            frameId,
-            popupFactory,
-            depth,
-            parentPopupId,
-            parentFrameId,
-            useProxyPopup,
-            pageType,
-            allowRootFramePopupProxy: true
-        });
-        await frontend.prepare();
-    }
-
     authenticateMessageData(data) {
         return data;
     }
@@ -451,6 +428,20 @@ class Display extends EventDispatcher {
 
     _onMessageSetCustomCss({css}) {
         this.setCustomCss(css);
+    }
+
+    _onMessageSetContentScale({scale}) {
+        this._setContentScale(scale);
+    }
+
+    async _onMessageConfigure({depth, parentPopupId, parentFrameId, ownerFrameId, childrenSupported, scale, optionsContext}) {
+        this._depth = depth;
+        this._parentPopupId = parentPopupId;
+        this._parentFrameId = parentFrameId;
+        this._ownerFrameId = ownerFrameId;
+        this._childrenSupported = childrenSupported;
+        this._setContentScale(scale);
+        await this.setOptionsContext(optionsContext);
     }
 
     // Private
@@ -1567,5 +1558,74 @@ class Display extends EventDispatcher {
         ) {
             target.focus({preventScroll: true});
         }
+    }
+
+    _setContentScale(scale) {
+        const body = document.body;
+        if (body === null) { return; }
+        body.style.fontSize = `${scale}em`;
+    }
+
+    async _updateNestedFrontend(options) {
+        const isSearchPage = (this._pageType === 'search');
+        const isEnabled = this._childrenSupported && (
+            (isSearchPage) ?
+            (options.scanning.enableOnSearchPage) :
+            (this._depth < options.scanning.popupNestingMaxDepth)
+        );
+
+        if (this._frontend === null) {
+            if (!isEnabled) { return; }
+
+            try {
+                if (this._frontendSetupPromise === null) {
+                    this._frontendSetupPromise = this._setupNestedFrontend(isSearchPage);
+                }
+                await this._frontendSetupPromise;
+            } catch (e) {
+                yomichan.logError(e);
+                return;
+            } finally {
+                this._frontendSetupPromise = null;
+            }
+        }
+
+        this._frontend.setDisabledOverride(!isEnabled);
+    }
+
+    async _setupNestedFrontend(isSearchPage) {
+        const setupNestedPopupsOptions = (
+            (isSearchPage) ?
+            {useProxyPopup: false} :
+            {useProxyPopup: true, parentPopupId: this._parentPopupId, parentFrameId: this._parentFrameId}
+        );
+
+        const {frameId} = await api.frameInformationGet();
+
+        await dynamicLoader.loadScripts([
+            '/mixed/js/text-scanner.js',
+            '/mixed/js/frame-client.js',
+            '/fg/js/popup.js',
+            '/fg/js/popup-proxy.js',
+            '/fg/js/popup-window.js',
+            '/fg/js/popup-factory.js',
+            '/fg/js/frame-offset-forwarder.js',
+            '/fg/js/frontend.js'
+        ]);
+
+        const popupFactory = new PopupFactory(frameId);
+        popupFactory.prepare();
+
+        Object.assign(setupNestedPopupsOptions, {
+            depth: this._depth + 1,
+            frameId,
+            popupFactory,
+            pageType: this._pageType,
+            allowRootFramePopupProxy: true
+        });
+
+        const frontend = new Frontend(setupNestedPopupsOptions);
+        this._frontend = frontend;
+        await frontend.prepare();
     }
 }

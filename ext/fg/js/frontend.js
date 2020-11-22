@@ -379,10 +379,6 @@ class Frontend {
         }
         if (this._updatePopupToken !== token) { return; }
 
-        if (this._pageType === 'search') {
-            this.setDisabledOverride(!this._options.scanning.enableOnSearchPage);
-        }
-
         this._clearSelection(true);
         this._popupEventListeners.removeAllEventListeners();
         this._popup = popup;
@@ -525,11 +521,7 @@ class Frontend {
     }
 
     _updateTextScannerEnabled() {
-        const enabled = (
-            this._options.general.enable &&
-            this._depth <= this._options.scanning.popupNestingMaxDepth &&
-            !this._disabledOverride
-        );
+        const enabled = (this._options.general.enable && !this._disabledOverride);
         this._textScanner.setEnabled(enabled);
     }
 

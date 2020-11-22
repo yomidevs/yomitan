@@ -23,8 +23,7 @@
 
 class DisplayFloat extends Display {
     constructor() {
-        super();
-        this._nestedPopupsPrepared = false;
+        super('popup');
         this._frameEndpoint = new FrameEndpoint();
         this._windowMessageHandlers = new Map([
             ['extensionUnloaded', {async: false, handler: this._onMessageExtensionUnloaded.bind(this)}]
@@ -48,10 +47,6 @@ class DisplayFloat extends Display {
         const {browser} = await api.getEnvironmentInfo();
         this._browser = browser;
 
-        this.registerDirectMessageHandlers([
-            ['configure',       {async: true,  handler: this._onMessageConfigure.bind(this)}],
-            ['setContentScale', {async: false, handler: this._onMessageSetContentScale.bind(this)}]
-        ]);
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
         document.documentElement.addEventListener('mouseup', this._onMouseUp.bind(this), false);
         document.documentElement.addEventListener('click', this._onClick.bind(this), false);
@@ -99,23 +94,6 @@ class DisplayFloat extends Display {
 
         const callback = () => {}; // NOP
         yomichan.invokeMessageHandler(messageHandler, params, callback);
-    }
-
-    async _onMessageConfigure({frameId, ownerFrameId, popupId, optionsContext, childrenSupported, scale}) {
-        this.ownerFrameId = ownerFrameId;
-        await this.setOptionsContext(optionsContext);
-
-        if (childrenSupported && !this._nestedPopupsPrepared) {
-            const {depth} = optionsContext;
-            this._prepareNestedPopups(depth + 1, popupId, frameId);
-            this._nestedPopupsPrepared = true;
-        }
-
-        this._setContentScale(scale);
-    }
-
-    _onMessageSetContentScale({scale}) {
-        this._setContentScale(scale);
     }
 
     _onMessageExtensionUnloaded() {
@@ -198,42 +176,6 @@ class DisplayFloat extends Display {
         textarea.select();
         document.execCommand('copy');
         parent.removeChild(textarea);
-    }
-
-    _setContentScale(scale) {
-        const body = document.body;
-        if (body === null) { return; }
-        body.style.fontSize = `${scale}em`;
-    }
-
-    async _prepareNestedPopups(depth, parentPopupId, parentFrameId) {
-        let complete = false;
-
-        const onOptionsUpdated = async () => {
-            const optionsContext = this.getOptionsContext();
-            const options = await api.optionsGet(optionsContext);
-            const maxPopupDepthExceeded = !(typeof depth === 'number' && depth <= options.scanning.popupNestingMaxDepth);
-            if (maxPopupDepthExceeded || complete) { return; }
-
-            complete = true;
-            yomichan.off('optionsUpdated', onOptionsUpdated);
-
-            try {
-                await this.setupNestedPopups({
-                    depth,
-                    parentPopupId,
-                    parentFrameId,
-                    useProxyPopup: true,
-                    pageType: 'popup'
-                });
-            } catch (e) {
-                yomichan.logError(e);
-            }
-        };
-
-        yomichan.on('optionsUpdated', onOptionsUpdated);
-
-        await onOptionsUpdated();
     }
 
     _invokeOwner(action, params={}) {

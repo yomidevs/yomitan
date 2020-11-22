@@ -25,7 +25,7 @@
 
 class DisplaySearch extends Display {
     constructor() {
-        super();
+        super('search');
         this._searchButton = document.querySelector('#search-button');
         this._queryInput = document.querySelector('#search-textbox');
         this._introElement = document.querySelector('#intro');
@@ -84,8 +84,6 @@ class DisplaySearch extends Display {
         this._clipboardMonitorEnableCheckbox.addEventListener('change', this._onClipboardMonitorEnableChange.bind(this));
 
         this._onModeChange();
-
-        await this._prepareNestedPopups();
 
         this.initializeState();
 
@@ -317,33 +315,6 @@ class DisplaySearch extends Display {
             this._introElement.style.transition = '';
         }
         this._introElement.style.height = '0';
-    }
-
-    async _prepareNestedPopups() {
-        let complete = false;
-
-        const onOptionsUpdated = async () => {
-            const optionsContext = this.getOptionsContext();
-            const options = await api.optionsGet(optionsContext);
-            if (!options.scanning.enableOnSearchPage || complete) { return; }
-
-            complete = true;
-            yomichan.off('optionsUpdated', onOptionsUpdated);
-
-            try {
-                await this.setupNestedPopups({
-                    depth: 1,
-                    useProxyPopup: false,
-                    pageType: 'search'
-                });
-            } catch (e) {
-                yomichan.logError(e);
-            }
-        };
-
-        yomichan.on('optionsUpdated', onOptionsUpdated);
-
-        await onOptionsUpdated();
     }
 
     async _setClipboardMonitorEnabled(value) {

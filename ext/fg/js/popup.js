@@ -255,12 +255,13 @@ class Popup extends EventDispatcher {
 
         // Configure
         await this._invokeSafe('configure', {
-            frameId: this._frameId,
+            depth: this._depth,
+            parentPopupId: this._id,
+            parentFrameId: this._frameId,
             ownerFrameId: this._ownerFrameId,
-            popupId: this._id,
-            optionsContext: this._optionsContext,
             childrenSupported: this._childrenSupported,
-            scale: this._contentScale
+            scale: this._contentScale,
+            optionsContext: this._optionsContext
         });
     }
 
