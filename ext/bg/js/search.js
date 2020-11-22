@@ -56,6 +56,7 @@ class DisplaySearch extends Display {
             ['AltGraph', new Set()],
             ['Shift', new Set()]
         ]);
+        this.autoPlayAudioDelay = 0;
     }
 
     async prepare() {

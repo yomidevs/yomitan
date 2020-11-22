@@ -16,7 +16,7 @@
  */
 
 /* global
- * DisplayFloat
+ * Display
  * api
  */
 
@@ -25,8 +25,9 @@
         api.forwardLogsToBackend();
         await yomichan.backendReady();
 
-        const display = new DisplayFloat();
+        const display = new Display('popup');
         await display.prepare();
+        display.initializeState();
 
         yomichan.ready();
     } catch (e) {

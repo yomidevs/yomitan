@@ -21,6 +21,7 @@
  * DisplayGenerator
  * DisplayHistory
  * DocumentUtil
+ * FrameEndpoint
  * Frontend
  * MediaLoader
  * PopupFactory
@@ -47,19 +48,18 @@ class Display extends EventDispatcher {
         });
         this._styleNode = null;
         this._eventListeners = new EventListenerCollection();
-        this._persistentEventListeners = new EventListenerCollection();
-        this._interactive = false;
         this._eventListenersActive = false;
         this._clickScanPrevent = false;
         this._setContentToken = null;
         this._autoPlayAudioTimer = null;
-        this._autoPlayAudioDelay = 0;
+        this._autoPlayAudioDelay = 400;
         this._mediaLoader = new MediaLoader();
         this._displayGenerator = new DisplayGenerator({mediaLoader: this._mediaLoader});
         this._hotkeys = new Map();
         this._actions = new Map();
         this._messageHandlers = new Map();
         this._directMessageHandlers = new Map();
+        this._windowMessageHandlers = new Map();
         this._history = new DisplayHistory({clearable: true, useBrowserHistory: false});
         this._historyChangeIgnore = false;
         this._historyHasChanged = false;
@@ -102,38 +102,43 @@ class Display extends EventDispatcher {
         this._parentFrameId = null;
         this._ownerFrameId = null;
         this._childrenSupported = true;
+        this._frameEndpoint = (pageType === 'popup' ? new FrameEndpoint() : null);
+        this._browser = null;
+        this._copyTextarea = null;
 
         this.registerActions([
-            ['close',            () => { this.onEscape(); }],
-            ['nextEntry',        () => { this._focusEntry(this._index + 1, true); }],
-            ['nextEntry3',       () => { this._focusEntry(this._index + 3, true); }],
-            ['previousEntry',    () => { this._focusEntry(this._index - 1, true); }],
-            ['previousEntry3',   () => { this._focusEntry(this._index - 3, true); }],
-            ['lastEntry',        () => { this._focusEntry(this._definitions.length - 1, true); }],
-            ['firstEntry',       () => { this._focusEntry(0, true); }],
-            ['historyBackward',  () => { this._sourceTermView(); }],
-            ['historyForward',   () => { this._nextTermView(); }],
-            ['addNoteKanji',     () => { this._noteTryAdd('kanji'); }],
-            ['addNoteTermKanji', () => { this._noteTryAdd('term-kanji'); }],
-            ['addNoteTermKana',  () => { this._noteTryAdd('term-kana'); }],
-            ['viewNote',         () => { this._noteTryView(); }],
-            ['playAudio',        () => { this._playAudioCurrent(); }]
+            ['close',             () => { this.onEscape(); }],
+            ['nextEntry',         () => { this._focusEntry(this._index + 1, true); }],
+            ['nextEntry3',        () => { this._focusEntry(this._index + 3, true); }],
+            ['previousEntry',     () => { this._focusEntry(this._index - 1, true); }],
+            ['previousEntry3',    () => { this._focusEntry(this._index - 3, true); }],
+            ['lastEntry',         () => { this._focusEntry(this._definitions.length - 1, true); }],
+            ['firstEntry',        () => { this._focusEntry(0, true); }],
+            ['historyBackward',   () => { this._sourceTermView(); }],
+            ['historyForward',    () => { this._nextTermView(); }],
+            ['addNoteKanji',      () => { this._noteTryAdd('kanji'); }],
+            ['addNoteTermKanji',  () => { this._noteTryAdd('term-kanji'); }],
+            ['addNoteTermKana',   () => { this._noteTryAdd('term-kana'); }],
+            ['viewNote',          () => { this._noteTryView(); }],
+            ['playAudio',         () => { this._playAudioCurrent(); }],
+            ['copyHostSelection', () => this._copyHostSelection()]
         ]);
         this.registerHotkeys([
-            {key: 'Escape',    modifiers: [],      action: 'close'},
-            {key: 'PageUp',    modifiers: ['alt'], action: 'previousEntry3'},
-            {key: 'PageDown',  modifiers: ['alt'], action: 'nextEntry3'},
-            {key: 'End',       modifiers: ['alt'], action: 'lastEntry'},
-            {key: 'Home',      modifiers: ['alt'], action: 'firstEntry'},
-            {key: 'ArrowUp',   modifiers: ['alt'], action: 'previousEntry'},
-            {key: 'ArrowDown', modifiers: ['alt'], action: 'nextEntry'},
-            {key: 'B',         modifiers: ['alt'], action: 'historyBackward'},
-            {key: 'F',         modifiers: ['alt'], action: 'historyForward'},
-            {key: 'K',         modifiers: ['alt'], action: 'addNoteKanji'},
-            {key: 'E',         modifiers: ['alt'], action: 'addNoteTermKanji'},
-            {key: 'R',         modifiers: ['alt'], action: 'addNoteTermKana'},
-            {key: 'P',         modifiers: ['alt'], action: 'playAudio'},
-            {key: 'V',         modifiers: ['alt'], action: 'viewNote'}
+            {key: 'Escape',    modifiers: [],       action: 'close'},
+            {key: 'PageUp',    modifiers: ['alt'],  action: 'previousEntry3'},
+            {key: 'PageDown',  modifiers: ['alt'],  action: 'nextEntry3'},
+            {key: 'End',       modifiers: ['alt'],  action: 'lastEntry'},
+            {key: 'Home',      modifiers: ['alt'],  action: 'firstEntry'},
+            {key: 'ArrowUp',   modifiers: ['alt'],  action: 'previousEntry'},
+            {key: 'ArrowDown', modifiers: ['alt'],  action: 'nextEntry'},
+            {key: 'B',         modifiers: ['alt'],  action: 'historyBackward'},
+            {key: 'F',         modifiers: ['alt'],  action: 'historyForward'},
+            {key: 'K',         modifiers: ['alt'],  action: 'addNoteKanji'},
+            {key: 'E',         modifiers: ['alt'],  action: 'addNoteTermKanji'},
+            {key: 'R',         modifiers: ['alt'],  action: 'addNoteTermKana'},
+            {key: 'P',         modifiers: ['alt'],  action: 'playAudio'},
+            {key: 'V',         modifiers: ['alt'],  action: 'viewNote'},
+            {key: 'C',         modifiers: ['ctrl'], action: 'copyHostSelection'}
         ]);
         this.registerMessageHandlers([
             ['setMode', {async: false, handler: this._onMessageSetMode.bind(this)}]
@@ -145,6 +150,9 @@ class Display extends EventDispatcher {
             ['setCustomCss',       {async: false, handler: this._onMessageSetCustomCss.bind(this)}],
             ['setContentScale',    {async: false, handler: this._onMessageSetContentScale.bind(this)}],
             ['configure',          {async: true,  handler: this._onMessageConfigure.bind(this)}]
+        ]);
+        this.registerWindowMessageHandlers([
+            ['extensionUnloaded', {async: false, handler: this._onMessageExtensionUnloaded.bind(this)}]
         ]);
     }
 
@@ -169,31 +177,58 @@ class Display extends EventDispatcher {
         return this._mode;
     }
 
-    get ownerFrameId() {
-        return this._ownerFrameId;
-    }
-
     async prepare() {
-        this._audioSystem.prepare();
+        // State setup
+        const {documentElement} = document;
         this._updateMode();
-        this._setInteractive(true);
+        const {browser} = await api.getEnvironmentInfo();
+        this._browser = browser;
+
+        // Prepare
         await this._displayGenerator.prepare();
+        this._audioSystem.prepare();
         this._queryParser.prepare();
         this._history.prepare();
+
+        // Event setup
         this._history.on('stateChanged', this._onStateChanged.bind(this));
         this._queryParser.on('searched', this._onQueryParserSearch.bind(this));
+        this._progressIndicatorVisible.on('change', this._onProgressIndicatorVisibleChanged.bind(this));
         yomichan.on('extensionUnloaded', this._onExtensionUnloaded.bind(this));
         chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
         api.crossFrame.registerHandlers([
             ['popupMessage', {async: 'dynamic', handler: this._onDirectMessage.bind(this)}]
         ]);
+        window.addEventListener('message', this._onWindowMessage.bind(this), false);
         window.addEventListener('focus', this._onWindowFocus.bind(this), false);
+
+        if (this._pageType === 'popup' && documentElement !== null) {
+            documentElement.addEventListener('mouseup', this._onDocumentElementMouseUp.bind(this), false);
+            documentElement.addEventListener('click', this._onDocumentElementClick.bind(this), false);
+            documentElement.addEventListener('auxclick', this._onDocumentElementClick.bind(this), false);
+        }
+
+        document.addEventListener('keydown', this.onKeyDown.bind(this), false);
+        document.addEventListener('wheel', this._onWheel.bind(this), {passive: false});
+        if (this._closeButton !== null) {
+            this._closeButton.addEventListener('click', this._onCloseButtonClick.bind(this), false);
+        }
+        if (this._navigationPreviousButton !== null) {
+            this._navigationPreviousButton.addEventListener('click', this._onSourceTermView.bind(this), false);
+        }
+        if (this._navigationNextButton !== null) {
+            this._navigationNextButton.addEventListener('click', this._onNextTermView.bind(this), false);
+        }
+
+        // Final preparation
         this._updateFocusedElement();
-        this._progressIndicatorVisible.on('change', this._onProgressIndicatorVisibleChanged.bind(this));
     }
 
     initializeState() {
         this._onStateChanged();
+        if (this._frameEndpoint !== null) {
+            this._frameEndpoint.signal();
+        }
     }
 
     setHistorySettings({clearable, useBrowserHistory}) {
@@ -211,7 +246,9 @@ class Display extends EventDispatcher {
     }
 
     onEscape() {
-        throw new Error('Override me');
+        if (this._pageType === 'popup') {
+            this.close();
+        }
     }
 
     onKeyDown(e) {
@@ -340,6 +377,9 @@ class Display extends EventDispatcher {
     }
 
     async getDocumentTitle() {
+        if (this._pageType === 'float') {
+            return await this._getRootFrameDocumentTitle();
+        }
         return document.title;
     }
 
@@ -372,8 +412,20 @@ class Display extends EventDispatcher {
         }
     }
 
+    registerWindowMessageHandlers(handlers) {
+        for (const [name, handlerInfo] of handlers) {
+            this._windowMessageHandlers.set(name, handlerInfo);
+        }
+    }
+
     authenticateMessageData(data) {
-        return data;
+        if (this._frameEndpoint === null) {
+            return data;
+        }
+        if (!this._frameEndpoint.authenticate(data)) {
+            throw new Error('Invalid authentication');
+        }
+        return data.data;
     }
 
     postProcessQuery(query) {
@@ -381,7 +433,9 @@ class Display extends EventDispatcher {
     }
 
     close() {
-        // NOP
+        if (this._pageType === 'popup') {
+            this._invokeOwner('closePopup');
+        }
     }
 
     blurElement(element) {
@@ -408,6 +462,21 @@ class Display extends EventDispatcher {
         const {async, handler} = handlerInfo;
         const result = handler(params);
         return {async, result};
+    }
+
+    _onWindowMessage({data}) {
+        try {
+            data = this.authenticateMessageData(data);
+        } catch (e) {
+            return;
+        }
+
+        const {action, params} = data;
+        const messageHandler = this._windowMessageHandlers.get(action);
+        if (typeof messageHandler === 'undefined') { return; }
+
+        const callback = () => {}; // NOP
+        yomichan.invokeMessageHandler(messageHandler, params, callback);
     }
 
     _onMessageSetMode({mode}) {
@@ -442,6 +511,11 @@ class Display extends EventDispatcher {
         this._childrenSupported = childrenSupported;
         this._setContentScale(scale);
         await this.setOptionsContext(optionsContext);
+    }
+
+    _onMessageExtensionUnloaded() {
+        if (yomichan.isExtensionUnloaded) { return; }
+        yomichan.triggerExtensionUnloaded();
     }
 
     // Private
@@ -751,6 +825,38 @@ class Display extends EventDispatcher {
         console.log(definition);
     }
 
+    _onDocumentElementMouseUp(e) {
+        switch (e.button) {
+            case 3: // Back
+                if (this._history.hasPrevious()) {
+                    e.preventDefault();
+                }
+                break;
+            case 4: // Forward
+                if (this._history.hasNext()) {
+                    e.preventDefault();
+                }
+                break;
+        }
+    }
+
+    _onDocumentElementClick(e) {
+        switch (e.button) {
+            case 3: // Back
+                if (this._history.hasPrevious()) {
+                    e.preventDefault();
+                    this._history.back();
+                }
+                break;
+            case 4: // Forward
+                if (this._history.hasNext()) {
+                    e.preventDefault();
+                    this._history.forward();
+                }
+                break;
+        }
+    }
+
     _updateDocumentOptions(options) {
         const data = document.documentElement.dataset;
         data.ankiEnabled = `${options.anki.enable}`;
@@ -768,31 +874,8 @@ class Display extends EventDispatcher {
         document.documentElement.dataset.yomichanTheme = themeName;
     }
 
-    _setInteractive(interactive) {
-        interactive = !!interactive;
-        if (this._interactive === interactive) { return; }
-        this._interactive = interactive;
-
-        if (interactive) {
-            this._persistentEventListeners.addEventListener(document, 'keydown', this.onKeyDown.bind(this), false);
-            this._persistentEventListeners.addEventListener(document, 'wheel', this._onWheel.bind(this), {passive: false});
-            if (this._closeButton !== null) {
-                this._persistentEventListeners.addEventListener(this._closeButton, 'click', this._onCloseButtonClick.bind(this));
-            }
-            if (this._navigationPreviousButton !== null) {
-                this._persistentEventListeners.addEventListener(this._navigationPreviousButton, 'click', this._onSourceTermView.bind(this));
-            }
-            if (this._navigationNextButton !== null) {
-                this._persistentEventListeners.addEventListener(this._navigationNextButton, 'click', this._onNextTermView.bind(this));
-            }
-        } else {
-            this._persistentEventListeners.removeAllEventListeners();
-        }
-        this._setEventListenersActive(this._eventListenersActive);
-    }
-
     _setEventListenersActive(active) {
-        active = !!active && this._interactive;
+        active = !!active;
         if (this._eventListenersActive === active) { return; }
         this._eventListenersActive = active;
 
@@ -1627,5 +1710,64 @@ class Display extends EventDispatcher {
         const frontend = new Frontend(setupNestedPopupsOptions);
         this._frontend = frontend;
         await frontend.prepare();
+    }
+
+    async _invokeOwner(action, params={}) {
+        if (this._ownerFrameId === null) {
+            throw new Error('No owner frame');
+        }
+        return await api.crossFrame.invoke(this._ownerFrameId, action, params);
+    }
+
+    _copyHostSelection() {
+        if (window.getSelection().toString()) { return false; }
+        this._copyHostSelectionInner();
+        return true;
+    }
+
+    async _copyHostSelectionInner() {
+        switch (this._browser) {
+            case 'firefox':
+            case 'firefox-mobile':
+                {
+                    let text;
+                    try {
+                        text = await this._invokeOwner('getSelectionText');
+                    } catch (e) {
+                        break;
+                    }
+                    this._copyText(text);
+                }
+                break;
+            default:
+                await this._invokeOwner('copySelection');
+                break;
+        }
+    }
+
+    _copyText(text) {
+        const parent = document.body;
+        if (parent === null) { return; }
+
+        let textarea = this._copyTextarea;
+        if (textarea === null) {
+            textarea = document.createElement('textarea');
+            this._copyTextarea = textarea;
+        }
+
+        textarea.value = text;
+        parent.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        parent.removeChild(textarea);
+    }
+
+    async _getRootFrameDocumentTitle() {
+        try {
+            const {title} = await api.crossFrame.invoke(0, 'getDocumentInformation');
+            return title;
+        } catch (e) {
+            return '';
+        }
     }
 }
