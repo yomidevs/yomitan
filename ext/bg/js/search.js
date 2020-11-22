@@ -44,7 +44,7 @@ class DisplaySearch extends Display {
         });
         this._onKeyDownIgnoreKeys = new Map([
             ['ANY_MOD', new Set([
-                'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageDown', 'PageUp', 'Home', 'End', 'Enter',
+                'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageDown', 'PageUp', 'Home', 'End', 'Enter', 'Escape',
                 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10',
                 'F11', 'F12', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19', 'F20',
                 'F21', 'F22', 'F23', 'F24'
@@ -157,7 +157,7 @@ class DisplaySearch extends Display {
             case 'kanji':
                 animate = content.animate;
                 valid = content.definitions.length > 0;
-                this._queryInput.blur();
+                this.blurElement(this._queryInput);
                 break;
             case 'clear':
                 valid = false;
@@ -183,7 +183,7 @@ class DisplaySearch extends Display {
         // Search
         e.preventDefault();
         e.stopImmediatePropagation();
-        e.currentTarget.blur();
+        this.blurElement(e.currentTarget);
         this._search();
     }
 

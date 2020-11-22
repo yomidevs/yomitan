@@ -473,11 +473,15 @@ class DisplayGenerator {
 
     _appendMultiple(container, createItem, detailsArray, ...args) {
         let count = 0;
+        const {ELEMENT_NODE} = Node;
         if (Array.isArray(detailsArray)) {
             for (const details of detailsArray) {
                 const item = createItem(details, ...args);
                 if (item === null) { continue; }
                 container.appendChild(item);
+                if (item.nodeType === ELEMENT_NODE) {
+                    item.dataset.index = `${count}`;
+                }
                 ++count;
             }
         }

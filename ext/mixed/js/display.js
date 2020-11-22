@@ -183,8 +183,6 @@ class Display extends EventDispatcher {
             ['popupMessage', {async: 'dynamic', handler: this._onDirectMessage.bind(this)}]
         ]);
         window.addEventListener('focus', this._onWindowFocus.bind(this), false);
-        document.documentElement.addEventListener('focusin', this._onDocumentFocusIn.bind(this), false);
-        document.documentElement.addEventListener('focusout', this._onDocumentFocusOut.bind(this), false);
         this._updateFocusedElement();
         this._progressIndicatorVisible.on('change', this._onProgressIndicatorVisibleChanged.bind(this));
     }
@@ -283,11 +281,7 @@ class Display extends EventDispatcher {
 
         if (this._definitions.length === 0) { return; }
 
-        const definition = this._definitions[0];
-        const expressionIndex = this._getFirstExpressionIndex();
-        const callback = () => {
-            this._audioPlay(definition, expressionIndex, 0);
-        };
+        const callback = () => this._playAudio(0, 0);
 
         if (this._autoPlayAudioDelay > 0) {
             this._autoPlayAudioTimer = setTimeout(callback, this._autoPlayAudioDelay);
@@ -411,6 +405,11 @@ class Display extends EventDispatcher {
 
     close() {
         // NOP
+    }
+
+    blurElement(element) {
+        element.blur();
+        this._updateFocusedElement();
     }
 
     // Message handlers
@@ -588,14 +587,6 @@ class Display extends EventDispatcher {
         this._updateFocusedElement();
     }
 
-    _onDocumentFocusIn() {
-        this._updateFocusedElement();
-    }
-
-    _onDocumentFocusOut() {
-        this._updateFocusedElement();
-    }
-
     async _onKanjiLookup(e) {
         try {
             e.preventDefault();
@@ -604,7 +595,7 @@ class Display extends EventDispatcher {
             const link = e.target;
             const {state} = this._history;
 
-            state.focusEntry = this._entryIndexFind(link);
+            state.focusEntry = this._getClosestDefinitionIndex(link);
             state.scrollX = this._windowScroll.x;
             state.scrollY = this._windowScroll.y;
             this._historyStateUpdate(state);
@@ -664,7 +655,7 @@ class Display extends EventDispatcher {
         const layoutAwareScan = this._options.scanning.layoutAwareScan;
         const sentence = this._documentUtil.extractSentence(textSource, sentenceExtent, layoutAwareScan);
 
-        state.focusEntry = this._entryIndexFind(scannedElement);
+        state.focusEntry = this._getClosestDefinitionIndex(scannedElement);
         state.scrollX = this._windowScroll.x;
         state.scrollY = this._windowScroll.y;
         this._historyStateUpdate(state);
@@ -715,23 +706,16 @@ class Display extends EventDispatcher {
     _onAudioPlay(e) {
         e.preventDefault();
         const link = e.currentTarget;
-        const entry = link.closest('.entry');
-        const index = this._entryIndexFind(entry);
-        if (index < 0 || index >= this._definitions.length) { return; }
-
-        const expressionIndex = this._indexOf(entry.querySelectorAll('.term-expression .action-play-audio'), link);
-        this._audioPlay(
-            this._definitions[index],
-            // expressionIndex is used in audioPlay to detect result output mode
-            Math.max(expressionIndex, this._options.general.resultOutputMode === 'merge' ? 0 : -1),
-            index
-        );
+        const definitionIndex = this._getClosestDefinitionIndex(link);
+        if (definitionIndex < 0) { return; }
+        const expressionIndex = Math.max(0, this._getClosestExpressionIndex(link));
+        this._playAudio(definitionIndex, expressionIndex);
     }
 
     _onNoteAdd(e) {
         e.preventDefault();
         const link = e.currentTarget;
-        const index = this._entryIndexFind(link);
+        const index = this._getClosestDefinitionIndex(link);
         if (index < 0 || index >= this._definitions.length) { return; }
 
         this._noteAdd(this._definitions[index], link.dataset.mode);
@@ -770,7 +754,7 @@ class Display extends EventDispatcher {
 
     _onDebugLogClick(e) {
         const link = e.currentTarget;
-        const index = this._entryIndexFind(link);
+        const index = this._getClosestDefinitionIndex(link);
         if (index < 0 || index >= this._definitions.length) { return; }
         const definition = this._definitions[index];
         console.log(definition);
@@ -937,6 +921,7 @@ class Display extends EventDispatcher {
                 this._displayGenerator.createTermEntry(definitions[i]) :
                 this._displayGenerator.createKanjiEntry(definitions[i])
             );
+            entry.dataset.index = `${i}`;
             container.appendChild(entry);
         }
 
@@ -1187,11 +1172,19 @@ class Display extends EventDispatcher {
         }
     }
 
-    async _audioPlay(definition, expressionIndex, entryIndex) {
+    async _playAudio(definitionIndex, expressionIndex) {
+        if (definitionIndex < 0 || definitionIndex >= this._definitions.length) { return; }
+
+        const definition = this._definitions[definitionIndex];
+        if (definition.type === 'kanji') { return; }
+
+        const {expressions} = definition;
+        if (expressionIndex < 0 || expressionIndex >= expressions.length) { return; }
+
+        const {expression, reading} = expressions[expressionIndex];
+
         const overrideToken = this._progressIndicatorVisible.setOverride(true);
         try {
-            const {expression, reading} = expressionIndex === -1 ? definition : definition.expressions[expressionIndex];
-
             this._stopPlayingAudio();
 
             let audio, info;
@@ -1208,7 +1201,7 @@ class Display extends EventDispatcher {
                 info = 'Could not find audio';
             }
 
-            const button = this._audioButtonFindImage(entryIndex, expressionIndex);
+            const button = this._audioButtonFindImage(definitionIndex, expressionIndex);
             if (button !== null) {
                 let titleDefault = button.dataset.titleDefault;
                 if (!titleDefault) {
@@ -1239,15 +1232,15 @@ class Display extends EventDispatcher {
         }
     }
 
+    async _playAudioCurrent() {
+        return await this._playAudio(this._index, 0);
+    }
+
     _stopPlayingAudio() {
         if (this._audioPlaying !== null) {
             this._audioPlaying.pause();
             this._audioPlaying = null;
         }
-    }
-
-    _getFirstExpressionIndex() {
-        return this._options.general.resultOutputMode === 'merge' ? 0 : -1;
     }
 
     _getEntry(index) {
@@ -1271,9 +1264,19 @@ class Display extends EventDispatcher {
         };
     }
 
-    _entryIndexFind(element) {
-        const entry = element.closest('.entry');
-        return entry !== null ? this._indexOf(this._container.querySelectorAll('.entry'), entry) : -1;
+    _getClosestDefinitionIndex(element) {
+        return this._getClosestIndex(element, '.entry');
+    }
+
+    _getClosestExpressionIndex(element) {
+        return this._getClosestIndex(element, '.term-expression');
+    }
+
+    _getClosestIndex(element, selector) {
+        const node = element.closest(selector);
+        if (node === null) { return -1; }
+        const index = parseInt(node.dataset.index, 10);
+        return Number.isFinite(index) ? index : -1;
     }
 
     _adderButtonFind(index, mode) {
@@ -1307,15 +1310,6 @@ class Display extends EventDispatcher {
         return container !== null ? container.querySelector('.action-play-audio>img') : null;
     }
 
-    _indexOf(nodeList, node) {
-        for (let i = 0, ii = nodeList.length; i < ii; ++i) {
-            if (nodeList[i] === node) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     _getElementTop(element) {
         const elementRect = element.getBoundingClientRect();
         const documentRect = this._contentScrollBodyElement.getBoundingClientRect();
@@ -1329,16 +1323,6 @@ class Display extends EventDispatcher {
                 title: documentTitle
             }
         };
-    }
-
-    _playAudioCurrent() {
-        const index = this._index;
-        if (index < 0 || index >= this._definitions.length) { return; }
-
-        const entry = this._getEntry(index);
-        if (entry !== null && entry.dataset.type === 'term') {
-            this._audioPlay(this._definitions[index], this._getFirstExpressionIndex(), index);
-        }
     }
 
     _historyHasState() {
@@ -1581,7 +1565,7 @@ class Display extends EventDispatcher {
             activeElement === document.documentElement ||
             activeElement === document.body
         ) {
-            target.focus();
+            target.focus({preventScroll: true});
         }
     }
 }
