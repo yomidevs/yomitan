@@ -48,7 +48,6 @@ class Display extends EventDispatcher {
         });
         this._styleNode = null;
         this._eventListeners = new EventListenerCollection();
-        this._eventListenersActive = false;
         this._clickScanPrevent = false;
         this._setContentToken = null;
         this._autoPlayAudioTimer = null;
@@ -65,8 +64,8 @@ class Display extends EventDispatcher {
         this._historyHasChanged = false;
         this._navigationHeader = document.querySelector('#navigation-header');
         this._contentType = 'clear';
-        this._defaultTitle = 'Yomichan Search';
-        this._defaultTitleMaxLength = 1000;
+        this._defaultTitle = document.title;
+        this._titleMaxLength = 1000;
         this._fullQuery = '';
         this._documentUtil = new DocumentUtil();
         this._progressIndicator = document.querySelector('#progress-indicator');
@@ -314,12 +313,6 @@ class Display extends EventDispatcher {
         this._updateNestedFrontend(options);
     }
 
-    addMultipleEventListeners(selector, type, listener, options) {
-        for (const node of this._container.querySelectorAll(selector)) {
-            this._eventListeners.addEventListener(node, type, listener, options);
-        }
-    }
-
     autoPlayAudio() {
         this.clearAutoPlayTimer();
 
@@ -535,7 +528,7 @@ class Display extends EventDispatcher {
             this._updateQueryParser();
 
             this._closePopups();
-            this._setEventListenersActive(false);
+            this._eventListeners.removeAllEventListeners();
 
             let assigned = false;
             const eventArgs = {type, urlSearchParams, token};
@@ -572,8 +565,6 @@ class Display extends EventDispatcher {
                     this.trigger('contentUpdating', eventArgs);
                     this._clearContent();
                 }
-
-                this._setEventListenersActive(true);
             }
 
             eventArgs.stale = stale;
@@ -857,6 +848,14 @@ class Display extends EventDispatcher {
         }
     }
 
+    _onEntryClick(e) {
+        if (e.button !== 0) { return; }
+        const node = e.currentTarget;
+        const index = parseInt(node.dataset.index, 10);
+        if (!Number.isFinite(index)) { return; }
+        this._entrySetCurrent(index);
+    }
+
     _updateDocumentOptions(options) {
         const data = document.documentElement.dataset;
         data.ankiEnabled = `${options.anki.enable}`;
@@ -872,27 +871,6 @@ class Display extends EventDispatcher {
 
     _updateTheme(themeName) {
         document.documentElement.dataset.yomichanTheme = themeName;
-    }
-
-    _setEventListenersActive(active) {
-        active = !!active;
-        if (this._eventListenersActive === active) { return; }
-        this._eventListenersActive = active;
-
-        if (active) {
-            this.addMultipleEventListeners('.action-add-note', 'click', this._onNoteAdd.bind(this));
-            this.addMultipleEventListeners('.action-view-note', 'click', this._onNoteView.bind(this));
-            this.addMultipleEventListeners('.action-play-audio', 'click', this._onAudioPlay.bind(this));
-            this.addMultipleEventListeners('.kanji-link', 'click', this._onKanjiLookup.bind(this));
-            this.addMultipleEventListeners('.debug-log-link', 'click', this._onDebugLogClick.bind(this));
-            if (this._options !== null && this._options.scanning.enablePopupSearch) {
-                this.addMultipleEventListeners('.term-glossary-item, .tag', 'mouseup', this._onGlossaryMouseUp.bind(this));
-                this.addMultipleEventListeners('.term-glossary-item, .tag', 'mousedown', this._onGlossaryMouseDown.bind(this));
-                this.addMultipleEventListeners('.term-glossary-item, .tag', 'mousemove', this._onGlossaryMouseMove.bind(this));
-            }
-        } else {
-            this._eventListeners.removeAllEventListeners();
-        }
     }
 
     async _findDefinitions(isTerms, source, urlSearchParams, optionsContext) {
@@ -990,12 +968,14 @@ class Display extends EventDispatcher {
                 if (this._setContentToken !== token) { return true; }
             }
 
+            const definition = definitions[i];
             const entry = (
                 isTerms ?
-                this._displayGenerator.createTermEntry(definitions[i]) :
-                this._displayGenerator.createKanjiEntry(definitions[i])
+                this._displayGenerator.createTermEntry(definition) :
+                this._displayGenerator.createKanjiEntry(definition)
             );
             entry.dataset.index = `${i}`;
+            this._addEntryEventListeners(entry);
             container.appendChild(entry);
         }
 
@@ -1074,18 +1054,19 @@ class Display extends EventDispatcher {
     }
 
     _setTitleText(text) {
-        // Chrome limits title to 1024 characters
-        const ellipsis = '...';
-        const maxLength = this._defaultTitleMaxLength - this._defaultTitle.length;
-        if (text.length > maxLength) {
-            text = `${text.substring(0, Math.max(0, maxLength - maxLength))}${ellipsis}`;
-        }
+        let title = '';
+        if (text.length > 0) {
+            // Chrome limits title to 1024 characters
+            const ellipsis = '...';
+            const separator = ' - ';
+            const maxLength = this._titleMaxLength - this._defaultTitle.length - separator.length;
+            if (text.length > maxLength) {
+                text = `${text.substring(0, Math.max(0, maxLength - ellipsis.length))}${ellipsis}`;
+            }
 
-        document.title = (
-            text.length === 0 ?
-            this._defaultTitle :
-            `${text} - ${this._defaultTitle}`
-        );
+            title = `${text}${separator}${this._defaultTitle}`;
+        }
+        document.title = title;
     }
 
     _updateNavigation(previous, next) {
@@ -1769,6 +1750,26 @@ class Display extends EventDispatcher {
             return title;
         } catch (e) {
             return '';
+        }
+    }
+
+    _addMultipleEventListeners(container, selector, ...args) {
+        for (const node of container.querySelectorAll(selector)) {
+            this._eventListeners.addEventListener(node, ...args);
+        }
+    }
+
+    _addEntryEventListeners(entry) {
+        this._eventListeners.addEventListener(entry, 'click', this._onEntryClick.bind(this));
+        this._addMultipleEventListeners(entry, '.action-add-note', 'click', this._onNoteAdd.bind(this));
+        this._addMultipleEventListeners(entry, '.action-view-note', 'click', this._onNoteView.bind(this));
+        this._addMultipleEventListeners(entry, '.action-play-audio', 'click', this._onAudioPlay.bind(this));
+        this._addMultipleEventListeners(entry, '.kanji-link', 'click', this._onKanjiLookup.bind(this));
+        this._addMultipleEventListeners(entry, '.debug-log-link', 'click', this._onDebugLogClick.bind(this));
+        if (this._options !== null && this._options.scanning.enablePopupSearch) {
+            this._addMultipleEventListeners(entry, '.term-glossary-item,.tag', 'mouseup', this._onGlossaryMouseUp.bind(this));
+            this._addMultipleEventListeners(entry, '.term-glossary-item,.tag', 'mousedown', this._onGlossaryMouseDown.bind(this));
+            this._addMultipleEventListeners(entry, '.term-glossary-item,.tag', 'mousemove', this._onGlossaryMouseMove.bind(this));
         }
     }
 }
