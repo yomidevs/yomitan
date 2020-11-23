@@ -48,12 +48,19 @@ class PopupFactory {
             ['clearAutoPlayTimer',   {async: false, handler: this._onApiClearAutoPlayTimer.bind(this)}],
             ['setContentScale',      {async: false, handler: this._onApiSetContentScale.bind(this)}],
             ['updateTheme',          {async: false, handler: this._onApiUpdateTheme.bind(this)}],
-            ['setCustomOuterCss',    {async: false, handler: this._onApiSetCustomOuterCss.bind(this)}],
-            ['setChildrenSupported', {async: false, handler: this._onApiSetChildrenSupported.bind(this)}]
+            ['setCustomOuterCss',    {async: false, handler: this._onApiSetCustomOuterCss.bind(this)}]
         ]);
     }
 
-    async getOrCreatePopup({frameId=null, ownerFrameId=null, id=null, parentPopupId=null, depth=null, popupWindow=false}) {
+    async getOrCreatePopup({
+        frameId=null,
+        ownerFrameId=null,
+        id=null,
+        parentPopupId=null,
+        depth=null,
+        popupWindow=false,
+        childrenSupported=false
+    }) {
         // Find by existing id
         if (id !== null) {
             const popup = this._popups.get(id);
@@ -91,7 +98,12 @@ class PopupFactory {
             if (id === null) {
                 id = generateId(16);
             }
-            const popup = new PopupWindow(id, depth, this._frameId, ownerFrameId);
+            const popup = new PopupWindow({
+                id,
+                depth,
+                frameId: this._frameId,
+                ownerFrameId
+            });
             this._popups.set(id, popup);
             return popup;
         } else if (frameId === this._frameId) {
@@ -99,7 +111,13 @@ class PopupFactory {
             if (id === null) {
                 id = generateId(16);
             }
-            const popup = new Popup(id, depth, frameId, ownerFrameId);
+            const popup = new Popup({
+                id,
+                depth,
+                frameId,
+                ownerFrameId,
+                childrenSupported
+            });
             if (parent !== null) {
                 if (parent.child !== null) {
                     throw new Error('Parent popup already has a child');
@@ -112,8 +130,20 @@ class PopupFactory {
             return popup;
         } else {
             const useFrameOffsetForwarder = (parentPopupId === null);
-            ({id, depth, frameId} = await api.crossFrame.invoke(frameId, 'getOrCreatePopup', {id, parentPopupId, frameId, ownerFrameId}));
-            const popup = new PopupProxy(id, depth, frameId, ownerFrameId, useFrameOffsetForwarder ? this._frameOffsetForwarder : null);
+            ({id, depth, frameId} = await api.crossFrame.invoke(frameId, 'getOrCreatePopup', {
+                id,
+                parentPopupId,
+                frameId,
+                ownerFrameId,
+                childrenSupported
+            }));
+            const popup = new PopupProxy({
+                id,
+                depth,
+                frameId,
+                ownerFrameId,
+                frameOffsetForwarder: useFrameOffsetForwarder ? this._frameOffsetForwarder : null
+            });
             this._popups.set(id, popup);
             return popup;
         }
@@ -155,8 +185,8 @@ class PopupFactory {
 
     // API message handlers
 
-    async _onApiGetOrCreatePopup({id, parentPopupId, frameId, ownerFrameId}) {
-        const popup = await this.getOrCreatePopup({id, parentPopupId, frameId, ownerFrameId});
+    async _onApiGetOrCreatePopup(details) {
+        const popup = await this.getOrCreatePopup(details);
         return {
             id: popup.id,
             depth: popup.depth,
@@ -230,11 +260,6 @@ class PopupFactory {
     _onApiSetCustomOuterCss({id, css, useWebExtensionApi}) {
         const popup = this._getPopup(id);
         return popup.setCustomOuterCss(css, useWebExtensionApi);
-    }
-
-    _onApiSetChildrenSupported({id, value}) {
-        const popup = this._getPopup(id);
-        return popup.setChildrenSupported(value);
     }
 
     // Private functions

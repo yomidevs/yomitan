@@ -23,15 +23,21 @@
  */
 
 class Popup extends EventDispatcher {
-    constructor(id, depth, frameId, ownerFrameId) {
+    constructor({
+        id,
+        depth,
+        frameId,
+        ownerFrameId,
+        childrenSupported
+    }) {
         super();
         this._id = id;
         this._depth = depth;
         this._frameId = frameId;
         this._ownerFrameId = ownerFrameId;
+        this._childrenSupported = childrenSupported;
         this._parent = null;
         this._child = null;
-        this._childrenSupported = true;
         this._injectPromise = null;
         this._injectPromiseComplete = false;
         this._visible = new DynamicProperty(false);
@@ -190,11 +196,8 @@ class Popup extends EventDispatcher {
             useWebExtensionApi = false;
             parentNode = this._shadow;
         }
-        return await dynamicLoader.loadStyle('yomichan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi, parentNode);
-    }
-
-    setChildrenSupported(value) {
-        this._childrenSupported = value;
+        const node = await dynamicLoader.loadStyle('yomichan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi, parentNode);
+        this.trigger('customOuterCssChanged', {node, useWebExtensionApi});
     }
 
     getFrameRect() {

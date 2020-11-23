@@ -1704,7 +1704,8 @@ class Display extends EventDispatcher {
             frameId,
             popupFactory,
             pageType: this._pageType,
-            allowRootFramePopupProxy: true
+            allowRootFramePopupProxy: true,
+            childrenSupported: this._childrenSupported
         });
 
         const frontend = new Frontend(setupNestedPopupsOptions);

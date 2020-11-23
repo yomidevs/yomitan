@@ -20,7 +20,13 @@
  */
 
 class PopupProxy extends EventDispatcher {
-    constructor(id, depth, frameId, ownerFrameId, frameOffsetForwarder=null) {
+    constructor({
+        id,
+        depth,
+        frameId,
+        ownerFrameId,
+        frameOffsetForwarder
+    }) {
         super();
         this._id = id;
         this._depth = depth;
@@ -137,10 +143,6 @@ class PopupProxy extends EventDispatcher {
 
     setCustomOuterCss(css, useWebExtensionApi) {
         return this._invokeSafe('setCustomOuterCss', {id: this._id, css, useWebExtensionApi});
-    }
-
-    setChildrenSupported(value) {
-        return this._invokeSafe('setChildrenSupported', {id: this._id, value});
     }
 
     getFrameRect() {

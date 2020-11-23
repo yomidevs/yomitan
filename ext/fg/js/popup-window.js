@@ -20,7 +20,12 @@
  */
 
 class PopupWindow extends EventDispatcher {
-    constructor(id, depth, frameId, ownerFrameId) {
+    constructor({
+        id,
+        depth,
+        frameId,
+        ownerFrameId
+    }) {
         super();
         this._id = id;
         this._depth = depth;
@@ -120,10 +125,6 @@ class PopupWindow extends EventDispatcher {
     }
 
     async setCustomOuterCss(_css, _useWebExtensionApi) {
-        // NOP
-    }
-
-    async setChildrenSupported(_value) {
         // NOP
     }
 
