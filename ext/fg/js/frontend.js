@@ -322,11 +322,13 @@ class Frontend {
         });
         this._updateTextScannerEnabled();
 
-        const ignoreNodes = ['.scan-disable', '.scan-disable *'];
-        if (!this._options.scanning.enableOnPopupExpressions) {
-            ignoreNodes.push('.source-text', '.source-text *');
+        if (this._pageType !== 'web') {
+            const excludeSelectors = ['.scan-disable', '.scan-disable *'];
+            if (!scanningOptions.enableOnPopupExpressions) {
+                excludeSelectors.push('.source-text', '.source-text *');
+            }
+            this._textScanner.excludeSelector = excludeSelectors.join(',');
         }
-        this._textScanner.ignoreNodes = ignoreNodes.join(',');
 
         this._updateContentScale();
 
@@ -527,7 +529,7 @@ class Frontend {
     }
 
     _updateTextScannerEnabled() {
-        const enabled = (this._options.general.enable && !this._disabledOverride);
+        const enabled = (this._options !== null && this._options.general.enable && !this._disabledOverride);
         this._textScanner.setEnabled(enabled);
     }
 

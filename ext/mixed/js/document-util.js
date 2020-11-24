@@ -261,6 +261,18 @@ class DocumentUtil {
         return false;
     }
 
+    static everyNodeMatchesSelector(nodes, selector) {
+        const ELEMENT_NODE = Node.ELEMENT_NODE;
+        for (let node of nodes) {
+            while (true) {
+                if (node === null) { return false; }
+                if (node.nodeType === ELEMENT_NODE && node.matches(selector)) { break; }
+                node = node.parentNode;
+            }
+        }
+        return true;
+    }
+
     static getModifierKeys(os) {
         switch (os) {
             case 'win':

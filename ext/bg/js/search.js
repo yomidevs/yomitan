@@ -62,7 +62,7 @@ class DisplaySearch extends Display {
     async prepare() {
         await super.prepare();
         await this.updateOptions();
-        yomichan.on('optionsUpdated', () => this.updateOptions());
+        yomichan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
 
         this.on('contentUpdating', this._onContentUpdating.bind(this));
         this.on('modeChange', this._onModeChange.bind(this));
@@ -126,15 +126,6 @@ class DisplaySearch extends Display {
         }
     }
 
-    async updateOptions() {
-        await super.updateOptions();
-        if (!this._isPrepared) { return; }
-        const query = this._queryInput.value;
-        if (query) {
-            this._onSearchQueryUpdated(query, false);
-        }
-    }
-
     postProcessQuery(query) {
         if (this._wanakanaEnabled) {
             try {
@@ -147,6 +138,14 @@ class DisplaySearch extends Display {
     }
 
     // Private
+
+    async _onOptionsUpdated() {
+        await this.updateOptions();
+        const query = this._queryInput.value;
+        if (query) {
+            this._search(false);
+        }
+    }
 
     _onContentUpdating({type, content, source}) {
         let animate = false;
@@ -183,12 +182,12 @@ class DisplaySearch extends Display {
         e.preventDefault();
         e.stopImmediatePropagation();
         this.blurElement(e.currentTarget);
-        this._search();
+        this._search(true);
     }
 
     _onSearch(e) {
         e.preventDefault();
-        this._search();
+        this._search(true);
     }
 
     _onCopy() {
@@ -197,27 +196,8 @@ class DisplaySearch extends Display {
     }
 
     _onExternalSearchUpdate({text, animate=true}) {
-        this._onSearchQueryUpdated(text, animate);
-    }
-
-    _onSearchQueryUpdated(query, animate) {
-        const details = {
-            focus: false,
-            history: false,
-            params: {
-                query
-            },
-            state: {
-                focusEntry: 0,
-                sentence: {text: query, offset: 0},
-                url: window.location.href
-            },
-            content: {
-                definitions: null,
-                animate
-            }
-        };
-        this.setContent(details);
+        this._queryInput.value = text;
+        this._search(animate);
     }
 
     _onWanakanaEnableChange(e) {
@@ -362,9 +342,25 @@ class DisplaySearch extends Display {
         });
     }
 
-    _search() {
+    _search(animate) {
         const query = this._queryInput.value;
-        this._onSearchQueryUpdated(query, true);
+        const details = {
+            focus: false,
+            history: false,
+            params: {
+                query
+            },
+            state: {
+                focusEntry: 0,
+                sentence: {text: query, offset: 0},
+                url: window.location.href
+            },
+            content: {
+                definitions: null,
+                animate
+            }
+        };
+        this.setContent(details);
     }
 
     _updateSearchHeight() {

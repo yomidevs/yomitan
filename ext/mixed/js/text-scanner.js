@@ -21,19 +21,31 @@
  */
 
 class TextScanner extends EventDispatcher {
-    constructor({node, ignoreElements, ignorePoint, documentUtil, getOptionsContext, searchTerms=false, searchKanji=false, searchOnClick=false}) {
+    constructor({
+        node,
+        documentUtil,
+        getOptionsContext,
+        ignoreElements=null,
+        ignorePoint=null,
+        searchTerms=false,
+        searchKanji=false,
+        searchOnClick=false,
+        searchOnClickOnly=false
+    }) {
         super();
         this._node = node;
-        this._ignoreElements = ignoreElements;
-        this._ignorePoint = ignorePoint;
         this._documentUtil = documentUtil;
         this._getOptionsContext = getOptionsContext;
+        this._ignoreElements = ignoreElements;
+        this._ignorePoint = ignorePoint;
         this._searchTerms = searchTerms;
         this._searchKanji = searchKanji;
         this._searchOnClick = searchOnClick;
+        this._searchOnClickOnly = searchOnClickOnly;
 
         this._isPrepared = false;
-        this._ignoreNodes = null;
+        this._includeSelector = null;
+        this._excludeSelector = null;
 
         this._inputInfoCurrent = null;
         this._scanTimerPromise = null;
@@ -76,12 +88,20 @@ class TextScanner extends EventDispatcher {
         this._canClearSelection = value;
     }
 
-    get ignoreNodes() {
-        return this._ignoreNodes;
+    get includeSelector() {
+        return this._includeSelector;
     }
 
-    set ignoreNodes(value) {
-        this._ignoreNodes = value;
+    set includeSelector(value) {
+        this._includeSelector = value;
+    }
+
+    get excludeSelector() {
+        return this._excludeSelector;
+    }
+
+    set excludeSelector(value) {
+        this._excludeSelector = value;
     }
 
     prepare() {
@@ -178,15 +198,8 @@ class TextScanner extends EventDispatcher {
 
         clonedTextSource.setEndOffset(length, layoutAwareScan);
 
-        if (this._ignoreNodes !== null) {
-            length = clonedTextSource.text().length;
-            while (
-                length > 0 &&
-                DocumentUtil.anyNodeMatchesSelector(clonedTextSource.getNodesInRange(), this._ignoreNodes)
-            ) {
-                --length;
-                clonedTextSource.setEndOffset(length, layoutAwareScan);
-            }
+        if (this._excludeSelector !== null) {
+            this._constrainTextSource(clonedTextSource, this._includeSelector, this._excludeSelector, layoutAwareScan);
         }
 
         return clonedTextSource.text();
@@ -287,7 +300,7 @@ class TextScanner extends EventDispatcher {
     }
 
     _onMouseOver(e) {
-        if (this._ignoreElements().includes(e.target)) {
+        if (this._ignoreElements !== null && this._ignoreElements().includes(e.target)) {
             this._scanTimerClear();
         }
     }
@@ -613,7 +626,9 @@ class TextScanner extends EventDispatcher {
 
     _hookEvents() {
         let eventListenerInfos;
-        if (this._arePointerEventsSupported()) {
+        if (this._searchOnClickOnly) {
+            eventListenerInfos = this._getMouseClickOnlyEventListeners();
+        } else if (this._arePointerEventsSupported()) {
             eventListenerInfos = this._getPointerEventListeners();
         } else {
             eventListenerInfos = this._getMouseEventListeners();
@@ -652,6 +667,11 @@ class TextScanner extends EventDispatcher {
         ];
     }
 
+    _getMouseClickOnlyEventListeners() {
+        return [
+            [this._node, 'click', this._onClick.bind(this)]
+        ];
+    }
     _getTouchEventListeners() {
         return [
             [this._node, 'auxclick', this._onAuxClick.bind(this)],
@@ -872,5 +892,21 @@ class TextScanner extends EventDispatcher {
         // Workaround for Firefox bug not detecting certain 'touch' events as 'pen' events.
         const cachedPointerType = this._pointerIdTypeMap.get(e.pointerId);
         return (typeof cachedPointerType !== 'undefined' ? cachedPointerType : e.pointerType);
+    }
+
+    _constrainTextSource(textSource, includeSelector, excludeSelector, layoutAwareScan) {
+        let length = textSource.text().length;
+        while (length > 0) {
+            const nodes = textSource.getNodesInRange();
+            if (
+                (includeSelector !== null && !DocumentUtil.everyNodeMatchesSelector(nodes, includeSelector)) ||
+                (excludeSelector !== null && DocumentUtil.anyNodeMatchesSelector(nodes, excludeSelector))
+            ) {
+                --length;
+                textSource.setEndOffset(length, layoutAwareScan);
+            } else {
+                break;
+            }
+        }
     }
 }

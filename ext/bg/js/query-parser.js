@@ -34,8 +34,6 @@ class QueryParser extends EventDispatcher {
         this._queryParserModeSelect = document.querySelector('#query-parser-mode-select');
         this._textScanner = new TextScanner({
             node: this._queryParser,
-            ignoreElements: () => [],
-            ignorePoint: null,
             getOptionsContext,
             documentUtil,
             searchTerms: true,

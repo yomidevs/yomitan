@@ -27,6 +27,7 @@
  * PopupFactory
  * QueryParser
  * TemplateRendererProxy
+ * TextScanner
  * WindowScroll
  * api
  * dynamicLoader
@@ -48,7 +49,6 @@ class Display extends EventDispatcher {
         });
         this._styleNode = null;
         this._eventListeners = new EventListenerCollection();
-        this._clickScanPrevent = false;
         this._setContentToken = null;
         this._autoPlayAudioTimer = null;
         this._autoPlayAudioDelay = 400;
@@ -104,6 +104,7 @@ class Display extends EventDispatcher {
         this._frameEndpoint = (pageType === 'popup' ? new FrameEndpoint() : null);
         this._browser = null;
         this._copyTextarea = null;
+        this._definitionTextScanner = null;
 
         this.registerActions([
             ['close',             () => { this.onEscape(); }],
@@ -311,6 +312,7 @@ class Display extends EventDispatcher {
         });
 
         this._updateNestedFrontend(options);
+        this._updateDefinitionTextScanner(options);
     }
 
     autoPlayAudio() {
@@ -348,6 +350,7 @@ class Display extends EventDispatcher {
         const url = `${location.protocol}//${location.host}${location.pathname}?${urlSearchParams.toString()}`;
 
         if (history && this._historyHasChanged) {
+            this._updateHistoryState();
             this._history.pushState(state, content, url);
         } else {
             this._history.clear();
@@ -648,24 +651,18 @@ class Display extends EventDispatcher {
             e.preventDefault();
             if (!this._historyHasState()) { return; }
 
-            const link = e.target;
-            const {state} = this._history;
-
-            state.focusEntry = this._getClosestDefinitionIndex(link);
-            state.scrollX = this._windowScroll.x;
-            state.scrollY = this._windowScroll.y;
-            this._historyStateUpdate(state);
-
-            const query = link.textContent;
-            const definitions = await api.kanjiFind(query, this.getOptionsContext());
+            const {state: {sentence}} = this._history;
+            const optionsContext = this.getOptionsContext();
+            const query = e.currentTarget.textContent;
+            const definitions = await api.kanjiFind(query, optionsContext);
             const details = {
                 focus: false,
                 history: true,
                 params: this._createSearchParams('kanji', query, false),
                 state: {
                     focusEntry: 0,
-                    sentence: state.sentence,
-                    optionsContext: state.optionsContext
+                    sentence,
+                    optionsContext
                 },
                 content: {
                     definitions
@@ -675,88 +672,6 @@ class Display extends EventDispatcher {
         } catch (error) {
             this.onError(error);
         }
-    }
-
-    _onGlossaryMouseDown(e) {
-        if (DocumentUtil.isMouseButtonPressed(e, 'primary')) {
-            this._clickScanPrevent = false;
-        }
-    }
-
-    _onGlossaryMouseMove() {
-        this._clickScanPrevent = true;
-    }
-
-    _onGlossaryMouseUp(e) {
-        if (!this._clickScanPrevent && DocumentUtil.isMouseButtonPressed(e, 'primary')) {
-            try {
-                this._onTermLookup(e);
-            } catch (error) {
-                this.onError(error);
-            }
-        }
-    }
-
-    async _onTermLookup(e) {
-        if (!this._historyHasState()) { return; }
-
-        const termLookupResults = await this._termLookup(e);
-        if (!termLookupResults || !this._historyHasState()) { return; }
-
-        const {state} = this._history;
-        const {textSource, definitions} = termLookupResults;
-
-        const scannedElement = e.target;
-        const sentenceExtent = this._options.anki.sentenceExt;
-        const layoutAwareScan = this._options.scanning.layoutAwareScan;
-        const sentence = this._documentUtil.extractSentence(textSource, sentenceExtent, layoutAwareScan);
-
-        state.focusEntry = this._getClosestDefinitionIndex(scannedElement);
-        state.scrollX = this._windowScroll.x;
-        state.scrollY = this._windowScroll.y;
-        this._historyStateUpdate(state);
-
-        const query = textSource.text();
-        const details = {
-            focus: false,
-            history: true,
-            params: this._createSearchParams('terms', query, false),
-            state: {
-                focusEntry: 0,
-                sentence,
-                optionsContext: state.optionsContext
-            },
-            content: {
-                definitions
-            }
-        };
-        this.setContent(details);
-    }
-
-    async _termLookup(e) {
-        e.preventDefault();
-
-        const {length: scanLength, deepDomScan: deepScan, layoutAwareScan} = this._options.scanning;
-        const textSource = this._documentUtil.getRangeFromPoint(e.clientX, e.clientY, deepScan);
-        if (textSource === null) {
-            return false;
-        }
-
-        let definitions, length;
-        try {
-            textSource.setEndOffset(scanLength, layoutAwareScan);
-
-            ({definitions, length} = await api.termsFind(textSource.text(), {}, this.getOptionsContext()));
-            if (definitions.length === 0) {
-                return false;
-            }
-
-            textSource.setEndOffset(length, layoutAwareScan);
-        } finally {
-            textSource.cleanup();
-        }
-
-        return {textSource, definitions};
     }
 
     _onAudioPlay(e) {
@@ -942,7 +857,7 @@ class Display extends EventDispatcher {
         if (this._setContentToken !== token) { return true; }
 
         if (changeHistory) {
-            this._historyStateUpdate(state, content);
+            this._replaceHistoryStateNoNavigate(state, content);
         }
 
         eventArgs.source = source;
@@ -1054,17 +969,17 @@ class Display extends EventDispatcher {
     }
 
     _setTitleText(text) {
-        let title = '';
+        let title = this._defaultTitle;
         if (text.length > 0) {
             // Chrome limits title to 1024 characters
             const ellipsis = '...';
             const separator = ' - ';
-            const maxLength = this._titleMaxLength - this._defaultTitle.length - separator.length;
+            const maxLength = this._titleMaxLength - title.length - separator.length;
             if (text.length > maxLength) {
                 text = `${text.substring(0, Math.max(0, maxLength - ellipsis.length))}${ellipsis}`;
             }
 
-            title = `${text}${separator}${this._defaultTitle}`;
+            title = `${text}${separator}${title}`;
         }
         document.title = title;
     }
@@ -1384,12 +1299,20 @@ class Display extends EventDispatcher {
         return isObject(this._history.state);
     }
 
-    _historyStateUpdate(state, content) {
+    _updateHistoryState() {
+        const {state, content} = this._history;
+        if (!isObject(state)) { return; }
+
+        state.focusEntry = this._index;
+        state.scrollX = this._windowScroll.x;
+        state.scrollY = this._windowScroll.y;
+        this._replaceHistoryStateNoNavigate(state, content);
+    }
+
+    _replaceHistoryStateNoNavigate(state, content) {
         const historyChangeIgnorePre = this._historyChangeIgnore;
         try {
             this._historyChangeIgnore = true;
-            if (typeof state === 'undefined') { state = this._history.state; }
-            if (typeof content === 'undefined') { content = this._history.content; }
             this._history.replaceState(state, content);
         } finally {
             this._historyChangeIgnore = historyChangeIgnorePre;
@@ -1702,7 +1625,7 @@ class Display extends EventDispatcher {
     }
 
     _copyHostSelection() {
-        if (window.getSelection().toString()) { return false; }
+        if (this._ownerFrameId === null || window.getSelection().toString()) { return false; }
         this._copyHostSelectionInner();
         return true;
     }
@@ -1766,10 +1689,89 @@ class Display extends EventDispatcher {
         this._addMultipleEventListeners(entry, '.action-play-audio', 'click', this._onAudioPlay.bind(this));
         this._addMultipleEventListeners(entry, '.kanji-link', 'click', this._onKanjiLookup.bind(this));
         this._addMultipleEventListeners(entry, '.debug-log-link', 'click', this._onDebugLogClick.bind(this));
-        if (this._options !== null && this._options.scanning.enablePopupSearch) {
-            this._addMultipleEventListeners(entry, '.term-glossary-item,.tag', 'mouseup', this._onGlossaryMouseUp.bind(this));
-            this._addMultipleEventListeners(entry, '.term-glossary-item,.tag', 'mousedown', this._onGlossaryMouseDown.bind(this));
-            this._addMultipleEventListeners(entry, '.term-glossary-item,.tag', 'mousemove', this._onGlossaryMouseMove.bind(this));
+    }
+
+    _updateDefinitionTextScanner(options) {
+        if (!options.scanning.enablePopupSearch) {
+            if (this._definitionTextScanner !== null) {
+                this._definitionTextScanner.setEnabled(false);
+            }
+            return;
         }
+
+        if (this._definitionTextScanner === null) {
+            this._definitionTextScanner = new TextScanner({
+                node: window,
+                getOptionsContext: this.getOptionsContext.bind(this),
+                documentUtil: this._documentUtil,
+                searchTerms: true,
+                searchKanji: false,
+                searchOnClick: true,
+                searchOnClickOnly: true
+            });
+            this._definitionTextScanner.prepare();
+            this._definitionTextScanner.on('searched', this._onDefinitionTextScannerSearched.bind(this));
+        }
+
+        const scanningOptions = options.scanning;
+        this._definitionTextScanner.setOptions({
+            inputs: [{
+                include: 'mouse0',
+                exclude: '',
+                types: {mouse: true, pen: false, touch: false},
+                options: {
+                    searchTerms: true,
+                    searchKanji: true,
+                    scanOnTouchMove: false,
+                    scanOnPenHover: false,
+                    scanOnPenPress: false,
+                    scanOnPenRelease: false,
+                    preventTouchScrolling: false
+                }
+            }],
+            deepContentScan: scanningOptions.deepDomScan,
+            selectText: false,
+            delay: scanningOptions.delay,
+            touchInputEnabled: false,
+            pointerEventsEnabled: false,
+            scanLength: scanningOptions.length,
+            sentenceExtent: options.anki.sentenceExt,
+            layoutAwareScan: scanningOptions.layoutAwareScan,
+            preventMiddleMouse: false
+        });
+
+        const includeSelector = '.term-glossary-item,.term-glossary-item *,.tag,.tag *';
+        this._definitionTextScanner.includeSelector = includeSelector;
+
+        this._definitionTextScanner.setEnabled(true);
+    }
+
+    _onDefinitionTextScannerSearched({type, definitions, sentence, textSource, optionsContext, error}) {
+        if (error !== null && !yomichan.isExtensionUnloaded) {
+            yomichan.logError(error);
+        }
+
+        if (type === null) { return; }
+
+        const query = textSource.text();
+        const details = {
+            focus: false,
+            history: true,
+            params: {
+                type,
+                query,
+                wildcards: 'off'
+            },
+            state: {
+                focusEntry: 0,
+                sentence,
+                optionsContext
+            },
+            content: {
+                definitions
+            }
+        };
+        this._definitionTextScanner.clearSelection(true);
+        this.setContent(details);
     }
 }
