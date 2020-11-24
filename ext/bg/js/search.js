@@ -143,7 +143,7 @@ class DisplaySearch extends Display {
         await this.updateOptions();
         const query = this._queryInput.value;
         if (query) {
-            this._search(false);
+            this._search(false, false);
         }
     }
 
@@ -153,7 +153,7 @@ class DisplaySearch extends Display {
         switch (type) {
             case 'terms':
             case 'kanji':
-                animate = content.animate;
+                animate = !!content.animate;
                 valid = content.definitions.length > 0;
                 this.blurElement(this._queryInput);
                 break;
@@ -182,12 +182,12 @@ class DisplaySearch extends Display {
         e.preventDefault();
         e.stopImmediatePropagation();
         this.blurElement(e.currentTarget);
-        this._search(true);
+        this._search(true, true);
     }
 
     _onSearch(e) {
         e.preventDefault();
-        this._search(true);
+        this._search(true, true);
     }
 
     _onCopy() {
@@ -197,7 +197,7 @@ class DisplaySearch extends Display {
 
     _onExternalSearchUpdate({text, animate=true}) {
         this._queryInput.value = text;
-        this._search(animate);
+        this._search(animate, false);
     }
 
     _onWanakanaEnableChange(e) {
@@ -342,11 +342,11 @@ class DisplaySearch extends Display {
         });
     }
 
-    _search(animate) {
+    _search(animate, history) {
         const query = this._queryInput.value;
         const details = {
             focus: false,
-            history: false,
+            history,
             params: {
                 query
             },

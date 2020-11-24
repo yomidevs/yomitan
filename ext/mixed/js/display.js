@@ -522,6 +522,12 @@ class Display extends EventDispatcher {
         const token = {}; // Unique identifier token
         this._setContentToken = token;
         try {
+            // Clear
+            this._closePopups();
+            this._eventListeners.removeAllEventListeners();
+            this._mediaLoader.unloadAll();
+
+            // Prepare
             const urlSearchParams = new URLSearchParams(location.search);
             let type = urlSearchParams.get('type');
             if (type === null) { type = 'terms'; }
@@ -530,46 +536,51 @@ class Display extends EventDispatcher {
             this._queryParserVisibleOverride = (fullVisible === null ? null : (fullVisible !== 'false'));
             this._updateQueryParser();
 
-            this._closePopups();
-            this._eventListeners.removeAllEventListeners();
-
-            let assigned = false;
-            const eventArgs = {type, urlSearchParams, token};
+            let clear = true;
             this._historyHasChanged = true;
             this._contentType = type;
-            this._mediaLoader.unloadAll();
+            const eventArgs = {type, urlSearchParams, token};
+
+            // Set content
             switch (type) {
                 case 'terms':
                 case 'kanji':
                     {
+                        let query = urlSearchParams.get('query');
+                        if (!query) { break; }
+
+                        clear = false;
                         const isTerms = (type === 'terms');
-                        assigned = await this._setContentTermsOrKanji(token, isTerms, urlSearchParams, eventArgs);
+                        query = this.postProcessQuery(query);
+                        let queryFull = urlSearchParams.get('full');
+                        queryFull = (queryFull !== null ? this.postProcessQuery(queryFull) : query);
+                        const wildcardsEnabled = (urlSearchParams.get('wildcards') !== 'off');
+                        await this._setContentTermsOrKanji(token, isTerms, query, queryFull, wildcardsEnabled, eventArgs);
                     }
                     break;
                 case 'unloaded':
                     {
+                        clear = false;
                         const {content} = this._history;
                         eventArgs.content = content;
                         this.trigger('contentUpdating', eventArgs);
                         this._setContentExtensionUnloaded();
-                        assigned = true;
                     }
                     break;
             }
 
-            const stale = (this._setContentToken !== token);
-            if (!stale) {
-                if (!assigned) {
-                    type = 'clear';
-                    this._contentType = type;
-                    const {content} = this._history;
-                    eventArgs.type = type;
-                    eventArgs.content = content;
-                    this.trigger('contentUpdating', eventArgs);
-                    this._clearContent();
-                }
+            // Clear
+            if (clear) {
+                type = 'clear';
+                this._contentType = type;
+                const {content} = this._history;
+                eventArgs.type = type;
+                eventArgs.content = content;
+                this.trigger('contentUpdating', eventArgs);
+                this._clearContent();
             }
 
+            const stale = (this._setContentToken !== token);
             eventArgs.stale = stale;
             this.trigger('contentUpdated', eventArgs);
         } catch (e) {
@@ -788,10 +799,10 @@ class Display extends EventDispatcher {
         document.documentElement.dataset.yomichanTheme = themeName;
     }
 
-    async _findDefinitions(isTerms, source, urlSearchParams, optionsContext) {
+    async _findDefinitions(isTerms, source, wildcardsEnabled, optionsContext) {
         if (isTerms) {
             const findDetails = {};
-            if (urlSearchParams.get('wildcards') !== 'off') {
+            if (wildcardsEnabled) {
                 const match = /^([*\uff0a]*)([\w\W]*?)([*\uff0a]*)$/.exec(source);
                 if (match !== null) {
                     if (match[1]) {
@@ -811,13 +822,7 @@ class Display extends EventDispatcher {
         }
     }
 
-    async _setContentTermsOrKanji(token, isTerms, urlSearchParams, eventArgs) {
-        let source = urlSearchParams.get('query');
-        if (!source) {
-            this._setFullQuery('');
-            return false;
-        }
-
+    async _setContentTermsOrKanji(token, isTerms, query, queryFull, wildcardsEnabled, eventArgs) {
         let {state, content} = this._history;
         let changeHistory = false;
         if (!isObject(content)) {
@@ -839,28 +844,30 @@ class Display extends EventDispatcher {
         if (typeof url !== 'string') { url = window.location.href; }
         sentence = this._getValidSentenceData(sentence);
 
-        source = this.postProcessQuery(source);
-        let full = urlSearchParams.get('full');
-        full = (full === null ? source : this.postProcessQuery(full));
-        this._setFullQuery(full);
-        this._setTitleText(source);
+        this._setFullQuery(queryFull);
+        this._setTitleText(query);
 
         let {definitions} = content;
         if (!Array.isArray(definitions)) {
-            definitions = await this._findDefinitions(isTerms, source, urlSearchParams, optionsContext);
-            if (this._setContentToken !== token) { return true; }
+            definitions = await this._findDefinitions(isTerms, query, wildcardsEnabled, optionsContext);
+            if (this._setContentToken !== token) { return; }
             content.definitions = definitions;
             changeHistory = true;
         }
 
         await this._setOptionsContextIfDifferent(optionsContext);
-        if (this._setContentToken !== token) { return true; }
+        if (this._setContentToken !== token) { return; }
+
+        if (this._options === null) {
+            await this.updateOptions();
+            if (this._setContentToken !== token) { return; }
+        }
 
         if (changeHistory) {
             this._replaceHistoryStateNoNavigate(state, content);
         }
 
-        eventArgs.source = source;
+        eventArgs.source = query;
         eventArgs.content = content;
         this.trigger('contentUpdating', eventArgs);
 
@@ -880,7 +887,7 @@ class Display extends EventDispatcher {
         for (let i = 0, ii = definitions.length; i < ii; ++i) {
             if (i > 0) {
                 await promiseTimeout(1);
-                if (this._setContentToken !== token) { return true; }
+                if (this._setContentToken !== token) { return; }
             }
 
             const definition = definitions[i];
@@ -912,8 +919,6 @@ class Display extends EventDispatcher {
         }
 
         this._updateAdderButtons(token, isTerms, definitions);
-
-        return true;
     }
 
     _setContentExtensionUnloaded() {
@@ -930,11 +935,13 @@ class Display extends EventDispatcher {
         this._updateNavigation(false, false);
         this._setNoContentVisible(false);
         this._setTitleText('');
+        this._setFullQuery('');
     }
 
     _clearContent() {
         this._container.textContent = '';
         this._setTitleText('');
+        this._setFullQuery('');
     }
 
     _setNoContentVisible(visible) {
@@ -1566,7 +1573,7 @@ class Display extends EventDispatcher {
 
             try {
                 if (this._frontendSetupPromise === null) {
-                    this._frontendSetupPromise = this._setupNestedFrontend(isSearchPage);
+                    this._frontendSetupPromise = this._setupNestedFrontend();
                 }
                 await this._frontendSetupPromise;
             } catch (e) {
@@ -1580,12 +1587,12 @@ class Display extends EventDispatcher {
         this._frontend.setDisabledOverride(!isEnabled);
     }
 
-    async _setupNestedFrontend(isSearchPage) {
-        const setupNestedPopupsOptions = (
-            (isSearchPage) ?
-            {useProxyPopup: false} :
-            {useProxyPopup: true, parentPopupId: this._parentPopupId, parentFrameId: this._parentFrameId}
-        );
+    async _setupNestedFrontend() {
+        const setupNestedPopupsOptions = {
+            useProxyPopup: this._parentFrameId !== null,
+            parentPopupId: this._parentPopupId,
+            parentFrameId: this._parentFrameId
+        };
 
         const {frameId} = await api.frameInformationGet();
 

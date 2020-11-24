@@ -27,13 +27,13 @@ class MediaLoader {
     }
 
     async loadMedia(path, dictionaryName, onLoad, onUnload) {
-        const token = this.token;
+        const token = this._token;
         const data = {onUnload, loaded: false};
 
         this._loadMediaData.push(data);
 
         const media = await this.getMedia(path, dictionaryName);
-        if (token !== this.token) { return; }
+        if (token !== this._token) { return; }
 
         onLoad(media.url);
         data.loaded = true;

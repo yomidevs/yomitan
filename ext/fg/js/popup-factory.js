@@ -114,7 +114,7 @@ class PopupFactory {
             const popup = new Popup({
                 id,
                 depth,
-                frameId,
+                frameId: this._frameId,
                 ownerFrameId,
                 childrenSupported
             });
@@ -129,6 +129,9 @@ class PopupFactory {
             popup.prepare();
             return popup;
         } else {
+            if (frameId === null) {
+                throw new Error('Invalid frameId');
+            }
             const useFrameOffsetForwarder = (parentPopupId === null);
             ({id, depth, frameId} = await api.crossFrame.invoke(frameId, 'getOrCreatePopup', {
                 id,
