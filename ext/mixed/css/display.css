@@ -572,9 +572,6 @@ button.action-button {
 .entry-header3 {
     display: inline;
 }
-.term-frequency-separator::before {
-    content: ":";
-}
 .entry+.entry {
     border-top: var(--thin-border-size) solid var(--light-border-color);
 }
@@ -608,6 +605,27 @@ button.action-button {
 }
 .term-expression-list>.term-expression:not(:last-of-type)>.term-expression-text::after {
     content: "\3001";
+}
+.term-frequency-separator::before {
+    content: ":";
+}
+.term-frequency-disambiguation-separator::before {
+    content: ":";
+}
+.term-frequency-disambiguation::before {
+    content: "(";
+}
+.term-frequency-disambiguation::after {
+    content: ") ";
+}
+.frequencies .tag[data-reading-is-same=true] .term-frequency-disambiguation-separator,
+.frequencies .tag[data-reading-is-same=true] .term-frequency-disambiguation-reading,
+.entry[data-unique-expression-count="1"] .term-frequency-disambiguation-separator,
+.entry[data-unique-expression-count="1"] .term-frequency-disambiguation-expression,
+.entry[data-unique-reading-count="1"] .term-frequency-disambiguation-separator,
+.entry[data-unique-reading-count="1"] .term-frequency-disambiguation-reading,
+.entry[data-unique-expression-count="1"][data-unique-reading-count="1"] .term-frequency-disambiguation {
+    display: none;
 }
 
 
@@ -647,6 +665,9 @@ button.action-button {
     left: 0;
     bottom: -1.9em;
     white-space: nowrap;
+}
+.entry[data-expression-multi=true] .term-expression-list .term-expression-details>.frequencies .term-frequency-disambiguation {
+    display: none;
 }
 
 

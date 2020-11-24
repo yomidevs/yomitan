@@ -57,12 +57,21 @@ class DisplayGenerator {
         const pitches = DictionaryDataUtil.getPitchAccentInfos(details);
         const pitchCount = pitches.reduce((i, v) => i + v.pitches.length, 0);
 
+        const uniqueExpressions = new Set();
+        const uniqueReadings = new Set();
+        for (const {expression, reading} of expressions) {
+            uniqueExpressions.add(expression);
+            uniqueReadings.add(reading);
+        }
+
         node.dataset.format = type;
         node.dataset.expressionMulti = `${merged}`;
         node.dataset.expressionCount = `${expressions.length}`;
         node.dataset.definitionCount = `${definitions.length}`;
         node.dataset.pitchAccentDictionaryCount = `${pitches.length}`;
         node.dataset.pitchAccentCount = `${pitchCount}`;
+        node.dataset.uniqueExpressionCount = `${uniqueExpressions.size}`;
+        node.dataset.uniqueReadingCount = `${uniqueReadings.size}`;
 
         bodyContainer.dataset.sectionCount = `${
             (definitions.length > 0 ? 1 : 0) +
@@ -437,16 +446,19 @@ class DisplayGenerator {
     }
 
     _createFrequencyTag(details) {
+        const {expression, reading, dictionary, frequency} = details;
         const node = this._templates.instantiate('tag-frequency');
 
-        let n = node.querySelector('.term-frequency-dictionary-name');
-        n.textContent = details.dictionary;
+        node.querySelector('.term-frequency-disambiguation-expression').textContent = expression;
+        node.querySelector('.term-frequency-disambiguation-reading').textContent = reading;
+        node.querySelector('.term-frequency-dictionary-name').textContent = dictionary;
+        node.querySelector('.term-frequency-value').textContent = frequency;
 
-        n = node.querySelector('.term-frequency-value');
-        n.textContent = `${details.frequency}`;
-
-        node.dataset.dictionary = details.dictionary;
-        node.dataset.frequency = details.frequency;
+        node.dataset.expression = expression;
+        node.dataset.reading = reading;
+        node.dataset.readingIsSame = `${reading === expression}`;
+        node.dataset.dictionary = dictionary;
+        node.dataset.frequency = frequency;
 
         return node;
     }
