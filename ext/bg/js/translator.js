@@ -812,7 +812,7 @@ class Translator {
         let frequency = data;
         if (data !== null && typeof data === 'object') {
             if (data.reading !== reading) { return null; }
-            frequency = data.frequency2;
+            frequency = data.frequency;
         }
         return {expression, reading, dictionary, frequency};
     }
