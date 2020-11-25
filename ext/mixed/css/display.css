@@ -63,16 +63,21 @@
     /* Colors */
     --background-color: #ffffff;
     --glossary-image-background-color: #eeeeee;
+    --accent-color: #0275d8;
+    --link-color: var(--accent-color);
 
     --dark-text-color: #000000;
     --default-text-color: #333333;
     --light-text-color: #777777;
     --very-light-text-color: #999999;
-    --popuplar-kanji-text-color: #0275d8;
+    --popuplar-kanji-text-color: var(--accent-color);
+
+    --reason-text-color: var(--light-text-color);
 
     --light-border-color: #eeeeee;
     --medium-border-color: #dddddd;
     --dark-border-color: #777777;
+    --kanji-border-color: var(--dark-border-color);
 
     --pitch-accent-annotation-color: #000000;
 
@@ -105,23 +110,28 @@
     --scrollbar-track-color: #f1f1f1;
 
     --progress-bar-track-color: #cccccc;
-    --progress-bar-indicator-color: #0275d8;
-    --entry-current-indicator-color: #0275d8;
+    --progress-bar-indicator-color: var(--accent-color);
+    --entry-current-indicator-color: var(--accent-color);
 }
 :root[data-yomichan-theme=dark] {
     /* Colors */
     --background-color: #1e1e1e;
     --glossary-image-background-color: #2f2f2f;
+    --accent-color: #0275d8;
+    --link-color: var(--accent-color);
 
     --dark-text-color: #d8d8d8;
     --default-text-color: #d4d4d4;
     --light-text-color: #888888;
     --very-light-text-color: #666666;
-    --popuplar-kanji-text-color: #0275d8;
+    --popuplar-kanji-text-color: var(--accent-color);
+
+    --reason-text-color: var(--light-text-color);
 
     --light-border-color: #2f2f2f;
     --medium-border-color: #3f3f3f;
     --dark-border-color: #888888;
+    --kanji-border-color: var(--dark-border-color);
 
     --pitch-accent-annotation-color: #ffffff;
 
@@ -154,8 +164,8 @@
     --scrollbar-track-color: #2f2f2f;
 
     --progress-bar-track-color: #3a3a3a;
-    --progress-bar-indicator-color: #0275d8;
-    --entry-current-indicator-color: #0275d8;
+    --progress-bar-indicator-color: var(--accent-color);
+    --entry-current-indicator-color: var(--accent-color);
 }
 
 
@@ -208,32 +218,32 @@ h2 {
     border-bottom: calc(1em / (var(--font-size-no-units) * var(--h2-font-size-no-units))) solid var(--light-border-color);
 }
 a {
-    color: var(--popuplar-kanji-text-color);
+    color: var(--link-color);
     text-decoration: underline;
     cursor: pointer;
 }
 
 
 /* Scrollbars */
-:root[data-yomichan-theme=dark] .scrollbar {
+:root:not([data-yomichan-theme=light]) .scrollbar {
     scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
 }
-:root[data-yomichan-theme=dark] .scrollbar::-webkit-scrollbar {
+:root:not([data-yomichan-theme=light]) .scrollbar::-webkit-scrollbar {
     width: auto;
 }
-:root[data-yomichan-theme=dark] .scrollbar::-webkit-scrollbar-button {
+:root:not([data-yomichan-theme=light]) .scrollbar::-webkit-scrollbar-button {
     height: 0;
 }
-:root[data-yomichan-theme=dark] .scrollbar::-webkit-scrollbar-thumb {
+:root:not([data-yomichan-theme=light]) .scrollbar::-webkit-scrollbar-thumb {
     background-color: var(--scrollbar-thumb-color);
 }
-:root[data-yomichan-theme=dark] .scrollbar::-webkit-scrollbar-track {
+:root:not([data-yomichan-theme=light]) .scrollbar::-webkit-scrollbar-track {
     background-color: var(--scrollbar-thumb-color);
 }
-:root[data-yomichan-theme=dark] .scrollbar::-webkit-scrollbar-track-piece {
+:root:not([data-yomichan-theme=light]) .scrollbar::-webkit-scrollbar-track-piece {
     background-color: var(--scrollbar-track-color);
 }
-:root[data-yomichan-theme=dark] .scrollbar::-webkit-scrollbar-corner {
+:root:not([data-yomichan-theme=light]) .scrollbar::-webkit-scrollbar-corner {
     background-color: var(--scrollbar-track-color);
 }
 
@@ -557,17 +567,17 @@ button.action-button {
         visibility 0s linear 0s;
 }
 .term-expression .kanji-link {
-    border-bottom: var(--expression-thin-border-size) dashed var(--dark-border-color);
+    border-bottom: var(--expression-thin-border-size) dashed var(--kanji-border-color);
     color: var(--default-text-color);
     text-decoration: none;
     cursor: pointer;
 }
-.term-expression[data-frequency=popular]>.term-expression-text,
-.term-expression[data-frequency=popular]>.term-expression-text .kanji-link {
+.term-expression[data-frequency=popular] .term-expression-text,
+.term-expression[data-frequency=popular] .term-expression-text .kanji-link {
     color: var(--popuplar-kanji-text-color);
 }
-.term-expression[data-frequency=rare]>.term-expression-text,
-.term-expression[data-frequency=rare]>.term-expression-text .kanji-link {
+.term-expression[data-frequency=rare] .term-expression-text,
+.term-expression[data-frequency=rare] .term-expression-text .kanji-link {
     color: var(--very-light-text-color);
 }
 .entry-header2,
@@ -579,7 +589,7 @@ button.action-button {
 }
 .term-reasons {
     display: inline-block;
-    color: var(--light-text-color);
+    color: var(--reason-text-color);
 }
 .term-reasons>.term-reason+.term-reason-separator+.term-reason::before {
     content: " \00AB  "; /* The two spaces is not a typo */
