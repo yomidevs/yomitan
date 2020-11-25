@@ -60,6 +60,8 @@
 
     --expression-space-size: 0.5em;
 
+    --animation-duration: 0.125s;
+
     /* Colors */
     --background-color: #ffffff;
     --glossary-image-background-color: #eeeeee;
@@ -420,17 +422,33 @@ button.sidebar-button.danger:hover .sidebar-button-icon {
 
 
 /* Action buttons */
-.action-button.disabled {
+.action-button {
+    display: block;
+    opacity: 1;
+    transition:
+        opacity var(--animation-duration) linear,
+        visibility 0s linear 0s,
+        filter var(--animation-duration) linear,
+        -webkit-filter var(--animation-duration) linear;
+}
+.action-button[hidden] {
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+    transition:
+        opacity var(--animation-duration) linear,
+        visibility 0s linear var(--animation-duration),
+        filter var(--animation-duration) linear,
+        -webkit-filter var(--animation-duration) linear;
+}
+.action-button:disabled {
     pointer-events: none;
     cursor: default;
-}
-.action-button.disabled::before {
     -webkit-filter: grayscale(100%);
     filter: grayscale(100%);
-    opacity: 0.25;
 }
-.action-button.pending {
-    visibility: hidden;
+.action-button:disabled:not([hidden]) {
+    opacity: 0.25;
 }
 .actions {
     display: flex;
@@ -453,7 +471,7 @@ button.sidebar-button.danger:hover .sidebar-button-icon {
 button.action-button {
     cursor: pointer;
 }
-.action-button[data-icon]::before {
+.action-button::before {
     content: "";
     width: calc(1em * (var(--action-button-size-no-units) / var(--font-size-no-units)));
     height: calc(1em * (var(--action-button-size-no-units) / var(--font-size-no-units)));

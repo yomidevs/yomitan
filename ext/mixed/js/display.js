@@ -1051,8 +1051,8 @@ class Display extends EventDispatcher {
                 if (Array.isArray(noteIds) && noteIds.length > 0) {
                     noteId = noteIds[0];
                 }
-                button.classList.toggle('disabled', !canAdd);
-                button.classList.remove('pending');
+                button.disabled = !canAdd;
+                button.hidden = false;
             }
             if (noteId !== null) {
                 this._viewerButtonShow(i, noteId);
@@ -1115,14 +1115,14 @@ class Display extends EventDispatcher {
         if (index < 0 || index >= this._definitions.length) { return; }
 
         const button = this._adderButtonFind(index, mode);
-        if (button !== null && !button.classList.contains('disabled')) {
+        if (button !== null && !button.disabled) {
             this._noteAdd(this._definitions[index], mode);
         }
     }
 
     _noteTryView() {
         const button = this._viewerButtonFind(this._index);
-        if (button !== null && !button.classList.contains('disabled')) {
+        if (button !== null && !button.disabled) {
             api.noteView(button.dataset.noteId);
         }
     }
@@ -1136,7 +1136,7 @@ class Display extends EventDispatcher {
                 const index = this._definitions.indexOf(definition);
                 const adderButton = this._adderButtonFind(index, mode);
                 if (adderButton !== null) {
-                    adderButton.classList.add('disabled');
+                    adderButton.disabled = true;
                 }
                 this._viewerButtonShow(index, noteId);
             } else {
@@ -1271,7 +1271,8 @@ class Display extends EventDispatcher {
         if (viewerButton === null) {
             return;
         }
-        viewerButton.classList.remove('pending', 'disabled');
+        viewerButton.disabled = false;
+        viewerButton.hidden = false;
         viewerButton.dataset.noteId = noteId;
     }
 
