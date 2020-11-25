@@ -317,10 +317,12 @@ class DisplayGenerator {
     }
 
     _createSearchTag(text) {
-        const node = this._templates.instantiate('tag-search');
-        node.textContent = text;
-        node.dataset.query = text;
-        return node;
+        return this._createTag({
+            notes: '',
+            name: text,
+            category: 'search',
+            redundant: false
+        });
     }
 
     _createPitches(details) {

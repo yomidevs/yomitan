@@ -29,6 +29,7 @@ class HtmlTemplateCollection {
         for (const template of sourceNode.querySelectorAll('template')) {
             const match = pattern.exec(template.id);
             if (match === null) { continue; }
+            this._prepareTemplate(template);
             this._templates.set(match[1], template);
         }
     }
@@ -41,5 +42,33 @@ class HtmlTemplateCollection {
     instantiateFragment(name) {
         const template = this._templates.get(name);
         return document.importNode(template.content, true);
+    }
+
+    // Private
+
+    _prepareTemplate(template) {
+        if (template.dataset.removeWhitespaceText === 'true') {
+            this._removeWhitespaceText(template);
+        }
+    }
+
+    _removeWhitespaceText(template) {
+        const {content} = template;
+        const {TEXT_NODE} = Node;
+        const iterator = document.createNodeIterator(content, NodeFilter.SHOW_TEXT);
+        const removeNodes = [];
+        while (true) {
+            const node = iterator.nextNode();
+            if (node === null) { break; }
+            if (node.nodeType === TEXT_NODE && node.nodeValue.trim().length === 0) {
+                removeNodes.push(node);
+            }
+        }
+        for (const node of removeNodes) {
+            const {parentNode} = node;
+            if (parentNode !== null) {
+                parentNode.removeChild(node);
+            }
+        }
     }
 }

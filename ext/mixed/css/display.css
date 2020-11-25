@@ -58,6 +58,8 @@
     --entry-current-indicator: calc(4em / var(--font-size-no-units));
     --entry-current-indicator-transition-duration: 0.125s;
 
+    --expression-space-size: 0.5em;
+
     /* Colors */
     --background-color: #ffffff;
     --glossary-image-background-color: #eeeeee;
@@ -590,8 +592,11 @@ button.action-button {
 .term-expression {
     display: inline;
 }
-.term-expression-text {
+.term-expression-text-container {
     display: inline-block;
+}
+.term-expression-text {
+    display: inline;
     font-size: var(--expression-font-size);
 }
 .term-expression-details {
@@ -603,7 +608,7 @@ button.action-button {
 .term-expression-details>.frequencies {
     display: none;
 }
-.term-expression-list>.term-expression:not(:last-of-type)>.term-expression-text::after {
+.term-expression-list>.term-expression:not(:last-of-type)>.term-expression-text-container>.term-expression-text::after {
     content: "\3001";
 }
 .term-frequency-separator::before {
@@ -630,6 +635,10 @@ button.action-button {
 
 
 /* Merged term styles */
+.entry[data-expression-multi=true] .term-expression-list,
+.entry:not([data-expression-multi=true]) .term-expression-text-container {
+    margin-right: var(--expression-space-size);
+}
 .entry[data-expression-multi=true] .term-expression-list .term-expression-details {
     display: inline-block;
     position: relative;
