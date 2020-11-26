@@ -28,8 +28,8 @@ iframe.yomichan-float {
     box-sizing: border-box;
 }
 
-iframe.yomichan-float[data-yomichan-theme=dark],
-iframe.yomichan-float[data-yomichan-theme=auto][data-yomichan-site-color=dark] {
+iframe.yomichan-float[data-outer-theme=dark],
+iframe.yomichan-float[data-outer-theme=auto][data-site-color=dark] {
     background-color: #1e1e1e;
     border: 1px solid #666;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);

@@ -186,8 +186,10 @@ class Popup extends EventDispatcher {
     }
 
     updateTheme() {
-        this._frame.dataset.yomichanTheme = this._options.general.popupOuterTheme;
-        this._frame.dataset.yomichanSiteColor = this._getSiteColor();
+        const {popupTheme, popupOuterTheme} = this._options.general;
+        this._frame.dataset.theme = popupTheme;
+        this._frame.dataset.outerTheme = popupOuterTheme;
+        this._frame.dataset.siteColor = this._getSiteColor();
     }
 
     async setCustomOuterCss(css, useWebExtensionApi) {

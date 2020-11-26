@@ -59,7 +59,7 @@
 :root[data-loaded=true] {
     --animation-duration: 0.125s;
 }
-:root[data-yomichan-theme=dark] {
+:root[data-theme=dark] {
     --text-color-default: #d8d8d8;
     --background-color: #1e1e1e;
     --shadow-color: rgba(255, 255, 255, 0.185);

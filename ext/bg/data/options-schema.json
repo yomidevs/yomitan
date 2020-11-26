@@ -94,7 +94,7 @@
                                     "popupScaleRelativeToVisualViewport",
                                     "showGuide",
                                     "compactTags",
-                                    "compactGlossaries",
+                                    "glossaryLayoutMode",
                                     "mainDictionary",
                                     "popupTheme",
                                     "popupOuterTheme",
@@ -198,9 +198,10 @@
                                         "type": "boolean",
                                         "default": false
                                     },
-                                    "compactGlossaries": {
-                                        "type": "boolean",
-                                        "default": false
+                                    "glossaryLayoutMode": {
+                                        "type": "string",
+                                        "enum": ["default", "compact"],
+                                        "default": "default"
                                     },
                                     "mainDictionary": {
                                         "type": "string"

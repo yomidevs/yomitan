@@ -278,7 +278,7 @@ function createProfileOptionsUpdatedTestData1() {
             popupScaleRelativeToVisualViewport: true,
             showGuide: true,
             compactTags: false,
-            compactGlossaries: false,
+            glossaryLayoutMode: 'default',
             mainDictionary: '',
             popupTheme: 'default',
             popupOuterTheme: 'default',

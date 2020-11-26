@@ -786,7 +786,7 @@ class Display extends EventDispatcher {
         const data = document.documentElement.dataset;
         data.ankiEnabled = `${options.anki.enable}`;
         data.audioEnabled = `${options.audio.enabled && options.audio.sources.length > 0}`;
-        data.compactGlossaries = `${options.general.compactGlossaries}`;
+        data.glossaryLayoutMode = `${options.general.glossaryLayoutMode}`;
         data.compactTags = `${options.general.compactTags}`;
         data.enableSearchTags = `${options.scanning.enableSearchTags}`;
         data.showPitchAccentDownstepNotation = `${options.general.showPitchAccentDownstepNotation}`;
@@ -796,7 +796,7 @@ class Display extends EventDispatcher {
     }
 
     _updateTheme(themeName) {
-        document.documentElement.dataset.yomichanTheme = themeName;
+        document.documentElement.dataset.theme = themeName;
     }
 
     async _findDefinitions(isTerms, source, wildcardsEnabled, optionsContext) {
@@ -1461,7 +1461,7 @@ class Display extends EventDispatcher {
 
     async _createNote(definition, mode, context, options, templates, injectMedia) {
         const {
-            general: {resultOutputMode, compactGlossaries, compactTags},
+            general: {resultOutputMode, glossaryLayoutMode, compactTags},
             anki: {tags, checkForDuplicates, duplicateScope, kanji, terms, screenshot: {format, quality}},
             audio: {sources, customSourceUrl}
         } = options;
@@ -1501,7 +1501,7 @@ class Display extends EventDispatcher {
             checkForDuplicates,
             duplicateScope,
             resultOutputMode,
-            compactGlossaries,
+            glossaryLayoutMode,
             compactTags,
             modeOptions
         });

@@ -145,10 +145,6 @@
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="compact-glossaries" data-setting="general.compactGlossaries"> Compact glossaries</label>
-                </div>
-
-                <div class="checkbox">
                     <label><input type="checkbox" id="show-advanced-options" data-setting="general.showAdvanced" data-transform-pre="setDocumentAttribute" data-transform-post="setDocumentAttribute" data-document-attribute="data-options-general-show-advanced"> Show advanced options</label>
                 </div>
 
@@ -202,14 +198,6 @@
                         <option value="group">Group results by term-reading pairs</option>
                         <option value="merge">Group results by main dictionary entry</option>
                         <option value="split">Split definitions to their own results</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="popup-display-mode">Popup display mode</label>
-                    <select class="form-control" id="popup-display-mode" data-setting="general.popupDisplayMode">
-                        <option value="default">Default</option>
-                        <option value="full-width">Full width</option>
                     </select>
                 </div>
 
@@ -280,6 +268,25 @@
                         <div class="col-xs-6">
                             <label for="popup-vertical-offset2">Vertical popup offset for vertical text <span class="label-light">(in pixels)</span></label>
                             <input type="number" id="popup-vertical-offset2" class="form-control" data-setting="general.popupVerticalOffset2">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <label for="popup-display-mode">Popup display mode</label>
+                            <select class="form-control" id="popup-display-mode" data-setting="general.popupDisplayMode">
+                                <option value="default">Default</option>
+                                <option value="full-width">Full width</option>
+                            </select>
+                        </div>
+                        <div class="col-xs-6">
+                            <label for="glossary-layout-mode">Glossary layout mode</label>
+                            <select class="form-control" id="glossary-layout-mode" data-setting="general.glossaryLayoutMode">
+                                <option value="default">Default</option>
+                                <option value="compact">Compact</option>
+                            </select>
                         </div>
                     </div>
                 </div>
