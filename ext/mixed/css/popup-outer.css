@@ -15,37 +15,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-iframe.yomichan-float {
+iframe.yomichan-popup {
     all: initial;
-    background-color: #fff;
-    border: 1px solid #999;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    font-size: 1px;
+    background-color: #ffffff;
+    border: 1em solid #999999;
+    box-shadow: 0 0 10em rgba(0, 0, 0, 0.5);
     position: fixed;
     resize: both;
     visibility: hidden;
     z-index: 2147483647;
     box-sizing: border-box;
 }
-
-iframe.yomichan-float[data-outer-theme=dark],
-iframe.yomichan-float[data-outer-theme=auto][data-site-color=dark] {
+iframe.yomichan-popup[data-theme=dark] {
     background-color: #1e1e1e;
-    border: 1px solid #666;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    border-color: #666666;
 }
-
-iframe.yomichan-float.yomichan-float-full-width {
+iframe.yomichan-popup[data-outer-theme=dark],
+iframe.yomichan-popup[data-outer-theme=auto][data-site-color=dark] {
+    box-shadow: 0 0 10em rgba(255, 255, 255, 0.5);
+}
+iframe.yomichan-popup[data-popup-display-mode=full-width] {
     border-left: none;
     border-right: none;
-    box-sizing: border-box;
     resize: none;
 }
-
-iframe.yomichan-float.yomichan-float-full-width:not(.yomichan-float-above) {
+iframe.yomichan-popup[data-popup-display-mode=full-width][data-below=true] {
     border-bottom: none;
 }
-
-iframe.yomichan-float.yomichan-float-full-width.yomichan-float-above {
+iframe.yomichan-popup[data-popup-display-mode=full-width]:not([data-below=true]) {
     border-top: none;
 }

@@ -108,7 +108,7 @@ class PopupPreviewFrame {
     _onCustomOuterCssChanged({node}) {
         if (node === null) { return; }
 
-        const node2 = document.querySelector('#client-css');
+        const node2 = document.querySelector('#popup-outer-css');
         if (node2 === null) { return; }
 
         // This simulates the stylesheet priorities when injecting using the web extension API.

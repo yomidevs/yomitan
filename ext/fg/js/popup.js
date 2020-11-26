@@ -49,7 +49,7 @@ class Popup extends EventDispatcher {
         this._frameSizeContentScale = null;
         this._frameClient = null;
         this._frame = document.createElement('iframe');
-        this._frame.className = 'yomichan-float';
+        this._frame.className = 'yomichan-popup';
         this._frame.style.width = '0';
         this._frame.style.height = '0';
 
@@ -178,6 +178,7 @@ class Popup extends EventDispatcher {
 
     setContentScale(scale) {
         this._contentScale = scale;
+        this._frame.style.fontSize = `${scale}px`;
         this._invokeSafe('setContentScale', {scale});
     }
 
@@ -333,7 +334,7 @@ class Popup extends EventDispatcher {
             useWebExtensionApi = false;
             parentNode = this._shadow;
         }
-        await dynamicLoader.loadStyle('yomichan-popup-outer-stylesheet', fileType, '/fg/css/client.css', useWebExtensionApi, parentNode);
+        await dynamicLoader.loadStyle('yomichan-popup-outer-stylesheet', fileType, '/mixed/css/popup-outer.css', useWebExtensionApi, parentNode);
     }
 
     _observeFullscreen(observe) {
@@ -361,6 +362,7 @@ class Popup extends EventDispatcher {
         await this._inject();
 
         const optionsGeneral = this._options.general;
+        const {popupDisplayMode} = optionsGeneral;
         const frame = this._frame;
         const frameRect = frame.getBoundingClientRect();
 
@@ -383,11 +385,10 @@ class Popup extends EventDispatcher {
             this._getPositionForVerticalText(...getPositionArgs)
         );
 
-        const fullWidth = (optionsGeneral.popupDisplayMode === 'full-width');
-        frame.classList.toggle('yomichan-float-full-width', fullWidth);
-        frame.classList.toggle('yomichan-float-above', !below);
+        frame.dataset.popupDisplayMode = popupDisplayMode;
+        frame.dataset.below = `${below}`;
 
-        if (optionsGeneral.popupDisplayMode === 'full-width') {
+        if (popupDisplayMode === 'full-width') {
             x = viewport.left;
             y = below ? viewport.bottom - height : viewport.top;
             width = viewport.right - viewport.left;
