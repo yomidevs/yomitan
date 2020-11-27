@@ -81,8 +81,8 @@ const api = (() => {
             return this._invoke('getAnkiNoteInfo', {notes, duplicateScope});
         }
 
-        injectAnkiNoteMedia(expression, reading, timestamp, audioDetails, screenshotDetails, clipboardDetails) {
-            return this._invoke('injectAnkiNoteMedia', {expression, reading, timestamp, audioDetails, screenshotDetails, clipboardDetails});
+        injectAnkiNoteMedia(timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails) {
+            return this._invoke('injectAnkiNoteMedia', {timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails});
         }
 
         noteView(noteId) {
