@@ -1386,7 +1386,7 @@ class Display extends EventDispatcher {
             const timestamp = Date.now();
             const ownerFrameId = this._ownerFrameId;
             const {fields} = modeOptions;
-            const {expression, reading} = this._getDefinitionPrimaryExpressionAndReading(definition);
+            const definitionDetails = this._getDefinitionDetailsForNote(definition);
             const audioDetails = (mode !== 'kanji' && this._ankiNoteBuilder.containsMarker(fields, 'audio') ? {sources, customSourceUrl} : null);
             const screenshotDetails = (this._ankiNoteBuilder.containsMarker(fields, 'screenshot') ? {ownerFrameId, format, quality} : null);
             const clipboardDetails = {
@@ -1394,9 +1394,8 @@ class Display extends EventDispatcher {
                 text: this._ankiNoteBuilder.containsMarker(fields, 'clipboard-text')
             };
             const {screenshotFileName, clipboardImageFileName, clipboardText, audioFileName} = await api.injectAnkiNoteMedia(
-                expression,
-                reading,
                 timestamp,
+                definitionDetails,
                 audioDetails,
                 screenshotDetails,
                 clipboardDetails
@@ -1420,11 +1419,13 @@ class Display extends EventDispatcher {
         });
     }
 
-    async _getAudioInfo(source, expression, reading, details) {
-        return await api.getDefinitionAudioInfo(source, expression, reading, details);
-    }
+    _getDefinitionDetailsForNote(definition) {
+        const {type} = definition;
+        if (type === 'kanji') {
+            const {character} = definition;
+            return {type, character};
+        }
 
-    _getDefinitionPrimaryExpressionAndReading(definition) {
         const termDetailsList = definition.expressions;
         let bestIndex = -1;
         for (let i = 0, ii = termDetailsList.length; i < ii; ++i) {
@@ -1437,6 +1438,10 @@ class Display extends EventDispatcher {
             }
         }
         const {expression, reading} = termDetailsList[Math.max(0, bestIndex)];
-        return {expression, reading};
+        return {type, expression, reading};
+    }
+
+    async _getAudioInfo(source, expression, reading, details) {
+        return await api.getDefinitionAudioInfo(source, expression, reading, details);
     }
 }
