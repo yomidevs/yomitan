@@ -181,7 +181,7 @@ class StatusFooter extends PopupElement {
         }
 
         if (active) {
-            target.dataset.active = true;
+            target.dataset.active = 'true';
             if (!this.isVisible()) {
                 this.setVisible(true);
             }

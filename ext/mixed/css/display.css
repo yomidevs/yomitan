@@ -33,7 +33,6 @@
     --thin-border-size: calc(1em / var(--font-size-no-units));
     --expression-thin-border-size: calc(1em / (var(--expression-font-size-no-units) * var(--font-size-no-units)));
 
-    --spinner-size-no-units: 32;
     --action-button-size-no-units: 16;
 
     --list-margin: 0.72em;
@@ -60,6 +59,17 @@
 
     --expression-space-size: 0.5em;
 
+    --tag-font-size-no-units: calc(11 / 14);
+    --tag-font-size: calc(1em * var(--tag-font-size-no-units));
+    --tag-border-size-no-units: 0;
+    --tag-border-size: calc(1em * (var(--tag-border-size-no-units) / (var(--font-size-no-units) * var(--tag-font-size-no-units))));
+    --tag-border-style: none;
+    --tag-font-weight: bold;
+
+    --compact-list-separator: " | ";
+    --list-padding1: 1.4em;
+    --list-padding2: var(--list-padding1);
+
     --animation-duration: 0.125s;
 
     /* Colors */
@@ -68,8 +78,7 @@
     --accent-color: #0275d8;
     --link-color: var(--accent-color);
 
-    --dark-text-color: #000000;
-    --default-text-color: #333333;
+    --default-text-color: #000000;
     --light-text-color: #777777;
     --very-light-text-color: #999999;
     --kanji-text-color: var(--default-text-color);
@@ -86,6 +95,7 @@
     --pitch-accent-annotation-color: #000000;
 
     --tag-text-color: #ffffff;
+    --tag-border-color: transparent;
     --tag-default-background-color: #8a8a91;
     --tag-name-background-color: #5cb85c;
     --tag-expression-background-color: #f0ad4e;
@@ -124,7 +134,6 @@
     --accent-color: #0275d8;
     --link-color: var(--accent-color);
 
-    --dark-text-color: #d8d8d8;
     --default-text-color: #d4d4d4;
     --light-text-color: #888888;
     --very-light-text-color: #666666;
@@ -142,6 +151,7 @@
     --pitch-accent-annotation-color: #ffffff;
 
     --tag-text-color: #e1e1e1;
+    --tag-border-color: transparent;
     --tag-default-background-color: #69696e;
     --tag-name-background-color: #489148;
     --tag-expression-background-color: #b07f39;
@@ -206,16 +216,6 @@ body {
 ol, ul {
     margin-top: 0;
     margin-bottom: var(--list-padding);
-}
-#spinner {
-    position: fixed;
-    z-index: 1;
-    right: 0.36em;
-    bottom: 0.36em;
-}
-#spinner>img {
-    width: calc(1em * (var(--spinner-size-no-units) / var(--font-size-no-units)));
-    height: calc(1em * (var(--spinner-size-no-units) / var(--font-size-no-units)));
 }
 h2 {
     font-size: var(--h2-font-size);
@@ -508,8 +508,8 @@ button.action-button {
 .tag {
     display: inline-block;
     padding: 0.2em 0.6em 0.3em;
-    font-size: 75%;
-    font-weight: 700;
+    font-size: var(--tag-font-size);
+    font-weight: var(--tag-font-weight);
     line-height: 1.25;
     text-align: center;
     white-space: nowrap;
@@ -517,6 +517,8 @@ button.action-button {
     border-radius: 0.25em;
     color: var(--tag-text-color);
     background-color: var(--tag-default-background-color);
+    border: var(--tag-border-size) var(--tag-border-style) var(--tag-border-color);
+    margin-right: 0.375em;
 }
 .tag[data-category=name] {
     background-color: var(--tag-name-background-color);
@@ -551,16 +553,6 @@ button.action-button {
 .tag-inner {
     display: block;
 }
-.tag-list>.tag {
-    margin-right: 0.375em;
-}
-
-:root:not([data-enable-search-tags=true]) .tag[data-category=search] {
-    display: none;
-}
-:root[data-compact-tags=true] .tag[data-redundant=true] {
-    display: none;
-}
 
 
 /* Entries */
@@ -588,18 +580,21 @@ button.action-button {
         width var(--entry-current-indicator-transition-duration) linear,
         visibility 0s linear 0s;
 }
-.term-expression .kanji-link {
+.kanji-link {
     border-bottom: var(--expression-thin-border-size) dashed var(--kanji-border-color);
     color: var(--kanji-text-color);
     text-decoration: none;
     cursor: pointer;
 }
+.term-expression-text {
+    color: var(--kanji-text-color);
+}
 .term-expression[data-frequency=popular] .term-expression-text,
-.term-expression[data-frequency=popular] .term-expression-text .kanji-link {
+.term-expression[data-frequency=popular] .kanji-link {
     color: var(--kanji-popular-text-color);
 }
 .term-expression[data-frequency=rare] .term-expression-text,
-.term-expression[data-frequency=rare] .term-expression-text .kanji-link {
+.term-expression[data-frequency=rare] .kanji-link {
     color: var(--kanji-rare-text-color);
 }
 .term-expression-text>ruby>rt {
@@ -718,25 +713,27 @@ button.action-button {
 /* Definitions */
 .term-definition-list {
     margin: 0;
-    padding: 0;
-    list-style-type: none;
-    color: var(--light-text-color);
-}
-.term-definition-list:not([data-count="0"]):not([data-count="1"]) {
-    padding-left: 1.4em;
+    padding: 0 0 0 var(--list-padding1);
     list-style-type: decimal;
+}
+.term-definition-list[data-count="0"],
+.term-definition-list[data-count="1"] {
+    padding-left: 0;
+    list-style-type: none;
 }
 .term-glossary-list {
     margin: 0;
-    padding: 0;
-    list-style-type: none;
-}
-.term-glossary-list:not([data-count="0"]):not([data-count="1"]) {
-    padding-left: 1.4em;
+    padding: 0 0 0 var(--list-padding2);
     list-style-type: circle;
 }
-.term-glossary {
-    color: var(--dark-text-color);
+.term-glossary-list[data-count="0"],
+.term-glossary-list[data-count="1"] {
+    padding-left: 0;
+    list-style-type: none;
+}
+.term-definition-item::marker,
+.term-glossary-item::marker {
+    color: var(--light-text-color);
 }
 .term-definition-disambiguation-list[data-count="0"] {
     display: none;
@@ -766,36 +763,6 @@ button.action-button {
 }
 
 
-/* Conditional styles */
-:root:not([data-debug=true]) .debug-info {
-    display: none;
-}
-:root[data-anki-enabled=false] .action-view-note,
-:root[data-anki-enabled=false] .action-add-note {
-    display: none;
-}
-:root[data-audio-enabled=false] .action-play-audio {
-    display: none;
-}
-:root[data-glossary-layout-mode=compact] .term-definition-tag-list,
-:root[data-glossary-layout-mode=compact] .term-definition-disambiguation-list:not([data-count="0"]) {
-    display: inline;
-}
-:root[data-glossary-layout-mode=compact] .term-glossary-list {
-    display: inline;
-    list-style: none;
-    padding-left: 0;
-}
-:root[data-glossary-layout-mode=compact] .term-glossary-list>li {
-    display: inline;
-}
-:root[data-glossary-layout-mode=compact] .term-glossary-list>li:not(:first-child)::before {
-    white-space: pre-wrap;
-    content: " | ";
-    display: inline;
-}
-
-
 /* Pitch accent styles */
 .entry[data-pitch-accent-count='0'] .term-pitch-accent-container {
     display: none;
@@ -807,32 +774,37 @@ button.action-button {
 }
 .term-pitch-accent-group-list {
     margin: 0;
-    padding: 0;
-    list-style-type: none;
-    color: var(--light-text-color);
-}
-.term-pitch-accent-group-list:not([data-count="0"]):not([data-count="1"]) {
-    padding-left: 1.4em;
+    padding: 0 0 0 var(--list-padding1);
     list-style-type: decimal;
+}
+.term-pitch-accent-group-list[data-count="0"],
+.term-pitch-accent-group-list[data-count="1"] {
+    padding-left: 0;
+    list-style-type: none;
 }
 .term-pitch-accent-list {
     margin: 0;
-    padding: 0;
-    list-style-type: none;
-    display: inline;
-}
-.term-pitch-accent-list:not([data-count="0"]):not([data-count="1"]) {
-    padding-left: 1.4em;
+    padding: 0 0 0 var(--list-padding2);
     list-style-type: circle;
     display: block;
 }
-.term-pitch-accent {
+.term-pitch-accent-list[data-count="0"],
+.term-pitch-accent-list[data-count="1"] {
+    padding-left: 0;
+    list-style-type: none;
     display: inline;
-    line-height: 1.5em;
-    color: var(--dark-text-color);
 }
-.term-pitch-accent-list:not([data-count="0"]):not([data-count="1"])>.term-pitch-accent {
+.term-pitch-accent-group::marker,
+.term-pitch-accent::marker {
+    color: var(--light-text-color);
+}
+.term-pitch-accent {
     display: list-item;
+    line-height: 1.5;
+}
+.term-pitch-accent-list[data-count="0"] .term-pitch-accent,
+.term-pitch-accent-list[data-count="1"] .term-pitch-accent {
+    display: inline;
 }
 .term-pitch-accent-group-tag-list {
     margin-right: 0.375em;
@@ -855,9 +827,6 @@ button.action-button {
 }
 .term-pitch-accent-tag-list:not([data-count="0"]) {
     margin-right: 0.375em;
-}
-.term-special-tags>.pitches {
-    display: inline;
 }
 .term-pitch-accent-character {
     display: inline-block;
@@ -900,20 +869,6 @@ button.action-button {
     height: 0;
     padding: 0 0.25em;
     vertical-align: middle;
-}
-
-:root[data-show-pitch-accent-downstep-notation=true] .term-pitch-accent-disambiguation-list[data-expression-count="0"],
-:root[data-show-pitch-accent-downstep-notation=true] .term-pitch-accent-disambiguation[data-type=reading] {
-    display: none;
-}
-:root[data-show-pitch-accent-downstep-notation=false] .term-pitch-accent-characters {
-    display: none;
-}
-:root[data-show-pitch-accent-position-notation=false] .term-pitch-accent-position {
-    display: none;
-}
-:root[data-show-pitch-accent-graph=false] .term-pitch-accent-details {
-    display: none;
 }
 
 
@@ -1029,32 +984,6 @@ button.action-button {
     content: "]";
 }
 
-:root[data-glossary-layout-mode=compact] .term-glossary-image-container {
-    display: none;
-    position: absolute;
-    left: 0;
-    top: 100%;
-    z-index: 1;
-}
-:root[data-glossary-layout-mode=compact] .entry:nth-last-of-type(1):not(:nth-of-type(1)) .term-glossary-image-container {
-    bottom: 100%;
-    top: auto;
-}
-:root[data-glossary-layout-mode=compact] .term-glossary-image-link {
-    position: relative;
-    display: inline-block;
-}
-:root[data-glossary-layout-mode=compact] .term-glossary-image-link:hover .term-glossary-image-container,
-:root[data-glossary-layout-mode=compact] .term-glossary-image-link:focus .term-glossary-image-container {
-    display: block;
-}
-:root:not([data-glossary-layout-mode=compact]) .term-glossary-image-link-text {
-    display: none;
-}
-:root:not([data-glossary-layout-mode=compact]) .term-glossary-image-description {
-    display: block;
-}
-
 
 /* Kanji */
 .kanji-glyph {
@@ -1098,16 +1027,16 @@ button.action-button {
 }
 .kanji-glossary-list {
     margin: 0;
-    padding: 0;
-    list-style-type: none;
-    color: var(--light-text-color);
-}
-.kanji-glossary-list:not([data-count="0"]):not([data-count="1"]) {
-    padding-left: 1.4em;
+    padding: 0 0 0 var(--list-padding1);
     list-style-type: decimal;
 }
-.kanji-glossary {
-    color: var(--dark-text-color);
+.kanji-glossary-list[data-count="0"],
+.kanji-glossary-list[data-count="1"] {
+    padding-left: 0;
+    list-style-type: none;
+}
+.kanji-glossary-item::marker {
+    color: var(--light-text-color);
 }
 
 
@@ -1181,4 +1110,97 @@ button.action-button {
     height: 0;
     pointer-events: none;
     z-index: 10;
+}
+
+
+/* Conditional styles */
+:root:not([data-enable-search-tags=true]) .tag[data-category=search] {
+    display: none;
+}
+:root[data-compact-tags=true] .tag[data-redundant=true] {
+    display: none;
+}
+
+:root:not([data-debug=true]) .debug-info {
+    display: none;
+}
+:root[data-anki-enabled=false] .action-view-note,
+:root[data-anki-enabled=false] .action-add-note {
+    display: none;
+}
+:root[data-audio-enabled=false] .action-play-audio {
+    display: none;
+}
+:root[data-glossary-layout-mode=compact] .term-definition-tag-list,
+:root[data-glossary-layout-mode=compact] .term-definition-disambiguation-list:not([data-count="0"]) {
+    display: inline;
+}
+:root[data-glossary-layout-mode=compact] .term-glossary-list {
+    display: inline;
+    list-style: none;
+    padding-left: 0;
+}
+:root[data-glossary-layout-mode=compact] .term-glossary-item {
+    display: inline;
+}
+:root[data-glossary-layout-mode=compact] .term-glossary-item:not(:first-child)::before {
+    white-space: pre-wrap;
+    content: var(--compact-list-separator);
+    display: inline;
+    color: var(--light-text-color);
+}
+
+:root[data-show-pitch-accent-downstep-notation=true] .term-pitch-accent-disambiguation-list[data-expression-count="0"],
+:root[data-show-pitch-accent-downstep-notation=true] .term-pitch-accent-disambiguation[data-type=reading] {
+    display: none;
+}
+:root[data-show-pitch-accent-downstep-notation=false] .term-pitch-accent-characters {
+    display: none;
+}
+:root[data-show-pitch-accent-position-notation=false] .term-pitch-accent-position {
+    display: none;
+}
+:root[data-show-pitch-accent-graph=false] .term-pitch-accent-details {
+    display: none;
+}
+
+:root[data-glossary-layout-mode=compact][data-show-pitch-accent-graph=false] .term-pitch-accent-list:not([data-has-tags=true]) {
+    display: inline;
+    list-style: none;
+    padding-left: 0;
+}
+:root[data-glossary-layout-mode=compact][data-show-pitch-accent-graph=false] .term-pitch-accent-list:not([data-has-tags=true]) .term-pitch-accent {
+    display: inline;
+}
+:root[data-glossary-layout-mode=compact][data-show-pitch-accent-graph=false] .term-pitch-accent-list:not([data-has-tags=true]) .term-pitch-accent:not(:first-child)::before {
+    white-space: pre-wrap;
+    content: var(--compact-list-separator);
+    display: inline;
+    color: var(--light-text-color);
+}
+
+:root[data-glossary-layout-mode=compact] .term-glossary-image-container {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 100%;
+    z-index: 1;
+}
+:root[data-glossary-layout-mode=compact] .entry:nth-last-of-type(1):not(:nth-of-type(1)) .term-glossary-image-container {
+    bottom: 100%;
+    top: auto;
+}
+:root[data-glossary-layout-mode=compact] .term-glossary-image-link {
+    position: relative;
+    display: inline-block;
+}
+:root[data-glossary-layout-mode=compact] .term-glossary-image-link:hover .term-glossary-image-container,
+:root[data-glossary-layout-mode=compact] .term-glossary-image-link:focus .term-glossary-image-container {
+    display: block;
+}
+:root:not([data-glossary-layout-mode=compact]) .term-glossary-image-link-text {
+    display: none;
+}
+:root:not([data-glossary-layout-mode=compact]) .term-glossary-image-description {
+    display: block;
 }

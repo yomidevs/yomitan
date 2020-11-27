@@ -298,7 +298,7 @@ class ProfileController {
         if (profile === null || this.profileCount <= 1) { return; }
 
         this._removeProfileNameElement.textContent = profile.name;
-        this._profileRemoveModal.node.dataset.profileIndex = profileIndex;
+        this._profileRemoveModal.node.dataset.profileIndex = `${profileIndex}`;
         this._profileRemoveModal.setVisible(true);
     }
 
