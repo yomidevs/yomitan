@@ -108,9 +108,19 @@ class AnkiNoteBuilder {
     _createNoteData(definition, mode, context, resultOutputMode, glossaryLayoutMode, compactTags) {
         const pitches = DictionaryDataUtil.getPitchAccentInfos(definition);
         const pitchCount = pitches.reduce((i, v) => i + v.pitches.length, 0);
+        const uniqueExpressions = new Set();
+        const uniqueReadings = new Set();
+        if (definition.type !== 'kanji') {
+            for (const {expression, reading} of definition.expressions) {
+                uniqueExpressions.add(expression);
+                uniqueReadings.add(reading);
+            }
+        }
         return {
             marker: null,
             definition,
+            uniqueExpressions: [...uniqueExpressions],
+            uniqueReadings: [...uniqueReadings],
             pitches,
             pitchCount,
             group: resultOutputMode === 'group',

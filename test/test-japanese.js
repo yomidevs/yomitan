@@ -334,6 +334,25 @@ function testDistributeFurigana() {
             [
                 {text: '長い間', furigana: 'ながいあいだ'}
             ]
+        ],
+        // Same/empty reading
+        [
+            ['飼い犬', ''],
+            [
+                {text: '飼い犬', furigana: ''}
+            ]
+        ],
+        [
+            ['かいいぬ', 'かいいぬ'],
+            [
+                {text: 'かいいぬ', furigana: ''}
+            ]
+        ],
+        [
+            ['かいぬ', 'かいぬ'],
+            [
+                {text: 'かいぬ', furigana: ''}
+            ]
         ]
     ];
 

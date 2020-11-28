@@ -163,6 +163,7 @@ Flashcard fields can be configured with the following steps:
     `{dictionary}` | Name of the dictionary from which the card is being created (unavailable in *grouped* mode).
     `{document-title}` | Title of the web page that the term appeared in.
     `{expression}` | Term expressed as kanji (will be displayed in kana if kanji is not available).
+    `{frequencies}` | Frequency information for the term.
     `{furigana}` | Term expressed as kanji with furigana displayed above it (e.g. <ruby>日本語<rt>にほんご</rt></ruby>).
     `{furigana-plain}` | Term expressed as kanji with furigana displayed next to it in brackets (e.g. 日本語[にほんご]).
     `{glossary}` | List of definitions for the term (output format depends on whether running in *grouped* mode).
@@ -188,6 +189,7 @@ Flashcard fields can be configured with the following steps:
     `{cloze-suffix}` | Fragment of the containing `{sentence}` starting at the end of `{cloze-body}` until the end of `{sentence}`.
     `{dictionary}` | Name of the dictionary from which the card is being created.
     `{document-title}` | Title of the web page that the kanji appeared in.
+    `{frequencies}` | Frequency information for the kanji.
     `{glossary}` | List of definitions for the kanji.
     `{kunyomi}` | Kunyomi (Japanese reading) for the kanji expressed as katakana.
     `{onyomi}` | Onyomi (Chinese reading) for the kanji expressed as hiragana.

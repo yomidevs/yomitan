@@ -117,13 +117,13 @@ class TemplateRenderer {
         return this._escape(dump);
     }
 
-    _furigana(context, options) {
-        const definition = options.fn(context);
-        const segs = jp.distributeFurigana(definition.expression, definition.reading);
+    _furigana(context, ...args) {
+        const {expression, reading} = this._getFuriganaExpressionAndReading(context, ...args);
+        const segs = jp.distributeFurigana(expression, reading);
 
         let result = '';
         for (const seg of segs) {
-            if (seg.furigana) {
+            if (seg.furigana.length > 0) {
                 result += `<ruby>${seg.text}<rt>${seg.furigana}</rt></ruby>`;
             } else {
                 result += seg.text;
@@ -133,20 +133,31 @@ class TemplateRenderer {
         return result;
     }
 
-    _furiganaPlain(context, options) {
-        const definition = options.fn(context);
-        const segs = jp.distributeFurigana(definition.expression, definition.reading);
+    _furiganaPlain(context, ...args) {
+        const {expression, reading} = this._getFuriganaExpressionAndReading(context, ...args);
+        const segs = jp.distributeFurigana(expression, reading);
 
         let result = '';
         for (const seg of segs) {
-            if (seg.furigana) {
-                result += ` ${seg.text}[${seg.furigana}]`;
+            if (seg.furigana.length > 0) {
+                if (result.length > 0) { result += ' '; }
+                result += `${seg.text}[${seg.furigana}]`;
             } else {
                 result += seg.text;
             }
         }
 
-        return result.trimLeft();
+        return result;
+    }
+
+    _getFuriganaExpressionAndReading(context, ...args) {
+        const options = args[args.length - 1];
+        if (args.length >= 3) {
+            return {expression: args[0], reading: args[1]};
+        } else {
+            const {expression, reading} = options.fn(context);
+            return {expression, reading};
+        }
     }
 
     _kanjiLinks(context, options) {

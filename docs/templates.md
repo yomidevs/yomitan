@@ -44,21 +44,27 @@ This function can be helpful for debugging values when creating templates.
 
 ### `furigana`
 
-Converts a definition to its furigana representation.
+Converts a definition or expression/reading pair to its furigana representation.
 
 <details>
   <summary>Syntax:</summary>
 
-  <code>{{#furigana}}<i>&lt;definition&gt;</i>{{/furigana}}</code>
+  <code>{{#furigana}}<i>&lt;definition&gt;</i>{{/furigana}}</code><br>
+  <code>{{#furigana <i>expression</i> <i>reading</i>}}{{/furigana}}</code><br>
 
   * _`definition`_ <br>
     The definition to convert.
+  * _`expression`_ <br>
+    The expression to convert.
+  * _`reading`_ <br>
+    The reading to convert.
 </details>
 <details>
   <summary>Example:</summary>
 
   ```handlebars
   {{#furigana}}{{.}}{{/furigana}}
+  {{#furigana "読む" "よむ"}}{{/furigana}}
   ```
 
   Output:
@@ -73,21 +79,27 @@ Converts a definition to its furigana representation.
 
 ### `furiganaPlain`
 
-Converts a definition to its simplified furigana representation.
+Converts a definition or expression/reading pair to its simplified furigana representation.
 
 <details>
   <summary>Syntax:</summary>
 
   <code>{{#furiganaPlain}}<i>&lt;definition&gt;</i>{{/furigana}}</code>
+  <code>{{#furiganaPlain <i>expression</i> <i>reading</i>}}{{/furiganaPlain}}</code><br>
 
   * _`definition`_ <br>
     The definition to convert.
+  * _`expression`_ <br>
+    The expression to convert.
+  * _`reading`_ <br>
+    The reading to convert.
 </details>
 <details>
   <summary>Example:</summary>
 
   ```handlebars
   {{~#furiganaPlain~}}{{.}}{{~/furiganaPlain~}}
+  {{#furiganaPlain "読む" "よむ"}}{{/furiganaPlain}}
   ```
 
   Output:

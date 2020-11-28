@@ -411,9 +411,9 @@ const jp = (() => {
         // Furigana distribution
 
         distributeFurigana(expression, reading) {
-            const fallback = [{furigana: reading, text: expression}];
-            if (!reading) {
-                return fallback;
+            if (!reading || reading === expression) {
+                // Same
+                return [{furigana: '', text: expression}];
             }
 
             let isAmbiguous = false;
@@ -471,7 +471,9 @@ const jp = (() => {
             if (segments && !isAmbiguous) {
                 return segments;
             }
-            return fallback;
+
+            // Fallback
+            return [{furigana: reading, text: expression}];
         }
 
         distributeFuriganaInflected(expression, reading, source) {

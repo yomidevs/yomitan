@@ -83,6 +83,7 @@ class AnkiController {
                     'dictionary',
                     'document-title',
                     'expression',
+                    'frequencies',
                     'furigana',
                     'furigana-plain',
                     'glossary',
