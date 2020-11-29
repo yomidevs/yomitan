@@ -105,8 +105,8 @@ class PopupPreviewFrame {
         return options;
     }
 
-    _onCustomOuterCssChanged({node}) {
-        if (node === null) { return; }
+    _onCustomOuterCssChanged({node, inShadow}) {
+        if (node === null || inShadow) { return; }
 
         const node2 = document.querySelector('#popup-outer-css');
         if (node2 === null) { return; }

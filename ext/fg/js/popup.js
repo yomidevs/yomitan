@@ -195,12 +195,13 @@ class Popup extends EventDispatcher {
 
     async setCustomOuterCss(css, useWebExtensionApi) {
         let parentNode = null;
-        if (this._shadow !== null) {
+        const inShadow = (this._shadow !== null);
+        if (inShadow) {
             useWebExtensionApi = false;
             parentNode = this._shadow;
         }
         const node = await dynamicLoader.loadStyle('yomichan-popup-outer-user-stylesheet', 'code', css, useWebExtensionApi, parentNode);
-        this.trigger('customOuterCssChanged', {node, useWebExtensionApi});
+        this.trigger('customOuterCssChanged', {node, useWebExtensionApi, inShadow});
     }
 
     getFrameRect() {
