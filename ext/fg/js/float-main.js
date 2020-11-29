@@ -17,6 +17,7 @@
 
 /* global
  * Display
+ * JapaneseUtil
  * api
  */
 
@@ -25,7 +26,8 @@
         api.forwardLogsToBackend();
         await yomichan.backendReady();
 
-        const display = new Display('popup');
+        const japaneseUtil = new JapaneseUtil(null);
+        const display = new Display('popup', japaneseUtil);
         await display.prepare();
         display.initializeState();
 

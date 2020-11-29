@@ -15,18 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * jp
- */
-
 class ClipboardMonitor extends EventDispatcher {
-    constructor({clipboardReader}) {
+    constructor({japaneseUtil, clipboardReader}) {
         super();
+        this._japaneseUtil = japaneseUtil;
+        this._clipboardReader = clipboardReader;
         this._timerId = null;
         this._timerToken = null;
         this._interval = 250;
         this._previousText = null;
-        this._clipboardReader = clipboardReader;
     }
 
     start() {
@@ -53,7 +50,7 @@ class ClipboardMonitor extends EventDispatcher {
                 text !== this._previousText
             ) {
                 this._previousText = text;
-                if (jp.isStringPartiallyJapanese(text)) {
+                if (this._japaneseUtil.isStringPartiallyJapanese(text)) {
                     this.trigger('change', {text});
                 }
             }

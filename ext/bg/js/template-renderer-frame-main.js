@@ -16,12 +16,14 @@
  */
 
 /* globals
+ * JapaneseUtil
  * TemplateRenderer
  * TemplateRendererFrameApi
  */
 
 (() => {
-    const templateRenderer = new TemplateRenderer();
+    const japaneseUtil = new JapaneseUtil(null);
+    const templateRenderer = new TemplateRenderer(japaneseUtil);
     const api = new TemplateRendererFrameApi(templateRenderer);
     api.prepare();
 })();

@@ -17,7 +17,9 @@
 
 /* global
  * DisplaySearch
+ * JapaneseUtil
  * api
+ * wanakana
  */
 
 (async () => {
@@ -25,7 +27,8 @@
         api.forwardLogsToBackend();
         await yomichan.backendReady();
 
-        const displaySearch = new DisplaySearch();
+        const japaneseUtil = new JapaneseUtil(wanakana);
+        const displaySearch = new DisplaySearch(japaneseUtil);
         await displaySearch.prepare();
 
         document.documentElement.dataset.loaded = 'true';

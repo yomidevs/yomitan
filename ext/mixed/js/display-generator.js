@@ -19,11 +19,11 @@
  * DictionaryDataUtil
  * HtmlTemplateCollection
  * api
- * jp
  */
 
 class DisplayGenerator {
-    constructor({mediaLoader}) {
+    constructor({japaneseUtil, mediaLoader}) {
+        this._japaneseUtil = japaneseUtil;
         this._mediaLoader = mediaLoader;
         this._templates = null;
         this._termPitchAccentStaticTemplateIsSetup = false;
@@ -354,6 +354,7 @@ class DisplayGenerator {
     }
 
     _createPitch(details) {
+        const jp = this._japaneseUtil;
         const {reading, position, tags, exclusiveExpressions, exclusiveReadings} = details;
         const morae = jp.getKanaMorae(reading);
 
@@ -417,6 +418,7 @@ class DisplayGenerator {
     }
 
     _populatePitchGraph(svg, position, morae) {
+        const jp = this._japaneseUtil;
         const svgns = svg.getAttribute('xmlns');
         const ii = morae.length;
         svg.setAttribute('viewBox', `0 0 ${50 * (ii + 1)} 100`);
@@ -475,6 +477,7 @@ class DisplayGenerator {
     }
 
     _appendKanjiLinks(container, text) {
+        const jp = this._japaneseUtil;
         let part = '';
         for (const c of text) {
             if (jp.isCodePointKanji(c.codePointAt(0))) {

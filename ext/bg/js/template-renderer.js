@@ -17,11 +17,11 @@
 
 /* global
  * Handlebars
- * jp
  */
 
 class TemplateRenderer {
-    constructor() {
+    constructor(japaneseUtil) {
+        this._japaneseUtil = japaneseUtil;
         this._cache = new Map();
         this._cacheMaxSize = 5;
         this._helpersRegistered = false;
@@ -119,7 +119,7 @@ class TemplateRenderer {
 
     _furigana(context, ...args) {
         const {expression, reading} = this._getFuriganaExpressionAndReading(context, ...args);
-        const segs = jp.distributeFurigana(expression, reading);
+        const segs = this._japaneseUtil.distributeFurigana(expression, reading);
 
         let result = '';
         for (const seg of segs) {
@@ -135,7 +135,7 @@ class TemplateRenderer {
 
     _furiganaPlain(context, ...args) {
         const {expression, reading} = this._getFuriganaExpressionAndReading(context, ...args);
-        const segs = jp.distributeFurigana(expression, reading);
+        const segs = this._japaneseUtil.distributeFurigana(expression, reading);
 
         let result = '';
         for (const seg of segs) {
@@ -161,6 +161,7 @@ class TemplateRenderer {
     }
 
     _kanjiLinks(context, options) {
+        const jp = this._japaneseUtil;
         let result = '';
         for (const c of options.fn(context)) {
             if (jp.isCodePointKanji(c.codePointAt(0))) {
@@ -385,10 +386,10 @@ class TemplateRenderer {
     }
 
     _isMoraPitchHigh(context, index, position) {
-        return jp.isMoraPitchHigh(index, position);
+        return this._japaneseUtil.isMoraPitchHigh(index, position);
     }
 
     _getKanaMorae(context, text) {
-        return jp.getKanaMorae(`${text}`);
+        return this._japaneseUtil.getKanaMorae(`${text}`);
     }
 }

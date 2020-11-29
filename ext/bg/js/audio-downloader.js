@@ -17,11 +17,11 @@
 
 /* global
  * SimpleDOMParser
- * jp
  */
 
 class AudioDownloader {
-    constructor({requestBuilder}) {
+    constructor({japaneseUtil, requestBuilder}) {
+        this._japaneseUtil = japaneseUtil;
         this._requestBuilder = requestBuilder;
         this._getInfoHandlers = new Map([
             ['jpod101', this._getInfoJpod101.bind(this)],
@@ -89,7 +89,7 @@ class AudioDownloader {
         let kana = reading;
         let kanji = expression;
 
-        if (!kana && jp.isStringEntirelyKana(kanji)) {
+        if (!kana && this._japaneseUtil.isStringEntirelyKana(kanji)) {
             kana = kanji;
             kanji = null;
         }

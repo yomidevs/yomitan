@@ -25,8 +25,8 @@ vm.execute([
     'mixed/js/japanese.js',
     'bg/js/text-source-map.js'
 ]);
-const jp = vm.get('jp');
-const TextSourceMap = vm.get('TextSourceMap');
+const [JapaneseUtil, TextSourceMap, wanakana] = vm.get(['JapaneseUtil', 'TextSourceMap', 'wanakana']);
+const jp = new JapaneseUtil(wanakana);
 
 
 function testIsCodePointKanji() {

@@ -22,6 +22,7 @@
  * ClipboardReader
  * DictionaryDatabase
  * Environment
+ * JapaneseUtil
  * JsonSchemaValidator
  * Mecab
  * MediaUtility
@@ -30,14 +31,18 @@
  * ProfileConditions
  * RequestBuilder
  * Translator
- * jp
+ * wanakana
  */
 
 class Backend {
     constructor() {
+        this._japaneseUtil = new JapaneseUtil(wanakana);
         this._environment = new Environment();
         this._dictionaryDatabase = new DictionaryDatabase();
-        this._translator = new Translator(this._dictionaryDatabase);
+        this._translator = new Translator({
+            japaneseUtil: this._japaneseUtil,
+            database: this._dictionaryDatabase
+        });
         this._anki = new AnkiConnect();
         this._mecab = new Mecab();
         this._mediaUtility = new MediaUtility();
@@ -48,6 +53,7 @@ class Backend {
             mediaUtility: this._mediaUtility
         });
         this._clipboardMonitor = new ClipboardMonitor({
+            japaneseUtil: this._japaneseUtil,
             clipboardReader: this._clipboardReader
         });
         this._options = null;
@@ -57,6 +63,7 @@ class Backend {
         this._defaultAnkiFieldTemplates = null;
         this._requestBuilder = new RequestBuilder();
         this._audioDownloader = new AudioDownloader({
+            japaneseUtil: this._japaneseUtil,
             requestBuilder: this._requestBuilder
         });
         this._optionsUtil = new OptionsUtil();
@@ -952,6 +959,7 @@ class Backend {
     }
 
     async _textParseScanning(text, options) {
+        const jp = this._japaneseUtil;
         const {scanning: {length: scanningLength}, parsing: {readingMode}} = options;
         const findTermsOptions = this._getTranslatorFindTermsOptions({wildcard: null}, options);
         const results = [];
@@ -981,6 +989,7 @@ class Backend {
     }
 
     async _textParseMecab(text, options) {
+        const jp = this._japaneseUtil;
         const {parsing: {readingMode}} = options;
         const results = [];
         const rawResults = await this._mecab.parseText(text);

@@ -18,7 +18,6 @@
 /* global
  * Deinflector
  * TextSourceMap
- * jp
  */
 
 /**
@@ -29,7 +28,8 @@ class Translator {
      * Creates a new Translator instance.
      * @param database An instance of DictionaryDatabase.
      */
-    constructor(database) {
+    constructor({japaneseUtil, database}) {
+        this._japaneseUtil = japaneseUtil;
         this._database = database;
         this._deinflector = null;
         this._tagCache = new Map();
@@ -318,6 +318,7 @@ class Translator {
             collapseEmphaticOptions
         ];
 
+        const jp = this._japaneseUtil;
         const deinflections = [];
         const used = new Set();
         for (const [halfWidth, numeric, alphabetic, katakana, hiragana, [collapseEmphatic, collapseEmphaticFull]] of this._getArrayVariants(textOptionVariantArray)) {
@@ -846,6 +847,7 @@ class Translator {
             return text;
         }
 
+        const jp = this._japaneseUtil;
         let newText = '';
         for (const c of text) {
             if (!jp.isCodePointJapanese(c.codePointAt(0))) {
@@ -1031,7 +1033,7 @@ class Translator {
         this._sortTags(definitionTagsExpanded);
         this._sortTags(termTagsExpanded);
 
-        const furiganaSegments = jp.distributeFurigana(expression, reading);
+        const furiganaSegments = this._japaneseUtil.distributeFurigana(expression, reading);
         const termDetailsList = [this._createTermDetails(sourceTerm, expression, reading, furiganaSegments, termTagsExpanded)];
         const sourceTermExactMatchCount = (sourceTerm === expression ? 1 : 0);
 

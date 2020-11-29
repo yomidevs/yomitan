@@ -24,8 +24,8 @@
  */
 
 class DisplaySearch extends Display {
-    constructor() {
-        super('search');
+    constructor(japaneseUtil) {
+        super('search', japaneseUtil);
         this._searchButton = document.querySelector('#search-button');
         this._queryInput = document.querySelector('#search-textbox');
         this._introElement = document.querySelector('#intro');
@@ -38,6 +38,7 @@ class DisplaySearch extends Display {
         this._introAnimationTimer = null;
         this._clipboardMonitorEnabled = false;
         this._clipboardMonitor = new ClipboardMonitor({
+            japaneseUtil,
             clipboardReader: {
                 getText: async () => (await api.clipboardGet())
             }
@@ -129,7 +130,7 @@ class DisplaySearch extends Display {
     postProcessQuery(query) {
         if (this._wanakanaEnabled) {
             try {
-                query = wanakana.toKana(query);
+                query = this._japaneseUtil.convertToKana(query);
             } catch (e) {
                 // NOP
             }

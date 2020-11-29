@@ -21,7 +21,10 @@
 
 (async () => {
     try {
-        const displayGenerator = new DisplayGenerator({mediaLoader: null});
+        const displayGenerator = new DisplayGenerator({
+            japaneseUtil: null,
+            mediaLoader: null
+        });
         await displayGenerator.prepare();
         displayGenerator.preparePitchAccents();
     } catch (e) {

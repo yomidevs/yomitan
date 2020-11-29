@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const jp = (() => {
+const JapaneseUtil = (() => {
     const ITERATION_MARK_CODE_POINT = 0x3005;
     const HIRAGANA_SMALL_TSU_CODE_POINT = 0x3063;
     const KATAKANA_SMALL_TSU_CODE_POINT = 0x30c3;
@@ -179,19 +179,8 @@ const jp = (() => {
         }
     }
 
-    function getWanakana() {
-        try {
-            if (typeof wanakana !== 'undefined') {
-                // eslint-disable-next-line no-undef
-                return wanakana;
-            }
-        } catch (e) {
-            // NOP
-        }
-        return null;
-    }
 
-
+    // eslint-disable-next-line no-shadow
     class JapaneseUtil {
         constructor(wanakana=null) {
             this._wanakana = wanakana;
@@ -257,6 +246,10 @@ const jp = (() => {
         }
 
         // Conversion functions
+
+        convertToKana(text) {
+            return this._getWanakana().toKana(text);
+        }
 
         convertKatakanaToHiragana(text) {
             let result = '';
@@ -591,5 +584,5 @@ const jp = (() => {
     }
 
 
-    return new JapaneseUtil(getWanakana());
+    return JapaneseUtil;
 })();

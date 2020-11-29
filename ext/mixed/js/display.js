@@ -34,9 +34,10 @@
  */
 
 class Display extends EventDispatcher {
-    constructor(pageType) {
+    constructor(pageType, japaneseUtil) {
         super();
         this._pageType = pageType;
+        this._japaneseUtil = japaneseUtil;
         this._container = document.querySelector('#definitions');
         this._definitions = [];
         this._optionsContext = {depth: 0, url: window.location.href};
@@ -53,7 +54,10 @@ class Display extends EventDispatcher {
         this._autoPlayAudioTimer = null;
         this._autoPlayAudioDelay = 400;
         this._mediaLoader = new MediaLoader();
-        this._displayGenerator = new DisplayGenerator({mediaLoader: this._mediaLoader});
+        this._displayGenerator = new DisplayGenerator({
+            japaneseUtil,
+            mediaLoader: this._mediaLoader
+        });
         this._hotkeys = new Map();
         this._actions = new Map();
         this._messageHandlers = new Map();
@@ -175,6 +179,10 @@ class Display extends EventDispatcher {
 
     get mode() {
         return this._mode;
+    }
+
+    get japaneseUtil() {
+        return this._japaneseUtil;
     }
 
     async prepare() {
