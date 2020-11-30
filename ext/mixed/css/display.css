@@ -611,6 +611,9 @@ button.action-button {
     display: inline-block;
     color: var(--reason-text-color);
 }
+.term-reasons:empty {
+    display: none;
+}
 .term-reasons>.term-reason+.term-reason-separator+.term-reason::before {
     content: " \00AB  "; /* The two spaces is not a typo */
     white-space: pre-wrap;
@@ -1149,7 +1152,18 @@ button.action-button {
     display: inline;
     color: var(--light-text-color);
 }
+:root[data-glossary-layout-mode=compact] .entry:not([data-type=term][data-expression-multi=true]) .term-special-tags {
+    display: none;
+}
+:root[data-glossary-layout-mode=compact] .term-expression-details>.frequencies {
+    display: inline;
+}
 
+:root[data-glossary-layout-mode=compact] .term-pitch-accent-container {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
 :root[data-show-pitch-accent-downstep-notation=true] .term-pitch-accent-disambiguation-list[data-expression-count="0"],
 :root[data-show-pitch-accent-downstep-notation=true] .term-pitch-accent-disambiguation[data-type=reading] {
     display: none;
