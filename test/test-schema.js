@@ -358,6 +358,19 @@ function testValidate2() {
                 {expected: false, value: 1}
             ]
         },
+        {
+            schema: {
+                type: 'integer',
+                multipleOf: 2
+            },
+            inputs: [
+                {expected: true,  value: -2},
+                {expected: false, value: -1},
+                {expected: true,  value: 0},
+                {expected: false, value: 1},
+                {expected: true,  value: 2}
+            ]
+        },
 
         // Numeric type tests
         {
@@ -593,6 +606,79 @@ function testGetValidValueOrDefault1() {
                 [
                     Object.create({toString: 'value'}),
                     {toString: 'default'}
+                ]
+            ]
+        },
+
+        // Test enum
+        {
+            schema: {
+                type: 'object',
+                required: ['test'],
+                properties: {
+                    test: {
+                        type: 'string',
+                        default: 'value1',
+                        enum: ['value1', 'value2', 'value3']
+                    }
+                }
+            },
+            inputs: [
+                [
+                    {test: 'value1'},
+                    {test: 'value1'}
+                ],
+                [
+                    {test: 'value2'},
+                    {test: 'value2'}
+                ],
+                [
+                    {test: 'value3'},
+                    {test: 'value3'}
+                ],
+                [
+                    {test: 'value4'},
+                    {test: 'value1'}
+                ]
+            ]
+        },
+
+        // Test valid vs invalid default
+        {
+            schema: {
+                type: 'object',
+                required: ['test'],
+                properties: {
+                    test: {
+                        type: 'integer',
+                        default: 2,
+                        minimum: 1
+                    }
+                }
+            },
+            inputs: [
+                [
+                    {test: -1},
+                    {test: 2}
+                ]
+            ]
+        },
+        {
+            schema: {
+                type: 'object',
+                required: ['test'],
+                properties: {
+                    test: {
+                        type: 'integer',
+                        default: 1,
+                        minimum: 2
+                    }
+                }
+            },
+            inputs: [
+                [
+                    {test: -1},
+                    {test: -1}
                 ]
             ]
         }

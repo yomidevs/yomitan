@@ -594,23 +594,22 @@ class JsonSchemaValidator {
         return null;
     }
 
+    _getDefaultSchemaValue(schema) {
+        const schemaType = schema.type;
+        const schemaDefault = schema.default;
+        return (
+            typeof schemaDefault !== 'undefined' &&
+            this._isValueTypeAny(schemaDefault, this._getValueType(schemaDefault), schemaType) ?
+            clone(schemaDefault) :
+            this._getDefaultTypeValue(schemaType)
+        );
+    }
+
     _getValidValueOrDefault(schema, value, info) {
         let type = this._getValueType(value);
-        const schemaType = schema.type;
-        if (typeof value === 'undefined' || !this._isValueTypeAny(value, type, schemaType)) {
-            let assignDefault = true;
-
-            const schemaDefault = schema.default;
-            if (typeof schemaDefault !== 'undefined') {
-                value = clone(schemaDefault);
-                type = this._getValueType(value);
-                assignDefault = !this._isValueTypeAny(value, type, schemaType);
-            }
-
-            if (assignDefault) {
-                value = this._getDefaultTypeValue(schemaType);
-                type = this._getValueType(value);
-            }
+        if (typeof value === 'undefined' || !this._isValueTypeAny(value, type, schema.type)) {
+            value = this._getDefaultSchemaValue(schema);
+            type = this._getValueType(value);
         }
 
         switch (type) {
@@ -619,6 +618,14 @@ class JsonSchemaValidator {
                 break;
             case 'array':
                 value = this._populateArrayDefaults(value, schema, info);
+                break;
+            default:
+                if (!this.isValid(value, schema)) {
+                    const schemaDefault = this._getDefaultSchemaValue(schema);
+                    if (this.isValid(schemaDefault, schema)) {
+                        value = schemaDefault;
+                    }
+                }
                 break;
         }
 
