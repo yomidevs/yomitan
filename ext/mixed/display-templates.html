@@ -97,6 +97,24 @@
 
 <!-- Tag templates -->
 <template id="tag-template"><span class="tag"><span class="tag-inner"></span></span></template>
-<template id="tag-frequency-template"><span class="tag" data-category="frequency"><span class="tag-inner"><span class="term-frequency-disambiguation"><span class="term-frequency-disambiguation-expression"></span><span class="term-frequency-disambiguation-separator"></span><span class="term-frequency-disambiguation-reading"></span></span><span class="term-frequency-dictionary-name"></span><span class="term-frequency-separator"></span><span class="term-frequency-value"></span></span></span></template>
+<template id="term-tag-frequency-template" data-remove-whitespace-text="true"><span class="tag" data-category="frequency">
+    <span class="tag-inner">
+        <span class="tag-frequency-disambiguation">
+            <span class="tag-frequency-disambiguation-expression"></span>
+            <span class="tag-frequency-disambiguation-separator"></span>
+            <span class="tag-frequency-disambiguation-reading"></span>
+        </span>
+        <span class="tag-frequency-dictionary-name"></span>
+        <span class="tag-frequency-separator"></span>
+        <span class="tag-frequency-value"></span>
+    </span>
+</span></template>
+<template id="kanji-tag-frequency-template" data-remove-whitespace-text="true"><span class="tag" data-category="frequency">
+    <span class="tag-inner">
+        <span class="tag-frequency-dictionary-name"></span>
+        <span class="tag-frequency-separator"></span>
+        <span class="tag-frequency-value"></span>
+    </span>
+</span></template>
 
 </body></html>

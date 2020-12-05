@@ -553,6 +553,27 @@ button.action-button {
 .tag-inner {
     display: block;
 }
+.tag-frequency-separator::before {
+    content: ":";
+}
+.tag-frequency-disambiguation-separator::before {
+    content: ":";
+}
+.tag-frequency-disambiguation::before {
+    content: "(";
+}
+.tag-frequency-disambiguation::after {
+    content: ") ";
+}
+.frequencies .tag[data-reading-is-same=true] .tag-frequency-disambiguation-separator,
+.frequencies .tag[data-reading-is-same=true] .tag-frequency-disambiguation-reading,
+.entry[data-unique-expression-count="1"] .tag-frequency-disambiguation-separator,
+.entry[data-unique-expression-count="1"] .tag-frequency-disambiguation-expression,
+.entry[data-unique-reading-count="1"] .tag-frequency-disambiguation-separator,
+.entry[data-unique-reading-count="1"] .tag-frequency-disambiguation-reading,
+.entry[data-unique-expression-count="1"][data-unique-reading-count="1"] .tag-frequency-disambiguation {
+    display: none;
+}
 
 
 /* Entries */
@@ -644,27 +665,6 @@ button.action-button {
 .term-expression-list>.term-expression:not(:last-of-type)>.term-expression-text-container>.term-expression-text::after {
     content: "\3001";
 }
-.term-frequency-separator::before {
-    content: ":";
-}
-.term-frequency-disambiguation-separator::before {
-    content: ":";
-}
-.term-frequency-disambiguation::before {
-    content: "(";
-}
-.term-frequency-disambiguation::after {
-    content: ") ";
-}
-.frequencies .tag[data-reading-is-same=true] .term-frequency-disambiguation-separator,
-.frequencies .tag[data-reading-is-same=true] .term-frequency-disambiguation-reading,
-.entry[data-unique-expression-count="1"] .term-frequency-disambiguation-separator,
-.entry[data-unique-expression-count="1"] .term-frequency-disambiguation-expression,
-.entry[data-unique-reading-count="1"] .term-frequency-disambiguation-separator,
-.entry[data-unique-reading-count="1"] .term-frequency-disambiguation-reading,
-.entry[data-unique-expression-count="1"][data-unique-reading-count="1"] .term-frequency-disambiguation {
-    display: none;
-}
 
 
 /* Merged term styles */
@@ -708,7 +708,7 @@ button.action-button {
     bottom: -1.9em;
     white-space: nowrap;
 }
-.entry[data-expression-multi=true] .term-expression-list .term-expression-details>.frequencies .term-frequency-disambiguation {
+.entry[data-expression-multi=true] .term-expression-list .term-expression-details>.frequencies .tag-frequency-disambiguation {
     display: none;
 }
 
