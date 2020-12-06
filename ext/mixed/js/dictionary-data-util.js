@@ -17,20 +17,17 @@
 
 class DictionaryDataUtil {
     static getPitchAccentInfos(definition) {
-        const {type} = definition;
-        if (type === 'kanji') { return []; }
+        if (definition.type === 'kanji') { return []; }
 
         const results = new Map();
         const allExpressions = new Set();
         const allReadings = new Set();
-        const sources = [definition];
 
-        for (const {pitches: expressionPitches, expression} of sources) {
+        for (const {expression, reading, pitches: expressionPitches} of definition.expressions) {
             allExpressions.add(expression);
+            allReadings.add(reading);
 
-            for (const {reading, pitches, dictionary} of expressionPitches) {
-                allReadings.add(reading);
-
+            for (const {pitches, dictionary} of expressionPitches) {
                 let dictionaryResults = results.get(dictionary);
                 if (typeof dictionaryResults === 'undefined') {
                     dictionaryResults = [];
