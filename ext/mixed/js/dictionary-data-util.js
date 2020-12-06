@@ -23,7 +23,8 @@ class DictionaryDataUtil {
         const allExpressions = new Set();
         const allReadings = new Set();
 
-        for (const {expression, reading, pitches: expressionPitches} of definition.expressions) {
+        for (let {expression, reading, pitches: expressionPitches} of definition.expressions) {
+            if (reading.length === 0) { reading = expression; }
             allExpressions.add(expression);
             allReadings.add(reading);
 
