@@ -738,6 +738,9 @@ button.action-button {
 .term-glossary-item::marker {
     color: var(--light-text-color);
 }
+.term-definition-disambiguation-list {
+    color: var(--light-text-color);
+}
 .term-definition-disambiguation-list[data-count="0"] {
     display: none;
 }
