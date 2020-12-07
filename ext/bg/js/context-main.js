@@ -30,11 +30,13 @@ class DisplayController {
         this._showExtensionInfo(manifest);
         this._setupEnvironment();
         this._setupButtonEvents('.action-open-search', 'search', chrome.runtime.getURL('/bg/search.html'));
-        this._setupButtonEvents('.action-open-options', 'options', chrome.runtime.getURL(manifest.options_ui.page));
         this._setupButtonEvents('.action-open-help', 'help', 'https://foosoft.net/projects/yomichan/');
 
         const optionsFull = await api.optionsGetFull();
         this._optionsFull = optionsFull;
+
+        const optionsPageUrl = optionsFull.global.useSettingsV2 ? '/bg/settings2.html' : manifest.options_ui.page;
+        this._setupButtonEvents('.action-open-options', 'options', chrome.runtime.getURL(optionsPageUrl));
 
         const {profiles, profileCurrent} = optionsFull;
         const primaryProfile = (profileCurrent >= 0 && profileCurrent < profiles.length) ? profiles[profileCurrent] : null;

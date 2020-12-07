@@ -797,7 +797,8 @@
             "type": "object",
             "required": [
                 "database",
-                "showPopupPreview"
+                "showPopupPreview",
+                "useSettingsV2"
             ],
             "properties": {
                 "database": {
@@ -813,6 +814,10 @@
                     }
                 },
                 "showPopupPreview": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "useSettingsV2": {
                     "type": "boolean",
                     "default": false
                 }

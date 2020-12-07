@@ -613,10 +613,12 @@ class OptionsUtil {
         // Version 6 changes:
         //  Updated handlebars templates to include "conjugation" definition.
         //  Added global option showPopupPreview.
+        //  Added global option useSettingsV2.
         //  Added anki.checkForDuplicates.
         //  Added general.glossaryLayoutMode; removed general.compactGlossaries.
         await this._addFieldTemplatesToOptions(options, '/bg/data/anki-field-templates-upgrade-v6.handlebars');
         options.global.showPopupPreview = false;
+        options.global.useSettingsV2 = false;
         for (const profile of options.profiles) {
             profile.options.anki.checkForDuplicates = true;
             profile.options.general.glossaryLayoutMode = (profile.options.general.compactGlossaries ? 'compact' : 'default');

@@ -790,12 +790,25 @@ class Backend {
     }
 
     _onCommandOptions(params) {
+        const {useSettingsV2} = this._options.global;
         const {mode='existingOrNewTab'} = params || {};
         if (mode === 'existingOrNewTab') {
+            if (useSettingsV2) {
+                (async () => {
+                    const url = chrome.runtime.getURL('/bg/settings2.html');
+                    const tab = await this._findTab(1000, (url2) => url2.startsWith(url));
+                    if (tab !== null) {
+                        await this._focusTab(tab);
+                    } else {
+                        chrome.tabs.create({url});
+                    }
+                })();
+                return;
+            }
             chrome.runtime.openOptionsPage();
         } else if (mode === 'newTab') {
             const manifest = chrome.runtime.getManifest();
-            const url = chrome.runtime.getURL(manifest.options_ui.page);
+            const url = chrome.runtime.getURL(useSettingsV2 ? '/bg/settings2.html' : manifest.options_ui.page);
             chrome.tabs.create({url});
         }
     }
