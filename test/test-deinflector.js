@@ -480,9 +480,10 @@ function testDeinflections() {
                 {term: '為る', source: '為た',           rule: 'vs', reasons: ['past']},
                 {term: '為る', source: '為ました',       rule: 'vs', reasons: ['polite past']},
                 {term: '為る', source: '為て',           rule: 'vs', reasons: ['-te']},
-                // ['potential']
+                {term: '為る', source: '為られる',       rule: 'vs', reasons: ['potential or passive']},
                 {term: '為る', source: '為れる',         rule: 'vs', reasons: ['passive']},
                 {term: '為る', source: '為せる',         rule: 'vs', reasons: ['causative']},
+                {term: '為る', source: '為させる',       rule: 'vs', reasons: ['causative']},
                 {term: '為る', source: '為せられる',     rule: 'vs', reasons: ['causative', 'potential or passive']},
                 {term: '為る', source: '為ろ',           rule: 'vs', reasons: ['imperative']},
                 {term: '為る', source: '為ない',         rule: 'vs', reasons: ['negative']},
@@ -521,9 +522,10 @@ function testDeinflections() {
                 {term: 'する', source: 'した',           rule: 'vs', reasons: ['past']},
                 {term: 'する', source: 'しました',       rule: 'vs', reasons: ['polite past']},
                 {term: 'する', source: 'して',           rule: 'vs', reasons: ['-te']},
-                // ['potential']
+                {term: 'する', source: 'せられる',       rule: 'vs', reasons: ['potential or passive']},
                 {term: 'する', source: 'される',         rule: 'vs', reasons: ['passive']},
                 {term: 'する', source: 'させる',         rule: 'vs', reasons: ['causative']},
+                {term: 'する', source: 'せさせる',       rule: 'vs', reasons: ['causative']},
                 {term: 'する', source: 'させられる',     rule: 'vs', reasons: ['causative', 'potential or passive']},
                 {term: 'する', source: 'しろ',           rule: 'vs', reasons: ['imperative']},
                 {term: 'する', source: 'しない',         rule: 'vs', reasons: ['negative']},

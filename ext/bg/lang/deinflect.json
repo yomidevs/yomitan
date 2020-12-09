@@ -257,6 +257,8 @@
         {"kanaIn": "わせる", "kanaOut": "う", "rulesIn": ["v1"], "rulesOut": ["v5"]},
         {"kanaIn": "させる", "kanaOut": "する", "rulesIn": ["v1"], "rulesOut": ["vs"]},
         {"kanaIn": "為せる", "kanaOut": "為る", "rulesIn": ["v1"], "rulesOut": ["vs"]},
+        {"kanaIn": "せさせる", "kanaOut": "する", "rulesIn": ["v1"], "rulesOut": ["vs"]},
+        {"kanaIn": "為させる", "kanaOut": "為る", "rulesIn": ["v1"], "rulesOut": ["vs"]},
         {"kanaIn": "こさせる", "kanaOut": "くる", "rulesIn": ["v1"], "rulesOut": ["vk"]},
         {"kanaIn": "来させる", "kanaOut": "来る", "rulesIn": ["v1"], "rulesOut": ["vk"]},
         {"kanaIn": "來させる", "kanaOut": "來る", "rulesIn": ["v1"], "rulesOut": ["vk"]}
@@ -496,6 +498,8 @@
     ],
     "potential or passive": [
         {"kanaIn": "られる", "kanaOut": "る", "rulesIn": ["v1"], "rulesOut": ["v1"]},
+        {"kanaIn": "せられる", "kanaOut": "する", "rulesIn": ["v1"], "rulesOut": ["vs"]},
+        {"kanaIn": "為られる", "kanaOut": "為る", "rulesIn": ["v1"], "rulesOut": ["vs"]},
         {"kanaIn": "こられる", "kanaOut": "くる", "rulesIn": ["v1"], "rulesOut": ["vk"]},
         {"kanaIn": "来られる", "kanaOut": "来る", "rulesIn": ["v1"], "rulesOut": ["vk"]},
         {"kanaIn": "來られる", "kanaOut": "來る", "rulesIn": ["v1"], "rulesOut": ["vk"]}
