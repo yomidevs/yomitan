@@ -29,6 +29,7 @@ function createTestDictionaryArchive(dictionary, dictionaryName) {
 async function main() {
     const dictionaries = [
         {name: 'valid-dictionary1', valid: true},
+        {name: 'valid-dictionary2', valid: true},
         {name: 'invalid-dictionary1', valid: false},
         {name: 'invalid-dictionary2', valid: false},
         {name: 'invalid-dictionary3', valid: false},

@@ -1,0 +1,42 @@
+[
+    [
+        "打",
+        "ダ ダアス",
+        "う.つ う.ち- ぶ.つ",
+        "ktag1 ktag2",
+        [
+            "meaning1",
+            "meaning2",
+            "meaning3",
+            "meaning4",
+            "meaning5"
+        ],
+        {
+            "kstat1": "1",
+            "kstat2": "2",
+            "kstat3": "3",
+            "kstat4": "4",
+            "kstat5": "5"
+        }
+    ],
+    [
+        "込",
+        "",
+        "-こ.む こ.む こ.み -こ.み こ.める",
+        "ktag1 ktag2",
+        [
+            "meaning1",
+            "meaning2",
+            "meaning3",
+            "meaning4",
+            "meaning5"
+        ],
+        {
+            "kstat1": "1",
+            "kstat2": "2",
+            "kstat3": "3",
+            "kstat4": "4",
+            "kstat5": "5"
+        }
+    ]
+]

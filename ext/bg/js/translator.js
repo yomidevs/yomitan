@@ -55,10 +55,11 @@ class Translator {
     /**
      * Finds term definitions for the given text.
      * @param mode The mode to use for finding terms, which determines the format of the resulting array.
+     *   One of: 'group', 'merge', 'split', 'simple'
      * @param text The text to find terms for.
      * @param options An object using the following structure:
      *   {
-     *     wildcard: (null or string),
+     *     wildcard: (enum: null, 'prefix', 'suffix'),
      *     mainDictionary: (string),
      *     alphanumeric: (boolean),
      *     convertHalfWidthCharacters: (enum: 'false', 'true', 'variant'),

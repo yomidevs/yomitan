@@ -15,102 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const fs = require('fs');
-const url = require('url');
 const path = require('path');
 const assert = require('assert');
-const {JSZip, createDictionaryArchive, testMain} = require('../dev/util');
-const {VM} = require('../dev/vm');
-require('fake-indexeddb/auto');
-
-const chrome = {
-    runtime: {
-        onMessage: {
-            addListener() { /* NOP */ },
-            removeListener() { /* NOP */ }
-        },
-        getURL(path2) {
-            return url.pathToFileURL(path.join(__dirname, '..', 'ext', path2.replace(/^\//, ''))).href;
-        },
-        sendMessage() {
-            // NOP
-        }
-    }
-};
-
-class Image {
-    constructor() {
-        this._src = '';
-        this._loadCallbacks = [];
-    }
-
-    get src() {
-        return this._src;
-    }
-
-    set src(value) {
-        this._src = value;
-        this._delayTriggerLoad();
-    }
-
-    get naturalWidth() {
-        return 100;
-    }
-
-    get naturalHeight() {
-        return 100;
-    }
-
-    addEventListener(eventName, callback) {
-        if (eventName === 'load') {
-            this._loadCallbacks.push(callback);
-        }
-    }
-
-    removeEventListener(eventName, callback) {
-        if (eventName === 'load') {
-            const index = this._loadCallbacks.indexOf(callback);
-            if (index >= 0) {
-                this._loadCallbacks.splice(index, 1);
-            }
-        }
-    }
-
-    async _delayTriggerLoad() {
-        await Promise.resolve();
-        for (const callback of this._loadCallbacks) {
-            callback();
-        }
-    }
-}
-
-async function fetch(url2) {
-    const filePath = url.fileURLToPath(url2);
-    await Promise.resolve();
-    const content = fs.readFileSync(filePath, {encoding: null});
-    return {
-        ok: true,
-        status: 200,
-        statusText: 'OK',
-        text: async () => Promise.resolve(content.toString('utf8')),
-        json: async () => Promise.resolve(JSON.parse(content.toString('utf8')))
-    };
-}
+const {createDictionaryArchive, testMain} = require('../dev/util');
+const {DatabaseVM} = require('../dev/database-vm');
 
 
-const vm = new VM({
-    chrome,
-    Image,
-    fetch,
-    indexedDB: global.indexedDB,
-    IDBKeyRange: global.IDBKeyRange,
-    JSZip,
-    addEventListener() {
-        // NOP
-    }
-});
-vm.context.window = vm.context;
-
+const vm = new DatabaseVM();
 vm.execute([
     'mixed/js/core.js',
     'mixed/js/cache-map.js',
@@ -155,7 +66,7 @@ function clearDatabase(timeout) {
         }, timeout);
 
         (async () => {
-            const indexedDB = global.indexedDB;
+            const indexedDB = vm.indexedDB;
             for (const {name} of await indexedDB.databases()) {
                 await new Promise((resolve2, reject2) => {
                     const request = indexedDB.deleteDatabase(name);
@@ -477,15 +388,16 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
         {
             inputs: [
                 {
-                    sequenceList: [1, 2, 3, 4, 5, 6]
+                    sequenceList: [1, 2, 3, 4, 5]
                 }
             ],
             expectedResults: {
-                total: 32,
+                total: 33,
                 expressions: [
                     ['打', 2],
                     ['打つ', 17],
-                    ['打ち込む', 13]
+                    ['打ち込む', 13],
+                    ['画像', 1]
                 ],
                 readings: [
                     ['だ', 1],
@@ -493,7 +405,8 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
                     ['うつ', 15],
                     ['ぶつ', 2],
                     ['うちこむ', 9],
-                    ['ぶちこむ', 4]
+                    ['ぶちこむ', 4],
+                    ['がぞう', 1]
                 ]
             }
         },
@@ -536,12 +449,13 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
                 }
             ],
             expectedResults: {
-                total: 15,
+                total: 17,
                 expressions: [
-                    ['打つ', 15]
+                    ['打つ', 17]
                 ],
                 readings: [
-                    ['うつ', 15]
+                    ['うつ', 15],
+                    ['ぶつ', 2]
                 ]
             }
         },
@@ -552,12 +466,13 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
                 }
             ],
             expectedResults: {
-                total: 2,
+                total: 13,
                 expressions: [
-                    ['打つ', 2]
+                    ['打ち込む', 13]
                 ],
                 readings: [
-                    ['ぶつ', 2]
+                    ['うちこむ', 9],
+                    ['ぶちこむ', 4]
                 ]
             }
         },
@@ -568,28 +483,12 @@ async function testFindTermsBySequenceBulk1(database, mainDictionary) {
                 }
             ],
             expectedResults: {
-                total: 9,
+                total: 1,
                 expressions: [
-                    ['打ち込む', 9]
+                    ['画像', 1]
                 ],
                 readings: [
-                    ['うちこむ', 9]
-                ]
-            }
-        },
-        {
-            inputs: [
-                {
-                    sequenceList: [6]
-                }
-            ],
-            expectedResults: {
-                total: 4,
-                expressions: [
-                    ['打ち込む', 4]
-                ],
-                readings: [
-                    ['ぶちこむ', 4]
+                    ['がぞう', 1]
                 ]
             }
         },
