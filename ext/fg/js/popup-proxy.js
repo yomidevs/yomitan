@@ -149,6 +149,14 @@ class PopupProxy extends EventDispatcher {
         return new DOMRect(0, 0, 0, 0);
     }
 
+    getFrameSize() {
+        return this._invokeSafe('popup.getFrameSize', {id: this._id}, {width: 0, height: 0, valid: false});
+    }
+
+    setFrameSize(width, height) {
+        return this._invokeSafe('popup.setFrameSize', {id: this._id, width, height});
+    }
+
     // Private
 
     _invoke(action, params={}) {

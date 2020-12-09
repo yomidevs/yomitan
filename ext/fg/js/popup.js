@@ -208,6 +208,16 @@ class Popup extends EventDispatcher {
         return this._frame.getBoundingClientRect();
     }
 
+    async getFrameSize() {
+        const rect = this._frame.getBoundingClientRect();
+        return {width: rect.width, height: rect.height, valid: true};
+    }
+
+    async setFrameSize(width, height) {
+        this._setFrameSize(width, height);
+        return true;
+    }
+
     // Private functions
 
     _onFrameMouseOver() {
@@ -397,13 +407,18 @@ class Popup extends EventDispatcher {
 
         frame.style.left = `${x}px`;
         frame.style.top = `${y}px`;
-        frame.style.width = `${width}px`;
-        frame.style.height = `${height}px`;
+        this._setFrameSize(width, height);
 
         this._setVisible(true);
         if (this._child !== null) {
             this._child.hide(true);
         }
+    }
+
+    _setFrameSize(width, height) {
+        const {style} = this._frame;
+        style.width = `${width}px`;
+        style.height = `${height}px`;
     }
 
     _setVisible(visible) {

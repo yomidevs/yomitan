@@ -119,7 +119,9 @@ class Frontend {
             ['copySelection',           {async: false, handler: this._onApiCopySelection.bind(this)}],
             ['getSelectionText',        {async: false, handler: this._onApiGetSelectionText.bind(this)}],
             ['getPopupInfo',            {async: false, handler: this._onApiGetPopupInfo.bind(this)}],
-            ['getDocumentInformation',  {async: false, handler: this._onApiGetDocumentInformation.bind(this)}]
+            ['getDocumentInformation',  {async: false, handler: this._onApiGetDocumentInformation.bind(this)}],
+            ['getFrameSize',            {async: true,  handler: this._onApiGetFrameSize.bind(this)}],
+            ['setFrameSize',            {async: true,  handler: this._onApiSetFrameSize.bind(this)}]
         ]);
 
         this._updateContentScale();
@@ -201,6 +203,14 @@ class Frontend {
 
     async _onApiClearAllVisibleOverride({token}) {
         return await this._popupFactory.clearAllVisibleOverride(token);
+    }
+
+    async _onApiGetFrameSize() {
+        return await this._popup.getFrameSize();
+    }
+
+    async _onApiSetFrameSize({width, height}) {
+        return await this._popup.setFrameSize(width, height);
     }
 
     // Private

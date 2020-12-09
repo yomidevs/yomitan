@@ -109,6 +109,11 @@ class Display extends EventDispatcher {
         this._browser = null;
         this._copyTextarea = null;
         this._definitionTextScanner = null;
+        this._frameResizeToken = null;
+        this._frameResizeHandle = document.querySelector('#frame-resizer-handle');
+        this._frameResizeStartSize = null;
+        this._frameResizeStartOffset = null;
+        this._frameResizeEventListeners = new EventListenerCollection();
 
         this.registerActions([
             ['close',             () => { this.onEscape(); }],
@@ -226,6 +231,10 @@ class Display extends EventDispatcher {
         }
         if (this._navigationNextButton !== null) {
             this._navigationNextButton.addEventListener('click', this._onNextTermView.bind(this), false);
+        }
+
+        if (this._frameResizeHandle !== null) {
+            this._frameResizeHandle.addEventListener('mousedown', this._onFrameResizerMouseDown.bind(this), false);
         }
 
         // Final preparation
@@ -801,6 +810,7 @@ class Display extends EventDispatcher {
         data.showPitchAccentPositionNotation = `${options.general.showPitchAccentPositionNotation}`;
         data.showPitchAccentGraph = `${options.general.showPitchAccentGraph}`;
         data.debug = `${options.general.debugInfo}`;
+        data.popupDisplayMode = `${options.general.popupDisplayMode}`;
     }
 
     _updateTheme(themeName) {
@@ -1794,5 +1804,69 @@ class Display extends EventDispatcher {
         };
         this._definitionTextScanner.clearSelection(true);
         this.setContent(details);
+    }
+
+    _onFrameResizerMouseDown(e) {
+        if (e.button !== 0) { return; }
+        // Don't do e.preventDefault() here; this allows mousemove events to be processed
+        // if the pointer moves out of the frame.
+        this._startFrameResize(e);
+    }
+
+    _onFrameResizerMouseUp() {
+        this._stopFrameResize();
+    }
+
+    _onFrameResizerWindowBlur() {
+        this._stopFrameResize();
+    }
+
+    _onFrameResizerMouseMove(e) {
+        if ((e.buttons & 0x1) === 0x0) {
+            this._stopFrameResize();
+        } else {
+            if (this._frameResizeStartSize === null) { return; }
+            const {clientX: x, clientY: y} = e;
+            this._updateFrameSize(x, y);
+        }
+    }
+
+    _startFrameResize(e) {
+        if (this._frameResizeToken !== null) { return; }
+
+        const {clientX: x, clientY: y} = e;
+        const token = {};
+        this._frameResizeToken = token;
+        this._frameResizeStartOffset = {x, y};
+        this._frameResizeEventListeners.addEventListener(window, 'mouseup', this._onFrameResizerMouseUp.bind(this), false);
+        this._frameResizeEventListeners.addEventListener(window, 'blur', this._onFrameResizerWindowBlur.bind(this), false);
+        this._frameResizeEventListeners.addEventListener(window, 'mousemove', this._onFrameResizerMouseMove.bind(this), false);
+
+        this._initializeFrameResize(token);
+    }
+
+    async _initializeFrameResize(token) {
+        const size = await this._invokeOwner('getFrameSize');
+        if (this._frameResizeToken !== token) { return; }
+        this._frameResizeStartSize = size;
+    }
+
+    _stopFrameResize() {
+        if (this._frameResizeToken === null) { return; }
+
+        this._frameResizeEventListeners.removeAllEventListeners();
+        this._frameResizeStartSize = null;
+        this._frameResizeStartOffset = null;
+        this._frameResizeToken = null;
+    }
+
+    async _updateFrameSize(x, y) {
+        const handleSize = this._frameResizeHandle.getBoundingClientRect();
+        let {width, height} = this._frameResizeStartSize;
+        width += x - this._frameResizeStartOffset.x;
+        height += y - this._frameResizeStartOffset.y;
+        width = Math.max(Math.max(0, handleSize.width), width);
+        height = Math.max(Math.max(0, handleSize.height), height);
+        await this._invokeOwner('setFrameSize', {width, height});
     }
 }

@@ -22,7 +22,7 @@ iframe.yomichan-popup {
     border: 1em solid #999999;
     box-shadow: 0 0 10em rgba(0, 0, 0, 0.5);
     position: fixed;
-    resize: both;
+    resize: none;
     visibility: hidden;
     z-index: 2147483647;
     box-sizing: border-box;
@@ -38,7 +38,6 @@ iframe.yomichan-popup[data-outer-theme=auto][data-site-color=dark] {
 iframe.yomichan-popup[data-popup-display-mode=full-width] {
     border-left: none;
     border-right: none;
-    resize: none;
 }
 iframe.yomichan-popup[data-popup-display-mode=full-width][data-below=true] {
     border-bottom: none;

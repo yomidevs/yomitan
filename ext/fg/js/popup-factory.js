@@ -48,7 +48,9 @@ class PopupFactory {
             ['clearAutoPlayTimer',   {async: false, handler: this._onApiClearAutoPlayTimer.bind(this)}],
             ['setContentScale',      {async: false, handler: this._onApiSetContentScale.bind(this)}],
             ['updateTheme',          {async: false, handler: this._onApiUpdateTheme.bind(this)}],
-            ['setCustomOuterCss',    {async: false, handler: this._onApiSetCustomOuterCss.bind(this)}]
+            ['setCustomOuterCss',    {async: false, handler: this._onApiSetCustomOuterCss.bind(this)}],
+            ['popup.getFrameSize',   {async: true,  handler: this._onApiGetFrameSize.bind(this)}],
+            ['popup.setFrameSize',   {async: true,  handler: this._onApiSetFrameSize.bind(this)}]
         ]);
     }
 
@@ -263,6 +265,16 @@ class PopupFactory {
     _onApiSetCustomOuterCss({id, css, useWebExtensionApi}) {
         const popup = this._getPopup(id);
         return popup.setCustomOuterCss(css, useWebExtensionApi);
+    }
+
+    async _onApiGetFrameSize({id}) {
+        const popup = this._getPopup(id);
+        return await popup.getFrameSize();
+    }
+
+    async _onApiSetFrameSize({id, width, height}) {
+        const popup = this._getPopup(id);
+        return await popup.setFrameSize(width, height);
     }
 
     // Private functions

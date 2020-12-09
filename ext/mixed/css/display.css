@@ -1119,6 +1119,52 @@ button.action-button {
 }
 
 
+/* Frame resizer */
+.frame-resizer-container {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 100;
+    background: transparent;
+    pointer-events: none;
+    user-select: none;
+}
+.frame-resizer-sizer1 {
+    padding-top: 100%;
+    line-height: 0;
+}
+.frame-resizer-sizer2 {
+    display: inline-block;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    vertical-align: bottom;
+}
+.frame-resizer-sizer2.frame-resizer-sizer2-with-min-size {
+    min-width: 1em;
+}
+.frame-resizer-svg {
+    display: block;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 75%;
+    height: 75%;
+}
+.frame-resizer-handle {
+    fill: var(--default-text-color);
+    opacity: 0.125;
+    cursor: se-resize;
+    pointer-events: auto;
+    transition:
+        fill var(--animation-duration) linear,
+        opacity var(--animation-duration) linear;
+}
+.frame-resizer-handle:hover {
+    fill: var(--accent-color);
+    opacity: 1;
+}
+
+
 /* Conditional styles */
 :root:not([data-enable-search-tags=true]) .tag[data-category=search] {
     display: none;
@@ -1220,4 +1266,8 @@ button.action-button {
 }
 :root:not([data-glossary-layout-mode=compact]) .term-glossary-image-description {
     display: block;
+}
+
+:root[data-popup-display-mode=full-width] .frame-resizer-container {
+    display: none;
 }
