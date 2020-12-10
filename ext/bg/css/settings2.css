@@ -281,6 +281,7 @@ h3 {
     overflow-y: scroll;
     position: relative;
     align-items: stretch;
+    justify-content: center;
 }
 .content-left {
     flex: 1 1 0;
@@ -608,6 +609,9 @@ h3 {
     padding: var(--settings-group-inner-vertical-padding) var(--settings-group-inner-horizontal-padding-half) var(--settings-group-inner-vertical-padding) var(--settings-group-inner-horizontal-padding);
     flex: 1 1 auto;
     align-self: center;
+}
+.settings-item-left:last-child {
+    padding-right: var(--settings-group-inner-horizontal-padding);
 }
 .settings-item-right {
     margin-top: calc(var(--settings-group-inner-vertical-margin) * -1);
