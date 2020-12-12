@@ -22,6 +22,10 @@ const assert = require('assert');
 const {getAllFiles} = require('../util');
 
 
+function escapeRegExp(string) {
+    return string.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&');
+}
+
 function countOccurences(string, pattern) {
     return (string.match(pattern) || []).length;
 }
@@ -38,13 +42,12 @@ function getNewline(string) {
 }
 
 function getSubstringCount(string, substring) {
-    let start = 0;
     let count = 0;
+    const pattern = new RegExp(`\\b${escapeRegExp(substring)}\\b`, 'g');
     while (true) {
-        const pos = string.indexOf(substring, start);
-        if (pos < 0) { break; }
+        const match = pattern.exec(string);
+        if (match === null) { break; }
         ++count;
-        start = pos + substring.length;
     }
     return count;
 }

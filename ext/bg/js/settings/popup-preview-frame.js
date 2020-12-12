@@ -17,7 +17,6 @@
 
 /* global
  * Frontend
- * Popup
  * TextSourceRange
  * api
  * wanakana

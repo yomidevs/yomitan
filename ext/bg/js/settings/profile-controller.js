@@ -16,7 +16,6 @@
  */
 
 /* global
- * Modal
  * ProfileConditionsUI
  * api
  */

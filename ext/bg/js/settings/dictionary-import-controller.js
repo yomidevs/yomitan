@@ -18,7 +18,6 @@
 /* global
  * DictionaryDatabase
  * DictionaryImporter
- * Modal
  * ObjectPropertyAccessor
  * api
  */

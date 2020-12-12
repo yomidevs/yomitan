@@ -17,7 +17,6 @@
 
 /* global
  * DictionaryDatabase
- * Modal
  * ObjectPropertyAccessor
  * api
  */

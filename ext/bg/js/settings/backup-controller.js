@@ -17,7 +17,6 @@
 
 /* global
  * DictionaryController
- * Modal
  * OptionsUtil
  * api
  */

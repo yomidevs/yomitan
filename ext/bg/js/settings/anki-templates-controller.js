@@ -17,7 +17,6 @@
 
 /* global
  * AnkiNoteBuilder
- * Modal
  * TemplateRendererProxy
  * api
  */
