@@ -49,6 +49,12 @@ class AnkiConnect {
         }
     }
 
+    async getVersion() {
+        if (!this._enabled) { return null; }
+        await this._checkVersion();
+        return await this._invoke('version', {});
+    }
+
     async addNote(note) {
         if (!this._enabled) { return null; }
         await this._checkVersion();

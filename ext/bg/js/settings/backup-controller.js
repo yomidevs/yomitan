@@ -31,24 +31,40 @@ class BackupController {
         this._settingsResetModal = null;
         this._settingsImportErrorModal = null;
         this._settingsImportWarningModal = null;
-        this._optionsUtil = new OptionsUtil();
+        this._optionsUtil = null;
+        try {
+            this._optionsUtil = new OptionsUtil();
+        } catch (e) {
+            // NOP
+        }
     }
 
     async prepare() {
-        await this._optionsUtil.prepare();
+        if (this._optionsUtil !== null) {
+            await this._optionsUtil.prepare();
+        }
 
-        this._settingsResetModal = this._modalController.getModal('settings-reset');
-        this._settingsImportErrorModal = this._modalController.getModal('settings-import-error');
-        this._settingsImportWarningModal = this._modalController.getModal('settings-import-warning');
+        if (this._modalController !== null) {
+            this._settingsResetModal = this._modalController.getModal('settings-reset');
+            this._settingsImportErrorModal = this._modalController.getModal('settings-import-error');
+            this._settingsImportWarningModal = this._modalController.getModal('settings-import-warning');
+        }
 
-        document.querySelector('#settings-export-button').addEventListener('click', this._onSettingsExportClick.bind(this), false);
-        document.querySelector('#settings-import-button').addEventListener('click', this._onSettingsImportClick.bind(this), false);
-        document.querySelector('#settings-import-file').addEventListener('change', this._onSettingsImportFileChange.bind(this), false);
-        document.querySelector('#settings-reset-button').addEventListener('click', this._onSettingsResetClick.bind(this), false);
-        document.querySelector('#settings-reset-confirm-button').addEventListener('click', this._onSettingsResetConfirmClick.bind(this), false);
+        this._addNodeEventListener('#settings-export-button', 'click', this._onSettingsExportClick.bind(this), false);
+        this._addNodeEventListener('#settings-import-button', 'click', this._onSettingsImportClick.bind(this), false);
+        this._addNodeEventListener('#settings-import-file', 'change', this._onSettingsImportFileChange.bind(this), false);
+        this._addNodeEventListener('#settings-reset-button', 'click', this._onSettingsResetClick.bind(this), false);
+        this._addNodeEventListener('#settings-reset-confirm-button', 'click', this._onSettingsResetConfirmClick.bind(this), false);
     }
 
     // Private
+
+    _addNodeEventListener(selector, ...args) {
+        const node = document.querySelector(selector);
+        if (node === null) { return; }
+
+        node.addEventListener(...args);
+    }
 
     _getSettingsExportDateString(date, dateSeparator, dateTimeSeparator, timeSeparator, resolution) {
         const values = [

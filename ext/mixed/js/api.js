@@ -73,6 +73,10 @@ const api = (() => {
             return this._invoke('isAnkiConnected');
         }
 
+        getAnkiConnectVersion() {
+            return this._invoke('getAnkiConnectVersion');
+        }
+
         addAnkiNote(note) {
             return this._invoke('addAnkiNote', {note});
         }
