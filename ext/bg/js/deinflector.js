@@ -86,10 +86,11 @@ class Deinflector {
 }
 
 Deinflector.ruleTypes = new Map([
-    ['v1',    0b0000001], // Verb ichidan
-    ['v5',    0b0000010], // Verb godan
-    ['vs',    0b0000100], // Verb suru
-    ['vk',    0b0001000], // Verb kuru
-    ['adj-i', 0b0010000], // Adjective i
-    ['iru',   0b0100000] // Intermediate -iru endings for progressive or perfect tense
+    ['v1',    0b00000001], // Verb ichidan
+    ['v5',    0b00000010], // Verb godan
+    ['vs',    0b00000100], // Verb suru
+    ['vk',    0b00001000], // Verb kuru
+    ['vz',    0b00010000], // Verb zuru
+    ['adj-i', 0b00100000], // Adjective i
+    ['iru',   0b01000000] // Intermediate -iru endings for progressive or perfect tense
 ]);
