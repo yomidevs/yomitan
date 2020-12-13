@@ -71,7 +71,7 @@
             "pages": [
                 "bg/template-renderer.html"
             ],
-            "content_security_policy": "sandbox allow-scripts; script-src 'self' 'unsafe-eval'; object-src 'self'"
+            "content_security_policy": "sandbox allow-scripts; default-src 'self'; script-src 'self' 'unsafe-eval'"
         },
         "permissions": [
             "<all_urls>",
@@ -103,7 +103,7 @@
             "fg/float.html",
             "bg/template-renderer.html"
         ],
-        "content_security_policy": "script-src 'self'; object-src 'self'"
+        "content_security_policy": "default-src 'self'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
     },
     "variants": [
         {
@@ -146,7 +146,7 @@
                 {
                     "action": "set",
                     "path": ["content_security_policy"],
-                    "value": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+                    "value": "default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; connect-src *"
                 },
                 {
                     "action": "set",
