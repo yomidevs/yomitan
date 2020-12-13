@@ -381,7 +381,7 @@ class Display extends EventDispatcher {
     }
 
     async getDocumentTitle() {
-        if (this._pageType === 'float') {
+        if (this._pageType === 'popup') {
             return await this._getRootFrameDocumentTitle();
         }
         return document.title;
