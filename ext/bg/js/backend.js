@@ -206,7 +206,7 @@ class Backend {
 
             const options = this.getOptions({current: true});
             if (options.general.showGuide) {
-                chrome.tabs.create({url: chrome.runtime.getURL('/bg/welcome.html')});
+                this._openWelcomeGuidePage();
             }
 
             this._clipboardMonitor.on('change', this._onClipboardTextChange.bind(this));
@@ -782,41 +782,21 @@ class Backend {
                 } catch (e) {
                     // NOP
                 }
-                chrome.tabs.create({url});
+                await this._createTab(url);
                 return;
             case 'newTab':
-                chrome.tabs.create({url});
+                await this._createTab(url);
                 return;
         }
     }
 
-    _onCommandHelp() {
-        const url = chrome.runtime.getURL('/bg/info.html');
-        chrome.tabs.create({url});
+    async _onCommandHelp() {
+        await this._openInfoPage();
     }
 
-    _onCommandOptions(params) {
-        const {useSettingsV2} = this._options.global;
+    async _onCommandOptions(params) {
         const {mode='existingOrNewTab'} = params || {};
-        if (mode === 'existingOrNewTab') {
-            if (useSettingsV2) {
-                (async () => {
-                    const url = chrome.runtime.getURL('/bg/settings2.html');
-                    const tab = await this._findTab(1000, (url2) => url2.startsWith(url));
-                    if (tab !== null) {
-                        await this._focusTab(tab);
-                    } else {
-                        chrome.tabs.create({url});
-                    }
-                })();
-                return;
-            }
-            chrome.runtime.openOptionsPage();
-        } else if (mode === 'newTab') {
-            const manifest = chrome.runtime.getManifest();
-            const url = chrome.runtime.getURL(useSettingsV2 ? '/bg/settings2.html' : manifest.options_ui.page);
-            chrome.tabs.create({url});
-        }
+        await this._openSettingsPage(mode);
     }
 
     async _onCommandToggle() {
@@ -1734,5 +1714,58 @@ class Backend {
             enabledDictionaryMap.set(title, {priority, allowSecondarySearches});
         }
         return enabledDictionaryMap;
+    }
+
+    async _openWelcomeGuidePage() {
+        await this._createTab(chrome.runtime.getURL('/bg/welcome.html'));
+    }
+
+    async _openInfoPage() {
+        await this._createTab(chrome.runtime.getURL('/bg/info.html'));
+    }
+
+    async _openSettingsPage(mode) {
+        const {useSettingsV2} = this._options.global;
+        const manifest = chrome.runtime.getManifest();
+        const url = chrome.runtime.getURL(useSettingsV2 ? '/bg/settings2.html' : manifest.options_ui.page);
+        switch (mode) {
+            case 'existingOrNewTab':
+                if (useSettingsV2) {
+                    const tab = await this._findTab(1000, (url2) => url2.startsWith(url));
+                    if (tab !== null) {
+                        await this._focusTab(tab);
+                    } else {
+                        await this._createTab(url);
+                    }
+                } else {
+                    await new Promise((resolve, reject) => {
+                        chrome.runtime.openOptionsPage(() => {
+                            const e = chrome.runtime.lastError;
+                            if (e) {
+                                reject(new Error(e.message));
+                            } else {
+                                resolve();
+                            }
+                        });
+                    });
+                }
+                break;
+            case 'newTab':
+                await this._createTab(url);
+                break;
+        }
+    }
+
+    _createTab(url) {
+        return new Promise((resolve, reject) => {
+            chrome.tabs.create({url}, (tab) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve(tab);
+                }
+            });
+        });
     }
 }
