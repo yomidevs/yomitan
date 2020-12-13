@@ -184,7 +184,7 @@ class DictionaryEntry {
 }
 
 class DictionaryController {
-    constructor(settingsController, modalController, storageController, statusFooter=null) {
+    constructor(settingsController, modalController, storageController, statusFooter) {
         this._settingsController = settingsController;
         this._modalController = modalController;
         this._storageController = storageController;
