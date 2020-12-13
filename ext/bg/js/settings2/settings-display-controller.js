@@ -73,8 +73,10 @@ class SettingsDisplayController {
         });
         menuSelectorObserver.observe(document.documentElement, false);
 
-        this._contentNode.addEventListener('scroll', this._onScroll.bind(this), {passive: true});
-        this._topLink.addEventListener('click', this._onTopLinkClick.bind(this), false);
+        if (this._topLink !== null) {
+            this._contentNode.addEventListener('scroll', this._onScroll.bind(this), {passive: true});
+            this._topLink.addEventListener('click', this._onTopLinkClick.bind(this), false);
+        }
 
         window.addEventListener('keydown', this._onKeyDown.bind(this), false);
         window.addEventListener('popstate', this._onPopState.bind(this), false);

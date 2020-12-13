@@ -206,7 +206,7 @@ class Backend {
 
             const options = this.getOptions({current: true});
             if (options.general.showGuide) {
-                chrome.tabs.create({url: chrome.runtime.getURL('/bg/guide.html')});
+                chrome.tabs.create({url: chrome.runtime.getURL('/bg/welcome.html')});
             }
 
             this._clipboardMonitor.on('change', this._onClipboardTextChange.bind(this));

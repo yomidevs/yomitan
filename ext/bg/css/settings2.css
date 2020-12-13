@@ -46,9 +46,10 @@
     --settings-group-wrap: nowrap;
     --show-preview-label-height: 40px;
 
-    --font-size-default: 14px;
+    --font-size-default-no-units: 14;
+    --font-size-default: calc(1px * var(--font-size-default-no-units));
     --font-size-small: 12px;
-    --line-height-default: calc(20 / 14);
+    --line-height-default: calc(20 / var(--font-size-default-no-units));
     --outline-item-height: 40px;
     --outline-item-icon-size: 32px;
     --input-width: 100px;
@@ -586,8 +587,15 @@ h3 {
 .settings-group.settings-group-top-margin {
     margin-top: 1.0125em;
 }
+.settings-item:not([hidden]) {
+    display: block;
+}
 .settings-item-button {
     cursor: pointer;
+}
+a.settings-item-button {
+    color: var(--text-color-default);
+    text-decoration: none;
 }
 .settings-item-outer {
     display: block;
@@ -2335,7 +2343,7 @@ code.anki-field-marker {
     margin: 0;
     padding: 0;
     width: 100%;
-    height: calc(0.425em * 4 + 1em * (20 / 14) * 3);
+    height: calc(0.425em * 4 + 1em * var(--line-height-default) * 3);
 }
 
 

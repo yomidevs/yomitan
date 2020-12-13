@@ -58,22 +58,29 @@ class DictionaryEntry {
         const versionNode = node.querySelector('.dictionary-version');
         const wildcardSupportedCheckbox = node.querySelector('.dictionary-prefix-wildcard-searches-supported');
 
-        const hasDetails = this._setupDetails(detailsTable);
+        const hasDetails = (detailsTable !== null && this._setupDetails(detailsTable));
         this._hasDetails = hasDetails;
 
         titleNode.textContent = title;
         versionNode.textContent = `rev.${revision}`;
-        wildcardSupportedCheckbox.checked = !!prefixWildcardsSupported;
-
-        outdatedContainer.hidden = (version >= 3);
-        if (detailsToggleLink !== null) { detailsToggleLink.hidden = !hasDetails; }
-
-        enabledCheckbox.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'enabled']);
-        priorityInput.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'priority']);
+        if (wildcardSupportedCheckbox !== null) {
+            wildcardSupportedCheckbox.checked = !!prefixWildcardsSupported;
+        }
+        if (outdatedContainer !== null) {
+            outdatedContainer.hidden = (version >= 3);
+        }
+        if (detailsToggleLink !== null) {
+            detailsToggleLink.hidden = !hasDetails;
+        }
+        if (enabledCheckbox !== null) {
+            enabledCheckbox.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'enabled']);
+        }
+        if (priorityInput !== null) {
+            priorityInput.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'priority']);
+        }
         if (allowSecondarySearchesCheckbox !== null) {
             allowSecondarySearchesCheckbox.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'allowSecondarySearches']);
         }
-
         if (deleteButton !== null) {
             this._eventListeners.addEventListener(deleteButton, 'click', this._onDeleteButtonClicked.bind(this), false);
         }
@@ -84,7 +91,9 @@ class DictionaryEntry {
         if (detailsToggleLink !== null && this._detailsContainer !== null) {
             this._eventListeners.addEventListener(detailsToggleLink, 'click', this._onDetailsToggleLinkClicked.bind(this), false);
         }
-        this._eventListeners.addEventListener(priorityInput, 'settingChanged', this._onPriorityChanged.bind(this), false);
+        if (priorityInput !== null) {
+            this._eventListeners.addEventListener(priorityInput, 'settingChanged', this._onPriorityChanged.bind(this), false);
+        }
     }
 
     cleanup() {
@@ -213,7 +222,9 @@ class DictionaryController {
         yomichan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
 
         document.querySelector('#dictionary-confirm-delete-button').addEventListener('click', this._onDictionaryConfirmDelete.bind(this), false);
-        this._checkIntegrityButton.addEventListener('click', this._onCheckIntegrityButtonClick.bind(this), false);
+        if (this._checkIntegrityButton !== null) {
+            this._checkIntegrityButton.addEventListener('click', this._onCheckIntegrityButtonClick.bind(this), false);
+        }
 
         await this._onDatabaseUpdated();
     }
@@ -433,8 +444,8 @@ class DictionaryController {
             for (const progress of progressContainers) { progress.hidden = true; }
             if (statusFooter !== null) { statusFooter.setTaskActive(progressSelector, false); }
             this._setButtonsEnabled(true);
-            storageController.updateStats();
             this._isDeleting = false;
+            if (storageController !== null) { storageController.updateStats(); }
         }
     }
 

@@ -93,7 +93,7 @@ class DictionaryImportController {
         if (this._modifying) { return; }
 
         const purgeNotification = this._purgeNotification;
-
+        const storageController = this._storageController;
         const prevention = this._preventPageExit();
 
         try {
@@ -114,8 +114,8 @@ class DictionaryImportController {
             prevention.end();
             if (purgeNotification !== null) { purgeNotification.hidden = true; }
             this._setSpinnerVisible(false);
-            this._storageController.updateStats();
             this._setModifying(false);
+            if (storageController !== null) { storageController.updateStats(); }
         }
     }
 
@@ -157,7 +157,7 @@ class DictionaryImportController {
                 const statusString = `${percent.toFixed(0)}%`;
                 for (const progressBar of progressBars) { progressBar.style.width = cssString; }
                 for (const label of statusLabels) { label.textContent = statusString; }
-                storageController.updateStats();
+                if (storageController !== null) { storageController.updateStats(); }
             };
 
             const fileCount = files.length;
@@ -187,6 +187,7 @@ class DictionaryImportController {
             }
             this._setSpinnerVisible(false);
             this._setModifying(false);
+            if (storageController !== null) { storageController.updateStats(); }
         }
     }
 
