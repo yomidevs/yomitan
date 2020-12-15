@@ -122,6 +122,24 @@ function applyModifications(manifest, modifications) {
                         value.splice(start, deleteCount, ...itemsNew);
                     }
                     break;
+                case 'copy':
+                    {
+                        const {newPath} = modification;
+                        const value = getObjectProperties(manifest, path2, path2.length);
+                        const newObject = getObjectProperties(manifest, newPath, newPath.length - 1);
+                        newObject[newPath[newPath.length - 1]] = value;
+                    }
+                    break;
+                case 'move':
+                    {
+                        const {newPath} = modification;
+                        const value = getObjectProperties(manifest, path2, path2.length);
+                        const oldObject = getObjectProperties(manifest, path2, path2.length - 1);
+                        const newObject = getObjectProperties(manifest, newPath, newPath.length - 1);
+                        newObject[newPath[newPath.length - 1]] = value;
+                        delete oldObject[path2[path2.length - 1]];
+                    }
+                    break;
             }
         }
     }
