@@ -109,7 +109,7 @@ class AudioDownloader {
         });
         const responseText = await response.text();
 
-        const dom = new NativeSimpleDOMParser(responseText);
+        const dom = this._createSimpleDOMParser(responseText);
         for (const row of dom.getElementsByClassName('dc-result-row')) {
             try {
                 const audio = dom.getElementByTagName('audio', row);
@@ -149,7 +149,7 @@ class AudioDownloader {
         });
         const responseText = await response.text();
 
-        const dom = new NativeSimpleDOMParser(responseText);
+        const dom = this._createSimpleDOMParser(responseText);
         try {
             const audio = dom.getElementById(`audio_${expression}:${reading}`);
             if (audio !== null) {
@@ -236,5 +236,13 @@ class AudioDownloader {
 
     _arrayBufferToBase64(arrayBuffer) {
         return btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+    }
+
+    _createSimpleDOMParser(content) {
+        if (NativeSimpleDOMParser.isSupported()) {
+            return new NativeSimpleDOMParser(content);
+        } else {
+            throw new Error('DOM parsing not supported');
+        }
     }
 }

@@ -43,4 +43,8 @@ class NativeSimpleDOMParser {
     getTextContent(element) {
         return element.textContent;
     }
+
+    static isSupported() {
+        return typeof DOMParser !== 'undefined';
+    }
 }
