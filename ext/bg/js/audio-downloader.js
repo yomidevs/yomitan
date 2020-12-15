@@ -67,22 +67,8 @@ class AudioDownloader {
 
     // Private
 
-    _normalizeUrl(url, baseUrl, basePath) {
-        if (url) {
-            if (url[0] === '/') {
-                if (url.length >= 2 && url[1] === '/') {
-                    // Begins with "//"
-                    url = baseUrl.substring(0, baseUrl.indexOf(':') + 1) + url;
-                } else {
-                    // Begins with "/"
-                    url = baseUrl + url;
-                }
-            } else if (!/^[a-z][a-z0-9\-+.]*:/i.test(url)) {
-                // No URI scheme => relative path
-                url = baseUrl + basePath + url;
-            }
-        }
-        return url;
+    _normalizeUrl(url, base) {
+        return new URL(url, base).href;
     }
 
     async _getInfoJpod101(expression, reading) {
@@ -140,7 +126,7 @@ class AudioDownloader {
 
                 const htmlReading = dom.getTextContent(htmlReadings[0]);
                 if (htmlReading && (!reading || reading === htmlReading)) {
-                    url = this._normalizeUrl(url, 'https://www.japanesepod101.com', '/learningcenter/reference/');
+                    url = this._normalizeUrl(url, response.url);
                     return {type: 'url', details: {url}};
                 }
             } catch (e) {
@@ -171,7 +157,7 @@ class AudioDownloader {
                 if (source !== null) {
                     let url = dom.getAttribute(source, 'src');
                     if (url !== null) {
-                        url = this._normalizeUrl(url, 'https://jisho.org', '/search/');
+                        url = this._normalizeUrl(url, response.url);
                         return {type: 'url', details: {url}};
                     }
                 }
