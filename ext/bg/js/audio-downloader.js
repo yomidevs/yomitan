@@ -16,7 +16,7 @@
  */
 
 /* global
- * SimpleDOMParser
+ * NativeSimpleDOMParser
  */
 
 class AudioDownloader {
@@ -109,7 +109,7 @@ class AudioDownloader {
         });
         const responseText = await response.text();
 
-        const dom = new SimpleDOMParser(responseText);
+        const dom = new NativeSimpleDOMParser(responseText);
         for (const row of dom.getElementsByClassName('dc-result-row')) {
             try {
                 const audio = dom.getElementByTagName('audio', row);
@@ -149,7 +149,7 @@ class AudioDownloader {
         });
         const responseText = await response.text();
 
-        const dom = new SimpleDOMParser(responseText);
+        const dom = new NativeSimpleDOMParser(responseText);
         try {
             const audio = dom.getElementById(`audio_${expression}:${reading}`);
             if (audio !== null) {
