@@ -87,6 +87,7 @@ class BackupController {
         const optionsFull = await this._settingsController.getOptionsFull();
         const environment = await api.getEnvironmentInfo();
         const fieldTemplatesDefault = await api.getDefaultAnkiFieldTemplates();
+        const permissions = await this._getPermissions();
 
         // Format options
         for (const {options} of optionsFull.profiles) {
@@ -102,6 +103,7 @@ class BackupController {
             manifest: chrome.runtime.getManifest(),
             environment,
             userAgent: navigator.userAgent,
+            permissions,
             options: optionsFull
         };
 
@@ -163,6 +165,10 @@ class BackupController {
             reader.onerror = () => reject(reader.error);
             reader.readAsArrayBuffer(file);
         });
+    }
+
+    _getPermissions() {
+        return new Promise((resolve) => chrome.permissions.getAll(resolve));
     }
 
     // Importing
