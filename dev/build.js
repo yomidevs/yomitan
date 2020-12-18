@@ -87,9 +87,16 @@ function applyModifications(manifest, modifications) {
                         const key = path2[path2.length - 1];
 
                         let {index} = modification;
-                        if (typeof index !== 'number') { index = -1; }
-                        if (typeof before === 'string') { index = getObjectKeyIndex(object, before); }
-                        if (typeof after === 'string') { index = getObjectKeyIndex(object, after); }
+                        if (typeof index !== 'number') {
+                            index = -1;
+                        }
+                        if (typeof before === 'string') {
+                            index = getObjectKeyIndex(object, before);
+                        }
+                        if (typeof after === 'string') {
+                            index = getObjectKeyIndex(object, after);
+                            if (index >= 0) { ++index; }
+                        }
 
                         setObjectKeyAtIndex(object, key, value, index);
                     }
@@ -139,9 +146,17 @@ function applyModifications(manifest, modifications) {
                         const oldObjectIsNewObject = arraysAreSame(path2, newPath, -1);
                         const value = oldObject[oldKey];
 
-                        let index = (oldObjectIsNewObject && action !== 'copy') ? getObjectKeyIndex(oldObject, oldKey) : -1;
-                        if (typeof before === 'string') { index = getObjectKeyIndex(newObject, before); }
-                        if (typeof after === 'string') { index = getObjectKeyIndex(newObject, after); }
+                        let {index} = modification;
+                        if (typeof index !== 'number' || index < 0) {
+                            index = (oldObjectIsNewObject && action !== 'copy') ? getObjectKeyIndex(oldObject, oldKey) : -1;
+                        }
+                        if (typeof before === 'string') {
+                            index = getObjectKeyIndex(newObject, before);
+                        }
+                        if (typeof after === 'string') {
+                            index = getObjectKeyIndex(newObject, after);
+                            if (index >= 0) { ++index; }
+                        }
 
                         setObjectKeyAtIndex(newObject, newKey, value, index);
                         if (action !== 'copy' && (!oldObjectIsNewObject || oldKey !== newKey)) {
