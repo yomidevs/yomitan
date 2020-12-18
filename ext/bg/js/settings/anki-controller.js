@@ -46,6 +46,7 @@ class AnkiController {
         this._ankiErrorInvalidResponseInfo = null;
         this._ankiCardPrimary = null;
         this._ankiCardPrimaryType = null;
+        this._validateFieldsToken = null;
     }
 
     async prepare() {
@@ -464,10 +465,19 @@ class AnkiCardController {
 
         const markers = this._ankiController.getFieldMarkers(this._cardType);
         const totalFragment = document.createDocumentFragment();
+        const fieldMap = new Map();
+        let index = 0;
         for (const [fieldName, fieldValue] of Object.entries(this._fields)) {
             const content = this._settingsController.instantiateTemplateFragment('anki-card-field');
 
-            content.querySelector('.anki-card-field-name').textContent = fieldName;
+            const fieldNameContainerNode = content.querySelector('.anki-card-field-name-container');
+            fieldNameContainerNode.dataset.index = `${index}`;
+            const fieldNameNode = content.querySelector('.anki-card-field-name');
+            fieldNameNode.textContent = fieldName;
+            fieldMap.set(fieldName, {fieldNameContainerNode});
+
+            const valueContainer = content.querySelector('.anki-card-field-value-container');
+            valueContainer.dataset.index = `${index}`;
 
             const inputField = content.querySelector('.anki-card-field-value');
             inputField.value = fieldValue;
@@ -494,6 +504,8 @@ class AnkiCardController {
             }
 
             totalFragment.appendChild(content);
+
+            ++index;
         }
 
         const ELEMENT_NODE = Node.ELEMENT_NODE;
@@ -503,6 +515,30 @@ class AnkiCardController {
             container.removeChild(node);
         }
         container.appendChild(totalFragment);
+
+        this._validateFields(fieldMap);
+    }
+
+    async _validateFields(fieldMap) {
+        const token = {};
+        this._validateFieldsToken = token;
+
+        let fieldNames;
+        try {
+            fieldNames = await this._ankiController.getModelFieldNames(this._model);
+        } catch (e) {
+            return;
+        }
+
+        if (token !== this._validateFieldsToken) { return; }
+
+        const fieldNamesSet = new Set(fieldNames);
+        let index = 0;
+        for (const [fieldName, {fieldNameContainerNode}] of fieldMap.entries()) {
+            fieldNameContainerNode.dataset.isValid = `${fieldNamesSet.has(fieldName)}`;
+            fieldNameContainerNode.dataset.orderMatches = `${index < fieldNames.length && fieldName === fieldNames[index]}`;
+            ++index;
+        }
     }
 
     async _setDeck(value) {

@@ -2088,9 +2088,22 @@ select.profile-condition-operator {
 .anki-card-field-input-header {
     font-weight: bold;
 }
-.anki-card-field-name {
-    margin-right: 1em;
+.anki-card-field-name-container {
+    display: flex;
+    flex-flow: row nowrap;
+    align-self: stretch;
+    align-items: center;
     margin-top: 0.25em;
+    margin-right: 0.25em;
+    padding: 0 0.25em;
+}
+.anki-card-field-name-container[data-is-valid=false],
+.anki-card-field-name-container[data-order-matches=false][data-index='0'] {
+    background-color: var(--danger-color-lightest);
+    border-radius: var(--text-input-border-radius);
+}
+.anki-card-field-name {
+    flex: 1 1 auto;
 }
 .anki-card-field-value-container {
     display: flex;
