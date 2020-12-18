@@ -28,9 +28,11 @@
  */
 
 async function setupEnvironmentInfo() {
+    const {manifest_version: manifestVersion} = chrome.runtime.getManifest();
     const {browser, platform} = await api.getEnvironmentInfo();
     document.documentElement.dataset.browser = browser;
     document.documentElement.dataset.os = platform.os;
+    document.documentElement.dataset.manifestVersion = `${manifestVersion}`;
 }
 
 async function setupGenericSettingsController(genericSettingController) {

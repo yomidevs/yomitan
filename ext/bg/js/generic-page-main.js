@@ -15,7 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+function setupEnvironmentInfo() {
+    const {manifest_version: manifestVersion} = chrome.runtime.getManifest();
+    document.documentElement.dataset.manifestVersion = `${manifestVersion}`;
+}
+
 (() => {
     document.querySelector('#content-scroll-focus').focus();
     document.documentElement.dataset.loaded = 'true';
+    setupEnvironmentInfo();
 })();
