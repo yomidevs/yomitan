@@ -16,6 +16,7 @@
  */
 
 self.importScripts(
+    '/mixed/lib/parse5.js',
     '/mixed/lib/wanakana.min.js',
     '/mixed/js/core.js',
     '/mixed/js/yomichan.js',
@@ -37,7 +38,7 @@ self.importScripts(
     '/bg/js/options.js',
     '/bg/js/profile-conditions.js',
     '/bg/js/request-builder.js',
-    '/bg/js/native-simple-dom-parser.js',
+    '/bg/js/simple-dom-parser.js',
     '/bg/js/text-source-map.js',
     '/bg/js/translator.js',
     '/bg/js/backend.js',

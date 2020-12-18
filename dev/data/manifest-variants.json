@@ -110,7 +110,9 @@
             "name": "chrome",
             "fileName": "yomichan-chrome.zip",
             "excludeFiles": [
-                "sw.js"
+                "sw.js",
+                "bg/js/simple-dom-parser.js",
+                "mixed/lib/parse5.js"
             ]
         },
         {
@@ -133,7 +135,9 @@
                 }
             ],
             "excludeFiles": [
-                "sw.js"
+                "sw.js",
+                "bg/js/simple-dom-parser.js",
+                "mixed/lib/parse5.js"
             ]
         },
         {
@@ -155,6 +159,10 @@
                 {"action": "move",   "path": ["web_accessible_resources"], "newPath": ["web_accessible_resources_old"]},
                 {"action": "set",    "path": ["web_accessible_resources"], "value": [{"resources": [], "matches": ["<all_urls>"]}], "after": "web_accessible_resources_old"},
                 {"action": "move",   "path": ["web_accessible_resources_old"], "newPath": ["web_accessible_resources", 0, "resources"]}
+            ],
+            "excludeFiles": [
+                "bg/background.html",
+                "bg/js/native-simple-dom-parser.js"
             ]
         },
         {
@@ -187,7 +195,9 @@
                 }
             ],
             "excludeFiles": [
-                "sw.js"
+                "sw.js",
+                "bg/js/simple-dom-parser.js",
+                "mixed/lib/parse5.js"
             ]
         },
         {
@@ -216,7 +226,9 @@
                 }
             ],
             "excludeFiles": [
-                "sw.js"
+                "sw.js",
+                "bg/js/simple-dom-parser.js",
+                "mixed/lib/parse5.js"
             ]
         }
     ]

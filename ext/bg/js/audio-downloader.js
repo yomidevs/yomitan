@@ -17,6 +17,7 @@
 
 /* global
  * NativeSimpleDOMParser
+ * SimpleDOMParser
  */
 
 class AudioDownloader {
@@ -239,8 +240,10 @@ class AudioDownloader {
     }
 
     _createSimpleDOMParser(content) {
-        if (NativeSimpleDOMParser.isSupported()) {
+        if (typeof NativeSimpleDOMParser !== 'undefined' && NativeSimpleDOMParser.isSupported()) {
             return new NativeSimpleDOMParser(content);
+        } else if (typeof SimpleDOMParser !== 'undefined' && SimpleDOMParser.isSupported()) {
+            return new SimpleDOMParser(content);
         } else {
             throw new Error('DOM parsing not supported');
         }

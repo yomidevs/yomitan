@@ -36,6 +36,13 @@ function getAllHtmlScriptPaths(fileName) {
     }
 }
 
+function convertBackgroundScriptsToServiceWorkerScripts(scripts) {
+    // Use parse5-based SimpleDOMParser
+    scripts.splice(0, 0, '/mixed/lib/parse5.js');
+    const index = scripts.indexOf('/bg/js/native-simple-dom-parser.js');
+    assert.ok(index >= 0);
+    scripts[index] = '/bg/js/simple-dom-parser.js';
+}
 
 function main() {
     try {
@@ -45,6 +52,7 @@ function main() {
         const extDir = path.join(rootDir, extDirName);
 
         const scripts = getAllHtmlScriptPaths(path.join(extDir, 'bg', 'background.html'));
+        convertBackgroundScriptsToServiceWorkerScripts(scripts);
         const importedScripts = [];
 
         const importScripts = (...scripts2) => {
