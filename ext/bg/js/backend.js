@@ -240,6 +240,10 @@ class Backend {
     // Event handlers
 
     async _onClipboardTextChange({text}) {
+        const {general: {maximumClipboardSearchLength}} = this.getOptions({current: true});
+        if (text.length > maximumClipboardSearchLength) {
+            text = text.substring(0, maximumClipboardSearchLength);
+        }
         try {
             const {tab, created} = await this._getOrCreateSearchPopup();
             await this._focusTab(tab);

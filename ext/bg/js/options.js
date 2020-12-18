@@ -481,6 +481,10 @@ class OptionsUtil {
             {
                 async: true,
                 update: this._updateVersion6.bind(this)
+            },
+            {
+                async: false,
+                update: this._updateVersion7.bind(this)
             }
         ];
     }
@@ -653,5 +657,14 @@ class OptionsUtil {
         templates = templates.replace(pattern1, (g0, space) => (space + replacement1.replace(simpleNewline, space)));
         templates = templates.replace(/\bcompactGlossaries=((?:\.*\/)*)compactGlossaries\b/g, (g0, g1) => `${g0} data=${g1}.`);
         return templates;
+    }
+
+    _updateVersion7(options) {
+        // Version 7 changes:
+        //  Added general.maximumClipboardSearchLength.
+        for (const profile of options.profiles) {
+            profile.options.general.maximumClipboardSearchLength = 1000;
+        }
+        return options;
     }
 }

@@ -292,7 +292,8 @@ function createProfileOptionsUpdatedTestData1() {
             showIframePopupsInRootFrame: false,
             useSecurePopupFrameUrl: true,
             usePopupShadowDom: true,
-            usePopupWindow: false
+            usePopupWindow: false,
+            maximumClipboardSearchLength: 1000
         },
         audio: {
             enabled: true,
@@ -498,7 +499,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 6,
+        version: 7,
         global: {
             database: {
                 prefixWildcardsSupported: false

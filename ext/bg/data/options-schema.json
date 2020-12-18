@@ -108,7 +108,8 @@
                                     "showIframePopupsInRootFrame",
                                     "useSecurePopupFrameUrl",
                                     "usePopupShadowDom",
-                                    "usePopupWindow"
+                                    "usePopupWindow",
+                                    "maximumClipboardSearchLength"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -259,6 +260,11 @@
                                     "usePopupWindow": {
                                         "type": "boolean",
                                         "default": false
+                                    },
+                                    "maximumClipboardSearchLength": {
+                                        "type": "integer",
+                                        "default": 1000,
+                                        "minimum": 0
                                     }
                                 }
                             },

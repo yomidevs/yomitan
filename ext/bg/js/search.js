@@ -197,6 +197,10 @@ class DisplaySearch extends Display {
     }
 
     _onExternalSearchUpdate({text, animate=true}) {
+        const {general: {maximumClipboardSearchLength}} = this.getOptions();
+        if (text.length > maximumClipboardSearchLength) {
+            text = text.substring(0, maximumClipboardSearchLength);
+        }
         this._queryInput.value = text;
         this._search(animate, false);
     }
