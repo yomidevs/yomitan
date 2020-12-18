@@ -260,7 +260,7 @@ const yomichan = (() => {
         // Private
 
         _getUrl() {
-            return (typeof window === 'object' && window !== null ? window.location.href : '');
+            return location.href;
         }
 
         _getLogContext() {
