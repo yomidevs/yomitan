@@ -123,21 +123,24 @@ function applyModifications(manifest, modifications) {
                     }
                     break;
                 case 'copy':
-                    {
-                        const {newPath} = modification;
-                        const value = getObjectProperties(manifest, path2, path2.length);
-                        const newObject = getObjectProperties(manifest, newPath, newPath.length - 1);
-                        newObject[newPath[newPath.length - 1]] = value;
-                    }
-                    break;
                 case 'move':
                     {
-                        const {newPath} = modification;
-                        const value = getObjectProperties(manifest, path2, path2.length);
+                        const {newPath, before, after} = modification;
+                        const oldKey = path2[path2.length - 1];
+                        const newKey = newPath[newPath.length - 1];
                         const oldObject = getObjectProperties(manifest, path2, path2.length - 1);
                         const newObject = getObjectProperties(manifest, newPath, newPath.length - 1);
-                        newObject[newPath[newPath.length - 1]] = value;
-                        delete oldObject[path2[path2.length - 1]];
+                        const oldObjectIsNewObject = arraysAreSame(path2, newPath, -1);
+                        const value = oldObject[oldKey];
+
+                        let index = (oldObjectIsNewObject && action !== 'copy') ? getObjectKeyIndex(oldObject, oldKey) : -1;
+                        if (typeof before === 'string') { index = getObjectKeyIndex(newObject, before); }
+                        if (typeof after === 'string') { index = getObjectKeyIndex(newObject, after); }
+
+                        setObjectKeyAtIndex(newObject, newKey, value, index);
+                        if (action !== 'copy' && (!oldObjectIsNewObject || oldKey !== newKey)) {
+                            delete oldObject[oldKey];
+                        }
                     }
                     break;
             }
@@ -145,6 +148,39 @@ function applyModifications(manifest, modifications) {
     }
 
     return manifest;
+}
+
+function arraysAreSame(array1, array2, lengthOffset) {
+    let ii = array1.length;
+    if (ii !== array2.length) { return false; }
+    ii += lengthOffset;
+    for (let i = 0; i < ii; ++i) {
+        if (array1[i] !== array2[i]) { return false; }
+    }
+    return true;
+}
+
+function getObjectKeyIndex(object, key) {
+    return Object.keys(object).indexOf(key);
+}
+
+function setObjectKeyAtIndex(object, key, value, index) {
+    if (index < 0 || Object.prototype.hasOwnProperty.call(object, key)) {
+        object[key] = value;
+        return;
+    }
+
+    const entries = Object.entries(object);
+    index = Math.min(index, entries.length);
+    for (let i = index, ii = entries.length; i < ii; ++i) {
+        const [key2] = entries[i];
+        delete object[key2];
+    }
+    entries.splice(index, 0, [key, value]);
+    for (let i = index, ii = entries.length; i < ii; ++i) {
+        const [key2, value2] = entries[i];
+        object[key2] = value2;
+    }
 }
 
 function getObjectProperties(object, path2, count) {
