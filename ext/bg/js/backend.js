@@ -47,6 +47,7 @@ class Backend {
         this._mecab = new Mecab();
         this._mediaUtility = new MediaUtility();
         this._clipboardReader = new ClipboardReader({
+            // eslint-disable-next-line no-undef
             document: (typeof document === 'object' && document !== null ? document : null),
             pasteTargetSelector: '#clipboard-paste-target',
             imagePasteTargetSelector: '#clipboard-image-paste-target',
@@ -551,43 +552,7 @@ class Backend {
     }
 
     _onApiInjectStylesheet({type, value}, sender) {
-        if (!sender.tab) {
-            return Promise.reject(new Error('Invalid tab'));
-        }
-
-        const tabId = sender.tab.id;
-        const frameId = sender.frameId;
-        const details = (
-            type === 'file' ?
-            {
-                file: value,
-                runAt: 'document_start',
-                cssOrigin: 'author',
-                allFrames: false,
-                matchAboutBlank: true
-            } :
-            {
-                code: value,
-                runAt: 'document_start',
-                cssOrigin: 'user',
-                allFrames: false,
-                matchAboutBlank: true
-            }
-        );
-        if (typeof frameId === 'number') {
-            details.frameId = frameId;
-        }
-
-        return new Promise((resolve, reject) => {
-            chrome.tabs.insertCSS(tabId, details, () => {
-                const e = chrome.runtime.lastError;
-                if (e) {
-                    reject(new Error(e.message));
-                } else {
-                    resolve();
-                }
-            });
-        });
+        return this._injectStylesheet(type, value, sender);
     }
 
     async _onApiGetStylesheetContent({url}) {
@@ -1768,6 +1733,90 @@ class Backend {
                     reject(new Error(e.message));
                 } else {
                     resolve(tab);
+                }
+            });
+        });
+    }
+
+    _injectStylesheet(type, value, target) {
+        if (isObject(chrome.tabs) && typeof chrome.tabs.insertCSS === 'function') {
+            return this._injectStylesheetMV2(type, value, target);
+        } else if (isObject(chrome.scripting) && typeof chrome.scripting.insertCSS === 'function') {
+            return this._injectStylesheetMV3(type, value, target);
+        } else {
+            return Promise.reject(new Error('insertCSS function not available'));
+        }
+    }
+
+    _injectStylesheetMV2(type, value, target) {
+        return new Promise((resolve, reject) => {
+            if (!target.tab) {
+                reject(new Error('Invalid tab'));
+                return;
+            }
+
+            const tabId = target.tab.id;
+            const frameId = target.frameId;
+            const details = (
+                type === 'file' ?
+                {
+                    file: value,
+                    runAt: 'document_start',
+                    cssOrigin: 'author',
+                    allFrames: false,
+                    matchAboutBlank: true
+                } :
+                {
+                    code: value,
+                    runAt: 'document_start',
+                    cssOrigin: 'user',
+                    allFrames: false,
+                    matchAboutBlank: true
+                }
+            );
+            if (typeof frameId === 'number') {
+                details.frameId = frameId;
+            }
+
+            chrome.tabs.insertCSS(tabId, details, () => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve();
+                }
+            });
+        });
+    }
+
+    _injectStylesheetMV3(type, value, target) {
+        return new Promise((resolve, reject) => {
+            if (!target.tab) {
+                reject(new Error('Invalid tab'));
+                return;
+            }
+
+            const tabId = target.tab.id;
+            const frameId = target.frameId;
+            const details = (
+                type === 'file' ?
+                {origin: chrome.scripting.StyleOrigin.AUTHOR, files: [value]} :
+                {origin: chrome.scripting.StyleOrigin.USER,   css: value}
+            );
+            details.target = {
+                tabId,
+                allFrames: false
+            };
+            if (typeof frameId === 'number') {
+                details.target.frameIds = [frameId];
+            }
+
+            chrome.scripting.insertCSS(details, () => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve();
                 }
             });
         });

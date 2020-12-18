@@ -17,6 +17,8 @@
 
 class NativeSimpleDOMParser {
     constructor(content) {
+        // TODO : Remove
+        // eslint-disable-next-line no-undef
         this._document = new DOMParser().parseFromString(content, 'text/html');
     }
 

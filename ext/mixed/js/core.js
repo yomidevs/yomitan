@@ -304,7 +304,12 @@ function promiseTimeout(delay, resolveValue) {
 }
 
 function promiseAnimationFrame(timeout=null) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
+        if (typeof cancelAnimationFrame !== 'function' || typeof requestAnimationFrame !== 'function') {
+            reject(new Error('Animation not supported in this context'));
+            return;
+        }
+
         let timer = null;
         let frameRequest = null;
         const onFrame = (time) => {
@@ -318,12 +323,14 @@ function promiseAnimationFrame(timeout=null) {
         const onTimeout = () => {
             timer = null;
             if (frameRequest !== null) {
+                // eslint-disable-next-line no-undef
                 cancelAnimationFrame(frameRequest);
                 frameRequest = null;
             }
             resolve({time: timeout, timeout: true});
         };
 
+        // eslint-disable-next-line no-undef
         frameRequest = requestAnimationFrame(onFrame);
         if (typeof timeout === 'number') {
             timer = setTimeout(onTimeout, timeout);

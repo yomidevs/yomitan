@@ -131,6 +131,27 @@
             ]
         },
         {
+            "name": "chrome-mv3",
+            "fileName": "yomichan-chrome-mv3.zip",
+            "modifications": [
+                {"action": "set",    "path": ["manifest_version"], "value": 3},
+                {"action": "move",   "path": ["browser_action"], "newPath": ["action"]},
+                {"action": "delete", "path": ["background", "page"]},
+                {"action": "delete", "path": ["background", "persistent"]},
+                {"action": "set",    "path": ["background", "service_worker"], "value": "sw.js"},
+                {"action": "move",   "path": ["content_security_policy"], "newPath": ["content_security_policy_old"]},
+                {"action": "set",    "path": ["content_security_policy"], "value": {}},
+                {"action": "move",   "path": ["content_security_policy_old"], "newPath": ["content_security_policy", "extension_pages"]},
+                {"action": "move",   "path": ["sandbox", "content_security_policy"], "newPath": ["content_security_policy", "sandbox"]},
+                {"action": "remove", "path": ["permissions"], "item": "<all_urls>"},
+                {"action": "set",    "path": ["host_permissions"], "value": ["<all_urls>"], "after": "optional_permissions"},
+                {"action": "add",    "path": ["permissions"], "items": ["scripting"]},
+                {"action": "move",   "path": ["web_accessible_resources"], "newPath": ["web_accessible_resources_old"]},
+                {"action": "set",    "path": ["web_accessible_resources"], "value": [{"resources": [], "matches": ["<all_urls>"]}], "after": "web_accessible_resources_old"},
+                {"action": "move",   "path": ["web_accessible_resources_old"], "newPath": ["web_accessible_resources", 0, "resources"]}
+            ]
+        },
+        {
             "name": "firefox",
             "fileName": "yomichan-firefox.xpi",
             "modifications": [

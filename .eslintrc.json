@@ -156,6 +156,46 @@
                 "node": true,
                 "webextensions": false
             }
+        },
+        {
+            "files": [
+                "ext/mixed/js/core.js",
+                "ext/mixed/js/yomichan.js",
+                "ext/mixed/js/environment.js",
+                "ext/mixed/js/japanese.js",
+                "ext/mixed/js/cache-map.js",
+                "ext/mixed/js/dictionary-data-util.js",
+                "ext/mixed/js/object-property-accessor.js",
+                "ext/bg/js/anki.js",
+                "ext/bg/js/audio-downloader.js",
+                "ext/bg/js/clipboard-monitor.js",
+                "ext/bg/js/clipboard-reader.js",
+                "ext/bg/js/database.js",
+                "ext/bg/js/deinflector.js",
+                "ext/bg/js/dictionary-database.js",
+                "ext/bg/js/json-schema.js",
+                "ext/bg/js/mecab.js",
+                "ext/bg/js/media-utility.js",
+                "ext/bg/js/options.js",
+                "ext/bg/js/profile-conditions.js",
+                "ext/bg/js/request-builder.js",
+                "ext/bg/js/native-simple-dom-parser.js",
+                "ext/bg/js/text-source-map.js",
+                "ext/bg/js/translator.js",
+                "ext/bg/js/backend.js",
+                "ext/bg/js/background-main.js"
+            ],
+            "env": {
+                "browser": false,
+                "serviceworker": true,
+                "es2017": true,
+                "webextensions": true
+            },
+            "globals": {
+                "FileReader": "readonly",
+                "Intl": "readonly",
+                "crypto": "readonly"
+            }
         }
     ]
 }
