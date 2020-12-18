@@ -187,6 +187,7 @@ class Backend {
 
             yomichan.on('log', this._onLog.bind(this));
 
+            await this._requestBuilder.prepare();
             await this._environment.prepare();
             this._clipboardReader.browser = this._environment.getInfo().browser;
 

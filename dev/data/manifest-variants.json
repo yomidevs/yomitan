@@ -154,8 +154,10 @@
                 {"action": "move",   "path": ["content_security_policy_old"], "newPath": ["content_security_policy", "extension_pages"]},
                 {"action": "move",   "path": ["sandbox", "content_security_policy"], "newPath": ["content_security_policy", "sandbox"]},
                 {"action": "remove", "path": ["permissions"], "item": "<all_urls>"},
+                {"action": "remove", "path": ["permissions"], "item": "webRequest"},
+                {"action": "remove", "path": ["permissions"], "item": "webRequestBlocking"},
+                {"action": "add",    "path": ["permissions"], "items": ["declarativeNetRequest", "scripting"]},
                 {"action": "set",    "path": ["host_permissions"], "value": ["<all_urls>"], "after": "optional_permissions"},
-                {"action": "add",    "path": ["permissions"], "items": ["scripting"]},
                 {"action": "move",   "path": ["web_accessible_resources"], "newPath": ["web_accessible_resources_old"]},
                 {"action": "set",    "path": ["web_accessible_resources"], "value": [{"resources": [], "matches": ["<all_urls>"]}], "after": "web_accessible_resources_old"},
                 {"action": "move",   "path": ["web_accessible_resources_old"], "newPath": ["web_accessible_resources", 0, "resources"]}

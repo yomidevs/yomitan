@@ -19,9 +19,22 @@ class RequestBuilder {
     constructor() {
         this._extraHeadersSupported = null;
         this._onBeforeSendHeadersExtraInfoSpec = ['blocking', 'requestHeaders', 'extraHeaders'];
+        this._textEncoder = new TextEncoder();
+        this._ruleIds = new Set();
+    }
+
+    async prepare() {
+        try {
+            await this._clearDynamicRules();
+        } catch (e) {
+            // NOP
+        }
     }
 
     async fetchAnonymous(url, init) {
+        if (isObject(chrome.declarativeNetRequest)) {
+            return await this._fetchAnonymousDeclarative(url, init);
+        }
         const originURL = this._getOriginURL(url);
         const modifications = [
             ['cookie', null],
@@ -129,5 +142,125 @@ class RequestBuilder {
                 headers.push(header);
             }
         }
+    }
+
+    async _clearDynamicRules() {
+        if (!isObject(chrome.declarativeNetRequest)) { return; }
+
+        const rules = this._getDynamicRules();
+
+        if (rules.length === 0) { return; }
+
+        const removeRuleIds = [];
+        for (const {id} of rules) {
+            removeRuleIds.push(id);
+        }
+
+        await this._updateDynamicRules({removeRuleIds});
+    }
+
+    async _fetchAnonymousDeclarative(url, init) {
+        const id = this._getNewRuleId();
+        const originUrl = this._getOriginURL(url);
+        url = encodeURI(decodeURI(url));
+
+        this._ruleIds.add(id);
+        try {
+            const addRules = [{
+                id,
+                priority: 1,
+                condition: {
+                    urlFilter: `|${this._escapeDnrUrl(url)}|`,
+                    resourceTypes: ['xmlhttprequest']
+                },
+                action: {
+                    type: 'modifyHeaders',
+                    requestHeaders: [
+                        {
+                            operation: 'remove',
+                            header: 'Cookie'
+                        },
+                        {
+                            operation: 'set',
+                            header: 'Origin',
+                            value: originUrl
+                        }
+                    ],
+                    responseHeaders: [
+                        {
+                            operation: 'remove',
+                            header: 'Set-Cookie'
+                        }
+                    ]
+                }
+            }];
+
+            await this._updateDynamicRules({addRules});
+            try {
+                return await fetch(url, init);
+            } finally {
+                await this._tryUpdateDynamicRules({removeRuleIds: [id]});
+            }
+        } finally {
+            this._ruleIds.delete(id);
+        }
+    }
+
+    _getDynamicRules() {
+        return new Promise((resolve, reject) => {
+            chrome.declarativeNetRequest.getDynamicRules((result) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve(result);
+                }
+            });
+        });
+    }
+
+    _updateDynamicRules(options) {
+        return new Promise((resolve, reject) => {
+            chrome.declarativeNetRequest.updateDynamicRules(options, () => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve();
+                }
+            });
+        });
+    }
+
+    async _tryUpdateDynamicRules(options) {
+        try {
+            await this._updateDynamicRules(options);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    _getNewRuleId() {
+        let id = 1;
+        while (this._ruleIds.has(id)) {
+            const pre = id;
+            ++id;
+            if (id === pre) { throw new Error('Could not generate an id'); }
+        }
+        return id;
+    }
+
+    _escapeDnrUrl(url) {
+        return url.replace(/[|*^]/g, (char) => this._urlEncodeUtf8(char));
+    }
+
+    _urlEncodeUtf8(text) {
+        const array = this._textEncoder.encode(text);
+        let result = '';
+        for (const byte of array) {
+            result += `%${byte.toString(16).toUpperCase().padStart(2, '0')}`;
+        }
+        return result;
     }
 }
