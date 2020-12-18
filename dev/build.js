@@ -27,15 +27,18 @@ function clone(value) {
     return JSON.parse(JSON.stringify(value));
 }
 
-async function createZip(directory, outputFileName, sevenZipExes=[], onUpdate=null) {
+async function createZip(directory, excludeFiles, outputFileName, sevenZipExes=[], onUpdate=null) {
+    fs.unlinkSync(outputFileName);
     for (const exe of sevenZipExes) {
         try {
+            const excludeArguments = excludeFiles.map((excludeFilePath) => `-x!${excludeFilePath}`);
             childProcess.execFileSync(
                 exe,
                 [
                     'a',
                     outputFileName,
-                    '.'
+                    '.',
+                    ...excludeArguments
                 ],
                 {
                     cwd: directory
@@ -46,12 +49,13 @@ async function createZip(directory, outputFileName, sevenZipExes=[], onUpdate=nu
             // NOP
         }
     }
-    return await createJSZip(directory, outputFileName, onUpdate);
+    return await createJSZip(directory, excludeFiles, outputFileName, onUpdate);
 }
 
-async function createJSZip(directory, outputFileName, onUpdate) {
+async function createJSZip(directory, excludeFiles, outputFileName, onUpdate) {
     const JSZip = util.JSZip;
     const files = getAllFiles(directory, directory);
+    removeItemsFromArray(files, excludeFiles);
     const zip = new JSZip();
     for (const fileName of files) {
         zip.file(
@@ -73,6 +77,27 @@ async function createJSZip(directory, outputFileName, onUpdate) {
     process.stdout.write('\n');
 
     fs.writeFileSync(outputFileName, data, {encoding: null, flag: 'w'});
+}
+
+function removeItemsFromArray(array, removeItems) {
+    for (const item of removeItems) {
+        const index = getIndexOfFilePath(array, item);
+        if (index >= 0) {
+            array.splice(index, 1);
+        }
+    }
+}
+
+function getIndexOfFilePath(array, item) {
+    const pattern = /\\/g;
+    const separator = '/';
+    item = item.replace(pattern, separator);
+    for (let i = 0, ii = array.length; i < ii; ++i) {
+        if (array[i].replace(pattern, separator) === item) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 function applyModifications(manifest, modifications) {
@@ -271,6 +296,9 @@ async function build(manifest, buildDir, extDir, manifestPath, variantMap, varia
         if (typeof variant === 'undefined') { continue; }
 
         const {name, fileName, fileCopies} = variant;
+        let {excludeFiles} = variant;
+        if (!Array.isArray(excludeFiles)) { excludeFiles = []; }
+
         process.stdout.write(`Building ${name}...\n`);
 
         const modifiedManifest = createVariantManifest(manifest, variant, variantMap);
@@ -278,7 +306,7 @@ async function build(manifest, buildDir, extDir, manifestPath, variantMap, varia
         const fileNameSafe = path.basename(fileName);
         const fullFileName = path.join(buildDir, fileNameSafe);
         fs.writeFileSync(manifestPath, createManifestString(modifiedManifest));
-        await createZip(extDir, fullFileName, sevenZipExes, onUpdate);
+        await createZip(extDir, excludeFiles, fullFileName, sevenZipExes, onUpdate);
 
         if (Array.isArray(fileCopies)) {
             for (const fileName2 of fileCopies) {

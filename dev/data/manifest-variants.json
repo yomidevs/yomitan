@@ -108,7 +108,10 @@
     "variants": [
         {
             "name": "chrome",
-            "fileName": "yomichan-chrome.zip"
+            "fileName": "yomichan-chrome.zip",
+            "excludeFiles": [
+                "sw.js"
+            ]
         },
         {
             "name": "chrome-dev",
@@ -128,6 +131,9 @@
                     "patternFlags": "",
                     "replacement": "$1. This is a development build; get the stable version here: https://tinyurl.com/yaatdjmp"
                 }
+            ],
+            "excludeFiles": [
+                "sw.js"
             ]
         },
         {
@@ -179,6 +185,9 @@
                         }
                     }
                 }
+            ],
+            "excludeFiles": [
+                "sw.js"
             ]
         },
         {
@@ -205,6 +214,9 @@
                     "path": ["browser_specific_settings", "gecko", "id"],
                     "value": "alex.testing@foosoft.net"
                 }
+            ],
+            "excludeFiles": [
+                "sw.js"
             ]
         }
     ]
