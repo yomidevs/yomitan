@@ -1196,7 +1196,8 @@ button.action-button {
         fill var(--animation-duration) linear,
         opacity var(--animation-duration) linear;
 }
-.frame-resizer-handle:hover {
+.frame-resizer-handle:hover,
+:root[data-is-resizing=true] .frame-resizer-handle {
     fill: var(--accent-color);
     opacity: 1;
 }

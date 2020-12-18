@@ -1868,6 +1868,11 @@ class Display extends EventDispatcher {
         this._frameResizeEventListeners.addEventListener(window, 'blur', this._onFrameResizerWindowBlur.bind(this), false);
         this._frameResizeEventListeners.addEventListener(window, 'mousemove', this._onFrameResizerMouseMove.bind(this), false);
 
+        const {documentElement} = document;
+        if (documentElement !== null) {
+            documentElement.dataset.isResizing = 'true';
+        }
+
         this._initializeFrameResize(token);
     }
 
@@ -1884,6 +1889,11 @@ class Display extends EventDispatcher {
         this._frameResizeStartSize = null;
         this._frameResizeStartOffset = null;
         this._frameResizeToken = null;
+
+        const {documentElement} = document;
+        if (documentElement !== null) {
+            delete documentElement.dataset.isResizing;
+        }
     }
 
     async _updateFrameSize(x, y) {
