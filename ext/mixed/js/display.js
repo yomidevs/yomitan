@@ -20,6 +20,7 @@
  * AudioSystem
  * DisplayGenerator
  * DisplayHistory
+ * DisplayNotification
  * DocumentUtil
  * FrameEndpoint
  * Frontend
@@ -114,6 +115,8 @@ class Display extends EventDispatcher {
         this._frameResizeStartSize = null;
         this._frameResizeStartOffset = null;
         this._frameResizeEventListeners = new EventListenerCollection();
+        this._tagNotification = null;
+        this._tagNotificationContainer = document.querySelector('#content-footer');
 
         this.registerActions([
             ['close',             () => { this.onEscape(); }],
@@ -543,6 +546,7 @@ class Display extends EventDispatcher {
             this._closePopups();
             this._eventListeners.removeAllEventListeners();
             this._mediaLoader.unloadAll();
+            this._hideTagNotification(false);
 
             // Prepare
             const urlSearchParams = new URLSearchParams(location.search);
@@ -797,6 +801,27 @@ class Display extends EventDispatcher {
         const index = parseInt(node.dataset.index, 10);
         if (!Number.isFinite(index)) { return; }
         this._entrySetCurrent(index);
+    }
+
+    _onTagClick(e) {
+        const node = e.currentTarget;
+        const {dataset: {details}} = node;
+        this._showTagNotification(details);
+    }
+
+    _showTagNotification(content) {
+        if (this._tagNotification === null) {
+            const node = this._displayGenerator.createEmptyFooterNotification();
+            this._tagNotification = new DisplayNotification(this._tagNotificationContainer, node);
+        }
+
+        this._tagNotification.setContent(content);
+        this._tagNotification.open();
+    }
+
+    _hideTagNotification(animate) {
+        if (this._tagNotification === null) { return; }
+        this._tagNotification.close(animate);
     }
 
     _updateDocumentOptions(options) {
@@ -1720,6 +1745,7 @@ class Display extends EventDispatcher {
         this._addMultipleEventListeners(entry, '.action-play-audio', 'click', this._onAudioPlay.bind(this));
         this._addMultipleEventListeners(entry, '.kanji-link', 'click', this._onKanjiLookup.bind(this));
         this._addMultipleEventListeners(entry, '.debug-log-link', 'click', this._onDebugLogClick.bind(this));
+        this._addMultipleEventListeners(entry, '.tag', 'click', this._onTagClick.bind(this));
     }
 
     _updateDefinitionTextScanner(options) {

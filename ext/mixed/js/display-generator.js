@@ -117,6 +117,10 @@ class DisplayGenerator {
         return node;
     }
 
+    createEmptyFooterNotification() {
+        return this._templates.instantiate('footer-notification');
+    }
+
     // Private
 
     _createTermExpression(details) {
@@ -310,6 +314,7 @@ class DisplayGenerator {
 
         node.title = details.notes;
         inner.textContent = details.name;
+        node.dataset.details = details.notes || details.name;
         node.dataset.category = details.category;
         if (details.redundant) { node.dataset.redundant = 'true'; }
 
@@ -472,6 +477,7 @@ class DisplayGenerator {
         node.dataset.readingIsSame = `${reading === expression}`;
         node.dataset.dictionary = dictionary;
         node.dataset.frequency = frequency;
+        node.dataset.details = `${dictionary}: ${frequency}`;
 
         return node;
     }
@@ -486,6 +492,7 @@ class DisplayGenerator {
         node.dataset.character = character;
         node.dataset.dictionary = dictionary;
         node.dataset.frequency = frequency;
+        node.dataset.details = `${dictionary}: ${frequency}`;
 
         return node;
     }
