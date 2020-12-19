@@ -54,7 +54,8 @@
     --progress-bar-active-transition-start-delay: 0.0625s;
     --progress-bar-animation-duration: 2s;
 
-    --entry-current-indicator: calc(4em / var(--font-size-no-units));
+    --entry-current-indicator-width-no-units: 4;
+    --entry-current-indicator-width: calc(1em * var(--entry-current-indicator-width-no-units) / var(--font-size-no-units));
     --entry-current-indicator-transition-duration: 0.125s;
 
     --expression-space-size: 0.5em;
@@ -632,7 +633,7 @@ button.action-button {
         visibility 0s linear var(--entry-current-indicator-transition-duration);
 }
 .entry.entry-current>.entry-current-indicator {
-    width: var(--entry-current-indicator);
+    width: var(--entry-current-indicator-width);
     visibility: visible;
     transition:
         width var(--entry-current-indicator-transition-duration) linear,
