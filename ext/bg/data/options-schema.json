@@ -109,7 +109,8 @@
                                     "useSecurePopupFrameUrl",
                                     "usePopupShadowDom",
                                     "usePopupWindow",
-                                    "maximumClipboardSearchLength"
+                                    "maximumClipboardSearchLength",
+                                    "popupCurrentIndicatorMode"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -265,6 +266,11 @@
                                         "type": "integer",
                                         "default": 1000,
                                         "minimum": 0
+                                    },
+                                    "popupCurrentIndicatorMode": {
+                                        "type": "string",
+                                        "enum": ["none", "asterisk", "triangle", "bar-left", "bar-right", "dot-left", "dot-right"],
+                                        "default": "bar-left"
                                     }
                                 }
                             },

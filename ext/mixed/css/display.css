@@ -34,6 +34,8 @@
     --expression-thin-border-size: calc(1em / (var(--expression-font-size-no-units) * var(--font-size-no-units)));
 
     --action-button-size-no-units: 16;
+    --action-button-size: calc(1em * (var(--action-button-size-no-units) / var(--font-size-no-units)));
+    --action-button-padding: 0.3em;
 
     --list-margin: 0.72em;
     --main-content-vertical-padding: 0em;
@@ -70,6 +72,9 @@
     --compact-list-separator: " | ";
     --list-padding1: 1.4em;
     --list-padding2: var(--list-padding1);
+
+    --entry-current-indicator-triangle-size-no-units: 6;
+    --entry-current-indicator-triangle-size: calc(1em * (var(--entry-current-indicator-triangle-size-no-units) / var(--font-size-no-units)));
 
     --animation-duration: 0.125s;
 
@@ -463,14 +468,33 @@ button.sidebar-button.danger:hover .sidebar-button-icon {
 
 
 /* Action buttons */
+.actions {
+    display: flex;
+    flex-flow: row nowrap;
+    float: right;
+    margin: -0.25em;
+}
+.actions::after {
+    clear: both;
+    content: '';
+    display: block;
+}
 .action-button {
     display: block;
     opacity: 1;
+    border: 0;
+    margin: 0;
+    padding: var(--action-button-padding);
+    background: transparent;
+    font-size: inherit;
     transition:
         opacity var(--animation-duration) linear,
         visibility 0s linear 0s,
         filter var(--animation-duration) linear,
         -webkit-filter var(--animation-duration) linear;
+}
+button.action-button {
+    cursor: pointer;
 }
 .action-button[hidden] {
     display: block;
@@ -491,31 +515,10 @@ button.sidebar-button.danger:hover .sidebar-button-icon {
 .action-button:disabled:not([hidden]) {
     opacity: 0.25;
 }
-.actions {
-    display: flex;
-    float: right;
-    margin: -0.25em;
-}
-.actions::after {
-    clear: both;
-    content: '';
-    display: block;
-}
-.action-button {
-    display: inline-block;
-    border: 0;
-    margin: 0;
-    padding: 0.3em;
-    background: transparent;
-    font-size: inherit;
-}
-button.action-button {
-    cursor: pointer;
-}
 .action-button::before {
     content: "";
-    width: calc(1em * (var(--action-button-size-no-units) / var(--font-size-no-units)));
-    height: calc(1em * (var(--action-button-size-no-units) / var(--font-size-no-units)));
+    width: var(--action-button-size);
+    height: var(--action-button-size);
     display: block;
     background-color: transparent;
     background-repeat: no-repeat;
@@ -619,34 +622,20 @@ button.action-button {
     padding: var(--entry-vertical-padding) var(--entry-horizontal-padding);
     position: relative;
 }
-.entry>.entry-current-indicator {
-    display: block;
-    position: absolute;
-    left: calc(-1 * var(--main-content-horizontal-padding));
-    top: 0;
-    bottom: 0;
-    width: 0;
-    background-color: var(--entry-current-indicator-color);
-    visibility: hidden;
-    transition:
-        width var(--entry-current-indicator-transition-duration) linear,
-        visibility 0s linear var(--entry-current-indicator-transition-duration);
-}
-.entry.entry-current>.entry-current-indicator {
-    width: var(--entry-current-indicator-width);
-    visibility: visible;
-    transition:
-        width var(--entry-current-indicator-transition-duration) linear,
-        visibility 0s linear 0s;
-}
 .kanji-link {
     border-bottom: var(--expression-thin-border-size) dashed var(--kanji-border-color);
     color: var(--kanji-text-color);
     text-decoration: none;
     cursor: pointer;
 }
+.term-expression-text-container {
+    display: inline-block;
+}
 .term-expression-text {
     color: var(--kanji-text-color);
+    font-size: var(--expression-font-size);
+    display: inline-block;
+    position: relative;
 }
 .entry[data-expression-multi=true] .term-expression[data-frequency=popular] .term-expression-text,
 .entry[data-expression-multi=true] .term-expression[data-frequency=popular] .kanji-link {
@@ -684,13 +673,6 @@ button.action-button {
 .term-expression {
     display: inline;
 }
-.term-expression-text-container {
-    display: inline-block;
-}
-.term-expression-text {
-    display: inline;
-    font-size: var(--expression-font-size);
-}
 .term-expression-details {
     display: inline;
 }
@@ -702,6 +684,132 @@ button.action-button {
 }
 .term-expression-list>.term-expression:not(:last-of-type)>.term-expression-text-container>.term-expression-text::after {
     content: "\3001";
+}
+
+
+/* Entry indicator */
+.entry-current-indicator {
+    display: block;
+    position: absolute;
+    left: calc(-1 * var(--main-content-horizontal-padding));
+    top: 0;
+    bottom: 0;
+    width: 0;
+    background-color: var(--entry-current-indicator-color);
+    visibility: hidden;
+    transition:
+        width var(--entry-current-indicator-transition-duration) linear,
+        visibility 0s linear var(--entry-current-indicator-transition-duration);
+}
+.entry.entry-current .entry-current-indicator {
+    width: var(--entry-current-indicator-width);
+    visibility: visible;
+    transition:
+        width var(--entry-current-indicator-transition-duration) linear,
+        visibility 0s linear 0s;
+}
+:root[data-popup-current-indicator-mode=bar-right] .entry-current-indicator,
+:root[data-popup-current-indicator-mode=dot-right] .entry-current-indicator {
+    left: auto;
+    right: 0;
+}
+.entry-current-indicator-inner {
+    display: none;
+    pointer-events: auto;
+    width: 100%;
+    height: 0;
+    top: 0;
+    background-color: var(--entry-current-indicator-color);
+    transition:
+        height var(--entry-current-indicator-transition-duration) linear;
+}
+.entry.entry-current .entry-current-indicator-inner {
+    height: var(--entry-current-indicator-width);
+    transition:
+        height var(--entry-current-indicator-transition-duration) linear;
+}
+:root[data-popup-current-indicator-mode=dot-left] .entry-current-indicator,
+:root[data-popup-current-indicator-mode=dot-right] .entry-current-indicator {
+    background-color: transparent;
+}
+:root[data-popup-current-indicator-mode=dot-left] .entry-current-indicator-inner,
+:root[data-popup-current-indicator-mode=dot-right] .entry-current-indicator-inner {
+    display: block;
+    position: sticky;
+}
+:root[data-popup-current-indicator-mode=none] .entry-current-indicator,
+:root[data-popup-current-indicator-mode=asterisk] .entry-current-indicator,
+:root[data-popup-current-indicator-mode=triangle] .entry-current-indicator {
+    display: none;
+}
+
+
+/* Triangle entry indicator */
+.term-expression-current-indicator {
+    pointer-events: none;
+    position: absolute;
+    font-size: calc(1em / var(--expression-font-size-no-units));
+    left: calc(-1 * var(--main-content-horizontal-padding));
+    top: 0;
+    bottom: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity var(--entry-current-indicator-transition-duration) linear,
+        visibility 0s linear var(--entry-current-indicator-transition-duration);
+}
+.entry.entry-current .term-expression-current-indicator {
+    opacity: 1;
+    visibility: visible;
+    transition:
+        opacity var(--entry-current-indicator-transition-duration) linear,
+        visibility 0s linear 0s;
+}
+.term-expression-current-indicator::after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: var(--entry-current-indicator-triangle-size);
+    height: calc(2 * var(--entry-current-indicator-triangle-size));
+    left: calc(-1 * var(--entry-horizontal-padding));
+    top: calc(50% - var(--entry-current-indicator-triangle-size));
+    background-color: var(--entry-current-indicator-color);
+    mask-repeat: no-repeat;
+    mask-position: center center;
+    mask-mode: alpha;
+    mask-size: contain;
+    mask-image: url(/mixed/img/material-right-arrow.svg);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center center;
+    -webkit-mask-mode: alpha;
+    -webkit-mask-size: contain;
+    -webkit-mask-image: url(/mixed/img/material-right-arrow.svg);
+}
+.term-expression:not(:first-of-type) .term-expression-current-indicator,
+:root:not([data-popup-current-indicator-mode=triangle]) .term-expression-current-indicator {
+    display: none;
+}
+
+
+/* Old entry indicator */
+.entry-current-indicator-icon {
+    display: block;
+    padding: var(--action-button-padding);
+}
+.entry-current-indicator-icon[hidden],
+.entry:not(.entry-current) .entry-current-indicator-icon,
+:root:not([data-popup-current-indicator-mode=asterisk]) .entry-current-indicator-icon {
+    display: none;
+}
+.entry-current-indicator-icon::before {
+    content: "";
+    width: var(--action-button-size);
+    height: var(--action-button-size);
+    display: block;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-image: url("/mixed/img/entry-current.svg");
 }
 
 

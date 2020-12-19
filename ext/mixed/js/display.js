@@ -836,6 +836,7 @@ class Display extends EventDispatcher {
         data.showPitchAccentGraph = `${options.general.showPitchAccentGraph}`;
         data.debug = `${options.general.debugInfo}`;
         data.popupDisplayMode = `${options.general.popupDisplayMode}`;
+        data.popupCurrentIndicatorMode = `${options.general.popupCurrentIndicatorMode}`;
     }
 
     _updateTheme(themeName) {

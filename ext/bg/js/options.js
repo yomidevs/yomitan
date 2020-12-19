@@ -662,8 +662,10 @@ class OptionsUtil {
     _updateVersion7(options) {
         // Version 7 changes:
         //  Added general.maximumClipboardSearchLength.
+        //  Added general.popupCurrentIndicatorMode.
         for (const profile of options.profiles) {
             profile.options.general.maximumClipboardSearchLength = 1000;
+            profile.options.general.popupCurrentIndicatorMode = 'bar-left';
         }
         return options;
     }

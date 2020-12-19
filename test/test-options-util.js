@@ -293,7 +293,8 @@ function createProfileOptionsUpdatedTestData1() {
             useSecurePopupFrameUrl: true,
             usePopupShadowDom: true,
             usePopupWindow: false,
-            maximumClipboardSearchLength: 1000
+            maximumClipboardSearchLength: 1000,
+            popupCurrentIndicatorMode: 'bar-left'
         },
         audio: {
             enabled: true,
