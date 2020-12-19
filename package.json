@@ -7,11 +7,12 @@
     },
     "scripts": {
         "build": "node ./dev/build.js",
-        "test": "npm run test-lint && npm run test-code && npm run test-manifest",
+        "test": "npm run test-lint && npm run test-code && npm run test-manifest && npm run test-build",
         "test-lint": "eslint . && node ./dev/lint/global-declarations.js && node ./dev/lint/html-scripts.js",
         "test-lint-web-ext": "npx web-ext lint",
         "test-code": "node ./test/test-all.js ./test --skip ./test/test-manifest.js",
-        "test-manifest": "node ./test/test-manifest.js"
+        "test-manifest": "node ./test/test-manifest.js",
+        "test-build": "node ./dev/build.js --dry-run --all"
     },
     "repository": {
         "type": "git",

@@ -17,42 +17,50 @@
 
 const fs = require('fs');
 const path = require('path');
+const assert = require('assert');
 const readline = require('readline');
 const childProcess = require('child_process');
 const util = require('./util');
-const {getAllFiles, getDefaultManifestAndVariants, createManifestString, getArgs} = util;
+const {getAllFiles, getDefaultManifestAndVariants, createManifestString, getArgs, testMain} = util;
 
 
 function clone(value) {
     return JSON.parse(JSON.stringify(value));
 }
 
-async function createZip(directory, excludeFiles, outputFileName, sevenZipExes=[], onUpdate=null) {
-    fs.unlinkSync(outputFileName);
-    for (const exe of sevenZipExes) {
-        try {
-            const excludeArguments = excludeFiles.map((excludeFilePath) => `-x!${excludeFilePath}`);
-            childProcess.execFileSync(
-                exe,
-                [
-                    'a',
-                    outputFileName,
-                    '.',
-                    ...excludeArguments
-                ],
-                {
-                    cwd: directory
-                }
-            );
-            return;
-        } catch (e) {
-            // NOP
+async function createZip(directory, excludeFiles, outputFileName, sevenZipExes, onUpdate, dryRun) {
+    try {
+        fs.unlinkSync(outputFileName);
+    } catch (e) {
+        // NOP
+    }
+
+    if (!dryRun) {
+        for (const exe of sevenZipExes) {
+            try {
+                const excludeArguments = excludeFiles.map((excludeFilePath) => `-x!${excludeFilePath}`);
+                childProcess.execFileSync(
+                    exe,
+                    [
+                        'a',
+                        outputFileName,
+                        '.',
+                        ...excludeArguments
+                    ],
+                    {
+                        cwd: directory
+                    }
+                );
+                return;
+            } catch (e) {
+                // NOP
+            }
         }
     }
-    return await createJSZip(directory, excludeFiles, outputFileName, onUpdate);
+    return await createJSZip(directory, excludeFiles, outputFileName, onUpdate, dryRun);
 }
 
-async function createJSZip(directory, excludeFiles, outputFileName, onUpdate) {
+async function createJSZip(directory, excludeFiles, outputFileName, onUpdate, dryRun) {
     const JSZip = util.JSZip;
     const files = getAllFiles(directory, directory);
     removeItemsFromArray(files, excludeFiles);
@@ -76,7 +84,9 @@ async function createJSZip(directory, excludeFiles, outputFileName, onUpdate) {
     }, onUpdate);
     process.stdout.write('\n');
 
-    fs.writeFileSync(outputFileName, data, {encoding: null, flag: 'w'});
+    if (!dryRun) {
+        fs.writeFileSync(outputFileName, data, {encoding: null, flag: 'w'});
+    }
 }
 
 function removeItemsFromArray(array, removeItems) {
@@ -272,15 +282,18 @@ function createVariantManifest(manifest, variant, variantMap) {
     return modifiedManifest;
 }
 
-async function build(manifest, buildDir, extDir, manifestPath, variantMap, variantNames) {
+async function build(manifest, buildDir, extDir, manifestPath, variantMap, variantNames, dryRun, dryRunBuildZip) {
     const sevenZipExes = ['7za', '7z'];
 
     // Create build directory
-    if (!fs.existsSync(buildDir)) {
+    if (!fs.existsSync(buildDir) && !dryRun) {
         fs.mkdirSync(buildDir, {recursive: true});
     }
 
+    const dontLogOnUpdate = !process.stdout.isTTY;
     const onUpdate = (metadata) => {
+        if (dontLogOnUpdate) { return; }
+
         let message = `Progress: ${metadata.percent.toFixed(2)}%`;
         if (metadata.currentFile) {
             message += ` (${metadata.currentFile})`;
@@ -305,13 +318,21 @@ async function build(manifest, buildDir, extDir, manifestPath, variantMap, varia
 
         const fileNameSafe = path.basename(fileName);
         const fullFileName = path.join(buildDir, fileNameSafe);
-        fs.writeFileSync(manifestPath, createManifestString(modifiedManifest));
-        await createZip(extDir, excludeFiles, fullFileName, sevenZipExes, onUpdate);
+        ensureFilesExist(extDir, excludeFiles);
+        if (!dryRun) {
+            fs.writeFileSync(manifestPath, createManifestString(modifiedManifest));
+        }
 
-        if (Array.isArray(fileCopies)) {
-            for (const fileName2 of fileCopies) {
-                const fileName2Safe = path.basename(fileName2);
-                fs.copyFileSync(fullFileName, path.join(buildDir, fileName2Safe));
+        if (!dryRun || dryRunBuildZip) {
+            await createZip(extDir, excludeFiles, fullFileName, sevenZipExes, onUpdate, dryRun);
+        }
+
+        if (!dryRun) {
+            if (Array.isArray(fileCopies)) {
+                for (const fileName2 of fileCopies) {
+                    const fileName2Safe = path.basename(fileName2);
+                    fs.copyFileSync(fullFileName, path.join(buildDir, fileName2Safe));
+                }
             }
         }
 
@@ -319,15 +340,25 @@ async function build(manifest, buildDir, extDir, manifestPath, variantMap, varia
     }
 }
 
+function ensureFilesExist(directory, files) {
+    for (const file of files) {
+        assert.ok(fs.existsSync(path.join(directory, file)));
+    }
+}
 
-async function main() {
-    const argv = process.argv.slice(2);
+
+async function main(argv) {
     const args = getArgs(argv, new Map([
         ['all', false],
         ['default', false],
         ['manifest', null],
+        ['dry-run', false],
+        ['dry-run-build-zip', false],
         [null, []]
     ]));
+
+    const dryRun = args.get('dry-run');
+    const dryRunBuildZip = args.get('dry-run-build-zip');
 
     const {manifest, variants} = getDefaultManifestAndVariants();
 
@@ -343,7 +374,7 @@ async function main() {
 
     try {
         const variantNames = (argv.length === 0 || args.get('all') ? variants.map(({name}) => name) : args.get(null));
-        await build(manifest, buildDir, extDir, manifestPath, variantMap, variantNames);
+        await build(manifest, buildDir, extDir, manifestPath, variantMap, variantNames, dryRun, dryRunBuildZip);
     } finally {
         // Restore manifest
         let restoreManifest = manifest;
@@ -354,9 +385,18 @@ async function main() {
             }
         }
         process.stdout.write('Restoring manifest...\n');
-        fs.writeFileSync(manifestPath, createManifestString(restoreManifest));
+        if (!dryRun) {
+            fs.writeFileSync(manifestPath, createManifestString(restoreManifest));
+        }
     }
 }
 
 
-if (require.main === module) { main(); }
+if (require.main === module) {
+    testMain(main, process.argv.slice(2));
+}
+
+
+module.exports = {
+    main
+};

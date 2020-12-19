@@ -137,9 +137,9 @@ function createDictionaryArchive(dictionaryDirectory, dictionaryName) {
 }
 
 
-async function testMain(func) {
+async function testMain(func, ...args) {
     try {
-        await func();
+        await func(...args);
     } catch (e) {
         console.log(e);
         process.exit(-1);
