@@ -879,6 +879,7 @@ class Display extends EventDispatcher {
         }
 
         let {sentence=null, optionsContext=null, focusEntry=null, scrollX=null, scrollY=null} = state;
+        if (typeof focusEntry !== 'number') { focusEntry = 0; }
         if (!(typeof optionsContext === 'object' && optionsContext !== null)) {
             optionsContext = this.getOptionsContext();
             state.optionsContext = optionsContext;
@@ -943,9 +944,11 @@ class Display extends EventDispatcher {
             entry.dataset.index = `${i}`;
             this._addEntryEventListeners(entry);
             container.appendChild(entry);
+            if (focusEntry === i) {
+                this._focusEntry(i, false);
+            }
         }
 
-        this._focusEntry(typeof focusEntry === 'number' ? focusEntry : 0, false);
         if (typeof scrollX === 'number' || typeof scrollY === 'number') {
             let {x, y} = this._windowScroll;
             if (typeof scrollX === 'number') { x = scrollX; }
