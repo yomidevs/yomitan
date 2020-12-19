@@ -720,8 +720,7 @@ button.action-button {
     height: 0;
     top: 0;
     background-color: var(--entry-current-indicator-color);
-    transition:
-        height var(--entry-current-indicator-transition-duration) linear;
+    transition: none;
 }
 .entry.entry-current .entry-current-indicator-inner {
     height: var(--entry-current-indicator-width);
@@ -736,11 +735,14 @@ button.action-button {
 :root[data-popup-current-indicator-mode=dot-right] .entry-current-indicator-inner {
     display: block;
     position: sticky;
+    transition:
+        height var(--entry-current-indicator-transition-duration) linear;
 }
 :root[data-popup-current-indicator-mode=none] .entry-current-indicator,
 :root[data-popup-current-indicator-mode=asterisk] .entry-current-indicator,
 :root[data-popup-current-indicator-mode=triangle] .entry-current-indicator {
     display: none;
+    transition: none;
 }
 
 
@@ -788,6 +790,7 @@ button.action-button {
 .term-expression:not(:first-of-type) .term-expression-current-indicator,
 :root:not([data-popup-current-indicator-mode=triangle]) .term-expression-current-indicator {
     display: none;
+    transition: none;
 }
 
 
