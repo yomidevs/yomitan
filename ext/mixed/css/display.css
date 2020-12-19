@@ -610,12 +610,12 @@ button.action-button {
 .term-expression-text {
     color: var(--kanji-text-color);
 }
-.term-expression[data-frequency=popular] .term-expression-text,
-.term-expression[data-frequency=popular] .kanji-link {
+.entry[data-expression-multi=true] .term-expression[data-frequency=popular] .term-expression-text,
+.entry[data-expression-multi=true] .term-expression[data-frequency=popular] .kanji-link {
     color: var(--kanji-popular-text-color);
 }
-.term-expression[data-frequency=rare] .term-expression-text,
-.term-expression[data-frequency=rare] .kanji-link {
+.entry[data-expression-multi=true] .term-expression[data-frequency=rare] .term-expression-text,
+.entry[data-expression-multi=true] .term-expression[data-frequency=rare] .kanji-link {
     color: var(--kanji-rare-text-color);
 }
 .term-expression-text>ruby>rt {
