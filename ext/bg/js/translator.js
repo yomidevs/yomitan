@@ -909,6 +909,30 @@ class Translator {
         return [...uniqueDictionaryNames];
     }
 
+    _getUniqueTermTags(definitions) {
+        const newTermTags = [];
+        if (definitions.length <= 1) {
+            for (const {termTags} of definitions) {
+                for (const tag of termTags) {
+                    newTermTags.push(this._cloneTag(tag));
+                }
+            }
+        } else {
+            const tagsSet = new Set();
+            let checkTagsMap = false;
+            for (const {termTags} of definitions) {
+                for (const tag of termTags) {
+                    const key = this._getTagMapKey(tag);
+                    if (checkTagsMap && tagsSet.has(key)) { continue; }
+                    tagsSet.add(key);
+                    newTermTags.push(this._cloneTag(tag));
+                }
+                checkTagsMap = true;
+            }
+        }
+        return newTermTags;
+    }
+
     *_getArrayVariants(arrayVariants) {
         const ii = arrayVariants.length;
 
@@ -970,12 +994,9 @@ class Translator {
         return this._createTag(name, category, notes, order, score, dictionary, redundant);
     }
 
-    _cloneTags(tags) {
-        const results = [];
-        for (const tag of tags) {
-            results.push(this._cloneTag(tag));
-        }
-        return results;
+    _getTagMapKey(tag) {
+        const {name, category, notes} = tag;
+        return this._createMapKey([name, category, notes]);
     }
 
     _createMapKey(array) {
@@ -1066,10 +1087,11 @@ class Translator {
     }
 
     _createGroupedTermDefinition(definitions) {
-        const {expression, reading, furiganaSegments, reasons, termTags, source, rawSource, sourceTerm} = definitions[0];
+        const {expression, reading, furiganaSegments, reasons, source, rawSource, sourceTerm} = definitions[0];
         const score = this._getMaxDefinitionScore(definitions);
         const dictionaryPriority = this._getMaxDictionaryPriority(definitions);
         const dictionaryNames = this._getUniqueDictionaryNames(definitions);
+        const termTags = this._getUniqueTermTags(definitions);
         const termDetailsList = [this._createTermDetails(sourceTerm, expression, reading, furiganaSegments, termTags)];
         const sourceTermExactMatchCount = (sourceTerm === expression ? 1 : 0);
         return {
@@ -1090,7 +1112,7 @@ class Translator {
             furiganaSegments, // Contains duplicate data
             // glossary
             // definitionTags
-            termTags: this._cloneTags(termTags),
+            termTags,
             definitions, // type: 'term'
             frequencies: [],
             pitches: [],

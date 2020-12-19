@@ -7957,6 +7957,24 @@
                                         "score": 0,
                                         "dictionary": "Test Dictionary 2",
                                         "redundant": false
+                                    },
+                                    {
+                                        "name": "tag6",
+                                        "category": "default",
+                                        "notes": "",
+                                        "order": 0,
+                                        "score": 0,
+                                        "dictionary": "Test Dictionary 2",
+                                        "redundant": false
+                                    },
+                                    {
+                                        "name": "tag7",
+                                        "category": "default",
+                                        "notes": "",
+                                        "order": 0,
+                                        "score": 0,
+                                        "dictionary": "Test Dictionary 2",
+                                        "redundant": false
                                     }
                                 ],
                                 "termFrequency": "normal",
@@ -8034,6 +8052,24 @@
                                 "name": "tag5",
                                 "category": "category5",
                                 "notes": "tag5 notes",
+                                "order": 0,
+                                "score": 0,
+                                "dictionary": "Test Dictionary 2",
+                                "redundant": false
+                            },
+                            {
+                                "name": "tag6",
+                                "category": "default",
+                                "notes": "",
+                                "order": 0,
+                                "score": 0,
+                                "dictionary": "Test Dictionary 2",
+                                "redundant": false
+                            },
+                            {
+                                "name": "tag7",
+                                "category": "default",
+                                "notes": "",
                                 "order": 0,
                                 "score": 0,
                                 "dictionary": "Test Dictionary 2",
