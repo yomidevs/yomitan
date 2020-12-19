@@ -1291,7 +1291,7 @@ button.action-button {
     display: inline;
     color: var(--light-text-color);
 }
-:root[data-glossary-layout-mode=compact] .entry:not([data-type=term][data-expression-multi=true]) .term-special-tags {
+:root[data-glossary-layout-mode=compact] .entry:not([data-expression-multi=true]) .term-special-tags {
     display: none;
 }
 :root[data-glossary-layout-mode=compact] .term-expression-details>.frequencies {
