@@ -298,6 +298,7 @@ a {
     justify-content: flex-start;
 }
 .content-body {
+    height: 0;
     flex: 1 1 auto;
     position: relative;
 }
@@ -352,7 +353,8 @@ a {
     display: none;
 }
 .content-sidebar[hidden][data-has-navigation-previous=true],
-.content-sidebar[hidden][data-has-navigation-next=true] {
+.content-sidebar[hidden][data-has-navigation-next=true],
+:root[data-popup-action-bar-visibility=always] .content-sidebar {
     display: block;
 }
 .content-sidebar-inner {
@@ -360,6 +362,11 @@ a {
     flex-flow: column nowrap;
     width: var(--sidebar-width);
     height: 100%;
+}
+.content-sidebar-top-pre {
+    flex: 0 0 auto;
+    display: flex;
+    flex-flow: column nowrap;
 }
 .content-sidebar-top {
     flex: 1 1 auto;
@@ -372,6 +379,43 @@ a {
     background-color: var(--sidebar-background-color);
     display: flex;
     flex-flow: column nowrap;
+}
+:root[data-popup-action-bar-location=top] .content-outer,
+:root[data-popup-action-bar-location=bottom] .content-outer {
+    flex-flow: column nowrap;
+}
+:root[data-popup-action-bar-location=top] .content-sidebar,
+:root[data-popup-action-bar-location=bottom] .content-sidebar {
+    height: auto;
+    width: 100%;
+}
+:root[data-popup-action-bar-location=left] .content-sidebar,
+:root[data-popup-action-bar-location=top] .content-sidebar {
+    order: -1;
+}
+:root[data-popup-action-bar-location=top] .content-sidebar-inner,
+:root[data-popup-action-bar-location=bottom] .content-sidebar-inner {
+    flex-flow: row nowrap;
+    width: auto;
+    height: var(--sidebar-button-height);
+}
+:root[data-popup-action-bar-location=top] .content-sidebar-top-pre,
+:root[data-popup-action-bar-location=bottom] .content-sidebar-top-pre {
+    flex-flow: row nowrap;
+    order: 1;
+}
+:root[data-popup-action-bar-location=top] .content-sidebar-top,
+:root[data-popup-action-bar-location=bottom] .content-sidebar-top {
+    flex-flow: row nowrap;
+}
+:root[data-popup-action-bar-location=top] .content-sidebar-bottom,
+:root[data-popup-action-bar-location=bottom] .content-sidebar-bottom {
+    flex-flow: row nowrap;
+}
+:root[data-popup-action-bar-location=top] button.sidebar-button,
+:root[data-popup-action-bar-location=bottom] button.sidebar-button {
+    width: var(--sidebar-width) !important;
+    height: 100% !important;
 }
 
 

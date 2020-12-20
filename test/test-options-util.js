@@ -294,7 +294,9 @@ function createProfileOptionsUpdatedTestData1() {
             usePopupShadowDom: true,
             usePopupWindow: false,
             maximumClipboardSearchLength: 1000,
-            popupCurrentIndicatorMode: 'bar-left'
+            popupCurrentIndicatorMode: 'bar-left',
+            popupActionBarVisibility: 'auto',
+            popupActionBarLocation: 'right'
         },
         audio: {
             enabled: true,

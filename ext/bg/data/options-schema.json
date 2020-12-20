@@ -110,7 +110,9 @@
                                     "usePopupShadowDom",
                                     "usePopupWindow",
                                     "maximumClipboardSearchLength",
-                                    "popupCurrentIndicatorMode"
+                                    "popupCurrentIndicatorMode",
+                                    "popupActionBarVisibility",
+                                    "popupActionBarLocation"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -271,6 +273,16 @@
                                         "type": "string",
                                         "enum": ["none", "asterisk", "triangle", "bar-left", "bar-right", "dot-left", "dot-right"],
                                         "default": "bar-left"
+                                    },
+                                    "popupActionBarVisibility": {
+                                        "type": "string",
+                                        "enum": ["auto", "always"],
+                                        "default": "auto"
+                                    },
+                                    "popupActionBarLocation": {
+                                        "type": "string",
+                                        "enum": ["left", "right", "top", "bottom"],
+                                        "default": "right"
                                     }
                                 }
                             },

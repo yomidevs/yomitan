@@ -663,9 +663,13 @@ class OptionsUtil {
         // Version 7 changes:
         //  Added general.maximumClipboardSearchLength.
         //  Added general.popupCurrentIndicatorMode.
+        //  Added general.popupActionBarVisibility.
+        //  Added general.popupActionBarLocation.
         for (const profile of options.profiles) {
             profile.options.general.maximumClipboardSearchLength = 1000;
             profile.options.general.popupCurrentIndicatorMode = 'bar-left';
+            profile.options.general.popupActionBarVisibility = 'auto';
+            profile.options.general.popupActionBarLocation = 'right';
         }
         return options;
     }
