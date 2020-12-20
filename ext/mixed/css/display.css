@@ -484,6 +484,9 @@ button.action-button {
     background-repeat: no-repeat;
     background-size: contain;
 }
+.action-button[data-icon=entry-current]::before {
+    background-image: url("/mixed/img/entry-current.svg");
+}
 .action-button[data-icon=view-note]::before {
     background-image: url("/mixed/img/view-note.svg");
 }
@@ -582,7 +585,7 @@ button.action-button {
     position: relative;
 }
 .entry>.entry-current-indicator {
-    display: block;
+    display: none;
     position: absolute;
     left: calc(-1 * var(--main-content-horizontal-padding));
     top: 0;
@@ -620,6 +623,9 @@ button.action-button {
 }
 .term-expression-text>ruby>rt {
     color: var(--kanji-furigana-text-color);
+}
+.entry:not(.entry-current) .action-current-indicator {
+    display: none;
 }
 .entry-header2,
 .entry-header3 {
