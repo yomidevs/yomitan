@@ -24,6 +24,7 @@ class SecondarySearchDictionaryController {
         this._settingsController = settingsController;
         this._getDictionaryInfoToken = null;
         this._container = null;
+        this._eventListeners = new EventListenerCollection();
     }
 
     async prepare() {
@@ -37,6 +38,8 @@ class SecondarySearchDictionaryController {
     // Private
 
     async _onDatabaseUpdated() {
+        this._eventListeners.removeAllEventListeners();
+
         const token = {};
         this._getDictionaryInfoToken = token;
         const dictionaries = await this._settingsController.getDictionaryInfo();
@@ -44,18 +47,27 @@ class SecondarySearchDictionaryController {
         this._getDictionaryInfoToken = null;
 
         const fragment = document.createDocumentFragment();
-        for (const {title} of dictionaries) {
+        for (const {title, revision} of dictionaries) {
             const node = this._settingsController.instantiateTemplate('secondary-search-dictionary');
             fragment.appendChild(node);
 
-            const nameNode = node.querySelector('.dictionary-name');
+            const nameNode = node.querySelector('.dictionary-title');
             nameNode.textContent = title;
+
+            const versionNode = node.querySelector('.dictionary-version');
+            versionNode.textContent = `rev.${revision}`;
 
             const toggle = node.querySelector('.dictionary-allow-secondary-searches');
             toggle.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'allowSecondarySearches']);
+            this._eventListeners.addEventListener(toggle, 'settingChanged', this._onEnabledChanged.bind(this, node), false);
         }
 
         this._container.textContent = '';
         this._container.appendChild(fragment);
+    }
+
+    _onEnabledChanged(node, e) {
+        const {detail: {value}} = e;
+        node.dataset.enabled = `${value}`;
     }
 }

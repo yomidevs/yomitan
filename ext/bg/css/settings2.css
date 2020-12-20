@@ -1903,6 +1903,28 @@ body.preview-sidebar-visible .fab-container-item.fab-container-item-popup-previe
     display: block;
 }
 
+.dictionary-info {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+.dictionary-info-label {
+    margin-left: 1em;
+}
+
+.dictionary-title {
+    color: inherit;
+    transition: color var(--animation-duration) ease-in-out;
+}
+.dictionary-item[data-enabled=false] .dictionary-title {
+    color: var(--text-color-light);
+}
+
+.dictionary-list {
+    display: flex;
+    flex-flow: column nowrap;
+    width: 100%;
+}
 .dictionary-list>.settings-item,
 .dictionary-list>.settings-item+.settings-item {
     margin-left: calc(var(--modal-padding-horizontal) * -1);

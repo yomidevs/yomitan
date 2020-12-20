@@ -74,6 +74,7 @@ class DictionaryEntry {
         }
         if (enabledCheckbox !== null) {
             enabledCheckbox.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'enabled']);
+            this._eventListeners.addEventListener(enabledCheckbox, 'settingChanged', this._onEnabledChanged.bind(this), false);
         }
         if (priorityInput !== null) {
             priorityInput.dataset.setting = ObjectPropertyAccessor.getPathString(['dictionaries', title, 'priority']);
@@ -90,9 +91,6 @@ class DictionaryEntry {
         }
         if (detailsToggleLink !== null && this._detailsContainer !== null) {
             this._eventListeners.addEventListener(detailsToggleLink, 'click', this._onDetailsToggleLinkClicked.bind(this), false);
-        }
-        if (priorityInput !== null) {
-            this._eventListeners.addEventListener(priorityInput, 'settingChanged', this._onPriorityChanged.bind(this), false);
         }
     }
 
@@ -122,7 +120,7 @@ class DictionaryEntry {
         const {detail: {menu}} = e;
         const showDetails = menu.querySelector('.popup-menu-item[data-menu-action="showDetails"]');
         const hideDetails = menu.querySelector('.popup-menu-item[data-menu-action="hideDetails"]');
-        const hasDetails = (this._detailsContainer !== null && (this._hasDetails || this._hasCounts));
+        const hasDetails = (this._detailsContainer !== null);
         const detailsVisible = (hasDetails && !this._detailsContainer.hidden);
         if (showDetails !== null) {
             showDetails.hidden = detailsVisible;
@@ -154,9 +152,9 @@ class DictionaryEntry {
         this._detailsContainer.hidden = !this._detailsContainer.hidden;
     }
 
-    _onPriorityChanged(e) {
+    _onEnabledChanged(e) {
         const {detail: {value}} = e;
-        this._node.style.order = `${-value}`;
+        this._node.dataset.enabled = `${value}`;
     }
 
     _setupDetails(detailsTable) {
