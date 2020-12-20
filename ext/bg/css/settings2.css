@@ -232,7 +232,8 @@ h2 {
     font-size: 1.125em;
     font-weight: normal;
     line-height: 1.5;
-    margin: 1.75em 0 0.9em;
+    padding: 0.9em 0;
+    margin: 0.85em 0 0;
 }
 h3 {
     font-size: 1em;
@@ -246,6 +247,17 @@ h3 {
     width: 100%;
     align-items: baseline;
 }
+.heading-container-icon {
+    flex: 0 0 auto;
+    align-self: center;
+    margin: 0.85em 0.75em 0 0;
+}
+.heading-container-icon>.icon {
+    display: block;
+    background-color: var(--button-icon-color);
+    width: var(--outline-item-icon-size);
+    height: var(--outline-item-icon-size);
+}
 .heading-container-left {
     flex: 1 1 auto;
 }
@@ -253,7 +265,7 @@ h3 {
     flex: 0 0 auto;
 }
 .heading-sub-text {
-    font-size: 0.88888888em;
+    font-size: calc(1em / 1.125);
     color: var(--text-color-light);
 }
 .heading-link-light {
