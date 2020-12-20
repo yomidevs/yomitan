@@ -535,7 +535,7 @@ class AnkiCardController {
         const fieldNamesSet = new Set(fieldNames);
         let index = 0;
         for (const [fieldName, {fieldNameContainerNode}] of fieldMap.entries()) {
-            fieldNameContainerNode.dataset.isValid = `${fieldNamesSet.has(fieldName)}`;
+            fieldNameContainerNode.dataset.invalid = `${!fieldNamesSet.has(fieldName)}`;
             fieldNameContainerNode.dataset.orderMatches = `${index < fieldNames.length && fieldName === fieldNames[index]}`;
             ++index;
         }

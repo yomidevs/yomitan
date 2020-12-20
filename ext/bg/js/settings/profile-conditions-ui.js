@@ -614,7 +614,7 @@ class ProfileConditionUI {
         }
 
         this._value = value;
-        node.classList.remove('is-invalid');
+        delete node.dataset.invalid;
         node.type = inputType;
         if (inputValue !== null) {
             node.value = inputValue;
@@ -634,7 +634,7 @@ class ProfileConditionUI {
 
     _validateValue(value, validate) {
         const okay = (validate === null || validate(value));
-        this._valueInput.classList.toggle('is-invalid', !okay);
+        this._valueInput.dataset.invalid = `${!okay}`;
         return okay;
     }
 

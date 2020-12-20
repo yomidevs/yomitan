@@ -210,7 +210,7 @@ class AnkiTemplatesController {
         infoNode.textContent = hasException ? exceptions.map((e) => `${e}`).join('\n') : (showSuccessResult ? result : '');
         infoNode.classList.toggle('text-danger', hasException);
         if (invalidateInput) {
-            this._fieldTemplatesTextarea.classList.toggle('is-invalid', hasException);
+            this._fieldTemplatesTextarea.dataset.invalid = `${hasException}`;
         }
     }
 

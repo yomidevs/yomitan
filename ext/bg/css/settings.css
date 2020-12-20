@@ -43,7 +43,7 @@ html:root:not([data-options-general-result-output-mode=merge]) #dictionary-main-
     font-weight: normal;
 }
 
-.form-control.is-invalid {
+.form-control[data-invalid=true] {
     border-color: #f00000;
 }
 

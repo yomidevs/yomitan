@@ -1106,13 +1106,6 @@ input[type=number]::-webkit-outer-spin-button {
 input[type=text] {
     width: var(--input-width-large);
 }
-input[type=text].input-with-suffix-button,
-input[type=number].input-with-suffix-button {
-    flex: 1 1 auto;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    z-index: 1;
-}
 textarea {
     box-sizing: border-box;
     padding: var(--textarea-padding);
@@ -1122,10 +1115,15 @@ textarea {
     line-height: var(--textarea-line-height);
     border: 1px solid var(--input-background-color);
 }
-input[type=text].is-invalid,
-input[type=number].is-invalid,
-textarea.is-invalid {
-    border-color: var(--danger-color);
+select:invalid,
+textarea:invalid,
+input[type=text]:invalid,
+input[type=number]:invalid,
+select[data-invalid=true],
+textarea[data-invalid=true],
+input[type=text][data-invalid=true],
+input[type=number][data-invalid=true] {
+    border: var(--thin-border-size) solid var(--danger-color);
 }
 select,
 textarea,
@@ -1140,6 +1138,25 @@ input[type=text]:focus,
 input[type=number]:focus {
     box-shadow: 0 0 0 2px var(--input-outline-color);
     outline: none;
+}
+select:invalid:focus,
+textarea:invalid:focus,
+input[type=text]:invalid:focus,
+input[type=number]:invalid:focus,
+select[data-invalid=true]:focus,
+textarea[data-invalid=true]:focus,
+input[type=text][data-invalid=true]:focus,
+input[type=number][data-invalid=true]:focus {
+    box-shadow: 0 0 0 2px var(--danger-color);
+    outline: none;
+}
+input[type=text].input-with-suffix-button,
+input[type=number].input-with-suffix-button {
+    flex: 1 1 auto;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-style: none;
+    z-index: 1;
 }
 
 
@@ -1265,6 +1282,7 @@ button.input-suffix-button {
     background-color: var(--input-background-color);
     box-sizing: border-box;
     padding: 0 0.5em;
+    border-color: transparent;
 }
 button.input-suffix-button.input-suffix-icon-button {
     width: 2.125em;
@@ -1277,6 +1295,14 @@ button.input-suffix-button.input-suffix-icon-button:focus {
 button.input-suffix-button.input-suffix-icon-button:active {
     background-color: var(--input-background-color-darker);
 }
+input[type=text]:invalid+button.input-suffix-button,
+input[type=number]:invalid+button.input-suffix-button,
+input[type=text][data-invalid=true]+button.input-suffix-button,
+input[type=number][data-invalid=true]+button.input-suffix-button {
+    border: var(--thin-border-size) solid var(--danger-color);
+    border-left-style: none;
+}
+
 
 /* Material design icon button */
 button.icon-button {
@@ -2097,7 +2123,7 @@ select.profile-condition-operator {
     margin-right: 0.25em;
     padding: 0 0.25em;
 }
-.anki-card-field-name-container[data-is-valid=false],
+.anki-card-field-name-container[data-invalid=true],
 .anki-card-field-name-container[data-order-matches=false][data-index='0'] {
     background-color: var(--danger-color-lightest);
     border-radius: var(--text-input-border-radius);
