@@ -98,6 +98,23 @@ h1 {
     border-bottom: calc(1em / (var(--font-size-no-units) * 2)) solid var(--separator-color1);
 }
 
+/* Icons */
+.icon {
+    --icon-image: none;
+    --icon-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center center;
+    -webkit-mask-mode: alpha;
+    -webkit-mask-size: var(--icon-size);
+    -webkit-mask-image: var(--icon-image);
+    mask-repeat: no-repeat;
+    mask-position: center center;
+    mask-mode: alpha;
+    mask-size: var(--icon-size);
+    mask-image: var(--icon-image);
+}
+.icon[data-icon=magnifying-glass] { --icon-image: url(/mixed/img/magnifying-glass.svg); }
+
 /* Material design select */
 select {
     width: var(--input-width-large);
@@ -289,7 +306,7 @@ label.toggle {
     background-color: var(--input-background-color-darker);
 }
 
-.icon-button-icon {
+#search-button>.icon {
     display: block;
     position: absolute;
     left: 0;
@@ -297,18 +314,7 @@ label.toggle {
     right: 0;
     bottom: 0;
     background-color: var(--button-icon-color);
-    mask-repeat: no-repeat;
-    mask-position: center center;
-    mask-mode: alpha;
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-position: center center;
-    -webkit-mask-mode: alpha;
-}
-.icon-button-icon[data-icon=magnifying-glass] {
-    mask-image: url(/mixed/img/magnifying-glass.svg);
-    -webkit-mask-image: url(/mixed/img/magnifying-glass.svg);
-    mask-size: 16px 16px;
-    -webkit-mask-size: 16px 16px;
+    --icon-size: 16px 16px;
 }
 
 /* Search options */
