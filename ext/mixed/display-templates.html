@@ -57,7 +57,7 @@
 <template id="term-pitch-accent-character-template"><span class="term-pitch-accent-character"><span class="term-pitch-accent-character-inner"></span></span></template>
 
 <!-- Kanji entry templates -->
-<template id="kanji-entry-template"><div class="entry" data-type="kanji">
+<template id="kanji-entry-template" data-remove-whitespace-text="true"><div class="entry" data-type="kanji">
     <div class="entry-current-indicator" title="Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)"><span class="entry-current-indicator-inner"></span></div>
     <div class="entry-header1">
         <div class="entry-header2">
@@ -67,7 +67,10 @@
                     <button class="action-button action-add-note" hidden disabled data-icon="add-term-kanji" data-mode="kanji" title="Add Kanji (Alt + K)"></button>
                     <span class="entry-current-indicator-icon" title="Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)"></span>
                 </div>
-                <div class="kanji-glyph source-text"></div>
+                <div class="kanji-glyph-container">
+                    <span class="term-expression-current-indicator"></span>
+                    <div class="kanji-glyph source-text"></div>
+                </div>
             </div>
         </div>
         <div class="frequencies"></div>

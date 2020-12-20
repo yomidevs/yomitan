@@ -794,7 +794,6 @@ button.action-button {
 .term-expression-current-indicator {
     pointer-events: none;
     position: absolute;
-    font-size: calc(1em / var(--expression-font-size-no-units));
     left: calc(-1 * var(--main-content-horizontal-padding));
     top: 0;
     bottom: 0;
@@ -803,6 +802,9 @@ button.action-button {
     transition:
         opacity var(--entry-current-indicator-transition-duration) linear,
         visibility 0s linear var(--entry-current-indicator-transition-duration);
+}
+.term-expression-text .term-expression-current-indicator {
+    font-size: calc(1em / var(--expression-font-size-no-units));
 }
 .entry.entry-current .term-expression-current-indicator {
     opacity: 1;
@@ -1185,6 +1187,10 @@ button.action-button {
 
 
 /* Kanji */
+.kanji-glyph-container {
+    display: block;
+    position: relative;
+}
 .kanji-glyph {
     font-family: kanji-stroke-orders;
     font-size: 8.5em;
