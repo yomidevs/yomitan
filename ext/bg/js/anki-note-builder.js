@@ -22,6 +22,7 @@
 class AnkiNoteBuilder {
     constructor({renderTemplate}) {
         this._renderTemplate = renderTemplate;
+        this._markerPattern = /\{([\w-]+)\}/g;
     }
 
     async createNote({
@@ -98,6 +99,12 @@ class AnkiNoteBuilder {
         return false;
     }
 
+    containsAnyMarker(field) {
+        const result = this._markerPattern.test(field);
+        this._markerPattern.lastIndex = 0;
+        return result;
+    }
+
     getRootDeckName(deckName) {
         const index = deckName.indexOf('::');
         return index >= 0 ? deckName.substring(0, index) : deckName;
@@ -136,8 +143,7 @@ class AnkiNoteBuilder {
     }
 
     async _formatField(field, data, templates, errors=null) {
-        const pattern = /\{([\w-]+)\}/g;
-        return await this._stringReplaceAsync(field, pattern, async (g0, marker) => {
+        return await this._stringReplaceAsync(field, this._markerPattern, async (g0, marker) => {
             try {
                 return await this._renderTemplate(templates, data, marker);
             } catch (e) {

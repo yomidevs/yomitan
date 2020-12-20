@@ -17,6 +17,7 @@
 
 /* global
  * AnkiConnect
+ * AnkiNoteBuilder
  * ObjectPropertyAccessor
  * SelectorObserver
  */
@@ -25,6 +26,9 @@ class AnkiController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._ankiConnect = new AnkiConnect();
+        this._ankiNoteBuilder = new AnkiNoteBuilder({
+            renderTemplate: null
+        });
         this._selectorObserver = new SelectorObserver({
             selector: '.anki-card',
             ignoreSelector: null,
@@ -157,6 +161,10 @@ class AnkiController {
         if (requireClipboard) {
             this._requestClipboardReadPermission();
         }
+    }
+
+    containsAnyMarker(field) {
+        return this._ankiNoteBuilder.containsAnyMarker(field);
     }
 
     // Private
@@ -403,8 +411,15 @@ class AnkiCardController {
         this._setModel(e.currentTarget.value);
     }
 
-    _onFieldChange(e) {
-        this._ankiController.validateFieldPermissions(e.currentTarget.value);
+    _onFieldChange(index, e) {
+        const node = e.currentTarget;
+        this._ankiController.validateFieldPermissions(node.value);
+        this._validateField(node, index);
+    }
+
+    _onFieldInput(index, e) {
+        const node = e.currentTarget;
+        this._validateField(node, index);
     }
 
     _onFieldMenuClosed({currentTarget: node, detail: {action, item}}) {
@@ -419,6 +434,13 @@ class AnkiCardController {
         e.preventDefault();
         const link = e.currentTarget;
         this._setFieldMarker(link, link.textContent);
+    }
+
+    _validateField(node, index) {
+        if (index === 0) {
+            const containsAnyMarker = this._ankiController.containsAnyMarker(node.value);
+            node.dataset.invalid = `${!containsAnyMarker}`;
+        }
     }
 
     _setFieldMarker(element, marker) {
@@ -482,7 +504,9 @@ class AnkiCardController {
             const inputField = content.querySelector('.anki-card-field-value');
             inputField.value = fieldValue;
             inputField.dataset.setting = ObjectPropertyAccessor.getPathString(['anki', this._cardType, 'fields', fieldName]);
-            this._fieldEventListeners.addEventListener(inputField, 'change', this._onFieldChange.bind(this), false);
+            this._fieldEventListeners.addEventListener(inputField, 'change', this._onFieldChange.bind(this, index), false);
+            this._fieldEventListeners.addEventListener(inputField, 'input', this._onFieldInput.bind(this, index), false);
+            this._validateField(inputField, index);
 
             const markerList = content.querySelector('.anki-card-field-marker-list');
             if (markerList !== null) {
