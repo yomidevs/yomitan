@@ -315,6 +315,8 @@ h3 {
 .icon[data-icon=material-right-arrow]    { --icon-image: url(/mixed/img/material-right-arrow.svg); }
 .icon[data-icon=exclamation-point-short] { --icon-image: url(/mixed/img/exclamation-point-short.svg); }
 .icon[data-icon=magnifying-glass]        { --icon-image: url(/mixed/img/magnifying-glass.svg); }
+.icon[data-icon=collapse]                { --icon-image: url(/mixed/img/collapse.svg); }
+.icon[data-icon=expand]                  { --icon-image: url(/mixed/img/expand.svg); }
 
 
 /* Content layout */
@@ -1444,7 +1446,11 @@ button.icon-button:active {
     flex: 0 1 auto;
     border-radius: 0.5em;
     transform: translate(0, var(--modal-transition-offset));
-    transition: transform 0s linear var(--animation-duration2);
+    transition:
+        transform 0s linear var(--animation-duration2),
+        width var(--animation-duration2) ease-in-out,
+        height var(--animation-duration2) ease-in-out,
+        border-radius var(--animation-duration2) ease-in-out;
     box-shadow: var(--shadow-vertical);
     display: flex;
     flex-flow: column nowrap;
@@ -1460,22 +1466,30 @@ button.icon-button:active {
     max-height: 100%;
 }
 .modal-content.modal-content-full {
-    max-width: var(--main-content-size);
-    width: 100%;
+    width: var(--main-content-size);
     height: 100%;
     transform: translate(0, 0);
     border-radius: 0;
 }
 .modal-container.modal-container-open .modal-content {
     transform: translate(0, 0);
-    transition: transform var(--animation-duration2) ease-out;
+    transition:
+        transform var(--animation-duration2) ease-out,
+        width var(--animation-duration2) ease-in-out,
+        height var(--animation-duration2) ease-in-out,
+        border-radius var(--animation-duration2) ease-in-out;
 }
 .modal-header {
     flex: 0 0 auto;
     padding: var(--modal-padding-vertical) var(--modal-padding-horizontal) var(--modal-padding-vertical-half);
+    display: flex;
+    width: 100%;
+    align-items: center;
+    box-sizing: border-box;
 }
 .modal-title {
     font-size: 1.125em;
+    flex: 1 1 auto;
 }
 .modal-footer {
     flex: 0 0 auto;
@@ -1575,6 +1589,51 @@ button.icon-button:active {
     bottom: 0;
     width: 64px;
     background: transparent linear-gradient(to right, var(--dim-background-color), transparent) repeat-y;
+}
+
+.modal-header-button-container {
+    margin-top: calc(-1 * var(--modal-padding-vertical-half));
+    margin-bottom: calc(-1 * var(--modal-padding-vertical-half));
+}
+.modal-header-button-group {
+    display: block;
+    position: relative;
+    width: var(--icon-button-size);
+    height: var(--icon-button-size);
+}
+.modal-header-button {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+button.icon-button.modal-header-button>.icon-button-inner>.icon {
+    background-color: var(--button-icon-color-light);
+    transition: background-color var(--animation-duration) ease-in-out;
+}
+button.icon-button.modal-header-button:hover>.icon-button-inner>.icon,
+button.icon-button.modal-header-button:active>.icon-button-inner>.icon {
+    background-color: var(--button-icon-color);
+}
+.modal-header-button[data-modal-action=expand],
+.modal-header-button[data-modal-action=collapse] {
+    visibility: visible;
+    opacity: 1;
+    z-index: 1;
+    transition:
+        opacity var(--animation-duration2) ease-in-out 0s,
+        visibility 0s ease-in-out 0s;
+}
+.modal-content.modal-content-full .modal-header-button[data-modal-action=expand],
+.modal-content:not(.modal-content-full) .modal-header-button[data-modal-action=collapse] {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+    transition:
+        opacity var(--animation-duration2) ease-in-out 0s,
+        visibility 0s ease-in-out var(--animation-duration2);
 }
 
 

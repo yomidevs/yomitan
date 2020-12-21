@@ -112,16 +112,22 @@ class Modal extends PopupElement {
             closingClassName: 'modal-container-closing',
             closingAnimationDuration: 375 // Milliseconds; includes buffer
         });
+        this._contentNode = null;
         this._canCloseOnClick = false;
     }
 
     prepare() {
-        const node = this._node;
+        const node = this.node;
+        this._contentNode = node.querySelector('.modal-content');
         let dimmerNode = node.querySelector('.modal-content-dimmer');
         if (dimmerNode === null) { dimmerNode = node; }
         dimmerNode.addEventListener('mousedown', this._onModalContainerMouseDown.bind(this), false);
         dimmerNode.addEventListener('mouseup', this._onModalContainerMouseUp.bind(this), false);
         dimmerNode.addEventListener('click', this._onModalContainerClick.bind(this), false);
+
+        for (const actionNode of node.querySelectorAll('[data-modal-action]')) {
+            actionNode.addEventListener('click', this._onActionNodeClick.bind(this), false);
+        }
     }
 
     // Private
@@ -140,6 +146,23 @@ class Modal extends PopupElement {
         this._canCloseOnClick = false;
         if (e.currentTarget !== e.target) { return; }
         this.setVisible(false);
+    }
+
+    _onActionNodeClick(e) {
+        const {modalAction} = e.currentTarget.dataset;
+        switch (modalAction) {
+            case 'expand':
+                this._setExpanded(true);
+                break;
+            case 'collapse':
+                this._setExpanded(false);
+                break;
+        }
+    }
+
+    _setExpanded(expanded) {
+        if (this._contentNode === null) { return; }
+        this._contentNode.classList.toggle('modal-content-full', expanded);
     }
 }
 
