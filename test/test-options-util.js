@@ -507,7 +507,6 @@ function createOptionsUpdatedTestData1() {
             database: {
                 prefixWildcardsSupported: false
             },
-            showPopupPreview: false,
             useSettingsV2: false
         }
     };

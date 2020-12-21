@@ -665,6 +665,8 @@ class OptionsUtil {
         //  Added general.popupCurrentIndicatorMode.
         //  Added general.popupActionBarVisibility.
         //  Added general.popupActionBarLocation.
+        //  Removed global option showPopupPreview.
+        delete options.global.showPopupPreview;
         for (const profile of options.profiles) {
             profile.options.general.maximumClipboardSearchLength = 1000;
             profile.options.general.popupCurrentIndicatorMode = 'bar-left';

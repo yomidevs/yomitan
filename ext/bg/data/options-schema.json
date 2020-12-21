@@ -821,7 +821,6 @@
             "type": "object",
             "required": [
                 "database",
-                "showPopupPreview",
                 "useSettingsV2"
             ],
             "properties": {
@@ -836,10 +835,6 @@
                             "default": false
                         }
                     }
-                },
-                "showPopupPreview": {
-                    "type": "boolean",
-                    "default": false
                 },
                 "useSettingsV2": {
                     "type": "boolean",

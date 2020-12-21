@@ -561,11 +561,7 @@ h3 {
 .preview-frame-container {
     position: relative;
     align-self: stretch;
-    flex: 0 1 auto;
-    visibility: hidden;
-}
-.preview-frame-container.preview-frame-container-visible {
-    flex-grow: 1;
+    flex: 1 1 auto;
     visibility: visible;
 }
 .preview-frame {
