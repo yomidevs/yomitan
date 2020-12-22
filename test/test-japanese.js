@@ -353,6 +353,347 @@ function testDistributeFurigana() {
             [
                 {text: 'かいぬ', furigana: ''}
             ]
+        ],
+        // Misc
+        [
+            ['月', 'か'],
+            [
+                {text: '月', furigana: 'か'}
+            ]
+        ],
+        [
+            ['月', 'カ'],
+            [
+                {text: '月', furigana: 'カ'}
+            ]
+        ],
+        // Mismatched kana readings
+        [
+            ['有り難う', 'アリガトウ'],
+            [
+                {text: '有', furigana: 'ア'},
+                {text: 'り', furigana: 'リ'},
+                {text: '難', furigana: 'ガト'},
+                {text: 'う', furigana: 'ウ'}
+            ]
+        ],
+        [
+            ['ありがとう', 'アリガトウ'],
+            [
+                {text: 'ありがとう', furigana: 'アリガトウ'}
+            ]
+        ],
+        // Mismatched kana readings (real examples)
+        [
+            ['カ月', 'かげつ'],
+            [
+                {text: 'カ', furigana: 'か'},
+                {text: '月', furigana: 'げつ'}
+            ]
+        ],
+        [
+            ['序ノ口', 'じょのくち'],
+            [
+                {text: '序', furigana: 'じょ'},
+                {text: 'ノ', furigana: 'の'},
+                {text: '口', furigana: 'くち'}
+            ]
+        ],
+        [
+            ['スズメの涙', 'すずめのなみだ'],
+            [
+                {text: 'スズメの', furigana: 'すずめの'},
+                {text: '涙', furigana: 'なみだ'}
+            ]
+        ],
+        [
+            ['二カ所', 'にかしょ'],
+            [
+                {text: '二', furigana: 'に'},
+                {text: 'カ', furigana: 'か'},
+                {text: '所', furigana: 'しょ'}
+            ]
+        ],
+        [
+            ['八ツ橋', 'やつはし'],
+            [
+                {text: '八', furigana: 'や'},
+                {text: 'ツ', furigana: 'つ'},
+                {text: '橋', furigana: 'はし'}
+            ]
+        ],
+        [
+            ['八ツ橋', 'やつはし'],
+            [
+                {text: '八', furigana: 'や'},
+                {text: 'ツ', furigana: 'つ'},
+                {text: '橋', furigana: 'はし'}
+            ]
+        ],
+        [
+            ['一カ月', 'いっかげつ'],
+            [
+                {text: '一', furigana: 'いっ'},
+                {text: 'カ', furigana: 'か'},
+                {text: '月', furigana: 'げつ'}
+            ]
+        ],
+        [
+            ['一カ所', 'いっかしょ'],
+            [
+                {text: '一', furigana: 'いっ'},
+                {text: 'カ', furigana: 'か'},
+                {text: '所', furigana: 'しょ'}
+            ]
+        ],
+        [
+            ['カ所', 'かしょ'],
+            [
+                {text: 'カ', furigana: 'か'},
+                {text: '所', furigana: 'しょ'}
+            ]
+        ],
+        [
+            ['数カ月', 'すうかげつ'],
+            [
+                {text: '数', furigana: 'すう'},
+                {text: 'カ', furigana: 'か'},
+                {text: '月', furigana: 'げつ'}
+            ]
+        ],
+        [
+            ['くノ一', 'くのいち'],
+            [
+                {text: 'くノ', furigana: 'くの'},
+                {text: '一', furigana: 'いち'}
+            ]
+        ],
+        [
+            ['くノ一', 'くのいち'],
+            [
+                {text: 'くノ', furigana: 'くの'},
+                {text: '一', furigana: 'いち'}
+            ]
+        ],
+        [
+            ['数カ国', 'すうかこく'],
+            [
+                {text: '数', furigana: 'すう'},
+                {text: 'カ', furigana: 'か'},
+                {text: '国', furigana: 'こく'}
+            ]
+        ],
+        [
+            ['数カ所', 'すうかしょ'],
+            [
+                {text: '数', furigana: 'すう'},
+                {text: 'カ', furigana: 'か'},
+                {text: '所', furigana: 'しょ'}
+            ]
+        ],
+        [
+            ['壇ノ浦の戦い', 'だんのうらのたたかい'],
+            [
+                {text: '壇', furigana: 'だん'},
+                {text: 'ノ', furigana: 'の'},
+                {text: '浦', furigana: 'うら'},
+                {text: 'の', furigana: ''},
+                {text: '戦', furigana: 'たたか'},
+                {text: 'い', furigana: ''}
+            ]
+        ],
+        [
+            ['壇ノ浦の戦', 'だんのうらのたたかい'],
+            [
+                {text: '壇', furigana: 'だん'},
+                {text: 'ノ', furigana: 'の'},
+                {text: '浦', furigana: 'うら'},
+                {text: 'の', furigana: ''},
+                {text: '戦', furigana: 'たたかい'}
+            ]
+        ],
+        [
+            ['序ノ口格', 'じょのくちかく'],
+            [
+                {text: '序', furigana: 'じょ'},
+                {text: 'ノ', furigana: 'の'},
+                {text: '口格', furigana: 'くちかく'}
+            ]
+        ],
+        [
+            ['二カ国語', 'にかこくご'],
+            [
+                {text: '二', furigana: 'に'},
+                {text: 'カ', furigana: 'か'},
+                {text: '国語', furigana: 'こくご'}
+            ]
+        ],
+        [
+            ['カ国', 'かこく'],
+            [
+                {text: 'カ', furigana: 'か'},
+                {text: '国', furigana: 'こく'}
+            ]
+        ],
+        [
+            ['カ国語', 'かこくご'],
+            [
+                {text: 'カ', furigana: 'か'},
+                {text: '国語', furigana: 'こくご'}
+            ]
+        ],
+        [
+            ['壇ノ浦の合戦', 'だんのうらのかっせん'],
+            [
+                {text: '壇', furigana: 'だん'},
+                {text: 'ノ', furigana: 'の'},
+                {text: '浦', furigana: 'うら'},
+                {text: 'の', furigana: ''},
+                {text: '合戦', furigana: 'かっせん'}
+            ]
+        ],
+        [
+            ['一タ偏', 'いちたへん'],
+            [
+                {text: '一', furigana: 'いち'},
+                {text: 'タ', furigana: 'た'},
+                {text: '偏', furigana: 'へん'}
+            ]
+        ],
+        [
+            ['ル又', 'るまた'],
+            [
+                {text: 'ル', furigana: 'る'},
+                {text: '又', furigana: 'また'}
+            ]
+        ],
+        [
+            ['ノ木偏', 'のぎへん'],
+            [
+                {text: 'ノ', furigana: 'の'},
+                {text: '木偏', furigana: 'ぎへん'}
+            ]
+        ],
+        [
+            ['一ノ貝', 'いちのかい'],
+            [
+                {text: '一', furigana: 'いち'},
+                {text: 'ノ', furigana: 'の'},
+                {text: '貝', furigana: 'かい'}
+            ]
+        ],
+        [
+            ['虎ノ門事件', 'とらのもんじけん'],
+            [
+                {text: '虎', furigana: 'とら'},
+                {text: 'ノ', furigana: 'の'},
+                {text: '門事件', furigana: 'もんじけん'}
+            ]
+        ],
+        [
+            ['教育ニ関スル勅語', 'きょういくにかんするちょくご'],
+            [
+                {text: '教育', furigana: 'きょういく'},
+                {text: 'ニ', furigana: 'に'},
+                {text: '関', furigana: 'かん'},
+                {text: 'スル', furigana: 'する'},
+                {text: '勅語', furigana: 'ちょくご'}
+            ]
+        ],
+        [
+            ['二カ年', 'にかねん'],
+            [
+                {text: '二', furigana: 'に'},
+                {text: 'カ', furigana: 'か'},
+                {text: '年', furigana: 'ねん'}
+            ]
+        ],
+        [
+            ['三カ年', 'さんかねん'],
+            [
+                {text: '三', furigana: 'さん'},
+                {text: 'カ', furigana: 'か'},
+                {text: '年', furigana: 'ねん'}
+            ]
+        ],
+        [
+            ['四カ年', 'よんかねん'],
+            [
+                {text: '四', furigana: 'よん'},
+                {text: 'カ', furigana: 'か'},
+                {text: '年', furigana: 'ねん'}
+            ]
+        ],
+        [
+            ['五カ年', 'ごかねん'],
+            [
+                {text: '五', furigana: 'ご'},
+                {text: 'カ', furigana: 'か'},
+                {text: '年', furigana: 'ねん'}
+            ]
+        ],
+        [
+            ['六カ年', 'ろっかねん'],
+            [
+                {text: '六', furigana: 'ろっ'},
+                {text: 'カ', furigana: 'か'},
+                {text: '年', furigana: 'ねん'}
+            ]
+        ],
+        [
+            ['七カ年', 'ななかねん'],
+            [
+                {text: '七', furigana: 'なな'},
+                {text: 'カ', furigana: 'か'},
+                {text: '年', furigana: 'ねん'}
+            ]
+        ],
+        [
+            ['八カ年', 'はちかねん'],
+            [
+                {text: '八', furigana: 'はち'},
+                {text: 'カ', furigana: 'か'},
+                {text: '年', furigana: 'ねん'}
+            ]
+        ],
+        [
+            ['九カ年', 'きゅうかねん'],
+            [
+                {text: '九', furigana: 'きゅう'},
+                {text: 'カ', furigana: 'か'},
+                {text: '年', furigana: 'ねん'}
+            ]
+        ],
+        [
+            ['十カ年', 'じゅうかねん'],
+            [
+                {text: '十', furigana: 'じゅう'},
+                {text: 'カ', furigana: 'か'},
+                {text: '年', furigana: 'ねん'}
+            ]
+        ],
+        [
+            ['鏡ノ間', 'かがみのま'],
+            [
+                {text: '鏡', furigana: 'かがみ'},
+                {text: 'ノ', furigana: 'の'},
+                {text: '間', furigana: 'ま'}
+            ]
+        ],
+        [
+            ['鏡ノ間', 'かがみのま'],
+            [
+                {text: '鏡', furigana: 'かがみ'},
+                {text: 'ノ', furigana: 'の'},
+                {text: '間', furigana: 'ま'}
+            ]
+        ],
+        [
+            ['ページ違反', 'ぺーじいはん'],
+            [
+                {text: 'ページ', furigana: 'ぺーじ'},
+                {text: '違反', furigana: 'いはん'}
+            ]
         ]
     ];
 

@@ -406,72 +406,40 @@ const JapaneseUtil = (() => {
         distributeFurigana(expression, reading) {
             if (!reading || reading === expression) {
                 // Same
-                return [{furigana: '', text: expression}];
+                return [this._createFuriganaSegment(expression, '')];
             }
-
-            let isAmbiguous = false;
-            const segmentize = (reading2, groups) => {
-                if (groups.length === 0 || isAmbiguous) {
-                    return [];
-                }
-
-                const group = groups[0];
-                if (group.mode === 'kana') {
-                    if (this.convertKatakanaToHiragana(reading2).startsWith(this.convertKatakanaToHiragana(group.text))) {
-                        const readingLeft = reading2.substring(group.text.length);
-                        const segs = segmentize(readingLeft, groups.splice(1));
-                        if (segs) {
-                            return [{text: group.text, furigana: ''}].concat(segs);
-                        }
-                    }
-                } else {
-                    let foundSegments = null;
-                    for (let i = reading2.length; i >= group.text.length; --i) {
-                        const readingUsed = reading2.substring(0, i);
-                        const readingLeft = reading2.substring(i);
-                        const segs = segmentize(readingLeft, groups.slice(1));
-                        if (segs) {
-                            if (foundSegments !== null) {
-                                // more than one way to segmentize the tail, mark as ambiguous
-                                isAmbiguous = true;
-                                return null;
-                            }
-                            foundSegments = [{text: group.text, furigana: readingUsed}].concat(segs);
-                        }
-                        // there is only one way to segmentize the last non-kana group
-                        if (groups.length === 1) {
-                            break;
-                        }
-                    }
-                    return foundSegments;
-                }
-            };
 
             const groups = [];
-            let modePrev = null;
+            let groupPre = null;
+            let isKanaPre = null;
             for (const c of expression) {
                 const codePoint = c.codePointAt(0);
-                const modeCurr = this.isCodePointKanji(codePoint) || codePoint === ITERATION_MARK_CODE_POINT ? 'kanji' : 'kana';
-                if (modeCurr === modePrev) {
-                    groups[groups.length - 1].text += c;
+                const isKana = !(this.isCodePointKanji(codePoint) || codePoint === ITERATION_MARK_CODE_POINT);
+                if (isKana === isKanaPre) {
+                    groupPre.text += c;
                 } else {
-                    groups.push({mode: modeCurr, text: c});
-                    modePrev = modeCurr;
+                    groupPre = {isKana, text: c, textNormalized: null};
+                    groups.push(groupPre);
+                    isKanaPre = isKana;
+                }
+            }
+            for (const group of groups) {
+                if (group.isKana) {
+                    group.textNormalized = this.convertKatakanaToHiragana(group.text);
                 }
             }
 
-            const segments = segmentize(reading, groups);
-            if (segments && !isAmbiguous) {
+            const readingNormalized = this.convertKatakanaToHiragana(reading);
+            const segments = this._segmentizeFurigana(reading, readingNormalized, groups, 0);
+            if (segments !== null) {
                 return segments;
             }
 
             // Fallback
-            return [{furigana: reading, text: expression}];
+            return [this._createFuriganaSegment(expression, reading)];
         }
 
         distributeFuriganaInflected(expression, reading, source) {
-            const output = [];
-
             let stemLength = 0;
             const shortest = Math.min(source.length, expression.length);
             const sourceHiragana = this.convertKatakanaToHiragana(source);
@@ -486,15 +454,13 @@ const JapaneseUtil = (() => {
                 0,
                 offset === 0 ? reading.length : reading.length - expression.length + stemLength
             );
-            for (const segment of this.distributeFurigana(stemExpression, stemReading)) {
-                output.push(segment);
-            }
+            const result = this.distributeFurigana(stemExpression, stemReading);
 
             if (stemLength !== source.length) {
-                output.push({text: source.substring(stemLength), furigana: ''});
+                result.push(this._createFuriganaSegment(source.substring(stemLength), ''));
             }
 
-            return output;
+            return result;
         }
 
         // Miscellaneous
@@ -531,6 +497,62 @@ const JapaneseUtil = (() => {
         }
 
         // Private
+
+        _createFuriganaSegment(text, furigana) {
+            return {text, furigana};
+        }
+
+        _segmentizeFurigana(reading, readingNormalized, groups, groupsStart) {
+            const groupCount = groups.length - groupsStart;
+            if (groupCount <= 0) {
+                return [];
+            }
+
+            const group = groups[groupsStart];
+            const {isKana, text} = group;
+            const textLength = text.length;
+            if (isKana) {
+                const {textNormalized} = group;
+                if (readingNormalized.startsWith(textNormalized)) {
+                    const segments = this._segmentizeFurigana(
+                        reading.substring(textLength),
+                        readingNormalized.substring(textLength),
+                        groups,
+                        groupsStart + 1
+                    );
+                    if (segments !== null) {
+                        const furigana = reading.startsWith(text) ? '' : reading.substring(0, textLength);
+                        segments.unshift(this._createFuriganaSegment(text, furigana));
+                        return segments;
+                    }
+                }
+                return null;
+            } else {
+                let result = null;
+                for (let i = reading.length; i >= textLength; --i) {
+                    const segments = this._segmentizeFurigana(
+                        reading.substring(i),
+                        readingNormalized.substring(i),
+                        groups,
+                        groupsStart + 1
+                    );
+                    if (segments !== null) {
+                        if (result !== null) {
+                            // More than one way to segmentize the tail; mark as ambiguous
+                            return null;
+                        }
+                        const furigana = reading.substring(0, i);
+                        segments.unshift(this._createFuriganaSegment(text, furigana));
+                        result = segments;
+                    }
+                    // There is only one way to segmentize the last non-kana group
+                    if (groupCount === 1) {
+                        break;
+                    }
+                }
+                return result;
+            }
+        }
 
         _getWanakana() {
             const wanakana = this._wanakana;
