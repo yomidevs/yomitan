@@ -1772,6 +1772,8 @@ class Display extends EventDispatcher {
                 searchOnClick: true,
                 searchOnClickOnly: true
             });
+            const excludeSelectors = ['.scan-disable', '.scan-disable *'];
+            this._definitionTextScanner.excludeSelector = excludeSelectors.join(',');
             this._definitionTextScanner.prepare();
             this._definitionTextScanner.on('searched', this._onDefinitionTextScannerSearched.bind(this));
         }
