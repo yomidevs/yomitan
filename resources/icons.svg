@@ -28,10 +28,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="22.627417"
-     inkscape:cx="3.1138994"
-     inkscape:cy="7.3363221"
+     inkscape:cx="14.845666"
+     inkscape:cy="-0.0071760774"
      inkscape:document-units="px"
-     inkscape:current-layer="layer46"
+     inkscape:current-layer="layer47"
      showgrid="true"
      units="px"
      inkscape:snap-center="true"
@@ -1494,11 +1494,21 @@
      inkscape:label="Collapse"
      id="g1073"
      inkscape:groupmode="layer"
-     style="display:inline">
+     style="display:none">
     <path
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="M 5,1 V 5 H 1 V 7 H 7 V 1 Z m 4,0 v 6 h 6 V 5 H 11 V 1 Z M 1,9 v 2 h 4 v 4 H 7 V 9 Z m 8,0 v 6 h 2 v -4 h 4 V 9 Z"
        id="path1065"
        inkscape:connector-curvature="0" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer47"
+     inkscape:label="Window"
+     style="display:inline">
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       d="M 1 3 L 1 13 L 15 13 L 15 3 L 1 3 z M 2 4 L 7 4 L 7 5 L 2 5 L 2 4 z M 11 4 L 12 4 L 12 5 L 11 5 L 11 4 z M 13 4 L 14 4 L 14 5 L 13 5 L 13 4 z M 2 6 L 14 6 L 14 12 L 2 12 L 2 6 z M 3 7.5 L 3 8.5 L 13 8.5 L 13 7.5 L 3 7.5 z M 3 9.5 L 3 10.5 L 11 10.5 L 11 9.5 L 3 9.5 z "
+       id="rect1060" />
   </g>
 </svg>

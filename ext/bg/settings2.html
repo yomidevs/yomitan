@@ -28,6 +28,7 @@
             <a href="#!popup"            class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="popup"></span></span><span class="outline-item-label">Popup</span></a>
             <a href="#!popup-appearance" class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="palette"></span></span><span class="outline-item-label">Appearance</span></a>
             <a href="#!popup-size"       class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="popup-size"></span></span><span class="outline-item-label">Position &amp; Size</span></a>
+            <a href="#!window"           class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="window"></span></span><span class="outline-item-label">Window</span></a>
             <a href="#!audio"            class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="speaker"></span></span><span class="outline-item-label">Audio</span></a>
             <a href="#!text-parsing"     class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="text-parsing"></span></span><span class="outline-item-label">Text Parsing</span></a>
             <a href="#!translation"      class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="translation"></span></span><span class="outline-item-label">Translation</span></a>
@@ -525,69 +526,6 @@
                 </p>
             </div>
         </div>
-        <div class="settings-item advanced-only">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        Use a native browser window instead of an embedded popup
-                        <a class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" data-setting="general.usePopupWindow"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <p>
-                    Instead of showing definitions in a popup embedded into the webpage,
-                    a native browser window containing the popup content will be opened instead.
-                    This window will be shared across all tabs.
-                </p>
-                <p>
-                    <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
-                </p>
-            </div>
-        </div>
-        <div class="settings-item advanced-only">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        Open a native browser window when copying Japanese text
-                        <a class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" id="enable-clipboard-popups"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <p>
-                    When Japanese text is copied to the clipboard, a browser window popup searching for the clipboard
-                    text will be opened.
-                    This can be useful for using Yomichan to scan text from external applications.
-                </p>
-                <p>
-                    This feature requires Yomichan to have clipboard reading permissions, and when this option is enabled,
-                    the clipboard will be frequently polled for new text.
-                </p>
-                <p>
-                    Alternatively, this feature can be enabled only on the search page, and clipboard contents polling will
-                    only be performed when the search page is already open.
-                </p>
-                <p>
-                    <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
-                </p>
-            </div>
-        </div>
-        <div class="settings-item advanced-only"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Maximum clipboard text search length</div>
-                <div class="settings-item-description">Limit the number of text characters used when searching clipboard content.</div>
-            </div>
-            <div class="settings-item-right">
-                <input type="number" min="0" step="1" data-setting="general.maximumClipboardSearchLength">
-            </div>
-        </div></div>
     </div>
 
     <div class="heading-container">
@@ -927,6 +865,76 @@
                         <input type="number" class="short-width short-height" data-setting="general.popupVerticalOffset2">
                     </div>
                 </div>
+            </div>
+        </div></div>
+    </div>
+
+    <div class="heading-container">
+        <div class="heading-container-icon"><span class="icon" data-icon="window"></span></div>
+        <div class="heading-container-left"><h2 id="window">Window</h2></div>
+    </div>
+    <div class="settings-group">
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">
+                        Use a native browser window instead of an embedded popup
+                        <a class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="general.usePopupWindow"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <p>
+                    Instead of showing definitions in a popup embedded into the webpage,
+                    a native browser window containing the popup content will be opened instead.
+                    This window will be shared across all tabs.
+                </p>
+                <p>
+                    <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">
+                        Open a native browser window when copying Japanese text
+                        <a class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" id="enable-clipboard-popups"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <p>
+                    When Japanese text is copied to the clipboard, a browser window popup searching for the clipboard
+                    text will be opened.
+                    This can be useful for using Yomichan to scan text from external applications.
+                </p>
+                <p>
+                    This feature requires Yomichan to have clipboard reading permissions, and when this option is enabled,
+                    the clipboard will be frequently polled for new text.
+                </p>
+                <p>
+                    Alternatively, this feature can be enabled only on the search page, and clipboard contents polling will
+                    only be performed when the search page is already open.
+                </p>
+                <p>
+                    <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Maximum clipboard text search length</div>
+                <div class="settings-item-description">Limit the number of text characters used when searching clipboard content.</div>
+            </div>
+            <div class="settings-item-right">
+                <input type="number" min="0" step="1" data-setting="general.maximumClipboardSearchLength">
             </div>
         </div></div>
     </div>

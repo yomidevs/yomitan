@@ -317,6 +317,7 @@ h3 {
 .icon[data-icon=magnifying-glass]        { --icon-image: url(/mixed/img/magnifying-glass.svg); }
 .icon[data-icon=collapse]                { --icon-image: url(/mixed/img/collapse.svg); }
 .icon[data-icon=expand]                  { --icon-image: url(/mixed/img/expand.svg); }
+.icon[data-icon=window]                  { --icon-image: url(/mixed/img/window.svg); }
 
 
 /* Content layout */
