@@ -24,11 +24,11 @@
             <a href="#!profile"          class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="profile"></span></span><span class="outline-item-label">Profile</span></a>
             <a href="#!dictionaries"     class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="book"></span><span class="outline-item-left-warning-badge no-dictionaries-installed-warning" hidden><span class="icon" data-icon="exclamation-point-short"></span></span></span><span class="outline-item-label">Dictionaries</span></a>
             <a href="#!general"          class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="cog"></span></span><span class="outline-item-label">General</span></a>
+            <a href="#!scanning"         class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="scanning"></span></span><span class="outline-item-label">Scanning</span></a>
             <a href="#!popup"            class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="popup"></span></span><span class="outline-item-label">Popup</span></a>
             <a href="#!popup-appearance" class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="palette"></span></span><span class="outline-item-label">Appearance</span></a>
             <a href="#!popup-size"       class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="popup-size"></span></span><span class="outline-item-label">Position &amp; Size</span></a>
             <a href="#!audio"            class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="speaker"></span></span><span class="outline-item-label">Audio</span></a>
-            <a href="#!scanning"         class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="scanning"></span></span><span class="outline-item-label">Scanning</span></a>
             <a href="#!text-parsing"     class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="text-parsing"></span></span><span class="outline-item-label">Text Parsing</span></a>
             <a href="#!translation"      class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="translation"></span></span><span class="outline-item-label">Translation</span></a>
             <a href="#!anki"             class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="note-card"></span></span><span class="outline-item-label">Anki</span></a>
@@ -273,6 +273,174 @@
             </div>
             <div class="settings-item-right">
                 <input type="number" min="1" data-setting="general.maxResults">
+            </div>
+        </div></div>
+    </div>
+
+    <div class="heading-container">
+        <div class="heading-container-icon"><span class="icon" data-icon="scanning"></span></div>
+        <div class="heading-container-left"><h2 id="scanning">Scanning</h2></div>
+    </div>
+    <div class="settings-group">
+        <div class="settings-item">
+            <div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Scan modifier key</div>
+                    <div class="settings-item-description">
+                        Hold a key while moving the cursor to scan text.
+                        <a class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <select id="main-scan-modifier-key"></select>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <p>
+                    A keyboard modifier key can be used to activate text scanning when the cursor is moved.
+                    Alternatively, the <em>None</em> option can be used to scan text whenever the cursor is moved.
+                </p>
+                <p>
+                    More advanced scanning input customization can be set up by enabling the <em>Advanced</em> option
+                    and clicking <em data-modal-action="show,scanning-inputs">Configure advanced scanning inputs</em>.
+                </p>
+                <p>
+                    <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Scan using middle mouse button</div>
+                <div class="settings-item-description">Hold the middle mouse button while moving the cursor to scan text.</div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" id="middle-mouse-button-scan"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+        </div></div>
+        <div class="settings-item settings-item-button advanced-only" data-modal-action="show,scanning-inputs"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Configure advanced scanning inputs&hellip; <span class="light no-wrap">(<span class="scanning-input-count">#</span> defined)</span></div>
+            </div>
+            <div class="settings-item-right open-panel-button-container">
+                <button class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
+            </div>
+        </div></div>
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">
+                        Support inputs for devices with touch screens
+                        <a class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                    </div>
+                </div>
+                <div class="settings-item-right flex-row-wrap">
+                    <div class="settings-item-group settings-item-group-wrap">
+                        <label class="settings-item-group-item flex-label no-wrap">
+                            <label class="checkbox"><input type="checkbox" data-setting="scanning.touchInputEnabled"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                            <span>Touch inputs</span>
+                        </label>
+                        <label class="settings-item-group-item flex-label no-wrap advanced-only">
+                            <label class="checkbox"><input type="checkbox" data-setting="scanning.pointerEventsEnabled"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                            <span>Pointer inputs</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <p>
+                    To enable text scanning when using devices with a touch screen, either the <em>Touch inputs</em> or the <em>Pointer inputs</em> option must be enabled.
+                    <em>Touch inputs</em> supports generic touches on a touch screen device, but do not distinguish between touch and pen inputs.
+                    <em>Pointer inputs</em> supports supports the detection pen devices, but may not work on all devices.
+                    If both options are enabled, <em>Pointer inputs</em> takes precedence.
+                </p>
+                <p>
+                    The <em>Pointer inputs</em> option is only visible when the <em>Advanced</em> option is enabled.
+                </p>
+                <p>
+                    <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Auto-hide search popup</div>
+                    <div class="settings-item-description">When no text or definitions are found, the popup will automatically hide.</div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="scanning.autoHideResults" data-transform="setVisibility" data-ancestor-distance="-1" data-relative-selector="#auto-hide-search-popup-options" data-visbility-condition='{"op":"===","value":true}'><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
+            </div>
+            <div class="settings-item-children settings-item-children-group" id="auto-hide-search-popup-options" hidden>
+                <div class="settings-item"><div class="settings-item-inner">
+                    <div class="settings-item-left">
+                        <div class="settings-item-label">Auto-hide delay <span class="light">(in milliseconds)</span></div>
+                    </div>
+                    <div class="settings-item-right">
+                        <input type="number" data-setting="scanning.hideDelay" min="0">
+                    </div>
+                </div></div>
+            </div>
+        </div>
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Scan delay <span class="light">(in milliseconds)</span></div>
+                <div class="settings-item-description">When no key or button is required for scanning, the delay before scanning occurs.</div>
+            </div>
+            <div class="settings-item-right">
+                <input type="number" data-setting="scanning.delay" min="0">
+            </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Select matched text</div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" data-setting="scanning.selectText"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Search text with non-Japanese characters</div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" data-setting="scanning.alphanumeric"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+        </div></div>
+        <div class="settings-item advanced-only"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Layout-aware scanning</div>
+                <div class="settings-item-description">Use webpage styling information to determine where line breaks are likely to be.</div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" data-setting="scanning.layoutAwareScan"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+        </div></div>
+        <div class="settings-item advanced-only"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Deep content scanning</div>
+                <div class="settings-item-description">Enable scanning text that is covered by other layers.</div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" data-setting="scanning.deepDomScan"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+        </div></div>
+        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Text scan length</div>
+                <div class="settings-item-description">Change how many characters are read when scanning for terms.</div>
+            </div>
+            <div class="settings-item-right">
+                <input type="number" data-setting="scanning.length" min="1" step="1">
+            </div>
+        </div></div>
+        <div class="settings-item settings-item-button advanced-only" data-modal-action="show,input-action-prevention"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Configure input action prevention&hellip;</div>
+            </div>
+            <div class="settings-item-right open-panel-button-container">
+                <button class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
             </div>
         </div></div>
     </div>
@@ -798,174 +966,6 @@
         <div class="settings-item settings-item-button" data-modal-action="show,audio-sources"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Configure audio playback sources&hellip;</div>
-            </div>
-            <div class="settings-item-right open-panel-button-container">
-                <button class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
-            </div>
-        </div></div>
-    </div>
-
-    <div class="heading-container">
-        <div class="heading-container-icon"><span class="icon" data-icon="scanning"></span></div>
-        <div class="heading-container-left"><h2 id="scanning">Scanning</h2></div>
-    </div>
-    <div class="settings-group">
-        <div class="settings-item">
-            <div class="settings-item-inner settings-item-inner-wrappable">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">Scan modifier key</div>
-                    <div class="settings-item-description">
-                        Hold a key while moving the cursor to scan text.
-                        <a class="more-toggle more-only" data-parent-distance="4">More&hellip;</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <select id="main-scan-modifier-key"></select>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <p>
-                    A keyboard modifier key can be used to activate text scanning when the cursor is moved.
-                    Alternatively, the <em>None</em> option can be used to scan text whenever the cursor is moved.
-                </p>
-                <p>
-                    More advanced scanning input customization can be set up by enabling the <em>Advanced</em> option
-                    and clicking <em data-modal-action="show,scanning-inputs">Configure advanced scanning inputs</em>.
-                </p>
-                <p>
-                    <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
-                </p>
-            </div>
-        </div>
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Scan using middle mouse button</div>
-                <div class="settings-item-description">Hold the middle mouse button while moving the cursor to scan text.</div>
-            </div>
-            <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" id="middle-mouse-button-scan"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            </div>
-        </div></div>
-        <div class="settings-item settings-item-button advanced-only" data-modal-action="show,scanning-inputs"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Configure advanced scanning inputs&hellip; <span class="light no-wrap">(<span class="scanning-input-count">#</span> defined)</span></div>
-            </div>
-            <div class="settings-item-right open-panel-button-container">
-                <button class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
-            </div>
-        </div></div>
-        <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        Support inputs for devices with touch screens
-                        <a class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                    </div>
-                </div>
-                <div class="settings-item-right flex-row-wrap">
-                    <div class="settings-item-group settings-item-group-wrap">
-                        <label class="settings-item-group-item flex-label no-wrap">
-                            <label class="checkbox"><input type="checkbox" data-setting="scanning.touchInputEnabled"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                            <span>Touch inputs</span>
-                        </label>
-                        <label class="settings-item-group-item flex-label no-wrap advanced-only">
-                            <label class="checkbox"><input type="checkbox" data-setting="scanning.pointerEventsEnabled"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                            <span>Pointer inputs</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <p>
-                    To enable text scanning when using devices with a touch screen, either the <em>Touch inputs</em> or the <em>Pointer inputs</em> option must be enabled.
-                    <em>Touch inputs</em> supports generic touches on a touch screen device, but do not distinguish between touch and pen inputs.
-                    <em>Pointer inputs</em> supports supports the detection pen devices, but may not work on all devices.
-                    If both options are enabled, <em>Pointer inputs</em> takes precedence.
-                </p>
-                <p>
-                    The <em>Pointer inputs</em> option is only visible when the <em>Advanced</em> option is enabled.
-                </p>
-                <p>
-                    <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
-                </p>
-            </div>
-        </div>
-        <div class="settings-item">
-            <div class="settings-item-inner">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">Auto-hide search popup</div>
-                    <div class="settings-item-description">When no text or definitions are found, the popup will automatically hide.</div>
-                </div>
-                <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" data-setting="scanning.autoHideResults" data-transform="setVisibility" data-ancestor-distance="-1" data-relative-selector="#auto-hide-search-popup-options" data-visbility-condition='{"op":"===","value":true}'><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-                </div>
-            </div>
-            <div class="settings-item-children settings-item-children-group" id="auto-hide-search-popup-options" hidden>
-                <div class="settings-item"><div class="settings-item-inner">
-                    <div class="settings-item-left">
-                        <div class="settings-item-label">Auto-hide delay <span class="light">(in milliseconds)</span></div>
-                    </div>
-                    <div class="settings-item-right">
-                        <input type="number" data-setting="scanning.hideDelay" min="0">
-                    </div>
-                </div></div>
-            </div>
-        </div>
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Scan delay <span class="light">(in milliseconds)</span></div>
-                <div class="settings-item-description">When no key or button is required for scanning, the delay before scanning occurs.</div>
-            </div>
-            <div class="settings-item-right">
-                <input type="number" data-setting="scanning.delay" min="0">
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Select matched text</div>
-            </div>
-            <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" data-setting="scanning.selectText"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            </div>
-        </div></div>
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Search text with non-Japanese characters</div>
-            </div>
-            <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" data-setting="scanning.alphanumeric"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            </div>
-        </div></div>
-        <div class="settings-item advanced-only"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Layout-aware scanning</div>
-                <div class="settings-item-description">Use webpage styling information to determine where line breaks are likely to be.</div>
-            </div>
-            <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" data-setting="scanning.layoutAwareScan"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            </div>
-        </div></div>
-        <div class="settings-item advanced-only"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Deep content scanning</div>
-                <div class="settings-item-description">Enable scanning text that is covered by other layers.</div>
-            </div>
-            <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" data-setting="scanning.deepDomScan"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
-            </div>
-        </div></div>
-        <div class="settings-item advanced-only"><div class="settings-item-inner settings-item-inner-wrappable">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Text scan length</div>
-                <div class="settings-item-description">Change how many characters are read when scanning for terms.</div>
-            </div>
-            <div class="settings-item-right">
-                <input type="number" data-setting="scanning.length" min="1" step="1">
-            </div>
-        </div></div>
-        <div class="settings-item settings-item-button advanced-only" data-modal-action="show,input-action-prevention"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Configure input action prevention&hellip;</div>
             </div>
             <div class="settings-item-right open-panel-button-container">
                 <button class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
