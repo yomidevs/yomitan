@@ -610,13 +610,6 @@ h3 {
 .settings-item:not([hidden]) {
     display: block;
 }
-.settings-item-button {
-    cursor: pointer;
-}
-a.settings-item-button {
-    color: var(--text-color-default);
-    text-decoration: none;
-}
 .settings-item-outer {
     display: block;
     width: 100%;
@@ -693,6 +686,30 @@ a.settings-item-button {
 }
 :root:not([data-advanced=true]) .advanced-only {
     display: none;
+}
+.settings-item.settings-item-button,
+a.settings-item.settings-item-button {
+    cursor: pointer;
+    color: var(--text-color-default);
+    text-decoration: none;
+    background-color: transparent;
+    transition: background-color var(--animation-duration) ease-in-out;
+}
+.settings-item.settings-item-button>.settings-item-inner,
+.settings-item.settings-item-button>.settings-item-inner>.settings-item-left,
+.settings-item.settings-item-button>.settings-item-inner>.settings-item-right {
+    margin-top: 0;
+}
+.settings-item.settings-item-button:hover,
+.settings-item.settings-item-button:active {
+    background-color: var(--background-color);
+}
+.settings-item.settings-item-button .icon-button>.icon-button-inner>.icon {
+    transition: background-color var(--animation-duration) ease-in-out;
+}
+.settings-item.settings-item-button:hover .icon-button>.icon-button-inner>.icon,
+.settings-item.settings-item-button:active .icon-button>.icon-button-inner>.icon {
+    background-color: var(--accent-color);
 }
 
 
