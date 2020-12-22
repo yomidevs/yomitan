@@ -144,7 +144,7 @@ class DisplaySearch extends Display {
         await this.updateOptions();
         const query = this._queryInput.value;
         if (query) {
-            this._search(false, false);
+            this.searchLast();
         }
     }
 
