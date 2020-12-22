@@ -272,7 +272,7 @@
                                     "popupCurrentIndicatorMode": {
                                         "type": "string",
                                         "enum": ["none", "asterisk", "triangle", "bar-left", "bar-right", "dot-left", "dot-right"],
-                                        "default": "bar-left"
+                                        "default": "triangle"
                                     },
                                     "popupActionBarVisibility": {
                                         "type": "string",

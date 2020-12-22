@@ -669,7 +669,7 @@ class OptionsUtil {
         delete options.global.showPopupPreview;
         for (const profile of options.profiles) {
             profile.options.general.maximumClipboardSearchLength = 1000;
-            profile.options.general.popupCurrentIndicatorMode = 'bar-left';
+            profile.options.general.popupCurrentIndicatorMode = 'triangle';
             profile.options.general.popupActionBarVisibility = 'auto';
             profile.options.general.popupActionBarLocation = 'right';
         }
