@@ -17,6 +17,7 @@
 
 /* global
  * BackupController
+ * DocumentFocusController
  * SettingsController
  * api
  */
@@ -47,7 +48,8 @@ function getOperatingSystemDisplayName(os) {
 
 (async () => {
     try {
-        document.querySelector('#content-scroll-focus').focus();
+        const documentFocusController = new DocumentFocusController();
+        documentFocusController.prepare();
 
         const manifest = chrome.runtime.getManifest();
         const language = chrome.i18n.getUILanguage();

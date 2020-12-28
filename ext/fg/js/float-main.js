@@ -17,17 +17,21 @@
 
 /* global
  * Display
+ * DocumentFocusController
  * JapaneseUtil
  * api
  */
 
 (async () => {
     try {
+        const documentFocusController = new DocumentFocusController();
+        documentFocusController.prepare();
+
         api.forwardLogsToBackend();
         await yomichan.backendReady();
 
         const japaneseUtil = new JapaneseUtil(null);
-        const display = new Display('popup', japaneseUtil);
+        const display = new Display('popup', japaneseUtil, documentFocusController);
         await display.prepare();
         display.initializeState();
 

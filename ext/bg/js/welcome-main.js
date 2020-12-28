@@ -18,6 +18,7 @@
 /* global
  * DictionaryController
  * DictionaryImportController
+ * DocumentFocusController
  * GenericSettingController
  * ModalController
  * ScanInputsSimpleController
@@ -42,7 +43,8 @@ async function setupGenericSettingsController(genericSettingController) {
 
 (async () => {
     try {
-        document.querySelector('#content-scroll-focus').focus();
+        const documentFocusController = new DocumentFocusController();
+        documentFocusController.prepare();
 
         const statusFooter = new StatusFooter(document.querySelector('.status-footer-container'));
         statusFooter.prepare();

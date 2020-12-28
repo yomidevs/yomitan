@@ -16,6 +16,7 @@
  */
 
 /* global
+ * DocumentFocusController
  * api
  */
 
@@ -52,7 +53,9 @@ async function setPermissionsGranted(permissions, shouldHave) {
 
 (async () => {
     try {
-        document.querySelector('#content-scroll-focus').focus();
+        const documentFocusController = new DocumentFocusController();
+        documentFocusController.prepare();
+
         document.querySelector('#extension-id-example').textContent = chrome.runtime.getURL('/');
 
         api.forwardLogsToBackend();

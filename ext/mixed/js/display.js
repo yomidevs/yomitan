@@ -35,10 +35,11 @@
  */
 
 class Display extends EventDispatcher {
-    constructor(pageType, japaneseUtil) {
+    constructor(pageType, japaneseUtil, documentFocusController) {
         super();
         this._pageType = pageType;
         this._japaneseUtil = japaneseUtil;
+        this._documentFocusController = documentFocusController;
         this._container = document.querySelector('#definitions');
         this._definitions = [];
         this._optionsContext = {depth: 0, url: window.location.href};
@@ -95,7 +96,6 @@ class Display extends EventDispatcher {
         this._updateAdderButtonsPromise = Promise.resolve();
         this._contentScrollElement = document.querySelector('#content-scroll');
         this._contentScrollBodyElement = document.querySelector('#content-body');
-        this._contentScrollFocusElement = document.querySelector('#content-scroll-focus');
         this._windowScroll = new WindowScroll(this._contentScrollElement);
         this._contentSidebar = document.querySelector('#content-sidebar');
         this._closeButton = document.querySelector('#close-button');
@@ -218,7 +218,6 @@ class Display extends EventDispatcher {
             ['popupMessage', {async: 'dynamic', handler: this._onDirectMessage.bind(this)}]
         ]);
         window.addEventListener('message', this._onWindowMessage.bind(this), false);
-        window.addEventListener('focus', this._onWindowFocus.bind(this), false);
 
         if (this._pageType === 'popup' && documentElement !== null) {
             documentElement.addEventListener('mouseup', this._onDocumentElementMouseUp.bind(this), false);
@@ -241,9 +240,6 @@ class Display extends EventDispatcher {
         if (this._frameResizeHandle !== null) {
             this._frameResizeHandle.addEventListener('mousedown', this._onFrameResizerMouseDown.bind(this), false);
         }
-
-        // Final preparation
-        this._updateFocusedElement();
     }
 
     initializeState() {
@@ -457,8 +453,7 @@ class Display extends EventDispatcher {
     }
 
     blurElement(element) {
-        element.blur();
-        this._updateFocusedElement();
+        this._documentFocusController.blurElement(element);
     }
 
     searchLast() {
@@ -709,10 +704,6 @@ class Display extends EventDispatcher {
                 this._progressIndicatorTimer = null;
             }, 250);
         }
-    }
-
-    _onWindowFocus() {
-        this._updateFocusedElement();
     }
 
     async _onKanjiLookup(e) {
@@ -1631,19 +1622,6 @@ class Display extends EventDispatcher {
     async _setOptionsContextIfDifferent(optionsContext) {
         if (deepEqual(this._optionsContext, optionsContext)) { return; }
         await this.setOptionsContext(optionsContext);
-    }
-
-    _updateFocusedElement() {
-        const target = this._contentScrollFocusElement;
-        if (target === null) { return; }
-        const {activeElement} = document;
-        if (
-            activeElement === null ||
-            activeElement === document.documentElement ||
-            activeElement === document.body
-        ) {
-            target.focus({preventScroll: true});
-        }
     }
 
     _setContentScale(scale) {

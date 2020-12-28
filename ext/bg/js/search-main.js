@@ -17,6 +17,7 @@
 
 /* global
  * DisplaySearch
+ * DocumentFocusController
  * JapaneseUtil
  * api
  * wanakana
@@ -24,11 +25,14 @@
 
 (async () => {
     try {
+        const documentFocusController = new DocumentFocusController();
+        documentFocusController.prepare();
+
         api.forwardLogsToBackend();
         await yomichan.backendReady();
 
         const japaneseUtil = new JapaneseUtil(wanakana);
-        const displaySearch = new DisplaySearch(japaneseUtil);
+        const displaySearch = new DisplaySearch(japaneseUtil, documentFocusController);
         await displaySearch.prepare();
 
         document.documentElement.dataset.loaded = 'true';

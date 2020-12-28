@@ -361,8 +361,16 @@ h3 {
     opacity: 0;
     margin: 0;
     padding: 0;
+    outline: none;
     background-color: transparent;
     display: inline;
+    width: 0;
+    height: 0;
+    line-height: 0;
+    user-select: none;
+}
+#content-scroll-focus::-moz-focus-inner {
+    border: 0;
 }
 .content-dimmer {
     display: block;
