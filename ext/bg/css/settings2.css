@@ -1447,17 +1447,21 @@ button.icon-button:active {
     background-color: var(--dim-background-color);
     outline: none;
     z-index: 100;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity var(--animation-duration2) ease-in, visibility 0s linear var(--animation-duration2);
-}
-.modal-container:not(.modal-container-open):not(.modal-container-opening):not(.modal-container-closing) {
-    display: none;
-}
-.modal-container.modal-container-open {
     opacity: 1;
     visibility: visible;
-    transition: opacity var(--animation-duration2) ease-out, visibility 0s linear;
+    transition:
+        opacity var(--animation-duration2) ease-out,
+        visibility 0s linear;
+}
+.modal-container[hidden] {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity var(--animation-duration2) ease-in,
+        visibility 0s linear var(--animation-duration2);
+}
+.modal-container[hidden]:not(.hidden-animating) {
+    display: none;
 }
 .modal-content {
     max-width: 100%;
@@ -1467,9 +1471,9 @@ button.icon-button:active {
     background-color: var(--background-color-light);
     flex: 0 1 auto;
     border-radius: 0.5em;
-    transform: translate(0, var(--modal-transition-offset));
+    transform: translate(0, 0);
     transition:
-        transform 0s linear var(--animation-duration2),
+        transform var(--animation-duration2) ease-out,
         width var(--animation-duration2) ease-in-out,
         height var(--animation-duration2) ease-in-out,
         border-radius var(--animation-duration2) ease-in-out;
@@ -1478,7 +1482,7 @@ button.icon-button:active {
     flex-flow: column nowrap;
     overflow: hidden;
 }
-.modal-container:not(.modal-container-open) .modal-content {
+.modal-container[hidden] .modal-content {
     pointer-events: none;
 }
 .modal-content.modal-content-small {
@@ -1493,10 +1497,10 @@ button.icon-button:active {
     transform: translate(0, 0);
     border-radius: 0;
 }
-.modal-container.modal-container-open .modal-content {
-    transform: translate(0, 0);
+.modal-container[hidden] .modal-content {
+    transform: translate(0, var(--modal-transition-offset));
     transition:
-        transform var(--animation-duration2) ease-out,
+        transform 0s linear var(--animation-duration2),
         width var(--animation-duration2) ease-in-out,
         height var(--animation-duration2) ease-in-out,
         border-radius var(--animation-duration2) ease-in-out;
@@ -1756,14 +1760,18 @@ button.popup-menu-item:disabled {
     border-radius: var(--settings-group-border-radius) var(--settings-group-border-radius) 0 0;
     transform: none;
     opacity: 1;
-    transition: transform var(--animation-duration) ease-out, opacity var(--animation-duration) ease-out;
+    transition:
+        transform var(--animation-duration) ease-out,
+        opacity var(--animation-duration) ease-out;
 }
-.status-footer-container:not(.status-footer-container-open) .status-footer {
+.status-footer-container[hidden] .status-footer {
     transform: translate(0, 100%);
     opacity: 0;
-    transition: transform var(--animation-duration) ease-in, opacity var(--animation-duration) ease-in;
+    transition:
+        transform var(--animation-duration) ease-in,
+        opacity var(--animation-duration) ease-in;
 }
-.status-footer-container:not(.status-footer-container-open):not(.status-footer-container-opening):not(.status-footer-container-closing) {
+.status-footer-container[hidden]:not(.hidden-animating) {
     display: none;
 }
 .status-footer-header {

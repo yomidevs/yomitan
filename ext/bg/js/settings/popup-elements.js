@@ -16,13 +16,11 @@
  */
 
 class PopupElement extends EventDispatcher {
-    constructor({node, visibleClassName, openingClassName, closingClassName, closingAnimationDuration}) {
+    constructor({node, closingAnimationDuration}) {
         super();
         this._node = node;
-        this._visibleClassName = visibleClassName;
-        this._openingClassName = openingClassName;
-        this._closingClassName = closingClassName;
         this._closingAnimationDuration = closingAnimationDuration;
+        this._hiddenAnimatingClass = 'hidden-animating';
         this._mutationObserver = null;
         this._visible = false;
         this._closeTimer = null;
@@ -33,30 +31,31 @@ class PopupElement extends EventDispatcher {
     }
 
     isVisible() {
-        return this._node.classList.contains(this._visibleClassName);
+        return !this._node.hidden;
     }
 
     setVisible(value, animate=true) {
         value = !!value;
-        const {classList} = this._node;
-        if (classList.contains(this._visibleClassName) === value) { return; }
+        if (this.isVisible() === value) { return; }
 
         if (this._closeTimer !== null) {
             clearTimeout(this._closeTimer);
-            this._completeClose(classList, true);
+            this._completeClose(true);
         }
 
+        const node = this._node;
+        const {classList} = node;
         if (value) {
-            if (animate) { classList.add(this._openingClassName); }
-            getComputedStyle(this._node).getPropertyValue('display'); // Force update of CSS display property, allowing animation
-            classList.add(this._visibleClassName);
-            if (animate) { classList.remove(this._openingClassName); }
-            this._node.focus();
+            if (animate) { classList.add(this._hiddenAnimatingClass); }
+            getComputedStyle(node).getPropertyValue('display'); // Force update of CSS display property, allowing animation
+            classList.remove(this._hiddenAnimatingClass);
+            node.hidden = false;
+            node.focus();
         } else {
-            if (animate) { classList.add(this._closingClassName); }
-            classList.remove(this._visibleClassName);
+            if (animate) { classList.add(this._hiddenAnimatingClass); }
+            node.hidden = true;
             if (animate) {
-                this._closeTimer = setTimeout(() => this._completeClose(classList, false), this._closingAnimationDuration);
+                this._closeTimer = setTimeout(() => this._completeClose(false), this._closingAnimationDuration);
             }
         }
     }
@@ -64,11 +63,11 @@ class PopupElement extends EventDispatcher {
     on(eventName, callback) {
         if (eventName === 'visibilityChanged') {
             if (this._mutationObserver === null) {
-                this._visible = this._node.classList.contains(this._visibleClassName);
+                this._visible = this.isVisible();
                 this._mutationObserver = new MutationObserver(this._onMutation.bind(this));
                 this._mutationObserver.observe(this._node, {
                     attributes: true,
-                    attributeFilter: ['class'],
+                    attributeFilter: ['hidden'],
                     attributeOldValue: true
                 });
             }
@@ -90,15 +89,15 @@ class PopupElement extends EventDispatcher {
     // Private
 
     _onMutation() {
-        const visible = this._node.classList.contains(this._visibleClassName);
+        const visible = this.isVisible();
         if (this._visible === visible) { return; }
         this._visible = visible;
         this.trigger('visibilityChanged', {visible});
     }
 
-    _completeClose(classList, reopening) {
+    _completeClose(reopening) {
         this._closeTimer = null;
-        classList.remove(this._closingClassName);
+        this._node.classList.remove(this._hiddenAnimatingClass);
         this.trigger('closeCompleted', {reopening});
     }
 }
@@ -107,9 +106,6 @@ class Modal extends PopupElement {
     constructor(node) {
         super({
             node,
-            visibleClassName: 'modal-container-open',
-            openingClassName: 'modal-container-opening',
-            closingClassName: 'modal-container-closing',
             closingAnimationDuration: 375 // Milliseconds; includes buffer
         });
         this._contentNode = null;
@@ -170,9 +166,6 @@ class StatusFooter extends PopupElement {
     constructor(node) {
         super({
             node,
-            visibleClassName: 'status-footer-container-open',
-            openingClassName: 'status-footer-container-opening',
-            closingClassName: 'status-footer-container-closing',
             closingAnimationDuration: 375 // Milliseconds; includes buffer
         });
         this._body = node.querySelector('.status-footer');
