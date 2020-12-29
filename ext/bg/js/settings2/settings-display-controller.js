@@ -25,7 +25,6 @@ class SettingsDisplayController {
         this._settingsController = settingsController;
         this._modalController = modalController;
         this._contentNode = null;
-        this._topLink = null;
         this._menuContainer = null;
         this._openPopupMenus = new Set();
         this._onMoreToggleClickBind = null;
@@ -34,7 +33,6 @@ class SettingsDisplayController {
 
     prepare() {
         this._contentNode = document.querySelector('.content');
-        this._topLink = document.querySelector('.sidebar-top-link');
         this._menuContainer = document.querySelector('#popup-menus');
 
         const onFabButtonClick = this._onFabButtonClick.bind(this);
@@ -73,11 +71,6 @@ class SettingsDisplayController {
         });
         menuSelectorObserver.observe(document.documentElement, false);
 
-        if (this._topLink !== null) {
-            this._contentNode.addEventListener('scroll', this._onScroll.bind(this), {passive: true});
-            this._topLink.addEventListener('click', this._onTopLinkClick.bind(this), false);
-        }
-
         window.addEventListener('keydown', this._onKeyDown.bind(this), false);
         window.addEventListener('popstate', this._onPopState.bind(this), false);
         this._updateScrollTarget();
@@ -107,13 +100,6 @@ class SettingsDisplayController {
         const element = e.currentTarget;
         const {menu} = element.dataset;
         this._showMenu(element, menu);
-    }
-
-    _onScroll(e) {
-        const content = e.currentTarget;
-        const topLink = this._topLink;
-        const scrollTop = content.scrollTop;
-        topLink.hidden = (scrollTop < 100);
     }
 
     _onFabButtonClick(e) {
@@ -212,21 +198,6 @@ class SettingsDisplayController {
         return false;
     }
 
-    _onTopLinkClick(e) {
-        if (window.location.hash.length > 0) {
-            const {pathname, search} = window.location;
-            const url = `${pathname}${search}`;
-            history.pushState(null, '', url);
-        }
-
-        const content = this._contentNode;
-        content.scrollTop = 0;
-
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-    }
-
     _onClosePopupMenu({popupMenu, onClose}) {
         this._openPopupMenus.delete(popupMenu);
         popupMenu.off('closed', onClose);
@@ -262,7 +233,6 @@ class SettingsDisplayController {
         const rect1 = content.getBoundingClientRect();
         const rect2 = target.getBoundingClientRect();
         content.scrollTop += rect2.top - rect1.top;
-        this._onScroll({currentTarget: content});
     }
 
     _getMoreContainer(link) {
