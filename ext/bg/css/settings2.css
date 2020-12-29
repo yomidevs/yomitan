@@ -468,7 +468,7 @@ h3 {
     margin-right: calc(var(--padding) * 0.5);
 }
 .sidebar-body {
-    padding: 0 0 2em;
+    padding: 2em 0;
 }
 .sidebar-bottom {
     padding-bottom: 2em;
