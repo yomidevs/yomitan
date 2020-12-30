@@ -706,7 +706,7 @@ class Translator {
                 switch (mode) {
                     case 'freq':
                         {
-                            const frequencyData = this._getFrequencyData(expression, reading, dictionary, data);
+                            const frequencyData = this._getTermFrequencyData(expression, reading, dictionary, data);
                             if (frequencyData === null) { continue; }
                             for (const {frequencies} of targets) { frequencies.push(frequencyData); }
                         }
@@ -733,7 +733,10 @@ class Translator {
         for (const {character, mode, data, dictionary, index} of metas) {
             switch (mode) {
                 case 'freq':
-                    definitions[index].frequencies.push({character, frequency: data, dictionary});
+                    {
+                        const frequencyData = this._getKanjiFrequencyData(character, dictionary, data);
+                        definitions[index].frequencies.push(frequencyData);
+                    }
                     break;
             }
         }
@@ -805,13 +808,18 @@ class Translator {
         return tagMetaList;
     }
 
-    _getFrequencyData(expression, reading, dictionary, data) {
+    _getTermFrequencyData(expression, reading, dictionary, data) {
         let frequency = data;
-        if (data !== null && typeof data === 'object') {
+        const hasReading = (data !== null && typeof data === 'object');
+        if (hasReading) {
             if (data.reading !== reading) { return null; }
             frequency = data.frequency;
         }
-        return {expression, reading, dictionary, frequency};
+        return {dictionary, expression, reading, hasReading, frequency};
+    }
+
+    _getKanjiFrequencyData(character, dictionary, data) {
+        return {dictionary, character, frequency: data};
     }
 
     async _getPitchData(expression, reading, dictionary, data) {

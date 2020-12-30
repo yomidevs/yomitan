@@ -147,9 +147,9 @@
                         },
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "character": "打",
-                                "frequency": 1,
-                                "dictionary": "Test Dictionary 2"
+                                "frequency": 1
                             }
                         ]
                     }
@@ -270,9 +270,9 @@
                         },
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "character": "込",
-                                "frequency": 2,
-                                "dictionary": "Test Dictionary 2"
+                                "frequency": 2
                             }
                         ]
                     }
@@ -356,15 +356,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "だ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 1
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "だ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 4
                                     }
                                 ],
@@ -441,15 +443,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "だ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 1
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "だ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 4
                             }
                         ],
@@ -515,15 +519,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "ダース",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 1
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "ダース",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 5
                                     }
                                 ],
@@ -600,15 +606,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "ダース",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 1
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "ダース",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 5
                             }
                         ],
@@ -690,15 +698,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 6
                                     }
                                 ],
@@ -779,15 +789,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 6
                             }
                         ],
@@ -857,15 +869,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 7
                                     }
                                 ],
@@ -946,15 +960,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 7
                             }
                         ],
@@ -1024,15 +1040,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 6
                                     }
                                 ],
@@ -1113,15 +1131,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 6
                             }
                         ],
@@ -1191,15 +1211,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 7
                                     }
                                 ],
@@ -1280,15 +1302,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 7
                             }
                         ],
@@ -1354,15 +1378,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "だ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 1
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "だ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 4
                                     }
                                 ],
@@ -1439,15 +1465,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "だ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 1
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "だ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 4
                             }
                         ],
@@ -1513,15 +1541,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "ダース",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 1
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "ダース",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 5
                                     }
                                 ],
@@ -1598,15 +1628,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "ダース",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 1
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "ダース",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 5
                             }
                         ],
@@ -1696,15 +1728,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 8
                                     }
                                 ],
@@ -1809,15 +1843,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "うちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 3
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "うちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 8
                             }
                         ],
@@ -1911,15 +1947,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 9
                                     }
                                 ],
@@ -2024,15 +2062,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "ぶちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 3
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "ぶちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 9
                             }
                         ],
@@ -2126,15 +2166,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 8
                                     }
                                 ],
@@ -2239,15 +2281,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "うちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 3
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "うちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 8
                             }
                         ],
@@ -2341,15 +2385,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 9
                                     }
                                 ],
@@ -2454,15 +2500,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "ぶちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 3
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "ぶちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 9
                             }
                         ],
@@ -2550,15 +2598,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 6
                                     }
                                 ],
@@ -2639,15 +2689,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 6
                             }
                         ],
@@ -2719,15 +2771,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 7
                                     }
                                 ],
@@ -2808,15 +2862,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 7
                             }
                         ],
@@ -2888,15 +2944,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 6
                                     }
                                 ],
@@ -2977,15 +3035,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 6
                             }
                         ],
@@ -3057,15 +3117,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 7
                                     }
                                 ],
@@ -3146,15 +3208,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 7
                             }
                         ],
@@ -3220,15 +3284,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "だ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 1
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "だ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 4
                                     }
                                 ],
@@ -3305,15 +3371,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "だ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 1
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "だ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 4
                             }
                         ],
@@ -3379,15 +3447,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "ダース",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 1
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "ダース",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 5
                                     }
                                 ],
@@ -3464,15 +3534,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "ダース",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 1
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "ダース",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 5
                             }
                         ],
@@ -3704,15 +3776,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "だ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 1
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "だ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 4
                                     }
                                 ],
@@ -3789,15 +3863,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "だ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 1
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "だ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 4
                             }
                         ],
@@ -3875,15 +3951,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "ダース",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 1
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "ダース",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 5
                                     }
                                 ],
@@ -3960,15 +4038,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "ダース",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 1
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "ダース",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 5
                             }
                         ],
@@ -4050,15 +4130,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 6
                                     }
                                 ],
@@ -4139,15 +4221,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 6
                             }
                         ],
@@ -4217,15 +4301,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 6
                                     }
                                 ],
@@ -4306,15 +4392,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 6
                             }
                         ],
@@ -4396,15 +4484,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 7
                                     }
                                 ],
@@ -4485,15 +4575,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 7
                             }
                         ],
@@ -4563,15 +4655,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 7
                                     }
                                 ],
@@ -4652,15 +4746,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 7
                             }
                         ],
@@ -4750,15 +4846,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 8
                                     }
                                 ],
@@ -4863,15 +4961,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "うちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 3
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "うちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 8
                             }
                         ],
@@ -4965,15 +5065,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 8
                                     }
                                 ],
@@ -5078,15 +5180,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "うちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 3
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "うちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 8
                             }
                         ],
@@ -5174,15 +5278,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 6
                                     }
                                 ],
@@ -5263,15 +5369,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 6
                             }
                         ],
@@ -5343,15 +5451,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 6
                                     }
                                 ],
@@ -5432,15 +5542,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 6
                             }
                         ],
@@ -5530,15 +5642,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 9
                                     }
                                 ],
@@ -5643,15 +5757,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "ぶちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 3
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "ぶちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 9
                             }
                         ],
@@ -5745,15 +5861,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 9
                                     }
                                 ],
@@ -5858,15 +5976,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "ぶちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 3
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "ぶちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 9
                             }
                         ],
@@ -5954,15 +6074,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 7
                                     }
                                 ],
@@ -6043,15 +6165,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 7
                             }
                         ],
@@ -6123,15 +6247,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 7
                                     }
                                 ],
@@ -6212,15 +6338,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 7
                             }
                         ],
@@ -7980,15 +8108,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 8
                                     }
                                 ],
@@ -8148,15 +8278,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "うちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 3
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "うちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 8
                                             }
                                         ],
@@ -8261,15 +8393,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 8
                                     }
                                 ],
@@ -8363,15 +8497,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "うちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 3
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "うちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 8
                                             }
                                         ],
@@ -8476,15 +8612,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 8
                                     }
                                 ],
@@ -8510,15 +8648,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "うちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 3
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "うちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 8
                             }
                         ],
@@ -8610,15 +8750,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 9
                                     }
                                 ],
@@ -8760,15 +8902,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "ぶちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 3
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "ぶちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 9
                                             }
                                         ],
@@ -8873,15 +9017,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 9
                                     }
                                 ],
@@ -8975,15 +9121,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "ぶちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 3
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "ぶちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 9
                                             }
                                         ],
@@ -9088,15 +9236,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 9
                                     }
                                 ],
@@ -9122,15 +9272,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "ぶちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 3
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "ぶちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 9
                             }
                         ],
@@ -9216,15 +9368,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 6
                                     }
                                 ],
@@ -9336,15 +9490,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "うつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 2
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "うつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 6
                                             }
                                         ],
@@ -9425,15 +9581,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 6
                                     }
                                 ],
@@ -9505,15 +9663,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "うつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 2
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "うつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 6
                                             }
                                         ],
@@ -9594,15 +9754,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 6
                                     }
                                 ],
@@ -9612,15 +9774,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 6
                             }
                         ],
@@ -9690,15 +9854,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 7
                                     }
                                 ],
@@ -9810,15 +9976,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "ぶつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 2
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "ぶつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 7
                                             }
                                         ],
@@ -9899,15 +10067,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 7
                                     }
                                 ],
@@ -9979,15 +10149,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "ぶつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 2
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "ぶつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 7
                                             }
                                         ],
@@ -10068,15 +10240,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 7
                                     }
                                 ],
@@ -10086,15 +10260,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 7
                             }
                         ],
@@ -10158,15 +10334,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "だ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 1
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "だ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 4
                                     }
                                 ],
@@ -10268,15 +10446,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打",
                                                 "reading": "だ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 1
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打",
                                                 "reading": "だ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 4
                                             }
                                         ],
@@ -10353,15 +10533,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "だ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 1
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "だ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 4
                                     }
                                 ],
@@ -10371,15 +10553,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "だ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 1
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "だ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 4
                             }
                         ],
@@ -10443,15 +10627,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "ダース",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 1
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "ダース",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 5
                                     }
                                 ],
@@ -10553,15 +10739,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打",
                                                 "reading": "ダース",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 1
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打",
                                                 "reading": "ダース",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 5
                                             }
                                         ],
@@ -10638,15 +10826,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "ダース",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 1
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "ダース",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 5
                                     }
                                 ],
@@ -10656,15 +10846,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "ダース",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 1
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "ダース",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 5
                             }
                         ],
@@ -10774,15 +10966,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 8
                                     }
                                 ],
@@ -10858,15 +11052,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 9
                                     }
                                 ],
@@ -10962,15 +11158,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "うちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 3
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "うちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 8
                                             }
                                         ],
@@ -11098,15 +11296,17 @@
                                                 "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打ち込む",
                                                         "reading": "うちこむ",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": false,
                                                         "frequency": 3
                                                     },
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打ち込む",
                                                         "reading": "うちこむ",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": true,
                                                         "frequency": 8
                                                     }
                                                 ],
@@ -11211,15 +11411,17 @@
                                         ],
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "うちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 3
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "うちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 8
                                             }
                                         ],
@@ -11245,15 +11447,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 8
                                     }
                                 ],
@@ -11351,15 +11555,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "ぶちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 3
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "ぶちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 9
                                             }
                                         ],
@@ -11487,15 +11693,17 @@
                                                 "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打ち込む",
                                                         "reading": "ぶちこむ",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": false,
                                                         "frequency": 3
                                                     },
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打ち込む",
                                                         "reading": "ぶちこむ",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": true,
                                                         "frequency": 9
                                                     }
                                                 ],
@@ -11600,15 +11808,17 @@
                                         ],
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "ぶちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 3
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "ぶちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 9
                                             }
                                         ],
@@ -11634,15 +11844,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 9
                                     }
                                 ],
@@ -11740,15 +11952,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "うちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 3
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "うちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 8
                                             }
                                         ],
@@ -11876,15 +12090,17 @@
                                                 "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打ち込む",
                                                         "reading": "うちこむ",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": false,
                                                         "frequency": 3
                                                     },
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打ち込む",
                                                         "reading": "うちこむ",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": true,
                                                         "frequency": 8
                                                     }
                                                 ],
@@ -11989,15 +12205,17 @@
                                         ],
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "うちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 3
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "うちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 8
                                             }
                                         ],
@@ -12023,15 +12241,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 8
                                     }
                                 ],
@@ -12129,15 +12349,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "ぶちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 3
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "ぶちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 9
                                             }
                                         ],
@@ -12265,15 +12487,17 @@
                                                 "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打ち込む",
                                                         "reading": "ぶちこむ",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": false,
                                                         "frequency": 3
                                                     },
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打ち込む",
                                                         "reading": "ぶちこむ",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": true,
                                                         "frequency": 9
                                                     }
                                                 ],
@@ -12378,15 +12602,17 @@
                                         ],
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "ぶちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 3
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打ち込む",
                                                 "reading": "ぶちこむ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 9
                                             }
                                         ],
@@ -12412,15 +12638,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 9
                                     }
                                 ],
@@ -12449,27 +12677,31 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "うちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 3
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "ぶちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 3
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "うちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 8
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "ぶちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 9
                             }
                         ],
@@ -12574,15 +12806,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 6
                                     }
                                 ],
@@ -12634,15 +12868,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 7
                                     }
                                 ],
@@ -12714,15 +12950,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "うつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 2
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "うつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 6
                                             }
                                         ],
@@ -12828,15 +13066,17 @@
                                                 "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打つ",
                                                         "reading": "うつ",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": false,
                                                         "frequency": 2
                                                     },
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打つ",
                                                         "reading": "うつ",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": true,
                                                         "frequency": 6
                                                     }
                                                 ],
@@ -12917,15 +13157,17 @@
                                         ],
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "うつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 2
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "うつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 6
                                             }
                                         ],
@@ -12935,15 +13177,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 6
                                     }
                                 ],
@@ -13017,15 +13261,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "ぶつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 2
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "ぶつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 7
                                             }
                                         ],
@@ -13131,15 +13377,17 @@
                                                 "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打つ",
                                                         "reading": "ぶつ",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": false,
                                                         "frequency": 2
                                                     },
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打つ",
                                                         "reading": "ぶつ",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": true,
                                                         "frequency": 7
                                                     }
                                                 ],
@@ -13220,15 +13468,17 @@
                                         ],
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "ぶつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 2
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "ぶつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 7
                                             }
                                         ],
@@ -13238,15 +13488,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 7
                                     }
                                 ],
@@ -13320,15 +13572,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "うつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 2
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "うつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 6
                                             }
                                         ],
@@ -13434,15 +13688,17 @@
                                                 "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打つ",
                                                         "reading": "うつ",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": false,
                                                         "frequency": 2
                                                     },
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打つ",
                                                         "reading": "うつ",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": true,
                                                         "frequency": 6
                                                     }
                                                 ],
@@ -13523,15 +13779,17 @@
                                         ],
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "うつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 2
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "うつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 6
                                             }
                                         ],
@@ -13541,15 +13799,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 6
                                     }
                                 ],
@@ -13623,15 +13883,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "ぶつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 2
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "ぶつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 7
                                             }
                                         ],
@@ -13737,15 +13999,17 @@
                                                 "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打つ",
                                                         "reading": "ぶつ",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": false,
                                                         "frequency": 2
                                                     },
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打つ",
                                                         "reading": "ぶつ",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": true,
                                                         "frequency": 7
                                                     }
                                                 ],
@@ -13826,15 +14090,17 @@
                                         ],
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "ぶつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 2
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打つ",
                                                 "reading": "ぶつ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 7
                                             }
                                         ],
@@ -13844,15 +14110,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 7
                                     }
                                 ],
@@ -13865,27 +14133,31 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 6
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 7
                             }
                         ],
@@ -13952,15 +14224,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "だ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 1
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "だ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 4
                                     }
                                 ],
@@ -14028,15 +14302,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打",
                                                 "reading": "だ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 1
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打",
                                                 "reading": "だ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 4
                                             }
                                         ],
@@ -14136,15 +14412,17 @@
                                                 "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打",
                                                         "reading": "だ",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": false,
                                                         "frequency": 1
                                                     },
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打",
                                                         "reading": "だ",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": true,
                                                         "frequency": 4
                                                     }
                                                 ],
@@ -14221,15 +14499,17 @@
                                         ],
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打",
                                                 "reading": "だ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 1
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打",
                                                 "reading": "だ",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 4
                                             }
                                         ],
@@ -14239,15 +14519,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "だ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 1
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "だ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 4
                                     }
                                 ],
@@ -14258,15 +14540,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "だ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 1
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "だ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 4
                             }
                         ],
@@ -14333,15 +14617,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "ダース",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 1
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "ダース",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 5
                                     }
                                 ],
@@ -14409,15 +14695,17 @@
                                         "termFrequency": "normal",
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打",
                                                 "reading": "ダース",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 1
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打",
                                                 "reading": "ダース",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 5
                                             }
                                         ],
@@ -14517,15 +14805,17 @@
                                                 "termFrequency": "normal",
                                                 "frequencies": [
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打",
                                                         "reading": "ダース",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": false,
                                                         "frequency": 1
                                                     },
                                                     {
+                                                        "dictionary": "Test Dictionary 2",
                                                         "expression": "打",
                                                         "reading": "ダース",
-                                                        "dictionary": "Test Dictionary 2",
+                                                        "hasReading": true,
                                                         "frequency": 5
                                                     }
                                                 ],
@@ -14602,15 +14892,17 @@
                                         ],
                                         "frequencies": [
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打",
                                                 "reading": "ダース",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": false,
                                                 "frequency": 1
                                             },
                                             {
+                                                "dictionary": "Test Dictionary 2",
                                                 "expression": "打",
                                                 "reading": "ダース",
-                                                "dictionary": "Test Dictionary 2",
+                                                "hasReading": true,
                                                 "frequency": 5
                                             }
                                         ],
@@ -14620,15 +14912,17 @@
                                 ],
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "ダース",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 1
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "ダース",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 5
                                     }
                                 ],
@@ -14639,15 +14933,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "ダース",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 1
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "ダース",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 5
                             }
                         ],
@@ -14741,15 +15037,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 8
                                     }
                                 ],
@@ -14854,15 +15152,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "うちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 3
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "うちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 8
                             }
                         ],
@@ -14960,15 +15260,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 9
                                     }
                                 ],
@@ -15073,15 +15375,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "ぶちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 3
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "ぶちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 9
                             }
                         ],
@@ -15179,15 +15483,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "うちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 8
                                     }
                                 ],
@@ -15292,15 +15598,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "うちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 3
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "うちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 8
                             }
                         ],
@@ -15398,15 +15706,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 3
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打ち込む",
                                         "reading": "ぶちこむ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 9
                                     }
                                 ],
@@ -15511,15 +15821,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "ぶちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 3
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打ち込む",
                                 "reading": "ぶちこむ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 9
                             }
                         ],
@@ -15607,15 +15919,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 6
                                     }
                                 ],
@@ -15696,15 +16010,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 6
                             }
                         ],
@@ -15776,15 +16092,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 7
                                     }
                                 ],
@@ -15865,15 +16183,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 7
                             }
                         ],
@@ -15945,15 +16265,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "うつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 6
                                     }
                                 ],
@@ -16034,15 +16356,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "うつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 6
                             }
                         ],
@@ -16114,15 +16438,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 2
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打つ",
                                         "reading": "ぶつ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 7
                                     }
                                 ],
@@ -16203,15 +16529,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 2
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打つ",
                                 "reading": "ぶつ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 7
                             }
                         ],
@@ -16277,15 +16605,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "だ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 1
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "だ",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 4
                                     }
                                 ],
@@ -16362,15 +16692,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "だ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 1
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "だ",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 4
                             }
                         ],
@@ -16436,15 +16768,17 @@
                                 "termFrequency": "normal",
                                 "frequencies": [
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "ダース",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": false,
                                         "frequency": 1
                                     },
                                     {
+                                        "dictionary": "Test Dictionary 2",
                                         "expression": "打",
                                         "reading": "ダース",
-                                        "dictionary": "Test Dictionary 2",
+                                        "hasReading": true,
                                         "frequency": 5
                                     }
                                 ],
@@ -16521,15 +16855,17 @@
                         ],
                         "frequencies": [
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "ダース",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": false,
                                 "frequency": 1
                             },
                             {
+                                "dictionary": "Test Dictionary 2",
                                 "expression": "打",
                                 "reading": "ダース",
-                                "dictionary": "Test Dictionary 2",
+                                "hasReading": true,
                                 "frequency": 5
                             }
                         ],
