@@ -596,6 +596,15 @@ h3 {
 .settings-item-children.settings-item-children-group .settings-item-left {
     padding-left: 0;
 }
+.settings-item-children.settings-item-children-group .settings-item-inner.settings-item-inner-wrappable>.settings-item-left:not(:last-child) {
+    padding-right: calc(
+        var(--settings-group-inner-horizontal-padding-half-wrappable) +
+        var(--settings-group-inner-horizontal-padding-half-wrappable)
+    );
+}
+.settings-item-children.settings-item-children-group .settings-item-inner.settings-item-inner-wrappable>.settings-item-right {
+    padding-left: 0;
+}
 .settings-item-children.settings-item-children-group .settings-item-children {
     padding-left: 0;
 }
