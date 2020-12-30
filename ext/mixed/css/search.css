@@ -108,8 +108,7 @@ h1 {
     cursor: pointer;
     outline: none;
     transition: background-color var(--animation-duration) ease-in-out;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+    border-radius: 0;
 }
 #search-button:hover,
 #search-button:focus {

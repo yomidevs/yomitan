@@ -537,6 +537,8 @@ button.sidebar-button.danger:hover .sidebar-button-icon {
     flex-flow: row nowrap;
     float: right;
     margin: -0.25em;
+    position: relative;
+    z-index: 1;
 }
 .actions::after {
     clear: both;
@@ -552,6 +554,7 @@ button.action-button {
     padding: var(--action-button-padding);
     background: transparent;
     font-size: inherit;
+    box-shadow: none;
     transition:
         opacity var(--animation-duration) linear,
         visibility 0s linear 0s,
@@ -580,11 +583,14 @@ button.action-button:disabled {
 button.action-button:disabled:not([hidden]) {
     opacity: 0.25;
 }
-button.action-button:hover {
+button.action-button:hover,
+button.action-button:focus {
     background-color: transparent;
+    box-shadow: none;
 }
 button.action-button:active {
     background-color: var(--action-button-active-color);
+    box-shadow: none;
 }
 button.action-button::before {
     content: "";

@@ -174,8 +174,8 @@
 .icon[data-icon=hamburger-menu]          { --icon-image: url(/mixed/img/hamburger-menu.svg); }
 .icon[data-icon=kebab-menu]              { --icon-image: url(/mixed/img/kebab-menu.svg); }
 .icon[data-icon=mouse]                   { --icon-image: url(/mixed/img/mouse.svg); }
-.icon[data-icon=material-down-arrow]     { --icon-image: url(/mixed/img/material-down-arrow.svg); }
-.icon[data-icon=material-right-arrow]    { --icon-image: url(/mixed/img/material-right-arrow.svg); }
+.icon[data-icon=material-down-arrow]     { --icon-image: url(/mixed/img/material-down-arrow.svg);  --icon-size: var(--material-arrow-dimension2) var(--material-arrow-dimension1); }
+.icon[data-icon=material-right-arrow]    { --icon-image: url(/mixed/img/material-right-arrow.svg); --icon-size: var(--material-arrow-dimension1) var(--material-arrow-dimension2); }
 .icon[data-icon=exclamation-point-short] { --icon-image: url(/mixed/img/exclamation-point-short.svg); }
 .icon[data-icon=magnifying-glass]        { --icon-image: url(/mixed/img/magnifying-glass.svg); }
 .icon[data-icon=collapse]                { --icon-image: url(/mixed/img/collapse.svg); }
@@ -752,6 +752,12 @@ button.input-suffix-button.input-suffix-icon-button:focus {
 }
 button.input-suffix-button.input-suffix-icon-button:active {
     background-color: var(--input-background-color-darker);
+}
+button.input-suffix-button.input-suffix-icon-button>.icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: var(--button-icon-color);
 }
 input[type=text]:invalid+button.input-suffix-button,
 input[type=number]:invalid+button.input-suffix-button,
