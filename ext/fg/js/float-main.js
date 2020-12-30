@@ -17,6 +17,7 @@
 
 /* global
  * Display
+ * DisplayProfileSelection
  * DocumentFocusController
  * JapaneseUtil
  * api
@@ -33,6 +34,8 @@
         const japaneseUtil = new JapaneseUtil(null);
         const display = new Display('popup', japaneseUtil, documentFocusController);
         await display.prepare();
+        const displayProfileSelection = new DisplayProfileSelection(display);
+        displayProfileSelection.prepare();
         display.initializeState();
 
         yomichan.ready();

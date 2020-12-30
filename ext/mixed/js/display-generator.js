@@ -121,6 +121,10 @@ class DisplayGenerator {
         return this._templates.instantiate('footer-notification');
     }
 
+    createProfileListItem() {
+        return this._templates.instantiate('profile-list-item');
+    }
+
     // Private
 
     _createTermExpression(details) {

@@ -349,6 +349,8 @@ class Frontend {
         const {usePopupWindow, showIframePopupsInRootFrame} = this._options.general;
         const isIframe = !this._useProxyPopup && (window !== window.parent);
 
+        const currentPopup = this._popup;
+
         let popupPromise;
         if (usePopupWindow) {
             popupPromise = this._popupCache.get('window');
@@ -393,7 +395,10 @@ class Frontend {
         }
         if (this._updatePopupToken !== token) { return; }
 
-        this._clearSelection(true);
+        if (popup !== currentPopup) {
+            this._clearSelection(true);
+        }
+
         this._popupEventListeners.removeAllEventListeners();
         this._popup = popup;
         if (popup !== null) {

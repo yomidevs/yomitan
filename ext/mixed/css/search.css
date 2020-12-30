@@ -57,14 +57,6 @@ h1 {
     border-bottom: calc(1em / (var(--font-size-no-units) * 2)) solid var(--separator-color1);
 }
 
-/* Content layout */
-.content-body-inner {
-    width: var(--main-content-size);
-    max-width: 100%;
-    box-sizing: border-box;
-    margin: 0 auto;
-}
-
 /* Search bar */
 .search-textbox-container {
     display: flex;
