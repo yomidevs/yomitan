@@ -597,10 +597,7 @@ h3 {
     padding-left: 0;
 }
 .settings-item-children.settings-item-children-group .settings-item-inner.settings-item-inner-wrappable>.settings-item-left:not(:last-child) {
-    padding-right: calc(
-        var(--settings-group-inner-horizontal-padding-half-wrappable) +
-        var(--settings-group-inner-horizontal-padding-half-wrappable)
-    );
+    padding-right: calc(var(--settings-group-inner-horizontal-padding-half-wrappable) * 2);
 }
 .settings-item-children.settings-item-children-group .settings-item-inner.settings-item-inner-wrappable>.settings-item-right {
     padding-left: 0;
