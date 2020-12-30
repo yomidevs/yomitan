@@ -77,6 +77,8 @@
     --entry-current-indicator-triangle-size-no-units: 6;
     --entry-current-indicator-triangle-size: calc(1em * (var(--entry-current-indicator-triangle-size-no-units) / var(--font-size-no-units)));
 
+    --overlay-panel-translate-distance: 4em;
+
     --animation-duration: 0.125s;
     --animation-duration2: calc(2 * var(--animation-duration));
 
@@ -1506,7 +1508,7 @@ button.action-button[data-icon=source-term]::before {
         transform var(--animation-duration2) ease-out;
 }
 .overlay-panel[hidden] {
-    transform: translate(4em, 0);
+    transform: translate(var(--overlay-panel-translate-distance), 0);
     opacity: 0;
     visibility: hidden;
     transition:
@@ -1516,6 +1518,15 @@ button.action-button[data-icon=source-term]::before {
 }
 .overlay-panel[hidden]:not(.hidden-animating) {
     display: none;
+}
+:root[data-popup-action-bar-location=left] .overlay-panel[hidden] {
+    transform: translate(calc(-1 * var(--overlay-panel-translate-distance)), 0);
+}
+:root[data-popup-action-bar-location=top] .overlay-panel[hidden] {
+    transform: translate(0, calc(-1 * var(--overlay-panel-translate-distance)));
+}
+:root[data-popup-action-bar-location=bottom] .overlay-panel[hidden] {
+    transform: translate(0, var(--overlay-panel-translate-distance));
 }
 .overlay-panel-inner {
     padding: var(--entry-vertical-padding) var(--entry-horizontal-padding);
