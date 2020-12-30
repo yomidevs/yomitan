@@ -1,0 +1,845 @@
+/*
+ * Copyright (C) 2020  Yomichan Authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/* Variables */
+:root {
+    --font-size-no-units: 14;
+    --font-size: calc(1px * var(--font-size-no-units));
+
+    --animation-duration: 0.125s;
+    --animation-duration2: calc(var(--animation-duration) * 2);
+
+    --checkbox-size: calc(16em / var(--font-size-no-units));
+    --icon-button-size: calc(36em / var(--font-size-no-units));
+    --radio-size: calc(20em / var(--font-size-no-units));
+    --toggle-size: calc(16em / var(--font-size-no-units));
+
+    --input-font-size-no-units: 1;
+    --input-font-size: calc(1em * var(--input-font-size-no-units));
+    --input-width: calc(100em / (var(--font-size-no-units) * var(--input-font-size-no-units)));
+    --input-width-large: calc(200em / (var(--font-size-no-units) * var(--input-font-size-no-units)));
+    --input-height: calc(32em / (var(--font-size-no-units) * var(--input-font-size-no-units)));
+    --input-border-radius: 0.25em;
+    --textarea-line-height: 1.25em;
+    --textarea-padding: 0.5em;
+
+    --material-arrow-dimension1: calc(5em / var(--font-size-no-units));
+    --material-arrow-dimension2: calc(10em / var(--font-size-no-units));
+
+    --button-shadow-params: 0 0.0625em 0.125em 0;
+
+    --thin-border-size: calc(1em / var(--font-size-no-units));
+
+    --text-color: #222222;
+    --background-color: #f8f9fa;
+    --background-color-light: #ffffff;
+
+    --shadow-color: rgba(0, 0, 0, 0.185);
+    --shadow-color-off: rgba(0, 0, 0, 0);
+    --shadow-color-light: rgba(0, 0, 0, 0.085);
+
+    --accent-color: #1a73e8;
+    --accent-color-light: #4a91ed;
+    --accent-color-lighter: #8db9f4;
+    --accent-color-lightest: #a7c9f6;
+    --accent-color-dark: #1060c0;
+    --accent-color-transparent0: rgba(28, 116, 233, 0);
+    --accent-color-transparent5: rgba(28, 116, 233, 0.05);
+    --accent-color-transparent25: rgba(28, 116, 233, 0.25);
+
+    --danger-color: #c83c28;
+    --danger-color-light: #dd6755;
+    --danger-color-lighter: #e68d7f;
+    --danger-color-lightest: #eeb3aa;
+    --danger-color-transparent0: rgba(200, 60, 40, 0);
+    --danger-color-transparent5: rgba(200, 60, 40, 0.05);
+    --danger-color-transparent25: rgba(200, 60, 40, 0.25);
+
+    --disabled-color: #aaaaaa;
+    --disabled-color-light: #dddddd;
+    --disabled-color-lighter: #eeeeee;
+
+    --input-background-color: #f2f2f2;
+    --input-background-color-dark: #dddddd;
+    --input-background-color-darker: #cccccc;
+    --input-outline-color: var(--text-color);
+
+    --button-text-color: #ffffff;
+    --button-border-color: #cccccc;
+    --button-icon-color: #333333;
+    --button-icon-color-light: #666666;
+
+    --checkbox-checked-color: var(--accent-color);
+    --checkbox-unchecked-color: #666666;
+    --checkbox-check-color: var(--background-color-light);
+    --checkbox-disabled-color: var(--disabled-color);
+
+    --toggle-track-color: #cccccc;
+    --toggle-knob-color: var(--background-color-light);
+
+    --selectable-indicator-color: rgba(160, 160, 160, 0.25);
+}
+:root[data-theme=dark] {
+    --text-color: #d4d4d4;
+    --background-color: #1e1e1e;
+    --background-color-light: #0a0a0a;
+
+    --shadow-color: rgba(255, 255, 255, 0.185);
+    --shadow-color-off: rgba(255, 255, 255, 0);
+    --shadow-color-light: rgba(255, 255, 255, 0.085);
+
+    --accent-color: #4a91ed;
+    --accent-color-light: #1a73e8;
+    --accent-color-lighter: #135dbe;
+    --accent-color-lightest: #0e4690;
+    --accent-color-transparent0: rgb(78, 172, 253, 0);
+    --accent-color-transparent5: rgb(78, 172, 253, 0.05);
+    --accent-color-transparent25: rgb(78, 172, 253, 0.25);
+
+    --danger-color: #dd6755;
+    --danger-color-light: #c83c28;
+    --danger-color-lighter: #9e301f;
+    --danger-color-lightest: #732317;
+    --danger-color-transparent0: rgba(221, 103, 85, 0);
+    --danger-color-transparent5: rgba(221, 103, 85, 0.05);
+    --danger-color-transparent25: rgba(221, 103, 85, 0.25);
+
+    --disabled-color: #444444;
+    --disabled-color-light: #585858;
+    --disabled-color-lighter: #777777;
+
+    --input-background-color: #2f2f2f;
+    --input-background-color-dark: #383838;
+    --input-background-color-darker: #484848;
+    --input-outline-color: var(--text-color);
+
+    --button-text-color: #000000;
+    --button-border-color: #333333;
+    --button-icon-color: #cccccc;
+    --button-icon-color-light: #999999;
+
+    --checkbox-unchecked-color: #999999;
+
+    --toggle-track-color: #cccccc;
+    --toggle-knob-color: #ffffff;
+
+    --selectable-indicator-color: rgba(100, 100, 100, 0.25);
+}
+
+
+/* Icons */
+.icon {
+    --icon-image: none;
+    --icon-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center center;
+    -webkit-mask-mode: alpha;
+    -webkit-mask-size: var(--icon-size);
+    -webkit-mask-image: var(--icon-image);
+    mask-repeat: no-repeat;
+    mask-position: center center;
+    mask-mode: alpha;
+    mask-size: var(--icon-size);
+    mask-image: var(--icon-image);
+}
+.icon[data-icon=profile]                 { --icon-image: url(/mixed/img/profile.svg); }
+.icon[data-icon=cog]                     { --icon-image: url(/mixed/img/cog.svg); }
+.icon[data-icon=palette]                 { --icon-image: url(/mixed/img/palette.svg); }
+.icon[data-icon=popup]                   { --icon-image: url(/mixed/img/popup.svg); }
+.icon[data-icon=speaker]                 { --icon-image: url(/mixed/img/speaker.svg); }
+.icon[data-icon=scanning]                { --icon-image: url(/mixed/img/scanning.svg); }
+.icon[data-icon=text-parsing]            { --icon-image: url(/mixed/img/text-parsing.svg); }
+.icon[data-icon=translation]             { --icon-image: url(/mixed/img/translation.svg); }
+.icon[data-icon=book]                    { --icon-image: url(/mixed/img/book.svg); }
+.icon[data-icon=note-card]               { --icon-image: url(/mixed/img/note-card.svg); }
+.icon[data-icon=keyboard]                { --icon-image: url(/mixed/img/keyboard.svg); }
+.icon[data-icon=backup]                  { --icon-image: url(/mixed/img/backup.svg); }
+.icon[data-icon=lock]                    { --icon-image: url(/mixed/img/lock.svg); }
+.icon[data-icon=question-mark]           { --icon-image: url(/mixed/img/question-mark.svg); }
+.icon[data-icon=popup-size]              { --icon-image: url(/mixed/img/popup-size.svg); }
+.icon[data-icon=hamburger-menu]          { --icon-image: url(/mixed/img/hamburger-menu.svg); }
+.icon[data-icon=kebab-menu]              { --icon-image: url(/mixed/img/kebab-menu.svg); }
+.icon[data-icon=mouse]                   { --icon-image: url(/mixed/img/mouse.svg); }
+.icon[data-icon=material-down-arrow]     { --icon-image: url(/mixed/img/material-down-arrow.svg); }
+.icon[data-icon=material-right-arrow]    { --icon-image: url(/mixed/img/material-right-arrow.svg); }
+.icon[data-icon=exclamation-point-short] { --icon-image: url(/mixed/img/exclamation-point-short.svg); }
+.icon[data-icon=magnifying-glass]        { --icon-image: url(/mixed/img/magnifying-glass.svg); }
+.icon[data-icon=collapse]                { --icon-image: url(/mixed/img/collapse.svg); }
+.icon[data-icon=expand]                  { --icon-image: url(/mixed/img/expand.svg); }
+.icon[data-icon=window]                  { --icon-image: url(/mixed/img/window.svg); }
+
+
+/* Checkbox */
+label.checkbox {
+    cursor: default;
+}
+.checkbox {
+    font-size: var(--checkbox-size);
+    display: inline-block;
+}
+.checkbox>input[type=checkbox] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    display: block;
+    margin: 0;
+    padding: 0;
+    border: none;
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+}
+.checkbox-body {
+    display: block;
+    cursor: pointer;
+    width: 1em;
+    height: 1em;
+    position: relative;
+    cursor: pointer;
+}
+.checkbox>input[type=checkbox]:disabled+.checkbox-body {
+    cursor: default;
+}
+.checkbox-fill,
+.checkbox-border,
+.checkbox-check {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    mask-repeat: no-repeat;
+    mask-position: center center;
+    mask-mode: alpha;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center center;
+    -webkit-mask-mode: alpha;
+    -webkit-mask-size: contain;
+    transition: opacity var(--animation-duration) linear, background-color var(--animation-duration) linear;
+}
+.checkbox-fill {
+    mask-image: url(/mixed/img/checkbox-fill.svg);
+    -webkit-mask-image: url(/mixed/img/checkbox-fill.svg);
+    background-color: var(--checkbox-unchecked-color);
+    opacity: 0;
+}
+.checkbox-border {
+    mask-image: url(/mixed/img/checkbox-border.svg);
+    -webkit-mask-image: url(/mixed/img/checkbox-border.svg);
+    background-color: var(--checkbox-unchecked-color);
+    opacity: 1;
+}
+.checkbox-check {
+    mask-image: url(/mixed/img/checkbox-check.svg);
+    -webkit-mask-image: url(/mixed/img/checkbox-check.svg);
+    background-color: var(--checkbox-check-color);
+    opacity: 0;
+}
+.checkbox>input[type=checkbox]:checked+.checkbox-body>.checkbox-fill {
+    background-color: var(--checkbox-checked-color);
+    opacity: 1;
+}
+.checkbox>input[type=checkbox]:checked+.checkbox-body>.checkbox-border {
+    background-color: var(--checkbox-checked-color);
+    opacity: 1;
+}
+.checkbox>input[type=checkbox]:checked+.checkbox-body>.checkbox-check {
+    background-color: var(--checkbox-check-color);
+    opacity: 1;
+}
+.checkbox>input[type=checkbox]:disabled+.checkbox-body>.checkbox-fill {
+    opacity: 0;
+}
+.checkbox>input[type=checkbox]:disabled+.checkbox-body>.checkbox-border {
+    background-color: var(--checkbox-disabled-color);
+    opacity: 1;
+}
+.checkbox>input[type=checkbox]:disabled+.checkbox-body>.checkbox-check {
+    background-color: var(--checkbox-disabled-color);
+}
+
+
+/* Toggle switch */
+label.toggle {
+    cursor: default;
+}
+.toggle {
+    font-size: var(--toggle-size);
+    display: inline-block;
+}
+.toggle>input[type=checkbox] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    display: block;
+    margin: 0;
+    padding: 0;
+    border: none;
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+}
+.toggle-body {
+    display: block;
+    cursor: pointer;
+    width: 2em;
+    height: 1em;
+    position: relative;
+}
+.toggle-track {
+    display: block;
+    position: absolute;
+    left: 0.125em;
+    right: 0.125em;
+    top: 0.125em;
+    bottom: 0.125em;
+    background-color: var(--toggle-track-color);
+    border-radius: 0.4375em;
+    transition: background-color var(--animation-duration) ease-in-out;
+}
+.toggle-knob {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1em;
+    height: 1em;
+    background-color: var(--toggle-knob-color);
+    border-radius: 0.5em;
+    box-shadow:
+        0 0.0625em 0.25em 0 var(--shadow-color),
+        0 0.125em 0.125em 0 var(--shadow-color);
+    transition: transform var(--animation-duration) ease-in-out,
+                background-color var(--animation-duration) ease-in-out;
+}
+.toggle-body>.toggle-knob::after {
+    position: absolute;
+    display: block;
+    content: "";
+    left: -0.75em;
+    top: -0.75em;
+    right: -0.75em;
+    bottom: -0.75em;
+    border-radius: 2.5em;
+    background-color: var(--selectable-indicator-color);
+    pointer-events: none;
+    transform: scale(0);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0s ease-in-out var(--animation-duration2),
+                background-color var(--animation-duration2) ease-in-out,
+                opacity var(--animation-duration2) ease-in-out,
+                visibility 0s ease-in-out var(--animation-duration2);
+}
+.toggle>input[type=checkbox]:focus:not(:disabled)+.toggle-body>.toggle-knob::after,
+.toggle:active>input[type=checkbox]:not(:disabled)+.toggle-body>.toggle-knob::after {
+    transform: scale(1);
+    opacity: 1;
+    visibility: visible;
+    transition: transform var(--animation-duration2) ease-in-out,
+                background-color var(--animation-duration2) ease-in-out,
+                opacity var(--animation-duration2) ease-in-out,
+                visibility var(--animation-duration2) ease-in-out;
+}
+.toggle>input[type=checkbox]:focus+.toggle-body>.toggle-knob::after {
+    opacity: 0.5;
+}
+.toggle:active>input[type=checkbox]:focus+.toggle-body>.toggle-knob::after {
+    opacity: 1;
+}
+.toggle>input[type=checkbox]:checked+.toggle-body>.toggle-knob {
+    transform: translateX(1em);
+}
+.toggle>input[type=checkbox]:checked:not(:disabled)+.toggle-body>.toggle-track {
+    background-color: var(--accent-color-lighter);
+}
+.toggle>input[type=checkbox]:checked:not(:disabled)+.toggle-body>.toggle-knob {
+    background-color: var(--accent-color);
+}
+.toggle>input[type=checkbox]:focus:checked:not(:disabled)+.toggle-body>.toggle-knob::after,
+.toggle:active>input[type=checkbox]:checked:not(:disabled)+.toggle-body>.toggle-knob::after {
+    background-color: var(--accent-color-transparent25);
+}
+.toggle>input[type=checkbox]:disabled+.toggle-body {
+    cursor: default;
+}
+.toggle>input[type=checkbox]:disabled+.toggle-body>.toggle-track {
+    background-color: var(--disabled-color-light);
+}
+.toggle>input[type=checkbox]:disabled+.toggle-body>.toggle-knob {
+    background-color: var(--disabled-color-lighter);
+}
+
+
+/* Radio button */
+label.radio {
+    cursor: default;
+}
+.radio {
+    display: inline-block;
+    vertical-align: middle;
+}
+.radio>input[type=radio] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    display: block;
+    margin: 0;
+    padding: 0;
+    border: none;
+    cursor: default;
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+}
+.radio>input[type=radio]:not(:disabled)+.radio-body {
+    cursor: pointer;
+}
+.radio-body {
+    display: block;
+    position: relative;
+    width: var(--radio-size);
+    height: var(--radio-size);
+}
+.radio-border,
+.radio-dot {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--accent-color);
+    mask-repeat: no-repeat;
+    mask-position: center center;
+    mask-mode: alpha;
+    mask-size: var(--radio-size) var(--radio-size);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center center;
+    -webkit-mask-mode: alpha;
+    -webkit-mask-size: var(--radio-size) var(--radio-size);
+}
+.radio-border {
+    mask-image: url(/mixed/img/radio-button.svg);
+    -webkit-mask-image: url(/mixed/img/radio-button.svg);
+}
+.radio-dot {
+    mask-image: url(/mixed/img/radio-button-dot.svg);
+    -webkit-mask-image: url(/mixed/img/radio-button-dot.svg);
+    opacity: 1;
+    transform: none;
+    transition: transform var(--animation-duration2) ease-in-out,
+                opacity var(--animation-duration2) ease-in-out,
+                visibility var(--animation-duration2) ease-in-out;
+}
+.radio>input[type=radio]:disabled+.radio-body>.radio-border,
+.radio>input[type=radio]:disabled+.radio-body>.radio-dot {
+    background-color: var(--disabled-color);
+}
+.radio>input[type=radio]:not(:checked)+.radio-body>.radio-dot {
+    opacity: 0;
+    transform: scale(0);
+    transition: transform 0s ease-in-out var(--animation-duration2),
+                opacity var(--animation-duration2) ease-in-out,
+                visibility 0s ease-in-out var(--animation-duration2);
+}
+.radio-body::after {
+    position: absolute;
+    display: block;
+    content: "";
+    left: -0.75em;
+    top: -0.75em;
+    right: -0.75em;
+    bottom: -0.75em;
+    border-radius: 2.5em;
+    background-color: var(--selectable-indicator-color);
+    pointer-events: none;
+    transform: scale(0);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0s ease-in-out var(--animation-duration2),
+                background-color var(--animation-duration2) ease-in-out,
+                opacity var(--animation-duration2) ease-in-out,
+                visibility 0s ease-in-out var(--animation-duration2);
+}
+.radio>input[type=radio]:focus:not(:disabled)+.radio-body::after,
+.radio:active>input[type=radio]:not(:disabled)+.radio-body::after {
+    transform: scale(1);
+    opacity: 1;
+    visibility: visible;
+    transition: transform var(--animation-duration2) ease-in-out,
+                background-color var(--animation-duration2) ease-in-out,
+                opacity var(--animation-duration2) ease-in-out,
+                visibility var(--animation-duration2) ease-in-out;
+}
+.radio>input[type=radio]:focus+.radio-body::after {
+    opacity: 0.5;
+}
+.radio:active>input[type=radio]:focus+.radio-body::after {
+    opacity: 1;
+}
+.radio-label {
+    cursor: pointer;
+    white-space: nowrap;
+}
+.radio-label>.radio {
+    vertical-align: middle;
+}
+.radio-label>.radio-label-text {
+    display: inline-block;
+    margin-left: 0.5em;
+    vertical-align: middle;
+    white-space: normal;
+}
+
+
+/* Material design select */
+select {
+    width: var(--input-width-large);
+    height: var(--input-height);
+    line-height: var(--input-height);
+    border: 0;
+    border-radius: var(--input-border-radius);
+    box-sizing: border-box;
+    padding: 0 0.5em;
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    background-image: url(/mixed/img/material-down-arrow.svg);
+    background-repeat: no-repeat;
+    background-position: right calc(10em / var(--font-size-no-units)) center;
+    background-color: var(--input-background-color);
+    background-size: var(--material-arrow-dimension2) var(--material-arrow-dimension1);
+    cursor: pointer;
+    color: var(--text-color);
+    font-size: var(--input-font-size);
+}
+select::-ms-expand {
+    display: none;
+}
+
+
+/* Material design inputs */
+input[type=text],
+input[type=number] {
+    width: var(--input-width);
+    height: var(--input-height);
+    line-height: var(--input-height);
+    color: var(--text-color);
+    font-size: var(--input-font-size);
+    background-color: var(--input-background-color);
+    border: none;
+    border-radius: var(--input-border-radius);
+    box-sizing: border-box;
+    padding: 0 0.5em;
+    appearance: textfield;
+    -moz-appearance: textfield;
+    -webkit-appearance: textfield;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=text] {
+    width: var(--input-width-large);
+}
+textarea {
+    box-sizing: border-box;
+    padding: var(--textarea-padding);
+    font-family: 'Courier New', Courier, monospace;
+    color: var(--text-color);
+    font-size: var(--input-font-size);
+    background-color: var(--input-background-color);
+    border-radius: var(--input-border-radius);
+    line-height: var(--textarea-line-height);
+    border: var(--thin-border-size) solid var(--input-background-color);
+}
+select:invalid,
+textarea:invalid,
+input[type=text]:invalid,
+input[type=number]:invalid,
+select[data-invalid=true],
+textarea[data-invalid=true],
+input[type=text][data-invalid=true],
+input[type=number][data-invalid=true] {
+    border: var(--thin-border-size) solid var(--danger-color);
+}
+select,
+textarea,
+input[type=text],
+input[type=number] {
+    box-shadow: none;
+    transition: box-shadow calc(var(--animation-duration) / 2) linear;
+}
+select:focus,
+textarea:focus,
+input[type=text]:focus,
+input[type=number]:focus {
+    box-shadow: 0 0 0 calc(2em / var(--font-size-no-units)) var(--input-outline-color);
+    outline: none;
+}
+select:invalid:focus,
+textarea:invalid:focus,
+input[type=text]:invalid:focus,
+input[type=number]:invalid:focus,
+select[data-invalid=true]:focus,
+textarea[data-invalid=true]:focus,
+input[type=text][data-invalid=true]:focus,
+input[type=number][data-invalid=true]:focus {
+    box-shadow: 0 0 0 calc(2em / var(--font-size-no-units)) var(--danger-color);
+    outline: none;
+}
+input[type=text].input-with-suffix-button,
+input[type=number].input-with-suffix-button {
+    flex: 1 1 auto;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-style: none;
+    z-index: 1;
+}
+
+
+/* Material design button */
+button {
+    border: var(--thin-border-size) solid transparent;
+    border-radius: 0.3em;
+    padding: 0.5em 1em;
+    font-weight: bold;
+    font-size: inherit;
+    font-family: inherit;
+    cursor: pointer;
+    background-color: transparent;
+    box-shadow: var(--button-shadow-params) var(--shadow-color-off);
+    transition: background-color var(--animation-duration) ease-in, box-shadow var(--animation-duration) ease-in, border-color var(--animation-duration) ease-in;
+    -webkit-tap-highlight-color: transparent;
+}
+button:focus {
+    outline: none;
+}
+button:hover {
+    transition: background-color var(--animation-duration) ease-out, box-shadow var(--animation-duration) ease-out, border-color var(--animation-duration) ease-out;
+}
+button:hover:not(:disabled) {
+    box-shadow: var(--button-shadow-params) var(--shadow-color-light);
+}
+button:active:not(:disabled) {
+    box-shadow: var(--button-shadow-params) var(--shadow-color);
+}
+
+/* Standard button */
+button:not(:disabled) {
+    color: var(--button-text-color);
+    border-color: var(--accent-color);
+    background-color: var(--accent-color);
+}
+button:hover:not(:disabled) {
+    background-color: var(--accent-color-light);
+    border-color: var(--accent-color-light);
+}
+button:focus:not(:disabled) {
+    background-color: var(--accent-color-light);
+}
+button:active:not(:disabled) {
+    border-color: var(--accent-color-lighter);
+    background-color: var(--accent-color-lighter);
+}
+
+/* Standard danger button */
+button.danger:not(:disabled) {
+    color: var(--button-text-color);
+    border-color: var(--danger-color);
+    background-color: var(--danger-color);
+}
+button.danger:hover:not(:disabled) {
+    background-color: var(--danger-color-light);
+    border-color: var(--danger-color-light);
+}
+button.danger:focus:not(:disabled) {
+    background-color: var(--danger-color-light);
+}
+button.danger:active:not(:disabled) {
+    border-color: var(--danger-color-lighter);
+    background-color: var(--danger-color-lighter);
+}
+
+/* Low emphasis button */
+button.low-emphasis:not(:disabled) {
+    color: var(--accent-color);
+    border-color: var(--button-border-color);
+    background-color: var(--accent-color-transparent0);
+}
+button.low-emphasis:hover:not(:disabled) {
+    background-color: var(--accent-color-transparent5);
+    border-color: var(--accent-color-light);
+}
+button.low-emphasis:focus:not(:disabled) {
+    border-color: var(--accent-color);
+}
+button.low-emphasis:active:not(:disabled) {
+    border-color: var(--accent-color);
+    background-color: var(--accent-color-transparent25);
+}
+
+/* Low emphasis danger button */
+button.low-emphasis.danger:not(:disabled) {
+    color: var(--danger-color);
+    border-color: var(--button-border-color);
+    background-color: var(--danger-color-transparent0);
+}
+button.low-emphasis.danger:hover:not(:disabled) {
+    border-color: var(--danger-color-light);
+    background-color: var(--danger-color-transparent5);
+}
+button.low-emphasis.danger:focus:not(:disabled) {
+    border-color: var(--danger-color);
+}
+button.low-emphasis.danger:active:not(:disabled) {
+    border-color: var(--danger-color);
+    background-color: var(--danger-color-transparent25);
+}
+
+/* Disabled buttons */
+button:disabled {
+    color: var(--button-text-color);
+    border-color: var(--disabled-color);
+    background-color: var(--disabled-color);
+    cursor: default;
+}
+button.low-emphasis:disabled {
+    color: var(--disabled-color);
+    border-color: var(--disabled-color);
+    background-color: transparent;
+}
+
+/* Input suffix button */
+button.input-suffix-button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border: none;
+    height: var(--input-height);
+    line-height: var(--input-height);
+    background-color: var(--input-background-color);
+    box-sizing: border-box;
+    padding: 0 0.5em;
+    border-color: transparent;
+}
+button.input-suffix-button.input-suffix-icon-button {
+    width: 2.125em;
+    position: relative;
+}
+button.input-suffix-button.input-suffix-icon-button:hover,
+button.input-suffix-button.input-suffix-icon-button:focus {
+    background-color: var(--input-background-color-dark);
+}
+button.input-suffix-button.input-suffix-icon-button:active {
+    background-color: var(--input-background-color-darker);
+}
+input[type=text]:invalid+button.input-suffix-button,
+input[type=number]:invalid+button.input-suffix-button,
+input[type=text][data-invalid=true]+button.input-suffix-button,
+input[type=number][data-invalid=true]+button.input-suffix-button {
+    border: var(--thin-border-size) solid var(--danger-color);
+    border-left-style: none;
+}
+
+
+/* Material design icon button */
+button.icon-button {
+    display: inline-block;
+    vertical-align: middle;
+    border: none;
+    margin: 0;
+    padding: 0;
+    box-sizing: content-box;
+    font-size: inherit;
+    cursor: pointer;
+    background-color: transparent;
+}
+button.icon-button>.icon-button-inner {
+    display: block;
+    width: var(--icon-button-size);
+    height: var(--icon-button-size);
+    position: relative;
+}
+button.icon-button:focus {
+    outline: none;
+}
+button.icon-button,
+button.icon-button:hover,
+button.icon-button:focus,
+button.icon-button:active {
+    background-color: transparent;
+    box-shadow: none;
+}
+.icon-button>.icon-button-inner::after {
+    position: absolute;
+    display: block;
+    content: "";
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    background-color: var(--selectable-indicator-color);
+    pointer-events: none;
+    transform: scale(0);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0s ease-in-out var(--animation-duration2),
+                background-color var(--animation-duration2) ease-in-out,
+                opacity var(--animation-duration2) ease-in-out,
+                visibility 0s ease-in-out var(--animation-duration2);
+}
+.icon-button:focus>.icon-button-inner::after {
+    transform: scale(1);
+    opacity: 1;
+    visibility: visible;
+    transition: transform var(--animation-duration2) ease-in-out,
+                background-color var(--animation-duration2) ease-in-out,
+                opacity var(--animation-duration2) ease-in-out,
+                visibility var(--animation-duration2) ease-in-out;
+}
+.icon-button>.icon-button-inner>.icon {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--button-icon-color);
+    --icon-size: calc(16em / var(--font-size-no-units)) calc(16em / var(--font-size-no-units));
+}
+.icon-button>.icon-button-inner>.icon.icon-button-icon-light {
+    background-color: var(--button-icon-color-light);
+}
+.icon-button>.icon-button-inner>.icon[data-icon=material-right-arrow] { --icon-size: var(--material-arrow-dimension1) var(--material-arrow-dimension2); }
+.icon-button>.icon-button-inner>.icon[data-icon=material-down-arrow] { --icon-size: var(--material-arrow-dimension2) var(--material-arrow-dimension1); }
+
+.input-height-icon-button-container {
+    height: var(--input-height);
+    box-sizing: border-box;
+}
+.input-height-icon-button-container>.icon-button {
+    position: relative;
+    top: calc((var(--input-height) - var(--icon-button-size)) * 0.5);
+}
+

@@ -81,17 +81,16 @@
     /* Colors */
     --background-color: #ffffff;
     --glossary-image-background-color: #eeeeee;
-    --accent-color: #0275d8;
     --link-color: var(--accent-color);
 
-    --default-text-color: #000000;
-    --light-text-color: #777777;
-    --very-light-text-color: #999999;
-    --kanji-text-color: var(--default-text-color);
+    --text-color: #000000;
+    --text-color-light: #777777;
+    --text-color-very-light: #999999;
+    --kanji-text-color: var(--text-color);
     --kanji-popular-text-color: var(--accent-color);
-    --kanji-rare-text-color: var(--very-light-text-color);
+    --kanji-rare-text-color: var(--text-color-very-light);
     --kanji-furigana-text-color: inherit;
-    --reason-text-color: var(--light-text-color);
+    --reason-text-color: var(--text-color-light);
 
     --light-border-color: #eeeeee;
     --medium-border-color: #dddddd;
@@ -136,22 +135,23 @@
     --notification-text-color: #ffffff;
     --notification-background-color: #333333;
     --notification-shadow-color: rgba(0, 0, 0, 0.5);
+
+    --action-button-active-color: var(--scrollbar-thumb-color);
 }
 :root[data-theme=dark] {
     /* Colors */
     --background-color: #1e1e1e;
     --glossary-image-background-color: #2f2f2f;
-    --accent-color: #4eacfd;
     --link-color: var(--accent-color);
 
-    --default-text-color: #d4d4d4;
-    --light-text-color: #888888;
-    --very-light-text-color: #666666;
-    --kanji-text-color: var(--default-text-color);
+    --text-color: #d4d4d4;
+    --text-color-light: #888888;
+    --text-color-very-light: #666666;
+    --kanji-text-color: var(--text-color);
     --kanji-popular-text-color: var(--accent-color);
-    --kanji-rare-text-color: var(--very-light-text-color);
+    --kanji-rare-text-color: var(--text-color-very-light);
     --kanji-furigana-text-color: inherit;
-    --reason-text-color: var(--light-text-color);
+    --reason-text-color: var(--text-color-light);
 
     --light-border-color: #2f2f2f;
     --medium-border-color: #3f3f3f;
@@ -196,6 +196,8 @@
     --notification-text-color: #2f2f2f;
     --notification-background-color: #e1e1e1;
     --notification-shadow-color: rgba(255, 255, 255, 0.25);
+
+    --action-button-active-color: var(--scrollbar-thumb-color);
 }
 
 
@@ -224,7 +226,7 @@ body {
     height: 100%;
     overflow: hidden;
     background-color: var(--background-color);
-    color: var(--default-text-color);
+    color: var(--text-color);
     font-size: inherit;
 }
 ol, ul {
@@ -541,7 +543,8 @@ button.sidebar-button.danger:hover .sidebar-button-icon {
     content: '';
     display: block;
 }
-.action-button {
+button.action-button {
+    cursor: pointer;
     display: block;
     opacity: 1;
     border: 0;
@@ -553,12 +556,10 @@ button.sidebar-button.danger:hover .sidebar-button-icon {
         opacity var(--animation-duration) linear,
         visibility 0s linear 0s,
         filter var(--animation-duration) linear,
-        -webkit-filter var(--animation-duration) linear;
+        -webkit-filter var(--animation-duration) linear,
+        background-color var(--animation-duration) linear;
 }
-button.action-button {
-    cursor: pointer;
-}
-.action-button[hidden] {
+button.action-button[hidden] {
     display: block;
     visibility: hidden;
     opacity: 0;
@@ -566,18 +567,26 @@ button.action-button {
         opacity var(--animation-duration) linear,
         visibility 0s linear var(--animation-duration),
         filter var(--animation-duration) linear,
-        -webkit-filter var(--animation-duration) linear;
+        -webkit-filter var(--animation-duration) linear,
+        background-color var(--animation-duration) linear;
 }
-.action-button:disabled {
+button.action-button:disabled {
     pointer-events: none;
     cursor: default;
     -webkit-filter: grayscale(100%);
     filter: grayscale(100%);
+    background-color: transparent;
 }
-.action-button:disabled:not([hidden]) {
+button.action-button:disabled:not([hidden]) {
     opacity: 0.25;
 }
-.action-button::before {
+button.action-button:hover {
+    background-color: transparent;
+}
+button.action-button:active {
+    background-color: var(--action-button-active-color);
+}
+button.action-button::before {
     content: "";
     width: var(--action-button-size);
     height: var(--action-button-size);
@@ -586,22 +595,22 @@ button.action-button {
     background-repeat: no-repeat;
     background-size: contain;
 }
-.action-button[data-icon=view-note]::before {
+button.action-button[data-icon=view-note]::before {
     background-image: url("/mixed/img/view-note.svg");
 }
-.action-button[data-icon=add-term-kanji]::before {
+button.action-button[data-icon=add-term-kanji]::before {
     background-image: url("/mixed/img/add-term-kanji.svg");
 }
-.action-button[data-icon=add-term-kana]::before {
+button.action-button[data-icon=add-term-kana]::before {
     background-image: url("/mixed/img/add-term-kana.svg");
 }
-.action-button[data-icon=play-audio]::before {
+button.action-button[data-icon=play-audio]::before {
     background-image: url("/mixed/img/play-audio.svg");
 }
-.action-button[data-icon=source-term]::before {
+button.action-button[data-icon=source-term]::before {
     background-image: url("/mixed/img/source-term.svg");
 }
-.entry[data-type=term][data-expression-multi=true] .actions>.action-play-audio {
+.entry[data-type=term][data-expression-multi=true] .actions>button.action-button.action-play-audio {
     display: none;
 }
 
@@ -949,10 +958,10 @@ button.action-button {
 }
 .term-definition-item::marker,
 .term-glossary-item::marker {
-    color: var(--light-text-color);
+    color: var(--text-color-light);
 }
 .term-definition-disambiguation-list {
-    color: var(--light-text-color);
+    color: var(--text-color-light);
 }
 .term-definition-disambiguation-list[data-count="0"] {
     display: none;
@@ -1015,7 +1024,7 @@ button.action-button {
 }
 .term-pitch-accent-group::marker,
 .term-pitch-accent::marker {
-    color: var(--light-text-color);
+    color: var(--text-color-light);
 }
 .term-pitch-accent {
     display: list-item;
@@ -1030,7 +1039,7 @@ button.action-button {
 }
 .term-pitch-accent-disambiguation-list {
     padding-right: 0.25em;
-    color: var(--light-text-color);
+    color: var(--text-color-light);
 }
 .term-pitch-accent-disambiguation-list::before {
     content: "(";
@@ -1156,7 +1165,7 @@ button.action-button {
     display: table;
     table-layout: fixed;
     white-space: normal;
-    color: var(--light-text-color);
+    color: var(--text-color-light);
 }
 .term-glossary-item[data-has-image=true][data-image-load-state=load-error] .term-glossary-image-container-overlay::after {
     content: "Image failed to load";
@@ -1259,7 +1268,7 @@ button.action-button {
     list-style-type: none;
 }
 .kanji-glossary-item::marker {
-    color: var(--light-text-color);
+    color: var(--text-color-light);
 }
 
 
@@ -1368,7 +1377,7 @@ button.action-button {
     height: 75%;
 }
 .frame-resizer-handle {
-    fill: var(--default-text-color);
+    fill: var(--text-color);
     opacity: 0.125;
     cursor: se-resize;
     pointer-events: auto;
@@ -1468,7 +1477,7 @@ button.action-button {
     white-space: pre-wrap;
     content: var(--compact-list-separator);
     display: inline;
-    color: var(--light-text-color);
+    color: var(--text-color-light);
 }
 :root[data-glossary-layout-mode=compact] .entry:not([data-expression-multi=true]) .term-special-tags {
     display: none;
@@ -1508,7 +1517,7 @@ button.action-button {
     white-space: pre-wrap;
     content: var(--compact-list-separator);
     display: inline;
-    color: var(--light-text-color);
+    color: var(--text-color-light);
 }
 
 :root[data-glossary-layout-mode=compact] .term-glossary-image-container {
