@@ -1500,12 +1500,6 @@ button.anki-card-field-value-menu-button {
     box-sizing: border-box;
     padding: 0 0.5em;
 }
-#anki-error-message-details-toggle {
-    display: inline-block;
-    margin-left: 0.5em;
-    cursor: pointer;
-    font-weight: bold;
-}
 #anki-error-message-details {
     margin-top: 0.25em;
     font-family: 'Courier New', Courier, monospace;

@@ -1202,14 +1202,28 @@
         </div>
     </div>
     <div class="settings-group">
-        <div class="settings-item"><div class="settings-item-inner">
-            <div class="settings-item-left">
-                <div class="settings-item-label">Enable Anki integration</div>
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Enable Anki integration</div>
+                    <div class="settings-item-description">
+                        <span>Connection status:</span>
+                        <span id="anki-error-message">&hellip;</span> <a id="anki-error-message-details-toggle" hidden>Details&hellip;</a>
+                    </div>
+                </div>
+                <div class="settings-item-right">
+                    <label class="toggle"><input type="checkbox" data-setting="anki.enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                </div>
             </div>
-            <div class="settings-item-right">
-                <label class="toggle"><input type="checkbox" data-setting="anki.enable"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            <div class="settings-item-children" id="anki-error-message-details-container" hidden>
+                <p class="danger-text" id="anki-error-invalid-response-info" hidden>
+                    Attempting to connect to Anki can sometimes return an error message which includes "Invalid response",
+                    which may indicate that the value of the <em>AnkiConnect server address</em> option is incorrect.
+                    Resetting it to the default value may fix issues that are occurring.
+                </p>
+                <div class="danger-text" id="anki-error-message-details"></div>
             </div>
-        </div></div>
+        </div>
         <div class="settings-item">
             <div class="settings-item-inner settings-item-inner-wrappable">
                 <div class="settings-item-left">
@@ -2006,18 +2020,6 @@
             <div class="anki-card-field-name-header" data-persistent="true">Field</div>
             <div class="anki-card-field-input-header" data-persistent="true">Value</div>
         </div>
-    </div>
-    <div class="modal-body-addon" id="anki-error" hidden>
-        <p class="danger-text">
-            <strong>Anki connection error:</strong>
-            <span id="anki-error-message"></span><a id="anki-error-message-details-toggle">&hellip;</a>
-        </p>
-        <p class="danger-text" id="anki-error-invalid-response-info" hidden>
-            Attempting to connect to Anki can sometimes return an error message which includes "Invalid response",
-            which may indicate that the value of the <em>AnkiConnect server address</em> option is incorrect.
-            Resetting it to the default value may fix issues that are occurring.
-        </p>
-        <div class="danger-text" id="anki-error-message-details" hidden></div>
     </div>
     <div class="modal-footer">
         <button class="low-emphasis" data-modal-action="show,anki-cards-info">Help</button>

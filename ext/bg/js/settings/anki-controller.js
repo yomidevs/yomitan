@@ -44,7 +44,9 @@ class AnkiController {
         this._ankiOptions = null;
         this._getAnkiDataPromise = null;
         this._ankiErrorContainer = null;
-        this._ankiErrorMessageContainer = null;
+        this._ankiErrorMessageNode = null;
+        this._ankiErrorMessageNodeDefaultContent = '';
+        this._ankiErrorMessageDetailsNode = null;
         this._ankiErrorMessageDetailsContainer = null;
         this._ankiErrorMessageDetailsToggle = null;
         this._ankiErrorInvalidResponseInfo = null;
@@ -55,8 +57,10 @@ class AnkiController {
 
     async prepare() {
         this._ankiErrorContainer = document.querySelector('#anki-error');
-        this._ankiErrorMessageContainer = document.querySelector('#anki-error-message');
-        this._ankiErrorMessageDetailsContainer = document.querySelector('#anki-error-message-details');
+        this._ankiErrorMessageNode = document.querySelector('#anki-error-message');
+        this._ankiErrorMessageNodeDefaultContent = this._ankiErrorMessageNode.textContent;
+        this._ankiErrorMessageDetailsNode = document.querySelector('#anki-error-message-details');
+        this._ankiErrorMessageDetailsContainer = document.querySelector('#anki-error-message-details-container');
         this._ankiErrorMessageDetailsToggle = document.querySelector('#anki-error-message-details-toggle');
         this._ankiErrorInvalidResponseInfo = document.querySelector('#anki-error-invalid-response-info');
         this._ankiEnableCheckbox = document.querySelector('[data-setting="anki.enable"]');
@@ -256,6 +260,7 @@ class AnkiController {
     }
 
     async _getAnkiData() {
+        this._setAnkiStatusChanging();
         const [
             [deckNames, error1],
             [modelNames, error2]
@@ -295,18 +300,29 @@ class AnkiController {
         }
     }
 
+    _setAnkiStatusChanging() {
+        this._ankiErrorMessageNode.textContent = this._ankiErrorMessageNodeDefaultContent;
+        this._ankiErrorMessageNode.classList.remove('danger-text');
+    }
+
     _hideAnkiError() {
-        this._ankiErrorContainer.hidden = true;
+        if (this._ankiErrorContainer !== null) {
+            this._ankiErrorContainer.hidden = true;
+        }
         this._ankiErrorMessageDetailsContainer.hidden = true;
+        this._ankiErrorMessageDetailsToggle.hidden = true;
         this._ankiErrorInvalidResponseInfo.hidden = true;
-        this._ankiErrorMessageContainer.textContent = '';
-        this._ankiErrorMessageDetailsContainer.textContent = '';
+        this._ankiErrorMessageNode.textContent = (this._ankiConnect.enabled ? 'Connected' : 'Not enabled');
+        this._ankiErrorMessageNode.classList.remove('danger-text');
+        this._ankiErrorMessageDetailsNode.textContent = '';
     }
 
     _showAnkiError(error) {
         let errorString = typeof error === 'object' && error !== null ? error.message : null;
         if (!errorString) { errorString = `${error}`; }
-        this._ankiErrorMessageContainer.textContent = errorString;
+        if (!/[.!?]$/.test(errorString)) { errorString += '.'; }
+        this._ankiErrorMessageNode.textContent = errorString;
+        this._ankiErrorMessageNode.classList.add('danger-text');
 
         const data = error.data;
         let details = '';
@@ -314,11 +330,14 @@ class AnkiController {
             details += `${JSON.stringify(data, null, 4)}\n\n`;
         }
         details += `${error.stack}`.trimRight();
-        this._ankiErrorMessageDetailsContainer.textContent = details;
+        this._ankiErrorMessageDetailsNode.textContent = details;
 
-        this._ankiErrorContainer.hidden = false;
+        if (this._ankiErrorContainer !== null) {
+            this._ankiErrorContainer.hidden = false;
+        }
         this._ankiErrorMessageDetailsContainer.hidden = true;
         this._ankiErrorInvalidResponseInfo.hidden = (errorString.indexOf('Invalid response') < 0);
+        this._ankiErrorMessageDetailsToggle.hidden = false;
     }
 
     async _requestClipboardReadPermission() {
