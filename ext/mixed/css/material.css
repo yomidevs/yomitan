@@ -181,6 +181,7 @@
 .icon[data-icon=collapse]                { --icon-image: url(/mixed/img/collapse.svg); }
 .icon[data-icon=expand]                  { --icon-image: url(/mixed/img/expand.svg); }
 .icon[data-icon=window]                  { --icon-image: url(/mixed/img/window.svg); }
+.icon[data-icon=cross]                   { --icon-image: url(/mixed/img/cross.svg); }
 
 
 /* Checkbox */

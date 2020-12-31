@@ -1447,7 +1447,10 @@ button.action-button[data-icon=source-term]::before {
     flex: 1 1 auto;
     padding-right: 0.5em;
 }
-.footer-notification-close-button {
+button.footer-notification-close-button,
+button.footer-notification-close-button:focus,
+button.footer-notification-close-button:hover,
+button.footer-notification-close-button:active {
     flex: 0 0 auto;
     background-color: transparent;
     margin: -0.25em;
@@ -1456,21 +1459,12 @@ button.action-button[data-icon=source-term]::before {
     outline: none;
     cursor: pointer;
     font-size: inherit;
+    box-shadow: none;
 }
 .footer-notification-close-button-icon {
     display: block;
-    width: calc(12em / var(--font-size-no-units));
-    height: calc(12em / var(--font-size-no-units));
-    mask-repeat: no-repeat;
-    mask-position: center center;
-    mask-mode: alpha;
-    mask-size: var(--sidebar-button-icon-size) var(--sidebar-button-icon-size);
-    mask-image: url(/mixed/img/cross.svg);
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-position: center center;
-    -webkit-mask-mode: alpha;
-    -webkit-mask-size: var(--sidebar-button-icon-size) var(--sidebar-button-icon-size);
-    -webkit-mask-image: url(/mixed/img/cross.svg);
+    width: calc(16em / var(--font-size-no-units));
+    height: calc(16em / var(--font-size-no-units));
     background-color: var(--notification-text-color);
 }
 
