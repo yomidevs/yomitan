@@ -36,7 +36,8 @@ class GenericSettingController {
             ['splitTags', this._splitTags.bind(this)],
             ['joinTags', this._joinTags.bind(this)],
             ['toNumber', this._toNumber.bind(this)],
-            ['toString', this._toString.bind(this)]
+            ['toString', this._toString.bind(this)],
+            ['conditionalConvert', this._conditionalConvert.bind(this)]
         ]);
     }
 
@@ -207,5 +208,20 @@ class GenericSettingController {
 
     _toString(value) {
         return `${value}`;
+    }
+
+    _conditionalConvert(value, data) {
+        const {cases} = data;
+        if (Array.isArray(cases)) {
+            for (const {op, value: value2, default: isDefault, result} of cases) {
+                if (isDefault === true) {
+                    value = result;
+                } else if (this._evaluateSimpleOperation(op, value, value2)) {
+                    value = result;
+                    break;
+                }
+            }
+        }
+        return value;
     }
 }
