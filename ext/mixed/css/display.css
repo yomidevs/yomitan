@@ -307,28 +307,23 @@ a {
 
 /* Main layout */
 .content {
-    width: 100%;
-    height: 100%;
+    flex: 1 1 auto;
     position: relative;
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr;
-    grid-template-areas: "main";
-    justify-items: stretch;
-    align-items: stretch;
 }
 .content-scroll {
-    grid-area: main;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     flex-flow: column nowrap;
     overflow-x: hidden;
     overflow-y: scroll;
-    position: relative;
     align-items: stretch;
     justify-content: flex-start;
 }
 .content-body {
-    height: 0;
     flex: 1 1 auto;
     position: relative;
 }
@@ -370,6 +365,7 @@ a {
     flex-flow: row nowrap;
     overflow: hidden;
     align-items: stretch;
+    align-content: stretch;
     justify-content: center;
 }
 .content-sidebar {
