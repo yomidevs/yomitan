@@ -1252,6 +1252,8 @@ button.action-button[data-icon=source-term]::before {
     line-height: 1;
     padding: 0.01em;
     vertical-align: top;
+    position: relative;
+    z-index: -1;
 }
 .kanji-glyph-data {
     margin-top: 0.75em;
