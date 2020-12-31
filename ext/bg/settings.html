@@ -151,7 +151,13 @@
                 </div>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="show-advanced-options" data-setting="general.showAdvanced" data-transform-pre="setDocumentAttribute" data-transform-post="setDocumentAttribute" data-document-attribute="data-options-general-show-advanced"> Show advanced options</label>
+                    <label><input type="checkbox" id="show-advanced-options" data-setting="general.showAdvanced"
+                        data-transform='{
+                            "type": "setAttribute",
+                            "selector": ":root",
+                            "attribute": "data-options-general-show-advanced"
+                        }'
+                    > Show advanced options</label>
                 </div>
 
                 <div class="checkbox options-advanced ignore-form-changes" data-hide-for-browser="firefox-mobile">
@@ -195,7 +201,13 @@
                 </div>
 
                 <div class="checkbox options-advanced">
-                    <label><input type="checkbox" id="show-debug-info" data-setting="general.debugInfo" data-transform-pre="setDocumentAttribute" data-transform-post="setDocumentAttribute" data-document-attribute="data-options-general-debug-info"> Show debug information</label>
+                    <label><input type="checkbox" id="show-debug-info" data-setting="general.debugInfo"
+                        data-transform='{
+                            "type": "setAttribute",
+                            "selector": ":root",
+                            "attribute": "data-options-general-debug-info"
+                        }'
+                    > Show debug information</label>
                 </div>
 
                 <div class="checkbox options-advanced">
@@ -204,7 +216,13 @@
 
                 <div class="form-group">
                     <label for="result-output-mode">Result grouping</label>
-                    <select class="form-control" id="result-output-mode" data-setting="general.resultOutputMode" data-transform-pre="setDocumentAttribute" data-transform-post="setDocumentAttribute" data-document-attribute="data-options-general-result-output-mode">
+                    <select class="form-control" id="result-output-mode" data-setting="general.resultOutputMode"
+                        data-transform='{
+                            "type": "setAttribute",
+                            "selector": ":root",
+                            "attribute": "data-options-general-result-output-mode"
+                        }'
+                    >
                         <option value="group">Group results by term-reading pairs</option>
                         <option value="merge">Group results by main dictionary entry</option>
                         <option value="split">Split definitions to their own results</option>
@@ -498,10 +516,11 @@
                                     <label class="scan-input-toggle scan-input-type"><input type="checkbox" class="scan-input-settings-checkbox" data-property="types.touch"><span>Touch</span></label>
                                     <label class="scan-input-toggle scan-input-type"><input type="checkbox" class="scan-input-settings-checkbox" data-property="types.pen"><span>Pen</span></label>
                                     <label class="scan-input-toggle scan-input-type"><input type="checkbox" class="scan-input-settings-checkbox" data-property="options.showAdvanced"
-                                        data-transform-pre="setRelativeAttribute"
-                                        data-transform-post="setRelativeAttribute"
-                                        data-ancestor-distance="7"
-                                        data-relative-attribute="data-show-advanced"
+                                        data-transform='{
+                                            "type": "setAttribute",
+                                            "ancestorDistance": 7,
+                                            "attribute": "data-show-advanced"
+                                        }'
                                     ><span>Advanced</span></label>
                                 </div></div>
                             </div></div>
@@ -899,7 +918,13 @@
                 </p>
 
                 <div class="checkbox">
-                    <label><input type="checkbox" id="anki-enable" data-setting="anki.enable" data-transform="setDocumentAttribute" data-document-attribute="data-options-anki-enable"> Enable Anki integration</label>
+                    <label><input type="checkbox" id="anki-enable" data-setting="anki.enable"
+                        data-transform='{
+                            "type": "setAttribute",
+                            "selector": ":root",
+                            "attribute": "data-options-anki-enable"
+                        }'
+                    > Enable Anki integration</label>
                 </div>
 
                 <div id="anki-general">
@@ -925,7 +950,12 @@
 
                     <div class="form-group">
                         <label for="card-tags">Card tags <span class="label-light">(comma or space separated)</span></label>
-                        <input type="text" id="card-tags" class="form-control" data-setting="anki.tags" data-transform-pre="splitTags" data-transform-post="joinTags">
+                        <input type="text" id="card-tags" class="form-control" data-setting="anki.tags"
+                            data-transform='[
+                                {"type": "splitTags", "step": "pre"},
+                                {"type": "joinTags", "step": "post"}
+                            ]'
+                        >
                     </div>
 
                     <div class="form-group options-advanced">

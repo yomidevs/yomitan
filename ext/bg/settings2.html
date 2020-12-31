@@ -39,7 +39,13 @@
         </div>
         <div class="sidebar-bottom">
             <label class="outline-item"><span class="outline-item-left">
-                <label class="toggle"><input id="advanced-checkbox" type="checkbox" data-setting="general.showAdvanced" data-transform="setDocumentAttribute" data-document-attribute="data-advanced"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                <label class="toggle"><input id="advanced-checkbox" type="checkbox" data-setting="general.showAdvanced"
+                    data-transform='{
+                        "type": "setAttribute",
+                        "selector": ":root",
+                        "attribute": "data-advanced"
+                    }'
+                ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
             </span><span class="outline-item-label">Advanced</span></label>
             <a href="/bg/info.html" class="outline-item"><span class="outline-item-left"><span class="outline-item-icon icon" data-icon="question-mark"></span></span><span class="outline-item-label">About Yomichan</span></a>
         </div>
@@ -216,7 +222,13 @@
                     </div>
                 </div>
                 <div class="settings-item-right">
-                    <select data-setting="general.resultOutputMode" data-transform="setVisibility" data-ancestor-distance="-1" data-relative-selector="#main-dictionary-container" data-visbility-condition='{"op":"===","value":"merge"}'>
+                    <select data-setting="general.resultOutputMode"
+                        data-transform='{
+                            "type": "setVisibility",
+                            "selector": "#main-dictionary-container",
+                            "condition": {"op": "===", "value": "merge"}
+                        }'
+                    >
                         <option value="split">No grouping</option>
                         <option value="group">Group term-reading pairs</option>
                         <option value="merge">Group related terms</option>
@@ -375,7 +387,13 @@
                     <div class="settings-item-description">When no text or definitions are found, the popup will automatically hide.</div>
                 </div>
                 <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" data-setting="scanning.autoHideResults" data-transform="setVisibility" data-ancestor-distance="-1" data-relative-selector="#auto-hide-search-popup-options" data-visbility-condition='{"op":"===","value":true}'><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                    <label class="toggle"><input type="checkbox" data-setting="scanning.autoHideResults"
+                        data-transform='{
+                            "type": "setVisibility",
+                            "selector": "#auto-hide-search-popup-options",
+                            "condition": {"op": "===", "value": true}
+                        }'
+                    ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
                 </div>
             </div>
             <div class="settings-item-children settings-item-children-group" id="auto-hide-search-popup-options" hidden>
@@ -737,7 +755,12 @@
                     <div class="settings-item-description">Control the scaling factor of the popup.</div>
                 </div>
                 <div class="settings-item-right">
-                    <select data-setting="general.popupScalingFactor" data-transform-pre="toNumber" data-transform-post="toString" data-min="0.25">
+                    <select data-setting="general.popupScalingFactor"
+                        data-transform='[
+                            {"type": "toNumber", "step": "pre", "constraints": {"min": 0.25}},
+                            {"type": "toString", "step": "post"}
+                        ]'
+                    >
                         <option value="0.25">25%</option>
                         <option value="0.33">33%</option>
                         <option value="0.5">50%</option>
@@ -1253,7 +1276,12 @@
                 <div class="settings-item-description">List of space or comma separated tags to add to the card.</div>
             </div>
             <div class="settings-item-right">
-                <input type="text" spellcheck="false" autocomplete="off" data-setting="anki.tags" data-transform-pre="splitTags" data-transform-post="joinTags">
+                <input type="text" spellcheck="false" autocomplete="off" data-setting="anki.tags"
+                    data-transform='[
+                        {"type": "splitTags", "step": "pre"},
+                        {"type": "joinTags", "step": "post"}
+                    ]'
+                >
             </div>
         </div></div>
         <div class="settings-item advanced-only">
@@ -1263,7 +1291,13 @@
                     <div class="settings-item-description">When a card is detected as a duplicate, the add buttons will be disabled.</div>
                 </div>
                 <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" data-setting="anki.checkForDuplicates" data-transform="setVisibility" data-ancestor-distance="-1" data-relative-selector="#anki-card-duplicate-options" data-visbility-condition='{"op":"===","value":true}'><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                    <label class="toggle"><input type="checkbox" data-setting="anki.checkForDuplicates"
+                        data-transform='{
+                            "type": "setVisibility",
+                            "selector": "#anki-card-duplicate-options",
+                            "condition": {"op": "===", "value": true}
+                        }'
+                    ><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
                 </div>
             </div>
             <div class="settings-item-children settings-item-children-group" id="anki-card-duplicate-options" hidden>
@@ -1316,10 +1350,11 @@
                     <div class="settings-item-group-item">
                         <div class="settings-item-group-item-label">Format</div>
                         <select class="short-width short-height" data-setting="anki.screenshot.format"
-                            data-transform="setVisibility"
-                            data-ancestor-distance="-1"
-                            data-relative-selector="#anki-screenshot-quality"
-                            data-visbility-condition='{"op":"===","value":"jpeg"}'
+                            data-transform='{
+                                "type": "setVisibility",
+                                "selector": "#anki-screenshot-quality",
+                                "condition": {"op": "===", "value": "jpeg"}
+                            }'
                         >
                             <option value="png">PNG</option>
                             <option value="jpeg">JPEG</option>
