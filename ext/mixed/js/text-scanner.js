@@ -198,8 +198,10 @@ class TextScanner extends EventDispatcher {
 
         clonedTextSource.setEndOffset(length, layoutAwareScan);
 
-        if (this._excludeSelector !== null) {
-            this._constrainTextSource(clonedTextSource, this._includeSelector, this._excludeSelector, layoutAwareScan);
+        const includeSelector = this._includeSelector;
+        const excludeSelector = this._excludeSelector;
+        if (includeSelector !== null || excludeSelector !== null) {
+            this._constrainTextSource(clonedTextSource, includeSelector, excludeSelector, layoutAwareScan);
         }
 
         return clonedTextSource.text();

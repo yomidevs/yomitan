@@ -845,6 +845,7 @@ class Display extends EventDispatcher {
     _showTagNotification(content) {
         if (this._tagNotification === null) {
             const node = this._displayGenerator.createEmptyFooterNotification();
+            node.classList.add('click-scannable');
             this._tagNotification = new DisplayNotification(this._tagNotificationContainer, node);
         }
 
@@ -1792,8 +1793,8 @@ class Display extends EventDispatcher {
                 searchOnClick: true,
                 searchOnClickOnly: true
             });
-            const excludeSelectors = ['.scan-disable', '.scan-disable *'];
-            this._definitionTextScanner.excludeSelector = excludeSelectors.join(',');
+            this._definitionTextScanner.includeSelector = '.click-scannable,.click-scannable *';
+            this._definitionTextScanner.excludeSelector = '.scan-disable,.scan-disable *';
             this._definitionTextScanner.prepare();
             this._definitionTextScanner.on('searched', this._onDefinitionTextScannerSearched.bind(this));
         }
@@ -1824,9 +1825,6 @@ class Display extends EventDispatcher {
             layoutAwareScan: scanningOptions.layoutAwareScan,
             preventMiddleMouse: false
         });
-
-        const includeSelector = '.term-glossary-item,.term-glossary-item *,.tag,.tag *';
-        this._definitionTextScanner.includeSelector = includeSelector;
 
         this._definitionTextScanner.setEnabled(true);
     }
