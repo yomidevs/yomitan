@@ -53,4 +53,5 @@ li {
     max-width: 100%;
     width: 700px;
     flex: 0 0 auto;
+    height: auto;
 }
