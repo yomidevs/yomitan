@@ -301,22 +301,13 @@ class Translator {
     }
 
     _getAllDeinflections(text, options) {
-        const collapseEmphaticOptions = [[false, false]];
-        switch (options.collapseEmphaticSequences) {
-            case 'true':
-                collapseEmphaticOptions.push([true, false]);
-                break;
-            case 'full':
-                collapseEmphaticOptions.push([true, false], [true, true]);
-                break;
-        }
         const textOptionVariantArray = [
             this._getTextOptionEntryVariants(options.convertHalfWidthCharacters),
             this._getTextOptionEntryVariants(options.convertNumericCharacters),
             this._getTextOptionEntryVariants(options.convertAlphabeticCharacters),
             this._getTextOptionEntryVariants(options.convertHiraganaToKatakana),
             this._getTextOptionEntryVariants(options.convertKatakanaToHiragana),
-            collapseEmphaticOptions
+            this._getCollapseEmphaticOptions(options)
         ];
 
         const jp = this._japaneseUtil;
@@ -873,6 +864,19 @@ class Translator {
             case 'variant': return [false, true];
             default: return [false];
         }
+    }
+
+    _getCollapseEmphaticOptions(options) {
+        const collapseEmphaticOptions = [[false, false]];
+        switch (options.collapseEmphaticSequences) {
+            case 'true':
+                collapseEmphaticOptions.push([true, false]);
+                break;
+            case 'full':
+                collapseEmphaticOptions.push([true, false], [true, true]);
+                break;
+        }
+        return collapseEmphaticOptions;
     }
 
     _getSecondarySearchDictionaryMap(enabledDictionaryMap) {
