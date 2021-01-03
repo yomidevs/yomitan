@@ -21,6 +21,10 @@ jobs:
       run: npm run test-lint
       env:
         CI: true
+    - name: Lint CSS
+      run: npm run test-lint-css
+      env:
+        CI: true
     - name: Tests
       run: npm run test-code
       env:

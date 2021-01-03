@@ -1,5 +1,5 @@
 body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 14px;
     max-width: 680px;
     padding: 0 1em;
@@ -39,9 +39,9 @@ y-test {
     border-radius: 4px;
 }
 
-.test:before,
-y-test:before {
-    content: "Test " counter(test-id);
+.test::before,
+y-test::before {
+    content: 'Test ' counter(test-id);
     display: block;
     counter-increment: test-id;
     margin-bottom: 0.5em;

@@ -41,8 +41,7 @@ body {
     background-color: var(--background-color);
     margin: 0;
     padding: 0;
-    margin: 0;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     color: var(--text-color);
     height: 100%;
     overflow: hidden;
@@ -72,7 +71,6 @@ h1 {
     flex: 1 1 auto;
     box-sizing: border-box;
     padding: var(--textarea-padding);
-    font-family: 'Courier New', Courier, monospace;
     background-color: var(--input-background-color);
     border-radius: 0;
     line-height: var(--textarea-line-height);
@@ -84,8 +82,7 @@ h1 {
     max-height: calc(var(--textarea-line-height) * 10 + var(--textarea-padding) * 2);
     resize: vertical;
     font-size: var(--font-size);
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: var(--text-color);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     white-space: pre-wrap;
     z-index: 1;
 }

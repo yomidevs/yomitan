@@ -76,11 +76,11 @@ html:root:not([data-options-general-result-output-mode=merge]) #dictionary-main-
 .condition>.input-group-btn {
     width: auto;
 }
-.condition>.profile-condition-prefix:after {
-    content: "IF";
+.condition>.profile-condition-prefix::after {
+    content: 'IF';
 }
-.condition:nth-child(n+2)>.profile-condition-prefix:after {
-    content: "AND";
+.condition:nth-child(n+2)>.profile-condition-prefix::after {
+    content: 'AND';
 }
 
 .profile-condition-prefix {
@@ -152,7 +152,7 @@ html:root:not([data-options-general-result-output-mode=merge]) #dictionary-main-
     justify-content: center;
     align-items: center;
 }
-.scan-input-index:after {
+.scan-input-index::after {
     display: block;
     counter-increment: scan-input-id;
     content: counter(scan-input-id);
@@ -265,7 +265,7 @@ html:root:not([data-options-general-result-output-mode=merge]) #dictionary-main-
     width: 39px;
     text-align: center;
 }
-.generic-input-list .generic-input-prefix:after {
+.generic-input-list .generic-input-prefix::after {
     counter-increment: generic-input-id;
     content: counter(generic-input-id);
 }
@@ -276,7 +276,6 @@ html:root:not([data-options-general-result-output-mode=merge]) #dictionary-main-
     width: 100%;
     min-height: 34px;
     line-height: 18px;
-    height: 96px;
     resize: vertical;
     font-family: 'Courier New', Courier, monospace;
     white-space: pre;
@@ -395,7 +394,7 @@ html:root[data-operating-system=openbsd] [data-hide-for-operating-system~=openbs
 
 .dictionary-details-table {
     display: table;
-    width: 100%
+    width: 100%;
 }
 
 .dictionary-details-entry {

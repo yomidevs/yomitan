@@ -67,7 +67,7 @@
     --text-color-lighter: #888888;
     --separator-color1: #cccccc;
     --separator-color2: #eeeeee;
-    --outline-item-background-color: rgba(13, 13, 13, 0.0);
+    --outline-item-background-color: rgba(13, 13, 13, 0);
     --outline-item-background-color-hover: rgba(13, 13, 13, 0.15);
     --warning-color: #96751c;
     --warning-color-light: hsl(44, 80%, 65%);
@@ -116,7 +116,7 @@ body {
     padding: 0;
     border: none;
     font-size: var(--font-size);
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     color: var(--text-color);
     line-height: var(--line-height-default);
     height: 100%;
@@ -130,9 +130,15 @@ ul {
     margin: 0;
     padding: 0 0 0 1.5em;
 }
-p+p,  p+ol,  p+ul,
-ol+p, ol+ol, ol+ul,
-ul+p, ul+ol, ul+ul,
+p+p,
+p+ol,
+p+ul,
+ol+p,
+ol+ol,
+ol+ul,
+ul+p,
+ul+ol,
+ul+ul,
 li {
     margin: 0.425em 0;
 }
@@ -326,8 +332,9 @@ h3 {
 }
 .sidebar:hover {
     max-width: var(--sidebar-size);
-    transition: max-width var(--animation-duration) ease-out 0.5s,
-                box-shadow var(--animation-duration) ease-out;
+    transition:
+        max-width var(--animation-duration) ease-out 0.5s,
+        box-shadow var(--animation-duration) ease-out;
 }
 .sidebar-inner {
     width: 100%;
@@ -455,9 +462,10 @@ h3 {
     width: 100%;
     min-width: 100%;
     max-width: 100%;
-    transition: width var(--animation-duration) ease-in-out,
-                max-width var(--animation-duration) ease-in-out,
-                box-shadow var(--animation-duration) ease-in-out;
+    transition:
+        width var(--animation-duration) ease-in-out,
+        max-width var(--animation-duration) ease-in-out,
+        box-shadow var(--animation-duration) ease-in-out;
 }
 .preview-sidebar-inner {
     width: 100%;
@@ -807,7 +815,7 @@ select.short-height {
     margin-right: calc(var(--modal-padding-horizontal) * -1);
 }
 .modal-body .settings-item+.settings-item {
-    border-top: none
+    border-top: none;
 }
 .modal-body .settings-item-left {
     padding-left: var(--modal-padding-horizontal);
@@ -1094,8 +1102,9 @@ button.popup-menu-item:disabled {
     width: 100%;
     min-width: 100%;
     max-width: 100%;
-    transition: width var(--animation-duration) ease-in-out,
-                max-width var(--animation-duration) ease-in-out;
+    transition:
+        width var(--animation-duration) ease-in-out,
+        max-width var(--animation-duration) ease-in-out;
 }
 .fab-container-right-inner2 {
     display: flex;
@@ -1128,7 +1137,7 @@ button.fab-button:active {
 .fab-button-background {
     position: absolute;
     display: block;
-    content: "";
+    content: '';
     left: 0;
     top: 0;
     right: 0;
@@ -1264,7 +1273,7 @@ body.preview-sidebar-visible .fab-container-item.fab-container-item-popup-previe
 }
 .dictionary-details-table {
     display: table;
-    width: 100%
+    width: 100%;
 }
 .dictionary-details-entry {
     display: table-row;
@@ -1332,7 +1341,7 @@ body.preview-sidebar-visible .fab-container-item.fab-container-item-popup-previe
     flex: 0 0 auto;
     min-width: 4em;
     text-align: center;
-    align-self: stretch
+    align-self: stretch;
 }
 .profile-entry-cell:nth-child(5) {
     flex: 0 0 auto;
@@ -1426,10 +1435,10 @@ input[type=text].profile-entry-name-input {
     margin-right: 0.25em;
 }
 .profile-condition-prefix::after {
-    content: "if"
+    content: 'if';
 }
 .profile-condition:nth-child(n+2)>.profile-condition-prefix::after {
-    content: "and"
+    content: 'and';
 }
 select.profile-condition-type,
 select.profile-condition-operator {
@@ -1743,9 +1752,9 @@ code.anki-field-marker {
     grid-template-columns: auto auto 1fr auto;
     grid-template-rows: auto;
     grid-template-areas:
-        "index pattern-label     pattern     button"
-        ".     replacement-label replacement button"
-        ".     test-label        test        .";
+        'index pattern-label     pattern     button'
+        '.     replacement-label replacement button'
+        '.     test-label        test        .';
     column-gap: 0.25em;
     row-gap: 0.25em;
     align-items: stretch;

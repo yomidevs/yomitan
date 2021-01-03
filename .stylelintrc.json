@@ -1,0 +1,54 @@
+{
+    "extends": "stylelint-config-recommended",
+    "ignoreFiles": [
+        "ext/mixed/lib/**/*.css"
+    ],
+    "rules": {
+        "font-family-name-quotes": "always-where-recommended",
+        "string-quotes": "single",
+        "color-named": "never",
+        "declaration-no-important": true,
+        "function-calc-no-invalid": true,
+        "function-calc-no-unspaced-operator": true,
+        "string-no-newline": true,
+        "unit-no-unknown": true,
+        "block-no-empty": true,
+        "no-extra-semicolons": true,
+        "no-invalid-double-slash-comments": true,
+        "font-weight-notation": "named-where-possible",
+        "color-hex-case": "lower",
+        "function-comma-space-after": "always",
+        "function-comma-space-before": "never",
+        "function-name-case": "lower",
+        "function-parentheses-space-inside": "never",
+        "function-whitespace-after": "always",
+        "number-leading-zero": "always",
+        "number-no-trailing-zeros": true,
+        "unit-case": "lower",
+        "value-keyword-case": "lower",
+        "property-case": "lower",
+        "indentation": 4,
+        "max-empty-lines": 2,
+        "selector-type-no-unknown": null,
+        "no-descending-specificity": null,
+        "no-duplicate-selectors": null,
+        "selector-combinator-space-before": "never",
+        "selector-combinator-space-after": "never",
+        "selector-list-comma-newline-after": "always-multi-line",
+        "rule-empty-line-before": null,
+        "block-opening-brace-space-before": [
+            "always",
+            {
+                "ignoreSelectors": "/^\\.icon/"
+            }
+        ],
+        "block-opening-brace-space-after": "always-single-line",
+        "color-hex-length": null,
+        "declaration-colon-space-before": "never",
+        "declaration-colon-space-after": "always-single-line",
+        "length-zero-no-unit": null,
+        "selector-pseudo-element-colon-notation": "double",
+        "custom-property-empty-line-before": null,
+        "at-rule-empty-line-before": null
+    }
+}

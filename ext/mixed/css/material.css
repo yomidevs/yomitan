@@ -145,6 +145,7 @@
 .icon {
     --icon-image: none;
     --icon-size: contain;
+
     -webkit-mask-repeat: no-repeat;
     -webkit-mask-position: center center;
     -webkit-mask-mode: alpha;
@@ -174,14 +175,20 @@
 .icon[data-icon=hamburger-menu]          { --icon-image: url(/mixed/img/hamburger-menu.svg); }
 .icon[data-icon=kebab-menu]              { --icon-image: url(/mixed/img/kebab-menu.svg); }
 .icon[data-icon=mouse]                   { --icon-image: url(/mixed/img/mouse.svg); }
-.icon[data-icon=material-down-arrow]     { --icon-image: url(/mixed/img/material-down-arrow.svg);  --icon-size: var(--material-arrow-dimension2) var(--material-arrow-dimension1); }
-.icon[data-icon=material-right-arrow]    { --icon-image: url(/mixed/img/material-right-arrow.svg); --icon-size: var(--material-arrow-dimension1) var(--material-arrow-dimension2); }
 .icon[data-icon=exclamation-point-short] { --icon-image: url(/mixed/img/exclamation-point-short.svg); }
 .icon[data-icon=magnifying-glass]        { --icon-image: url(/mixed/img/magnifying-glass.svg); }
 .icon[data-icon=collapse]                { --icon-image: url(/mixed/img/collapse.svg); }
 .icon[data-icon=expand]                  { --icon-image: url(/mixed/img/expand.svg); }
 .icon[data-icon=window]                  { --icon-image: url(/mixed/img/window.svg); }
 .icon[data-icon=cross]                   { --icon-image: url(/mixed/img/cross.svg); }
+.icon[data-icon=material-down-arrow] {
+    --icon-image: url(/mixed/img/material-down-arrow.svg);
+    --icon-size: var(--material-arrow-dimension2) var(--material-arrow-dimension1);
+}
+.icon[data-icon=material-right-arrow] {
+    --icon-image: url(/mixed/img/material-right-arrow.svg);
+    --icon-size: var(--material-arrow-dimension1) var(--material-arrow-dimension2);
+}
 
 
 /* Checkbox */
@@ -210,7 +217,6 @@ label.checkbox {
     width: 1em;
     height: 1em;
     position: relative;
-    cursor: pointer;
 }
 .checkbox>input[type=checkbox]:disabled+.checkbox-body {
     cursor: default;
@@ -326,13 +332,14 @@ label.toggle {
     box-shadow:
         0 0.0625em 0.25em 0 var(--shadow-color),
         0 0.125em 0.125em 0 var(--shadow-color);
-    transition: transform var(--animation-duration) ease-in-out,
-                background-color var(--animation-duration) ease-in-out;
+    transition:
+        transform var(--animation-duration) ease-in-out,
+        background-color var(--animation-duration) ease-in-out;
 }
 .toggle-body>.toggle-knob::after {
     position: absolute;
     display: block;
-    content: "";
+    content: '';
     left: -0.75em;
     top: -0.75em;
     right: -0.75em;
@@ -343,20 +350,22 @@ label.toggle {
     transform: scale(0);
     opacity: 0;
     visibility: hidden;
-    transition: transform 0s ease-in-out var(--animation-duration2),
-                background-color var(--animation-duration2) ease-in-out,
-                opacity var(--animation-duration2) ease-in-out,
-                visibility 0s ease-in-out var(--animation-duration2);
+    transition:
+        transform 0s ease-in-out var(--animation-duration2),
+        background-color var(--animation-duration2) ease-in-out,
+        opacity var(--animation-duration2) ease-in-out,
+        visibility 0s ease-in-out var(--animation-duration2);
 }
 .toggle>input[type=checkbox]:focus:not(:disabled)+.toggle-body>.toggle-knob::after,
 .toggle:active>input[type=checkbox]:not(:disabled)+.toggle-body>.toggle-knob::after {
     transform: scale(1);
     opacity: 1;
     visibility: visible;
-    transition: transform var(--animation-duration2) ease-in-out,
-                background-color var(--animation-duration2) ease-in-out,
-                opacity var(--animation-duration2) ease-in-out,
-                visibility var(--animation-duration2) ease-in-out;
+    transition:
+        transform var(--animation-duration2) ease-in-out,
+        background-color var(--animation-duration2) ease-in-out,
+        opacity var(--animation-duration2) ease-in-out,
+        visibility var(--animation-duration2) ease-in-out;
 }
 .toggle>input[type=checkbox]:focus+.toggle-body>.toggle-knob::after {
     opacity: 0.5;
@@ -445,9 +454,10 @@ label.radio {
     -webkit-mask-image: url(/mixed/img/radio-button-dot.svg);
     opacity: 1;
     transform: none;
-    transition: transform var(--animation-duration2) ease-in-out,
-                opacity var(--animation-duration2) ease-in-out,
-                visibility var(--animation-duration2) ease-in-out;
+    transition:
+        transform var(--animation-duration2) ease-in-out,
+        opacity var(--animation-duration2) ease-in-out,
+        visibility var(--animation-duration2) ease-in-out;
 }
 .radio>input[type=radio]:disabled+.radio-body>.radio-border,
 .radio>input[type=radio]:disabled+.radio-body>.radio-dot {
@@ -456,14 +466,15 @@ label.radio {
 .radio>input[type=radio]:not(:checked)+.radio-body>.radio-dot {
     opacity: 0;
     transform: scale(0);
-    transition: transform 0s ease-in-out var(--animation-duration2),
-                opacity var(--animation-duration2) ease-in-out,
-                visibility 0s ease-in-out var(--animation-duration2);
+    transition:
+        transform 0s ease-in-out var(--animation-duration2),
+        opacity var(--animation-duration2) ease-in-out,
+        visibility 0s ease-in-out var(--animation-duration2);
 }
 .radio-body::after {
     position: absolute;
     display: block;
-    content: "";
+    content: '';
     left: -0.75em;
     top: -0.75em;
     right: -0.75em;
@@ -474,20 +485,22 @@ label.radio {
     transform: scale(0);
     opacity: 0;
     visibility: hidden;
-    transition: transform 0s ease-in-out var(--animation-duration2),
-                background-color var(--animation-duration2) ease-in-out,
-                opacity var(--animation-duration2) ease-in-out,
-                visibility 0s ease-in-out var(--animation-duration2);
+    transition:
+        transform 0s ease-in-out var(--animation-duration2),
+        background-color var(--animation-duration2) ease-in-out,
+        opacity var(--animation-duration2) ease-in-out,
+        visibility 0s ease-in-out var(--animation-duration2);
 }
 .radio>input[type=radio]:focus:not(:disabled)+.radio-body::after,
 .radio:active>input[type=radio]:not(:disabled)+.radio-body::after {
     transform: scale(1);
     opacity: 1;
     visibility: visible;
-    transition: transform var(--animation-duration2) ease-in-out,
-                background-color var(--animation-duration2) ease-in-out,
-                opacity var(--animation-duration2) ease-in-out,
-                visibility var(--animation-duration2) ease-in-out;
+    transition:
+        transform var(--animation-duration2) ease-in-out,
+        background-color var(--animation-duration2) ease-in-out,
+        opacity var(--animation-duration2) ease-in-out,
+        visibility var(--animation-duration2) ease-in-out;
 }
 .radio>input[type=radio]:focus+.radio-body::after {
     opacity: 0.5;
@@ -804,7 +817,7 @@ button.icon-button:active {
 .icon-button>.icon-button-inner::after {
     position: absolute;
     display: block;
-    content: "";
+    content: '';
     left: 0;
     top: 0;
     right: 0;
@@ -815,19 +828,21 @@ button.icon-button:active {
     transform: scale(0);
     opacity: 0;
     visibility: hidden;
-    transition: transform 0s ease-in-out var(--animation-duration2),
-                background-color var(--animation-duration2) ease-in-out,
-                opacity var(--animation-duration2) ease-in-out,
-                visibility 0s ease-in-out var(--animation-duration2);
+    transition:
+        transform 0s ease-in-out var(--animation-duration2),
+        background-color var(--animation-duration2) ease-in-out,
+        opacity var(--animation-duration2) ease-in-out,
+        visibility 0s ease-in-out var(--animation-duration2);
 }
 .icon-button:focus>.icon-button-inner::after {
     transform: scale(1);
     opacity: 1;
     visibility: visible;
-    transition: transform var(--animation-duration2) ease-in-out,
-                background-color var(--animation-duration2) ease-in-out,
-                opacity var(--animation-duration2) ease-in-out,
-                visibility var(--animation-duration2) ease-in-out;
+    transition:
+        transform var(--animation-duration2) ease-in-out,
+        background-color var(--animation-duration2) ease-in-out,
+        opacity var(--animation-duration2) ease-in-out,
+        visibility var(--animation-duration2) ease-in-out;
 }
 .icon-button>.icon-button-inner>.icon {
     display: block;
