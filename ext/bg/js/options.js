@@ -485,6 +485,10 @@ class OptionsUtil {
             {
                 async: false,
                 update: this._updateVersion7.bind(this)
+            },
+            {
+                async: false,
+                update: this._updateVersion8.bind(this)
             }
         ];
     }
@@ -672,6 +676,18 @@ class OptionsUtil {
             profile.options.general.popupCurrentIndicatorMode = 'triangle';
             profile.options.general.popupActionBarVisibility = 'auto';
             profile.options.general.popupActionBarLocation = 'right';
+        }
+        return options;
+    }
+
+    _updateVersion8(options) {
+        // Version 8 changes:
+        //  Added translation.textReplacements.
+        for (const profile of options.profiles) {
+            profile.options.translation.textReplacements = {
+                searchOriginal: true,
+                groups: []
+            };
         }
         return options;
     }

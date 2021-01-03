@@ -68,6 +68,13 @@ class Translator {
      *     convertHiraganaToKatakana: (enum: 'false', 'true', 'variant'),
      *     convertKatakanaToHiragana: (enum: 'false', 'true', 'variant'),
      *     collapseEmphaticSequences: (enum: 'false', 'true', 'full'),
+     *     textReplacements: [
+     *       (null or [
+     *         {pattern: (RegExp), replacement: (string)}
+     *         ...
+     *       ])
+     *       ...
+     *     ],
      *     enabledDictionaryMap: (Map of [
      *       (string),
      *       {
@@ -302,6 +309,7 @@ class Translator {
 
     _getAllDeinflections(text, options) {
         const textOptionVariantArray = [
+            this._getTextReplacementsVariants(options),
             this._getTextOptionEntryVariants(options.convertHalfWidthCharacters),
             this._getTextOptionEntryVariants(options.convertNumericCharacters),
             this._getTextOptionEntryVariants(options.convertAlphabeticCharacters),
@@ -313,9 +321,12 @@ class Translator {
         const jp = this._japaneseUtil;
         const deinflections = [];
         const used = new Set();
-        for (const [halfWidth, numeric, alphabetic, katakana, hiragana, [collapseEmphatic, collapseEmphaticFull]] of this._getArrayVariants(textOptionVariantArray)) {
+        for (const [textReplacements, halfWidth, numeric, alphabetic, katakana, hiragana, [collapseEmphatic, collapseEmphaticFull]] of this._getArrayVariants(textOptionVariantArray)) {
             let text2 = text;
             const sourceMap = new TextSourceMap(text2);
+            if (textReplacements !== null) {
+                text2 = this._applyTextReplacements(text2, sourceMap, textReplacements);
+            }
             if (halfWidth) {
                 text2 = jp.convertHalfWidthKanaToFullWidth(text2, sourceMap);
             }
@@ -879,6 +890,10 @@ class Translator {
         return collapseEmphaticOptions;
     }
 
+    _getTextReplacementsVariants(options) {
+        return options.textReplacements;
+    }
+
     _getSecondarySearchDictionaryMap(enabledDictionaryMap) {
         const secondarySearchDictionaryMap = new Map();
         for (const [dictionary, details] of enabledDictionaryMap.entries()) {
@@ -1302,6 +1317,66 @@ class Translator {
             if (i !== 0) { return i; }
 
             return stringComparer.compare(v1.notes, v2.notes);
+        });
+    }
+
+    // Regex functions
+
+    _applyTextReplacements(text, sourceMap, replacements) {
+        for (const {pattern, replacement} of replacements) {
+            text = this._applyTextReplacement(text, sourceMap, pattern, replacement);
+        }
+        return text;
+    }
+
+    _applyTextReplacement(text, sourceMap, pattern, replacement) {
+        const isGlobal = pattern.global;
+        if (isGlobal) { pattern.lastIndex = 0; }
+        for (let loop = true; loop; loop = isGlobal) {
+            const match = pattern.exec(text);
+            if (match === null) { break; }
+
+            const matchText = match[0];
+            const index = match.index;
+            const actualReplacement = this._applyMatchReplacement(replacement, match);
+            const actualReplacementLength = actualReplacement.length;
+            const delta = actualReplacementLength - (matchText.length > 0 ? matchText.length : -1);
+
+            text = `${text.substring(0, index)}${actualReplacement}${text.substring(index + matchText.length)}`;
+            pattern.lastIndex += delta;
+
+            if (actualReplacementLength > 0) {
+                sourceMap.combine(Math.max(0, index - 1), matchText.length);
+                sourceMap.insert(index, ...(new Array(actualReplacementLength).fill(0)));
+            } else {
+                sourceMap.combine(index, matchText.length);
+            }
+        }
+        return text;
+    }
+
+    _applyMatchReplacement(replacement, match) {
+        const pattern = /\$(?:\$|&|`|'|(\d\d?)|<([^>]*)>)/g;
+        return replacement.replace(pattern, (g0, g1, g2) => {
+            if (typeof g1 !== 'undefined') {
+                const matchIndex = Number.parseInt(g1, 10);
+                if (matchIndex >= 1 && matchIndex <= match.length) {
+                    return match[matchIndex];
+                }
+            } else if (typeof g2 !== 'undefined') {
+                const {groups} = match;
+                if (typeof groups === 'object' && groups !== null && Object.prototype.hasOwnProperty.call(groups, g2)) {
+                    return groups[g2];
+                }
+            } else {
+                switch (g0) {
+                    case '$': return '$';
+                    case '&': return match[0];
+                    case '`': return replacement.substring(0, match.index);
+                    case '\'': return replacement.substring(match.index + g0.length);
+                }
+            }
+            return g0;
         });
     }
 }

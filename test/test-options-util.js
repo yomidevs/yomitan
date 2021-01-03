@@ -394,7 +394,11 @@ function createProfileOptionsUpdatedTestData1() {
             convertAlphabeticCharacters: 'false',
             convertHiraganaToKatakana: 'false',
             convertKatakanaToHiragana: 'variant',
-            collapseEmphaticSequences: 'false'
+            collapseEmphaticSequences: 'false',
+            textReplacements: {
+                searchOriginal: true,
+                groups: []
+            }
         },
         dictionaries: {},
         parsing: {
@@ -502,7 +506,7 @@ function createOptionsUpdatedTestData1() {
             }
         ],
         profileCurrent: 0,
-        version: 7,
+        version: 8,
         global: {
             database: {
                 prefixWildcardsSupported: false

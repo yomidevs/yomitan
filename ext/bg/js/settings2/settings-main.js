@@ -36,6 +36,7 @@
  * SettingsDisplayController
  * StatusFooter
  * StorageController
+ * TranslationTextReplacementsController
  * api
  */
 
@@ -119,6 +120,9 @@ async function setupGenericSettingsController(genericSettingController) {
 
         const secondarySearchDictionaryController = new SecondarySearchDictionaryController(settingsController);
         secondarySearchDictionaryController.prepare();
+
+        const translationTextReplacementsController = new TranslationTextReplacementsController(settingsController);
+        translationTextReplacementsController.prepare();
 
         await Promise.all(preparePromises);
 

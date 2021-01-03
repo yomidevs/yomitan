@@ -617,6 +617,10 @@ input[type=number].input-with-suffix-button {
     border-right-style: none;
     z-index: 1;
 }
+input[type=text].code,
+input[type=number].code {
+    font-family: 'Courier New', Courier, monospace;
+}
 
 
 /* Material design button */

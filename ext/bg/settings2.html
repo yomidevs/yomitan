@@ -1144,6 +1144,14 @@
         </div>
     </div>
     <div class="settings-group">
+        <div class="settings-item settings-item-button advanced-only" data-modal-action="show,translation-text-replacement-patterns"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Configure custom text replacement patterns&hellip;</div>
+            </div>
+            <div class="settings-item-right open-panel-button-container">
+                <button class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
+            </div>
+        </div></div>
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Convert half width characters to full width</div>
@@ -2612,6 +2620,91 @@
 </div></div>
 
 
+<!-- Translation modals -->
+<div id="translation-text-replacement-patterns" class="modal-container" tabindex="-1" role="dialog" hidden><div class="modal-content">
+    <div class="modal-header">
+        <div class="modal-title">Custom Text Replacement Patterns</div>
+        <div class="modal-header-button-container">
+            <div class="modal-header-button-group">
+                <button class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                <button class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-body">
+        <div class="settings-item"><div class="settings-item-inner"><div class="settings-item-left"><div class="settings-item-label">
+            Text replacement patterns are used to modify or remove text that matches certain patterns.
+            Patterns are defined using
+            <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions" target="_blank" rel="noreferrer noopener">regular expression syntax</a>,
+            and the replacement text can use certain
+            <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#Specifying_a_string_as_a_parameter" target="_blank" rel="noreferrer noopener">special replacement patterns</a>.
+        </div></div></div></div>
+        <div class="settings-item"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">
+                    Search original text
+                </div>
+                <div class="settings-item-description">
+                    The original unmodified text will also be searched for definitions.
+                </div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" data-setting="translation.textReplacements.searchOriginal"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+        </div></div>
+        <div class="settings-item">
+            <div class="settings-item-inner">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">Text replacement patterns</div>
+                </div>
+                <div class="settings-item-right">
+                    <button id="translation-text-replacement-add" class="low-emphasis">Add</button>
+                </div>
+            </div>
+            <div class="settings-item-children">
+                <div id="translation-text-replacement-list" class="generic-list"></div>
+                <div id="translation-text-replacement-list-empty"><em>None defined</em></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button data-modal-action="hide">Close</button>
+    </div>
+</div></div>
+
+
+<!-- Translation templates -->
+<template id="translation-text-replacement-entry-template"><div class="translation-text-replacement-entry">
+    <div class="translation-text-replacement-index generic-list-index-prefix"></div>
+    <div class="translation-text-replacement-pattern-label">Pattern:</div>
+    <div class="translation-text-replacement-replacement-label">Replacement:</div>
+    <div class="translation-text-replacement-pattern-container">
+        <input type="text" class="translation-text-replacement-pattern code">
+        <label class="translation-text-replacement-checkbox-container">
+            <label class="checkbox"><input type="checkbox" class="translation-text-replacement-checkbox translation-text-replacement-pattern-ignore-case"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+            <span class="translation-text-replacement-checkbox-label">Ignore case</span>
+        </label>
+    </div>
+    <div class="translation-text-replacement-replacement-container">
+        <input type="text" class="translation-text-replacement-replacement code">
+    </div>
+    <button class="icon-button translation-text-replacement-button" data-menu="translation-text-replacement-entry-menu" data-menu-position="below,left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
+
+    <div class="translation-text-replacement-test-label translation-text-replacement-test-node">Test Input:</div>
+    <div class="translation-text-replacement-test-container translation-text-replacement-test-node">
+        <input type="text" class="translation-text-replacement-test-input">
+        <div class="translation-text-replacement-test-label-inner">Output:</div>
+        <input type="text" class="translation-text-replacement-test-output" readonly>
+    </div>
+</div></template>
+
+<template id="translation-text-replacement-entry-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu">
+    <button class="popup-menu-item" data-menu-action="showTest">Test</button>
+    <button class="popup-menu-item" data-menu-action="hideTest">Hide test</button>
+    <button class="popup-menu-item" data-menu-action="remove">Remove</button>
+</div></div></template>
+
+
 <!-- Scripts -->
 <script src="/mixed/lib/jszip.min.js"></script>
 <script src="/mixed/lib/wanakana.min.js"></script>
@@ -2671,6 +2764,7 @@
 <script src="/bg/js/settings2/nested-popups-controller.js"></script>
 <script src="/bg/js/settings2/secondary-search-dictionary-controller.js"></script>
 <script src="/bg/js/settings2/settings-display-controller.js"></script>
+<script src="/bg/js/settings2/translation-text-replacements-controller.js"></script>
 
 <script src="/bg/js/settings2/settings-main.js"></script>
 

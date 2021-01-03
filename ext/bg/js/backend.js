@@ -1655,9 +1655,11 @@ class Backend {
                 convertAlphabeticCharacters,
                 convertHiraganaToKatakana,
                 convertKatakanaToHiragana,
-                collapseEmphaticSequences
+                collapseEmphaticSequences,
+                textReplacements: textReplacementsOptions
             }
         } = options;
+        const textReplacements = this._getTranslatorTextReplacements(textReplacementsOptions);
         return {
             wildcard,
             mainDictionary,
@@ -1668,6 +1670,7 @@ class Backend {
             convertHiraganaToKatakana,
             convertKatakanaToHiragana,
             collapseEmphaticSequences,
+            textReplacements,
             enabledDictionaryMap
         };
     }
@@ -1684,6 +1687,29 @@ class Backend {
             enabledDictionaryMap.set(title, {priority, allowSecondarySearches});
         }
         return enabledDictionaryMap;
+    }
+
+    _getTranslatorTextReplacements(textReplacementsOptions) {
+        const textReplacements = [];
+        for (const group of textReplacementsOptions.groups) {
+            const textReplacementsEntries = [];
+            for (let {pattern, ignoreCase, replacement} of group) {
+                try {
+                    pattern = new RegExp(pattern, ignoreCase ? 'gi' : 'g');
+                } catch (e) {
+                    // Invalid pattern
+                    continue;
+                }
+                textReplacementsEntries.push({pattern, replacement});
+            }
+            if (textReplacementsEntries.length > 0) {
+                textReplacements.push(textReplacementsEntries);
+            }
+        }
+        if (textReplacements.length === 0 || textReplacementsOptions.searchOriginal) {
+            textReplacements.unshift(null);
+        }
+        return textReplacements;
     }
 
     async _openWelcomeGuidePage() {

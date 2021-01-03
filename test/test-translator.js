@@ -107,6 +107,16 @@ function buildOptions(optionsPresets, optionsArray, dictionaryTitle) {
         }
     }
 
+    // Construct regex
+    if (Array.isArray(options.textReplacements)) {
+        options.textReplacements = options.textReplacements.map((value) => {
+            if (Array.isArray(value)) {
+                value = value.map(({pattern, flags, replacement}) => ({pattern: new RegExp(pattern, flags), replacement}));
+            }
+            return value;
+        });
+    }
+
     // Update structure
     const placeholder = '${title}';
     if (options.mainDictionary === placeholder) {

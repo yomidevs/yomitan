@@ -592,7 +592,8 @@
                                     "convertAlphabeticCharacters",
                                     "convertHiraganaToKatakana",
                                     "convertKatakanaToHiragana",
-                                    "collapseEmphaticSequences"
+                                    "collapseEmphaticSequences",
+                                    "textReplacements"
                                 ],
                                 "properties": {
                                     "convertHalfWidthCharacters": {
@@ -624,6 +625,46 @@
                                         "type": "string",
                                         "enum": ["false", "true", "full"],
                                         "default": "false"
+                                    },
+                                    "textReplacements": {
+                                        "type": "object",
+                                        "required": [
+                                            "searchOriginal",
+                                            "groups"
+                                        ],
+                                        "properties": {
+                                            "searchOriginal": {
+                                                "type": "boolean",
+                                                "default": true
+                                            },
+                                            "groups": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "required": [
+                                                            "pattern",
+                                                            "ignoreCase",
+                                                            "replacement"
+                                                        ],
+                                                        "properties": {
+                                                            "pattern": {
+                                                                "type": "string",
+                                                                "default": ""
+                                                            },
+                                                            "ignoreCase": {
+                                                                "type": "boolean",
+                                                                "default": false
+                                                            },
+                                                            "replacement": {
+                                                                "type": "string",
+                                                                "default": ""
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             },
