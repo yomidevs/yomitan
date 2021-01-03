@@ -9,10 +9,19 @@
   `unlimitedStorage` is used to help prevent web browsers from unexpectedly
   deleting dictionary data.
 
-* `webRequest` and `webRequestBlocking` <br>
+* `webRequest` and `webRequestBlocking` _(Manifest V2 only)_ <br>
   Yomichan uses these permissions to ensure certain requests have valid and secure headers.
   This sometimes involves removing or changing the `Origin` request header,
   as this can be used to fingerprint browser configuration.
+
+* `declarativeNetRequest` _(Manifest V3 only)_ <br>
+  Yomichan uses this permission to ensure certain requests have valid and secure headers.
+  This sometimes involves removing or changing the `Origin` request header,
+  as this can be used to fingerprint browser configuration.
+
+* `scripting` _(Manifest V3 only)_ <br>
+  Yomichan will sometimes need to inject stylesheets into webpages in order to
+  properly display the search popup.
 
 * `nativeMessaging` <br>
   Yomichan has the ability to communicate with an optional native messaging component in order to support

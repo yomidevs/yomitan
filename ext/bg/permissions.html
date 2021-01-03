@@ -45,7 +45,7 @@
                 </div>
             </div>
         </div></div>
-        <div class="settings-item"><div class="settings-item-inner">
+        <div class="settings-item" data-hide-for-manifest-version="3"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label"><code>webRequest</code> and <code>webRequestBlocking</code></div>
                 <div class="settings-item-description">
@@ -57,6 +57,30 @@
                     <p>
                         Example: <code>Origin: <span id="extension-id-example"></span></code>
                     </p>
+                </div>
+            </div>
+        </div></div>
+        <div class="settings-item" data-show-for-manifest-version="3"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label"><code>declarativeNetRequest</code></div>
+                <div class="settings-item-description">
+                    <p>
+                        Yomichan uses this permission to ensure certain requests have valid and secure headers.
+                        This sometimes involves removing or changing the <code>Origin</code> request header,
+                        as this can be used to fingerprint browser configuration.
+                    </p>
+                    <p>
+                        Example: <code>Origin: <span id="extension-id-example"></span></code>
+                    </p>
+                </div>
+            </div>
+        </div></div>
+        <div class="settings-item" data-show-for-manifest-version="3"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label"><code>scripting</code></div>
+                <div class="settings-item-description">
+                    Yomichan will sometimes need to inject stylesheets into webpages in order to
+                    properly display the search popup.
                 </div>
             </div>
         </div></div>
