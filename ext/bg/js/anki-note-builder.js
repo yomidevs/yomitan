@@ -26,42 +26,35 @@ class AnkiNoteBuilder {
     }
 
     async createNote({
-        anki=null,
         definition,
         mode,
         context,
         templates,
+        deckName,
+        modelName,
+        fields,
         tags=[],
         checkForDuplicates=true,
         duplicateScope='collection',
         resultOutputMode='split',
         glossaryLayoutMode='default',
         compactTags=false,
-        modeOptions: {fields, deck, model},
-        audioDetails=null,
-        screenshotDetails=null,
-        clipboardDetails=null,
         errors=null
     }) {
-        if (anki !== null) {
-            await this._injectMedia(anki, definition, fields, mode, audioDetails, screenshotDetails, clipboardDetails);
-        }
-
         let duplicateScopeDeckName = null;
         let duplicateScopeCheckChildren = false;
         if (duplicateScope === 'deck-root') {
             duplicateScope = 'deck';
-            duplicateScopeDeckName = this.getRootDeckName(deck);
+            duplicateScopeDeckName = this.getRootDeckName(deckName);
             duplicateScopeCheckChildren = true;
         }
 
-        const fieldEntries = Object.entries(fields);
         const noteFields = {};
         const note = {
             fields: noteFields,
             tags,
-            deckName: deck,
-            modelName: model,
+            deckName,
+            modelName,
             options: {
                 allowDuplicate: !checkForDuplicates,
                 duplicateScope,
@@ -74,14 +67,14 @@ class AnkiNoteBuilder {
 
         const data = this._createNoteData(definition, mode, context, resultOutputMode, glossaryLayoutMode, compactTags);
         const formattedFieldValuePromises = [];
-        for (const [, fieldValue] of fieldEntries) {
+        for (const [, fieldValue] of fields) {
             const formattedFieldValuePromise = this._formatField(fieldValue, data, templates, errors);
             formattedFieldValuePromises.push(formattedFieldValuePromise);
         }
 
         const formattedFieldValues = await Promise.all(formattedFieldValuePromises);
-        for (let i = 0, ii = fieldEntries.length; i < ii; ++i) {
-            const fieldName = fieldEntries[i][0];
+        for (let i = 0, ii = fields.length; i < ii; ++i) {
+            const fieldName = fields[i][0];
             const formattedFieldValue = formattedFieldValues[i];
             noteFields[fieldName] = formattedFieldValue;
         }
@@ -91,7 +84,7 @@ class AnkiNoteBuilder {
 
     containsMarker(fields, marker) {
         marker = `{${marker}}`;
-        for (const fieldValue of Object.values(fields)) {
+        for (const [, fieldValue] of fields) {
             if (fieldValue.includes(marker)) {
                 return true;
             }

@@ -189,14 +189,14 @@ class AnkiTemplatesController {
                     mode,
                     context,
                     templates,
+                    deckName: '',
+                    modelName: '',
+                    fields: [
+                        ['field', field]
+                    ],
                     resultOutputMode,
                     glossaryLayoutMode,
                     compactTags,
-                    modeOptions: {
-                        fields: {field},
-                        deck: '',
-                        model: ''
-                    },
                     errors: exceptions
                 });
                 result = note.fields.field;
