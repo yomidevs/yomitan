@@ -41,7 +41,6 @@ class AnkiController {
             'clipboard-text'
         ]);
         this._stringComparer = new Intl.Collator(); // Locale does not matter
-        this._ankiOptions = null;
         this._getAnkiDataPromise = null;
         this._ankiErrorContainer = null;
         this._ankiErrorMessageNode = null;
@@ -174,7 +173,6 @@ class AnkiController {
     // Private
 
     async _onOptionsChanged({options: {anki}}) {
-        this._ankiOptions = anki;
         this._ankiConnect.server = anki.server;
         this._ankiConnect.enabled = anki.enable;
 
@@ -188,7 +186,7 @@ class AnkiController {
     }
 
     _onAnkiEnableChanged({detail: {value}}) {
-        if (this._ankiOptions === null) { return; }
+        if (this._ankiConnect.server === null) { return; }
         this._ankiConnect.enabled = value;
 
         for (const cardController of this._selectorObserver.datas()) {
@@ -215,7 +213,7 @@ class AnkiController {
 
     _createCardController(node) {
         const cardController = new AnkiCardController(this._settingsController, this, node);
-        cardController.prepare(this._ankiOptions);
+        cardController.prepare();
         return cardController;
     }
 
@@ -383,9 +381,14 @@ class AnkiCardController {
         this._ankiCardDeckSelect = null;
         this._ankiCardModelSelect = null;
         this._ankiCardFieldsContainer = null;
+        this._cleaned = false;
     }
 
-    async prepare(ankiOptions) {
+    async prepare() {
+        const options = await this._settingsController.getOptions();
+        const ankiOptions = options.anki;
+        if (this._cleaned) { return; }
+
         const cardOptions = this._getCardOptions(ankiOptions, this._cardType);
         if (cardOptions === null) { return; }
         const {deck, model, fields} = cardOptions;
@@ -407,12 +410,14 @@ class AnkiCardController {
     }
 
     cleanup() {
+        this._cleaned = true;
         this._eventListeners.removeAllEventListeners();
     }
 
     async updateAnkiState() {
         if (this._fields === null) { return; }
         const {deckNames, modelNames} = await this._ankiController.getAnkiData();
+        if (this._cleaned) { return; }
         this._setupSelects(deckNames, modelNames);
     }
 
