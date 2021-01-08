@@ -150,7 +150,7 @@ class CrossFrameAPIPort extends EventDispatcher {
 
         const error = data.error;
         if (typeof error !== 'undefined') {
-            invocation.reject(jsonToError(error));
+            invocation.reject(deserializeError(error));
         } else {
             invocation.resolve(data.result);
         }
@@ -200,7 +200,7 @@ class CrossFrameAPIPort extends EventDispatcher {
     }
 
     _sendError(id, error) {
-        this._sendResponse({type: 'result', id, data: {error: errorToJson(error)}});
+        this._sendResponse({type: 'result', id, data: {error: serializeError(error)}});
     }
 }
 

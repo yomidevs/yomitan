@@ -40,7 +40,7 @@ const api = (() => {
 
             yomichan.on('log', async ({error, level, context}) => {
                 try {
-                    await this.log(errorToJson(error), level, context);
+                    await this.log(serializeError(error), level, context);
                 } catch (e) {
                     // NOP
                 }
@@ -264,7 +264,7 @@ const api = (() => {
                             break;
                         case 'error':
                             cleanup();
-                            reject(jsonToError(message.data));
+                            reject(deserializeError(message.data));
                             break;
                     }
                 };
@@ -317,7 +317,7 @@ const api = (() => {
                         this._checkLastError(chrome.runtime.lastError);
                         if (response !== null && typeof response === 'object') {
                             if (typeof response.error !== 'undefined') {
-                                reject(jsonToError(response.error));
+                                reject(deserializeError(response.error));
                             } else {
                                 resolve(response.result);
                             }

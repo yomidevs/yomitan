@@ -219,7 +219,7 @@ const yomichan = (() => {
             }
             error = response.error;
             if (error) {
-                throw jsonToError(error);
+                throw deserializeError(error);
             }
             return response.result;
         }
@@ -233,7 +233,7 @@ const yomichan = (() => {
                 if (async) {
                     promiseOrResult.then(
                         (result) => { callback({result}); },
-                        (error) => { callback({error: errorToJson(error)}); }
+                        (error) => { callback({error: serializeError(error)}); }
                     );
                     return true;
                 } else {
@@ -241,7 +241,7 @@ const yomichan = (() => {
                     return false;
                 }
             } catch (error) {
-                callback({error: errorToJson(error)});
+                callback({error: serializeError(error)});
                 return false;
             }
         }

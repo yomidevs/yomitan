@@ -189,7 +189,7 @@ class AudioDownloader {
             throw new Error('No custom URL defined');
         }
         const data = {expression, reading};
-        const url = customSourceUrl.replace(/\{([^}]*)\}/g, (m0, m1) => (hasOwn(data, m1) ? `${data[m1]}` : m0));
+        const url = customSourceUrl.replace(/\{([^}]*)\}/g, (m0, m1) => (Object.prototype.hasOwnProperty.call(data, m1) ? `${data[m1]}` : m0));
         return {type: 'url', details: {url}};
     }
 

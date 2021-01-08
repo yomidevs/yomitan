@@ -305,7 +305,7 @@ class Backend {
             try {
                 this._validatePrivilegedMessageSender(sender);
             } catch (error) {
-                callback({error: errorToJson(error)});
+                callback({error: serializeError(error)});
                 return false;
             }
         }
@@ -628,7 +628,7 @@ class Backend {
     }
 
     _onApiLog({error, level, context}) {
-        yomichan.log(jsonToError(error), level, context);
+        yomichan.log(deserializeError(error), level, context);
     }
 
     _onApiLogIndicatorClear() {
@@ -667,7 +667,7 @@ class Backend {
                 const result = this._modifySetting(target);
                 results.push({result: clone(result)});
             } catch (e) {
-                results.push({error: errorToJson(e)});
+                results.push({error: serializeError(e)});
             }
         }
         await this._saveOptions(source);
@@ -681,7 +681,7 @@ class Backend {
                 const result = this._getSetting(target);
                 results.push({result: clone(result)});
             } catch (e) {
-                results.push({error: errorToJson(e)});
+                results.push({error: serializeError(e)});
             }
         }
         return results;
@@ -730,8 +730,10 @@ class Backend {
 
         const isTabMatch = (url2) => {
             if (url2 === null || !url2.startsWith(baseUrl)) { return false; }
-            const {baseUrl: baseUrl2, queryParams: queryParams2} = parseUrl(url2);
-            return baseUrl2 === baseUrl && (queryParams2.mode === mode || (!queryParams2.mode && mode === 'existingOrNewTab'));
+            const parsedUrl = new URL(url2);
+            const baseUrl2 = `${parsedUrl.origin}${parsedUrl.pathname}`;
+            const mode2 = parsedUrl.searchParams.get('mode');
+            return baseUrl2 === baseUrl && (mode2 === mode || (!mode2 && mode === 'existingOrNewTab'));
         };
 
         const openInTab = async () => {
@@ -1052,7 +1054,7 @@ class Backend {
         const cleanup = (error) => {
             if (port === null) { return; }
             if (error !== null) {
-                port.postMessage({type: 'error', data: errorToJson(error)});
+                port.postMessage({type: 'error', data: serializeError(error)});
             }
             if (!hasStarted) {
                 port.onMessage.removeListener(onMessage);

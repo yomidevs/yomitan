@@ -980,6 +980,30 @@ class Translator {
         }
     }
 
+    _areSetsEqual(set1, set2) {
+        if (set1.size !== set2.size) {
+            return false;
+        }
+
+        for (const value of set1) {
+            if (!set2.has(value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    _getSetIntersection(set1, set2) {
+        const result = [];
+        for (const value of set1) {
+            if (set2.has(value)) {
+                result.push(value);
+            }
+        }
+        return result;
+    }
+
     // Reduction functions
 
     _getTermTagsScoreSum(termTags) {
@@ -1181,11 +1205,11 @@ class Translator {
 
     _createMergedGlossaryTermDefinition(source, rawSource, definitions, expressions, readings, allExpressions, allReadings) {
         const only = [];
-        if (!areSetsEqual(expressions, allExpressions)) {
-            only.push(...getSetIntersection(expressions, allExpressions));
+        if (!this._areSetsEqual(expressions, allExpressions)) {
+            only.push(...this._getSetIntersection(expressions, allExpressions));
         }
-        if (!areSetsEqual(readings, allReadings)) {
-            only.push(...getSetIntersection(readings, allReadings));
+        if (!this._areSetsEqual(readings, allReadings)) {
+            only.push(...this._getSetIntersection(readings, allReadings));
         }
 
         const sourceTermExactMatchCount = this._getSourceTermMatchCountSum(definitions);

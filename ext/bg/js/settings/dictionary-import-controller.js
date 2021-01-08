@@ -338,7 +338,7 @@ class DictionaryImportController {
         const errors = [];
         for (const {error} of results) {
             if (typeof error !== 'undefined') {
-                errors.push(jsonToError(error));
+                errors.push(deserializeError(error));
             }
         }
         return errors;

@@ -343,7 +343,7 @@ class OptionsUtil {
 
         const combine = (target, source) => {
             for (const key in source) {
-                if (!hasOwn(target, key)) {
+                if (!Object.prototype.hasOwnProperty.call(target, key)) {
                     target[key] = source[key];
                 }
             }

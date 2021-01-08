@@ -113,7 +113,7 @@ class GenericSettingController {
     _transformResults(values, targets) {
         return values.map((value, i) => {
             const error = value.error;
-            if (error) { return jsonToError(error); }
+            if (error) { return deserializeError(error); }
             const {metadata: {transforms}, element} = targets[i];
             const result = this._applyTransforms(value.result, transforms, 'post', element);
             return {result};

@@ -99,16 +99,11 @@
                 "ext/mixed/js/dictionary-data-util.js"
             ],
             "globals": {
-                "errorToJson": "readonly",
-                "jsonToError": "readonly",
+                "serializeError": "readonly",
+                "deserializeError": "readonly",
                 "isObject": "readonly",
-                "hasOwn": "readonly",
                 "stringReverse": "readonly",
                 "promiseTimeout": "readonly",
-                "parseUrl": "readonly",
-                "areSetsEqual": "readonly",
-                "getSetIntersection": "readonly",
-                "getSetDifference": "readonly",
                 "escapeRegExp": "readonly",
                 "deferPromise": "readonly",
                 "clone": "readonly",

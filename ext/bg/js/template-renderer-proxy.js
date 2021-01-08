@@ -127,7 +127,7 @@ class TemplateRendererProxy {
                 cleanup();
                 const {error} = response;
                 if (error) {
-                    reject(jsonToError(error));
+                    reject(deserializeError(error));
                 } else {
                     resolve(response.result);
                 }
