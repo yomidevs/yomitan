@@ -84,7 +84,8 @@
         {
             "files": [
                 "ext/mixed/js/core.js",
-                "ext/bg/js/template-renderer.js"
+                "ext/bg/js/template-renderer.js",
+                "ext/mixed/js/dictionary-data-util.js"
             ],
             "env": {
                 "webextensions": false
@@ -94,7 +95,8 @@
             "files": ["ext/**/*.js"],
             "excludedFiles": [
                 "ext/mixed/js/core.js",
-                "ext/bg/js/template-renderer.js"
+                "ext/bg/js/template-renderer.js",
+                "ext/mixed/js/dictionary-data-util.js"
             ],
             "globals": {
                 "errorToJson": "readonly",

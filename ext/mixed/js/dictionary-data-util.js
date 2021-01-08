@@ -52,8 +52,8 @@ class DictionaryDataUtil {
                 const exclusiveExpressions = [];
                 const exclusiveReadings = [];
                 const resultExpressions = result.expressions;
-                if (!areSetsEqual(resultExpressions, allExpressions)) {
-                    exclusiveExpressions.push(...getSetIntersection(resultExpressions, allExpressions));
+                if (!this._areSetsEqual(resultExpressions, allExpressions)) {
+                    exclusiveExpressions.push(...this._getSetIntersection(resultExpressions, allExpressions));
                 }
                 if (multipleReadings) {
                     exclusiveReadings.push(result.reading);
@@ -70,6 +70,8 @@ class DictionaryDataUtil {
         }
         return results2;
     }
+
+    // Private
 
     static _findExistingPitchAccentInfo(reading, position, tags, pitchAccentInfoList) {
         for (const pitchInfo of pitchAccentInfoList) {
@@ -97,5 +99,29 @@ class DictionaryDataUtil {
         }
 
         return true;
+    }
+
+    static _areSetsEqual(set1, set2) {
+        if (set1.size !== set2.size) {
+            return false;
+        }
+
+        for (const value of set1) {
+            if (!set2.has(value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    static _getSetIntersection(set1, set2) {
+        const result = [];
+        for (const value of set1) {
+            if (set2.has(value)) {
+                result.push(value);
+            }
+        }
+        return result;
     }
 }
