@@ -58,8 +58,13 @@ class DisplayNotification {
         }
     }
 
-    setContent(text) {
-        this._body.textContent = text;
+    setContent(value) {
+        if (typeof value === 'string') {
+            this._body.textContent = value;
+        } else {
+            this._body.textContent = '';
+            this._body.appendChild(value);
+        }
     }
 
     isClosing() {

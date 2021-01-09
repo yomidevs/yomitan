@@ -699,6 +699,26 @@ button.action-button[data-icon=source-term]::before {
 .tag-inner {
     display: block;
 }
+.tag-details-disambiguation-list::before {
+    content: 'Only: ';
+}
+.tag-details-disambiguation-list ruby>rt {
+    display: inline;
+    font-size: 1em;
+}
+.tag-details-disambiguation-list ruby>rt::before {
+    content: '(';
+}
+.tag-details-disambiguation-list ruby>rt::after {
+    content: ')';
+}
+.tag-details-disambiguation-list[data-unmatched-expression-count='0'],
+.tag-details-disambiguation-list:not([data-unmatched-expression-count]) {
+    display: none;
+}
+.tag-details-disambiguation:not(:last-child)::after {
+    content: ', ';
+}
 
 
 /* Entries */
@@ -755,19 +775,28 @@ button.action-button[data-icon=source-term]::before {
     display: inline;
 }
 .term-expression {
-    display: inline;
+    display: inline-block;
 }
 .term-expression-details {
     display: inline;
 }
 .term-expression-details>.tags {
-    display: inline;
+    display: none;
 }
 .term-expression-details>.frequencies {
     display: none;
 }
 .term-expression-list>.term-expression:not(:last-of-type)>.term-expression-text-container>.term-expression-text::after {
     content: '\3001';
+}
+.term-details {
+    display: inline;
+}
+.term-tags {
+    display: inline;
+}
+.entry[data-expression-multi=true] .term-details {
+    display: block;
 }
 
 

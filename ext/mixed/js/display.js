@@ -837,18 +837,17 @@ class Display extends EventDispatcher {
     }
 
     _onTagClick(e) {
-        const node = e.currentTarget;
-        const {dataset: {details}} = node;
-        this._showTagNotification(details);
+        this._showTagNotification(e.currentTarget);
     }
 
-    _showTagNotification(content) {
+    _showTagNotification(tagNode) {
         if (this._tagNotification === null) {
             const node = this._displayGenerator.createEmptyFooterNotification();
             node.classList.add('click-scannable');
             this._tagNotification = new DisplayNotification(this._tagNotificationContainer, node);
         }
 
+        const content = this._displayGenerator.createTagFooterNotificationDetails(tagNode);
         this._tagNotification.setContent(content);
         this._tagNotification.open();
     }

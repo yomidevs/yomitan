@@ -49,6 +49,7 @@ class DisplayGenerator {
         const pitchesContainer = node.querySelector('.term-pitch-accent-group-list');
         const frequencyGroupListContainer = node.querySelector('.frequency-group-list');
         const definitionsContainer = node.querySelector('.term-definition-list');
+        const termTagsContainer = node.querySelector('.term-tags');
 
         const {expressions, type, reasons, frequencies} = details;
         const definitions = (type === 'term' ? [details] : details.definitions);
@@ -56,6 +57,7 @@ class DisplayGenerator {
         const pitches = DictionaryDataUtil.getPitchAccentInfos(details);
         const pitchCount = pitches.reduce((i, v) => i + v.pitches.length, 0);
         const groupedFrequencies = DictionaryDataUtil.groupTermFrequencies(frequencies);
+        const termTags = DictionaryDataUtil.groupTermTags(details);
 
         const uniqueExpressions = new Set();
         const uniqueReadings = new Set();
@@ -80,6 +82,7 @@ class DisplayGenerator {
         this._appendMultiple(frequencyGroupListContainer, this._createFrequencyGroup.bind(this), groupedFrequencies, false);
         this._appendMultiple(pitchesContainer, this._createPitches.bind(this), pitches);
         this._appendMultiple(definitionsContainer, this._createTermDefinitionItem.bind(this), definitions);
+        this._appendMultiple(termTagsContainer, this._createTermTag.bind(this), termTags, expressions.length);
 
         return node;
     }
@@ -117,6 +120,45 @@ class DisplayGenerator {
 
     createEmptyFooterNotification() {
         return this._templates.instantiate('footer-notification');
+    }
+
+    createTagFooterNotificationDetails(tagNode) {
+        const node = this._templates.instantiateFragment('footer-notification-tag-details');
+
+        const details = tagNode.dataset.details;
+        node.querySelector('.tag-details').textContent = details;
+
+        let disambiguation = null;
+        try {
+            let a = tagNode.dataset.disambiguation;
+            if (typeof a !== 'undefined') {
+                a = JSON.parse(a);
+                if (Array.isArray(a)) { disambiguation = a; }
+            }
+        } catch (e) {
+            // NOP
+        }
+
+        if (disambiguation !== null) {
+            const disambiguationContainer = node.querySelector('.tag-details-disambiguation-list');
+            const copyAttributes = ['totalExpressionCount', 'matchedExpressionCount', 'unmatchedExpressionCount'];
+            for (const attribute of copyAttributes) {
+                const value = tagNode.dataset[attribute];
+                if (typeof value === 'undefined') { continue; }
+                disambiguationContainer.dataset[attribute] = value;
+            }
+            for (const {expression, reading} of disambiguation) {
+                const segments = this._japaneseUtil.distributeFurigana(expression, reading);
+                const disambiguationItem = document.createElement('span');
+                disambiguationItem.className = 'tag-details-disambiguation';
+                this._appendFurigana(disambiguationItem, segments, (container, text) => {
+                    container.appendChild(document.createTextNode(text));
+                });
+                disambiguationContainer.appendChild(disambiguationItem);
+            }
+        }
+
+        return node;
     }
 
     createProfileListItem() {
@@ -318,6 +360,16 @@ class DisplayGenerator {
         node.dataset.category = details.category;
         if (details.redundant) { node.dataset.redundant = 'true'; }
 
+        return node;
+    }
+
+    _createTermTag(details, totalExpressionCount) {
+        const {tag, expressions} = details;
+        const node = this._createTag(tag);
+        node.dataset.disambiguation = `${JSON.stringify(expressions)}`;
+        node.dataset.totalExpressionCount = `${totalExpressionCount}`;
+        node.dataset.matchedExpressionCount = `${expressions.length}`;
+        node.dataset.unmatchedExpressionCount = `${Math.max(0, totalExpressionCount - expressions.length)}`;
         return node;
     }
 

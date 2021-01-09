@@ -16,6 +16,37 @@
  */
 
 class DictionaryDataUtil {
+    static groupTermTags(definition) {
+        const {expressions} = definition;
+        const expressionsLength = expressions.length;
+        const uniqueCheck = (expressionsLength > 1);
+        const resultsMap = new Map();
+        const results = [];
+        for (let i = 0; i < expressionsLength; ++i) {
+            const {termTags, expression, reading} = expressions[i];
+            for (const tag of termTags) {
+                if (uniqueCheck) {
+                    const {name, category, notes, dictionary} = tag;
+                    const key = this._createMapKey([name, category, notes, dictionary]);
+                    const index = resultsMap.get(key);
+                    if (typeof index !== 'undefined') {
+                        const existingItem = results[index];
+                        existingItem.expressions.push({index: i, expression, reading});
+                        continue;
+                    }
+                    resultsMap.set(key, results.length);
+                }
+
+                const item = {
+                    tag,
+                    expressions: [{index: i, expression, reading}]
+                };
+                results.push(item);
+            }
+        }
+        return results;
+    }
+
     static groupTermFrequencies(frequencies) {
         const map1 = new Map();
         for (const {dictionary, expression, reading, hasReading, frequency} of frequencies) {
@@ -26,7 +57,7 @@ class DictionaryDataUtil {
             }
 
             const readingKey = hasReading ? reading : null;
-            const key = JSON.stringify([expression, readingKey], null, 0);
+            const key = this._createMapKey([expression, readingKey]);
             let frequencyData = map2.get(key);
             if (typeof frequencyData === 'undefined') {
                 frequencyData = {expression, reading: readingKey, frequencies: new Set()};
@@ -178,5 +209,9 @@ class DictionaryDataUtil {
             }
         }
         return result;
+    }
+
+    static _createMapKey(array) {
+        return JSON.stringify(array);
     }
 }
