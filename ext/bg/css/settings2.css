@@ -201,6 +201,14 @@ h3 {
     width: 100%;
     align-items: baseline;
 }
+.heading-container a {
+    color: inherit;
+    transition: background-color var(--animation-duration) ease-in-out;
+}
+.heading-container a:hover {
+    color: var(--link-color-hover);
+    text-decoration: none;
+}
 .heading-container-icon {
     flex: 0 0 auto;
     align-self: center;
