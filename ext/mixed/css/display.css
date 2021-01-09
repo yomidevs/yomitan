@@ -1068,6 +1068,10 @@ button.action-button[data-icon=source-term]::before {
 .frequency-disambiguation::after {
     content: ' only) ';
 }
+.frequency-disambiguation-reading {
+    display: inline;
+    font-size: 1em;
+}
 .entry[data-unique-expression-count='1'] .frequency-item[data-has-reading=false] .frequency-disambiguation,
 .entry[data-unique-reading-count='1'][data-unique-expression-count='1'] .frequency-disambiguation,
 .frequency-item[data-reading-is-same=true] .frequency-disambiguation-separator,
