@@ -16,6 +16,48 @@
  */
 
 class DictionaryDataUtil {
+    static groupTermFrequencies(frequencies) {
+        const map1 = new Map();
+        for (const {dictionary, expression, reading, hasReading, frequency} of frequencies) {
+            let map2 = map1.get(dictionary);
+            if (typeof map2 === 'undefined') {
+                map2 = new Map();
+                map1.set(dictionary, map2);
+            }
+
+            const readingKey = hasReading ? reading : null;
+            const key = JSON.stringify([expression, readingKey], null, 0);
+            let frequencyData = map2.get(key);
+            if (typeof frequencyData === 'undefined') {
+                frequencyData = {expression, reading: readingKey, frequencies: new Set()};
+                map2.set(key, frequencyData);
+            }
+
+            frequencyData.frequencies.add(frequency);
+        }
+        return this._createFrequencyGroupsFromMap(map1);
+    }
+
+    static groupKanjiFrequencies(frequencies) {
+        const map1 = new Map();
+        for (const {dictionary, character, frequency} of frequencies) {
+            let map2 = map1.get(dictionary);
+            if (typeof map2 === 'undefined') {
+                map2 = new Map();
+                map1.set(dictionary, map2);
+            }
+
+            let frequencyData = map2.get(character);
+            if (typeof frequencyData === 'undefined') {
+                frequencyData = {character, frequencies: new Set()};
+                map2.set(character, frequencyData);
+            }
+
+            frequencyData.frequencies.add(frequency);
+        }
+        return this._createFrequencyGroupsFromMap(map1);
+    }
+
     static getPitchAccentInfos(definition) {
         if (definition.type === 'kanji') { return []; }
 
@@ -72,6 +114,19 @@ class DictionaryDataUtil {
     }
 
     // Private
+
+    static _createFrequencyGroupsFromMap(map) {
+        const results = [];
+        for (const [dictionary, map2] of map.entries()) {
+            const frequencyDataArray = [];
+            for (const frequencyData of map2.values()) {
+                frequencyData.frequencies = [...frequencyData.frequencies];
+                frequencyDataArray.push(frequencyData);
+            }
+            results.push({dictionary, frequencyData: frequencyDataArray});
+        }
+        return results;
+    }
 
     static _findExistingPitchAccentInfo(reading, position, tags, pitchAccentInfoList) {
         for (const pitchInfo of pitchAccentInfoList) {

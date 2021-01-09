@@ -249,6 +249,12 @@ h3 {
     margin: 0.25em 0 0.375em;
     padding: 0;
 }
+h5 {
+    font-size: calc(12em / 14);
+    margin: 0;
+    padding: 0;
+    font-weight: normal;
+}
 a {
     color: var(--link-color);
     text-decoration: underline;
@@ -693,27 +699,6 @@ button.action-button[data-icon=source-term]::before {
 .tag-inner {
     display: block;
 }
-.tag-frequency-separator::before {
-    content: ':';
-}
-.tag-frequency-disambiguation-separator::before {
-    content: ':';
-}
-.tag-frequency-disambiguation::before {
-    content: '(';
-}
-.tag-frequency-disambiguation::after {
-    content: ') ';
-}
-.frequencies .tag[data-reading-is-same=true] .tag-frequency-disambiguation-separator,
-.frequencies .tag[data-reading-is-same=true] .tag-frequency-disambiguation-reading,
-.entry[data-unique-expression-count='1'] .tag-frequency-disambiguation-separator,
-.entry[data-unique-expression-count='1'] .tag-frequency-disambiguation-expression,
-.entry[data-unique-reading-count='1'] .tag-frequency-disambiguation-separator,
-.entry[data-unique-reading-count='1'] .tag-frequency-disambiguation-reading,
-.entry[data-unique-expression-count='1'][data-unique-reading-count='1'] .tag-frequency-disambiguation {
-    display: none;
-}
 
 
 /* Entries */
@@ -949,16 +934,6 @@ button.action-button[data-icon=source-term]::before {
     bottom: -0.5em;
     white-space: nowrap;
 }
-.entry[data-expression-multi=true] .term-expression-list .term-expression-details>.frequencies {
-    display: block;
-    position: absolute;
-    left: 0;
-    bottom: -1.9em;
-    white-space: nowrap;
-}
-.entry[data-expression-multi=true] .term-expression-list .term-expression-details>.frequencies .tag-frequency-disambiguation {
-    display: none;
-}
 
 
 /* Definitions */
@@ -1008,24 +983,106 @@ button.action-button[data-icon=source-term]::before {
     opacity: 0;
     white-space: pre-wrap;
 }
-.term-special-tags>.frequencies {
-    display: inline;
+.entry-body {
+    margin-top: -0.5em;
 }
-.term-entry-body[data-section-count='0'] .term-entry-body-section-header,
-.term-entry-body[data-section-count='1'] .term-entry-body-section-header {
+.entry-body-section {
+    margin-top: 0.5em;
+}
+.entry[data-definition-count='0'] .entry-body-section[data-section-type=definitions],
+.entry[data-frequency-count='0'] .entry-body-section[data-section-type=frequencies],
+.entry[data-pitch-accent-count='0'] .entry-body-section[data-section-type=pitch-accents] {
     display: none;
+}
+.entry[data-pitch-accent-count='0'][data-frequency-count='0'] .entry-body-section[data-section-type=definitions]>h5 {
+    display: none;
+}
+
+
+/* Frequencies */
+.frequency-group-list {
+    margin: 0;
+    padding: 0 0 0 var(--list-padding1);
+    list-style-type: decimal;
+}
+.frequency-group-list[data-count='0'],
+.frequency-group-list[data-count='1'] {
+    padding-left: 0;
+    list-style-type: none;
+}
+.frequency-list {
+    margin: 0;
+    padding: 0 0 0 var(--list-padding2);
+    list-style-type: circle;
+}
+.frequency-list[data-count='0'],
+.frequency-list[data-count='1'] {
+    padding-left: 0;
+    list-style-type: none;
+}
+.frequency-group-item::marker,
+.frequency-item::marker {
+    color: var(--text-color-light);
+}
+.frequency-disambiguation {
+    color: var(--text-color-light);
+}
+.frequency-separator::before {
+    content: '';
+}
+.frequency-disambiguation-separator::before {
+    content: ':';
+}
+.frequency-disambiguation::before {
+    content: '(';
+}
+.frequency-disambiguation::after {
+    content: ' only) ';
+}
+.entry[data-unique-expression-count='1'] .frequency-item[data-has-reading=false] .frequency-disambiguation,
+.entry[data-unique-reading-count='1'][data-unique-expression-count='1'] .frequency-disambiguation,
+.frequency-item[data-reading-is-same=true] .frequency-disambiguation-separator,
+.frequency-item[data-reading-is-same=true] .frequency-disambiguation-reading,
+.frequency-item[data-has-reading=false] .frequency-disambiguation-separator,
+.frequency-item[data-has-reading=false] .frequency-disambiguation-reading,
+.entry[data-unique-expression-count='1'] .frequency-disambiguation-separator,
+.entry[data-unique-expression-count='1'] .frequency-disambiguation-expression,
+.entry[data-unique-reading-count='1'] .frequency-disambiguation-separator,
+.entry[data-unique-reading-count='1'] .frequency-disambiguation-reading {
+    display: none;
+}
+:root[data-glossary-layout-mode=compact] .frequency-group-list,
+:root[data-glossary-layout-mode=compact] .frequency-list,
+.frequency-list[data-count='1'] {
+    display: inline;
+    list-style: none;
+    padding-left: 0;
+}
+:root[data-glossary-layout-mode=compact] .frequency-group-item {
+    display: inline-block;
+    margin-right: 1em;
+}
+:root[data-glossary-layout-mode=compact] .entry-body-section[data-section-type=frequencies] {
+    margin-right: -1em;
+}
+:root[data-glossary-layout-mode=compact] .frequency-item,
+.frequency-list[data-count='1'] .frequency-item {
+    display: inline-block;
+}
+:root[data-glossary-layout-mode=compact] .frequency-item:not(:first-child)::before,
+.frequency-list[data-count='1'] .frequency-item:not(:first-child)::before {
+    white-space: pre-wrap;
+    content: var(--compact-list-separator);
+    display: inline;
+    color: var(--text-color-light);
+}
+:root[data-glossary-layout-mode=compact] .frequency-tag-list,
+.frequency-group-item[data-count='1'] .frequency-tag-list {
+    display: inline;
 }
 
 
 /* Pitch accent styles */
-.entry[data-pitch-accent-count='0'] .term-pitch-accent-container {
-    display: none;
-}
-.term-pitch-accent-container {
-    border-bottom: var(--thin-border-size) solid var(--light-border-color);
-    padding-bottom: 0.25em;
-    margin-bottom: 0.25em;
-}
 .term-pitch-accent-group-list {
     margin: 0;
     padding: 0 0 0 var(--list-padding1);
@@ -1582,17 +1639,15 @@ button.footer-notification-close-button:active {
     display: inline;
     color: var(--text-color-light);
 }
-:root[data-glossary-layout-mode=compact] .entry:not([data-expression-multi=true]) .term-special-tags {
+
+:root[data-glossary-layout-mode=compact] .entry-body-section>h5 {
     display: none;
 }
-:root[data-glossary-layout-mode=compact] .term-expression-details>.frequencies {
-    display: inline;
+:root[data-glossary-layout-mode=compact] .entry-body {
+    margin-top: 0;
 }
-
-:root[data-glossary-layout-mode=compact] .term-pitch-accent-container {
-    border-bottom: none;
-    padding-bottom: 0;
-    margin-bottom: 0;
+:root[data-glossary-layout-mode=compact] .entry-body-section {
+    margin-top: 0;
 }
 :root[data-show-pitch-accent-downstep-notation=true] .term-pitch-accent-disambiguation-list[data-expression-count='0'],
 :root[data-show-pitch-accent-downstep-notation=true] .term-pitch-accent-disambiguation[data-type=reading] {

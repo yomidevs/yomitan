@@ -17,11 +17,20 @@
             </div>
             <div class="term-reasons"></div>
         </div>
-        <div class="term-special-tags"><div class="frequencies tag-list"></div></div>
     </div>
-    <div class="term-entry-body">
-        <div class="term-entry-body-section term-pitch-accent-container"><ol class="term-entry-body-section-content term-pitch-accent-group-list"></ol></div>
-        <div class="term-entry-body-section term-definition-container"><ol class="term-entry-body-section-content term-definition-list"></ol></div>
+    <div class="entry-body">
+        <div class="entry-body-section" data-section-type="frequencies">
+            <h5>Frequencies</h5>
+            <ol class="entry-body-section-content frequency-group-list"></ol>
+        </div>
+        <div class="entry-body-section" data-section-type="pitch-accents">
+            <h5>Pitch Accents</h5>
+            <ol class="entry-body-section-content term-pitch-accent-group-list"></ol>
+        </div>
+        <div class="entry-body-section" data-section-type="definitions">
+            <h5>Definitions</h5>
+            <ol class="entry-body-section-content term-definition-list"></ol>
+        </div>
     </div>
     <div class="debug-info"><a class="debug-log-link">Log debug info to console</a></div>
 </div></template>
@@ -34,7 +43,6 @@
     <div class="term-expression-details">
         <button class="action-button action-play-audio" data-icon="play-audio" title="Play audio"></button>
         <div class="tags tag-list"></div>
-        <div class="frequencies tag-list"></div>
     </div>
 </div></template>
 <template id="term-definition-item-template"><li class="term-definition-item"><div class="term-definition-tag-list tag-list"></div><div class="term-definition-disambiguation-list"></div><ul class="term-glossary-list"></ul></li></template>
@@ -42,6 +50,21 @@
 <template id="term-glossary-item-template"><li class="term-glossary-item click-scannable"><span class="term-glossary-separator"> </span><span class="term-glossary"></span></li></template>
 <template id="term-glossary-item-image-template"><li class="term-glossary-item click-scannable" data-has-image="true"><span class="term-glossary-separator"> </span><span class="term-glossary"><a class="term-glossary-image-link" target="_blank" rel="noreferrer noopener"><span class="term-glossary-image-container"><span class="term-glossary-image-aspect-ratio-sizer"></span><img class="term-glossary-image" alt="" /><span class="term-glossary-image-container-overlay"></span></span><span class="term-glossary-image-link-text">Image</span></a> <span class="term-glossary-image-description"></span></span></li></template>
 <template id="term-reason-template"><span class="term-reason"></span><span class="term-reason-separator"> </span></template>
+
+<!-- Frequency templates -->
+<template id="frequency-group-item-template"><li class="frequency-group-item"><div class="frequency-tag-list tag-list"></div><ul class="frequency-list"></ul></li></template>
+<template id="term-frequency-item-template" data-remove-whitespace-text="true"><li class="frequency-item" data-frequency-type="term">
+    <span class="frequency-disambiguation">
+        <span class="frequency-disambiguation-expression"></span>
+        <span class="frequency-disambiguation-separator"></span>
+        <span class="frequency-disambiguation-reading"></span>
+    </span>
+    <span class="frequency-separator"></span>
+    <span class="frequency-value"></span>
+</li></template>
+<template id="kanji-frequency-item-template" data-remove-whitespace-text="true"><li class="frequency-item" data-frequency-type="kanji">
+    <span class="frequency-value"></span>
+</li></template>
 
 <!-- Pitch accent templates -->
 <template id="term-pitch-accent-static-template"><svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -73,9 +96,13 @@
                 </div>
             </div>
         </div>
-        <div class="frequencies"></div>
     </div>
     <div class="tags tag-list"></div>
+    <div class="entry-body">
+        <div class="entry-body-section" data-section-type="frequencies">
+            <ol class="entry-body-section-content frequency-group-list"></ol>
+        </div>
+    </div>
     <table class="kanji-glyph-data"><tbody>
         <tr>
             <th>Glossary</th>
@@ -104,25 +131,6 @@
 
 <!-- Tag templates -->
 <template id="tag-template"><span class="tag"><span class="tag-inner"></span></span></template>
-<template id="term-tag-frequency-template" data-remove-whitespace-text="true"><span class="tag" data-category="frequency">
-    <span class="tag-inner">
-        <span class="tag-frequency-disambiguation">
-            <span class="tag-frequency-disambiguation-expression"></span>
-            <span class="tag-frequency-disambiguation-separator"></span>
-            <span class="tag-frequency-disambiguation-reading"></span>
-        </span>
-        <span class="tag-frequency-dictionary-name"></span>
-        <span class="tag-frequency-separator"></span>
-        <span class="tag-frequency-value"></span>
-    </span>
-</span></template>
-<template id="kanji-tag-frequency-template" data-remove-whitespace-text="true"><span class="tag" data-category="frequency">
-    <span class="tag-inner">
-        <span class="tag-frequency-dictionary-name"></span>
-        <span class="tag-frequency-separator"></span>
-        <span class="tag-frequency-value"></span>
-    </span>
-</span></template>
 
 <!-- Extra -->
 <template id="footer-notification-template"><div class="footer-notification">
