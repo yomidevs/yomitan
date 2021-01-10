@@ -846,13 +846,72 @@
                             "sentenceParsing": {
                                 "type": "object",
                                 "required": [
-                                    "scanExtent"
+                                    "scanExtent",
+                                    "enableTerminationCharacters",
+                                    "terminationCharacters"
                                 ],
                                 "properties": {
                                     "scanExtent": {
                                         "type": "integer",
                                         "minimum": 0,
                                         "default": 200
+                                    },
+                                    "enableTerminationCharacters": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
+                                    "terminationCharacters": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "required": [
+                                                "enabled",
+                                                "character1",
+                                                "character2",
+                                                "includeCharacterAtStart",
+                                                "includeCharacterAtEnd"
+                                            ],
+                                            "properties": {
+                                                "enabled": {
+                                                    "type": "boolean",
+                                                    "default": true
+                                                },
+                                                "character1": {
+                                                    "type": "string",
+                                                    "default": "\"",
+                                                    "minLength": 1,
+                                                    "maxLength": 1
+                                                },
+                                                "character2": {
+                                                    "type": ["string", "null"],
+                                                    "default": "\"",
+                                                    "minLength": 1,
+                                                    "maxLength": 1
+                                                },
+                                                "includeCharacterAtStart": {
+                                                    "type": "boolean",
+                                                    "default": false
+                                                },
+                                                "includeCharacterAtEnd": {
+                                                    "type": "boolean",
+                                                    "default": false
+                                                }
+                                            }
+                                        },
+                                        "default": [
+                                            {"enabled": true, "character1": "「", "character2": "」", "includeCharacterAtStart": false, "includeCharacterAtEnd": false},
+                                            {"enabled": true, "character1": "『", "character2": "』", "includeCharacterAtStart": false, "includeCharacterAtEnd": false},
+                                            {"enabled": true, "character1": "\"", "character2": "\"", "includeCharacterAtStart": false, "includeCharacterAtEnd": false},
+                                            {"enabled": true, "character1": "'", "character2": "'", "includeCharacterAtStart": false, "includeCharacterAtEnd": false},
+                                            {"enabled": true, "character1": ".", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
+                                            {"enabled": true, "character1": "!", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
+                                            {"enabled": true, "character1": "?", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
+                                            {"enabled": true, "character1": "．", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
+                                            {"enabled": true, "character1": "。", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
+                                            {"enabled": true, "character1": "！", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
+                                            {"enabled": true, "character1": "？", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true},
+                                            {"enabled": true, "character1": "…", "character2": null, "includeCharacterAtStart": false, "includeCharacterAtEnd": true}
+                                        ]
                                     }
                                 }
                             }

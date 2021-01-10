@@ -181,8 +181,29 @@ async function testDocumentTextScanningFunctions(dom, {DocumentUtil, TextSourceR
         }
         if (source === null) { continue; }
 
+        // Sentence info
+        const terminatorString = '…。．.？?！!';
+        const terminatorMap = new Map();
+        for (const char of terminatorString) {
+            terminatorMap.set(char, [false, true]);
+        }
+        const quoteArray = [['「', '」'], ['『', '』'], ['\'', '\''], ['"', '"']];
+        const forwardQuoteMap = new Map();
+        const backwardQuoteMap = new Map();
+        for (const [char1, char2] of quoteArray) {
+            forwardQuoteMap.set(char1, [char2, false]);
+            backwardQuoteMap.set(char2, [char1, false]);
+        }
+
         // Test docSentenceExtract
-        const sentenceActual = documentUtil.extractSentence(source, false, sentenceScanExtent).text;
+        const sentenceActual = documentUtil.extractSentence(
+            source,
+            false,
+            sentenceScanExtent,
+            terminatorMap,
+            forwardQuoteMap,
+            backwardQuoteMap
+        ).text;
         assert.strictEqual(sentenceActual, sentence);
 
         // Clean

@@ -24,24 +24,6 @@
 class DocumentUtil {
     constructor() {
         this._transparentColorPattern = /rgba\s*\([^)]*,\s*0(?:\.0+)?\s*\)/;
-
-        const quoteArray = [
-            ['「', '」'],
-            ['『', '』'],
-            ['\'', '\''],
-            ['"', '"']
-        ];
-        const terminatorString = '…。．.？?！!';
-        this._terminatorMap = new Map();
-        for (const char of terminatorString) {
-            this._terminatorMap.set(char, [false, true]);
-        }
-        this._forwardQuoteMap = new Map();
-        this._backwardQuoteMap = new Map();
-        for (const [char1, char2] of quoteArray) {
-            this._forwardQuoteMap.set(char1, [char2, false]);
-            this._backwardQuoteMap.set(char2, [char1, false]);
-        }
     }
 
     getRangeFromPoint(x, y, deepContentScan) {
@@ -81,11 +63,30 @@ class DocumentUtil {
         }
     }
 
-    extractSentence(source, layoutAwareScan, extent) {
-        const terminatorMap = this._terminatorMap;
-        const forwardQuoteMap = this._forwardQuoteMap;
-        const backwardQuoteMap = this._backwardQuoteMap;
-
+    /**
+     * Extract a sentence from a document.
+     * @param source The text source object, either `TextSourceRange` or `TextSourceElement`.
+     * @param layoutAwareScan Whether or not layout-aware scan mode should be used.
+     * @param extent The length of the sentence to extract.
+     * @param terminatorMap A mapping of characters that terminate a sentence.
+     *   Format:
+     *   ```js
+     *   new Map([ [character: string, [includeCharacterAtStart: boolean, includeCharacterAtEnd: boolean]], ... ])
+     *   ```
+     * @param forwardQuoteMap A mapping of quote characters that delimit a sentence.
+     *   Format:
+     *   ```js
+     *   new Map([ [character: string, [otherCharacter: string, includeCharacterAtStart: boolean]], ... ])
+     *   ```
+     * @param backwardQuoteMap A mapping of quote characters that delimit a sentence,
+     *   which is the inverse of forwardQuoteMap.
+     *   Format:
+     *   ```js
+     *   new Map([ [character: string, [otherCharacter: string, includeCharacterAtEnd: boolean]], ... ])
+     *   ```
+     * @returns The sentence and the offset to the original source: `{sentence: string, offset: integer}`.
+     */
+    extractSentence(source, layoutAwareScan, extent, terminatorMap, forwardQuoteMap, backwardQuoteMap) {
         // Scan text
         source = source.clone();
         const startLength = source.setStartOffset(extent, layoutAwareScan);

@@ -326,9 +326,9 @@ class Frontend {
             touchInputEnabled: scanningOptions.touchInputEnabled,
             pointerEventsEnabled: scanningOptions.pointerEventsEnabled,
             scanLength: scanningOptions.length,
-            sentenceScanExtent: sentenceParsingOptions.scanExtent,
             layoutAwareScan: scanningOptions.layoutAwareScan,
-            preventMiddleMouse
+            preventMiddleMouse,
+            sentenceParsingOptions
         });
         this._updateTextScannerEnabled();
 

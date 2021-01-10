@@ -1856,6 +1856,81 @@ input.translation-text-replacement-test-output {
     display: none;
 }
 
+.sentence-termination-character-list-table {
+    width: 100%;
+    table-layout: fixed;
+    border-spacing: 0.25em;
+    margin-top: 0.5em;
+    min-width: 400px;
+}
+.sentence-termination-character-list-table thead td {
+    white-space: nowrap;
+    font-size: var(--font-size-small);
+    line-height: 1;
+    text-align: left;
+    vertical-align: bottom;
+    font-weight: normal;
+}
+.sentence-termination-character-list-table td {
+    vertical-align: middle;
+    padding: 0;
+}
+.sentence-termination-character-list-table td:nth-child(1) {
+    width: 2em;
+}
+.sentence-termination-character-list-table td:nth-child(2) {
+    width: 4em;
+}
+.sentence-termination-character-list-table td:nth-child(3) {
+    width: 25%;
+}
+.sentence-termination-character-list-table td:nth-child(4) {
+    width: 18.5%;
+}
+.sentence-termination-character-list-table td:nth-child(5) {
+    width: 18.5%;
+}
+.sentence-termination-character-list-table td:nth-child(6) {
+    width: 40%;
+}
+.sentence-termination-character-list-table td:nth-child(7) {
+    width: 3em;
+}
+select.sentence-termination-character-type,
+input.sentence-termination-character-input1,
+input.sentence-termination-character-input2 {
+    width: 100%;
+}
+.sentence-termination-character-input2-alt {
+    text-align: center;
+}
+.sentence-termination-character-entry:not([data-type=quote]) .sentence-termination-character-input2 {
+    display: none;
+}
+.sentence-termination-character-entry[data-type=quote] .sentence-termination-character-input2-alt {
+    display: none;
+}
+.sentence-termination-character-include-list {
+    display: flex;
+    flex-flow: row nowrap;
+}
+.sentence-termination-character-include {
+    display: flex;
+    flex-flow: row nowrap;
+    white-space: nowrap;
+    align-items: center;
+}
+.sentence-termination-character-include>:first-child {
+    margin-right: 0.375em;
+}
+.sentence-termination-character-include+.sentence-termination-character-include {
+    margin-left: 1em;
+}
+#sentence-termination-character-list-empty {
+    flex: 0 1 auto;
+    margin-top: 0.5em;
+}
+
 
 /* Generic layouts */
 .margin-above {

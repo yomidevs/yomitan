@@ -32,6 +32,7 @@
  * ScanInputsController
  * ScanInputsSimpleController
  * SecondarySearchDictionaryController
+ * SentenceTerminationCharactersController
  * SettingsController
  * SettingsDisplayController
  * StatusFooter
@@ -123,6 +124,9 @@ async function setupGenericSettingsController(genericSettingController) {
 
         const translationTextReplacementsController = new TranslationTextReplacementsController(settingsController);
         translationTextReplacementsController.prepare();
+
+        const sentenceTerminationCharactersController = new SentenceTerminationCharactersController(settingsController);
+        sentenceTerminationCharactersController.prepare();
 
         await Promise.all(preparePromises);
 

@@ -684,13 +684,30 @@ class OptionsUtil {
         // Version 8 changes:
         //  Added translation.textReplacements.
         //  Moved anki.sentenceExt to sentenceParsing.scanExtent.
+        //  Added sentenceParsing.enableTerminationCharacters.
+        //  Added sentenceParsing.terminationCharacters.
         for (const profile of options.profiles) {
             profile.options.translation.textReplacements = {
                 searchOriginal: true,
                 groups: []
             };
             profile.options.sentenceParsing = {
-                scanExtent: profile.options.anki.sentenceExt
+                scanExtent: profile.options.anki.sentenceExt,
+                enableTerminationCharacters: true,
+                terminationCharacters: [
+                    {enabled: true, character1: '「', character2: '」', includeCharacterAtStart: false, includeCharacterAtEnd: false},
+                    {enabled: true, character1: '『', character2: '』', includeCharacterAtStart: false, includeCharacterAtEnd: false},
+                    {enabled: true, character1: '"', character2: '"', includeCharacterAtStart: false, includeCharacterAtEnd: false},
+                    {enabled: true, character1: '\'', character2: '\'', includeCharacterAtStart: false, includeCharacterAtEnd: false},
+                    {enabled: true, character1: '.', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
+                    {enabled: true, character1: '!', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
+                    {enabled: true, character1: '?', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
+                    {enabled: true, character1: '．', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
+                    {enabled: true, character1: '。', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
+                    {enabled: true, character1: '！', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
+                    {enabled: true, character1: '？', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
+                    {enabled: true, character1: '…', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true}
+                ]
             };
             delete profile.options.anki.sentenceExt;
         }

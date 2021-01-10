@@ -1125,29 +1125,31 @@
         </div>
     </div>
     <div class="settings-group advanced-only">
-        <div class="settings-item">
-            <div class="settings-item-inner settings-item-inner-wrappable">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        Sentence scanning extent
-                        <a class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                    </div>
-                </div>
-                <div class="settings-item-right">
-                    <input type="number" data-setting="sentenceParsing.scanExtent" min="0" step="1">
-                </div>
+        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Sentence scanning extent</div>
+                <div class="settings-item-description">Adjust how many characters are bidirectionally scanned to form a sentence.</div>
             </div>
-            <div class="settings-item-children more" hidden>
-                <p>
-                    This option controls the maximum scanning distance used to determine the bounds of a sentence,
-                    in number of characters.
-                    Sentence scanning is bidirectional and begins from both the start and end of the source term.
-                </p>
-                <p>
-                    <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
-                </p>
+            <div class="settings-item-right">
+                <input type="number" data-setting="sentenceParsing.scanExtent" min="0" step="1">
             </div>
-        </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Enable sentence termination characters</div>
+            </div>
+            <div class="settings-item-right">
+                <label class="toggle"><input type="checkbox" data-setting="sentenceParsing.enableTerminationCharacters"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+            </div>
+        </div></div>
+        <div class="settings-item settings-item-button" data-modal-action="show,sentence-termination-characters"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Configure sentence termination characters&hellip;</div>
+            </div>
+            <div class="settings-item-right open-panel-button-container">
+                <button class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
+            </div>
+        </div></div>
     </div>
 
     <!-- Translation -->
@@ -2725,6 +2727,86 @@
 </div></div></template>
 
 
+<!-- Sentence parsing modal -->
+<div id="sentence-termination-characters" class="modal-container" tabindex="-1" role="dialog" hidden><div class="modal-content">
+    <div class="modal-header">
+        <div class="modal-title">Sentence Termination Characters</div>
+        <div class="modal-header-button-container">
+            <div class="modal-header-button-group">
+                <button class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                <button class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-body">
+        <p>
+            Sentences are terminated by punctuation and quotation marks, which can both be configured below.
+        </p>
+        <table class="sentence-termination-character-list-table" id="sentence-termination-character-list-table" hidden>
+            <thead><tr>
+                <td>#</td>
+                <td>Enabled</td>
+                <td>Type</td>
+                <td>Character 1</td>
+                <td>Character 2</td>
+                <td>Include character in sentence</td>
+                <td></td>
+            </tr></thead>
+            <tbody class="sentence-termination-character-list generic-list" id="sentence-termination-character-list"></tbody>
+        </table>
+        <div id="sentence-termination-character-list-empty" hidden>
+            No terminators defined.
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="low-emphasis danger" id="sentence-termination-character-list-reset">Reset</button>
+        <button class="low-emphasis" id="sentence-termination-character-list-add">Add</button>
+        <button data-modal-action="hide">Close</button>
+    </div>
+</div></div>
+
+
+<!-- Sentence parsing templates -->
+<template id="sentence-termination-character-entry-template"><tr class="sentence-termination-character-entry">
+    <td class="generic-list-index-prefix"></td>
+    <td>
+        <label class="toggle"><input type="checkbox" class="sentence-termination-character-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+    </td>
+    <td>
+        <select class="sentence-termination-character-type">
+            <option value="terminator">Terminator</option>
+            <option value="quote">Quote</option>
+        </select>
+    </td>
+    <td>
+        <input type="text" class="sentence-termination-character-input1" maxlength="1">
+    </td>
+    <td>
+        <input type="text" class="sentence-termination-character-input2" maxlength="1">
+        <div class="sentence-termination-character-input2-alt">&mdash;</div>
+    </td>
+    <td>
+        <div class="sentence-termination-character-include-list">
+            <label class="sentence-termination-character-include">
+                <label class="checkbox"><input type="checkbox" class="sentence-termination-character-include-at-start"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>At start</span>
+            </label>
+            <label class="sentence-termination-character-include">
+                <label class="checkbox"><input type="checkbox" class="sentence-termination-character-include-at-end"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <span>At end</span>
+            </label>
+        </div>
+    </td>
+    <td>
+        <button class="icon-button sentence-termination-character-entry-button" data-menu="sentence-termination-character-entry-menu" data-menu-position="below,left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
+    </td>
+</tr></template>
+
+<template id="sentence-termination-character-entry-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu">
+    <button class="popup-menu-item" data-menu-action="delete">Delete</button>
+</div></div></template>
+
+
 <!-- Scripts -->
 <script src="/mixed/lib/jszip.min.js"></script>
 <script src="/mixed/lib/wanakana.min.js"></script>
@@ -2783,6 +2865,7 @@
 
 <script src="/bg/js/settings2/nested-popups-controller.js"></script>
 <script src="/bg/js/settings2/secondary-search-dictionary-controller.js"></script>
+<script src="/bg/js/settings2/sentence-termination-characters-controller.js"></script>
 <script src="/bg/js/settings2/settings-display-controller.js"></script>
 <script src="/bg/js/settings2/translation-text-replacements-controller.js"></script>
 

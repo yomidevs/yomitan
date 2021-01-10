@@ -327,9 +327,9 @@ class Display extends EventDispatcher {
                 touchInputEnabled: scanningOptions.touchInputEnabled,
                 pointerEventsEnabled: scanningOptions.pointerEventsEnabled,
                 scanLength: scanningOptions.length,
-                sentenceScanExtent: sentenceParsingOptions.scanExtent,
                 layoutAwareScan: scanningOptions.layoutAwareScan,
-                preventMiddleMouse: scanningOptions.preventMiddleMouse.onSearchQuery
+                preventMiddleMouse: scanningOptions.preventMiddleMouse.onSearchQuery,
+                sentenceParsingOptions
             }
         });
 
@@ -1832,9 +1832,9 @@ class Display extends EventDispatcher {
             touchInputEnabled: false,
             pointerEventsEnabled: false,
             scanLength: scanningOptions.length,
-            sentenceScanExtent: sentenceParsingOptions.scanExtent,
             layoutAwareScan: scanningOptions.layoutAwareScan,
-            preventMiddleMouse: false
+            preventMiddleMouse: false,
+            sentenceParsingOptions
         });
 
         this._definitionTextScanner.setEnabled(true);

@@ -59,9 +59,12 @@ class TextScanner extends EventDispatcher {
         this._touchInputEnabled = false;
         this._pointerEventsEnabled = false;
         this._scanLength = 1;
-        this._sentenceScanExtent = 1;
         this._layoutAwareScan = false;
         this._preventMiddleMouse = false;
+        this._sentenceScanExtent = 0;
+        this._sentenceTerminatorMap = new Map();
+        this._sentenceForwardQuoteMap = new Map();
+        this._sentenceBackwardQuoteMap = new Map();
         this._inputs = [];
 
         this._enabled = false;
@@ -142,9 +145,9 @@ class TextScanner extends EventDispatcher {
         touchInputEnabled,
         pointerEventsEnabled,
         scanLength,
-        sentenceScanExtent,
         layoutAwareScan,
-        preventMiddleMouse
+        preventMiddleMouse,
+        sentenceParsingOptions
     }) {
         if (Array.isArray(inputs)) {
             this._inputs = inputs.map(({
@@ -193,14 +196,37 @@ class TextScanner extends EventDispatcher {
         if (typeof scanLength === 'number') {
             this._scanLength = scanLength;
         }
-        if (typeof sentenceScanExtent === 'number') {
-            this._sentenceScanExtent = sentenceScanExtent;
-        }
         if (typeof layoutAwareScan === 'boolean') {
             this._layoutAwareScan = layoutAwareScan;
         }
         if (typeof preventMiddleMouse === 'boolean') {
             this._preventMiddleMouse = preventMiddleMouse;
+        }
+        if (typeof sentenceParsingOptions === 'object' && sentenceParsingOptions !== null) {
+            const {scanExtent, enableTerminationCharacters, terminationCharacters} = sentenceParsingOptions;
+            const hasTerminationCharacters = (typeof terminationCharacters === 'object' && Array.isArray(terminationCharacters));
+            if (typeof scanExtent === 'number') {
+                this._sentenceScanExtent = sentenceParsingOptions.scanExtent;
+            }
+            if (typeof enableTerminationCharacters === 'boolean' || hasTerminationCharacters) {
+                const sentenceTerminatorMap = this._sentenceTerminatorMap;
+                const sentenceForwardQuoteMap = this._sentenceForwardQuoteMap;
+                const sentenceBackwardQuoteMap = this._sentenceBackwardQuoteMap;
+                sentenceTerminatorMap.clear();
+                sentenceForwardQuoteMap.clear();
+                sentenceBackwardQuoteMap.clear();
+                if (enableTerminationCharacters !== false && hasTerminationCharacters) {
+                    for (const {enabled, character1, character2, includeCharacterAtStart, includeCharacterAtEnd} of terminationCharacters) {
+                        if (!enabled) { continue; }
+                        if (character2 === null) {
+                            sentenceTerminatorMap.set(character1, [includeCharacterAtStart, includeCharacterAtEnd]);
+                        } else {
+                            sentenceForwardQuoteMap.set(character1, [character2, includeCharacterAtStart]);
+                            sentenceBackwardQuoteMap.set(character2, [character1, includeCharacterAtEnd]);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -723,6 +749,9 @@ class TextScanner extends EventDispatcher {
     async _findTerms(textSource, optionsContext) {
         const scanLength = this._scanLength;
         const sentenceScanExtent = this._sentenceScanExtent;
+        const sentenceTerminatorMap = this._sentenceTerminatorMap;
+        const sentenceForwardQuoteMap = this._sentenceForwardQuoteMap;
+        const sentenceBackwardQuoteMap = this._sentenceBackwardQuoteMap;
         const layoutAwareScan = this._layoutAwareScan;
         const searchText = this.getTextSourceContent(textSource, scanLength, layoutAwareScan);
         if (searchText.length === 0) { return null; }
@@ -731,13 +760,23 @@ class TextScanner extends EventDispatcher {
         if (definitions.length === 0) { return null; }
 
         textSource.setEndOffset(length, layoutAwareScan);
-        const sentence = this._documentUtil.extractSentence(textSource, layoutAwareScan, sentenceScanExtent);
+        const sentence = this._documentUtil.extractSentence(
+            textSource,
+            layoutAwareScan,
+            sentenceScanExtent,
+            sentenceTerminatorMap,
+            sentenceForwardQuoteMap,
+            sentenceBackwardQuoteMap
+        );
 
         return {definitions, sentence, type: 'terms'};
     }
 
     async _findKanji(textSource, optionsContext) {
         const sentenceScanExtent = this._sentenceScanExtent;
+        const sentenceTerminatorMap = this._sentenceTerminatorMap;
+        const sentenceForwardQuoteMap = this._sentenceForwardQuoteMap;
+        const sentenceBackwardQuoteMap = this._sentenceBackwardQuoteMap;
         const layoutAwareScan = this._layoutAwareScan;
         const searchText = this.getTextSourceContent(textSource, 1, layoutAwareScan);
         if (searchText.length === 0) { return null; }
@@ -746,7 +785,14 @@ class TextScanner extends EventDispatcher {
         if (definitions.length === 0) { return null; }
 
         textSource.setEndOffset(1, layoutAwareScan);
-        const sentence = this._documentUtil.extractSentence(textSource, layoutAwareScan, sentenceScanExtent);
+        const sentence = this._documentUtil.extractSentence(
+            textSource,
+            layoutAwareScan,
+            sentenceScanExtent,
+            sentenceTerminatorMap,
+            sentenceForwardQuoteMap,
+            sentenceBackwardQuoteMap
+        );
 
         return {definitions, sentence, type: 'kanji'};
     }
