@@ -24,6 +24,20 @@
 class DocumentUtil {
     constructor() {
         this._transparentColorPattern = /rgba\s*\([^)]*,\s*0(?:\.0+)?\s*\)/;
+
+        const quoteArray = [
+            ['「', '」'],
+            ['『', '』'],
+            ['\'', '\''],
+            ['"', '"']
+        ];
+        this._terminatorSet = new Set(['…', '。', '．', '.', '？', '?', '！', '!']);
+        this._startQuoteMap = new Map();
+        this._endQuoteMap = new Map();
+        for (const [char1, char2] of quoteArray) {
+            this._startQuoteMap.set(char1, char2);
+            this._endQuoteMap.set(char2, char1);
+        }
     }
 
     getRangeFromPoint(x, y, deepContentScan) {
@@ -64,72 +78,79 @@ class DocumentUtil {
     }
 
     extractSentence(source, extent, layoutAwareScan) {
-        const quotesFwd = {'「': '」', '『': '』', "'": "'", '"': '"'};
-        const quotesBwd = {'」': '「', '』': '『', "'": "'", '"': '"'};
-        const terminators = '…。．.？?！!';
+        const terminatorSet = this._terminatorSet;
+        const startQuoteMap = this._startQuoteMap;
+        const endQuoteMap = this._endQuoteMap;
 
-        const sourceLocal = source.clone();
-        const position = sourceLocal.setStartOffset(extent, layoutAwareScan);
-        sourceLocal.setEndOffset(extent * 2 - position, layoutAwareScan, true);
-        const content = sourceLocal.text();
+        // Scan text
+        source = source.clone();
+        const startLength = source.setStartOffset(extent, layoutAwareScan);
+        const endLength = source.setEndOffset(extent * 2 - startLength, layoutAwareScan, true);
+        const text = source.text();
+        const textLength = text.length;
+        const textEndAnchor = textLength - endLength;
+        let pos1 = startLength;
+        let pos2 = textEndAnchor;
 
+        // Move backward
         let quoteStack = [];
+        for (; pos1 > 0; --pos1) {
+            const c = text[pos1 - 1];
+            if (c === '\n') { break; }
 
-        let startPos = 0;
-        for (let i = position; i >= startPos; --i) {
-            const c = content[i];
-
-            if (c === '\n') {
-                startPos = i + 1;
+            if (quoteStack.length === 0 && terminatorSet.has(c)) {
                 break;
             }
 
-            if (quoteStack.length === 0 && (terminators.includes(c) || c in quotesFwd)) {
-                startPos = i + 1;
-                break;
-            }
-
-            if (quoteStack.length > 0 && c === quoteStack[0]) {
-                quoteStack.pop();
-            } else if (c in quotesBwd) {
-                quoteStack.unshift(quotesBwd[c]);
-            }
-        }
-
-        quoteStack = [];
-
-        let endPos = content.length;
-        for (let i = position; i <= endPos; ++i) {
-            const c = content[i];
-
-            if (c === '\n') {
-                endPos = i + 1;
-                break;
-            }
-
-            if (quoteStack.length === 0) {
-                if (terminators.includes(c)) {
-                    endPos = i + 1;
+            let otherQuote = startQuoteMap.get(c);
+            if (typeof otherQuote !== 'undefined') {
+                if (quoteStack.length === 0) {
                     break;
-                } else if (c in quotesBwd) {
-                    endPos = i;
-                    break;
+                } else if (quoteStack[0] === c) {
+                    quoteStack.pop();
+                }
+            } else {
+                otherQuote = endQuoteMap.get(c);
+                if (typeof otherQuote !== 'undefined') {
+                    quoteStack.unshift(otherQuote);
                 }
             }
+        }
 
-            if (quoteStack.length > 0 && c === quoteStack[0]) {
-                quoteStack.pop();
-            } else if (c in quotesFwd) {
-                quoteStack.unshift(quotesFwd[c]);
+        // Move forward
+        quoteStack = [];
+        for (; pos2 < textLength; ++pos2) {
+            const c = text[pos2];
+            if (c === '\n') { break; }
+
+            if (quoteStack.length === 0 && terminatorSet.has(c)) {
+                ++pos2;
+                break;
+            }
+
+            let otherQuote = endQuoteMap.get(c);
+            if (typeof otherQuote !== 'undefined') {
+                if (quoteStack.length === 0) {
+                    break;
+                } else if (quoteStack[0] === c) {
+                    quoteStack.pop();
+                }
+            } else {
+                otherQuote = startQuoteMap.get(c);
+                if (typeof otherQuote !== 'undefined') {
+                    quoteStack.unshift(otherQuote);
+                }
             }
         }
 
-        const text = content.substring(startPos, endPos);
-        const padding = text.length - text.replace(/^\s+/, '').length;
+        // Trim whitespace
+        for (; pos1 < startLength && this._isWhitespace(text[pos1]); ++pos1) { /* NOP */ }
+        for (; pos2 > textEndAnchor && this._isWhitespace(text[pos2 - 1]); --pos2) { /* NOP */ }
 
+        // Result
         return {
-            text: text.trim(),
-            offset: position - startPos - padding
+            text: text.substring(pos1, pos2),
+            offset: startLength - pos1
         };
     }
 
