@@ -327,7 +327,7 @@ class Display extends EventDispatcher {
                 touchInputEnabled: scanning.touchInputEnabled,
                 pointerEventsEnabled: scanning.pointerEventsEnabled,
                 scanLength: scanning.length,
-                sentenceExtent: options.anki.sentenceExt,
+                sentenceExtent: options.sentenceParsing.scanExtent,
                 layoutAwareScan: scanning.layoutAwareScan,
                 preventMiddleMouse: scanning.preventMiddleMouse.onSearchQuery
             }
@@ -1832,7 +1832,7 @@ class Display extends EventDispatcher {
             touchInputEnabled: false,
             pointerEventsEnabled: false,
             scanLength: scanningOptions.length,
-            sentenceExtent: options.anki.sentenceExt,
+            sentenceExtent: options.sentenceParsing.scanExtent,
             layoutAwareScan: scanningOptions.layoutAwareScan,
             preventMiddleMouse: false
         });

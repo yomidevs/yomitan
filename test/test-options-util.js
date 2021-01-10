@@ -412,13 +412,15 @@ function createProfileOptionsUpdatedTestData1() {
             enable: false,
             server: 'http://127.0.0.1:8765',
             tags: ['yomichan'],
-            sentenceExt: 200,
             screenshot: {format: 'png', quality: 92},
             terms: {deck: '', model: '', fields: {}},
             kanji: {deck: '', model: '', fields: {}},
             duplicateScope: 'collection',
             checkForDuplicates: true,
             fieldTemplates: null
+        },
+        sentenceParsing: {
+            scanExtent: 200
         }
     };
 }

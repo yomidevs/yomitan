@@ -326,7 +326,7 @@ class Frontend {
             touchInputEnabled: scanningOptions.touchInputEnabled,
             pointerEventsEnabled: scanningOptions.pointerEventsEnabled,
             scanLength: scanningOptions.length,
-            sentenceExtent: options.anki.sentenceExt,
+            sentenceExtent: options.sentenceParsing.scanExtent,
             layoutAwareScan: scanningOptions.layoutAwareScan,
             preventMiddleMouse
         });

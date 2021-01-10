@@ -68,7 +68,8 @@
                             "translation",
                             "dictionaries",
                             "parsing",
-                            "anki"
+                            "anki",
+                            "sentenceParsing"
                         ],
                         "properties": {
                             "general": {
@@ -732,7 +733,6 @@
                                     "enable",
                                     "server",
                                     "tags",
-                                    "sentenceExt",
                                     "screenshot",
                                     "terms",
                                     "kanji",
@@ -757,11 +757,6 @@
                                         "default": [
                                             "yomichan"
                                         ]
-                                    },
-                                    "sentenceExt": {
-                                        "type": "integer",
-                                        "minimum": 0,
-                                        "default": 200
                                     },
                                     "screenshot": {
                                         "type": "object",
@@ -845,6 +840,19 @@
                                     "fieldTemplates": {
                                         "type": ["string", "null"],
                                         "default": null
+                                    }
+                                }
+                            },
+                            "sentenceParsing": {
+                                "type": "object",
+                                "required": [
+                                    "scanExtent"
+                                ],
+                                "properties": {
+                                    "scanExtent": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "default": 200
                                     }
                                 }
                             }

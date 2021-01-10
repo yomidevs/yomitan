@@ -683,11 +683,16 @@ class OptionsUtil {
     _updateVersion8(options) {
         // Version 8 changes:
         //  Added translation.textReplacements.
+        //  Moved anki.sentenceExt to sentenceParsing.scanExtent.
         for (const profile of options.profiles) {
             profile.options.translation.textReplacements = {
                 searchOriginal: true,
                 groups: []
             };
+            profile.options.sentenceParsing = {
+                scanExtent: profile.options.anki.sentenceExt
+            };
+            delete profile.options.anki.sentenceExt;
         }
         return options;
     }
