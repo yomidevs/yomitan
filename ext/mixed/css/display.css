@@ -389,7 +389,8 @@ a {
 }
 .content-sidebar[hidden][data-has-navigation-previous=true],
 .content-sidebar[hidden][data-has-navigation-next=true],
-:root[data-popup-action-bar-visibility=always] .content-sidebar {
+:root[data-popup-action-bar-visibility=always] .content-sidebar,
+:root[data-profile-panel-visible=true] .content-sidebar {
     display: block;
 }
 .content-sidebar-inner {

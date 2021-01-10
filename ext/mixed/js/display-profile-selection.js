@@ -59,6 +59,7 @@ class DisplayProfileSelection {
     _setProfilePanelVisible(visible) {
         this._profilePanel.setVisible(visible);
         this._profileButton.classList.toggle('sidebar-button-highlight', visible);
+        document.documentElement.dataset.profilePanelVisible = `${visible}`;
         if (visible && this._profileListNeedsUpdate) {
             this._updateProfileList();
         }
