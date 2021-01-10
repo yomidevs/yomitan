@@ -283,7 +283,7 @@
                                     "popupActionBarLocation": {
                                         "type": "string",
                                         "enum": ["left", "right", "top", "bottom"],
-                                        "default": "right"
+                                        "default": "top"
                                     }
                                 }
                             },

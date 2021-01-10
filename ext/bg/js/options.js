@@ -686,6 +686,7 @@ class OptionsUtil {
         //  Moved anki.sentenceExt to sentenceParsing.scanExtent.
         //  Added sentenceParsing.enableTerminationCharacters.
         //  Added sentenceParsing.terminationCharacters.
+        //  Changed general.popupActionBarLocation.
         for (const profile of options.profiles) {
             profile.options.translation.textReplacements = {
                 searchOriginal: true,
@@ -710,6 +711,7 @@ class OptionsUtil {
                 ]
             };
             delete profile.options.anki.sentenceExt;
+            profile.options.general.popupActionBarLocation = 'top';
         }
         return options;
     }
