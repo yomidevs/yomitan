@@ -97,7 +97,6 @@ class Display extends EventDispatcher {
         this._contentScrollElement = document.querySelector('#content-scroll');
         this._contentScrollBodyElement = document.querySelector('#content-body');
         this._windowScroll = new WindowScroll(this._contentScrollElement);
-        this._contentSidebar = document.querySelector('#content-sidebar');
         this._closeButton = document.querySelector('#close-button');
         this._navigationPreviousButton = document.querySelector('#navigate-previous-button');
         this._navigationNextButton = document.querySelector('#navigate-next-button');
@@ -1074,9 +1073,10 @@ class Display extends EventDispatcher {
     }
 
     _updateNavigation(previous, next) {
-        if (this._contentSidebar !== null) {
-            this._contentSidebar.dataset.hasNavigationPrevious = `${previous}`;
-            this._contentSidebar.dataset.hasNavigationNext = `${next}`;
+        const {documentElement} = document;
+        if (documentElement !== null) {
+            documentElement.dataset.hasNavigationPrevious = `${previous}`;
+            documentElement.dataset.hasNavigationNext = `${next}`;
         }
         if (this._navigationPreviousButton !== null) {
             this._navigationPreviousButton.disabled = !previous;

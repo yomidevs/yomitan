@@ -382,13 +382,10 @@ a {
     background-color: var(--sidebar-background-color);
     z-index: 10;
     position: relative;
-    display: block;
-}
-.content-sidebar[hidden] {
     display: none;
 }
-.content-sidebar[hidden][data-has-navigation-previous=true],
-.content-sidebar[hidden][data-has-navigation-next=true],
+:root[data-has-navigation-previous=true] .content-sidebar,
+:root[data-has-navigation-next=true] .content-sidebar,
 :root[data-popup-action-bar-visibility=always] .content-sidebar,
 :root[data-profile-panel-visible=true] .content-sidebar {
     display: block;
