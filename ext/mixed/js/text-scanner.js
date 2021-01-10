@@ -59,7 +59,7 @@ class TextScanner extends EventDispatcher {
         this._touchInputEnabled = false;
         this._pointerEventsEnabled = false;
         this._scanLength = 1;
-        this._sentenceExtent = 1;
+        this._sentenceScanExtent = 1;
         this._layoutAwareScan = false;
         this._preventMiddleMouse = false;
         this._inputs = [];
@@ -134,7 +134,18 @@ class TextScanner extends EventDispatcher {
         }
     }
 
-    setOptions({inputs, deepContentScan, selectText, delay, touchInputEnabled, pointerEventsEnabled, scanLength, sentenceExtent, layoutAwareScan, preventMiddleMouse}) {
+    setOptions({
+        inputs,
+        deepContentScan,
+        selectText,
+        delay,
+        touchInputEnabled,
+        pointerEventsEnabled,
+        scanLength,
+        sentenceScanExtent,
+        layoutAwareScan,
+        preventMiddleMouse
+    }) {
         if (Array.isArray(inputs)) {
             this._inputs = inputs.map(({
                 include,
@@ -182,8 +193,8 @@ class TextScanner extends EventDispatcher {
         if (typeof scanLength === 'number') {
             this._scanLength = scanLength;
         }
-        if (typeof sentenceExtent === 'number') {
-            this._sentenceExtent = sentenceExtent;
+        if (typeof sentenceScanExtent === 'number') {
+            this._sentenceScanExtent = sentenceScanExtent;
         }
         if (typeof layoutAwareScan === 'boolean') {
             this._layoutAwareScan = layoutAwareScan;
@@ -711,7 +722,7 @@ class TextScanner extends EventDispatcher {
 
     async _findTerms(textSource, optionsContext) {
         const scanLength = this._scanLength;
-        const sentenceExtent = this._sentenceExtent;
+        const sentenceScanExtent = this._sentenceScanExtent;
         const layoutAwareScan = this._layoutAwareScan;
         const searchText = this.getTextSourceContent(textSource, scanLength, layoutAwareScan);
         if (searchText.length === 0) { return null; }
@@ -720,13 +731,13 @@ class TextScanner extends EventDispatcher {
         if (definitions.length === 0) { return null; }
 
         textSource.setEndOffset(length, layoutAwareScan);
-        const sentence = this._documentUtil.extractSentence(textSource, sentenceExtent, layoutAwareScan);
+        const sentence = this._documentUtil.extractSentence(textSource, layoutAwareScan, sentenceScanExtent);
 
         return {definitions, sentence, type: 'terms'};
     }
 
     async _findKanji(textSource, optionsContext) {
-        const sentenceExtent = this._sentenceExtent;
+        const sentenceScanExtent = this._sentenceScanExtent;
         const layoutAwareScan = this._layoutAwareScan;
         const searchText = this.getTextSourceContent(textSource, 1, layoutAwareScan);
         if (searchText.length === 0) { return null; }
@@ -735,7 +746,7 @@ class TextScanner extends EventDispatcher {
         if (definitions.length === 0) { return null; }
 
         textSource.setEndOffset(1, layoutAwareScan);
-        const sentence = this._documentUtil.extractSentence(textSource, sentenceExtent, layoutAwareScan);
+        const sentence = this._documentUtil.extractSentence(textSource, layoutAwareScan, sentenceScanExtent);
 
         return {definitions, sentence, type: 'kanji'};
     }

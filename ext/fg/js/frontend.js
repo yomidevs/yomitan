@@ -312,7 +312,7 @@ class Frontend {
     async _updateOptionsInternal() {
         const optionsContext = await this._getOptionsContext();
         const options = await api.optionsGet(optionsContext);
-        const scanningOptions = options.scanning;
+        const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
         this._options = options;
 
         await this._updatePopup();
@@ -326,7 +326,7 @@ class Frontend {
             touchInputEnabled: scanningOptions.touchInputEnabled,
             pointerEventsEnabled: scanningOptions.pointerEventsEnabled,
             scanLength: scanningOptions.length,
-            sentenceExtent: options.sentenceParsing.scanExtent,
+            sentenceScanExtent: sentenceParsingOptions.scanExtent,
             layoutAwareScan: scanningOptions.layoutAwareScan,
             preventMiddleMouse
         });

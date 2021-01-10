@@ -309,7 +309,7 @@ class Display extends EventDispatcher {
 
     async updateOptions() {
         const options = await api.optionsGet(this.getOptionsContext());
-        const scanning = options.scanning;
+        const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
         this._options = options;
 
         this._updateDocumentOptions(options);
@@ -320,16 +320,16 @@ class Display extends EventDispatcher {
             selectedParser: options.parsing.selectedParser,
             termSpacing: options.parsing.termSpacing,
             scanning: {
-                inputs: scanning.inputs,
-                deepContentScan: scanning.deepDomScan,
-                selectText: scanning.selectText,
-                delay: scanning.delay,
-                touchInputEnabled: scanning.touchInputEnabled,
-                pointerEventsEnabled: scanning.pointerEventsEnabled,
-                scanLength: scanning.length,
-                sentenceExtent: options.sentenceParsing.scanExtent,
-                layoutAwareScan: scanning.layoutAwareScan,
-                preventMiddleMouse: scanning.preventMiddleMouse.onSearchQuery
+                inputs: scanningOptions.inputs,
+                deepContentScan: scanningOptions.deepDomScan,
+                selectText: scanningOptions.selectText,
+                delay: scanningOptions.delay,
+                touchInputEnabled: scanningOptions.touchInputEnabled,
+                pointerEventsEnabled: scanningOptions.pointerEventsEnabled,
+                scanLength: scanningOptions.length,
+                sentenceScanExtent: sentenceParsingOptions.scanExtent,
+                layoutAwareScan: scanningOptions.layoutAwareScan,
+                preventMiddleMouse: scanningOptions.preventMiddleMouse.onSearchQuery
             }
         });
 
@@ -1810,7 +1810,7 @@ class Display extends EventDispatcher {
             this._definitionTextScanner.on('searched', this._onDefinitionTextScannerSearched.bind(this));
         }
 
-        const scanningOptions = options.scanning;
+        const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
         this._definitionTextScanner.setOptions({
             inputs: [{
                 include: 'mouse0',
@@ -1832,7 +1832,7 @@ class Display extends EventDispatcher {
             touchInputEnabled: false,
             pointerEventsEnabled: false,
             scanLength: scanningOptions.length,
-            sentenceExtent: options.sentenceParsing.scanExtent,
+            sentenceScanExtent: sentenceParsingOptions.scanExtent,
             layoutAwareScan: scanningOptions.layoutAwareScan,
             preventMiddleMouse: false
         });

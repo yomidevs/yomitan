@@ -127,7 +127,7 @@ async function testDocumentTextScanningFunctions(dom, {DocumentUtil, TextSourceR
             endNodeSelector,
             endOffset,
             resultType,
-            sentenceExtent,
+            sentenceScanExtent,
             sentence,
             hasImposter
         } = testElement.dataset;
@@ -139,7 +139,7 @@ async function testDocumentTextScanningFunctions(dom, {DocumentUtil, TextSourceR
 
         startOffset = parseInt(startOffset, 10);
         endOffset = parseInt(endOffset, 10);
-        sentenceExtent = parseInt(sentenceExtent, 10);
+        sentenceScanExtent = parseInt(sentenceScanExtent, 10);
 
         assert.notStrictEqual(elementFromPointValue, null);
         assert.notStrictEqual(caretRangeFromPointValue, null);
@@ -182,7 +182,7 @@ async function testDocumentTextScanningFunctions(dom, {DocumentUtil, TextSourceR
         if (source === null) { continue; }
 
         // Test docSentenceExtract
-        const sentenceActual = documentUtil.extractSentence(source, sentenceExtent, false).text;
+        const sentenceActual = documentUtil.extractSentence(source, false, sentenceScanExtent).text;
         assert.strictEqual(sentenceActual, sentence);
 
         // Clean
