@@ -86,8 +86,8 @@ class Display extends EventDispatcher {
             documentUtil: this._documentUtil
         });
         this._mode = null;
-        this._defaultAnkiFieldTemplates = null;
-        this._defaultAnkiFieldTemplatesPromise = null;
+        this._ankiFieldTemplates = null;
+        this._ankiFieldTemplatesDefault = null;
         this._ankiNoteBuilder = new AnkiNoteBuilder(true);
         this._updateAdderButtonsPromise = Promise.resolve();
         this._contentScrollElement = document.querySelector('#content-scroll');
@@ -125,10 +125,10 @@ class Display extends EventDispatcher {
             ['firstEntry',        () => { this._focusEntry(0, true); }],
             ['historyBackward',   () => { this._sourceTermView(); }],
             ['historyForward',    () => { this._nextTermView(); }],
-            ['addNoteKanji',      () => { this._noteTryAdd('kanji'); }],
-            ['addNoteTermKanji',  () => { this._noteTryAdd('term-kanji'); }],
-            ['addNoteTermKana',   () => { this._noteTryAdd('term-kana'); }],
-            ['viewNote',          () => { this._noteTryView(); }],
+            ['addNoteKanji',      () => { this._tryAddAnkiNoteForSelectedDefinition('kanji'); }],
+            ['addNoteTermKanji',  () => { this._tryAddAnkiNoteForSelectedDefinition('term-kanji'); }],
+            ['addNoteTermKana',   () => { this._tryAddAnkiNoteForSelectedDefinition('term-kana'); }],
+            ['viewNote',          () => { this._tryViewAnkiNoteForSelectedDefinition(); }],
             ['playAudio',         () => { this._playAudioCurrent(); }],
             ['copyHostSelection', () => this._copyHostSelection()]
         ]);
@@ -304,8 +304,10 @@ class Display extends EventDispatcher {
 
     async updateOptions() {
         const options = await api.optionsGet(this.getOptionsContext());
+        const templates = await this._getAnkiFieldTemplates(options);
         const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
         this._options = options;
+        this._ankiFieldTemplates = templates;
 
         this._updateDocumentOptions(options);
         this._updateTheme(options.general.popupTheme);
@@ -747,9 +749,7 @@ class Display extends EventDispatcher {
         e.preventDefault();
         const link = e.currentTarget;
         const index = this._getClosestDefinitionIndex(link);
-        if (index < 0 || index >= this._definitions.length) { return; }
-
-        this._noteAdd(this._definitions[index], link.dataset.mode);
+        this._addAnkiNote(index, link.dataset.mode);
     }
 
     _onNoteView(e) {
@@ -1188,43 +1188,42 @@ class Display extends EventDispatcher {
         }
     }
 
-    _noteTryAdd(mode) {
-        const index = this._index;
-        if (index < 0 || index >= this._definitions.length) { return; }
-
-        const button = this._adderButtonFind(index, mode);
-        if (button !== null && !button.disabled) {
-            this._noteAdd(this._definitions[index], mode);
-        }
+    _tryAddAnkiNoteForSelectedDefinition(mode) {
+        this._addAnkiNote(this._index, mode);
     }
 
-    _noteTryView() {
+    _tryViewAnkiNoteForSelectedDefinition() {
         const button = this._viewerButtonFind(this._index);
         if (button !== null && !button.disabled) {
             api.noteView(button.dataset.noteId);
         }
     }
 
-    async _noteAdd(definition, mode) {
+    async _addAnkiNote(definitionIndex, mode) {
+        if (definitionIndex < 0 || definitionIndex >= this._definitions.length) { return false; }
+        const definition = this._definitions[definitionIndex];
+
+        const button = this._adderButtonFind(definitionIndex, mode);
+        if (button === null || button.disabled) { return false; }
+
         const overrideToken = this._progressIndicatorVisible.setOverride(true);
         try {
             const noteContext = await this._getNoteContext();
-            const noteId = await this._addDefinition(definition, mode, noteContext);
+            const note = await this._createNote(definition, mode, noteContext, true);
+            const noteId = await api.addAnkiNote(note);
             if (noteId) {
-                const index = this._definitions.indexOf(definition);
-                const adderButton = this._adderButtonFind(index, mode);
-                if (adderButton !== null) {
-                    adderButton.disabled = true;
-                }
-                this._viewerButtonShow(index, noteId);
+                button.disabled = true;
+                this._viewerButtonShow(definitionIndex, noteId);
             } else {
                 throw new Error('Note could not be added');
             }
         } catch (e) {
             this.onError(e);
+            return false;
         } finally {
             this._progressIndicatorVisible.clearOverride(overrideToken);
         }
+        return true;
     }
 
     async _playAudio(definitionIndex, expressionIndex) {
@@ -1462,56 +1461,30 @@ class Display extends EventDispatcher {
         this.trigger('modeChange', {mode});
     }
 
-    async _getTemplates(options) {
+    async _getAnkiFieldTemplates(options) {
         let templates = options.anki.fieldTemplates;
         if (typeof templates === 'string') { return templates; }
 
-        templates = this._defaultAnkiFieldTemplates;
+        templates = this._ankiFieldTemplatesDefault;
         if (typeof templates === 'string') { return templates; }
 
-        return await this._getDefaultTemplatesPromise();
-    }
-
-    _getDefaultTemplatesPromise() {
-        if (this._defaultAnkiFieldTemplatesPromise === null) {
-            this._defaultAnkiFieldTemplatesPromise = this._getDefaultTemplates();
-            this._defaultAnkiFieldTemplatesPromise.then(
-                () => { this._defaultAnkiFieldTemplatesPromise = null; },
-                () => {} // NOP
-            );
-        }
-        return this._defaultAnkiFieldTemplatesPromise;
-    }
-
-    async _getDefaultTemplates() {
-        const value = await api.getDefaultAnkiFieldTemplates();
-        this._defaultAnkiFieldTemplates = value;
-        return value;
-    }
-
-    async _addDefinition(definition, mode, context) {
-        const options = this._options;
-        const templates = await this._getTemplates(options);
-        const note = await this._createNote(definition, mode, context, options, templates, true);
-        return await api.addAnkiNote(note);
+        templates = await api.getDefaultAnkiFieldTemplates();
+        this._ankiFieldTemplatesDefault = templates;
+        return templates;
     }
 
     async _areDefinitionsAddable(definitions, modes, context) {
-        const options = this._options;
-        const templates = await this._getTemplates(options);
-
         const modeCount = modes.length;
-        const {duplicateScope} = options.anki;
         const notePromises = [];
         for (const definition of definitions) {
             for (const mode of modes) {
-                const notePromise = this._createNote(definition, mode, context, options, templates, false);
+                const notePromise = this._createNote(definition, mode, context, false);
                 notePromises.push(notePromise);
             }
         }
         const notes = await Promise.all(notePromises);
 
-        const infos = await api.getAnkiNoteInfo(notes, duplicateScope);
+        const infos = await api.getAnkiNoteInfo(notes);
         const results = [];
         for (let i = 0, ii = infos.length; i < ii; i += modeCount) {
             results.push(infos.slice(i, i + modeCount));
@@ -1533,7 +1506,9 @@ class Display extends EventDispatcher {
         return results;
     }
 
-    async _createNote(definition, mode, context, options, templates, injectMedia) {
+    async _createNote(definition, mode, context, injectMedia) {
+        const options = this._options;
+        const templates = this._ankiFieldTemplates;
         const {
             general: {resultOutputMode, glossaryLayoutMode, compactTags},
             anki: ankiOptions

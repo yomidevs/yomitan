@@ -81,8 +81,8 @@ const api = (() => {
             return this._invoke('addAnkiNote', {note});
         }
 
-        getAnkiNoteInfo(notes, duplicateScope) {
-            return this._invoke('getAnkiNoteInfo', {notes, duplicateScope});
+        getAnkiNoteInfo(notes) {
+            return this._invoke('getAnkiNoteInfo', {notes});
         }
 
         injectAnkiNoteMedia(timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails) {

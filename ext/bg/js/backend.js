@@ -447,7 +447,7 @@ class Backend {
         return await this._anki.addNote(note);
     }
 
-    async _onApiGetAnkiNoteInfo({notes, duplicateScope}) {
+    async _onApiGetAnkiNoteInfo({notes}) {
         const results = [];
         const cannotAdd = [];
         const canAddArray = await this._anki.canAddNotes(notes);
@@ -464,7 +464,7 @@ class Backend {
 
         if (cannotAdd.length > 0) {
             const cannotAddNotes = cannotAdd.map(({note}) => note);
-            const noteIdsArray = await this._anki.findNoteIds(cannotAddNotes, duplicateScope);
+            const noteIdsArray = await this._anki.findNoteIds(cannotAddNotes);
             for (let i = 0, ii = Math.min(cannotAdd.length, noteIdsArray.length); i < ii; ++i) {
                 const noteIds = noteIdsArray[i];
                 if (noteIds.length > 0) {

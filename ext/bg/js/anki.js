@@ -103,12 +103,12 @@ class AnkiConnect {
         return await this._invoke('storeMediaFile', {filename: fileName, data: dataBase64});
     }
 
-    async findNoteIds(notes, duplicateScope) {
+    async findNoteIds(notes) {
         if (!this._enabled) { return []; }
         await this._checkVersion();
         const actions = notes.map((note) => {
             let query = '';
-            switch (duplicateScope) {
+            switch (this._getDuplicateScopeFromNote(note)) {
                 case 'deck':
                     query = `"deck:${this._escapeQuery(note.deckName)}" `;
                     break;
@@ -177,5 +177,16 @@ class AnkiConnect {
 
         const key = fieldNames[0];
         return `"${key.toLowerCase()}:${this._escapeQuery(fields[key])}"`;
+    }
+
+    _getDuplicateScopeFromNote(note) {
+        const {options} = note;
+        if (typeof options === 'object' && options !== null) {
+            const {duplicateScope} = options;
+            if (typeof duplicateScope !== 'undefined') {
+                return duplicateScope;
+            }
+        }
+        return null;
     }
 }
