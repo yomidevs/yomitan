@@ -17,7 +17,6 @@
 
 /* global
  * AnkiNoteBuilder
- * TemplateRendererProxy
  * api
  */
 
@@ -34,7 +33,7 @@ class AnkiTemplatesController {
         this._renderFieldInput = null;
         this._renderResult = null;
         this._fieldTemplateResetModal = null;
-        this._templateRenderer = new TemplateRendererProxy();
+        this._ankiNoteBuilder = new AnkiNoteBuilder(true);
     }
 
     async prepare() {
@@ -180,11 +179,8 @@ class AnkiTemplatesController {
                 };
                 let templates = options.anki.fieldTemplates;
                 if (typeof templates !== 'string') { templates = this._defaultFieldTemplates; }
-                const ankiNoteBuilder = new AnkiNoteBuilder({
-                    renderTemplate: this._renderTemplate.bind(this)
-                });
                 const {general: {resultOutputMode, glossaryLayoutMode, compactTags}} = options;
-                const note = await ankiNoteBuilder.createNote({
+                const note = await this._ankiNoteBuilder.createNote({
                     definition,
                     mode,
                     context,
@@ -212,9 +208,5 @@ class AnkiTemplatesController {
         if (invalidateInput) {
             this._fieldTemplatesTextarea.dataset.invalid = `${hasException}`;
         }
-    }
-
-    async _renderTemplate(template, data, marker) {
-        return await this._templateRenderer.render(template, data, marker);
     }
 }

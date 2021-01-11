@@ -26,9 +26,7 @@ class AnkiController {
     constructor(settingsController) {
         this._settingsController = settingsController;
         this._ankiConnect = new AnkiConnect();
-        this._ankiNoteBuilder = new AnkiNoteBuilder({
-            renderTemplate: null
-        });
+        this._ankiNoteBuilder = new AnkiNoteBuilder(false);
         this._selectorObserver = new SelectorObserver({
             selector: '.anki-card',
             ignoreSelector: null,

@@ -25,9 +25,9 @@ class TemplateRendererProxy {
         this._invocations = new Set();
     }
 
-    async render(template, data, marker) {
+    async render(template, data, type) {
         await this._prepareFrame();
-        return await this._invoke('renderHandlebarsTemplate', {template, data, marker});
+        return await this._invoke('render', {template, data, type});
     }
 
     // Private

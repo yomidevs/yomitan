@@ -26,9 +26,14 @@ class TemplateRenderer {
         this._cacheMaxSize = 5;
         this._helpersRegistered = false;
         this._stateStack = null;
+        this._dataTypes = new Map();
     }
 
-    async render(template, data, marker) {
+    registerDataType(name, {modifier=null, modifierPost=null}) {
+        this._dataTypes.set(name, {modifier, modifierPost});
+    }
+
+    async render(template, data, type) {
         if (!this._helpersRegistered) {
             this._registerHelpers();
             this._helpersRegistered = true;
@@ -42,18 +47,27 @@ class TemplateRenderer {
             cache.set(template, instance);
         }
 
-        const markerPre = data.marker;
-        const markerPreHas = Object.prototype.hasOwnProperty.call(data, 'marker');
+        let modifier = null;
+        let modifierPost = null;
+        if (typeof type === 'string') {
+            const typeInfo = this._dataTypes.get(type);
+            if (typeof typeInfo !== 'undefined') {
+                ({modifier, modifierPost} = typeInfo);
+            }
+        }
+
         try {
+            if (typeof modifier === 'function') {
+                data = modifier(data);
+            }
+
             this._stateStack = [new Map()];
-            data.marker = marker;
             return instance(data).trim();
         } finally {
             this._stateStack = null;
-            if (markerPreHas) {
-                data.marker = markerPre;
-            } else {
-                delete data.marker;
+
+            if (typeof modifierPost === 'function') {
+                modifierPost(data);
             }
         }
     }

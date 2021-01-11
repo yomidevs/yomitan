@@ -27,7 +27,6 @@
  * MediaLoader
  * PopupFactory
  * QueryParser
- * TemplateRendererProxy
  * TextScanner
  * WindowScroll
  * api
@@ -89,10 +88,7 @@ class Display extends EventDispatcher {
         this._mode = null;
         this._defaultAnkiFieldTemplates = null;
         this._defaultAnkiFieldTemplatesPromise = null;
-        this._templateRenderer = new TemplateRendererProxy();
-        this._ankiNoteBuilder = new AnkiNoteBuilder({
-            renderTemplate: this._renderTemplate.bind(this)
-        });
+        this._ankiNoteBuilder = new AnkiNoteBuilder(true);
         this._updateAdderButtonsPromise = Promise.resolve();
         this._contentScrollElement = document.querySelector('#content-scroll');
         this._contentScrollBodyElement = document.querySelector('#content-body');
@@ -1491,10 +1487,6 @@ class Display extends EventDispatcher {
         const value = await api.getDefaultAnkiFieldTemplates();
         this._defaultAnkiFieldTemplates = value;
         return value;
-    }
-
-    async _renderTemplate(template, data, marker) {
-        return await this._templateRenderer.render(template, data, marker);
     }
 
     async _addDefinition(definition, mode, context) {
