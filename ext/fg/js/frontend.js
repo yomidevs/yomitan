@@ -54,7 +54,7 @@ class Frontend {
             node: window,
             ignoreElements: this._ignoreElements.bind(this),
             ignorePoint: this._ignorePoint.bind(this),
-            getOptionsContext: this._getOptionsContext.bind(this),
+            getSearchContext: this._getSearchContext.bind(this),
             documentUtil: this._documentUtil,
             searchTerms: true,
             searchKanji: true
@@ -615,6 +615,10 @@ class Frontend {
     }
 
     async _getOptionsContext() {
+        return (await this._getSearchContext()).optionsContext;
+    }
+
+    async _getSearchContext() {
         if (this._optionsContextOverride !== null) {
             return this._optionsContextOverride;
         }
@@ -629,6 +633,6 @@ class Frontend {
         }
 
         const depth = this._depth;
-        return {depth, url};
+        return {optionsContext: {depth, url}};
     }
 }

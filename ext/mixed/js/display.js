@@ -82,7 +82,7 @@ class Display extends EventDispatcher {
         this._queryParserVisibleOverride = null;
         this._queryParserContainer = document.querySelector('#query-parser-container');
         this._queryParser = new QueryParser({
-            getOptionsContext: this.getOptionsContext.bind(this),
+            getSearchContext: this._getSearchContext.bind(this),
             documentUtil: this._documentUtil
         });
         this._mode = null;
@@ -1764,7 +1764,7 @@ class Display extends EventDispatcher {
         if (this._definitionTextScanner === null) {
             this._definitionTextScanner = new TextScanner({
                 node: window,
-                getOptionsContext: this.getOptionsContext.bind(this),
+                getSearchContext: this._getSearchContext.bind(this),
                 documentUtil: this._documentUtil,
                 searchTerms: true,
                 searchKanji: false,
@@ -1859,6 +1859,10 @@ class Display extends EventDispatcher {
             const {clientX: x, clientY: y} = e;
             this._updateFrameSize(x, y);
         }
+    }
+
+    _getSearchContext() {
+        return {optionsContext: this.getOptionsContext()};
     }
 
     _startFrameResize(e) {

@@ -21,9 +21,9 @@
  */
 
 class QueryParser extends EventDispatcher {
-    constructor({getOptionsContext, documentUtil}) {
+    constructor({getSearchContext, documentUtil}) {
         super();
-        this._getOptionsContext = getOptionsContext;
+        this._getSearchContext = getSearchContext;
         this._documentUtil = documentUtil;
         this._text = '';
         this._setTextToken = null;
@@ -34,7 +34,7 @@ class QueryParser extends EventDispatcher {
         this._queryParserModeSelect = document.querySelector('#query-parser-mode-select');
         this._textScanner = new TextScanner({
             node: this._queryParser,
-            getOptionsContext,
+            getSearchContext,
             documentUtil,
             searchTerms: true,
             searchKanji: false,
@@ -82,7 +82,7 @@ class QueryParser extends EventDispatcher {
 
     // Private
 
-    _onSearched({type, definitions, sentence, inputInfo, textSource, optionsContext, error}) {
+    _onSearched({type, definitions, sentence, inputInfo, textSource, optionsContext, detail, error}) {
         if (error !== null) {
             yomichan.logError(error);
             return;
@@ -95,13 +95,18 @@ class QueryParser extends EventDispatcher {
             sentence,
             inputInfo,
             textSource,
-            optionsContext
+            optionsContext,
+            detail
         });
     }
 
     _onParserChange(e) {
         const value = e.currentTarget.value;
         this._setSelectedParser(value);
+    }
+
+    _getOptionsContext() {
+        return this._getSearchContext().optionsContext;
     }
 
     _refreshSelectedParser() {
