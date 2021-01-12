@@ -349,6 +349,9 @@ class DisplaySearch extends Display {
 
     _search(animate, history) {
         const query = this._queryInput.value;
+        const depth = this.depth;
+        const url = window.location.href;
+        const documentTitle = document.title;
         const details = {
             focus: false,
             history,
@@ -357,8 +360,10 @@ class DisplaySearch extends Display {
             },
             state: {
                 focusEntry: 0,
+                optionsContext: {depth, url},
+                url,
                 sentence: {text: query, offset: 0},
-                url: window.location.href
+                documentTitle
             },
             content: {
                 definitions: null,

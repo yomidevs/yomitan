@@ -194,6 +194,10 @@ class Display extends EventDispatcher {
         return this._japaneseUtil;
     }
 
+    get depth() {
+        return this._depth;
+    }
+
     async prepare() {
         // State setup
         const {documentElement} = document;
@@ -391,13 +395,6 @@ class Display extends EventDispatcher {
         }
     }
 
-    async getDocumentTitle() {
-        if (this._pageType === 'popup') {
-            return await this._getRootFrameDocumentTitle();
-        }
-        return document.title;
-    }
-
     registerActions(actions) {
         for (const [name, handler] of actions) {
             this._actions.set(name, handler);
@@ -466,8 +463,10 @@ class Display extends EventDispatcher {
             clone(this._history.state) :
             {
                 focusEntry: 0,
+                optionsContext: this._optionsContext,
+                url: window.location.href,
                 sentence: {text: query, offset: 0},
-                url: window.location.href
+                documentTitle: document.title
             }
         );
         const details = {
@@ -713,7 +712,9 @@ class Display extends EventDispatcher {
             e.preventDefault();
             if (!this._historyHasState()) { return; }
 
-            const {state: {sentence}} = this._history;
+            let {state: {sentence, url, documentTitle}} = this._history;
+            if (typeof url !== 'string') { url = window.location.href; }
+            if (typeof documentTitle !== 'string') { documentTitle = document.title; }
             const optionsContext = this.getOptionsContext();
             const query = e.currentTarget.textContent;
             const definitions = await api.kanjiFind(query, optionsContext);
@@ -723,8 +724,10 @@ class Display extends EventDispatcher {
                 params: this._createSearchParams('kanji', query, false),
                 state: {
                     focusEntry: 0,
+                    optionsContext,
+                    url,
                     sentence,
-                    optionsContext
+                    documentTitle
                 },
                 content: {
                     definitions
@@ -908,15 +911,21 @@ class Display extends EventDispatcher {
             changeHistory = true;
         }
 
-        let {sentence=null, optionsContext=null, focusEntry=null, scrollX=null, scrollY=null} = state;
+        let {
+            focusEntry=null,
+            scrollX=null,
+            scrollY=null,
+            optionsContext=null,
+            sentence=null,
+            url
+        } = state;
         if (typeof focusEntry !== 'number') { focusEntry = 0; }
+        if (typeof url !== 'string') { url = window.location.href; }
         if (!(typeof optionsContext === 'object' && optionsContext !== null)) {
             optionsContext = this.getOptionsContext();
             state.optionsContext = optionsContext;
             changeHistory = true;
         }
-        let {url} = optionsContext;
-        if (typeof url !== 'string') { url = window.location.href; }
         sentence = this._getValidSentenceData(sentence);
 
         this._setFullQuery(queryFull);
@@ -1094,7 +1103,7 @@ class Display extends EventDispatcher {
             let states;
             try {
                 if (this._options.anki.checkForDuplicates) {
-                    const noteContext = await this._getNoteContext();
+                    const noteContext = this._getNoteContext();
                     states = await this._areDefinitionsAddable(definitions, modes, noteContext);
                 } else {
                     if (!await api.isAnkiConnected()) {
@@ -1208,7 +1217,7 @@ class Display extends EventDispatcher {
 
         const overrideToken = this._progressIndicatorVisible.setOverride(true);
         try {
-            const noteContext = await this._getNoteContext();
+            const noteContext = this._getNoteContext();
             const note = await this._createNote(definition, mode, noteContext, true);
             const noteId = await api.addAnkiNote(note);
             if (noteId) {
@@ -1371,8 +1380,15 @@ class Display extends EventDispatcher {
         return elementRect.top - documentRect.top;
     }
 
-    async _getNoteContext() {
-        const documentTitle = await this.getDocumentTitle();
+    _getNoteContext() {
+        const {state} = this._history;
+        let documentTitle = null;
+        if (typeof state === 'object' && state !== null) {
+            ({documentTitle} = state);
+        }
+        if (typeof documentTitle !== 'string') {
+            documentTitle = '';
+        }
         return {
             document: {
                 title: documentTitle
@@ -1728,15 +1744,6 @@ class Display extends EventDispatcher {
         parent.removeChild(textarea);
     }
 
-    async _getRootFrameDocumentTitle() {
-        try {
-            const {title} = await api.crossFrame.invoke(0, 'getDocumentInformation');
-            return title;
-        } catch (e) {
-            return '';
-        }
-    }
-
     _addMultipleEventListeners(container, selector, ...args) {
         for (const node of container.querySelectorAll(selector)) {
             this._eventListeners.addEventListener(node, ...args);
@@ -1815,6 +1822,8 @@ class Display extends EventDispatcher {
         if (type === null) { return; }
 
         const query = textSource.text();
+        const url = window.location.href;
+        const documentTitle = document.title;
         const details = {
             focus: false,
             history: true,
@@ -1825,8 +1834,10 @@ class Display extends EventDispatcher {
             },
             state: {
                 focusEntry: 0,
+                optionsContext,
+                url,
                 sentence,
-                optionsContext
+                documentTitle
             },
             content: {
                 definitions

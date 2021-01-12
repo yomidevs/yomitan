@@ -114,12 +114,11 @@ class Frontend {
         this._textScanner.on('searched', this._onSearched.bind(this));
 
         api.crossFrame.registerHandlers([
-            ['getUrl',                  {async: false, handler: this._onApiGetUrl.bind(this)}],
             ['closePopup',              {async: false, handler: this._onApiClosePopup.bind(this)}],
             ['copySelection',           {async: false, handler: this._onApiCopySelection.bind(this)}],
             ['getSelectionText',        {async: false, handler: this._onApiGetSelectionText.bind(this)}],
             ['getPopupInfo',            {async: false, handler: this._onApiGetPopupInfo.bind(this)}],
-            ['getDocumentInformation',  {async: false, handler: this._onApiGetDocumentInformation.bind(this)}],
+            ['getPageInfo',             {async: false, handler: this._onApiGetPageInfo.bind(this)}],
             ['getFrameSize',            {async: true,  handler: this._onApiGetFrameSize.bind(this)}],
             ['setFrameSize',            {async: true,  handler: this._onApiSetFrameSize.bind(this)}]
         ]);
@@ -187,9 +186,10 @@ class Frontend {
         };
     }
 
-    _onApiGetDocumentInformation() {
+    _onApiGetPageInfo() {
         return {
-            title: document.title
+            url: window.location.href,
+            documentTitle: document.title
         };
     }
 
@@ -251,7 +251,7 @@ class Frontend {
         }
     }
 
-    _onSearched({type, definitions, sentence, inputInfo: {cause, empty}, textSource, optionsContext, error}) {
+    _onSearched({type, definitions, sentence, inputInfo: {cause, empty}, textSource, optionsContext, detail: {documentTitle}, error}) {
         const scanningOptions = this._options.scanning;
 
         if (error !== null) {
@@ -265,7 +265,7 @@ class Frontend {
         } if (type !== null) {
             this._stopClearSelectionDelayed();
             const focus = (cause === 'mouseMove');
-            this._showContent(textSource, focus, definitions, type, sentence, optionsContext);
+            this._showContent(textSource, focus, definitions, type, sentence, documentTitle, optionsContext);
         } else {
             if (scanningOptions.autoHideResults) {
                 this._clearSelectionDelayed(scanningOptions.hideDelay, false);
@@ -497,8 +497,9 @@ class Frontend {
         this._showPopupContent(textSource, null);
     }
 
-    _showContent(textSource, focus, definitions, type, sentence, optionsContext) {
+    _showContent(textSource, focus, definitions, type, sentence, documentTitle, optionsContext) {
         const query = textSource.text();
+        const {url} = optionsContext;
         const details = {
             focus,
             history: false,
@@ -509,8 +510,10 @@ class Frontend {
             },
             state: {
                 focusEntry: 0,
+                optionsContext,
+                url,
                 sentence,
-                optionsContext
+                documentTitle
             },
             content: {
                 definitions
@@ -624,15 +627,19 @@ class Frontend {
         }
 
         let url = window.location.href;
+        let documentTitle = document.title;
         if (this._useProxyPopup) {
             try {
-                url = await api.crossFrame.invoke(this._parentFrameId, 'getUrl', {});
+                ({url, documentTitle} = await api.crossFrame.invoke(this._parentFrameId, 'getPageInfo', {}));
             } catch (e) {
                 // NOP
             }
         }
 
         const depth = this._depth;
-        return {optionsContext: {depth, url}};
+        return {
+            optionsContext: {depth, url},
+            detail: {documentTitle}
+        };
     }
 }
