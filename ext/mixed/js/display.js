@@ -915,18 +915,14 @@ class Display extends EventDispatcher {
             focusEntry=null,
             scrollX=null,
             scrollY=null,
-            optionsContext=null,
-            sentence=null,
-            url
+            optionsContext=null
         } = state;
         if (typeof focusEntry !== 'number') { focusEntry = 0; }
-        if (typeof url !== 'string') { url = window.location.href; }
         if (!(typeof optionsContext === 'object' && optionsContext !== null)) {
             optionsContext = this.getOptionsContext();
             state.optionsContext = optionsContext;
             changeHistory = true;
         }
-        sentence = this._getValidSentenceData(sentence);
 
         this._setFullQuery(queryFull);
         this._setTitleText(query);
@@ -956,11 +952,6 @@ class Display extends EventDispatcher {
         this.trigger('contentUpdating', eventArgs);
 
         this._definitions = definitions;
-
-        for (const definition of definitions) {
-            definition.cloze = this._clozeBuild(sentence, isTerms ? definition.rawSource : definition.character);
-            definition.url = url;
-        }
 
         this._updateNavigation(this._history.hasPrevious(), this._history.hasNext());
         this._setNoContentVisible(definitions.length === 0);
@@ -1318,15 +1309,6 @@ class Display extends EventDispatcher {
         return {text, offset};
     }
 
-    _clozeBuild({text, offset}, source) {
-        return {
-            sentence: text.trim(),
-            prefix: text.substring(0, offset).trim(),
-            body: text.substring(offset, offset + source.length),
-            suffix: text.substring(offset + source.length).trim()
-        };
-    }
-
     _getClosestDefinitionIndex(element) {
         return this._getClosestIndex(element, '.entry');
     }
@@ -1382,17 +1364,18 @@ class Display extends EventDispatcher {
 
     _getNoteContext() {
         const {state} = this._history;
-        let documentTitle = null;
-        if (typeof state === 'object' && state !== null) {
-            ({documentTitle} = state);
-        }
+        let {documentTitle, url, sentence} = (isObject(state) ? state : {});
         if (typeof documentTitle !== 'string') {
             documentTitle = '';
         }
+        if (typeof url !== 'string') {
+            url = window.location.href;
+        }
+        sentence = this._getValidSentenceData(sentence);
         return {
-            document: {
-                title: documentTitle
-            }
+            url,
+            sentence,
+            documentTitle
         };
     }
 
@@ -1534,9 +1517,7 @@ class Display extends EventDispatcher {
         const {deck: deckName, model: modelName} = modeOptions;
         const fields = Object.entries(modeOptions.fields);
 
-        if (injectMedia) {
-            await this._injectAnkiNoteMedia(definition, mode, options, fields);
-        }
+        const injectedMedia = (injectMedia ? await this._injectAnkiNoteMedia(definition, mode, options, fields) : null);
 
         return await this._ankiNoteBuilder.createNote({
             definition,
@@ -1551,7 +1532,8 @@ class Display extends EventDispatcher {
             duplicateScope,
             resultOutputMode,
             glossaryLayoutMode,
-            compactTags
+            compactTags,
+            injectedMedia
         });
     }
 
@@ -1570,17 +1552,13 @@ class Display extends EventDispatcher {
             image: this._ankiNoteBuilder.containsMarker(fields, 'clipboard-image'),
             text: this._ankiNoteBuilder.containsMarker(fields, 'clipboard-text')
         };
-        const {screenshotFileName, clipboardImageFileName, clipboardText, audioFileName} = await api.injectAnkiNoteMedia(
+        return await api.injectAnkiNoteMedia(
             timestamp,
             definitionDetails,
             audioDetails,
             screenshotDetails,
             clipboardDetails
         );
-        if (screenshotFileName !== null) { definition.screenshotFileName = screenshotFileName; }
-        if (clipboardImageFileName !== null) { definition.clipboardImageFileName = clipboardImageFileName; }
-        if (audioFileName !== null) { definition.audioFileName = audioFileName; }
-        if (clipboardText !== null) { definition.clipboardText = clipboardText; }
     }
 
     _getDefinitionDetailsForNote(definition) {

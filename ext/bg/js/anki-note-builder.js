@@ -16,7 +16,6 @@
  */
 
 /* global
- * DictionaryDataUtil
  * TemplateRendererProxy
  */
 
@@ -35,6 +34,7 @@ class AnkiNoteBuilder {
         modelName,
         fields,
         tags=[],
+        injectedMedia=null,
         checkForDuplicates=true,
         duplicateScope='collection',
         resultOutputMode='split',
@@ -50,7 +50,15 @@ class AnkiNoteBuilder {
             duplicateScopeCheckChildren = true;
         }
 
-        const data = this._createNoteData(definition, mode, context, resultOutputMode, glossaryLayoutMode, compactTags);
+        const data = {
+            definition,
+            mode,
+            context,
+            resultOutputMode,
+            glossaryLayoutMode,
+            compactTags,
+            injectedMedia
+        };
         const formattedFieldValuePromises = [];
         for (const [, fieldValue] of fields) {
             const formattedFieldValuePromise = this._formatField(fieldValue, data, templates, errors);
@@ -103,36 +111,6 @@ class AnkiNoteBuilder {
     }
 
     // Private
-
-    _createNoteData(definition, mode, context, resultOutputMode, glossaryLayoutMode, compactTags) {
-        const pitches = DictionaryDataUtil.getPitchAccentInfos(definition);
-        const pitchCount = pitches.reduce((i, v) => i + v.pitches.length, 0);
-        const uniqueExpressions = new Set();
-        const uniqueReadings = new Set();
-        if (definition.type !== 'kanji') {
-            for (const {expression, reading} of definition.expressions) {
-                uniqueExpressions.add(expression);
-                uniqueReadings.add(reading);
-            }
-        }
-        return {
-            marker: null,
-            definition,
-            uniqueExpressions: [...uniqueExpressions],
-            uniqueReadings: [...uniqueReadings],
-            pitches,
-            pitchCount,
-            group: resultOutputMode === 'group',
-            merge: resultOutputMode === 'merge',
-            modeTermKanji: mode === 'term-kanji',
-            modeTermKana: mode === 'term-kana',
-            modeKanji: mode === 'kanji',
-            compactGlossaries: (glossaryLayoutMode === 'compact'),
-            glossaryLayoutMode,
-            compactTags,
-            context
-        };
-    }
 
     async _formatField(field, data, templates, errors=null) {
         return await this._stringReplaceAsync(field, this._markerPattern, async (g0, marker) => {

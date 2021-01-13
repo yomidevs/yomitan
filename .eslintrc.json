@@ -96,6 +96,7 @@
             "excludedFiles": [
                 "ext/mixed/js/core.js",
                 "ext/bg/js/template-renderer.js",
+                "ext/bg/js/anki-note-data.js",
                 "ext/mixed/js/dictionary-data-util.js"
             ],
             "globals": {
