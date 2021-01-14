@@ -18,7 +18,6 @@
 /* global
  * ClipboardMonitor
  * Display
- * DocumentUtil
  * api
  * wanakana
  */
@@ -43,20 +42,6 @@ class DisplaySearch extends Display {
                 getText: async () => (await api.clipboardGet())
             }
         });
-        this._onKeyDownIgnoreKeys = new Map([
-            ['ANY_MOD', new Set([
-                'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageDown', 'PageUp', 'Home', 'End', 'Enter', 'Escape',
-                'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10',
-                'F11', 'F12', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19', 'F20',
-                'F21', 'F22', 'F23', 'F24'
-            ])],
-            ['Control', new Set(['C', 'A', 'Z', 'Y', 'X', 'F', 'G'])],
-            ['Meta', new Set(['C', 'A', 'Z', 'Y', 'X', 'F', 'G'])],
-            ['OS', new Set()],
-            ['Alt', new Set()],
-            ['AltGraph', new Set()],
-            ['Shift', new Set()]
-        ]);
         this.autoPlayAudioDelay = 0;
     }
 
@@ -102,27 +87,14 @@ class DisplaySearch extends Display {
     }
 
     onKeyDown(e) {
-        const key = DocumentUtil.getKeyFromEvent(e);
-        const ignoreKeys = this._onKeyDownIgnoreKeys;
-
-        const activeModifierMap = new Map([
-            ['Control', e.ctrlKey],
-            ['Meta', e.metaKey],
-            ['Shift', e.shiftKey],
-            ['Alt', e.altKey],
-            ['ANY_MOD', true]
-        ]);
-
-        let preventFocus = false;
-        for (const [modifier, keys] of ignoreKeys.entries()) {
-            const modifierActive = activeModifierMap.get(modifier);
-            if (key === modifier || (modifierActive && keys.has(key))) {
-                preventFocus = true;
-                break;
-            }
-        }
-
-        if (!super.onKeyDown(e) && !preventFocus && document.activeElement !== this._queryInput) {
+        if (
+            !super.onKeyDown(e) &&
+            document.activeElement !== this._queryInput &&
+            !e.ctrlKey &&
+            !e.metaKey &&
+            !e.altKey &&
+            e.key.length === 1
+        ) {
             this._queryInput.focus({preventScroll: true});
         }
     }
