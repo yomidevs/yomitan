@@ -27,7 +27,7 @@ class KeyboardMouseInputField extends EventDispatcher {
         this._isPointerTypeSupported = isPointerTypeSupported;
         this._keySeparator = ' + ';
         this._inputNameMap = new Map(DocumentUtil.getModifierKeys(os));
-        this._keyPriorities = new Map([
+        this._modifierPriorities = new Map([
             ['meta', -4],
             ['ctrl', -3],
             ['alt', -2],
@@ -35,25 +35,29 @@ class KeyboardMouseInputField extends EventDispatcher {
         ]);
         this._mouseInputNamePattern = /^mouse(\d+)$/;
         this._eventListeners = new EventListenerCollection();
-        this._value = '';
-        this._type = null;
+        this._key = null;
+        this._modifiers = [];
         this._penPointerIds = new Set();
+        this._mouseModifiersSupported = false;
+        this._keySupported = false;
     }
 
-    get value() {
-        return this._value;
+    get modifiers() {
+        return this._modifiers;
     }
 
-    prepare(value, type) {
+    prepare(key, modifiers, mouseModifiersSupported=false, keySupported=false) {
         this.cleanup();
 
-        this._value = value;
-        const modifiers = this._splitValue(value);
-        const {displayValue} = this._getInputStrings(modifiers);
+        this._key = key;
+        this._modifiers = this._sortModifiers(modifiers);
+        this._mouseModifiersSupported = mouseModifiersSupported;
+        this._keySupported = keySupported;
+        this._updateDisplayString();
         const events = [
             [this._inputNode, 'keydown', this._onModifierKeyDown.bind(this), false]
         ];
-        if (type === 'modifierInputs' && this._mouseButton !== null) {
+        if (mouseModifiersSupported && this._mouseButton !== null) {
             events.push(
                 [this._mouseButton, 'mousedown', this._onMouseButtonMouseDown.bind(this), false],
                 [this._mouseButton, 'pointerdown', this._onMouseButtonPointerDown.bind(this), false],
@@ -64,7 +68,6 @@ class KeyboardMouseInputField extends EventDispatcher {
                 [this._mouseButton, 'contextmenu', this._onMouseButtonContextMenu.bind(this), false]
             );
         }
-        this._inputNode.value = displayValue;
         for (const args of events) {
             this._eventListeners.addEventListener(...args);
         }
@@ -72,35 +75,33 @@ class KeyboardMouseInputField extends EventDispatcher {
 
     cleanup() {
         this._eventListeners.removeAllEventListeners();
-        this._value = '';
-        this._type = null;
+        this._modifiers = [];
+        this._key = null;
+        this._mouseModifiersSupported = false;
+        this._keySupported = false;
         this._penPointerIds.clear();
     }
 
     clearInputs() {
-        this._updateInputs([]);
+        this._updateModifiers([], null);
     }
 
     // Private
 
-    _splitValue(value) {
-        return value.split(/[,;\s]+/).map((v) => v.trim().toLowerCase()).filter((v) => v.length > 0);
-    }
-
-    _sortInputs(inputs) {
+    _sortModifiers(modifiers) {
         const pattern = this._mouseInputNamePattern;
-        const keyPriorities = this._keyPriorities;
-        const inputInfos = inputs.map((value, index) => {
-            const match = pattern.exec(value);
+        const keyPriorities = this._modifierPriorities;
+        const modifierInfos = modifiers.map((modifier, index) => {
+            const match = pattern.exec(modifier);
             if (match !== null) {
-                return [value, 1, Number.parseInt(match[1], 10), index];
+                return [modifier, 1, Number.parseInt(match[1], 10), index];
             } else {
-                let priority = keyPriorities.get(value);
+                let priority = keyPriorities.get(modifier);
                 if (typeof priority === 'undefined') { priority = 0; }
-                return [value, 0, priority, index];
+                return [modifier, 0, priority, index];
             }
         });
-        inputInfos.sort((a, b) => {
+        modifierInfos.sort((a, b) => {
             let i = a[1] - b[1];
             if (i !== 0) { return i; }
 
@@ -113,36 +114,37 @@ class KeyboardMouseInputField extends EventDispatcher {
             i = a[3] - b[3];
             return i;
         });
-        return inputInfos.map(([value]) => value);
+        return modifierInfos.map(([modifier]) => modifier);
     }
 
-    _getInputStrings(inputs) {
-        let value = '';
+    _updateDisplayString() {
         let displayValue = '';
         let first = true;
-        for (const input of inputs) {
-            const {name} = this._getInputName(input);
+        for (const modifier of this._modifiers) {
+            const {name} = this._getModifierName(modifier);
             if (first) {
                 first = false;
             } else {
-                value += ', ';
                 displayValue += this._keySeparator;
             }
-            value += input;
             displayValue += name;
         }
-        return {value, displayValue};
+        if (this._key !== null) {
+            if (!first) { displayValue += this._keySeparator; }
+            displayValue += this._key;
+        }
+        this._inputNode.value = displayValue;
     }
 
-    _getInputName(value) {
+    _getModifierName(modifier) {
         const pattern = this._mouseInputNamePattern;
-        const match = pattern.exec(value);
+        const match = pattern.exec(modifier);
         if (match !== null) {
             return {name: `Mouse ${match[1]}`, type: 'mouse'};
         }
 
-        let name = this._inputNameMap.get(value);
-        if (typeof name === 'undefined') { name = value; }
+        let name = this._inputNameMap.get(modifier);
+        if (typeof name === 'undefined') { name = modifier; }
         return {name, type: 'key'};
     }
 
@@ -166,24 +168,40 @@ class KeyboardMouseInputField extends EventDispatcher {
         return modifiers;
     }
 
+    _isModifierKey(keyName) {
+        switch (keyName) {
+            case 'Alt':
+            case 'Control':
+            case 'Meta':
+            case 'Shift':
+                return true;
+            default:
+                return false;
+        }
+    }
+
     _onModifierKeyDown(e) {
         e.preventDefault();
 
         const key = DocumentUtil.getKeyFromEvent(e);
-        switch (key) {
-            case 'Escape':
-            case 'Backspace':
-                this.clearInputs();
-                break;
-            default:
-                this._addInputs(this._getModifierKeys(e));
-                break;
+        if (this._keySupported) {
+            this._updateModifiers([...this._getModifierKeys(e)], this._isModifierKey(key) ? void 0 : key);
+        } else {
+            switch (key) {
+                case 'Escape':
+                case 'Backspace':
+                    this.clearInputs();
+                    break;
+                default:
+                    this._addModifiers(this._getModifierKeys(e));
+                    break;
+            }
         }
     }
 
     _onMouseButtonMouseDown(e) {
         e.preventDefault();
-        this._addInputs(DocumentUtil.getActiveButtons(e));
+        this._addModifiers(DocumentUtil.getActiveButtons(e));
     }
 
     _onMouseButtonPointerDown(e) {
@@ -200,7 +218,7 @@ class KeyboardMouseInputField extends EventDispatcher {
             return;
         }
         e.preventDefault();
-        this._addInputs(DocumentUtil.getActiveButtons(e));
+        this._addModifiers(DocumentUtil.getActiveButtons(e));
     }
 
     _onMouseButtonPointerOver(e) {
@@ -227,22 +245,41 @@ class KeyboardMouseInputField extends EventDispatcher {
         e.preventDefault();
     }
 
-    _addInputs(newInputs) {
-        const inputs = new Set(this._splitValue(this._value));
-        for (const input of newInputs) {
-            inputs.add(input);
+    _addModifiers(newModifiers, newKey) {
+        const modifiers = new Set(this._modifiers);
+        for (const modifier of newModifiers) {
+            modifiers.add(modifier);
         }
-        this._updateInputs([...inputs]);
+        this._updateModifiers([...modifiers], newKey);
     }
 
-    _updateInputs(inputs) {
-        inputs = this._sortInputs(inputs);
+    _updateModifiers(modifiers, newKey) {
+        modifiers = this._sortModifiers(modifiers);
 
-        const node = this._inputNode;
-        const {value, displayValue} = this._getInputStrings(inputs);
-        node.value = displayValue;
-        if (this._value === value) { return; }
-        this._value = value;
-        this.trigger('change', {value, displayValue});
+        let changed = false;
+        if (typeof newKey !== 'undefined' && this._key !== newKey) {
+            this._key = newKey;
+            changed = true;
+        }
+        if (!this._areArraysEqual(this._modifiers, modifiers)) {
+            this._modifiers = modifiers;
+            changed = true;
+        }
+
+        this._updateDisplayString();
+        if (changed) {
+            this.trigger('change', {modifiers: this._modifiers, key: this._key});
+        }
+    }
+
+    _areArraysEqual(array1, array2) {
+        const length = array1.length;
+        if (length !== array2.length) { return false; }
+
+        for (let i = 0; i < length; ++i) {
+            if (array1[i] !== array2[i]) { return false; }
+        }
+
+        return true;
     }
 }

@@ -199,8 +199,8 @@ class ScanInputField {
         const isPointerTypeSupported = this._isPointerTypeSupported.bind(this);
         this._includeInputField = new KeyboardMouseInputField(includeInputNode, includeMouseButton, this._os, isPointerTypeSupported);
         this._excludeInputField = new KeyboardMouseInputField(excludeInputNode, excludeMouseButton, this._os, isPointerTypeSupported);
-        this._includeInputField.prepare(include, 'modifierInputs');
-        this._excludeInputField.prepare(exclude, 'modifierInputs');
+        this._includeInputField.prepare(null, this._splitModifiers(include), true, false);
+        this._excludeInputField.prepare(null, this._splitModifiers(exclude), true, false);
 
         this._eventListeners.on(this._includeInputField, 'change', this._onIncludeValueChange.bind(this));
         this._eventListeners.on(this._excludeInputField, 'change', this._onExcludeValueChange.bind(this));
@@ -230,12 +230,14 @@ class ScanInputField {
 
     // Private
 
-    _onIncludeValueChange({value}) {
-        this._parent.setProperty(this._index, 'include', value, true);
+    _onIncludeValueChange({modifiers}) {
+        modifiers = this._joinModifiers(modifiers);
+        this._parent.setProperty(this._index, 'include', modifiers, true);
     }
 
-    _onExcludeValueChange({value}) {
-        this._parent.setProperty(this._index, 'exclude', value, true);
+    _onExcludeValueChange({modifiers}) {
+        modifiers = this._joinModifiers(modifiers);
+        this._parent.setProperty(this._index, 'exclude', modifiers, true);
     }
 
     _onRemoveClick(e) {
@@ -295,5 +297,13 @@ class ScanInputField {
         showAdvanced = !!showAdvanced;
         this._node.dataset.showAdvanced = `${showAdvanced}`;
         this._parent.setProperty(this._index, 'options.showAdvanced', showAdvanced, false);
+    }
+
+    _splitModifiers(modifiersString) {
+        return modifiersString.split(/[,;\s]+/).map((v) => v.trim().toLowerCase()).filter((v) => v.length > 0);
+    }
+
+    _joinModifiers(modifiersArray) {
+        return modifiersArray.join(', ');
     }
 }
