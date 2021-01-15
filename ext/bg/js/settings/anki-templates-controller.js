@@ -173,9 +173,9 @@ class AnkiTemplatesController {
             if (definition !== null) {
                 const options = await this._settingsController.getOptions();
                 const context = {
-                    document: {
-                        title: document.title
-                    }
+                    url: window.location.href,
+                    sentence: {text: definition.rawSource, offset: 0},
+                    documentTitle: document.title
                 };
                 let templates = options.anki.fieldTemplates;
                 if (typeof templates !== 'string') { templates = this._defaultFieldTemplates; }
