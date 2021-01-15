@@ -97,6 +97,7 @@ class Backend {
             ['getAnkiNoteInfo',              {async: true,  contentScript: true,  handler: this._onApiGetAnkiNoteInfo.bind(this)}],
             ['injectAnkiNoteMedia',          {async: true,  contentScript: true,  handler: this._onApiInjectAnkiNoteMedia.bind(this)}],
             ['noteView',                     {async: true,  contentScript: true,  handler: this._onApiNoteView.bind(this)}],
+            ['suspendAnkiCardsForNote',      {async: true,  contentScript: true,  handler: this._onApiSuspendAnkiCardsForNote.bind(this)}],
             ['commandExec',                  {async: false, contentScript: true,  handler: this._onApiCommandExec.bind(this)}],
             ['getDefinitionAudioInfo',       {async: true,  contentScript: true,  handler: this._onApiGetDefinitionAudioInfo.bind(this)}],
             ['downloadDefinitionAudio',      {async: true,  contentScript: true,  handler: this._onApiDownloadDefinitionAudio.bind(this)}],
@@ -493,6 +494,16 @@ class Backend {
 
     async _onApiNoteView({noteId}) {
         return await this._anki.guiBrowseNote(noteId);
+    }
+
+    async _onApiSuspendAnkiCardsForNote({noteId}) {
+        const cardIds = await this._anki.findCardsForNote(noteId);
+        const count = cardIds.length;
+        if (count > 0) {
+            const okay = await this._anki.suspendCards(cardIds);
+            if (!okay) { return 0; }
+        }
+        return count;
     }
 
     _onApiCommandExec({command, params}) {

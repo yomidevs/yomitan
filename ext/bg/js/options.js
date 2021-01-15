@@ -687,6 +687,8 @@ class OptionsUtil {
         //  Added sentenceParsing.enableTerminationCharacters.
         //  Added sentenceParsing.terminationCharacters.
         //  Changed general.popupActionBarLocation.
+        //  Added inputs.hotkeys.
+        //  Added anki.suspendNewCards.
         for (const profile of options.profiles) {
             profile.options.translation.textReplacements = {
                 searchOriginal: true,
@@ -731,6 +733,7 @@ class OptionsUtil {
                     {action: 'copyHostSelection', key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup', 'search'], enabled: true}
                 ]
             };
+            profile.options.anki.suspendNewCards = false;
         }
         return options;
     }

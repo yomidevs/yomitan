@@ -417,7 +417,8 @@ function createProfileOptionsUpdatedTestData1() {
             kanji: {deck: '', model: '', fields: {}},
             duplicateScope: 'collection',
             checkForDuplicates: true,
-            fieldTemplates: null
+            fieldTemplates: null,
+            suspendNewCards: false
         },
         sentenceParsing: {
             scanExtent: 200,

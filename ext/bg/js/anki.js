@@ -122,6 +122,22 @@ class AnkiConnect {
         return await this._invoke('multi', {actions});
     }
 
+    async suspendCards(cardIds) {
+        if (!this._enabled) { return false; }
+        await this._checkVersion();
+        return await this._invoke('suspend', {cards: cardIds});
+    }
+
+    async findCards(query) {
+        if (!this._enabled) { return []; }
+        await this._checkVersion();
+        return await this._invoke('findCards', {query});
+    }
+
+    async findCardsForNote(noteId) {
+        return await this.findCards(`nid:${noteId}`);
+    }
+
     getRootDeckName(deckName) {
         const index = deckName.indexOf('::');
         return index >= 0 ? deckName.substring(0, index) : deckName;

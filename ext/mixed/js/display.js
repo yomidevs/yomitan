@@ -1181,10 +1181,18 @@ class Display extends EventDispatcher {
 
         const overrideToken = this._progressIndicatorVisible.setOverride(true);
         try {
+            const {anki: {suspendNewCards}} = this._options;
             const noteContext = this._getNoteContext();
             const note = await this._createNote(definition, mode, noteContext, true);
             const noteId = await api.addAnkiNote(note);
             if (noteId) {
+                if (suspendNewCards) {
+                    try {
+                        await api.suspendAnkiCardsForNote(noteId);
+                    } catch (e) {
+                        // NOP
+                    }
+                }
                 button.disabled = true;
                 this._viewerButtonShow(definitionIndex, noteId);
             } else {

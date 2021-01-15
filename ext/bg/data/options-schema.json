@@ -739,7 +739,8 @@
                                     "kanji",
                                     "duplicateScope",
                                     "checkForDuplicates",
-                                    "fieldTemplates"
+                                    "fieldTemplates",
+                                    "suspendNewCards"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -841,6 +842,10 @@
                                     "fieldTemplates": {
                                         "type": ["string", "null"],
                                         "default": null
+                                    },
+                                    "suspendNewCards": {
+                                        "type": "boolean",
+                                        "default": false
                                     }
                                 }
                             },

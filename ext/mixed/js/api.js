@@ -93,6 +93,10 @@ const api = (() => {
             return this._invoke('noteView', {noteId});
         }
 
+        suspendAnkiCardsForNote(noteId) {
+            return this._invoke('suspendAnkiCardsForNote', {noteId});
+        }
+
         getDefinitionAudioInfo(source, expression, reading, details) {
             return this._invoke('getDefinitionAudioInfo', {source, expression, reading, details});
         }
