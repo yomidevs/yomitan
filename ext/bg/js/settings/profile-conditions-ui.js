@@ -485,32 +485,13 @@ class ProfileConditionUI {
 
     _onTypeChange(e) {
         const type = e.currentTarget.value;
-        const operators = this._getDescriptorOperators(type);
-        const operator = operators.length > 0 ? operators[0].name : '';
-        const operatorDetails = this._getOperatorDetails(type, operator);
-        const {defaultValue} = operatorDetails;
-        this._updateSelect(this._operatorInput, this._operatorOptionContainer, operators, operator);
-        this._updateValueInput(defaultValue, operatorDetails);
-        this.settingsController.modifyGlobalSettings([
-            {action: 'set', path: this.getPath('type'), value: type},
-            {action: 'set', path: this.getPath('operator'), value: operator},
-            {action: 'set', path: this.getPath('value'), value: defaultValue}
-        ]);
+        this._setType(type);
     }
 
     _onOperatorChange(e) {
         const type = this._typeInput.value;
         const operator = e.currentTarget.value;
-        const operatorDetails = this._getOperatorDetails(type, operator);
-        const settingsModifications = [{action: 'set', path: this.getPath('operator'), value: operator}];
-        if (operatorDetails.resetDefaultOnChange) {
-            const {defaultValue} = operatorDetails;
-            const okay = this._updateValueInput(defaultValue, operatorDetails);
-            if (okay) {
-                settingsModifications.push({action: 'set', path: this.getPath('value'), value: defaultValue});
-            }
-        }
-        this.settingsController.modifyGlobalSettings(settingsModifications);
+        this._setOperator(type, operator);
     }
 
     _onValueInputChange({validate, normalize}, e) {
@@ -543,6 +524,9 @@ class ProfileConditionUI {
         switch (action) {
             case 'delete':
                 this._removeSelf();
+                break;
+            case 'resetValue':
+                this._resetValue();
                 break;
         }
     }
@@ -653,5 +637,40 @@ class ProfileConditionUI {
 
     _joinModifiers(modifiersArray) {
         return modifiersArray.join(', ');
+    }
+
+    async _setType(type, operator) {
+        const operators = this._getDescriptorOperators(type);
+        if (typeof operator === 'undefined') {
+            operator = operators.length > 0 ? operators[0].name : '';
+        }
+        const operatorDetails = this._getOperatorDetails(type, operator);
+        const {defaultValue} = operatorDetails;
+        this._updateSelect(this._operatorInput, this._operatorOptionContainer, operators, operator);
+        this._updateValueInput(defaultValue, operatorDetails);
+        await this.settingsController.modifyGlobalSettings([
+            {action: 'set', path: this.getPath('type'), value: type},
+            {action: 'set', path: this.getPath('operator'), value: operator},
+            {action: 'set', path: this.getPath('value'), value: defaultValue}
+        ]);
+    }
+
+    async _setOperator(type, operator) {
+        const operatorDetails = this._getOperatorDetails(type, operator);
+        const settingsModifications = [{action: 'set', path: this.getPath('operator'), value: operator}];
+        if (operatorDetails.resetDefaultOnChange) {
+            const {defaultValue} = operatorDetails;
+            const okay = this._updateValueInput(defaultValue, operatorDetails);
+            if (okay) {
+                settingsModifications.push({action: 'set', path: this.getPath('value'), value: defaultValue});
+            }
+        }
+        await this.settingsController.modifyGlobalSettings(settingsModifications);
+    }
+
+    async _resetValue() {
+        const type = this._typeInput.value;
+        const operator = this._operatorInput.value;
+        await this._setType(type, operator);
     }
 }
