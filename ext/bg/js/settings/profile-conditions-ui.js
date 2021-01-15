@@ -19,8 +19,9 @@
  * KeyboardMouseInputField
  */
 
-class ProfileConditionsUI {
+class ProfileConditionsUI extends EventDispatcher {
     constructor(settingsController) {
+        super();
         this._settingsController = settingsController;
         this._os = null;
         this._conditionGroupsContainer = null;
@@ -88,7 +89,12 @@ class ProfileConditionsUI {
         this._os = value;
     }
 
-    prepare(profileIndex, conditionGroups) {
+    async prepare(profileIndex) {
+        const options = await this._settingsController.getOptionsFull();
+        const {profiles} = options;
+        if (profileIndex < 0 || profileIndex >= profiles.length) { return; }
+        const {conditionGroups} = profiles[profileIndex];
+
         this._profileIndex = profileIndex;
         this._conditionGroupsContainer = document.querySelector('#profile-condition-groups');
         this._addConditionGroupButton = document.querySelector('#profile-add-condition-group');
@@ -195,6 +201,8 @@ class ProfileConditionsUI {
             items: []
         }]);
 
+        this._triggerConditionGroupCountChanged(this._children.length);
+
         return true;
     }
 
@@ -228,6 +236,8 @@ class ProfileConditionsUI {
             deleteCount: 0,
             items: [conditionGroup]
         }]);
+
+        this._triggerConditionGroupCountChanged(this._children.length);
     }
 
     _addConditionGroup(conditionGroup, index) {
@@ -269,6 +279,10 @@ class ProfileConditionsUI {
     _normalizeDomains(value) {
         return this.splitValue(value).join(', ');
     }
+
+    _triggerConditionGroupCountChanged(count) {
+        this.trigger('conditionGroupCountChanged', {count, profileIndex: this._profileIndex});
+    }
 }
 
 class ProfileConditionGroupUI {
@@ -300,6 +314,10 @@ class ProfileConditionGroupUI {
 
     get node() {
         return this._node;
+    }
+
+    get childCount() {
+        return this._children.length;
     }
 
     prepare(conditionGroup) {
@@ -358,7 +376,7 @@ class ProfileConditionGroupUI {
         }]);
 
         if (this._children.length === 0) {
-            this._parent.removeConditionGroup(this);
+            this.removeSelf();
         }
 
         return true;
@@ -367,6 +385,10 @@ class ProfileConditionGroupUI {
     getPath(property) {
         property = (typeof property === 'string' ? `.${property}` : '');
         return this._parent.getPath(`conditionGroups[${this._index}]${property}`);
+    }
+
+    removeSelf() {
+        this._parent.removeConditionGroup(this);
     }
 
     // Private
@@ -455,7 +477,10 @@ class ProfileConditionUI {
         this._eventListeners.addEventListener(this._typeInput, 'change', this._onTypeChange.bind(this), false);
         this._eventListeners.addEventListener(this._operatorInput, 'change', this._onOperatorChange.bind(this), false);
         if (this._removeButton !== null) { this._eventListeners.addEventListener(this._removeButton, 'click', this._onRemoveButtonClick.bind(this), false); }
-        if (this._menuButton !== null) { this._eventListeners.addEventListener(this._menuButton, 'menuClosed', this._onMenuClosed.bind(this), false); }
+        if (this._menuButton !== null) {
+            this._eventListeners.addEventListener(this._menuButton, 'menuOpened', this._onMenuOpened.bind(this), false);
+            this._eventListeners.addEventListener(this._menuButton, 'menuClosed', this._onMenuClosed.bind(this), false);
+        }
     }
 
     cleanup() {
@@ -520,10 +545,20 @@ class ProfileConditionUI {
         this._removeSelf();
     }
 
+    _onMenuOpened({detail: {menu}}) {
+        const deleteGroup = menu.querySelector('.popup-menu-item[data-menu-action="deleteGroup"]');
+        if (deleteGroup !== null) {
+            deleteGroup.hidden = (this._parent.childCount <= 1);
+        }
+    }
+
     _onMenuClosed({detail: {action}}) {
         switch (action) {
             case 'delete':
                 this._removeSelf();
+                break;
+            case 'deleteGroup':
+                this._parent.removeSelf();
                 break;
             case 'resetValue':
                 this._resetValue();

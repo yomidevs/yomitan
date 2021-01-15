@@ -92,6 +92,7 @@ class ProfileController {
         if (this._profileMoveUpButton !== null) { this._profileMoveUpButton.addEventListener('click', this._onMove.bind(this, -1), false); }
         if (this._profileMoveDownButton !== null) { this._profileMoveDownButton.addEventListener('click', this._onMove.bind(this, 1), false); }
 
+        this._profileConditionsUI.on('conditionGroupCountChanged', this._onConditionGroupCountChanged.bind(this));
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
         this._onOptionsChanged();
     }
@@ -334,7 +335,7 @@ class ProfileController {
 
         this._profileConditionsUI.cleanup();
         this._profileConditionsIndex = profileIndex;
-        this._profileConditionsUI.prepare(profileIndex, profile.conditionGroups);
+        this._profileConditionsUI.prepare(profileIndex);
         if (this._profileConditionsProfileName !== null) {
             this._profileConditionsProfileName.textContent = profile.name;
         }
@@ -368,7 +369,7 @@ class ProfileController {
         this._profileConditionsUI.cleanup();
         const conditionsProfile = this._getProfile(this._profileConditionsIndex !== null ? this._profileConditionsIndex : settingsProfileIndex);
         if (conditionsProfile !== null) {
-            this._profileConditionsUI.prepare(settingsProfileIndex, conditionsProfile.conditionGroups);
+            this._profileConditionsUI.prepare(settingsProfileIndex);
         }
 
         // Udpate profile entries
@@ -447,6 +448,13 @@ class ProfileController {
 
     _onMove(offset) {
         this.moveProfile(this._settingsController.profileIndex, offset);
+    }
+
+    _onConditionGroupCountChanged({count, profileIndex}) {
+        if (profileIndex >= 0 && profileIndex < this._profileEntryList.length) {
+            const profileEntry = this._profileEntryList[profileIndex];
+            profileEntry.setConditionGroupsCount(count);
+        }
     }
 
     _addProfileEntry(profileIndex) {
@@ -626,8 +634,12 @@ class ProfileEntry {
 
     updateState() {
         this._nameInput.value = this._profile.name;
-        this._countText.textContent = this._profile.conditionGroups.length;
+        this._countText.textContent = `${this._profile.conditionGroups.length}`;
         this._isDefaultRadio.checked = (this._index === this._profileController.profileCurrentIndex);
+    }
+
+    setConditionGroupsCount(count) {
+        this._countText.textContent = `${count}`;
     }
 
     // Private
