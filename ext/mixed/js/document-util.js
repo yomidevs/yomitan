@@ -227,11 +227,6 @@ class DocumentUtil {
         return buttons;
     }
 
-    static getKeyFromEvent(event) {
-        const key = event.key;
-        return (typeof key === 'string' ? (key.length === 1 ? key.toUpperCase() : key) : '');
-    }
-
     static addFullscreenChangeEventListener(onFullscreenChanged, eventListenerCollection=null) {
         const target = document;
         const options = false;

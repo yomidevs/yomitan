@@ -140,14 +140,14 @@ class Display extends EventDispatcher {
             {key: 'Home',      modifiers: ['alt'],  action: 'firstEntry'},
             {key: 'ArrowUp',   modifiers: ['alt'],  action: 'previousEntry'},
             {key: 'ArrowDown', modifiers: ['alt'],  action: 'nextEntry'},
-            {key: 'B',         modifiers: ['alt'],  action: 'historyBackward'},
-            {key: 'F',         modifiers: ['alt'],  action: 'historyForward'},
-            {key: 'K',         modifiers: ['alt'],  action: 'addNoteKanji'},
-            {key: 'E',         modifiers: ['alt'],  action: 'addNoteTermKanji'},
-            {key: 'R',         modifiers: ['alt'],  action: 'addNoteTermKana'},
-            {key: 'P',         modifiers: ['alt'],  action: 'playAudio'},
-            {key: 'V',         modifiers: ['alt'],  action: 'viewNote'},
-            {key: 'C',         modifiers: ['ctrl'], action: 'copyHostSelection'}
+            {key: 'KeyB',      modifiers: ['alt'],  action: 'historyBackward'},
+            {key: 'KeyF',      modifiers: ['alt'],  action: 'historyForward'},
+            {key: 'KeyK',      modifiers: ['alt'],  action: 'addNoteKanji'},
+            {key: 'KeyE',      modifiers: ['alt'],  action: 'addNoteTermKanji'},
+            {key: 'KeyR',      modifiers: ['alt'],  action: 'addNoteTermKana'},
+            {key: 'KeyP',      modifiers: ['alt'],  action: 'playAudio'},
+            {key: 'KeyV',      modifiers: ['alt'],  action: 'viewNote'},
+            {key: 'KeyC',      modifiers: ['ctrl'], action: 'copyHostSelection'}
         ]);
         this.registerMessageHandlers([
             ['setMode', {async: false, handler: this._onMessageSetMode.bind(this)}]
@@ -273,7 +273,7 @@ class Display extends EventDispatcher {
     }
 
     onKeyDown(e) {
-        const key = DocumentUtil.getKeyFromEvent(e);
+        const key = e.code;
         const handlers = this._hotkeys.get(key);
         if (typeof handlers === 'undefined') { return false; }
 

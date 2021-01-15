@@ -156,7 +156,7 @@ class KeyboardMouseInputField extends EventDispatcher {
         // This is a hack and only works when both Shift and Alt are not pressed.
         if (
             !modifiers.has('meta') &&
-            DocumentUtil.getKeyFromEvent(e) === 'Meta' &&
+            e.key === 'Meta' &&
             !(
                 modifiers.size === 2 &&
                 modifiers.has('shift') &&
@@ -170,10 +170,16 @@ class KeyboardMouseInputField extends EventDispatcher {
 
     _isModifierKey(keyName) {
         switch (keyName) {
-            case 'Alt':
-            case 'Control':
-            case 'Meta':
-            case 'Shift':
+            case 'AltLeft':
+            case 'AltRight':
+            case 'ControlLeft':
+            case 'ControlRight':
+            case 'MetaLeft':
+            case 'MetaRight':
+            case 'ShiftLeft':
+            case 'ShiftRight':
+            case 'OSLeft':
+            case 'OSRight':
                 return true;
             default:
                 return false;
@@ -183,7 +189,8 @@ class KeyboardMouseInputField extends EventDispatcher {
     _onModifierKeyDown(e) {
         e.preventDefault();
 
-        const key = DocumentUtil.getKeyFromEvent(e);
+        let key = e.code;
+        if (key === 'Unidentified' || key === '') { key = void 0; }
         if (this._keySupported) {
             this._updateModifiers([...this._getModifierKeys(e)], this._isModifierKey(key) ? void 0 : key);
         } else {
