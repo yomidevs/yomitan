@@ -317,7 +317,8 @@
             <div class="settings-item-children more" hidden>
                 <p>
                     A keyboard modifier key can be used to activate text scanning when the cursor is moved.
-                    Alternatively, the <em>None</em> option can be used to scan text whenever the cursor is moved.
+                    Alternatively, the <em>No key</em> option can be used to scan text whenever the cursor is moved,
+                    without requiring any key to be held.
                 </p>
                 <p>
                     More advanced scanning input customization can be set up by enabling the <em>Advanced</em> option
@@ -346,46 +347,10 @@
             </div>
         </div></div>
         <div class="settings-item">
-            <div class="settings-item-inner settings-item-inner-wrappable">
-                <div class="settings-item-left">
-                    <div class="settings-item-label">
-                        Support inputs for devices with touch screens
-                        <a class="more-toggle more-only" data-parent-distance="4">(?)</a>
-                    </div>
-                </div>
-                <div class="settings-item-right flex-row-wrap">
-                    <div class="settings-item-group settings-item-group-wrap">
-                        <label class="settings-item-group-item flex-label no-wrap">
-                            <label class="checkbox"><input type="checkbox" data-setting="scanning.touchInputEnabled"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                            <span>Touch inputs</span>
-                        </label>
-                        <label class="settings-item-group-item flex-label no-wrap advanced-only">
-                            <label class="checkbox"><input type="checkbox" data-setting="scanning.pointerEventsEnabled"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
-                            <span>Pointer inputs</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="settings-item-children more" hidden>
-                <p>
-                    To enable text scanning when using devices with a touch screen, either the <em>Touch inputs</em> or the <em>Pointer inputs</em> option must be enabled.
-                    <em>Touch inputs</em> supports generic touches on a touch screen device, but do not distinguish between touch and pen inputs.
-                    <em>Pointer inputs</em> supports supports the detection pen devices, but may not work on all devices.
-                    If both options are enabled, <em>Pointer inputs</em> takes precedence.
-                </p>
-                <p>
-                    The <em>Pointer inputs</em> option is only visible when the <em>Advanced</em> option is enabled.
-                </p>
-                <p>
-                    <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
-                </p>
-            </div>
-        </div>
-        <div class="settings-item">
             <div class="settings-item-inner">
                 <div class="settings-item-left">
                     <div class="settings-item-label">Auto-hide search popup</div>
-                    <div class="settings-item-description">When no text or definitions are found, the popup will automatically hide.</div>
+                    <div class="settings-item-description">When no definitions are found after scanning text, the popup will automatically hide.</div>
                 </div>
                 <div class="settings-item-right">
                     <label class="toggle"><input type="checkbox" data-setting="scanning.autoHideResults"
@@ -411,7 +376,7 @@
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
                 <div class="settings-item-label">Scan delay <span class="light">(in milliseconds)</span></div>
-                <div class="settings-item-description">When no key or button is required for scanning, the delay before scanning occurs.</div>
+                <div class="settings-item-description">Change the delay before scanning occurs when no modifier key is required.</div>
             </div>
             <div class="settings-item-right">
                 <input type="number" data-setting="scanning.delay" min="0">
@@ -460,6 +425,42 @@
                 <input type="number" data-setting="scanning.length" min="1" step="1">
             </div>
         </div></div>
+        <div class="settings-item advanced-only">
+            <div class="settings-item-inner settings-item-inner-wrappable">
+                <div class="settings-item-left">
+                    <div class="settings-item-label">
+                        Support inputs for devices with touch screens
+                        <a class="more-toggle more-only" data-parent-distance="4">(?)</a>
+                    </div>
+                </div>
+                <div class="settings-item-right flex-row-wrap">
+                    <div class="settings-item-group settings-item-group-wrap">
+                        <label class="settings-item-group-item flex-label no-wrap">
+                            <label class="checkbox"><input type="checkbox" data-setting="scanning.touchInputEnabled"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                            <span>Touch inputs</span>
+                        </label>
+                        <label class="settings-item-group-item flex-label no-wrap">
+                            <label class="checkbox"><input type="checkbox" data-setting="scanning.pointerEventsEnabled"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                            <span>Pointer inputs</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-item-children more" hidden>
+                <p>
+                    To enable text scanning when using devices with a touch screen, either the <em>Touch inputs</em> or the <em>Pointer inputs</em> option must be enabled.
+                    <em>Touch inputs</em> supports generic touches on a touch screen device, but do not distinguish between touch and pen inputs.
+                    <em>Pointer inputs</em> supports supports the detection pen devices, but may not work on all devices.
+                    If both options are enabled, <em>Pointer inputs</em> takes precedence.
+                </p>
+                <p>
+                    The <em>Pointer inputs</em> option is only visible when the <em>Advanced</em> option is enabled.
+                </p>
+                <p>
+                    <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>
+                </p>
+            </div>
+        </div>
         <div class="settings-item settings-item-button advanced-only" data-modal-action="show,input-action-prevention"><div class="settings-item-inner">
             <div class="settings-item-left">
                 <div class="settings-item-label">Configure input action prevention&hellip;</div>

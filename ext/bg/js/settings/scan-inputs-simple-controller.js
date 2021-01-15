@@ -106,7 +106,7 @@ class ScanInputsSimpleController {
 
     _populateSelect(select, hasOther) {
         const modifierKeys = [
-            {value: 'none', name: 'None'},
+            {value: 'none', name: 'No key'},
             ...DocumentUtil.getModifierKeys(this._os).map(([value, name]) => ({value, name}))
         ];
 
