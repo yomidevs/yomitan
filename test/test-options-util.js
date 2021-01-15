@@ -436,6 +436,25 @@ function createProfileOptionsUpdatedTestData1() {
                 {enabled: true, character1: '？', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true},
                 {enabled: true, character1: '…', character2: null, includeCharacterAtStart: false, includeCharacterAtEnd: true}
             ]
+        },
+        inputs: {
+            hotkeys: [
+                {action: 'close',             key: 'Escape',    modifiers: [],       scopes: ['popup', 'search'], enabled: true},
+                {action: 'previousEntry3',    key: 'PageUp',    modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+                {action: 'nextEntry3',        key: 'PageDown',  modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+                {action: 'lastEntry',         key: 'End',       modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+                {action: 'firstEntry',        key: 'Home',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+                {action: 'previousEntry',     key: 'ArrowUp',   modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+                {action: 'nextEntry',         key: 'ArrowDown', modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+                {action: 'historyBackward',   key: 'KeyB',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+                {action: 'historyForward',    key: 'KeyF',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+                {action: 'addNoteKanji',      key: 'KeyK',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+                {action: 'addNoteTermKanji',  key: 'KeyE',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+                {action: 'addNoteTermKana',   key: 'KeyR',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+                {action: 'playAudio',         key: 'KeyP',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+                {action: 'viewNote',          key: 'KeyV',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
+                {action: 'copyHostSelection', key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup', 'search'], enabled: true}
+            ]
         }
     };
 }

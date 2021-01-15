@@ -132,23 +132,6 @@ class Display extends EventDispatcher {
             ['playAudio',         () => { this._playAudioCurrent(); }],
             ['copyHostSelection', () => this._copyHostSelection()]
         ]);
-        this.registerHotkeys([
-            {key: 'Escape',    modifiers: [],       action: 'close'},
-            {key: 'PageUp',    modifiers: ['alt'],  action: 'previousEntry3'},
-            {key: 'PageDown',  modifiers: ['alt'],  action: 'nextEntry3'},
-            {key: 'End',       modifiers: ['alt'],  action: 'lastEntry'},
-            {key: 'Home',      modifiers: ['alt'],  action: 'firstEntry'},
-            {key: 'ArrowUp',   modifiers: ['alt'],  action: 'previousEntry'},
-            {key: 'ArrowDown', modifiers: ['alt'],  action: 'nextEntry'},
-            {key: 'KeyB',      modifiers: ['alt'],  action: 'historyBackward'},
-            {key: 'KeyF',      modifiers: ['alt'],  action: 'historyForward'},
-            {key: 'KeyK',      modifiers: ['alt'],  action: 'addNoteKanji'},
-            {key: 'KeyE',      modifiers: ['alt'],  action: 'addNoteTermKanji'},
-            {key: 'KeyR',      modifiers: ['alt'],  action: 'addNoteTermKana'},
-            {key: 'KeyP',      modifiers: ['alt'],  action: 'playAudio'},
-            {key: 'KeyV',      modifiers: ['alt'],  action: 'viewNote'},
-            {key: 'KeyC',      modifiers: ['ctrl'], action: 'copyHostSelection'}
-        ]);
         this.registerMessageHandlers([
             ['setMode', {async: false, handler: this._onMessageSetMode.bind(this)}]
         ]);
@@ -313,6 +296,7 @@ class Display extends EventDispatcher {
         this._options = options;
         this._ankiFieldTemplates = templates;
 
+        this._updateHotkeys(options);
         this._updateDocumentOptions(options);
         this._updateTheme(options.general.popupTheme);
         this.setCustomCss(options.general.customPopupCss);
@@ -398,17 +382,6 @@ class Display extends EventDispatcher {
     registerActions(actions) {
         for (const [name, handler] of actions) {
             this._actions.set(name, handler);
-        }
-    }
-
-    registerHotkeys(hotkeys) {
-        for (const {key, modifiers, action} of hotkeys) {
-            let handlers = this._hotkeys.get(key);
-            if (typeof handlers === 'undefined') {
-                handlers = [];
-                this._hotkeys.set(key, handlers);
-            }
-            handlers.push({modifiers: new Set(modifiers), action});
         }
     }
 
@@ -1901,5 +1874,26 @@ class Display extends EventDispatcher {
         width = Math.max(Math.max(0, handleSize.width), width);
         height = Math.max(Math.max(0, handleSize.height), height);
         await this._invokeOwner('setFrameSize', {width, height});
+    }
+
+    _registerHotkey(key, modifiers, action) {
+        if (!this._actions.has(action)) { return false; }
+
+        let handlers = this._hotkeys.get(key);
+        if (typeof handlers === 'undefined') {
+            handlers = [];
+            this._hotkeys.set(key, handlers);
+        }
+        handlers.push({modifiers: new Set(modifiers), action});
+        return true;
+    }
+
+    _updateHotkeys(options) {
+        this._hotkeys.clear();
+
+        for (const {action, key, modifiers, scopes, enabled} of options.inputs.hotkeys) {
+            if (!enabled || !scopes.includes(this._pageType)) { continue; }
+            this._registerHotkey(key, modifiers, action);
+        }
     }
 }

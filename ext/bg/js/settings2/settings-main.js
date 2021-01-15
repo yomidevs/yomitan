@@ -25,6 +25,7 @@
  * DictionaryImportController
  * DocumentFocusController
  * GenericSettingController
+ * KeyboardShortcutController
  * ModalController
  * NestedPopupsController
  * PopupPreviewController
@@ -127,6 +128,9 @@ async function setupGenericSettingsController(genericSettingController) {
 
         const sentenceTerminationCharactersController = new SentenceTerminationCharactersController(settingsController);
         sentenceTerminationCharactersController.prepare();
+
+        const keyboardShortcutController = new KeyboardShortcutController(settingsController);
+        keyboardShortcutController.prepare();
 
         await Promise.all(preparePromises);
 

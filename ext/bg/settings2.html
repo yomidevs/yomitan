@@ -1482,6 +1482,14 @@
                 </div>
             </div>
         </div></div>
+        <div class="settings-item settings-item-button" data-modal-action="show,keyboard-shortcuts"><div class="settings-item-inner">
+            <div class="settings-item-left">
+                <div class="settings-item-label">Configure keyboard shortcuts&hellip;</div>
+            </div>
+            <div class="settings-item-right open-panel-button-container">
+                <button class="icon-button"><span class="icon-button-inner"><span class="icon" data-icon="material-right-arrow"></span></span></button>
+            </div>
+        </div></div>
     </div>
 
     <!-- Backup -->
@@ -2807,6 +2815,88 @@
 </div></div></template>
 
 
+<!-- Keyboard shortcuts modal -->
+<div id="keyboard-shortcuts" class="modal-container" tabindex="-1" role="dialog" hidden><div class="modal-content modal-content-full">
+    <div class="modal-header">
+        <div class="modal-title">Keyboard Shortcuts</div>
+        <div class="modal-header-button-container">
+            <div class="modal-header-button-group">
+                <button class="icon-button modal-header-button" data-modal-action="expand"><span class="icon-button-inner"><span class="icon" data-icon="expand"></span></span></button>
+                <button class="icon-button modal-header-button" data-modal-action="collapse"><span class="icon-button-inner"><span class="icon" data-icon="collapse"></span></span></button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-body">
+        <div class="hotkey-list generic-list" id="hotkey-list"></div>
+        <div class="hotkey-list-empty" id="hotkey-list-empty" hidden>
+            No keyboard shortcuts defined.
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="low-emphasis danger" id="hotkey-list-reset">Reset</button>
+        <button class="low-emphasis" id="hotkey-list-add">Add</button>
+        <button data-modal-action="hide">Close</button>
+    </div>
+</div></div>
+
+<!-- Keyboard shortcuts templates -->
+<template id="hotkey-list-item-template"><div class="hotkey-list-item"><div class="hotkey-list-item-grid">
+    <div class="hotkey-list-item-index-cell generic-list-index-prefix"></div>
+    <div class="hotkey-list-item-button-cell">
+        <div class="input-height-icon-button-container">
+            <button class="icon-button hotkey-list-item-button" data-menu="hotkey-list-item-menu" data-menu-position="below,left"><span class="icon-button-inner"><span class="icon" data-icon="kebab-menu"></span></span></button>
+        </div>
+    </div>
+
+    <div class="hotkey-list-item-input-label-cell">Input:</div>
+    <div class="hotkey-list-item-input-cell">
+        <input type="text" class="hotkey-list-item-input" autocomplete="off" spellcheck="false" placeholder="No input" data-property="include">
+        <label class="toggle hotkey-list-item-enabled-label"><input type="checkbox" class="hotkey-list-item-enabled"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+    </div>
+
+    <div class="hotkey-list-item-action-label-cell">Action:</div>
+    <div class="hotkey-list-item-action-cell">
+        <select class="hotkey-list-item-action">
+            <option value="">None</option>
+            <option value="close">Close popup</option>
+            <option value="nextEntry">Go to next entry</option>
+            <option value="nextEntry3">Go to next entry (x3)</option>
+            <option value="previousEntry">Go to previous entry</option>
+            <option value="previousEntry3">Go to previous entry (x3)</option>
+            <option value="lastEntry">Go to last entry</option>
+            <option value="firstEntry">Go to first entry</option>
+            <option value="historyBackward">Navigate backward in history</option>
+            <option value="historyForward">Navigate forward in history</option>
+            <option value="addNoteKanji">Add kanji note</option>
+            <option value="addNoteTermKanji">Add term note</option>
+            <option value="addNoteTermKana">Add term note (reading)</option>
+            <option value="viewNote">View note</option>
+            <option value="playAudio">Play audio</option>
+            <option value="copyHostSelection">Copy selection</option>
+        </select>
+        <div class="hotkey-list-item-flex-row">
+            <div class="hotkey-list-item-flex-row-label">Scopes:</div>
+            <div class="hotkey-list-item-flex-row">
+                <label class="hotkey-scope-checkbox-container">
+                    <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-type="popup"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                    <span>Popup</span>
+                </label>
+                <label class="hotkey-scope-checkbox-container">
+                    <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-type="search"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                    <span>Search</span>
+                </label>
+            </div>
+        </div>
+    </div>
+</div></div></template>
+
+<template id="hotkey-list-item-menu-template"><div class="popup-menu-container" tabindex="-1" role="dialog"><div class="popup-menu">
+    <button class="popup-menu-item" data-menu-action="clearInputs">Clear input</button>
+    <button class="popup-menu-item" data-menu-action="resetInput">Reset input</button>
+    <button class="popup-menu-item" data-menu-action="delete">Delete</button>
+</div></div></template>
+
+
 <!-- Scripts -->
 <script src="/mixed/lib/jszip.min.js"></script>
 <script src="/mixed/lib/wanakana.min.js"></script>
@@ -2863,6 +2953,7 @@
 <script src="/bg/js/settings/status-footer.js"></script>
 <script src="/bg/js/settings/storage-controller.js"></script>
 
+<script src="/bg/js/settings2/keyboard-shortcuts-controller.js"></script>
 <script src="/bg/js/settings2/nested-popups-controller.js"></script>
 <script src="/bg/js/settings2/secondary-search-dictionary-controller.js"></script>
 <script src="/bg/js/settings2/sentence-termination-characters-controller.js"></script>

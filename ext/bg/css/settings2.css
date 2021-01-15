@@ -1931,6 +1931,94 @@ input.sentence-termination-character-input2 {
     margin-top: 0.5em;
 }
 
+.hotkey-list {
+    margin: 0 calc(var(--modal-padding-horizontal) * -1);
+}
+.hotkey-list-item {
+    margin: 0.5em 0;
+}
+.hotkey-list-item+.hotkey-list-item {
+    border-top: var(--thin-border-size) solid var(--separator-color2);
+}
+.hotkey-list-item-grid {
+    display: grid;
+    grid-template-columns: auto auto 1fr auto;
+    grid-template-rows: auto;
+    grid-template-areas:
+        'index input-label  input  button'
+        '.     action-label action .';
+    width: 100%;
+    column-gap: 0.25em;
+    row-gap: 0.25em;
+    margin: 0.5em 0;
+    padding: 0 var(--modal-padding-horizontal);
+    box-sizing: border-box;
+}
+.hotkey-list-item-index-cell {
+    grid-area: index;
+    align-self: center;
+    text-align: center;
+    width: 2em;
+}
+.hotkey-list-item-button-cell {
+    grid-area: button;
+    align-self: center;
+}
+.hotkey-list-item-input-label-cell {
+    grid-area: input-label;
+    align-self: center;
+}
+.hotkey-list-item-input-cell {
+    grid-area: input;
+    display: flex;
+    flex-flow: row nowrap;
+    width: 100%;
+    align-items: stretch;
+    align-self: center;
+}
+.hotkey-list-item-input {
+    flex: 1 1 auto;
+}
+.hotkey-list-item-action-label-cell {
+    grid-area: action-label;
+    align-self: center;
+}
+.hotkey-list-item-action-cell {
+    grid-area: action;
+    align-self: center;
+    display: flex;
+    flex-flow: row nowrap;
+    width: 100%;
+    align-items: center;
+}
+.hotkey-list-item-action {
+    flex: 1 1 auto;
+}
+.hotkey-list-item-enabled-label {
+    align-self: center;
+    margin-left: 1em;
+}
+.hotkey-list-item-flex-row {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+.hotkey-list-item-flex-row-label {
+    margin: 0 0.5em 0 1em;
+}
+.hotkey-scope-checkbox-container {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    cursor: pointer;
+}
+.hotkey-scope-checkbox-container:not(:last-child) {
+    margin-right: 0.75em;
+}
+.hotkey-scope-checkbox-container>span {
+    padding-left: 0.375em;
+}
+
 
 /* Generic layouts */
 .margin-above {
