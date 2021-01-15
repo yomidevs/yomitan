@@ -15,10 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global
- * OptionsUtil
- */
-
 class SentenceTerminationCharactersController {
     constructor(settingsController) {
         this._settingsController = settingsController;
@@ -135,17 +131,10 @@ class SentenceTerminationCharactersController {
     }
 
     async _reset() {
-        const defaultOptions = await this._getDefaultOptions();
+        const defaultOptions = await this._settingsController.getDefaultOptions();
         const value = defaultOptions.profiles[0].options.sentenceParsing.terminationCharacters;
         await this._settingsController.setProfileSetting('sentenceParsing.terminationCharacters', value);
         await this._updateOptions();
-    }
-
-    async _getDefaultOptions() {
-        const optionsUtil = new OptionsUtil();
-        await optionsUtil.prepare();
-        const optionsFull = optionsUtil.getDefault();
-        return optionsFull;
     }
 }
 

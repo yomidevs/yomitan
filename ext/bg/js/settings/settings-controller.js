@@ -17,6 +17,7 @@
 
 /* global
  * HtmlTemplateCollection
+ * OptionsUtil
  * api
  */
 
@@ -122,6 +123,13 @@ class SettingsController extends EventDispatcher {
 
     instantiateTemplateFragment(name) {
         return this._templates.instantiateFragment(name);
+    }
+
+    async getDefaultOptions() {
+        const optionsUtil = new OptionsUtil();
+        await optionsUtil.prepare();
+        const optionsFull = optionsUtil.getDefault();
+        return optionsFull;
     }
 
     // Private
