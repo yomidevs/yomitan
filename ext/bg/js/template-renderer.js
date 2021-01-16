@@ -107,7 +107,8 @@ class TemplateRenderer {
             ['property',         this._property.bind(this)],
             ['noop',             this._noop.bind(this)],
             ['isMoraPitchHigh',  this._isMoraPitchHigh.bind(this)],
-            ['getKanaMorae',     this._getKanaMorae.bind(this)]
+            ['getKanaMorae',     this._getKanaMorae.bind(this)],
+            ['typeof',           this._getTypeof.bind(this)]
         ];
 
         for (const [name, helper] of helpers) {
@@ -405,5 +406,11 @@ class TemplateRenderer {
 
     _getKanaMorae(context, text) {
         return this._japaneseUtil.getKanaMorae(`${text}`);
+    }
+
+    _getTypeof(context, ...args) {
+        const ii = args.length - 1;
+        const value = (ii > 0 ? args[0] : args[ii].fn(context));
+        return typeof value;
     }
 }

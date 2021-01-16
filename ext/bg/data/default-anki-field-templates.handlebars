@@ -323,4 +323,19 @@
     {{~/if~}}
 {{/inline}}
 
+{{#*inline "stroke-count"}}
+    {{~#scope~}}
+        {{~#set "found" false}}{{/set~}}
+        {{~#each definition.stats.misc~}}
+            {{~#if (op "===" name "strokes")~}}
+                {{~#set "found" true}}{{/set~}}
+                Stroke count: {{value}}
+            {{~/if~}}
+        {{~/each~}}
+        {{~#if (op "!" (get "found"))~}}
+            Stroke count: Unknown
+        {{~/if~}}
+    {{~/scope~}}
+{{/inline}}
+
 {{~> (lookup . "marker") ~}}

@@ -487,7 +487,7 @@ class OptionsUtil {
                 update: this._updateVersion7.bind(this)
             },
             {
-                async: false,
+                async: true,
                 update: this._updateVersion8.bind(this)
             }
         ];
@@ -680,7 +680,7 @@ class OptionsUtil {
         return options;
     }
 
-    _updateVersion8(options) {
+    async _updateVersion8(options) {
         // Version 8 changes:
         //  Added translation.textReplacements.
         //  Moved anki.sentenceExt to sentenceParsing.scanExtent.
@@ -690,6 +690,8 @@ class OptionsUtil {
         //  Added inputs.hotkeys.
         //  Added anki.suspendNewCards.
         //  Added popupWindow.
+        //  Updated handlebars templates to include "stroke-count" definition.
+        await this._addFieldTemplatesToOptions(options, '/bg/data/anki-field-templates-upgrade-v8.handlebars');
         for (const profile of options.profiles) {
             profile.options.translation.textReplacements = {
                 searchOriginal: true,

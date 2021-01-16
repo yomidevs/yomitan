@@ -195,6 +195,7 @@ Flashcard fields can be configured with the following steps:
     `{onyomi}` | Onyomi (Chinese reading) for the kanji expressed as hiragana.
     `{screenshot}` | Screenshot of the web page taken at the time the kanji was added.
     `{sentence}` | Sentence, quote, or phrase that the character appears in from the source content.
+    `{stroke-count}` | Number of strokes that the kanji character has.
     `{url}` | Address of the web page in which the kanji appeared in.
 
 When creating your model for Yomichan, *make sure that you pick a unique field to be first*; fields that will

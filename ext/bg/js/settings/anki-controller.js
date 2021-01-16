@@ -118,6 +118,7 @@ class AnkiController {
                     'onyomi',
                     'screenshot',
                     'sentence',
+                    'stroke-count',
                     'tags',
                     'url'
                 ];
