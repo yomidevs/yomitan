@@ -131,10 +131,11 @@ class Backend {
         ]);
 
         this._commandHandlers = new Map([
-            ['search',  this._onCommandSearch.bind(this)],
-            ['help',    this._onCommandHelp.bind(this)],
-            ['options', this._onCommandOptions.bind(this)],
-            ['toggle',  this._onCommandToggle.bind(this)]
+            ['toggleTextScanning', this._onCommandToggleTextScanning.bind(this)],
+            ['openHelpPage',       this._onCommandOpenHelpPage.bind(this)],
+            ['openSettingsPage',   this._onCommandOpenSettingsPage.bind(this)],
+            ['openSearchPage',     this._onCommandOpenSearchPage.bind(this)],
+            ['openPopupWindow',    this._onCommandOpenPopupWindow.bind(this)]
         ]);
     }
 
@@ -727,7 +728,7 @@ class Backend {
 
     // Command handlers
 
-    async _onCommandSearch(params) {
+    async _onCommandOpenSearchPage(params) {
         const {mode='existingOrNewTab', query} = params || {};
 
         const baseUrl = chrome.runtime.getURL('/bg/search.html');
@@ -773,20 +774,24 @@ class Backend {
         }
     }
 
-    async _onCommandHelp() {
+    async _onCommandOpenHelpPage() {
         await this._openInfoPage();
     }
 
-    async _onCommandOptions(params) {
+    async _onCommandOpenSettingsPage(params) {
         const {mode='existingOrNewTab'} = params || {};
         await this._openSettingsPage(mode);
     }
 
-    async _onCommandToggle() {
+    async _onCommandToggleTextScanning() {
         const source = 'popup';
         const options = this.getOptions({current: true});
         options.general.enable = !options.general.enable;
         await this._saveOptions(source);
+    }
+
+    async _onCommandOpenPopupWindow() {
+        await this._onApiGetOrCreateSearchPopup({focus: true});
     }
 
     // Utilities

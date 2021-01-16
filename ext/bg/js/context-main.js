@@ -29,14 +29,14 @@ class DisplayController {
 
         this._showExtensionInfo(manifest);
         this._setupEnvironment();
-        this._setupButtonEvents('.action-open-search', 'search', chrome.runtime.getURL('/bg/search.html'));
-        this._setupButtonEvents('.action-open-help', 'help', chrome.runtime.getURL('/bg/info.html'));
+        this._setupButtonEvents('.action-open-search', 'openSearchPage', chrome.runtime.getURL('/bg/search.html'));
+        this._setupButtonEvents('.action-open-help', 'openHelpPage', chrome.runtime.getURL('/bg/info.html'));
 
         const optionsFull = await api.optionsGetFull();
         this._optionsFull = optionsFull;
 
         const optionsPageUrl = optionsFull.global.useSettingsV2 ? '/bg/settings2.html' : manifest.options_ui.page;
-        this._setupButtonEvents('.action-open-options', 'options', chrome.runtime.getURL(optionsPageUrl));
+        this._setupButtonEvents('.action-open-options', 'openSettingsPage', chrome.runtime.getURL(optionsPageUrl));
 
         const {profiles, profileCurrent} = optionsFull;
         const primaryProfile = (profileCurrent >= 0 && profileCurrent < profiles.length) ? profiles[profileCurrent] : null;
@@ -92,7 +92,7 @@ class DisplayController {
 
     _setupOptions({options}) {
         const extensionEnabled = options.general.enable;
-        const onToggleChanged = () => api.commandExec('toggle');
+        const onToggleChanged = () => api.commandExec('toggleTextScanning');
         for (const toggle of document.querySelectorAll('#enable-search,#enable-search2')) {
             toggle.checked = extensionEnabled;
             toggle.addEventListener('change', onToggleChanged, false);

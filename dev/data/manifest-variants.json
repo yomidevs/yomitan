@@ -86,17 +86,26 @@
             "clipboardRead"
         ],
         "commands": {
-            "toggle": {
+            "toggleTextScanning": {
                 "suggested_key": {
                     "default": "Alt+Delete"
                 },
-                "description": "Toggle text scanning"
+                "description": "Toggle text scanning on/off"
             },
-            "search": {
+            "openHelpPage": {
+                "description": "Open the help page"
+            },
+            "openSettingsPage": {
+                "description": "Open the settings page"
+            },
+            "openSearchPage": {
                 "suggested_key": {
                     "default": "Alt+Insert"
                 },
-                "description": "Open search window"
+                "description": "Open the search page"
+            },
+            "openPopupWindow": {
+                "description": "Open the popup window"
             }
         },
         "web_accessible_resources": [
