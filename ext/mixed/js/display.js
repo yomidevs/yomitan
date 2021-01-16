@@ -116,7 +116,7 @@ class Display extends EventDispatcher {
         this._tagNotificationContainer = document.querySelector('#content-footer');
 
         this.registerActions([
-            ['close',             () => { this.onEscape(); }],
+            ['close',             () => { this.close(); }],
             ['nextEntry',         () => { this._focusEntry(this._index + 1, true); }],
             ['nextEntry3',        () => { this._focusEntry(this._index + 3, true); }],
             ['previousEntry',     () => { this._focusEntry(this._index - 1, true); }],
@@ -247,12 +247,6 @@ class Display extends EventDispatcher {
     onError(error) {
         if (yomichan.isExtensionUnloaded) { return; }
         yomichan.logError(error);
-    }
-
-    onEscape() {
-        if (this._pageType === 'popup') {
-            this.close();
-        }
     }
 
     onKeyDown(e) {
@@ -418,8 +412,13 @@ class Display extends EventDispatcher {
     }
 
     close() {
-        if (this._pageType === 'popup') {
-            this._invokeOwner('closePopup');
+        switch (this._pageType) {
+            case 'popup':
+                this._invokeOwner('closePopup');
+                break;
+            case 'search':
+                this._closeTab();
+                break;
         }
     }
 
@@ -1903,5 +1902,29 @@ class Display extends EventDispatcher {
             if (!enabled || !scopes.includes(this._pageType)) { continue; }
             this._registerHotkey(key, modifiers, action);
         }
+    }
+
+    async _closeTab() {
+        const tab = await new Promise((resolve, reject) => {
+            chrome.tabs.getCurrent((result) => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve(result);
+                }
+            });
+        });
+        const tabId = tab.id;
+        await new Promise((resolve, reject) => {
+            chrome.tabs.remove(tabId, () => {
+                const e = chrome.runtime.lastError;
+                if (e) {
+                    reject(new Error(e.message));
+                } else {
+                    resolve();
+                }
+            });
+        });
     }
 }

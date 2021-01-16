@@ -716,7 +716,8 @@ class OptionsUtil {
             profile.options.general.popupActionBarLocation = 'top';
             profile.options.inputs = {
                 hotkeys: [
-                    {action: 'close',             key: 'Escape',    modifiers: [],       scopes: ['popup', 'search'], enabled: true},
+                    {action: 'close',             key: 'Escape',    modifiers: [],       scopes: ['popup'], enabled: true},
+                    {action: 'focusSearchBox',    key: 'Escape',    modifiers: [],       scopes: ['search'], enabled: true},
                     {action: 'previousEntry3',    key: 'PageUp',    modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                     {action: 'nextEntry3',        key: 'PageDown',  modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                     {action: 'lastEntry',         key: 'End',       modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},

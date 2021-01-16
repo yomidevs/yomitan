@@ -43,6 +43,10 @@ class DisplaySearch extends Display {
             }
         });
         this.autoPlayAudioDelay = 0;
+
+        this.registerActions([
+            ['focusSearchBox', this._onActionFocusSearchBox.bind(this)]
+        ]);
     }
 
     async prepare() {
@@ -77,15 +81,6 @@ class DisplaySearch extends Display {
         this._isPrepared = true;
     }
 
-    onEscape() {
-        if (this._queryInput === null) {
-            return;
-        }
-
-        this._queryInput.focus();
-        this._queryInput.select();
-    }
-
     onKeyDown(e) {
         if (
             !super.onKeyDown(e) &&
@@ -108,6 +103,14 @@ class DisplaySearch extends Display {
             }
         }
         return query;
+    }
+
+    // Actions
+
+    _onActionFocusSearchBox() {
+        if (this._queryInput === null) { return; }
+        this._queryInput.focus();
+        this._queryInput.select();
     }
 
     // Private
