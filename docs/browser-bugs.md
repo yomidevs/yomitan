@@ -46,3 +46,8 @@ This page lists several of the browser bugs that have affected Yomichan over the
 * **Browser**: Firefox
 * **Date**: 2020-09-12
 * **Links**: [#819](https://github.com/FooSoft/yomichan/pull/819), [#820](https://github.com/FooSoft/yomichan/pull/820), [#821](https://github.com/FooSoft/yomichan/pull/821), [#824](https://github.com/FooSoft/yomichan/pull/824), [Report 1](https://bugzilla.mozilla.org/show_bug.cgi?id=1449660), [Report 2](https://bugzilla.mozilla.org/show_bug.cgi?id=1487509), [Report 3](https://bugzilla.mozilla.org/show_bug.cgi?id=1583480), [Report 4](https://bugzilla.mozilla.org/show_bug.cgi?id=1583519), [Report 5](https://bugzilla.mozilla.org/show_bug.cgi?id=1631377)
+
+## Cannot read clipboard from service worker in a MV3 chrome extension
+* **Browser**: Chrome
+* **Date**: 2020-12-18
+* **Links**: [#455](https://github.com/FooSoft/yomichan/issues/455), [#1247](https://github.com/FooSoft/yomichan/issues/1247), [Report](https://bugs.chromium.org/p/chromium/issues/detail?id=1160302)
