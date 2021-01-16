@@ -130,7 +130,9 @@ class Display extends EventDispatcher {
             ['addNoteTermKana',   () => { this._tryAddAnkiNoteForSelectedDefinition('term-kana'); }],
             ['viewNote',          () => { this._tryViewAnkiNoteForSelectedDefinition(); }],
             ['playAudio',         () => { this._playAudioCurrent(); }],
-            ['copyHostSelection', () => this._copyHostSelection()]
+            ['copyHostSelection', () => this._copyHostSelection()],
+            ['nextEntryDifferentDictionary',     () => { this._focusEntryWithDifferentDictionary(1, true); }],
+            ['previousEntryDifferentDictionary', () => { this._focusEntryWithDifferentDictionary(-1, true); }]
         ]);
         this.registerMessageHandlers([
             ['setMode', {async: false, handler: this._onMessageSetMode.bind(this)}]
@@ -1142,6 +1144,32 @@ class Display extends EventDispatcher {
         } else {
             this._windowScroll.toY(target);
         }
+    }
+
+    _focusEntryWithDifferentDictionary(offset, smooth) {
+        const offsetSign = Math.sign(offset);
+        if (offsetSign === 0) { return false; }
+
+        let index = this._index;
+        const definitionCount = this._definitions.length;
+        if (index < 0 || index >= definitionCount) { return false; }
+
+        const {dictionary} = this._definitions[index];
+        for (let indexNext = index + offsetSign; indexNext >= 0 && indexNext < definitionCount; indexNext += offsetSign) {
+            const {dictionaryNames} = this._definitions[indexNext];
+            if (dictionaryNames.length > 1 || !dictionaryNames.includes(dictionary)) {
+                offset -= offsetSign;
+                if (Math.sign(offsetSign) !== offset) {
+                    index = indexNext;
+                    break;
+                }
+            }
+        }
+
+        if (index === this._index) { return false; }
+
+        this._focusEntry(index, smooth);
+        return true;
     }
 
     _sourceTermView() {
