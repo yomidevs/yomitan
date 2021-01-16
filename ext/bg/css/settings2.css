@@ -2019,6 +2019,11 @@ input.sentence-termination-character-input2 {
     padding-left: 0.375em;
 }
 
+.anki-card-primary-separator {
+    border-bottom: var(--thin-border-size) solid var(--separator-color1);
+    margin: 0 calc(var(--modal-padding-horizontal) * -1);
+}
+
 
 /* Generic layouts */
 .margin-above {
