@@ -559,7 +559,7 @@ function createOptionsUpdatedTestData1() {
             database: {
                 prefixWildcardsSupported: false
             },
-            useSettingsV2: false
+            useSettingsV2: true
         }
     };
 }

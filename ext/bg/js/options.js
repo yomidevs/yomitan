@@ -667,7 +667,9 @@ class OptionsUtil {
         //  Added anki.suspendNewCards.
         //  Added popupWindow.
         //  Updated handlebars templates to include "stroke-count" definition.
+        //  Updated global.useSettingsV2 to be true (opt-out).
         await this._addFieldTemplatesToOptions(options, '/bg/data/anki-field-templates-upgrade-v8.handlebars');
+        options.global.useSettingsV2 = true;
         for (const profile of options.profiles) {
             profile.options.translation.textReplacements = {
                 searchOriginal: true,
