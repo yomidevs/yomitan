@@ -230,7 +230,7 @@ h3 {
     font-size: calc(1em / 1.125);
     color: var(--text-color-light);
 }
-.heading-link-light {
+a.heading-link-light {
     color: var(--text-color-light);
 }
 .heading-description,

@@ -689,6 +689,7 @@ class OptionsUtil {
         //  Changed general.popupActionBarLocation.
         //  Added inputs.hotkeys.
         //  Added anki.suspendNewCards.
+        //  Added popupWindow.
         for (const profile of options.profiles) {
             profile.options.translation.textReplacements = {
                 searchOriginal: true,
@@ -735,6 +736,16 @@ class OptionsUtil {
                 ]
             };
             profile.options.anki.suspendNewCards = false;
+            profile.options.popupWindow = {
+                width: profile.options.general.popupWidth,
+                height: profile.options.general.popupHeight,
+                left: 0,
+                top: 0,
+                useLeft: false,
+                useTop: false,
+                windowType: 'popup',
+                windowState: 'normal'
+            };
         }
         return options;
     }

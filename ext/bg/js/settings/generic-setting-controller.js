@@ -36,6 +36,7 @@ class GenericSettingController {
             ['splitTags', this._splitTags.bind(this)],
             ['joinTags', this._joinTags.bind(this)],
             ['toNumber', this._toNumber.bind(this)],
+            ['toBoolean', this._toBoolean.bind(this)],
             ['toString', this._toString.bind(this)],
             ['conditionalConvert', this._conditionalConvert.bind(this)]
         ]);
@@ -204,6 +205,10 @@ class GenericSettingController {
         let {constraints} = data;
         if (!isObject(constraints)) { constraints = {}; }
         return DOMDataBinder.convertToNumber(value, constraints);
+    }
+
+    _toBoolean(value) {
+        return (value === 'true');
     }
 
     _toString(value) {

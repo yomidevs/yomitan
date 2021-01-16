@@ -63,6 +63,7 @@
                         "type": "object",
                         "required": [
                             "general",
+                            "popupWindow",
                             "audio",
                             "scanning",
                             "translation",
@@ -285,6 +286,57 @@
                                         "type": "string",
                                         "enum": ["left", "right", "top", "bottom"],
                                         "default": "top"
+                                    }
+                                }
+                            },
+                            "popupWindow": {
+                                "type": "object",
+                                "required": [
+                                    "width",
+                                    "height",
+                                    "left",
+                                    "top",
+                                    "useLeft",
+                                    "useTop",
+                                    "windowType",
+                                    "windowState"
+                                ],
+                                "properties": {
+                                    "width": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "default": 400
+                                    },
+                                    "height": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "default": 250
+                                    },
+                                    "left": {
+                                        "type": "integer",
+                                        "default": 0
+                                    },
+                                    "top": {
+                                        "type": "integer",
+                                        "default": 0
+                                    },
+                                    "useLeft": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "useTop": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "windowType": {
+                                        "type": "string",
+                                        "enum": ["normal", "popup"],
+                                        "default": "popup"
+                                    },
+                                    "windowState": {
+                                        "type": "string",
+                                        "enum": ["normal", "maximized", "fullscreen"],
+                                        "default": "normal"
                                     }
                                 }
                             },

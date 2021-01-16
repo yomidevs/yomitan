@@ -457,6 +457,16 @@ function createProfileOptionsUpdatedTestData1() {
                 {action: 'viewNote',          key: 'KeyV',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                 {action: 'copyHostSelection', key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup', 'search'], enabled: true}
             ]
+        },
+        popupWindow: {
+            width: 400,
+            height: 250,
+            left: 0,
+            top: 0,
+            useLeft: false,
+            useTop: false,
+            windowType: 'popup',
+            windowState: 'normal'
         }
     };
 }

@@ -29,6 +29,7 @@
  * ModalController
  * NestedPopupsController
  * PopupPreviewController
+ * PopupWindowController
  * ProfileController
  * ScanInputsController
  * ScanInputsSimpleController
@@ -131,6 +132,9 @@ async function setupGenericSettingsController(genericSettingController) {
 
         const keyboardShortcutController = new KeyboardShortcutController(settingsController);
         keyboardShortcutController.prepare();
+
+        const popupWindowController = new PopupWindowController();
+        popupWindowController.prepare();
 
         await Promise.all(preparePromises);
 
