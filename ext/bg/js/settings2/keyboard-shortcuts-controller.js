@@ -30,6 +30,7 @@ class KeyboardShortcutController {
         this._listContainer = null;
         this._emptyIndicator = null;
         this._stringComparer = new Intl.Collator('en-US'); // Invariant locale
+        this._scrollContainer = null;
     }
 
     get settingsController() {
@@ -44,6 +45,7 @@ class KeyboardShortcutController {
         this._resetButton = document.querySelector('#hotkey-list-reset');
         this._listContainer = document.querySelector('#hotkey-list');
         this._emptyIndicator = document.querySelector('#hotkey-list-empty');
+        this._scrollContainer = document.querySelector('#keyboard-shortcuts .modal-body');
 
         this._addButton.addEventListener('click', this._onAddClick.bind(this));
         this._resetButton.addEventListener('click', this._onResetClick.bind(this));
@@ -65,6 +67,7 @@ class KeyboardShortcutController {
         }]);
 
         await this._updateOptions();
+        this._scrollContainer.scrollTop = this._scrollContainer.scrollHeight;
     }
 
     async deleteEntry(index) {

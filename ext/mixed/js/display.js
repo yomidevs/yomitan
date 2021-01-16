@@ -1927,7 +1927,7 @@ class Display extends EventDispatcher {
         this._hotkeys.clear();
 
         for (const {action, key, modifiers, scopes, enabled} of options.inputs.hotkeys) {
-            if (!enabled || !scopes.includes(this._pageType)) { continue; }
+            if (!enabled || action === '' || !scopes.includes(this._pageType)) { continue; }
             this._registerHotkey(key, modifiers, action);
         }
     }
