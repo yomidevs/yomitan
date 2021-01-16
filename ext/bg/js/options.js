@@ -458,38 +458,14 @@ class OptionsUtil {
 
     _getVersionUpdates() {
         return [
-            {
-                async: false,
-                update: this._updateVersion1.bind(this)
-            },
-            {
-                async: false,
-                update: this._updateVersion2.bind(this)
-            },
-            {
-                async: true,
-                update: this._updateVersion3.bind(this)
-            },
-            {
-                async: true,
-                update: this._updateVersion4.bind(this)
-            },
-            {
-                async: false,
-                update: this._updateVersion5.bind(this)
-            },
-            {
-                async: true,
-                update: this._updateVersion6.bind(this)
-            },
-            {
-                async: false,
-                update: this._updateVersion7.bind(this)
-            },
-            {
-                async: true,
-                update: this._updateVersion8.bind(this)
-            }
+            {async: false, update: this._updateVersion1.bind(this)},
+            {async: false, update: this._updateVersion2.bind(this)},
+            {async: true,  update: this._updateVersion3.bind(this)},
+            {async: true,  update: this._updateVersion4.bind(this)},
+            {async: false, update: this._updateVersion5.bind(this)},
+            {async: true,  update: this._updateVersion6.bind(this)},
+            {async: false, update: this._updateVersion7.bind(this)},
+            {async: true,  update: this._updateVersion8.bind(this)}
         ];
     }
 
