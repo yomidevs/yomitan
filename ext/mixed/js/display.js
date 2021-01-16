@@ -24,6 +24,7 @@
  * DocumentUtil
  * FrameEndpoint
  * Frontend
+ * HotkeyHandler
  * MediaLoader
  * PopupFactory
  * QueryParser
@@ -59,8 +60,7 @@ class Display extends EventDispatcher {
             japaneseUtil,
             mediaLoader: this._mediaLoader
         });
-        this._hotkeys = new Map();
-        this._actions = new Map();
+        this._hotkeyHandler = new HotkeyHandler(this._pageType);
         this._messageHandlers = new Map();
         this._directMessageHandlers = new Map();
         this._windowMessageHandlers = new Map();
@@ -115,7 +115,7 @@ class Display extends EventDispatcher {
         this._tagNotification = null;
         this._tagNotificationContainer = document.querySelector('#content-footer');
 
-        this.registerActions([
+        this._hotkeyHandler.registerActions([
             ['close',             () => { this.close(); }],
             ['nextEntry',         () => { this._focusEntry(this._index + 1, true); }],
             ['nextEntry3',        () => { this._focusEntry(this._index + 3, true); }],
@@ -183,6 +183,10 @@ class Display extends EventDispatcher {
         return this._depth;
     }
 
+    get hotkeyHandler() {
+        return this._hotkeyHandler;
+    }
+
     async prepare() {
         // State setup
         const {documentElement} = document;
@@ -195,6 +199,7 @@ class Display extends EventDispatcher {
         this._audioSystem.prepare();
         this._queryParser.prepare();
         this._history.prepare();
+        this._hotkeyHandler.prepare();
 
         // Event setup
         this._history.on('stateChanged', this._onStateChanged.bind(this));
@@ -213,7 +218,6 @@ class Display extends EventDispatcher {
             documentElement.addEventListener('auxclick', this._onDocumentElementClick.bind(this), false);
         }
 
-        document.addEventListener('keydown', this.onKeyDown.bind(this), false);
         document.addEventListener('wheel', this._onWheel.bind(this), {passive: false});
         if (this._closeButton !== null) {
             this._closeButton.addEventListener('click', this._onCloseButtonClick.bind(this), false);
@@ -249,27 +253,6 @@ class Display extends EventDispatcher {
     onError(error) {
         if (yomichan.isExtensionUnloaded) { return; }
         yomichan.logError(error);
-    }
-
-    onKeyDown(e) {
-        const key = e.code;
-        const handlers = this._hotkeys.get(key);
-        if (typeof handlers === 'undefined') { return false; }
-
-        const eventModifiers = DocumentUtil.getActiveModifiers(e);
-        for (const {modifiers, action} of handlers) {
-            if (!this._areSame(modifiers, eventModifiers)) { continue; }
-
-            const actionHandler = this._actions.get(action);
-            if (typeof actionHandler === 'undefined') { continue; }
-
-            const result = actionHandler(e);
-            if (result !== false) {
-                e.preventDefault();
-                return true;
-            }
-        }
-        return false;
     }
 
     getOptions() {
@@ -372,12 +355,6 @@ class Display extends EventDispatcher {
         const parent = document.head;
         if (this._styleNode.parentNode !== parent) {
             parent.appendChild(this._styleNode);
-        }
-    }
-
-    registerActions(actions) {
-        for (const [name, handler] of actions) {
-            this._actions.set(name, handler);
         }
     }
 
@@ -1595,16 +1572,6 @@ class Display extends EventDispatcher {
         return await api.getDefinitionAudioInfo(source, expression, reading, details);
     }
 
-    _areSame(set, array) {
-        if (set.size !== array.length) { return false; }
-        for (const value of array) {
-            if (!set.has(value)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     async _setOptionsContextIfDifferent(optionsContext) {
         if (deepEqual(this._optionsContext, optionsContext)) { return; }
         await this.setOptionsContext(optionsContext);
@@ -1911,25 +1878,9 @@ class Display extends EventDispatcher {
         await this._invokeOwner('setFrameSize', {width, height});
     }
 
-    _registerHotkey(key, modifiers, action) {
-        if (!this._actions.has(action)) { return false; }
-
-        let handlers = this._hotkeys.get(key);
-        if (typeof handlers === 'undefined') {
-            handlers = [];
-            this._hotkeys.set(key, handlers);
-        }
-        handlers.push({modifiers: new Set(modifiers), action});
-        return true;
-    }
-
     _updateHotkeys(options) {
-        this._hotkeys.clear();
-
-        for (const {action, key, modifiers, scopes, enabled} of options.inputs.hotkeys) {
-            if (!enabled || action === '' || !scopes.includes(this._pageType)) { continue; }
-            this._registerHotkey(key, modifiers, action);
-        }
+        this._hotkeyHandler.clearHotkeys();
+        this._hotkeyHandler.registerHotkeys(options.inputs.hotkeys);
     }
 
     async _closeTab() {

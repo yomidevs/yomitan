@@ -44,7 +44,7 @@ class DisplaySearch extends Display {
         });
         this.autoPlayAudioDelay = 0;
 
-        this.registerActions([
+        this.hotkeyHandler.registerActions([
             ['focusSearchBox', this._onActionFocusSearchBox.bind(this)]
         ]);
     }
@@ -73,25 +73,13 @@ class DisplaySearch extends Display {
         window.addEventListener('copy', this._onCopy.bind(this));
         this._clipboardMonitor.on('change', this._onExternalSearchUpdate.bind(this));
         this._clipboardMonitorEnableCheckbox.addEventListener('change', this._onClipboardMonitorEnableChange.bind(this));
+        this.hotkeyHandler.on('keydownNonHotkey', this._onKeyDown.bind(this));
 
         this._onModeChange();
 
         this.initializeState();
 
         this._isPrepared = true;
-    }
-
-    onKeyDown(e) {
-        if (
-            !super.onKeyDown(e) &&
-            document.activeElement !== this._queryInput &&
-            !e.ctrlKey &&
-            !e.metaKey &&
-            !e.altKey &&
-            e.key.length === 1
-        ) {
-            this._queryInput.focus({preventScroll: true});
-        }
     }
 
     postProcessQuery(query) {
@@ -114,6 +102,18 @@ class DisplaySearch extends Display {
     }
 
     // Private
+
+    _onKeyDown(e) {
+        if (
+            document.activeElement !== this._queryInput &&
+            !e.ctrlKey &&
+            !e.metaKey &&
+            !e.altKey &&
+            e.key.length === 1
+        ) {
+            this._queryInput.focus({preventScroll: true});
+        }
+    }
 
     async _onOptionsUpdated() {
         await this.updateOptions();
