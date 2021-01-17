@@ -33,6 +33,8 @@ class HotkeyHandler extends EventDispatcher {
         this._hotkeys = new Map();
         this._actions = new Map();
         this._eventListeners = new EventListenerCollection();
+        this._isPrepared = false;
+        this._hasEventListeners = false;
     }
 
     /**
@@ -53,14 +55,16 @@ class HotkeyHandler extends EventDispatcher {
      * Begins listening to key press events in order to detect hotkeys.
      */
     prepare() {
-        this._eventListeners.addEventListener(document, 'keydown', this._onKeyDown.bind(this), false);
+        this._isPrepared = true;
+        this._updateEventHandlers();
     }
 
     /**
      * Stops listening to key press events.
      */
     cleanup() {
-        this._eventListeners.removeAllEventListeners();
+        this._isPrepared = false;
+        this._updateEventHandlers();
     }
 
     /**
@@ -93,6 +97,7 @@ class HotkeyHandler extends EventDispatcher {
                 this._registerHotkey(key, modifiers, action);
             }
         }
+        this._updateEventHandlers();
     }
 
     /**
@@ -100,6 +105,31 @@ class HotkeyHandler extends EventDispatcher {
      */
     clearHotkeys() {
         this._hotkeys.clear();
+    }
+
+    /**
+     * Adds a single event listener to a specific event.
+     * @param eventName The string representing the event's name.
+     * @param callback The event listener callback to add.
+     */
+    on(eventName, callback) {
+        const result = super.on(eventName, callback);
+        this._updateHasEventListeners();
+        this._updateEventHandlers();
+        return result;
+    }
+
+    /**
+     * Removes a single event listener from a specific event.
+     * @param eventName The string representing the event's name.
+     * @param callback The event listener callback to add.
+     * @returns `true` if the callback was removed, `false` otherwise.
+     */
+    off(eventName, callback) {
+        const result = super.off(eventName, callback);
+        this._updateHasEventListeners();
+        this._updateEventHandlers();
+        return result;
     }
 
     // Private
@@ -143,5 +173,18 @@ class HotkeyHandler extends EventDispatcher {
             }
         }
         return true;
+    }
+
+    _updateHasEventListeners() {
+        this._hasEventListeners = this.hasListeners('keydownNonHotkey');
+    }
+
+    _updateEventHandlers() {
+        if (this._isPrepared && (this._hotkeys.size > 0 || this._hasEventListeners)) {
+            if (this._eventListeners.size !== 0) { return; }
+            this._eventListeners.addEventListener(document, 'keydown', this._onKeyDown.bind(this), false);
+        } else {
+            this._eventListeners.removeAllEventListeners();
+        }
     }
 }
