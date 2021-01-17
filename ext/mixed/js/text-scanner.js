@@ -309,7 +309,7 @@ class TextScanner extends EventDispatcher {
 
         try {
             if (this._textSourceCurrent !== null && this._textSourceCurrent.hasSameStart(textSource)) {
-                return;
+                return null;
             }
 
             ({optionsContext, detail} = await this._getSearchContext());
@@ -327,9 +327,9 @@ class TextScanner extends EventDispatcher {
             error = e;
         }
 
-        if (!searched) { return; }
+        if (!searched) { return null; }
 
-        this.trigger('searched', {
+        const results = {
             textScanner: this,
             type,
             definitions,
@@ -339,7 +339,9 @@ class TextScanner extends EventDispatcher {
             optionsContext,
             detail,
             error
-        });
+        };
+        this.trigger('searched', results);
+        return results;
     }
 
     _onMouseOver(e) {
