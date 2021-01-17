@@ -1880,9 +1880,7 @@ class Display extends EventDispatcher {
     }
 
     _updateHotkeys(options) {
-        const scope = this._pageType;
-        this._hotkeyHandler.clearHotkeys(scope);
-        this._hotkeyHandler.registerHotkeys(scope, options.inputs.hotkeys);
+        this._hotkeyHandler.setHotkeys(this._pageType, options.inputs.hotkeys);
     }
 
     async _closeTab() {

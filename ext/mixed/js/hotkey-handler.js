@@ -106,6 +106,23 @@ class HotkeyHandler extends EventDispatcher {
     }
 
     /**
+     * Assigns a set of hotkeys for a given scope. This is an optimized shorthand for calling
+     * `clearHotkeys`, then calling `registerHotkeys`.
+     * @see registerHotkeys for argument information.
+     */
+    setHotkeys(scope, hotkeys) {
+        let registrations = this._hotkeyRegistrations.get(scope);
+        if (typeof registrations === 'undefined') {
+            registrations = [];
+            this._hotkeyRegistrations.set(scope, registrations);
+        } else {
+            registrations.length = 0;
+        }
+        registrations.push(...hotkeys);
+        this._updateHotkeyRegistrations();
+    }
+
+    /**
      * Adds a single event listener to a specific event.
      * @param eventName The string representing the event's name.
      * @param callback The event listener callback to add.
