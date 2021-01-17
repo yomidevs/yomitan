@@ -330,6 +330,9 @@ class KeyboardShortcutHotkeyEntry {
                 }
             }
             if (changed) {
+                if (scopes.length === 0) {
+                    scopes.push(...validScopes);
+                }
                 targets.push({
                     action: 'set',
                     path: `${this._basePath}.scopes`,
