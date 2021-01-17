@@ -283,8 +283,8 @@ class TextScanner extends EventDispatcher {
         return false;
     }
 
-    async search(textSource) {
-        const inputInfo = this._createInputInfo(-1, false, null, 'script', 'script', [], []);
+    async search(textSource, inputDetail) {
+        const inputInfo = this._createInputInfo(null, 'script', 'script', true, [], [], inputDetail);
         return await this._search(textSource, this._searchTerms, this._searchKanji, inputInfo);
     }
 
@@ -391,7 +391,7 @@ class TextScanner extends EventDispatcher {
         if (this._searchOnClick) {
             const modifiers = DocumentUtil.getActiveModifiersAndButtons(e);
             const modifierKeys = DocumentUtil.getActiveModifiers(e);
-            const inputInfo = this._createInputInfo(-1, false, null, 'mouse', 'click', modifiers, modifierKeys);
+            const inputInfo = this._createInputInfo(null, 'mouse', 'click', false, modifiers, modifierKeys);
             this._searchAt(e.clientX, e.clientY, inputInfo);
         }
 
@@ -682,8 +682,8 @@ class TextScanner extends EventDispatcher {
             }
         }
 
-        for (const [node, type, listener, options] of eventListenerInfos) {
-            this._eventListeners.addEventListener(node, type, listener, options);
+        for (const args of eventListenerInfos) {
+            this._eventListeners.addEventListener(...args);
         }
     }
 
@@ -840,7 +840,7 @@ class TextScanner extends EventDispatcher {
     async _searchAtFromMouseMove(x, y, inputInfo) {
         if (this._pendingLookup) { return; }
 
-        if (inputInfo.empty) {
+        if (inputInfo.passive) {
             if (!await this._scanTimerWait()) {
                 // Aborted
                 return;
@@ -871,10 +871,10 @@ class TextScanner extends EventDispatcher {
         }
     }
 
-    async _searchAtFromPen(e, x, y, cause, prevent) {
+    async _searchAtFromPen(e, x, y, eventType, prevent) {
         if (this._pendingLookup) { return; }
 
-        const inputInfo = this._getMatchingInputGroupFromEvent('pen', cause, e);
+        const inputInfo = this._getMatchingInputGroupFromEvent('pen', eventType, e);
         if (inputInfo === null) { return; }
 
         const {input: {options}} = inputInfo;
@@ -900,32 +900,37 @@ class TextScanner extends EventDispatcher {
         }
     }
 
-    _getMatchingInputGroupFromEvent(type, cause, event) {
+    _getMatchingInputGroupFromEvent(pointerType, eventType, event) {
         const modifiers = DocumentUtil.getActiveModifiersAndButtons(event);
         const modifierKeys = DocumentUtil.getActiveModifiers(event);
-        return this._getMatchingInputGroup(type, cause, modifiers, modifierKeys);
+        return this._getMatchingInputGroup(pointerType, eventType, modifiers, modifierKeys);
     }
 
-    _getMatchingInputGroup(type, cause, modifiers, modifierKeys) {
-        let fallback = null;
+    _getMatchingInputGroup(pointerType, eventType, modifiers, modifierKeys) {
+        let fallbackIndex = -1;
         const modifiersSet = new Set(modifiers);
         for (let i = 0, ii = this._inputs.length; i < ii; ++i) {
             const input = this._inputs[i];
             const {include, exclude, types} = input;
-            if (!types.has(type)) { continue; }
+            if (!types.has(pointerType)) { continue; }
             if (this._setHasAll(modifiersSet, include) && (exclude.length === 0 || !this._setHasAll(modifiersSet, exclude))) {
                 if (include.length > 0) {
-                    return this._createInputInfo(i, false, input, type, cause, modifiers, modifierKeys);
-                } else if (fallback === null) {
-                    fallback = this._createInputInfo(i, true, input, type, cause, modifiers, modifierKeys);
+                    return this._createInputInfo(input, pointerType, eventType, false, modifiers, modifierKeys);
+                } else if (fallbackIndex < 0) {
+                    fallbackIndex = i;
                 }
             }
         }
-        return fallback;
+
+        return (
+            fallbackIndex >= 0 ?
+            this._createInputInfo(this._inputs[fallbackIndex], pointerType, eventType, true, modifiers, modifierKeys) :
+            null
+        );
     }
 
-    _createInputInfo(index, empty, input, type, cause, modifiers, modifierKeys) {
-        return {index, empty, input, type, cause, modifiers, modifierKeys};
+    _createInputInfo(input, pointerType, eventType, passive, modifiers, modifierKeys, detail) {
+        return {input, pointerType, eventType, passive, modifiers, modifierKeys, detail};
     }
 
     _setHasAll(set, values) {

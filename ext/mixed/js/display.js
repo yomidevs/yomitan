@@ -587,11 +587,11 @@ class Display extends EventDispatcher {
         }
     }
 
-    _onQueryParserSearch({type, definitions, sentence, inputInfo: {cause}, textSource, optionsContext}) {
+    _onQueryParserSearch({type, definitions, sentence, inputInfo: {eventType}, textSource, optionsContext}) {
         const query = textSource.text();
         const historyState = this._history.state;
         const history = (
-            cause === 'click' ||
+            eventType === 'click' ||
             !isObject(historyState) ||
             historyState.cause !== 'queryParser'
         );

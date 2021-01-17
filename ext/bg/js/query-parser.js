@@ -82,22 +82,15 @@ class QueryParser extends EventDispatcher {
 
     // Private
 
-    _onSearched({type, definitions, sentence, inputInfo, textSource, optionsContext, detail, error}) {
+    _onSearched(e) {
+        const {error} = e;
         if (error !== null) {
             yomichan.logError(error);
             return;
         }
-        if (type === null) { return; }
+        if (e.type === null) { return; }
 
-        this.trigger('searched', {
-            type,
-            definitions,
-            sentence,
-            inputInfo,
-            textSource,
-            optionsContext,
-            detail
-        });
+        this.trigger('searched', e);
     }
 
     _onParserChange(e) {

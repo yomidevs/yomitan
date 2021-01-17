@@ -251,12 +251,12 @@ class Frontend {
         }
     }
 
-    _onSearched({type, definitions, sentence, inputInfo: {cause, empty}, textSource, optionsContext, detail: {documentTitle}, error}) {
+    _onSearched({type, definitions, sentence, inputInfo: {eventType, passive, detail}, textSource, optionsContext, detail: {documentTitle}, error}) {
         const scanningOptions = this._options.scanning;
 
         if (error !== null) {
             if (yomichan.isExtensionUnloaded) {
-                if (textSource !== null && !empty) {
+                if (textSource !== null && !passive) {
                     this._showExtensionUnloaded(textSource);
                 }
             } else {
@@ -264,7 +264,11 @@ class Frontend {
             }
         } if (type !== null) {
             this._stopClearSelectionDelayed();
-            const focus = (cause === 'mouseMove');
+            let focus = (eventType === 'mouseMove');
+            if (isObject(detail)) {
+                const focus2 = detail.focus;
+                if (typeof focus2 === 'boolean') { focus = focus2; }
+            }
             this._showContent(textSource, focus, definitions, type, sentence, documentTitle, optionsContext);
         } else {
             if (scanningOptions.autoHideResults) {
