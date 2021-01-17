@@ -19,6 +19,7 @@
  * Display
  * DisplayProfileSelection
  * DocumentFocusController
+ * HotkeyHandler
  * JapaneseUtil
  * api
  */
@@ -32,7 +33,11 @@
         await yomichan.backendReady();
 
         const japaneseUtil = new JapaneseUtil(null);
-        const display = new Display('popup', japaneseUtil, documentFocusController);
+
+        const hotkeyHandler = new HotkeyHandler();
+        hotkeyHandler.prepare();
+
+        const display = new Display('popup', japaneseUtil, documentFocusController, hotkeyHandler);
         await display.prepare();
         const displayProfileSelection = new DisplayProfileSelection(display);
         displayProfileSelection.prepare();

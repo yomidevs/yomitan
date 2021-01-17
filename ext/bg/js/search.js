@@ -23,8 +23,8 @@
  */
 
 class DisplaySearch extends Display {
-    constructor(japaneseUtil, documentFocusController) {
-        super('search', japaneseUtil, documentFocusController);
+    constructor(japaneseUtil, documentFocusController, hotkeyHandler) {
+        super('search', japaneseUtil, documentFocusController, hotkeyHandler);
         this._searchButton = document.querySelector('#search-button');
         this._queryInput = document.querySelector('#search-textbox');
         this._introElement = document.querySelector('#intro');

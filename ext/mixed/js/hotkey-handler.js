@@ -17,6 +17,7 @@
 
 /* global
  * DocumentUtil
+ * api
  */
 
 /**
@@ -25,30 +26,31 @@
 class HotkeyHandler extends EventDispatcher {
     /**
      * Creates a new instance of the class.
-     * @param scope The scope required for hotkey definitions.
      */
-    constructor(scope) {
+    constructor() {
         super();
-        this._scope = scope;
-        this._hotkeys = new Map();
         this._actions = new Map();
+        this._hotkeys = new Map();
+        this._hotkeyRegistrations = new Map();
         this._eventListeners = new EventListenerCollection();
         this._isPrepared = false;
         this._hasEventListeners = false;
+        this._forwardFrameId = null;
     }
 
     /**
-     * Gets the scope required for the hotkey definitions.
+     * Gets the frame ID used for forwarding hotkeys.
      */
-    get scope() {
-        return this._scope;
+    get forwardFrameId() {
+        return this._forwardFrameId;
     }
 
     /**
-     * Sets the scope required for the hotkey definitions.
+     * Sets the frame ID used for forwarding hotkeys.
      */
-    set scope(value) {
-        this._scope = value;
+    set forwardFrameId(value) {
+        this._forwardFrameId = value;
+        this._updateHotkeyRegistrations();
     }
 
     /**
@@ -57,14 +59,9 @@ class HotkeyHandler extends EventDispatcher {
     prepare() {
         this._isPrepared = true;
         this._updateEventHandlers();
-    }
-
-    /**
-     * Stops listening to key press events.
-     */
-    cleanup() {
-        this._isPrepared = false;
-        this._updateEventHandlers();
+        api.crossFrame.registerHandlers([
+            ['hotkeyHandler.forwardHotkey', {async: false, handler: this._onMessageForwardHotkey.bind(this)}]
+        ]);
     }
 
     /**
@@ -78,7 +75,8 @@ class HotkeyHandler extends EventDispatcher {
     }
 
     /**
-     * Registers a set of hotkeys
+     * Registers a set of hotkeys for a given scope.
+     * @param scope The scope that the hotkey definitions must be for in order to be activated.
      * @param hotkeys An array of hotkey definitions of the format `{action, key, modifiers, scopes, enabled}`.
      * * `action` - a string indicating which action to perform.
      * * `key` - a keyboard key code indicating which key needs to be pressed.
@@ -86,25 +84,25 @@ class HotkeyHandler extends EventDispatcher {
      * * `scopes` - an array of scopes for which the hotkey is valid. If this array does not contain `this.scope`, the hotkey will not be registered.
      * * `enabled` - a boolean indicating whether the hotkey is currently enabled.
      */
-    registerHotkeys(hotkeys) {
-        for (const {action, key, modifiers, scopes, enabled} of hotkeys) {
-            if (
-                enabled &&
-                key !== null &&
-                action !== '' &&
-                scopes.includes(this._scope)
-            ) {
-                this._registerHotkey(key, modifiers, action);
-            }
+    registerHotkeys(scope, hotkeys) {
+        let registrations = this._hotkeyRegistrations.get(scope);
+        if (typeof registrations === 'undefined') {
+            registrations = [];
+            this._hotkeyRegistrations.set(scope, registrations);
         }
-        this._updateEventHandlers();
+        registrations.push(...hotkeys);
+        this._updateHotkeyRegistrations();
     }
 
     /**
-     * Removes all registered hotkeys.
+     * Removes all registered hotkeys for a given scope.
      */
-    clearHotkeys() {
-        this._hotkeys.clear();
+    clearHotkeys(scope) {
+        const registrations = this._hotkeyRegistrations.get(scope);
+        if (typeof registrations !== 'undefined') {
+            registrations.length = 0;
+        }
+        this._updateHotkeyRegistrations();
     }
 
     /**
@@ -132,37 +130,67 @@ class HotkeyHandler extends EventDispatcher {
         return result;
     }
 
+    /**
+     * Attempts to simulate an action for a given combination of key and modifiers.
+     * @param key A keyboard key code indicating which key needs to be pressed.
+     * @param modifiers An array of keyboard modifiers which also need to be pressed. Supports: `'alt', 'ctrl', 'shift', 'meta'`.
+     * @returns `true` if an action was performed, `false` otherwise.
+     */
+    simulate(key, modifiers) {
+        const hotkeyInfo = this._hotkeys.get(key);
+        return (
+            typeof hotkeyInfo !== 'undefined' &&
+            this._invokeHandlers(key, modifiers, hotkeyInfo, false)
+        );
+    }
+
+    // Message handlers
+
+    _onMessageForwardHotkey({key, modifiers}) {
+        return this.simulate(key, modifiers);
+    }
+
     // Private
+
+    _onMessage({action, params}, sender, callback) {
+        const messageHandler = this._messageHandlers.get(action);
+        if (typeof messageHandler === 'undefined') { return false; }
+        return yomichan.invokeMessageHandler(messageHandler, params, callback, sender);
+    }
 
     _onKeyDown(e) {
         const key = e.code;
-        const handlers = this._hotkeys.get(key);
-        if (typeof handlers !== 'undefined') {
+        const hotkeyInfo = this._hotkeys.get(key);
+        if (typeof hotkeyInfo !== 'undefined') {
             const eventModifiers = DocumentUtil.getActiveModifiers(e);
-            for (const {modifiers, action} of handlers) {
-                if (!this._areSame(modifiers, eventModifiers)) { continue; }
+            const canForward = (this._forwardFrameId !== null);
+            if (this._invokeHandlers(key, eventModifiers, hotkeyInfo, canForward)) {
+                e.preventDefault();
+                return;
+            }
+        }
+        this.trigger('keydownNonHotkey', e);
+    }
 
-                const actionHandler = this._actions.get(action);
-                if (typeof actionHandler === 'undefined') { continue; }
+    _invokeHandlers(key, modifiers, hotkeyInfo, canForward) {
+        for (const {modifiers: handlerModifiers, action} of hotkeyInfo.handlers) {
+            if (!this._areSame(handlerModifiers, modifiers)) { continue; }
 
-                const result = actionHandler(e);
+            const actionHandler = this._actions.get(action);
+            if (typeof actionHandler !== 'undefined') {
+                const result = actionHandler();
                 if (result !== false) {
-                    e.preventDefault();
                     return true;
                 }
             }
         }
-        this.trigger('keydownNonHotkey', e);
-        return false;
-    }
 
-    _registerHotkey(key, modifiers, action) {
-        let handlers = this._hotkeys.get(key);
-        if (typeof handlers === 'undefined') {
-            handlers = [];
-            this._hotkeys.set(key, handlers);
+        if (canForward && hotkeyInfo.forward) {
+            this._forwardHotkey(key, modifiers);
+            return true;
         }
-        handlers.push({modifiers: new Set(modifiers), action});
+
+        return false;
     }
 
     _areSame(set, array) {
@@ -175,6 +203,34 @@ class HotkeyHandler extends EventDispatcher {
         return true;
     }
 
+    _updateHotkeyRegistrations() {
+        if (this._hotkeys.size === 0 && this._hotkeyRegistrations.size === 0) { return; }
+
+        const canForward = (this._forwardFrameId !== null);
+        this._hotkeys.clear();
+        for (const [scope, registrations] of this._hotkeyRegistrations.entries()) {
+            for (const {action, key, modifiers, scopes, enabled} of registrations) {
+                if (!(enabled && key !== null && action !== '')) { continue; }
+
+                const correctScope = scopes.includes(scope);
+                if (!correctScope && !canForward) { continue; }
+
+                let hotkeyInfo = this._hotkeys.get(key);
+                if (typeof hotkeyInfo === 'undefined') {
+                    hotkeyInfo = {handlers: [], forward: false};
+                    this._hotkeys.set(key, hotkeyInfo);
+                }
+
+                if (correctScope) {
+                    hotkeyInfo.handlers.push({modifiers: new Set(modifiers), action});
+                } else {
+                    hotkeyInfo.forward = true;
+                }
+            }
+        }
+        this._updateEventHandlers();
+    }
+
     _updateHasEventListeners() {
         this._hasEventListeners = this.hasListeners('keydownNonHotkey');
     }
@@ -185,6 +241,16 @@ class HotkeyHandler extends EventDispatcher {
             this._eventListeners.addEventListener(document, 'keydown', this._onKeyDown.bind(this), false);
         } else {
             this._eventListeners.removeAllEventListeners();
+        }
+    }
+
+    async _forwardHotkey(key, modifiers) {
+        const frameId = this._forwardFrameId;
+        if (frameId === null) { throw new Error('No forwarding target'); }
+        try {
+            await api.crossFrame.invoke(frameId, 'hotkeyHandler.forwardHotkey', {key, modifiers});
+        } catch (e) {
+            // NOP
         }
     }
 }

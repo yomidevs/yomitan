@@ -24,7 +24,6 @@
  * DocumentUtil
  * FrameEndpoint
  * Frontend
- * HotkeyHandler
  * MediaLoader
  * PopupFactory
  * QueryParser
@@ -35,11 +34,12 @@
  */
 
 class Display extends EventDispatcher {
-    constructor(pageType, japaneseUtil, documentFocusController) {
+    constructor(pageType, japaneseUtil, documentFocusController, hotkeyHandler) {
         super();
         this._pageType = pageType;
         this._japaneseUtil = japaneseUtil;
         this._documentFocusController = documentFocusController;
+        this._hotkeyHandler = hotkeyHandler;
         this._container = document.querySelector('#definitions');
         this._definitions = [];
         this._optionsContext = {depth: 0, url: window.location.href};
@@ -60,7 +60,6 @@ class Display extends EventDispatcher {
             japaneseUtil,
             mediaLoader: this._mediaLoader
         });
-        this._hotkeyHandler = new HotkeyHandler(this._pageType);
         this._messageHandlers = new Map();
         this._directMessageHandlers = new Map();
         this._windowMessageHandlers = new Map();
@@ -199,7 +198,6 @@ class Display extends EventDispatcher {
         this._audioSystem.prepare();
         this._queryParser.prepare();
         this._history.prepare();
-        this._hotkeyHandler.prepare();
 
         // Event setup
         this._history.on('stateChanged', this._onStateChanged.bind(this));
@@ -498,6 +496,9 @@ class Display extends EventDispatcher {
         this._parentPopupId = parentPopupId;
         this._parentFrameId = parentFrameId;
         this._ownerFrameId = ownerFrameId;
+        if (this._pageType === 'popup') {
+            this._hotkeyHandler.forwardFrameId = ownerFrameId;
+        }
         this._childrenSupported = childrenSupported;
         this._setContentScale(scale);
         await this.setOptionsContext(optionsContext);
@@ -1879,8 +1880,9 @@ class Display extends EventDispatcher {
     }
 
     _updateHotkeys(options) {
-        this._hotkeyHandler.clearHotkeys();
-        this._hotkeyHandler.registerHotkeys(options.inputs.hotkeys);
+        const scope = this._pageType;
+        this._hotkeyHandler.clearHotkeys(scope);
+        this._hotkeyHandler.registerHotkeys(scope, options.inputs.hotkeys);
     }
 
     async _closeTab() {

@@ -18,6 +18,7 @@
 /* global
  * DisplaySearch
  * DocumentFocusController
+ * HotkeyHandler
  * JapaneseUtil
  * api
  * wanakana
@@ -32,7 +33,11 @@
         await yomichan.backendReady();
 
         const japaneseUtil = new JapaneseUtil(wanakana);
-        const displaySearch = new DisplaySearch(japaneseUtil, documentFocusController);
+
+        const hotkeyHandler = new HotkeyHandler();
+        hotkeyHandler.prepare();
+
+        const displaySearch = new DisplaySearch(japaneseUtil, documentFocusController, hotkeyHandler);
         await displaySearch.prepare();
 
         document.documentElement.dataset.loaded = 'true';
