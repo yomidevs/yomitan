@@ -40,6 +40,10 @@ class TextSourceElement {
         return this._endOffset;
     }
 
+    get isConnected() {
+        return this._element.isConnected;
+    }
+
     clone() {
         return new TextSourceElement(this._element, this._fullContent, this._startOffset, this._endOffset);
     }
@@ -71,6 +75,15 @@ class TextSourceElement {
         this._startOffset -= delta;
         this._content = this._fullContent.substring(this._startOffset, this._endOffset);
         return delta;
+    }
+
+    collapse(toStart) {
+        if (toStart) {
+            this._endOffset = this._startOffset;
+        } else {
+            this._startOffset = this._endOffset;
+        }
+        this._content = '';
     }
 
     getRect() {

@@ -41,6 +41,13 @@ class TextSourceRange {
         return this._imposterSourceElement;
     }
 
+    get isConnected() {
+        return (
+            this._range.startContainer.isConnected &&
+            this._range.endContainer.isConnected
+        );
+    }
+
     clone() {
         return new TextSourceRange(this._range.cloneRange(), this._content, this._imposterContainer, this._imposterSourceElement);
     }
@@ -72,6 +79,11 @@ class TextSourceRange {
         this._rangeStartOffset = this._range.startOffset;
         this._content = state.content + this._content;
         return length - state.remainder;
+    }
+
+    collapse(toStart) {
+        this._range.collapse(toStart);
+        this._content = '';
     }
 
     getRect() {
