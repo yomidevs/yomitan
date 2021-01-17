@@ -2007,10 +2007,12 @@ input.sentence-termination-character-input2 {
     margin: 0 0.5em 0 1em;
 }
 .hotkey-scope-checkbox-container {
-    display: flex;
     flex-flow: row nowrap;
     align-items: center;
     cursor: pointer;
+}
+.hotkey-scope-checkbox-container:not([hidden]) {
+    display: flex;
 }
 .hotkey-scope-checkbox-container:not(:last-child) {
     margin-right: 0.75em;

@@ -2995,35 +2995,35 @@
     <div class="hotkey-list-item-action-label-cell">Action:</div>
     <div class="hotkey-list-item-action-cell">
         <select class="hotkey-list-item-action">
-            <option value="">None</option>
-            <option value="close">Close</option>
-            <option value="focusSearchBox">Focus search box</option>
-            <option value="nextEntry">Go to next entry</option>
-            <option value="nextEntry3">Go to next entry (x3)</option>
-            <option value="previousEntry">Go to previous entry</option>
-            <option value="previousEntry3">Go to previous entry (x3)</option>
-            <option value="lastEntry">Go to last entry</option>
-            <option value="firstEntry">Go to first entry</option>
-            <option value="nextEntryDifferentDictionary">Go to next dictionary</option>
-            <option value="previousEntryDifferentDictionary">Go to previous dictionary</option>
-            <option value="historyBackward">Navigate backward in history</option>
-            <option value="historyForward">Navigate forward in history</option>
-            <option value="addNoteKanji">Add kanji note</option>
-            <option value="addNoteTermKanji">Add term note</option>
-            <option value="addNoteTermKana">Add term note (reading)</option>
-            <option value="viewNote">View note</option>
-            <option value="playAudio">Play audio</option>
-            <option value="copyHostSelection">Copy selection</option>
+            <option value="" data-scopes="popup search">None</option>
+            <option value="close" data-scopes="popup search">Close</option>
+            <option value="focusSearchBox" data-scopes="search">Focus search box</option>
+            <option value="nextEntry" data-scopes="popup search">Go to next entry</option>
+            <option value="nextEntry3" data-scopes="popup search">Go to next entry (x3)</option>
+            <option value="previousEntry" data-scopes="popup search">Go to previous entry</option>
+            <option value="previousEntry3" data-scopes="popup search">Go to previous entry (x3)</option>
+            <option value="lastEntry" data-scopes="popup search">Go to last entry</option>
+            <option value="firstEntry" data-scopes="popup search">Go to first entry</option>
+            <option value="nextEntryDifferentDictionary" data-scopes="popup search">Go to next dictionary</option>
+            <option value="previousEntryDifferentDictionary" data-scopes="popup search">Go to previous dictionary</option>
+            <option value="historyBackward" data-scopes="popup search">Navigate backward in history</option>
+            <option value="historyForward" data-scopes="popup search">Navigate forward in history</option>
+            <option value="addNoteKanji" data-scopes="popup search">Add kanji note</option>
+            <option value="addNoteTermKanji" data-scopes="popup search">Add term note</option>
+            <option value="addNoteTermKana" data-scopes="popup search">Add term note (reading)</option>
+            <option value="viewNote" data-scopes="popup search">View note</option>
+            <option value="playAudio" data-scopes="popup search">Play audio</option>
+            <option value="copyHostSelection" data-scopes="popup search">Copy selection</option>
         </select>
         <div class="hotkey-list-item-flex-row">
             <div class="hotkey-list-item-flex-row-label">Scopes:</div>
             <div class="hotkey-list-item-flex-row">
-                <label class="hotkey-scope-checkbox-container">
-                    <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-type="popup"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <label class="hotkey-scope-checkbox-container" data-scope="popup">
+                    <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-scope="popup"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
                     <span>Popup</span>
                 </label>
-                <label class="hotkey-scope-checkbox-container">
-                    <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-type="search"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                <label class="hotkey-scope-checkbox-container" data-scope="search">
+                    <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-scope="search"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
                     <span>Search</span>
                 </label>
             </div>
