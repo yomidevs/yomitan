@@ -86,6 +86,7 @@ class HotkeyHandler extends EventDispatcher {
         for (const {action, key, modifiers, scopes, enabled} of hotkeys) {
             if (
                 enabled &&
+                key !== null &&
                 action !== '' &&
                 scopes.includes(this._scope)
             ) {
