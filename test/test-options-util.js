@@ -455,7 +455,7 @@ function createProfileOptionsUpdatedTestData1() {
                 {action: 'addNoteTermKana',   key: 'KeyR',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                 {action: 'playAudio',         key: 'KeyP',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
                 {action: 'viewNote',          key: 'KeyV',      modifiers: ['alt'],  scopes: ['popup', 'search'], enabled: true},
-                {action: 'copyHostSelection', key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup', 'search'], enabled: true}
+                {action: 'copyHostSelection', key: 'KeyC',      modifiers: ['ctrl'], scopes: ['popup'], enabled: true}
             ]
         },
         popupWindow: {
