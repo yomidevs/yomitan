@@ -305,42 +305,6 @@ class DocumentUtil {
         return true;
     }
 
-    static getModifierKeys(os) {
-        switch (os) {
-            case 'win':
-                return [
-                    ['alt', 'Alt'],
-                    ['ctrl', 'Ctrl'],
-                    ['shift', 'Shift'],
-                    ['meta', 'Windows']
-                ];
-            case 'mac':
-                return [
-                    ['alt', 'Opt'],
-                    ['ctrl', 'Ctrl'],
-                    ['shift', 'Shift'],
-                    ['meta', 'Cmd']
-                ];
-            case 'linux':
-            case 'openbsd':
-            case 'cros':
-            case 'android':
-                return [
-                    ['alt', 'Alt'],
-                    ['ctrl', 'Ctrl'],
-                    ['shift', 'Shift'],
-                    ['meta', 'Super']
-                ];
-            default: // 'unknown', etc
-                return [
-                    ['alt', 'Alt'],
-                    ['ctrl', 'Ctrl'],
-                    ['shift', 'Shift'],
-                    ['meta', 'Meta']
-                ];
-        }
-    }
-
     static isMetaKeySupported(os, browser) {
         return !(browser === 'firefox' || browser === 'firefox-mobile') || os === 'mac';
     }

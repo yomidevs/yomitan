@@ -17,6 +17,7 @@
 
 /* global
  * DocumentUtil
+ * HotkeyUtil
  */
 
 class KeyboardMouseInputField extends EventDispatcher {
@@ -25,15 +26,7 @@ class KeyboardMouseInputField extends EventDispatcher {
         this._inputNode = inputNode;
         this._mouseButton = mouseButton;
         this._isPointerTypeSupported = isPointerTypeSupported;
-        this._keySeparator = ' + ';
-        this._inputNameMap = new Map(DocumentUtil.getModifierKeys(os));
-        this._modifierPriorities = new Map([
-            ['meta', -4],
-            ['ctrl', -3],
-            ['alt', -2],
-            ['shift', -1]
-        ]);
-        this._mouseInputNamePattern = /^mouse(\d+)$/;
+        this._hotkeyUtil = new HotkeyUtil(os);
         this._eventListeners = new EventListenerCollection();
         this._key = null;
         this._modifiers = [];
@@ -93,72 +86,12 @@ class KeyboardMouseInputField extends EventDispatcher {
     // Private
 
     _sortModifiers(modifiers) {
-        const pattern = this._mouseInputNamePattern;
-        const keyPriorities = this._modifierPriorities;
-        const modifierInfos = modifiers.map((modifier, index) => {
-            const match = pattern.exec(modifier);
-            if (match !== null) {
-                return [modifier, 1, Number.parseInt(match[1], 10), index];
-            } else {
-                let priority = keyPriorities.get(modifier);
-                if (typeof priority === 'undefined') { priority = 0; }
-                return [modifier, 0, priority, index];
-            }
-        });
-        modifierInfos.sort((a, b) => {
-            let i = a[1] - b[1];
-            if (i !== 0) { return i; }
-
-            i = a[2] - b[2];
-            if (i !== 0) { return i; }
-
-            i = a[0].localeCompare(b[0], 'en-US'); // Ensure an invariant culture
-            if (i !== 0) { return i; }
-
-            i = a[3] - b[3];
-            return i;
-        });
-        return modifierInfos.map(([modifier]) => modifier);
+        return this._hotkeyUtil.sortModifiers(modifiers);
     }
 
     _updateDisplayString() {
-        let displayValue = '';
-        let first = true;
-        for (const modifier of this._modifiers) {
-            const {name} = this._getModifierName(modifier);
-            if (first) {
-                first = false;
-            } else {
-                displayValue += this._keySeparator;
-            }
-            displayValue += name;
-        }
-        if (this._key !== null) {
-            if (!first) { displayValue += this._keySeparator; }
-            displayValue += this._getDisplayKey(this._key);
-        }
+        const displayValue = this._hotkeyUtil.getInputDisplayValue(this._key, this._modifiers);
         this._inputNode.value = displayValue;
-    }
-
-    _getDisplayKey(key) {
-        if (typeof key === 'string') {
-            if (key.length === 4 && key.startsWith('Key')) {
-                key = key.substring(3);
-            }
-        }
-        return key;
-    }
-
-    _getModifierName(modifier) {
-        const pattern = this._mouseInputNamePattern;
-        const match = pattern.exec(modifier);
-        if (match !== null) {
-            return {name: `Mouse ${match[1]}`, type: 'mouse'};
-        }
-
-        let name = this._inputNameMap.get(modifier);
-        if (typeof name === 'undefined') { name = modifier; }
-        return {name, type: 'key'};
     }
 
     _getModifierKeys(e) {

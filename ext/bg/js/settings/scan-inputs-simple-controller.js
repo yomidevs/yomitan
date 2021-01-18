@@ -16,7 +16,7 @@
  */
 
 /* global
- * DocumentUtil
+ * HotkeyUtil
  * ScanInputsController
  * api
  */
@@ -27,7 +27,7 @@ class ScanInputsSimpleController {
         this._middleMouseButtonScan = null;
         this._mainScanModifierKeyInput = null;
         this._mainScanModifierKeyInputHasOther = false;
-        this._os = null;
+        this._hotkeyUtil = new HotkeyUtil();
     }
 
     async prepare() {
@@ -35,7 +35,7 @@ class ScanInputsSimpleController {
         this._mainScanModifierKeyInput = document.querySelector('#main-scan-modifier-key');
 
         const {platform: {os}} = await api.getEnvironmentInfo();
-        this._os = os;
+        this._hotkeyUtil.os = os;
 
         this._mainScanModifierKeyInputHasOther = false;
         this._populateSelect(this._mainScanModifierKeyInput, this._mainScanModifierKeyInputHasOther);
@@ -106,9 +106,12 @@ class ScanInputsSimpleController {
 
     _populateSelect(select, hasOther) {
         const modifierKeys = [
-            {value: 'none', name: 'No key'},
-            ...DocumentUtil.getModifierKeys(this._os).map(([value, name]) => ({value, name}))
+            {value: 'none', name: 'No key'}
         ];
+        for (const value of ['alt', 'ctrl', 'shift', 'meta']) {
+            const name = this._hotkeyUtil.getModifierDisplayValue(value);
+            modifierKeys.push({value, name});
+        }
 
         if (hasOther) {
             modifierKeys.push({value: 'other', name: 'Other'});
