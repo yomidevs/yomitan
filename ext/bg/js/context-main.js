@@ -16,6 +16,7 @@
  */
 
 /* global
+ * HotkeyHelpController
  * api
  */
 
@@ -34,6 +35,8 @@ class DisplayController {
 
         const optionsFull = await api.optionsGetFull();
         this._optionsFull = optionsFull;
+
+        this._setupHotkeys();
 
         const optionsPageUrl = optionsFull.global.useSettingsV2 ? '/bg/settings2.html' : manifest.options_ui.page;
         this._setupButtonEvents('.action-open-settings', 'openSettingsPage', chrome.runtime.getURL(optionsPageUrl));
@@ -97,6 +100,19 @@ class DisplayController {
             toggle.checked = extensionEnabled;
             toggle.addEventListener('change', onToggleChanged, false);
         }
+    }
+
+    async _setupHotkeys() {
+        const hotkeyHelpController = new HotkeyHelpController();
+        await hotkeyHelpController.prepare();
+
+        const {profiles, profileCurrent} = this._optionsFull;
+        const primaryProfile = (profileCurrent >= 0 && profileCurrent < profiles.length) ? profiles[profileCurrent] : null;
+        if (primaryProfile !== null) {
+            hotkeyHelpController.setOptions(primaryProfile.options);
+        }
+
+        hotkeyHelpController.setupNode(document.documentElement);
     }
 
     _updateProfileSelect(profiles, profileCurrent) {

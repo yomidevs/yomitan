@@ -22,9 +22,10 @@
  */
 
 class DisplayGenerator {
-    constructor({japaneseUtil, mediaLoader}) {
+    constructor({japaneseUtil, mediaLoader, hotkeyHelpController}) {
         this._japaneseUtil = japaneseUtil;
         this._mediaLoader = mediaLoader;
+        this._hotkeyHelpController = hotkeyHelpController;
         this._templates = null;
         this._termPitchAccentStaticTemplateIsSetup = false;
     }
@@ -32,6 +33,14 @@ class DisplayGenerator {
     async prepare() {
         const html = await api.getDisplayTemplatesHtml();
         this._templates = new HtmlTemplateCollection(html);
+        this.updateHotkeys();
+    }
+
+    updateHotkeys() {
+        const hotkeyHelpController = this._hotkeyHelpController;
+        for (const template of this._templates.getAllTemplates()) {
+            hotkeyHelpController.setupNode(template.content);
+        }
     }
 
     preparePitchAccents() {

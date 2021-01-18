@@ -44,6 +44,10 @@ class HtmlTemplateCollection {
         return document.importNode(template.content, true);
     }
 
+    getAllTemplates() {
+        return this._templates.values();
+    }
+
     // Private
 
     _prepareTemplate(template) {

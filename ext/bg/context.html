@@ -30,9 +30,9 @@
                 <optgroup label="Primary Profile" id="profile-select-option-group"></optgroup>
             </select></span>
         </button>
-        <a class="nav-button action-open-settings" data-icon="cog" title="Options&#10;(Middle click to open in new tab)"></a>
-        <a class="nav-button action-open-search" data-icon="magnifying-glass" title="Search (Alt + Insert)&#10;(Middle click to open in new tab)"></a>
-        <a class="nav-button action-open-info" data-icon="question-mark" title="Information"></a>
+        <a class="nav-button action-open-settings" data-icon="cog" title="Settings" data-hotkey='["global:openSettingsPage","title","Settings ({0})"]'></a>
+        <a class="nav-button action-open-search" data-icon="magnifying-glass" title="Search" data-hotkey='["global:openSearchPage","title","Search ({0})"]'></a>
+        <a class="nav-button action-open-info" data-icon="question-mark" title="Information" data-hotkey='["global:openInfoPage","title","Information ({0})"]'></a>
     </div>
 </div>
 
@@ -42,7 +42,7 @@
         <span class="link-group-icon"><input type="checkbox" id="enable-search2"></span><span class="link-group-label">Enable content scanning</span>
     </label>
     <a class="link-group action-open-settings">
-        <span class="link-group-icon" data-icon="chevron"></span><span class="link-group-label">Options</span>
+        <span class="link-group-icon" data-icon="chevron"></span><span class="link-group-label">Settings</span>
     </a>
     <a class="link-group action-open-search">
         <span class="link-group-icon" data-icon="chevron"></span><span class="link-group-label">Search</span>
@@ -56,6 +56,9 @@
 <script src="/mixed/js/yomichan.js"></script>
 <script src="/mixed/js/comm.js"></script>
 <script src="/mixed/js/api.js"></script>
+
+<script src="/mixed/js/hotkey-help-controller.js"></script>
+<script src="/mixed/js/hotkey-util.js"></script>
 
 <script src="/bg/js/context-main.js"></script>
 

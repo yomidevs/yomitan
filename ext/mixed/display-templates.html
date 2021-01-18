@@ -2,16 +2,16 @@
 
 <!-- Term entry templates -->
 <template id="term-entry-template" data-remove-whitespace-text="true"><div class="entry" data-type="term">
-    <div class="entry-current-indicator" title="Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)"><span class="entry-current-indicator-inner"></span></div>
+    <div class="entry-current-indicator" title="Current entry"><span class="entry-current-indicator-inner"></span></div>
     <div class="entry-header1">
         <div class="entry-header2">
             <div class="entry-header3">
                 <div class="actions">
-                    <button class="action-button action-view-note" hidden disabled data-icon="view-note" title="View added note (Alt + V)"></button>
-                    <button class="action-button action-add-note" hidden disabled data-icon="add-term-kanji" data-mode="term-kanji" title="Add expression (Alt + E)"></button>
-                    <button class="action-button action-add-note" hidden disabled data-icon="add-term-kana" data-mode="term-kana" title="Add reading (Alt + R)"></button>
-                    <button class="action-button action-play-audio" data-icon="play-audio" title="Play audio" data-title-default="Play audio"></button>
-                    <span class="entry-current-indicator-icon" title="Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)"></span>
+                    <button class="action-button action-view-note" hidden disabled data-icon="view-note" title="View added note" data-hotkey='["viewNote","title","View added note ({0})"]'></button>
+                    <button class="action-button action-add-note" hidden disabled data-icon="add-term-kanji" data-mode="term-kanji" title="Add expression" data-hotkey='["addNoteTermKanji","title","Add expression ({0})"]'></button>
+                    <button class="action-button action-add-note" hidden disabled data-icon="add-term-kana" data-mode="term-kana" title="Add reading" data-hotkey='["addNoteTermKana","title","Add reading ({0})"]'></button>
+                    <button class="action-button action-play-audio" data-icon="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]'></button>
+                    <span class="entry-current-indicator-icon" title="Current entry"></span>
                 </div>
                 <div class="term-expression-list"></div>
             </div>
@@ -44,7 +44,7 @@
         </span>
     </div>
     <div class="term-expression-details">
-        <button class="action-button action-play-audio" data-icon="play-audio" title="Play audio" data-title-default="Play audio"></button>
+        <button class="action-button action-play-audio" data-icon="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]'></button>
         <div class="tags tag-list"></div>
     </div>
 </div></template>
@@ -84,14 +84,14 @@
 
 <!-- Kanji entry templates -->
 <template id="kanji-entry-template" data-remove-whitespace-text="true"><div class="entry" data-type="kanji">
-    <div class="entry-current-indicator" title="Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)"><span class="entry-current-indicator-inner"></span></div>
+    <div class="entry-current-indicator" title="Current entry"><span class="entry-current-indicator-inner"></span></div>
     <div class="entry-header1">
         <div class="entry-header2">
             <div class="entry-header3">
                 <div class="actions">
-                    <button class="action-button action-view-note" hidden disabled data-icon="view-note" title="View added note (Alt + V)"></button>
-                    <button class="action-button action-add-note" hidden disabled data-icon="add-term-kanji" data-mode="kanji" title="Add Kanji (Alt + K)"></button>
-                    <span class="entry-current-indicator-icon" title="Current entry (Alt + Up/Down/Home/End/PgUp/PgDn)"></span>
+                    <button class="action-button action-view-note" hidden disabled data-icon="view-note" title="View added note" data-hotkey='["viewNote","title","View added note ({0})"]'></button>
+                    <button class="action-button action-add-note" hidden disabled data-icon="add-term-kanji" data-mode="kanji" title="Add kanji" data-hotkey='["addNoteKanji","title","Add kanji ({0})"]'></button>
+                    <span class="entry-current-indicator-icon" title="Current entry"></span>
                 </div>
                 <div class="kanji-glyph-container">
                     <span class="term-expression-current-indicator"></span>

@@ -24,6 +24,7 @@
  * DocumentUtil
  * FrameEndpoint
  * Frontend
+ * HotkeyHelpController
  * MediaLoader
  * PopupFactory
  * QueryParser
@@ -50,9 +51,11 @@ class Display extends EventDispatcher {
         this._eventListeners = new EventListenerCollection();
         this._setContentToken = null;
         this._mediaLoader = new MediaLoader();
+        this._hotkeyHelpController = new HotkeyHelpController();
         this._displayGenerator = new DisplayGenerator({
             japaneseUtil,
-            mediaLoader: this._mediaLoader
+            mediaLoader: this._mediaLoader,
+            hotkeyHelpController: this._hotkeyHelpController
         });
         this._messageHandlers = new Map();
         this._directMessageHandlers = new Map();
@@ -201,6 +204,7 @@ class Display extends EventDispatcher {
         this._browser = browser;
 
         // Prepare
+        await this._hotkeyHelpController.prepare();
         await this._displayGenerator.prepare();
         this._displayAudio.prepare();
         this._queryParser.prepare();
@@ -285,6 +289,9 @@ class Display extends EventDispatcher {
         this._updateTheme(options.general.popupTheme);
         this.setCustomCss(options.general.customPopupCss);
         this._displayAudio.updateOptions(options);
+        this._hotkeyHelpController.setOptions(options);
+        this._displayGenerator.updateHotkeys();
+        this._hotkeyHelpController.setupNode(document.documentElement);
 
         this._queryParser.setOptions({
             selectedParser: options.parsing.selectedParser,
