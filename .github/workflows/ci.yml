@@ -15,8 +15,6 @@ jobs:
         node-version: '12.x'
     - name: Install dependencies
       run: npm ci
-    - name: Build
-      run: npm run build --if-present
     - name: Lint
       run: npm run test-lint
       env:
@@ -33,3 +31,5 @@ jobs:
       run: npm run test-manifest
       env:
         CI: true
+    - name: Build
+      run: npm run test-build
