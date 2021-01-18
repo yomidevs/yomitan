@@ -18,12 +18,13 @@
 /* global
  * CacheMap
  * TextToSpeechAudio
+ * api
  */
 
 class AudioSystem {
-    constructor({getAudioInfo, cacheSize=32}) {
-        this._cache = new CacheMap(cacheSize);
-        this._getAudioInfo = getAudioInfo;
+    constructor(useCache) {
+        this._cache = new CacheMap(useCache ? 32 : 0);
+        this._fallbackAudio = null;
     }
 
     prepare() {
@@ -81,6 +82,13 @@ class AudioSystem {
         throw new Error('Could not create audio');
     }
 
+    getFallbackAudio() {
+        if (this._fallbackAudio === null) {
+            this._fallbackAudio = new Audio('/mixed/mp3/button.mp3');
+        }
+        return this._fallbackAudio;
+    }
+
     createAudio(url) {
         return new Promise((resolve, reject) => {
             const audio = new Audio(url);
@@ -104,6 +112,10 @@ class AudioSystem {
     }
 
     // Private
+
+    async _getAudioInfo(source, expression, reading, details) {
+        return await api.getDefinitionAudioInfo(source, expression, reading, details);
+    }
 
     _isAudioValid(audio) {
         const duration = audio.duration;

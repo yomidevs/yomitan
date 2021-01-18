@@ -22,9 +22,7 @@
 class AudioController {
     constructor(settingsController) {
         this._settingsController = settingsController;
-        this._audioSystem = new AudioSystem({
-            cacheSize: 0
-        });
+        this._audioSystem = new AudioSystem(false);
         this._audioSourceContainer = null;
         this._audioSourceAddButton = null;
         this._audioSourceEntries = [];

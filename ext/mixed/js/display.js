@@ -46,10 +46,7 @@ class Display extends EventDispatcher {
         this._options = null;
         this._index = 0;
         this._audioPlaying = null;
-        this._audioFallback = null;
-        this._audioSystem = new AudioSystem({
-            getAudioInfo: this._getAudioInfo.bind(this)
-        });
+        this._audioSystem = new AudioSystem(true);
         this._styleNode = null;
         this._eventListeners = new EventListenerCollection();
         this._setContentToken = null;
@@ -1234,10 +1231,7 @@ class Display extends EventDispatcher {
                 ({audio, index} = await this._audioSystem.createDefinitionAudio(sources, expression, reading, {textToSpeechVoice, customSourceUrl}));
                 info = `From source ${1 + index}: ${sources[index]}`;
             } catch (e) {
-                if (this._audioFallback === null) {
-                    this._audioFallback = new Audio('/mixed/mp3/button.mp3');
-                }
-                audio = this._audioFallback;
+                audio = this._audioSystem.getFallbackAudio();
                 info = 'Could not find audio';
             }
 
@@ -1567,10 +1561,6 @@ class Display extends EventDispatcher {
         }
         const {expression, reading} = termDetailsList[Math.max(0, bestIndex)];
         return {type, expression, reading};
-    }
-
-    async _getAudioInfo(source, expression, reading, details) {
-        return await api.getDefinitionAudioInfo(source, expression, reading, details);
     }
 
     async _setOptionsContextIfDifferent(optionsContext) {
