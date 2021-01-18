@@ -23,9 +23,10 @@
  */
 
 class PopupPreviewFrame {
-    constructor(frameId, popupFactory) {
+    constructor(frameId, popupFactory, hotkeyHandler) {
         this._frameId = frameId;
         this._popupFactory = popupFactory;
+        this._hotkeyHandler = hotkeyHandler;
         this._frontend = null;
         this._apiOptionsGetOld = null;
         this._popupShown = false;
@@ -74,7 +75,8 @@ class PopupPreviewFrame {
             useProxyPopup: false,
             pageType: 'web',
             allowRootFramePopupProxy: false,
-            childrenSupported: false
+            childrenSupported: false,
+            hotkeyHandler: this._hotkeyHandler
         });
         this._frontend.setOptionsContextOverride(this._optionsContext);
         await this._frontend.prepare();

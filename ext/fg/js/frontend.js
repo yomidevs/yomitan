@@ -19,6 +19,7 @@
  * DocumentUtil
  * TextScanner
  * TextSourceElement
+ * TextSourceRange
  * api
  */
 
@@ -32,7 +33,8 @@ class Frontend {
         parentFrameId,
         useProxyPopup,
         allowRootFramePopupProxy,
-        childrenSupported=true
+        childrenSupported=true,
+        hotkeyHandler
     }) {
         this._pageType = pageType;
         this._popupFactory = popupFactory;
@@ -43,6 +45,7 @@ class Frontend {
         this._useProxyPopup = useProxyPopup;
         this._allowRootFramePopupProxy = allowRootFramePopupProxy;
         this._childrenSupported = childrenSupported;
+        this._hotkeyHandler = hotkeyHandler;
         this._popup = null;
         this._disabledOverride = false;
         this._options = null;
@@ -70,6 +73,10 @@ class Frontend {
             ['requestFrontendReadyBroadcast', {async: false, handler: this._onMessageRequestFrontendReadyBroadcast.bind(this)}],
             ['setAllVisibleOverride',         {async: true,  handler: this._onApiSetAllVisibleOverride.bind(this)}],
             ['clearAllVisibleOverride',       {async: true,  handler: this._onApiClearAllVisibleOverride.bind(this)}]
+        ]);
+
+        this._hotkeyHandler.registerActions([
+            ['scanSelectedText', this._onActionScanSelectedText.bind(this)]
         ]);
     }
 
@@ -159,6 +166,12 @@ class Frontend {
 
     _onMessageRequestFrontendReadyBroadcast({frameId}) {
         this._signalFrontendReady(frameId);
+    }
+
+    // Action handlers
+
+    _onActionScanSelectedText() {
+        this._scanSelectedText();
     }
 
     // API message handlers
@@ -318,6 +331,8 @@ class Frontend {
         const options = await api.optionsGet(optionsContext);
         const {scanning: scanningOptions, sentenceParsing: sentenceParsingOptions} = options;
         this._options = options;
+
+        this._hotkeyHandler.setHotkeys('web', options.inputs.hotkeys);
 
         await this._updatePopup();
 
@@ -645,5 +660,24 @@ class Frontend {
             optionsContext: {depth, url},
             detail: {documentTitle}
         };
+    }
+
+    async _scanSelectedText() {
+        const range = this._getFirstNonEmptySelectionRange();
+        if (range === null) { return false; }
+        const source = new TextSourceRange(range, range.toString(), null, null);
+        await this._textScanner.search(source, {focus: true});
+        return true;
+    }
+
+    _getFirstNonEmptySelectionRange() {
+        const selection = window.getSelection();
+        for (let i = 0, ii = selection.rangeCount; i < ii; ++i) {
+            const range = selection.getRangeAt(i);
+            if (range.toString().length > 0) {
+                return range;
+            }
+        }
+        return null;
     }
 }

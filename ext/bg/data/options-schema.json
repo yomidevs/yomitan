@@ -1011,7 +1011,7 @@
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "enum": ["popup", "search"],
+                                                        "enum": ["popup", "search", "web"],
                                                         "default": "popup"
                                                     },
                                                     "default": ["popup", "search"]

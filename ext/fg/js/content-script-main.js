@@ -17,6 +17,7 @@
 
 /* global
  * Frontend
+ * HotkeyHandler
  * PopupFactory
  * api
  */
@@ -31,6 +32,9 @@
             throw new Error('Failed to get frameId');
         }
 
+        const hotkeyHandler = new HotkeyHandler();
+        hotkeyHandler.prepare();
+
         const popupFactory = new PopupFactory(frameId);
         popupFactory.prepare();
 
@@ -42,7 +46,8 @@
             parentFrameId: null,
             useProxyPopup: false,
             pageType: 'web',
-            allowRootFramePopupProxy: true
+            allowRootFramePopupProxy: true,
+            hotkeyHandler
         });
         await frontend.prepare();
 

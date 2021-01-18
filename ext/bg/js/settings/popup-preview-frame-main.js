@@ -16,6 +16,7 @@
  */
 
 /* global
+ * HotkeyHandler
  * PopupFactory
  * PopupPreviewFrame
  * api
@@ -27,10 +28,13 @@
 
         const {frameId} = await api.frameInformationGet();
 
+        const hotkeyHandler = new HotkeyHandler();
+        hotkeyHandler.prepare();
+
         const popupFactory = new PopupFactory(frameId);
         popupFactory.prepare();
 
-        const preview = new PopupPreviewFrame(frameId, popupFactory);
+        const preview = new PopupPreviewFrame(frameId, popupFactory, hotkeyHandler);
         await preview.prepare();
 
         document.documentElement.dataset.loaded = 'true';

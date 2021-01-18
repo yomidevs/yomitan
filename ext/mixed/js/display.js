@@ -1640,7 +1640,8 @@ class Display extends EventDispatcher {
             popupFactory,
             pageType: this._pageType,
             allowRootFramePopupProxy: true,
-            childrenSupported: this._childrenSupported
+            childrenSupported: this._childrenSupported,
+            hotkeyHandler: this._hotkeyHandler
         });
 
         const frontend = new Frontend(setupNestedPopupsOptions);

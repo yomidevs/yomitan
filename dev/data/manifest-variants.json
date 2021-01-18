@@ -47,6 +47,7 @@
                     "mixed/js/frame-client.js",
                     "mixed/js/text-scanner.js",
                     "mixed/js/document-util.js",
+                    "mixed/js/hotkey-handler.js",
                     "fg/js/dom-text-scanner.js",
                     "fg/js/popup.js",
                     "fg/js/text-source-range.js",

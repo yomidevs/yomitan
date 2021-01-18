@@ -3014,10 +3014,15 @@
             <option value="viewNote" data-scopes="popup search">View note</option>
             <option value="playAudio" data-scopes="popup search">Play audio</option>
             <option value="copyHostSelection" data-scopes="popup search">Copy selection</option>
+            <option value="scanSelectedText" data-scopes="web">Scan selected text</option>
         </select>
         <div class="hotkey-list-item-flex-row">
             <div class="hotkey-list-item-flex-row-label">Scopes:</div>
             <div class="hotkey-list-item-flex-row">
+                <label class="hotkey-scope-checkbox-container" data-scope="web">
+                    <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-scope="web"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
+                    <span>Web</span>
+                </label>
                 <label class="hotkey-scope-checkbox-container" data-scope="popup">
                     <label class="checkbox"><input type="checkbox" class="hotkey-scope-checkbox" data-scope="popup"><span class="checkbox-body"><span class="checkbox-fill"></span><span class="checkbox-border"></span><span class="checkbox-check"></span></span></label>
                     <span>Popup</span>
