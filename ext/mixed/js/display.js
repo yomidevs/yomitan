@@ -17,7 +17,7 @@
 
 /* global
  * AnkiNoteBuilder
- * AudioSystem
+ * DisplayAudio
  * DisplayGenerator
  * DisplayHistory
  * DisplayNotification
@@ -42,16 +42,13 @@ class Display extends EventDispatcher {
         this._hotkeyHandler = hotkeyHandler;
         this._container = document.querySelector('#definitions');
         this._definitions = [];
+        this._definitionNodes = [];
         this._optionsContext = {depth: 0, url: window.location.href};
         this._options = null;
         this._index = 0;
-        this._audioPlaying = null;
-        this._audioSystem = new AudioSystem(true);
         this._styleNode = null;
         this._eventListeners = new EventListenerCollection();
         this._setContentToken = null;
-        this._autoPlayAudioTimer = null;
-        this._autoPlayAudioDelay = 400;
         this._mediaLoader = new MediaLoader();
         this._displayGenerator = new DisplayGenerator({
             japaneseUtil,
@@ -110,6 +107,7 @@ class Display extends EventDispatcher {
         this._frameResizeEventListeners = new EventListenerCollection();
         this._tagNotification = null;
         this._tagNotificationContainer = document.querySelector('#content-footer');
+        this._displayAudio = new DisplayAudio(this);
 
         this._hotkeyHandler.registerActions([
             ['close',             () => { this.close(); }],
@@ -151,11 +149,11 @@ class Display extends EventDispatcher {
     }
 
     get autoPlayAudioDelay() {
-        return this._autoPlayAudioDelay;
+        return this._displayAudio.autoPlayAudioDelay;
     }
 
     set autoPlayAudioDelay(value) {
-        this._autoPlayAudioDelay = value;
+        this._displayAudio.autoPlayAudioDelay = value;
     }
 
     get queryParserVisible() {
@@ -183,6 +181,18 @@ class Display extends EventDispatcher {
         return this._hotkeyHandler;
     }
 
+    get definitions() {
+        return this._definitions;
+    }
+
+    get definitionNodes() {
+        return this._definitionNodes;
+    }
+
+    get progressIndicatorVisible() {
+        return this._progressIndicatorVisible;
+    }
+
     async prepare() {
         // State setup
         const {documentElement} = document;
@@ -192,7 +202,7 @@ class Display extends EventDispatcher {
 
         // Prepare
         await this._displayGenerator.prepare();
-        this._audioSystem.prepare();
+        this._displayAudio.prepare();
         this._queryParser.prepare();
         this._history.prepare();
 
@@ -274,6 +284,7 @@ class Display extends EventDispatcher {
         this._updateDocumentOptions(options);
         this._updateTheme(options.general.popupTheme);
         this.setCustomCss(options.general.customPopupCss);
+        this._displayAudio.updateOptions(options);
 
         this._queryParser.setOptions({
             selectedParser: options.parsing.selectedParser,
@@ -296,25 +307,8 @@ class Display extends EventDispatcher {
         this._updateDefinitionTextScanner(options);
     }
 
-    autoPlayAudio() {
-        this.clearAutoPlayTimer();
-
-        if (this._definitions.length === 0) { return; }
-
-        const callback = () => this._playAudio(0, 0);
-
-        if (this._autoPlayAudioDelay > 0) {
-            this._autoPlayAudioTimer = setTimeout(callback, this._autoPlayAudioDelay);
-        } else {
-            callback();
-        }
-    }
-
     clearAutoPlayTimer() {
-        if (this._autoPlayAudioTimer !== null) {
-            clearTimeout(this._autoPlayAudioTimer);
-            this._autoPlayAudioTimer = null;
-        }
+        this._displayAudio.clearAutoPlayTimer();
     }
 
     setContent(details) {
@@ -518,7 +512,10 @@ class Display extends EventDispatcher {
             this._closePopups();
             this._eventListeners.removeAllEventListeners();
             this._mediaLoader.unloadAll();
+            this._displayAudio.cleanupEntries();
             this._hideTagNotification(false);
+            this._definitions = [];
+            this._definitionNodes = [];
 
             // Prepare
             const urlSearchParams = new URLSearchParams(location.search);
@@ -688,15 +685,6 @@ class Display extends EventDispatcher {
         }
     }
 
-    _onAudioPlay(e) {
-        e.preventDefault();
-        const link = e.currentTarget;
-        const definitionIndex = this._getClosestDefinitionIndex(link);
-        if (definitionIndex < 0) { return; }
-        const expressionIndex = Math.max(0, this._getClosestExpressionIndex(link));
-        this._playAudio(definitionIndex, expressionIndex);
-    }
-
     _onNoteAdd(e) {
         e.preventDefault();
         const link = e.currentTarget;
@@ -807,7 +795,6 @@ class Display extends EventDispatcher {
     _updateDocumentOptions(options) {
         const data = document.documentElement.dataset;
         data.ankiEnabled = `${options.anki.enable}`;
-        data.audioEnabled = `${options.audio.enabled && options.audio.sources.length > 0}`;
         data.glossaryLayoutMode = `${options.general.glossaryLayoutMode}`;
         data.compactTags = `${options.general.compactTags}`;
         data.enableSearchTags = `${options.scanning.enableSearchTags}`;
@@ -921,7 +908,9 @@ class Display extends EventDispatcher {
                 this._displayGenerator.createKanjiEntry(definition)
             );
             entry.dataset.index = `${i}`;
+            this._definitionNodes.push(entry);
             this._addEntryEventListeners(entry);
+            this._displayAudio.setupEntry(entry, i);
             container.appendChild(entry);
             if (focusEntry === i) {
                 this._focusEntry(i, false);
@@ -936,13 +925,7 @@ class Display extends EventDispatcher {
             this._windowScroll.to(x, y);
         }
 
-        if (
-            isTerms &&
-            this._options.audio.enabled &&
-            this._options.audio.autoPlay
-        ) {
-            this.autoPlayAudio();
-        }
+        this._displayAudio.setupEntriesComplete();
 
         this._updateAdderButtons(token, isTerms, definitions);
     }
@@ -1209,76 +1192,12 @@ class Display extends EventDispatcher {
         return true;
     }
 
-    async _playAudio(definitionIndex, expressionIndex) {
-        if (definitionIndex < 0 || definitionIndex >= this._definitions.length) { return; }
-
-        const definition = this._definitions[definitionIndex];
-        if (definition.type === 'kanji') { return; }
-
-        const {expressions} = definition;
-        if (expressionIndex < 0 || expressionIndex >= expressions.length) { return; }
-
-        const {expression, reading} = expressions[expressionIndex];
-
-        const overrideToken = this._progressIndicatorVisible.setOverride(true);
-        try {
-            this._stopPlayingAudio();
-
-            let audio, info;
-            try {
-                const {sources, textToSpeechVoice, customSourceUrl} = this._options.audio;
-                let index;
-                ({audio, index} = await this._audioSystem.createDefinitionAudio(sources, expression, reading, {textToSpeechVoice, customSourceUrl}));
-                info = `From source ${1 + index}: ${sources[index]}`;
-            } catch (e) {
-                audio = this._audioSystem.getFallbackAudio();
-                info = 'Could not find audio';
-            }
-
-            const button = this._audioButtonFindImage(definitionIndex, expressionIndex);
-            if (button !== null) {
-                let titleDefault = button.dataset.titleDefault;
-                if (!titleDefault) {
-                    titleDefault = button.title || '';
-                    button.dataset.titleDefault = titleDefault;
-                }
-                button.title = `${titleDefault}\n${info}`;
-            }
-
-            this._stopPlayingAudio();
-
-            const volume = Math.max(0.0, Math.min(1.0, this._options.audio.volume / 100.0));
-            this._audioPlaying = audio;
-            audio.currentTime = 0;
-            audio.volume = Number.isFinite(volume) ? volume : 1.0;
-            const playPromise = audio.play();
-            if (typeof playPromise !== 'undefined') {
-                try {
-                    await playPromise;
-                } catch (e2) {
-                    // NOP
-                }
-            }
-        } catch (e) {
-            this.onError(e);
-        } finally {
-            this._progressIndicatorVisible.clearOverride(overrideToken);
-        }
-    }
-
     async _playAudioCurrent() {
-        return await this._playAudio(this._index, 0);
-    }
-
-    _stopPlayingAudio() {
-        if (this._audioPlaying !== null) {
-            this._audioPlaying.pause();
-            this._audioPlaying = null;
-        }
+        return await this._displayAudio.playAudio(this._index, 0);
     }
 
     _getEntry(index) {
-        const entries = this._container.querySelectorAll('.entry');
+        const entries = this._definitionNodes;
         return index >= 0 && index < entries.length ? entries[index] : null;
     }
 
@@ -1291,10 +1210,6 @@ class Display extends EventDispatcher {
 
     _getClosestDefinitionIndex(element) {
         return this._getClosestIndex(element, '.entry');
-    }
-
-    _getClosestExpressionIndex(element) {
-        return this._getClosestIndex(element, '.term-expression');
     }
 
     _getClosestIndex(element, selector) {
@@ -1322,18 +1237,6 @@ class Display extends EventDispatcher {
         viewerButton.disabled = false;
         viewerButton.hidden = false;
         viewerButton.dataset.noteId = noteId;
-    }
-
-    _audioButtonFindImage(index, expressionIndex) {
-        const entry = this._getEntry(index);
-        if (entry === null) { return null; }
-
-        const container = (
-            expressionIndex >= 0 ?
-            entry.querySelector(`.term-expression:nth-of-type(${expressionIndex + 1})`) :
-            entry
-        );
-        return container !== null ? container.querySelector('.action-play-audio>img') : null;
     }
 
     _getElementTop(element) {
@@ -1699,7 +1602,6 @@ class Display extends EventDispatcher {
         this._eventListeners.addEventListener(entry, 'click', this._onEntryClick.bind(this));
         this._addMultipleEventListeners(entry, '.action-add-note', 'click', this._onNoteAdd.bind(this));
         this._addMultipleEventListeners(entry, '.action-view-note', 'click', this._onNoteView.bind(this));
-        this._addMultipleEventListeners(entry, '.action-play-audio', 'click', this._onAudioPlay.bind(this));
         this._addMultipleEventListeners(entry, '.kanji-link', 'click', this._onKanjiLookup.bind(this));
         this._addMultipleEventListeners(entry, '.debug-log-link', 'click', this._onDebugLogClick.bind(this));
         this._addMultipleEventListeners(entry, '.tag', 'click', this._onTagClick.bind(this));
