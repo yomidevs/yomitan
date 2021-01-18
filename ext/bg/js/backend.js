@@ -132,7 +132,7 @@ class Backend {
 
         this._commandHandlers = new Map([
             ['toggleTextScanning', this._onCommandToggleTextScanning.bind(this)],
-            ['openHelpPage',       this._onCommandOpenHelpPage.bind(this)],
+            ['openInfoPage',       this._onCommandOpenInfoPage.bind(this)],
             ['openSettingsPage',   this._onCommandOpenSettingsPage.bind(this)],
             ['openSearchPage',     this._onCommandOpenSearchPage.bind(this)],
             ['openPopupWindow',    this._onCommandOpenPopupWindow.bind(this)]
@@ -774,7 +774,7 @@ class Backend {
         }
     }
 
-    async _onCommandOpenHelpPage() {
+    async _onCommandOpenInfoPage() {
         await this._openInfoPage();
     }
 

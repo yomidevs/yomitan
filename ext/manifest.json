@@ -92,8 +92,8 @@
             },
             "description": "Toggle text scanning on/off"
         },
-        "openHelpPage": {
-            "description": "Open the help page"
+        "openInfoPage": {
+            "description": "Open the info page"
         },
         "openSettingsPage": {
             "description": "Open the settings page"

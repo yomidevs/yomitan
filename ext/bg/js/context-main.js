@@ -30,13 +30,13 @@ class DisplayController {
         this._showExtensionInfo(manifest);
         this._setupEnvironment();
         this._setupButtonEvents('.action-open-search', 'openSearchPage', chrome.runtime.getURL('/bg/search.html'));
-        this._setupButtonEvents('.action-open-help', 'openHelpPage', chrome.runtime.getURL('/bg/info.html'));
+        this._setupButtonEvents('.action-open-info', 'openInfoPage', chrome.runtime.getURL('/bg/info.html'));
 
         const optionsFull = await api.optionsGetFull();
         this._optionsFull = optionsFull;
 
         const optionsPageUrl = optionsFull.global.useSettingsV2 ? '/bg/settings2.html' : manifest.options_ui.page;
-        this._setupButtonEvents('.action-open-options', 'openSettingsPage', chrome.runtime.getURL(optionsPageUrl));
+        this._setupButtonEvents('.action-open-settings', 'openSettingsPage', chrome.runtime.getURL(optionsPageUrl));
 
         const {profiles, profileCurrent} = optionsFull;
         const primaryProfile = (profileCurrent >= 0 && profileCurrent < profiles.length) ? profiles[profileCurrent] : null;
