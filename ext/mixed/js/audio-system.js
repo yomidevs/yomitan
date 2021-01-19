@@ -36,47 +36,30 @@ class AudioSystem {
         eventListeners.addEventListener(speechSynthesis, 'voiceschanged', onVoicesChanged, false);
     }
 
-    async createDefinitionAudio(sources, expression, reading, details) {
+    async createExpressionAudio(sources, expression, reading, details) {
         const key = [expression, reading];
 
         const cacheValue = this._cache.get(key);
         if (typeof cacheValue !== 'undefined') {
-            const {audio, source} = cacheValue;
-            const index = sources.indexOf(source);
-            if (index >= 0) {
-                return {audio, index};
-            }
+            return cacheValue;
         }
 
         for (let i = 0, ii = sources.length; i < ii; ++i) {
             const source = sources[i];
-            const info = await this._getAudioInfo(source, expression, reading, details);
-            if (info === null) { continue; }
-
-            let audio;
-            try {
-                switch (info.type) {
-                    case 'url':
-                        {
-                            const {details: {url}} = info;
-                            audio = await this.createAudio(url);
-                        }
-                        break;
-                    case 'tts':
-                        {
-                            const {details: {text, voice}} = info;
-                            audio = this.createTextToSpeechAudio(text, voice);
-                        }
-                        break;
-                    default:
-                        throw new Error(`Unsupported type: ${info.type}`);
+            const infoList = await await api.getExpressionAudioInfoList(source, expression, reading, details);
+            for (let j = 0, jj = infoList.length; j < jj; ++j) {
+                const info = infoList[j];
+                let audio;
+                try {
+                    audio = await this.createAudioFromInfo(info);
+                } catch (e) {
+                    continue;
                 }
-            } catch (e) {
-                continue;
-            }
 
-            this._cache.set(key, {audio, source});
-            return {audio, index: i};
+                const result = {audio, source, infoList, infoListIndex: j};
+                this._cache.set(key, result);
+                return result;
+            }
         }
 
         throw new Error('Could not create audio');
@@ -111,11 +94,18 @@ class AudioSystem {
         return new TextToSpeechAudio(text, voice);
     }
 
-    // Private
-
-    async _getAudioInfo(source, expression, reading, details) {
-        return await api.getDefinitionAudioInfo(source, expression, reading, details);
+    async createAudioFromInfo(info) {
+        switch (info.type) {
+            case 'url':
+                return await this.createAudio(info.url);
+            case 'tts':
+                return this.createTextToSpeechAudio(info.text, info.voice);
+            default:
+                throw new Error(`Unsupported type: ${info.type}`);
+        }
     }
+
+    // Private
 
     _isAudioValid(audio) {
         const duration = audio.duration;

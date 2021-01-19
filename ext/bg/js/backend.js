@@ -99,7 +99,7 @@ class Backend {
             ['noteView',                     {async: true,  contentScript: true,  handler: this._onApiNoteView.bind(this)}],
             ['suspendAnkiCardsForNote',      {async: true,  contentScript: true,  handler: this._onApiSuspendAnkiCardsForNote.bind(this)}],
             ['commandExec',                  {async: false, contentScript: true,  handler: this._onApiCommandExec.bind(this)}],
-            ['getDefinitionAudioInfo',       {async: true,  contentScript: true,  handler: this._onApiGetDefinitionAudioInfo.bind(this)}],
+            ['getExpressionAudioInfoList',   {async: true,  contentScript: true,  handler: this._onApiGetExpressionAudioInfoList.bind(this)}],
             ['downloadDefinitionAudio',      {async: true,  contentScript: true,  handler: this._onApiDownloadDefinitionAudio.bind(this)}],
             ['screenshotGet',                {async: true,  contentScript: true,  handler: this._onApiScreenshotGet.bind(this)}],
             ['sendMessageToFrame',           {async: false, contentScript: true,  handler: this._onApiSendMessageToFrame.bind(this)}],
@@ -500,8 +500,8 @@ class Backend {
         return this._runCommand(command, params);
     }
 
-    async _onApiGetDefinitionAudioInfo({source, expression, reading, details}) {
-        return await this._audioDownloader.getInfo(source, expression, reading, details);
+    async _onApiGetExpressionAudioInfoList({source, expression, reading, details}) {
+        return await this._audioDownloader.getExpressionAudioInfoList(source, expression, reading, details);
     }
 
     async _onApiDownloadDefinitionAudio({sources, expression, reading, details}) {
@@ -1528,7 +1528,7 @@ class Backend {
     }
 
     async _downloadDefinitionAudio(sources, expression, reading, details) {
-        return await this._audioDownloader.downloadAudio(sources, expression, reading, details);
+        return await this._audioDownloader.downloadExpressionAudio(sources, expression, reading, details);
     }
 
     async _injectAnkNoteMedia(ankiConnect, timestamp, definitionDetails, audioDetails, screenshotDetails, clipboardDetails) {

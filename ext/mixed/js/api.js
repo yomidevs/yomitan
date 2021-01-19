@@ -97,8 +97,8 @@ const api = (() => {
             return this._invoke('suspendAnkiCardsForNote', {noteId});
         }
 
-        getDefinitionAudioInfo(source, expression, reading, details) {
-            return this._invoke('getDefinitionAudioInfo', {source, expression, reading, details});
+        getExpressionAudioInfoList(source, expression, reading, details) {
+            return this._invoke('getExpressionAudioInfoList', {source, expression, reading, details});
         }
 
         downloadDefinitionAudio(sources, expression, reading, details) {
