@@ -26,7 +26,6 @@ class SettingsDisplayController {
         this._modalController = modalController;
         this._contentNode = null;
         this._menuContainer = null;
-        this._openPopupMenus = new Set();
         this._onMoreToggleClickBind = null;
         this._onMenuButtonClickBind = null;
     }
@@ -198,11 +197,6 @@ class SettingsDisplayController {
         return false;
     }
 
-    _onClosePopupMenu({popupMenu, onClose}) {
-        this._openPopupMenus.delete(popupMenu);
-        popupMenu.off('closed', onClose);
-    }
-
     _onInputTabActionKeyDown(e) {
         if (e.key !== 'Tab' || e.ctrlKey) { return; }
 
@@ -248,7 +242,7 @@ class SettingsDisplayController {
     }
 
     _closeTopMenuOrModal() {
-        for (const popupMenu of this._openPopupMenus) {
+        for (const popupMenu of PopupMenu.openMenus) {
             popupMenu.close();
             return;
         }
@@ -266,12 +260,6 @@ class SettingsDisplayController {
         this._menuContainer.appendChild(menu);
 
         const popupMenu = new PopupMenu(element, menu);
-        this._openPopupMenus.add(popupMenu);
-
-        const data = {popupMenu, onClose: null};
-        data.onClose = this._onClosePopupMenu.bind(this, data);
-
-        popupMenu.on('closed', data.onClose);
         popupMenu.prepare();
     }
 

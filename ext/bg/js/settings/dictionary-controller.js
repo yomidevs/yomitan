@@ -86,8 +86,8 @@ class DictionaryEntry {
             this._eventListeners.addEventListener(deleteButton, 'click', this._onDeleteButtonClicked.bind(this), false);
         }
         if (menuButton !== null) {
-            this._eventListeners.addEventListener(menuButton, 'menuOpened', this._onMenuOpened.bind(this), false);
-            this._eventListeners.addEventListener(menuButton, 'menuClosed', this._onMenuClosed.bind(this), false);
+            this._eventListeners.addEventListener(menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
+            this._eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this), false);
         }
         if (detailsToggleLink !== null && this._detailsContainer !== null) {
             this._eventListeners.addEventListener(detailsToggleLink, 'click', this._onDetailsToggleLinkClicked.bind(this), false);
@@ -116,10 +116,10 @@ class DictionaryEntry {
         this._delete();
     }
 
-    _onMenuOpened(e) {
-        const {detail: {menu}} = e;
-        const showDetails = menu.querySelector('.popup-menu-item[data-menu-action="showDetails"]');
-        const hideDetails = menu.querySelector('.popup-menu-item[data-menu-action="hideDetails"]');
+    _onMenuOpen(e) {
+        const node = e.detail.menu.node;
+        const showDetails = node.querySelector('.popup-menu-item[data-menu-action="showDetails"]');
+        const hideDetails = node.querySelector('.popup-menu-item[data-menu-action="hideDetails"]');
         const hasDetails = (this._detailsContainer !== null);
         const detailsVisible = (hasDetails && !this._detailsContainer.hidden);
         if (showDetails !== null) {
@@ -132,9 +132,8 @@ class DictionaryEntry {
         }
     }
 
-    _onMenuClosed(e) {
-        const {detail: {action}} = e;
-        switch (action) {
+    _onMenuClose(e) {
+        switch (e.detail.action) {
             case 'delete':
                 this._delete();
                 break;

@@ -478,8 +478,8 @@ class ProfileConditionUI {
         this._eventListeners.addEventListener(this._operatorInput, 'change', this._onOperatorChange.bind(this), false);
         if (this._removeButton !== null) { this._eventListeners.addEventListener(this._removeButton, 'click', this._onRemoveButtonClick.bind(this), false); }
         if (this._menuButton !== null) {
-            this._eventListeners.addEventListener(this._menuButton, 'menuOpened', this._onMenuOpened.bind(this), false);
-            this._eventListeners.addEventListener(this._menuButton, 'menuClosed', this._onMenuClosed.bind(this), false);
+            this._eventListeners.addEventListener(this._menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
+            this._eventListeners.addEventListener(this._menuButton, 'menuClose', this._onMenuClose.bind(this), false);
         }
     }
 
@@ -545,15 +545,16 @@ class ProfileConditionUI {
         this._removeSelf();
     }
 
-    _onMenuOpened({detail: {menu}}) {
-        const deleteGroup = menu.querySelector('.popup-menu-item[data-menu-action="deleteGroup"]');
+    _onMenuOpen(e) {
+        const node = e.detail.menu.node;
+        const deleteGroup = node.querySelector('.popup-menu-item[data-menu-action="deleteGroup"]');
         if (deleteGroup !== null) {
             deleteGroup.hidden = (this._parent.childCount <= 1);
         }
     }
 
-    _onMenuClosed({detail: {action}}) {
-        switch (action) {
+    _onMenuClose(e) {
+        switch (e.detail.action) {
             case 'delete':
                 this._removeSelf();
                 break;

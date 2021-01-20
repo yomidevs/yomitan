@@ -158,8 +158,8 @@ class TranslationTextReplacementsEntry {
         replacementInput.dataset.setting = `${pathBase}.replacement`;
         ignoreCaseToggle.dataset.setting = `${pathBase}.ignoreCase`;
 
-        this._eventListeners.addEventListener(menuButton, 'menuOpened', this._onMenuOpened.bind(this), false);
-        this._eventListeners.addEventListener(menuButton, 'menuClosed', this._onMenuClosed.bind(this), false);
+        this._eventListeners.addEventListener(menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
+        this._eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this), false);
         this._eventListeners.addEventListener(patternInput, 'settingChanged', this._onPatternChanged.bind(this), false);
         this._eventListeners.addEventListener(ignoreCaseToggle, 'settingChanged', this._updateTestInput.bind(this), false);
         this._eventListeners.addEventListener(replacementInput, 'settingChanged', this._updateTestInput.bind(this), false);
@@ -175,14 +175,15 @@ class TranslationTextReplacementsEntry {
 
     // Private
 
-    _onMenuOpened({detail: {menu}}) {
+    _onMenuOpen(e) {
+        const node = e.detail.menu.node;
         const testVisible = this._isTestVisible();
-        menu.querySelector('[data-menu-action=showTest]').hidden = testVisible;
-        menu.querySelector('[data-menu-action=hideTest]').hidden = !testVisible;
+        node.querySelector('[data-menu-action=showTest]').hidden = testVisible;
+        node.querySelector('[data-menu-action=hideTest]').hidden = !testVisible;
     }
 
-    _onMenuClosed({detail: {action}}) {
-        switch (action) {
+    _onMenuClose(e) {
+        switch (e.detail.action) {
             case 'remove':
                 this._parent.deleteGroup(this._index);
                 break;

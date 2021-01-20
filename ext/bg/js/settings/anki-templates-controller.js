@@ -69,7 +69,7 @@ class AnkiTemplatesController {
         resetButton.addEventListener('click', this._onReset.bind(this), false);
         resetConfirmButton.addEventListener('click', this._onResetConfirm.bind(this), false);
         if (menuButton !== null) {
-            menuButton.addEventListener('menuClosed', this._onFieldMenuClosed.bind(this), false);
+            menuButton.addEventListener('menuClose', this._onFieldMenuClose.bind(this), false);
         }
 
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
@@ -138,10 +138,10 @@ class AnkiTemplatesController {
         this._validate(infoNode, field, 'term-kanji', true, false);
     }
 
-    _onFieldMenuClosed({currentTarget: node, detail: {action, item}}) {
+    _onFieldMenuClose({currentTarget: button, detail: {action, item}}) {
         switch (action) {
             case 'setFieldMarker':
-                this._setFieldMarker(node, item.dataset.marker);
+                this._setFieldMarker(button, item.dataset.marker);
                 break;
         }
     }

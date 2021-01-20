@@ -612,8 +612,8 @@ class ProfileEntry {
         this._eventListeners.addEventListener(this._isDefaultRadio, 'change', this._onIsDefaultRadioChange.bind(this), false);
         this._eventListeners.addEventListener(this._nameInput, 'input', this._onNameInputInput.bind(this), false);
         this._eventListeners.addEventListener(this._countLink, 'click', this._onConditionsCountLinkClick.bind(this), false);
-        this._eventListeners.addEventListener(this._menuButton, 'menuOpened', this._onMenuOpened.bind(this), false);
-        this._eventListeners.addEventListener(this._menuButton, 'menuClosed', this._onMenuClosed.bind(this), false);
+        this._eventListeners.addEventListener(this._menuButton, 'menuOpen', this._onMenuOpen.bind(this), false);
+        this._eventListeners.addEventListener(this._menuButton, 'menuClose', this._onMenuClose.bind(this), false);
     }
 
     cleanup() {
@@ -658,16 +658,17 @@ class ProfileEntry {
         this._profileController.openProfileConditionsModal(this._index);
     }
 
-    _onMenuOpened({detail: {menu}}) {
+    _onMenuOpen(e) {
+        const node = e.detail.menu.node;
         const count = this._profileController.profileCount;
-        this._setMenuActionEnabled(menu, 'moveUp', this._index > 0);
-        this._setMenuActionEnabled(menu, 'moveDown', this._index < count - 1);
-        this._setMenuActionEnabled(menu, 'copyFrom', count > 1);
-        this._setMenuActionEnabled(menu, 'delete', count > 1);
+        this._setMenuActionEnabled(node, 'moveUp', this._index > 0);
+        this._setMenuActionEnabled(node, 'moveDown', this._index < count - 1);
+        this._setMenuActionEnabled(node, 'copyFrom', count > 1);
+        this._setMenuActionEnabled(node, 'delete', count > 1);
     }
 
-    _onMenuClosed({detail: {action}}) {
-        switch (action) {
+    _onMenuClose(e) {
+        switch (e.detail.action) {
             case 'moveUp':
                 this._profileController.moveProfile(this._index, -1);
                 break;

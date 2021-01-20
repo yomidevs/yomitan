@@ -208,8 +208,8 @@ class ScanInputField {
             this._eventListeners.addEventListener(removeButton, 'click', this._onRemoveClick.bind(this));
         }
         if (menuButton !== null) {
-            this._eventListeners.addEventListener(menuButton, 'menuOpened', this._onMenuOpened.bind(this));
-            this._eventListeners.addEventListener(menuButton, 'menuClosed', this._onMenuClosed.bind(this));
+            this._eventListeners.addEventListener(menuButton, 'menuOpen', this._onMenuOpen.bind(this));
+            this._eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this));
         }
 
         this._updateDataSettingTargets();
@@ -245,9 +245,10 @@ class ScanInputField {
         this._removeSelf();
     }
 
-    _onMenuOpened({detail: {menu}}) {
-        const showAdvanced = menu.querySelector('.popup-menu-item[data-menu-action="showAdvanced"]');
-        const hideAdvanced = menu.querySelector('.popup-menu-item[data-menu-action="hideAdvanced"]');
+    _onMenuOpen(e) {
+        const node = e.detail.menu.node;
+        const showAdvanced = node.querySelector('.popup-menu-item[data-menu-action="showAdvanced"]');
+        const hideAdvanced = node.querySelector('.popup-menu-item[data-menu-action="hideAdvanced"]');
         const advancedVisible = (this._node.dataset.showAdvanced === 'true');
         if (showAdvanced !== null) {
             showAdvanced.hidden = advancedVisible;
@@ -257,8 +258,8 @@ class ScanInputField {
         }
     }
 
-    _onMenuClosed({detail: {action}}) {
-        switch (action) {
+    _onMenuClose(e) {
+        switch (e.detail.action) {
             case 'remove':
                 this._removeSelf();
                 break;

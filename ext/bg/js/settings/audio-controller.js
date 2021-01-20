@@ -168,7 +168,7 @@ class AudioController {
             eventListeners.addEventListener(removeButton, 'click', this._onAudioSourceRemoveClicked.bind(this, entry), false);
         }
         if (menuButton !== null) {
-            eventListeners.addEventListener(menuButton, 'menuClosed', this._onMenuClosed.bind(this, entry), false);
+            eventListeners.addEventListener(menuButton, 'menuClose', this._onMenuClose.bind(this, entry), false);
         }
 
         this._audioSourceContainer.appendChild(container);
@@ -224,9 +224,8 @@ class AudioController {
         this._removeAudioSourceEntry(entry);
     }
 
-    _onMenuClosed(entry, e) {
-        const {detail: {action}} = e;
-        switch (action) {
+    _onMenuClose(entry, e) {
+        switch (e.detail.action) {
             case 'remove':
                 this._removeAudioSourceEntry(entry);
                 break;
