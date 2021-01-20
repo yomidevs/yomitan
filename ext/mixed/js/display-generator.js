@@ -22,7 +22,7 @@
  */
 
 class DisplayGenerator {
-    constructor({japaneseUtil, mediaLoader, hotkeyHelpController}) {
+    constructor({japaneseUtil, mediaLoader, hotkeyHelpController=null}) {
         this._japaneseUtil = japaneseUtil;
         this._mediaLoader = mediaLoader;
         this._hotkeyHelpController = hotkeyHelpController;
@@ -38,6 +38,7 @@ class DisplayGenerator {
 
     updateHotkeys() {
         const hotkeyHelpController = this._hotkeyHelpController;
+        if (hotkeyHelpController === null) { return; }
         for (const template of this._templates.getAllTemplates()) {
             hotkeyHelpController.setupNode(template.content);
         }
