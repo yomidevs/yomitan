@@ -114,7 +114,7 @@ class TextSourceElement {
     }
 
     getNodesInRange() {
-        return [];
+        return [this._element];
     }
 
     static getElementContent(element) {
