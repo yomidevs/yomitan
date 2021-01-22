@@ -92,7 +92,7 @@ class PopupMenu extends EventDispatcher {
         let verticalCover = 1;
         const positionInfo = this._sourceElement.dataset.menuPosition;
         if (typeof positionInfo === 'string') {
-            const positionInfoSet = new Set(positionInfo.split(','));
+            const positionInfoSet = new Set(positionInfo.split(' '));
 
             if (positionInfoSet.has('left')) {
                 horizontal = -1;
