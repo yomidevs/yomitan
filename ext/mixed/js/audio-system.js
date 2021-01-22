@@ -37,7 +37,7 @@ class AudioSystem {
     }
 
     async createExpressionAudio(sources, expression, reading, details) {
-        const key = [expression, reading];
+        const key = JSON.stringify([expression, reading]);
 
         const cacheValue = this._cache.get(key);
         if (typeof cacheValue !== 'undefined') {

@@ -16,29 +16,24 @@
  */
 
 /**
- * Class which caches a map of values using an arbitrary length path,
- * keeping the most recently accessed values.
+ * Class which caches a map of values, keeping the most recently accessed values.
  */
 class CacheMap {
     /**
      * Creates a new CacheMap.
-     * @param maxCount The maximum number of entries able to be stored in the cache.
-     * @param create A function to create a value for the corresponding path.
-     *   The signature is: create(path)
+     * @param maxSize The maximum number of entries able to be stored in the cache.
      */
-    constructor(maxCount, create) {
+    constructor(maxSize) {
         if (!(
-            typeof maxCount === 'number' &&
-            Number.isFinite(maxCount) &&
-            maxCount >= 0 &&
-            Math.floor(maxCount) === maxCount
+            typeof maxSize === 'number' &&
+            Number.isFinite(maxSize) &&
+            maxSize >= 0 &&
+            Math.floor(maxSize) === maxSize
         )) {
             throw new Error('Invalid maxCount');
         }
 
-        this._maxCount = maxCount;
-        this._create = create;
-        this._count = 0;
+        this._maxSize = maxSize;
         this._map = new Map();
         this._listFirst = this._createNode(null, null);
         this._listLast = this._createNode(null, null);
@@ -48,54 +43,62 @@ class CacheMap {
     /**
      * Returns the number of items in the cache.
      */
-    get count() {
-        return this._count;
+    get size() {
+        return this._map.size;
     }
 
     /**
      * Returns the maximum number of items that can be added to the cache.
      */
-    get maxCount() {
-        return this._maxCount;
+    get maxSize() {
+        return this._maxSize;
     }
 
     /**
-     * Returns whether or not an item exists at the given path.
-     * @param path Array corresponding to the key of the cache.
-     * @returns A boolean indicating whether ot not the item exists.
+     * Returns whether or not an element exists at the given key.
+     * @param key The key of the element.
+     * @returns `true` if an element with the specified key exists, `false` otherwise.
      */
-    has(path) {
-        const node = this._accessNode(false, false, null, false, path);
-        return (node !== null);
+    has(key) {
+        return this._map.has(key);
     }
 
     /**
-     * Gets an item at the given path, if it exists. Otherwise, returns undefined.
-     * @param path Array corresponding to the key of the cache.
-     * @returns The existing value at the path, if any; otherwise, undefined.
+     * Gets an element at the given key, if it exists. Otherwise, returns undefined.
+     * @param key The key of the element.
+     * @returns The existing value at the key, if any; `undefined` otherwise.
      */
-    get(path) {
-        const node = this._accessNode(false, false, null, true, path);
-        return (node !== null ? node.value : void 0);
+    get(key) {
+        const node = this._map.get(key);
+        if (typeof node === 'undefined') { return void 0; }
+        this._updateRecency(node);
+        return node.value;
     }
 
     /**
-     * Gets an item at the given path, if it exists. Otherwise, creates a new item
-     * and adds it to the cache. If the count exceeds the maximum count, items will be removed.
-     * @param path Array corresponding to the key of the cache.
-     * @returns The existing value at the path, if any; otherwise, a newly created value.
-     */
-    getOrCreate(path) {
-        return this._accessNode(true, false, null, true, path).value;
-    }
-
-    /**
-     * Sets a value at a given path.
-     * @param path Array corresponding to the key of the cache.
+     * Sets a value at a given key.
+     * @param key The key of the element.
      * @param value The value to store in the cache.
      */
-    set(path, value) {
-        this._accessNode(false, true, value, true, path);
+    set(key, value) {
+        let node = this._map.get(key);
+        if (typeof node !== 'undefined') {
+            this._updateRecency(node);
+            node.value = value;
+        } else {
+            if (this._maxSize <= 0) { return; }
+
+            node = this._createNode(key, value);
+            this._addNode(node, this._listFirst);
+            this._map.set(key, node);
+
+            // Remove
+            for (let removeCount = this._map.size - this._maxSize; removeCount > 0; --removeCount) {
+                node = this._listLast.previous;
+                this._removeNode(node);
+                this._map.delete(node.key);
+            }
+        }
     }
 
     /**
@@ -103,73 +106,18 @@ class CacheMap {
      */
     clear() {
         this._map.clear();
-        this._count = 0;
         this._resetEndNodes();
     }
 
     // Private
-
-    _accessNode(create, set, value, updateRecency, path) {
-        let ii = path.length;
-        if (ii === 0) { throw new Error('Invalid path'); }
-
-        let map = this._map;
-        let i = 0;
-        for (; i < ii; ++i) {
-            const map2 = map.get(path[i]);
-            if (typeof map2 === 'undefined') { break; }
-            map = map2;
-        }
-
-        if (i === ii) {
-            // Found (map should now be a node)
-            if (updateRecency) { this._updateRecency(map); }
-            if (set) { map.value = value; }
-            return map;
-        }
-
-        // Create new
-        if (create) {
-            value = this._create(path);
-        } else if (!set) {
-            return null;
-        }
-
-        // Create mapping
-        --ii;
-        for (; i < ii; ++i) {
-            const map2 = new Map();
-            map.set(path[i], map2);
-            map = map2;
-        }
-
-        // Assign
-        const node = this._createNode(value, path);
-        this._addNode(node, this._listFirst);
-        map.set(path[ii], node);
-        ++this._count;
-
-        this._updateCount();
-
-        return node;
-    }
 
     _updateRecency(node) {
         this._removeNode(node);
         this._addNode(node, this._listFirst);
     }
 
-    _updateCount() {
-        for (let removeCount = this._count - this._maxCount; removeCount > 0; --removeCount) {
-            const node = this._listLast.previous;
-            this._removeNode(node);
-            this._removeMapping(node.path);
-            --this._count;
-        }
-    }
-
-    _createNode(value, path) {
-        return {value, path, previous: null, next: null};
+    _createNode(key, value) {
+        return {key, value, previous: null, next: null};
     }
 
     _addNode(node, previous) {
@@ -183,30 +131,6 @@ class CacheMap {
     _removeNode(node) {
         node.next.previous = node.previous;
         node.previous.next = node.next;
-    }
-
-    _removeMapping(path) {
-        const ii = path.length - 1;
-        let i = 0;
-        const maps = [];
-        let map = this._map;
-        for (; i < ii; ++i) {
-            const map2 = map.get(path[i]);
-            if (typeof map2 === 'undefined') { return; }
-            maps.push([map, map2]);
-            map = map2;
-        }
-
-        // Delete node
-        map.delete(path[ii]);
-
-        // Clear empty paths
-        for (i = ii - 1; i >= 0; --i) {
-            let map2;
-            [map, map2] = maps[i];
-            if (map2.size > 0) { return; }
-            map.delete(path[i]);
-        }
     }
 
     _resetEndNodes() {
