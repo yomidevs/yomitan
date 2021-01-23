@@ -152,7 +152,8 @@ class DisplaySearch extends Display {
     }
 
     _onSearchKeydown(e) {
-        if (e.code !== 'Enter' || e.shiftKey) { return; }
+        const {code} = e;
+        if (!((code === 'Enter' || code === 'NumpadEnter') && !e.shiftKey)) { return; }
 
         // Search
         e.preventDefault();
