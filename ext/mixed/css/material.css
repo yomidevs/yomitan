@@ -196,10 +196,13 @@
 .icon[data-icon=expand]                  { --icon-image: url(/mixed/img/expand.svg); }
 .icon[data-icon=window]                  { --icon-image: url(/mixed/img/window.svg); }
 .icon[data-icon=cross]                   { --icon-image: url(/mixed/img/cross.svg); }
+.icon[data-icon=checkmark]               { --icon-image: url(/mixed/img/checkmark.svg); }
 .icon[data-icon=sentence-parsing]        { --icon-image: url(/mixed/img/sentence-parsing.svg); }
 .icon[data-icon=question-mark]           { --icon-image: url(/mixed/img/question-mark.svg); }
 .icon[data-icon=question-mark-circle]    { --icon-image: url(/mixed/img/question-mark-circle.svg); }
 .icon[data-icon=question-mark-thick]     { --icon-image: url(/mixed/img/question-mark-thick.svg); }
+.icon[data-icon=left-chevron]            { --icon-image: url(/mixed/img/left-chevron.svg); }
+.icon[data-icon=right-chevron]           { --icon-image: url(/mixed/img/right-chevron.svg); }
 .icon[data-icon=material-down-arrow] {
     --icon-image: url(/mixed/img/material-down-arrow.svg);
     --icon-size: var(--material-arrow-dimension2) var(--material-arrow-dimension1);

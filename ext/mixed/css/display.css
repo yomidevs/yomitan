@@ -494,17 +494,11 @@ button.sidebar-button.danger:active:not(:disabled) {
     background-color: var(--sidebar-button-danger-background-color-active);
 }
 .sidebar-button-icon {
+    --icon-size: var(--sidebar-button-icon-size) var(--sidebar-button-icon-size);
+
     display: block;
     width: 100%;
     height: 100%;
-    mask-repeat: no-repeat;
-    mask-position: center center;
-    mask-mode: alpha;
-    mask-size: var(--sidebar-button-icon-size) var(--sidebar-button-icon-size);
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-position: center center;
-    -webkit-mask-mode: alpha;
-    -webkit-mask-size: var(--sidebar-button-icon-size) var(--sidebar-button-icon-size);
     background-color: var(--sidebar-button-icon-color);
     transition: background-color 0.125s ease-in-out;
 }
@@ -517,26 +511,6 @@ button.sidebar-button.danger:focus .sidebar-button-icon {
 }
 button.sidebar-button.sidebar-button-highlight>.sidebar-button-icon {
     background-color: var(--accent-color);
-}
-.sidebar-button-icon[data-icon=cross] {
-    mask-image: url(/mixed/img/cross.svg);
-    -webkit-mask-image: url(/mixed/img/cross.svg);
-}
-.sidebar-button-icon[data-icon=left-chevron] {
-    mask-image: url(/mixed/img/left-chevron.svg);
-    -webkit-mask-image: url(/mixed/img/left-chevron.svg);
-}
-.sidebar-button-icon[data-icon=right-chevron] {
-    mask-image: url(/mixed/img/right-chevron.svg);
-    -webkit-mask-image: url(/mixed/img/right-chevron.svg);
-}
-.sidebar-button-icon[data-icon=kebab-menu] {
-    mask-image: url(/mixed/img/kebab-menu.svg);
-    -webkit-mask-image: url(/mixed/img/kebab-menu.svg);
-}
-.sidebar-button-icon[data-icon=profile] {
-    mask-image: url(/mixed/img/profile.svg);
-    -webkit-mask-image: url(/mixed/img/profile.svg);
 }
 
 
