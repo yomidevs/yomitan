@@ -53,7 +53,7 @@ class AudioDownloader {
                 switch (info.type) {
                     case 'url':
                         try {
-                            return await this._downloadAudioFromUrl(info.url);
+                            return await this._downloadAudioFromUrl(info.url, source);
                         } catch (e) {
                             // NOP
                         }
@@ -192,7 +192,7 @@ class AudioDownloader {
         return [{type: 'url', url}];
     }
 
-    async _downloadAudioFromUrl(url) {
+    async _downloadAudioFromUrl(url, source) {
         const response = await this._requestBuilder.fetchAnonymous(url, {
             method: 'GET',
             mode: 'cors',
@@ -208,18 +208,25 @@ class AudioDownloader {
 
         const arrayBuffer = await response.arrayBuffer();
 
-        if (!await this._isAudioBinaryValid(arrayBuffer)) {
+        if (!await this._isAudioBinaryValid(arrayBuffer, source)) {
             throw new Error('Could not retrieve audio');
         }
 
         return this._arrayBufferToBase64(arrayBuffer);
     }
 
-    async _isAudioBinaryValid(arrayBuffer) {
-        const digest = await this._arrayBufferDigest(arrayBuffer);
-        switch (digest) {
-            case 'ae6398b5a27bc8c0a771df6c907ade794be15518174773c58c7c7ddd17098906': // jpod101 invalid audio
-                return false;
+    async _isAudioBinaryValid(arrayBuffer, source) {
+        switch (source) {
+            case 'jpod101':
+            {
+                const digest = await this._arrayBufferDigest(arrayBuffer);
+                switch (digest) {
+                    case 'ae6398b5a27bc8c0a771df6c907ade794be15518174773c58c7c7ddd17098906': // Invalid audio
+                        return false;
+                    default:
+                        return true;
+                }
+            }
             default:
                 return true;
         }

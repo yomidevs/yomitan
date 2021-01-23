@@ -51,7 +51,7 @@ class AudioSystem {
                 const info = infoList[j];
                 let audio;
                 try {
-                    audio = await this.createAudioFromInfo(info);
+                    audio = await this.createAudioFromInfo(info, source);
                 } catch (e) {
                     continue;
                 }
@@ -72,11 +72,11 @@ class AudioSystem {
         return this._fallbackAudio;
     }
 
-    createAudio(url) {
+    createAudio(url, source) {
         return new Promise((resolve, reject) => {
             const audio = new Audio(url);
             audio.addEventListener('loadeddata', () => {
-                if (!this._isAudioValid(audio)) {
+                if (!this._isAudioValid(audio, source)) {
                     reject(new Error('Could not retrieve audio'));
                 } else {
                     resolve(audio);
@@ -94,10 +94,10 @@ class AudioSystem {
         return new TextToSpeechAudio(text, voice);
     }
 
-    async createAudioFromInfo(info) {
+    async createAudioFromInfo(info, source) {
         switch (info.type) {
             case 'url':
-                return await this.createAudio(info.url);
+                return await this.createAudio(info.url, source);
             case 'tts':
                 return this.createTextToSpeechAudio(info.text, info.voice);
             default:
@@ -107,12 +107,19 @@ class AudioSystem {
 
     // Private
 
-    _isAudioValid(audio) {
-        const duration = audio.duration;
-        return (
-            duration !== 5.694694 && // jpod101 invalid audio (Chrome)
-            duration !== 5.720718 // jpod101 invalid audio (Firefox)
-        );
+    _isAudioValid(audio, source) {
+        switch (source) {
+            case 'jpod101':
+            {
+                const duration = audio.duration;
+                return (
+                    duration !== 5.694694 && // Invalid audio (Chrome)
+                    duration !== 5.720718 // Invalid audio (Firefox)
+                );
+            }
+            default:
+                return true;
+        }
     }
 
     _getTextToSpeechVoiceFromVoiceUri(voiceUri) {
