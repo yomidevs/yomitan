@@ -62,8 +62,8 @@ class DisplayAudio {
     }
 
     setupEntriesComplete() {
-        const {audio} = this._display.getOptions();
-        if (!audio.enabled || !audio.autoPlay) { return; }
+        const audioOptions = this._getAudioOptions();
+        if (!audioOptions.enabled || !audioOptions.autoPlay) { return; }
 
         this.clearAutoPlayTimer();
 
@@ -97,21 +97,22 @@ class DisplayAudio {
         this._audioPlaying = null;
     }
 
-    async playAudio(definitionIndex, expressionIndex) {
+    async playAudio(definitionIndex, expressionIndex, sources=null, sourceDetailsMap=null) {
         this.stopAudio();
         this.clearAutoPlayTimer();
 
-        const {definitions} = this._display;
-        if (definitionIndex < 0 || definitionIndex >= definitions.length) { return; }
+        const expressionReading = this._getExpressionAndReading(definitionIndex, expressionIndex);
+        if (expressionReading === null) { return; }
 
-        const definition = definitions[definitionIndex];
-        if (definition.type === 'kanji') { return; }
-
-        const {expressions} = definition;
-        if (expressionIndex < 0 || expressionIndex >= expressions.length) { return; }
-
-        const {expression, reading} = expressions[expressionIndex];
-        const {sources, textToSpeechVoice, customSourceUrl, volume} = this._display.getOptions().audio;
+        const {expression, reading} = expressionReading;
+        const audioOptions = this._getAudioOptions();
+        const {textToSpeechVoice, customSourceUrl, volume} = audioOptions;
+        if (!Array.isArray(sources)) {
+            ({sources} = audioOptions);
+        }
+        if (!(sourceDetailsMap instanceof Map)) {
+            sourceDetailsMap = null;
+        }
 
         const progressIndicatorVisible = this._display.progressIndicatorVisible;
         const overrideToken = progressIndicatorVisible.setOverride(true);
@@ -119,7 +120,7 @@ class DisplayAudio {
             // Create audio
             let audio;
             let title;
-            const info = await this._createExpressionAudio(sources, expression, reading, {textToSpeechVoice, customSourceUrl});
+            const info = await this._createExpressionAudio(sources, sourceDetailsMap, expression, reading, {textToSpeechVoice, customSourceUrl});
             if (info !== null) {
                 let source;
                 ({audio, source} = info);
@@ -187,8 +188,8 @@ class DisplayAudio {
         return results;
     }
 
-    async _createExpressionAudio(sources, expression, reading, details) {
-        const key = JSON.stringify([expression, reading]);
+    async _createExpressionAudio(sources, sourceDetailsMap, expression, reading, details) {
+        const key = this._getExpressionReadingKey(expression, reading);
 
         let sourceMap = this._cache.get(key);
         if (typeof sourceMap === 'undefined') {
@@ -199,33 +200,67 @@ class DisplayAudio {
         for (let i = 0, ii = sources.length; i < ii; ++i) {
             const source = sources[i];
 
-            let infoListPromise = sourceMap.get(source);
-            if (typeof infoListPromise === 'undefined') {
+            let infoListPromise;
+            let sourceInfo = sourceMap.get(source);
+            if (typeof sourceInfo === 'undefined') {
                 infoListPromise = this._getExpressionAudioInfoList(source, expression, reading, details);
-                sourceMap.set(source, infoListPromise);
+                sourceInfo = {infoListPromise, infoList: null};
+                sourceMap.set(source, sourceInfo);
             }
-            const infoList = await infoListPromise;
 
-            for (let j = 0, jj = infoList.length; j < jj; ++j) {
-                const item = infoList[j];
+            let {infoList} = sourceInfo;
+            if (infoList === null) {
+                infoList = await infoListPromise;
+                sourceInfo.infoList = infoList;
+            }
 
+            let start = 0;
+            let end = infoList.length;
+
+            if (sourceDetailsMap !== null) {
+                const sourceDetails = sourceDetailsMap.get(source);
+                if (typeof sourceDetails !== 'undefined') {
+                    const {start: start2, end: end2} = sourceDetails;
+                    if (this._isInteger(start2)) { start = this._clamp(start2, start, end); }
+                    if (this._isInteger(end2)) { end = this._clamp(end2, start, end); }
+                }
+            }
+
+            const audio = await this._createAudioFromInfoList(source, infoList, start, end);
+            if (audio !== null) { return audio; }
+        }
+
+        return null;
+    }
+
+    async _createAudioFromInfoList(source, infoList, start, end) {
+        for (let i = start; i < end; ++i) {
+            const item = infoList[i];
+
+            let {audio, audioResolved} = item;
+
+            if (!audioResolved) {
                 let {audioPromise} = item;
                 if (audioPromise === null) {
                     audioPromise = this._createAudioFromInfo(item.info, source);
                     item.audioPromise = audioPromise;
                 }
 
-                let audio;
                 try {
                     audio = await audioPromise;
                 } catch (e) {
                     continue;
+                } finally {
+                    item.audioResolved = true;
                 }
 
-                return {audio, source, infoListIndex: j};
+                item.audio = audio;
             }
-        }
 
+            if (audio === null) { continue; }
+
+            return {audio, source, infoListIndex: i};
+        }
         return null;
     }
 
@@ -243,5 +278,39 @@ class DisplayAudio {
     async _getExpressionAudioInfoList(source, expression, reading, details) {
         const infoList = await api.getExpressionAudioInfoList(source, expression, reading, details);
         return infoList.map((info) => ({info, audioPromise: null}));
+    }
+
+    _getExpressionAndReading(definitionIndex, expressionIndex) {
+        const {definitions} = this._display;
+        if (definitionIndex < 0 || definitionIndex >= definitions.length) { return null; }
+
+        const definition = definitions[definitionIndex];
+        if (definition.type === 'kanji') { return null; }
+
+        const {expressions} = definition;
+        if (expressionIndex < 0 || expressionIndex >= expressions.length) { return null; }
+
+        const {expression, reading} = expressions[expressionIndex];
+        return {expression, reading};
+    }
+
+    _getExpressionReadingKey(expression, reading) {
+        return JSON.stringify([expression, reading]);
+    }
+
+    _getAudioOptions() {
+        return this._display.getOptions().audio;
+    }
+
+    _isInteger(value) {
+        return (
+            typeof value === 'number' &&
+            Number.isFinite(value) &&
+            Math.floor(value) === value
+        );
+    }
+
+    _clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
     }
 }
