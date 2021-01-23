@@ -51,7 +51,10 @@
     --menu-shadow: 0 1px 3px 1px var(--shadow-color), 0 2px 4px 3px var(--shadow-color);
 
     --text-color: #222222;
-    --text-color-light: #666666;
+    --text-color-light1: #555555;
+    --text-color-light2: #666666;
+    --text-color-light3: #777777;
+    --text-color-light4: #888888;
     --background-color: #f8f9fa;
     --background-color-light: #ffffff;
 
@@ -105,7 +108,10 @@
 }
 :root[data-theme=dark] {
     --text-color: #d4d4d4;
-    --text-color-light: #909090;
+    --text-color-light1: #aaaaaa;
+    --text-color-light2: #999999;
+    --text-color-light3: #888888;
+    --text-color-light4: #777777;
     --background-color: #1e1e1e;
     --background-color-light: #0a0a0a;
 
@@ -950,7 +956,7 @@ button.popup-menu-item:active:not(:disabled) {
     box-shadow: none;
 }
 button.popup-menu-item:disabled {
-    color: var(--text-color-light);
+    color: var(--text-color-light2);
 }
 .popup-menu-item-icon {
     display: block;

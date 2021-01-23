@@ -88,13 +88,11 @@
     --link-color: var(--accent-color);
 
     --text-color: #000000;
-    --text-color-light: #777777;
-    --text-color-very-light: #999999;
     --kanji-text-color: var(--text-color);
     --kanji-popular-text-color: var(--accent-color);
-    --kanji-rare-text-color: var(--text-color-very-light);
+    --kanji-rare-text-color: var(--text-color-light4);
     --kanji-furigana-text-color: inherit;
-    --reason-text-color: var(--text-color-light);
+    --reason-text-color: var(--text-color-light3);
 
     --light-border-color: #eeeeee;
     --medium-border-color: #dddddd;
@@ -149,13 +147,11 @@
     --link-color: var(--accent-color);
 
     --text-color: #d4d4d4;
-    --text-color-light: #888888;
-    --text-color-very-light: #666666;
     --kanji-text-color: var(--text-color);
     --kanji-popular-text-color: var(--accent-color);
-    --kanji-rare-text-color: var(--text-color-very-light);
+    --kanji-rare-text-color: var(--text-color-light4);
     --kanji-furigana-text-color: inherit;
-    --reason-text-color: var(--text-color-light);
+    --reason-text-color: var(--text-color-light3);
 
     --light-border-color: #2f2f2f;
     --medium-border-color: #3f3f3f;
@@ -960,10 +956,10 @@ button.action-button[data-icon=source-term]::before {
 }
 .term-definition-item::marker,
 .term-glossary-item::marker {
-    color: var(--text-color-light);
+    color: var(--text-color-light3);
 }
 .term-definition-disambiguation-list {
-    color: var(--text-color-light);
+    color: var(--text-color-light3);
 }
 .term-definition-disambiguation-list[data-count='0'] {
     display: none;
@@ -1023,10 +1019,10 @@ button.action-button[data-icon=source-term]::before {
 }
 .frequency-group-item::marker,
 .frequency-item::marker {
-    color: var(--text-color-light);
+    color: var(--text-color-light3);
 }
 .frequency-disambiguation {
-    color: var(--text-color-light);
+    color: var(--text-color-light3);
 }
 .frequency-separator::before {
     content: '';
@@ -1079,7 +1075,7 @@ button.action-button[data-icon=source-term]::before {
     white-space: pre-wrap;
     content: var(--compact-list-separator);
     display: inline;
-    color: var(--text-color-light);
+    color: var(--text-color-light3);
 }
 :root[data-glossary-layout-mode=compact] .frequency-tag-list,
 .frequency-group-item[data-count='1'] .frequency-tag-list {
@@ -1112,7 +1108,7 @@ button.action-button[data-icon=source-term]::before {
 }
 .term-pitch-accent-group::marker,
 .term-pitch-accent::marker {
-    color: var(--text-color-light);
+    color: var(--text-color-light3);
 }
 .term-pitch-accent {
     display: list-item;
@@ -1127,7 +1123,7 @@ button.action-button[data-icon=source-term]::before {
 }
 .term-pitch-accent-disambiguation-list {
     padding-right: 0.25em;
-    color: var(--text-color-light);
+    color: var(--text-color-light3);
 }
 .term-pitch-accent-disambiguation-list::before {
     content: '(';
@@ -1253,7 +1249,7 @@ button.action-button[data-icon=source-term]::before {
     display: table;
     table-layout: fixed;
     white-space: normal;
-    color: var(--text-color-light);
+    color: var(--text-color-light3);
 }
 .term-glossary-item[data-has-image=true][data-image-load-state=load-error] .term-glossary-image-container-overlay::after {
     content: 'Image failed to load';
@@ -1358,7 +1354,7 @@ button.action-button[data-icon=source-term]::before {
     list-style-type: none;
 }
 .kanji-glossary-item::marker {
-    color: var(--text-color-light);
+    color: var(--text-color-light3);
 }
 
 
@@ -1642,7 +1638,7 @@ button.footer-notification-close-button:active {
     white-space: pre-wrap;
     content: var(--compact-list-separator);
     display: inline;
-    color: var(--text-color-light);
+    color: var(--text-color-light3);
 }
 
 :root[data-glossary-layout-mode=compact] .entry-body-section>h5 {
@@ -1680,7 +1676,7 @@ button.footer-notification-close-button:active {
     white-space: pre-wrap;
     content: var(--compact-list-separator);
     display: inline;
-    color: var(--text-color-light);
+    color: var(--text-color-light3);
 }
 
 :root[data-glossary-layout-mode=compact] .term-glossary-image-container {

@@ -58,7 +58,6 @@
 
     --link-color: var(--accent-color);
     --link-color-hover: var(--accent-color-dark);
-    --text-color-light: #666666;
     --separator-color1: #cccccc;
     --separator-color2: #eeeeee;
     --outline-item-background-color: rgba(13, 13, 13, 0);
@@ -156,7 +155,7 @@ label {
 
 /* Text styles */
 .light {
-    color: var(--text-color-light);
+    color: var(--text-color-light2);
 }
 .warning-text {
     color: var(--warning-color);
@@ -222,10 +221,10 @@ h3 {
 }
 .heading-sub-text {
     font-size: calc(1em / 1.125);
-    color: var(--text-color-light);
+    color: var(--text-color-light2);
 }
 a.heading-link-light {
-    color: var(--text-color-light);
+    color: var(--text-color-light2);
 }
 .heading-description,
 .heading-description.more {
@@ -569,7 +568,7 @@ a.heading-link-light {
     border-top: var(--thin-border-size) solid var(--separator-color2);
 }
 .settings-item-description {
-    color: var(--text-color-light);
+    color: var(--text-color-light2);
 }
 .settings-item-right.open-panel-button-container {
     padding: 0.25em 1em 0.25em 0.75em;
@@ -1189,7 +1188,7 @@ body.preview-sidebar-visible .fab-container-item.fab-container-item-popup-previe
     transition: color var(--animation-duration) ease-in-out;
 }
 .dictionary-item[data-enabled=false] .dictionary-title {
-    color: var(--text-color-light);
+    color: var(--text-color-light2);
 }
 
 .dictionary-list {
