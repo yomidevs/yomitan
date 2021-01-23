@@ -277,7 +277,7 @@ class DisplayAudio {
 
     async _getExpressionAudioInfoList(source, expression, reading, details) {
         const infoList = await api.getExpressionAudioInfoList(source, expression, reading, details);
-        return infoList.map((info) => ({info, audioPromise: null}));
+        return infoList.map((info) => ({info, audioPromise: null, audio: null}));
     }
 
     _getExpressionAndReading(definitionIndex, expressionIndex) {
