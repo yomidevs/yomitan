@@ -171,6 +171,7 @@
     mask-size: var(--icon-size);
     mask-image: var(--icon-image);
 }
+.icon[data-icon=none]                    { --icon-image: linear-gradient(transparent, transparent); }
 .icon[data-icon=profile]                 { --icon-image: url(/mixed/img/profile.svg); }
 .icon[data-icon=cog]                     { --icon-image: url(/mixed/img/cog.svg); }
 .icon[data-icon=palette]                 { --icon-image: url(/mixed/img/palette.svg); }
@@ -196,6 +197,9 @@
 .icon[data-icon=window]                  { --icon-image: url(/mixed/img/window.svg); }
 .icon[data-icon=cross]                   { --icon-image: url(/mixed/img/cross.svg); }
 .icon[data-icon=sentence-parsing]        { --icon-image: url(/mixed/img/sentence-parsing.svg); }
+.icon[data-icon=question-mark]           { --icon-image: url(/mixed/img/question-mark.svg); }
+.icon[data-icon=question-mark-circle]    { --icon-image: url(/mixed/img/question-mark-circle.svg); }
+.icon[data-icon=question-mark-thick]     { --icon-image: url(/mixed/img/question-mark-thick.svg); }
 .icon[data-icon=material-down-arrow] {
     --icon-image: url(/mixed/img/material-down-arrow.svg);
     --icon-size: var(--material-arrow-dimension2) var(--material-arrow-dimension1);
@@ -925,8 +929,11 @@ button.popup-menu-item {
     border: none;
     width: 100%;
     text-align: left;
+    font-size: 1em;
     font-weight: normal;
     font-family: inherit;
+    display: flex;
+    align-items: center;
 }
 button.popup-menu-item:hover:not(:disabled),
 button.popup-menu-item:focus:not(:disabled) {
@@ -940,14 +947,21 @@ button.popup-menu-item:active:not(:disabled) {
 button.popup-menu-item:disabled {
     color: var(--text-color-light);
 }
-:root[data-page-type=popup] .popup-menu,
+.popup-menu-item-icon {
+    display: block;
+    width: calc(16em / 14);
+    height: calc(16em / 14);
+    background-color: var(--text-color);
+    margin-right: 0.5em;
+}
+:root[data-page-type=popup] .popup-menu.popup-menu-auto-size,
 .popup-menu.popup-menu-small {
     border-radius: calc(var(--menu-border-radius) * 0.75);
     padding: 0.25em 0;
     min-width: 6em;
 }
-:root[data-page-type=popup] button.popup-menu-item,
-.popup-menu-small button.popup-menu-item {
+:root[data-page-type=popup] .popup-menu.popup-menu-auto-size button.popup-menu-item,
+.popup-menu.popup-menu-small button.popup-menu-item {
     padding: 0.5em 0.75em;
     font-size: var(--font-size-small);
 }
