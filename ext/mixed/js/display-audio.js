@@ -17,7 +17,6 @@
 
 /* global
  * AudioSystem
- * CacheMap
  * api
  */
 
@@ -29,7 +28,7 @@ class DisplayAudio {
         this._autoPlayAudioTimer = null;
         this._autoPlayAudioDelay = 400;
         this._eventListeners = new EventListenerCollection();
-        this._cache = new CacheMap(32);
+        this._cache = new Map();
     }
 
     get autoPlayAudioDelay() {
@@ -50,6 +49,7 @@ class DisplayAudio {
     }
 
     cleanupEntries() {
+        this._cache.clear();
         this.clearAutoPlayTimer();
         this._eventListeners.removeAllEventListeners();
     }
@@ -118,15 +118,16 @@ class DisplayAudio {
         try {
             // Create audio
             let audio;
-            let info;
-            try {
+            let title;
+            const info = await this._createExpressionAudio(sources, expression, reading, {textToSpeechVoice, customSourceUrl});
+            if (info !== null) {
                 let source;
-                ({audio, source} = await this._createExpressionAudio(sources, expression, reading, {textToSpeechVoice, customSourceUrl}));
+                ({audio, source} = info);
                 const sourceIndex = sources.indexOf(source);
-                info = `From source ${1 + sourceIndex}: ${source}`;
-            } catch (e) {
+                title = `From source ${1 + sourceIndex}: ${source}`;
+            } else {
                 audio = this._audioSystem.getFallbackAudio();
-                info = 'Could not find audio';
+                title = 'Could not find audio';
             }
 
             // Stop any currently playing audio
@@ -135,7 +136,7 @@ class DisplayAudio {
             // Update details
             for (const button of this._getAudioPlayButtons(definitionIndex, expressionIndex)) {
                 const titleDefault = button.dataset.titleDefault || '';
-                button.title = `${titleDefault}\n${info}`;
+                button.title = `${titleDefault}\n${title}`;
             }
 
             // Play
@@ -189,30 +190,43 @@ class DisplayAudio {
     async _createExpressionAudio(sources, expression, reading, details) {
         const key = JSON.stringify([expression, reading]);
 
-        const cacheValue = this._cache.get(key);
-        if (typeof cacheValue !== 'undefined') {
-            return cacheValue;
+        let sourceMap = this._cache.get(key);
+        if (typeof sourceMap === 'undefined') {
+            sourceMap = new Map();
+            this._cache.set(key, sourceMap);
         }
 
         for (let i = 0, ii = sources.length; i < ii; ++i) {
             const source = sources[i];
-            const infoList = await await api.getExpressionAudioInfoList(source, expression, reading, details);
+
+            let infoListPromise = sourceMap.get(source);
+            if (typeof infoListPromise === 'undefined') {
+                infoListPromise = this._getExpressionAudioInfoList(source, expression, reading, details);
+                sourceMap.set(source, infoListPromise);
+            }
+            const infoList = await infoListPromise;
+
             for (let j = 0, jj = infoList.length; j < jj; ++j) {
-                const info = infoList[j];
+                const item = infoList[j];
+
+                let {audioPromise} = item;
+                if (audioPromise === null) {
+                    audioPromise = this._createAudioFromInfo(item.info, source);
+                    item.audioPromise = audioPromise;
+                }
+
                 let audio;
                 try {
-                    audio = await this._createAudioFromInfo(info, source);
+                    audio = await audioPromise;
                 } catch (e) {
                     continue;
                 }
 
-                const result = {audio, source, infoList, infoListIndex: j};
-                this._cache.set(key, result);
-                return result;
+                return {audio, source, infoListIndex: j};
             }
         }
 
-        throw new Error('Could not create audio');
+        return null;
     }
 
     async _createAudioFromInfo(info, source) {
@@ -224,5 +238,10 @@ class DisplayAudio {
             default:
                 throw new Error(`Unsupported type: ${info.type}`);
         }
+    }
+
+    async _getExpressionAudioInfoList(source, expression, reading, details) {
+        const infoList = await api.getExpressionAudioInfoList(source, expression, reading, details);
+        return infoList.map((info) => ({info, audioPromise: null}));
     }
 }
