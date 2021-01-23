@@ -16,14 +16,11 @@
  */
 
 /* global
- * CacheMap
  * TextToSpeechAudio
- * api
  */
 
 class AudioSystem {
-    constructor(useCache) {
-        this._cache = new CacheMap(useCache ? 32 : 0);
+    constructor() {
         this._fallbackAudio = null;
     }
 
@@ -34,35 +31,6 @@ class AudioSystem {
         const eventListeners = new EventListenerCollection();
         const onVoicesChanged = () => { eventListeners.removeAllEventListeners(); };
         eventListeners.addEventListener(speechSynthesis, 'voiceschanged', onVoicesChanged, false);
-    }
-
-    async createExpressionAudio(sources, expression, reading, details) {
-        const key = JSON.stringify([expression, reading]);
-
-        const cacheValue = this._cache.get(key);
-        if (typeof cacheValue !== 'undefined') {
-            return cacheValue;
-        }
-
-        for (let i = 0, ii = sources.length; i < ii; ++i) {
-            const source = sources[i];
-            const infoList = await await api.getExpressionAudioInfoList(source, expression, reading, details);
-            for (let j = 0, jj = infoList.length; j < jj; ++j) {
-                const info = infoList[j];
-                let audio;
-                try {
-                    audio = await this.createAudioFromInfo(info, source);
-                } catch (e) {
-                    continue;
-                }
-
-                const result = {audio, source, infoList, infoListIndex: j};
-                this._cache.set(key, result);
-                return result;
-            }
-        }
-
-        throw new Error('Could not create audio');
     }
 
     getFallbackAudio() {
@@ -92,17 +60,6 @@ class AudioSystem {
             throw new Error('Invalid text-to-speech voice');
         }
         return new TextToSpeechAudio(text, voice);
-    }
-
-    async createAudioFromInfo(info, source) {
-        switch (info.type) {
-            case 'url':
-                return await this.createAudio(info.url, source);
-            case 'tts':
-                return this.createTextToSpeechAudio(info.text, info.voice);
-            default:
-                throw new Error(`Unsupported type: ${info.type}`);
-        }
     }
 
     // Private

@@ -17,8 +17,8 @@
 
 class TextToSpeechAudio {
     constructor(text, voice) {
-        this.text = text;
-        this.voice = voice;
+        this._text = text;
+        this._voice = voice;
         this._utterance = null;
         this._volume = 1;
     }
@@ -26,6 +26,7 @@ class TextToSpeechAudio {
     get currentTime() {
         return 0;
     }
+
     set currentTime(value) {
         // NOP
     }
@@ -33,6 +34,7 @@ class TextToSpeechAudio {
     get volume() {
         return this._volume;
     }
+
     set volume(value) {
         this._volume = value;
         if (this._utterance !== null) {
@@ -43,10 +45,10 @@ class TextToSpeechAudio {
     async play() {
         try {
             if (this._utterance === null) {
-                this._utterance = new SpeechSynthesisUtterance(this.text || '');
+                this._utterance = new SpeechSynthesisUtterance(typeof this._text === 'string' ? this._text : '');
                 this._utterance.lang = 'ja-JP';
                 this._utterance.volume = this._volume;
-                this._utterance.voice = this.voice;
+                this._utterance.voice = this._voice;
             }
 
             speechSynthesis.cancel();
