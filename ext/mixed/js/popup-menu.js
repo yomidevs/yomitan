@@ -76,12 +76,16 @@ class PopupMenu extends EventDispatcher {
 
     _onMenuContainerClick(e) {
         if (e.currentTarget !== e.target) { return; }
+        e.stopPropagation();
+        e.preventDefault();
         this._close(null, 'outside', true);
     }
 
     _onMenuItemClick(e) {
         const item = e.currentTarget;
         if (item.disabled) { return; }
+        e.stopPropagation();
+        e.preventDefault();
         this._close(item, 'item', true);
     }
 

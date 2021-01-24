@@ -1620,6 +1620,21 @@ button.footer-notification-close-button:active {
 }
 
 
+/* Audio menu */
+.audio-button-popup-menu[data-show-icons=false] .popup-menu-item-icon {
+    display: none;
+}
+.popup-menu-item-icon[data-icon=checkmark] {
+    background-color: var(--success-color);
+}
+.popup-menu-item-icon[data-icon=cross] {
+    background-color: var(--danger-color);
+}
+.popup-menu-item[data-source-in-options=false][data-valid=null] {
+    color: var(--text-color-light1);
+}
+
+
 /* Conditional styles */
 :root:not([data-enable-search-tags=true]) .tag[data-category=search] {
     display: none;

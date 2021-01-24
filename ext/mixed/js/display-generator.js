@@ -175,6 +175,10 @@ class DisplayGenerator {
         return this._templates.instantiate('profile-list-item');
     }
 
+    createPopupMenu(name) {
+        return this._templates.instantiate(`${name}-popup-menu`);
+    }
+
     // Private
 
     _createTermExpression(details) {

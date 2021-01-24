@@ -10,7 +10,7 @@
                     <button class="action-button action-view-note" hidden disabled data-icon="view-note" title="View added note" data-hotkey='["viewNote","title","View added note ({0})"]'></button>
                     <button class="action-button action-add-note" hidden disabled data-icon="add-term-kanji" data-mode="term-kanji" title="Add expression" data-hotkey='["addNoteTermKanji","title","Add expression ({0})"]'></button>
                     <button class="action-button action-add-note" hidden disabled data-icon="add-term-kana" data-mode="term-kana" title="Add reading" data-hotkey='["addNoteTermKana","title","Add reading ({0})"]'></button>
-                    <button class="action-button action-play-audio" data-icon="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]'><div class="action-button-badge icon" hidden></div></button>
+                    <button class="action-button action-play-audio" data-icon="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]' data-menu-position="left below h-cover v-cover"><div class="action-button-badge icon" hidden></div></button>
                     <span class="entry-current-indicator-icon" title="Current entry"></span>
                 </div>
                 <div class="term-expression-list"></div>
@@ -44,7 +44,7 @@
         </span>
     </div>
     <div class="term-expression-details">
-        <button class="action-button action-play-audio" data-icon="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]'><div class="action-button-badge icon" hidden></div></button>
+        <button class="action-button action-play-audio" data-icon="play-audio" title="Play audio" data-title-default="Play audio" data-hotkey='["playAudio",["title","data-title-default"],"Play audio ({0})"]' data-menu-position="right below h-cover v-cover"><div class="action-button-badge icon" hidden></div></button>
         <div class="tags tag-list"></div>
     </div>
 </div></template>
@@ -148,5 +148,15 @@
     <div class="profile-list-item-selection"><label class="radio"><input type="radio" class="profile-entry-is-default-radio" name="profile-entry-default-radio"><span class="radio-body"><span class="radio-border"></span><span class="radio-dot"></span></span></label></div>
     <div class="profile-list-item-name"></div>
 </label></template>
+
+<!-- Popup menu -->
+<template id="audio-button-popup-menu-template"><div class="popup-menu-container scan-disable audio-button-popup-menu" tabindex="-1" role="dialog"><div class="popup-menu popup-menu-auto-size"><div class="popup-menu-body">
+    <button class="popup-menu-item" data-menu-action="playAudioFromSource" data-source="jpod101"><div class="popup-menu-item-icon icon" data-icon="none"></div><span class="popup-menu-item-label">JapanesePod101</span></button>
+    <button class="popup-menu-item" data-menu-action="playAudioFromSource" data-source="jpod101-alternate"><div class="popup-menu-item-icon icon" data-icon="none"></div><span class="popup-menu-item-label">JapanesePod101 (Alternate)</span></button>
+    <button class="popup-menu-item" data-menu-action="playAudioFromSource" data-source="jisho"><div class="popup-menu-item-icon icon" data-icon="none"></div><span class="popup-menu-item-label">Jisho.org</span></button>
+    <button class="popup-menu-item" data-menu-action="playAudioFromSource" data-source="text-to-speech"><div class="popup-menu-item-icon icon" data-icon="none"></div><span class="popup-menu-item-label">Text-to-speech</span></button>
+    <button class="popup-menu-item" data-menu-action="playAudioFromSource" data-source="text-to-speech-reading"><div class="popup-menu-item-icon icon" data-icon="none"></div><span class="popup-menu-item-label">Text-to-speech (Kana reading)</span></button>
+    <button class="popup-menu-item" data-menu-action="playAudioFromSource" data-source="custom"><div class="popup-menu-item-icon icon" data-icon="none"></div><span class="popup-menu-item-label">Custom</span></button>
+</div></div></div></template>
 
 </body></html>

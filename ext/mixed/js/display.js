@@ -27,6 +27,7 @@
  * HotkeyHelpController
  * MediaLoader
  * PopupFactory
+ * PopupMenu
  * QueryParser
  * TextScanner
  * WindowScroll
@@ -113,7 +114,7 @@ class Display extends EventDispatcher {
         this._displayAudio = new DisplayAudio(this);
 
         this._hotkeyHandler.registerActions([
-            ['close',             () => { this.close(); }],
+            ['close',             () => { this._onHotkeyClose(); }],
             ['nextEntry',         () => { this._focusEntry(this._index + 1, true); }],
             ['nextEntry3',        () => { this._focusEntry(this._index + 3, true); }],
             ['previousEntry',     () => { this._focusEntry(this._index - 1, true); }],
@@ -517,6 +518,7 @@ class Display extends EventDispatcher {
         try {
             // Clear
             this._closePopups();
+            this._closeAllPopupMenus();
             this._eventListeners.removeAllEventListeners();
             this._mediaLoader.unloadAll();
             this._displayAudio.cleanupEntries();
@@ -1805,5 +1807,24 @@ class Display extends EventDispatcher {
                 }
             });
         });
+    }
+
+    _onHotkeyClose() {
+        if (this._closeSinglePopupMenu()) { return; }
+        this.close();
+    }
+
+    _closeAllPopupMenus() {
+        for (const popupMenu of PopupMenu.openMenus) {
+            popupMenu.close();
+        }
+    }
+
+    _closeSinglePopupMenu() {
+        for (const popupMenu of PopupMenu.openMenus) {
+            popupMenu.close();
+            return true;
+        }
+        return false;
     }
 }
