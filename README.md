@@ -14,7 +14,7 @@ Yomichan provides advanced features not available in other browser-based diction
 *   Custom search page for easily executing custom search queries.
 *   Support for multiple dictionary formats including [EPWING](https://ja.wikipedia.org/wiki/EPWING) via the [Yomichan Import](https://foosoft.net/projects/yomichan-import) tool.
 *   Automatic note creation for the [Anki](https://apps.ankiweb.net/) flashcard program via the [AnkiConnect](https://foosoft.net/projects/anki-connect) plugin.
-*   Clean, modern code makes it easy for developers to [contribute](https://github.com/FooSoft/yomichan) new features.
+*   Clean, modern code makes it easy for developers to [contribute](https://github.com/FooSoft/yomichan/blob/master/CONTRIBUTING.md) new features.
 
 ## Table of Contents ##
 
@@ -26,11 +26,9 @@ Yomichan provides advanced features not available in other browser-based diction
     *   [Flashcard Configuration](#flashcard-configuration)
     *   [Flashcard Creation](#flashcard-creation)
 *   [Keyboard Shortcuts](#keyboard-shortcuts)
-*   [Development](#development)
-    *   [Dependencies](#dependencies)
 *   [Frequently Asked Questions](#frequently-asked-questions)
+*   [Licenses](#licenses)
 *   [Screenshots](#screenshots)
-*   [License](#license)
 
 ## Installation ##
 
@@ -244,31 +242,6 @@ Shortcut | Action
 <kbd>Alt</kbd> + <kbd>p</kbd> | Play audio for current term.
 <kbd>Alt</kbd> + <kbd>k</kbd> | Add current kanji to Anki.
 
-## Development ##
-
-As feature development and improvements to Yomichan can be time consuming, contributions are welcome from
-any developers who want to help out. Below are a few guidelines to ensure contributions have a good level
-of quality and consistency:
-
-*   Open GitHub issues to discuss large features before writing code.
-*   Follow the [conventions and style](.eslintrc.json) of the existing code.
-*   Test changes using the continuous integration tests included in the repository (`npm ci; npm test`).
-*   Write clean, modern ES6 code (`const`/`let`, `async`/`await`, arrow functions, etc.)
-*   Large pull requests without a clear scope will not be merged.
-*   Incomplete or non-standalone features will not be merged.
-
-### Dependencies ###
-
-Yomichan uses several third-party libraries to function. Below are links to homepages, snapshots, and licenses of the exact
-versions packaged.
-
-*   Bootstrap: [homepage](https://getbootstrap.com/) - [snapshot](https://github.com/twbs/bootstrap/releases/download/v3.3.7/bootstrap-3.3.7-dist.zip) - [license](https://github.com/twbs/bootstrap/blob/v3.3.7/LICENSE)
-*   Handlebars: [homepage](https://handlebarsjs.com/) - [snapshot](http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars.min-714a4c4.js) - [license](https://github.com/wycats/handlebars.js/blob/v4.0.6/LICENSE)
-*   jQuery: [homepage](https://blog.jquery.com/) - [snapshot](https://code.jquery.com/jquery-3.2.1.min.js) - [license](https://github.com/jquery/jquery/blob/3.2.1/LICENSE.txt)
-*   JSZip: [homepage](https://stuk.github.io/jszip/) - [snapshot](https://raw.githubusercontent.com/Stuk/jszip/de7f52fbcba485737bef7923a83f0fad92d9f5bc/dist/jszip.min.js) - [license](https://github.com/Stuk/jszip/blob/v3.1.3/LICENSE.markdown)
-*   WanaKana: [homepage](https://wanakana.com/) - [snapshot](https://unpkg.com/wanakana@4.0.2/umd/wanakana.min.js) - [license](https://github.com/WaniKani/WanaKana/blob/4.0.2/LICENSE)
-*   parse5: [homepage](https://github.com/inikulin/parse5) - [snapshot](https://github.com/inikulin/parse5/tree/v6.0.1/packages/parse5) - [license](https://github.com/inikulin/parse5/blob/v6.0.1/LICENSE) _(Only used in MV3 build)_
-
 ## Frequently Asked Questions ##
 
 **I'm having problems importing dictionaries in Firefox, what do I do?**
@@ -339,7 +312,7 @@ languages would not only require many additional changes to the codebase, it wou
 overhead and knowledge demands for the developers. Therefore, suggestions and contributions for supporting
 new languages will be declined, allowing Yomichan's focus to remain Japanese-centric.
 
-## Legal ##
+## Licenses ##
 
 Required licensing notices for this project follow below:
 
@@ -354,6 +327,18 @@ Required licensing notices for this project follow below:
 
     The pitch accent notation, verb particle data, phonetics, homonyms and other additions or modifications to EDICT,
     KANJIDIC or KRADFILE were provided by Uros Ozvatic through his free database.
+
+### Third-Party Libraries ###
+
+Yomichan uses several third-party libraries to function. Below are links to homepages, snapshots, and licenses of the exact
+versions packaged.
+
+*   Bootstrap: [homepage](https://getbootstrap.com/) - [snapshot](https://github.com/twbs/bootstrap/releases/download/v3.3.7/bootstrap-3.3.7-dist.zip) - [license](https://github.com/twbs/bootstrap/blob/v3.3.7/LICENSE)
+*   Handlebars: [homepage](https://handlebarsjs.com/) - [snapshot](http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars.min-714a4c4.js) - [license](https://github.com/wycats/handlebars.js/blob/v4.0.6/LICENSE)
+*   jQuery: [homepage](https://blog.jquery.com/) - [snapshot](https://code.jquery.com/jquery-3.2.1.min.js) - [license](https://github.com/jquery/jquery/blob/3.2.1/LICENSE.txt)
+*   JSZip: [homepage](https://stuk.github.io/jszip/) - [snapshot](https://raw.githubusercontent.com/Stuk/jszip/de7f52fbcba485737bef7923a83f0fad92d9f5bc/dist/jszip.min.js) - [license](https://github.com/Stuk/jszip/blob/v3.1.3/LICENSE.markdown)
+*   WanaKana: [homepage](https://wanakana.com/) - [snapshot](https://unpkg.com/wanakana@4.0.2/umd/wanakana.min.js) - [license](https://github.com/WaniKani/WanaKana/blob/4.0.2/LICENSE)
+*   parse5: [homepage](https://github.com/inikulin/parse5) - [snapshot](https://github.com/inikulin/parse5/tree/v6.0.1/packages/parse5) - [license](https://github.com/inikulin/parse5/blob/v6.0.1/LICENSE) _(Only used in MV3 build)_
 
 ## Screenshots ##
 
