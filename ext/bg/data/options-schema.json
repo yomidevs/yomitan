@@ -348,6 +348,7 @@
                                     "volume",
                                     "autoPlay",
                                     "customSourceUrl",
+                                    "customSourceType",
                                     "textToSpeechVoice"
                                 ],
                                 "properties": {
@@ -386,6 +387,11 @@
                                     "customSourceUrl": {
                                         "type": "string",
                                         "default": ""
+                                    },
+                                    "customSourceType": {
+                                        "type": "string",
+                                        "enum": ["audio", "json"],
+                                        "default": "audio"
                                     },
                                     "textToSpeechVoice": {
                                         "type": "string",

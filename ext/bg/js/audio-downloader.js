@@ -16,6 +16,7 @@
  */
 
 /* global
+ * JsonSchemaValidator
  * NativeSimpleDOMParser
  * SimpleDOMParser
  */
@@ -24,6 +25,8 @@ class AudioDownloader {
     constructor({japaneseUtil, requestBuilder}) {
         this._japaneseUtil = japaneseUtil;
         this._requestBuilder = requestBuilder;
+        this._customAudioListSchema = null;
+        this._schemaValidator = null;
         this._getInfoHandlers = new Map([
             ['jpod101', this._getInfoJpod101.bind(this)],
             ['jpod101-alternate', this._getInfoJpod101Alternate.bind(this)],
@@ -183,13 +186,50 @@ class AudioDownloader {
         return [{type: 'tts', text: reading || expression, voice: textToSpeechVoice}];
     }
 
-    async _getInfoCustom(expression, reading, {customSourceUrl}) {
+    async _getInfoCustom(expression, reading, {customSourceUrl, customSourceType}) {
         if (typeof customSourceUrl !== 'string') {
             throw new Error('No custom URL defined');
         }
         const data = {expression, reading};
         const url = customSourceUrl.replace(/\{([^}]*)\}/g, (m0, m1) => (Object.prototype.hasOwnProperty.call(data, m1) ? `${data[m1]}` : m0));
-        return [{type: 'url', url}];
+
+        switch (customSourceType) {
+            case 'json':
+                return await this._getInfoCustomJson(url);
+            default:
+                return [{type: 'url', url}];
+        }
+    }
+
+    async _getInfoCustomJson(url) {
+        const response = await this._requestBuilder.fetchAnonymous(url, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'default',
+            credentials: 'omit',
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer'
+        });
+
+        if (!response.ok) {
+            throw new Error(`Invalid response: ${response.status}`);
+        }
+
+        const responseJson = await response.json();
+
+        const schema = await this._getCustomAudioListSchema();
+        if (this._schemaValidator === null) {
+            this._schemaValidator = new JsonSchemaValidator();
+        }
+        this._schemaValidator.validate(responseJson, schema);
+
+        const results = [];
+        for (const {url: url2, name} of responseJson.audioSources) {
+            const info = {type: 'url', url: url2};
+            if (typeof name === 'string') { info.name = name; }
+            results.push(info);
+        }
+        return results;
     }
 
     async _downloadAudioFromUrl(url, source) {
@@ -253,5 +293,23 @@ class AudioDownloader {
         } else {
             throw new Error('DOM parsing not supported');
         }
+    }
+
+    async _getCustomAudioListSchema() {
+        let schema = this._customAudioListSchema;
+        if (schema === null) {
+            const url = chrome.runtime.getURL('/bg/data/custom-audio-list-schema.json');
+            const response = await fetch(url, {
+                method: 'GET',
+                mode: 'no-cors',
+                cache: 'default',
+                credentials: 'omit',
+                redirect: 'follow',
+                referrerPolicy: 'no-referrer'
+            });
+            schema = await response.json();
+            this._customAudioListSchema = schema;
+        }
+        return schema;
     }
 }

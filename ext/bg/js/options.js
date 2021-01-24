@@ -726,6 +726,7 @@ class OptionsUtil {
                 windowType: 'popup',
                 windowState: 'normal'
             };
+            profile.options.audio.customSourceType = 'audio';
         }
         return options;
     }

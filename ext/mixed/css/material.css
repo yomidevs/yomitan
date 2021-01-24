@@ -970,6 +970,7 @@ button.popup-menu-item:disabled {
     height: calc(16em / 14);
     background-color: var(--text-color);
     margin-right: 0.5em;
+    flex: 0 0 auto;
 }
 .popup-menu-item-icon:not([hidden]) {
     display: block;

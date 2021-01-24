@@ -1432,13 +1432,13 @@ class Display extends EventDispatcher {
     async _injectAnkiNoteMedia(definition, mode, options, fields) {
         const {
             anki: {screenshot: {format, quality}},
-            audio: {sources, customSourceUrl}
+            audio: {sources, customSourceUrl, customSourceType}
         } = options;
 
         const timestamp = Date.now();
         const ownerFrameId = this._ownerFrameId;
         const definitionDetails = this._getDefinitionDetailsForNote(definition);
-        const audioDetails = (mode !== 'kanji' && this._ankiNoteBuilder.containsMarker(fields, 'audio') ? {sources, customSourceUrl} : null);
+        const audioDetails = (mode !== 'kanji' && this._ankiNoteBuilder.containsMarker(fields, 'audio') ? {sources, customSourceUrl, customSourceType} : null);
         const screenshotDetails = (this._ankiNoteBuilder.containsMarker(fields, 'screenshot') ? {ownerFrameId, format, quality} : null);
         const clipboardDetails = {
             image: this._ankiNoteBuilder.containsMarker(fields, 'clipboard-image'),

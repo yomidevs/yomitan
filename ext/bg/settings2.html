@@ -2205,15 +2205,41 @@
                     </div>
                 </div>
                 <div class="settings-item-right">
-                    <input type="text" spellcheck="false" autocomplete="off" data-setting="audio.customSourceUrl" placeholder="None">
+                    <div class="settings-item-group">
+                        <div class="settings-item-group-item">
+                            <div class="settings-item-group-item-label">Type</div>
+                            <select class="short-width short-height" data-setting="audio.customSourceType">
+                                <option value="audio">Audio</option>
+                                <option value="json">JSON</option>
+                            </select>
+                        </div>
+                        <div class="settings-item-group-item">
+                            <div class="settings-item-group-item-label">URL</div>
+                            <input class="short-height" type="text" spellcheck="false" autocomplete="off" data-setting="audio.customSourceUrl" placeholder="None">
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="settings-item-children more" hidden>
                 <p>
-                    URL format used for fetching audio clips in <em>Custom</em> mode.
+                    The <em>URL</em> property specifies the URL format used for fetching audio clips in <em>Custom</em> mode.
                     The replacement tags <code data-select-on-click="">{expression}</code> and <code data-select-on-click="">{reading}</code> can be used to specify which
                     expression and reading is being looked up.<br>
-                    Example: <a data-select-on-click="">http://localhost/audio.mp3?expression={expression}&reading={reading}</a>
+                </p>
+                <p>
+                    The <em>Type</em> property specifies how the URL is handled when looking up audio:
+                </p>
+                <ul>
+                    <li>
+                        <strong>Audio</strong> - The link is treated as a direct link to an audio file that the browser can play.
+                    </li>
+                    <li>
+                        <strong>JSON</strong> - The link is interpreted as a link to a JSON file, which is downloaded and parsed for audio URLs.
+                        The format of the JSON file is specified in <a href="/bg/data/custom-audio-list-schema.json" target="_blank" rel="noopener noreferrer">this schema file</a>.
+                    </li>
+                </ul>
+                <p>
+                    Example URL: <a data-select-on-click="">http://localhost/audio.mp3?expression={expression}&reading={reading}</a>
                 </p>
                 <p>
                     <a class="more-toggle" data-parent-distance="3">Less&hellip;</a>

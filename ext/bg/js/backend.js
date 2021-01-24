@@ -1581,7 +1581,7 @@ class Backend {
             throw new Error('Invalid reading and expression');
         }
 
-        const {sources, customSourceUrl} = details;
+        const {sources, customSourceUrl, customSourceType} = details;
         const data = await this._downloadDefinitionAudio(
             sources,
             expression,
@@ -1589,6 +1589,7 @@ class Backend {
             {
                 textToSpeechVoice: null,
                 customSourceUrl,
+                customSourceType,
                 binary: true,
                 disableCache: true
             }

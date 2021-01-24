@@ -304,6 +304,7 @@ function createProfileOptionsUpdatedTestData1() {
             volume: 100,
             autoPlay: false,
             customSourceUrl: '',
+            customSourceType: 'audio',
             textToSpeechVoice: ''
         },
         scanning: {
