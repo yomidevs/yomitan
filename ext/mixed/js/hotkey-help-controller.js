@@ -83,6 +83,11 @@ class HotkeyHelpController {
 
     async _setupGlobalCommands(commandMap) {
         const commands = await new Promise((resolve, reject) => {
+            if (!(isObject(chrome.commands) && typeof chrome.commands.getAll === 'function')) {
+                resolve([]);
+                return;
+            }
+
             chrome.commands.getAll((result) => {
                 const e = chrome.runtime.lastError;
                 if (e) {

@@ -637,14 +637,14 @@ class Frontend {
     }
 
     async _getOptionsContext() {
-        return (await this._getSearchContext()).optionsContext;
+        let optionsContext = this._optionsContextOverride;
+        if (optionsContext === null) {
+            optionsContext = (await this._getSearchContext()).optionsContext;
+        }
+        return optionsContext;
     }
 
     async _getSearchContext() {
-        if (this._optionsContextOverride !== null) {
-            return this._optionsContextOverride;
-        }
-
         let url = window.location.href;
         let documentTitle = document.title;
         if (this._useProxyPopup) {
@@ -655,9 +655,13 @@ class Frontend {
             }
         }
 
-        const depth = this._depth;
+        let optionsContext = this._optionsContextOverride;
+        if (optionsContext === null) {
+            optionsContext = {depth: this._depth, url};
+        }
+
         return {
-            optionsContext: {depth, url},
+            optionsContext,
             detail: {documentTitle}
         };
     }
