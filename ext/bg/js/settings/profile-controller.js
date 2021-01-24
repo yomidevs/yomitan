@@ -659,12 +659,12 @@ class ProfileEntry {
     }
 
     _onMenuOpen(e) {
-        const node = e.detail.menu.node;
+        const bodyNode = e.detail.menu.bodyNode;
         const count = this._profileController.profileCount;
-        this._setMenuActionEnabled(node, 'moveUp', this._index > 0);
-        this._setMenuActionEnabled(node, 'moveDown', this._index < count - 1);
-        this._setMenuActionEnabled(node, 'copyFrom', count > 1);
-        this._setMenuActionEnabled(node, 'delete', count > 1);
+        this._setMenuActionEnabled(bodyNode, 'moveUp', this._index > 0);
+        this._setMenuActionEnabled(bodyNode, 'moveDown', this._index < count - 1);
+        this._setMenuActionEnabled(bodyNode, 'copyFrom', count > 1);
+        this._setMenuActionEnabled(bodyNode, 'delete', count > 1);
     }
 
     _onMenuClose(e) {

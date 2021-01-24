@@ -117,9 +117,9 @@ class DictionaryEntry {
     }
 
     _onMenuOpen(e) {
-        const node = e.detail.menu.node;
-        const showDetails = node.querySelector('.popup-menu-item[data-menu-action="showDetails"]');
-        const hideDetails = node.querySelector('.popup-menu-item[data-menu-action="hideDetails"]');
+        const bodyNode = e.detail.menu.bodyNode;
+        const showDetails = bodyNode.querySelector('.popup-menu-item[data-menu-action="showDetails"]');
+        const hideDetails = bodyNode.querySelector('.popup-menu-item[data-menu-action="hideDetails"]');
         const hasDetails = (this._detailsContainer !== null);
         const detailsVisible = (hasDetails && !this._detailsContainer.hidden);
         if (showDetails !== null) {

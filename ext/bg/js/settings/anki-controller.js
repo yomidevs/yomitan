@@ -240,7 +240,7 @@ class AnkiController {
             }
             markers = [...new Set(markers)];
 
-            const container = element.content.querySelector('.popup-menu');
+            const container = element.content.querySelector('.popup-menu-body');
             if (container === null) { return; }
 
             const fragment = document.createDocumentFragment();

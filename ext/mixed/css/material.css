@@ -928,11 +928,13 @@ button.icon-button:active {
     border-radius: var(--menu-border-radius);
     background-color: var(--background-color-light);
     padding: 0.5em 0;
+    min-width: 8em;
+    overflow: auto;
+}
+.popup-menu-body {
     display: flex;
     flex-flow: column nowrap;
     align-items: stretch;
-    min-width: 8em;
-    overflow: auto;
     white-space: nowrap;
 }
 button.popup-menu-item {
