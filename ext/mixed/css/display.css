@@ -551,6 +551,7 @@ button.action-button {
     background: transparent;
     font-size: inherit;
     box-shadow: none;
+    position: relative;
     transition:
         opacity var(--animation-duration) linear,
         visibility 0s linear 0s,
@@ -614,6 +615,21 @@ button.action-button[data-icon=source-term]::before {
 }
 .entry[data-type=term][data-expression-multi=true] .actions>button.action-button.action-play-audio {
     display: none;
+}
+.action-button-badge {
+    pointer-events: none;
+    position: absolute;
+    display: block;
+    right: 0;
+    top: 0;
+    width: calc(8em / var(--font-size-no-units));
+    height: calc(8em / var(--font-size-no-units));
+}
+.action-button-badge[data-icon=cross] {
+    background-color: var(--danger-color);
+}
+.action-button-badge[data-icon=plus-thick] {
+    background-color: var(--success-color);
 }
 
 

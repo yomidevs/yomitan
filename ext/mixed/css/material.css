@@ -79,6 +79,8 @@
     --danger-color-transparent5: rgba(200, 60, 40, 0.05);
     --danger-color-transparent25: rgba(200, 60, 40, 0.25);
 
+    --success-color: #51ab30;
+
     --disabled-color: #aaaaaa;
     --disabled-color-light: #dddddd;
     --disabled-color-lighter: #eeeeee;
@@ -134,6 +136,8 @@
     --danger-color-transparent0: rgba(221, 103, 85, 0);
     --danger-color-transparent5: rgba(221, 103, 85, 0.05);
     --danger-color-transparent25: rgba(221, 103, 85, 0.25);
+
+    --success-color: #75cf54;
 
     --disabled-color: #444444;
     --disabled-color-light: #585858;
@@ -209,6 +213,7 @@
 .icon[data-icon=question-mark-thick]     { --icon-image: url(/mixed/img/question-mark-thick.svg); }
 .icon[data-icon=left-chevron]            { --icon-image: url(/mixed/img/left-chevron.svg); }
 .icon[data-icon=right-chevron]           { --icon-image: url(/mixed/img/right-chevron.svg); }
+.icon[data-icon=plus-thick]              { --icon-image: url(/mixed/img/plus-thick.svg); }
 .icon[data-icon=material-down-arrow] {
     --icon-image: url(/mixed/img/material-down-arrow.svg);
     --icon-size: var(--material-arrow-dimension2) var(--material-arrow-dimension1);
@@ -959,11 +964,13 @@ button.popup-menu-item:disabled {
     color: var(--text-color-light2);
 }
 .popup-menu-item-icon {
-    display: block;
     width: calc(16em / 14);
     height: calc(16em / 14);
     background-color: var(--text-color);
     margin-right: 0.5em;
+}
+.popup-menu-item-icon:not([hidden]) {
+    display: block;
 }
 :root[data-page-type=popup] .popup-menu.popup-menu-auto-size,
 .popup-menu.popup-menu-small {

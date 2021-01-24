@@ -27,11 +27,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="32"
-     inkscape:cx="10.107295"
-     inkscape:cy="8.7280255"
+     inkscape:zoom="45.254834"
+     inkscape:cx="8.4539164"
+     inkscape:cy="8.0625778"
      inkscape:document-units="px"
-     inkscape:current-layer="layer41"
+     inkscape:current-layer="layer49"
      showgrid="true"
      units="px"
      inkscape:snap-center="true"
@@ -1536,7 +1536,7 @@
        inkscape:connector-curvature="0" />
   </g>
   <g
-     style="display:inline"
+     style="display:none"
      inkscape:label="Check"
      id="g1068"
      inkscape:groupmode="layer">
@@ -1546,5 +1546,14 @@
        id="path1066"
        d="M 6.4999999,13 14.5,5 l -2,-2 -6.0000001,6 -3,-3 -2,2 z"
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer49"
+     inkscape:label="Plus Thick">
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       d="M 6 2 L 6 6 L 2 6 L 2 10 L 6 10 L 6 14 L 10 14 L 10 10 L 14 10 L 14 6 L 10 6 L 10 2 L 6 2 z "
+       id="rect1068" />
   </g>
 </svg>

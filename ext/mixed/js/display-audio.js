@@ -135,9 +135,11 @@ class DisplayAudio {
             this.stopAudio();
 
             // Update details
+            const potentialAvailableAudioCount = this._getPotentialAvailableAudioCount(expression, reading);
             for (const button of this._getAudioPlayButtons(definitionIndex, expressionIndex)) {
                 const titleDefault = button.dataset.titleDefault || '';
                 button.title = `${titleDefault}\n${title}`;
+                this._updateAudioPlayButtonBadge(button, potentialAvailableAudioCount);
             }
 
             // Play
@@ -277,7 +279,7 @@ class DisplayAudio {
 
     async _getExpressionAudioInfoList(source, expression, reading, details) {
         const infoList = await api.getExpressionAudioInfoList(source, expression, reading, details);
-        return infoList.map((info) => ({info, audioPromise: null, audio: null}));
+        return infoList.map((info) => ({info, audioPromise: null, audioResolved: false, audio: null}));
     }
 
     _getExpressionAndReading(definitionIndex, expressionIndex) {
@@ -312,5 +314,50 @@ class DisplayAudio {
 
     _clamp(value, min, max) {
         return Math.max(min, Math.min(max, value));
+    }
+
+    _updateAudioPlayButtonBadge(button, potentialAvailableAudioCount) {
+        if (potentialAvailableAudioCount === null) {
+            delete button.dataset.potentialAvailableAudioCount;
+        } else {
+            button.dataset.potentialAvailableAudioCount = `${potentialAvailableAudioCount}`;
+        }
+
+        const badge = button.querySelector('.action-button-badge');
+        if (badge === null) { return; }
+
+        const badgeData = badge.dataset;
+        switch (potentialAvailableAudioCount) {
+            case 0:
+                badgeData.icon = 'cross';
+                badgeData.hidden = false;
+                break;
+            case 1:
+            case null:
+                delete badgeData.icon;
+                badgeData.hidden = true;
+                break;
+            default:
+                badgeData.icon = 'plus-thick';
+                badgeData.hidden = false;
+                break;
+        }
+    }
+
+    _getPotentialAvailableAudioCount(expression, reading) {
+        const key = this._getExpressionReadingKey(expression, reading);
+        const sourceMap = this._cache.get(key);
+        if (typeof sourceMap === 'undefined') { return null; }
+
+        let count = 0;
+        for (const {infoList} of sourceMap.values()) {
+            if (infoList === null) { continue; }
+            for (const {audio, audioResolved} of infoList) {
+                if (!audioResolved || audio !== null) {
+                    ++count;
+                }
+            }
+        }
+        return count;
     }
 }
