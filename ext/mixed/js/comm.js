@@ -43,19 +43,27 @@ class CrossFrameAPIPort extends EventDispatcher {
     invoke(action, params, ackTimeout, responseTimeout) {
         return new Promise((resolve, reject) => {
             if (this._port === null) {
-                reject(new Error('Port is disconnected'));
+                reject(new Error(`Port is disconnected (${action})`));
                 return;
             }
 
             const id = this._invocationId++;
-            const invocation = {id, resolve, reject, responseTimeout, ack: false, timer: null};
+            const invocation = {
+                id,
+                resolve,
+                reject,
+                responseTimeout,
+                action,
+                ack: false,
+                timer: null
+            };
             this._activeInvocations.set(id, invocation);
 
             if (ackTimeout !== null) {
                 try {
-                    invocation.timer = setTimeout(() => this._onError(id, new Error('Timeout (ack)')), ackTimeout);
+                    invocation.timer = setTimeout(() => this._onError(id, 'Acknowledgement timeout'), ackTimeout);
                 } catch (e) {
-                    this._onError(id, new Error('Failed to set timeout'));
+                    this._onError(id, 'Failed to set timeout');
                     return;
                 }
             }
@@ -79,7 +87,7 @@ class CrossFrameAPIPort extends EventDispatcher {
         this._eventListeners.removeAllEventListeners();
         this._port = null;
         for (const id of this._activeInvocations.keys()) {
-            this._onError(id, new Error('Disconnected'));
+            this._onError(id, 'Disconnected');
         }
         this.trigger('disconnect', this);
     }
@@ -103,12 +111,12 @@ class CrossFrameAPIPort extends EventDispatcher {
     _onAck(id) {
         const invocation = this._activeInvocations.get(id);
         if (typeof invocation === 'undefined') {
-            yomichan.logWarning(new Error(`Request ${id} not found for ack`));
+            yomichan.logWarning(new Error(`Request ${id} not found for acknowledgement`));
             return;
         }
 
         if (invocation.ack) {
-            this._onError(id, new Error(`Request ${id} already ack'd`));
+            this._onError(id, `Request ${id} already acknowledged`);
             return;
         }
 
@@ -122,9 +130,9 @@ class CrossFrameAPIPort extends EventDispatcher {
         const responseTimeout = invocation.responseTimeout;
         if (responseTimeout !== null) {
             try {
-                invocation.timer = setTimeout(() => this._onError(id, new Error('Timeout (response)')), responseTimeout);
+                invocation.timer = setTimeout(() => this._onError(id, 'Response timeout'), responseTimeout);
             } catch (e) {
-                this._onError(id, new Error('Failed to set timeout'));
+                this._onError(id, 'Failed to set timeout');
             }
         }
     }
@@ -137,7 +145,7 @@ class CrossFrameAPIPort extends EventDispatcher {
         }
 
         if (!invocation.ack) {
-            this._onError(id, new Error(`Request ${id} not ack'd`));
+            this._onError(id, `Request ${id} not acknowledged`);
             return;
         }
 
@@ -159,6 +167,10 @@ class CrossFrameAPIPort extends EventDispatcher {
     _onError(id, error) {
         const invocation = this._activeInvocations.get(id);
         if (typeof invocation === 'undefined') { return; }
+
+        if (typeof error === 'string') {
+            error = new Error(`${error} (${invocation.action})`);
+        }
 
         this._activeInvocations.delete(id);
         if (invocation.timer !== null) {
