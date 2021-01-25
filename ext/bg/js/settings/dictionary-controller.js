@@ -154,6 +154,7 @@ class DictionaryEntry {
     _onEnabledChanged(e) {
         const {detail: {value}} = e;
         this._node.dataset.enabled = `${value}`;
+        this._dictionaryController.updateDictionariesEnabled();
     }
 
     _setupDetails(detailsTable) {
@@ -203,6 +204,9 @@ class DictionaryController {
         this._dictionaryEntryContainer = null;
         this._integrityExtraInfoContainer = null;
         this._dictionaryInstallCountNode = null;
+        this._dictionaryEnabledCountNode = null;
+        this._noDictionariesInstalledWarnings = null;
+        this._noDictionariesEnabledWarnings = null;
         this._deleteDictionaryModal = null;
         this._integrityExtraInfoNode = null;
         this._isDeleting = false;
@@ -213,10 +217,13 @@ class DictionaryController {
         this._dictionaryEntryContainer = document.querySelector('#dictionary-list');
         this._integrityExtraInfoContainer = document.querySelector('#dictionary-list-extra');
         this._dictionaryInstallCountNode = document.querySelector('#dictionary-install-count');
+        this._dictionaryEnabledCountNode = document.querySelector('#dictionary-enabled-count');
         this._noDictionariesInstalledWarnings = document.querySelectorAll('.no-dictionaries-installed-warning');
+        this._noDictionariesEnabledWarnings = document.querySelectorAll('.no-dictionaries-enabled-warning');
         this._deleteDictionaryModal = this._modalController.getModal('dictionary-confirm-delete');
 
         yomichan.on('databaseUpdated', this._onDatabaseUpdated.bind(this));
+        this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
 
         document.querySelector('#dictionary-confirm-delete-button').addEventListener('click', this._onDictionaryConfirmDelete.bind(this), false);
         if (this._checkIntegrityButton !== null) {
@@ -238,13 +245,23 @@ class DictionaryController {
         return this._settingsController.instantiateTemplate(name);
     }
 
+    async updateDictionariesEnabled() {
+        const options = await this._settingsController.getOptions();
+        this._updateDictionariesEnabledWarnings(options);
+    }
+
     // Private
+
+    _onOptionsChanged({options}) {
+        this._updateDictionariesEnabledWarnings(options);
+    }
 
     async _onDatabaseUpdated() {
         const token = {};
         this._databaseStateToken = token;
         this._dictionaries = null;
         const dictionaries = await this._settingsController.getDictionaryInfo();
+        const options = await this._settingsController.getOptions();
         if (this._databaseStateToken !== token) { return; }
         this._dictionaries = dictionaries;
 
@@ -264,9 +281,34 @@ class DictionaryController {
             node.hidden = hasDictionary;
         }
 
+        this._updateDictionariesEnabledWarnings(options);
+
         await this._ensureDictionarySettings(dictionaries);
         for (const dictionary of dictionaries) {
             this._createDictionaryEntry(dictionary);
+        }
+    }
+
+    _updateDictionariesEnabledWarnings(options) {
+        let enabledCount = 0;
+        if (this._dictionaries !== null) {
+            for (const {title} of this._dictionaries) {
+                if (Object.prototype.hasOwnProperty.call(options.dictionaries, title)) {
+                    const {enabled} = options.dictionaries[title];
+                    if (enabled) {
+                        ++enabledCount;
+                    }
+                }
+            }
+        }
+
+        const hasEnabledDictionary = (enabledCount > 0);
+        for (const node of this._noDictionariesEnabledWarnings) {
+            node.hidden = hasEnabledDictionary;
+        }
+
+        if (this._dictionaryEnabledCountNode !== null) {
+            this._dictionaryEnabledCountNode.textContent = `${enabledCount}`;
         }
     }
 

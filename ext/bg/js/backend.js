@@ -1248,14 +1248,17 @@ class Backend {
                 color = '#f0ad4e';
                 status = 'Loading';
             }
-        } else if (!this._anyOptionsMatches((options) => options.general.enable)) {
-            text = 'off';
-            color = '#555555';
-            status = 'Disabled';
-        } else if (!this._anyOptionsMatches((options) => this._isAnyDictionaryEnabled(options))) {
-            text = '!';
-            color = '#f0ad4e';
-            status = 'No dictionaries installed';
+        } else {
+            const options = this._getProfileOptions({current: true});
+            if (!options.general.enable) {
+                text = 'off';
+                color = '#555555';
+                status = 'Disabled';
+            } else if (!this._isAnyDictionaryEnabled(options)) {
+                text = '!';
+                color = '#f0ad4e';
+                status = 'No dictionaries installed';
+            }
         }
 
         if (color !== null && typeof chrome.browserAction.setBadgeBackgroundColor === 'function') {
