@@ -84,32 +84,35 @@ primary language is not English, you may consider also importing the English ver
 
 ## Basic Usage ##
 
-1.  Click on the ![](https://foosoft.net/projects/yomichan/img/yomichan-icon.png) icon in the browser toolbar to open the Yomichan actions dialog.
+1.  Click the <img src="ext/mixed/img/yomichan-icon.svg" alt="" width="16" height="16"> _Yomichan_ button in the browser bar to open the quick-actions popup.
 
-    [![](https://foosoft.net/projects/yomichan/img/ui-actions-thumb.png)](https://foosoft.net/projects/yomichan/img/ui-actions.png)
+    <a href="resources/images/browser-action-popup1.png"><img src="resources/images/browser-action-popup1.png" width="103" height="100"></a>
 
-2.  Click on the *spanner/cog* icon in the middle to open the options page.
+    *   The <img src="ext/mixed/img/cog.svg" alt="" width="16" height="16"> _cog_ button will open the settings page.
+    *   The <img src="ext/mixed/img/magnifying-glass.svg" alt="" width="16" height="16"> _magnifying glass_ button will open the search page.
+    *   The <img src="ext/mixed/img/question-mark-circle.svg" alt="" width="16" height="16"> _question mark_ button will open a page with some general information about Yomichan.
+    *   The <img src="ext/mixed/img/profile.svg" alt="" width="16" height="16"> _profile_ button will appear when multiple profiles exist, allowing the current profile to be quickly changed.
 
-3.  Import the dictionaries you wish to use for term and kanji searches. If you do not have any dictionaries installed
-    (or enabled), Yomichan will warn you that it is not ready for use by displaying an orange exclamation mark over its
+2.  Import the dictionaries you wish to use for term and kanji searches. If you do not have any dictionaries installed
+    or enabled, Yomichan will warn you that it is not ready for use by displaying an orange exclamation mark over its
     icon. This exclamation mark will disappear once you have installed and enabled at least one dictionary.
 
-    [![](https://foosoft.net/projects/yomichan/img/ui-import-thumb.png)](https://foosoft.net/projects/yomichan/img/ui-import.png)
+    <a href="resources/images/settings-dictionaries-popup.png"><img src="resources/images/settings-dictionaries-popup-thumb.png" width="128" height="86"></a>
 
-4.  Hold down the <kbd>Shift</kbd> key or the middle mouse button as you move your mouse over text to display a popup
-    window containing term definitions. This window will only be shown if definitions were found and it can be dismissed
-    by clicking anywhere outside of it.
+3.  Webpage text can be scanned by moving the cursor while holding the scanning modifier key, which is <kbd>Shift</kbd>
+    by default. If definitions are found for the text at the cursor position, a popup window containing term definitions
+    will open. This window can be dismissed by clicking anywhere outside of it.
 
-    [![](https://foosoft.net/projects/yomichan/img/ui-terms-thumb.png)](https://foosoft.net/projects/yomichan/img/ui-terms.png)
+    <a href="resources/images/search-popup-terms.png"><img src="resources/images/search-popup-terms-thumb.png" width="128" height="95"></a>
 
-5.  Click on the ![](https://foosoft.net/projects/yomichan/img/btn-play-audio.png) icon to hear the term pronounced by a native speaker. If an audio sample is
+4.  Click on the <img src="ext/mixed/img/play-audio.svg" alt="" width="16" height="16"> _speaker_ button to hear the term pronounced by a native speaker. If an audio sample is
     not available, you will hear a short click instead. You can configure the sources used to retrieve audio samples in
     the options page.
 
-6.  Click on individual kanji in the term definition results to view additional information about those characters,
+5.  Click on individual kanji in the term definition results to view additional information about those characters,
     including stroke order diagrams, readings, meanings, as well as other useful data.
 
-    [![](https://foosoft.net/projects/yomichan/img/ui-kanji-thumb.png)](https://foosoft.net/projects/yomichan/img/ui-kanji.png)
+    <a href="resources/images/search-popup-kanji.png"><img src="resources/images/search-popup-kanji-thumb.png" width="103" height="128"></a>
 
 ## Custom Dictionaries ##
 
