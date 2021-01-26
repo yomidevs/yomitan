@@ -54,6 +54,7 @@ class DisplaySearch extends Display {
         await this.updateOptions();
         yomichan.on('optionsUpdated', this._onOptionsUpdated.bind(this));
 
+        this.on('optionsUpdated', this._onDisplayOptionsUpdated.bind(this));
         this.on('contentUpdating', this._onContentUpdating.bind(this));
         this.on('modeChange', this._onModeChange.bind(this));
 
@@ -76,6 +77,7 @@ class DisplaySearch extends Display {
         this.hotkeyHandler.on('keydownNonHotkey', this._onKeyDown.bind(this));
 
         this._onModeChange();
+        this._onDisplayOptionsUpdated();
 
         this.initializeState();
 
@@ -121,6 +123,11 @@ class DisplaySearch extends Display {
         if (query) {
             this.searchLast();
         }
+    }
+
+    _onDisplayOptionsUpdated({options}) {
+        this._clipboardMonitorEnabled = options.general.enableClipboardMonitor;
+        this._updateClipboardMonitorEnabled();
     }
 
     _onContentUpdating({type, content, source}) {

@@ -670,6 +670,7 @@ class OptionsUtil {
         //  Updated global.useSettingsV2 to be true (opt-out).
         //  Added audio.customSourceType.
         //  Added general.autoSearchClipboardContent.
+        //  Forced general.enableClipboardMonitor to false due to a bug which caused its value to not be read.
         await this._addFieldTemplatesToOptions(options, '/bg/data/anki-field-templates-upgrade-v8.handlebars');
         options.global.useSettingsV2 = true;
         for (const profile of options.profiles) {
@@ -730,6 +731,7 @@ class OptionsUtil {
             };
             profile.options.audio.customSourceType = 'audio';
             profile.options.general.autoSearchClipboardContent = true;
+            profile.options.general.enableClipboardMonitor = false;
         }
         return options;
     }

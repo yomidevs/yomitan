@@ -313,6 +313,8 @@ class Display extends EventDispatcher {
 
         this._updateNestedFrontend(options);
         this._updateDefinitionTextScanner(options);
+
+        this.trigger('optionsUpdated', {options});
     }
 
     clearAutoPlayTimer() {
