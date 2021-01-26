@@ -130,7 +130,7 @@ class DisplaySearch extends Display {
             case 'terms':
             case 'kanji':
                 animate = !!content.animate;
-                valid = content.definitions.length > 0;
+                valid = (typeof source === 'string' && source.length > 0);
                 this.blurElement(this._queryInput);
                 break;
             case 'clear':
@@ -159,12 +159,12 @@ class DisplaySearch extends Display {
         e.preventDefault();
         e.stopImmediatePropagation();
         this.blurElement(e.currentTarget);
-        this._search(true, true);
+        this._search(true, true, true);
     }
 
     _onSearch(e) {
         e.preventDefault();
-        this._search(true, true);
+        this._search(true, true, true);
     }
 
     _onCopy() {
@@ -173,12 +173,12 @@ class DisplaySearch extends Display {
     }
 
     _onExternalSearchUpdate({text, animate=true}) {
-        const {general: {maximumClipboardSearchLength}} = this.getOptions();
+        const {general: {maximumClipboardSearchLength, autoSearchClipboardContent}} = this.getOptions();
         if (text.length > maximumClipboardSearchLength) {
             text = text.substring(0, maximumClipboardSearchLength);
         }
         this._queryInput.value = text;
-        this._search(animate, false);
+        this._search(animate, false, autoSearchClipboardContent);
     }
 
     _onWanakanaEnableChange(e) {
@@ -323,7 +323,7 @@ class DisplaySearch extends Display {
         });
     }
 
-    _search(animate, history) {
+    _search(animate, history, lookup) {
         const query = this._queryInput.value;
         const depth = this.depth;
         const url = window.location.href;
@@ -346,6 +346,7 @@ class DisplaySearch extends Display {
                 animate
             }
         };
+        if (!lookup) { details.params.lookup = 'false'; }
         this.setContent(details);
     }
 

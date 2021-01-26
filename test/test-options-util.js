@@ -296,7 +296,8 @@ function createProfileOptionsUpdatedTestData1() {
             maximumClipboardSearchLength: 1000,
             popupCurrentIndicatorMode: 'triangle',
             popupActionBarVisibility: 'auto',
-            popupActionBarLocation: 'top'
+            popupActionBarLocation: 'top',
+            autoSearchClipboardContent: true
         },
         audio: {
             enabled: true,

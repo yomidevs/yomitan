@@ -993,6 +993,29 @@
         </div></div>
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
             <div class="settings-item-left">
+                <div class="settings-item-label">Clipboard text search mode</div>
+                <div class="settings-item-description">Change how the search page reacts to new text in the clipboard.</div>
+            </div>
+            <div class="settings-item-right">
+                <select data-setting="general.autoSearchClipboardContent"
+                    data-transform='[
+                        {
+                            "step": "pre",
+                            "type": "toBoolean"
+                        },
+                        {
+                            "step": "post",
+                            "type": "toString"
+                        }
+                    ]'
+                >
+                    <option value="true">Search for definitions</option>
+                    <option value="false">Update search query only</option>
+                </select>
+            </div>
+        </div></div>
+        <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
+            <div class="settings-item-left">
                 <div class="settings-item-label">Size</div>
                 <div class="settings-item-description">Control the size of the window, in pixels.</div>
             </div>

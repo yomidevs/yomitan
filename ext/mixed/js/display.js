@@ -558,7 +558,8 @@ class Display extends EventDispatcher {
                         let queryFull = urlSearchParams.get('full');
                         queryFull = (queryFull !== null ? this.postProcessQuery(queryFull) : query);
                         const wildcardsEnabled = (urlSearchParams.get('wildcards') !== 'off');
-                        await this._setContentTermsOrKanji(token, isTerms, query, queryFull, wildcardsEnabled, eventArgs);
+                        const lookup = (urlSearchParams.get('lookup') !== 'false');
+                        await this._setContentTermsOrKanji(token, isTerms, query, queryFull, lookup, wildcardsEnabled, eventArgs);
                     }
                     break;
                 case 'unloaded':
@@ -844,7 +845,7 @@ class Display extends EventDispatcher {
         }
     }
 
-    async _setContentTermsOrKanji(token, isTerms, query, queryFull, wildcardsEnabled, eventArgs) {
+    async _setContentTermsOrKanji(token, isTerms, query, queryFull, lookup, wildcardsEnabled, eventArgs) {
         let {state, content} = this._history;
         let changeHistory = false;
         if (!isObject(content)) {
@@ -874,7 +875,7 @@ class Display extends EventDispatcher {
 
         let {definitions} = content;
         if (!Array.isArray(definitions)) {
-            definitions = await this._findDefinitions(isTerms, query, wildcardsEnabled, optionsContext);
+            definitions = lookup ? await this._findDefinitions(isTerms, query, wildcardsEnabled, optionsContext) : [];
             if (this._setContentToken !== token) { return; }
             content.definitions = definitions;
             changeHistory = true;
@@ -899,7 +900,7 @@ class Display extends EventDispatcher {
         this._definitions = definitions;
 
         this._updateNavigation(this._history.hasPrevious(), this._history.hasNext());
-        this._setNoContentVisible(definitions.length === 0);
+        this._setNoContentVisible(definitions.length === 0 && lookup);
 
         const container = this._container;
         container.textContent = '';

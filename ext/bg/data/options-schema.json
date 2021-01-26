@@ -115,7 +115,8 @@
                                     "maximumClipboardSearchLength",
                                     "popupCurrentIndicatorMode",
                                     "popupActionBarVisibility",
-                                    "popupActionBarLocation"
+                                    "popupActionBarLocation",
+                                    "autoSearchClipboardContent"
                                 ],
                                 "properties": {
                                     "enable": {
@@ -286,6 +287,10 @@
                                         "type": "string",
                                         "enum": ["left", "right", "top", "bottom"],
                                         "default": "top"
+                                    },
+                                    "autoSearchClipboardContent": {
+                                        "type": "boolean",
+                                        "default": true
                                     }
                                 }
                             },
