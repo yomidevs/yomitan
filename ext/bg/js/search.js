@@ -149,13 +149,15 @@ class DisplaySearch extends Display {
 
         if (typeof source !== 'string') { source = ''; }
 
-        this._queryInput.value = source;
-        this._updateSearchHeight();
+        if (this._queryInput.value !== source) {
+            this._queryInput.value = source;
+            this._updateSearchHeight(true);
+        }
         this._setIntroVisible(!valid, animate);
     }
 
     _onSearchInput() {
-        this._updateSearchHeight();
+        this._updateSearchHeight(false);
     }
 
     _onSearchKeydown(e) {
@@ -185,6 +187,7 @@ class DisplaySearch extends Display {
             text = text.substring(0, maximumClipboardSearchLength);
         }
         this._queryInput.value = text;
+        this._updateSearchHeight(true);
         this._search(animate, false, autoSearchClipboardContent);
     }
 
@@ -357,11 +360,14 @@ class DisplaySearch extends Display {
         this.setContent(details);
     }
 
-    _updateSearchHeight() {
+    _updateSearchHeight(shrink) {
         const node = this._queryInput;
+        if (shrink) {
+            node.style.height = '0';
+        }
         const {scrollHeight} = node;
         const currentHeight = node.getBoundingClientRect().height;
-        if (scrollHeight >= currentHeight - 1) {
+        if (shrink || scrollHeight >= currentHeight - 1) {
             node.style.height = `${scrollHeight}px`;
         }
     }
