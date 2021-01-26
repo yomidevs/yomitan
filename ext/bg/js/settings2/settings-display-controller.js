@@ -54,6 +54,10 @@ class SettingsDisplayController {
             node.addEventListener('keydown', onInputTabActionKeyDown, false);
         }
 
+        for (const node of document.querySelectorAll('.defer-load-iframe')) {
+            this._setupDeferLoadIframe(node);
+        }
+
         this._onMoreToggleClickBind = this._onMoreToggleClick.bind(this);
         const moreSelectorObserver = new SelectorObserver({
             selector: '.more-toggle',
@@ -304,5 +308,34 @@ class SettingsDisplayController {
             default:
                 return false;
         }
+    }
+
+    _setupDeferLoadIframe(element) {
+        const parent = this._getMoreContainer(element);
+        if (parent === null) { return; }
+
+        let mutationObserver = null;
+        const callback = () => {
+            if (!this._isElementVisible(element)) { return false; }
+
+            const src = element.dataset.src;
+            delete element.dataset.src;
+            element.src = src;
+
+            if (mutationObserver === null) { return true; }
+
+            mutationObserver.disconnect();
+            mutationObserver = null;
+            return true;
+        };
+
+        if (callback()) { return; }
+
+        mutationObserver = new MutationObserver(callback);
+        mutationObserver.observe(parent, {attributes: true});
+    }
+
+    _isElementVisible(element) {
+        return (element.offsetParent !== null);
     }
 }
