@@ -233,9 +233,9 @@ class Backend {
     // Event handlers
 
     async _onClipboardTextChange({text}) {
-        const {general: {maximumClipboardSearchLength}} = this._getProfileOptions({current: true});
-        if (text.length > maximumClipboardSearchLength) {
-            text = text.substring(0, maximumClipboardSearchLength);
+        const {clipboard: {maximumSearchLength}} = this._getProfileOptions({current: true});
+        if (text.length > maximumSearchLength) {
+            text = text.substring(0, maximumSearchLength);
         }
         try {
             const {tab, created} = await this._getOrCreateSearchPopup();
@@ -912,7 +912,7 @@ class Backend {
             this._mecab.stopListener();
         }
 
-        if (options.general.enableClipboardPopups) {
+        if (options.clipboard.enableBackgroundMonitor) {
             this._clipboardMonitor.start();
         } else {
             this._clipboardMonitor.stop();

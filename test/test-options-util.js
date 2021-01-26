@@ -259,7 +259,6 @@ function createProfileOptionsUpdatedTestData1() {
     return {
         general: {
             enable: true,
-            enableClipboardPopups: false,
             resultOutputMode: 'group',
             debugInfo: false,
             maxResults: 32,
@@ -285,7 +284,6 @@ function createProfileOptionsUpdatedTestData1() {
             customPopupCss: '',
             customPopupOuterCss: '',
             enableWanakana: true,
-            enableClipboardMonitor: false,
             showPitchAccentDownstepNotation: true,
             showPitchAccentPositionNotation: true,
             showPitchAccentGraph: false,
@@ -293,11 +291,9 @@ function createProfileOptionsUpdatedTestData1() {
             useSecurePopupFrameUrl: true,
             usePopupShadowDom: true,
             usePopupWindow: false,
-            maximumClipboardSearchLength: 1000,
             popupCurrentIndicatorMode: 'triangle',
             popupActionBarVisibility: 'auto',
-            popupActionBarLocation: 'top',
-            autoSearchClipboardContent: true
+            popupActionBarLocation: 'top'
         },
         audio: {
             enabled: true,
@@ -469,6 +465,12 @@ function createProfileOptionsUpdatedTestData1() {
             useTop: false,
             windowType: 'popup',
             windowState: 'normal'
+        },
+        clipboard: {
+            enableBackgroundMonitor: false,
+            enableSearchPageMonitor: false,
+            autoSearchContent: true,
+            maximumSearchLength: 1000
         }
     };
 }

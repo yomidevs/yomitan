@@ -126,7 +126,7 @@ class DisplaySearch extends Display {
     }
 
     _onDisplayOptionsUpdated({options}) {
-        this._clipboardMonitorEnabled = options.general.enableClipboardMonitor;
+        this._clipboardMonitorEnabled = options.clipboard.enableSearchPageMonitor;
         this._updateClipboardMonitorEnabled();
     }
 
@@ -182,13 +182,13 @@ class DisplaySearch extends Display {
     }
 
     _onExternalSearchUpdate({text, animate=true}) {
-        const {general: {maximumClipboardSearchLength, autoSearchClipboardContent}} = this.getOptions();
-        if (text.length > maximumClipboardSearchLength) {
-            text = text.substring(0, maximumClipboardSearchLength);
+        const {clipboard: {autoSearchContent, maximumSearchLength}} = this.getOptions();
+        if (text.length > maximumSearchLength) {
+            text = text.substring(0, maximumSearchLength);
         }
         this._queryInput.value = text;
         this._updateSearchHeight(true);
-        this._search(animate, false, autoSearchClipboardContent);
+        this._search(animate, false, autoSearchContent);
     }
 
     _onWanakanaEnableChange(e) {
@@ -303,7 +303,7 @@ class DisplaySearch extends Display {
 
         await api.modifySettings([{
             action: 'set',
-            path: 'general.enableClipboardMonitor',
+            path: 'clipboard.enableSearchPageMonitor',
             value,
             scope: 'profile',
             optionsContext: this.getOptionsContext()

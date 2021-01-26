@@ -71,14 +71,14 @@
                             "parsing",
                             "anki",
                             "sentenceParsing",
-                            "inputs"
+                            "inputs",
+                            "clipboard"
                         ],
                         "properties": {
                             "general": {
                                 "type": "object",
                                 "required": [
                                     "enable",
-                                    "enableClipboardPopups",
                                     "resultOutputMode",
                                     "debugInfo",
                                     "maxResults",
@@ -104,7 +104,6 @@
                                     "customPopupCss",
                                     "customPopupOuterCss",
                                     "enableWanakana",
-                                    "enableClipboardMonitor",
                                     "showPitchAccentDownstepNotation",
                                     "showPitchAccentPositionNotation",
                                     "showPitchAccentGraph",
@@ -112,20 +111,14 @@
                                     "useSecurePopupFrameUrl",
                                     "usePopupShadowDom",
                                     "usePopupWindow",
-                                    "maximumClipboardSearchLength",
                                     "popupCurrentIndicatorMode",
                                     "popupActionBarVisibility",
-                                    "popupActionBarLocation",
-                                    "autoSearchClipboardContent"
+                                    "popupActionBarLocation"
                                 ],
                                 "properties": {
                                     "enable": {
                                         "type": "boolean",
                                         "default": true
-                                    },
-                                    "enableClipboardPopups": {
-                                        "type": "boolean",
-                                        "default": false
                                     },
                                     "resultOutputMode": {
                                         "type": "string",
@@ -236,10 +229,6 @@
                                         "type": "boolean",
                                         "default": true
                                     },
-                                    "enableClipboardMonitor": {
-                                        "type": "boolean",
-                                        "default": false
-                                    },
                                     "showPitchAccentDownstepNotation": {
                                         "type": "boolean",
                                         "default": true
@@ -268,11 +257,6 @@
                                         "type": "boolean",
                                         "default": false
                                     },
-                                    "maximumClipboardSearchLength": {
-                                        "type": "integer",
-                                        "default": 1000,
-                                        "minimum": 0
-                                    },
                                     "popupCurrentIndicatorMode": {
                                         "type": "string",
                                         "enum": ["none", "asterisk", "triangle", "bar-left", "bar-right", "dot-left", "dot-right"],
@@ -287,10 +271,6 @@
                                         "type": "string",
                                         "enum": ["left", "right", "top", "bottom"],
                                         "default": "top"
-                                    },
-                                    "autoSearchClipboardContent": {
-                                        "type": "boolean",
-                                        "default": true
                                     }
                                 }
                             },
@@ -1051,6 +1031,34 @@
                                             {"action": "viewNote",          "key": "KeyV",      "modifiers": ["alt"],  "scopes": ["popup", "search"], "enabled": true},
                                             {"action": "copyHostSelection", "key": "KeyC",      "modifiers": ["ctrl"], "scopes": ["popup"], "enabled": true}
                                         ]
+                                    }
+                                }
+                            },
+                            "clipboard": {
+                                "type": "object",
+                                "required": [
+                                    "enableBackgroundMonitor",
+                                    "enableSearchPageMonitor",
+                                    "autoSearchContent",
+                                    "maximumSearchLength"
+                                ],
+                                "properties": {
+                                    "enableBackgroundMonitor": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "enableSearchPageMonitor": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "autoSearchContent": {
+                                        "type": "boolean",
+                                        "default": true
+                                    },
+                                    "maximumSearchLength": {
+                                        "type": "integer",
+                                        "default": 1000,
+                                        "minimum": 0
                                     }
                                 }
                             }

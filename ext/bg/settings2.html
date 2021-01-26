@@ -960,7 +960,7 @@
                     </div>
                 </div>
                 <div class="settings-item-right">
-                    <label class="toggle"><input type="checkbox" id="enable-clipboard-popups"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
+                    <label class="toggle"><input type="checkbox" id="clipboard-enable-background-monitor"><span class="toggle-body"><span class="toggle-track"></span><span class="toggle-knob"></span></span></label>
                 </div>
             </div>
             <div class="settings-item-children more" hidden>
@@ -988,7 +988,7 @@
                 <div class="settings-item-description">Limit the number of text characters used when searching clipboard content.</div>
             </div>
             <div class="settings-item-right">
-                <input type="number" min="0" step="1" data-setting="general.maximumClipboardSearchLength">
+                <input type="number" min="0" step="1" data-setting="clipboard.maximumSearchLength">
             </div>
         </div></div>
         <div class="settings-item"><div class="settings-item-inner settings-item-inner-wrappable">
@@ -997,7 +997,7 @@
                 <div class="settings-item-description">Change how the search page reacts to new text in the clipboard.</div>
             </div>
             <div class="settings-item-right">
-                <select data-setting="general.autoSearchClipboardContent"
+                <select data-setting="clipboard.autoSearchContent"
                     data-transform='[
                         {
                             "step": "pre",

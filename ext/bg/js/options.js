@@ -669,8 +669,10 @@ class OptionsUtil {
         //  Updated handlebars templates to include "stroke-count" definition.
         //  Updated global.useSettingsV2 to be true (opt-out).
         //  Added audio.customSourceType.
-        //  Added general.autoSearchClipboardContent.
-        //  Forced general.enableClipboardMonitor to false due to a bug which caused its value to not be read.
+        //  Moved general.enableClipboardPopups => clipboard.enableBackgroundMonitor.
+        //  Moved general.enableClipboardMonitor => clipboard.enableSearchPageMonitor. Forced value to false due to a bug which caused its value to not be read.
+        //  Moved general.maximumClipboardSearchLength => clipboard.maximumSearchLength.
+        //  Added clipboard.autoSearchContent.
         await this._addFieldTemplatesToOptions(options, '/bg/data/anki-field-templates-upgrade-v8.handlebars');
         options.global.useSettingsV2 = true;
         for (const profile of options.profiles) {
@@ -730,8 +732,15 @@ class OptionsUtil {
                 windowState: 'normal'
             };
             profile.options.audio.customSourceType = 'audio';
-            profile.options.general.autoSearchClipboardContent = true;
-            profile.options.general.enableClipboardMonitor = false;
+            profile.options.clipboard = {
+                enableBackgroundMonitor: profile.options.general.enableClipboardPopups,
+                enableSearchPageMonitor: false,
+                autoSearchContent: true,
+                maximumSearchLength: profile.options.general.maximumClipboardSearchLength
+            };
+            delete profile.options.general.enableClipboardPopups;
+            delete profile.options.general.enableClipboardMonitor;
+            delete profile.options.general.maximumClipboardSearchLength;
         }
         return options;
     }

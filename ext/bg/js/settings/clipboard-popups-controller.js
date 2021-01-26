@@ -18,11 +18,11 @@
 class ClipboardPopupsController {
     constructor(settingsController) {
         this._settingsController = settingsController;
-        this._checkbox = document.querySelector('#enable-clipboard-popups');
+        this._checkbox = document.querySelector('#clipboard-enable-background-monitor');
     }
 
     async prepare() {
-        this._checkbox.addEventListener('change', this._onEnableClipboardPopupsChanged.bind(this), false);
+        this._checkbox.addEventListener('change', this._onEnableBackgroundMonitorChanged.bind(this), false);
         this._settingsController.on('optionsChanged', this._onOptionsChanged.bind(this));
 
         const options = await this._settingsController.getOptions();
@@ -32,10 +32,10 @@ class ClipboardPopupsController {
     // Private
 
     _onOptionsChanged({options}) {
-        this._checkbox.checked = options.general.enableClipboardPopups;
+        this._checkbox.checked = options.clipboard.enableBackgroundMonitor;
     }
 
-    async _onEnableClipboardPopupsChanged(e) {
+    async _onEnableBackgroundMonitorChanged(e) {
         const checkbox = e.currentTarget;
         let value = checkbox.checked;
 
@@ -46,6 +46,6 @@ class ClipboardPopupsController {
             checkbox.checked = value;
         }
 
-        await this._settingsController.setProfileSetting('general.enableClipboardPopups', value);
+        await this._settingsController.setProfileSetting('clipboard.enableBackgroundMonitor', value);
     }
 }
