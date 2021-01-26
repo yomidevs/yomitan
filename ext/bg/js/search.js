@@ -77,7 +77,7 @@ class DisplaySearch extends Display {
         this.hotkeyHandler.on('keydownNonHotkey', this._onKeyDown.bind(this));
 
         this._onModeChange();
-        this._onDisplayOptionsUpdated();
+        this._onDisplayOptionsUpdated({options: this.getOptions()});
 
         this.initializeState();
 
