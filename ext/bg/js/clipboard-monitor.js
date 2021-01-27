@@ -32,6 +32,7 @@ class ClipboardMonitor extends EventDispatcher {
         // The token below is used as a unique identifier to ensure that a new clipboard monitor
         // hasn't been started during the await call. The check below the await call
         // will exit early if the reference has changed.
+        let canChange = false;
         const token = {};
         const intervalCallback = async () => {
             this._timerId = null;
@@ -50,11 +51,12 @@ class ClipboardMonitor extends EventDispatcher {
                 text !== this._previousText
             ) {
                 this._previousText = text;
-                if (this._japaneseUtil.isStringPartiallyJapanese(text)) {
+                if (canChange && this._japaneseUtil.isStringPartiallyJapanese(text)) {
                     this.trigger('change', {text});
                 }
             }
 
+            canChange = true;
             this._timerId = setTimeout(intervalCallback, this._interval);
         };
 
@@ -65,6 +67,7 @@ class ClipboardMonitor extends EventDispatcher {
 
     stop() {
         this._timerToken = null;
+        this._previousText = null;
         if (this._timerId !== null) {
             clearTimeout(this._timerId);
             this._timerId = null;
